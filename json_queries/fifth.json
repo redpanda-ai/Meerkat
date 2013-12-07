@@ -1,0 +1,36 @@
+{
+	"from" : 5,
+	"size" : 5,
+	"fields" : [ 
+		"BUSINESSSTANDARDNAME",
+		"HOUSE",
+		"STREET",
+		"STRTYPE",
+		"CITYNAME",
+		"STATE",
+		"ZIP",
+		"pin.location" ],
+	"query": {
+		"filtered": {
+			"filter": {
+				"geo_distance": {
+					"distance": "1km", 
+					"pin.location": {
+						"lat": 37.78, 
+						"lon": -122.42
+					}
+				}
+			}, 
+			"query": {
+				"match_all": { }
+			}
+		}
+	},
+	"sort" : [
+		{ "BUSINESSSTANDARDNAME" : 
+			{
+				"order" : "asc"
+			}
+		}
+	]
+}
