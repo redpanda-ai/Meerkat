@@ -56,24 +56,27 @@ complex_expected_fields = [ "lat", "lon"]
 def finish():
 	numeric = re.compile("^[0-9/#]+$")
 
-	junk_terms = []	
-	filtered_terms = []
-	numeric_terms = []
-	for term in search_terms:
-		#print term
-		if term in stop_words:
-			junk_terms.append(term)
-		elif not numeric.search(term):
-			filtered_terms.append(string_cleanse(term))
+	search_tokens = []
+	stop_tokens = []	
+	filtered_tokens = []
+	numeric_tokens = []
+	for token in tokens:
+		if token in search_terms:
+			search_tokens.append(token)
+		if token in stop_words:
+			stop_tokens.append(token)
+		elif numeric.search(token): 
+			numeric_tokens.append(token)
 		else:
-			numeric_terms.append(term)
+			filtered_tokens.append(string_cleanse(token))
 
-	print "Search terms:" + str(search_terms)
-	print "Junk terms:" + str(junk_terms)
-	print "Numeric terms:" + str(numeric_terms)
-	print "Filtered terms:" + str(filtered_terms)
+	print "Tokens are:                 " + str(tokens)
+	print "Tokens found in ES:         " + str(search_terms)
+	print "Tokens that are stop words: " + str(stop_tokens)
+	print "Tokens that are numeric:    " + str(numeric_tokens)
+	print "Tokens that are filtered:   " + str(filtered_tokens)
 		
-	show_terms = " ".join(filtered_terms)	
+	show_terms = " ".join(filtered_tokens)
 	print "Sending the following terms to elasticsearch:\n\t" + str(show_terms)
 	output = show_merchants(show_terms)
 	hits = output['hits']['hits']
@@ -95,10 +98,12 @@ def finish():
 		,f["HOUSE"], f["STREET"], f["STRTYPE"],f["CITYNAME"],f["STATE"],f["ZIP"]\
 		,f["pin.location"]["lat"], f["pin.location"]["lon"])
 
-def start(longest_substrings, terms, input):
+def start(longest_substrings, terms, input, recursive):
 	if len(input) >= 2:
 		new_terms = input.split()
 		for term in new_terms:
+			if not recursive:
+				tokens.append(term)
 			substrings = {}
 			powerset(term,substrings)
 			local_longest_substring = search_substrings(substrings)
@@ -114,18 +119,37 @@ def start(longest_substrings, terms, input):
 		return	
 	longest_substring = longest_substrings[sorted(longest_substrings.iterkeys())[-1]].keys()[0]
 	l = len(longest_substring)
-
+	
 	search_terms.append(longest_substring)
 
 	original_term = longest_substrings[len(longest_substring)][longest_substring]
+	b = original_term.find(longest_substring)
+	c = b + len(longest_substring)
+	pre = original_term[:b]
+	post = original_term[c:]	
+	remainder = original_term[:b] + " " + original_term[c:]
+	#print "Longest Substring: " + longest_substring
+	#print "Original Term: " + original_term
+	#print "Remainder: " + remainder	
 
 	del longest_substrings[l][longest_substring]
 	if len(longest_substrings[l]) == 0:
 		del longest_substrings[l]
 	
-	new_input = original_term.replace(longest_substring,"",1)	
-	start(longest_substrings, terms, new_input)
-
+	new_input = remainder
+	temp = []
+	for i in range(len(tokens)):
+		if tokens[i] != original_term:	
+			temp.append(tokens[i])
+		else:
+			if pre != "":
+				temp.append(pre)
+			temp.append(longest_substring)
+			if post != "":
+				temp.append(post)
+	global tokens
+	tokens = temp
+	start(longest_substrings, terms, new_input, True)
 def powerset(term,substrings):
 	l = len(term)
 	if l not in substrings:
@@ -163,7 +187,7 @@ def search_substrings(substrings):
 			if len(term) > 1:
 				hit_count = count_merchants(term)
 			if hit_count > 0:
-				print "Found: " + term + " " + str(hit_count) + " times."
+				#print "Found: " + term + " " + str(hit_count) + " times."
 				#print hit_count
 				return term
 
@@ -181,7 +205,8 @@ def string_cleanse(s):
 
 input = initialize()
 
-longest_substrings, terms = {}, []
+longest_substrings, terms, tokens = {}, [], []
 print "Input: " + input
-start(longest_substrings, terms, input)
+recursive = False
+start(longest_substrings, terms, input, recursive)
 finish()
