@@ -15,6 +15,8 @@ class InvalidArguments(Exception):
 #class FileProblem(Exception):
 #	pass
 
+#Matt is a tool.
+ 
 bad_characters = [ "\[", "\]", "'", "\{", "\}", '"', "/"]
 x = "|".join(bad_characters)
 cleanse_pattern = re.compile(x)
@@ -32,7 +34,7 @@ count_query = """
 show_query = """
 {
 	"from" : 0,
-	"size" : 5,
+	"size" : 10,
 	"fields" : [ 
 		"BUSINESSSTANDARDNAME",
 		"HOUSE",
@@ -77,7 +79,7 @@ def finish():
 	print "Tokens that are filtered:   " + str(filtered_tokens)
 		
 	show_terms = " ".join(filtered_tokens)
-	print "Sending the following terms to elasticsearch:\n\t" + str(show_terms)
+	print "Sending the following terms to elasticsearch, you should also try Google:\n\t" + str(show_terms)
 	output = show_merchants(show_terms)
 	hits = output['hits']['hits']
 	for item in hits: 
@@ -99,6 +101,7 @@ def finish():
 		,f["pin.location"]["lat"], f["pin.location"]["lon"])
 
 def start(longest_substrings, terms, input, recursive):
+	global tokens
 	if len(input) >= 2:
 		new_terms = input.split()
 		for term in new_terms:
@@ -147,7 +150,6 @@ def start(longest_substrings, terms, input, recursive):
 			temp.append(longest_substring)
 			if post != "":
 				temp.append(post)
-	global tokens
 	tokens = temp
 	start(longest_substrings, terms, new_input, True)
 def powerset(term,substrings):
