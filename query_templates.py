@@ -1,21 +1,27 @@
 #!/usr/bin/python
 
-#This template is used to count the number of hits in a "query_string" query
-count_query = """
-{
-	"size" : 0,
-	"query" : {
-		"query_string" : {
-			"query" : "__term"
-		}
-	}
-}"""
+def unpack_json_id(json_id,stuff):
+	json_split = json_id.split(".")
+	key = json_split[0]
+	if len(json_split) == 1:
+		return '{ "' + key + '" : { ' + unpack_attributes(stuff)[:-1] + " } } "
+	value = ".".join(json_split[1:])
+	return '{ "' + key + '" : ' + unpack_json_id(value,stuff) + " }"
 
-#This template is used to return select fields from the highest scoring hits from a "query string" query
-show_query = """
+def unpack_tuple_as_keyval(attribute):
+	name, value = attribute[0:2]
+	return '"' + name + '" : ' + str(value) + ","
+
+def unpack_attributes(list_of_attributes):
+	strings = []
+	for attribute in list_of_attributes:
+		name, value = attribute[0:2]
+		strings.append('"' + name + '" : ' + str(value) + ",")
+	return "\t" + "\n\t".join(strings)
+
+standard_query = """
 {
-	"from" : 0,
-	"size" : 10,
+__attributes
 	"fields" : [ 
 		"BUSINESSSTANDARDNAME",
 		"HOUSE",
@@ -25,11 +31,6 @@ show_query = """
 		"STATE",
 		"ZIP",
 		"pin.location" ],
-	"query" : {
-		"query_string" : {
-			"query" : "__term"
-		}
-	}
+	__query
 }"""
-
 

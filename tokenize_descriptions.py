@@ -2,7 +2,7 @@
 
 import json, os, sys, re, urllib, urllib2
 from subprocess import Popen, PIPE
-from query_templates import count_query, show_query
+from query_templates import unpack_attributes, unpack_json_id, standard_query
 
 class InvalidArguments(Exception):
 	pass
@@ -16,7 +16,6 @@ stop_words = ["CHECK", "CARD", "CHECKCARD", "PAYPOINT", "PURCHASE", "LLC" ]
 expected_fields = [ "BUSINESSSTANDARDNAME", "HOUSE", "STREET", "STRTYPE", \
 "CITYNAME", "STATE", "ZIP" ]
 complex_expected_fields = [ "lat", "lon"]
-
 
 #This function displays our output
 def display_results():
@@ -42,16 +41,14 @@ def display_results():
 	print "\t" + str(len(stop_tokens)) +    " stop words:      " + str(stop_tokens)
 	print "\t" + str(len(numeric_tokens)) + " numeric words:   " + str(numeric_tokens)
 	print "\t" + str(len(filtered_tokens)) + " worth searching: " + str(filtered_tokens)
-	#print "\tworth searching: " + str(filtered_tokens)
 	#show all search terms seperated by spaces		
 	show_terms = " ".join(filtered_tokens)
 	ngrams = get_ngrams(filtered_tokens)
 	display_ngrams(ngrams)
-"""
+	#TODO: search the ngrams with a "match" query using "bool" to combine them with the "term query"
 	print "Elasticsearching the following"
 	print "You can also try Google:\n\t" + str(show_terms)
 	get_elasticsearch_results(show_terms)
-"""
 
 def get_ngrams(list_of_tokens):
 	ngrams = {}
@@ -67,8 +64,16 @@ def get_ngrams(list_of_tokens):
 	return ngrams
 
 def display_ngrams(ngrams):
+	query_key = "query.match._all"
+	query_values = [ ("query",'"__term"'), ("type",'"phrase"') ]
+
+	print "Matched the following n-grams to our merchants index:"
 	for key in reversed(sorted(ngrams.iterkeys())):
-		print str(key) + "-grams:\n\t" + str(ngrams[key])
+		for term in ngrams[key]:
+			attributes = [ ("size",0) ]
+			hit_count = search_index(term,standard_query,attributes,query_key,query_values)['hits']['total']
+			if hit_count > 0:
+				print str(key) + "-gram : " + term + " (" + str(hit_count) + ")"
 	
 #Extracts the longest substring from our input, returning left over fragments
 def extract_longest_substring(longest_substring):
@@ -91,9 +96,13 @@ def extract_longest_substring(longest_substring):
 	return original_term, pre, post
 
 #Searches the merchants index and the merchant mapping
-def get_merchants(term,action):
+def search_index(term,action,attributes,query_key,query_values):
 	url = "http://brainstorm8:9200/merchants/merchant/_search"
-	input = show_query.replace("__term",urllib.quote_plus(term))
+
+	input = action.replace("__attributes",(unpack_attributes(attributes)))
+	input = input.replace("__query", unpack_json_id(query_key, query_values)[1:-1])
+	input = input.replace("__term",urllib.quote_plus(term))
+
 	request = urllib2.Request(url, input)
 	response = urllib2.urlopen(request)
 	output = json.loads(response.read())
@@ -101,7 +110,10 @@ def get_merchants(term,action):
 
 #Runs an ElasticSearch query to find the results
 def get_elasticsearch_results(elasticsearch_tokens):
-	output = get_merchants(elasticsearch_tokens,show_query)
+	query_key = "query.query_string"
+	query_values = [ ("query",'"__term"') ]
+	attributes = [ ("from",0), ("size",10) ]
+	output = search_index(elasticsearch_tokens,standard_query,attributes,query_key,query_values)
 	hits = output['hits']['hits']
 	for item in hits: 
 		f = item['fields']
@@ -146,11 +158,14 @@ def powerset(term,substrings):
 #Looks for the longest substring in our merchants index that 
 #can actually be found.
 def search_substrings(substrings):
+	query_key = "query.query_string"
+	query_values = [ ("query",'"__term"') ]
+	attributes = [ ("size",0) ]
 	for key in reversed(sorted(substrings.iterkeys())):
 		for term in substrings[key]:
 			hit_count = 0
 			if len(term) > 1:
-				hit_count = get_merchants(term,count_query)['hits']['total']
+				hit_count = search_index(term,standard_query,attributes,query_key,query_values)['hits']['total']
 			if hit_count > 0:
 				return term
 
