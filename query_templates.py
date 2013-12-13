@@ -19,7 +19,7 @@ def unpack_attributes(list_of_attributes):
 		strings.append('"' + name + '" : ' + str(value) + ",")
 	return "\t" + "\n\t".join(strings)
 
-standard_query = """
+STANDARD_QUERY = """
 {
 __attributes
 	"fields" : [ 
@@ -31,6 +31,36 @@ __attributes
 		"STATE",
 		"ZIP",
 		"pin.location" ],
-	__query
-}"""
+	"query": {
+		"bool" : {
+			"should": [
+				__query
+			],
+			"minimum_number_should_match" : 1,
+			"boost" : 1.0
+		}
+	}
+}
+"""
 
+BOOL_QUERY = """
+{
+__attributes
+	"fields" : [ 
+		"BUSINESSSTANDARDNAME",
+		"HOUSE",
+		"STREET",
+		"STRTYPE",
+		"CITYNAME",
+		"STATE",
+		"ZIP",
+		"pin.location" ],
+	"query": {
+		"bool" : {
+			__should,
+			"minimum_number_should_match" : 1,
+			"boost" : 1.0
+		}
+	}
+}
+"""
