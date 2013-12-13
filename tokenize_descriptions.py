@@ -48,20 +48,20 @@ def display_results():
 	show_terms = " ".join(filtered_tokens)
 	n_gram_tokens = get_n_gram_tokens(filtered_tokens)
 	matched_n_gram_tokens = search_n_gram_tokens(n_gram_tokens)
+
 	#FIXME: search the matched_n_gram_tokens with a "match" query using "bool" to combine them with the "term query"
-	#It's currently not returning very relevant results
+	#It's currently not returning very relevant results, so it is commented out
 	#build_boolean_search(matched_n_gram_tokens,show_terms)
 	
 	print "Elasticsearching the following"
 	print "You can also try Google:\n\t" + str(show_terms)
 	get_elasticsearch_results(show_terms)
 
-"""
 def build_boolean_search(matched_n_gram_tokens,query_string):
 	query_parts = []
 	print "Building boolean search"
 	print "Should match terms"
-	query_key, query_values = "match._all", [("query",'"__term"'), ("type",'"phrase"') ]
+	query_key, query_values = "match._all", [("query",'"__term"'), ("type",'"phrase"'),("boost",0.01)]
 	x = unpack_json_id(query_key, query_values)
 	print "x is " 
 	for term in matched_n_gram_tokens:
@@ -74,10 +74,11 @@ def build_boolean_search(matched_n_gram_tokens,query_string):
 	term = ",".join(query_parts)
 
 	should = '"should" : [ ' + term + ']'
-	attributes = [ ("from",0), ("size",10) ]
+	attributes = [ ("from",0), ("size",10)]
 	query_values = [ ]
 	input = build_bool_input(should,BOOL_QUERY,attributes,query_key,query_values)
 	input_json = json.loads(input)
+	#print input_json
 	output = search_index_with_input(input)
 	hits = output['hits']['hits']
 	print "BEGIN Composite"
@@ -88,7 +89,6 @@ def build_bool_input(should,action,attributes,query_key,query_values):
 	input = action.replace("__attributes",(unpack_attributes(attributes)))
 	input = input.replace("__should",should)
 	return input
-"""
 
 def get_n_gram_tokens(list_of_tokens):
 	n_gram_tokens = {}
