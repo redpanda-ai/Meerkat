@@ -1,0 +1,359 @@
+Input: TGI FRIDAY'S CUPERTINO CUPERTINO CA
+Unigrams are:
+	['TGI', 'FRIDAYS', 'CUPERTINO', 'CUPERTINO', 'CA']
+Unigrams matched to ElasticSearch:
+	['CUPERTINO', 'FRIDAYS', 'TGI', 'CA']
+Of these:
+	0 stop words:      []
+	0 numeric words:   []
+	5 worth searching: ['TGI', 'FRIDAYS', 'CUPERTINO', 'CUPERTINO', 'CA']
+Matched the following n-grams to our merchants index:
+3-gram : CUPERTINO CUPERTINO CA (954)
+2-gram : CUPERTINO CA (1742)
+2-gram : CUPERTINO CUPERTINO (955)
+Search Attempt using n-grams = 1
+You can also try Google:
+	TGI FRIDAYS CUPERTINO CUPERTINO CA
+T.G.I. Fridays 10343 Wolfe Rd Cupertino, CA 95014 (37.328091, -122.01487)
+Super Tgi Inc 1102 Saratoga Ave San Jose, CA 95129 (37.305082, -121.978512)
+Cupertino Chiropractic & Professional Center 10601 De Anza Blvd Cupertino, CA
+95014 (37.314157, -122.032516)
+Sage at Cupertino 175 Calvert Dr Cupertino, CA 95014 (37.321087, -122.001518)
+Cupertino Waterfall 10272 Danube Dr Cupertino, CA 95014 (37.319691,
+-122.027618)
+Cupertino Electric 10413 Torre Ave Cupertino, CA 95014 (37.316757,
+-122.029686)
+Cupertino Sanitary Dist 20833 Stevens Creek Blvd Cupertino, CA 95014
+(37.322937, -122.036898)
+Strike Cupertino Vfp LLC 10123 Wolfe Rd Cupertino, CA 95014 (37.324989,
+-122.013008)
+City of Cupertino Recreation-City of Cupertino 21251 Stevens Creek Blvd
+Cupertino, CA 95014 (37.322917, -122.050272)
+The Commons of Cupertino Hoa 21116 Freedom Dr Cupertino, CA 95014 (37.324644,
+-122.043164)
+
+
+
+Input: CHECKCARD 1009 TATAMI BUFFET CUPERTINO CA 24431063283207602800381
+Unigrams are:
+	['CHECKCARD', '1009', 'TATAMI', 'BUFFET', 'CUPERTINO', 'CA', '24',
+'43106', '32832', '07', '602800', '381']
+Unigrams matched to ElasticSearch:
+	['CUPERTINO', 'TATAMI', '602800', 'BUFFET', '32832', '43106', '1009',
+'381', '24', 'CA', '07']
+Of these:
+	1 stop words:      ['CHECKCARD']
+	7 numeric words:   ['1009', '24', '43106', '32832', '07', '602800',
+'381']
+	4 worth searching: ['TATAMI', 'BUFFET', 'CUPERTINO', 'CA']
+Matched the following n-grams to our merchants index:
+2-gram : CUPERTINO CA (1742)
+2-gram : TATAMI BUFFET (1)
+Search Attempt using n-grams = 1
+You can also try Google:
+	TATAMI BUFFET CUPERTINO CA
+Tatami Buffet 10123 Wolfe Rd Cupertino, CA 95014 (37.324989, -122.013008)
+Mizuumi Buffet 1604 Decoto Rd Union City, CA 94587 (37.5893, -122.0205)
+India Buffet 5168 Mowry Ave Fremont, CA 94538 (37.534686, -121.999666)
+Hometown Buffet 408 Capitol Ave San Jose, CA 95133 (37.373531, -121.84304)
+Hometown Buffet 4735 Hamilton Ave San Jose, CA 95130 (37.291912, -121.985992)
+Old Country Buffet 456 Maude Ave Sunnyvale, CA 94085 (37.389748, -122.032364)
+V V Buffet 895 Villa St Mountain View, CA 94041 (37.393917, -122.080009)
+Crazy Buffet 834 El Camino Real  Sunnyvale, CA 94087 (37.370249, -122.042418)
+Hometown Buffet 704 Southland Mall Hayward, CA 94545 (37.6507, -122.1045)
+New Empire Buffet Inc 1070 Stanley Blvd Livermore, CA 94550 (37.678703,
+-121.784264)
+
+
+
+Input: BEVERAGES & MO #000886296 PURCHASE BEVERAGES & MOR SUNNYVALE CA
+Unigrams are:
+	['BEVERAGES', '&', 'MO', '#0008', '8', '6296', 'PURCHASE',
+'BEVERAGES', '&', 'MOR', 'SUNNYVALE', 'CA']
+Unigrams matched to ElasticSearch:
+	['BEVERAGES', 'SUNNYVALE', 'PURCHASE', '#0008', '6296', 'MOR', 'MO',
+'CA']
+Of these:
+	1 stop words:      ['PURCHASE']
+	3 numeric words:   ['#0008', '8', '6296']
+	8 worth searching: ['BEVERAGES', '&', 'MO', 'BEVERAGES', '&', 'MOR',
+'SUNNYVALE', 'CA']
+Matched the following n-grams to our merchants index:
+2-gram : SUNNYVALE CA (4252)
+2-gram : & MOR (19)
+2-gram : BEVERAGES & (158)
+2-gram : & MO (57)
+2-gram : BEVERAGES & (158)
+Search Attempt using n-grams = 1
+You can also try Google:
+	BEVERAGES & MO BEVERAGES & MOR SUNNYVALE CA
+Dispenser Beverages Inc 2090 Farallon Dr San Leandro, CA 94577 (37.692791,
+-122.168411)
+Waterloo Beverages LLC 295 Terry Francois St San Francisco, CA 94158
+(37.776489, -122.389129)
+Pepsi Beverages Company 455 Market St San Francisco, CA 94105 (37.790951,
+-122.398643)
+Beverages Plus 2060 Curtner Ave San Jose, CA 95124 (37.272412, -121.933465)
+Red Bull Southbay 3064 Kenneth St Santa Clara, CA 95054 (37.378372,
+-121.956835)
+First Aid Beverages 330 Primrose Rd Burlingame, CA 94010 (37.578484,
+-122.348396)
+Water Works 868 Old San Francisco Rd Sunnyvale, CA 94086 (37.36647,
+-122.014866)
+Impex Beverages 360 Swift Ave South San Francisco, CA 94080 (37.649223,
+-122.389771)
+Vignette Soda LLC 2265 5th St Berkeley, CA 94710 (37.86398, -122.297442)
+Faultline Brewing Co 1235 Oakmead Pkwy Sunnyvale, CA 94085 (37.387356,
+-121.992615)
+
+
+
+
+Input: ARCO PAYPOINT 000503476 PURCHASE ARCO PAYPOINT SUNNYVALE CA
+Unigrams are:
+	['ARCO', 'PAYPOINT', '0005', '0', '3476', 'PURCHASE', 'ARCO',
+'PAYPOINT', 'SUNNYVALE', 'CA']
+Unigrams matched to ElasticSearch:
+	['SUNNYVALE', 'PURCHASE', '0005', '3476', 'ARCO', 'CA']
+Of these:
+	3 stop words:      ['PAYPOINT', 'PURCHASE', 'PAYPOINT']
+	3 numeric words:   ['0005', '0', '3476']
+	4 worth searching: ['ARCO', 'ARCO', 'SUNNYVALE', 'CA']
+Matched the following n-grams to our merchants index:
+2-gram : SUNNYVALE CA (4252)
+Search Attempt using n-grams = 1
+You can also try Google:
+	ARCO ARCO SUNNYVALE CA
+Arco Howard 860 Fremont Ave Sunnyvale, CA 94087 (37.35186, -122.048859)
+Arco Service Station-Shoreline Arco 790 Shoreline Blvd Mountain View, CA 94043
+(37.405905, -122.078292)
+Westlake Arco Service 151 Southgate Ave Daly City, CA 94015 (37.697273,
+-122.483276)
+Westborough Arco 2300 Westborough Blvd South San Francisco, CA 94080
+(37.643517, -122.453491)
+Whipple Arco 504 Whipple Ave Redwood City, CA 94063 (37.494598, -122.235054)
+Hegenberger Arco 566 Hegenberger Rd Oakland, CA 94621 (37.744888, -122.195511)
+Julian Arco 1256 Julian St San Jose, CA 95116 (37.351852, -121.86937)
+Mission & Berry Arco 25225 Mission Blvd Hayward, CA 94544 (37.656857,
+-122.071838)
+Als Arco 3595 Benton St Santa Clara, CA 95051 (37.345764, -121.995216)
+Jackson 92 Arco 365 Jackson St Hayward, CA 94544 (37.661488, -122.084328)
+
+
+
+
+Input: SAFEWAY 2887 09/06 #000511891 PURCHASE 150 E. EL CAMINO SUNNYVALE CA 
+Unigrams are:
+	['SAFEWAY', '2887', '0906', '#0005', '11891', 'PURCHASE', '150', 'E.',
+'EL', 'CAMINO', 'SUNNYVALE', 'CA']
+Unigrams matched to ElasticSearch:
+	['SUNNYVALE', 'PURCHASE', 'SAFEWAY', 'CAMINO', '#0005', '11891',
+'0906', '2887', '150', 'EL', 'CA', 'E.']
+Of these:
+	1 stop words:      ['PURCHASE']
+	5 numeric words:   ['2887', '0906', '#0005', '11891', '150']
+	6 worth searching: ['SAFEWAY', 'E.', 'EL', 'CAMINO', 'SUNNYVALE',
+'CA']
+Matched the following n-grams to our merchants index:
+3-gram : E. EL CAMINO (545)
+2-gram : SUNNYVALE CA (4252)
+2-gram : EL CAMINO (5304)
+2-gram : E. EL (547)
+Search Attempt using n-grams = 1
+You can also try Google:
+	SAFEWAY E. EL CAMINO SUNNYVALE CA
+Safeway Bail Bonds 1030 El Camino Real  Sunnyvale, CA 94087 (37.351963,
+-122.005431)
+Safeway 785 El Camino Real  Sunnyvale, CA 94087 (37.356536, -122.018515)
+Safeway 785 El Camino Real  Sunnyvale, CA 94087 (37.356536, -122.018515)
+U.S. Bank - Saratoga Safeway Office 150 El Camino Real  Sunnyvale, CA 94087
+(37.368035, -122.033336)
+Auto Sales El Camino Real 1073 El Camino Real  Sunnyvale, CA 94087 (37.35268,
+-122.002937)
+Pesarattu 893 El Camino Real  Sunnyvale, CA 94087 (37.353813, -122.015191)
+Ghiassi Fred 897 El Camino Real  Sunnyvale, CA 94087 (37.353759, -122.015112)
+Bail Bonds Safeway 3790 El Camino Real  Palo Alto, CA 94306 (37.417582,
+-122.132015)
+Safeway 1655 El Camino Real  San Mateo, CA 94402 (37.553021, -122.314758)
+Thai Lemongrass 573 El Camino Real  Sunnyvale, CA 94087 (37.362257,
+-122.025429)
+
+
+
+Input: TGI FRIDAY'S CUPERTINO CUPERTINO CA
+Unigrams are:
+	['TGI', 'FRIDAYS', 'CUPERTINO', 'CUPERTINO', 'CA']
+Unigrams matched to ElasticSearch:
+	['CUPERTINO', 'FRIDAYS', 'TGI', 'CA']
+Of these:
+	0 stop words:      []
+	0 numeric words:   []
+	5 worth searching: ['TGI', 'FRIDAYS', 'CUPERTINO', 'CUPERTINO', 'CA']
+Matched the following n-grams to our merchants index:
+3-gram : CUPERTINO CUPERTINO CA (954)
+2-gram : CUPERTINO CA (1742)
+2-gram : CUPERTINO CUPERTINO (955)
+Search Attempt using n-grams = 1
+You can also try Google:
+	TGI FRIDAYS CUPERTINO CUPERTINO CA
+T.G.I. Fridays 10343 Wolfe Rd Cupertino, CA 95014 (37.328091, -122.01487)
+Super Tgi Inc 1102 Saratoga Ave San Jose, CA 95129 (37.305082, -121.978512)
+Cupertino Chiropractic & Professional Center 10601 De Anza Blvd Cupertino, CA
+95014 (37.314157, -122.032516)
+Sage at Cupertino 175 Calvert Dr Cupertino, CA 95014 (37.321087, -122.001518)
+Cupertino Waterfall 10272 Danube Dr Cupertino, CA 95014 (37.319691,
+-122.027618)
+Cupertino Electric 10413 Torre Ave Cupertino, CA 95014 (37.316757,
+-122.029686)
+Cupertino Sanitary Dist 20833 Stevens Creek Blvd Cupertino, CA 95014
+(37.322937, -122.036898)
+Strike Cupertino Vfp LLC 10123 Wolfe Rd Cupertino, CA 95014 (37.324989,
+-122.013008)
+City of Cupertino Recreation-City of Cupertino 21251 Stevens Creek Blvd
+Cupertino, CA 95014 (37.322917, -122.050272)
+The Commons of Cupertino Hoa 21116 Freedom Dr Cupertino, CA 95014 (37.324644,
+-122.043164)
+
+
+
+
+Input: CHECKCARD 1009 TATAMI BUFFET CUPERTINO CA 24431063283207602800381
+Unigrams are:
+	['CHECKCARD', '1009', 'TATAMI', 'BUFFET', 'CUPERTINO', 'CA', '24',
+'43106', '32832', '07', '602800', '381']
+Unigrams matched to ElasticSearch:
+	['CUPERTINO', 'TATAMI', '602800', 'BUFFET', '32832', '43106', '1009',
+'381', '24', 'CA', '07']
+Of these:
+	1 stop words:      ['CHECKCARD']
+	7 numeric words:   ['1009', '24', '43106', '32832', '07', '602800',
+'381']
+	4 worth searching: ['TATAMI', 'BUFFET', 'CUPERTINO', 'CA']
+Matched the following n-grams to our merchants index:
+2-gram : CUPERTINO CA (1742)
+2-gram : TATAMI BUFFET (1)
+Search Attempt using n-grams = 1
+You can also try Google:
+	TATAMI BUFFET CUPERTINO CA
+Tatami Buffet 10123 Wolfe Rd Cupertino, CA 95014 (37.324989, -122.013008)
+Mizuumi Buffet 1604 Decoto Rd Union City, CA 94587 (37.5893, -122.0205)
+India Buffet 5168 Mowry Ave Fremont, CA 94538 (37.534686, -121.999666)
+Hometown Buffet 408 Capitol Ave San Jose, CA 95133 (37.373531, -121.84304)
+Hometown Buffet 4735 Hamilton Ave San Jose, CA 95130 (37.291912, -121.985992)
+Old Country Buffet 456 Maude Ave Sunnyvale, CA 94085 (37.389748, -122.032364)
+V V Buffet 895 Villa St Mountain View, CA 94041 (37.393917, -122.080009)
+Crazy Buffet 834 El Camino Real  Sunnyvale, CA 94087 (37.370249, -122.042418)
+Hometown Buffet 704 Southland Mall Hayward, CA 94545 (37.6507, -122.1045)
+New Empire Buffet Inc 1070 Stanley Blvd Livermore, CA 94550 (37.678703,
+-121.784264)
+
+
+
+
+Input: BEVERAGES & MO #000886296 PURCHASE BEVERAGES & MOR SUNNYVALE CA
+Unigrams are:
+	['BEVERAGES', '&', 'MO', '#0008', '8', '6296', 'PURCHASE',
+'BEVERAGES', '&', 'MOR', 'SUNNYVALE', 'CA']
+Unigrams matched to ElasticSearch:
+	['BEVERAGES', 'SUNNYVALE', 'PURCHASE', '#0008', '6296', 'MOR', 'MO',
+'CA']
+Of these:
+	1 stop words:      ['PURCHASE']
+	3 numeric words:   ['#0008', '8', '6296']
+	8 worth searching: ['BEVERAGES', '&', 'MO', 'BEVERAGES', '&', 'MOR',
+'SUNNYVALE', 'CA']
+Matched the following n-grams to our merchants index:
+2-gram : SUNNYVALE CA (4252)
+2-gram : & MOR (19)
+2-gram : BEVERAGES & (158)
+2-gram : & MO (57)
+2-gram : BEVERAGES & (158)
+Search Attempt using n-grams = 1
+You can also try Google:
+	BEVERAGES & MO BEVERAGES & MOR SUNNYVALE CA
+Dispenser Beverages Inc 2090 Farallon Dr San Leandro, CA 94577 (37.692791,
+-122.168411)
+Waterloo Beverages LLC 295 Terry Francois St San Francisco, CA 94158
+(37.776489, -122.389129)
+Pepsi Beverages Company 455 Market St San Francisco, CA 94105 (37.790951,
+-122.398643)
+Beverages Plus 2060 Curtner Ave San Jose, CA 95124 (37.272412, -121.933465)
+Red Bull Southbay 3064 Kenneth St Santa Clara, CA 95054 (37.378372,
+-121.956835)
+First Aid Beverages 330 Primrose Rd Burlingame, CA 94010 (37.578484,
+-122.348396)
+Water Works 868 Old San Francisco Rd Sunnyvale, CA 94086 (37.36647,
+-122.014866)
+Impex Beverages 360 Swift Ave South San Francisco, CA 94080 (37.649223,
+-122.389771)
+Vignette Soda LLC 2265 5th St Berkeley, CA 94710 (37.86398, -122.297442)
+Faultline Brewing Co 1235 Oakmead Pkwy Sunnyvale, CA 94085 (37.387356,
+-121.992615)
+
+
+
+
+Input: ARCO PAYPOINT 000503476 PURCHASE ARCO PAYPOINT SUNNYVALE CA
+Unigrams are:
+	['ARCO', 'PAYPOINT', '0005', '0', '3476', 'PURCHASE', 'ARCO',
+'PAYPOINT', 'SUNNYVALE', 'CA']
+Unigrams matched to ElasticSearch:
+	['SUNNYVALE', 'PURCHASE', '0005', '3476', 'ARCO', 'CA']
+Of these:
+	3 stop words:      ['PAYPOINT', 'PURCHASE', 'PAYPOINT']
+	3 numeric words:   ['0005', '0', '3476']
+	4 worth searching: ['ARCO', 'ARCO', 'SUNNYVALE', 'CA']
+Matched the following n-grams to our merchants index:
+2-gram : SUNNYVALE CA (4252)
+Search Attempt using n-grams = 1
+You can also try Google:
+	ARCO ARCO SUNNYVALE CA
+Arco Howard 860 Fremont Ave Sunnyvale, CA 94087 (37.35186, -122.048859)
+Arco Service Station-Shoreline Arco 790 Shoreline Blvd Mountain View, CA 94043
+(37.405905, -122.078292)
+Westlake Arco Service 151 Southgate Ave Daly City, CA 94015 (37.697273,
+-122.483276)
+Westborough Arco 2300 Westborough Blvd South San Francisco, CA 94080
+(37.643517, -122.453491)
+Whipple Arco 504 Whipple Ave Redwood City, CA 94063 (37.494598, -122.235054)
+Hegenberger Arco 566 Hegenberger Rd Oakland, CA 94621 (37.744888, -122.195511)
+Julian Arco 1256 Julian St San Jose, CA 95116 (37.351852, -121.86937)
+Mission & Berry Arco 25225 Mission Blvd Hayward, CA 94544 (37.656857,
+-122.071838)
+Als Arco 3595 Benton St Santa Clara, CA 95051 (37.345764, -121.995216)
+Jackson 92 Arco 365 Jackson St Hayward, CA 94544 (37.661488, -122.084328)
+Input: SAFEWAY 2887 09/06 #000511891 PURCHASE 150 E. EL CAMINO SUNNYVALE CA 
+Unigrams are:
+	['SAFEWAY', '2887', '0906', '#0005', '11891', 'PURCHASE', '150', 'E.',
+'EL', 'CAMINO', 'SUNNYVALE', 'CA']
+Unigrams matched to ElasticSearch:
+	['SUNNYVALE', 'PURCHASE', 'SAFEWAY', 'CAMINO', '#0005', '11891',
+'0906', '2887', '150', 'EL', 'CA', 'E.']
+Of these:
+	1 stop words:      ['PURCHASE']
+	5 numeric words:   ['2887', '0906', '#0005', '11891', '150']
+	6 worth searching: ['SAFEWAY', 'E.', 'EL', 'CAMINO', 'SUNNYVALE',
+'CA']
+Matched the following n-grams to our merchants index:
+3-gram : E. EL CAMINO (545)
+2-gram : SUNNYVALE CA (4252)
+2-gram : EL CAMINO (5304)
+2-gram : E. EL (547)
+Search Attempt using n-grams = 1
+You can also try Google:
+	SAFEWAY E. EL CAMINO SUNNYVALE CA
+Safeway Bail Bonds 1030 El Camino Real  Sunnyvale, CA 94087 (37.351963,
+-122.005431)
+Safeway 785 El Camino Real  Sunnyvale, CA 94087 (37.356536, -122.018515)
+Safeway 785 El Camino Real  Sunnyvale, CA 94087 (37.356536, -122.018515)
+U.S. Bank - Saratoga Safeway Office 150 El Camino Real  Sunnyvale, CA 94087
+(37.368035, -122.033336)
+Auto Sales El Camino Real 1073 El Camino Real  Sunnyvale, CA 94087 (37.35268,
+-122.002937)
+Pesarattu 893 El Camino Real  Sunnyvale, CA 94087 (37.353813, -122.015191)
+Ghiassi Fred 897 El Camino Real  Sunnyvale, CA 94087 (37.353759, -122.015112)
+Bail Bonds Safeway 3790 El Camino Real  Palo Alto, CA 94306 (37.417582,
+-122.132015)
+Safeway 1655 El Camino Real  San Mateo, CA 94402 (37.553021, -122.314758)
+Thai Lemongrass 573 El Camino Real  Sunnyvale, CA 94087 (37.362257,
+-122.025429)
