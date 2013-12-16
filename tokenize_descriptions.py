@@ -1,17 +1,14 @@
 #!/usr/bin/python
 
-import json, os, sys, re, urllib, urllib2
+import copy, json, os, sys, re, urllib, urllib2
 from subprocess import Popen, PIPE
-from query_templates import unpack_attributes, unpack_json_id
-from query_templates import BOOL_QUERY, STANDARD_QUERY
+from query_templates import GENERIC_ELASTICSEARCH_QUERY
 
 class InvalidArguments(Exception):
 	pass
 
 STILL_BREAKABLE = 2
 UNIGRAM_SIZE = 1
-PLACEHOLDER = "foo"
-PLACEHOLDER_LENGTH = len(PLACEHOLDER) + len(" :")
 
 bad_characters = [ "\[", "\]", "'", "\{", "\}", '"', "/"]
 x = "|".join(bad_characters)
@@ -45,50 +42,39 @@ def display_results():
 	print "\t" + str(len(numeric_tokens)) + " numeric words:   " + str(numeric_tokens)
 	print "\t" + str(len(filtered_tokens)) + " worth searching: " + str(filtered_tokens)
 	#show all search terms seperated by spaces		
-	show_terms = " ".join(filtered_tokens)
+	query_string = " ".join(filtered_tokens)
 	n_gram_tokens = get_n_gram_tokens(filtered_tokens)
 	matched_n_gram_tokens = search_n_gram_tokens(n_gram_tokens)
 
-	#FIXME: search the matched_n_gram_tokens with a "match" query using "bool" to combine them with the "term query"
-	#It's currently not returning very relevant results, so it is commented out
-	#build_boolean_search(matched_n_gram_tokens,show_terms)
 	
-	print "Elasticsearching the following"
-	print "You can also try Google:\n\t" + str(show_terms)
-	get_elasticsearch_results(show_terms)
+	print "Search Attempt using n-grams = 1"
+	print "You can also try Google:\n\t" + str(query_string)
+	get_query_string_search_results(query_string)
 
-def build_boolean_search(matched_n_gram_tokens,query_string):
-	query_parts = []
-	print "Building boolean search"
-	print "Should match terms"
-	query_key, query_values = "match._all", [("query",'"__term"'), ("type",'"phrase"'),("boost",0.01)]
-	x = unpack_json_id(query_key, query_values)
-	print "x is " 
+	#FIXME these results actually suck, and aren't worth getting yet
+	#print "Search Attempt using n-grams > 1"
+	#print "These results currently are not especially good or relevant"
+	#get_composite_search_results(matched_n_gram_tokens,query_string)
+
+def get_composite_search_results(matched_n_gram_tokens,query_string):
+	my_new_query = copy.deepcopy(GENERIC_ELASTICSEARCH_QUERY)
+	my_new_query["size"], my_new_query["from"] = 10,0
+	
+	sub_query = {}
+	sub_query["match"] = {}
+	sub_query["match"]["_all"] = {}
+	sub_query["match"]["_all"]["query"] = "__term"
+	sub_query["match"]["_all"]["type"] = "phrase"
+	sub_query["match"]["_all"]["boost"] = 1.2
+
 	for term in matched_n_gram_tokens:
-		y = x.replace("__term",term)
-		query_parts.append(y)
-	query_key, query_values = "query_string", [ ("query",'"__term"') ]
-	x = unpack_json_id(query_key, query_values)
-	y = x.replace("__term",term) 
-	query_parts.append(y)
-	term = ",".join(query_parts)
+		s = copy.deepcopy(sub_query)
+		s["match"]["_all"]["query"] = term	
+		my_new_query["query"]["bool"]["should"].append(s)
 
-	should = '"should" : [ ' + term + ']'
-	attributes = [ ("from",0), ("size",10)]
-	query_values = [ ]
-	input = build_bool_input(should,BOOL_QUERY,attributes,query_key,query_values)
-	input_json = json.loads(input)
-	#print input_json
-	output = search_index_with_input(input)
+	output = search_index(my_new_query)	
 	hits = output['hits']['hits']
-	print "BEGIN Composite"
 	display_hits(hits)
-	print "END Composite"
-
-def build_bool_input(should,action,attributes,query_key,query_values):
-	input = action.replace("__attributes",(unpack_attributes(attributes)))
-	input = input.replace("__should",should)
-	return input
 
 def get_n_gram_tokens(list_of_tokens):
 	n_gram_tokens = {}
@@ -106,14 +92,23 @@ def get_n_gram_tokens(list_of_tokens):
 
 def search_n_gram_tokens(n_gram_tokens):
 	matched_n_gram_tokens = []
-	query_key = "match._all"
-	query_values = [ ("query",'"__term"'), ("type",'"phrase"') ]
+
+	my_new_query = copy.deepcopy(GENERIC_ELASTICSEARCH_QUERY)
+	my_new_query["size"], my_new_query["from"] = 0,0
+
+	sub_query = {}
+	sub_query["match"] = {}
+	sub_query["match"]["_all"] = {}
+	sub_query["match"]["_all"]["query"] = "__term"
+	sub_query["match"]["_all"]["type"] = "phrase"
 
 	print "Matched the following n-grams to our merchants index:"
 	for key in reversed(sorted(n_gram_tokens.iterkeys())):
 		for term in n_gram_tokens[key]:
-			attributes = [ ("size",0) ]
-			hit_count = search_index(term,STANDARD_QUERY,attributes,query_key,query_values)['hits']['total']
+			sub_query["match"]["_all"]["query"] = term
+			my_new_query["query"]["bool"]["should"].append(sub_query)
+			hit_count = search_index(my_new_query)['hits']['total']
+			del my_new_query["query"]["bool"]["should"][0]
 			if hit_count > 0:
 				print str(key) + "-gram : " + term + " (" + str(hit_count) + ")"
 				matched_n_gram_tokens.append(term)
@@ -140,18 +135,8 @@ def extract_longest_substring(longest_substring):
 	return original_term, pre, post
 
 #Searches the merchants index and the merchant mapping
-def search_index(term,action,attributes,query_key,query_values):
-	input = build_search_input(term,action,attributes,query_key,query_values)
-	return search_index_with_input(input)
-
-def build_search_input(term,action,attributes,query_key,query_values):
-	input = action.replace("__attributes",(unpack_attributes(attributes)))
-	input = input.replace("__query", unpack_json_id(query_key, query_values))
-	input = input.replace("__term",urllib.quote_plus(term))
-	return input
-
-
-def search_index_with_input(input):
+def search_index(input_as_object):
+	input = json.dumps(input_as_object)
 	url = "http://brainstorm8:9200/merchants/merchant/_search"
 	request = urllib2.Request(url, input)
 	response = urllib2.urlopen(request)
@@ -159,11 +144,17 @@ def search_index_with_input(input):
 	return output
 
 #Runs an ElasticSearch query to find the results
-def get_elasticsearch_results(unigram_tokens):
-	query_key = "query_string"
-	query_values = [ ("query",'"__term"') ]
-	attributes = [ ("from",0), ("size",10) ]
-	output = search_index(unigram_tokens,STANDARD_QUERY,attributes,query_key,query_values)
+def get_query_string_search_results(unigram_tokens):
+	my_new_query = copy.deepcopy(GENERIC_ELASTICSEARCH_QUERY)
+	my_new_query["size"], my_new_query["from"] = 10,0
+
+	sub_query = {}
+	sub_query["query_string"] = {}
+	sub_query["query_string"]["query"] = "__term"
+	my_new_query["query"]["bool"]["should"].append(sub_query)
+	sub_query["query_string"]["query"] = "".join(unigram_tokens)
+	
+	output = search_index(my_new_query)	
 	hits = output['hits']['hits']
 	display_hits(hits)
 
@@ -210,14 +201,20 @@ def powerset(term,substrings):
 #Looks for the longest substring in our merchants index that 
 #can actually be found.
 def search_substrings(substrings):
-	query_key = "query_string"
-	query_values = [ ("query",'"__term"') ]
-	attributes = [ ("size",0) ]
+	my_new_query = copy.deepcopy(GENERIC_ELASTICSEARCH_QUERY)
+	my_new_query["size"], my_new_query["from"] = 0,0
+
+	sub_query = {}
+	sub_query["query_string"] = {}
+	sub_query["query_string"]["query"] = "__term"
+	my_new_query["query"]["bool"]["should"].append(sub_query)
+
 	for key in reversed(sorted(substrings.iterkeys())):
 		for term in substrings[key]:
 			hit_count = 0
 			if len(term) > 1:
-				hit_count = search_index(term,STANDARD_QUERY,attributes,query_key,query_values)['hits']['total']
+				sub_query["query_string"]["query"] = str(term)
+				hit_count = search_index(my_new_query)['hits']['total']
 			if hit_count > 0:
 				return term
 
@@ -230,6 +227,7 @@ def parse_description_into_search_tokens(longest_substrings, terms, input, recur
 	if len(input) >= STILL_BREAKABLE:
 		new_terms = input.split()
 		for term in new_terms:
+			term = string_cleanse(term)
 			if not recursive:
 				tokens.append(term)
 			substrings = {}
