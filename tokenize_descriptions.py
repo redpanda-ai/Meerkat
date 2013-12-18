@@ -2,7 +2,7 @@
 
 """This script scans, tokenizes, and constructs queries to match transaction
 description strings (unstructured data) to merchant data indexed with 
-ElasticSearch."""
+ElasticSearch (structured data)."""
 
 import copy, json, sys, re, urllib2
 from query_templates import GENERIC_ELASTICSEARCH_QUERY, STOP_WORDS
