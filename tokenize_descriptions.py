@@ -6,6 +6,7 @@ ElasticSearch (structured data)."""
 
 import copy, json, sys, re, urllib2
 from query_templates import GENERIC_ELASTICSEARCH_QUERY, STOP_WORDS
+from various_tools import string_cleanse
 
 class InvalidArguments(Exception):
 	"""Thrown when invalid arguments are passed in via command line."""
@@ -80,9 +81,9 @@ def display_results():
 
 	#I think these results should be refined, as they sometimes over-score
 	#results that should be less relevant.
-	print "Search Attempt using n-grams, n >= 1"
-	print "WARNING: These results may over-score irrelevant n-grams."
-	print "\tIn the future, we can revise these results."
+	#print "Search Attempt using n-grams, n >= 1"
+	#print "WARNING: These results may over-score irrelevant n-grams."
+	#print "\tIn the future, we can revise these results."
 	n_gram_tokens = get_n_gram_tokens(filtered_tokens)
 	matched_n_gram_tokens = search_n_gram_tokens(n_gram_tokens)
 	get_composite_search_results(matched_n_gram_tokens)
@@ -295,13 +296,6 @@ def search_substrings(substrings):
 				hit_count = search_index(my_new_query)['hits']['total']
 			if hit_count > 0:
 				return term
-
-def string_cleanse(original_string):
-	"""Strips out characters that might confuse ElasticSearch."""
-	bad_characters = [ "\[", "\]", "'", "\{", "\}", '"', "/"]
-	bad_character_regex = "|".join(bad_characters)
-	cleanse_pattern = re.compile(bad_character_regex)
-	return re.sub(cleanse_pattern, "", original_string)	
 
 def usage():
 	"""Shows the user which parameters to send into the program."""
