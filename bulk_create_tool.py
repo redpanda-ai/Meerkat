@@ -5,7 +5,7 @@ import json, sys, re
 from various_tools import string_cleanse
 from custom_exceptions import InvalidArguments, InvalidNumberOfLines\
 , FileProblem
-from query_templates import get_mapping_template
+from query_templates import get_mapping_template, get_create_object
 
 USAGE = """Usage:
 	<input_file_name>
@@ -51,8 +51,6 @@ def initialize():
 def revise_column_data_type(col_num, my_cell, column_meta):
 	"""This function tries to determine the best fit for the column,
 	based upon observing values found in the input for the column."""
-	#thingus = COLUMN_META[col_num]
-	#print thingus
 	PATTERN = 1
 	my_data_type = column_meta[col_num][DATA_TYPE]
 	if my_data_type == STRING:
@@ -80,34 +78,34 @@ def usage():
 	program."""
 	print USAGE
 
-def process_row(cells, column_meta, create_api):
-	create_json_footer = '" } }'
+def process_row(cells, column_meta, es_index, es_type):
+	record_obj = {}
 	record = '{ '
 	for column_number in range(len(cells)):
 		cell = string_cleanse(str(cells[column_number]).strip())
 		if column_number == 0:
-			create_api += cell + create_json_footer
+			create_obj = get_create_object(es_index,es_type,cell)
+			create_json = json.dumps(create_obj)
 		revise_column_data_type(column_number, cell, column_meta)
 
 		#Exclude latitude and longitude	until the end
 		if column_meta[column_number][NAME] == "LATITUDE":
-			latitude = cell	
+			continue
 		elif column_meta[column_number][NAME] == "LONGITUDE":
-			longitude = cell
+			continue
 		elif len(cell) == 0:
 			continue
 		else:
 			record += '"'\
 			+ column_meta[column_number][NAME] + '": "'\
 			+ cell + '", '
-	return record, create_api
+			record_obj[column_meta[column_number][NAME]] = cell
+	return record_obj, create_json
 
 def process_input_rows(input_file, es_index, es_type):
-	create_json_header = '{ "create" : { "_index" : "' + es_index \
-	+ '", "_type": "' + es_type + '", "_id": "'
 	line_count = 0
-	SENTINEL = 200.0
-	latitude, longitude = SENTINEL, SENTINEL
+	sentinel = 200.0
+	latitude, longitude = sentinel, sentinel
 	column_meta = {}
 	for line in input_file:
 		cells = line.split("\t")
@@ -117,22 +115,21 @@ def process_input_rows(input_file, es_index, es_type):
 		elif line_count >= INPUT_LINES_TO_SCAN:
 			break	
 		else:
-			create_api = create_json_header
-			latitude, longitude = SENTINEL, SENTINEL
-			record, create_api = process_row(cells, column_meta\
-			, create_api)
-
-			#Add the geo-data, if there is any, otherwise just close
-			#the document
+			#create_api = create_json_header
+			latitude, longitude = sentinel, sentinel
+			record_obj, create_json =\
+			process_row(cells, column_meta , es_index, es_type)
+			#Add the geo-data, if there is any
 			if len(str(latitude)) > 0 and len(str(longitude)) > 0:
-				record += '"pin" : { "location" : { "lat" : '\
-				+ str(latitude) + ', "lon" : '\
-				+ str(longitude) + ' } } }'
-			else:
-				record = record[0:-2] + "}"
-	
-			BULK_CREATE_FILE.write(create_api + "\n")	
-			BULK_CREATE_FILE.write(record + "\n")
+				record_obj["pin"] = {}
+				record_obj["pin"]["location"] = {}
+				location_obj = record_obj["pin"]["location"] 
+				location_obj["lat"] = str(latitude)
+				location_obj["lon"] = str(latitude)
+			#This would be where we add composite fields
+			record_json = json.dumps(record_obj)	
+			BULK_CREATE_FILE.write(create_json + "\n")	
+			BULK_CREATE_FILE.write(record_json + "\n")
 		line_count += 1
 	return column_meta, total_fields
 
