@@ -30,7 +30,7 @@ DATA_TYPE_NAME, PATTERN = 0, 1
 NAME, DATA_TYPE, INDEX = 0, 1, 2
 
 def get_mapping_template(es_type_name, shards, replicas, column_meta\
-, data_types, total_fields):
+, data_types):
 	"Builds a mapping for an index type."""
 	map_object = {}
 	map_object["settings"] = {}
@@ -45,7 +45,7 @@ def get_mapping_template(es_type_name, shards, replicas, column_meta\
 	my_properties = my_map["_source"]["properties"] 
 
 	#Adds a mapping for most non-null fields.
-	for column_number in range(total_fields):
+	for column_number in range(column_meta["total_fields"]):
 		data_type = column_meta[column_number][DATA_TYPE]
 		column_name = column_meta[column_number][NAME]
 		column_type = data_types[data_type][DATA_TYPE_NAME]

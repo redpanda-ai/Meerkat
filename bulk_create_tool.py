@@ -109,7 +109,7 @@ def process_input_rows(input_file, es_index, es_type):
 	column_meta = {}
 	for line in input_file:
 		cells = line.split("\t")
-		total_fields = len(cells)
+		column_meta["total_fields"] = len(cells)
 		if line_count == 0:
 			column_meta = scan_column_headers(cells)
 		elif line_count >= INPUT_LINES_TO_SCAN:
@@ -131,7 +131,7 @@ def process_input_rows(input_file, es_index, es_type):
 			BULK_CREATE_FILE.write(create_json + "\n")	
 			BULK_CREATE_FILE.write(record_json + "\n")
 		line_count += 1
-	return column_meta, total_fields
+	return column_meta
 
 #DICTIONARIES
 NULL, FLOAT, DATE, INT, STRING = 0, 1, 2, 3, 4
@@ -146,7 +146,6 @@ DATA_TYPES = { \
 
 INPUT_LINES_TO_SCAN, INPUT_FILE, BULK_CREATE_FILE, TYPE_MAPPING_FILE\
 , ES_INDEX, ES_TYPE = initialize()
-COLUMN_META, TOTAL_FIELDS = process_input_rows(INPUT_FILE, ES_INDEX, ES_TYPE)
-MY_MAP = get_mapping_template(ES_TYPE, 3, 2, COLUMN_META, DATA_TYPES\
-, TOTAL_FIELDS)
+COLUMN_META = process_input_rows(INPUT_FILE, ES_INDEX, ES_TYPE)
+MY_MAP = get_mapping_template(ES_TYPE, 3, 2, COLUMN_META, DATA_TYPES)
 TYPE_MAPPING_FILE.write(json.dumps(MY_MAP))
