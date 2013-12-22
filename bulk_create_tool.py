@@ -51,13 +51,13 @@ def initialize():
 def revise_column_data_type(col_num, my_cell, column_meta):
 	"""This function tries to determine the best fit for the column,
 	based upon observing values found in the input for the column."""
-	PATTERN = 1
+	pattern = 1
 	my_data_type = column_meta[col_num][DATA_TYPE]
 	if my_data_type == STRING:
 		return my_data_type
 	if my_cell == "":
 		return my_data_type
-	if DATA_TYPES[my_data_type][PATTERN].match(my_cell):
+	if DATA_TYPES[my_data_type][pattern].match(my_cell):
 		return my_data_type
 	else:
 		column_meta[col_num][DATA_TYPE] += 1
@@ -79,30 +79,30 @@ def usage():
 	print USAGE
 
 def process_row(cells, column_meta, es_index, es_type):
+	"""Scans a row from the input and returns:
+	1.  JSON for the 'bulk create'
+	2.  A record object that contains most fields needed"""
 	record_obj = {}
-	record = '{ '
 	for column_number in range(len(cells)):
 		cell = string_cleanse(str(cells[column_number]).strip())
 		if column_number == 0:
-			create_obj = get_create_object(es_index,es_type,cell)
+			create_obj = get_create_object(es_index, es_type, cell)
 			create_json = json.dumps(create_obj)
 		revise_column_data_type(column_number, cell, column_meta)
 
 		#Exclude latitude and longitude	until the end
-		if column_meta[column_number][NAME] == "LATITUDE":
-			continue
-		elif column_meta[column_number][NAME] == "LONGITUDE":
+		if column_meta[column_number][NAME] in \
+		("LATITUDE", "LONGITUDE"):
 			continue
 		elif len(cell) == 0:
 			continue
 		else:
-			record += '"'\
-			+ column_meta[column_number][NAME] + '": "'\
-			+ cell + '", '
 			record_obj[column_meta[column_number][NAME]] = cell
 	return record_obj, create_json
 
 def process_input_rows(input_file, es_index, es_type):
+	"""Reads each line in the input file, creating bulk insert records
+	for each in ElasticSearch."""
 	line_count = 0
 	sentinel = 200.0
 	latitude, longitude = sentinel, sentinel
@@ -117,7 +117,7 @@ def process_input_rows(input_file, es_index, es_type):
 		else:
 			#create_api = create_json_header
 			latitude, longitude = sentinel, sentinel
-			record_obj, create_json =\
+			record_obj, create_json = \
 			process_row(cells, column_meta , es_index, es_type)
 			#Add the geo-data, if there is any
 			if len(str(latitude)) > 0 and len(str(longitude)) > 0:
@@ -146,7 +146,7 @@ DATA_TYPES = { \
 
 INPUT_LINES_TO_SCAN, INPUT_FILE, BULK_CREATE_FILE, TYPE_MAPPING_FILE\
 , ES_INDEX, ES_TYPE = initialize()
-COLUMN_META, total_fields = process_input_rows(INPUT_FILE, ES_INDEX, ES_TYPE)
+COLUMN_META, TOTAL_FIELDS = process_input_rows(INPUT_FILE, ES_INDEX, ES_TYPE)
 MY_MAP = get_mapping_template(ES_TYPE, 3, 2, COLUMN_META, DATA_TYPES\
-, total_fields)
+, TOTAL_FIELDS)
 TYPE_MAPPING_FILE.write(json.dumps(MY_MAP))
