@@ -22,3 +22,9 @@ class FileProblem(Exception):
 		self.expr = expr
 		self.msg = msg	
 
+class UnsupportedQueryType(Exception):
+	"""Wraps exceptions related to using an unsupported query."""
+	def __init__(self, expr, msg):
+		self.expr = expr
+		self.msg = msg	
+

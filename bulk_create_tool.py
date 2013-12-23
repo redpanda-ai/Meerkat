@@ -84,9 +84,7 @@ def process_row(cells, column_meta, es_index, es_type):
 	1.  JSON for the 'bulk create'
 	2.  A record object that contains most fields needed"""
 	record_obj = {}
-	latitude, longitude = None, None
 	for column_number in range(len(cells)):
-		latitude, longitude = None, None
 		cell = string_cleanse(str(cells[column_number]).strip())
 		if column_number == 0:
 			create_obj = get_create_object(es_index, es_type, cell)
@@ -107,32 +105,10 @@ def process_row(cells, column_meta, es_index, es_type):
 
 	return record_obj, create_json
 
-"""
-def get_composite_address(record_obj):
-	pieces = ["HOUSE", "PREDIR", "STREET", "STRTYPE", "POSTDIR"\
-	, "APTTYPE", "APTNBR"]
-	my_pieces = [record_obj[piece] \
-	for piece in pieces if piece in record_obj]
-	if "compisite" not in record_obj:
-		record_obj["composite"] = {}	
-	record_obj["composite"]["address"] = " ".join(my_pieces)
-"""
-"""
-			if len(str(latitude)) > 0 and len(str(longitude)) > 0:
-				print "LATLON"
-				print "LAT" + str(latitude)
-				record_obj["pin"] = {}
-				record_obj["pin"]["location"] = {}
-				location_obj = record_obj["pin"]["location"] 
-				location_obj["lat"] = str(latitude)
-				location_obj["lon"] = str(latitude)
-"""
 def process_input_rows(input_file, es_index, es_type):
 	"""Reads each line in the input file, creating bulk insert records
 	for each in ElasticSearch."""
 	line_count = 0
-	sentinel = 200.0
-	latitude, longitude = sentinel, sentinel
 	column_meta = {}
 	for line in input_file:
 		cells = line.split("\t")
@@ -142,12 +118,10 @@ def process_input_rows(input_file, es_index, es_type):
 		elif line_count >= INPUT_LINES_TO_SCAN:
 			break	
 		else:
-			#create_api = create_json_header
-			latitude, longitude = sentinel, sentinel
-			record_obj, create_json = \
-			process_row(cells, column_meta , es_index, es_type)
-			#Add the geo-data, if there is any
-			#This would be where we add composite fields
+			#Process each row of input data
+			record_obj, create_json = process_row(cells\
+			, column_meta , es_index, es_type)
+			#Add the composite features
 			get_composites(record_obj)
 			record_json = json.dumps(record_obj)	
 			BULK_CREATE_FILE.write(create_json + "\n")	
