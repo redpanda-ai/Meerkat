@@ -5,7 +5,8 @@ import json, sys, re
 from various_tools import string_cleanse
 from custom_exceptions import InvalidArguments, InvalidNumberOfLines\
 , FileProblem
-from query_templates import get_mapping_template, get_create_object
+from query_templates import get_mapping_template, get_create_object\
+, get_composites
 
 USAGE = """Usage:
 	<input_file_name>
@@ -83,23 +84,49 @@ def process_row(cells, column_meta, es_index, es_type):
 	1.  JSON for the 'bulk create'
 	2.  A record object that contains most fields needed"""
 	record_obj = {}
+	latitude, longitude = None, None
 	for column_number in range(len(cells)):
+		latitude, longitude = None, None
 		cell = string_cleanse(str(cells[column_number]).strip())
 		if column_number == 0:
 			create_obj = get_create_object(es_index, es_type, cell)
 			create_json = json.dumps(create_obj)
 		revise_column_data_type(column_number, cell, column_meta)
 
-		#Exclude latitude and longitude	until the end
-		if column_meta[column_number][NAME] in \
-		("LATITUDE", "LONGITUDE"):
-			continue
+		#Special handling for LATITUDE and LONGITUDE
+		if column_meta[column_number][NAME] == "LATITUDE":
+			record_obj["pin"] = {}
+			record_obj["pin"]["location"] = {}
+			record_obj["pin"]["location"]["lat"] = cell
+		elif column_meta[column_number][NAME] == "LONGITUDE":
+			record_obj["pin"]["location"]["lon"] = cell
 		elif len(cell) == 0:
 			continue
 		else:
 			record_obj[column_meta[column_number][NAME]] = cell
+
 	return record_obj, create_json
 
+"""
+def get_composite_address(record_obj):
+	pieces = ["HOUSE", "PREDIR", "STREET", "STRTYPE", "POSTDIR"\
+	, "APTTYPE", "APTNBR"]
+	my_pieces = [record_obj[piece] \
+	for piece in pieces if piece in record_obj]
+	if "compisite" not in record_obj:
+		record_obj["composite"] = {}	
+	record_obj["composite"]["address"] = " ".join(my_pieces)
+"""
+"""
+			if len(str(latitude)) > 0 and len(str(longitude)) > 0:
+				print "LATLON"
+				print "LAT" + str(latitude)
+				record_obj["pin"] = {}
+				record_obj["pin"]["location"] = {}
+				location_obj = record_obj["pin"]["location"] 
+				location_obj["lat"] = str(latitude)
+				location_obj["lon"] = str(latitude)
+"""
 def process_input_rows(input_file, es_index, es_type):
 	"""Reads each line in the input file, creating bulk insert records
 	for each in ElasticSearch."""
@@ -120,13 +147,8 @@ def process_input_rows(input_file, es_index, es_type):
 			record_obj, create_json = \
 			process_row(cells, column_meta , es_index, es_type)
 			#Add the geo-data, if there is any
-			if len(str(latitude)) > 0 and len(str(longitude)) > 0:
-				record_obj["pin"] = {}
-				record_obj["pin"]["location"] = {}
-				location_obj = record_obj["pin"]["location"] 
-				location_obj["lat"] = str(latitude)
-				location_obj["lon"] = str(latitude)
 			#This would be where we add composite fields
+			get_composites(record_obj)
 			record_json = json.dumps(record_obj)	
 			BULK_CREATE_FILE.write(create_json + "\n")	
 			BULK_CREATE_FILE.write(record_json + "\n")

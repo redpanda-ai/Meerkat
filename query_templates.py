@@ -15,6 +15,19 @@ GENERIC_ELASTICSEARCH_QUERY["query"]["bool"]["minimum_number_should_match"] = 1
 GENERIC_ELASTICSEARCH_QUERY["query"]["bool"]["boost"] = 1.0
 GENERIC_ELASTICSEARCH_QUERY["query"]["bool"]["should"] = []
 
+#Structure for composite_data_types.
+COMPOSITES = {}
+COMPOSITES["address"] = ["HOUSE", "PREDIR", "STREET", "STRTYPE", "POSTDIR"\
+	, "APTTYPE", "APTNBR"]
+
+def get_composites(record_obj):
+	record_obj["composite"] = {}
+	for key in COMPOSITES:
+		components = COMPOSITES[key]
+		row_components = [record_obj[component] \
+		for component in components if component in record_obj]
+		record_obj["composite"][key] = " ".join(row_components)
+
 def get_create_object(es_index, es_type, cell_id):
 	"""Builds object used for building a bulk create command."""
 	create_object = {}
@@ -70,3 +83,5 @@ def get_mapping_template(es_type_name, shards, replicas, column_meta\
 	#Add composite fields here.
 
 	return map_object		
+
+
