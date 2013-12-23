@@ -17,16 +17,28 @@ GENERIC_ELASTICSEARCH_QUERY["query"]["bool"]["should"] = []
 
 #Structure for composite_data_types.
 COMPOSITES = {}
-COMPOSITES["address"] = ["HOUSE", "PREDIR", "STREET", "STRTYPE", "POSTDIR"\
-	, "APTTYPE", "APTNBR"]
+COMPOSITES[("address"," ")] = \
+["HOUSE", "PREDIR", "STREET", "STRTYPE", "POSTDIR" , "APTTYPE", "APTNBR"]
+COMPOSITES[("phone","")] = \
+["AREACODE", "EXCHANGE", "PHONENUMBER"]
+
+
+
+#Aliases for magic numbers.
+NULL, FLOAT, DATE, INT, STRING = 0, 1, 2, 3, 4
+DATA_TYPE_NAME, PATTERN = 0, 1
+NAME, DATA_TYPE, INDEX = 0, 1, 2
+KEY_NAME, KEY_DELIMITER = 0, 1
 
 def get_composites(record_obj):
 	record_obj["composite"] = {}
 	for key in COMPOSITES:
 		components = COMPOSITES[key]
+		key_name, key_delimiter = key[0:len(key)]		
 		row_components = [record_obj[component] \
 		for component in components if component in record_obj]
-		record_obj["composite"][key] = " ".join(row_components)
+		record_obj["composite"][key_name] = \
+		key_delimiter.join(row_components)
 
 def get_create_object(es_index, es_type, cell_id):
 	"""Builds object used for building a bulk create command."""
@@ -36,11 +48,6 @@ def get_create_object(es_index, es_type, cell_id):
 	create_object["create"]["_type"] = es_type
 	create_object["create"]["_id"] = cell_id 
 	return create_object
-
-#Aliases for magic numbers.
-NULL, FLOAT, DATE, INT, STRING = 0, 1, 2, 3, 4
-DATA_TYPE_NAME, PATTERN = 0, 1
-NAME, DATA_TYPE, INDEX = 0, 1, 2
 
 def get_mapping_template(es_type_name, shards, replicas, column_meta\
 , data_types):
