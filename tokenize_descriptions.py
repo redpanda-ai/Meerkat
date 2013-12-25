@@ -31,22 +31,24 @@ def generate_complete_boolean_query(unigrams, address, phone_numbers):
 	search_components = []
 	print "Search components are:"
 	print "\tUnigrams: " + "'" + unigrams + "'"
-	search_components.append((unigrams, "qs_query", "_all"))
+	#search_components.append((unigrams, "qs_query", ["_all"]))
+	search_components.append((unigrams, "qs_query", ["_all^1"\
+	, "BUSINESSSTANDARDNAME^2"], 1))
 	if address is not None:
 		print "\tMatching 'Address': " + "'"\
 		+ address + "'"
-		search_components.append((address\
-		,"match_query","composite.address"))
+		search_components.append((address, "match_query"\
+		,["composite.address^1"], 10))
 	if len(phone_numbers) != 0:
 		for phone_num in phone_numbers:
 			print "\tMatching 'Phone': " + "'"\
 			+ phone_num + "'"
 			search_components.append((phone_num, "match_query"\
-			, "composite.phone"))
+			, ["composite.phone^1"], 8))
 
 	my_obj = get_boolean_search_object(search_components)
+	print my_obj
 	my_results = search_index(my_obj)
-	hits = my_results['hits']['hits']
 	print "This system required " + str(METRICS["query_count"])\
 	+ " individual searches."
 	display_search_results(my_results)
@@ -106,29 +108,12 @@ def display_results():
 	##matched_n_gram_tokens = search_n_gram_tokens(n_gram_tokens)
 	##print "ALL"
 
-def display_search_results(search_results):
-	"""Displays search results."""
-	hits = search_results['hits']['hits']
-	scores = []
-	results = []
-	for hit in hits: 
-		hit_fields, score = hit['fields'], hit['_score']
-		scores.append(score)
-		field_order = RESULT_FIELDS
-		ordered_fields = []
-		fields_in_hit = [field for field in hit_fields]
-		ordered_hit_fields = []
-		for ordinal in field_order:
-			if ordinal in fields_in_hit:
-				my_field = str(convert_to_non_unicode(\
-				hit_fields[ordinal]))
-				ordered_hit_fields.append(my_field)
-		results.append(\
-		"[" + str(round(score,3)) + "] " + " ".join(ordered_hit_fields))
+def display_z_score_delta(scores):
+	"""Display the Z-score delta between the first and second scores."""
 	scores = np.array(scores)
 	z_scores = z_score(scores)
 	first_score, second_score = z_scores[0:2]
-	z_score_delta = round(first_score - second_score,3)
+	z_score_delta = round(first_score - second_score, 3)
 	print "Z-Score delta: [" + str(z_score_delta) + "]"
 	quality = "Non"
 	if z_score_delta <= 1:
@@ -138,6 +123,26 @@ def display_search_results(search_results):
 	else:
 		quality = "High-grade"
 	print "Top Score Quality: " + quality
+
+def display_search_results(search_results):
+	"""Displays search results."""
+	hits = search_results['hits']['hits']
+	scores = []
+	results = []
+	for hit in hits: 
+		hit_fields, score = hit['fields'], hit['_score']
+		scores.append(score)
+		field_order = RESULT_FIELDS
+		fields_in_hit = [field for field in hit_fields]
+		ordered_hit_fields = []
+		for ordinal in field_order:
+			if ordinal in fields_in_hit:
+				my_field = str(convert_to_non_unicode(\
+				hit_fields[ordinal]))
+				ordered_hit_fields.append(my_field)
+		results.append(\
+		"[" + str(round(score,3)) + "] " + " ".join(ordered_hit_fields))
+	display_z_score_delta(scores)	
 	for result in results:
 		print result
 
@@ -189,18 +194,19 @@ def extract_longest_substring(long_substrings, longest_substring):
 
 	return original_term, pre, post
 
-def get_boolean_search_object(list):
+def get_boolean_search_object(search_components):
 	"""Builds an object for a "bool" search."""
 	bool_search = copy.deepcopy(GENERIC_ELASTICSEARCH_QUERY)
 	bool_search["size"], bool_search["from"] = 10, 0
 
-	for item in list:
+	for item in search_components:
 		my_subquery = None
-		term, query_type, feature_name = item[0:3]
+		term, query_type, feature_list, boost = item[0:4]
 		if query_type == "qs_query":
-			my_subquery = get_qs_query(term)
+			my_subquery = get_qs_query(term, feature_list, boost)
 		elif query_type == "match_query":
-			my_subquery = get_match_query(term, feature_name)
+			for feature in feature_list:
+				my_subquery = get_match_query(term, feature, boost)
 		else:
 			raise UnsupportedQueryType("There is no support"\
 			+ " for a query of type: " + query_type ) 

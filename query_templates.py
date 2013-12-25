@@ -17,7 +17,7 @@ GENERIC_ELASTICSEARCH_QUERY["fields"] = RESULT_FIELDS
 GENERIC_ELASTICSEARCH_QUERY["query"] = {}
 GENERIC_ELASTICSEARCH_QUERY["query"]["bool"] = {}
 GENERIC_ELASTICSEARCH_QUERY["query"]["bool"]["minimum_number_should_match"] = 1
-GENERIC_ELASTICSEARCH_QUERY["query"]["bool"]["boost"] = 1.0
+#GENERIC_ELASTICSEARCH_QUERY["query"]["bool"]["boost"] = 1.0
 GENERIC_ELASTICSEARCH_QUERY["query"]["bool"]["should"] = []
 
 #Structure for composite_data_types.
@@ -36,19 +36,21 @@ DATA_TYPE_NAME, PATTERN = 0, 1
 NAME, DATA_TYPE, INDEX = 0, 1, 2
 KEY_NAME, KEY_DELIMITER = 0, 1
 
-def get_match_query(term, feature_name):
+def get_match_query(term, feature_name, boost):
 	match_query = {}
 	match_query["match"] = {}
 	match_query["match"][feature_name] = {}
 	match_query["match"][feature_name]["query"] = term
 	match_query["match"][feature_name]["type"] = "phrase"
-	match_query["match"][feature_name]["boost"] = 1.2
+	match_query["match"][feature_name]["boost"] = boost
 	return match_query
 
-def get_qs_query(term):
+def get_qs_query(term, fields, boost):
 	qs_query = {}
 	qs_query["query_string"] = {}
 	qs_query["query_string"]["query"] = term
+	qs_query["query_string"]["fields"] = fields
+	qs_query["query_string"]["boost"] = boost
 	return qs_query
 
 def get_composites(record_obj):
