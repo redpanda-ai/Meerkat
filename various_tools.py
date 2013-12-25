@@ -4,6 +4,7 @@
 within multiple scripts."""
 
 import collections, re
+import numpy as np
 
 def string_cleanse(original_string):
 	"""Strips out characters that might confuse ElasticSearch."""
@@ -28,3 +29,12 @@ def convert_to_non_unicode(data):
         return type(data)(map(convert_to_non_unicode, data))
     else:
         return data
+
+def z_score(a):
+    """ Returns a 1D array of z-scores, one for each score in the passed array,
+	computed relative to the passed array.  """
+    mu = np.mean(a)
+    sigma = np.std(a)
+    return (np.array(a)-mu)/sigma
+
+

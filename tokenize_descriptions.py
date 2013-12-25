@@ -5,10 +5,12 @@ description strings (unstructured data) to merchant data indexed with
 ElasticSearch (structured data)."""
 
 import copy, json, sys, re, urllib2
+import numpy as np
 from query_templates import GENERIC_ELASTICSEARCH_QUERY, STOP_WORDS\
 , get_match_query, get_qs_query, RESULT_FIELDS
-from various_tools import string_cleanse, convert_to_non_unicode
+from various_tools import string_cleanse, convert_to_non_unicode, z_score
 from custom_exceptions import InvalidArguments, UnsupportedQueryType
+#from scipy import stats
 
 def begin_parse(input_string):
 	"""Creates data structures used the first call into the 
@@ -107,8 +109,11 @@ def display_results():
 def display_search_results(search_results):
 	"""Displays search results."""
 	hits = search_results['hits']['hits']
+	scores = []
+	results = []
 	for hit in hits: 
 		hit_fields, score = hit['fields'], hit['_score']
+		scores.append(score)
 		field_order = RESULT_FIELDS
 		ordered_fields = []
 		fields_in_hit = [field for field in hit_fields]
@@ -118,7 +123,23 @@ def display_search_results(search_results):
 				my_field = str(convert_to_non_unicode(\
 				hit_fields[ordinal]))
 				ordered_hit_fields.append(my_field)
-		print "[" + str(round(score,3)) + "] " + " ".join(ordered_hit_fields)
+		results.append(\
+		"[" + str(round(score,3)) + "] " + " ".join(ordered_hit_fields))
+	scores = np.array(scores)
+	z_scores = z_score(scores)
+	first_score, second_score = z_scores[0:2]
+	z_score_delta = round(first_score - second_score,3)
+	print "Z-Score delta: [" + str(z_score_delta) + "]"
+	quality = "Non"
+	if z_score_delta <= 1:
+		quality = "Low-grade"
+	elif z_score_delta <= 2:
+		quality = "Mid-grade"
+	else:
+		quality = "High-grade"
+	print "Top Score Quality: " + quality
+	for result in results:
+		print result
 
 def get_matching_address():
 	"""Sadly, this function is temporary.  I plan to go to a more
