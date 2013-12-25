@@ -6,8 +6,8 @@ ElasticSearch (structured data)."""
 
 import copy, json, sys, re, urllib2
 from query_templates import GENERIC_ELASTICSEARCH_QUERY, STOP_WORDS\
-, get_match_query, get_qs_query
-from various_tools import string_cleanse
+, get_match_query, get_qs_query, RESULT_FIELDS
+from various_tools import string_cleanse, convert_to_non_unicode
 from custom_exceptions import InvalidArguments, UnsupportedQueryType
 
 def begin_parse(input_string):
@@ -47,7 +47,7 @@ def generate_complete_boolean_query(unigrams, address, phone_numbers):
 	hits = my_results['hits']['hits']
 	print "This system required " + str(METRICS["query_count"])\
 	+ " individual searches."
-	display_search_results(hits)
+	display_search_results(my_results)
 
 def display_results():
 	"""Displays our tokens, n-grams, and search results."""
@@ -104,31 +104,21 @@ def display_results():
 	##matched_n_gram_tokens = search_n_gram_tokens(n_gram_tokens)
 	##print "ALL"
 
-def display_search_results(hits):
+def display_search_results(search_results):
 	"""Displays search results."""
-	expected_fields = [ "BUSINESSSTANDARDNAME", "HOUSE", "PREDIR"\
-	, "STREET", "STRTYPE", "CITYNAME", "STATE", "ZIP" ]
-	complex_expected_fields = [ "lat", "lon"]
-
-	for item in hits: 
-		fields = item['fields']
-		#place "blanks" if expected field is null
-		for field in expected_fields:
-			if field not in fields:
-				fields[field] = ""
-		for field in complex_expected_fields:
-			if "pin.location" not in fields:
-				fields["pin.location"] = {}
-			if field not in fields["pin.location"]:
-				fields["pin.location"][field] = 0.0
-				
-		#display the search result
-		output_format = "{0} {1} {2} {3} {4} {5}, {6} {7} ({8}, {9})"
-		print output_format.format(fields["BUSINESSSTANDARDNAME"]\
-		, fields["HOUSE"], fields["PREDIR"], fields["STREET"]\
-		, fields["STRTYPE"], fields["CITYNAME"], fields["STATE"]\
-		, fields["ZIP"], fields["pin.location"]["lat"]\
-		, fields["pin.location"]["lon"])
+	hits = search_results['hits']['hits']
+	for hit in hits: 
+		hit_fields, score = hit['fields'], hit['_score']
+		field_order = RESULT_FIELDS
+		ordered_fields = []
+		fields_in_hit = [field for field in hit_fields]
+		ordered_hit_fields = []
+		for ordinal in field_order:
+			if ordinal in fields_in_hit:
+				my_field = str(convert_to_non_unicode(\
+				hit_fields[ordinal]))
+				ordered_hit_fields.append(my_field)
+		print "[" + str(round(score,3)) + "] " + " ".join(ordered_hit_fields)
 
 def get_matching_address():
 	"""Sadly, this function is temporary.  I plan to go to a more
