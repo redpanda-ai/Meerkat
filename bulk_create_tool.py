@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3.3
 """This tool creates an ElasticSearch index and bulk loads it with data."""
 
 import json, sys, re
@@ -63,9 +63,9 @@ def revise_column_data_type(col_num, my_cell, column_meta):
 	else:
 		column_meta[col_num][DATA_TYPE] += 1
 		return revise_column_data_type(col_num, my_cell, column_meta)
-	
+
 def scan_column_headers(my_cells):
-	"""This function scans the first line of the data input file in 
+	"""This function scans the first line of the data input file in
 	order to provide column names for our index."""
 	column_meta = {}
 	for my_col_number in range(len(my_cells)):
@@ -77,7 +77,7 @@ def scan_column_headers(my_cells):
 def usage():
 	"""Shows which command line arguments should be passed to the
 	program."""
-	print USAGE
+	print(USAGE)
 
 def process_row(cells, column_meta, es_index, es_type):
 	"""Scans a row from the input and returns:
@@ -116,15 +116,15 @@ def process_input_rows(input_file, es_index, es_type):
 		if line_count == 0:
 			column_meta = scan_column_headers(cells)
 		elif line_count >= INPUT_LINES_TO_SCAN:
-			break	
+			break
 		else:
 			#Process each row of input data
 			record_obj, create_json = process_row(cells\
 			, column_meta , es_index, es_type)
 			#Add the composite features
 			get_composites(record_obj)
-			record_json = json.dumps(record_obj)	
-			BULK_CREATE_FILE.write(create_json + "\n")	
+			record_json = json.dumps(record_obj)
+			BULK_CREATE_FILE.write(create_json + "\n")
 			BULK_CREATE_FILE.write(record_json + "\n")
 		line_count += 1
 	return column_meta

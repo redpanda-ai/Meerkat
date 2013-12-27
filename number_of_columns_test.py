@@ -1,17 +1,18 @@
-#!/usr/bin/python
+#!/usr/bin/python3.3
 
-import os, sys
+"""Finds the number of columns in each row."""
+import sys
 
-sizes = {}
+SIZES = {}
 
 F = open(sys.argv[1])
-line_count = 0
+LINE_COUNT = 0
 for line in F:
-	line_count += 1
+	LINE_COUNT += 1
 	fields = line.split("\t")
 	size = len(fields)
-	if size not in sizes:
-		sizes[size] = 1
+	if size not in SIZES:
+		SIZES[size] = 1
 	else:
-		sizes[size] += 1
-print sizes
+		SIZES[size] += 1
+print(SIZES)

@@ -1,23 +1,21 @@
 #!/usr/bin/python
 
 """This script scans, tokenizes, and constructs queries to match transaction
-description strings (unstructured data) to merchant data indexed with 
+description strings (unstructured data) to merchant data indexed with
 ElasticSearch (structured data)."""
 
-import copy, json, sys, re, urllib2
-import numpy as np
+import copy, json, sys, re, urllib.request
 from query_templates import GENERIC_ELASTICSEARCH_QUERY, STOP_WORDS\
 , get_match_query, get_qs_query, RESULT_FIELDS
-from various_tools import string_cleanse, convert_to_non_unicode, z_score
+from various_tools import string_cleanse
 from custom_exceptions import InvalidArguments, UnsupportedQueryType
-#from scipy import stats
+from scipy.stats.mstats import zscore
 
 def begin_parse(input_string):
-	"""Creates data structures used the first call into the 
+	"""Creates data structures used the first call into the
 	parse_into_search_tokens function."""
-
-	print "Input: " + input_string
-	terms, long_substrings, recursive = [], {}, False	
+	print( "Input String ",input_string)
+	terms, long_substrings, recursive = [], {}, False
 	parse_into_search_tokens(long_substrings, terms, input_string\
 	, recursive)
 
@@ -26,31 +24,29 @@ def generate_complete_boolean_query(unigrams, address, phone_numbers):
 	1.  Unigrams (query_string)
 	2.  Addresses (match)
 	3.  Phone Number (match)"""
-	#Add dynamic output based upon a dictionary of token types	
+	#Add dynamic output based upon a dictionary of token types
 	#See comment above
 	search_components = []
-	print "Search components are:"
-	print "\tUnigrams: " + "'" + unigrams + "'"
+	print( "Search components are:")
+	print( "\tUnigrams: ", "'", unigrams, "'")
 	#search_components.append((unigrams, "qs_query", ["_all"]))
 	search_components.append((unigrams, "qs_query", ["_all^1"\
 	, "BUSINESSSTANDARDNAME^2"], 1))
 	if address is not None:
-		print "\tMatching 'Address': " + "'"\
-		+ address + "'"
+		print( "\tMatching 'Address': " , "'" , address , "'")
 		search_components.append((address, "match_query"\
 		,["composite.address^1"], 10))
 	if len(phone_numbers) != 0:
 		for phone_num in phone_numbers:
-			print "\tMatching 'Phone': " + "'"\
-			+ phone_num + "'"
+			print( "\tMatching 'Phone': " , "'" , phone_num , "'")
 			search_components.append((phone_num, "match_query"\
 			, ["composite.phone^1"], 8))
 
 	my_obj = get_boolean_search_object(search_components)
-	print my_obj
+	print( my_obj)
 	my_results = search_index(my_obj)
-	print "This system required " + str(METRICS["query_count"])\
-	+ " individual searches."
+	print( "This system required " , str(METRICS["query_count"])\
+		, " individual searches.")
 	display_search_results(my_results)
 
 def display_results():
@@ -58,7 +54,7 @@ def display_results():
 	phone_re = re.compile("^[0-9/#]{10}$")
 	numeric = re.compile("^[0-9/#]+$")
 
-	stop_tokens = []	
+	stop_tokens = []
 	filtered_tokens = []
 	numeric_tokens = []
 	addresses = []
@@ -68,32 +64,29 @@ def display_results():
 			stop_tokens.append(token)
 		elif phone_re.search(token):
 			phone_numbers.append(string_cleanse(token))
-		elif numeric.search(token): 
+		elif numeric.search(token):
 			numeric_tokens.append(token)
 		else:
 			filtered_tokens.append(string_cleanse(token))
 
 	#Add dynamic output based upon a dictionary of token types
 	#e.g. Unigram, Composite, Numeric, Stop...
-	print "Unigrams are:\n\t" + str(TOKENS)
-	print "Unigrams matched to ElasticSearch:\n\t" + str(UNIGRAM_TOKENS)
-	print "Of these:"
-	print "\t" + str(len(stop_tokens)) + " stop words:      "\
-	+ str(stop_tokens)
-	print "\t" + str(len(phone_numbers)) + " phone_numbers:   "\
-	+ str(phone_numbers)
-	print "\t" + str(len(numeric_tokens)) + " numeric words:   "\
-	+ str(numeric_tokens)
-	print "\t" + str(len(filtered_tokens)) + " unigrams: "\
-	+ str(filtered_tokens)
+	print( "Unigrams are:\n\t" , str(TOKENS))
+	print( "Unigrams matched to ElasticSearch:\n\t" , str(UNIGRAM_TOKENS))
+	print( "Of these:")
+	print( "\t" , str(len(stop_tokens)) , " stop words:      " , str(stop_tokens))
+	print( "\t" , str(len(phone_numbers)) , " phone_numbers:   "\
+		, str(phone_numbers))
+	print( "\t" , str(len(numeric_tokens)) , " numeric words:   "\
+		, str(numeric_tokens))
+	print( "\t" , str(len(filtered_tokens)) , " unigrams: " , str(filtered_tokens))
 
 	count, matching_address = get_matching_address()
 	if count > 0:
 		addresses.append(matching_address)
-	print "\t" + str(len(addresses)) + " addresses: "\
-	+ str(addresses)
+	print( "\t" , str(len(addresses)) , " addresses: " , str(addresses))
 
-	#show all search terms seperated by spaces		
+	#show all search terms separated by spaces
 	query_string = " ".join(filtered_tokens)
 
 	generate_complete_boolean_query(query_string, matching_address\
@@ -102,7 +95,7 @@ def display_results():
 	#n-gram on a per composite-feature basis.
 	#n_gram_tokens = get_n_gram_tokens(filtered_tokens)
 	#n_gram_tokens = get_n_gram_tokens(TOKENS)
-	
+
 	##print n_gram_tokens
 	##Not currently used
 	##matched_n_gram_tokens = search_n_gram_tokens(n_gram_tokens)
@@ -110,11 +103,10 @@ def display_results():
 
 def display_z_score_delta(scores):
 	"""Display the Z-score delta between the first and second scores."""
-	scores = np.array(scores)
-	z_scores = z_score(scores)
+	z_scores = zscore(scores)
 	first_score, second_score = z_scores[0:2]
 	z_score_delta = round(first_score - second_score, 3)
-	print "Z-Score delta: [" + str(z_score_delta) + "]"
+	print( "Z-Score delta: [" , str(z_score_delta) , "]")
 	quality = "Non"
 	if z_score_delta <= 1:
 		quality = "Low-grade"
@@ -122,14 +114,13 @@ def display_z_score_delta(scores):
 		quality = "Mid-grade"
 	else:
 		quality = "High-grade"
-	print "Top Score Quality: " + quality
+	print( "Top Score Quality: " , quality)
 
 def display_search_results(search_results):
 	"""Displays search results."""
 	hits = search_results['hits']['hits']
-	scores = []
-	results = []
-	for hit in hits: 
+	scores, results = [], []
+	for hit in hits:
 		hit_fields, score = hit['fields'], hit['_score']
 		scores.append(score)
 		field_order = RESULT_FIELDS
@@ -137,14 +128,13 @@ def display_search_results(search_results):
 		ordered_hit_fields = []
 		for ordinal in field_order:
 			if ordinal in fields_in_hit:
-				my_field = str(convert_to_non_unicode(\
-				hit_fields[ordinal]))
+				my_field = str(hit_fields[ordinal])
 				ordered_hit_fields.append(my_field)
 		results.append(\
 		"[" + str(round(score,3)) + "] " + " ".join(ordered_hit_fields))
-	display_z_score_delta(scores)	
+	display_z_score_delta(scores)
 	for result in results:
-		print result
+		print( result)
 
 def get_matching_address():
 	"""Sadly, this function is temporary.  I plan to go to a more
@@ -164,9 +154,9 @@ def get_matching_address():
 				if current_length not in address_candidates:
 					address_candidates[current_length] = []
 					my_stuff = \
-					address_candidates[current_length] 
+					address_candidates[current_length]
 					my_stuff.append(" ".join(n_gram))
-	for key in reversed(sorted(address_candidates.iterkeys())):
+	for key in reversed(sorted(address_candidates.keys())):
 		candidate_list = address_candidates[key]
 		count, term = get_composite_search_count(candidate_list\
 		,"composite.address")
@@ -175,13 +165,13 @@ def get_matching_address():
 	return 0, None
 
 def extract_longest_substring(long_substrings, longest_substring):
-	"""Extracts the longest substring from our input, returning left 
+	"""Extracts the longest substring from our input, returning left
 	over fragments to find the following strings:
 	1.  "original_term": the original string containing "longest_substring"
 	2.  "pre": substring preceding "longest_substring"
 	3.  "post" : substring following "longest_substring" """
-	
-	ls_len = len(longest_substring)	
+
+	ls_len = len(longest_substring)
 	original_term = long_substrings[ls_len][longest_substring]
 	start_index = original_term.find(longest_substring)
 	end_index = start_index + ls_len
@@ -209,7 +199,7 @@ def get_boolean_search_object(search_components):
 				my_subquery = get_match_query(term, feature, boost)
 		else:
 			raise UnsupportedQueryType("There is no support"\
-			+ " for a query of type: " + query_type ) 
+			+ " for a query of type: " + query_type )
 		bool_search["query"]["bool"]["should"].append(my_subquery)
 	return bool_search
 
@@ -219,7 +209,7 @@ def get_composite_search_count(list_of_ngrams, feature_name):
 	additional parameter."""
 	my_new_query = copy.deepcopy(GENERIC_ELASTICSEARCH_QUERY)
 	my_new_query["size"], my_new_query["from"] = 0, 0
-	
+
 	sub_query = {}
 	sub_query["match"] = {}
 	sub_query["match"][feature_name] = {}
@@ -229,11 +219,11 @@ def get_composite_search_count(list_of_ngrams, feature_name):
 
 	for term in list_of_ngrams:
 		my_sub_query = copy.deepcopy(sub_query)
-		my_sub_query["match"][feature_name]["query"] = term	
+		my_sub_query["match"][feature_name]["query"] = term
 		my_new_query["query"]["bool"]["should"].append(my_sub_query)
-		total = search_index(my_new_query)['hits']['total'] 
+		total = search_index(my_new_query)['hits']['total']
 		if total == 0:
-			my_new_query["query"]["bool"]["should"] = []	
+			my_new_query["query"]["bool"]["should"] = []
 		else:
 			return total, term
 	return 0, None
@@ -245,7 +235,7 @@ def get_n_gram_tokens(list_of_tokens):
 	end_index = len(list_of_tokens)
 	for end_offset in range(end_index):
 		for start_index in range(end_index-end_offset):
-			n_gram_size = end_index - end_offset - start_index 
+			n_gram_size = end_index - end_offset - start_index
 			if n_gram_size > unigram_size:
 				if n_gram_size not in n_gram_tokens:
 					n_gram_tokens[n_gram_size] = []
@@ -256,13 +246,14 @@ def get_n_gram_tokens(list_of_tokens):
 
 def search_index(input_as_object):
 	"""Searches the merchants index and the merchant mapping"""
-	input_string = json.dumps(input_as_object)
-	url = "http://brainstorm8:9200/merchants/merchant/_search"
-	request = urllib2.Request(url, input_string)
-	response = urllib2.urlopen(request)
+	input_data = json.dumps(input_as_object).encode('UTF-8')
+	url = "http://brainstorm8:9200/"
+	path = "merchants/merchant/_search"
+	req = urllib.request.Request(url=url+path,data=input_data)
+	output_data = urllib.request.urlopen(req).read().decode('UTF-8')
 	METRICS["query_count"] += 1
-	output = json.loads(response.read())
-	return output
+	output_string = json.loads(output_data)
+	return output_string
 
 def search_n_gram_tokens(n_gram_tokens):
 	"""Creates a boolean elasticsearch composed of multiple
@@ -279,18 +270,18 @@ def search_n_gram_tokens(n_gram_tokens):
 	sub_query["match"]["_all"]["query"] = "__term"
 	sub_query["match"]["_all"]["type"] = "phrase"
 
-	print "Matched the following n-grams to our merchants index:"
-	for key in reversed(sorted(n_gram_tokens.iterkeys())):
+	print( "Matched the following n-grams to our merchants index:")
+	for key in reversed(sorted(n_gram_tokens.keys())):
 		for term in n_gram_tokens[key]:
 			sub_query["match"]["_all"]["query"] = term
 			my_new_query["query"]["bool"]["should"].append(sub_query)
 			hit_count = search_index(my_new_query)['hits']['total']
 			del my_new_query["query"]["bool"]["should"][0]
 			if hit_count > 0:
-				print str(key) + "-gram : " + term + " (" + str(hit_count) + ")"
+				print( str(key) , "-gram : " , term , " (" , str(hit_count) , ")")
 				matched_n_gram_tokens.append(term)
 	return matched_n_gram_tokens
-	
+
 def initialize():
 	"""Validates the command line arguments."""
 	if len(sys.argv) != 2:
@@ -323,12 +314,12 @@ def parse_into_search_tokens(long_substrings, terms, input_string, recursive):
 
 	#This check allows us to exit if no substrings are found
 	if len(long_substrings) == 0:
-		return	
+		return
 
-	#This block finds the longest substring match in our index and adds 
-	#it to our dictionary of search terms.	
-	longest_substring = long_substrings[sorted\
-	(long_substrings.iterkeys())[-1]].keys()[0]
+	#This block finds the longest substring match in our index and adds
+	#it to our dictionary of search terms
+	longest_substring = list(long_substrings[sorted\
+	(long_substrings.keys())[-1]].keys())[0]
 	UNIGRAM_TOKENS.append(longest_substring)
 
 	original_term, pre, post = extract_longest_substring(\
@@ -357,7 +348,7 @@ def rebuild_tokens(original_term, longest_substring, pre, post):
 	extraction."""
 	rebuilt_tokens = []
 	for i in range(len(TOKENS)):
-		if TOKENS[i] != original_term:	
+		if TOKENS[i] != original_term:
 			rebuilt_tokens.append(TOKENS[i])
 		else:
 			if pre != "":
@@ -378,7 +369,7 @@ def search_substrings(substrings):
 	sub_query["query_string"]["query"] = "__term"
 	my_new_query["query"]["bool"]["should"].append(sub_query)
 
-	for key in reversed(sorted(substrings.iterkeys())):
+	for key in reversed(sorted(substrings.keys())):
 		for term in substrings[key]:
 			hit_count = 0
 			if len(term) > 1:
@@ -389,7 +380,7 @@ def search_substrings(substrings):
 
 def usage():
 	"""Shows the user which parameters to send into the program."""
-	print "Usage:\n\t<quoted_transaction_description_string>"
+	print( "Usage:\n\t<quoted_transaction_description_string>")
 
 #INPUT_STRING = "MEL'S DRIVE-IN #2 SAN FRANCISCOCA 24492153337286434101508"
 

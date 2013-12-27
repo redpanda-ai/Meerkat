@@ -1,6 +1,6 @@
-#!/usr/bin/python
-
-import os, sys
+#!/usr/bin/local/python3
+"""generates a report of columns and their population rates."""
+import sys
 
 def fill_dict(fields):
 	columns, c2 = {}, {} 
@@ -13,21 +13,17 @@ F = open(sys.argv[1])
 line_count = 0
 columns, c2 = {}, {} 
 
-fields = []
+FIELDS = []
 for line in F:
-	fields = line.split("\t")
+	FIELDS = line.split("\t")
 	if line_count == 0:
-		columns, c2 = fill_dict(fields)
+		columns, c2 = fill_dict(FIELDS)
 	else:
-		for i in range(len(fields)):
-			if fields[i].strip() != '':
-				c2[i] += 1	
-						
+		for i in range(len(FIELDS)):
+			if FIELDS[i].strip() != '':
+				c2[i] += 1
 	line_count += 1
 
-
-for key in sorted(c2.iterkeys()):
-	#print str(key) + ": " + str(c2[key]) + " ( " + str(1.0 *c2[key]/line_count) + ") " + columns[key]
-	print str(key).strip() + "\t" + columns[key].strip() + "\t" + str(round(1.0 *c2[key]/line_count,2)).strip()
-
-
+for key in sorted(c2.keys()):
+	print (str(key).strip(), "\t", columns[key].strip(), "\t"\
+	, str(round(1.0 *c2[key]/line_count,2)).strip())

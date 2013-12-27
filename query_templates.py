@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3.3
 
 """Words we wish to ignore while searching."""
 STOP_WORDS = ["CHECK", "CARD", "CHECKCARD", "PAYPOINT", "PURCHASE", "LLC" ]
@@ -17,7 +17,6 @@ GENERIC_ELASTICSEARCH_QUERY["fields"] = RESULT_FIELDS
 GENERIC_ELASTICSEARCH_QUERY["query"] = {}
 GENERIC_ELASTICSEARCH_QUERY["query"]["bool"] = {}
 GENERIC_ELASTICSEARCH_QUERY["query"]["bool"]["minimum_number_should_match"] = 1
-#GENERIC_ELASTICSEARCH_QUERY["query"]["bool"]["boost"] = 1.0
 GENERIC_ELASTICSEARCH_QUERY["query"]["bool"]["should"] = []
 
 #Structure for composite_data_types.
@@ -37,6 +36,7 @@ NAME, DATA_TYPE, INDEX = 0, 1, 2
 KEY_NAME, KEY_DELIMITER = 0, 1
 
 def get_match_query(term, feature_name, boost):
+	"""Returns a "match" style ElasticSearch query object"""
 	match_query = {}
 	match_query["match"] = {}
 	match_query["match"][feature_name] = {}
@@ -46,6 +46,7 @@ def get_match_query(term, feature_name, boost):
 	return match_query
 
 def get_qs_query(term, fields, boost):
+	"""Returns a "query_string" style ElasticSearch query object"""
 	qs_query = {}
 	qs_query["query_string"] = {}
 	qs_query["query_string"]["query"] = term
@@ -58,7 +59,7 @@ def get_composites(record_obj):
 	record_obj["composite"] = {}
 	for key in COMPOSITES:
 		components = COMPOSITES[key]
-		key_name, key_delimiter = key[0:len(key)]		
+		key_name, key_delimiter = key[0:len(key)]
 		row_components = [record_obj[component] \
 		for component in components if component in record_obj]
 		record_obj["composite"][key_name] = \
@@ -70,7 +71,7 @@ def get_create_object(es_index, es_type, cell_id):
 	create_object["create"] = {}
 	create_object["create"]["_index"] = es_index
 	create_object["create"]["_type"] = es_type
-	create_object["create"]["_id"] = cell_id 
+	create_object["create"]["_id"] = cell_id
 	return create_object
 
 def get_mapping_template(es_type_name, shards, replicas, column_meta\
@@ -78,15 +79,15 @@ def get_mapping_template(es_type_name, shards, replicas, column_meta\
 	"Builds a mapping for an index type."""
 	map_object = {}
 	map_object["settings"] = {}
-	map_object["settings"]["number_of_shards"] = shards 
-	map_object["settings"]["number_of_replicas"] = replicas 
+	map_object["settings"]["number_of_shards"] = shards
+	map_object["settings"]["number_of_replicas"] = replicas
 	map_object["settings"]["mappings"] = {}
 	map_object["settings"]["mappings"][es_type_name] = {}
-	my_map = map_object["settings"]["mappings"][es_type_name] 
+	my_map = map_object["settings"]["mappings"][es_type_name]
 	my_map["_source"] = {}
-	my_map["_source"]["enabled"] = True	
+	my_map["_source"]["enabled"] = True
 	my_map["_source"]["properties"] = {}
-	my_properties = my_map["_source"]["properties"] 
+	my_properties = my_map["_source"]["properties"]
 
 	#Adds a mapping for most non-null fields.
 	for column_number in range(column_meta["total_fields"]):
@@ -113,6 +114,6 @@ def get_mapping_template(es_type_name, shards, replicas, column_meta\
 
 	#Add composite fields here.
 
-	return map_object		
+	return map_object
 
 
