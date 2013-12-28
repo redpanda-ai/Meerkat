@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-"""This is where we are keeping functions that are useful enough to call from
+"""This is where we keep functions that are useful enough to call from
 within multiple scripts."""
 
 import re
