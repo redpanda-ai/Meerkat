@@ -1,6 +1,6 @@
 #!/usr/bin/python
-
-import os, sys
+"""Not sure what I used this for, maybe to generate a dictionary of keys?"""
+import sys
 
 def fill_dict(fields):
 	columns, c2 = {}, {} 
@@ -34,14 +34,9 @@ for line in F:
 				d[sz] = {}
 			if cell not in d[sz]:
 				d[sz][cell] = 0 
-#				d[sz][cell].append(line_count) 
-#			else:
-#				d[sz][cell].append(line_count) 
 			d[sz][cell] += 1
 
 	line_count += 1
-
-#print fields
 
 for key in sorted(list(d.keys())):
 	print (str(key), ": ", str(d[key]))

@@ -6,14 +6,11 @@ STOP_WORDS = ["CHECK", "CARD", "CHECKCARD", "PAYPOINT", "PURCHASE", "LLC" ]
 RESULT_FIELDS = ["BUSINESSSTANDARDNAME", "HOUSE"\
 , "PREDIR", "STREET", "STRTYPE", "CITYNAME", "STATE", "ZIP", "pin.location"]
 
-
-
 #Template for building a search.
 GENERIC_ELASTICSEARCH_QUERY = {}
 GENERIC_ELASTICSEARCH_QUERY["from"] = 0
 GENERIC_ELASTICSEARCH_QUERY["size"] = 10
 GENERIC_ELASTICSEARCH_QUERY["fields"] = RESULT_FIELDS
-
 GENERIC_ELASTICSEARCH_QUERY["query"] = {}
 GENERIC_ELASTICSEARCH_QUERY["query"]["bool"] = {}
 GENERIC_ELASTICSEARCH_QUERY["query"]["bool"]["minimum_number_should_match"] = 1
@@ -27,32 +24,12 @@ COMPOSITES[("address"," ")] = \
 COMPOSITES[("phone","")] = \
 ["AREACODE", "EXCHANGE", "PHONENUMBER"]
 
-
-
 #Aliases for magic numbers.
 NULL, FLOAT, DATE, INT, STRING = 0, 1, 2, 3, 4
 DATA_TYPE_NAME, PATTERN = 0, 1
 NAME, DATA_TYPE, INDEX = 0, 1, 2
 KEY_NAME, KEY_DELIMITER = 0, 1
 
-def get_match_query(term, feature_name, boost):
-	"""Returns a "match" style ElasticSearch query object"""
-	match_query = {}
-	match_query["match"] = {}
-	match_query["match"][feature_name] = {}
-	match_query["match"][feature_name]["query"] = term
-	match_query["match"][feature_name]["type"] = "phrase"
-	match_query["match"][feature_name]["boost"] = boost
-	return match_query
-
-def get_qs_query(term, fields, boost):
-	"""Returns a "query_string" style ElasticSearch query object"""
-	qs_query = {}
-	qs_query["query_string"] = {}
-	qs_query["query_string"]["query"] = term
-	qs_query["query_string"]["fields"] = fields
-	qs_query["query_string"]["boost"] = boost
-	return qs_query
 
 def get_composites(record_obj):
 	"""Builds all composite features and adds them to the record object."""
@@ -73,6 +50,16 @@ def get_create_object(es_index, es_type, cell_id):
 	create_object["create"]["_type"] = es_type
 	create_object["create"]["_id"] = cell_id
 	return create_object
+
+def get_match_query(term, feature_name, boost):
+	"""Returns a "match" style ElasticSearch query object"""
+	match_query = {}
+	match_query["match"] = {}
+	match_query["match"][feature_name] = {}
+	match_query["match"][feature_name]["query"] = term
+	match_query["match"][feature_name]["type"] = "phrase"
+	match_query["match"][feature_name]["boost"] = boost
+	return match_query
 
 def get_mapping_template(es_type_name, shards, replicas, column_meta\
 , data_types):
@@ -116,4 +103,11 @@ def get_mapping_template(es_type_name, shards, replicas, column_meta\
 
 	return map_object
 
-
+def get_qs_query(term, fields, boost):
+	"""Returns a "query_string" style ElasticSearch query object"""
+	qs_query = {}
+	qs_query["query_string"] = {}
+	qs_query["query_string"]["query"] = term
+	qs_query["query_string"]["fields"] = fields
+	qs_query["query_string"]["boost"] = boost
+	return qs_query
