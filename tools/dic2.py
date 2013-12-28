@@ -26,6 +26,7 @@ for line in F:
 	else:
 		for i in range(len(fields)):
 			cell = str(fields[i]).strip()
+			#print cell
 			sz = len(cell)
 			if sz < 2:
 				continue
@@ -33,11 +34,18 @@ for line in F:
 				d[sz] = {}
 			if cell not in d[sz]:
 				d[sz][cell] = 0 
+#				d[sz][cell].append(line_count) 
+#			else:
+#				d[sz][cell].append(line_count) 
 			d[sz][cell] += 1
 
 	line_count += 1
 
 #print fields
+
 for key in sorted(d.iterkeys()):
 	print str(key) + ": " + str(d[key])
+#	#print str(key) + ": " + str(c2[key]) + " ( " + str(1.0 *c2[key]/line_count) + ") " + columns[key]
+#	print str(key) + ": " + columns[key] + " " + str(round(1.0 *c2[key]/line_count,2))
+
 
