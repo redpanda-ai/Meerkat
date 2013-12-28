@@ -1,5 +1,6 @@
 #!/usr/bin/python
-
+"""Prints a report about the columns in a tab delimited file and
+their population rates."""
 import sys
 
 def fill_dict(fields):
