@@ -4,31 +4,31 @@ their population rates."""
 import sys
 
 def fill_dict(fields):
-	columns, c2 = {}, {} 
-	for i in range(len(fields)):
-		columns[i] = fields[i]
-		c2[i] = 0
-	return columns, c2
+	"""Files the columns and columns_2 dictionaries."""
+	columns, columns_2 = {}, {}
+	for j in range(len(fields)):
+		columns[j] = fields[j]
+		columns_2[j] = 0
+	return columns, columns_2
 
 F = open(sys.argv[1])
-line_count = 0
-columns, c2 = {}, {} 
+LINE_COUNT = 0
+COLUMNS, COLUMNS_2 = {}, {}
 
-fields = []
+FIELDS = []
 for line in F:
-	fields = line.split("\t")
-	if line_count == 0:
-		columns, c2 = fill_dict(fields)
+	FIELDS = line.split("\t")
+	if LINE_COUNT == 0:
+		COLUMNS, COLUMNS_2 = fill_dict(FIELDS)
 	else:
-		for i in range(len(fields)):
-			if fields[i].strip() != '':
-				c2[i] += 1	
-						
-	line_count += 1
+		for i in range(len(FIELDS)):
+			if FIELDS[i].strip() != '':
+				COLUMNS_2[i] += 1
+	LINE_COUNT += 1
 
 
-for key in sorted(list(c2.keys())):
-	#print str(key) + ": " + str(c2[key]) + " ( " + str(1.0 *c2[key]/line_count) + ") " + columns[key]
-	print (str(key), ": ", columns[key], " ", str(round(1.0 *c2[key]/line_count,2)))
+for key in sorted(list(COLUMNS_2.keys())):
+	print (str(key), ": ", COLUMNS[key], " "\
+	, str(round(1.0 *COLUMNS_2[key]/LINE_COUNT,2)))
 
 
