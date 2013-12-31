@@ -4,7 +4,7 @@
 description strings (unstructured data) to merchant data indexed with
 ElasticSearch (structured data)."""
 
-import copy, json, sys, re, urllib.request
+import copy, json, logging, sys, re, urllib.request
 from query_templates import GENERIC_ELASTICSEARCH_QUERY, STOP_WORDS\
 , get_match_query, get_qs_query, RESULT_FIELDS
 from various_tools import string_cleanse
@@ -71,20 +71,22 @@ def display_results():
 
 	#Add dynamic output based upon a dictionary of token types
 	#e.g. Unigram, Composite, Numeric, Stop...
-	print( "Unigrams are:\n\t" , str(TOKENS))
-	print( "Unigrams matched to ElasticSearch:\n\t" , str(UNIGRAM_TOKENS))
-	print( "Of these:")
-	print( "\t" , str(len(stop_tokens)) , " stop words:      " , str(stop_tokens))
-	print( "\t" , str(len(phone_numbers)) , " phone_numbers:   "\
-		, str(phone_numbers))
-	print( "\t" , str(len(numeric_tokens)) , " numeric words:   "\
-		, str(numeric_tokens))
-	print( "\t" , str(len(filtered_tokens)) , " unigrams: " , str(filtered_tokens))
+	logging.info( "Unigrams are:\n\t" + str(TOKENS))
+	logging.info( "Unigrams matched to ElasticSearch:\n\t" + str(UNIGRAM_TOKENS))
+	logging.info( "Of these:")
+	logging.info( "\t" + str(len(stop_tokens)) + " stop words:      "\
+				+ str(stop_tokens))
+	logging.info( "\t" + str(len(phone_numbers)) + " phone_numbers:   "\
+		+ str(phone_numbers))
+	logging.info( "\t" + str(len(numeric_tokens)) + " numeric words:   "\
+		+ str(numeric_tokens))
+	logging.info( "\t" + str(len(filtered_tokens)) + " unigrams: "\
+		+ str(filtered_tokens))
 
 	count, matching_address = get_matching_address()
 	if count > 0:
 		addresses.append(matching_address)
-	print( "\t" , str(len(addresses)) , " addresses: " , str(addresses))
+	logging.info( "\t" + str(len(addresses)) + " addresses: " + str(addresses))
 
 	#show all search terms separated by spaces
 	query_string = " ".join(filtered_tokens)
