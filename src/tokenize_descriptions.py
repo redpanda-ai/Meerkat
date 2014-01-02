@@ -11,15 +11,17 @@ from various_tools import string_cleanse
 from custom_exceptions import InvalidArguments, UnsupportedQueryType
 from scipy.stats.mstats import zscore
 
-def begin_parse(input_string):
+def begin_parse(my_meta,input_string):
 	"""Creates data structures used the first call into the
 	parse_into_search_tokens function."""
 	print( "Input String ",input_string)
-	terms, long_substrings, recursive = [], {}, False
-	parse_into_search_tokens(long_substrings, terms, input_string\
-	, recursive)
+	recursive = False
+	my_meta["terms"] = []
+	my_meta["long_substrings"] = {}
+	#unigram_tokens, tokens = {}, {}
+	parse_into_search_tokens(my_meta, input_string, recursive)
 
-def generate_complete_boolean_query(unigrams, address, phone_numbers):
+def generate_complete_boolean_query(my_meta, qs_query, address, phone_numbers):
 	"""Constructs a complete boolean query based upon:
 	1.  Unigrams (query_string)
 	2.  Addresses (match)
@@ -28,28 +30,29 @@ def generate_complete_boolean_query(unigrams, address, phone_numbers):
 	#See comment above
 	search_components = []
 	print( "Search components are:")
-	print( "\tUnigrams: ", "'", unigrams, "'")
+	print( "\tUnigrams: ", "'", qs_query, "'")
 	#search_components.append((unigrams, "qs_query", ["_all"]))
-	search_components.append((unigrams, "qs_query", ["_all^1"\
+	search_components.append((qs_query, "qs_query", ["_all^1"\
 	, "BUSINESSSTANDARDNAME^2"], 1))
 	if address is not None:
 		print( "\tMatching 'Address': " , "'" , address , "'")
 		search_components.append((address, "match_query"\
-		,["composite.address^1"], 10))
+		,["composite.address^3"], 10))
 	if len(phone_numbers) != 0:
 		for phone_num in phone_numbers:
 			print( "\tMatching 'Phone': " , "'" , phone_num , "'")
 			search_components.append((phone_num, "match_query"\
-			, ["composite.phone^1"], 8))
+			, ["composite.phone^1"], 1))
 
 	my_obj = get_boolean_search_object(search_components)
 	print( my_obj)
-	my_results = search_index(my_obj)
-	print( "This system required " , str(METRICS["query_count"])\
+	my_results = search_index(my_meta, my_obj)
+	metrics = my_meta["metrics"]
+	print( "This system required " , str(metrics["query_count"])\
 		, " individual searches.")
 	display_search_results(my_results)
 
-def display_results():
+def display_results(my_meta):
 	"""Displays our tokens, n-grams, and search results."""
 	phone_re = re.compile("^[0-9/#]{10}$")
 	numeric = re.compile("^[0-9/#]+$")
@@ -59,7 +62,9 @@ def display_results():
 	numeric_tokens = []
 	addresses = []
 	phone_numbers = []
-	for token in TOKENS:
+	tokens = my_meta["tokens"]
+	unigram_tokens = my_meta["unigram_tokens"]
+	for token in tokens:
 		if token in STOP_WORDS:
 			stop_tokens.append(token)
 		elif phone_re.search(token):
@@ -71,8 +76,8 @@ def display_results():
 
 	#Add dynamic output based upon a dictionary of token types
 	#e.g. Unigram, Composite, Numeric, Stop...
-	logging.info( "Unigrams are:\n\t" + str(TOKENS))
-	logging.info( "Unigrams matched to ElasticSearch:\n\t" + str(UNIGRAM_TOKENS))
+	logging.info( "Unigrams are:\n\t" + str(tokens))
+	logging.info( "Unigrams matched to ElasticSearch:\n\t" + str(unigram_tokens))
 	logging.info( "Of these:")
 	logging.info( "\t" + str(len(stop_tokens)) + " stop words:      "\
 				+ str(stop_tokens))
@@ -83,7 +88,7 @@ def display_results():
 	logging.info( "\t" + str(len(filtered_tokens)) + " unigrams: "\
 		+ str(filtered_tokens))
 
-	count, matching_address = get_matching_address()
+	count, matching_address = get_matching_address(my_meta)
 	if count > 0:
 		addresses.append(matching_address)
 	logging.info( "\t" + str(len(addresses)) + " addresses: " + str(addresses))
@@ -91,7 +96,7 @@ def display_results():
 	#show all search terms separated by spaces
 	query_string = " ".join(filtered_tokens)
 
-	generate_complete_boolean_query(query_string, matching_address\
+	generate_complete_boolean_query(my_meta, query_string, matching_address\
 	, phone_numbers)
 	#Not finished, do a tail recursive search for longest matching
 	#n-gram on a per composite-feature basis.
@@ -138,14 +143,15 @@ def display_search_results(search_results):
 	for result in results:
 		print( result)
 
-def get_matching_address():
+def get_matching_address(my_meta):
 	"""Sadly, this function is temporary.  I plan to go to a more
 	generic approach that exhaustively works with all n-grams
 	against all composite features."""
 	numeric = re.compile("^[0-9]+$")
 	address_candidates = {}
 	n_gram = []
-	for token in TOKENS:
+	tokens = my_meta["tokens"]
+	for token in tokens:
 		if numeric.search(token):
 			n_gram = []
 			n_gram.append(token)
@@ -160,7 +166,7 @@ def get_matching_address():
 					my_stuff.append(" ".join(n_gram))
 	for key in reversed(sorted(address_candidates.keys())):
 		candidate_list = address_candidates[key]
-		count, term = get_composite_search_count(candidate_list\
+		count, term = get_composite_search_count(my_meta, candidate_list\
 		,"composite.address")
 		if count > 0:
 			return count, term
@@ -205,7 +211,7 @@ def get_boolean_search_object(search_components):
 		bool_search["query"]["bool"]["should"].append(my_subquery)
 	return bool_search
 
-def get_composite_search_count(list_of_ngrams, feature_name):
+def get_composite_search_count(my_meta, list_of_ngrams, feature_name):
 	"""Obtains search results for a query composed of multiple
 	sub-queries.  At some point I may add 'query_string' as an
 	additional parameter."""
@@ -223,7 +229,7 @@ def get_composite_search_count(list_of_ngrams, feature_name):
 		my_sub_query = copy.deepcopy(sub_query)
 		my_sub_query["match"][feature_name]["query"] = term
 		my_new_query["query"]["bool"]["should"].append(my_sub_query)
-		total = search_index(my_new_query)['hits']['total']
+		total = search_index(my_meta,my_new_query)['hits']['total']
 		if total == 0:
 			my_new_query["query"]["bool"]["should"] = []
 		else:
@@ -246,18 +252,20 @@ def get_n_gram_tokens(list_of_tokens):
 				n_gram_tokens[n_gram_size].append(" ".join(new_n_gram))
 	return n_gram_tokens
 
-def search_index(input_as_object):
+def search_index(my_meta,input_as_object):
 	"""Searches the merchants index and the merchant mapping"""
 	input_data = json.dumps(input_as_object).encode('UTF-8')
+	logging.debug(input_data)
 	url = "http://brainstorm8:9200/"
 	path = "merchants/merchant/_search"
 	req = urllib.request.Request(url=url+path,data=input_data)
 	output_data = urllib.request.urlopen(req).read().decode('UTF-8')
-	METRICS["query_count"] += 1
+	metrics = my_meta["metrics"]
+	metrics["query_count"] += 1
 	output_string = json.loads(output_data)
 	return output_string
 
-def search_n_gram_tokens(n_gram_tokens):
+def search_n_gram_tokens(my_meta):
 	"""Creates a boolean elasticsearch composed of multiple
 	sub-queries.  Each sub-query is itself a 'phrase' query
 	built of n-grams where n >= 2."""
@@ -273,11 +281,12 @@ def search_n_gram_tokens(n_gram_tokens):
 	sub_query["match"]["_all"]["type"] = "phrase"
 
 	print( "Matched the following n-grams to our merchants index:")
+	n_gram_tokens = my_meta["n_gram_tokens"]
 	for key in reversed(sorted(n_gram_tokens.keys())):
 		for term in n_gram_tokens[key]:
 			sub_query["match"]["_all"]["query"] = term
 			my_new_query["query"]["bool"]["should"].append(sub_query)
-			hit_count = search_index(my_new_query)['hits']['total']
+			hit_count = search_index(my_meta,my_new_query)['hits']['total']
 			del my_new_query["query"]["bool"]["should"][0]
 			if hit_count > 0:
 				print( str(key) , "-gram : " , term , " (" , str(hit_count) , ")")
@@ -286,26 +295,36 @@ def search_n_gram_tokens(n_gram_tokens):
 
 def initialize():
 	"""Validates the command line arguments."""
+	input_file = None
 	if len(sys.argv) != 2:
 		usage()
-		raise InvalidArguments("Incorrect number of arguments")
-	return sys.argv[1]
+		raise InvalidArguments(msg="Incorrect number of arguments", expr=None)
+	try:
+		input_file = open(sys.argv[1], encoding='utf-8')
+	except FileNotFoundError:
+		print (sys.argv[1], " not found, aborting.")
+		logging.error(sys.argv[1] + " not found, aborting.")
+		sys.exit()
+	return input_file
 
-def parse_into_search_tokens(long_substrings, terms, input_string, recursive):
+def parse_into_search_tokens(my_meta, input_string, recursive):
 	"""Recursively attempts to parse an unstructured transaction
-	description into TOKENS."""
-	global TOKENS
+	description into TOKENS.
+	Example: "MEL'S DRIVE-IN #2 SAN FRANCISCOCA 24492153337286434101508" """
 	#This loop breaks up the input string looking for new search terms
 	#that match portions of our ElasticSearch index
+	tokens = my_meta["tokens"]
+	long_substrings = my_meta["long_substrings"]
+	terms = my_meta["terms"]
 	if len(input_string) >= STILL_BREAKABLE:
 		new_terms = input_string.split()
 		for term in new_terms:
 			term = string_cleanse(term)
 			if not recursive:
-				TOKENS.append(term)
+				tokens.append(term)
 			substrings = {}
 			powerset(term, substrings)
-			big_substring = search_substrings(substrings)
+			big_substring = search_substrings(my_meta, substrings)
 			if big_substring is not None:
 				bs_length = len(big_substring)
 				if bs_length not in long_substrings:
@@ -317,18 +336,17 @@ def parse_into_search_tokens(long_substrings, terms, input_string, recursive):
 	#This check allows us to exit if no substrings are found
 	if len(long_substrings) == 0:
 		return
-
 	#This block finds the longest substring match in our index and adds
 	#it to our dictionary of search terms
 	longest_substring = list(long_substrings[sorted\
 	(long_substrings.keys())[-1]].keys())[0]
-	UNIGRAM_TOKENS.append(longest_substring)
+	my_meta["unigram_tokens"].append(longest_substring)
 
 	original_term, pre, post = extract_longest_substring(\
 	long_substrings, longest_substring)
-	TOKENS = rebuild_tokens(original_term, longest_substring, pre, post)
+	tokens = rebuild_tokens(original_term, longest_substring, pre, post, tokens)
 
-	parse_into_search_tokens(long_substrings, terms, pre + " " + post, True)
+	parse_into_search_tokens(my_meta, pre + " " + post, True)
 
 def powerset(term, substrings):
 	"""Recursively discover all substrings for a term."""
@@ -345,13 +363,13 @@ def powerset(term, substrings):
 		powerset(term[0:-1], substrings)
 		powerset(term[1:], substrings)
 
-def rebuild_tokens(original_term, longest_substring, pre, post):
+def rebuild_tokens(original_term, longest_substring, pre, post, tokens):
 	"""Rebuilds our complete list of tokens following a substring
 	extraction."""
 	rebuilt_tokens = []
-	for i in range(len(TOKENS)):
-		if TOKENS[i] != original_term:
-			rebuilt_tokens.append(TOKENS[i])
+	for i in range(len(tokens)):
+		if tokens[i] != original_term:
+			rebuilt_tokens.append(tokens[i])
 		else:
 			if pre != "":
 				rebuilt_tokens.append(pre)
@@ -360,7 +378,7 @@ def rebuild_tokens(original_term, longest_substring, pre, post):
 				rebuilt_tokens.append(post)
 	return rebuilt_tokens
 
-def search_substrings(substrings):
+def search_substrings(my_meta, substrings):
 	"""Looks for the longest substring in our merchants index that
 	#can actually be found."""
 	my_new_query = copy.deepcopy(GENERIC_ELASTICSEARCH_QUERY)
@@ -376,20 +394,27 @@ def search_substrings(substrings):
 			hit_count = 0
 			if len(term) > 1:
 				sub_query["query_string"]["query"] = str(term)
-				hit_count = search_index(my_new_query)['hits']['total']
+				hit_count = search_index(my_meta, my_new_query)['hits']['total']
 			if hit_count > 0:
 				return term
+
+def tokenize_file(input_file):
+	"""Opens a file of descriptions, one per line, and tokenizes the results."""
+	meta = {}
+	for input_string in input_file:
+		#unigram_tokens, tokens, metrics = [], [], { "query_count" : 0 }
+		meta[input_string] = {}
+		my_meta = meta[input_string]
+		my_meta["unigram_tokens"] = []
+		my_meta["tokens"] = []
+		my_meta["metrics"] = { "query_count" : 0 }
+		begin_parse(my_meta,input_string)
+		display_results(my_meta)
+	input_file.close()
 
 def usage():
 	"""Shows the user which parameters to send into the program."""
 	print( "Usage:\n\t<quoted_transaction_description_string>")
 
-#INPUT_STRING = "MEL'S DRIVE-IN #2 SAN FRANCISCOCA 24492153337286434101508"
-
 STILL_BREAKABLE = 2
-UNIGRAM_TOKENS, TOKENS = [], []
-METRICS = { "query_count" : 0 }
-INPUT_STRING = initialize()
-begin_parse(INPUT_STRING)
-display_results()
-
+tokenize_file(initialize())
