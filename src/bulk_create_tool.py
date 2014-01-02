@@ -18,7 +18,7 @@ NAME, DATA_TYPE, INDEX = 0, 1, 2
 
 def initialize():
 	"""This function does basic validation for the command-line
-	parameters.""" 
+	parameters."""
 	if len(sys.argv) != 5:
 		usage()
 		raise InvalidArguments("Incorrect number of arguments")
@@ -134,7 +134,7 @@ NULL, FLOAT, DATE, INT, STRING = 0, 1, 2, 3, 4
 DATE_REGEX = "^[0-9]{4}(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])$"
 DATA_TYPES = { \
 	NULL : ("null", re.compile("^$")) , \
-	FLOAT : ("float", re.compile("[-+]?[0-9]*\.[0-9]+")) , \
+	FLOAT : ("float", re.compile(r"[-+]?[0-9]*\.[0-9]+")) , \
 	DATE : ("date", re.compile(DATE_REGEX)) , \
 	INT : ("integer", re.compile("^[-+]?[0-9]+$")) , \
 	STRING : ("string", re.compile(".+")) \
