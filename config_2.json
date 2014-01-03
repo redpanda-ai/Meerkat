@@ -7,12 +7,13 @@
 		"level" : "warning",
 		"path" : "../foo.log",
 		"formatter" : "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-		"console" : false
+		"console" : true
 	},
 	"output" : {
 		"results" : {
 			"fields" : [ "id", "BUSINESSSTANDARDNAME"
-			]
+			],
+			"size" : 1
 		},
 		"path" : "../config_2.json"
 	}

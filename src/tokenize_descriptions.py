@@ -104,6 +104,9 @@ def display_search_results(search_results):
 def display_z_score_delta(scores):
 	"""Display the Z-score delta between the first and second scores."""
 	z_scores = zscore(scores)
+	if len(z_scores) < 2:
+		LOGGER.info("Unable to generate Z-Score")
+		return
 	first_score, second_score = z_scores[0:2]
 	z_score_delta = round(first_score - second_score, 3)
 	LOGGER.info( "Z-Score delta: [" + str(z_score_delta) + "]")
@@ -170,7 +173,10 @@ def get_boolean_search_object(search_components):
 	"""Builds an object for a "bool" search."""
 	bool_search = copy.deepcopy(GENERIC_ELASTICSEARCH_QUERY)
 	bool_search["fields"] = META["output"]["results"]["fields"]
-	bool_search["size"], bool_search["from"] = 10, 0
+	bool_search["from"] = 0
+
+	if "size" in META["output"]["results"]:
+		bool_search["size"] = META["output"]["results"]["size"]
 
 	for item in search_components:
 		my_subquery = None
