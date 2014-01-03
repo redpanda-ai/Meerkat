@@ -10,7 +10,10 @@
 		"console" : true
 	},
 	"output" : {
-		"type" : "local",
-		"path" : "../short_bank_transaction_descriptions_results.csv"},
-		"output" : "name_of_python_function_to_format_output"
+		"results" : {
+			"fields" : [ "BUSINESSSTANDARDNAME", "HOUSE", "PREDIR", "STREET",
+				"STRTYPE", "CITYNAME", "STATE", "ZIP", "pin.location"
+			]
+		}
+	}
 }

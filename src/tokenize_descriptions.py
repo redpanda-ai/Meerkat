@@ -6,7 +6,7 @@ ElasticSearch (structured data)."""
 
 import copy, json, logging, sys, re, urllib.request
 from query_templates import GENERIC_ELASTICSEARCH_QUERY, STOP_WORDS\
-, get_match_query, get_qs_query, RESULT_FIELDS
+, get_match_query, get_qs_query
 from various_tools import string_cleanse
 from custom_exceptions import InvalidArguments, UnsupportedQueryType
 from scipy.stats.mstats import zscore
@@ -29,27 +29,27 @@ def generate_complete_boolean_query(my_meta, qs_query, address, phone_numbers):
 	#Add dynamic output based upon a dictionary of token types
 	#See comment above
 	search_components = []
-	print( "Search components are:")
-	print( "\tUnigrams: ", "'", qs_query, "'")
+	LOGGER.info( "Search components are:")
+	LOGGER.info( "\tUnigrams: '" + qs_query + "'")
 	#search_components.append((unigrams, "qs_query", ["_all"]))
 	search_components.append((qs_query, "qs_query", ["_all^1"\
 	, "BUSINESSSTANDARDNAME^2"], 1))
 	if address is not None:
-		print( "\tMatching 'Address': " , "'" , address , "'")
+		LOGGER.info( "\tMatching 'Address': '" + address + "'")
 		search_components.append((address, "match_query"\
 		,["composite.address^3"], 10))
 	if len(phone_numbers) != 0:
 		for phone_num in phone_numbers:
-			print( "\tMatching 'Phone': " , "'" , phone_num , "'")
+			LOGGER.info( "\tMatching 'Phone': '" + phone_num + "'")
 			search_components.append((phone_num, "match_query"\
 			, ["composite.phone^1"], 1))
 
 	my_obj = get_boolean_search_object(search_components)
-	LOGGER.info(my_obj)
+	LOGGER.info(json.dumps(my_obj))
 	my_results = search_index(my_meta, my_obj)
 	metrics = my_meta["metrics"]
-	print( "This system required " , str(metrics["query_count"])\
-		, " individual searches.")
+	LOGGER.info( "This system required " + str(metrics["query_count"])\
+	+ " individual searches.")
 	display_search_results(my_results)
 
 def display_results(my_meta):
@@ -122,7 +122,7 @@ def display_z_score_delta(scores):
 		quality = "Mid-grade"
 	else:
 		quality = "High-grade"
-	print( "Top Score Quality: " , quality)
+	LOGGER.info( "Top Score Quality: " + quality)
 
 def display_search_results(search_results):
 	"""Displays search results."""
@@ -131,7 +131,8 @@ def display_search_results(search_results):
 	for hit in hits:
 		hit_fields, score = hit['fields'], hit['_score']
 		scores.append(score)
-		field_order = RESULT_FIELDS
+		#field_order = RESULT_FIELDS
+		field_order = META["output"]["results"]["fields"]
 		fields_in_hit = [field for field in hit_fields]
 		ordered_hit_fields = []
 		for ordinal in field_order:
@@ -196,6 +197,7 @@ def extract_longest_substring(long_substrings, longest_substring):
 def get_boolean_search_object(search_components):
 	"""Builds an object for a "bool" search."""
 	bool_search = copy.deepcopy(GENERIC_ELASTICSEARCH_QUERY)
+	bool_search["fields"] = META["output"]["results"]["fields"]
 	bool_search["size"], bool_search["from"] = 10, 0
 
 	for item in search_components:
@@ -305,18 +307,11 @@ def initialize():
 		input_file = open(sys.argv[1], encoding='utf-8')
 		my_meta = json.loads(input_file.read())
 		input_file.close()
-		meta_json = json.dumps(my_meta,sort_keys=True,indent=4\
-		, separators=(',', ': '))
-		print(meta_json)
-		#sys.exit()
 	except FileNotFoundError:
 		print (sys.argv[1], " not found, aborting.")
 		logging.error(sys.argv[1] + " not found, aborting.")
 		sys.exit()
-
-		#The following is to build the LOGGER
-	my_logger = get_logger(my_meta)
-	return my_meta, my_logger
+	return my_meta, get_logger(my_meta)
 
 def get_logger(my_meta):
 	"""Creates a LOGGER, based upon the supplied config object."""
@@ -344,7 +339,10 @@ def get_logger(my_meta):
 		console_handler.setFormatter(my_formatter)
 		my_logger.addHandler(console_handler)
 
-	my_logger.info("Logger created.")
+	my_logger.info("Log initialized.")
+	meta_json = json.dumps(my_meta,sort_keys=True,indent=4\
+	, separators=(',', ': '))
+	my_logger.info(meta_json)
 	return my_logger
 
 def parse_into_search_tokens(my_meta, input_string, recursive):
@@ -444,8 +442,8 @@ def tokenize_file(my_meta):
 	lines = None
 	#print (str(meta))
 	try:
-		input_file = open(meta["input"]["filename"]\
-		, encoding=meta['input']['encoding'])
+		input_file = open(my_meta["input"]["filename"]\
+		, encoding=my_meta['input']['encoding'])
 		lines = input_file.read()
 		input_file.close()
 	except FileNotFoundError:
@@ -453,8 +451,8 @@ def tokenize_file(my_meta):
 		logging.error(sys.argv[1] + " not found, aborting.")
 		sys.exit()
 	for input_string in lines.split("\n"):
-		meta[input_string] = {}
-		my_meta = meta[input_string]
+		my_meta[input_string] = {}
+		my_meta = my_meta[input_string]
 		my_meta["unigram_tokens"] = []
 		my_meta["tokens"] = []
 		my_meta["metrics"] = { "query_count" : 0 }
@@ -468,5 +466,5 @@ def usage():
 
 STILL_BREAKABLE = 2
 #logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.ERROR)
-meta, LOGGER = initialize()
-tokenize_file(meta)
+META, LOGGER = initialize()
+tokenize_file(META)
