@@ -45,7 +45,7 @@ def generate_complete_boolean_query(my_meta, qs_query, address, phone_numbers):
 			, ["composite.phone^1"], 1))
 
 	my_obj = get_boolean_search_object(search_components)
-	logging.info(my_obj)
+	logger.info(my_obj)
 	my_results = search_index(my_meta, my_obj)
 	metrics = my_meta["metrics"]
 	print( "This system required " , str(metrics["query_count"])\
@@ -76,22 +76,23 @@ def display_results(my_meta):
 
 	#Add dynamic output based upon a dictionary of token types
 	#e.g. Unigram, Composite, Numeric, Stop...
-	logging.info( "Unigrams are:\n\t" + str(tokens))
-	logging.info( "Unigrams matched to ElasticSearch:\n\t" + str(unigram_tokens))
-	logging.info( "Of these:")
-	logging.info( "\t" + str(len(stop_tokens)) + " stop words:      "\
+	#logger = my_meta["logger"]
+	logger.info( "Unigrams are:\n\t" + str(tokens))
+	logger.info( "Unigrams matched to ElasticSearch:\n\t" + str(unigram_tokens))
+	logger.info( "Of these:")
+	logger.info( "\t" + str(len(stop_tokens)) + " stop words:      "\
 				+ str(stop_tokens))
-	logging.info( "\t" + str(len(phone_numbers)) + " phone_numbers:   "\
+	logger.info( "\t" + str(len(phone_numbers)) + " phone_numbers:   "\
 		+ str(phone_numbers))
-	logging.info( "\t" + str(len(numeric_tokens)) + " numeric words:   "\
+	logger.info( "\t" + str(len(numeric_tokens)) + " numeric words:   "\
 		+ str(numeric_tokens))
-	logging.info( "\t" + str(len(filtered_tokens)) + " unigrams: "\
+	logger.info( "\t" + str(len(filtered_tokens)) + " unigrams: "\
 		+ str(filtered_tokens))
 
 	count, matching_address = get_matching_address(my_meta)
 	if count > 0:
 		addresses.append(matching_address)
-	logging.info( "\t" + str(len(addresses)) + " addresses: " + str(addresses))
+	logger.info( "\t" + str(len(addresses)) + " addresses: " + str(addresses))
 
 	#show all search terms separated by spaces
 	query_string = " ".join(filtered_tokens)
@@ -113,7 +114,7 @@ def display_z_score_delta(scores):
 	z_scores = zscore(scores)
 	first_score, second_score = z_scores[0:2]
 	z_score_delta = round(first_score - second_score, 3)
-	logging.info( "Z-Score delta: [" + str(z_score_delta) + "]")
+	logger.info( "Z-Score delta: [" + str(z_score_delta) + "]")
 	quality = "Non"
 	if z_score_delta <= 1:
 		quality = "Low-grade"
@@ -255,7 +256,8 @@ def get_n_gram_tokens(list_of_tokens):
 def search_index(my_meta,input_as_object):
 	"""Searches the merchants index and the merchant mapping"""
 	input_data = json.dumps(input_as_object).encode('UTF-8')
-	logging.debug(input_data)
+	#print (str(my_meta))
+	logger.debug(input_data)
 	url = "http://brainstorm8:9200/"
 	path = "merchants/merchant/_search"
 	req = urllib.request.Request(url=url+path,data=input_data)
@@ -301,11 +303,45 @@ def initialize():
 		raise InvalidArguments(msg="Incorrect number of arguments", expr=None)
 	try:
 		input_file = open(sys.argv[1], encoding='utf-8')
+		my_meta = json.loads(input_file.read())
+		input_file.close()
+		meta_json = json.dumps(my_meta,sort_keys=True,indent=4\
+		, separators=(',', ': '))
+		print(meta_json)
+		#sys.exit()
 	except FileNotFoundError:
 		print (sys.argv[1], " not found, aborting.")
 		logging.error(sys.argv[1] + " not found, aborting.")
 		sys.exit()
-	return input_file
+
+		#The following is to build the logger
+	my_logger = get_logger(my_meta)
+	my_logger.info("WOW")
+	print (my_logger)
+	return my_meta, my_logger
+
+def get_logger(my_meta):
+	"""Creates a logger, based upon the supplied config object."""
+
+	my_logger = logging.getLogger("simple_example")
+	my_logger.setLevel(logging.DEBUG)
+	# create file handler which logs even debug messages
+	file_handler = logging.FileHandler("../spam.log")
+	file_handler.setLevel(logging.DEBUG)
+	# create console handler with a higher log level
+	console_handler = logging.StreamHandler()
+	console_handler.setLevel(logging.ERROR)
+	# create formatter and add it to the handlers
+	formatter = \
+	logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+	console_handler.setFormatter(formatter)
+	file_handler.setFormatter(formatter)
+	# add the handlers to logger
+	my_logger.addHandler(console_handler)
+	my_logger.addHandler(file_handler)
+
+	my_logger.info("Hi there")
+	return my_logger
 
 def parse_into_search_tokens(my_meta, input_string, recursive):
 	"""Recursively attempts to parse an unstructured transaction
@@ -398,10 +434,21 @@ def search_substrings(my_meta, substrings):
 			if hit_count > 0:
 				return term
 
-def tokenize_file(input_file):
+def tokenize_file(my_meta):
 	"""Opens a file of descriptions, one per line, and tokenizes the results."""
-	meta = {}
-	for input_string in input_file:
+	#meta = {}
+	lines = None
+	#print (str(meta))
+	try:
+		input_file = open(meta["input"]["filename"]\
+		, encoding=meta['input']['encoding'])
+		lines = input_file.read()
+		input_file.close()
+	except FileNotFoundError:
+		print (sys.argv[1], " not found, aborting.")
+		logging.error(sys.argv[1] + " not found, aborting.")
+		sys.exit()
+	for input_string in lines.split("\n"):
 		meta[input_string] = {}
 		my_meta = meta[input_string]
 		my_meta["unigram_tokens"] = []
@@ -416,5 +463,6 @@ def usage():
 	print( "Usage:\n\t<quoted_transaction_description_string>")
 
 STILL_BREAKABLE = 2
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.ERROR)
-tokenize_file(initialize())
+#logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.ERROR)
+meta, logger = initialize()
+tokenize_file(meta)
