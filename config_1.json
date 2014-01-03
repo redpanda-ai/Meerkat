@@ -1,0 +1,16 @@
+{
+	"input" : {
+		"filename" : "../short_bank_transaction_descriptions.csv",
+		"encoding" : "utf-8"
+	},
+	"logging" : {
+		"level" : "info",
+		"path" : "../logs.log",
+		"formatter" : "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+		"console" : true
+	},
+	"output" : {
+		"type" : "local",
+		"path" : "../short_bank_transaction_descriptions_results.csv"},
+		"output" : "name_of_python_function_to_format_output"
+}

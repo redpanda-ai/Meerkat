@@ -45,7 +45,7 @@ def generate_complete_boolean_query(my_meta, qs_query, address, phone_numbers):
 			, ["composite.phone^1"], 1))
 
 	my_obj = get_boolean_search_object(search_components)
-	logger.info(my_obj)
+	LOGGER.info(my_obj)
 	my_results = search_index(my_meta, my_obj)
 	metrics = my_meta["metrics"]
 	print( "This system required " , str(metrics["query_count"])\
@@ -76,23 +76,23 @@ def display_results(my_meta):
 
 	#Add dynamic output based upon a dictionary of token types
 	#e.g. Unigram, Composite, Numeric, Stop...
-	#logger = my_meta["logger"]
-	logger.info( "Unigrams are:\n\t" + str(tokens))
-	logger.info( "Unigrams matched to ElasticSearch:\n\t" + str(unigram_tokens))
-	logger.info( "Of these:")
-	logger.info( "\t" + str(len(stop_tokens)) + " stop words:      "\
+	#LOGGER = my_meta["LOGGER"]
+	LOGGER.info( "Unigrams are:\n\t" + str(tokens))
+	LOGGER.info( "Unigrams matched to ElasticSearch:\n\t" + str(unigram_tokens))
+	LOGGER.info( "Of these:")
+	LOGGER.info( "\t" + str(len(stop_tokens)) + " stop words:      "\
 				+ str(stop_tokens))
-	logger.info( "\t" + str(len(phone_numbers)) + " phone_numbers:   "\
+	LOGGER.info( "\t" + str(len(phone_numbers)) + " phone_numbers:   "\
 		+ str(phone_numbers))
-	logger.info( "\t" + str(len(numeric_tokens)) + " numeric words:   "\
+	LOGGER.info( "\t" + str(len(numeric_tokens)) + " numeric words:   "\
 		+ str(numeric_tokens))
-	logger.info( "\t" + str(len(filtered_tokens)) + " unigrams: "\
+	LOGGER.info( "\t" + str(len(filtered_tokens)) + " unigrams: "\
 		+ str(filtered_tokens))
 
 	count, matching_address = get_matching_address(my_meta)
 	if count > 0:
 		addresses.append(matching_address)
-	logger.info( "\t" + str(len(addresses)) + " addresses: " + str(addresses))
+	LOGGER.info( "\t" + str(len(addresses)) + " addresses: " + str(addresses))
 
 	#show all search terms separated by spaces
 	query_string = " ".join(filtered_tokens)
@@ -114,7 +114,7 @@ def display_z_score_delta(scores):
 	z_scores = zscore(scores)
 	first_score, second_score = z_scores[0:2]
 	z_score_delta = round(first_score - second_score, 3)
-	logger.info( "Z-Score delta: [" + str(z_score_delta) + "]")
+	LOGGER.info( "Z-Score delta: [" + str(z_score_delta) + "]")
 	quality = "Non"
 	if z_score_delta <= 1:
 		quality = "Low-grade"
@@ -257,7 +257,7 @@ def search_index(my_meta,input_as_object):
 	"""Searches the merchants index and the merchant mapping"""
 	input_data = json.dumps(input_as_object).encode('UTF-8')
 	#print (str(my_meta))
-	logger.debug(input_data)
+	LOGGER.debug(input_data)
 	url = "http://brainstorm8:9200/"
 	path = "merchants/merchant/_search"
 	req = urllib.request.Request(url=url+path,data=input_data)
@@ -314,33 +314,37 @@ def initialize():
 		logging.error(sys.argv[1] + " not found, aborting.")
 		sys.exit()
 
-		#The following is to build the logger
+		#The following is to build the LOGGER
 	my_logger = get_logger(my_meta)
-	my_logger.info("WOW")
-	print (my_logger)
 	return my_meta, my_logger
 
 def get_logger(my_meta):
-	"""Creates a logger, based upon the supplied config object."""
+	"""Creates a LOGGER, based upon the supplied config object."""
 
-	my_logger = logging.getLogger("simple_example")
-	my_logger.setLevel(logging.DEBUG)
-	# create file handler which logs even debug messages
-	file_handler = logging.FileHandler("../spam.log")
-	file_handler.setLevel(logging.DEBUG)
-	# create console handler with a higher log level
-	console_handler = logging.StreamHandler()
-	console_handler.setLevel(logging.ERROR)
-	# create formatter and add it to the handlers
-	formatter = \
-	logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-	console_handler.setFormatter(formatter)
-	file_handler.setFormatter(formatter)
-	# add the handlers to logger
-	my_logger.addHandler(console_handler)
+	levels = { 'debug': logging.DEBUG, 'info': logging.INFO\
+	, 'warning': logging.WARNING, 'error': logging.ERROR\
+	, 'critical': logging.CRITICAL }
+	my_level = my_meta["logging"]["level"]
+	if my_level in levels:
+		my_level = levels[my_level]
+	my_path = my_meta["logging"]["path"]
+	my_formatter = logging.Formatter(my_meta['logging']['formatter'])
+	my_logger = logging.getLogger("my_logger")
+	my_logger.setLevel(my_level)
+	file_handler = logging.FileHandler(my_path)
+	file_handler.setLevel(my_level)
+	file_handler.setFormatter(my_formatter)
 	my_logger.addHandler(file_handler)
 
-	my_logger.info("Hi there")
+	#Add console logging, if configured
+	my_console = my_meta["logging"]["console"]
+	if my_console is True:
+		console_handler = logging.StreamHandler()
+		console_handler.setLevel(my_level)
+		console_handler.setFormatter(my_formatter)
+		my_logger.addHandler(console_handler)
+
+	my_logger.info("Logger created.")
 	return my_logger
 
 def parse_into_search_tokens(my_meta, input_string, recursive):
@@ -464,5 +468,5 @@ def usage():
 
 STILL_BREAKABLE = 2
 #logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.ERROR)
-meta, logger = initialize()
+meta, LOGGER = initialize()
 tokenize_file(meta)
