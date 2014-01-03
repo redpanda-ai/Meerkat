@@ -402,7 +402,6 @@ def tokenize_file(input_file):
 	"""Opens a file of descriptions, one per line, and tokenizes the results."""
 	meta = {}
 	for input_string in input_file:
-		#unigram_tokens, tokens, metrics = [], [], { "query_count" : 0 }
 		meta[input_string] = {}
 		my_meta = meta[input_string]
 		my_meta["unigram_tokens"] = []
