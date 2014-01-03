@@ -1,0 +1,19 @@
+{
+	"input" : {
+		"filename" : "../short_bank_transaction_descriptions.csv",
+		"encoding" : "utf-8"
+	},
+	"logging" : {
+		"level" : "warning",
+		"path" : "../foo.log",
+		"formatter" : "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+		"console" : false
+	},
+	"output" : {
+		"results" : {
+			"fields" : [ "id", "BUSINESSSTANDARDNAME"
+			]
+		},
+		"path" : "../config_2.json"
+	}
+}

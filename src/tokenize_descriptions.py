@@ -4,12 +4,12 @@
 description strings (unstructured data) to merchant data indexed with
 ElasticSearch (structured data)."""
 
-import copy, json, logging, sys, re, urllib.request
+import copy, json, logging, re, sys, urllib.request
+from custom_exceptions import InvalidArguments, UnsupportedQueryType
 from query_templates import GENERIC_ELASTICSEARCH_QUERY, STOP_WORDS\
 , get_match_query, get_qs_query
-from various_tools import string_cleanse
-from custom_exceptions import InvalidArguments, UnsupportedQueryType
 from scipy.stats.mstats import zscore
+from various_tools import string_cleanse
 
 def begin_parse(my_meta,input_string):
 	"""Creates data structures used the first call into the
@@ -21,36 +21,6 @@ def begin_parse(my_meta,input_string):
 	#unigram_tokens, tokens = {}, {}
 	parse_into_search_tokens(my_meta, input_string, recursive)
 
-def generate_complete_boolean_query(my_meta, qs_query, address, phone_numbers):
-	"""Constructs a complete boolean query based upon:
-	1.  Unigrams (query_string)
-	2.  Addresses (match)
-	3.  Phone Number (match)"""
-	#Add dynamic output based upon a dictionary of token types
-	#See comment above
-	search_components = []
-	LOGGER.info( "Search components are:")
-	LOGGER.info( "\tUnigrams: '" + qs_query + "'")
-	#search_components.append((unigrams, "qs_query", ["_all"]))
-	search_components.append((qs_query, "qs_query", ["_all^1"\
-	, "BUSINESSSTANDARDNAME^2"], 1))
-	if address is not None:
-		LOGGER.info( "\tMatching 'Address': '" + address + "'")
-		search_components.append((address, "match_query"\
-		,["composite.address^3"], 10))
-	if len(phone_numbers) != 0:
-		for phone_num in phone_numbers:
-			LOGGER.info( "\tMatching 'Phone': '" + phone_num + "'")
-			search_components.append((phone_num, "match_query"\
-			, ["composite.phone^1"], 1))
-
-	my_obj = get_boolean_search_object(search_components)
-	LOGGER.info(json.dumps(my_obj))
-	my_results = search_index(my_meta, my_obj)
-	metrics = my_meta["metrics"]
-	LOGGER.info( "This system required " + str(metrics["query_count"])\
-	+ " individual searches.")
-	display_search_results(my_results)
 
 def display_results(my_meta):
 	"""Displays our tokens, n-grams, and search results."""
@@ -109,20 +79,6 @@ def display_results(my_meta):
 	##matched_n_gram_tokens = search_n_gram_tokens(n_gram_tokens)
 	##print "ALL"
 
-def display_z_score_delta(scores):
-	"""Display the Z-score delta between the first and second scores."""
-	z_scores = zscore(scores)
-	first_score, second_score = z_scores[0:2]
-	z_score_delta = round(first_score - second_score, 3)
-	LOGGER.info( "Z-Score delta: [" + str(z_score_delta) + "]")
-	quality = "Non"
-	if z_score_delta <= 1:
-		quality = "Low-grade"
-	elif z_score_delta <= 2:
-		quality = "Mid-grade"
-	else:
-		quality = "High-grade"
-	LOGGER.info( "Top Score Quality: " + quality)
 
 def display_search_results(search_results):
 	"""Displays search results."""
@@ -143,36 +99,22 @@ def display_search_results(search_results):
 		"[" + str(round(score,3)) + "] " + " ".join(ordered_hit_fields))
 	display_z_score_delta(scores)
 	for result in results:
-		print( result)
+		print(result)
 
-def get_matching_address(my_meta):
-	"""Sadly, this function is temporary.  I plan to go to a more
-	generic approach that exhaustively works with all n-grams
-	against all composite features."""
-	numeric = re.compile("^[0-9]+$")
-	address_candidates = {}
-	n_gram = []
-	tokens = my_meta["tokens"]
-	for token in tokens:
-		if numeric.search(token):
-			n_gram = []
-			n_gram.append(token)
-		else:
-			n_gram.append(token)
-			current_length = len(n_gram)
-			if current_length > 1:
-				if current_length not in address_candidates:
-					address_candidates[current_length] = []
-					my_stuff = \
-					address_candidates[current_length]
-					my_stuff.append(" ".join(n_gram))
-	for key in reversed(sorted(address_candidates.keys())):
-		candidate_list = address_candidates[key]
-		count, term = get_composite_search_count(my_meta, candidate_list\
-		,"composite.address")
-		if count > 0:
-			return count, term
-	return 0, None
+def display_z_score_delta(scores):
+	"""Display the Z-score delta between the first and second scores."""
+	z_scores = zscore(scores)
+	first_score, second_score = z_scores[0:2]
+	z_score_delta = round(first_score - second_score, 3)
+	LOGGER.info( "Z-Score delta: [" + str(z_score_delta) + "]")
+	quality = "Non"
+	if z_score_delta <= 1:
+		quality = "Low-grade"
+	elif z_score_delta <= 2:
+		quality = "Mid-grade"
+	else:
+		quality = "High-grade"
+	LOGGER.info( "Top Score Quality: " + quality)
 
 def extract_longest_substring(long_substrings, longest_substring):
 	"""Extracts the longest substring from our input, returning left
@@ -191,8 +133,38 @@ def extract_longest_substring(long_substrings, longest_substring):
 	del long_substrings[ls_len][longest_substring]
 	if len(long_substrings[ls_len]) == 0:
 		del long_substrings[ls_len]
-
 	return original_term, pre, post
+
+def generate_complete_boolean_query(my_meta, qs_query, address, phone_numbers):
+	"""Constructs a complete boolean query based upon:
+	1.  Unigrams (query_string)
+	2.  Addresses (match)
+	3.  Phone Number (match)"""
+	#Add dynamic output based upon a dictionary of token types
+	#See comment above
+	search_components = []
+	LOGGER.info( "Search components are:")
+	LOGGER.info( "\tUnigrams: '" + qs_query + "'")
+	#search_components.append((unigrams, "qs_query", ["_all"]))
+	search_components.append((qs_query, "qs_query", ["_all^1"\
+	, "BUSINESSSTANDARDNAME^2"], 1))
+	if address is not None:
+		LOGGER.info( "\tMatching 'Address': '" + address + "'")
+		search_components.append((address, "match_query"\
+		,["composite.address^3"], 10))
+	if len(phone_numbers) != 0:
+		for phone_num in phone_numbers:
+			LOGGER.info( "\tMatching 'Phone': '" + phone_num + "'")
+			search_components.append((phone_num, "match_query"\
+			, ["composite.phone^1"], 1))
+
+	my_obj = get_boolean_search_object(search_components)
+	LOGGER.info(json.dumps(my_obj))
+	my_results = search_index(my_meta, my_obj)
+	metrics = my_meta["metrics"]
+	LOGGER.info( "This system required " + str(metrics["query_count"])\
+	+ " individual searches.")
+	display_search_results(my_results)
 
 def get_boolean_search_object(search_components):
 	"""Builds an object for a "bool" search."""
@@ -239,79 +211,34 @@ def get_composite_search_count(my_meta, list_of_ngrams, feature_name):
 			return total, term
 	return 0, None
 
-def get_n_gram_tokens(list_of_tokens):
-	"""Generates a list of n-grams where n >= 2."""
-	unigram_size = 1
-	n_gram_tokens = {}
-	end_index = len(list_of_tokens)
-	for end_offset in range(end_index):
-		for start_index in range(end_index-end_offset):
-			n_gram_size = end_index - end_offset - start_index
-			if n_gram_size > unigram_size:
-				if n_gram_size not in n_gram_tokens:
-					n_gram_tokens[n_gram_size] = []
-				new_n_gram = \
-				list_of_tokens[start_index:end_index-end_offset]
-				n_gram_tokens[n_gram_size].append(" ".join(new_n_gram))
-	return n_gram_tokens
-
-def search_index(my_meta,input_as_object):
-	"""Searches the merchants index and the merchant mapping"""
-	input_data = json.dumps(input_as_object).encode('UTF-8')
-	#print (str(my_meta))
-	LOGGER.debug(input_data)
-	url = "http://brainstorm8:9200/"
-	path = "merchants/merchant/_search"
-	req = urllib.request.Request(url=url+path,data=input_data)
-	output_data = urllib.request.urlopen(req).read().decode('UTF-8')
-	metrics = my_meta["metrics"]
-	metrics["query_count"] += 1
-	output_string = json.loads(output_data)
-	return output_string
-
-def search_n_gram_tokens(my_meta):
-	"""Creates a boolean elasticsearch composed of multiple
-	sub-queries.  Each sub-query is itself a 'phrase' query
-	built of n-grams where n >= 2."""
-	matched_n_gram_tokens = []
-
-	my_new_query = copy.deepcopy(GENERIC_ELASTICSEARCH_QUERY)
-	my_new_query["size"], my_new_query["from"] = 0, 0
-
-	sub_query = {}
-	sub_query["match"] = {}
-	sub_query["match"]["_all"] = {}
-	sub_query["match"]["_all"]["query"] = "__term"
-	sub_query["match"]["_all"]["type"] = "phrase"
-
-	print( "Matched the following n-grams to our merchants index:")
-	n_gram_tokens = my_meta["n_gram_tokens"]
-	for key in reversed(sorted(n_gram_tokens.keys())):
-		for term in n_gram_tokens[key]:
-			sub_query["match"]["_all"]["query"] = term
-			my_new_query["query"]["bool"]["should"].append(sub_query)
-			hit_count = search_index(my_meta,my_new_query)['hits']['total']
-			del my_new_query["query"]["bool"]["should"][0]
-			if hit_count > 0:
-				print( str(key) , "-gram : " , term , " (" , str(hit_count) , ")")
-				matched_n_gram_tokens.append(term)
-	return matched_n_gram_tokens
-
-def initialize():
-	"""Validates the command line arguments."""
-	input_file = None
-	if len(sys.argv) != 2:
-		usage()
-		raise InvalidArguments(msg="Incorrect number of arguments", expr=None)
-	try:
-		input_file = open(sys.argv[1], encoding='utf-8')
-		my_meta = json.loads(input_file.read())
-		input_file.close()
-	except FileNotFoundError:
-		print (sys.argv[1], " not found, aborting.")
-		logging.error(sys.argv[1] + " not found, aborting.")
-		sys.exit()
-	return my_meta, get_logger(my_meta)
+def get_matching_address(my_meta):
+	"""Sadly, this function is temporary.  I plan to go to a more
+	generic approach that exhaustively works with all n-grams
+	against all composite features."""
+	numeric = re.compile("^[0-9]+$")
+	address_candidates = {}
+	n_gram = []
+	tokens = my_meta["tokens"]
+	for token in tokens:
+		if numeric.search(token):
+			n_gram = []
+			n_gram.append(token)
+		else:
+			n_gram.append(token)
+			current_length = len(n_gram)
+			if current_length > 1:
+				if current_length not in address_candidates:
+					address_candidates[current_length] = []
+					my_stuff = \
+					address_candidates[current_length]
+					my_stuff.append(" ".join(n_gram))
+	for key in reversed(sorted(address_candidates.keys())):
+		candidate_list = address_candidates[key]
+		count, term = get_composite_search_count(my_meta, candidate_list\
+		,"composite.address")
+		if count > 0:
+			return count, term
+	return 0, None
 
 def get_logger(my_meta):
 	"""Creates a LOGGER, based upon the supplied config object."""
@@ -344,6 +271,41 @@ def get_logger(my_meta):
 	, separators=(',', ': '))
 	my_logger.info(meta_json)
 	return my_logger
+
+def get_n_gram_tokens(list_of_tokens):
+	"""Generates a list of n-grams where n >= 2."""
+	unigram_size = 1
+	n_gram_tokens = {}
+	end_index = len(list_of_tokens)
+	for end_offset in range(end_index):
+		for start_index in range(end_index-end_offset):
+			n_gram_size = end_index - end_offset - start_index
+			if n_gram_size > unigram_size:
+				if n_gram_size not in n_gram_tokens:
+					n_gram_tokens[n_gram_size] = []
+				new_n_gram = \
+				list_of_tokens[start_index:end_index-end_offset]
+				n_gram_tokens[n_gram_size].append(" ".join(new_n_gram))
+	return n_gram_tokens
+
+def initialize():
+	"""Validates the command line arguments."""
+	input_file = None
+	if len(sys.argv) != 2:
+		usage()
+		raise InvalidArguments(msg="Incorrect number of arguments", expr=None)
+	try:
+		input_file = open(sys.argv[1], encoding='utf-8')
+		my_meta = json.loads(input_file.read())
+		input_file.close()
+	except FileNotFoundError:
+		print (sys.argv[1], " not found, aborting.")
+		logging.error(sys.argv[1] + " not found, aborting.")
+		sys.exit()
+	return my_meta, get_logger(my_meta)
+
+
+
 
 def parse_into_search_tokens(my_meta, input_string, recursive):
 	"""Recursively attempts to parse an unstructured transaction
@@ -415,6 +377,48 @@ def rebuild_tokens(original_term, longest_substring, pre, post, tokens):
 			if post != "":
 				rebuilt_tokens.append(post)
 	return rebuilt_tokens
+
+def search_index(my_meta,input_as_object):
+	"""Searches the merchants index and the merchant mapping"""
+	input_data = json.dumps(input_as_object).encode('UTF-8')
+	#print (str(my_meta))
+	LOGGER.debug(input_data)
+	url = "http://brainstorm8:9200/"
+	path = "merchants/merchant/_search"
+	req = urllib.request.Request(url=url+path,data=input_data)
+	output_data = urllib.request.urlopen(req).read().decode('UTF-8')
+	metrics = my_meta["metrics"]
+	metrics["query_count"] += 1
+	output_string = json.loads(output_data)
+	return output_string
+
+def search_n_gram_tokens(my_meta):
+	"""Creates a boolean elasticsearch composed of multiple
+	sub-queries.  Each sub-query is itself a 'phrase' query
+	built of n-grams where n >= 2."""
+	matched_n_gram_tokens = []
+
+	my_new_query = copy.deepcopy(GENERIC_ELASTICSEARCH_QUERY)
+	my_new_query["size"], my_new_query["from"] = 0, 0
+
+	sub_query = {}
+	sub_query["match"] = {}
+	sub_query["match"]["_all"] = {}
+	sub_query["match"]["_all"]["query"] = "__term"
+	sub_query["match"]["_all"]["type"] = "phrase"
+
+	print( "Matched the following n-grams to our merchants index:")
+	n_gram_tokens = my_meta["n_gram_tokens"]
+	for key in reversed(sorted(n_gram_tokens.keys())):
+		for term in n_gram_tokens[key]:
+			sub_query["match"]["_all"]["query"] = term
+			my_new_query["query"]["bool"]["should"].append(sub_query)
+			hit_count = search_index(my_meta,my_new_query)['hits']['total']
+			del my_new_query["query"]["bool"]["should"][0]
+			if hit_count > 0:
+				print( str(key) , "-gram : " , term , " (" , str(hit_count) , ")")
+				matched_n_gram_tokens.append(term)
+	return matched_n_gram_tokens
 
 def search_substrings(my_meta, substrings):
 	"""Looks for the longest substring in our merchants index that
