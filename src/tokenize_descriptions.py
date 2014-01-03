@@ -45,7 +45,7 @@ def generate_complete_boolean_query(my_meta, qs_query, address, phone_numbers):
 			, ["composite.phone^1"], 1))
 
 	my_obj = get_boolean_search_object(search_components)
-	print( my_obj)
+	logging.info(my_obj)
 	my_results = search_index(my_meta, my_obj)
 	metrics = my_meta["metrics"]
 	print( "This system required " , str(metrics["query_count"])\
@@ -113,7 +113,7 @@ def display_z_score_delta(scores):
 	z_scores = zscore(scores)
 	first_score, second_score = z_scores[0:2]
 	z_score_delta = round(first_score - second_score, 3)
-	print( "Z-Score delta: [" , str(z_score_delta) , "]")
+	logging.info( "Z-Score delta: [" + str(z_score_delta) + "]")
 	quality = "Non"
 	if z_score_delta <= 1:
 		quality = "Low-grade"
@@ -417,4 +417,5 @@ def usage():
 	print( "Usage:\n\t<quoted_transaction_description_string>")
 
 STILL_BREAKABLE = 2
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.ERROR)
 tokenize_file(initialize())
