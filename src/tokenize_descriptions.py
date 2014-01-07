@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/local/bin/python3
 
 """This script scans, tokenizes, and constructs queries to match transaction
 description strings (unstructured data) to merchant data indexed with
