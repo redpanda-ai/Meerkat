@@ -103,10 +103,12 @@ def display_search_results(search_results):
 
 def display_z_score_delta(scores):
 	"""Display the Z-score delta between the first and second scores."""
-	z_scores = zscore(scores)
-	if len(z_scores) < 2:
+
+	if len(scores) < 2:
 		LOGGER.info("Unable to generate Z-Score")
 		return
+
+	z_scores = zscore(scores)
 	first_score, second_score = z_scores[0:2]
 	z_score_delta = round(first_score - second_score, 3)
 	LOGGER.info( "Z-Score delta: [" + str(z_score_delta) + "]")
