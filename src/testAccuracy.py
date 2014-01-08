@@ -10,20 +10,25 @@ dictA = csv.DictReader(fileA)
 dictB = csv.DictReader(fileB)
 fileCopy = []
 total = 0
+notFound = 0
 correct = 0
 
 # Copy
 for lRow in dictB: 
 	fileCopy.append(lRow)
 
-# Merge
+# Count
+numLabeled = len(fileCopy)
 for row in dictA:
 	total += 1
-	for lRow in fileCopy:
+	for index, lRow in enumerate(fileCopy):
 		if row['DESCRIPTION'] == lRow['DESCRIPTION']:
 			if row['PERSISTENTRECORDID'] == lRow['PERSISTENTRECORDID']:
 				correct += 1
 			break
+		if index + 1 == numLabeled:
+			notFound += 1
 
-print(str(math.ceil(correct/total * 100)) + "%")
+print("Accuracy = " + str(math.ceil(correct/(total-notFound) * 100)) + "%")
+print("Not Found = " + str(math.ceil(notFound/total * 100)) + "%")
 		
