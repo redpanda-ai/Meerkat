@@ -1,12 +1,12 @@
 #!/usr/local/bin/python3
 
 """This script merges a new set of labeled transactions into our 
-	existing set"""
+	existing set."""
 
 import csv, sys
 
 fileA = open(sys.argv[1])
-fileB = open(sys.argv[2])
+fileB = open("../labeledTrans.csv")
 dictA = csv.DictReader(fileA)
 dictB = csv.DictReader(fileB)
 fileCopy = []
