@@ -476,6 +476,7 @@ def usage():
 	"""Shows the user which parameters to send into the program."""
 	print( "Usage:\n\t<quoted_transaction_description_string>")
 
+#Test to ensure that changes are uploaded only to the issue_5 branch.
 STILL_BREAKABLE = 2
 #logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.ERROR)
 META, LOGGER = initialize()
