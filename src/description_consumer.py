@@ -4,7 +4,7 @@ Created on Jan 14, 2014
 @author: jkey
 '''
 #!/bin/python3
-import copy, json, logging, re, urllib.request, queue, threading
+import copy, json, logging, re,  queue, threading, urllib.request
 from custom_exceptions import UnsupportedQueryType
 from query_templates import GENERIC_ELASTICSEARCH_QUERY, STOP_WORDS\
 , get_match_query, get_qs_query
@@ -16,34 +16,14 @@ class DescriptionConsumer(threading.Thread):
 
 	STILL_BREAKABLE = 2
 
-	def __re_init(self):
-		"""Purges several object data structures and re-initializes them."""
-		self.recursive = False
-		self.my_meta = {}
-		self.my_meta["unigram_tokens"] = []
-		self.my_meta["tokens"] = []
-		self.my_meta["metrics"] = { "query_count" : 0 }
-
-	def __init__(self, thread_id, params, desc_queue):
-		''' Constructor '''
-		threading.Thread.__init__(self)
-		self.thread_id = thread_id
-		self.desc_queue = desc_queue
-		self.input_string = None
-		self.params = params
-		self.recursive = False
-		self.my_meta = None
-		self.__re_init()
-		self.get_logger()
-
 	def __begin_parse(self):
 		"""Creates data structures used the first call into the
-		parse_into_search_tokens function."""
+		__parse_into_search_tokens function."""
 		print( "Input String ",self.input_string)
 		self.recursive = False
 		self.my_meta["terms"] = []
 		self.my_meta["long_substrings"] = {}
-		self.parse_into_search_tokens(self.input_string, self.recursive)
+		self.__parse_into_search_tokens(self.input_string, self.recursive)
 
 	def __display_results(self):
 		"""Displays our tokens, n-grams, and search results."""
@@ -57,7 +37,6 @@ class DescriptionConsumer(threading.Thread):
 		phone_numbers = []
 		tokens = self.my_meta["tokens"]
 		unigram_tokens = self.my_meta["unigram_tokens"]
-		#unigram_tokens = my_meta["unigram_tokens"]
 		for token in tokens:
 			if token in STOP_WORDS:
 				stop_tokens.append(token)
@@ -68,11 +47,10 @@ class DescriptionConsumer(threading.Thread):
 			else:
 				filtered_tokens.append(string_cleanse(token))
 
-		print ("TOKENS ARE: ", str(tokens))
 		#Add dynamic output based upon a dictionary of token types
 		#e.g. Unigram, Composite, Numeric, Stop...
-		#logger = my_meta["logger"]
 		logger = logging.getLogger("thread " + str(self.thread_id))
+		logger.info("TOKENS ARE: " + str(tokens))
 		logger.info( "Unigrams are:\n\t" + str(tokens))
 		logger.info( "Unigrams matched to ElasticSearch:\n\t" + str(unigram_tokens))
 		logger.info( "Of these:")
@@ -85,7 +63,7 @@ class DescriptionConsumer(threading.Thread):
 		logger.info( "\t" + str(len(filtered_tokens)) + " unigrams: "\
 			+ str(filtered_tokens))
 
-		count, matching_address = self.get_matching_address()
+		count, matching_address = self.__get_matching_address()
 		if count > 0:
 			addresses.append(matching_address)
 		logger.info( "\t" + str(len(addresses)) + " addresses: " + str(addresses))
@@ -93,7 +71,7 @@ class DescriptionConsumer(threading.Thread):
 		#show all search terms separated by spaces
 		query_string = " ".join(filtered_tokens)
 
-		self.generate_complete_boolean_query(query_string, matching_address\
+		self.__generate_final_query(query_string, matching_address\
 		, phone_numbers)
 		#Not finished, do a tail recursive search for longest matching
 		#n-gram on a per composite-feature basis.
@@ -147,8 +125,72 @@ class DescriptionConsumer(threading.Thread):
 			quality = "High-grade"
 		logger.info( "Top Score Quality: " + quality)
 
+	def __extract_longest_substring(self, longest_substring):
+		"""Extracts the longest substring from our input, returning left
+		over fragments to find the following strings:
+		1.  "original_term": the original string containing "longest_substring"
+		2.  "pre": substring preceding "longest_substring"
+		3.  "post" : substring following "longest_substring" """
 
-	def get_boolean_search_object(self, search_components):
+		long_substrings = self.my_meta["long_substrings"]
+		ls_len = len(longest_substring)
+		original_term = long_substrings[ls_len][longest_substring]
+		start_index = original_term.find(longest_substring)
+		end_index = start_index + ls_len
+		pre, post = original_term[:start_index], original_term[end_index:]
+
+		#delete the current "longest substring" from our dictionary
+		del long_substrings[ls_len][longest_substring]
+		if len(long_substrings[ls_len]) == 0:
+			del long_substrings[ls_len]
+		return original_term, pre, post
+
+
+	def __init__(self, thread_id, params, desc_queue):
+		''' Constructor '''
+		threading.Thread.__init__(self)
+		self.thread_id = thread_id
+		self.desc_queue = desc_queue
+		self.input_string = None
+		self.params = params
+		self.recursive = False
+		self.my_meta = None
+		self.__reset_my_meta()
+		self.__set_logger()
+
+	def __generate_final_query(self, qs_query, address, phone_numbers):
+		"""Constructs a complete boolean query based upon:
+		1.  Unigrams (query_string)
+		2.  Addresses (match)
+		3.  Phone Number (match)"""
+		#Add dynamic output based upon a dictionary of token types
+		#See comment above
+		logger = logging.getLogger("thread " + str(self.thread_id))
+		my_meta = self.my_meta
+		search_components = []
+		logger.info( "Search components are:")
+		logger.info( "\tUnigrams: '" + qs_query + "'")
+		search_components.append((qs_query, "qs_query", ["_all^1"\
+		, "BUSINESSSTANDARDNAME^2"], 1))
+		if address is not None:
+			logger.info( "\tMatching 'Address': '" + address + "'")
+			search_components.append((address, "match_query"\
+			,["composite.address^3"], 10))
+		if len(phone_numbers) != 0:
+			for phone_num in phone_numbers:
+				logger.info( "\tMatching 'Phone': '" + phone_num + "'")
+				search_components.append((phone_num, "match_query"\
+				, ["composite.phone^1"], 1))
+
+		my_obj = self.__get_boolean_search_object(search_components)
+		logger.info(json.dumps(my_obj))
+		my_results = self.__search_index(my_obj)
+		metrics = my_meta["metrics"]
+		logger.info( "This system required " + str(metrics["query_count"])\
+		+ " individual searches.")
+		self.__display_search_results(my_results)
+
+	def __get_boolean_search_object(self, search_components):
 		"""Builds an object for a "bool" search."""
 		params = self.params
 		bool_search = copy.deepcopy(GENERIC_ELASTICSEARCH_QUERY)
@@ -172,79 +214,11 @@ class DescriptionConsumer(threading.Thread):
 			bool_search["query"]["bool"]["should"].append(my_subquery)
 		return bool_search
 
-	def generate_complete_boolean_query(self, qs_query, address, phone_numbers):
-		"""Constructs a complete boolean query based upon:
-		1.  Unigrams (query_string)
-		2.  Addresses (match)
-		3.  Phone Number (match)"""
-		#Add dynamic output based upon a dictionary of token types
-		#See comment above
-		logger = logging.getLogger("thread " + str(self.thread_id))
-		my_meta = self.my_meta
-		search_components = []
-		logger.info( "Search components are:")
-		logger.info( "\tUnigrams: '" + qs_query + "'")
-		#search_components.append((unigrams, "qs_query", ["_all"]))
-		search_components.append((qs_query, "qs_query", ["_all^1"\
-		, "BUSINESSSTANDARDNAME^2"], 1))
-		if address is not None:
-			logger.info( "\tMatching 'Address': '" + address + "'")
-			search_components.append((address, "match_query"\
-			,["composite.address^3"], 10))
-		if len(phone_numbers) != 0:
-			for phone_num in phone_numbers:
-				logger.info( "\tMatching 'Phone': '" + phone_num + "'")
-				search_components.append((phone_num, "match_query"\
-				, ["composite.phone^1"], 1))
 
-		my_obj = self.get_boolean_search_object(search_components)
-		logger.info(json.dumps(my_obj))
-		#print("FOO: ", json.dumps(my_obj))
-		my_results = self.__search_index(my_obj)
-		metrics = my_meta["metrics"]
-		logger.info( "This system required " + str(metrics["query_count"])\
-		+ " individual searches.")
-		self.__display_search_results(my_results)
-
-	def get_logger(self):
-		"""Creates a logger, based upon the supplied config object."""
-
-		levels = { 'debug': logging.DEBUG, 'info': logging.INFO\
-		, 'warning': logging.WARNING, 'error': logging.ERROR\
-		, 'critical': logging.CRITICAL }
-		params = self.params
-		#print (str(params))
-		my_level = params["logging"]["level"]
-		if my_level in levels:
-			my_level = levels[my_level]
-		my_path = params["logging"]["path"]
-		my_formatter = logging.Formatter(params['logging']['formatter'])
-		#You'll want to add something to identify the thread
-		my_logger = logging.getLogger("thread " + str(self.thread_id))
-		my_logger.setLevel(my_level)
-		file_handler = logging.FileHandler(my_path)
-		file_handler.setLevel(my_level)
-		file_handler.setFormatter(my_formatter)
-		my_logger.addHandler(file_handler)
-
-		#Add console logging, if configured
-		my_console = params["logging"]["console"]
-		if my_console is True:
-			console_handler = logging.StreamHandler()
-			console_handler.setLevel(my_level)
-			console_handler.setFormatter(my_formatter)
-			my_logger.addHandler(console_handler)
-
-		my_logger.info("Log initialized.")
-		meta_json = json.dumps(params,sort_keys=True,indent=4\
-		, separators=(',', ': '))
-		my_logger.info(meta_json)
-
-	def get_composite_search_count(self, list_of_ngrams, feature_name):
+	def __get_composite_search_count(self, list_of_ngrams, feature_name):
 		"""Obtains search results for a query composed of multiple
 		sub-queries.  At some point I may add 'query_string' as an
 		additional parameter."""
-		#my_meta = self.my_meta
 		my_new_query = copy.deepcopy(GENERIC_ELASTICSEARCH_QUERY)
 		my_new_query["size"], my_new_query["from"] = 0, 0
 
@@ -266,7 +240,7 @@ class DescriptionConsumer(threading.Thread):
 				return total, term
 		return 0, None
 
-	def get_matching_address(self):
+	def __get_matching_address(self):
 		"""Sadly, this function is temporary.  I plan to go to a more
 		generic approach that exhaustively works with all n-grams
 		against all composite features."""
@@ -290,33 +264,13 @@ class DescriptionConsumer(threading.Thread):
 						my_stuff.append(" ".join(n_gram))
 		for key in reversed(sorted(address_candidates.keys())):
 			candidate_list = address_candidates[key]
-			count, term = self.get_composite_search_count(candidate_list\
+			count, term = self.__get_composite_search_count(candidate_list\
 			,"composite.address")
 			if count > 0:
 				return count, term
 		return 0, None
 
-	def extract_longest_substring(self, longest_substring):
-		"""Extracts the longest substring from our input, returning left
-		over fragments to find the following strings:
-		1.  "original_term": the original string containing "longest_substring"
-		2.  "pre": substring preceding "longest_substring"
-		3.  "post" : substring following "longest_substring" """
-
-		long_substrings = self.my_meta["long_substrings"]
-		ls_len = len(longest_substring)
-		original_term = long_substrings[ls_len][longest_substring]
-		start_index = original_term.find(longest_substring)
-		end_index = start_index + ls_len
-		pre, post = original_term[:start_index], original_term[end_index:]
-
-		#delete the current "longest substring" from our dictionary
-		del long_substrings[ls_len][longest_substring]
-		if len(long_substrings[ls_len]) == 0:
-			del long_substrings[ls_len]
-		return original_term, pre, post
-
-	def parse_into_search_tokens(self, input_string, recursive):
+	def __parse_into_search_tokens(self, input_string, recursive):
 		"""Recursively attempts to parse an unstructured transaction
 		description into TOKENS.
 		Example: "MEL'S DRIVE-IN #2 SAN FRANCISCOCA 24492153337286434101508" """
@@ -352,9 +306,9 @@ class DescriptionConsumer(threading.Thread):
 		(long_substrings.keys())[-1]].keys())[0]
 		self.my_meta["unigram_tokens"].append(longest_substring)
 
-		original_term, pre, post = self.extract_longest_substring(longest_substring)
+		original_term, pre, post = self.__extract_longest_substring(longest_substring)
 		self.__rebuild_tokens(original_term, longest_substring, pre, post)
-		self.parse_into_search_tokens(pre + " " + post, True)
+		self.__parse_into_search_tokens(pre + " " + post, True)
 
 	def __powerset(self, term, substrings):
 		"""Recursively discover all substrings for a term."""
@@ -387,18 +341,13 @@ class DescriptionConsumer(threading.Thread):
 					rebuilt_tokens.append(post)
 		self.my_meta["tokens"] = rebuilt_tokens
 
-	def run(self):
-		while True:
-			try:
-				self.input_string = self.desc_queue.get()
-				self.__begin_parse()
-				self.__display_results()
-				self.__re_init()
-				self.desc_queue.task_done()
-
-			except queue.Empty:
-				print(str(self.thread_id), " found empty queue, terminating.")
-				return True
+	def __reset_my_meta(self):
+		"""Purges several object data structures and re-initializes them."""
+		self.recursive = False
+		self.my_meta = {}
+		self.my_meta["unigram_tokens"] = []
+		self.my_meta["tokens"] = []
+		self.my_meta["metrics"] = { "query_count" : 0 }
 
 	def __search_index(self, input_as_object):
 		"""Searches the merchants index and the merchant mapping"""
@@ -435,3 +384,48 @@ class DescriptionConsumer(threading.Thread):
 				if hit_count > 0:
 					return term
 
+	def __set_logger(self):
+		"""Creates a logger, based upon the supplied config object."""
+
+		levels = { 'debug': logging.DEBUG, 'info': logging.INFO\
+		, 'warning': logging.WARNING, 'error': logging.ERROR\
+		, 'critical': logging.CRITICAL }
+		params = self.params
+		my_level = params["logging"]["level"]
+		if my_level in levels:
+			my_level = levels[my_level]
+		my_path = params["logging"]["path"]
+		my_formatter = logging.Formatter(params['logging']['formatter'])
+		#You'll want to add something to identify the thread
+		my_logger = logging.getLogger("thread " + str(self.thread_id))
+		my_logger.setLevel(my_level)
+		file_handler = logging.FileHandler(my_path)
+		file_handler.setLevel(my_level)
+		file_handler.setFormatter(my_formatter)
+		my_logger.addHandler(file_handler)
+
+		#Add console logging, if configured
+		my_console = params["logging"]["console"]
+		if my_console is True:
+			console_handler = logging.StreamHandler()
+			console_handler.setLevel(my_level)
+			console_handler.setFormatter(my_formatter)
+			my_logger.addHandler(console_handler)
+
+		my_logger.info("Log initialized.")
+		params_json = json.dumps(params,sort_keys=True,indent=4\
+		, separators=(',', ': '))
+		my_logger.info(params_json)
+
+	def run(self):
+		while True:
+			try:
+				self.input_string = self.desc_queue.get()
+				self.__begin_parse()
+				self.__display_results()
+				self.__reset_my_meta()
+				self.desc_queue.task_done()
+
+			except queue.Empty:
+				print(str(self.thread_id), " found empty queue, terminating.")
+				return True
