@@ -12,7 +12,8 @@ from scipy.stats.mstats import zscore
 from various_tools import string_cleanse
 
 class DescriptionConsumer(threading.Thread):
-	''' classdocs '''
+	''' Acts as a client to an ElasticSearch cluster, tokenizing description
+	strings that it pulls from a synchronized queue. '''
 
 	STILL_BREAKABLE = 2
 

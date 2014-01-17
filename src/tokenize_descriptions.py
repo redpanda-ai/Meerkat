@@ -17,7 +17,6 @@ def get_desc_queue(params):
 		input_file = open(params["input"]["filename"]\
 		, encoding=params['input']['encoding'])
 		lines = input_file.read()
-		#input_file.close()
 	except FileNotFoundError:
 		print (sys.argv[1], " not found, aborting.")
 		logging.error(sys.argv[1] + " not found, aborting.")
@@ -59,10 +58,14 @@ def tokenize(params, desc_queue):
 
 def usage():
 	"""Shows the user which parameters to send into the program."""
-	print( "Usage:\n\t<quoted_transaction_description_string>")
+	result = "Usage:\n\t<quoted_transaction_description_string>"
+	print( result )
+	return result
 
-#Test to ensure that changes are uploaded only to the issue_5 branch.
-STILL_BREAKABLE = 2
-PARAMS = initialize()
-DESC_QUEUE = get_desc_queue(PARAMS)
-tokenize(PARAMS, DESC_QUEUE)
+def start():
+	"""Runs the entire program."""
+	params = initialize()
+	desc_queue = get_desc_queue(params)
+	tokenize(params, desc_queue)
+
+start()
