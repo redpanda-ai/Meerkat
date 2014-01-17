@@ -67,5 +67,4 @@ def start():
 	params = initialize()
 	desc_queue = get_desc_queue(params)
 	tokenize(params, desc_queue)
-
-start()
+	
