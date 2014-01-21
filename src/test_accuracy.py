@@ -5,29 +5,31 @@
 
 import csv, sys, math
 
-file_a = open(sys.argv[1])
-file_b = open("../data/labeledTrans.csv")
-dict_a = csv.DictReader(file_a)
-dict_b = csv.DictReader(file_b)
+machine_labeled = open(sys.argv[1])
+human_labeled = open("../data/labeledTrans.csv")
+dict_ML = csv.DictReader(machine_labeled)
+dict_HL = csv.DictReader(human_labeled)
 file_copy = []
 total = 0
 not_found = 0
 correct = 0
 
 # Copy
-for lRow in dict_b:
-	file_copy.append(lRow)
+for hlRow in dict_HL:
+	file_copy.append(hlRow)
 
 # Count
 num_labeled = len(file_copy)
-for row in dict_a:
+for mlRow in dict_ML:
 	total += 1
-	for index, lRow in enumerate(file_copy):
-		if row['DESCRIPTION'] == lRow['DESCRIPTION']:
-			if row['PERSISTENTRECORDID'] == lRow['PERSISTENTRECORDID']:
+	for index, hlRow in enumerate(file_copy):
+		if mlRow['DESCRIPTION'] == hlRow['DESCRIPTION']:
+			if mlRow['PERSISTENTRECORDID'] == hlRow['PERSISTENTRECORDID']:
 				correct += 1
+			else: print("MISLABELED", hlRow['PERSISTENTRECORDID'], hlRow['DESCRIPTION'])	
 			break
 		if index + 1 == num_labeled:
+			print("NEEDS MANUAL VERIFICATION", mlRow['DESCRIPTION'])
 			not_found += 1
 
 print("Accuracy = " + str(math.ceil(correct/(total-not_found) * 100)) + "%")
