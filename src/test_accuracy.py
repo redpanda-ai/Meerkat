@@ -6,7 +6,7 @@
 import csv, sys, math
 
 file_a = open(sys.argv[1])
-file_b = open("../labeledTrans.csv")
+file_b = open("../data/labeledTrans.csv")
 dict_a = csv.DictReader(file_a)
 dict_b = csv.DictReader(file_b)
 file_copy = []

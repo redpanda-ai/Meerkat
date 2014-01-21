@@ -1,11 +1,11 @@
 {
 	"input" : {
-		"filename" : "../short_bank_transaction_descriptions.csv",
+		"filename" : "../data/short_bank_transaction_descriptions.csv",
 		"encoding" : "utf-8"
 	},
 	"logging" : {
 		"level" : "warning",
-		"path" : "../foo.log",
+		"path" : "../logs/foo.log",
 		"formatter" : "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 		"console" : true
 	},
@@ -14,7 +14,6 @@
 			"fields" : [ "id", "BUSINESSSTANDARDNAME"
 			],
 			"size" : 1
-		},
-		"path" : "../config_2.json"
+		}
 	}
 }
