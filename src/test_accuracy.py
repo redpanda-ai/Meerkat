@@ -6,12 +6,16 @@
 import csv, sys, math
 
 machine_labeled = open(sys.argv[1])
-human_labeled = open("../data/labeledTrans.csv")
+human_labeled = open("../data/verifiedLabeledTrans.csv")
 dict_ML = csv.DictReader(machine_labeled)
 dict_HL = csv.DictReader(human_labeled)
+
 file_copy = []
+needs_hand_labeling = []
+non_physical = []
+mislabeled = []
+
 total = 0
-not_found = 0
 correct = 0
 
 # Copy
@@ -25,12 +29,27 @@ for mlRow in dict_ML:
 	for index, hlRow in enumerate(file_copy):
 		if mlRow['DESCRIPTION'] == hlRow['DESCRIPTION']:
 			if mlRow['PERSISTENTRECORDID'] == hlRow['PERSISTENTRECORDID']:
+				# Transaction was correctly labeled
 				correct += 1
-			else: print("MISLABELED", hlRow['PERSISTENTRECORDID'], hlRow['DESCRIPTION'])	
-			break
+				break
+			elif hlRow['IS_PHYSICAL_TRANSACTION'] == '0':
+				# Transaction is non physical
+				non_physical.append(mlRow['DESCRIPTION'])
+				break
+			elif hlRow['PERSISTENTRECORDID'] == "":
+				# Transaction is not yet labeled
+				needs_hand_labeling.append(mlRow['DESCRIPTION'])
+				break
+			else: 
+				# Transaction is mislabeled
+				mislabeled.append(hlRow['DESCRIPTION'] + " - " + hlRow['PERSISTENTRECORDID'])	
+				break
 		if index + 1 == num_labeled:
-			print("NEEDS MANUAL VERIFICATION", mlRow['DESCRIPTION'])
-			not_found += 1
+			needs_hand_labeling.append(mlRow['DESCRIPTION'])
 
-print("Accuracy = " + str(math.ceil(correct/(total-not_found) * 100)) + "%")
-print("Not Found = " + str(math.ceil(not_found/total * 100)) + "%")
+print("STATS:")
+print("Accuracy = " + str(math.ceil(correct/(total-len(needs_hand_labeling)) * 100)) + "%")
+print("Not Found = " + str(math.ceil(len(needs_hand_labeling)/total * 100)) + "%", '\n')
+print("NEEDS HAND LABELING:", '\n'.join(needs_hand_labeling), sep="\n")
+print("", "MISLABELED:", '\n'.join(mislabeled), sep="\n")
+

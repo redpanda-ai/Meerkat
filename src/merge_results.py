@@ -1,13 +1,13 @@
 #!/usr/local/bin/python3
 # pylint: disable=C0103
 
-"""This script merges a new set of labeled
+"""This script merges a new set of hand labeled
  transactions into our existing set."""
 
 import csv, sys
 
 file_a = open(sys.argv[1])
-file_b = open("../data/labeledTrans.csv")
+file_b = open("../data/verifiedLabeledTrans.csv")
 dict_a = csv.DictReader(file_a)
 dict_b = csv.DictReader(file_b)
 file_copy = []
