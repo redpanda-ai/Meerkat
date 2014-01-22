@@ -1,5 +1,6 @@
 #!/usr/local/bin/python3
 # pylint: disable=C0103
+# pylint: disable=C0301
 
 """This script tests the current accuracy of our labeling tool"""
 
@@ -40,9 +41,9 @@ for mlRow in dict_ML:
 				# Transaction is not yet labeled
 				needs_hand_labeling.append(mlRow['DESCRIPTION'])
 				break
-			else: 
+			else:
 				# Transaction is mislabeled
-				mislabeled.append(hlRow['DESCRIPTION'] + " - " + hlRow['PERSISTENTRECORDID'])	
+				mislabeled.append(hlRow['DESCRIPTION'] + " - " + hlRow['PERSISTENTRECORDID'])
 				break
 		if index + 1 == num_labeled:
 			needs_hand_labeling.append(mlRow['DESCRIPTION'])
