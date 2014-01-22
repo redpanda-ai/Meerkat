@@ -3,8 +3,11 @@ Created on Jan 14, 2014
 
 @author: jkey
 '''
+
 #!/bin/python3
-import copy, json, logging, re,  queue, threading, urllib.request
+# pylint: disable=R0914
+
+import copy, json, logging, re, queue, threading, urllib.request
 from custom_exceptions import UnsupportedQueryType
 from query_templates import GENERIC_ELASTICSEARCH_QUERY, STOP_WORDS\
 , get_match_query, get_qs_query
@@ -20,7 +23,7 @@ class DescriptionConsumer(threading.Thread):
 	def __begin_parse(self):
 		"""Creates data structures used the first call into the
 		__parse_into_search_tokens function."""
-		print( "Input String ",self.input_string)
+		print("Input String ", self.input_string)
 		self.recursive = False
 		self.my_meta["terms"] = []
 		self.my_meta["long_substrings"] = {}
@@ -52,22 +55,22 @@ class DescriptionConsumer(threading.Thread):
 		#e.g. Unigram, Composite, Numeric, Stop...
 		logger = logging.getLogger("thread " + str(self.thread_id))
 		logger.info("TOKENS ARE: " + str(tokens))
-		logger.info( "Unigrams are:\n\t" + str(tokens))
-		logger.info( "Unigrams matched to ElasticSearch:\n\t" + str(unigram_tokens))
-		logger.info( "Of these:")
-		logger.info( "\t" + str(len(stop_tokens)) + " stop words:      "\
+		logger.info("Unigrams are:\n\t" + str(tokens))
+		logger.info("Unigrams matched to ElasticSearch:\n\t" + str(unigram_tokens))
+		logger.info("Of these:")
+		logger.info("\t" + str(len(stop_tokens)) + " stop words:      "\
 					+ str(stop_tokens))
-		logger.info( "\t" + str(len(phone_numbers)) + " phone_numbers:   "\
+		logger.info("\t" + str(len(phone_numbers)) + " phone_numbers:   "\
 			+ str(phone_numbers))
-		logger.info( "\t" + str(len(numeric_tokens)) + " numeric words:   "\
+		logger.info("\t" + str(len(numeric_tokens)) + " numeric words:   "\
 			+ str(numeric_tokens))
-		logger.info( "\t" + str(len(filtered_tokens)) + " unigrams: "\
+		logger.info("\t" + str(len(filtered_tokens)) + " unigrams: "\
 			+ str(filtered_tokens))
 
 		count, matching_address = self.__get_matching_address()
 		if count > 0:
 			addresses.append(matching_address)
-		logger.info( "\t" + str(len(addresses)) + " addresses: " + str(addresses))
+		logger.info("\t" + str(len(addresses)) + " addresses: " + str(addresses))
 
 		#show all search terms separated by spaces
 		query_string = " ".join(filtered_tokens)
@@ -88,7 +91,7 @@ class DescriptionConsumer(threading.Thread):
 		"""Displays search results."""
 		hits = search_results['hits']['hits']
 		scores, results, fields_found = [], [], []
-		outputDict = {}
+		output_dict = {}
 		params = self.params
 		for hit in hits:
 			hit_fields, score = hit['fields'], hit['_score']
@@ -103,13 +106,13 @@ class DescriptionConsumer(threading.Thread):
 					fields_found.append(ordinal)
 					ordered_hit_fields.append(my_field)
 			results.append(\
-			"[" + str(round(score,3)) + "] " + " ".join(ordered_hit_fields))
+			"[" + str(round(score, 3)) + "] " + " ".join(ordered_hit_fields))
 
 			# Send to result Queue
-			outputDict = dict(zip(fields_found, ordered_hit_fields))
-			outputDict['DESCRIPTION'] = self.input_string
-			self.result_queue.put(outputDict)
-				
+			output_dict = dict(zip(fields_found, ordered_hit_fields))
+			output_dict['DESCRIPTION'] = self.input_string
+			self.result_queue.put(output_dict)
+
 		self.__display_z_score_delta(scores)
 		for result in results:
 			print(result)
@@ -124,7 +127,7 @@ class DescriptionConsumer(threading.Thread):
 		z_scores = zscore(scores)
 		first_score, second_score = z_scores[0:2]
 		z_score_delta = round(first_score - second_score, 3)
-		logger.info( "Z-Score delta: [" + str(z_score_delta) + "]")
+		logger.info("Z-Score delta: [" + str(z_score_delta) + "]")
 		quality = "Non"
 		if z_score_delta <= 1:
 			quality = "Low-grade"
@@ -132,7 +135,7 @@ class DescriptionConsumer(threading.Thread):
 			quality = "Mid-grade"
 		else:
 			quality = "High-grade"
-		logger.info( "Top Score Quality: " + quality)
+		logger.info("Top Score Quality: " + quality)
 
 	def __extract_longest_substring(self, longest_substring):
 		"""Extracts the longest substring from our input, returning left
@@ -178,17 +181,17 @@ class DescriptionConsumer(threading.Thread):
 		logger = logging.getLogger("thread " + str(self.thread_id))
 		my_meta = self.my_meta
 		search_components = []
-		logger.info( "Search components are:")
-		logger.info( "\tUnigrams: '" + qs_query + "'")
+		logger.info("Search components are:")
+		logger.info("\tUnigrams: '" + qs_query + "'")
 		search_components.append((qs_query, "qs_query", ["_all^1"\
 		, "BUSINESSSTANDARDNAME^2"], 1))
 		if address is not None:
-			logger.info( "\tMatching 'Address': '" + address + "'")
+			logger.info("\tMatching 'Address': '" + address + "'")
 			search_components.append((address, "match_query"\
-			,["composite.address^3"], 10))
+			, ["composite.address^3"], 10))
 		if len(phone_numbers) != 0:
 			for phone_num in phone_numbers:
-				logger.info( "\tMatching 'Phone': '" + phone_num + "'")
+				logger.info("\tMatching 'Phone': '" + phone_num + "'")
 				search_components.append((phone_num, "match_query"\
 				, ["composite.phone^1"], 1))
 
@@ -196,7 +199,7 @@ class DescriptionConsumer(threading.Thread):
 		logger.info(json.dumps(my_obj))
 		my_results = self.__search_index(my_obj)
 		metrics = my_meta["metrics"]
-		logger.info( "This system required " + str(metrics["query_count"])\
+		logger.info("This system required " + str(metrics["query_count"])\
 		+ " individual searches.")
 		self.__display_search_results(my_results)
 
@@ -220,7 +223,7 @@ class DescriptionConsumer(threading.Thread):
 					my_subquery = get_match_query(term, feature, boost)
 			else:
 				raise UnsupportedQueryType("There is no support"\
-				+ " for a query of type: " + query_type )
+				+ " for a query of type: " + query_type)
 			bool_search["query"]["bool"]["should"].append(my_subquery)
 		return bool_search
 
@@ -275,7 +278,7 @@ class DescriptionConsumer(threading.Thread):
 		for key in reversed(sorted(address_candidates.keys())):
 			candidate_list = address_candidates[key]
 			count, term = self.__get_composite_search_count(candidate_list\
-			,"composite.address")
+			, "composite.address")
 			if count > 0:
 				return count, term
 		return 0, None
@@ -357,7 +360,7 @@ class DescriptionConsumer(threading.Thread):
 		self.my_meta = {}
 		self.my_meta["unigram_tokens"] = []
 		self.my_meta["tokens"] = []
-		self.my_meta["metrics"] = { "query_count" : 0 }
+		self.my_meta["metrics"] = {"query_count" : 0}
 
 	def __search_index(self, input_as_object):
 		"""Searches the merchants index and the merchant mapping"""
@@ -367,7 +370,7 @@ class DescriptionConsumer(threading.Thread):
 		logger.debug(input_data)
 		url = "http://brainstorm8:9200/"
 		path = "merchants/merchant/_search"
-		req = urllib.request.Request(url=url+path,data=input_data)
+		req = urllib.request.Request(url=url+path, data=input_data)
 		output_data = urllib.request.urlopen(req).read().decode('UTF-8')
 		metrics = self.my_meta["metrics"]
 		metrics["query_count"] += 1
@@ -397,9 +400,9 @@ class DescriptionConsumer(threading.Thread):
 	def __set_logger(self):
 		"""Creates a logger, based upon the supplied config object."""
 
-		levels = { 'debug': logging.DEBUG, 'info': logging.INFO\
+		levels = {'debug': logging.DEBUG, 'info': logging.INFO\
 		, 'warning': logging.WARNING, 'error': logging.ERROR\
-		, 'critical': logging.CRITICAL }
+		, 'critical': logging.CRITICAL}
 		params = self.params
 		my_level = params["logging"]["level"]
 		if my_level in levels:
@@ -423,7 +426,7 @@ class DescriptionConsumer(threading.Thread):
 			my_logger.addHandler(console_handler)
 
 		my_logger.info("Log initialized.")
-		params_json = json.dumps(params,sort_keys=True,indent=4\
+		params_json = json.dumps(params, sort_keys=True, indent=4\
 		, separators=(',', ': '))
 		my_logger.info(params_json)
 
