@@ -65,8 +65,6 @@ def write_output(params, result_queue):
 	output_list = []
 	file_name = params["output"]["file"]["path"] or '../data/longtailLabeled.csv'
 
-	print("STOP1")
-
 	while result_queue.qsize() > 0:
 		try:
 			output_list.append(result_queue.get())
@@ -74,8 +72,6 @@ def write_output(params, result_queue):
 
 		except queue.Empty:
 			break
-
-	print("STOP2")
 
 	# Output as CSV
 	if params["output"]["file"]["format"] == "csv":
@@ -86,14 +82,10 @@ def write_output(params, result_queue):
 		dict_w.writerows(output_list)
 		output_file.close()
 
-	print("STOP3")	
-
 	# Output as JSON
 	if params["output"]["file"]["format"] == "json":
 		with open(file_name, 'w') as outfile:
 			json.dump(output_list, outfile)
-
-	print("STOP4")		
 
 	result_queue.join()
 
