@@ -87,7 +87,8 @@ class DescriptionConsumer(threading.Thread):
 	def __display_search_results(self, search_results):
 		"""Displays search results."""
 		hits = search_results['hits']['hits']
-		scores, results = [], []
+		scores, results, fields_found = [], [], []
+		outputDict = {}
 		params = self.params
 		for hit in hits:
 			hit_fields, score = hit['fields'], hit['_score']
@@ -99,9 +100,16 @@ class DescriptionConsumer(threading.Thread):
 			for ordinal in field_order:
 				if ordinal in fields_in_hit:
 					my_field = str(hit_fields[ordinal])
+					fields_found.append(ordinal)
 					ordered_hit_fields.append(my_field)
 			results.append(\
 			"[" + str(round(score,3)) + "] " + " ".join(ordered_hit_fields))
+
+			# Send to result Queue
+			outputDict = dict(zip(fields_found, ordered_hit_fields))
+			outputDict['DESCRIPTION'] = self.input_string
+			self.result_queue.put(outputDict)
+				
 		self.__display_z_score_delta(scores)
 		for result in results:
 			print(result)
@@ -147,11 +155,12 @@ class DescriptionConsumer(threading.Thread):
 		return original_term, pre, post
 
 
-	def __init__(self, thread_id, params, desc_queue):
+	def __init__(self, thread_id, params, desc_queue, result_queue):
 		''' Constructor '''
 		threading.Thread.__init__(self)
 		self.thread_id = thread_id
 		self.desc_queue = desc_queue
+		self.result_queue = result_queue
 		self.input_string = None
 		self.params = params
 		self.recursive = False
