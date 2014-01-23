@@ -55,15 +55,18 @@ def tokenize(params, desc_queue):
 		new_consumer.setDaemon(True)
 		new_consumer.start()
 	desc_queue.join()
-	write_output(params, result_queue)
+	#Writing to an output file, if necessary.
+	if "file" in params["output"] and "format" in params["output"]["file"]\
+	and params["output"]["file"]["format"] in ["csv", "json"]:
+		write_output_to_file(params, result_queue)
+	else:
+		logging.critical("Not configured for file output.")
 	time_delta = datetime.datetime.now() - start_time
 	logging.critical("Total Time Taken: " + str(time_delta))
 
-def write_output(params, result_queue):
+def write_output_to_file(params, result_queue):
 	"""Outputs results to a file"""
-
 	output_list = []
-
 	while result_queue.qsize() > 0:
 		try:
 			output_list.append(result_queue.get())
@@ -71,14 +74,8 @@ def write_output(params, result_queue):
 
 		except queue.Empty:
 			break
-
 	result_queue.join()
-
-	if "file" in params["output"] and "format" in params["output"]["file"]:
-		file_name = params["output"]["file"].get("path", '../data/longtailLabeled.csv')
-	else:
-		return
-
+	file_name = params["output"]["file"].get("path", '../data/longtailLabeled.csv')
 	# Output as CSV
 	if params["output"]["file"]["format"] == "csv":
 		delimiter = params["output"]["file"].get("delimiter", ',')
@@ -87,7 +84,6 @@ def write_output(params, result_queue):
 		dict_w.writeheader()
 		dict_w.writerows(output_list)
 		output_file.close()
-
 	# Output as JSON
 	if params["output"]["file"]["format"] == "json":
 		with open(file_name, 'w') as outfile:
