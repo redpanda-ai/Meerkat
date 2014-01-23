@@ -95,9 +95,8 @@ def usage():
 	print(result)
 	return result
 
-def start():
+if __name__ == "__main__":
 	"""Runs the entire program."""
 	params = initialize()
 	desc_queue = get_desc_queue(params)
-	tokenize(params, desc_queue)
-	
+	tokenize(params, desc_queue)	
