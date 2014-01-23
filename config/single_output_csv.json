@@ -1,0 +1,23 @@
+{
+    "concurrency" : 10,
+    "input" : {
+            "filename" : "../data/100_bank_transaction_descriptions.csv",
+            "encoding" : "utf-8"
+    },
+    "logging" : {
+            "level" : "warning",
+            "path" : "../logs/foo.log",
+            "formatter" : "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+            "console" : true
+    },
+    "output" : {
+            "results" : {
+                    "fields" : ["BUSINESSSTANDARDNAME", "PERSISTENTRECORDID"],
+                    "size" : 1
+            },
+            "file" : {
+                    "format" : "csv",
+                    "path" : "../data/longtailLabeled.csv"
+            }
+    }
+} 
