@@ -55,6 +55,7 @@ def tokenize(params, desc_queue):
 		new_consumer.setDaemon(True)
 		new_consumer.start()
 	desc_queue.join()
+	#Writing to an output file, if necessary.
 	if "file" in params["output"] and "format" in params["output"]["file"]\
 	and params["output"]["file"]["format"] in ["csv", "json"]:
 		write_output_to_file(params, result_queue)
