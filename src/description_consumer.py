@@ -105,6 +105,9 @@ class DescriptionConsumer(threading.Thread):
 					my_field = str(hit_fields[ordinal])
 					fields_found.append(ordinal)
 					ordered_hit_fields.append(my_field)
+				else:
+					fields_found.append(ordinal)
+					ordered_hit_fields.append("")	
 			results.append(\
 			"[" + str(round(score, 3)) + "] " + " ".join(ordered_hit_fields))
 
