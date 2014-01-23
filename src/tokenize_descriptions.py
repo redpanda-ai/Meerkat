@@ -63,7 +63,6 @@ def write_output(params, result_queue):
 	"""Outputs results to a file"""
 
 	output_list = []
-	file_name = params["output"]["file"]["path"] or '../data/longtailLabeled.csv'
 
 	while result_queue.qsize() > 0:
 		try:
@@ -73,9 +72,16 @@ def write_output(params, result_queue):
 		except queue.Empty:
 			break
 
+	result_queue.join()
+
+	if "file" in params["output"] and "format" in params["output"]["file"]:
+		file_name = params["output"]["file"].get("path", '../data/longtailLabeled.csv')
+	else: 
+		return
+
 	# Output as CSV
 	if params["output"]["file"]["format"] == "csv":
-		delimiter = params["output"]["file"]["delimiter"] or ","
+		delimiter = params["output"]["file"].get("delimiter", ',')
 		output_file = open(file_name, 'w')
 		dict_w = csv.DictWriter(output_file, delimiter=delimiter, fieldnames=output_list[0].keys())
 		dict_w.writeheader()
@@ -86,8 +92,6 @@ def write_output(params, result_queue):
 	if params["output"]["file"]["format"] == "json":
 		with open(file_name, 'w') as outfile:
 			json.dump(output_list, outfile)
-
-	result_queue.join()
 
 def usage():
 	"""Shows the user which parameters to send into the program."""
