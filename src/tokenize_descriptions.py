@@ -76,7 +76,7 @@ def write_output(params, result_queue):
 
 	if "file" in params["output"] and "format" in params["output"]["file"]:
 		file_name = params["output"]["file"].get("path", '../data/longtailLabeled.csv')
-	else: 
+	else:
 		return
 
 	# Output as CSV
