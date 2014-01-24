@@ -6,8 +6,8 @@ description strings (unstructured data) to merchant data indexed with
 ElasticSearch (structured data)."""
 
 import datetime, json, logging, queue, sys, csv
-from custom_exceptions import InvalidArguments
-from description_consumer import DescriptionConsumer
+from longtail.custom_exceptions import InvalidArguments
+from longtail.description_consumer import DescriptionConsumer
 
 def get_desc_queue(params):
 	"""Opens a file of descriptions, one per line, and load a description
@@ -96,7 +96,8 @@ def usage():
 	return result
 
 if __name__ == "__main__":
-	"""Runs the entire program."""
-	params = initialize()
-	desc_queue = get_desc_queue(params)
-	tokenize(params, desc_queue)	
+	#Runs the entire program.
+	PARAMS = initialize()
+	DESC_QUEUE = get_desc_queue(PARAMS)
+	tokenize(PARAMS, DESC_QUEUE)
+	

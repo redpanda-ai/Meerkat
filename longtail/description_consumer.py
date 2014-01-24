@@ -8,11 +8,11 @@ Created on Jan 14, 2014
 # pylint: disable=R0914
 
 import copy, json, logging, re, queue, threading, urllib.request
-from custom_exceptions import UnsupportedQueryType
-from query_templates import GENERIC_ELASTICSEARCH_QUERY, STOP_WORDS\
+from longtail.custom_exceptions import UnsupportedQueryType
+from longtail.query_templates import GENERIC_ELASTICSEARCH_QUERY, STOP_WORDS\
 , get_match_query, get_qs_query
 from scipy.stats.mstats import zscore
-from various_tools import string_cleanse
+from longtail.various_tools import string_cleanse
 
 class DescriptionConsumer(threading.Thread):
 	''' Acts as a client to an ElasticSearch cluster, tokenizing description
@@ -107,7 +107,7 @@ class DescriptionConsumer(threading.Thread):
 					ordered_hit_fields.append(my_field)
 				else:
 					fields_found.append(ordinal)
-					ordered_hit_fields.append("")	
+					ordered_hit_fields.append("")
 			results.append(\
 			"[" + str(round(score, 3)) + "] " + " ".join(ordered_hit_fields))
 
