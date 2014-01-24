@@ -96,7 +96,6 @@ class DescriptionConsumer(threading.Thread):
 		for hit in hits:
 			hit_fields, score = hit['fields'], hit['_score']
 			scores.append(score)
-			#field_order = RESULT_FIELDS
 			field_order = params["output"]["results"]["fields"]
 			fields_in_hit = [field for field in hit_fields]
 			ordered_hit_fields = []
@@ -377,7 +376,14 @@ class DescriptionConsumer(threading.Thread):
 		path = self.params["elasticsearch"]["index"] + "/"\
 		+ self.params["elasticsearch"]["type"] + "/_search"
 		req = urllib.request.Request(url=url+path, data=input_data)
-		output_data = urllib.request.urlopen(req).read().decode('UTF-8')
+		try:
+			output_data = urllib.request.urlopen(req).read().decode('UTF-8')
+		except urllib.error.HTTPError as http_error:
+			#log the HTTPError as a critical and return output_data that will allow
+			# the consumer to continue working
+			logging.critical("Unable to process the following: " + str(input_data))
+			logging.critical(str(http_error))
+			output_data = '{"hits":{"total":0}}'
 		metrics = self.my_meta["metrics"]
 		metrics["query_count"] += 1
 		output_string = json.loads(output_data)
