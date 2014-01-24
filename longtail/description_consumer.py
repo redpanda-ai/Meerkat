@@ -96,7 +96,6 @@ class DescriptionConsumer(threading.Thread):
 		for hit in hits:
 			hit_fields, score = hit['fields'], hit['_score']
 			scores.append(score)
-			#field_order = RESULT_FIELDS
 			field_order = params["output"]["results"]["fields"]
 			fields_in_hit = [field for field in hit_fields]
 			ordered_hit_fields = []
@@ -169,6 +168,8 @@ class DescriptionConsumer(threading.Thread):
 		self.result_queue = result_queue
 		self.input_string = None
 		self.params = params
+		cluster_nodes = self.params["elasticsearch"]["cluster_nodes"]
+		self.es_node = cluster_nodes[self.thread_id % len(cluster_nodes)]
 		self.recursive = False
 		self.my_meta = None
 		self.__reset_my_meta()
@@ -371,10 +372,18 @@ class DescriptionConsumer(threading.Thread):
 		#print(str(self.thread_id), " : ", str(self.my_meta))
 		logger = logging.getLogger("thread " + str(self.thread_id))
 		logger.debug(input_data)
-		url = "http://brainstorm8:9200/"
-		path = "merchants/merchant/_search"
+		url = "http://" + self.es_node + "/"
+		path = self.params["elasticsearch"]["index"] + "/"\
+		+ self.params["elasticsearch"]["type"] + "/_search"
 		req = urllib.request.Request(url=url+path, data=input_data)
-		output_data = urllib.request.urlopen(req).read().decode('UTF-8')
+		try:
+			output_data = urllib.request.urlopen(req).read().decode('UTF-8')
+		except urllib.error.HTTPError as http_error:
+			#log the HTTPError as a critical and return output_data that will allow
+			# the consumer to continue working
+			logging.critical("Unable to process the following: " + str(input_data))
+			logging.critical(str(http_error))
+			output_data = '{"hits":{"total":0}}'
 		metrics = self.my_meta["metrics"]
 		metrics["query_count"] += 1
 		output_string = json.loads(output_data)

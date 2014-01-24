@@ -1,11 +1,11 @@
 {
 	"concurrency" : 12,
 	"input" : {
-		"filename" : "../data/100_bank_transaction_descriptions.csv",
+		"filename" : "../data/badStrings.csv",
 		"encoding" : "utf-8"
 	},
 	"logging" : {
-		"level" : "warning",
+		"level" : "info",
 		"path" : "../logs/foo.log",
 		"formatter" : "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 		"console" : true

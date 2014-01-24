@@ -18,5 +18,13 @@
 			"size" : 10
 		},
 		"filepath" : "../data/longTailLabeled.csv"
+	},
+	"elasticsearch" : {
+		"cluster_nodes" : ["brainstorm0:9200", "brainstorm1:9200", "brainstorm2:9200"
+		, "brainstorm3:9200", "brainstorm4:9200", "brainstorm5:9200", "brainstorm6:9200"
+		, "brainstorm7:9200", "brainstorm8:9200", "brainstorm9:9200", "brainstorma:9200"
+		, "brainstormb:9200"],
+		"index" : "new_index",
+		"type" : "new_type"			
 	}
 }
