@@ -169,6 +169,8 @@ class DescriptionConsumer(threading.Thread):
 		self.result_queue = result_queue
 		self.input_string = None
 		self.params = params
+		cluster_nodes = self.params["elasticsearch"]["cluster_nodes"]
+		self.es_node = cluster_nodes[self.thread_id % len(cluster_nodes)]
 		self.recursive = False
 		self.my_meta = None
 		self.__reset_my_meta()
@@ -371,8 +373,9 @@ class DescriptionConsumer(threading.Thread):
 		#print(str(self.thread_id), " : ", str(self.my_meta))
 		logger = logging.getLogger("thread " + str(self.thread_id))
 		logger.debug(input_data)
-		url = "http://brainstorm8:9200/"
-		path = "merchants/merchant/_search"
+		url = "http://" + self.es_node + "/"
+		path = self.params["elasticsearch"]["index"] + "/"\
+		+ self.params["elasticsearch"]["type"] + "/_search"
 		req = urllib.request.Request(url=url+path, data=input_data)
 		output_data = urllib.request.urlopen(req).read().decode('UTF-8')
 		metrics = self.my_meta["metrics"]

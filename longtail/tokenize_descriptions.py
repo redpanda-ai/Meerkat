@@ -29,7 +29,7 @@ def get_desc_queue(params):
 
 def initialize():
 	"""Validates the command line arguments."""
-	input_file = None
+	input_file, params = None, None
 	if len(sys.argv) != 2:
 		usage()
 		raise InvalidArguments(msg="Incorrect number of arguments", expr=None)
@@ -41,6 +41,15 @@ def initialize():
 		print(sys.argv[1], " not found, aborting.")
 		logging.error(sys.argv[1] + " not found, aborting.")
 		sys.exit()
+	if "elasticsearch" in params and "cluster_nodes" in params["elasticsearch"]\
+	and "index" in params["elasticsearch"] and "type" in params["elasticsearch"]:
+		return params
+	else:
+		logging.error("The following elements must be added to your configuration:")
+		logging.error("\t1.  elasticsearch.cluster_nodes")
+		logging.error("\t2.  elasticsearch.index")
+		logging.error("\t3.  elasticsearch.type")
+		logging.error("Aborting.")
 	return params
 
 def tokenize(params, desc_queue):
