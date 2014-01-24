@@ -2,10 +2,10 @@
 """This tool creates an ElasticSearch index and bulk loads it with data."""
 
 import json, sys, re
-from various_tools import string_cleanse
-from custom_exceptions import InvalidArguments, InvalidNumberOfLines\
+from longtail.various_tools import string_cleanse
+from longtail.custom_exceptions import InvalidArguments, InvalidNumberOfLines\
 , FileProblem
-from query_templates import get_mapping_template, get_create_object\
+from longtail.query_templates import get_mapping_template, get_create_object\
 , get_composites
 
 USAGE = """Usage:
@@ -30,6 +30,7 @@ def initialize():
 		raise InvalidNumberOfLines("Number of lines must be an integer")
 	try:
 		input_file = open(input_file_name)
+		input_file.close()
 	except:
 		usage()
 		raise FileProblem(input_file_name + " cannot be opened.")
@@ -46,7 +47,7 @@ def initialize():
 	except:
 		raise FileProblem(type_mapping_file + " cannot be created.")
 
-	return number_of_lines, input_file , bulk_create_file\
+	return number_of_lines, input_file_name, bulk_create_file\
 	, type_mapping_file, es_index, es_type
 
 def revise_column_data_type(col_num, my_cell, column_meta):
@@ -105,12 +106,16 @@ def process_row(cells, column_meta, es_index, es_type):
 
 	return record_obj, create_json
 
-def process_input_rows(input_file, es_index, es_type):
+def process_input_rows(input_file_name, es_index, es_type):
 	"""Reads each line in the input file, creating bulk insert records
 	for each in ElasticSearch."""
 	line_count = 0
 	column_meta = {}
-	for line in input_file:
+
+	with open(input_file_name, "r", encoding="utf-8") as input_file:
+		lines = input_file.read()
+
+	for line in lines.split("\n"):
 		cells = line.split("\t")
 		column_meta["total_fields"] = len(cells)
 		if line_count == 0:
@@ -120,10 +125,10 @@ def process_input_rows(input_file, es_index, es_type):
 		else:
 			#Process each row of input data
 			record_obj, create_json = process_row(cells\
-			, column_meta , es_index, es_type)
+			, column_meta, es_index, es_type)
 			#Add the composite features
 			get_composites(record_obj)
-			record_json = json.dumps(record_obj)
+			record_json = str(json.dumps(record_obj))
 			BULK_CREATE_FILE.write(create_json + "\n")
 			BULK_CREATE_FILE.write(record_json + "\n")
 		line_count += 1
@@ -140,8 +145,10 @@ DATA_TYPES = { \
 	STRING : ("string", re.compile(".+")) \
 }
 
-INPUT_LINES_TO_SCAN, INPUT_FILE, BULK_CREATE_FILE, TYPE_MAPPING_FILE\
-, ES_INDEX, ES_TYPE = initialize()
-COLUMN_META = process_input_rows(INPUT_FILE, ES_INDEX, ES_TYPE)
-MY_MAP = get_mapping_template(ES_TYPE, 3, 2, COLUMN_META, DATA_TYPES)
-TYPE_MAPPING_FILE.write(json.dumps(MY_MAP))
+if __name__ == "__main__":
+	#Runs the entire program.
+	INPUT_LINES_TO_SCAN, INPUT_FILE, BULK_CREATE_FILE, TYPE_MAPPING_FILE\
+	, ES_INDEX, ES_TYPE = initialize()
+	COLUMN_META = process_input_rows(INPUT_FILE, ES_INDEX, ES_TYPE)
+	MY_MAP = get_mapping_template(ES_TYPE, 3, 2, COLUMN_META, DATA_TYPES)
+	TYPE_MAPPING_FILE.write(json.dumps(MY_MAP))
