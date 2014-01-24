@@ -1,5 +1,5 @@
 #!/usr/bin/python3.3
-"""This tool creates an ElasticSearch index and bulk loads it with data."""
+"""Creates an ElasticSearch index and bulk loads it with data."""
 
 import json, sys, re
 from longtail.various_tools import string_cleanse
