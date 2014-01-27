@@ -59,13 +59,13 @@ class DescriptionConsumer(threading.Thread):
 		logger.info("Unigrams matched to ElasticSearch:\n\t" + str(unigram_tokens))
 		logger.info("Of these:")
 		logger.info("\t" + str(len(stop_tokens)) + " stop words:      "\
-					+ str(stop_tokens))
+		+ str(stop_tokens))
 		logger.info("\t" + str(len(phone_numbers)) + " phone_numbers:   "\
-			+ str(phone_numbers))
+		+ str(phone_numbers))
 		logger.info("\t" + str(len(numeric_tokens)) + " numeric words:   "\
-			+ str(numeric_tokens))
+		+ str(numeric_tokens))
 		logger.info("\t" + str(len(filtered_tokens)) + " unigrams: "\
-			+ str(filtered_tokens))
+		+ str(filtered_tokens))
 
 		count, matching_address = self.__get_matching_address()
 		if count > 0:
@@ -74,18 +74,18 @@ class DescriptionConsumer(threading.Thread):
 
 		#show all search terms separated by spaces
 		query_string = " ".join(filtered_tokens)
-
+		self.__get_n_gram_tokens(filtered_tokens)
+		
+		matched_n_gram_tokens = self.__search_n_gram_tokens()
+		logger.info("\t" + str(len(matched_n_gram_tokens)) + " 2+ grams: "\
+		+ str(matched_n_gram_tokens))
+		#TODO: ADD THE 2+GRAMS TO THE FINAL QUERY STRING
+		print(str(matched_n_gram_tokens))
 		self.__generate_final_query(query_string, matching_address\
 		, phone_numbers)
-		#Not finished, do a tail recursive search for longest matching
-		#n-gram on a per composite-feature basis.
-		#n_gram_tokens = get_n_gram_tokens(filtered_tokens)
-		#n_gram_tokens = get_n_gram_tokens(TOKENS)
 
-		##print n_gram_tokens
-		##Not currently used
-		##matched_n_gram_tokens = search_n_gram_tokens(n_gram_tokens)
-		##print "ALL"
+		#TODO: a tail recursive search for longest matching
+		#n-gram on a per composite-feature basis.
 
 	def __display_search_results(self, search_results):
 		"""Displays search results."""
@@ -172,6 +172,7 @@ class DescriptionConsumer(threading.Thread):
 		self.es_node = cluster_nodes[self.thread_id % len(cluster_nodes)]
 		self.recursive = False
 		self.my_meta = None
+		self.n_gram_tokens = None
 		self.__reset_my_meta()
 		self.__set_logger()
 
@@ -198,6 +199,9 @@ class DescriptionConsumer(threading.Thread):
 				logger.info("\tMatching 'Phone': '" + phone_num + "'")
 				search_components.append((phone_num, "match_query"\
 				, ["composite.phone^1"], 1))
+
+		#FIXME
+		#self.__get_n_gram_tokens()
 
 		my_obj = self.__get_boolean_search_object(search_components)
 		logger.info(json.dumps(my_obj))
@@ -287,6 +291,22 @@ class DescriptionConsumer(threading.Thread):
 				return count, term
 		return 0, None
 
+	def __get_n_gram_tokens(self, list_of_tokens):
+		"""Generates a list of n-grams where n >= 2."""
+		unigram_size = 1
+		self.n_gram_tokens = {}
+		end_index = len(list_of_tokens)
+		for end_offset in range(end_index):
+			for start_index in range(end_index-end_offset):
+				n_gram_size = end_index - end_offset - start_index
+				if n_gram_size > unigram_size:
+					if n_gram_size not in self.n_gram_tokens:
+						self.n_gram_tokens[n_gram_size] = []
+						new_n_gram = \
+						list_of_tokens[start_index:end_index-end_offset]
+						self.n_gram_tokens[n_gram_size].append(" ".join(new_n_gram))
+		return
+
 	def __parse_into_search_tokens(self, input_string, recursive):
 		"""Recursively attempts to parse an unstructured transaction
 		description into TOKENS.
@@ -361,6 +381,7 @@ class DescriptionConsumer(threading.Thread):
 	def __reset_my_meta(self):
 		"""Purges several object data structures and re-initializes them."""
 		self.recursive = False
+		self.n_gram_tokens = {}
 		self.my_meta = {}
 		self.my_meta["unigram_tokens"] = []
 		self.my_meta["tokens"] = []
@@ -388,6 +409,34 @@ class DescriptionConsumer(threading.Thread):
 		metrics["query_count"] += 1
 		output_string = json.loads(output_data)
 		return output_string
+
+	def __search_n_gram_tokens(self):
+		"""Creates a boolean elasticsearch composed of multiple
+		sub-queries.  Each sub-query is itself a 'phrase' query
+		built of n-grams where n >= 2."""
+		matched_n_gram_tokens = []
+
+		my_new_query = copy.deepcopy(GENERIC_ELASTICSEARCH_QUERY)
+		my_new_query["size"], my_new_query["from"] = 0, 0
+
+		sub_query = {}
+		sub_query["match"] = {}
+		sub_query["match"]["_all"] = {}
+		sub_query["match"]["_all"]["query"] = "__term"
+		sub_query["match"]["_all"]["type"] = "phrase"
+
+		logger = logging.getLogger("thread " + str(self.thread_id))
+		logger.info( "Matched the following n-grams to our merchants index:")
+		for key in reversed(sorted(self.n_gram_tokens.keys())):
+			for term in self.n_gram_tokens[key]:
+				sub_query["match"]["_all"]["query"] = term
+				my_new_query["query"]["bool"]["should"].append(sub_query)
+				hit_count = self.__search_index(my_new_query)['hits']['total']
+				del my_new_query["query"]["bool"]["should"][0]
+				if hit_count > 0:
+					logger.info( str(key) + "-gram : " + term + " (" + str(hit_count) + ")")
+					matched_n_gram_tokens.append(term)
+		return matched_n_gram_tokens
 
 	def __search_substrings(self, substrings):
 		"""Looks for the longest substring in our merchants index that
