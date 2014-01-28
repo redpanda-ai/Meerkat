@@ -1,12 +1,12 @@
 {
 	"concurrency" : 12,
 	"input" : {
-		"filename" : "../data/badStrings.csv",
+		"filename" : "data/badStrings.csv",
 		"encoding" : "utf-8"
 	},
 	"logging" : {
 		"level" : "info",
-		"path" : "../logs/foo.log",
+		"path" : "logs/foo.log",
 		"formatter" : "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 		"console" : true
 	},
@@ -17,7 +17,7 @@
 		},
 		"file" : {
 			"format" : "json",
-			"path" : "../data/longtailLabeled.json"
+			"path" : "data/longtailLabeled.json"
 		}
 	},
 	"elasticsearch" : {
