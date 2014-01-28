@@ -8,7 +8,7 @@ import csv, sys, math
 
 def test_accuracy(file_path):
 
-	human_labeled = open("../data/verifiedLabeledTrans.csv") if __name__ == "__main__" else file_path
+	human_labeled = open("data/verifiedLabeledTrans.csv") if __name__ == "__main__" else file_path
 	machine_labeled = open(sys.argv[1])
 	dict_ML = csv.DictReader(machine_labeled)
 	dict_HL = csv.DictReader(human_labeled)
@@ -20,6 +20,7 @@ def test_accuracy(file_path):
 
 	total = 0
 	correct = 0
+	found_in_verified = 0
 
 	# Copy
 	for hlRow in dict_HL:
@@ -31,6 +32,7 @@ def test_accuracy(file_path):
 		total += 1
 		for index, hlRow in enumerate(file_copy):
 			if mlRow['DESCRIPTION'] == hlRow['DESCRIPTION']:
+				found_in_verified += 1
 				if mlRow['PERSISTENTRECORDID'] == hlRow['PERSISTENTRECORDID']:
 					# Transaction was correctly labeled
 					correct += 1
@@ -50,11 +52,15 @@ def test_accuracy(file_path):
 			if index + 1 == num_labeled:
 				needs_hand_labeling.append(mlRow['DESCRIPTION'])
 
+	print(correct, len(needs_hand_labeling))
+
 	print("STATS:")
 	print("Accuracy = " + str(math.ceil(correct/(total-len(needs_hand_labeling)) * 100)) + "%")
-	print("Not Found = " + str(math.ceil(len(needs_hand_labeling)/total * 100)) + "%", '\n')
+	print("Not Found in hand verified list = " + str(math.ceil(len(needs_hand_labeling)/total * 100)) + "%")
+	print("Incorrect binary classification = " + str(math.ceil(len(non_physical)/found_in_verified * 100)) + "%", '\n')
 	print("NEEDS HAND LABELING:", '\n'.join(needs_hand_labeling), sep="\n")
 	print("", "MISLABELED:", '\n'.join(mislabeled), sep="\n")
+	print("", "NON_PHYSICAL:", '\n'.join(non_physical), sep="\n")
 
 if __name__ == "__main__":
-	test_accuracy("../data/verifiedLabeledTrans.csv")
+	test_accuracy("data/verifiedLabeledTrans.csv")
