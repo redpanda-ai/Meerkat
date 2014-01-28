@@ -1,7 +1,7 @@
 longtail
 ========
 
-Used for the Longtail project
+Used for the Longtail project.  All rights reserved.
 
 ========
 
