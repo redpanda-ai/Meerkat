@@ -8,6 +8,7 @@ ElasticSearch (structured data)."""
 import datetime, json, logging, queue, sys, csv
 from longtail.custom_exceptions import InvalidArguments
 from longtail.description_consumer import DescriptionConsumer
+from longtail.binary_classifier.bay import predict_if_physical_transaction
 
 def get_desc_queue(params):
 	"""Opens a file of descriptions, one per line, and load a description
@@ -23,7 +24,12 @@ def get_desc_queue(params):
 		logging.error(sys.argv[1] + " not found, aborting.")
 		sys.exit()
 	for input_string in lines.split("\n"):
-		desc_queue.put(input_string)
+		prediction = predict_if_physical_transaction(input_string)		
+		if prediction == "1":
+			desc_queue.put(input_string)
+		elif prediction == "0":	
+			# TODO Output to file
+			logging.info("NON-PHYSICAL: " + input_string)
 	input_file.close()
 	return desc_queue
 
