@@ -1,12 +1,12 @@
 {
 	"concurrency" : 10,
 	"input" : {
-		"filename" : "../data/short_bank_transaction_descriptions.csv",
+		"filename" : "data/short_bank_transaction_descriptions.csv",
 		"encoding" : "utf-8"
 	},
 	"logging" : {
 		"level" : "info",
-		"path" : "../logs/logs.log",
+		"path" : "logs/logs.log",
 		"formatter" : "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 		"console" : true
 	},
@@ -17,7 +17,7 @@
 			],
 			"size" : 10
 		},
-		"filepath" : "../data/longTailLabeled.csv"
+		"filepath" : "data/longTailLabeled.csv"
 	},
 	"elasticsearch" : {
 		"cluster_nodes" : ["brainstorm0:9200", "brainstorm1:9200", "brainstorm2:9200"
