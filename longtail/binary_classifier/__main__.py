@@ -1,6 +1,7 @@
 #!/usr/local/bin/python3
 
-from longtail.binary_classifier.bay import predict_if_physical_transaction, process_list
+from longtail.binary_classifier.bay import process_list
+from longtail.custom_exceptions import InvalidArguments
 
 import sys, logging
 
@@ -15,4 +16,4 @@ try:
 except FileNotFoundError:
 	print(sys.argv[1], " not found, aborting.")
 	logging.error(sys.argv[1] + " not found, aborting.")
-	sys.exit()	
+	sys.exit()
