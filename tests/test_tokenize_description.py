@@ -6,7 +6,6 @@ import unittest
 class TokenizeDescriptionTests(unittest.TestCase):
 	
 	"""Our UnitTest class."""
-
 	def test_usage(self):
 		"""usage test"""
 		result = longtail.tokenize_descriptions.usage()
