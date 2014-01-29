@@ -1,4 +1,5 @@
 #!/usr/local/bin/python3
+# pylint: disable=all
 
 from longtail.custom_exceptions import InvalidArguments
 
