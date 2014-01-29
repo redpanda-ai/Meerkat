@@ -17,6 +17,7 @@ def test_accuracy(file_path):
 	needs_hand_labeling = []
 	non_physical = []
 	mislabeled = []
+	unlabeled = []
 
 	total = 0
 	correct = 0
@@ -43,6 +44,10 @@ def test_accuracy(file_path):
 					# Transaction is not yet labeled
 					needs_hand_labeling.append(mlRow['DESCRIPTION'])
 					break
+				elif mlRow['PERSISTENTRECORDID'] == "":
+					# Our confidence was not high enough to label
+					unlabeled.append(mlRow['DESCRIPTION'])
+					break	
 				else:
 					# Transaction is mislabeled
 					mislabeled.append(hlRow['DESCRIPTION'] + " - " + hlRow['PERSISTENTRECORDID'])
@@ -51,10 +56,11 @@ def test_accuracy(file_path):
 				needs_hand_labeling.append(mlRow['DESCRIPTION'])
 
 	print("STATS:")
-	print("Accuracy = " + str(math.ceil(correct/(total-len(needs_hand_labeling)) * 100)) + "%")
+	print("Accuracy = " + str(math.ceil(correct/(total-len(needs_hand_labeling)-len(unlabeled)) * 100)) + "%")
 	print("Not Found = " + str(math.ceil(len(needs_hand_labeling)/total * 100)) + "%", '\n')
 	print("NEEDS HAND LABELING:", '\n'.join(needs_hand_labeling), sep="\n")
+	print("UNLABELED:", '\n'.join(unlabeled), sep="\n")
 	print("", "MISLABELED:", '\n'.join(mislabeled), sep="\n")
 
 if __name__ == "__main__":
-	test_accuracy("../data/verifiedLabeledTrans.csv")
+	test_accuracy("data/verifiedLabeledTrans.csv")

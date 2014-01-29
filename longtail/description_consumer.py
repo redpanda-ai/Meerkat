@@ -140,8 +140,15 @@ class DescriptionConsumer(threading.Thread):
 		z_score_delta = self.__display_z_score_delta(scores)
 		top_score = top_hit['_score']
 
+		#Unable to generate z_score
+		if z_score_delta == None:
+			output_dict = dict(zip(fields_found, ordered_hit_fields))
+			output_dict['DESCRIPTION'] = self.input_string
+			self.result_queue.put(output_dict)	
+			return
+				
 		#Send to result Queue if score good enough
-		if z_score_delta > 1.5:
+		if z_score_delta > 2:
 			output_dict = dict(zip(fields_found, ordered_hit_fields))
 		else:
 			output_dict = dict(zip(fields_found, ([""] * len(fields_found))))		
