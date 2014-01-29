@@ -24,6 +24,7 @@ for row in dict_a:
 			and lRow['PERSISTENTRECORDID'] == ""):
 			lRow['PERSISTENTRECORDID'] = row['PERSISTENTRECORDID']
 			break
+
 # Write
 output = open('output.csv', 'w')
 csv_writer = csv.DictWriter(output, delimiter=',', fieldnames=field_names)

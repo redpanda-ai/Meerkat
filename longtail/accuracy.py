@@ -7,7 +7,7 @@
 import csv, sys, math
 
 def test_accuracy(file_path):
-	"""Tests accuracy, duh."""
+
 	human_labeled = open("../data/verifiedLabeledTrans.csv") if __name__ == "__main__" else file_path
 	machine_labeled = open(sys.argv[1])
 	dict_ML = csv.DictReader(machine_labeled)
@@ -58,4 +58,3 @@ def test_accuracy(file_path):
 
 if __name__ == "__main__":
 	test_accuracy("../data/verifiedLabeledTrans.csv")
-	

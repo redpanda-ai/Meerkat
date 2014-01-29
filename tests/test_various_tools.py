@@ -6,6 +6,7 @@ import unittest
 class VariousToolsTests(unittest.TestCase):
 
 	"""Our UnitTest class."""
+
 	strings = (("Regular words[]'{}/:", "Regular words"),
                 ('Trans with "" quotes', 'Trans with  quotes'))
 
