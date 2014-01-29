@@ -75,7 +75,7 @@ class DescriptionConsumer(threading.Thread):
 		#show all search terms separated by spaces
 		query_string = " ".join(filtered_tokens)
 		self.__get_n_gram_tokens(filtered_tokens)
-		
+
 		matched_n_gram_tokens = self.__search_n_gram_tokens()
 		logger.info("\t" + str(len(matched_n_gram_tokens)) + " 2+ grams: "\
 		+ str(matched_n_gram_tokens))
@@ -199,9 +199,6 @@ class DescriptionConsumer(threading.Thread):
 				logger.info("\tMatching 'Phone': '" + phone_num + "'")
 				search_components.append((phone_num, "match_query"\
 				, ["composite.phone^1"], 1))
-
-		#FIXME
-		#self.__get_n_gram_tokens()
 
 		my_obj = self.__get_boolean_search_object(search_components)
 		logger.info(json.dumps(my_obj))
