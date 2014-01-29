@@ -462,6 +462,10 @@ class DescriptionConsumer(threading.Thread):
 
 		for key in reversed(sorted(substrings.keys())):
 			for term in substrings[key]:
+				#These words are reserved and will cause HTTP Response errors if
+				#sent as-is to an ElasticSearch query
+				if term in ["AND", "OR"]:
+					term = term.lower()
 				hit_count = 0
 				if len(term) > 1:
 					sub_query["query_string"]["query"] = str(term)
