@@ -1,5 +1,7 @@
 #!/usr/local/bin/python3
 
+from longtail.custom_exceptions import InvalidArguments
+
 def predict_if_physical_transaction(description=None):
 	""" Model for binary classification specific to Bay Area """
 
@@ -112,9 +114,9 @@ def process_list(transactions=None):
 		elif prediction == "0":
 			non_physical.append(row)
 		else:
-			logger.info("Unable to classify: " + row)
+			logging.info("Unable to classify: " + row)
 
-	return physical		
+	return physical
 
 if __name__ == "__main__":
 
@@ -125,11 +127,9 @@ if __name__ == "__main__":
 	try:
 		input_file = open(sys.argv[1], encoding='utf-8')
 		trans_list = input_file.read().splitlines()
-		process_list(trans_list)		
+		process_list(trans_list)	
 		input_file.close()
 	except FileNotFoundError:
 		print(sys.argv[1], " not found, aborting.")
 		logging.error(sys.argv[1] + " not found, aborting.")
-		sys.exit()									
-	
-
+		sys.exit()							
