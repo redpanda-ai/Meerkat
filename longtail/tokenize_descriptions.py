@@ -40,7 +40,7 @@ def get_online_cluster_nodes(params):
 		except Exception:
 			logging.critical(node + " error, continuing loop.")
 			continue
-		logging.critical(node + " found, returning.")
+		logging.info(node + " found, returning.")
 		break
 
 	nodes = json.loads(output_data)["nodes"]
@@ -49,7 +49,7 @@ def get_online_cluster_nodes(params):
 		http_address = nodes[node]["http_address"]
 		if http_address_re.search(http_address):
 			match = http_address_re.match(http_address).group(1)
-			logging.critical("Confirmed ES node at " + match)
+			logging.info("Confirmed ES node at " + match)
 			online_cluster_nodes.append(match)
 
 	return online_cluster_nodes
@@ -68,6 +68,7 @@ def initialize():
 		print(sys.argv[1], " not found, aborting.")
 		logging.error(sys.argv[1] + " not found, aborting.")
 		sys.exit()
+	params["search_cache"] = {}
 	if "elasticsearch" in params and "cluster_nodes" in params["elasticsearch"]\
 	and "index" in params["elasticsearch"] and "type" in params["elasticsearch"]:
 		params["elasticsearch"]["cluster_nodes"] = get_online_cluster_nodes(params)
