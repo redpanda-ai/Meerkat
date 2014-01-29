@@ -80,10 +80,9 @@ class DescriptionConsumer(threading.Thread):
 		matched_n_gram_tokens = self.__search_n_gram_tokens()
 		logger.info("\t" + str(len(matched_n_gram_tokens)) + " 2+ grams: "\
 		+ str(matched_n_gram_tokens))
-		#TODO: ADD THE 2+GRAMS TO THE FINAL QUERY STRING
-		#print(str(matched_n_gram_tokens))
+
 		self.__generate_final_query(query_string, matching_address\
-		, phone_numbers)
+		, phone_numbers, matched_n_gram_tokens)
 
 		#TODO: a tail recursive search for longest matching
 		#n-gram on a per composite-feature basis.
@@ -177,7 +176,8 @@ class DescriptionConsumer(threading.Thread):
 		self.__reset_my_meta()
 		self.__set_logger()
 
-	def __generate_final_query(self, qs_query, address, phone_numbers):
+	def __generate_final_query(self, qs_query, address, phone_numbers
+	, matching_n_grams):
 		"""Constructs a complete boolean query based upon:
 		1.  Unigrams (query_string)
 		2.  Addresses (match)
@@ -200,6 +200,9 @@ class DescriptionConsumer(threading.Thread):
 				logger.info("\tMatching 'Phone': '" + phone_num + "'")
 				search_components.append((phone_num, "match_query"\
 				, ["composite.phone^1"], 1))
+		for n_gram in matching_n_grams:
+			search_components.append((n_gram, "match_query"\
+			, ["_all^1"], 1))
 
 		my_obj = self.__get_boolean_search_object(search_components)
 		logger.info(json.dumps(my_obj))
