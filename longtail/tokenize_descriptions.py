@@ -5,7 +5,7 @@
 description strings (unstructured data) to merchant data indexed with
 ElasticSearch (structured data)."""
 
-import datetime, json, logging, queue, sys, csv
+import csv, datetime, json, logging, queue, sys, urllib, re
 from longtail.custom_exceptions import InvalidArguments
 from longtail.description_consumer import DescriptionConsumer
 from longtail.binary_classifier.bay import predict_if_physical_transaction
@@ -33,6 +33,33 @@ def get_desc_queue(params):
 	input_file.close()
 	return desc_queue
 
+def get_online_cluster_nodes(params):
+	"""Discover which cluster nodes are online and return the results."""
+	discovery_list = params["elasticsearch"]["cluster_nodes"]
+	online_cluster_nodes = []
+	output_data = None
+	for node in discovery_list:
+		url = "http://" + node + "/_cluster/nodes/"
+		req = urllib.request.Request(url=url)
+		try:
+			output_data = urllib.request.urlopen(req).read().decode('UTF-8')
+		except Exception:
+			logging.critical(node + " error, continuing loop.")
+			continue
+		logging.info(node + " found, returning.")
+		break
+
+	nodes = json.loads(output_data)["nodes"]
+	http_address_re = re.compile(r"^inet\[\/(.*)\]")
+	for node in nodes:
+		http_address = nodes[node]["http_address"]
+		if http_address_re.search(http_address):
+			match = http_address_re.match(http_address).group(1)
+			logging.info("Confirmed ES node at " + match)
+			online_cluster_nodes.append(match)
+
+	return online_cluster_nodes
+
 def initialize():
 	"""Validates the command line arguments."""
 	input_file, params = None, None
@@ -47,8 +74,10 @@ def initialize():
 		print(sys.argv[1], " not found, aborting.")
 		logging.error(sys.argv[1] + " not found, aborting.")
 		sys.exit()
+	params["search_cache"] = {}
 	if "elasticsearch" in params and "cluster_nodes" in params["elasticsearch"]\
 	and "index" in params["elasticsearch"] and "type" in params["elasticsearch"]:
+		params["elasticsearch"]["cluster_nodes"] = get_online_cluster_nodes(params)
 		return params
 	else:
 		logging.error("The following elements must be added to your configuration:")
