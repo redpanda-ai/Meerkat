@@ -156,8 +156,8 @@ class DescriptionConsumer(threading.Thread):
 		output_dict['DESCRIPTION'] = self.input_string
 		self.result_queue.put(output_dict)
 
-		logging.info("Z_SCORE_DELTA: " + z_score_delta)
-		logging.info("TOP_SCORE: " +  top_score)
+		logging.info("Z_SCORE_DELTA: " + str(z_score_delta))
+		logging.info("TOP_SCORE: " + str(top_score))
 
 	def __display_z_score_delta(self, scores):
 		"""Display the Z-score delta between the first and second scores."""
