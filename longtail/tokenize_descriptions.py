@@ -118,6 +118,11 @@ def write_output_to_file(params, result_queue):
 
 		except queue.Empty:
 			break
+
+	if len(output_list) < 1:
+		logging.warning("No results available to write")
+		return
+
 	result_queue.join()
 	file_name = params["output"]["file"].get("path", '../data/longtailLabeled.csv')
 	# Output as CSV

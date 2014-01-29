@@ -91,7 +91,6 @@ class DescriptionConsumer(threading.Thread):
 		"""Displays search results."""
 		hits = search_results['hits']['hits']
 		scores, results, fields_found = [], [], []
-		output_dict = {}
 		params = self.params
 		for hit in hits:
 			hit_fields, score = hit['fields'], hit['_score']
@@ -110,14 +109,55 @@ class DescriptionConsumer(threading.Thread):
 			results.append(\
 			"[" + str(round(score, 3)) + "] " + " ".join(ordered_hit_fields))
 
-			# Send to result Queue
-			output_dict = dict(zip(fields_found, ordered_hit_fields))
-			output_dict['DESCRIPTION'] = self.input_string
-			self.result_queue.put(output_dict)
-
 		self.__display_z_score_delta(scores)
 		for result in results:
 			print(result)
+
+	def output_to_result_queue(self, search_results):
+		"""Decides whether to output and pushes to result_queue"""
+		hits = search_results['hits']['hits']
+		scores, fields_found = [], []
+		output_dict = {}
+		params = self.params
+		field_order = params["output"]["results"]["fields"]
+		top_hit = hits[0]
+		hit_fields = top_hit["fields"]
+		fields_in_hit = [field for field in hit_fields]
+		ordered_hit_fields = []
+
+		for hit in hits:
+			scores.append(hit['_score'])
+
+		for ordinal in field_order:
+			if ordinal in fields_in_hit:
+				my_field = str(hit_fields[ordinal])
+				fields_found.append(ordinal)
+				ordered_hit_fields.append(my_field)
+			else:
+				fields_found.append(ordinal)
+				ordered_hit_fields.append("")
+
+		z_score_delta = self.__display_z_score_delta(scores)
+		top_score = top_hit['_score']
+
+		#Unable to generate z_score
+		if z_score_delta == None:
+			output_dict = dict(zip(fields_found, ordered_hit_fields))
+			output_dict['DESCRIPTION'] = self.input_string
+			self.result_queue.put(output_dict)
+			return
+
+		#Send to result Queue if score good enough
+		if z_score_delta > 2:
+			output_dict = dict(zip(fields_found, ordered_hit_fields))
+		else:
+			output_dict = dict(zip(fields_found, ([""] * len(fields_found))))
+
+		output_dict['DESCRIPTION'] = self.input_string
+		self.result_queue.put(output_dict)
+
+		logging.info("Z_SCORE_DELTA: " + z_score_delta)
+		logging.info("TOP_SCORE: " +  top_score)
 
 	def __display_z_score_delta(self, scores):
 		"""Display the Z-score delta between the first and second scores."""
@@ -137,7 +177,9 @@ class DescriptionConsumer(threading.Thread):
 			quality = "Mid-grade"
 		else:
 			quality = "High-grade"
+
 		logger.info("Top Score Quality: " + quality)
+		return z_score_delta
 
 	def __extract_longest_substring(self, longest_substring):
 		"""Extracts the longest substring from our input, returning left
@@ -211,6 +253,7 @@ class DescriptionConsumer(threading.Thread):
 		logger.info("Cache Hit / Miss: " + str(metrics["cache_count"])\
 		+ " / " + str(metrics["query_count"]))
 		self.__display_search_results(my_results)
+		self.output_to_result_queue(my_results)
 
 	def __get_boolean_search_object(self, search_components):
 		"""Builds an object for a "bool" search."""
