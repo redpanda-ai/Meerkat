@@ -7,7 +7,7 @@
 import csv, sys, math
 
 def test_accuracy(file_path):
-
+	"""Docstring to be determined."""
 	human_labeled = open("data/verifiedLabeledTrans.csv") if __name__ == "__main__" else file_path
 	machine_labeled = open(sys.argv[1])
 	dict_ML = csv.DictReader(machine_labeled)
@@ -47,7 +47,7 @@ def test_accuracy(file_path):
 				elif mlRow['PERSISTENTRECORDID'] == "":
 					# Our confidence was not high enough to label
 					unlabeled.append(mlRow['DESCRIPTION'])
-					break	
+					break
 				else:
 					# Transaction is mislabeled
 					mislabeled.append(hlRow['DESCRIPTION'] + " - " + hlRow['PERSISTENTRECORDID'])
@@ -64,3 +64,4 @@ def test_accuracy(file_path):
 
 if __name__ == "__main__":
 	test_accuracy("data/verifiedLabeledTrans.csv")
+	

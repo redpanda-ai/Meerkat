@@ -75,7 +75,7 @@ class DescriptionConsumer(threading.Thread):
 		#show all search terms separated by spaces
 		query_string = " ".join(filtered_tokens)
 		self.__get_n_gram_tokens(filtered_tokens)
-		
+
 		matched_n_gram_tokens = self.__search_n_gram_tokens()
 		logger.info("\t" + str(len(matched_n_gram_tokens)) + " 2+ grams: "\
 		+ str(matched_n_gram_tokens))
@@ -116,7 +116,7 @@ class DescriptionConsumer(threading.Thread):
 	def output_to_result_queue(self, search_results):
 		"""Decides whether to output and pushes to result_queue"""
 		hits = search_results['hits']['hits']
-		scores, results, fields_found = [], [], []
+		scores, fields_found = [], []
 		output_dict = {}
 		params = self.params
 		field_order = params["output"]["results"]["fields"]
@@ -125,7 +125,7 @@ class DescriptionConsumer(threading.Thread):
 		fields_in_hit = [field for field in hit_fields]
 		ordered_hit_fields = []
 
-		for hit in hits: 
+		for hit in hits:
 			scores.append(hit['_score'])
 
 		for ordinal in field_order:
@@ -144,20 +144,20 @@ class DescriptionConsumer(threading.Thread):
 		if z_score_delta == None:
 			output_dict = dict(zip(fields_found, ordered_hit_fields))
 			output_dict['DESCRIPTION'] = self.input_string
-			self.result_queue.put(output_dict)	
+			self.result_queue.put(output_dict)
 			return
-				
+
 		#Send to result Queue if score good enough
 		if z_score_delta > 2:
 			output_dict = dict(zip(fields_found, ordered_hit_fields))
 		else:
-			output_dict = dict(zip(fields_found, ([""] * len(fields_found))))		
+			output_dict = dict(zip(fields_found, ([""] * len(fields_found))))
 
 		output_dict['DESCRIPTION'] = self.input_string
-		self.result_queue.put(output_dict)	
+		self.result_queue.put(output_dict)
 
-		logging.info("Z_SCORE_DELTA: ", z_score_delta)
-		logging.info("TOP_SCORE: ", top_score)		
+		logging.info("Z_SCORE_DELTA: " + z_score_delta)
+		logging.info("TOP_SCORE: " +  top_score)
 
 	def __display_z_score_delta(self, scores):
 		"""Display the Z-score delta between the first and second scores."""
@@ -178,8 +178,8 @@ class DescriptionConsumer(threading.Thread):
 		else:
 			quality = "High-grade"
 
-		return z_score_delta	
 		logger.info("Top Score Quality: " + quality)
+		return z_score_delta
 
 	def __extract_longest_substring(self, longest_substring):
 		"""Extracts the longest substring from our input, returning left
