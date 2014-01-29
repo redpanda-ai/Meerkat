@@ -15,17 +15,17 @@ class VariousToolsTests(unittest.TestCase):
 
 	def test_string_cleanse(self):
 		"""string_cleanse test"""
-		
+
 		for chars, no_chars in self.strings:
 			result = longtail.various_tools.string_cleanse(chars)
 			self.assertEqual(no_chars, result)
 
 	def test_numeric_cleanse(self):
 		"""numeric_cleanse test"""
-		
+
 		for chars, no_chars in self.numbers:
 			result = longtail.various_tools.numeric_cleanse(chars)
-			self.assertEqual(no_chars, result)		
-		
+			self.assertEqual(no_chars, result)
+
 if __name__ == '__main__':
 	unittest.main()
