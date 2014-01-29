@@ -7,7 +7,7 @@ Created on Jan 14, 2014
 #!/bin/python3
 # pylint: disable=R0914
 
-import copy, json, logging, re, queue, threading, urllib.request
+import copy, json, logging, re, queue, threading, urllib.request, hashlib
 from longtail.custom_exceptions import UnsupportedQueryType
 from longtail.query_templates import GENERIC_ELASTICSEARCH_QUERY, STOP_WORDS\
 , get_match_query, get_qs_query
@@ -23,7 +23,8 @@ class DescriptionConsumer(threading.Thread):
 	def __begin_parse(self):
 		"""Creates data structures used the first call into the
 		__parse_into_search_tokens function."""
-		print("Input String ", self.input_string)
+		logger = logging.getLogger("thread " + str(self.thread_id))
+		logger.info("Input String " + self.input_string)
 		self.recursive = False
 		self.my_meta["terms"] = []
 		self.my_meta["long_substrings"] = {}
@@ -79,10 +80,9 @@ class DescriptionConsumer(threading.Thread):
 		matched_n_gram_tokens = self.__search_n_gram_tokens()
 		logger.info("\t" + str(len(matched_n_gram_tokens)) + " 2+ grams: "\
 		+ str(matched_n_gram_tokens))
-		#TODO: ADD THE 2+GRAMS TO THE FINAL QUERY STRING
-		print(str(matched_n_gram_tokens))
+
 		self.__generate_final_query(query_string, matching_address\
-		, phone_numbers)
+		, phone_numbers, matched_n_gram_tokens)
 
 		#TODO: a tail recursive search for longest matching
 		#n-gram on a per composite-feature basis.
@@ -218,7 +218,8 @@ class DescriptionConsumer(threading.Thread):
 		self.__reset_my_meta()
 		self.__set_logger()
 
-	def __generate_final_query(self, qs_query, address, phone_numbers):
+	def __generate_final_query(self, qs_query, address, phone_numbers
+	, matching_n_grams):
 		"""Constructs a complete boolean query based upon:
 		1.  Unigrams (query_string)
 		2.  Addresses (match)
@@ -241,16 +242,16 @@ class DescriptionConsumer(threading.Thread):
 				logger.info("\tMatching 'Phone': '" + phone_num + "'")
 				search_components.append((phone_num, "match_query"\
 				, ["composite.phone^1"], 1))
-
-		#FIXME
-		#self.__get_n_gram_tokens()
+		for n_gram in matching_n_grams:
+			search_components.append((n_gram, "match_query"\
+			, ["_all^1"], 1))
 
 		my_obj = self.__get_boolean_search_object(search_components)
 		logger.info(json.dumps(my_obj))
 		my_results = self.__search_index(my_obj)
 		metrics = my_meta["metrics"]
-		logger.info("This system required " + str(metrics["query_count"])\
-		+ " individual searches.")
+		logger.info("Cache Hit / Miss: " + str(metrics["cache_count"])\
+		+ " / " + str(metrics["query_count"]))
 		self.__display_search_results(my_results)
 		self.output_to_result_queue(my_results)
 
@@ -428,13 +429,22 @@ class DescriptionConsumer(threading.Thread):
 		self.my_meta = {}
 		self.my_meta["unigram_tokens"] = []
 		self.my_meta["tokens"] = []
-		self.my_meta["metrics"] = {"query_count" : 0}
+		self.my_meta["metrics"] = {"query_count" : 0, "cache_count" : 0}
 
 	def __search_index(self, input_as_object):
+		logger = logging.getLogger("thread " + str(self.thread_id))
+
 		"""Searches the merchants index and the merchant mapping"""
 		input_data = json.dumps(input_as_object).encode('UTF-8')
-		#print(str(self.thread_id), " : ", str(self.my_meta))
-		logger = logging.getLogger("thread " + str(self.thread_id))
+		#Check the cache first
+		input_hash = str(input_data)
+		if input_hash in self.params["search_cache"]:
+			logger.info("Cache hit, short-cutting")
+			self.my_meta["metrics"]["cache_count"] += 1		
+			return self.params["search_cache"][input_hash]
+		else:
+			logger.info("Cache miss, searching")
+	
 		logger.debug(input_data)
 		url = "http://" + self.es_node + "/"
 		path = self.params["elasticsearch"]["index"] + "/"\
@@ -451,6 +461,7 @@ class DescriptionConsumer(threading.Thread):
 		metrics = self.my_meta["metrics"]
 		metrics["query_count"] += 1
 		output_string = json.loads(output_data)
+		self.params["search_cache"][input_hash] = output_string
 		return output_string
 
 	def __search_n_gram_tokens(self):
@@ -494,6 +505,10 @@ class DescriptionConsumer(threading.Thread):
 
 		for key in reversed(sorted(substrings.keys())):
 			for term in substrings[key]:
+				#These words are reserved and will cause HTTP Response errors if
+				#sent as-is to an ElasticSearch query
+				if term in ["AND", "OR"]:
+					term = term.lower()
 				hit_count = 0
 				if len(term) > 1:
 					sub_query["query_string"]["query"] = str(term)
