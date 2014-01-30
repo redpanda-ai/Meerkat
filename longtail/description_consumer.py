@@ -201,7 +201,6 @@ class DescriptionConsumer(threading.Thread):
 			del long_substrings[ls_len]
 		return original_term, pre, post
 
-
 	def __init__(self, thread_id, params, desc_queue, result_queue):
 		''' Constructor '''
 		threading.Thread.__init__(self)
@@ -440,7 +439,7 @@ class DescriptionConsumer(threading.Thread):
 		input_hash = str(input_data)
 		if input_hash in self.params["search_cache"]:
 			logger.info("Cache hit, short-cutting")
-			self.my_meta["metrics"]["cache_count"] += 1		
+			self.my_meta["metrics"]["cache_count"] += 1
 			return self.params["search_cache"][input_hash]
 		else:
 			logger.info("Cache miss, searching")
