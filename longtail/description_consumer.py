@@ -7,7 +7,7 @@ Created on Jan 14, 2014
 #!/bin/python3
 # pylint: disable=R0914
 
-import copy, json, logging, re, queue, threading, urllib.request, hashlib
+import copy, json, logging, re, queue, threading, urllib.request
 from longtail.custom_exceptions import UnsupportedQueryType
 from longtail.query_templates import GENERIC_ELASTICSEARCH_QUERY, STOP_WORDS\
 , get_match_query, get_qs_query
@@ -278,7 +278,6 @@ class DescriptionConsumer(threading.Thread):
 			bool_search["query"]["bool"]["should"].append(my_subquery)
 		return bool_search
 
-
 	def __get_composite_search_count(self, list_of_ngrams, feature_name):
 		"""Obtains search results for a query composed of multiple
 		sub-queries.  At some point I may add 'query_string' as an
@@ -431,9 +430,8 @@ class DescriptionConsumer(threading.Thread):
 		self.my_meta["metrics"] = {"query_count" : 0, "cache_count" : 0}
 
 	def __search_index(self, input_as_object):
-		logger = logging.getLogger("thread " + str(self.thread_id))
-
 		"""Searches the merchants index and the merchant mapping"""
+		logger = logging.getLogger("thread " + str(self.thread_id))
 		input_data = json.dumps(input_as_object).encode('UTF-8')
 		#Check the cache first
 		input_hash = str(input_data)
@@ -443,7 +441,7 @@ class DescriptionConsumer(threading.Thread):
 			return self.params["search_cache"][input_hash]
 		else:
 			logger.info("Cache miss, searching")
-	
+
 		logger.debug(input_data)
 		url = "http://" + self.es_node + "/"
 		path = self.params["elasticsearch"]["index"] + "/"\
@@ -479,7 +477,7 @@ class DescriptionConsumer(threading.Thread):
 		sub_query["match"]["_all"]["type"] = "phrase"
 
 		logger = logging.getLogger("thread " + str(self.thread_id))
-		logger.info( "Matched the following n-grams to our merchants index:")
+		logger.info("Matched the following n-grams to our merchants index:")
 		for key in reversed(sorted(self.n_gram_tokens.keys())):
 			for term in self.n_gram_tokens[key]:
 				sub_query["match"]["_all"]["query"] = term
@@ -487,7 +485,7 @@ class DescriptionConsumer(threading.Thread):
 				hit_count = self.__search_index(my_new_query)['hits']['total']
 				del my_new_query["query"]["bool"]["should"][0]
 				if hit_count > 0:
-					logger.info( str(key) + "-gram : " + term + " (" + str(hit_count) + ")")
+					logger.info(str(key) + "-gram : " + term + " (" + str(hit_count) + ")")
 					matched_n_gram_tokens.append(term)
 		return matched_n_gram_tokens
 
