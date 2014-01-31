@@ -1,4 +1,4 @@
-'''Unit test for longtail.various_tools'''
+'''Unit test for longtail.description_consumer'''
 
 import queue, json
 from longtail.description_consumer import DescriptionConsumer
@@ -53,13 +53,13 @@ class DescriptionConsumerTests(unittest.TestCase):
 		self.desc_queue, self.result_queue = queue.Queue, queue.Queue
 
 	def test_validate_elasticsearch(self):
-		"""__Ensure 'elasticsearch' key is in configuration"""
+		"""Ensure 'elasticsearch' key is in configuration"""
 		del self.params["elasticsearch"]
 		args = [0, self.params, self.desc_queue, self.result_queue]
 		self.assertRaises(Misconfiguration, DescriptionConsumer, *args)
 
 	def test_validate_empty_config(self):
-		"""__Ensure configuration is not empty"""
+		"""Ensure configuration is not empty"""
 		self.params = {}
 		args = [0, self.params, self.desc_queue, self.result_queue]
 		self.assertRaises(Misconfiguration, DescriptionConsumer, *args)
@@ -71,23 +71,32 @@ class DescriptionConsumerTests(unittest.TestCase):
 		self.assertRaises(Misconfiguration, DescriptionConsumer, *args)
 
 	def test_validate_positive_concurrency(self):
-		"""__Ensure 'concurrency' value is a positive integer"""
+		"""Ensure 'concurrency' value is a positive integer"""
 		self.params["concurrency"] = 0
 		args = [0, self.params, self.desc_queue, self.result_queue]
 		self.assertRaises(Misconfiguration, DescriptionConsumer, *args)
 
 	def test_validate_input_key(self):
-		"""__Ensure 'input' key is in configuration"""
+		"""Ensure 'input' key is in configuration"""
 		del self.params["input"]
 		args = [0, self.params, self.desc_queue, self.result_queue]
 		self.assertRaises(Misconfiguration, DescriptionConsumer, *args)
 
-	def test_display_z_score_delta(self):
-		z_scores = [0]
+	def test_display_z_score_single_score(self):
+		"""Ensure that list containing one score, returns None for z_score"""
+		scores = [0]
 		my_consumer = DescriptionConsumer(0, self.params, self.desc_queue
 		, self.result_queue)
-		result = my_consumer._DescriptionConsumer__display_z_score_delta([0])
+		result = my_consumer._DescriptionConsumer__display_z_score_delta(scores)
 		self.assertEqual(result,None)
+
+	def test_display_z_score_delta(self):
+		"""Ensure that list containing [1,2,3], returns -1.225 for z_score"""
+		scores = [1, 2, 3]
+		my_consumer = DescriptionConsumer(0, self.params, self.desc_queue
+		, self.result_queue)
+		result = my_consumer._DescriptionConsumer__display_z_score_delta(scores)
+		self.assertEqual(result,-1.225)
 
 if __name__ == '__main__':
 	unittest.main()
