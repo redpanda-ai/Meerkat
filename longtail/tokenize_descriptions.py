@@ -13,15 +13,17 @@ from longtail.binary_classifier.bay import predict_if_physical_transaction
 def get_desc_queue(params):
 	"""Opens a file of descriptions, one per line, and load a description
 	queue."""
-	lines = None
+	lines, filename, encoding = None, None, None
 	desc_queue = queue.Queue()
 	try:
-		input_file = open(params["input"]["filename"]\
-		, encoding=params['input']['encoding'])
-		lines = input_file.read()
-	except FileNotFoundError:
-		print(sys.argv[1], " not found, aborting.")
-		logging.error(sys.argv[1] + " not found, aborting.")
+		filename = params["input"]["filename"]
+		encoding = params["input"]["encoding"]
+		with open(filename, 'r', encoding=encoding) as inputfile:
+			lines = inputfile.read()
+	except IOError:
+		msg="Invalid ['input']['filename'] key; value " + filename \
+		+ " cannot be found.  Correct your config file."
+		logging.critical(msg)
 		sys.exit()
 	for input_string in lines.split("\n"):
 		prediction = predict_if_physical_transaction(input_string)
@@ -30,7 +32,6 @@ def get_desc_queue(params):
 		elif prediction == "0":
 			# TODO Output to file
 			logging.info("NON-PHYSICAL: " + input_string)
-	input_file.close()
 	return desc_queue
 
 def get_online_cluster_nodes(params):
