@@ -68,6 +68,5 @@ class TokenizeDescriptionTests(unittest.TestCase):
 		"""The point of this function is to write
 		to a file. Both CSV and JSON should work"""
 
-	
 if __name__ == '__main__':
 	unittest.main(argv=[sys.argv[0]])
