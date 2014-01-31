@@ -41,6 +41,16 @@ class DescriptionConsumerTests(unittest.TestCase):
 	}
 }"""
 
+	clean_my_meta = """
+{
+	"unigram_tokens" : [],
+	"tokens" : [],
+	"metrics" : {
+		"query_count" : 0,
+		"cache_count" : 0
+	}
+}"""
+
 	def setUp(self):
 		"""Basic Fixture for all tests."""
 		self.params = json.loads(self.config)
@@ -98,5 +108,49 @@ class DescriptionConsumerTests(unittest.TestCase):
 		args = [0, self.params, self.desc_queue, self.result_queue]
 		self.assertRaises(Misconfiguration, DescriptionConsumer, *args)
 
+	def test_validate_logging_path(self):
+		"""Ensure 'logging.path' key is in configuration"""
+		del self.params["logging"]["path"]
+		args = [0, self.params, self.desc_queue, self.result_queue]
+		self.assertRaises(Misconfiguration, DescriptionConsumer, *args)
+
+	def test_validate_elasticsearch_index(self):
+		"""Ensure 'elasticsearch.index' key is in configuration"""
+		del self.params["elasticsearch"]['index']
+		args = [0, self.params, self.desc_queue, self.result_queue]
+		self.assertRaises(Misconfiguration, DescriptionConsumer, *args)
+
+	def test_validate_elasticsearch_type(self):
+		"""Ensure 'elasticsearch.type' key is in configuration"""
+		del self.params["elasticsearch"]['type']
+		args = [0, self.params, self.desc_queue, self.result_queue]
+		self.assertRaises(Misconfiguration, DescriptionConsumer, *args)
+
+	def test_reset_my_meta_recursive(self):
+		"""Ensure that the 'recursive' memeber is reset to 'false'"""
+		my_consumer = DescriptionConsumer(0, self.params, self.desc_queue
+		, self.result_queue)
+		my_consumer.recursive = True
+		my_consumer._DescriptionConsumer__reset_my_meta()
+		self.assertEqual(my_consumer.recursive,False)
+
+	def test_reset_my_meta_n_gram_tokens(self):
+		"""Ensure that the 'recursive' memeber is reset to 'false'"""
+		my_consumer = DescriptionConsumer(0, self.params, self.desc_queue
+		, self.result_queue)
+		my_consumer.n_gram_tokens = {"not" : "empty"}
+		my_consumer._DescriptionConsumer__reset_my_meta()
+		self.assertEqual(my_consumer.n_gram_tokens, {})
+
+	def test_reset_my_meta_n_gram_tokens(self):
+		"""Ensure that the 'my_meta' memeber is reset"""
+		my_consumer = DescriptionConsumer(0, self.params, self.desc_queue
+		, self.result_queue)
+		my_consumer.my_meta = {"dirty" : "my_meta"}
+		my_consumer._DescriptionConsumer__reset_my_meta()
+		#expected = = json.loads(self.clean_my_meta)
+		self.assertEqual(my_consumer.my_meta, json.loads(self.clean_my_meta))
+
 if __name__ == '__main__':
 	unittest.main()
+

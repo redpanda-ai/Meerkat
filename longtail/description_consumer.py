@@ -557,6 +557,14 @@ class DescriptionConsumer(threading.Thread):
 		if self.params["concurrency"] <= 0:
 			raise Misconfiguration(msg="Misconfiguration: 'concurrency' must be a positive integer", expr=None)
 
+		if "index" not in self.params["elasticsearch"]:
+			raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.index'", expr=None)
+		if "type" not in self.params["elasticsearch"]:
+			raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.type'", expr=None)
+		if "path" not in self.params["logging"]:
+			raise Misconfiguration(msg="Misconfiguration: missing key, 'logging.path'", expr=None)
+
+
 		return True
 
 	def run(self):
