@@ -8,7 +8,7 @@ Created on Jan 14, 2014
 # pylint: disable=R0914
 
 import copy, json, logging, re, queue, threading, urllib.request
-from longtail.custom_exceptions import UnsupportedQueryType
+from longtail.custom_exceptions import Misconfiguration, UnsupportedQueryType
 from longtail.query_templates import GENERIC_ELASTICSEARCH_QUERY, STOP_WORDS\
 , get_match_query, get_qs_query
 from scipy.stats.mstats import zscore
@@ -164,7 +164,7 @@ class DescriptionConsumer(threading.Thread):
 		logger = logging.getLogger("thread " + str(self.thread_id))
 		if len(scores) < 2:
 			logger.info("Unable to generate Z-Score")
-			return
+			return None
 
 		z_scores = zscore(scores)
 		first_score, second_score = z_scores[0:2]
@@ -209,6 +209,7 @@ class DescriptionConsumer(threading.Thread):
 		self.result_queue = result_queue
 		self.input_string = None
 		self.params = params
+		self.__validate_params()
 		cluster_nodes = self.params["elasticsearch"]["cluster_nodes"]
 		self.es_node = cluster_nodes[self.thread_id % len(cluster_nodes)]
 		self.recursive = False
@@ -545,6 +546,17 @@ class DescriptionConsumer(threading.Thread):
 		params_json = json.dumps(params, sort_keys=True, indent=4\
 		, separators=(',', ': '))
 		my_logger.info(params_json)
+
+	def __validate_params(self):
+		if "elasticsearch" not in self.params:
+			raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch'", expr=None )
+		if "concurrency" not in self.params:
+			raise Misconfiguration(msg="Misconfiguration: missing key, 'concurrency'", expr=None )
+		if self.params["concurrency"] <= 0:
+			raise Misconfiguration(msg="Misconfiguration: 'concurrency' must be a positive integer", expr=None )
+		if "input" not in self.params:
+			raise Misconfiguration(msg="Misconfiguration: missing key, 'input'", expr=None )
+		return True
 
 	def run(self):
 		while True:

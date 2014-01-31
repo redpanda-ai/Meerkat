@@ -24,10 +24,10 @@ def get_desc_queue(params):
 		logging.error(sys.argv[1] + " not found, aborting.")
 		sys.exit()
 	for input_string in lines.split("\n"):
-		prediction = predict_if_physical_transaction(input_string)		
+		prediction = predict_if_physical_transaction(input_string)
 		if prediction == "1":
 			desc_queue.put(input_string)
-		elif prediction == "0":	
+		elif prediction == "0":
 			# TODO Output to file
 			logging.info("NON-PHYSICAL: " + input_string)
 	input_file.close()

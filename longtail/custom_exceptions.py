@@ -3,6 +3,13 @@
 """This is where we keeping custom exception classes for use within multiple
 scripts."""
 
+class FileProblem(Exception):
+	"""Wraps exceptions pertaining to failures to open files."""
+	def __init__(self, expr, msg):
+		super(FileProblem, self).__init__(msg)
+		self.expr = expr
+		self.msg = msg
+
 class InvalidArguments(Exception):
 	"""Exception raised for invalid command line arguments."""
 	def __init__(self, expr, msg):
@@ -18,10 +25,10 @@ class InvalidNumberOfLines(Exception):
 		self.expr = expr
 		self.msg = msg
 
-class FileProblem(Exception):
-	"""Wraps exceptions pertaining to failures to open files."""
+class Misconfiguration(Exception):
+	"""Wraps an exeception for handling bad configuration files."""
 	def __init__(self, expr, msg):
-		super(FileProblem, self).__init__(msg)
+		super(Misconfiguration, self).__init__(msg)
 		self.expr = expr
 		self.msg = msg
 
