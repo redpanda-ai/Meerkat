@@ -17,7 +17,10 @@
 			],
 			"size" : 10
 		},
-		"filepath" : "data/longTailLabeled.csv"
+        "file" : {
+            "format" : "csv",
+            "path" : "data/longtailLabeled.csv"
+        }
 	},
 	"elasticsearch" : {
 		"cluster_nodes" : ["brainstorm0:9200", "brainstorm1:9200", "brainstorm2:9200"
