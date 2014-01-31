@@ -2,7 +2,7 @@
 
 from longtail import tokenize_descriptions
 from longtail.custom_exceptions import InvalidArguments
-import unittest, queue, sys
+import unittest, queue, sys, os
 
 class TokenizeDescriptionTests(unittest.TestCase):
 	
@@ -67,6 +67,18 @@ class TokenizeDescriptionTests(unittest.TestCase):
 	def test_write_output_to_file(self):
 		"""The point of this function is to write
 		to a file. Both CSV and JSON should work"""
+
+		my_queue = queue.Queue()
+		my_queue.put({"PERSISTENTRECORDID":"123456789"})
+		self.params["output"] = {}
+		self.params["output"]["file"] = {}
+		self.params["output"]["file"]["path"] = "data/unittestDeletable.csv"
+
+		tokenize_descriptions.write_output_to_file(self.params, my_queue)
+		self.assertTrue(os.path.isfile("data/unittestDeletable.csv"))
+
+		# Reset
+		os.remove("data/unittestDeletable.csv")
 
 if __name__ == '__main__':
 	unittest.main(argv=[sys.argv[0]])
