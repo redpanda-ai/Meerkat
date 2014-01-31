@@ -548,14 +548,15 @@ class DescriptionConsumer(threading.Thread):
 		my_logger.info(params_json)
 
 	def __validate_params(self):
-		if "elasticsearch" not in self.params:
-			raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch'", expr=None )
-		if "concurrency" not in self.params:
-			raise Misconfiguration(msg="Misconfiguration: missing key, 'concurrency'", expr=None )
+		"""Ensures that the correct parameters are supplied."""
+		mandatory_keys = ["elasticsearch", "concurrency", "input", "logging"]
+		for key in mandatory_keys:
+			if key not in self.params:
+				raise Misconfiguration(msg="Misconfiguration: missing key, '" + key + "'", expr=None)
+
 		if self.params["concurrency"] <= 0:
-			raise Misconfiguration(msg="Misconfiguration: 'concurrency' must be a positive integer", expr=None )
-		if "input" not in self.params:
-			raise Misconfiguration(msg="Misconfiguration: missing key, 'input'", expr=None )
+			raise Misconfiguration(msg="Misconfiguration: 'concurrency' must be a positive integer", expr=None)
+
 		return True
 
 	def run(self):
@@ -569,4 +570,4 @@ class DescriptionConsumer(threading.Thread):
 
 			except queue.Empty:
 				print(str(self.thread_id), " found empty queue, terminating.")
-				return True
+		return True

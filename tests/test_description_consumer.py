@@ -8,12 +8,6 @@ import unittest
 class DescriptionConsumerTests(unittest.TestCase):
 	"""Our UnitTest class."""
 
-	strings = (("Regular words[]'{}/:", "Regular words"),
-	('Trans with "" quotes', 'Trans with  quotes'))
-
-	numbers = (("[8]6{7}5'3/0-9", "8675309"),
-	('333"6"6"6"999', '333666999'))
-
 	config = """
 {
 	"concurrency" : 1,
@@ -65,7 +59,7 @@ class DescriptionConsumerTests(unittest.TestCase):
 		self.assertRaises(Misconfiguration, DescriptionConsumer, *args)
 
 	def test_validate_missing_concurrency(self):
-		"""__Ensure 'concurrency' key is in configuration"""
+		"""Ensure 'concurrency' key is in configuration"""
 		del self.params["concurrency"]
 		args = [0, self.params, self.desc_queue, self.result_queue]
 		self.assertRaises(Misconfiguration, DescriptionConsumer, *args)
@@ -97,6 +91,12 @@ class DescriptionConsumerTests(unittest.TestCase):
 		, self.result_queue)
 		result = my_consumer._DescriptionConsumer__display_z_score_delta(scores)
 		self.assertEqual(result,-1.225)
+
+	def test_validate_logging(self):
+		"""Ensure 'logging' key is in configuration"""
+		del self.params["logging"]
+		args = [0, self.params, self.desc_queue, self.result_queue]
+		self.assertRaises(Misconfiguration, DescriptionConsumer, *args)
 
 if __name__ == '__main__':
 	unittest.main()
