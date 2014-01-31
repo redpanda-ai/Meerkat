@@ -2,7 +2,7 @@
 
 from longtail import tokenize_descriptions
 from longtail.custom_exceptions import InvalidArguments
-import unittest, queue, sys, os
+import unittest, queue, sys, socket, os
 
 class TokenizeDescriptionTests(unittest.TestCase):
 	
@@ -40,6 +40,15 @@ class TokenizeDescriptionTests(unittest.TestCase):
 		online_nodes = tokenize_descriptions.get_online_cluster_nodes(self.params)
 
 		self.assertNotEqual(len(online_nodes), 0)
+
+		# Nodes are reachable
+		for node in online_nodes:
+			node = node.split(":")[0]
+			try:
+				socket.gethostbyaddr(node)
+				self.assertTrue(True)
+			except socket.gaierror:
+				self.assertTrue(False)		
 
 	def test_initialize(self):
 		"""The point of this function is to return a set of params"""
