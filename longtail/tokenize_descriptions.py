@@ -71,7 +71,7 @@ def initialize():
 		input_file = open(sys.argv[1], encoding='utf-8')
 		params = json.loads(input_file.read())
 		input_file.close()
-	except FileNotFoundError:
+	except IOError:
 		print(sys.argv[1], " not found, aborting.")
 		logging.error(sys.argv[1] + " not found, aborting.")
 		sys.exit()
@@ -145,7 +145,7 @@ def write_output_to_file(params, result_queue):
 def usage():
 	"""Shows the user which parameters to send into the program."""
 	result = "Usage:\n\t<quoted_transaction_description_string>"
-	print(result)
+	logging.error(result)
 	return result
 
 if __name__ == "__main__":
