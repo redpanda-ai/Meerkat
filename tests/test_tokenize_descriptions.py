@@ -5,7 +5,7 @@ from longtail.custom_exceptions import InvalidArguments
 import unittest, queue, sys, socket, os, json
 
 class TokenizeDescriptionTests(unittest.TestCase):
-	
+
 	"""Our UnitTest class."""
 
 	config = """
@@ -45,6 +45,8 @@ class TokenizeDescriptionTests(unittest.TestCase):
 	def setUp(self):
 		self.params = json.loads(self.config)
 		self.desc_queue, self.result_queue = queue.Queue(), queue.Queue()
+		for arg in sys.argv[1:]:
+			sys.argv.remove(arg)
 
 	def test_usage(self):
 		"""The point of this function is to print usage information to the user"""
@@ -53,34 +55,31 @@ class TokenizeDescriptionTests(unittest.TestCase):
 
 	def test_get_desc_queue_returns_queue(self):
 		"""Ensure returns an instance of Queue"""
-		my_queue = tokenize_descriptions.get_desc_queue(self.params)	
+		my_queue = tokenize_descriptions.get_desc_queue(self.params)
 		self.assertTrue(isinstance(my_queue, queue.Queue))
 
 	def test_get_desc_queue_is_not_empty(self):
 		"""Ensure queue is not empty"""
 		my_queue = tokenize_descriptions.get_desc_queue(self.params)
-		self.assertFalse(my_queue.empty())			
+		self.assertFalse(my_queue.empty())
 
 	def test_initialize_no_file_name(self):
 		"""Config file not provided"""
 		self.assertRaises(InvalidArguments, tokenize_descriptions.initialize)
-		
-	def test_initialize_file_does_not_exist(self):	
+
+	def test_initialize_file_does_not_exist(self):
 		"""Config file doesn't exist"""
 		sys.argv.append("data/somethingThatWontExist.csv")
 		self.assertRaises(SystemExit, tokenize_descriptions.initialize)
-		sys.argv.remove("data/somethingThatWontExist.csv")
 
 	def test_initialize_too_many_arguments(self):
 		"""Too Many Options"""
 		sys.argv.append("data/somethingThatWontExist.csv")
 		sys.argv.append("argument")
 		self.assertRaises(InvalidArguments, tokenize_descriptions.initialize)
-		sys.argv.remove("argument")
-		sys.argv.remove("data/somethingThatWontExist.csv")	
-	
+
 	def test_tokenize(self):
-		"""The point of this function is to start a number of 
+		"""The point of this function is to start a number of
 		consumers as well as a starting queue and a result queue.
 		At the end a call to write_output_to_file should be made"""
 
@@ -102,7 +101,7 @@ class TokenizeDescriptionTests(unittest.TestCase):
 		"""Ensure returned node list is not empty"""
 		online_nodes = tokenize_descriptions.get_online_cluster_nodes(self.params)
 		self.assertNotEqual(len(online_nodes), 0)
-		
+
 	def test_get_online_cluster_nodes_are_online(self):
 		"""Ensure returned nodes are actually online"""
 		online_nodes = tokenize_descriptions.get_online_cluster_nodes(self.params)
@@ -112,7 +111,7 @@ class TokenizeDescriptionTests(unittest.TestCase):
 				socket.gethostbyaddr(node)
 				self.assertTrue(True)
 			except socket.gaierror:
-				self.assertTrue(False)				
+				self.assertTrue(False)
 
 if __name__ == '__main__':
 	unittest.main(argv=[sys.argv[0]])
