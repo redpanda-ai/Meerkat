@@ -71,7 +71,7 @@ def initialize():
 		input_file = open(sys.argv[1], encoding='utf-8')
 		params = json.loads(input_file.read())
 		input_file.close()
-	except FileNotFoundError:
+	except IOError:
 		print(sys.argv[1], " not found, aborting.")
 		logging.error(sys.argv[1] + " not found, aborting.")
 		sys.exit()
@@ -126,23 +126,26 @@ def write_output_to_file(params, result_queue):
 
 	result_queue.join()
 	file_name = params["output"]["file"].get("path", '../data/longtailLabeled.csv')
+	format = params["output"]["file"].get("format", 'csv')
+
 	# Output as CSV
-	if params["output"]["file"]["format"] == "csv":
+	if format == "csv":
 		delimiter = params["output"]["file"].get("delimiter", ',')
 		output_file = open(file_name, 'w')
 		dict_w = csv.DictWriter(output_file, delimiter=delimiter, fieldnames=output_list[0].keys())
 		dict_w.writeheader()
 		dict_w.writerows(output_list)
 		output_file.close()
+
 	# Output as JSON
-	if params["output"]["file"]["format"] == "json":
+	if format == "json":
 		with open(file_name, 'w') as outfile:
 			json.dump(output_list, outfile)
 
 def usage():
 	"""Shows the user which parameters to send into the program."""
 	result = "Usage:\n\t<quoted_transaction_description_string>"
-	print(result)
+	logging.error(result)
 	return result
 
 if __name__ == "__main__":
