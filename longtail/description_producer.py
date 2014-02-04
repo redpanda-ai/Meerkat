@@ -13,25 +13,29 @@ from longtail.binary_classifier.bay import predict_if_physical_transaction
 def get_desc_queue(params):
 	"""Opens a file of descriptions, one per line, and load a description
 	queue."""
+
 	lines, filename, encoding = None, None, None
 	desc_queue = queue.Queue()
+
 	try:
 		filename = params["input"]["filename"]
 		encoding = params["input"]["encoding"]
 		with open(filename, 'r', encoding=encoding) as inputfile:
 			lines = inputfile.read()
 	except IOError:
-		msg="Invalid ['input']['filename'] key; value " + filename \
-		+ " cannot be found.  Correct your config file."
+		msg = "Invalid ['input']['filename'] key; Input file: " + filename \
+		+ " cannot be found. Correct your config file."
 		logging.critical(msg)
 		sys.exit()
+
+	# Run Binary Classifier
 	for input_string in lines.split("\n"):
 		prediction = predict_if_physical_transaction(input_string)
 		if prediction == "1":
 			desc_queue.put(input_string)
 		elif prediction == "0":
-			# TODO Output to file
 			logging.info("NON-PHYSICAL: " + input_string)
+
 	return desc_queue
 
 def get_online_cluster_nodes(params):
@@ -44,7 +48,7 @@ def get_online_cluster_nodes(params):
 		req = urllib.request.Request(url=url)
 		try:
 			output_data = urllib.request.urlopen(req).read().decode('UTF-8')
-		except Exception:
+		except ConnectionError:
 			logging.critical(node + " error, continuing loop.")
 			continue
 		logging.info(node + " found, returning.")
@@ -68,7 +72,7 @@ def initialize():
 	if len(sys.argv) != 2:
 		usage()
 		raise InvalidArguments(msg="Incorrect number of arguments", expr=None)
-	
+
 	try:
 		input_file = open(sys.argv[1], encoding='utf-8')
 		params = json.loads(input_file.read())
@@ -79,7 +83,7 @@ def initialize():
 		sys.exit()
 
 	params["search_cache"] = {}
-	
+
 	if validate_params(params):
 		params["elasticsearch"]["cluster_nodes"] = get_online_cluster_nodes(params)
 		return params
@@ -122,10 +126,10 @@ def write_output_to_file(params, result_queue):
 
 	result_queue.join()
 	file_name = params["output"]["file"].get("path", '../data/output/longtailLabeled.csv')
-	format = params["output"]["file"].get("format", 'csv')
+	file_format = params["output"]["file"].get("format", 'csv')
 
 	# Output as CSV
-	if format == "csv":
+	if file_format == "csv":
 		delimiter = params["output"]["file"].get("delimiter", ',')
 		output_file = open(file_name, 'w')
 		dict_w = csv.DictWriter(output_file, delimiter=delimiter, fieldnames=output_list[0].keys())
@@ -134,7 +138,7 @@ def write_output_to_file(params, result_queue):
 		output_file.close()
 
 	# Output as JSON
-	if format == "json":
+	if file_format == "json":
 		with open(file_name, 'w') as outfile:
 			json.dump(output_list, outfile)
 
@@ -156,8 +160,12 @@ def validate_params(params):
 		raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.cluster_nodes'", expr=None)
 	if "path" not in params["logging"]:
 		raise Misconfiguration(msg="Misconfiguration: missing key, 'logging.path'", expr=None)
+	if "filename" not in params["input"]:
+		raise Misconfiguration(msg="Misconfiguration: missing key, 'input.filename'", expr=None)
+	if "encoding" not in params["input"]:
+		raise Misconfiguration(msg="Misconfiguration: missing key, 'input.encoding'", expr=None)
 
-	return True			
+	return True
 
 def usage():
 	"""Shows the user which parameters to send into the program."""
@@ -170,4 +178,3 @@ if __name__ == "__main__":
 	PARAMS = initialize()
 	DESC_QUEUE = get_desc_queue(PARAMS)
 	tokenize(PARAMS, DESC_QUEUE)
-	
