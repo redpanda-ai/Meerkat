@@ -119,6 +119,7 @@ class DescriptionConsumer(threading.Thread):
 		scores, fields_found = [], []
 		output_dict = {}
 		params = self.params
+		parameter_key = self.parameter_key
 		field_order = params["output"]["results"]["fields"]
 		top_hit = hits[0]
 		hit_fields = top_hit["fields"]
@@ -148,7 +149,7 @@ class DescriptionConsumer(threading.Thread):
 			return
 
 		#Send to result Queue if score good enough
-		if z_score_delta > 2:
+		if z_score_delta > float(parameter_key.get("z_score_threshold", "2")):
 			output_dict = dict(zip(fields_found, ordered_hit_fields))
 		else:
 			output_dict = dict(zip(fields_found, ([""] * len(fields_found))))
@@ -262,9 +263,7 @@ class DescriptionConsumer(threading.Thread):
 		bool_search = copy.deepcopy(GENERIC_ELASTICSEARCH_QUERY)
 		bool_search["fields"] = params["output"]["results"]["fields"]
 		bool_search["from"] = 0
-
-		if "es_result_size" in parameter_key:
-			bool_search["size"] = parameter_key["es_result_size"]
+		bool_search["size"] = parameter_key.get("es_result_size", "10")
 
 		for item in search_components:
 			my_subquery = None
