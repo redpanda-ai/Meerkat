@@ -50,8 +50,13 @@ class DescriptionConsumerTests(unittest.TestCase):
 	}
 }"""
 
+	parameter_key = """
+		{"es_result_size":"20"}
+	"""
+
 	def setUp(self):
 		"""Basic Fixture for all tests."""
+		self.parameter_key = json.loads(self.parameter_key)
 		self.params = json.loads(self.config)
 		self.desc_queue, self.result_queue = queue.Queue, queue.Queue
 
@@ -59,7 +64,7 @@ class DescriptionConsumerTests(unittest.TestCase):
 		"""Ensure that list containing one score, returns None for z_score"""
 		scores = [0]
 		my_consumer = DescriptionConsumer(0, self.params, self.desc_queue
-		, self.result_queue)
+		, self.result_queue, self.parameter_key)
 		result = my_consumer._DescriptionConsumer__display_z_score_delta(scores)
 		self.assertEqual(result,None)
 
@@ -67,14 +72,14 @@ class DescriptionConsumerTests(unittest.TestCase):
 		"""Ensure that list containing [1,2,3], returns -1.225 for z_score"""
 		scores = [1, 2, 3]
 		my_consumer = DescriptionConsumer(0, self.params, self.desc_queue
-		, self.result_queue)
+		, self.result_queue, self.parameter_key)
 		result = my_consumer._DescriptionConsumer__display_z_score_delta(scores)
 		self.assertEqual(result,-1.225)
 
 	def test_reset_my_meta_recursive(self):
 		"""Ensure that the 'recursive' memeber is reset to 'false'"""
 		my_consumer = DescriptionConsumer(0, self.params, self.desc_queue
-		, self.result_queue)
+		, self.result_queue, self.parameter_key)
 		my_consumer.recursive = True
 		my_consumer._DescriptionConsumer__reset_my_meta()
 		self.assertEqual(my_consumer.recursive,False)
@@ -82,7 +87,7 @@ class DescriptionConsumerTests(unittest.TestCase):
 	def test_reset_my_meta_n_gram_tokens(self):
 		"""Ensure that the 'recursive' memeber is reset to 'false'"""
 		my_consumer = DescriptionConsumer(0, self.params, self.desc_queue
-		, self.result_queue)
+		, self.result_queue, self.parameter_key)
 		my_consumer.n_gram_tokens = {"not" : "empty"}
 		my_consumer._DescriptionConsumer__reset_my_meta()
 		self.assertEqual(my_consumer.n_gram_tokens, {})
@@ -90,7 +95,7 @@ class DescriptionConsumerTests(unittest.TestCase):
 	def test_reset_my_meta_n_gram_tokens(self):
 		"""Ensure that the 'my_meta' memeber is reset"""
 		my_consumer = DescriptionConsumer(0, self.params, self.desc_queue
-		, self.result_queue)
+		, self.result_queue, self.parameter_key)
 		my_consumer.my_meta = {"dirty" : "my_meta"}
 		my_consumer._DescriptionConsumer__reset_my_meta()
 		#expected = = json.loads(self.clean_my_meta)

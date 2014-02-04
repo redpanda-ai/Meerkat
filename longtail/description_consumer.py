@@ -201,7 +201,7 @@ class DescriptionConsumer(threading.Thread):
 			del long_substrings[ls_len]
 		return original_term, pre, post
 
-	def __init__(self, thread_id, params, desc_queue, result_queue):
+	def __init__(self, thread_id, params, desc_queue, result_queue, parameter_key):
 		''' Constructor '''
 		threading.Thread.__init__(self)
 		self.thread_id = thread_id
@@ -209,6 +209,7 @@ class DescriptionConsumer(threading.Thread):
 		self.result_queue = result_queue
 		self.input_string = None
 		self.params = params
+		self.parameter_key = parameter_key
 		cluster_nodes = self.params["elasticsearch"]["cluster_nodes"]
 		self.es_node = cluster_nodes[self.thread_id % len(cluster_nodes)]
 		self.recursive = False
@@ -257,12 +258,13 @@ class DescriptionConsumer(threading.Thread):
 	def __get_boolean_search_object(self, search_components):
 		"""Builds an object for a "bool" search."""
 		params = self.params
+		parameter_key = self.parameter_key
 		bool_search = copy.deepcopy(GENERIC_ELASTICSEARCH_QUERY)
 		bool_search["fields"] = params["output"]["results"]["fields"]
 		bool_search["from"] = 0
 
-		if "size" in params["output"]["results"]:
-			bool_search["size"] = params["output"]["results"]["size"]
+		if "es_result_size" in parameter_key:
+			bool_search["size"] = parameter_key["es_result_size"]
 
 		for item in search_components:
 			my_subquery = None

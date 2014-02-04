@@ -87,7 +87,7 @@ def initialize():
 		params["elasticsearch"]["cluster_nodes"] = get_online_cluster_nodes(params)
 		return params
 
-def tokenize(params, desc_queue):
+def tokenize(params, desc_queue, parameter_key):
 	"""Opens a number of threads to process the descriptions queue."""
 	consumer_threads = 1
 	result_queue = queue.Queue()
@@ -95,7 +95,7 @@ def tokenize(params, desc_queue):
 		consumer_threads = params["concurrency"]
 	start_time = datetime.datetime.now()
 	for i in range(consumer_threads):
-		new_consumer = DescriptionConsumer(i, params, desc_queue, result_queue)
+		new_consumer = DescriptionConsumer(i, params, desc_queue, result_queue, parameter_key)
 		new_consumer.setDaemon(True)
 		new_consumer.start()
 	desc_queue.join()
@@ -192,4 +192,4 @@ if __name__ == "__main__":
 	PARAMS = initialize()
 	KEY = load_key(PARAMS)
 	DESC_QUEUE = get_desc_queue(PARAMS)
-	tokenize(PARAMS, DESC_QUEUE)
+	tokenize(PARAMS, DESC_QUEUE, KEY)
