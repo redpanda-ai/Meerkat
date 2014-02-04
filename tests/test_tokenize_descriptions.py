@@ -12,7 +12,7 @@ class TokenizeDescriptionTests(unittest.TestCase):
 		{
 			"concurrency" : 1,
 			"input" : {
-				"filename" : "data/100_bank_transaction_descriptions.csv",
+				"filename" : "data/input/100_bank_transaction_descriptions.csv",
 				"encoding" : "utf-8"
 			},
 			"logging" : {
@@ -28,7 +28,7 @@ class TokenizeDescriptionTests(unittest.TestCase):
 				},
 				"file" : {
 					"format" : "csv",
-					"path" : "data/unittestDeletable.csv"
+					"path" : "data/input/unittestDeletable.csv"
 				}
 			},
 			"elasticsearch" : {
@@ -87,15 +87,15 @@ class TokenizeDescriptionTests(unittest.TestCase):
 		"""Ensure actually writes a file"""
 		self.result_queue.put({"PERSISTENTRECORDID":"123456789"})
 		tokenize_descriptions.write_output_to_file(self.params, self.result_queue)
-		self.assertTrue(os.path.isfile("data/unittestDeletable.csv"))
-		os.remove("data/unittestDeletable.csv")
+		self.assertTrue(os.path.isfile("data/input/unittestDeletable.csv"))
+		os.remove("data/input/unittestDeletable.csv")
 
 	def test_write_output_to_file_empties_queue(self):
 		"""Ensure queue is empty at end"""
 		self.result_queue.put({"PERSISTENTRECORDID":"123456789"})
 		tokenize_descriptions.write_output_to_file(self.params, self.result_queue)
 		self.assertTrue(self.result_queue.empty())
-		os.remove("data/unittestDeletable.csv")
+		os.remove("data/input/unittestDeletable.csv")
 
 	def test_get_online_cluster_nodes_not_empty(self):
 		"""Ensure returned node list is not empty"""

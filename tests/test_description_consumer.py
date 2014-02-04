@@ -12,7 +12,7 @@ class DescriptionConsumerTests(unittest.TestCase):
 {
 	"concurrency" : 1,
 	"input" : {
-		"filename" : "data/100_bank_transaction_descriptions.csv",
+		"filename" : "data/input/100_bank_transaction_descriptions.csv",
 		"encoding" : "utf-8"
 	},
 	"logging" : {
@@ -28,7 +28,7 @@ class DescriptionConsumerTests(unittest.TestCase):
 		},
 		"file" : {
 			"format" : "json",
-			"path" : "data/longtailLabeled.json"
+			"path" : "data/output/longtailLabeled.json"
 		}
 	},
 	"elasticsearch" : {
