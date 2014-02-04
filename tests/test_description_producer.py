@@ -1,7 +1,7 @@
-'''Unit tests for longtail.tokenize_descriptions'''
+'''Unit tests for longtail.description_producer'''
 
-from longtail import tokenize_descriptions
-from longtail.custom_exceptions import InvalidArguments
+from longtail import description_producer
+from longtail.custom_exceptions import InvalidArguments, Misconfiguration
 import unittest, queue, sys, socket, os, json
 
 class TokenizeDescriptionTests(unittest.TestCase):
@@ -50,33 +50,33 @@ class TokenizeDescriptionTests(unittest.TestCase):
 
 	def test_usage(self):
 		"""The point of this function is to print usage information to the user"""
-		result = tokenize_descriptions.usage()
+		result = description_producer.usage()
 		self.assertEqual("Usage:\n\t<quoted_transaction_description_string>", result)
 
 	def test_get_desc_queue_returns_queue(self):
 		"""Ensure returns an instance of Queue"""
-		my_queue = tokenize_descriptions.get_desc_queue(self.params)
+		my_queue = description_producer.get_desc_queue(self.params)
 		self.assertTrue(isinstance(my_queue, queue.Queue))
 
 	def test_get_desc_queue_is_not_empty(self):
 		"""Ensure queue is not empty"""
-		my_queue = tokenize_descriptions.get_desc_queue(self.params)
+		my_queue = description_producer.get_desc_queue(self.params)
 		self.assertFalse(my_queue.empty())
 
 	def test_initialize_no_file_name(self):
 		"""Config file not provided"""
-		self.assertRaises(InvalidArguments, tokenize_descriptions.initialize)
+		self.assertRaises(InvalidArguments, description_producer.initialize)
 
 	def test_initialize_file_does_not_exist(self):
 		"""Config file doesn't exist"""
 		sys.argv.append("data/somethingThatWontExist.csv")
-		self.assertRaises(SystemExit, tokenize_descriptions.initialize)
+		self.assertRaises(SystemExit, description_producer.initialize)
 
 	def test_initialize_too_many_arguments(self):
 		"""Too Many Options"""
 		sys.argv.append("data/somethingThatWontExist.csv")
 		sys.argv.append("argument")
-		self.assertRaises(InvalidArguments, tokenize_descriptions.initialize)
+		self.assertRaises(InvalidArguments, description_producer.initialize)
 
 	def test_tokenize(self):
 		"""The point of this function is to start a number of
@@ -86,25 +86,70 @@ class TokenizeDescriptionTests(unittest.TestCase):
 	def test_write_output_to_file_writes_file(self):
 		"""Ensure actually writes a file"""
 		self.result_queue.put({"PERSISTENTRECORDID":"123456789"})
-		tokenize_descriptions.write_output_to_file(self.params, self.result_queue)
+		description_producer.write_output_to_file(self.params, self.result_queue)
 		self.assertTrue(os.path.isfile("data/input/unittestDeletable.csv"))
 		os.remove("data/input/unittestDeletable.csv")
 
 	def test_write_output_to_file_empties_queue(self):
 		"""Ensure queue is empty at end"""
 		self.result_queue.put({"PERSISTENTRECORDID":"123456789"})
-		tokenize_descriptions.write_output_to_file(self.params, self.result_queue)
+		description_producer.write_output_to_file(self.params, self.result_queue)
 		self.assertTrue(self.result_queue.empty())
 		os.remove("data/input/unittestDeletable.csv")
 
 	def test_get_online_cluster_nodes_not_empty(self):
 		"""Ensure returned node list is not empty"""
-		online_nodes = tokenize_descriptions.get_online_cluster_nodes(self.params)
+		online_nodes = description_producer.get_online_cluster_nodes(self.params)
 		self.assertNotEqual(len(online_nodes), 0)
+
+	def test_validate_logging(self):
+		"""Ensure 'logging' key is in configuration"""
+		del self.params["logging"]
+		self.assertRaises(Misconfiguration, description_producer.validate_params, self.params)
+
+	def test_validate_logging_path(self):
+		"""Ensure 'logging.path' key is in configuration"""
+		del self.params["logging"]["path"]
+		self.assertRaises(Misconfiguration, description_producer.validate_params, self.params)
+
+	def test_validate_elasticsearch_index(self):
+		"""Ensure 'elasticsearch.index' key is in configuration"""
+		del self.params["elasticsearch"]['index']
+		self.assertRaises(Misconfiguration, description_producer.validate_params, self.params)
+
+	def test_validate_elasticsearch_type(self):
+		"""Ensure 'elasticsearch.type' key is in configuration"""
+		del self.params["elasticsearch"]['type']
+		self.assertRaises(Misconfiguration, description_producer.validate_params, self.params)
+
+	def test_validate_elasticsearch(self):
+		"""Ensure 'elasticsearch' key is in configuration"""
+		del self.params["elasticsearch"]
+		self.assertRaises(Misconfiguration, description_producer.validate_params, self.params)
+
+	def test_validate_empty_config(self):
+		"""Ensure configuration is not empty"""
+		self.params = {}
+		self.assertRaises(Misconfiguration, description_producer.validate_params, self.params)
+
+	def test_validate_missing_concurrency(self):
+		"""Ensure 'concurrency' key is in configuration"""
+		del self.params["concurrency"]
+		self.assertRaises(Misconfiguration, description_producer.validate_params, self.params)
+
+	def test_validate_positive_concurrency(self):
+		"""Ensure 'concurrency' value is a positive integer"""
+		self.params["concurrency"] = 0
+		self.assertRaises(Misconfiguration, description_producer.validate_params, self.params)
+
+	def test_validate_input_key(self):
+		"""Ensure 'input' key is in configuration"""
+		del self.params["input"]
+		self.assertRaises(Misconfiguration, description_producer.validate_params, self.params)		
 
 	def test_get_online_cluster_nodes_are_online(self):
 		"""Ensure returned nodes are actually online"""
-		online_nodes = tokenize_descriptions.get_online_cluster_nodes(self.params)
+		online_nodes = description_producer.get_online_cluster_nodes(self.params)
 		for node in online_nodes:
 			node = node.split(":")[0]
 			try:

@@ -8,7 +8,7 @@ Created on Jan 14, 2014
 # pylint: disable=R0914
 
 import copy, json, logging, re, queue, threading, urllib.request
-from longtail.custom_exceptions import Misconfiguration, UnsupportedQueryType
+from longtail.custom_exceptions import UnsupportedQueryType
 from longtail.query_templates import GENERIC_ELASTICSEARCH_QUERY, STOP_WORDS\
 , get_match_query, get_qs_query
 from scipy.stats.mstats import zscore
@@ -209,7 +209,6 @@ class DescriptionConsumer(threading.Thread):
 		self.result_queue = result_queue
 		self.input_string = None
 		self.params = params
-		self.__validate_params()
 		cluster_nodes = self.params["elasticsearch"]["cluster_nodes"]
 		self.es_node = cluster_nodes[self.thread_id % len(cluster_nodes)]
 		self.recursive = False
@@ -546,26 +545,6 @@ class DescriptionConsumer(threading.Thread):
 		params_json = json.dumps(params, sort_keys=True, indent=4\
 		, separators=(',', ': '))
 		my_logger.info(params_json)
-
-	def __validate_params(self):
-		"""Ensures that the correct parameters are supplied."""
-		mandatory_keys = ["elasticsearch", "concurrency", "input", "logging"]
-		for key in mandatory_keys:
-			if key not in self.params:
-				raise Misconfiguration(msg="Misconfiguration: missing key, '" + key + "'", expr=None)
-
-		if self.params["concurrency"] <= 0:
-			raise Misconfiguration(msg="Misconfiguration: 'concurrency' must be a positive integer", expr=None)
-
-		if "index" not in self.params["elasticsearch"]:
-			raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.index'", expr=None)
-		if "type" not in self.params["elasticsearch"]:
-			raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.type'", expr=None)
-		if "path" not in self.params["logging"]:
-			raise Misconfiguration(msg="Misconfiguration: missing key, 'logging.path'", expr=None)
-
-
-		return True
 
 	def run(self):
 		while True:
