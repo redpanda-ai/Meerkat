@@ -145,7 +145,17 @@ class TokenizeDescriptionTests(unittest.TestCase):
 	def test_validate_input_key(self):
 		"""Ensure 'input' key is in configuration"""
 		del self.params["input"]
-		self.assertRaises(Misconfiguration, description_producer.validate_params, self.params)		
+		self.assertRaises(Misconfiguration, description_producer.validate_params, self.params)
+
+	def test_validate_input_file(self):
+		"""Ensure input file is provided"""
+		del self.params["input"]["filename"]
+		self.assertRaises(Misconfiguration, description_producer.validate_params, self.params)
+
+	def test_validate_encoding(self):
+		"""Ensure encoding key is in configuration"""
+		del self.params["input"]["encoding"]
+		self.assertRaises(Misconfiguration, description_producer.validate_params, self.params)			
 
 	def test_get_online_cluster_nodes_are_online(self):
 		"""Ensure returned nodes are actually online"""
