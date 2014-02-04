@@ -78,7 +78,6 @@ def initialize():
 		params = json.loads(input_file.read())
 		input_file.close()
 	except IOError:
-		print(sys.argv[1], " not found, aborting.")
 		logging.error(sys.argv[1] + " not found, aborting.")
 		sys.exit()
 
@@ -152,6 +151,9 @@ def validate_params(params):
 	if params["concurrency"] <= 0:
 		raise Misconfiguration(msg="Misconfiguration: 'concurrency' must be a positive integer", expr=None)
 
+	if "parameter_key" not in params["input"]:
+		params["input"]["parameter_key"] = "config/keys/default.json"
+
 	if "index" not in params["elasticsearch"]:
 		raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.index'", expr=None)
 	if "type" not in params["elasticsearch"]:
@@ -163,9 +165,21 @@ def validate_params(params):
 	if "filename" not in params["input"]:
 		raise Misconfiguration(msg="Misconfiguration: missing key, 'input.filename'", expr=None)
 	if "encoding" not in params["input"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'input.encoding'", expr=None)
+		raise Misconfiguration(msg="Misconfiguration: missing key, 'input.encoding'", expr=None)		
 
 	return True
+
+def load_parameter_key(params):
+	"""Attempts to load parameter key"""
+	parameter_key = None
+	try:
+		input_file = open(params["input"]["parameter_key"], encoding='utf-8')
+		parameter_key = json.loads(input_file.read())
+		input_file.close()
+	except IOError:
+		logging.error(params["input"]["parameter_key"] + " not found, aborting.")
+		sys.exit()
+	return parameter_key	
 
 def usage():
 	"""Shows the user which parameters to send into the program."""
@@ -176,5 +190,6 @@ def usage():
 if __name__ == "__main__":
 	#Runs the entire program.
 	PARAMS = initialize()
+	KEY = load_key(PARAMS)
 	DESC_QUEUE = get_desc_queue(PARAMS)
 	tokenize(PARAMS, DESC_QUEUE)

@@ -12,6 +12,7 @@ class TokenizeDescriptionTests(unittest.TestCase):
 		{
 			"concurrency" : 1,
 			"input" : {
+				"parameter_key" : "config/keys/made_up_key_name.json",
 				"filename" : "data/input/100_bank_transaction_descriptions.csv",
 				"encoding" : "utf-8"
 			},
@@ -155,7 +156,17 @@ class TokenizeDescriptionTests(unittest.TestCase):
 	def test_validate_encoding(self):
 		"""Ensure encoding key is in configuration"""
 		del self.params["input"]["encoding"]
-		self.assertRaises(Misconfiguration, description_producer.validate_params, self.params)			
+		self.assertRaises(Misconfiguration, description_producer.validate_params, self.params)
+
+	def test_parameter_key_default(self):
+		"""Ensure parameter key defaults to default.json"""
+		del self.params["input"]["parameter_key"]
+		description_producer.validate_params(self.params)
+		self.assertEqual(self.params["input"]["parameter_key"], "config/keys/default.json")
+
+	def test_false_key_throws_error(self):
+		"""Ensure not existant key throws error"""
+		self.assertRaises(SystemExit, description_producer.load_parameter_key, self.params)				
 
 	def test_get_online_cluster_nodes_are_online(self):
 		"""Ensure returned nodes are actually online"""

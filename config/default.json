@@ -1,6 +1,7 @@
 {
 	"concurrency" : 10,
 	"input" : {
+		"parameter_key" : "config/keys/default.json"
 		"filename" : "data/input/short_bank_transaction_descriptions.csv",
 		"encoding" : "utf-8"
 	},
