@@ -1,7 +1,7 @@
 {
     "concurrency" : 10,
     "input" : {
-        "filename" : "data/unlabeledTrans.csv",
+        "filename" : "data/input/unlabeledTrans.csv",
         "encoding" : "utf-8"
     },
     "logging" : {
@@ -17,7 +17,7 @@
         },
         "file" : {
             "format" : "csv",
-            "path" : "data/longtailLabeled.csv"
+            "path" : "data/output/longtailLabeled.csv"
         }
     },
 	"elasticsearch" : {

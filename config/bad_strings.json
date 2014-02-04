@@ -1,7 +1,7 @@
 {
 	"concurrency" : 12,
 	"input" : {
-		"filename" : "data/badStrings.csv",
+		"filename" : "data/input/badStrings.csv",
 		"encoding" : "utf-8"
 	},
 	"logging" : {
@@ -17,7 +17,7 @@
 		},
 		"file" : {
 			"format" : "json",
-			"path" : "data/longtailLabeled.json"
+			"path" : "data/output/longtailLabeled.json"
 		}
 	},
 	"elasticsearch" : {

@@ -8,7 +8,7 @@ import csv, sys, math
 
 def test_accuracy(file_path):
 	"""Docstring to be determined."""
-	human_labeled = open("data/verifiedLabeledTrans.csv") if __name__ == "__main__" else file_path
+	human_labeled = open("data/misc/verifiedLabeledTrans.csv") if __name__ == "__main__" else file_path
 	machine_labeled = open(sys.argv[1])
 	dict_ML = csv.DictReader(machine_labeled)
 	dict_HL = csv.DictReader(human_labeled)
@@ -67,4 +67,4 @@ def test_accuracy(file_path):
 	print("", "NON_PHYSICAL:", '\n'.join(non_physical), sep="\n")
 
 if __name__ == "__main__":
-	test_accuracy("data/verifiedLabeledTrans.csv")
+	test_accuracy("data/misc/verifiedLabeledTrans.csv")
