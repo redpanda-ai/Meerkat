@@ -85,7 +85,7 @@ def initialize():
 
 	if validate_params(params):
 		params["elasticsearch"]["cluster_nodes"] = get_online_cluster_nodes(params)
-		return params
+	return params
 
 def tokenize(params, desc_queue):
 	"""Opens a number of threads to process the descriptions queue."""
@@ -165,7 +165,7 @@ def validate_params(params):
 	if "filename" not in params["input"]:
 		raise Misconfiguration(msg="Misconfiguration: missing key, 'input.filename'", expr=None)
 	if "encoding" not in params["input"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'input.encoding'", expr=None)		
+		raise Misconfiguration(msg="Misconfiguration: missing key, 'input.encoding'", expr=None)
 
 	return True
 
@@ -179,7 +179,7 @@ def load_parameter_key(params):
 	except IOError:
 		logging.error(params["input"]["parameter_key"] + " not found, aborting.")
 		sys.exit()
-	return parameter_key	
+	return parameter_key
 
 def usage():
 	"""Shows the user which parameters to send into the program."""
@@ -190,6 +190,6 @@ def usage():
 if __name__ == "__main__":
 	#Runs the entire program.
 	PARAMS = initialize()
-	KEY = load_key(PARAMS)
+	KEY = load_parameter_key(PARAMS)
 	DESC_QUEUE = get_desc_queue(PARAMS)
 	tokenize(PARAMS, DESC_QUEUE)

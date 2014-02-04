@@ -165,7 +165,7 @@ class TokenizeDescriptionTests(unittest.TestCase):
 		self.assertEqual(self.params["input"]["parameter_key"], "config/keys/default.json")
 
 	def test_false_key_throws_error(self):
-		"""Ensure not existant key throws error"""
+		"""Ensure not existent key throws error"""
 		self.assertRaises(SystemExit, description_producer.load_parameter_key, self.params)				
 
 	def test_get_online_cluster_nodes_are_online(self):
