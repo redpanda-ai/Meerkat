@@ -1,2 +1,3 @@
-{"es_result_size":"2",
-"z_score_threshold":"1.75"}
+{"es_result_size" : "2",
+"z_score_threshold" : "1.75",
+"business_name_boost" : "2"}
