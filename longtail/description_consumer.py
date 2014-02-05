@@ -232,7 +232,7 @@ class DescriptionConsumer(threading.Thread):
 		search_components = []
 		parameter_key = self.parameter_key
 		field_boosts = ["_all^1"]
-		field_boosts.append("BUSINESSSTANDARDNAME^" + parameter_key.get("business_name_boost", "2"))
+		field_boosts.append("BUSINESSSTANDARDNAME^" + parameter_key.get("business_name_boost", "1"))
 
 		logger.info("Search components are:")
 		logger.info("\tUnigrams: '" + qs_query + "'")
