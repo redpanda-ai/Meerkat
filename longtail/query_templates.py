@@ -1,7 +1,7 @@
 #!/usr/bin/python3.3
 
 """Words we wish to ignore while searching."""
-STOP_WORDS = ["CHECK", "CARD", "CHECKCARD", "PAYPOINT", "PURCHASE", "LLC" ]
+STOP_WORDS = ["CHECK", "CARD", "CHECKCARD", "PAYPOINT", "PURCHASE", "LLC"]
 
 #RESULT_FIELDS = ["BUSINESSSTANDARDNAME", "HOUSE"\
 #, "PREDIR", "STREET", "STRTYPE", "CITYNAME", "STATE", "ZIP", "pin.location"]
@@ -18,10 +18,10 @@ GENERIC_ELASTICSEARCH_QUERY["query"]["bool"]["should"] = []
 
 #Structure for composite_data_types.
 COMPOSITES = {}
-COMPOSITES[("address"," ")] = \
-["HOUSE", "PREDIR", "STREET", "STRTYPE", "POSTDIR" , "APTTYPE", "APTNBR"\
+COMPOSITES[("address", " ")] = \
+["HOUSE", "PREDIR", "STREET", "STRTYPE", "POSTDIR", "APTTYPE", "APTNBR"\
 , "CITYNAME", "STATE"]
-COMPOSITES[("phone","")] = \
+COMPOSITES[("phone", "")] = \
 ["AREACODE", "EXCHANGE", "PHONENUMBER"]
 
 #Aliases for magic numbers.
@@ -82,7 +82,7 @@ def get_mapping_template(es_type_name, shards, replicas, column_meta\
 		column_name = column_meta[column_number][NAME]
 		column_type = data_types[data_type][DATA_TYPE_NAME]
 		column_index = column_meta[column_number][INDEX]
-		if column_type in [ "null" ]:
+		if column_type in ["null"]:
 			pass
 		elif column_name in ["LATITUDE", "LONGITUDE"]:
 			pass

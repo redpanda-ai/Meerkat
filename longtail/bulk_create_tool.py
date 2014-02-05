@@ -72,7 +72,7 @@ def scan_column_headers(my_cells):
 	for my_col_number in range(len(my_cells)):
 		#NAME, DATA_TYPE, INDEX
 		column_meta[my_col_number] = [my_cells[my_col_number].strip()
-		, NULL, "analyzed" ]
+		, NULL, "analyzed"]
 	return column_meta
 
 def usage():
@@ -138,10 +138,10 @@ def process_input_rows(input_file_name, es_index, es_type):
 NULL, FLOAT, DATE, INT, STRING = 0, 1, 2, 3, 4
 DATE_REGEX = "^[0-9]{4}(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])$"
 DATA_TYPES = { \
-	NULL : ("null", re.compile("^$")) , \
-	FLOAT : ("float", re.compile(r"[-+]?[0-9]*\.[0-9]+")) , \
-	DATE : ("date", re.compile(DATE_REGEX)) , \
-	INT : ("integer", re.compile("^[-+]?[0-9]+$")) , \
+	NULL : ("null", re.compile("^$")), \
+	FLOAT : ("float", re.compile(r"[-+]?[0-9]*\.[0-9]+")), \
+	DATE : ("date", re.compile(DATE_REGEX)), \
+	INT : ("integer", re.compile("^[-+]?[0-9]+$")), \
 	STRING : ("string", re.compile(".+")) \
 }
 

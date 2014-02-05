@@ -1,8 +1,11 @@
 #!/usr/local/bin/python3
+'''Docstring for our __main__.py module'''
 
-from longtail.tokenize_descriptions import initialize, get_desc_queue, tokenize
+from longtail.description_producer import initialize, get_desc_queue\
+, tokenize, load_parameter_key
 
 #Runs the entire program.
 PARAMS = initialize()
+KEY = load_parameter_key(PARAMS)
 DESC_QUEUE = get_desc_queue(PARAMS)
-tokenize(PARAMS, DESC_QUEUE)
+tokenize(PARAMS, DESC_QUEUE, KEY)

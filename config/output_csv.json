@@ -1,7 +1,7 @@
 {
     "concurrency" : 10,
     "input" : {
-        "filename" : "data/unlabeledTrans.csv",
+        "filename" : "data/input/short_bank_transaction_descriptions.csv",
         "encoding" : "utf-8"
     },
     "logging" : {
@@ -12,12 +12,11 @@
     },
     "output" : {
         "results" : {
-            "fields" : ["BUSINESSSTANDARDNAME", "PERSISTENTRECORDID"],
-            "size" : 1
+            "fields" : ["BUSINESSSTANDARDNAME", "PERSISTENTRECORDID"]
         },
         "file" : {
             "format" : "csv",
-            "path" : "data/longtailLabeled.csv"
+            "path" : "data/output/longtailLabeled.csv"
         }
     },
 	"elasticsearch" : {

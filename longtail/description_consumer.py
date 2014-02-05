@@ -8,7 +8,7 @@ Created on Jan 14, 2014
 # pylint: disable=R0914
 
 import copy, json, logging, re, queue, threading, urllib.request
-from longtail.custom_exceptions import Misconfiguration, UnsupportedQueryType
+from longtail.custom_exceptions import UnsupportedQueryType
 from longtail.query_templates import GENERIC_ELASTICSEARCH_QUERY, STOP_WORDS\
 , get_match_query, get_qs_query
 from scipy.stats.mstats import zscore
@@ -119,6 +119,7 @@ class DescriptionConsumer(threading.Thread):
 		scores, fields_found = [], []
 		output_dict = {}
 		params = self.params
+		parameter_key = self.parameter_key
 		field_order = params["output"]["results"]["fields"]
 		top_hit = hits[0]
 		hit_fields = top_hit["fields"]
@@ -148,7 +149,7 @@ class DescriptionConsumer(threading.Thread):
 			return
 
 		#Send to result Queue if score good enough
-		if z_score_delta > 2:
+		if z_score_delta > float(parameter_key.get("z_score_threshold", "2")):
 			output_dict = dict(zip(fields_found, ordered_hit_fields))
 		else:
 			output_dict = dict(zip(fields_found, ([""] * len(fields_found))))
@@ -201,7 +202,7 @@ class DescriptionConsumer(threading.Thread):
 			del long_substrings[ls_len]
 		return original_term, pre, post
 
-	def __init__(self, thread_id, params, desc_queue, result_queue):
+	def __init__(self, thread_id, params, desc_queue, result_queue, parameter_key):
 		''' Constructor '''
 		threading.Thread.__init__(self)
 		self.thread_id = thread_id
@@ -209,7 +210,7 @@ class DescriptionConsumer(threading.Thread):
 		self.result_queue = result_queue
 		self.input_string = None
 		self.params = params
-		self.__validate_params()
+		self.parameter_key = parameter_key
 		cluster_nodes = self.params["elasticsearch"]["cluster_nodes"]
 		self.es_node = cluster_nodes[self.thread_id % len(cluster_nodes)]
 		self.recursive = False
@@ -229,10 +230,13 @@ class DescriptionConsumer(threading.Thread):
 		logger = logging.getLogger("thread " + str(self.thread_id))
 		my_meta = self.my_meta
 		search_components = []
+		parameter_key = self.parameter_key
+		field_boosts = ["_all^1"]
+		field_boosts.append("BUSINESSSTANDARDNAME^" + parameter_key.get("business_name_boost", "2"))
+
 		logger.info("Search components are:")
 		logger.info("\tUnigrams: '" + qs_query + "'")
-		search_components.append((qs_query, "qs_query", ["_all^1"\
-		, "BUSINESSSTANDARDNAME^2"], 1))
+		search_components.append((qs_query, "qs_query", field_boosts, 1))
 		if address is not None:
 			logger.info("\tMatching 'Address': '" + address + "'")
 			search_components.append((address, "match_query"\
@@ -258,12 +262,11 @@ class DescriptionConsumer(threading.Thread):
 	def __get_boolean_search_object(self, search_components):
 		"""Builds an object for a "bool" search."""
 		params = self.params
+		parameter_key = self.parameter_key
 		bool_search = copy.deepcopy(GENERIC_ELASTICSEARCH_QUERY)
 		bool_search["fields"] = params["output"]["results"]["fields"]
 		bool_search["from"] = 0
-
-		if "size" in params["output"]["results"]:
-			bool_search["size"] = params["output"]["results"]["size"]
+		bool_search["size"] = parameter_key.get("es_result_size", "10")
 
 		for item in search_components:
 			my_subquery = None
@@ -546,26 +549,6 @@ class DescriptionConsumer(threading.Thread):
 		params_json = json.dumps(params, sort_keys=True, indent=4\
 		, separators=(',', ': '))
 		my_logger.info(params_json)
-
-	def __validate_params(self):
-		"""Ensures that the correct parameters are supplied."""
-		mandatory_keys = ["elasticsearch", "concurrency", "input", "logging"]
-		for key in mandatory_keys:
-			if key not in self.params:
-				raise Misconfiguration(msg="Misconfiguration: missing key, '" + key + "'", expr=None)
-
-		if self.params["concurrency"] <= 0:
-			raise Misconfiguration(msg="Misconfiguration: 'concurrency' must be a positive integer", expr=None)
-
-		if "index" not in self.params["elasticsearch"]:
-			raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.index'", expr=None)
-		if "type" not in self.params["elasticsearch"]:
-			raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.type'", expr=None)
-		if "path" not in self.params["logging"]:
-			raise Misconfiguration(msg="Misconfiguration: missing key, 'logging.path'", expr=None)
-
-
-		return True
 
 	def run(self):
 		while True:

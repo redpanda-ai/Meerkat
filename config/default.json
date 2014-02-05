@@ -1,7 +1,8 @@
 {
 	"concurrency" : 10,
 	"input" : {
-		"filename" : "data/short_bank_transaction_descriptions.csv",
+		"parameter_key" : "config/keys/default.json",
+		"filename" : "data/input/short_bank_transaction_descriptions.csv",
 		"encoding" : "utf-8"
 	},
 	"logging" : {
@@ -14,12 +15,11 @@
 		"results" : {
 			"fields" : [ "BUSINESSSTANDARDNAME", "HOUSE", "PREDIR", "STREET",
 				"STRTYPE", "CITYNAME", "STATE", "ZIP", "pin.location"
-			],
-			"size" : 10
+			]
 		},
         "file" : {
             "format" : "csv",
-            "path" : "data/longtailLabeled.csv"
+            "path" : "data/output/longtailLabeled.csv"
         }
 	},
 	"elasticsearch" : {

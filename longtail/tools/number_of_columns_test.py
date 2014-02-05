@@ -12,4 +12,4 @@ for line in F:
 		SIZES[size] = 1
 	else:
 		SIZES[size] += 1
-print (SIZES)
+print(SIZES)

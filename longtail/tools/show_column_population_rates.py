@@ -28,7 +28,6 @@ for line in F:
 
 
 for key in sorted(list(COLUMNS_2.keys())):
-	print (str(key), ": ", COLUMNS[key], " "\
-	, str(round(1.0 *COLUMNS_2[key]/LINE_COUNT,2)))
-
+	print(str(key), ": ", COLUMNS[key], " "\
+	, str(round(1.0 *COLUMNS_2[key]/LINE_COUNT, 2)))
 
