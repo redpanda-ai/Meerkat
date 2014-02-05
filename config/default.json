@@ -1,7 +1,7 @@
 {
 	"concurrency" : 10,
 	"input" : {
-		"parameter_key" : "config/keys/default.json"
+		"parameter_key" : "config/keys/default.json",
 		"filename" : "data/input/short_bank_transaction_descriptions.csv",
 		"encoding" : "utf-8"
 	},
@@ -15,8 +15,7 @@
 		"results" : {
 			"fields" : [ "BUSINESSSTANDARDNAME", "HOUSE", "PREDIR", "STREET",
 				"STRTYPE", "CITYNAME", "STATE", "ZIP", "pin.location"
-			],
-			"size" : 10
+			]
 		},
         "file" : {
             "format" : "csv",

@@ -12,8 +12,7 @@
     },
     "output" : {
         "results" : {
-            "fields" : ["BUSINESSSTANDARDNAME", "PERSISTENTRECORDID"],
-            "size" : 1
+            "fields" : ["BUSINESSSTANDARDNAME", "PERSISTENTRECORDID"]
         },
         "file" : {
             "format" : "csv",

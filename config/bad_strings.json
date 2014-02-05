@@ -12,8 +12,7 @@
 	},
 	"output" : {
 		"results" : {
-			"fields" : ["BUSINESSSTANDARDNAME", "HOUSE", "PREDIR", "PERSISTENTRECORDID"],
-			"size" : 1
+			"fields" : ["BUSINESSSTANDARDNAME", "HOUSE", "PREDIR", "PERSISTENTRECORDID"]
 		},
 		"file" : {
 			"format" : "json",
