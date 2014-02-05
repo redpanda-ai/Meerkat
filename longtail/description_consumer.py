@@ -233,6 +233,8 @@ class DescriptionConsumer(threading.Thread):
 		parameter_key = self.parameter_key
 		field_boosts = ["_all^1"]
 		field_boosts.append("BUSINESSSTANDARDNAME^" + parameter_key.get("business_name_boost", "1"))
+		address_boost = "composite.address^" + parameter_key.get("address_boost", "1")
+		phone_boost = "composite.phone^" + parameter_key.get("phone_boost", "1")
 
 		logger.info("Search components are:")
 		logger.info("\tUnigrams: '" + qs_query + "'")
@@ -240,18 +242,18 @@ class DescriptionConsumer(threading.Thread):
 		if address is not None:
 			logger.info("\tMatching 'Address': '" + address + "'")
 			search_components.append((address, "match_query"\
-			, ["composite.address^3"], 10))
+			, [address_boost], 10))
 		if len(phone_numbers) != 0:
 			for phone_num in phone_numbers:
 				logger.info("\tMatching 'Phone': '" + phone_num + "'")
 				search_components.append((phone_num, "match_query"\
-				, ["composite.phone^1"], 1))
+				, [phone_boost], 1))
 		for n_gram in matching_n_grams:
 			search_components.append((n_gram, "match_query"\
 			, ["_all^1"], 1))
 
 		my_obj = self.__get_boolean_search_object(search_components)
-		logger.info(json.dumps(my_obj))
+		logger.warning(json.dumps(my_obj))
 		my_results = self.__search_index(my_obj)
 		metrics = my_meta["metrics"]
 		logger.info("Cache Hit / Miss: " + str(metrics["cache_count"])\
