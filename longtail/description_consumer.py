@@ -230,10 +230,13 @@ class DescriptionConsumer(threading.Thread):
 		logger = logging.getLogger("thread " + str(self.thread_id))
 		my_meta = self.my_meta
 		search_components = []
+		parameter_key = self.parameter_key
+		field_boosts = ["_all^1"]
+		field_boosts.append("BUSINESSSTANDARDNAME^" + parameter_key.get("business_name_boost", "2"))
+
 		logger.info("Search components are:")
 		logger.info("\tUnigrams: '" + qs_query + "'")
-		search_components.append((qs_query, "qs_query", ["_all^1"\
-		, "BUSINESSSTANDARDNAME^2"], 1))
+		search_components.append((qs_query, "qs_query", field_boosts, 1))
 		if address is not None:
 			logger.info("\tMatching 'Address': '" + address + "'")
 			search_components.append((address, "match_query"\
