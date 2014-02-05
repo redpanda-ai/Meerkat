@@ -253,7 +253,7 @@ class DescriptionConsumer(threading.Thread):
 			, ["_all^1"], 1))
 
 		my_obj = self.__get_boolean_search_object(search_components)
-		logger.warning(json.dumps(my_obj))
+		logger.info(json.dumps(my_obj))
 		my_results = self.__search_index(my_obj)
 		metrics = my_meta["metrics"]
 		logger.info("Cache Hit / Miss: " + str(metrics["cache_count"])\
