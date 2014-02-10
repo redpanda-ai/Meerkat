@@ -68,13 +68,13 @@ def get_mapping_template(es_type_name, shards, replicas, column_meta\
 	map_object["settings"] = {}
 	map_object["settings"]["number_of_shards"] = shards
 	map_object["settings"]["number_of_replicas"] = replicas
-	map_object["settings"]["mappings"] = {}
-	map_object["settings"]["mappings"][es_type_name] = {}
-	my_map = map_object["settings"]["mappings"][es_type_name]
+	map_object["mappings"] = {}
+	map_object["mappings"][es_type_name] = {}
+	my_map = map_object["mappings"][es_type_name]
 	my_map["_source"] = {}
 	my_map["_source"]["enabled"] = True
-	my_map["_source"]["properties"] = {}
-	my_properties = my_map["_source"]["properties"]
+	my_map["properties"] = {}
+	my_properties = my_map["properties"]
 
 	#Adds a mapping for most non-null fields.
 	for column_number in range(column_meta["total_fields"]):
@@ -82,7 +82,7 @@ def get_mapping_template(es_type_name, shards, replicas, column_meta\
 		column_name = column_meta[column_number][NAME]
 		column_type = data_types[data_type][DATA_TYPE_NAME]
 		column_index = column_meta[column_number][INDEX]
-		if column_type in ["null"]:
+		if column_type in [ "null" ]:
 			pass
 		elif column_name in ["LATITUDE", "LONGITUDE"]:
 			pass
