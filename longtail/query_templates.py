@@ -39,8 +39,9 @@ def get_composites(record_obj):
 		key_name, key_delimiter = key[0:len(key)]
 		row_components = [record_obj[component] \
 		for component in components if component in record_obj]
-		record_obj["composite"][key_name] = \
-		key_delimiter.join(row_components)
+		value_candidate = key_delimiter.join(row_components)
+		if value_candidate != "":
+			record_obj["composite"][key_name] = value_candidate
 
 def get_create_object(es_index, es_type, cell_id):
 	"""Builds object used for building a bulk create command."""

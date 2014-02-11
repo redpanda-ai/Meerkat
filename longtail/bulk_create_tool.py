@@ -85,6 +85,8 @@ def process_row(cells, column_meta, es_index, es_type):
 	1.  JSON for the 'bulk create'
 	2.  A record object that contains most fields needed"""
 	record_obj = {}
+	record_obj["pin"] = {}
+	record_obj["pin"]["location"] = {"lat": "", "lon": ""}
 	for column_number in range(len(cells)):
 		cell = string_cleanse(str(cells[column_number]).strip())
 		if column_number == 0:
@@ -94,8 +96,6 @@ def process_row(cells, column_meta, es_index, es_type):
 
 		#Special handling for LATITUDE and LONGITUDE
 		if column_meta[column_number][NAME] == "LATITUDE":
-			record_obj["pin"] = {}
-			record_obj["pin"]["location"] = {}
 			record_obj["pin"]["location"]["lat"] = cell
 		elif column_meta[column_number][NAME] == "LONGITUDE":
 			record_obj["pin"]["location"]["lon"] = cell
@@ -103,6 +103,11 @@ def process_row(cells, column_meta, es_index, es_type):
 			continue
 		else:
 			record_obj[column_meta[column_number][NAME]] = cell
+
+	#If either latitude or longitude is missing, remove both
+	location = record_obj["pin"]["location"]
+	if (location["lat"] == "") or (location["lon"] == ""):
+		del record_obj["pin"]
 
 	return record_obj, create_json
 
