@@ -214,7 +214,6 @@ class DescriptionConsumer(threading.Thread):
 		self.params = params
 		self.parameter_key = parameter_key
 		cluster_nodes = self.params["elasticsearch"]["cluster_nodes"]
-		#self.es_node = cluster_nodes[self.thread_id % len(cluster_nodes)]
 		self.es_connection = elasticsearch.Elasticsearch(cluster_nodes,
 			sniff_on_start=True, sniff_on_connection_fail=True, sniffer_timeout=3)
 		self.recursive = False
