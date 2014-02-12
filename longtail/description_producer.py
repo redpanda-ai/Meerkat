@@ -38,33 +38,6 @@ def get_desc_queue(params):
 
 	return desc_queue
 
-def get_online_cluster_nodes(params):
-	"""Discover which cluster nodes are online and return the results."""
-	discovery_list = params["elasticsearch"]["cluster_nodes"]
-	online_cluster_nodes = []
-	output_data = None
-	for node in discovery_list:
-		url = "http://" + node + "/_cluster/nodes/"
-		req = urllib.request.Request(url=url)
-		try:
-			output_data = urllib.request.urlopen(req).read().decode('UTF-8')
-		except ConnectionError:
-			logging.critical(node + " error, continuing loop.")
-			continue
-		logging.info(node + " found, returning.")
-		break
-
-	nodes = json.loads(output_data)["nodes"]
-	http_address_re = re.compile(r"^inet\[\/(.*)\]")
-	for node in nodes:
-		http_address = nodes[node]["http_address"]
-		if http_address_re.search(http_address):
-			match = http_address_re.match(http_address).group(1)
-			logging.info("Confirmed ES node at " + match)
-			online_cluster_nodes.append(match)
-
-	return online_cluster_nodes
-
 def initialize():
 	"""Validates the command line arguments."""
 	input_file, params = None, None
@@ -84,7 +57,7 @@ def initialize():
 	params["search_cache"] = {}
 
 	if validate_params(params):
-		params["elasticsearch"]["cluster_nodes"] = get_online_cluster_nodes(params)
+		logging.warning("Parameters are valid, proceeding.")
 	return params
 
 def tokenize(params, desc_queue, parameter_key):
@@ -183,7 +156,7 @@ def load_parameter_key(params):
 
 def usage():
 	"""Shows the user which parameters to send into the program."""
-	result = "Usage:\n\t<quoted_transaction_description_string>"
+	result = "Usage:\n\t<path_to_json_format_config_file>"
 	logging.error(result)
 	return result
 
