@@ -1,17 +1,19 @@
 '''
 Created on Jan 14, 2014
 
-@author: jkey
+@author: J. Andrew Key
+@author: Matt Sevrens
 '''
 
 #!/bin/python3
 # pylint: disable=R0914
 
-import copy, json, logging, re, queue, threading, urllib.request
-from longtail.custom_exceptions import UnsupportedQueryType
-from longtail.query_templates import GENERIC_ELASTICSEARCH_QUERY, STOP_WORDS\
-, get_match_query, get_qs_query
+import copy, elasticsearch, hashlib, json, logging, threading, queue, re
 from scipy.stats.mstats import zscore
+
+from longtail.custom_exceptions import UnsupportedQueryType
+from longtail.query_templates import (GENERIC_ELASTICSEARCH_QUERY, STOP_WORDS,
+	get_match_query, get_qs_query)
 from longtail.various_tools import string_cleanse
 
 class DescriptionConsumer(threading.Thread):
@@ -212,7 +214,9 @@ class DescriptionConsumer(threading.Thread):
 		self.params = params
 		self.parameter_key = parameter_key
 		cluster_nodes = self.params["elasticsearch"]["cluster_nodes"]
-		self.es_node = cluster_nodes[self.thread_id % len(cluster_nodes)]
+		#self.es_node = cluster_nodes[self.thread_id % len(cluster_nodes)]
+		self.es_connection = elasticsearch.Elasticsearch(cluster_nodes,
+			sniff_on_start=True, sniff_on_connection_fail=True, sniffer_timeout=3)
 		self.recursive = False
 		self.my_meta = None
 		self.n_gram_tokens = None
@@ -232,7 +236,8 @@ class DescriptionConsumer(threading.Thread):
 		search_components = []
 		parameter_key = self.parameter_key
 		field_boosts = ["_all^1"]
-		field_boosts.append("BUSINESSSTANDARDNAME^" + parameter_key.get("business_name_boost", "1"))
+		field_boosts.append("BUSINESSSTANDARDNAME^"\
+		+ parameter_key.get("business_name_boost", "1"))
 		address_boost = "composite.address^" + parameter_key.get("address_boost", "1")
 		phone_boost = "composite.phone^" + parameter_key.get("phone_boost", "1")
 
@@ -256,7 +261,7 @@ class DescriptionConsumer(threading.Thread):
 		logger.info(json.dumps(my_obj))
 		my_results = self.__search_index(my_obj)
 		metrics = my_meta["metrics"]
-		logger.info("Cache Hit / Miss: " + str(metrics["cache_count"])\
+		logger.warning("Cache Hit / Miss: " + str(metrics["cache_count"])\
 		+ " / " + str(metrics["query_count"]))
 		self.__display_search_results(my_results)
 		self.output_to_result_queue(my_results)
@@ -440,32 +445,26 @@ class DescriptionConsumer(threading.Thread):
 		logger = logging.getLogger("thread " + str(self.thread_id))
 		input_data = json.dumps(input_as_object).encode('UTF-8')
 		#Check the cache first
-		input_hash = str(input_data)
+		hash_object = hashlib.md5(str(input_data).encode())
+		input_hash = hash_object.hexdigest()
+		#input_hash = str(input_data)
 		if input_hash in self.params["search_cache"]:
 			logger.info("Cache hit, short-cutting")
 			self.my_meta["metrics"]["cache_count"] += 1
-			return self.params["search_cache"][input_hash]
+			output_data = self.params["search_cache"][input_hash]
 		else:
 			logger.info("Cache miss, searching")
+			try:
+				output_data = self.es_connection.search(
+					index=self.params["elasticsearch"]["index"], body=input_as_object)
+			except Exception:
+				logging.critical("Unable to process the following: " + str(input_as_object))
+				output_data = '{"hits":{"total":0}}'
 
-		logger.debug(input_data)
-		url = "http://" + self.es_node + "/"
-		path = self.params["elasticsearch"]["index"] + "/"\
-		+ self.params["elasticsearch"]["type"] + "/_search"
-		req = urllib.request.Request(url=url+path, data=input_data)
-		try:
-			output_data = urllib.request.urlopen(req).read().decode('UTF-8')
-		except urllib.error.HTTPError as http_error:
-			#log the HTTPError as a critical and return output_data that will allow
-			# the consumer to continue working
-			logging.critical("Unable to process the following: " + str(input_data))
-			logging.critical(str(http_error))
-			output_data = '{"hits":{"total":0}}'
 		metrics = self.my_meta["metrics"]
 		metrics["query_count"] += 1
-		output_string = json.loads(output_data)
-		self.params["search_cache"][input_hash] = output_string
-		return output_string
+		self.params["search_cache"][input_hash] = output_data
+		return output_data
 
 	def __search_n_gram_tokens(self):
 		"""Creates a boolean elasticsearch composed of multiple
