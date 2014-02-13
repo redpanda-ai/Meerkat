@@ -52,7 +52,7 @@ class TokenizeDescriptionTests(unittest.TestCase):
 	def test_usage(self):
 		"""The point of this function is to print usage information to the user"""
 		result = description_producer.usage()
-		self.assertEqual("Usage:\n\t<quoted_transaction_description_string>", result)
+		self.assertEqual("Usage:\n\t<path_to_json_format_config_file>", result)
 
 	def test_get_desc_queue_returns_queue(self):
 		"""Ensure returns an instance of Queue"""
@@ -97,11 +97,6 @@ class TokenizeDescriptionTests(unittest.TestCase):
 		description_producer.write_output_to_file(self.params, self.result_queue)
 		self.assertTrue(self.result_queue.empty())
 		os.remove("data/input/unittestDeletable.csv")
-
-	def test_get_online_cluster_nodes_not_empty(self):
-		"""Ensure returned node list is not empty"""
-		online_nodes = description_producer.get_online_cluster_nodes(self.params)
-		self.assertNotEqual(len(online_nodes), 0)
 
 	def test_validate_logging(self):
 		"""Ensure 'logging' key is in configuration"""
@@ -167,17 +162,6 @@ class TokenizeDescriptionTests(unittest.TestCase):
 	def test_false_key_throws_error(self):
 		"""Ensure not existent key throws error"""
 		self.assertRaises(SystemExit, description_producer.load_parameter_key, self.params)				
-
-	def test_get_online_cluster_nodes_are_online(self):
-		"""Ensure returned nodes are actually online"""
-		online_nodes = description_producer.get_online_cluster_nodes(self.params)
-		for node in online_nodes:
-			node = node.split(":")[0]
-			try:
-				socket.gethostbyaddr(node)
-				self.assertTrue(True)
-			except socket.gaierror:
-				self.assertTrue(False)
 
 if __name__ == '__main__':
 	unittest.main(argv=[sys.argv[0]])
