@@ -24,11 +24,17 @@ class DescriptionConsumer(threading.Thread):
 		"""Creates data structures used the first call into the
 		__parse_into_search_tokens function."""
 		logger = logging.getLogger("thread " + str(self.thread_id))
-		logger.info("Input String " + self.input_string)
+		#Abort processing, if input string is None
+		if self.input_string != None:
+			logger.info("Input String " + self.input_string)
+		else:
+			logger.warning("No input string provided, skipping")
+			return False
 		self.recursive = False
 		self.my_meta["terms"] = []
 		self.my_meta["long_substrings"] = {}
 		self.__parse_into_search_tokens(self.input_string, self.recursive)
+		return True
 
 	def __display_results(self):
 		"""Displays our tokens, n-grams, and search results."""
