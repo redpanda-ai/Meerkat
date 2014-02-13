@@ -85,19 +85,19 @@ class DescriptionConsumerTests(unittest.TestCase):
 		self.assertEqual(self.list_compare(result, expect), True)
 
 	def test_reset_my_meta_recursive(self):
-		"""Ensure that the 'recursive' memeber is reset to 'false'"""
+		"""Ensure that the 'recursive' member is reset to 'false'"""
 		self.my_consumer.recursive = True
 		self.my_consumer._DescriptionConsumer__reset_my_meta()
 		self.assertEqual(self.my_consumer.recursive,False)
 
 	def test_reset_my_meta_n_gram_tokens(self):
-		"""Ensure that the 'recursive' memeber is reset to 'false'"""
+		"""Ensure that the 'recursive' member is reset to 'false'"""
 		self.my_consumer.n_gram_tokens = {"not" : "empty"}
 		self.my_consumer._DescriptionConsumer__reset_my_meta()
 		self.assertEqual(self.my_consumer.n_gram_tokens, {})
 
 	def test_reset_my_meta_n_gram_tokens(self):
-		"""Ensure that the 'my_meta' memeber is reset"""
+		"""Ensure that the 'my_meta' member is reset"""
 		self.my_consumer.my_meta = {"dirty" : "my_meta"}
 		self.my_consumer._DescriptionConsumer__reset_my_meta()
 		self.assertEqual(self.my_consumer.my_meta, json.loads(self.clean_my_meta))
