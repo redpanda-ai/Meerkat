@@ -116,7 +116,7 @@ class DescriptionConsumerTests(unittest.TestCase):
 		self.assertEqual(self.my_consumer.recursive,False)
 
 	def test_reset_my_meta_n_gram_tokens(self):
-		"""Ensure that the 'recursive' member is reset to 'false'"""
+		"""Ensure that the 'n_gram_tokens' dict is emptied"""
 		self.my_consumer.n_gram_tokens = {"not" : "empty"}
 		self.my_consumer._DescriptionConsumer__reset_my_meta()
 		self.assertEqual(self.my_consumer.n_gram_tokens, {})
