@@ -45,12 +45,12 @@ class DescriptionConsumerTests(unittest.TestCase):
 {
 	"hits": {
 		"hits": [
-			{"_score": 3, "_type": "new_type",
-			"_id": "4", "fields": {"PERSISTENTRECORDID": "4"}, "_index": "new_index"},
-			{"_score": 2, "_type": "new_type",
-			"_id": "6", "fields": {"PERSISTENTRECORDID": "6"}, "_index": "new_index"},
-			{"_score": 1, "_type": "new_type",
-			"_id": "9", "fields": {"PERSISTENTRECORDID": "9"}, "_index": "new_index"}
+			{"_score": 3, "_type": "new_type", "_index": "new_index",
+			"_id": "4", "fields": {"PERSISTENTRECORDID": "4"}},
+			{"_score": 2, "_type": "new_type", "_index": "new_index",
+			"_id": "6", "fields": {"PERSISTENTRECORDID": "6"}},
+			{"_score": 1, "_type": "new_type", "_index": "new_index",
+			"_id": "9", "fields": {"PERSISTENTRECORDID": "9"}}
 		],
 	"total": 3,
 	"max_score": 3
