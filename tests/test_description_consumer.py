@@ -45,12 +45,12 @@ class DescriptionConsumerTests(unittest.TestCase):
 {
 	"hits": {
 		"hits": [
-			{"_score": 0.054203592, "_type": "new_type",
-			"_id": "40404997", "fields": {"PERSISTENTRECORDID": "40404997"}, "_index": "new_index"},
-			{"_score": 0.043917503, "_type": "new_type",
-			"_id": "695294798", "fields": {"PERSISTENTRECORDID": "695294798"}, "_index": "new_index"},
-			{"_score": 0.04222678, "_type": "new_type",
-			"_id": "16718350", "fields": {"PERSISTENTRECORDID": "16718350"}, "_index": "new_index"}
+			{"_score": 3, "_type": "new_type",
+			"_id": "4", "fields": {"PERSISTENTRECORDID": "4"}, "_index": "new_index"},
+			{"_score": 2, "_type": "new_type",
+			"_id": "6", "fields": {"PERSISTENTRECORDID": "6"}, "_index": "new_index"},
+			{"_score": 1, "_type": "new_type",
+			"_id": "9", "fields": {"PERSISTENTRECORDID": "9"}, "_index": "new_index"}
 		],
 	"total": 3,
 	"max_score": 0.054203592
