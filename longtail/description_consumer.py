@@ -120,6 +120,7 @@ class DescriptionConsumer(threading.Thread):
 		self.__display_z_score_delta(scores)
 		for result in results:
 			print(result)
+		return True
 
 	def __output_to_result_queue(self, search_results):
 		"""Decides whether to output and pushes to result_queue"""
@@ -268,7 +269,6 @@ class DescriptionConsumer(threading.Thread):
 		metrics = my_meta["metrics"]
 		logger.warning("Cache Hit / Miss: " + str(metrics["cache_count"])\
 		+ " / " + str(metrics["query_count"]))
-		logger.critical(str(json.dumps(my_results)))
 		self.__display_search_results(my_results)
 		self.__output_to_result_queue(my_results)
 

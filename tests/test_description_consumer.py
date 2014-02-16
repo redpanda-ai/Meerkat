@@ -38,7 +38,8 @@ class DescriptionConsumerTests(unittest.TestCase):
 		, "brainstorm7:9200", "brainstorm8:9200", "brainstorm9:9200", "brainstorma:9200"
 		, "brainstormb:9200"],
 		"index" : "new_index", "type" : "new_type"
-	}
+	},
+	"search_cache" : {}
 }"""
 
 	search_results = """
@@ -56,6 +57,19 @@ class DescriptionConsumerTests(unittest.TestCase):
 	"max_score": 3
 	},
 	"_shards": {"successful": 12, "failed": 0, "total": 12}, "took": 100, "timed_out": false
+}"""
+
+	input_json = """
+{
+	"query": {
+		"bool": {
+			"should": [
+				{"match": {"_all": {"type": "phrase", "query": "SUNNYVALE"}}}
+			], 
+			"minimum_number_should_match": 1
+		}
+	},
+	"from": 0, "size": 0
 }"""
 
 	list_compare = lambda self, x, y: collections.Counter(x) == collections.Counter(y)
@@ -86,10 +100,10 @@ class DescriptionConsumerTests(unittest.TestCase):
 		self.assertEqual(result,None)
 
 	def test_display_z_score_delta(self):
-		"""Ensure that list containing [1,2,3], returns -1.225 for z_score"""
-		scores = [1, 2, 3]
+		"""Ensure that list containing [3, 2, 1], returns 1.225 for z_score"""
+		scores = [3, 2, 1]
 		result = self.my_consumer._DescriptionConsumer__display_z_score_delta(scores)
-		self.assertEqual(result,-1.225)
+		self.assertEqual(result, 1.225)
 
 	def test_display_search_results_normal_use(self):
 		"""Ensure that display_search_results method completes """
@@ -145,6 +159,13 @@ class DescriptionConsumerTests(unittest.TestCase):
 		self.my_consumer.my_meta = {"dirty" : "my_meta"}
 		self.my_consumer._DescriptionConsumer__reset_my_meta()
 		self.assertEqual(self.my_consumer.my_meta, json.loads(self.clean_my_meta))
+
+	def test_search_index_normal_use(self):
+		"""Ensure that __search_index finds a common result."""
+		input_as_object = json.loads(self.input_json)
+		result = self.my_consumer._DescriptionConsumer__search_index(input_as_object)
+		self.assertGreater(result["hits"]["total"],-1)
+
 
 if __name__ == '__main__':
 	unittest.main()
