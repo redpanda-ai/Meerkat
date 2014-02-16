@@ -55,8 +55,8 @@ class DescriptionConsumerTests(unittest.TestCase):
 	"total": 3,
 	"max_score": 3
 	},
-	"_shards": {"successful": 12, "failed": 0, "total": 12}, "took": 100, "timed_out": false}
-"""
+	"_shards": {"successful": 12, "failed": 0, "total": 12}, "took": 100, "timed_out": false
+}"""
 
 	list_compare = lambda self, x, y: collections.Counter(x) == collections.Counter(y)
 	my_consumer, parameter_key = None, ' {"es_result_size":"20"} '
@@ -90,6 +90,12 @@ class DescriptionConsumerTests(unittest.TestCase):
 		scores = [1, 2, 3]
 		result = self.my_consumer._DescriptionConsumer__display_z_score_delta(scores)
 		self.assertEqual(result,-1.225)
+
+	def test_display_search_results_normal_use(self):
+		"""Ensure that display_search_results method completes """
+		search_results = json.loads(self.search_results)
+		result = self.my_consumer._DescriptionConsumer__display_search_results(search_results)
+		self.assertEqual(result,True)
 
 	def test_get_n_gram_tokens_normal_use(self):
 		"""Ensure that n-grams where n >=2 can be generated"""
