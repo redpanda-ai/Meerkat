@@ -269,7 +269,6 @@ class DescriptionConsumer(threading.Thread):
 		logger.warning("Cache Hit / Miss: " + str(metrics["cache_count"])\
 		+ " / " + str(metrics["query_count"]))
 		self.__display_search_results(my_results)
-		logger.critical(str(my_results))
 		self.output_to_result_queue(my_results)
 
 	def __get_boolean_search_object(self, search_components):
