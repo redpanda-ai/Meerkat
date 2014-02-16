@@ -53,7 +53,7 @@ class DescriptionConsumerTests(unittest.TestCase):
 			"_id": "9", "fields": {"PERSISTENTRECORDID": "9"}, "_index": "new_index"}
 		],
 	"total": 3,
-	"max_score": 0.054203592
+	"max_score": 3
 	},
 	"_shards": {"successful": 12, "failed": 0, "total": 12}, "took": 100, "timed_out": false}
 """
