@@ -41,8 +41,8 @@ class DescriptionConsumerTests(unittest.TestCase):
 	}
 }"""
 
-	thing = """
-{'_shards': {'successful': 12, 'total': 12, 'failed': 0}, 'took': 289, 'hits': {'max_score': 0.08663153, 'total': 192246, 'hits': [{'fields': {'PERSISTENTRECORDID': '686396728'}, '_type': 'new_type', '_index': 'new_index', '_score': 0.08663153, '_id': '686396728'}, {'fields': {'PERSISTENTRECORDID': '40404997'}, '_type': 'new_type', '_index': 'new_index', '_score': 0.08558531, '_id': '40404997'}, {'fields': {'PERSISTENTRECORDID': '685309290'}, '_type': 'new_type', '_index': 'new_index', '_score': 0.08067946, '_id': '685309290'}, {'fields': {'PERSISTENTRECORDID': '9347102'}, '_type': 'new_type', '_index': 'new_index', '_score': 0.07761325, '_id': '9347102'}, {'fields': {'PERSISTENTRECORDID': '11619132'}, '_type': 'new_type', '_index': 'new_index', '_score': 0.07618123, '_id': '11619132'}, {'fields': {'PERSISTENTRECORDID': '150943406'}, '_type': 'new_type', '_index': 'new_index', '_score': 0.07611385, '_id': '150943406'}, {'fields': {'PERSISTENTRECORDID': '25444365'}, '_type': 'new_type', '_index': 'new_index', '_score': 0.07585038, '_id': '25444365'}, {'fields': {'PERSISTENTRECORDID': '888596001'}, '_type': 'new_type', '_index': 'new_index', '_score': 0.075735435, '_id': '888596001'}, {'fields': {'PERSISTENTRECORDID': '40857490'}, '_type': 'new_type', '_index': 'new_index', '_score': 0.07549805, '_id': '40857490'}, {'fields': {'PERSISTENTRECORDID': '40409289'}, '_type': 'new_type', '_index': 'new_index', '_score': 0.07513924, '_id': '40409289'}, {'fields': {'PERSISTENTRECORDID': '11615760'}, '_type': 'new_type', '_index': 'new_index', '_score': 0.07435612, '_id': '11615760'}, {'fields': {'PERSISTENTRECORDID': '11728947'}, '_type': 'new_type', '_index': 'new_index', '_score': 0.07401032, '_id': '11728947'}, {'fields': {'PERSISTENTRECORDID': '11617463'}, '_type': 'new_type', '_index': 'new_index', '_score': 0.07345802, '_id': '11617463'}, {'fields': {'PERSISTENTRECORDID': '41735310'}, '_type': 'new_type', '_index': 'new_index', '_score': 0.072723344, '_id': '41735310'}, {'fields': {'PERSISTENTRECORDID': '158954918'}, '_type': 'new_type', '_index': 'new_index', '_score': 0.07234704, '_id': '158954918'}]}, 'timed_out': False}
+	search_results = """
+{"hits": {"hits": [{"_score": 0.054203592, "_type": "new_type", "_id": "40404997", "fields": {"PERSISTENTRECORDID": "40404997"}, "_index": "new_index"}, {"_score": 0.043917503, "_type": "new_type", "_id": "695294798", "fields": {"PERSISTENTRECORDID": "695294798"}, "_index": "new_index"}, {"_score": 0.04222678, "_type": "new_type", "_id": "16718350", "fields": {"PERSISTENTRECORDID": "16718350"}, "_index": "new_index"}, {"_score": 0.041285474, "_type": "new_type", "_id": "840679", "fields": {"PERSISTENTRECORDID": "840679"}, "_index": "new_index"}, {"_score": 0.040786088, "_type": "new_type", "_id": "41839613", "fields": {"PERSISTENTRECORDID": "41839613"}, "_index": "new_index"}, {"_score": 0.039184574, "_type": "new_type", "_id": "689211390", "fields": {"PERSISTENTRECORDID": "689211390"}, "_index": "new_index"}, {"_score": 0.037317432, "_type": "new_type", "_id": "701949909", "fields": {"PERSISTENTRECORDID": "701949909"}, "_index": "new_index"}, {"_score": 0.036799215, "_type": "new_type", "_id": "41703294", "fields": {"PERSISTENTRECORDID": "41703294"}, "_index": "new_index"}, {"_score": 0.036712445, "_type": "new_type", "_id": "41854361", "fields": {"PERSISTENTRECORDID": "41854361"}, "_index": "new_index"}, {"_score": 0.036061335, "_type": "new_type", "_id": "4443774", "fields": {"PERSISTENTRECORDID": "4443774"}, "_index": "new_index"}, {"_score": 0.03584761, "_type": "new_type", "_id": "65853055", "fields": {"PERSISTENTRECORDID": "65853055"}, "_index": "new_index"}, {"_score": 0.03584761, "_type": "new_type", "_id": "140074984", "fields": {"PERSISTENTRECORDID": "140074984"}, "_index": "new_index"}, {"_score": 0.03584761, "_type": "new_type", "_id": "39971471", "fields": {"PERSISTENTRECORDID": "39971471"}, "_index": "new_index"}, {"_score": 0.03429645, "_type": "new_type", "_id": "41855644", "fields": {"PERSISTENTRECORDID": "41855644"}, "_index": "new_index"}, {"_score": 0.03429645, "_type": "new_type", "_id": "136107249", "fields": {"PERSISTENTRECORDID": "136107249"}, "_index": "new_index"}], "total": 192246, "max_score": 0.054203592}, "_shards": {"successful": 12, "failed": 0, "total": 12}, "took": 142, "timed_out": false}
 """
 
 	list_compare = lambda self, x, y: collections.Counter(x) == collections.Counter(y)
@@ -52,7 +52,7 @@ class DescriptionConsumerTests(unittest.TestCase):
 		"""Basic Fixture for all tests."""
 		self.parameter_key = json.loads(self.parameter_key)
 		self.params = json.loads(self.config)
-		self.desc_queue, self.result_queue = queue.Queue, queue.Queue
+		self.desc_queue, self.result_queue = queue.Queue(), queue.Queue()
 		self.my_consumer = DescriptionConsumer(0, self.params, self.desc_queue
 			, self.result_queue, self.parameter_key)
 
@@ -85,6 +85,12 @@ class DescriptionConsumerTests(unittest.TestCase):
 		result = self.my_consumer.n_gram_tokens
 		expect = {2: ['3 4', '2 3', '1 2'], 3: ['2 3 4', '1 2 3'], 4: ['1 2 3 4']}
 		self.assertEqual(result,expect)
+
+	def test_output_to_result_queue(self):
+		"""Ensure that we can output to the result queue"""
+		search_results = json.loads(self.search_results)
+		self.my_consumer._DescriptionConsumer__output_to_result_queue(search_results)
+		self.assertEqual(False,self.my_consumer.result_queue.empty())
 
 	def test_powerset_normal_use(self):
 		"""Ensure that we can recursively discover all substrings"""

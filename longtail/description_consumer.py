@@ -121,7 +121,7 @@ class DescriptionConsumer(threading.Thread):
 		for result in results:
 			print(result)
 
-	def output_to_result_queue(self, search_results):
+	def __output_to_result_queue(self, search_results):
 		"""Decides whether to output and pushes to result_queue"""
 		hits = search_results['hits']['hits']
 		scores, fields_found = [], []
@@ -268,8 +268,9 @@ class DescriptionConsumer(threading.Thread):
 		metrics = my_meta["metrics"]
 		logger.warning("Cache Hit / Miss: " + str(metrics["cache_count"])\
 		+ " / " + str(metrics["query_count"]))
+		logger.critical(str(json.dumps(my_results)))
 		self.__display_search_results(my_results)
-		self.output_to_result_queue(my_results)
+		self.__output_to_result_queue(my_results)
 
 	def __get_boolean_search_object(self, search_components):
 		"""Builds an object for a "bool" search."""
@@ -371,7 +372,6 @@ class DescriptionConsumer(threading.Thread):
 		Example: "MEL'S DRIVE-IN #2 SAN FRANCISCOCA 24492153337286434101508" """
 		#This loop breaks up the input string looking for new search terms
 		#that match portions of our ElasticSearch index
-		#my_meta = self.my_meta
 		tokens = self.my_meta["tokens"]
 		long_substrings = self.my_meta["long_substrings"]
 		terms = self.my_meta["terms"]
@@ -452,7 +452,6 @@ class DescriptionConsumer(threading.Thread):
 		#Check the cache first
 		hash_object = hashlib.md5(str(input_data).encode())
 		input_hash = hash_object.hexdigest()
-		#input_hash = str(input_data)
 		if input_hash in self.params["search_cache"]:
 			logger.info("Cache hit, short-cutting")
 			self.my_meta["metrics"]["cache_count"] += 1
@@ -525,7 +524,6 @@ class DescriptionConsumer(threading.Thread):
 
 	def __set_logger(self):
 		"""Creates a logger, based upon the supplied config object."""
-
 		levels = {'debug': logging.DEBUG, 'info': logging.INFO\
 		, 'warning': logging.WARNING, 'error': logging.ERROR\
 		, 'critical': logging.CRITICAL}
