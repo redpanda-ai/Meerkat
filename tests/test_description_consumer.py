@@ -121,7 +121,7 @@ class DescriptionConsumerTests(unittest.TestCase):
 		self.my_consumer._DescriptionConsumer__reset_my_meta()
 		self.assertEqual(self.my_consumer.n_gram_tokens, {})
 
-	def test_reset_my_meta_n_gram_tokens(self):
+	def test_reset_my_meta_reset_my_meta(self):
 		"""Ensure that the 'my_meta' member is reset"""
 		self.my_consumer.my_meta = {"dirty" : "my_meta"}
 		self.my_consumer._DescriptionConsumer__reset_my_meta()
