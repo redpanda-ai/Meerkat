@@ -41,6 +41,10 @@ class DescriptionConsumerTests(unittest.TestCase):
 	}
 }"""
 
+	thing = """
+{'_shards': {'successful': 12, 'total': 12, 'failed': 0}, 'took': 289, 'hits': {'max_score': 0.08663153, 'total': 192246, 'hits': [{'fields': {'PERSISTENTRECORDID': '686396728'}, '_type': 'new_type', '_index': 'new_index', '_score': 0.08663153, '_id': '686396728'}, {'fields': {'PERSISTENTRECORDID': '40404997'}, '_type': 'new_type', '_index': 'new_index', '_score': 0.08558531, '_id': '40404997'}, {'fields': {'PERSISTENTRECORDID': '685309290'}, '_type': 'new_type', '_index': 'new_index', '_score': 0.08067946, '_id': '685309290'}, {'fields': {'PERSISTENTRECORDID': '9347102'}, '_type': 'new_type', '_index': 'new_index', '_score': 0.07761325, '_id': '9347102'}, {'fields': {'PERSISTENTRECORDID': '11619132'}, '_type': 'new_type', '_index': 'new_index', '_score': 0.07618123, '_id': '11619132'}, {'fields': {'PERSISTENTRECORDID': '150943406'}, '_type': 'new_type', '_index': 'new_index', '_score': 0.07611385, '_id': '150943406'}, {'fields': {'PERSISTENTRECORDID': '25444365'}, '_type': 'new_type', '_index': 'new_index', '_score': 0.07585038, '_id': '25444365'}, {'fields': {'PERSISTENTRECORDID': '888596001'}, '_type': 'new_type', '_index': 'new_index', '_score': 0.075735435, '_id': '888596001'}, {'fields': {'PERSISTENTRECORDID': '40857490'}, '_type': 'new_type', '_index': 'new_index', '_score': 0.07549805, '_id': '40857490'}, {'fields': {'PERSISTENTRECORDID': '40409289'}, '_type': 'new_type', '_index': 'new_index', '_score': 0.07513924, '_id': '40409289'}, {'fields': {'PERSISTENTRECORDID': '11615760'}, '_type': 'new_type', '_index': 'new_index', '_score': 0.07435612, '_id': '11615760'}, {'fields': {'PERSISTENTRECORDID': '11728947'}, '_type': 'new_type', '_index': 'new_index', '_score': 0.07401032, '_id': '11728947'}, {'fields': {'PERSISTENTRECORDID': '11617463'}, '_type': 'new_type', '_index': 'new_index', '_score': 0.07345802, '_id': '11617463'}, {'fields': {'PERSISTENTRECORDID': '41735310'}, '_type': 'new_type', '_index': 'new_index', '_score': 0.072723344, '_id': '41735310'}, {'fields': {'PERSISTENTRECORDID': '158954918'}, '_type': 'new_type', '_index': 'new_index', '_score': 0.07234704, '_id': '158954918'}]}, 'timed_out': False}
+"""
+
 	list_compare = lambda self, x, y: collections.Counter(x) == collections.Counter(y)
 	my_consumer, parameter_key = None, ' {"es_result_size":"20"} '
 
@@ -73,6 +77,14 @@ class DescriptionConsumerTests(unittest.TestCase):
 		scores = [1, 2, 3]
 		result = self.my_consumer._DescriptionConsumer__display_z_score_delta(scores)
 		self.assertEqual(result,-1.225)
+
+	def test_powerset_normal_use(self):
+		"""Ensure that we can recursively discover all substrings"""
+		term, substrings = "ABCD", {}
+		result = self.my_consumer._DescriptionConsumer__powerset(term, substrings)
+		expect = {2: {'AB': '', 'CD': '', 'BC': ''}, 3: {'BCD': '', 'ABC': ''}, 4: {'ABCD': ''}}
+		diff = set(substrings.keys()) - set(expect.keys())
+		self.assertEqual(substrings,expect)
 
 	def test_rebuild_tokens_normal_use(self):
 		"""Ensure that __rebuild_tokens works with a standard case"""
