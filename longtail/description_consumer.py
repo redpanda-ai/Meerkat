@@ -360,9 +360,9 @@ class DescriptionConsumer(threading.Thread):
 				if n_gram_size > unigram_size:
 					if n_gram_size not in self.n_gram_tokens:
 						self.n_gram_tokens[n_gram_size] = []
-						new_n_gram = \
-						list_of_tokens[start_index:end_index-end_offset]
-						self.n_gram_tokens[n_gram_size].append(" ".join(new_n_gram))
+					new_n_gram = \
+					list_of_tokens[start_index:end_index-end_offset]
+					self.n_gram_tokens[n_gram_size].append(" ".join(new_n_gram))
 		return
 
 	def __parse_into_search_tokens(self, input_string, recursive):

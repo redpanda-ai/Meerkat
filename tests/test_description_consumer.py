@@ -78,12 +78,19 @@ class DescriptionConsumerTests(unittest.TestCase):
 		result = self.my_consumer._DescriptionConsumer__display_z_score_delta(scores)
 		self.assertEqual(result,-1.225)
 
+	def test_get_n_gram_tokens_normal_use(self):
+		"""Ensure that n-grams where n >=2 can be generated"""
+		list_of_tokens = ["1", "2", "3", "4"]
+		self.my_consumer._DescriptionConsumer__get_n_gram_tokens(list_of_tokens)
+		result = self.my_consumer.n_gram_tokens
+		expect = {2: ['3 4', '2 3', '1 2'], 3: ['2 3 4', '1 2 3'], 4: ['1 2 3 4']}
+		self.assertEqual(result,expect)
+
 	def test_powerset_normal_use(self):
 		"""Ensure that we can recursively discover all substrings"""
 		term, substrings = "ABCD", {}
 		result = self.my_consumer._DescriptionConsumer__powerset(term, substrings)
 		expect = {2: {'AB': '', 'CD': '', 'BC': ''}, 3: {'BCD': '', 'ABC': ''}, 4: {'ABCD': ''}}
-		diff = set(substrings.keys()) - set(expect.keys())
 		self.assertEqual(substrings,expect)
 
 	def test_rebuild_tokens_normal_use(self):
