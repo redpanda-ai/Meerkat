@@ -42,7 +42,20 @@ class DescriptionConsumerTests(unittest.TestCase):
 }"""
 
 	search_results = """
-{"hits": {"hits": [{"_score": 0.054203592, "_type": "new_type", "_id": "40404997", "fields": {"PERSISTENTRECORDID": "40404997"}, "_index": "new_index"}, {"_score": 0.043917503, "_type": "new_type", "_id": "695294798", "fields": {"PERSISTENTRECORDID": "695294798"}, "_index": "new_index"}, {"_score": 0.04222678, "_type": "new_type", "_id": "16718350", "fields": {"PERSISTENTRECORDID": "16718350"}, "_index": "new_index"}, {"_score": 0.041285474, "_type": "new_type", "_id": "840679", "fields": {"PERSISTENTRECORDID": "840679"}, "_index": "new_index"}, {"_score": 0.040786088, "_type": "new_type", "_id": "41839613", "fields": {"PERSISTENTRECORDID": "41839613"}, "_index": "new_index"}, {"_score": 0.039184574, "_type": "new_type", "_id": "689211390", "fields": {"PERSISTENTRECORDID": "689211390"}, "_index": "new_index"}, {"_score": 0.037317432, "_type": "new_type", "_id": "701949909", "fields": {"PERSISTENTRECORDID": "701949909"}, "_index": "new_index"}, {"_score": 0.036799215, "_type": "new_type", "_id": "41703294", "fields": {"PERSISTENTRECORDID": "41703294"}, "_index": "new_index"}, {"_score": 0.036712445, "_type": "new_type", "_id": "41854361", "fields": {"PERSISTENTRECORDID": "41854361"}, "_index": "new_index"}, {"_score": 0.036061335, "_type": "new_type", "_id": "4443774", "fields": {"PERSISTENTRECORDID": "4443774"}, "_index": "new_index"}, {"_score": 0.03584761, "_type": "new_type", "_id": "65853055", "fields": {"PERSISTENTRECORDID": "65853055"}, "_index": "new_index"}, {"_score": 0.03584761, "_type": "new_type", "_id": "140074984", "fields": {"PERSISTENTRECORDID": "140074984"}, "_index": "new_index"}, {"_score": 0.03584761, "_type": "new_type", "_id": "39971471", "fields": {"PERSISTENTRECORDID": "39971471"}, "_index": "new_index"}, {"_score": 0.03429645, "_type": "new_type", "_id": "41855644", "fields": {"PERSISTENTRECORDID": "41855644"}, "_index": "new_index"}, {"_score": 0.03429645, "_type": "new_type", "_id": "136107249", "fields": {"PERSISTENTRECORDID": "136107249"}, "_index": "new_index"}], "total": 192246, "max_score": 0.054203592}, "_shards": {"successful": 12, "failed": 0, "total": 12}, "took": 142, "timed_out": false}
+{
+	"hits": {
+		"hits": [
+			{"_score": 0.054203592, "_type": "new_type",
+			"_id": "40404997", "fields": {"PERSISTENTRECORDID": "40404997"}, "_index": "new_index"},
+			{"_score": 0.043917503, "_type": "new_type",
+			"_id": "695294798", "fields": {"PERSISTENTRECORDID": "695294798"}, "_index": "new_index"},
+			{"_score": 0.04222678, "_type": "new_type",
+			"_id": "16718350", "fields": {"PERSISTENTRECORDID": "16718350"}, "_index": "new_index"}
+		],
+	"total": 3,
+	"max_score": 0.054203592
+	},
+	"_shards": {"successful": 12, "failed": 0, "total": 12}, "took": 100, "timed_out": false}
 """
 
 	list_compare = lambda self, x, y: collections.Counter(x) == collections.Counter(y)
