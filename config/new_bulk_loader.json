@@ -1,6 +1,6 @@
 {
-	"concurrency" : 5,
-	"batch_size" : 30,
+	"concurrency" : 2,
+	"batch_size" : 40,
 	"input" : {
 		"filename" : "data/input/factual.tab.100",
 		"encoding" : "utf-8"

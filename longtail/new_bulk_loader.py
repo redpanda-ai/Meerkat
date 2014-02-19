@@ -2,12 +2,15 @@
 # pylint: disable=C0301
 
 """This script does stuff."""
-import elasticsearch
+#import elasticsearch
 import json
 import logging
 import queue
 import sys
 import threading
+
+from elasticsearch import Elasticsearch, helpers
+from datetime import datetime
 #import csv, datetime, json, logging, queue, sys, urllib, re
 
 from longtail.custom_exceptions import InvalidArguments, Misconfiguration
@@ -71,9 +74,8 @@ class ThreadConsumer(threading.Thread):
 		self.params = params
 		self.document_queue = params["document_queue"]
 		cluster_nodes = self.params["elasticsearch"]["cluster_nodes"]
-		self.es_connection = elasticsearch.Elasticsearch(cluster_nodes,
-			sniff_on_start=True, sniff_on_connection_fail=True, sniffer_timeout=5,
-			sniff_timeout=5)
+		self.es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True,
+			sniff_on_connection_fail=True, sniffer_timeout=5, sniff_timeout=5)
 		self.__set_logger()
 		self.batch_list = []
 
@@ -103,8 +105,8 @@ class ThreadConsumer(threading.Thread):
 			console_handler.setLevel(my_level)
 			console_handler.setFormatter(my_formatter)
 			my_logger.addHandler(console_handler)
-
 		my_logger.info("Log initialized.")
+
 
 	def run(self):
 		"""Run method for this Thread"""
@@ -136,12 +138,28 @@ class ThreadConsumer(threading.Thread):
 		"""You do nothing but log."""
 		logger = logging.getLogger("thread " + str(self.thread_id))
 		batch_string = ""
-		logger.info("Queue size " + str(len(self.batch_list)))
-		self.batch_list = []
-		#for i in range(self.params["batch_size"]):
-			#batch_string += self.batch_queue.get()
-			#logger.info(str(self.thread_id))
-			#logger.info(batch_string)
+		header = self.params["header"]
+		queue_size = len(self.batch_list)
+		logger.info("Queue size " + str(queue_size))
+
+		#Split the batch into cells built of keys and values, excluding blank values
+		params = self.params
+		docs, actions = [], []
+		while len(self.batch_list) > 0:
+			item_list = self.batch_list.pop(0).split("\t")
+			if len(header) == len(item_list):
+				d = {x: y for (x, y) in list(zip(header, item_list)) if y != ""}
+				docs.append(d)
+				action = {
+					"_index": params["elasticsearch"]["index"],
+					"_type": params["elasticsearch"]["type"],
+					"_id": d["factual_id"],
+					"_source": d,
+					"timestamp": datetime.now()
+				}
+				actions.append(action)
+		helpers.bulk(self.es_connection, actions)
+				#logger.info(cells)
 
 def start_consumers(params):
 	"""Starts our consumer threads"""
@@ -182,5 +200,5 @@ if __name__ == "__main__":
 	PARAMS["header"], PARAMS["document_queue"] = load_document_queue(PARAMS)
 	start_consumers(PARAMS)
 	PARAMS["document_queue"].join()
-	logging.warning(PARAMS["header"])
+	logging.critical("Complete.")
 
