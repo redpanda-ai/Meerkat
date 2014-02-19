@@ -1,8 +1,7 @@
 #!/usr/local/bin/python3
 # pylint: disable=C0301
 
-"""This script does stuff."""
-#import elasticsearch
+"""This bulk loader handles multiple threads."""
 import json
 import logging
 import queue
@@ -11,12 +10,8 @@ import threading
 
 from elasticsearch import Elasticsearch, helpers
 from datetime import datetime
-#import csv, datetime, json, logging, queue, sys, urllib, re
 
 from longtail.custom_exceptions import InvalidArguments, Misconfiguration
-#from longtail.description_consumer import DescriptionConsumer
-#from longtail.binary_classifier.bay import predict_if_physical_transaction
-
 def initialize():
 	"""Validates the command line arguments."""
 	input_file, params = None, None
@@ -61,9 +56,11 @@ def load_document_queue(params):
 	header = records.pop(0).split("\t")
 	for input_string in records:
 		document_queue.put(input_string)
+	#document_queue.task_done()
+	document_queue_populated = True
 
 	logging.warning("Document Queue has " + str(document_queue.qsize()) + " elements")
-	return header, document_queue
+	return header, document_queue, document_queue_populated
 
 class ThreadConsumer(threading.Thread):
 	"""Used for our consumer threads."""
@@ -73,6 +70,7 @@ class ThreadConsumer(threading.Thread):
 		self.thread_id = thread_id
 		self.params = params
 		self.document_queue = params["document_queue"]
+		self.params["concurrency_queue"].put(self.thread_id)
 		cluster_nodes = self.params["elasticsearch"]["cluster_nodes"]
 		self.es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True,
 			sniff_on_connection_fail=True, sniffer_timeout=5, sniff_timeout=5)
@@ -107,37 +105,40 @@ class ThreadConsumer(threading.Thread):
 			my_logger.addHandler(console_handler)
 		my_logger.info("Log initialized.")
 
-
 	def run(self):
-		"""Run method for this Thread"""
+		"""Eats from the document queue and bulk loads."""
+		my_logger = logging.getLogger("thread " + str(self.thread_id))
+		params, document_queue = self.params, self.document_queue
+		batch_list, concurrency_queue = self.batch_list, params["concurrency_queue"]
+		document_queue_populated = params["document_queue_populated"]
 		while True:
 			count = 0
-			#for i in range(self.params["batch_size"]):
-			finished = False
-			while ( (not finished) and (count < self.params["batch_size"]) ):
+			if document_queue_populated and document_queue.empty():
+				my_logger.info("Concurrency queue size: " + str(concurrency_queue.qsize()))
+				concurrency_queue.get()
+				concurrency_queue.task_done()
+				my_logger.info("Consumer finished.")
+				cq_size = concurrency_queue.qsize()
+				dq_size = document_queue.qsize()
+				my_logger.info("Concurrency queue size: " + str(cq_size))
+				my_logger.info("Document queue size: " + str(dq_size))
+				return
+			for i in range(params["batch_size"]):
 				try:
-					if not self.document_queue.empty():
-						self.batch_list.append(self.document_queue.get())
-						self.document_queue.task_done()
-						count = count + 1
-					elif not finished:
-						if len(self.batch_list) > 0:
-							self.__publish_batch()
-						#logging.warning("Finished #1.")
-						finished = True
+					batch_list.append(document_queue.get(block=False))
+					document_queue.task_done()
+					count = count + 1
 				except queue.Empty:
 					if count > 0:
+						my_logger.info("queue was empty")
 						self.__publish_batch()
-						logging.warning("Queue empty exception.")
-						finished = True
-			if ( (count > 0) and (not finished)):
+						count = 0
+			if count > 0:
 				self.__publish_batch()
-				count = 0
 
 	def __publish_batch(self):
 		"""You do nothing but log."""
 		logger = logging.getLogger("thread " + str(self.thread_id))
-		batch_string = ""
 		header = self.params["header"]
 		queue_size = len(self.batch_list)
 		logger.info("Queue size " + str(queue_size))
@@ -159,12 +160,19 @@ class ThreadConsumer(threading.Thread):
 				}
 				actions.append(action)
 		helpers.bulk(self.es_connection, actions)
-				#logger.info(cells)
+		logger.info("Done for " + str(queue_size))
 
 def start_consumers(params):
 	"""Starts our consumer threads"""
 	for i in range(params["concurrency"]):
 		c = ThreadConsumer(i,params)
+		c.setDaemon(True)
+		c.start()
+
+def start_producers(params):
+	"""Starts our producer threads"""
+	for i in range(1):
+		c = ThreadProducer(i,params)
 		c.setDaemon(True)
 		c.start()
 
@@ -197,8 +205,16 @@ if __name__ == "__main__":
 	#Runs the entire program.
 	PARAMS = initialize()
 	logging.warning(json.dumps(PARAMS, sort_keys=True, indent=4, separators=(',', ':')))
-	PARAMS["header"], PARAMS["document_queue"] = load_document_queue(PARAMS)
+	PARAMS["document_queue_populated"] = False
+	PARAMS["concurrency_queue"] = queue.Queue()
+	PARAMS["header"], PARAMS["document_queue"], PARAMS["document_queue_populated"] =\
+		load_document_queue(PARAMS)
+	#start_producers(PARAMS)
 	start_consumers(PARAMS)
+	PARAMS["concurrency_queue"].join()
+	logging.info("Concurrency joined")
 	PARAMS["document_queue"].join()
-	logging.critical("Complete.")
+	logging.info("Documents joined")
+
+	logging.critical("End of program.")
 
