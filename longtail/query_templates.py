@@ -106,6 +106,10 @@ def get_mapping_template(es_type_name, shards, replicas, column_meta\
 	# for more details. Note the quote:
 	# [geo_shape type] should be used when either the data being indexed OR THE QUERIES
 	# BEING EXECUTED contain shapes other than just points.
+	#
+	# my_properties["location"] = {}
+	# my_properties["location"]["type"] = "geo_shape"
+	# my_properties["location"]["precision"] = "1m"
 
 	#Add composite fields here.
 
