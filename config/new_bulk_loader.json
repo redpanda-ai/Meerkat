@@ -1,15 +1,15 @@
 {
-	"concurrency" : 2,
-	"batch_size" : 40,
+	"concurrency" : 20,
+	"batch_size" : 1000,
 	"input" : {
-		"filename" : "data/input/factual.tab.100",
+		"filename" : "data/input/factual.tab",
 		"encoding" : "utf-8"
 	},
 	"logging" : {
 		"level" : "info",
 		"path" : "logs/logs.log",
 		"formatter" : "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-		"console" : true
+		"console" : false
 	},
 	"elasticsearch" : {
 		"cluster_nodes" : ["brainstorm0:9200", "brainstorm1:9200", "brainstorm2:9200"

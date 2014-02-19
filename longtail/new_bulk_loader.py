@@ -114,14 +114,14 @@ class ThreadConsumer(threading.Thread):
 		while True:
 			count = 0
 			if document_queue_populated and document_queue.empty():
-				my_logger.info("Concurrency queue size: " + str(concurrency_queue.qsize()))
+				my_logger.info("Concurrency queue size: %i", concurrency_queue.qsize())
 				concurrency_queue.get()
 				concurrency_queue.task_done()
 				my_logger.info("Consumer finished.")
 				cq_size = concurrency_queue.qsize()
 				dq_size = document_queue.qsize()
-				my_logger.info("Concurrency queue size: " + str(cq_size))
-				my_logger.info("Document queue size: " + str(dq_size))
+				my_logger.info("Concurrency queue size: %i", cq_size)
+				my_logger.info("Document queue size: %i", dq_size)
 				return
 			for i in range(params["batch_size"]):
 				try:
@@ -138,10 +138,10 @@ class ThreadConsumer(threading.Thread):
 
 	def __publish_batch(self):
 		"""You do nothing but log."""
-		logger = logging.getLogger("thread " + str(self.thread_id))
+		my_logger = logging.getLogger("thread " + str(self.thread_id))
 		header = self.params["header"]
 		queue_size = len(self.batch_list)
-		logger.info("Queue size " + str(queue_size))
+		my_logger.debug("Queue size %i", queue_size)
 
 		#Split the batch into cells built of keys and values, excluding blank values
 		params = self.params
@@ -159,8 +159,15 @@ class ThreadConsumer(threading.Thread):
 					"timestamp": datetime.now()
 				}
 				actions.append(action)
-		helpers.bulk(self.es_connection, actions)
-		logger.info("Done for " + str(queue_size))
+		_, errors = helpers.bulk(self.es_connection, actions)
+		success, failure, total = 0, 0, 0
+		for item in errors:
+			if item["index"]["ok"]:
+				success += 1
+			else:
+				failure += 1
+			total += 1
+		my_logger.info("Success/Failure/Total: %i/%i/%i", success, failure, total)
 
 def start_consumers(params):
 	"""Starts our consumer threads"""
