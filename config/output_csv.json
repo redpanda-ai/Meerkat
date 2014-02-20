@@ -1,7 +1,7 @@
 {
     "concurrency" : 10,
     "input" : {
-        "filename" : "data/input/short_bank_transaction_descriptions.csv",
+        "filename" : "data/input/bank_transaction_descriptions.csv",
         "encoding" : "utf-8"
     },
     "logging" : {

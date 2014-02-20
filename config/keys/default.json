@@ -1,5 +1,5 @@
-{"es_result_size" : "15",
-"z_score_threshold" : "1.75",
-"business_name_boost" : "1.5",
-"address_boost" : "2.5",
-"phone_boost" : "1.2"}
+{"es_result_size" : "20",
+"z_score_threshold" : "2",
+"business_name_boost" : "1",
+"address_boost" : "1",
+"phone_boost" : "1"}
