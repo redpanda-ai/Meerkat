@@ -77,6 +77,8 @@ def test_accuracy(file_path):
 	results['precision'] = math.ceil((len(correct) / num_verified) * 100)
 	results['incorrect_binary'] = math.ceil((len(non_physical) / total) * 100)
 
+	print(len(correct))
+
 	return results		
 
 if __name__ == "__main__":
