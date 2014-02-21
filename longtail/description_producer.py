@@ -5,7 +5,7 @@
 description strings (unstructured data) to merchant data indexed with
 ElasticSearch (structured data)."""
 
-import csv, datetime, json, logging, queue, sys, urllib, re
+import csv, datetime, json, logging, queue, sys
 from longtail.custom_exceptions import InvalidArguments, Misconfiguration
 from longtail.description_consumer import DescriptionConsumer
 from longtail.binary_classifier.bay import predict_if_physical_transaction

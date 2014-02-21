@@ -106,8 +106,8 @@ def speed_tests(start_time, accuracy_results):
 	print("Time Per Transaction: " + str(time_per_transaction) + " seconds")
 	print("Transactions Per Minute: " + str(transactions_per_minute))
 
-	return {'time_delta':time_delta, 
-			'time_per_transaction': time_per_transaction, 
+	return {'time_delta':time_delta,
+			'time_per_transaction': time_per_transaction,
 			'transactions_per_minute':transactions_per_minute}
 
 def print_results(results):
