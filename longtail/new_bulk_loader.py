@@ -137,7 +137,7 @@ class ThreadConsumer(threading.Thread):
 				self.__publish_batch()
 
 	def __publish_batch(self):
-		"""You do nothing but log."""
+		"""Publishes a bulk index to ElasticSearch."""
 		my_logger = logging.getLogger("thread " + str(self.thread_id))
 		header = self.params["header"]
 		queue_size = len(self.batch_list)
@@ -150,6 +150,15 @@ class ThreadConsumer(threading.Thread):
 			item_list = self.batch_list.pop(0).split("\t")
 			if len(header) == len(item_list):
 				d = {x: y for (x, y) in list(zip(header, item_list)) if y != ""}
+				#merge latitude and longitude into a point
+				if "longitude" in d and "latitude" in d:
+					#my_logger.debug("Found lon and lat: %s %s", d["longitude"], d["latitude"])
+					d["pin"] = { "location": { "type": "point", "coordinates" : [\
+						d["longitude"], d["latitude"] ] } }
+					del d["longitude"]
+					del d["latitude"]
+					#my_logger.debug("New dict is: %s", str(d))
+					#sys.exit()
 				docs.append(d)
 				action = {
 					"_index": params["elasticsearch"]["index"],
@@ -176,13 +185,6 @@ def start_consumers(params):
 		c.setDaemon(True)
 		c.start()
 
-def start_producers(params):
-	"""Starts our producer threads"""
-	for i in range(1):
-		c = ThreadProducer(i,params)
-		c.setDaemon(True)
-		c.start()
-
 def validate_params(params):
 	"""Ensures that the correct parameters are supplied."""
 	mandatory_keys = ["elasticsearch", "concurrency", "input", "logging", "batch_size"]
@@ -194,6 +196,8 @@ def validate_params(params):
 		raise Misconfiguration(msg="Misconfiguration: 'concurrency' must be a positive integer", expr=None)
 
 	if "index" not in params["elasticsearch"]:
+		raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.index'", expr=None)
+	if "type_mapping" not in params["elasticsearch"]:
 		raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.index'", expr=None)
 	if "type" not in params["elasticsearch"]:
 		raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.type'", expr=None)
@@ -208,15 +212,37 @@ def validate_params(params):
 
 	return True
 
+def guarantee_index_and_doc_type(params):
+	"""Ensure that the index and document type mapping are as they should be"""
+	cluster_nodes = params["elasticsearch"]["cluster_nodes"]
+	es_index = params["elasticsearch"]["index"]
+	doc_type = params["elasticsearch"]["type"]
+	es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True,
+		sniff_on_connection_fail=True, sniffer_timeout=5, sniff_timeout=5)
+	if es_connection.indices.exists(index=es_index):
+		logging.critical("Index exists, continuing")
+		if es_connection.indices.exists_type(index=es_index,doc_type=doc_type):
+			logging.critical("Doc type exists, continuing")
+	else:
+		logging.warning("Index does not exist, creating")
+		index_body = params["elasticsearch"]["type_mapping"]
+		result = es_connection.indices.create(index=es_index,body=index_body)
+		ok, acknowledged = result["ok"], result["acknowledged"]
+		if ok and acknowledged:
+			logging.critical("Index created successfully.")
+		else:
+			logging.error("Failed to create index, aborting.")
+			sys.exit()
+
 if __name__ == "__main__":
 	#Runs the entire program.
 	PARAMS = initialize()
 	logging.warning(json.dumps(PARAMS, sort_keys=True, indent=4, separators=(',', ':')))
+	guarantee_index_and_doc_type(PARAMS)
 	PARAMS["document_queue_populated"] = False
 	PARAMS["concurrency_queue"] = queue.Queue()
 	PARAMS["header"], PARAMS["document_queue"], PARAMS["document_queue_populated"] =\
 		load_document_queue(PARAMS)
-	#start_producers(PARAMS)
 	start_consumers(PARAMS)
 	PARAMS["concurrency_queue"].join()
 	logging.info("Concurrency joined")
