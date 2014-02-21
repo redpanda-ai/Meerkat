@@ -89,7 +89,7 @@ def test_accuracy(file_path=None, non_physical_trans=None, result_list=None):
 	results['total_recall'] = math.ceil((num_labeled / results['total_processed']) * 100)
 	results['total_recall_non_physical'] = math.ceil((num_labeled / total) * 100)
 	results['precision'] = math.ceil((num_correct / num_verified) * 100)
-	results['incorrect_binary'] = math.ceil((len(non_physical) / total) * 100)
+	results['binary_accuracy'] = 100 - math.ceil((len(non_physical) / total) * 100)
 
 	return results
 
@@ -106,6 +106,10 @@ def speed_tests(start_time, accuracy_results):
 	print("Time Per Transaction: " + str(time_per_transaction) + " seconds")
 	print("Transactions Per Minute: " + str(transactions_per_minute))
 
+	return {'time_delta':time_delta, 
+			'time_per_transaction': time_per_transaction, 
+			'transactions_per_minute':transactions_per_minute}
+
 def print_results(results):
 	"""Provide useful readable output"""
 
@@ -115,7 +119,7 @@ def print_results(results):
 	print("Total Transactions Processed = " + str(results['total_processed']))
 	print("Total Labeled Physical = " + str(results['total_physical']) + "%")
 	print("Total Labeled Non Physical = " + str(results['total_non_physical']) + "%")
-	print("Binary Classifier Accuracy = " + str(100 - results['incorrect_binary']) + "%", "\n")
+	print("Binary Classifier Accuracy = " + str(100 - results['binary_accuracy']) + "%", "\n")
 	print("Recall of all transactions = " + str(results['total_recall']) + "%")
 	print("Recall of transactions labeled non physical = " + str(results['total_recall_non_physical']) + "%")
 	print("Number of transactions verified = " + str(results['num_verified']))
