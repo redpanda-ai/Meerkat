@@ -87,11 +87,19 @@ def tokenize(params, desc_queue, parameter_key, non_physical):
 		logging.critical("Not configured for file output.")
 
 	# Test Accuracy
-	print_results(test_accuracy(result_list=result_list))
+	accuracy_results = test_accuracy(result_list=result_list, non_physical_trans=non_physical)
+	print_results(accuracy_results)
 
 	# Do Speed Tests
 	time_delta = datetime.datetime.now() - start_time
+	time_per_transaction = time_delta.seconds / accuracy_results['total_processed']
+	transactions_per_minute = (accuracy_results['total_processed'] / time_delta.seconds) * 60
+
+	print("")
+	logging.critical("SPEED TESTS:")
 	logging.critical("Total Time Taken: " + str(time_delta))
+	logging.critical("Time Per Transaction: " + str(time_per_transaction) + " seconds")
+	logging.critical("Transactions Per Minute: " + str(transactions_per_minute))
 
 def queue_to_list(result_queue):
 	"""Converts queue to list"""
