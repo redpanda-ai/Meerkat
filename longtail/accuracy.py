@@ -4,14 +4,22 @@
 
 """This script tests the current accuracy of our labeling tool"""
 
-import csv, sys, math
+import csv, sys, math, logging
 
-def test_accuracy(file_path):
-	"""Docstring to be determined."""
+def test_accuracy(file_path=None, non_physical=None, result_list=None):
+	"""Takes file by default but can accept result
+	queue/ non_physical list. Attempts to provide various
+	accuracy tests"""
 
+	if result_list is not None:
+		machine_labeled = result_list
+	elif file_path is not None:
+		ML_file = open(file_path)
+		machine_labeled = list(csv.DictReader(ML_file))
+	else:
+		logging.warning("Nothing provided to perform accuracy tests on")
+		
 	HL_file = open("data/misc/verifiedLabeledTrans.csv")
-	ML_file = open(file_path)
-	machine_labeled = list(csv.DictReader(ML_file))
 	human_labeled = list(csv.DictReader(HL_file))
 
 	needs_hand_labeling = []
@@ -40,7 +48,7 @@ def test_accuracy(file_path):
 					break
 				elif mlRow['PERSISTENTRECORDID'] == hlRow['PERSISTENTRECORDID']:
 					# Transaction was correctly labeled
-					correct.append(hlRow)
+					correct.append(hlRow['DESCRIPTION'] + " (ACTUAL:" + hlRow['PERSISTENTRECORDID'] + ")")
 					break
 				elif hlRow['IS_PHYSICAL_TRANSACTION'] == '0':
 					# Transaction is non physical
@@ -48,7 +56,7 @@ def test_accuracy(file_path):
 					break
 				else:
 					# Transaction is mislabeled
-					mislabeled.append(hlRow['DESCRIPTION'] + " - " + hlRow['PERSISTENTRECORDID'])
+					mislabeled.append(hlRow['DESCRIPTION'] + " (ACTUAL:" + hlRow['PERSISTENTRECORDID'] + ")")
 					break
 			elif index + 1 == len(human_labeled):
 				needs_hand_labeling.append(mlRow['DESCRIPTION'])
@@ -77,17 +85,18 @@ def test_accuracy(file_path):
 	results['precision'] = math.ceil((len(correct) / num_verified) * 100)
 	results['incorrect_binary'] = math.ceil((len(non_physical) / total) * 100)
 
-	print(len(correct))
+	return results
 
-	return results		
+def print_results(results):
+	
+	#print("", "CORRECT:", '\n'.join(results['correct']), sep="\n")	
+	print("\n", "STATS:")
+	print("Recall = " + str(results['recall']) + "%")
+	print("Precision = " + str(results['precision']) + "%")
+	print("Binary Classifier Accuracy = " + str(100 - results['incorrect_binary']) + "%")
+	print("", "MISLABELED:", '\n'.join(results['mislabeled']), sep="\n")	
 
 if __name__ == "__main__":
 
 	file_path = sys.argv[1] if len(sys.argv) > 1 else "data/output/longtailLabeled.csv"
-	results = test_accuracy(file_path)
-
-	print("STATS:")
-	print("Recall = " + str(results['recall']) + "%")
-	print("Precision = " + str(results['precision']) + "%")
-	print("Binary Classifier Accuracy = " + str(100 - results['incorrect_binary']) + "%")
-	print("", "MISLABELED:", '\n'.join(results['mislabeled']), sep="\n")
+	print_results(test_accuracy(file_path))

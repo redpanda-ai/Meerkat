@@ -9,12 +9,14 @@ import csv, datetime, json, logging, queue, sys, urllib, re
 from longtail.custom_exceptions import InvalidArguments, Misconfiguration
 from longtail.description_consumer import DescriptionConsumer
 from longtail.binary_classifier.bay import predict_if_physical_transaction
+from longtail.accuracy import test_accuracy, print_results
 
 def get_desc_queue(params):
 	"""Opens a file of descriptions, one per line, and load a description
 	queue."""
 
 	lines, filename, encoding = None, None, None
+	non_physical = []
 	desc_queue = queue.Queue()
 
 	try:
@@ -34,9 +36,10 @@ def get_desc_queue(params):
 		if prediction == "1":
 			desc_queue.put(input_string)
 		elif prediction == "0":
+			non_physical.append(input_string)
 			logging.info("NON-PHYSICAL: " + input_string)
 
-	return desc_queue
+	return desc_queue, non_physical
 
 def initialize():
 	"""Validates the command line arguments."""
@@ -60,7 +63,7 @@ def initialize():
 		logging.warning("Parameters are valid, proceeding.")
 	return params
 
-def tokenize(params, desc_queue, parameter_key):
+def tokenize(params, desc_queue, parameter_key, non_physical):
 	"""Opens a number of threads to process the descriptions queue."""
 	consumer_threads = 1
 	result_queue = queue.Queue()
@@ -72,31 +75,44 @@ def tokenize(params, desc_queue, parameter_key):
 		new_consumer.setDaemon(True)
 		new_consumer.start()
 	desc_queue.join()
-	#Writing to an output file, if necessary.
+
+	# Convert queue to list
+	result_list = queue_to_list(result_queue)
+
+	# Writing to an output file, if necessary.
 	if "file" in params["output"] and "format" in params["output"]["file"]\
 	and params["output"]["file"]["format"] in ["csv", "json"]:
-		write_output_to_file(params, result_queue)
+		write_output_to_file(params, result_list)
 	else:
 		logging.critical("Not configured for file output.")
+
+	# Test Accuracy
+	print_results(test_accuracy(result_list=result_list))
+
+	# Do Speed Tests
 	time_delta = datetime.datetime.now() - start_time
 	logging.critical("Total Time Taken: " + str(time_delta))
 
-def write_output_to_file(params, result_queue):
-	"""Outputs results to a file"""
-	output_list = []
+def queue_to_list(result_queue):
+	"""Converts queue to list"""
+	result_list = []
 	while result_queue.qsize() > 0:
 		try:
-			output_list.append(result_queue.get())
+			result_list.append(result_queue.get())
 			result_queue.task_done()
 
 		except queue.Empty:
 			break
+	result_queue.join()
+	return result_list
+
+def write_output_to_file(params, output_list):
+	"""Outputs results to a file"""
 
 	if len(output_list) < 1:
 		logging.warning("No results available to write")
 		return
 
-	result_queue.join()
 	file_name = params["output"]["file"].get("path", '../data/output/longtailLabeled.csv')
 	file_format = params["output"]["file"].get("format", 'csv')
 
@@ -164,5 +180,5 @@ if __name__ == "__main__":
 	#Runs the entire program.
 	PARAMS = initialize()
 	KEY = load_parameter_key(PARAMS)
-	DESC_QUEUE = get_desc_queue(PARAMS)
-	tokenize(PARAMS, DESC_QUEUE, KEY)
+	DESC_QUEUE, NON_PHYSICAL = get_desc_queue(PARAMS)
+	tokenize(PARAMS, DESC_QUEUE, KEY, NON_PHYSICAL)

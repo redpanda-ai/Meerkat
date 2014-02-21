@@ -7,5 +7,5 @@ from longtail.description_producer import initialize, get_desc_queue\
 #Runs the entire program.
 PARAMS = initialize()
 KEY = load_parameter_key(PARAMS)
-DESC_QUEUE = get_desc_queue(PARAMS)
-tokenize(PARAMS, DESC_QUEUE, KEY)
+DESC_QUEUE, NON_PHYSICAL = get_desc_queue(PARAMS)
+tokenize(PARAMS, DESC_QUEUE, KEY, NON_PHYSICAL)

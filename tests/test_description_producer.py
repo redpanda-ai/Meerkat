@@ -56,12 +56,12 @@ class TokenizeDescriptionTests(unittest.TestCase):
 
 	def test_get_desc_queue_returns_queue(self):
 		"""Ensure returns an instance of Queue"""
-		my_queue = description_producer.get_desc_queue(self.params)
+		my_queue, non_physical = description_producer.get_desc_queue(self.params)
 		self.assertTrue(isinstance(my_queue, queue.Queue))
 
 	def test_get_desc_queue_is_not_empty(self):
 		"""Ensure queue is not empty"""
-		my_queue = description_producer.get_desc_queue(self.params)
+		my_queue, non_physical = description_producer.get_desc_queue(self.params)
 		self.assertFalse(my_queue.empty())
 
 	def test_initialize_no_file_name(self):
