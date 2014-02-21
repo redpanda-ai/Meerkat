@@ -20,7 +20,7 @@ class DescriptionConsumerTests(unittest.TestCase):
 		"encoding" : "utf-8"
 	},
 	"logging" : {
-		"level" : "warning", "path" : "logs/foo.log", "console" : true,
+		"level" : "warning", "path" : "logs/foo.log", "console" : false,
 		"formatter" : "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 	},
 	"output" : {

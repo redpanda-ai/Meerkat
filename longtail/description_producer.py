@@ -9,7 +9,7 @@ import csv, datetime, json, logging, queue, sys, urllib, re
 from longtail.custom_exceptions import InvalidArguments, Misconfiguration
 from longtail.description_consumer import DescriptionConsumer
 from longtail.binary_classifier.bay import predict_if_physical_transaction
-from longtail.accuracy import test_accuracy, print_results
+from longtail.accuracy import test_accuracy, print_results, speed_tests
 
 def get_desc_queue(params):
 	"""Opens a file of descriptions, one per line, and load a description
@@ -60,7 +60,8 @@ def initialize():
 	params["search_cache"] = {}
 
 	if validate_params(params):
-		logging.warning("Parameters are valid, proceeding.")
+		logging.info("Parameters are valid, proceeding.")
+
 	return params
 
 def tokenize(params, desc_queue, parameter_key, non_physical):
@@ -91,15 +92,7 @@ def tokenize(params, desc_queue, parameter_key, non_physical):
 	print_results(accuracy_results)
 
 	# Do Speed Tests
-	time_delta = datetime.datetime.now() - start_time
-	time_per_transaction = time_delta.seconds / accuracy_results['total_processed']
-	transactions_per_minute = (accuracy_results['total_processed'] / time_delta.seconds) * 60
-
-	print("")
-	logging.critical("SPEED TESTS:")
-	logging.critical("Total Time Taken: " + str(time_delta))
-	logging.critical("Time Per Transaction: " + str(time_per_transaction) + " seconds")
-	logging.critical("Transactions Per Minute: " + str(transactions_per_minute))
+	speed_tests(start_time, accuracy_results)
 
 def queue_to_list(result_queue):
 	"""Converts queue to list"""
@@ -116,6 +109,9 @@ def queue_to_list(result_queue):
 
 def write_output_to_file(params, output_list):
 	"""Outputs results to a file"""
+
+	if type(output_list) is queue.Queue:
+		output_list = queue_to_list(output_list)
 
 	if len(output_list) < 1:
 		logging.warning("No results available to write")

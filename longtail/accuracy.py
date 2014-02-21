@@ -4,7 +4,7 @@
 
 """This script tests the current accuracy of our labeling tool"""
 
-import csv, sys, math, logging
+import csv, sys, math, logging, datetime
 
 def test_accuracy(file_path=None, non_physical_trans=None, result_list=None):
 	"""Takes file by default but can accept result
@@ -18,18 +18,18 @@ def test_accuracy(file_path=None, non_physical_trans=None, result_list=None):
 		machine_labeled = list(csv.DictReader(ML_file))
 	else:
 		logging.warning("Nothing provided to perform accuracy tests on")
-		
+
 	HL_file = open("data/misc/verifiedLabeledTrans.csv")
 	human_labeled = list(csv.DictReader(HL_file))
+	HL_file.close()
 
+	non_physical_trans = non_physical_trans or []
 	needs_hand_labeling = []
 	non_physical = []
 	mislabeled = []
 	unlabeled = []
-
-	total = len(machine_labeled)
 	correct = []
-	num_found = 0
+	total = len(machine_labeled)
 
 	# Test Recall / Precision
 	for mlRow in machine_labeled:
@@ -62,7 +62,7 @@ def test_accuracy(file_path=None, non_physical_trans=None, result_list=None):
 				needs_hand_labeling.append(mlRow['DESCRIPTION'])
 
 	# Test Binary
-	for i, item in enumerate(unlabeled):
+	for item in unlabeled:
 		for index, hlRow in enumerate(human_labeled):
 			if item == hlRow['DESCRIPTION']:
 				if hlRow['IS_PHYSICAL_TRANSACTION'] == '0':
@@ -70,14 +70,15 @@ def test_accuracy(file_path=None, non_physical_trans=None, result_list=None):
 					non_physical.append(item)
 					break
 
+	# Collect results into dict for easier access
 	num_labeled = total - len(unlabeled)
 	num_verified = num_labeled - len(needs_hand_labeling)
 	num_verified = num_verified if num_verified > 0 else 1
 	num_correct = len(correct)
 
 	results = {}
-	results['total_processed'] = len(result_list) + len(non_physical_trans)
-	results['total_physical'] = math.ceil((len(result_list) / results['total_processed']) * 100)
+	results['total_processed'] = len(machine_labeled) + len(non_physical_trans)
+	results['total_physical'] = math.ceil((len(machine_labeled) / results['total_processed']) * 100)
 	results['total_non_physical'] = math.ceil((len(non_physical_trans) / results['total_processed']) * 100)
 	results['correct'] = correct
 	results['needs_hand_labeling'] = needs_hand_labeling
@@ -92,10 +93,25 @@ def test_accuracy(file_path=None, non_physical_trans=None, result_list=None):
 
 	return results
 
+def speed_tests(start_time, accuracy_results):
+	"""Run a number of tests related to speed"""
+
+	time_delta = datetime.datetime.now() - start_time
+	time_per_transaction = time_delta.seconds / accuracy_results['total_processed']
+	transactions_per_minute = (accuracy_results['total_processed'] / time_delta.seconds) * 60
+
+	print("")
+	print("SPEED TESTS:")
+	print("Total Time Taken: " + str(time_delta))
+	print("Time Per Transaction: " + str(time_per_transaction) + " seconds")
+	print("Transactions Per Minute: " + str(transactions_per_minute))
+
 def print_results(results):
-	
-	#print("", "CORRECT:", '\n'.join(results['correct']), sep="\n")	
-	print("\n", "STATS:")
+	"""Provide useful readable output"""
+
+	#print("", "CORRECT:", '\n'.join(results['correct']), sep="\n")
+	print("")
+	print("STATS:")
 	print("Total Transactions Processed = " + str(results['total_processed']))
 	print("Total Labeled Physical = " + str(results['total_physical']) + "%")
 	print("Total Labeled Non Physical = " + str(results['total_non_physical']) + "%")
@@ -104,9 +120,9 @@ def print_results(results):
 	print("Recall of transactions labeled non physical = " + str(results['total_recall_non_physical']) + "%")
 	print("Number of transactions verified = " + str(results['num_verified']))
 	print("Precision = " + str(results['precision']) + "%")
-	print("", "MISLABELED:", '\n'.join(results['mislabeled']), sep="\n")	
+	print("", "MISLABELED:", '\n'.join(results['mislabeled']), sep="\n")
 
 if __name__ == "__main__":
 
-	file_path = sys.argv[1] if len(sys.argv) > 1 else "data/output/longtailLabeled.csv"
-	print_results(test_accuracy(file_path))
+	output_path = sys.argv[1] if len(sys.argv) > 1 else "data/output/longtailLabeled.csv"
+	print_results(test_accuracy(file_path=output_path))

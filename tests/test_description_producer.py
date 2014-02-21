@@ -17,7 +17,7 @@ class TokenizeDescriptionTests(unittest.TestCase):
 				"encoding" : "utf-8"
 			},
 			"logging" : {
-				"level" : "warning",
+				"level" : "critical",
 				"path" : "logs/foo.log",
 				"formatter" : "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 				"console" : true
