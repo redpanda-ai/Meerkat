@@ -1,5 +1,12 @@
 {"es_result_size" : "30",
+<<<<<<< HEAD
 "z_score_threshold" : "1.5",
 "business_name_boost" : "1",
 "address_boost" : "1",
 "phone_boost" : "1"}
+=======
+"z_score_threshold" : "1.55",
+"business_name_boost" : "1",
+"address_boost" : "1",
+"phone_boost" : "1"}
+>>>>>>> master

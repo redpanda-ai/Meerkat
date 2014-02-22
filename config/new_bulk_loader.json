@@ -1,0 +1,61 @@
+{
+	"concurrency" : 20,
+	"batch_size" : 1000,
+	"input" : {
+		"filename" : "data/input/factual.tab",
+		"encoding" : "utf-8"
+	},
+	"logging" : {
+		"level" : "info",
+		"path" : "logs/logs.log",
+		"formatter" : "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+		"console" : false
+	},
+	"elasticsearch" : {
+		"cluster_nodes" : ["brainstorm0:9200", "brainstorm1:9200", "brainstorm2:9200"
+		, "brainstorm3:9200", "brainstorm4:9200", "brainstorm5:9200", "brainstorm6:9200"
+		, "brainstorm7:9200", "brainstorm8:9200", "brainstorm9:9200", "brainstorma:9200"
+		, "brainstormb:9200"],
+		"index" : "factual_index",
+		"type" : "factual_type",
+		"type_mapping": {
+			"mappings": {
+				"factual_type": {
+					"_source": {
+						"enabled": true
+					},
+					"properties": {
+						"factual_id": { "index": "analyzed", "type": "string" },
+						"name": { "index": "analyzed", "type": "string" },
+						"address": { "index": "analyzed", "type": "string" },
+						"address_extended": { "index": "analyzed", "type": "string" },
+						"po_box": { "index": "analyzed", "type": "string" },
+						"locality": { "index": "analyzed", "type": "string" },
+						"region": { "index": "analyzed", "type": "string" },
+						"post_town": { "index": "analyzed", "type": "string" },
+						"admin_region": { "index": "analyzed", "type": "string" },
+						"postcode": { "index": "analyzed", "type": "string" },
+						"country": { "index": "analyzed", "type": "string" },
+						"tel": { "index": "analyzed", "type": "string" },
+						"fax": { "index": "analyzed", "type": "string" },
+						"neighborhood": { "index": "analyzed", "type": "string" },
+						"website": { "index": "analyzed", "type": "string" },
+						"email": { "index": "analyzed", "type": "string" },
+						"category_ids": { "index": "analyzed", "type": "string" },
+						"category_labels": { "index": "analyzed", "type": "string" },
+						"status": { "index": "analyzed", "type": "string" },
+						"chain_name": { "index": "analyzed", "type": "string" },
+						"chain_id": { "index": "analyzed", "type": "string" },
+						"pin": { "properties": { "location": {
+							"type": "geo_shape", "tree": "quadtree", "precision": "1m"
+						} } }
+					}
+				}
+			},
+			"settings": {
+				"number_of_replicas": 1,
+				"number_of_shards": 12
+			}
+		}
+	}
+}
