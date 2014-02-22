@@ -119,7 +119,7 @@ def print_results(results):
 	print("Total Transactions Processed = " + str(results['total_processed']))
 	print("Total Labeled Physical = " + str(results['total_physical']) + "%")
 	print("Total Labeled Non Physical = " + str(results['total_non_physical']) + "%")
-	print("Binary Classifier Accuracy = " + str(100 - results['binary_accuracy']) + "%", "\n")
+	print("Binary Classifier Accuracy = " + str(results['binary_accuracy']) + "%", "\n")
 	print("Recall of all transactions = " + str(results['total_recall']) + "%")
 	print("Recall of transactions labeled physical = " + str(results['total_recall_non_physical']) + "%")
 	print("Number of transactions verified = " + str(results['num_verified']))
