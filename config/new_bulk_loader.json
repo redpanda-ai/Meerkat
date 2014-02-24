@@ -46,7 +46,8 @@
 		"composite_fields" : [
 			{
 				"address" : {
-					"components" : [ "address", "address_extended", "locality", "region", "postcode", "country" ],
+					"components" : [ "address", "address_extended", "locality", "region",
+						"postcode", "country" ],
 					"format" : "{0} {1} {2}, {3} {4}, {5}",
 					"index" : "analyzed",
 					"type" : "string"
