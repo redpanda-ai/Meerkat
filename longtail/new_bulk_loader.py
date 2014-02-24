@@ -111,14 +111,14 @@ class ThreadConsumer(threading.Thread):
 		while True:
 			count = 0
 			if document_queue_populated and document_queue.empty():
-				my_logger.info("Concurrency queue size: %i", concurrency_queue.qsize())
 				concurrency_queue.get()
 				concurrency_queue.task_done()
-				my_logger.info("Consumer finished.")
+				#my_logger.info("Consumer finished.")
 				concurrency_qsize = concurrency_queue.qsize()
-				document_qsize = document_queue.qsize()
-				my_logger.info("Concurrency queue size: %i", concurrency_qsize)
-				my_logger.info("Document queue size: %i", document_qsize)
+				#document_qsize = document_queue.qsize()
+				my_logger.info("Consumer finished, concurrency queue size: %i", concurrency_queue.qsize())
+				#my_logger.info("Concurrency queue size: %i", concurrency_qsize)
+				#my_logger.info("Document queue size: %i", document_qsize)
 				return
 			for i in range(params["batch_size"]):
 				try:
@@ -243,13 +243,37 @@ def validate_params(params):
 					key + "' feature.", expr=None)
 	#Ensure that "boost_labels" and "boost_vectors" row vectors have the same cardinality
 	label_length = len(params["elasticsearch"]["boost_labels"])
-	for key in params["elasticsearch"]["boost_vectors"]:
-		if len(params["elasticsearch"]["boost_vectors"][key]) != label_length:
+	boost_vectors = params["elasticsearch"]["boost_vectors"]
+	for key in boost_vectors:
+		if len(boost_vectors[key]) != label_length:
 			raise Misconfiguration(msg="Row vector 'elasticsearch.boost_vectors." + key +\
 			"' should have exactly " + str(label_length) + " values.", expr=None)
-	#TODO Ensure that "boost_vectors" has exactly the same keys found
-	#in type_mapping.mappings.x.properties
-	#sys.exit()
+
+	#Ensure that "boost_vectors" is a subset of your mapping properties
+	add_composite_type_mappings(params)
+	my_props = params["elasticsearch"]["type_mapping"]["mappings"][my_type]["properties"]
+	missing_keys = dict.fromkeys(boost_vectors.keys() - my_props, "")
+	found_keys = []
+	for key in missing_keys:
+		key_expand = key.replace(".",".properties.")
+		key_split = key_expand.split(".")
+		my_dict, key_count, key_total = my_props, 0, len(key_split)
+		for second_key in key_split:
+			if second_key in my_dict:
+				my_dict = my_dict[second_key]
+			else:
+				raise Misconfiguration(msg="The following boost_vector key is missing from the type mapping: "\
+				+ str(key) , expr=None)
+			key_count += 1
+			if key_count == key_total:
+				logging.warning("key: '" + key + "' was found.")
+				found_keys.append(key)
+	for key in found_keys:
+		del missing_keys[key]
+
+	if missing_keys:
+		raise Misconfiguration(msg="The following boost_vector keys are missing from the type mapping: "\
+		+ str(missing_keys) , expr=None)
 	return True
 
 def add_composite_type_mappings(params):
@@ -283,7 +307,7 @@ def guarantee_index_and_doc_type(params):
 	else:
 		logging.warning("Index does not exist, creating")
 		index_body = params["elasticsearch"]["type_mapping"]
-		add_composite_type_mappings(params)
+		#add_composite_type_mappings(params)
 		result = es_connection.indices.create(index=es_index,body=index_body)
 		ok, acknowledged = result["ok"], result["acknowledged"]
 		if ok and acknowledged:

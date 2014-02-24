@@ -20,8 +20,7 @@
 		"type" : "factual_type",
 		"boost_labels" : [ "query_string", "composite.address" ],
 		"boost_vectors" : {
-			"composite.address" : [ 0.0, 3.0 ],
-			"factual_id" :        [ 1.0, 0.0 ],
+			"factual_id" :        [ 0.0, 0.0 ],
 			"name" :              [ 1.0, 0.0 ],
 			"address" :           [ 1.0, 0.0 ],
 			"address_extended" :  [ 1.0, 0.0 ],
@@ -30,7 +29,7 @@
 			"region" :            [ 1.0, 0.0 ],
 			"post_town" :         [ 1.0, 0.0 ],
 			"admin_region" :      [ 1.0, 0.0 ],
-			"post_code" :         [ 1.0, 0.0 ],
+			"postcode" :          [ 1.0, 0.0 ],
 			"country" :           [ 1.0, 0.0 ],
 			"tel" :               [ 1.0, 0.0 ],
 			"fax" :               [ 1.0, 0.0 ],
@@ -40,8 +39,9 @@
 			"category_labels" :   [ 1.0, 0.0 ],
 			"status" :            [ 1.0, 0.0 ],
 			"chain_name" :        [ 1.0, 0.0 ],
-			"chain_id" :          [ 1.0, 0.0 ],
-			"pin.location" :      [ 0.0, 0.0 ]
+			"chain_id2" :          [ 1.0, 0.0 ],
+			"pin.location" :      [ 0.0, 0.0 ],
+			"composite.address" : [ 0.0, 3.0 ]
 		},
 		"composite_fields" : [
 			{
