@@ -99,19 +99,7 @@ def get_mapping_template(es_type_name, shards, replicas, column_meta\
 	my_properties["pin"]["properties"] = {}
 	my_properties["pin"]["properties"]["location"] = {}
 	my_properties["pin"]["properties"]["location"]["type"] = "geo_point"
-	
-	# NOTE FOR ANDY: As counterintuitive as it seems, I believe mapping for our points
-	# should be geo_shape even though the actual points mapped are of type point. See: 
-	# http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/mapping-geo-shape-type.html
-	# for more details. Note the quote:
-	# [geo_shape type] should be used when either the data being indexed OR THE QUERIES
-	# BEING EXECUTED contain shapes other than just points.
-	#
-	# my_properties["location"] = {}
-	# my_properties["location"]["type"] = "geo_shape"
-	# my_properties["location"]["precision"] = "1m"
-
-	#Add composite fields here.
+	#TODO: Add composite fields here.
 
 	return map_object
 

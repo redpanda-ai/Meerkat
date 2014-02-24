@@ -3,7 +3,12 @@
 
 """This script scans, tokenizes, and constructs queries to match transaction
 description strings (unstructured data) to merchant data indexed with
-ElasticSearch (structured data)."""
+ElasticSearch (structured data).
+
+@author: J. Andrew Key
+@author: Matthew Sevrens
+
+"""
 
 import csv, datetime, json, logging, queue, sys
 from longtail.custom_exceptions import InvalidArguments, Misconfiguration
@@ -25,9 +30,9 @@ def get_desc_queue(params):
 		with open(filename, 'r', encoding=encoding) as inputfile:
 			lines = inputfile.read()
 	except IOError:
-		msg = "Invalid ['input']['filename'] key; Input file: " + filename \
-		+ " cannot be found. Correct your config file."
-		logging.critical(msg)
+		logging.critical("Invalid ['input']['filename'] key; Input file: %s"
+			" cannot be found. Correct your config file.", filename)
+
 		sys.exit()
 
 	# Run Binary Classifier
@@ -37,7 +42,7 @@ def get_desc_queue(params):
 			desc_queue.put(input_string)
 		elif prediction == "0":
 			non_physical.append(input_string)
-			logging.info("NON-PHYSICAL: " + input_string)
+			logging.info("NON-PHYSICAL: %s", input_string)
 
 	return desc_queue, non_physical
 
@@ -54,7 +59,7 @@ def initialize():
 		params = json.loads(input_file.read())
 		input_file.close()
 	except IOError:
-		logging.error(sys.argv[1] + " not found, aborting.")
+		logging.error("%s not found, aborting.", sys.argv[1])
 		sys.exit()
 
 	params["search_cache"] = {}
@@ -63,6 +68,31 @@ def initialize():
 		logging.info("Parameters are valid, proceeding.")
 
 	return params
+
+def load_parameter_key(params):
+	"""Attempts to load parameter key"""
+	parameter_key = None
+	try:
+		input_file = open(params["input"]["parameter_key"], encoding='utf-8')
+		parameter_key = json.loads(input_file.read())
+		input_file.close()
+	except IOError:
+		logging.error("%s not found, aborting.", params["input"]["parameter_key"])
+		sys.exit()
+	return parameter_key
+
+def queue_to_list(result_queue):
+	"""Converts queue to list"""
+	result_list = []
+	while result_queue.qsize() > 0:
+		try:
+			result_list.append(result_queue.get())
+			result_queue.task_done()
+
+		except queue.Empty:
+			break
+	result_queue.join()
+	return result_list
 
 def tokenize(params, desc_queue, parameter_key, non_physical):
 	"""Opens a number of threads to process the descriptions queue."""
@@ -94,18 +124,38 @@ def tokenize(params, desc_queue, parameter_key, non_physical):
 	# Do Speed Tests
 	speed_tests(start_time, accuracy_results)
 
-def queue_to_list(result_queue):
-	"""Converts queue to list"""
-	result_list = []
-	while result_queue.qsize() > 0:
-		try:
-			result_list.append(result_queue.get())
-			result_queue.task_done()
+def usage():
+	"""Shows the user which parameters to send into the program."""
+	result = "Usage:\n\t<path_to_json_format_config_file>"
+	logging.error(result)
+	return result
 
-		except queue.Empty:
-			break
-	result_queue.join()
-	return result_list
+def validate_params(params):
+	"""Ensures that the correct parameters are supplied."""
+	mandatory_keys = ["elasticsearch", "concurrency", "input", "logging"]
+	for key in mandatory_keys:
+		if key not in params:
+			raise Misconfiguration(msg="Misconfiguration: missing key, '" + key + "'", expr=None)
+
+	if params["concurrency"] <= 0:
+		raise Misconfiguration(msg="Misconfiguration: 'concurrency' must be a positive integer", expr=None)
+
+	if "parameter_key" not in params["input"]:
+		params["input"]["parameter_key"] = "config/keys/default.json"
+
+	if "index" not in params["elasticsearch"]:
+		raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.index'", expr=None)
+	if "type" not in params["elasticsearch"]:
+		raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.type'", expr=None)
+	if "cluster_nodes" not in params["elasticsearch"]:
+		raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.cluster_nodes'", expr=None)
+	if "path" not in params["logging"]:
+		raise Misconfiguration(msg="Misconfiguration: missing key, 'logging.path'", expr=None)
+	if "filename" not in params["input"]:
+		raise Misconfiguration(msg="Misconfiguration: missing key, 'input.filename'", expr=None)
+	if "encoding" not in params["input"]:
+		raise Misconfiguration(msg="Misconfiguration: missing key, 'input.encoding'", expr=None)
+	return True
 
 def write_output_to_file(params, output_list):
 	"""Outputs results to a file"""
@@ -133,52 +183,6 @@ def write_output_to_file(params, output_list):
 	if file_format == "json":
 		with open(file_name, 'w') as outfile:
 			json.dump(output_list, outfile)
-
-def validate_params(params):
-	"""Ensures that the correct parameters are supplied."""
-	mandatory_keys = ["elasticsearch", "concurrency", "input", "logging"]
-	for key in mandatory_keys:
-		if key not in params:
-			raise Misconfiguration(msg="Misconfiguration: missing key, '" + key + "'", expr=None)
-
-	if params["concurrency"] <= 0:
-		raise Misconfiguration(msg="Misconfiguration: 'concurrency' must be a positive integer", expr=None)
-
-	if "parameter_key" not in params["input"]:
-		params["input"]["parameter_key"] = "config/keys/default.json"
-
-	if "index" not in params["elasticsearch"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.index'", expr=None)
-	if "type" not in params["elasticsearch"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.type'", expr=None)
-	if "cluster_nodes" not in params["elasticsearch"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.cluster_nodes'", expr=None)
-	if "path" not in params["logging"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'logging.path'", expr=None)
-	if "filename" not in params["input"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'input.filename'", expr=None)
-	if "encoding" not in params["input"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'input.encoding'", expr=None)
-
-	return True
-
-def load_parameter_key(params):
-	"""Attempts to load parameter key"""
-	parameter_key = None
-	try:
-		input_file = open(params["input"]["parameter_key"], encoding='utf-8')
-		parameter_key = json.loads(input_file.read())
-		input_file.close()
-	except IOError:
-		logging.error(params["input"]["parameter_key"] + " not found, aborting.")
-		sys.exit()
-	return parameter_key
-
-def usage():
-	"""Shows the user which parameters to send into the program."""
-	result = "Usage:\n\t<path_to_json_format_config_file>"
-	logging.error(result)
-	return result
 
 if __name__ == "__main__":
 	#Runs the entire program.

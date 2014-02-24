@@ -2,7 +2,7 @@
 Created on Jan 14, 2014
 
 @author: J. Andrew Key
-@author: Matt Sevrens
+@author: Matthew Sevrens
 '''
 
 #!/bin/python3
@@ -11,6 +11,7 @@ Created on Jan 14, 2014
 import copy, elasticsearch, hashlib, json, logging, threading, queue, re
 from scipy.stats.mstats import zscore
 
+from elasticsearch import Elasticsearch, helpers
 from longtail.custom_exceptions import UnsupportedQueryType
 from longtail.query_templates import (GENERIC_ELASTICSEARCH_QUERY, STOP_WORDS,
 	get_match_query, get_qs_query)
@@ -221,8 +222,8 @@ class DescriptionConsumer(threading.Thread):
 		self.params = params
 		self.parameter_key = parameter_key
 		cluster_nodes = self.params["elasticsearch"]["cluster_nodes"]
-		self.es_connection = elasticsearch.Elasticsearch(cluster_nodes,
-			sniff_on_start=True, sniff_on_connection_fail=True, sniffer_timeout=3)
+		self.es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True,
+			sniff_on_connection_fail=True, sniffer_timeout=5, sniff_timeout=5)
 		self.recursive = False
 		self.my_meta = None
 		self.n_gram_tokens = None

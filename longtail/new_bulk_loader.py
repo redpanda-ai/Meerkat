@@ -29,8 +29,6 @@ def initialize():
 		logging.error(sys.argv[1] + " not found, aborting.")
 		sys.exit()
 
-	#params["search_cache"] = {}
-
 	if validate_params(params):
 		logging.warning("Parameters are valid, proceeding.")
 	return params
@@ -97,8 +95,7 @@ class ThreadConsumer(threading.Thread):
 		my_logger.addHandler(file_handler)
 
 		#Add console logging, if configured
-		my_console = params["logging"]["console"]
-		if my_console is True:
+		if params["logging"]["console"] is True:
 			console_handler = logging.StreamHandler()
 			console_handler.setLevel(my_level)
 			console_handler.setFormatter(my_formatter)
@@ -118,10 +115,10 @@ class ThreadConsumer(threading.Thread):
 				concurrency_queue.get()
 				concurrency_queue.task_done()
 				my_logger.info("Consumer finished.")
-				cq_size = concurrency_queue.qsize()
-				dq_size = document_queue.qsize()
-				my_logger.info("Concurrency queue size: %i", cq_size)
-				my_logger.info("Document queue size: %i", dq_size)
+				concurrency_qsize = concurrency_queue.qsize()
+				document_qsize = document_queue.qsize()
+				my_logger.info("Concurrency queue size: %i", concurrency_qsize)
+				my_logger.info("Document queue size: %i", document_qsize)
 				return
 			for i in range(params["batch_size"]):
 				try:
@@ -146,19 +143,36 @@ class ThreadConsumer(threading.Thread):
 		#Split the batch into cells built of keys and values, excluding blank values
 		params = self.params
 		docs, actions = [], []
+		composite_fields = params["elasticsearch"]["composite_fields"]
 		while len(self.batch_list) > 0:
 			item_list = self.batch_list.pop(0).split("\t")
 			if len(header) == len(item_list):
 				d = {x: y for (x, y) in list(zip(header, item_list)) if y != ""}
 				#merge latitude and longitude into a point
 				if "longitude" in d and "latitude" in d:
-					#my_logger.debug("Found lon and lat: %s %s", d["longitude"], d["latitude"])
 					d["pin"] = { "location": { "type": "point", "coordinates" : [\
 						d["longitude"], d["latitude"] ] } }
 					del d["longitude"]
 					del d["latitude"]
-					#my_logger.debug("New dict is: %s", str(d))
-					#sys.exit()
+
+				for field in composite_fields:
+					keys = field.keys()
+					for key in keys:
+						value = field[key]
+						components = value["components"]
+						composite_format = value["format"]
+						component_values = []
+						for component in components:
+							if component in d:
+								component_values.append(d[component])
+							else:
+								component_values.append('')
+						composite_string = composite_format.format(*component_values).strip()
+						if "composite" not in d:
+							d["composite"] = {}
+						d["composite"][key] = composite_string
+						my_logger.debug("New dict is: %s", str(d))
+
 				docs.append(d)
 				action = {
 					"_index": params["elasticsearch"]["index"],
@@ -195,22 +209,60 @@ def validate_params(params):
 	if params["concurrency"] <= 0:
 		raise Misconfiguration(msg="Misconfiguration: 'concurrency' must be a positive integer", expr=None)
 
+			
 	if "index" not in params["elasticsearch"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.index'", expr=None)
+		raise Misconfiguration(msg="Missing key, 'elasticsearch.index'", expr=None)
 	if "type_mapping" not in params["elasticsearch"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.index'", expr=None)
+		raise Misconfiguration(msg="Missing key, 'elasticsearch.type_mapping'", expr=None)
 	if "type" not in params["elasticsearch"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.type'", expr=None)
+		raise Misconfiguration(msg="Missing key, 'elasticsearch.type'", expr=None)
 	if "cluster_nodes" not in params["elasticsearch"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.cluster_nodes'", expr=None)
+		raise Misconfiguration(msg="Missing key, 'elasticsearch.cluster_nodes'", expr=None)
 	if "path" not in params["logging"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'logging.path'", expr=None)
+		raise Misconfiguration(msg="Missing key, 'logging.path'", expr=None)
 	if "filename" not in params["input"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'input.filename'", expr=None)
+		raise Misconfiguration(msg="Missing key, 'input.filename'", expr=None)
 	if "encoding" not in params["input"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'input.encoding'", expr=None)
+		raise Misconfiguration(msg="Missing key, 'input.encoding'", expr=None)
 
+	if "composite_fields" not in params["elasticsearch"]:
+		raise Misconfiguration(msg="Missing key, 'elasticsearch.composite_fields'", expr=None)
+	composite_fields = params["elasticsearch"]["composite_fields"]
+	my_type = params["elasticsearch"]["type"]
+	my_props = params["elasticsearch"]["type_mapping"]["mappings"][my_type]["properties"]
+	mandatory_composite_keys = ["components", "format", "index", "type"]
+	for field in composite_fields:
+		keys = field.keys()
+		for key in keys:
+			value = field[key]
+			for mandatory_key in mandatory_composite_keys:
+				if mandatory_key not in value:
+					raise Misconfiguration(msg="Missing key, elasticsearch.composite_fields."\
+					+ str(mandatory_key), expr=None)
+
+			components = value["components"]
+			for component in components:
+				if component not in my_props:
+					raise Misconfiguration(msg="Component feature '" + component +\
+					"' does not exist and cannot be used to build the '" + key + "' feature.", expr=None)
 	return True
+
+def add_composite_type_mappings(params):
+	"""Add additional type mapping properties for composite fields."""
+	my_type = params["elasticsearch"]["type"]
+	my_properties = params["elasticsearch"]["type_mapping"]["mappings"][my_type]["properties"]
+	composite_fields = params["elasticsearch"]["composite_fields"]
+	for field in composite_fields:
+		keys = field.keys()
+		for key in keys:
+			value = field[key]
+			if "composite" not in my_properties:
+				my_properties["composite"] = { "properties" : {} }
+			my_properties["composite"]["properties"][key] = {
+				"index" : field[key]["index"],
+				"type" : field[key]["type"]
+			}
+	logging.critical(json.dumps(params, sort_keys=True, indent=4, separators=(',', ':')))
 
 def guarantee_index_and_doc_type(params):
 	"""Ensure that the index and document type mapping are as they should be"""
@@ -226,6 +278,7 @@ def guarantee_index_and_doc_type(params):
 	else:
 		logging.warning("Index does not exist, creating")
 		index_body = params["elasticsearch"]["type_mapping"]
+		add_composite_type_mappings(params)
 		result = es_connection.indices.create(index=es_index,body=index_body)
 		ok, acknowledged = result["ok"], result["acknowledged"]
 		if ok and acknowledged:
