@@ -158,9 +158,9 @@ class ThreadConsumer(threading.Thread):
 				for field in composite_fields:
 					keys = field.keys()
 					for key in keys:
-						value = field[key]
-						components = value["components"]
-						composite_format = value["format"]
+						my_dict = field[key]
+						components = my_dict["components"]
+						composite_format = my_dict["format"]
 						component_values = []
 						for component in components:
 							if component in d:
@@ -199,53 +199,51 @@ def start_consumers(params):
 		c.setDaemon(True)
 		c.start()
 
+def ensure_keys_in_dictionary(dictionary, keys, prefix=''):
+	"""Function to determine if the supplied dictionary has the necessary keys."""
+	for key in keys:
+		if key not in dictionary:
+			raise Misconfiguration(msg="Missing key, '" + prefix + key + "'", expr=None)
+	return True
+
 def validate_params(params):
 	"""Ensures that the correct parameters are supplied."""
-	mandatory_keys = ["elasticsearch", "concurrency", "input", "logging", "batch_size"]
-	for key in mandatory_keys:
-		if key not in params:
-			raise Misconfiguration(msg="Misconfiguration: missing key, '" + key + "'", expr=None)
+	my_keys = ["elasticsearch", "concurrency", "input", "logging", "batch_size"]
+	ensure_keys_in_dictionary(params, my_keys)
+
+	my_keys = ["index", "type_mapping", "type", "cluster_nodes"\
+	, "boost_labels", "boost_vectors", "composite_fields"]
+	ensure_keys_in_dictionary(params["elasticsearch"], my_keys, prefix="elasticsearch.")
+
+	my_keys = ["filename", "encoding"]
+	ensure_keys_in_dictionary(params["input"], my_keys, prefix="input.")
+
+	my_keys = ["path", "level", "formatter", "console"]
+	ensure_keys_in_dictionary(params["logging"], my_keys, prefix="logging.")
 
 	if params["concurrency"] <= 0:
-		raise Misconfiguration(msg="Misconfiguration: 'concurrency' must be a positive integer", expr=None)
+		raise Misconfiguration(msg="'concurrency' must be a positive integer", expr=None)
 
-			
-	if "index" not in params["elasticsearch"]:
-		raise Misconfiguration(msg="Missing key, 'elasticsearch.index'", expr=None)
-	if "type_mapping" not in params["elasticsearch"]:
-		raise Misconfiguration(msg="Missing key, 'elasticsearch.type_mapping'", expr=None)
-	if "type" not in params["elasticsearch"]:
-		raise Misconfiguration(msg="Missing key, 'elasticsearch.type'", expr=None)
-	if "cluster_nodes" not in params["elasticsearch"]:
-		raise Misconfiguration(msg="Missing key, 'elasticsearch.cluster_nodes'", expr=None)
-	if "path" not in params["logging"]:
-		raise Misconfiguration(msg="Missing key, 'logging.path'", expr=None)
-	if "filename" not in params["input"]:
-		raise Misconfiguration(msg="Missing key, 'input.filename'", expr=None)
-	if "encoding" not in params["input"]:
-		raise Misconfiguration(msg="Missing key, 'input.encoding'", expr=None)
-
-	if "composite_fields" not in params["elasticsearch"]:
-		raise Misconfiguration(msg="Missing key, 'elasticsearch.composite_fields'", expr=None)
 	composite_fields = params["elasticsearch"]["composite_fields"]
 	my_type = params["elasticsearch"]["type"]
 	my_props = params["elasticsearch"]["type_mapping"]["mappings"][my_type]["properties"]
-	mandatory_composite_keys = ["components", "format", "index", "type"]
+	my_keys = ["components", "format", "index", "type"]
 	for field in composite_fields:
 		keys = field.keys()
 		for key in keys:
-			value = field[key]
-			for mandatory_key in mandatory_composite_keys:
-				if mandatory_key not in value:
-					raise Misconfiguration(msg="Missing key, elasticsearch.composite_fields."\
-					+ str(mandatory_key), expr=None)
+			my_dict = field[key]
+			ensure_keys_in_dictionary(my_dict, my_keys, prefix="elasticsearch.composite_fields.")
 
-			components = value["components"]
+			components = my_dict["components"]
 			for component in components:
 				if component not in my_props:
 					raise Misconfiguration(msg="Component feature '" + component +\
 					"' does not exist and cannot be used to build the '" +\
 					key + "' feature.", expr=None)
+	#TODO Ensure that "boost_labels" and "boost_vectors" row vectors have the same cardinality
+	#TODO Ensure that "boost_vectors" has exactly the same keys found
+	#in type_mapping.mappings.x.properties
+	sys.exit()
 	return True
 
 def add_composite_type_mappings(params):
@@ -256,7 +254,7 @@ def add_composite_type_mappings(params):
 	for field in composite_fields:
 		keys = field.keys()
 		for key in keys:
-			value = field[key]
+			my_dict = field[key]
 			if "composite" not in my_properties:
 				my_properties["composite"] = { "properties" : {} }
 			my_properties["composite"]["properties"][key] = {
