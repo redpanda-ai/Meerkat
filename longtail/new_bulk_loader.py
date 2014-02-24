@@ -244,7 +244,8 @@ def validate_params(params):
 			for component in components:
 				if component not in my_props:
 					raise Misconfiguration(msg="Component feature '" + component +\
-					"' does not exist and cannot be used to build the '" + key + "' feature.", expr=None)
+					"' does not exist and cannot be used to build the '" +\
+					key + "' feature.", expr=None)
 	return True
 
 def add_composite_type_mappings(params):
