@@ -57,7 +57,7 @@ def load_document_queue(params):
 	#document_queue.task_done()
 	document_queue_populated = True
 
-	logging.warning("Document Queue has " + str(document_queue.qsize()) + " elements")
+	#logging.warning("Document Queue has " + str(document_queue.qsize()) + " elements")
 	return header, document_queue, document_queue_populated
 
 class ThreadConsumer(threading.Thread):
@@ -190,7 +190,8 @@ class ThreadConsumer(threading.Thread):
 			else:
 				failure += 1
 			total += 1
-		my_logger.info("Success/Failure/Total: %i/%i/%i", success, failure, total)
+		my_logger.info("Success/Failure/Total: %i/%i/%i - %i documents in queue.", success, failure\
+		, total, self.document_queue.qsize())
 
 def start_consumers(params):
 	"""Starts our consumer threads"""
@@ -240,10 +241,15 @@ def validate_params(params):
 					raise Misconfiguration(msg="Component feature '" + component +\
 					"' does not exist and cannot be used to build the '" +\
 					key + "' feature.", expr=None)
-	#TODO Ensure that "boost_labels" and "boost_vectors" row vectors have the same cardinality
+	#Ensure that "boost_labels" and "boost_vectors" row vectors have the same cardinality
+	label_length = len(params["elasticsearch"]["boost_labels"])
+	for key in params["elasticsearch"]["boost_vectors"]:
+		if len(params["elasticsearch"]["boost_vectors"][key]) != label_length:
+			raise Misconfiguration(msg="Row vector 'elasticsearch.boost_vectors." + key +\
+			"' should have exactly " + str(label_length) + " values.", expr=None)
 	#TODO Ensure that "boost_vectors" has exactly the same keys found
 	#in type_mapping.mappings.x.properties
-	sys.exit()
+	#sys.exit()
 	return True
 
 def add_composite_type_mappings(params):
