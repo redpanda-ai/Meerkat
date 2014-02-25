@@ -26,19 +26,19 @@ from longtail.various_tools import string_cleanse
 STOP_WORDS = ["CHECK", "CARD", "CHECKCARD", "PAYPOINT", "PURCHASE", "LLC"]
 
 #Helper functions
-def get_bool_query():
+def get_bool_query(starting_from = 0, size = 0):
 	"""Returns a "bool" style ElasticSearch query object"""
-	return { "from" : 0, "size" : 10, "query" : {
+	return { "from" : starting_from, "size" : size, "query" : {
 		"bool": { "minimum_number_should_match": 1, "should": [] } } }
 
-def get_match_query(term, feature_name, boost):
+def get_match_query(term, feature_name, boost=1.0):
 	"""Returns a "match" style ElasticSearch query object"""
 	return { "match" : { feature_name : {
 		"query": term, "type": "phrase", "boost": boost } } }
 
 def get_phrase_query(term, feature_name, boost):
 	"""Returns a "phrase" style ElasticSearch query object"""
-	sub_query = { "match": { feature_name: {
+	return { "match": { feature_name: {
 		"query": term, "type": "phrase", "boost": boost } } }
 
 def get_qs_query(term, fields, boost):
@@ -58,7 +58,7 @@ class DescriptionConsumer(threading.Thread):
 		logger = logging.getLogger("thread " + str(self.thread_id))
 		#Abort processing, if input string is None
 		if self.input_string != None:
-			logger.info("Input String " + self.input_string)
+			logger.info("Input String: %s", self.input_string)
 		else:
 			logger.warning("No input string provided, skipping")
 			return False
@@ -75,13 +75,11 @@ class DescriptionConsumer(threading.Thread):
 		phone_re = re.compile("^[0-9/#]{10}$")
 		numeric = re.compile("^[0-9/#]+$")
 
-		stop_tokens = []
-		filtered_tokens = []
-		numeric_tokens = []
-		addresses = []
-		phone_numbers = []
+		stop_tokens, filtered_tokens = [], []
+		numeric_tokens, addresses, phone_numbers = [], [], []
 		tokens = self.my_meta["tokens"]
 		unigram_tokens = self.my_meta["unigram_tokens"]
+
 		for token in tokens:
 			if token in STOP_WORDS:
 				stop_tokens.append(token)
@@ -160,7 +158,7 @@ class DescriptionConsumer(threading.Thread):
 		z_scores = zscore(scores)
 		first_score, second_score = z_scores[0:2]
 		z_score_delta = round(first_score - second_score, 3)
-		logger.info("Z-Score delta: [" + str(z_score_delta) + "]")
+		logger.info("Z-Score delta: [%.2f]", z_score_delta)
 		quality = "Non"
 		if z_score_delta <= 1:
 			quality = "Low-grade"
@@ -169,7 +167,7 @@ class DescriptionConsumer(threading.Thread):
 		else:
 			quality = "High-grade"
 
-		logger.info("Top Score Quality: " + quality)
+		logger.info("Top Score Quality: %s", quality)
 		return z_score_delta
 
 	def __extract_longest_substring(self, longest_substring):
@@ -229,15 +227,15 @@ class DescriptionConsumer(threading.Thread):
 		phone_boost = "composite.phone^" + parameter_key.get("phone_boost", "1")
 
 		logger.info("Search components are:")
-		logger.info("\tUnigrams: '" + qs_query + "'")
+		logger.info("\tUnigrams: '%s'", qs_query)
 		search_components.append((qs_query, "qs_query", field_boosts, 1))
 		if address is not None:
-			logger.info("\tMatching 'Address': '" + address + "'")
+			logger.info("\tMatching 'Address': '%s", address)
 			search_components.append((address, "match_query"\
 			, [address_boost], 10))
 		if len(phone_numbers) != 0:
 			for phone_num in phone_numbers:
-				logger.info("\tMatching 'Phone': '" + phone_num + "'")
+				logger.info("\tMatching 'Phone': '%s'", phone_num)
 				search_components.append((phone_num, "match_query"\
 				, [phone_boost], 1))
 		for n_gram in matching_n_grams:
@@ -256,11 +254,10 @@ class DescriptionConsumer(threading.Thread):
 	def __get_boolean_search_object(self, search_components):
 		"""Builds an object for a "bool" search."""
 		params = self.params
-		parameter_key = self.parameter_key
-		bool_search = get_bool_query()
+		#parameter_key = self.parameter_key
+		result_size = self.parameter_key.get("es_result_size", "10")
+		bool_search = get_bool_query(size = result_size)
 		bool_search["fields"] = params["output"]["results"]["fields"]
-		bool_search["from"] = 0
-		bool_search["size"] = parameter_key.get("es_result_size", "10")
 
 		for item in search_components:
 			my_subquery = None
@@ -281,22 +278,13 @@ class DescriptionConsumer(threading.Thread):
 		sub-queries.  At some point I may add 'query_string' as an
 		additional parameter."""
 		my_new_query = get_bool_query()
-		my_new_query["size"], my_new_query["from"] = 0, 0
-
-		sub_query = { "match": { feature_name: {
-			"query": "__term", "type": "phrase", "boost": 1.2 } } }
-		#sub_query = {}
-		#sub_query["match"] = {}
-		#sub_query["match"][feature_name] = {}
-		#sub_query["match"][feature_name]["query"] = "__term"
-		#sub_query["match"][feature_name]["type"] = "phrase"
-		#sub_query["match"][feature_name]["boost"] = 1.2
+		#my_new_query["size"], my_new_query["from"] = 0, 0
 
 		boost = 1.2
 		for term in list_of_ngrams:
-			my_sub_query = copy.deepcopy(sub_query)
-			#my_sub_query = get_phrase_query(term, feature_name, boost)
-			my_sub_query["match"][feature_name]["query"] = term
+			#my_sub_query = copy.deepcopy(sub_query)
+			my_sub_query = get_phrase_query(term, feature_name, boost)
+			#my_sub_query["match"][feature_name]["query"] = term
 			my_new_query["query"]["bool"]["should"].append(my_sub_query)
 			total = self.__search_index(my_new_query)['hits']['total']
 			if total == 0:
@@ -395,8 +383,8 @@ class DescriptionConsumer(threading.Thread):
 		output_dict['DESCRIPTION'] = self.input_string
 		self.result_queue.put(output_dict)
 
-		logging.info("Z_SCORE_DELTA: %s", str(z_score_delta))
-		logging.info("TOP_SCORE: %s", str(top_score))
+		logging.info("Z_SCORE_DELTA: %.2f", z_score_delta)
+		logging.info("TOP_SCORE: %.4f", top_score)
 
 	def __parse_into_search_tokens(self, input_string, recursive):
 		"""Recursively attempts to parse an unstructured transaction
@@ -472,16 +460,18 @@ class DescriptionConsumer(threading.Thread):
 		"""Purges several object data structures and re-initializes them."""
 		self.recursive = False
 		self.n_gram_tokens = {}
-		self.my_meta = {}
-		self.my_meta["unigram_tokens"] = []
-		self.my_meta["tokens"] = []
-		self.my_meta["metrics"] = {"query_count" : 0, "cache_count" : 0}
+		self.my_meta = { "unigram_tokens": [], "tokens": [], "metrics": {
+			"query_count": 0, "cache_count": 0 }}
+		#self.my_meta = {}
+		#self.my_meta["unigram_tokens"] = []
+		#self.my_meta["tokens"] = []
+		#self.my_meta["metrics"] = {"query_count" : 0, "cache_count" : 0}
 
 	def __search_index(self, input_as_object):
 		"""Searches the merchants index and the merchant mapping"""
 		logger = logging.getLogger("thread " + str(self.thread_id))
 		input_data = json.dumps(input_as_object).encode('UTF-8')
-		#Check the cache first
+		#Check the client cache first
 		hash_object = hashlib.md5(str(input_data).encode())
 		input_hash = hash_object.hexdigest()
 		if input_hash in self.params["search_cache"]:
@@ -493,13 +483,13 @@ class DescriptionConsumer(threading.Thread):
 			try:
 				output_data = self.es_connection.search(
 					index=self.params["elasticsearch"]["index"], body=input_as_object)
+				#Add newly found results to the client cache
+				self.params["search_cache"][input_hash] = output_data
 			except Exception:
-				logging.critical("Unable to process the following: " + str(input_as_object))
+				logging.critical("Unable to process the following: %s", str(input_as_object))
 				output_data = '{"hits":{"total":0}}'
 
-		metrics = self.my_meta["metrics"]
-		metrics["query_count"] += 1
-		self.params["search_cache"][input_hash] = output_data
+		self.my_meta["metrics"]["query_count"] += 1
 		return output_data
 
 	def __search_n_gram_tokens(self):
@@ -510,23 +500,16 @@ class DescriptionConsumer(threading.Thread):
 		matched_n_gram_tokens = []
 
 		my_new_query = get_bool_query()
-		my_new_query["size"], my_new_query["from"] = 0, 0
-
-		sub_query = {}
-		sub_query["match"] = {}
-		sub_query["match"]["_all"] = {}
-		sub_query["match"]["_all"]["query"] = "__term"
-		sub_query["match"]["_all"]["type"] = "phrase"
 
 		logger.info("Matched the following n-grams to our merchants index:")
 		for key in reversed(sorted(self.n_gram_tokens.keys())):
 			for term in self.n_gram_tokens[key]:
-				sub_query["match"]["_all"]["query"] = term
+				sub_query = get_match_query(term, "_all")
 				my_new_query["query"]["bool"]["should"].append(sub_query)
 				hit_count = self.__search_index(my_new_query)['hits']['total']
 				del my_new_query["query"]["bool"]["should"][0]
 				if hit_count > 0:
-					logger.info(str(key) + "-gram : " + term + " (" + str(hit_count) + ")")
+					logger.info("%i-gram : %s (%i)", key, term, hit_count)
 					matched_n_gram_tokens.append(term)
 		return matched_n_gram_tokens
 
@@ -534,7 +517,6 @@ class DescriptionConsumer(threading.Thread):
 		"""Looks for the longest substring in our merchants index that
 		can actually be found."""
 		my_new_query = get_bool_query()
-		my_new_query["size"], my_new_query["from"] = 0, 0
 
 		sub_query = {}
 		sub_query["query_string"] = {}
