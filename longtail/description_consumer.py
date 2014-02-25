@@ -15,6 +15,7 @@ import logging
 import threading
 import queue
 import re
+import sys
 
 from elasticsearch import Elasticsearch, helpers
 from scipy.stats.mstats import zscore
@@ -31,17 +32,17 @@ def get_bool_query(starting_from = 0, size = 0):
 	return { "from" : starting_from, "size" : size, "query" : {
 		"bool": { "minimum_number_should_match": 1, "should": [] } } }
 
-def get_match_query(term, feature_name, boost=1.0):
+def get_match_phrase_query(term, feature_name, boost=1.0):
 	"""Returns a "match" style ElasticSearch query object"""
 	return { "match" : { feature_name : {
 		"query": term, "type": "phrase", "boost": boost } } }
 
-def get_phrase_query(term, feature_name, boost):
-	"""Returns a "phrase" style ElasticSearch query object"""
-	return { "match": { feature_name: {
-		"query": term, "type": "phrase", "boost": boost } } }
+def get_multi_match_query(term, field_list):
+	"""Returns a "match" style ElasticSearch query object"""
+	return { "multi_match" : { "query": term,
+		"type": "phrase", "fields": field_list } }
 
-def get_qs_query(term, fields, boost):
+def get_qs_query(term, fields=[], boost=1.0):
 	"""Returns a "query_string" style ElasticSearch query object"""
 	return { "query_string": {
 		"query": term, "fields": fields, "boost": boost } }
@@ -253,6 +254,7 @@ class DescriptionConsumer(threading.Thread):
 
 	def __get_boolean_search_object(self, search_components):
 		"""Builds an object for a "bool" search."""
+		#TODO: Replace this with the boost_list/boost_vector approach
 		params = self.params
 		#parameter_key = self.parameter_key
 		result_size = self.parameter_key.get("es_result_size", "10")
@@ -265,8 +267,12 @@ class DescriptionConsumer(threading.Thread):
 			if query_type == "qs_query":
 				my_subquery = get_qs_query(term, feature_list, boost)
 			elif query_type == "match_query":
+				#logging.critical("Feature list BEFORE: %s", str(feature_list))
+				#feature_list = [x+"^"+str(boost) for x in feature_list]
+				#logging.critical("Feature list AFTER: %s", str(feature_list))
+				#my_subquery = get_multi_match_query(term, field_list)
 				for feature in feature_list:
-					my_subquery = get_match_query(term, feature, boost)
+					my_subquery = get_match_phrase_query(term, feature, boost)
 			else:
 				raise UnsupportedQueryType("There is no support"\
 				+ " for a query of type: " + query_type)
@@ -278,18 +284,14 @@ class DescriptionConsumer(threading.Thread):
 		sub-queries.  At some point I may add 'query_string' as an
 		additional parameter."""
 		my_new_query = get_bool_query()
-		#my_new_query["size"], my_new_query["from"] = 0, 0
 
-		boost = 1.2
+		boost = "^1.2"
 		for term in list_of_ngrams:
-			#my_sub_query = copy.deepcopy(sub_query)
-			my_sub_query = get_phrase_query(term, feature_name, boost)
-			#my_sub_query["match"][feature_name]["query"] = term
-			my_new_query["query"]["bool"]["should"].append(my_sub_query)
+			#my_sub_query = get_match_phrase_query(term, feature_name, boost)
+			my_sub_query = get_multi_match_query(term, [ feature_name + boost ])
+			my_new_query["query"]["bool"]["should"] = [(my_sub_query)]
 			total = self.__search_index(my_new_query)['hits']['total']
-			if total == 0:
-				my_new_query["query"]["bool"]["should"] = []
-			else:
+			if total > 0:
 				return total, term
 		return 0, None
 
@@ -504,7 +506,7 @@ class DescriptionConsumer(threading.Thread):
 		logger.info("Matched the following n-grams to our merchants index:")
 		for key in reversed(sorted(self.n_gram_tokens.keys())):
 			for term in self.n_gram_tokens[key]:
-				sub_query = get_match_query(term, "_all")
+				sub_query = get_match_phrase_query(term, "_all")
 				my_new_query["query"]["bool"]["should"].append(sub_query)
 				hit_count = self.__search_index(my_new_query)['hits']['total']
 				del my_new_query["query"]["bool"]["should"][0]
@@ -517,12 +519,6 @@ class DescriptionConsumer(threading.Thread):
 		"""Looks for the longest substring in our merchants index that
 		can actually be found."""
 		my_new_query = get_bool_query()
-
-		sub_query = {}
-		sub_query["query_string"] = {}
-		sub_query["query_string"]["query"] = "__term"
-		my_new_query["query"]["bool"]["should"].append(sub_query)
-
 		for key in reversed(sorted(substrings.keys())):
 			for term in substrings[key]:
 				#These words are reserved and will cause HTTP Response errors if
@@ -531,7 +527,7 @@ class DescriptionConsumer(threading.Thread):
 					term = term.lower()
 				hit_count = 0
 				if len(term) > 1:
-					sub_query["query_string"]["query"] = str(term)
+					my_new_query["query"]["bool"]["should"] = [ get_qs_query(term) ]
 					hit_count = self.__search_index(my_new_query)['hits']['total']
 				if hit_count > 0:
 					return term
