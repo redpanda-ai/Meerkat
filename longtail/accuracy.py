@@ -4,24 +4,33 @@
 
 """This script tests the current accuracy of our labeling tool"""
 
-import csv, sys, math, logging, datetime
+import csv, sys, math, logging, datetime, os
 
-def test_accuracy(file_path=None, non_physical_trans=None, result_list=None):
+def test_accuracy(file_path=None, non_physical_trans=[], result_list=[]):
 	"""Takes file by default but can accept result
 	queue/ non_physical list. Attempts to provide various
 	accuracy tests"""
 
-	if result_list is not None:
+	if len(result_list) > 0:
 		machine_labeled = result_list
-	elif file_path is not None:
+	elif file_path is not None and os.path.isfile(file_path):
 		ML_file = open(file_path)
 		machine_labeled = list(csv.DictReader(ML_file))
 	else:
-		logging.warning("Nothing provided to perform accuracy tests on")
+		logging.warning("Not enough information provided to perform accuracy tests on")
+		return
 
 	HL_file = open("data/misc/verifiedLabeledTrans.csv")
 	human_labeled = list(csv.DictReader(HL_file))
 	HL_file.close()
+
+	# Ensure there is something to process
+	total = len(machine_labeled)
+	total_processed = len(machine_labeled) + len(non_physical_trans)
+
+	if total == 0 or total_processed == 0:
+		logging.warning("Nothing provided to perform accuracy tests on")
+		return
 
 	non_physical_trans = non_physical_trans or []
 	needs_hand_labeling = []
@@ -29,7 +38,6 @@ def test_accuracy(file_path=None, non_physical_trans=None, result_list=None):
 	mislabeled = []
 	unlabeled = []
 	correct = []
-	total = len(machine_labeled)
 
 	# Test Recall / Precision
 	for mlRow in machine_labeled:
@@ -77,7 +85,7 @@ def test_accuracy(file_path=None, non_physical_trans=None, result_list=None):
 	num_correct = len(correct)
 
 	results = {}
-	results['total_processed'] = len(machine_labeled) + len(non_physical_trans)
+	results['total_processed'] = total_processed
 	results['total_physical'] = math.ceil((len(machine_labeled) / results['total_processed']) * 100)
 	results['total_non_physical'] = math.ceil((len(non_physical_trans) / results['total_processed']) * 100)
 	results['correct'] = correct
@@ -113,7 +121,9 @@ def speed_tests(start_time, accuracy_results):
 def print_results(results):
 	"""Provide useful readable output"""
 
-	#print("", "CORRECT:", '\n'.join(results['correct']), sep="\n")
+	if results is None:
+		return
+		
 	print("")
 	print("STATS:")
 	print("Total Transactions Processed = " + str(results['total_processed']))
