@@ -8,14 +8,43 @@ Created on Jan 14, 2014
 #!/bin/python3
 # pylint: disable=R0914
 
-import copy, elasticsearch, hashlib, json, logging, threading, queue, re
-from scipy.stats.mstats import zscore
+import copy
+import hashlib
+import json
+import logging
+import threading
+import queue
+import re
 
 from elasticsearch import Elasticsearch, helpers
+from scipy.stats.mstats import zscore
+
 from longtail.custom_exceptions import UnsupportedQueryType
-from longtail.query_templates import (GENERIC_ELASTICSEARCH_QUERY, STOP_WORDS,
-	get_match_query, get_qs_query)
 from longtail.various_tools import string_cleanse
+
+#Globals
+STOP_WORDS = ["CHECK", "CARD", "CHECKCARD", "PAYPOINT", "PURCHASE", "LLC"]
+
+#Helper functions
+def get_bool_query():
+	"""Returns a "bool" style ElasticSearch query object"""
+	return { "from" : 0, "size" : 10, "query" : {
+		"bool": { "minimum_number_should_match": 1, "should": [] } } }
+
+def get_match_query(term, feature_name, boost):
+	"""Returns a "match" style ElasticSearch query object"""
+	return { "match" : { feature_name : {
+		"query": term, "type": "phrase", "boost": boost } } }
+
+def get_phrase_query(term, feature_name, boost):
+	"""Returns a "phrase" style ElasticSearch query object"""
+	sub_query = { "match": { feature_name: {
+		"query": term, "type": "phrase", "boost": boost } } }
+
+def get_qs_query(term, fields, boost):
+	"""Returns a "query_string" style ElasticSearch query object"""
+	return { "query_string": {
+		"query": term, "fields": fields, "boost": boost } }
 
 class DescriptionConsumer(threading.Thread):
 	''' Acts as a client to an ElasticSearch cluster, tokenizing description
@@ -41,6 +70,8 @@ class DescriptionConsumer(threading.Thread):
 
 	def __display_results(self):
 		"""Displays our tokens, n-grams, and search results."""
+		logger = logging.getLogger("thread " + str(self.thread_id))
+
 		phone_re = re.compile("^[0-9/#]{10}$")
 		numeric = re.compile("^[0-9/#]+$")
 
@@ -63,32 +94,28 @@ class DescriptionConsumer(threading.Thread):
 
 		#Add dynamic output based upon a dictionary of token types
 		#e.g. Unigram, Composite, Numeric, Stop...
-		logger = logging.getLogger("thread " + str(self.thread_id))
-		logger.info("TOKENS ARE: " + str(tokens))
-		logger.info("Unigrams are:\n\t" + str(tokens))
-		logger.info("Unigrams matched to ElasticSearch:\n\t" + str(unigram_tokens))
-		logger.info("Of these:")
-		logger.info("\t" + str(len(stop_tokens)) + " stop words:      "\
-		+ str(stop_tokens))
-		logger.info("\t" + str(len(phone_numbers)) + " phone_numbers:   "\
-		+ str(phone_numbers))
-		logger.info("\t" + str(len(numeric_tokens)) + " numeric words:   "\
-		+ str(numeric_tokens))
-		logger.info("\t" + str(len(filtered_tokens)) + " unigrams: "\
-		+ str(filtered_tokens))
+		logger.info("TOKENS ARE: %s", str(tokens))
+		logger.info("Unigrams are:\n\t%s", str(tokens))
+		logger.info("Unigrams matched to ElasticSearch:\n\t%s", str(unigram_tokens))
+		logger.info("BREAKDOWN:")
+		logger.info("\t%i stop words:    %s", len(stop_tokens), str(stop_tokens))
+		logger.info("\t%i phone numbers: %s", len(phone_numbers), str(phone_numbers))
+		logger.info("\t%i numeric words: %s", len(numeric_tokens), str(numeric_tokens))
+		logger.info("\t%i uni-grams:     %s", len(filtered_tokens), str(filtered_tokens))
 
+		#TODO: Deal with factual composite addresses in a generic manner
 		count, matching_address = self.__get_matching_address()
 		if count > 0:
 			addresses.append(matching_address)
-		logger.info("\t" + str(len(addresses)) + " addresses: " + str(addresses))
+		logger.info("\t%i addresses: %s", len(addresses), str(addresses))
 
 		#show all search terms separated by spaces
 		query_string = " ".join(filtered_tokens)
 		self.__get_n_gram_tokens(filtered_tokens)
 
 		matched_n_gram_tokens = self.__search_n_gram_tokens()
-		logger.info("\t" + str(len(matched_n_gram_tokens)) + " 2+ grams: "\
-		+ str(matched_n_gram_tokens))
+		logger.info("\t%i multi-grams: %s", len(matched_n_gram_tokens),\
+			str(matched_n_gram_tokens))
 
 		self.__generate_final_query(query_string, matching_address\
 		, phone_numbers, matched_n_gram_tokens)
@@ -122,53 +149,6 @@ class DescriptionConsumer(threading.Thread):
 		for result in results:
 			print(result)
 		return True
-
-	def __output_to_result_queue(self, search_results):
-		"""Decides whether to output and pushes to result_queue"""
-		hits = search_results['hits']['hits']
-		scores, fields_found = [], []
-		output_dict = {}
-		params = self.params
-		parameter_key = self.parameter_key
-		field_order = params["output"]["results"]["fields"]
-		top_hit = hits[0]
-		hit_fields = top_hit["fields"]
-		fields_in_hit = [field for field in hit_fields]
-		ordered_hit_fields = []
-
-		for hit in hits:
-			scores.append(hit['_score'])
-
-		for ordinal in field_order:
-			if ordinal in fields_in_hit:
-				my_field = str(hit_fields[ordinal])
-				fields_found.append(ordinal)
-				ordered_hit_fields.append(my_field)
-			else:
-				fields_found.append(ordinal)
-				ordered_hit_fields.append("")
-
-		z_score_delta = self.__display_z_score_delta(scores)
-		top_score = top_hit['_score']
-
-		#Unable to generate z_score
-		if z_score_delta == None:
-			output_dict = dict(zip(fields_found, ordered_hit_fields))
-			output_dict['DESCRIPTION'] = self.input_string
-			self.result_queue.put(output_dict)
-			return
-
-		#Send to result Queue if score good enough
-		if z_score_delta > float(parameter_key.get("z_score_threshold", "2")):
-			output_dict = dict(zip(fields_found, ordered_hit_fields))
-		else:
-			output_dict = dict(zip(fields_found, ([""] * len(fields_found))))
-
-		output_dict['DESCRIPTION'] = self.input_string
-		self.result_queue.put(output_dict)
-
-		logging.info("Z_SCORE_DELTA: " + str(z_score_delta))
-		logging.info("TOP_SCORE: " + str(top_score))
 
 	def __display_z_score_delta(self, scores):
 		"""Display the Z-score delta between the first and second scores."""
@@ -268,8 +248,8 @@ class DescriptionConsumer(threading.Thread):
 		logger.info(json.dumps(my_obj))
 		my_results = self.__search_index(my_obj)
 		metrics = my_meta["metrics"]
-		logger.warning("Cache Hit / Miss: " + str(metrics["cache_count"])\
-		+ " / " + str(metrics["query_count"]))
+		logger.warning("Cache Hit / Miss: %i / %i",\
+			 metrics["cache_count"], metrics["query_count"])
 		self.__display_search_results(my_results)
 		self.__output_to_result_queue(my_results)
 
@@ -277,7 +257,7 @@ class DescriptionConsumer(threading.Thread):
 		"""Builds an object for a "bool" search."""
 		params = self.params
 		parameter_key = self.parameter_key
-		bool_search = copy.deepcopy(GENERIC_ELASTICSEARCH_QUERY)
+		bool_search = get_bool_query()
 		bool_search["fields"] = params["output"]["results"]["fields"]
 		bool_search["from"] = 0
 		bool_search["size"] = parameter_key.get("es_result_size", "10")
@@ -300,18 +280,22 @@ class DescriptionConsumer(threading.Thread):
 		"""Obtains search results for a query composed of multiple
 		sub-queries.  At some point I may add 'query_string' as an
 		additional parameter."""
-		my_new_query = copy.deepcopy(GENERIC_ELASTICSEARCH_QUERY)
+		my_new_query = get_bool_query()
 		my_new_query["size"], my_new_query["from"] = 0, 0
 
-		sub_query = {}
-		sub_query["match"] = {}
-		sub_query["match"][feature_name] = {}
-		sub_query["match"][feature_name]["query"] = "__term"
-		sub_query["match"][feature_name]["type"] = "phrase"
-		sub_query["match"][feature_name]["boost"] = 1.2
+		sub_query = { "match": { feature_name: {
+			"query": "__term", "type": "phrase", "boost": 1.2 } } }
+		#sub_query = {}
+		#sub_query["match"] = {}
+		#sub_query["match"][feature_name] = {}
+		#sub_query["match"][feature_name]["query"] = "__term"
+		#sub_query["match"][feature_name]["type"] = "phrase"
+		#sub_query["match"][feature_name]["boost"] = 1.2
 
+		boost = 1.2
 		for term in list_of_ngrams:
 			my_sub_query = copy.deepcopy(sub_query)
+			#my_sub_query = get_phrase_query(term, feature_name, boost)
 			my_sub_query["match"][feature_name]["query"] = term
 			my_new_query["query"]["bool"]["should"].append(my_sub_query)
 			total = self.__search_index(my_new_query)['hits']['total']
@@ -366,6 +350,53 @@ class DescriptionConsumer(threading.Thread):
 					list_of_tokens[start_index:end_index-end_offset]
 					self.n_gram_tokens[n_gram_size].append(" ".join(new_n_gram))
 		return
+
+	def __output_to_result_queue(self, search_results):
+		"""Decides whether to output and pushes to result_queue"""
+		hits = search_results['hits']['hits']
+		scores, fields_found = [], []
+		output_dict = {}
+		params = self.params
+		parameter_key = self.parameter_key
+		field_order = params["output"]["results"]["fields"]
+		top_hit = hits[0]
+		hit_fields = top_hit["fields"]
+		fields_in_hit = [field for field in hit_fields]
+		ordered_hit_fields = []
+
+		for hit in hits:
+			scores.append(hit['_score'])
+
+		for ordinal in field_order:
+			if ordinal in fields_in_hit:
+				my_field = str(hit_fields[ordinal])
+				fields_found.append(ordinal)
+				ordered_hit_fields.append(my_field)
+			else:
+				fields_found.append(ordinal)
+				ordered_hit_fields.append("")
+
+		z_score_delta = self.__display_z_score_delta(scores)
+		top_score = top_hit['_score']
+
+		#Unable to generate z_score
+		if z_score_delta == None:
+			output_dict = dict(zip(fields_found, ordered_hit_fields))
+			output_dict['DESCRIPTION'] = self.input_string
+			self.result_queue.put(output_dict)
+			return
+
+		#Send to result Queue if score good enough
+		if z_score_delta > float(parameter_key.get("z_score_threshold", "2")):
+			output_dict = dict(zip(fields_found, ordered_hit_fields))
+		else:
+			output_dict = dict(zip(fields_found, ([""] * len(fields_found))))
+
+		output_dict['DESCRIPTION'] = self.input_string
+		self.result_queue.put(output_dict)
+
+		logging.info("Z_SCORE_DELTA: %s", str(z_score_delta))
+		logging.info("TOP_SCORE: %s", str(top_score))
 
 	def __parse_into_search_tokens(self, input_string, recursive):
 		"""Recursively attempts to parse an unstructured transaction
@@ -475,9 +506,10 @@ class DescriptionConsumer(threading.Thread):
 		"""Creates a boolean elasticsearch composed of multiple
 		sub-queries.  Each sub-query is itself a 'phrase' query
 		built of n-grams where n >= 2."""
+		logger = logging.getLogger("thread " + str(self.thread_id))
 		matched_n_gram_tokens = []
 
-		my_new_query = copy.deepcopy(GENERIC_ELASTICSEARCH_QUERY)
+		my_new_query = get_bool_query()
 		my_new_query["size"], my_new_query["from"] = 0, 0
 
 		sub_query = {}
@@ -486,7 +518,6 @@ class DescriptionConsumer(threading.Thread):
 		sub_query["match"]["_all"]["query"] = "__term"
 		sub_query["match"]["_all"]["type"] = "phrase"
 
-		logger = logging.getLogger("thread " + str(self.thread_id))
 		logger.info("Matched the following n-grams to our merchants index:")
 		for key in reversed(sorted(self.n_gram_tokens.keys())):
 			for term in self.n_gram_tokens[key]:
@@ -502,7 +533,7 @@ class DescriptionConsumer(threading.Thread):
 	def __search_substrings(self, substrings):
 		"""Looks for the longest substring in our merchants index that
 		can actually be found."""
-		my_new_query = copy.deepcopy(GENERIC_ELASTICSEARCH_QUERY)
+		my_new_query = get_bool_query()
 		my_new_query["size"], my_new_query["from"] = 0, 0
 
 		sub_query = {}
@@ -525,9 +556,11 @@ class DescriptionConsumer(threading.Thread):
 
 	def __set_logger(self):
 		"""Creates a logger, based upon the supplied config object."""
-		levels = {'debug': logging.DEBUG, 'info': logging.INFO\
-		, 'warning': logging.WARNING, 'error': logging.ERROR\
-		, 'critical': logging.CRITICAL}
+		levels = {
+			'debug': logging.DEBUG, 'info': logging.INFO,
+			'warning': logging.WARNING, 'error': logging.ERROR,
+			'critical': logging.CRITICAL
+		}
 		params = self.params
 		my_level = params["logging"]["level"]
 		if my_level in levels:
@@ -567,3 +600,4 @@ class DescriptionConsumer(threading.Thread):
 			except queue.Empty:
 				print(str(self.thread_id), " found empty queue, terminating.")
 		return True
+
