@@ -4,7 +4,12 @@
 
 """This script tests the current accuracy of our labeling tool"""
 
-import csv, sys, math, logging, datetime, os
+import csv
+import datetime
+import logging
+import math
+import os
+import sys
 
 def test_accuracy(file_path=None, non_physical_trans=[], result_list=[]):
 	"""Takes file by default but can accept result
@@ -20,11 +25,12 @@ def test_accuracy(file_path=None, non_physical_trans=[], result_list=[]):
 		logging.warning("Not enough information provided to perform accuracy tests on")
 		return
 
-	HL_file = open("data/misc/verifiedLabeledTrans.csv")
-	human_labeled = list(csv.DictReader(HL_file))
-	HL_file.close()
+	#FIXME: Hard-coded?
+	human_labeled_input_file = open("data/misc/verifiedLabeledTrans.factual.csv")
+	human_labeled = list(csv.DictReader(human_labeled_input_file))
+	human_labeled_input_file.close()
 
-	# Ensure there is something to process
+	#Ensure there is something to process
 	total = len(machine_labeled)
 	total_processed = len(machine_labeled) + len(non_physical_trans)
 
@@ -40,40 +46,40 @@ def test_accuracy(file_path=None, non_physical_trans=[], result_list=[]):
 	correct = []
 
 	# Test Recall / Precision
-	for mlRow in machine_labeled:
+	for machine_labeled_row in machine_labeled:
 
 		# Our confidence was not high enough to label
-		if mlRow['PERSISTENTRECORDID'] == "":
-			unlabeled.append(mlRow['DESCRIPTION'])
+		if machine_labeled_row['factual_id'] == "":
+			unlabeled.append(machine_labeled_row['DESCRIPTION'])
 			continue
 
 		# Verify against human labeled
-		for index, hlRow in enumerate(human_labeled):
-			if mlRow['DESCRIPTION'] == hlRow['DESCRIPTION']:
-				if hlRow['PERSISTENTRECORDID'] == "":
+		for index, human_labeled_row in enumerate(human_labeled):
+			if machine_labeled_row['DESCRIPTION'] == human_labeled_row['DESCRIPTION']:
+				if human_labeled_row['factual_id'] == "":
 					# Transaction is not yet labeled
-					needs_hand_labeling.append(mlRow['DESCRIPTION'])
+					needs_hand_labeling.append(machine_labeled_row['DESCRIPTION'])
 					break
-				elif mlRow['PERSISTENTRECORDID'] == hlRow['PERSISTENTRECORDID']:
+				elif machine_labeled_row['factual_id'] == human_labeled_row['factual_id']:
 					# Transaction was correctly labeled
-					correct.append(hlRow['DESCRIPTION'] + " (ACTUAL:" + hlRow['PERSISTENTRECORDID'] + ")")
+					correct.append(human_labeled_row['DESCRIPTION'] + " (ACTUAL:" + human_labeled_row['factual_id'] + ")")
 					break
-				elif hlRow['IS_PHYSICAL_TRANSACTION'] == '0':
+				elif human_labeled_row['IS_PHYSICAL_TRANSACTION'] == '0':
 					# Transaction is non physical
-					non_physical.append(mlRow['DESCRIPTION'])
+					non_physical.append(machine_labeled_row['DESCRIPTION'])
 					break
 				else:
 					# Transaction is mislabeled
-					mislabeled.append(hlRow['DESCRIPTION'] + " (ACTUAL:" + hlRow['PERSISTENTRECORDID'] + ")")
+					mislabeled.append(human_labeled_row['DESCRIPTION'] + " (ACTUAL:" + human_labeled_row['factual_id'] + ")")
 					break
 			elif index + 1 == len(human_labeled):
-				needs_hand_labeling.append(mlRow['DESCRIPTION'])
+				needs_hand_labeling.append(machine_labeled_row['DESCRIPTION'])
 
 	# Test Binary
 	for item in unlabeled:
-		for index, hlRow in enumerate(human_labeled):
-			if item == hlRow['DESCRIPTION']:
-				if hlRow['IS_PHYSICAL_TRANSACTION'] == '0':
+		for index, human_labeled_row in enumerate(human_labeled):
+			if item == human_labeled_row['DESCRIPTION']:
+				if human_labeled_row['IS_PHYSICAL_TRANSACTION'] == '0':
 					# Transaction is non physical
 					non_physical.append(item)
 					break
@@ -108,11 +114,10 @@ def speed_tests(start_time, accuracy_results):
 	time_per_transaction = time_delta.seconds / accuracy_results['total_processed']
 	transactions_per_minute = (accuracy_results['total_processed'] / time_delta.seconds) * 60
 
-	print("")
-	print("SPEED TESTS:")
-	print("Total Time Taken: " + str(time_delta))
-	print("Time Per Transaction: " + str(time_per_transaction) + " seconds")
-	print("Transactions Per Minute: " + str(transactions_per_minute))
+	print("\nSPEED TESTS:")
+	print("{0:35} = {1:11}".format("Total Time Taken", str(time_delta)[0:10]))
+	print("{0:35} = {1:11.2f}".format("Time per Transaction (in seconds)", time_per_transaction))
+	print("{0:35} = {1:11.2f}".format("Transactions Per Minute", transactions_per_minute))
 
 	return {'time_delta':time_delta,
 			'time_per_transaction': time_per_transaction,
@@ -124,19 +129,18 @@ def print_results(results):
 	if results is None:
 		return
 		
-	print("")
-	print("STATS:")
-	print("Total Transactions Processed = " + str(results['total_processed']))
-	print("Total Labeled Physical = " + str(results['total_physical']) + "%")
-	print("Total Labeled Non Physical = " + str(results['total_non_physical']) + "%")
-	print("Binary Classifier Accuracy = " + str(results['binary_accuracy']) + "%", "\n")
-	print("Recall of all transactions = " + str(results['total_recall']) + "%")
-	print("Recall of transactions labeled physical = " + str(results['total_recall_non_physical']) + "%")
-	print("Number of transactions verified = " + str(results['num_verified']))
-	print("Precision = " + str(results['precision']) + "%")
+	print("\nSTATS:")
+	print("{0:35} = {1:11}".format("Total Transactions Processed", results['total_processed']))
+	print("{0:35} = {1:11}".format("Total Labeled Physical", results['total_physical']))
+	print("{0:35} = {1:11.2f}%".format("Total Labeled Non Physical", results['total_non_physical']))
+	print("{0:35} = {1:11.2f}%".format("Binary Classifier Accuracy", results['binary_accuracy']))
+	print("\n")
+	print("{0:35} = {1:11.2f}%".format("Recall all transactions", results['total_recall']))
+	print("{0:35} = {1:11.2f}%".format("Recall non physical", results['total_recall_non_physical']))
+	print("{0:35} = {1:11}".format("Number of transactions verified", results['num_verified']))
+	print("{0:35} = {1:11.2f}%".format("Precision", results['precision']))
 	print("", "MISLABELED:", '\n'.join(results['mislabeled']), sep="\n")
 
 if __name__ == "__main__":
-
 	output_path = sys.argv[1] if len(sys.argv) > 1 else "data/output/longtailLabeled.csv"
 	print_results(test_accuracy(file_path=output_path))

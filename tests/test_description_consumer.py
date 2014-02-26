@@ -1,6 +1,10 @@
 '''Unit tests for longtail.description_consumer'''
 
-import collections, json, queue, unittest
+import collections
+import json
+import numpy as np
+import queue
+import unittest
 from longtail.description_consumer import DescriptionConsumer
 
 class DescriptionConsumerTests(unittest.TestCase):
@@ -37,7 +41,13 @@ class DescriptionConsumerTests(unittest.TestCase):
 		, "brainstorm3:9200", "brainstorm4:9200", "brainstorm5:9200", "brainstorm6:9200"
 		, "brainstorm7:9200", "brainstorm8:9200", "brainstorm9:9200", "brainstorma:9200"
 		, "brainstormb:9200"],
-		"index" : "new_index", "type" : "new_type"
+		"index" : "new_index", "type" : "new_type",
+		"boost_labels" : [ "query_string", "composite.address" ],
+		"boost_vectors" : {
+			"factual_id" :        [ 0.0, 1.0 ],
+			"name" :              [ 1.0, 0.0 ],
+			"address" :           [ 0.0, 1.0 ]
+		}
 	},
 	"search_cache" : {}
 }"""
@@ -93,6 +103,13 @@ class DescriptionConsumerTests(unittest.TestCase):
 		result = self.my_consumer._DescriptionConsumer__begin_parse()
 		self.assertEqual(result,False)
 
+	def test_break_string_into_substrings_normal_use(self):
+		"""Ensure that we can recursively discover all substrings"""
+		term, substrings = "ABCD", {}
+		result = self.my_consumer._DescriptionConsumer__break_string_into_substrings(term, substrings)
+		expect = {2: {'AB': '', 'CD': '', 'BC': ''}, 3: {'BCD': '', 'ABC': ''}, 4: {'ABCD': ''}}
+		self.assertEqual(substrings,expect)
+
 	def test_display_z_score_single_score(self):
 		"""Ensure that list containing one score, returns None for z_score"""
 		scores = [0]
@@ -124,13 +141,6 @@ class DescriptionConsumerTests(unittest.TestCase):
 		search_results = json.loads(self.search_results)
 		self.my_consumer._DescriptionConsumer__output_to_result_queue(search_results)
 		self.assertEqual(False,self.my_consumer.result_queue.empty())
-
-	def test_powerset_normal_use(self):
-		"""Ensure that we can recursively discover all substrings"""
-		term, substrings = "ABCD", {}
-		result = self.my_consumer._DescriptionConsumer__powerset(term, substrings)
-		expect = {2: {'AB': '', 'CD': '', 'BC': ''}, 3: {'BCD': '', 'ABC': ''}, 4: {'ABCD': ''}}
-		self.assertEqual(substrings,expect)
 
 	def test_rebuild_tokens_normal_use(self):
 		"""Ensure that __rebuild_tokens works with a standard case"""
@@ -166,6 +176,27 @@ class DescriptionConsumerTests(unittest.TestCase):
 		result = self.my_consumer._DescriptionConsumer__search_index(input_as_object)
 		self.assertGreater(result["hits"]["total"],-1)
 
+	def test_build_boost_vectors_boost_row_labels(self):
+		"""Ensure that __build_boost_vectors correctly builds a sorted list of
+		boost_row_labels."""
+		result, _ = self.my_consumer._DescriptionConsumer__build_boost_vectors()
+		expect = ["address", "factual_id", "name"]
+		self.assertEqual(self.list_compare(result,expect), True)
+
+	def test_build_boost_vectors_boost_column_vectors(self):
+		"""Ensure that __build_boost_vectors correctly builds a dictionary of
+		boost_column_vectors."""
+		_, result = self.my_consumer._DescriptionConsumer__build_boost_vectors()
+		expect = {
+			"composite.address": np.array([1, 1, 0]),
+			"query_string": np.array([0, 0, 1]),
+		}
+		for key in result.keys():
+			r, e = result[key], expect[key]
+			self.assertTrue(np.allclose(r, e, rtol=1e-05, atol=1e-08))
+
+#	def test_find_largest_matching_string(self):
+#		"""Ensure that __find_largest_matching_string finds a known string."""
 
 if __name__ == '__main__':
 	unittest.main()

@@ -12,6 +12,7 @@ import copy
 import hashlib
 import json
 import logging
+import numpy as np
 import threading
 import queue
 import re
@@ -55,7 +56,7 @@ class DescriptionConsumer(threading.Thread):
 
 	def __begin_parse(self):
 		"""Creates data structures used the first call into the
-		__parse_into_search_tokens function."""
+		__break_description function."""
 		logger = logging.getLogger("thread " + str(self.thread_id))
 		#Abort processing, if input string is None
 		if self.input_string != None:
@@ -66,8 +67,85 @@ class DescriptionConsumer(threading.Thread):
 		self.recursive = False
 		self.my_meta["terms"] = []
 		self.my_meta["long_substrings"] = {}
-		self.__parse_into_search_tokens(self.input_string, self.recursive)
+		self.__break_description(self.input_string, self.recursive)
 		return True
+
+	def __break_description(self, input_string, recursive):
+		"""Recursively break an unstructured transaction description into TOKENS.
+		Example: "MEL'S DRIVE-IN #2 SAN FRANCISCOCA 24492153337286434101508" """
+		#This loop breaks up the input string looking for new search terms
+		#that match portions of our ElasticSearch index
+		tokens = self.my_meta["tokens"]
+		long_substrings = self.my_meta["long_substrings"]
+		terms = self.my_meta["terms"]
+		if len(input_string) >= DescriptionConsumer.STILL_BREAKABLE:
+			new_terms = input_string.split()
+			for term in new_terms:
+				term = string_cleanse(term)
+				if not recursive:
+					tokens.append(term)
+				substrings = {}
+				self.__break_string_into_substrings(term, substrings)
+				big_substring = self.__find_largest_matching_string(substrings)
+				if big_substring is not None:
+					bs_length = len(big_substring)
+					if bs_length not in long_substrings:
+						long_substrings[bs_length] = {}
+					if big_substring not in long_substrings[bs_length]:
+						long_substrings[bs_length][big_substring] = term
+			terms.extend(new_terms)
+
+		#This check allows us to exit if no substrings are found
+		if len(long_substrings) == 0:
+			return
+		#This block finds the longest substring match in our index and adds
+		#it to our dictionary of search terms
+		longest_substring = list(long_substrings[sorted\
+		(long_substrings.keys())[-1]].keys())[0]
+		self.my_meta["unigram_tokens"].append(longest_substring)
+
+		original_term, pre, post = self.__extract_longest_substring(longest_substring)
+		self.__rebuild_tokens(original_term, longest_substring, pre, post)
+		self.__break_description(pre + " " + post, True)
+
+	def __break_string_into_substrings(self, term, substrings):
+		"""Recursively break substrings for a term."""
+		term_length = len(term)
+		#Create a new dictionary for the length of the substring, if needed
+		#Example structure for substrings:
+		#{ 1: {"A", "B", "C"}, 2: {"AA", "BB", "CC"}, etc. }
+		if term_length not in substrings:
+			substrings[term_length] = {}
+		#Add a new substring to the dictionary, if it was not there
+		if term not in substrings[term_length]:
+			substrings[term_length][term] = ""
+		#Exclude substrings that are too small
+		if term_length <= DescriptionConsumer.STILL_BREAKABLE:
+			return
+		#Exclude substrings that are "stop" words
+		if term in STOP_WORDS:
+			return
+		#If the term has never been broken, break it's substrings
+		else:
+			self.__break_string_into_substrings(term[0:-1], substrings)
+			self.__break_string_into_substrings(term[1:], substrings)
+
+	def __build_boost_vectors(self):
+		"""Turns configuration entries into a dictionary of numpy arrays."""
+		logger = logging.getLogger("thread " + str(self.thread_id))
+		boost_column_labels = self.params["elasticsearch"]["boost_labels"]
+		boost_row_vectors = self.params["elasticsearch"]["boost_vectors"]
+		boost_row_labels, boost_column_vectors = sorted(boost_row_vectors.keys()), {}
+		for i in range(len(boost_column_labels)):
+			my_list = []
+			for field in boost_row_labels:
+				my_list.append(boost_row_vectors[field][i])
+			boost_column_vectors[boost_column_labels[i]] = np.array(my_list)
+		#logger.debug("===================================================")
+		#logger.debug(str(boost_row_labels))
+		#logger.debug(str(boost_column_vectors))
+		#logger.debug("===================================================")
+		return boost_row_labels, boost_column_vectors
 
 	def __display_results(self):
 		"""Displays our tokens, n-grams, and search results."""
@@ -103,6 +181,8 @@ class DescriptionConsumer(threading.Thread):
 		logger.info("\t%i uni-grams:     %s", len(filtered_tokens), str(filtered_tokens))
 
 		#TODO: Deal with factual composite addresses in a generic manner
+
+		#Unable to use this, it assumes a composite address
 		count, matching_address = self.__get_matching_address()
 		if count > 0:
 			addresses.append(matching_address)
@@ -112,10 +192,12 @@ class DescriptionConsumer(threading.Thread):
 		query_string = " ".join(filtered_tokens)
 		self.__get_n_gram_tokens(filtered_tokens)
 
+		#Might be able to use this
 		matched_n_gram_tokens = self.__search_n_gram_tokens()
 		logger.info("\t%i multi-grams: %s", len(matched_n_gram_tokens),\
 			str(matched_n_gram_tokens))
 
+		#Cannot use this yet, it assumes only two composite fields
 		self.__generate_final_query(query_string, matching_address\
 		, phone_numbers, matched_n_gram_tokens)
 
@@ -200,14 +282,18 @@ class DescriptionConsumer(threading.Thread):
 		self.input_string = None
 		self.params = params
 		self.parameter_key = parameter_key
+
 		cluster_nodes = self.params["elasticsearch"]["cluster_nodes"]
 		self.es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True,
 			sniff_on_connection_fail=True, sniffer_timeout=5, sniff_timeout=5)
+
 		self.recursive = False
 		self.my_meta = None
 		self.n_gram_tokens = None
 		self.__reset_my_meta()
 		self.__set_logger()
+		self.boost_row_labels, self.boost_column_vectors =\
+			self.__build_boost_vectors()
 
 	def __generate_final_query(self, qs_query, address, phone_numbers
 	, matching_n_grams):
@@ -388,60 +474,6 @@ class DescriptionConsumer(threading.Thread):
 		logging.info("Z_SCORE_DELTA: %.2f", z_score_delta)
 		logging.info("TOP_SCORE: %.4f", top_score)
 
-	def __parse_into_search_tokens(self, input_string, recursive):
-		"""Recursively attempts to parse an unstructured transaction
-		description into TOKENS.
-		Example: "MEL'S DRIVE-IN #2 SAN FRANCISCOCA 24492153337286434101508" """
-		#This loop breaks up the input string looking for new search terms
-		#that match portions of our ElasticSearch index
-		tokens = self.my_meta["tokens"]
-		long_substrings = self.my_meta["long_substrings"]
-		terms = self.my_meta["terms"]
-		if len(input_string) >= DescriptionConsumer.STILL_BREAKABLE:
-			new_terms = input_string.split()
-			for term in new_terms:
-				term = string_cleanse(term)
-				if not recursive:
-					tokens.append(term)
-				substrings = {}
-				self.__powerset(term, substrings)
-				big_substring = self.__search_substrings(substrings)
-				if big_substring is not None:
-					bs_length = len(big_substring)
-					if bs_length not in long_substrings:
-						long_substrings[bs_length] = {}
-					if big_substring not in long_substrings[bs_length]:
-						long_substrings[bs_length][big_substring] = term
-			terms.extend(new_terms)
-
-		#This check allows us to exit if no substrings are found
-		if len(long_substrings) == 0:
-			return
-		#This block finds the longest substring match in our index and adds
-		#it to our dictionary of search terms
-		longest_substring = list(long_substrings[sorted\
-		(long_substrings.keys())[-1]].keys())[0]
-		self.my_meta["unigram_tokens"].append(longest_substring)
-
-		original_term, pre, post = self.__extract_longest_substring(longest_substring)
-		self.__rebuild_tokens(original_term, longest_substring, pre, post)
-		self.__parse_into_search_tokens(pre + " " + post, True)
-
-	def __powerset(self, term, substrings):
-		"""Recursively discover all substrings for a term."""
-		term_length = len(term)
-		if term_length not in substrings:
-			substrings[term_length] = {}
-		if term not in substrings[term_length]:
-			substrings[term_length][term] = ""
-		if term_length <= DescriptionConsumer.STILL_BREAKABLE:
-			return
-		if term in STOP_WORDS:
-			return
-		else:
-			self.__powerset(term[0:-1], substrings)
-			self.__powerset(term[1:], substrings)
-
 	def __rebuild_tokens(self, original_term, longest_substring, pre, post):
 		"""Rebuilds our complete list of tokens following a substring
 		extraction."""
@@ -515,7 +547,7 @@ class DescriptionConsumer(threading.Thread):
 					matched_n_gram_tokens.append(term)
 		return matched_n_gram_tokens
 
-	def __search_substrings(self, substrings):
+	def __find_largest_matching_string(self, substrings):
 		"""Looks for the longest substring in our merchants index that
 		can actually be found."""
 		my_new_query = get_bool_query()
@@ -564,7 +596,8 @@ class DescriptionConsumer(threading.Thread):
 		my_logger.info("Log initialized.")
 		params_json = json.dumps(params, sort_keys=True, indent=4\
 		, separators=(',', ': '))
-		my_logger.info(params_json)
+		my_logger.debug(params_json)
+
 
 	def run(self):
 		while True:
