@@ -195,6 +195,14 @@ class DescriptionConsumerTests(unittest.TestCase):
 			r, e = result[key], expect[key]
 			self.assertTrue(np.allclose(r, e, rtol=1e-05, atol=1e-08))
 
+	def test_get_boosted_fields_normal_use(self):
+		"""Test that __get_boosted_fields returns the expected result"""
+		self.my_consumer.boost_column_vectors = { "vector_1" : [0.0, 2.0, 1.0] }
+		self.my_consumer.boost_row_labels = ["A", "B", "C"]
+		expect = ["B^2.0", "C^1.0"]
+		result = self.my_consumer._DescriptionConsumer__get_boosted_fields("vector_1")
+		self.assertEqual(self.list_compare(result,expect), True)
+
 #	def test_find_largest_matching_string(self):
 #		"""Ensure that __find_largest_matching_string finds a known string."""
 

@@ -559,10 +559,20 @@ class DescriptionConsumer(threading.Thread):
 					term = term.lower()
 				hit_count = 0
 				if len(term) > 1:
-					my_new_query["query"]["bool"]["should"] = [ get_qs_query(term) ]
+					#my_new_query["query"]["bool"]["should"] = [ get_qs_query(term) ]
+					boosted_fields = self.__get_boosted_fields("query_string")
+					my_new_query["query"]["bool"]["should"] =\
+						 [ get_qs_query(term, fields=boosted_fields) ]
 					hit_count = self.__search_index(my_new_query)['hits']['total']
 				if hit_count > 0:
 					return term
+
+	def __get_boosted_fields(self, vector_name):
+		"""Returns a list of boosted fields built from a boost vector"""
+		boost_vector = self.boost_column_vectors[vector_name]
+		fields = [ x + "^" + str(y) for x, y in zip(self.boost_row_labels, boost_vector) if y != 0.0 ]
+		#logging.critical(str(fields))
+		return fields
 
 	def __set_logger(self):
 		"""Creates a logger, based upon the supplied config object."""
