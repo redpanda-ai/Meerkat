@@ -91,20 +91,21 @@ def test_accuracy(file_path=None, non_physical_trans=[], result_list=[]):
 	num_correct = len(correct)
 
 	#rounded percent = lambda function
+	rounded_percent = lambda x: math.ceil(x * 100)
 	return {
 		"total_processed": total_processed,
-		"total_physical": math.ceil((len(machine_labeled) / total_processed) * 100),
-		"total_non_physical": math.ceil((len(non_physical_trans) / total_processed) * 100),
+		"total_physical": rounded_percent(len(machine_labeled) / total_processed),
+		"total_non_physical": rounded_percent(len(non_physical_trans) / total_processed),
 		"correct": correct,
 		"needs_hand_labeling": needs_hand_labeling,
 		"non_physical": non_physical,
 		"unlabeled": unlabeled,
 		"num_verified": num_verified,
 		"mislabeled": mislabeled,
-		"total_recall": math.ceil((num_labeled / total_processed) * 100),
-		"total_recall_non_physical": math.ceil((num_labeled / total) * 100),
-		"precision": math.ceil((num_correct / num_verified) * 100),
-		"binary_accuracy": 100 - math.ceil((len(non_physical) / total) * 100)
+		"total_recall": rounded_percent(num_labeled / total_processed),
+		"total_recall_non_physical": rounded_percent(num_labeled / total),
+		"precision": rounded_percent(num_correct / num_verified),
+		"binary_accuracy": 100 - rounded_percent(len(non_physical) / total)
 	}
 
 def speed_tests(start_time, accuracy_results):
