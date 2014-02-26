@@ -4,7 +4,6 @@
 import csv, sys, logging, os
 
 from sklearn.cross_validation import train_test_split
-from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.linear_model import SGDClassifier
