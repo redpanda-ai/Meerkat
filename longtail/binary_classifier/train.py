@@ -1,10 +1,7 @@
 #!/usr/local/bin/python3
 # pylint: disable=all
 
-import csv
-import numpy as np
-from time import time
-from pprint import pprint
+import csv, sys, logging, os
 
 from sklearn.cross_validation import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -15,11 +12,18 @@ from sklearn.grid_search import GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.externals import joblib
 
-def load_data():
+def load_data(labeled_transactions="data/misc/verifiedLabeledTrans.csv"):
 
-    HL_file = open("data/misc/verifiedLabeledTrans.csv")
+    if not os.path.isfile(labeled_transactions):
+        logging.error("Please provide a set of labeled transactions to build the classifier on")
+
+    HL_file = open(labeled_transactions, encoding='utf-8')
     human_labeled = list(csv.DictReader(HL_file))
     HL_file.close()
+
+    if len(human_labeled) < 100:
+        logging.error("Not enough labeled data to create a model from")
+
     transactions = []
     labels = []
 
@@ -63,6 +67,14 @@ def build_model(trans_train, trans_test, labels_train, labels_test):
 
     print("Actual Score: " + str(score))
 
+    # Test Model
+    #test_model(labels_test, trans_test, grid_search)
+
+    # Save Model
+    joblib.dump(grid_search, 'longtail/binary_classifier/global.pkl', compress=3)
+
+def test_model(labels_test, trans_test, grid_search):
+
     y_true, y_pred = labels_test, grid_search.predict(trans_test)
     output = []
 
@@ -73,12 +85,14 @@ def build_model(trans_train, trans_test, labels_train, labels_test):
         result['ACTUAL'] = y_true[i]
         output.append(result)
 
-    #for i in range(len(output)):
-        #print(output[i])
-
-    # Save Model
-    joblib.dump(grid_search, 'longtail/binary_classifier/global.pkl', compress=9)
+    for i in range(len(output)):
+        print(output[i])  
 
 if __name__ == "__main__":
-    trans_train, trans_test, labels_train, labels_test = load_data()
+
+    if len(sys.argv) == 2 and os.path.isfile(sys.argv[1]):
+        trans_train, trans_test, labels_train, labels_test = load_data(labeled_transactions=sys.argv[1])
+    else:
+        trans_train, trans_test, labels_train, labels_test = load_data()
+
     build_model(trans_train, trans_test, labels_train, labels_test)
