@@ -90,22 +90,22 @@ def test_accuracy(file_path=None, non_physical_trans=[], result_list=[]):
 	num_verified = num_verified if num_verified > 0 else 1
 	num_correct = len(correct)
 
-	results = {}
-	results['total_processed'] = total_processed
-	results['total_physical'] = math.ceil((len(machine_labeled) / results['total_processed']) * 100)
-	results['total_non_physical'] = math.ceil((len(non_physical_trans) / results['total_processed']) * 100)
-	results['correct'] = correct
-	results['needs_hand_labeling'] = needs_hand_labeling
-	results['non_physical'] = non_physical
-	results['unlabeled'] = unlabeled
-	results['num_verified'] = num_verified
-	results['mislabeled'] = mislabeled
-	results['total_recall'] = math.ceil((num_labeled / results['total_processed']) * 100)
-	results['total_recall_non_physical'] = math.ceil((num_labeled / total) * 100)
-	results['precision'] = math.ceil((num_correct / num_verified) * 100)
-	results['binary_accuracy'] = 100 - math.ceil((len(non_physical) / total) * 100)
-
-	return results
+	#rounded percent = lambda function
+	return {
+		"total_processed": total_processed,
+		"total_physical": math.ceil((len(machine_labeled) / total_processed) * 100),
+		"total_non_physical": math.ceil((len(non_physical_trans) / total_processed) * 100),
+		"correct": correct,
+		"needs_hand_labeling": needs_hand_labeling,
+		"non_physical": non_physical,
+		"unlabeled": unlabeled,
+		"num_verified": num_verified,
+		"mislabeled": mislabeled,
+		"total_recall": math.ceil((num_labeled / total_processed) * 100),
+		"total_recall_non_physical": math.ceil((num_labeled / total) * 100),
+		"precision": math.ceil((num_correct / num_verified) * 100),
+		"binary_accuracy": 100 - math.ceil((len(non_physical) / total) * 100)
+	}
 
 def speed_tests(start_time, accuracy_results):
 	"""Run a number of tests related to speed"""

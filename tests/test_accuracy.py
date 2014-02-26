@@ -44,7 +44,7 @@ class AccuracyTests(unittest.TestCase):
 		self.assertEqual(self.speed_results['time_per_transaction'], 1)
 	
 	def test_transactions_per_minute(self):
-		self.assertEqual(self.speed_results['transactions_per_minute'], 60)	
+		self.assertEqual(self.speed_results['transactions_per_minute'], 60)
 		
 if __name__ == '__main__':
 	unittest.main()
