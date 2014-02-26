@@ -115,7 +115,7 @@ def speed_tests(start_time, accuracy_results):
 	transactions_per_minute = (accuracy_results['total_processed'] / time_delta.seconds) * 60
 
 	print("\nSPEED TESTS:")
-	print("{0:35} = {1:11}".format("Total Time Taken", str(time_delta)[0:10]))
+	print("{0:35} = {1:11}".format("Total Time Taken", str(time_delta)[0:11]))
 	print("{0:35} = {1:11.2f}".format("Time per Transaction (in seconds)", time_per_transaction))
 	print("{0:35} = {1:11.2f}".format("Transactions Per Minute", transactions_per_minute))
 
