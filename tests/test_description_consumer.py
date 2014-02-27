@@ -6,6 +6,7 @@ import numpy as np
 import queue
 import unittest
 from longtail.description_consumer import DescriptionConsumer
+from longtail.custom_exceptions import Misconfiguration
 
 class DescriptionConsumerTests(unittest.TestCase):
 	"""Our UnitTest class."""
@@ -42,7 +43,17 @@ class DescriptionConsumerTests(unittest.TestCase):
 		, "brainstorm7:9200", "brainstorm8:9200", "brainstorm9:9200", "brainstorma:9200"
 		, "brainstormb:9200"],
 		"index" : "new_index", "type" : "new_type",
-		"boost_labels" : [ "query_string", "composite.address" ],
+		"subqueries" : {
+			"largest_matching_string": {
+				"field_boosts" : "standard_fields",
+				"query_type" : "qs_query"
+			},
+			"find_addresses": {
+				"field_boosts" : "composite.address",
+				"query_type" : "multi_match_query"
+			}
+		},
+		"boost_labels" : [ "standard_fields", "composite.address" ],
 		"boost_vectors" : {
 			"factual_id" :        [ 0.0, 1.0 ],
 			"name" :              [ 1.0, 0.0 ],
@@ -189,7 +200,7 @@ class DescriptionConsumerTests(unittest.TestCase):
 		_, result = self.my_consumer._DescriptionConsumer__build_boost_vectors()
 		expect = {
 			"composite.address": np.array([1, 1, 0]),
-			"query_string": np.array([0, 0, 1]),
+			"standard_fields": np.array([0, 0, 1]),
 		}
 		for key in result.keys():
 			r, e = result[key], expect[key]
@@ -202,6 +213,24 @@ class DescriptionConsumerTests(unittest.TestCase):
 		expect = ["B^2.0", "C^1.0"]
 		result = self.my_consumer._DescriptionConsumer__get_boosted_fields("vector_1")
 		self.assertEqual(self.list_compare(result,expect), True)
+
+	def test_get_subquery_qs_query(self):
+		"""Test that __get_subquery works with a named qs_query subquery."""
+		expect = { 'query_string': { 'boost': 1.0, 'fields': ['name^1.0'], 'query': 'some_term'} }
+		result = self.my_consumer._DescriptionConsumer__get_subquery("some_term", "largest_matching_string")
+		self.assertEqual(expect, result)
+
+	def test_get_subquery_multi_match_query(self):
+		"""Test that __get_subquery works with a named multi_match_query subquery."""
+		expect = { 'multi_match': { 'fields': ['address^1.0', 'factual_id^1.0'],
+			'query': 'some_address', 'type': 'phrase'} }
+		result = self.my_consumer._DescriptionConsumer__get_subquery("some_address", "find_addresses")
+		self.assertEqual(expect, result)
+
+	def test_get_subquery_named_query_not_found(self):
+		"""Test that __get_subquery works with a named multi_match_query subquery."""
+		self.assertRaises(Misconfiguration, self.my_consumer._DescriptionConsumer__get_subquery,
+			"some_term", "not_in_configuration")
 
 #	def test_find_largest_matching_string(self):
 #		"""Ensure that __find_largest_matching_string finds a known string."""

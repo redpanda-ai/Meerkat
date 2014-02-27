@@ -143,6 +143,8 @@ def validate_params(params):
 	if "parameter_key" not in params["input"]:
 		params["input"]["parameter_key"] = "config/keys/default.json"
 
+	if "subqueries" not in params["elasticsearch"]:
+		raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.subqueries'", expr=None)
 	if "index" not in params["elasticsearch"]:
 		raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.index'", expr=None)
 	if "type" not in params["elasticsearch"]:

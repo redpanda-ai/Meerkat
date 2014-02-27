@@ -133,13 +133,13 @@ def print_results(results):
 	print("\nSTATS:")
 	print("{0:35} = {1:11}".format("Total Transactions Processed", results['total_processed']))
 	print("{0:35} = {1:11}".format("Total Labeled Physical", results['total_physical']))
-	print("{0:35} = {1:11.2f}%".format("Total Labeled Non Physical", results['total_non_physical']))
-	print("{0:35} = {1:11.2f}%".format("Binary Classifier Accuracy", results['binary_accuracy']))
+	print("{0:35} = {1:10.2f}%".format("Total Labeled Non Physical", results['total_non_physical']))
+	print("{0:35} = {1:10.2f}%".format("Binary Classifier Accuracy", results['binary_accuracy']))
 	print("\n")
-	print("{0:35} = {1:11.2f}%".format("Recall all transactions", results['total_recall']))
-	print("{0:35} = {1:11.2f}%".format("Recall non physical", results['total_recall_non_physical']))
+	print("{0:35} = {1:10.2f}%".format("Recall all transactions", results['total_recall']))
+	print("{0:35} = {1:10.2f}%".format("Recall non physical", results['total_recall_non_physical']))
 	print("{0:35} = {1:11}".format("Number of transactions verified", results['num_verified']))
-	print("{0:35} = {1:11.2f}%".format("Precision", results['precision']))
+	print("{0:35} = {1:10.2f}%".format("Precision", results['precision']))
 	print("", "MISLABELED:", '\n'.join(results['mislabeled']), sep="\n")
 
 if __name__ == "__main__":

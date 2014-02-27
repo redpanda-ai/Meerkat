@@ -18,6 +18,12 @@
 		, "brainstormb:9200"],
 		"index" : "factual_index",
 		"type" : "factual_type",
+		"subqueries" : {
+			"largest_matching_string": {
+				"field_boosts" : "standard_fields",
+				"query_type" : "query_string"
+			}
+		},
 		"boost_labels" : [ "query_string", "composite.address" ],
 		"boost_vectors" : {
 			"factual_id" :        [ 0.0, 0.0 ],

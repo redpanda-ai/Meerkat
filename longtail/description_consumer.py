@@ -21,13 +21,14 @@ import sys
 from elasticsearch import Elasticsearch, helpers
 from scipy.stats.mstats import zscore
 
-from longtail.custom_exceptions import UnsupportedQueryType
+from longtail.custom_exceptions import Misconfiguration, UnsupportedQueryType
 from longtail.various_tools import string_cleanse
 
 #Globals
 STOP_WORDS = ["CHECK", "CARD", "CHECKCARD", "PAYPOINT", "PURCHASE", "LLC"]
 
 #Helper functions
+
 def get_bool_query(starting_from = 0, size = 0):
 	"""Returns a "bool" style ElasticSearch query object"""
 	return { "from" : starting_from, "size" : size, "query" : {
@@ -38,15 +39,15 @@ def get_match_phrase_query(term, feature_name, boost=1.0):
 	return { "match" : { feature_name : {
 		"query": term, "type": "phrase", "boost": boost } } }
 
-def get_multi_match_query(term, field_list):
+def get_multi_match_query(term, field_list=[]):
 	"""Returns a "match" style ElasticSearch query object"""
 	return { "multi_match" : { "query": term,
 		"type": "phrase", "fields": field_list } }
 
-def get_qs_query(term, fields=[], boost=1.0):
+def get_qs_query(term, field_list=[], boost=1.0):
 	"""Returns a "query_string" style ElasticSearch query object"""
 	return { "query_string": {
-		"query": term, "fields": fields, "boost": boost } }
+		"query": term, "fields": field_list, "boost": boost } }
 
 class DescriptionConsumer(threading.Thread):
 	''' Acts as a client to an ElasticSearch cluster, tokenizing description
@@ -183,10 +184,10 @@ class DescriptionConsumer(threading.Thread):
 		#TODO: Deal with factual composite addresses in a generic manner
 
 		#Unable to use this, it assumes a composite address
-		count, matching_address = self.__get_matching_address()
-		if count > 0:
-			addresses.append(matching_address)
-		logger.info("\t%i addresses: %s", len(addresses), str(addresses))
+		#count, matching_address = self.__get_matching_address()
+		#if count > 0:
+		#	addresses.append(matching_address)
+		#logger.info("\t%i addresses: %s", len(addresses), str(addresses))
 
 		#show all search terms separated by spaces
 		query_string = " ".join(filtered_tokens)
@@ -198,8 +199,7 @@ class DescriptionConsumer(threading.Thread):
 			str(matched_n_gram_tokens))
 
 		#Cannot use this yet, it assumes only two composite fields
-		self.__generate_final_query(query_string, matching_address\
-		, phone_numbers, matched_n_gram_tokens)
+		self.__generate_final_query(query_string, matched_n_gram_tokens)
 
 		#TODO: a tail recursive search for longest matching
 		#n-gram on a per composite-feature basis.
@@ -295,12 +295,12 @@ class DescriptionConsumer(threading.Thread):
 		self.boost_row_labels, self.boost_column_vectors =\
 			self.__build_boost_vectors()
 
-	def __generate_final_query(self, qs_query, address, phone_numbers
-	, matching_n_grams):
+	def __generate_final_query(self, qs_query, matching_n_grams):
 		"""Constructs a complete boolean query based upon:
 		1.  Unigrams (query_string)
-		2.  Addresses (match)
-		3.  Phone Number (match)"""
+		2.  Matching n-grams (match)
+		REMOVED 3.  Addresses (match)
+		REMOVED 4.  Phone Number (match)"""
 		#Add dynamic output based upon a dictionary of token types
 		#See comment above
 		logger = logging.getLogger("thread " + str(self.thread_id))
@@ -308,23 +308,31 @@ class DescriptionConsumer(threading.Thread):
 		search_components = []
 		parameter_key = self.parameter_key
 		field_boosts = ["_all^1"]
-		field_boosts.append("BUSINESSSTANDARDNAME^"\
-		+ parameter_key.get("business_name_boost", "1"))
-		address_boost = "composite.address^" + parameter_key.get("address_boost", "1")
-		phone_boost = "composite.phone^" + parameter_key.get("phone_boost", "1")
+		#field_boosts.append("BUSINESSSTANDARDNAME^"\
+		#+ parameter_key.get("business_name_boost", "1"))
+		#address_boost = "composite.address^" + parameter_key.get("address_boost", "1")
+		#phone_boost = "composite.phone^" + parameter_key.get("phone_boost", "1")
 
 		logger.info("Search components are:")
 		logger.info("\tUnigrams: '%s'", qs_query)
+		
 		search_components.append((qs_query, "qs_query", field_boosts, 1))
-		if address is not None:
-			logger.info("\tMatching 'Address': '%s", address)
-			search_components.append((address, "match_query"\
-			, [address_boost], 10))
-		if len(phone_numbers) != 0:
-			for phone_num in phone_numbers:
-				logger.info("\tMatching 'Phone': '%s'", phone_num)
-				search_components.append((phone_num, "match_query"\
-				, [phone_boost], 1))
+
+		#TODO search_clauses.append("query_string", "qs_query"
+
+		#if address is not None:
+		#	logger.info("\tMatching 'Address': '%s", address)
+			#search_components.append((address, "match_query"\
+			#, [address_boost], 10))
+#		if len(phone_numbers) != 0:
+#			for phone_num in phone_numbers:
+#				logger.info("\tMatching 'Phone': '%s'", phone_num)
+#				search_components.append((phone_num, "match_query"\
+#				, [phone_boost], 1))
+
+		#Ultimately, the order doesnt matter, so let's have a complete list of 
+		#named subqueries.for the final query
+
 		for n_gram in matching_n_grams:
 			search_components.append((n_gram, "match_query"\
 			, ["_all^1"], 1))
@@ -353,10 +361,6 @@ class DescriptionConsumer(threading.Thread):
 			if query_type == "qs_query":
 				my_subquery = get_qs_query(term, feature_list, boost)
 			elif query_type == "match_query":
-				#logging.critical("Feature list BEFORE: %s", str(feature_list))
-				#feature_list = [x+"^"+str(boost) for x in feature_list]
-				#logging.critical("Feature list AFTER: %s", str(feature_list))
-				#my_subquery = get_multi_match_query(term, field_list)
 				for feature in feature_list:
 					my_subquery = get_match_phrase_query(term, feature, boost)
 			else:
@@ -427,6 +431,25 @@ class DescriptionConsumer(threading.Thread):
 					self.n_gram_tokens[n_gram_size].append(" ".join(new_n_gram))
 		return
 
+	def __get_subquery(self, term, subquery_name):
+		"""Routes to a named subquery to the correct helper function."""
+		subqueries = self.params["elasticsearch"]["subqueries"]
+		if subquery_name not in subqueries:
+			raise Misconfiguration(msg="Subquery name not in config file, '"\
+			+ subquery_name + "'", expr=None)
+
+		#field_boosts = subqueries[subquery_name]["field_boosts"]
+		field_boosts = self.__get_boosted_fields(subqueries[subquery_name]["field_boosts"])
+		query_type = subqueries[subquery_name]["query_type"]
+		if query_type == "qs_query":
+			return get_qs_query(term, field_boosts)
+		elif query_type == "multi_match_query":
+			return get_multi_match_query(term, field_boosts)
+		else:
+			raise UnsupportedQueryType("There is no support for a query of type"\
+			+ query_type, msg="")
+
+
 	def __output_to_result_queue(self, search_results):
 		"""Decides whether to output and pushes to result_queue"""
 		hits = search_results['hits']['hits']
@@ -496,10 +519,6 @@ class DescriptionConsumer(threading.Thread):
 		self.n_gram_tokens = {}
 		self.my_meta = { "unigram_tokens": [], "tokens": [], "metrics": {
 			"query_count": 0, "cache_count": 0 }}
-		#self.my_meta = {}
-		#self.my_meta["unigram_tokens"] = []
-		#self.my_meta["tokens"] = []
-		#self.my_meta["metrics"] = {"query_count" : 0, "cache_count" : 0}
 
 	def __search_index(self, input_as_object):
 		"""Searches the merchants index and the merchant mapping"""
@@ -559,10 +578,11 @@ class DescriptionConsumer(threading.Thread):
 					term = term.lower()
 				hit_count = 0
 				if len(term) > 1:
-					#my_new_query["query"]["bool"]["should"] = [ get_qs_query(term) ]
-					boosted_fields = self.__get_boosted_fields("query_string")
+					boosted_fields = self.__get_boosted_fields("standard_fields")
+#					my_new_query["query"]["bool"]["should"] =\
+#						 [ get_qs_query(term, fields=boosted_fields) ]
 					my_new_query["query"]["bool"]["should"] =\
-						 [ get_qs_query(term, fields=boosted_fields) ]
+						 [ self.__get_subquery(term, "largest_matching_string") ]
 					hit_count = self.__search_index(my_new_query)['hits']['total']
 				if hit_count > 0:
 					return term
