@@ -142,14 +142,10 @@ class DescriptionConsumer(threading.Thread):
 			for field in boost_row_labels:
 				my_list.append(boost_row_vectors[field][i])
 			boost_column_vectors[boost_column_labels[i]] = np.array(my_list)
-		#logger.debug("===================================================")
-		#logger.debug(str(boost_row_labels))
-		#logger.debug(str(boost_column_vectors))
-		#logger.debug("===================================================")
 		return boost_row_labels, boost_column_vectors
 
 	def __display_results(self):
-		"""Displays our tokens, n-grams, and search results."""
+		"""Displays our tokens, multi-grams, and search results."""
 		logger = logging.getLogger("thread " + str(self.thread_id))
 
 		phone_re = re.compile("^[0-9/#]{10}$")
@@ -181,28 +177,20 @@ class DescriptionConsumer(threading.Thread):
 		logger.info("\t%i numeric words: %s", len(numeric_tokens), str(numeric_tokens))
 		logger.info("\t%i uni-grams:     %s", len(filtered_tokens), str(filtered_tokens))
 
-		#TODO: Deal with factual composite addresses in a generic manner
-
-		#Unable to use this, it assumes a composite address
-		#count, matching_address = self.__get_matching_address()
-		#if count > 0:
-		#	addresses.append(matching_address)
-		#logger.info("\t%i addresses: %s", len(addresses), str(addresses))
-
 		#show all search terms separated by spaces
 		query_string = " ".join(filtered_tokens)
-		self.__get_n_gram_tokens(filtered_tokens)
+		self.params["unigram_string"] = query_string
+		self.__get_multi_gram_tokens(filtered_tokens)
 
-		#Might be able to use this
-		matched_n_gram_tokens = self.__search_n_gram_tokens()
-		logger.info("\t%i multi-grams: %s", len(matched_n_gram_tokens),\
-			str(matched_n_gram_tokens))
+		#Get matched unigram strings
+		matched_multigrams = self.__search_multi_grams()
+		self.params["matched_multigrams"] = self.__search_multi_grams()
 
 		#Cannot use this yet, it assumes only two composite fields
-		self.__generate_final_query(query_string, matched_n_gram_tokens)
+		self.__generate_final_query(query_string, matched_multigrams)
 
 		#TODO: a tail recursive search for longest matching
-		#n-gram on a per composite-feature basis.
+		#multi-gram on a per composite-feature basis.
 
 	def __display_search_results(self, search_results):
 		"""Displays search results."""
@@ -289,97 +277,62 @@ class DescriptionConsumer(threading.Thread):
 
 		self.recursive = False
 		self.my_meta = None
-		self.n_gram_tokens = None
+		self.multi_gram_tokens = None
 		self.__reset_my_meta()
 		self.__set_logger()
 		self.boost_row_labels, self.boost_column_vectors =\
 			self.__build_boost_vectors()
 
-	def __generate_final_query(self, qs_query, matching_n_grams):
+	def __generate_final_query(self, qs_query, matching_multi_grams):
 		"""Constructs a complete boolean query based upon:
 		1.  Unigrams (query_string)
-		2.  Matching n-grams (match)
-		REMOVED 3.  Addresses (match)
-		REMOVED 4.  Phone Number (match)"""
+		2.  Matching multi-grams (match)"""
+
 		#Add dynamic output based upon a dictionary of token types
 		#See comment above
+		#TODO: Merge with __get_boolean_search_object
 		logger = logging.getLogger("thread " + str(self.thread_id))
-		my_meta = self.my_meta
-		search_components = []
 		parameter_key = self.parameter_key
-		field_boosts = ["_all^1"]
-		#field_boosts.append("BUSINESSSTANDARDNAME^"\
-		#+ parameter_key.get("business_name_boost", "1"))
-		#address_boost = "composite.address^" + parameter_key.get("address_boost", "1")
-		#phone_boost = "composite.phone^" + parameter_key.get("phone_boost", "1")
 
-		logger.info("Search components are:")
-		logger.info("\tUnigrams: '%s'", qs_query)
-		
-		search_components.append((qs_query, "qs_query", field_boosts, 1))
+		logger.critical("BUILDING FINAL BOOLEAN SEARCH")
+		my_obj = self.__get_boolean_search_object()
 
-		#TODO search_clauses.append("query_string", "qs_query"
-
-		#if address is not None:
-		#	logger.info("\tMatching 'Address': '%s", address)
-			#search_components.append((address, "match_query"\
-			#, [address_boost], 10))
-#		if len(phone_numbers) != 0:
-#			for phone_num in phone_numbers:
-#				logger.info("\tMatching 'Phone': '%s'", phone_num)
-#				search_components.append((phone_num, "match_query"\
-#				, [phone_boost], 1))
-
-		#Ultimately, the order doesnt matter, so let's have a complete list of 
-		#named subqueries.for the final query
-
-		for n_gram in matching_n_grams:
-			search_components.append((n_gram, "match_query"\
-			, ["_all^1"], 1))
-
-		my_obj = self.__get_boolean_search_object(search_components)
-		logger.info(json.dumps(my_obj))
 		my_results = self.__search_index(my_obj)
-		metrics = my_meta["metrics"]
+		metrics = self.my_meta["metrics"]
 		logger.warning("Cache Hit / Miss: %i / %i",\
 			 metrics["cache_count"], metrics["query_count"])
 		self.__display_search_results(my_results)
 		self.__output_to_result_queue(my_results)
 
-	def __get_boolean_search_object(self, search_components):
+	def __get_boolean_search_object(self):
 		"""Builds an object for a "bool" search."""
-		#TODO: Replace this with the boost_list/boost_vector approach
-		params = self.params
-		#parameter_key = self.parameter_key
+		logger = logging.getLogger("thread " + str(self.thread_id))
+		parameter_key = self.parameter_key
 		result_size = self.parameter_key.get("es_result_size", "10")
 		bool_search = get_bool_query(size = result_size)
+		params = self.params
 		bool_search["fields"] = params["output"]["results"]["fields"]
-
-		for item in search_components:
-			my_subquery = None
-			term, query_type, feature_list, boost = item[0:4]
-			if query_type == "qs_query":
-				my_subquery = get_qs_query(term, feature_list, boost)
-			elif query_type == "match_query":
-				for feature in feature_list:
-					my_subquery = get_match_phrase_query(term, feature, boost)
-			else:
-				raise UnsupportedQueryType("There is no support"\
-				+ " for a query of type: " + query_type)
-			bool_search["query"]["bool"]["should"].append(my_subquery)
+		#Add unigram clause
+		should_clauses = bool_search["query"]["bool"]["should"]
+		should_clauses.append(self.__get_subquery(self.params["unigram_string"], "unigram_string"))
+		#Add multigram clauses
+		#TODO: Exhaust all "multi.x" subqueries first to see if addresses, phone numbers, etc. match first
+		#Then remove from the list of multi_grams
+		for matched_multigram in self.params["matched_multigrams"]:
+			should_clauses.append(self.__get_subquery(matched_multigram, "matched_multigram"))
+		logger.critical(json.dumps(bool_search, sort_keys=True, indent=4, separators=(',', ': ')))
 		return bool_search
 
-	def __get_composite_search_count(self, list_of_ngrams, feature_name):
+	def __get_composite_search_count(self, list_of_ngrams, subquery_name):
 		"""Obtains search results for a query composed of multiple
 		sub-queries.  At some point I may add 'query_string' as an
 		additional parameter."""
 		my_new_query = get_bool_query()
-
+		#TODO: pass this in and make it magnify according to multi-gram size
 		boost = "^1.2"
 		for term in list_of_ngrams:
-			#my_sub_query = get_match_phrase_query(term, feature_name, boost)
-			my_sub_query = get_multi_match_query(term, [ feature_name + boost ])
-			my_new_query["query"]["bool"]["should"] = [(my_sub_query)]
+			my_new_query["query"]["bool"]["should"] =\
+				[ self.__get_subquery(term, subquery_name) ]
 			total = self.__search_index(my_new_query)['hits']['total']
 			if total > 0:
 				return total, term
@@ -387,26 +340,26 @@ class DescriptionConsumer(threading.Thread):
 
 	def __get_matching_address(self):
 		"""Sadly, this function is temporary.  I plan to go to a more
-		generic approach that exhaustively works with all n-grams
+		generic approach that exhaustively works with all multi-grams
 		against all composite features."""
 		numeric = re.compile("^[0-9]+$")
 		address_candidates = {}
-		n_gram = []
+		multi_gram = []
 		my_meta = self.my_meta
 		tokens = my_meta["tokens"]
 		for token in tokens:
 			if numeric.search(token):
-				n_gram = []
-				n_gram.append(token)
+				multi_gram = []
+				multi_gram.append(token)
 			else:
-				n_gram.append(token)
-				current_length = len(n_gram)
+				multi_gram.append(token)
+				current_length = len(multi_gram)
 				if current_length > 1:
 					if current_length not in address_candidates:
 						address_candidates[current_length] = []
 						my_stuff = \
 						address_candidates[current_length]
-						my_stuff.append(" ".join(n_gram))
+						my_stuff.append(" ".join(multi_gram))
 		for key in reversed(sorted(address_candidates.keys())):
 			candidate_list = address_candidates[key]
 			count, term = self.__get_composite_search_count(candidate_list\
@@ -415,20 +368,20 @@ class DescriptionConsumer(threading.Thread):
 				return count, term
 		return 0, None
 
-	def __get_n_gram_tokens(self, list_of_tokens):
-		"""Generates a list of n-grams where n >= 2."""
+	def __get_multi_gram_tokens(self, list_of_tokens):
+		"""Generates a list of multi-grams."""
 		unigram_size = 1
-		self.n_gram_tokens = {}
+		self.multi_gram_tokens = {}
 		end_index = len(list_of_tokens)
 		for end_offset in range(end_index):
 			for start_index in range(end_index-end_offset):
-				n_gram_size = end_index - end_offset - start_index
-				if n_gram_size > unigram_size:
-					if n_gram_size not in self.n_gram_tokens:
-						self.n_gram_tokens[n_gram_size] = []
-					new_n_gram = \
+				multi_gram_size = end_index - end_offset - start_index
+				if multi_gram_size > unigram_size:
+					if multi_gram_size not in self.multi_gram_tokens:
+						self.multi_gram_tokens[multi_gram_size] = []
+					new_multi_gram = \
 					list_of_tokens[start_index:end_index-end_offset]
-					self.n_gram_tokens[n_gram_size].append(" ".join(new_n_gram))
+					self.multi_gram_tokens[multi_gram_size].append(" ".join(new_multi_gram))
 		return
 
 	def __get_subquery(self, term, subquery_name):
@@ -516,7 +469,7 @@ class DescriptionConsumer(threading.Thread):
 	def __reset_my_meta(self):
 		"""Purges several object data structures and re-initializes them."""
 		self.recursive = False
-		self.n_gram_tokens = {}
+		self.multi_gram_tokens = {}
 		self.my_meta = { "unigram_tokens": [], "tokens": [], "metrics": {
 			"query_count": 0, "cache_count": 0 }}
 
@@ -545,26 +498,25 @@ class DescriptionConsumer(threading.Thread):
 		self.my_meta["metrics"]["query_count"] += 1
 		return output_data
 
-	def __search_n_gram_tokens(self):
+	def __search_multi_grams(self):
 		"""Creates a boolean elasticsearch composed of multiple
 		sub-queries.  Each sub-query is itself a 'phrase' query
-		built of n-grams where n >= 2."""
+		built of multi-grams."""
 		logger = logging.getLogger("thread " + str(self.thread_id))
-		matched_n_gram_tokens = []
+		matched_multigrams = []
 
 		my_new_query = get_bool_query()
 
-		logger.info("Matched the following n-grams to our merchants index:")
-		for key in reversed(sorted(self.n_gram_tokens.keys())):
-			for term in self.n_gram_tokens[key]:
-				sub_query = get_match_phrase_query(term, "_all")
-				my_new_query["query"]["bool"]["should"].append(sub_query)
+		logger.info("Matched the following multi-grams to our merchants index:")
+		for key in reversed(sorted(self.multi_gram_tokens.keys())):
+			for term in self.multi_gram_tokens[key]:
+				my_new_query["query"]["bool"]["should"] =\
+					[ self.__get_subquery(term, "multi_grams") ]
 				hit_count = self.__search_index(my_new_query)['hits']['total']
-				del my_new_query["query"]["bool"]["should"][0]
 				if hit_count > 0:
 					logger.info("%i-gram : %s (%i)", key, term, hit_count)
-					matched_n_gram_tokens.append(term)
-		return matched_n_gram_tokens
+					matched_multigrams.append(term)
+		return matched_multigrams
 
 	def __find_largest_matching_string(self, substrings):
 		"""Looks for the longest substring in our merchants index that
@@ -579,8 +531,6 @@ class DescriptionConsumer(threading.Thread):
 				hit_count = 0
 				if len(term) > 1:
 					boosted_fields = self.__get_boosted_fields("standard_fields")
-#					my_new_query["query"]["bool"]["should"] =\
-#						 [ get_qs_query(term, fields=boosted_fields) ]
 					my_new_query["query"]["bool"]["should"] =\
 						 [ self.__get_subquery(term, "largest_matching_string") ]
 					hit_count = self.__search_index(my_new_query)['hits']['total']
@@ -591,7 +541,6 @@ class DescriptionConsumer(threading.Thread):
 		"""Returns a list of boosted fields built from a boost vector"""
 		boost_vector = self.boost_column_vectors[vector_name]
 		fields = [ x + "^" + str(y) for x, y in zip(self.boost_row_labels, boost_vector) if y != 0.0 ]
-		#logging.critical(str(fields))
 		return fields
 
 	def __set_logger(self):
@@ -627,7 +576,6 @@ class DescriptionConsumer(threading.Thread):
 		params_json = json.dumps(params, sort_keys=True, indent=4\
 		, separators=(',', ': '))
 		my_logger.debug(params_json)
-
 
 	def run(self):
 		while True:
