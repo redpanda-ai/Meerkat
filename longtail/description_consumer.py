@@ -475,7 +475,8 @@ class DescriptionConsumer(threading.Thread):
 		for first_key in my_keys:
 			for second_key in my_keys:
 				if (first_key.find(second_key) > -1) and (len(first_key) != len(second_key)):
-					del matched_multigrams[second_key]
+					if second_key in matched_multigrams:
+						del matched_multigrams[second_key]
 
 		logger.critical("Reduction phase B: %s", str(matched_multigrams))
 		return matched_multigrams
