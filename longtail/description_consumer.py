@@ -28,7 +28,6 @@ from longtail.various_tools import string_cleanse
 STOP_WORDS = ["CHECK", "CARD", "CHECKCARD", "PAYPOINT", "PURCHASE", "LLC"]
 
 #Helper functions
-
 def get_bool_query(starting_from = 0, size = 0):
 	"""Returns a "bool" style ElasticSearch query object"""
 	return { "from" : starting_from, "size" : size, "query" : {
@@ -177,15 +176,11 @@ class DescriptionConsumer(threading.Thread):
 		logger.info("\t%i numeric words: %s", len(numeric_tokens), str(numeric_tokens))
 		logger.info("\t%i uni-grams:     %s", len(filtered_tokens), str(filtered_tokens))
 
-		#show all search terms separated by spaces
-		query_string = " ".join(filtered_tokens)
-		self.my_meta["unigram_string"] = query_string
+		#Add tokens, and token combinations with the boost vectors they match to the final query
+		self.my_meta["unigram_string"] = " ".join(filtered_tokens)
 		self.__get_multi_gram_tokens(filtered_tokens)
-
-		#Get matched unigram strings
 		self.my_meta["matched_multigrams"] = self.__search_multi_grams()
 
-		#Cannot use this yet, it assumes only two composite fields
 		self.__generate_final_query()
 
 	def __display_search_results(self, search_results):
