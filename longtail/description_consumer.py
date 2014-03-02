@@ -309,7 +309,8 @@ class DescriptionConsumer(threading.Thread):
 
 	def __get_multi_gram_tokens(self, list_of_tokens):
 		"""Generates a list of multi-grams."""
-		unigram_size = 1
+		unigram_size = 0
+		#unigram_size = 1
 		self.multi_gram_tokens = {}
 		end_index = len(list_of_tokens)
 		for end_offset in range(end_index):
@@ -419,11 +420,15 @@ class DescriptionConsumer(threading.Thread):
 		hash_object = hashlib.md5(str(input_data).encode())
 		input_hash = hash_object.hexdigest()
 		if input_hash in self.params["search_cache"]:
-			logger.info("Cache hit, short-cutting")
+			logger.debug("Cache hit, short-cutting")
+			sys.stdout.write("*")
+			sys.stdout.flush()
 			self.my_meta["metrics"]["cache_count"] += 1
 			output_data = self.params["search_cache"][input_hash]
 		else:
-			logger.info("Cache miss, searching")
+			logger.debug("Cache miss, searching")
+			sys.stdout.write(".")
+			sys.stdout.flush()
 			try:
 				output_data = self.es_connection.search(
 					index=self.params["elasticsearch"]["index"], body=input_as_object)
@@ -458,7 +463,7 @@ class DescriptionConsumer(threading.Thread):
 						[ self.__get_subquery(term, subquery_name) ]
 					hit_count = self.__search_index(my_new_query)['hits']['total']
 					if hit_count > 0:
-						logger.info("%i-gram : %s (%i) found in %s", key, term, hit_count, subquery_name)
+						logger.debug("%i-gram : %s (%i) found in %s", key, term, hit_count, subquery_name)
 						if term not in matched_multigrams:
 							matched_multigrams[term] = []
 						matched_multigrams[term].append(subquery_name)

@@ -140,11 +140,12 @@ class DescriptionConsumerTests(unittest.TestCase):
 		self.assertEqual(result,True)
 
 	def test_get_multi_gram_tokens_normal_use(self):
-		"""Ensure that n-grams where n >=2 can be generated"""
+		"""Ensure that n-grams where n >=1 can be generated"""
 		list_of_tokens = ["1", "2", "3", "4"]
 		self.my_consumer._DescriptionConsumer__get_multi_gram_tokens(list_of_tokens)
 		result = self.my_consumer.multi_gram_tokens
-		expect = {2: ['3 4', '2 3', '1 2'], 3: ['2 3 4', '1 2 3'], 4: ['1 2 3 4']}
+		expect = {1: ['4', '3', '2', '1'], 2: ['3 4', '2 3', '1 2'],
+			3: ['2 3 4', '1 2 3'], 4: ['1 2 3 4']}
 		self.assertEqual(result,expect)
 
 	def test_output_to_result_queue(self):

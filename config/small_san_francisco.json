@@ -1,0 +1,132 @@
+{
+	"concurrency" : 6,
+	"input" : {
+		"filename" : "data/input/small_san_francisco.csv",
+		"encoding" : "utf-8"
+	},
+	"logging" : {
+		"level" : "info",
+		"path" : "logs/foo.log",
+		"formatter" : "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+		"console" : true
+	},
+	"output" : {
+		"results" : {
+			"fields" : ["name", "composite.address", "factual_id"]
+		},
+		"file" : {
+			"format" : "json",
+			"path" : "data/output/longtailLabeled.json"
+		}
+	},
+	"elasticsearch" : {
+		"cluster_nodes" : ["brainstorm0:9200", "brainstorm1:9200", "brainstorm2:9200"
+		, "brainstorm3:9200", "brainstorm4:9200", "brainstorm5:9200", "brainstorm6:9200"
+		, "brainstorm7:9200", "brainstorm8:9200", "brainstorm9:9200", "brainstorma:9200"
+		, "brainstormb:9200"],
+		"index" : "factual_index",
+		"type" : "factual_type",
+		"multigram_filters" : [ "full_address", "multi.name" ],
+		"subqueries" : {
+			"largest_matching_string": {
+				"field_boosts" : "standard_fields",
+				"query_type" : "qs_query"
+			},
+			"unigram_string": {
+				"field_boosts" : "standard_fields",
+				"query_type" : "qs_query"
+			},
+			"matched_multigram": {
+				"field_boosts" : "standard_fields",
+				"query_type" : "multi_match_query"
+			},
+			"multi_grams": {
+				"field_boosts" : "standard_fields",
+				"query_type" : "multi_match_query"
+			},
+			"multi.name": {
+				"field_boosts" : "name",
+				"query_type" : "multi_match_query"
+			},
+			"full_address": {
+				"field_boosts" : "composite.address",
+				"query_type" : "multi_match_query"
+			}
+		},
+		"boost_labels" : [ "standard_fields", "composite.address", "name" ],
+		"boost_vectors" : {
+			"factual_id" :        [ 0.0, 0.0, 0.0 ],
+			"name" :              [ 1.0, 0.0, 3.0 ],
+			"address" :           [ 1.0, 0.0, 0.0 ],
+			"address_extended" :  [ 1.0, 0.0, 0.0 ],
+			"po_box" :            [ 1.0, 0.0, 0.0 ],
+			"locality" :          [ 1.0, 0.0, 0.0 ],
+			"region" :            [ 1.0, 0.0, 0.0 ],
+			"post_town" :         [ 1.0, 0.0, 0.0 ],
+			"admin_region" :      [ 1.0, 0.0, 0.0 ],
+			"postcode" :          [ 1.0, 0.0, 0.0 ],
+			"country" :           [ 1.0, 0.0, 0.0 ],
+			"tel" :               [ 1.0, 0.0, 0.0 ],
+			"fax" :               [ 1.0, 0.0, 0.0 ],
+			"neighborhood" :      [ 1.0, 0.0, 0.0 ],
+			"email" :             [ 1.0, 0.0, 0.0 ],
+			"category_ids" :      [ 1.0, 0.0, 0.0 ],
+			"category_labels" :   [ 1.0, 0.0, 0.0 ],
+			"status" :            [ 1.0, 0.0, 0.0 ],
+			"chain_name" :        [ 1.0, 0.0, 0.0 ],
+			"chain_id" :          [ 1.0, 0.0, 0.0 ],
+			"pin.location" :      [ 0.0, 0.0, 0.0 ],
+			"composite.address" : [ 0.0, 3.0, 0.0 ]
+		},
+		"composite_fields" : [
+			{
+				"address" : {
+					"components" : [ "address", "address_extended", "locality", "region",
+						"postcode", "country" ],
+					"format" : "{0} {1} {2}, {3} {4}, {5}",
+					"index" : "analyzed",
+					"type" : "string"
+				}
+			}
+		],
+		"type_mapping" : {
+			"mappings" : {
+				"factual_type" : {
+					"_source" : {
+						"enabled" : true
+					},
+					"properties" : {
+						"factual_id" : { "index" : "analyzed", "type" : "string" },
+						"name" : { "index" : "analyzed", "type" : "string" },
+						"address" : { "index" : "analyzed", "type" : "string" },
+						"address_extended" : { "index" : "analyzed", "type" : "string" },
+						"po_box" : { "index" : "analyzed", "type" : "string" },
+						"locality" : { "index" : "analyzed", "type" : "string" },
+						"region" : { "index" : "analyzed", "type" : "string" },
+						"post_town" : { "index" : "analyzed", "type" : "string" },
+						"admin_region" : { "index" : "analyzed", "type" : "string" },
+						"postcode" : { "index" : "analyzed", "type" : "string" },
+						"country" : { "index" : "analyzed", "type" : "string" },
+						"tel" : { "index" : "analyzed", "type" : "string" },
+						"fax" : { "index" : "analyzed", "type" : "string" },
+						"neighborhood" : { "index" : "analyzed", "type" : "string" },
+						"website" : { "index" : "analyzed", "type" : "string" },
+						"email" : { "index" : "analyzed", "type" : "string" },
+						"category_ids" : { "index" : "analyzed", "type" : "string" },
+						"category_labels" : { "index" : "analyzed", "type" : "string" },
+						"status" : { "index" : "analyzed", "type" : "string" },
+						"chain_name" : { "index" : "analyzed", "type" : "string" },
+						"chain_id" : { "index" : "analyzed", "type" : "string" },
+						"pin" : { "properties" : { "location" : {
+							"type" : "geo_shape", "tree" : "quadtree", "precision" : "1m" } }
+						}
+					}
+				}
+			},
+			"settings" : {
+				"number_of_replicas" : 1,
+				"number_of_shards" : 12
+			}
+		}
+	}
+}
