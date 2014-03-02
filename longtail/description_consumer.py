@@ -179,11 +179,11 @@ class DescriptionConsumer(threading.Thread):
 
 		#show all search terms separated by spaces
 		query_string = " ".join(filtered_tokens)
-		self.params["unigram_string"] = query_string
+		self.my_meta["unigram_string"] = query_string
 		self.__get_multi_gram_tokens(filtered_tokens)
 
 		#Get matched unigram strings
-		self.params["matched_multigrams"] = self.__search_multi_grams()
+		self.my_meta["matched_multigrams"] = self.__search_multi_grams()
 
 		#Cannot use this yet, it assumes only two composite fields
 		self.__generate_final_query()
@@ -294,10 +294,10 @@ class DescriptionConsumer(threading.Thread):
 		bool_search["fields"] = params["output"]["results"]["fields"]
 		should_clauses = bool_search["query"]["bool"]["should"]
 		#Add unigram clause
-		should_clauses.append(self.__get_subquery(self.params["unigram_string"], "unigram_string"))
+		should_clauses.append(self.__get_subquery(self.my_meta["unigram_string"], "unigram_string"))
 		#Process multigram clauses
-		for term in self.params["matched_multigrams"]:
-			should_clauses.append(self.__get_subquery(term, self.params["matched_multigrams"][term]))
+		for term in self.my_meta["matched_multigrams"]:
+			should_clauses.append(self.__get_subquery(term, self.my_meta["matched_multigrams"][term]))
 		#Show final query
 		logger.critical(json.dumps(bool_search, sort_keys=True, indent=4, separators=(',', ': ')))
 		my_results = self.__search_index(bool_search)
