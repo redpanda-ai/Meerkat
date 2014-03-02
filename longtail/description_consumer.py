@@ -20,7 +20,6 @@ import sys
 
 from elasticsearch import Elasticsearch, helpers
 from scipy.stats.mstats import zscore
-from urllib.parse import quote_plus
 
 from longtail.custom_exceptions import Misconfiguration, UnsupportedQueryType
 from longtail.various_tools import string_cleanse
@@ -188,9 +187,6 @@ class DescriptionConsumer(threading.Thread):
 
 		#Cannot use this yet, it assumes only two composite fields
 		self.__generate_final_query()
-
-		#TODO: a tail recursive search for longest matching
-		#multi-gram on a per composite-feature basis.
 
 	def __display_search_results(self, search_results):
 		"""Displays search results."""

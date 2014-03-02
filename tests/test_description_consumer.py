@@ -139,11 +139,11 @@ class DescriptionConsumerTests(unittest.TestCase):
 		result = self.my_consumer._DescriptionConsumer__display_search_results(search_results)
 		self.assertEqual(result,True)
 
-	def test_get_n_gram_tokens_normal_use(self):
+	def test_get_multi_gram_tokens_normal_use(self):
 		"""Ensure that n-grams where n >=2 can be generated"""
 		list_of_tokens = ["1", "2", "3", "4"]
-		self.my_consumer._DescriptionConsumer__get_n_gram_tokens(list_of_tokens)
-		result = self.my_consumer.n_gram_tokens
+		self.my_consumer._DescriptionConsumer__get_multi_gram_tokens(list_of_tokens)
+		result = self.my_consumer.multi_gram_tokens
 		expect = {2: ['3 4', '2 3', '1 2'], 3: ['2 3 4', '1 2 3'], 4: ['1 2 3 4']}
 		self.assertEqual(result,expect)
 
@@ -169,11 +169,11 @@ class DescriptionConsumerTests(unittest.TestCase):
 		self.my_consumer._DescriptionConsumer__reset_my_meta()
 		self.assertEqual(self.my_consumer.recursive,False)
 
-	def test_reset_my_meta_n_gram_tokens(self):
-		"""Ensure that the 'n_gram_tokens' dict is emptied"""
-		self.my_consumer.n_gram_tokens = {"not" : "empty"}
+	def test_reset_my_meta_multi_gram_tokens(self):
+		"""Ensure that the 'multi_gram_tokens' dict is emptied"""
+		self.my_consumer.multi_gram_tokens = {"not" : "empty"}
 		self.my_consumer._DescriptionConsumer__reset_my_meta()
-		self.assertEqual(self.my_consumer.n_gram_tokens, {})
+		self.assertEqual(self.my_consumer.multi_gram_tokens, {})
 
 	def test_reset_my_meta_reset_my_meta(self):
 		"""Ensure that the 'my_meta' member is reset"""
