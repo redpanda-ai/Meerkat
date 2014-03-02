@@ -8,7 +8,7 @@
 		"level" : "info",
 		"path" : "logs/foo.log",
 		"formatter" : "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-		"console" : true
+		"console" : false
 	},
 	"output" : {
 		"results" : {
