@@ -1,5 +1,5 @@
 {
-	"concurrency" : 3,
+	"concurrency" : 1,
 	"input" : {
 		"filename" : "data/input/badStrings.csv",
 		"encoding" : "utf-8"
@@ -26,6 +26,7 @@
 		, "brainstormb:9200"],
 		"index" : "factual_index",
 		"type" : "factual_type",
+		"multigram_filters" : [ "full_address", "multi.name" ],
 		"subqueries" : {
 			"largest_matching_string": {
 				"field_boosts" : "standard_fields",
@@ -43,35 +44,39 @@
 				"field_boosts" : "standard_fields",
 				"query_type" : "multi_match_query"
 			},
+			"multi.name": {
+				"field_boosts" : "name",
+				"query_type" : "multi_match_query"
+			},
 			"full_address": {
 				"field_boosts" : "composite.address",
 				"query_type" : "multi_match_query"
 			}
 		},
-		"boost_labels" : [ "standard_fields", "composite.address" ],
+		"boost_labels" : [ "standard_fields", "composite.address", "name" ],
 		"boost_vectors" : {
-			"factual_id" :        [ 0.0, 0.0 ],
-			"name" :              [ 1.0, 0.0 ],
-			"address" :           [ 1.0, 0.0 ],
-			"address_extended" :  [ 1.0, 0.0 ],
-			"po_box" :            [ 1.0, 0.0 ],
-			"locality" :          [ 1.0, 0.0 ],
-			"region" :            [ 1.0, 0.0 ],
-			"post_town" :         [ 1.0, 0.0 ],
-			"admin_region" :      [ 1.0, 0.0 ],
-			"postcode" :          [ 1.0, 0.0 ],
-			"country" :           [ 1.0, 0.0 ],
-			"tel" :               [ 1.0, 0.0 ],
-			"fax" :               [ 1.0, 0.0 ],
-			"neighborhood" :      [ 1.0, 0.0 ],
-			"email" :             [ 1.0, 0.0 ],
-			"category_ids" :      [ 1.0, 0.0 ],
-			"category_labels" :   [ 1.0, 0.0 ],
-			"status" :            [ 1.0, 0.0 ],
-			"chain_name" :        [ 1.0, 0.0 ],
-			"chain_id" :          [ 1.0, 0.0 ],
-			"pin.location" :      [ 0.0, 0.0 ],
-			"composite.address" : [ 0.0, 3.0 ]
+			"factual_id" :        [ 0.0, 0.0, 0.0 ],
+			"name" :              [ 1.0, 0.0, 3.0 ],
+			"address" :           [ 1.0, 0.0, 0.0 ],
+			"address_extended" :  [ 1.0, 0.0, 0.0 ],
+			"po_box" :            [ 1.0, 0.0, 0.0 ],
+			"locality" :          [ 1.0, 0.0, 0.0 ],
+			"region" :            [ 1.0, 0.0, 0.0 ],
+			"post_town" :         [ 1.0, 0.0, 0.0 ],
+			"admin_region" :      [ 1.0, 0.0, 0.0 ],
+			"postcode" :          [ 1.0, 0.0, 0.0 ],
+			"country" :           [ 1.0, 0.0, 0.0 ],
+			"tel" :               [ 1.0, 0.0, 0.0 ],
+			"fax" :               [ 1.0, 0.0, 0.0 ],
+			"neighborhood" :      [ 1.0, 0.0, 0.0 ],
+			"email" :             [ 1.0, 0.0, 0.0 ],
+			"category_ids" :      [ 1.0, 0.0, 0.0 ],
+			"category_labels" :   [ 1.0, 0.0, 0.0 ],
+			"status" :            [ 1.0, 0.0, 0.0 ],
+			"chain_name" :        [ 1.0, 0.0, 0.0 ],
+			"chain_id" :          [ 1.0, 0.0, 0.0 ],
+			"pin.location" :      [ 0.0, 0.0, 0.0 ],
+			"composite.address" : [ 0.0, 3.0, 0.0 ]
 		},
 		"composite_fields" : [
 			{

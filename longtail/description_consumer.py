@@ -20,6 +20,7 @@ import sys
 
 from elasticsearch import Elasticsearch, helpers
 from scipy.stats.mstats import zscore
+from urllib.parse import quote_plus
 
 from longtail.custom_exceptions import Misconfiguration, UnsupportedQueryType
 from longtail.various_tools import string_cleanse
@@ -183,11 +184,10 @@ class DescriptionConsumer(threading.Thread):
 		self.__get_multi_gram_tokens(filtered_tokens)
 
 		#Get matched unigram strings
-		matched_multigrams = self.__search_multi_grams()
 		self.params["matched_multigrams"] = self.__search_multi_grams()
 
 		#Cannot use this yet, it assumes only two composite fields
-		self.__generate_final_query(query_string, matched_multigrams)
+		self.__generate_final_query()
 
 		#TODO: a tail recursive search for longest matching
 		#multi-gram on a per composite-feature basis.
@@ -283,90 +283,33 @@ class DescriptionConsumer(threading.Thread):
 		self.boost_row_labels, self.boost_column_vectors =\
 			self.__build_boost_vectors()
 
-	def __generate_final_query(self, qs_query, matching_multi_grams):
+	def __generate_final_query(self):
 		"""Constructs a complete boolean query based upon:
-		1.  Unigrams (query_string)
-		2.  Matching multi-grams (match)"""
+		1.  Matching Unigrams
+		2.  Matching multi-grams"""
 
-		#Add dynamic output based upon a dictionary of token types
-		#See comment above
-		#TODO: Merge with __get_boolean_search_object
 		logger = logging.getLogger("thread " + str(self.thread_id))
 		parameter_key = self.parameter_key
 
 		logger.critical("BUILDING FINAL BOOLEAN SEARCH")
-		my_obj = self.__get_boolean_search_object()
-
-		my_results = self.__search_index(my_obj)
+		result_size = self.parameter_key.get("es_result_size", "10")
+		bool_search = get_bool_query(size = result_size)
+		params = self.params
+		bool_search["fields"] = params["output"]["results"]["fields"]
+		should_clauses = bool_search["query"]["bool"]["should"]
+		#Add unigram clause
+		should_clauses.append(self.__get_subquery(self.params["unigram_string"], "unigram_string"))
+		#Process multigram clauses
+		for term in self.params["matched_multigrams"]:
+			should_clauses.append(self.__get_subquery(term, self.params["matched_multigrams"][term]))
+		#Show final query
+		logger.critical(json.dumps(bool_search, sort_keys=True, indent=4, separators=(',', ': ')))
+		my_results = self.__search_index(bool_search)
 		metrics = self.my_meta["metrics"]
 		logger.warning("Cache Hit / Miss: %i / %i",\
 			 metrics["cache_count"], metrics["query_count"])
 		self.__display_search_results(my_results)
 		self.__output_to_result_queue(my_results)
-
-	def __get_boolean_search_object(self):
-		"""Builds an object for a "bool" search."""
-		logger = logging.getLogger("thread " + str(self.thread_id))
-		parameter_key = self.parameter_key
-		result_size = self.parameter_key.get("es_result_size", "10")
-		bool_search = get_bool_query(size = result_size)
-		params = self.params
-		bool_search["fields"] = params["output"]["results"]["fields"]
-		#Add unigram clause
-		should_clauses = bool_search["query"]["bool"]["should"]
-		should_clauses.append(self.__get_subquery(self.params["unigram_string"], "unigram_string"))
-		#Add multigram clauses
-		#TODO: Exhaust all "multi.x" subqueries first to see if addresses, phone numbers, etc. match first
-		#Then remove from the list of multi_grams
-		for matched_multigram in self.params["matched_multigrams"]:
-			should_clauses.append(self.__get_subquery(matched_multigram, "matched_multigram"))
-		logger.critical(json.dumps(bool_search, sort_keys=True, indent=4, separators=(',', ': ')))
-		return bool_search
-
-	def __get_composite_search_count(self, list_of_ngrams, subquery_name):
-		"""Obtains search results for a query composed of multiple
-		sub-queries.  At some point I may add 'query_string' as an
-		additional parameter."""
-		my_new_query = get_bool_query()
-		#TODO: pass this in and make it magnify according to multi-gram size
-		boost = "^1.2"
-		for term in list_of_ngrams:
-			my_new_query["query"]["bool"]["should"] =\
-				[ self.__get_subquery(term, subquery_name) ]
-			total = self.__search_index(my_new_query)['hits']['total']
-			if total > 0:
-				return total, term
-		return 0, None
-
-	def __get_matching_address(self):
-		"""Sadly, this function is temporary.  I plan to go to a more
-		generic approach that exhaustively works with all multi-grams
-		against all composite features."""
-		numeric = re.compile("^[0-9]+$")
-		address_candidates = {}
-		multi_gram = []
-		my_meta = self.my_meta
-		tokens = my_meta["tokens"]
-		for token in tokens:
-			if numeric.search(token):
-				multi_gram = []
-				multi_gram.append(token)
-			else:
-				multi_gram.append(token)
-				current_length = len(multi_gram)
-				if current_length > 1:
-					if current_length not in address_candidates:
-						address_candidates[current_length] = []
-						my_stuff = \
-						address_candidates[current_length]
-						my_stuff.append(" ".join(multi_gram))
-		for key in reversed(sorted(address_candidates.keys())):
-			candidate_list = address_candidates[key]
-			count, term = self.__get_composite_search_count(candidate_list\
-			, "composite.address")
-			if count > 0:
-				return count, term
-		return 0, None
 
 	def __get_multi_gram_tokens(self, list_of_tokens):
 		"""Generates a list of multi-grams."""
@@ -401,7 +344,6 @@ class DescriptionConsumer(threading.Thread):
 		else:
 			raise UnsupportedQueryType("There is no support for a query of type"\
 			+ query_type, msg="")
-
 
 	def __output_to_result_queue(self, search_results):
 		"""Decides whether to output and pushes to result_queue"""
@@ -503,19 +445,43 @@ class DescriptionConsumer(threading.Thread):
 		sub-queries.  Each sub-query is itself a 'phrase' query
 		built of multi-grams."""
 		logger = logging.getLogger("thread " + str(self.thread_id))
-		matched_multigrams = []
-
+		logging.critical("Matching against multigram_filters")
+		multigram_filters = self.params["elasticsearch"]["multigram_filters"]
+		my_json = json.dumps(multigram_filters, sort_keys=True, indent=4\
+		, separators=(',', ': '))
+		logging.critical(my_json)
 		my_new_query = get_bool_query()
+		logging.critical("Adding logic to find and organize multi-grams.")
 
-		logger.info("Matched the following multi-grams to our merchants index:")
-		for key in reversed(sorted(self.multi_gram_tokens.keys())):
-			for term in self.multi_gram_tokens[key]:
-				my_new_query["query"]["bool"]["should"] =\
-					[ self.__get_subquery(term, "multi_grams") ]
-				hit_count = self.__search_index(my_new_query)['hits']['total']
-				if hit_count > 0:
-					logger.info("%i-gram : %s (%i)", key, term, hit_count)
-					matched_multigrams.append(term)
+		#Find matches per boost vector
+		matched_multigrams = {}
+		for subquery_name in multigram_filters:
+			for key in reversed(sorted(self.multi_gram_tokens.keys())):
+				for term in self.multi_gram_tokens[key]:
+					my_new_query["query"]["bool"]["should"] = \
+						[ self.__get_subquery(term, subquery_name) ]
+					hit_count = self.__search_index(my_new_query)['hits']['total']
+					if hit_count > 0:
+						logger.info("%i-gram : %s (%i) found in %s", key, term, hit_count, subquery_name)
+						if term not in matched_multigrams:
+							matched_multigrams[term] = []
+						matched_multigrams[term].append(subquery_name)
+						#At this point, you may wish to remove all derived numeric keys and values
+
+		logger.critical("Matched multigrams: %s", str(matched_multigrams))
+		#Reduce the results by boost vector ordinal
+		for key in matched_multigrams:
+			matched_multigrams[key] = matched_multigrams[key][0]
+		logger.critical("Reduction phase A: %s", str(matched_multigrams))
+
+		#Reduce by removing proper substring matches
+		my_keys = sorted(matched_multigrams.keys())
+		for first_key in my_keys:
+			for second_key in my_keys:
+				if (first_key.find(second_key) > -1) and (len(first_key) != len(second_key)):
+					del matched_multigrams[second_key]
+
+		logger.critical("Reduction phase B: %s", str(matched_multigrams))
 		return matched_multigrams
 
 	def __find_largest_matching_string(self, substrings):
