@@ -94,8 +94,8 @@ def test_accuracy(file_path=None, non_physical_trans=[], result_list=[]):
 	rounded_percent = lambda x: math.ceil(x * 100)
 	return {
 		"total_processed": total_processed,
-		"total_physical": rounded_percent(len(machine_labeled) / total_processed),
-		"total_non_physical": rounded_percent(len(non_physical_trans) / total_processed),
+		"total_physical": len(machine_labeled) / total_processed * 100,
+		"total_non_physical": len(non_physical_trans) / total_processed * 100,
 		"correct": correct,
 		"needs_hand_labeling": needs_hand_labeling,
 		"non_physical": non_physical,
@@ -132,7 +132,7 @@ def print_results(results):
 		
 	print("\nSTATS:")
 	print("{0:35} = {1:11}".format("Total Transactions Processed", results['total_processed']))
-	print("{0:35} = {1:11}".format("Total Labeled Physical", results['total_physical']))
+	print("{0:35} = {1:10.2f}%".format("Total Labeled Physical", results['total_physical']))
 	print("{0:35} = {1:10.2f}%".format("Total Labeled Non Physical", results['total_non_physical']))
 	print("{0:35} = {1:10.2f}%".format("Binary Classifier Accuracy", results['binary_accuracy']))
 	print("\n")
