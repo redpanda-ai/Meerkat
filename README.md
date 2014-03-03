@@ -4,7 +4,6 @@ Python project for labeling and classifying Longtail data
 
 Usage
 ------------
-<<<<<<< HEAD
 From base directory execute python3 -m longtail config/{config file}
 
 Installation
@@ -24,7 +23,6 @@ Installation
 ------------
 Manually for now
 
->>>>>>> b902832a885f1d8dc2ae7a0ed899760d4ed38ffa
 Dependencies
 ------------
 * Python 3
