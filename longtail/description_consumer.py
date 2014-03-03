@@ -545,7 +545,7 @@ class DescriptionConsumer(threading.Thread):
 		my_logger.debug(params_json)
 
 	def run(self):
-		while True:
+		while self.desc_queue.qsize() > 0:
 			try:
 				self.input_string = self.desc_queue.get()
 				self.__begin_parse()

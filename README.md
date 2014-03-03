@@ -4,12 +4,27 @@ Python project for labeling and classifying Longtail data
 
 Usage
 ------------
+<<<<<<< HEAD
 From base directory execute python3 -m longtail config/{config file}
 
 Installation
 ------------
 Manually for now
 
+=======
+**Run Longtail Classifier:**<br>
+From base directory execute **python3 -m longtail config/{config file}**
+
+**Train Binary Classifier:**<br>
+From base directory execute **python3 -m longtail.binary_classifier.train**<br>
+Accepts one optional argument, a CSV containing desripitions labeled as physical or non physical<br>
+Defaults to data/misc/verifiedLabeledTrans.csv
+
+Installation
+------------
+Manually for now
+
+>>>>>>> b902832a885f1d8dc2ae7a0ed899760d4ed38ffa
 Dependencies
 ------------
 * Python 3
