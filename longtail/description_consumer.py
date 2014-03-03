@@ -13,10 +13,11 @@ import hashlib
 import json
 import logging
 import numpy as np
-import threading
+import pickle
 import queue
 import re
 import sys
+import threading
 
 from elasticsearch import Elasticsearch, helpers
 from scipy.stats.mstats import zscore
@@ -410,7 +411,9 @@ class DescriptionConsumer(threading.Thread):
 	def __search_index(self, input_as_object):
 		"""Searches the merchants index and the merchant mapping"""
 		logger = logging.getLogger("thread " + str(self.thread_id))
-		input_data = json.dumps(input_as_object).encode('UTF-8')
+		#input_data = json.dumps(input_as_object).encode('UTF-8')
+		input_data = json.dumps(input_as_object, sort_keys=True, indent=4\
+		, separators=(',', ': ')).encode('UTF-8')
 		#Check the client cache first
 		hash_object = hashlib.md5(str(input_data).encode())
 		input_hash = hash_object.hexdigest()
@@ -422,8 +425,9 @@ class DescriptionConsumer(threading.Thread):
 			output_data = self.params["search_cache"][input_hash]
 		else:
 			logger.debug("Cache miss, searching")
-			sys.stdout.write(".")
+			sys.stdout.write(str(self.thread_id))
 			sys.stdout.flush()
+			#logger.critical(input_data)
 			try:
 				output_data = self.es_connection.search(
 					index=self.params["elasticsearch"]["index"], body=input_as_object)

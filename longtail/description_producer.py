@@ -10,7 +10,15 @@ ElasticSearch (structured data).
 
 """
 
-import csv, datetime, json, logging, queue, sys
+import csv
+import datetime
+import json
+import logging
+import os
+import pickle
+import queue
+import sys
+
 from longtail.custom_exceptions import InvalidArguments, Misconfiguration
 from longtail.description_consumer import DescriptionConsumer
 from longtail.binary_classifier.bay import predict_if_physical_transaction
@@ -63,6 +71,12 @@ def initialize():
 		sys.exit()
 
 	params["search_cache"] = {}
+
+	try:
+		with open("search_cache.pickle", 'rb') as f:
+			params["search_cache"] = pickle.load(f)
+	except IOError:
+		logging.critical("search_cache.pickle not found, starting anyway.")
 
 	if validate_params(params):
 		logging.info("Parameters are valid, proceeding.")
@@ -123,6 +137,19 @@ def tokenize(params, desc_queue, parameter_key, non_physical):
 
 	# Do Speed Tests
 	speed_tests(start_time, accuracy_results)
+
+	# Destroy the out-dated cache
+	logging.critical("Removing original pickle")
+	try:
+		os.remove("search_cache.pickle")
+	except OSError:
+		pass
+
+	#Pickle the search_cache
+	logging.critical("Begin Pickling.")
+	with open('search_cache.pickle', 'wb') as f:
+		pickle.dump(params["search_cache"], f, pickle.HIGHEST_PROTOCOL)
+	logging.critical("Pickling complete.")
 
 def usage():
 	"""Shows the user which parameters to send into the program."""
@@ -192,3 +219,4 @@ if __name__ == "__main__":
 	KEY = load_parameter_key(PARAMS)
 	DESC_QUEUE, NON_PHYSICAL = get_desc_queue(PARAMS)
 	tokenize(PARAMS, DESC_QUEUE, KEY, NON_PHYSICAL)
+
