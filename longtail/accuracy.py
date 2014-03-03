@@ -4,16 +4,12 @@
 
 """This script tests the current accuracy of our labeling tool"""
 
-<<<<<<< HEAD
 import csv
 import datetime
 import logging
 import math
 import os
 import sys
-=======
-import csv, sys, math, logging, datetime, os
->>>>>>> b902832a885f1d8dc2ae7a0ed899760d4ed38ffa
 
 def test_accuracy(file_path=None, non_physical_trans=[], result_list=[]):
 	"""Takes file by default but can accept result
@@ -28,7 +24,6 @@ def test_accuracy(file_path=None, non_physical_trans=[], result_list=[]):
 	else:
 		logging.warning("Not enough information provided to perform accuracy tests on")
 		return
-<<<<<<< HEAD
 
 	#FIXME: Hard-coded?
 	human_labeled_input_file = open("data/misc/verifiedLabeledTrans.factual.csv")
@@ -36,16 +31,6 @@ def test_accuracy(file_path=None, non_physical_trans=[], result_list=[]):
 	human_labeled_input_file.close()
 
 	#Ensure there is something to process
-	total = len(machine_labeled)
-	total_processed = len(machine_labeled) + len(non_physical_trans)
-=======
->>>>>>> b902832a885f1d8dc2ae7a0ed899760d4ed38ffa
-
-	if total == 0 or total_processed == 0:
-		logging.warning("Nothing provided to perform accuracy tests on")
-		return
-
-	# Ensure there is something to process
 	total = len(machine_labeled)
 	total_processed = len(machine_labeled) + len(non_physical_trans)
 
@@ -105,7 +90,6 @@ def test_accuracy(file_path=None, non_physical_trans=[], result_list=[]):
 	num_verified = num_verified if num_verified > 0 else 1
 	num_correct = len(correct)
 
-<<<<<<< HEAD
 	#rounded percent = lambda function
 	rounded_percent = lambda x: math.ceil(x * 100)
 	return {
@@ -123,24 +107,6 @@ def test_accuracy(file_path=None, non_physical_trans=[], result_list=[]):
 		"precision": rounded_percent(num_correct / num_verified),
 		"binary_accuracy": 100 - rounded_percent(len(non_physical) / total)
 	}
-=======
-	results = {}
-	results['total_processed'] = total_processed
-	results['total_physical'] = math.ceil((len(machine_labeled) / results['total_processed']) * 100)
-	results['total_non_physical'] = math.ceil((len(non_physical_trans) / results['total_processed']) * 100)
-	results['correct'] = correct
-	results['needs_hand_labeling'] = needs_hand_labeling
-	results['non_physical'] = non_physical
-	results['unlabeled'] = unlabeled
-	results['num_verified'] = num_verified
-	results['mislabeled'] = mislabeled
-	results['total_recall'] = math.ceil((num_labeled / results['total_processed']) * 100)
-	results['total_recall_non_physical'] = math.ceil((num_labeled / total) * 100)
-	results['precision'] = math.ceil((num_correct / num_verified) * 100)
-	results['binary_accuracy'] = 100 - math.ceil((len(non_physical) / total) * 100)
-
-	return results
->>>>>>> b902832a885f1d8dc2ae7a0ed899760d4ed38ffa
 
 def speed_tests(start_time, accuracy_results):
 	"""Run a number of tests related to speed"""
@@ -163,7 +129,6 @@ def print_results(results):
 
 	if results is None:
 		return
-<<<<<<< HEAD
 		
 	print("\nSTATS:")
 	print("{0:35} = {1:11}".format("Total Transactions Processed", results['total_processed']))
@@ -175,19 +140,6 @@ def print_results(results):
 	print("{0:35} = {1:10.2f}%".format("Recall non physical", results['total_recall_non_physical']))
 	print("{0:35} = {1:11}".format("Number of transactions verified", results['num_verified']))
 	print("{0:35} = {1:10.2f}%".format("Precision", results['precision']))
-=======
-
-	print("")
-	print("STATS:")
-	print("Total Transactions Processed = " + str(results['total_processed']))
-	print("Total Labeled Physical = " + str(results['total_physical']) + "%")
-	print("Total Labeled Non Physical = " + str(results['total_non_physical']) + "%")
-	print("Binary Classifier Accuracy = " + str(results['binary_accuracy']) + "%", "\n")
-	print("Recall of all transactions = " + str(results['total_recall']) + "%")
-	print("Recall of transactions labeled physical = " + str(results['total_recall_non_physical']) + "%")
-	print("Number of transactions verified = " + str(results['num_verified']))
-	print("Precision = " + str(results['precision']) + "%")
->>>>>>> b902832a885f1d8dc2ae7a0ed899760d4ed38ffa
 	print("", "MISLABELED:", '\n'.join(results['mislabeled']), sep="\n")
 
 if __name__ == "__main__":

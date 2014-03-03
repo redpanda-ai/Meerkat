@@ -21,7 +21,7 @@ import sys
 
 from longtail.custom_exceptions import InvalidArguments, Misconfiguration
 from longtail.description_consumer import DescriptionConsumer
-from longtail.binary_classifier.new import predict_if_physical_transaction
+from longtail.binary_classifier.bay import predict_if_physical_transaction
 from longtail.accuracy import test_accuracy, print_results, speed_tests
 
 def get_desc_queue(params):
