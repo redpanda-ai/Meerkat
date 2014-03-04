@@ -10,44 +10,67 @@ is resource intensive to exaustively perform a standard grid_search"""
 
 from longtail.description_producer import initialize, get_desc_queue, tokenize, load_parameter_key
 
-from time import time
-from scipy.stats import randint, uniform
+import sys, pprint
+from random import randint, uniform
 from sklearn.grid_search import RandomizedSearchCV
 
-def randomized_optimization():
+def recurse(iter=5):
+
+	"""Run randomized_optimization until the distributions shrink"""	
+
+def randomized_optimization(iter=10, min_precision=99, min_recall=35):
 
 	"""Generates randomized parameter keys by
-	providing a range and distribution to sample from. 
+	providing a range to sample from. 
 	Runs the classifier a fixed number of times and
 	provides the top score found"""
 
-	#Runs the entire program.
+	# Init
 	params = initialize()
 	results = []
 
-	# Run 20 times
-	for i in range(25):
+	# Run a provided number of times
+	for i in range(iter):
 
-		desc_queue, non_physical = get_desc_queue(params)
+		print("\n", "ITERATION NUMBER: " + str(i))
 
-		# specify parameters and distributions to sample from
 		randomized_hyperparameters = {
-			"es_result_size" : str(randint(15, 45).rvs()),
-			"z_score_threshold" : str(round(uniform(1, 2).rvs(), 2)),
-			"business_name_boost" : str(round(uniform(0, 1).rvs(), 2)),
-			"address_boost" : str(round(uniform(0, 1).rvs(), 2)),
-			"phone_boost" : str(round(uniform(0, 1).rvs(), 2))
+			"es_result_size" : randint(45, 45),
+			"z_score_threshold" : uniform(0.409, 1.109),
+			"business_name_boost" : uniform(0.546, 1.146),
+			"city_name_boost" : uniform(2.166, 2.766),
+			"street_boost" : uniform(0.518, 1.118),
 		}
 
-		print(randomized_hyperparameters)
+		# Get Randomized Hyperparameters
+		for key, value in randomized_hyperparameters.items():
+			if type(value) == int:
+				randomized_hyperparameters[key] = str(value)
+			elif type(value) == float:
+				randomized_hyperparameters[key] = str(round(value, 3))
+	
+		print("\n", randomized_hyperparameters,"\n")
 
+		# Run Classifier
+		desc_queue, non_physical = get_desc_queue(params)
 		accuracy = tokenize(params, desc_queue, randomized_hyperparameters, non_physical)
 
-		if accuracy['precision'] > 95:
+		print("\n", randomized_hyperparameters)
+
+		# Save Good Hyperparameters
+		if accuracy['precision'] >= min_precision and accuracy['total_recall'] >= min_recall:
 			accuracy['hyperparameters'] = randomized_hyperparameters
 			results.append(accuracy)
+			pprint.pprint(accuracy, record)
 
+	# We need at least 1 result
+	if len(results) < 1:
+		randomized_optimization(iter=1)
+		return
+
+	# Get Top Score
 	top_score = {"total_recall":0}
+	hyperparameters_used = [result['hyperparameters'] for result in results]
 
 	for score in results:
 		if score["total_recall"] > top_score["total_recall"]:
@@ -57,6 +80,13 @@ def randomized_optimization():
 	print("Best Recall = " + str(top_score['total_recall']) + "%")
 	print("HYPERPARAMETERS:")
 	print(top_score["hyperparameters"])
+	print("ALL RESULTS:")
+	
+	print(hyperparameters_used)
+
+	return hyperparameters_used
 
 if __name__ == "__main__":
-	randomized_optimization()
+
+	record = open("initialKeys.txt", "a")
+	randomized_optimization(iter=2000)
