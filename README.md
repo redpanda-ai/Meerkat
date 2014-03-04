@@ -4,13 +4,6 @@ Python project for labeling and classifying Longtail data
 
 Usage
 ------------
-From base directory execute python3 -m longtail config/{config file}
-
-Installation
-------------
-Manually for now
-
-=======
 **Run Longtail Classifier:**<br>
 From base directory execute **python3 -m longtail config/{config file}**
 
