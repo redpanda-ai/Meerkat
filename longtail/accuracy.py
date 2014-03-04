@@ -10,6 +10,7 @@ import logging
 import math
 import os
 import sys
+import pprint
 
 def test_accuracy(file_path=None, non_physical_trans=[], result_list=[]):
 	"""Takes file by default but can accept result
@@ -26,7 +27,7 @@ def test_accuracy(file_path=None, non_physical_trans=[], result_list=[]):
 		return
 
 	#FIXME: Hard-coded?
-	human_labeled_input_file = open("data/misc/verifiedLabeledTrans.factual.csv")
+	human_labeled_input_file = open("data/misc/verifiedLabeledTrans.csv")
 	human_labeled = list(csv.DictReader(human_labeled_input_file))
 	human_labeled_input_file.close()
 
