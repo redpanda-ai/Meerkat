@@ -12,7 +12,7 @@ class TokenizeDescriptionTests(unittest.TestCase):
 {
 	"concurrency" : 1,
 	"input" : {
-		"parameter_key" : "config/keys/made_up_key_name.json",
+		"parameter_key" : "config/hyperparameters/made_up_key_name.json",
 		"filename" : "data/input/100_bank_transaction_descriptions.csv",
 		"encoding" : "utf-8"
 	},
@@ -238,7 +238,7 @@ class TokenizeDescriptionTests(unittest.TestCase):
 		"""Ensure parameter key defaults to default.json"""
 		del self.params["input"]["parameter_key"]
 		description_producer.validate_params(self.params)
-		self.assertEqual(self.params["input"]["parameter_key"], "config/keys/default.json")
+		self.assertEqual(self.params["input"]["parameter_key"], "config/hyperparameters/default.json")
 
 	def test_false_key_throws_error(self):
 		"""Ensure not existent key throws error"""

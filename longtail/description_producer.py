@@ -168,7 +168,7 @@ def validate_params(params):
 		raise Misconfiguration(msg="Misconfiguration: 'concurrency' must be a positive integer", expr=None)
 
 	if "parameter_key" not in params["input"]:
-		params["input"]["parameter_key"] = "config/keys/default.json"
+		params["input"]["parameter_key"] = "config/hyperparameters/default.json"
 
 	if "subqueries" not in params["elasticsearch"]:
 		raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.subqueries'", expr=None)
