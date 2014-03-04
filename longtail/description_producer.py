@@ -18,6 +18,7 @@ import os
 import pickle
 import queue
 import sys
+import pprint
 
 from longtail.custom_exceptions import InvalidArguments, Misconfiguration
 from longtail.description_consumer import DescriptionConsumer
@@ -134,6 +135,7 @@ def tokenize(params, desc_queue, hyperparameters, non_physical):
 	# Test Accuracy
 	accuracy_results = test_accuracy(result_list=result_list, non_physical_trans=non_physical)
 	print_results(accuracy_results)
+	pprint.pprint(accuracy_results)
 
 	# Do Speed Tests
 	speed_tests(start_time, accuracy_results)

@@ -57,17 +57,17 @@ def test_accuracy(file_path=None, non_physical_trans=[], result_list=[]):
 		# Verify against human labeled
 		for index, human_labeled_row in enumerate(human_labeled):
 			if machine_labeled_row['DESCRIPTION'] == human_labeled_row['DESCRIPTION']:
-				if human_labeled_row['factual_id'] == "":
+				if human_labeled_row['IS_PHYSICAL_TRANSACTION'] == '0':
+					# Transaction is non physical
+					non_physical.append(machine_labeled_row['DESCRIPTION'])
+					break
+				elif human_labeled_row['factual_id'] == "":
 					# Transaction is not yet labeled
 					needs_hand_labeling.append(machine_labeled_row['DESCRIPTION'])
 					break
 				elif machine_labeled_row['factual_id'] == human_labeled_row['factual_id']:
 					# Transaction was correctly labeled
 					correct.append(human_labeled_row['DESCRIPTION'] + " (ACTUAL:" + human_labeled_row['factual_id'] + ")")
-					break
-				elif human_labeled_row['IS_PHYSICAL_TRANSACTION'] == '0':
-					# Transaction is non physical
-					non_physical.append(machine_labeled_row['DESCRIPTION'])
 					break
 				else:
 					# Transaction is mislabeled
@@ -142,7 +142,9 @@ def print_results(results):
 	print("{0:35} = {1:11}".format("Number of transactions verified", results['num_verified']))
 	print("{0:35} = {1:10.2f}%".format("Precision", results['precision']))
 	print("", "MISLABELED:", '\n'.join(results['mislabeled']), sep="\n")
+	print("", "MISLABELED BINARY:", '\n'.join(results['non_physical']), sep="\n")
 
 if __name__ == "__main__":
 	output_path = sys.argv[1] if len(sys.argv) > 1 else "data/output/longtailLabeled.csv"
-	print_results(test_accuracy(file_path=output_path))
+	pprint.pprint(test_accuracy(file_path=output_path))
+	#print_results(test_accuracy(file_path=output_path))
