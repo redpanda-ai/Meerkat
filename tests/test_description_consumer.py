@@ -94,15 +94,15 @@ class DescriptionConsumerTests(unittest.TestCase):
 }"""
 
 	list_compare = lambda self, x, y: collections.Counter(x) == collections.Counter(y)
-	my_consumer, parameter_key = None, ' {"es_result_size":"20"} '
+	my_consumer, hyperparameters = None, ' {"es_result_size":"20"} '
 
 	def setUp(self):
 		"""Basic Fixture for all tests."""
-		self.parameter_key = json.loads(self.parameter_key)
+		self.hyperparameters = json.loads(self.hyperparameters)
 		self.params = json.loads(self.config)
 		self.desc_queue, self.result_queue = queue.Queue(), queue.Queue()
 		self.my_consumer = DescriptionConsumer(0, self.params, self.desc_queue
-			, self.result_queue, self.parameter_key)
+			, self.result_queue, self.hyperparameters)
 
 	def test_begin_parse_no_string(self):
 		"""Ensure that __begin_parse fails gracefully with None strings"""

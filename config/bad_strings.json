@@ -1,6 +1,7 @@
 {
 	"concurrency" : 6,
 	"input" : {
+		"hyperparameters" : "config/hyperparameters/default.json",
 		"filename" : "data/input/badStrings.csv",
 		"encoding" : "utf-8"
 	},

@@ -83,17 +83,17 @@ def initialize():
 
 	return params
 
-def load_parameter_key(params):
+def load_hyperparameters(params):
 	"""Attempts to load parameter key"""
-	parameter_key = None
+	hyperparameters = None
 	try:
-		input_file = open(params["input"]["parameter_key"], encoding='utf-8')
-		parameter_key = json.loads(input_file.read())
+		input_file = open(params["input"]["hyperparameters"], encoding='utf-8')
+		hyperparameters = json.loads(input_file.read())
 		input_file.close()
 	except IOError:
-		logging.error("%s not found, aborting.", params["input"]["parameter_key"])
+		logging.error("%s not found, aborting.", params["input"]["hyperparameters"])
 		sys.exit()
-	return parameter_key
+	return hyperparameters
 
 def queue_to_list(result_queue):
 	"""Converts queue to list"""
@@ -108,7 +108,7 @@ def queue_to_list(result_queue):
 	result_queue.join()
 	return result_list
 
-def tokenize(params, desc_queue, parameter_key, non_physical):
+def tokenize(params, desc_queue, hyperparameters, non_physical):
 	"""Opens a number of threads to process the descriptions queue."""
 	consumer_threads = 1
 	result_queue = queue.Queue()
@@ -116,7 +116,7 @@ def tokenize(params, desc_queue, parameter_key, non_physical):
 		consumer_threads = params["concurrency"]
 	start_time = datetime.datetime.now()
 	for i in range(consumer_threads):
-		new_consumer = DescriptionConsumer(i, params, desc_queue, result_queue, parameter_key)
+		new_consumer = DescriptionConsumer(i, params, desc_queue, result_queue, hyperparameters)
 		new_consumer.setDaemon(True)
 		new_consumer.start()
 	desc_queue.join()
@@ -167,8 +167,8 @@ def validate_params(params):
 	if params["concurrency"] <= 0:
 		raise Misconfiguration(msg="Misconfiguration: 'concurrency' must be a positive integer", expr=None)
 
-	if "parameter_key" not in params["input"]:
-		params["input"]["parameter_key"] = "config/hyperparameters/default.json"
+	if "hyperparameters" not in params["input"]:
+		params["input"]["hyperparameters"] = "config/hyperparameters/default.json"
 
 	if "subqueries" not in params["elasticsearch"]:
 		raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.subqueries'", expr=None)
@@ -216,7 +216,7 @@ def write_output_to_file(params, output_list):
 if __name__ == "__main__":
 	#Runs the entire program.
 	PARAMS = initialize()
-	KEY = load_parameter_key(PARAMS)
+	KEY = load_hyperparameters(PARAMS)
 	DESC_QUEUE, NON_PHYSICAL = get_desc_queue(PARAMS)
 	tokenize(PARAMS, DESC_QUEUE, KEY, NON_PHYSICAL)
 

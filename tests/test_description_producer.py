@@ -12,7 +12,7 @@ class TokenizeDescriptionTests(unittest.TestCase):
 {
 	"concurrency" : 1,
 	"input" : {
-		"parameter_key" : "config/hyperparameters/made_up_key_name.json",
+		"hyperparameters" : "config/hyperparameters/made_up_key_name.json",
 		"filename" : "data/input/100_bank_transaction_descriptions.csv",
 		"encoding" : "utf-8"
 	},
@@ -234,15 +234,15 @@ class TokenizeDescriptionTests(unittest.TestCase):
 		del self.params["input"]["encoding"]
 		self.assertRaises(Misconfiguration, description_producer.validate_params, self.params)
 
-	def test_parameter_key_default(self):
+	def test_hyperparameters_default(self):
 		"""Ensure parameter key defaults to default.json"""
-		del self.params["input"]["parameter_key"]
+		del self.params["input"]["hyperparameters"]
 		description_producer.validate_params(self.params)
-		self.assertEqual(self.params["input"]["parameter_key"], "config/hyperparameters/default.json")
+		self.assertEqual(self.params["input"]["hyperparameters"], "config/hyperparameters/default.json")
 
 	def test_false_key_throws_error(self):
 		"""Ensure not existent key throws error"""
-		self.assertRaises(SystemExit, description_producer.load_parameter_key, self.params)				
+		self.assertRaises(SystemExit, description_producer.load_hyperparameters, self.params)				
 
 if __name__ == '__main__':
 	unittest.main(argv=[sys.argv[0]])

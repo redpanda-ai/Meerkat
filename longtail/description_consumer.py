@@ -253,7 +253,7 @@ class DescriptionConsumer(threading.Thread):
 			del long_substrings[ls_len]
 		return original_term, pre, post
 
-	def __init__(self, thread_id, params, desc_queue, result_queue, parameter_key):
+	def __init__(self, thread_id, params, desc_queue, result_queue, hyperparameters):
 		''' Constructor '''
 		threading.Thread.__init__(self)
 		self.thread_id = thread_id
@@ -261,7 +261,7 @@ class DescriptionConsumer(threading.Thread):
 		self.result_queue = result_queue
 		self.input_string = None
 		self.params = params
-		self.parameter_key = parameter_key
+		self.hyperparameters = hyperparameters
 
 		cluster_nodes = self.params["elasticsearch"]["cluster_nodes"]
 		self.es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True,
@@ -281,10 +281,10 @@ class DescriptionConsumer(threading.Thread):
 		2.  Matching multi-grams"""
 
 		logger = logging.getLogger("thread " + str(self.thread_id))
-		parameter_key = self.parameter_key
+		hyperparameters = self.hyperparameters
 
 		logger.critical("BUILDING FINAL BOOLEAN SEARCH")
-		result_size = self.parameter_key.get("es_result_size", "10")
+		result_size = self.hyperparameters.get("es_result_size", "10")
 		bool_search = get_bool_query(size = result_size)
 		params = self.params
 		bool_search["fields"] = params["output"]["results"]["fields"]
@@ -344,7 +344,7 @@ class DescriptionConsumer(threading.Thread):
 		scores, fields_found = [], []
 		output_dict = {}
 		params = self.params
-		parameter_key = self.parameter_key
+		hyperparameters = self.hyperparameters
 		field_order = params["output"]["results"]["fields"]
 		top_hit = hits[0]
 		hit_fields = top_hit["fields"]
@@ -374,7 +374,7 @@ class DescriptionConsumer(threading.Thread):
 			return
 
 		#Send to result Queue if score good enough
-		if z_score_delta > float(parameter_key.get("z_score_threshold", "2")):
+		if z_score_delta > float(hyperparameters.get("z_score_threshold", "2")):
 			output_dict = dict(zip(fields_found, ordered_hit_fields))
 		else:
 			output_dict = dict(zip(fields_found, ([""] * len(fields_found))))

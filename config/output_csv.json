@@ -1,7 +1,8 @@
 {
     "concurrency" : 10,
     "input" : {
-        "filename" : "data/input/bank_transaction_descriptions.csv",
+        "hyperparameters" : "config/hyperparameters/default.json",
+        "filename" : "data/input/small_san_francisco.csv",
         "encoding" : "utf-8"
     },
     "logging" : {
@@ -12,7 +13,7 @@
     },
     "output" : {
         "results" : {
-            "fields" : ["BUSINESSSTANDARDNAME", "PERSISTENTRECORDID"]
+            "fields" : ["name", "composite.address", "factual_id"]
         },
         "file" : {
             "format" : "csv",
