@@ -22,7 +22,7 @@ import pprint
 
 from longtail.custom_exceptions import InvalidArguments, Misconfiguration
 from longtail.description_consumer import DescriptionConsumer
-from longtail.binary_classifier.bay import predict_if_physical_transaction
+from longtail.binary_classifier.new import predict_if_physical_transaction
 from longtail.accuracy import test_accuracy, print_results, speed_tests
 
 def get_desc_queue(params):
@@ -135,7 +135,6 @@ def tokenize(params, desc_queue, hyperparameters, non_physical):
 	# Test Accuracy
 	accuracy_results = test_accuracy(result_list=result_list, non_physical_trans=non_physical)
 	print_results(accuracy_results)
-	pprint.pprint(accuracy_results)
 
 	# Do Speed Tests
 	speed_tests(start_time, accuracy_results)

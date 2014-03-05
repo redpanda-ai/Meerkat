@@ -207,8 +207,7 @@ class DescriptionConsumer(threading.Thread):
 			"[" + str(round(score, 3)) + "] " + " ".join(ordered_hit_fields))
 
 		self.__display_z_score_delta(scores)
-		for result in results:
-			print(result)
+		print(results[0])
 		return True
 
 	def __display_z_score_delta(self, scores):
@@ -283,23 +282,40 @@ class DescriptionConsumer(threading.Thread):
 		logger = logging.getLogger("thread " + str(self.thread_id))
 		hyperparameters = self.hyperparameters
 
-		logger.critical("BUILDING FINAL BOOLEAN SEARCH")
+		logger.info("BUILDING FINAL BOOLEAN SEARCH")
 		result_size = self.hyperparameters.get("es_result_size", "10")
 		bool_search = get_bool_query(size = result_size)
 		params = self.params
 		bool_search["fields"] = params["output"]["results"]["fields"]
 		should_clauses = bool_search["query"]["bool"]["should"]
+
+		"""
 		#Add unigram clause
 		should_clauses.append(self.__get_subquery(self.my_meta["unigram_string"], "unigram_string"))
 		#Process multigram clauses
 		for term in self.my_meta["matched_multigrams"]:
 			should_clauses.append(self.__get_subquery(term, self.my_meta["matched_multigrams"][term]))
+
+		"""
+
+		# Force Simple Search
+		simple = {'query_string': 
+					{
+						'boost': 1,
+                  	 	'fields': ['_all'],
+                 	 	'query': ''
+                 	}
+                 }
+
+		simple["query_string"]["query"] = string_cleanse(self.input_string)
+		bool_search["query"]["bool"]["should"] = [simple]
+
+
 		#Show final query
-		logger.critical(json.dumps(bool_search, sort_keys=True, indent=4, separators=(',', ': ')))
+		logger.info(json.dumps(bool_search, sort_keys=True, indent=4, separators=(',', ': ')))
 		my_results = self.__search_index(bool_search)
 		metrics = self.my_meta["metrics"]
-		logger.warning("Cache Hit / Miss: %i / %i",\
-			 metrics["cache_count"], metrics["query_count"])
+		logger.info("Cache Hit / Miss: %i / %i", metrics["cache_count"], metrics["query_count"])
 		self.__display_search_results(my_results)
 		self.__output_to_result_queue(my_results)
 
@@ -545,11 +561,12 @@ class DescriptionConsumer(threading.Thread):
 		my_logger.debug(params_json)
 
 	def run(self):
-		while True:
+		while self.desc_queue.qsize() > 0:
 			try:
 				self.input_string = self.desc_queue.get()
-				self.__begin_parse()
-				self.__display_results()
+				#self.__begin_parse()
+				#self.__display_results()
+				self.__generate_final_query()
 				self.__reset_my_meta()
 				self.desc_queue.task_done()
 
