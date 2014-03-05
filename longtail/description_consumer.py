@@ -25,9 +25,6 @@ from scipy.stats.mstats import zscore
 from longtail.custom_exceptions import Misconfiguration, UnsupportedQueryType
 from longtail.various_tools import string_cleanse
 
-#Globals
-STOP_WORDS = ["CHECK", "CARD", "CHECKCARD", "PAYPOINT", "PURCHASE", "LLC"]
-
 #Helper functions
 def get_bool_query(starting_from = 0, size = 0):
 	"""Returns a "bool" style ElasticSearch query object"""
@@ -53,84 +50,6 @@ class DescriptionConsumer(threading.Thread):
 	''' Acts as a client to an ElasticSearch cluster, tokenizing description
 	strings that it pulls from a synchronized queue. '''
 
-	STILL_BREAKABLE = 2
-
-	def __begin_parse(self):
-		"""Creates data structures used the first call into the
-		__break_description function."""
-		logger = logging.getLogger("thread " + str(self.thread_id))
-		#Abort processing, if input string is None
-		if self.input_string != None:
-			logger.info("Input String: %s", self.input_string)
-		else:
-			logger.warning("No input string provided, skipping")
-			return False
-		self.recursive = False
-		self.my_meta["terms"] = []
-		self.my_meta["long_substrings"] = {}
-		self.__break_description(self.input_string, self.recursive)
-		return True
-
-	def __break_description(self, input_string, recursive):
-		"""Recursively break an unstructured transaction description into TOKENS.
-		Example: "MEL'S DRIVE-IN #2 SAN FRANCISCOCA 24492153337286434101508" """
-		#This loop breaks up the input string looking for new search terms
-		#that match portions of our ElasticSearch index
-		tokens = self.my_meta["tokens"]
-		long_substrings = self.my_meta["long_substrings"]
-		terms = self.my_meta["terms"]
-		if len(input_string) >= DescriptionConsumer.STILL_BREAKABLE:
-			new_terms = input_string.split()
-			for term in new_terms:
-				term = string_cleanse(term)
-				if not recursive:
-					tokens.append(term)
-				substrings = {}
-				self.__break_string_into_substrings(term, substrings)
-				big_substring = self.__find_largest_matching_string(substrings)
-				if big_substring is not None:
-					bs_length = len(big_substring)
-					if bs_length not in long_substrings:
-						long_substrings[bs_length] = {}
-					if big_substring not in long_substrings[bs_length]:
-						long_substrings[bs_length][big_substring] = term
-			terms.extend(new_terms)
-
-		#This check allows us to exit if no substrings are found
-		if len(long_substrings) == 0:
-			return
-		#This block finds the longest substring match in our index and adds
-		#it to our dictionary of search terms
-		longest_substring = list(long_substrings[sorted\
-		(long_substrings.keys())[-1]].keys())[0]
-		self.my_meta["unigram_tokens"].append(longest_substring)
-
-		original_term, pre, post = self.__extract_longest_substring(longest_substring)
-		self.__rebuild_tokens(original_term, longest_substring, pre, post)
-		self.__break_description(pre + " " + post, True)
-
-	def __break_string_into_substrings(self, term, substrings):
-		"""Recursively break substrings for a term."""
-		term_length = len(term)
-		#Create a new dictionary for the length of the substring, if needed
-		#Example structure for substrings:
-		#{ 1: {"A", "B", "C"}, 2: {"AA", "BB", "CC"}, etc. }
-		if term_length not in substrings:
-			substrings[term_length] = {}
-		#Add a new substring to the dictionary, if it was not there
-		if term not in substrings[term_length]:
-			substrings[term_length][term] = ""
-		#Exclude substrings that are too small
-		if term_length <= DescriptionConsumer.STILL_BREAKABLE:
-			return
-		#Exclude substrings that are "stop" words
-		if term in STOP_WORDS:
-			return
-		#If the term has never been broken, break it's substrings
-		else:
-			self.__break_string_into_substrings(term[0:-1], substrings)
-			self.__break_string_into_substrings(term[1:], substrings)
-
 	def __build_boost_vectors(self):
 		"""Turns configuration entries into a dictionary of numpy arrays."""
 		logger = logging.getLogger("thread " + str(self.thread_id))
@@ -143,46 +62,6 @@ class DescriptionConsumer(threading.Thread):
 				my_list.append(boost_row_vectors[field][i])
 			boost_column_vectors[boost_column_labels[i]] = np.array(my_list)
 		return boost_row_labels, boost_column_vectors
-
-	def __display_results(self):
-		"""Displays our tokens, multi-grams, and search results."""
-		logger = logging.getLogger("thread " + str(self.thread_id))
-
-		phone_re = re.compile("^[0-9/#]{10}$")
-		numeric = re.compile("^[0-9/#]+$")
-
-		stop_tokens, filtered_tokens = [], []
-		numeric_tokens, addresses, phone_numbers = [], [], []
-		tokens = self.my_meta["tokens"]
-		unigram_tokens = self.my_meta["unigram_tokens"]
-
-		for token in tokens:
-			if token in STOP_WORDS:
-				stop_tokens.append(token)
-			elif phone_re.search(token):
-				phone_numbers.append(string_cleanse(token))
-			elif numeric.search(token):
-				numeric_tokens.append(token)
-			else:
-				filtered_tokens.append(string_cleanse(token))
-
-		#Add dynamic output based upon a dictionary of token types
-		#e.g. Unigram, Composite, Numeric, Stop...
-		logger.info("TOKENS ARE: %s", str(tokens))
-		logger.info("Unigrams are:\n\t%s", str(tokens))
-		logger.info("Unigrams matched to ElasticSearch:\n\t%s", str(unigram_tokens))
-		logger.info("BREAKDOWN:")
-		logger.info("\t%i stop words:    %s", len(stop_tokens), str(stop_tokens))
-		logger.info("\t%i phone numbers: %s", len(phone_numbers), str(phone_numbers))
-		logger.info("\t%i numeric words: %s", len(numeric_tokens), str(numeric_tokens))
-		logger.info("\t%i uni-grams:     %s", len(filtered_tokens), str(filtered_tokens))
-
-		#Add tokens, and token combinations with the boost vectors they match to the final query
-		self.my_meta["unigram_string"] = " ".join(filtered_tokens)
-		self.__get_multi_gram_tokens(filtered_tokens)
-		self.my_meta["matched_multigrams"] = self.__search_multi_grams()
-
-		self.__generate_final_query()
 
 	def __display_search_results(self, search_results):
 		"""Displays search results."""
@@ -231,26 +110,6 @@ class DescriptionConsumer(threading.Thread):
 
 		logger.info("Top Score Quality: %s", quality)
 		return z_score_delta
-
-	def __extract_longest_substring(self, longest_substring):
-		"""Extracts the longest substring from our input, returning left
-		over fragments to find the following strings:
-		1.  "original_term": the original string containing "longest_substring"
-		2.  "pre": substring preceding "longest_substring"
-		3.  "post" : substring following "longest_substring" """
-
-		long_substrings = self.my_meta["long_substrings"]
-		ls_len = len(longest_substring)
-		original_term = long_substrings[ls_len][longest_substring]
-		start_index = original_term.find(longest_substring)
-		end_index = start_index + ls_len
-		pre, post = original_term[:start_index], original_term[end_index:]
-
-		#delete the current "longest substring" from our dictionary
-		del long_substrings[ls_len][longest_substring]
-		if len(long_substrings[ls_len]) == 0:
-			del long_substrings[ls_len]
-		return original_term, pre, post
 
 	def __init__(self, thread_id, params, desc_queue, result_queue, hyperparameters):
 		''' Constructor '''
@@ -320,23 +179,6 @@ class DescriptionConsumer(threading.Thread):
 		self.__display_search_results(my_results)
 		self.__output_to_result_queue(my_results)
 
-	def __get_multi_gram_tokens(self, list_of_tokens):
-		"""Generates a list of multi-grams."""
-		unigram_size = 0
-		#unigram_size = 1
-		self.multi_gram_tokens = {}
-		end_index = len(list_of_tokens)
-		for end_offset in range(end_index):
-			for start_index in range(end_index-end_offset):
-				multi_gram_size = end_index - end_offset - start_index
-				if multi_gram_size > unigram_size:
-					if multi_gram_size not in self.multi_gram_tokens:
-						self.multi_gram_tokens[multi_gram_size] = []
-					new_multi_gram = \
-					list_of_tokens[start_index:end_index-end_offset]
-					self.multi_gram_tokens[multi_gram_size].append(" ".join(new_multi_gram))
-		return
-
 	def __get_subquery(self, term, subquery_name):
 		"""Routes to a named subquery to the correct helper function."""
 		subqueries = self.params["elasticsearch"]["subqueries"]
@@ -402,22 +244,6 @@ class DescriptionConsumer(threading.Thread):
 		logging.info("Z_SCORE_DELTA: %.2f", z_score_delta)
 		logging.info("TOP_SCORE: %.4f", top_score)
 
-	def __rebuild_tokens(self, original_term, longest_substring, pre, post):
-		"""Rebuilds our complete list of tokens following a substring
-		extraction."""
-		tokens = self.my_meta["tokens"]
-		rebuilt_tokens = []
-		for i in range(len(tokens)):
-			if tokens[i] != original_term:
-				rebuilt_tokens.append(tokens[i])
-			else:
-				if pre != "":
-					rebuilt_tokens.append(pre)
-				rebuilt_tokens.append(longest_substring)
-				if post != "":
-					rebuilt_tokens.append(post)
-		self.my_meta["tokens"] = rebuilt_tokens
-
 	def __reset_my_meta(self):
 		"""Purges several object data structures and re-initializes them."""
 		self.recursive = False
@@ -456,70 +282,6 @@ class DescriptionConsumer(threading.Thread):
 
 		self.my_meta["metrics"]["query_count"] += 1
 		return output_data
-
-	def __search_multi_grams(self):
-		"""Creates a boolean elasticsearch composed of multiple
-		sub-queries.  Each sub-query is itself a 'phrase' query
-		built of multi-grams."""
-		logger = logging.getLogger("thread " + str(self.thread_id))
-		logging.critical("Matching against multigram_filters")
-		multigram_filters = self.params["elasticsearch"]["multigram_filters"]
-		my_json = json.dumps(multigram_filters, sort_keys=True, indent=4\
-		, separators=(',', ': '))
-		logging.critical(my_json)
-		my_new_query = get_bool_query()
-		logging.critical("Adding logic to find and organize multi-grams.")
-
-		#Find matches per boost vector
-		matched_multigrams = {}
-		for subquery_name in multigram_filters:
-			for key in reversed(sorted(self.multi_gram_tokens.keys())):
-				for term in self.multi_gram_tokens[key]:
-					my_new_query["query"]["bool"]["should"] = \
-						[ self.__get_subquery(term, subquery_name) ]
-					hit_count = self.__search_index(my_new_query)['hits']['total']
-					if hit_count > 0:
-						logger.debug("%i-gram : %s (%i) found in %s", key, term, hit_count, subquery_name)
-						if term not in matched_multigrams:
-							matched_multigrams[term] = []
-						matched_multigrams[term].append(subquery_name)
-						#At this point, you may wish to remove all derived numeric keys and values
-
-		logger.critical("Matched multigrams: %s", str(matched_multigrams))
-		#Reduce the results by boost vector ordinal
-		for key in matched_multigrams:
-			matched_multigrams[key] = matched_multigrams[key][0]
-		logger.critical("Reduction phase A: %s", str(matched_multigrams))
-
-		#Reduce by removing proper substring matches
-		my_keys = sorted(matched_multigrams.keys())
-		for first_key in my_keys:
-			for second_key in my_keys:
-				if (first_key.find(second_key) > -1) and (len(first_key) != len(second_key)):
-					if second_key in matched_multigrams:
-						del matched_multigrams[second_key]
-
-		logger.critical("Reduction phase B: %s", str(matched_multigrams))
-		return matched_multigrams
-
-	def __find_largest_matching_string(self, substrings):
-		"""Looks for the longest substring in our merchants index that
-		can actually be found."""
-		my_new_query = get_bool_query()
-		for key in reversed(sorted(substrings.keys())):
-			for term in substrings[key]:
-				#These words are reserved and will cause HTTP Response errors if
-				#sent as-is to an ElasticSearch query
-				if term in ["AND", "OR"]:
-					term = term.lower()
-				hit_count = 0
-				if len(term) > 1:
-					boosted_fields = self.__get_boosted_fields("standard_fields")
-					my_new_query["query"]["bool"]["should"] =\
-						 [ self.__get_subquery(term, "largest_matching_string") ]
-					hit_count = self.__search_index(my_new_query)['hits']['total']
-				if hit_count > 0:
-					return term
 
 	def __get_boosted_fields(self, vector_name):
 		"""Returns a list of boosted fields built from a boost vector"""
@@ -565,8 +327,6 @@ class DescriptionConsumer(threading.Thread):
 		while self.desc_queue.qsize() > 0:
 			try:
 				self.input_string = self.desc_queue.get()
-				#self.__begin_parse()
-				#self.__display_results()
 				self.__generate_final_query()
 				self.__reset_my_meta()
 				self.desc_queue.task_done()
@@ -574,4 +334,3 @@ class DescriptionConsumer(threading.Thread):
 			except queue.Empty:
 				print(str(self.thread_id), " found empty queue, terminating.")
 		return True
-
