@@ -102,6 +102,7 @@ def test_accuracy(file_path=None, non_physical_trans=[], result_list=[]):
 		"non_physical": non_physical,
 		"unlabeled": unlabeled,
 		"num_verified": num_verified,
+		"num_labeled": num_labeled,
 		"mislabeled": mislabeled,
 		"total_recall": rounded_percent(num_labeled / total_processed),
 		"total_recall_non_physical": rounded_percent(num_labeled / total),
@@ -139,6 +140,7 @@ def print_results(results):
 	print("\n")
 	print("{0:35} = {1:10.2f}%".format("Recall all transactions", results['total_recall']))
 	print("{0:35} = {1:10.2f}%".format("Recall non physical", results['total_recall_non_physical']))
+	print("{0:35} = {1:11}".format("Number of transactions labeled", results['num_labeled']))
 	print("{0:35} = {1:11}".format("Number of transactions verified", results['num_verified']))
 	print("{0:35} = {1:10.2f}%".format("Precision", results['precision']))
 	print("", "MISLABELED:", '\n'.join(results['mislabeled']), sep="\n")

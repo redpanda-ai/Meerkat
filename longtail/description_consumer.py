@@ -281,6 +281,7 @@ class DescriptionConsumer(threading.Thread):
 
 		logger = logging.getLogger("thread " + str(self.thread_id))
 		hyperparameters = self.hyperparameters
+		subqueries = self.params["elasticsearch"]["subqueries"]
 
 		logger.info("BUILDING FINAL BOOLEAN SEARCH")
 		result_size = self.hyperparameters.get("es_result_size", "10")
