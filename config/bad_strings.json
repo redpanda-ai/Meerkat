@@ -27,34 +27,7 @@
 		, "brainstormb:9200"],
 		"index" : "factual_index",
 		"type" : "factual_type",
-		"multigram_filters" : [ "full_address", "multi.name" ],
-		"subqueries" : {
-			"largest_matching_string": {
-				"field_boosts" : "standard_fields",
-				"query_type" : "qs_query"
-			},
-			"unigram_string": {
-				"field_boosts" : "standard_fields",
-				"query_type" : "qs_query"
-			},
-			"matched_multigram": {
-				"field_boosts" : "standard_fields",
-				"query_type" : "multi_match_query"
-			},
-			"multi_grams": {
-				"field_boosts" : "standard_fields",
-				"query_type" : "multi_match_query"
-			},
-			"multi.name": {
-				"field_boosts" : "name",
-				"query_type" : "multi_match_query"
-			},
-			"full_address": {
-				"field_boosts" : "composite.address",
-				"query_type" : "multi_match_query"
-			}
-		},
-		"boost_labels" : [ "standard_fields", "composite.address", "name" ],
+		"boost_labels" : [ "standard_fields", "composite.address", "name"],
 		"boost_vectors" : {
 			"factual_id" :        [ 0.0, 0.0, 0.0 ],
 			"name" :              [ 1.0, 0.0, 3.0 ],

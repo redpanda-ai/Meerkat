@@ -229,4 +229,3 @@ if __name__ == "__main__":
 	KEY = load_hyperparameters(PARAMS)
 	DESC_QUEUE, NON_PHYSICAL = get_desc_queue(PARAMS)
 	tokenize(PARAMS, DESC_QUEUE, KEY, NON_PHYSICAL)
-
