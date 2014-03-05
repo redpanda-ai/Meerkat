@@ -206,7 +206,7 @@ class DescriptionConsumer(threading.Thread):
 
 	def __reset_my_meta(self):
 		"""Purges several object data structures and re-initializes them."""
-		self.my_meta = {"metrics": {"query_count": 0, "cache_count": 0 }}
+		self.my_meta = {"metrics": {"query_count": 0, "cache_count": 0}}
 
 	def __search_index(self, input_as_object):
 		"""Searches the merchants index and the merchant mapping"""

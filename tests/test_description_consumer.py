@@ -11,11 +11,7 @@ from longtail.custom_exceptions import Misconfiguration
 class DescriptionConsumerTests(unittest.TestCase):
 	"""Our UnitTest class."""
 
-	clean_my_meta = """
-{
-	"unigram_tokens" : [], "tokens" : [],
-	"metrics" : { "query_count" : 0, "cache_count" : 0 }
-}"""
+	clean_my_meta = '{"metrics" : { "query_count" : 0, "cache_count" : 0}}'
 
 	config = """
 {
@@ -104,23 +100,6 @@ class DescriptionConsumerTests(unittest.TestCase):
 		self.my_consumer = DescriptionConsumer(0, self.params, self.desc_queue
 			, self.result_queue, self.hyperparameters)
 
-	def test_begin_parse_no_string(self):
-		"""Ensure that __begin_parse fails gracefully with None strings"""
-		result = self.my_consumer._DescriptionConsumer__begin_parse()
-		self.assertEqual(result,False)
-
-	def test_begin_parse_empty_string(self):
-		"""Ensure that __begin_parse fails gracefully with empty strings"""
-		result = self.my_consumer._DescriptionConsumer__begin_parse()
-		self.assertEqual(result,False)
-
-	def test_break_string_into_substrings_normal_use(self):
-		"""Ensure that we can recursively discover all substrings"""
-		term, substrings = "ABCD", {}
-		result = self.my_consumer._DescriptionConsumer__break_string_into_substrings(term, substrings)
-		expect = {2: {'AB': '', 'CD': '', 'BC': ''}, 3: {'BCD': '', 'ABC': ''}, 4: {'ABCD': ''}}
-		self.assertEqual(substrings,expect)
-
 	def test_display_z_score_single_score(self):
 		"""Ensure that list containing one score, returns None for z_score"""
 		scores = [0]
@@ -139,42 +118,11 @@ class DescriptionConsumerTests(unittest.TestCase):
 		result = self.my_consumer._DescriptionConsumer__display_search_results(search_results)
 		self.assertEqual(result,True)
 
-	def test_get_multi_gram_tokens_normal_use(self):
-		"""Ensure that n-grams where n >=1 can be generated"""
-		list_of_tokens = ["1", "2", "3", "4"]
-		self.my_consumer._DescriptionConsumer__get_multi_gram_tokens(list_of_tokens)
-		result = self.my_consumer.multi_gram_tokens
-		expect = {1: ['4', '3', '2', '1'], 2: ['3 4', '2 3', '1 2'],
-			3: ['2 3 4', '1 2 3'], 4: ['1 2 3 4']}
-		self.assertEqual(result,expect)
-
 	def test_output_to_result_queue(self):
 		"""Ensure that we can output to the result queue"""
 		search_results = json.loads(self.search_results)
 		self.my_consumer._DescriptionConsumer__output_to_result_queue(search_results)
 		self.assertEqual(False,self.my_consumer.result_queue.empty())
-
-	def test_rebuild_tokens_normal_use(self):
-		"""Ensure that __rebuild_tokens works with a standard case"""
-		term, substring, pre, post = "BCDEF", "CDE", "B", "F"
-		self.my_consumer.my_meta["tokens"] = ["A", "BCDEF", "GH"]
-		self.my_consumer._DescriptionConsumer__rebuild_tokens(
-			term, substring, pre, post)
-		result = self.my_consumer.my_meta["tokens"]
-		expect = ["A", "B", "CDE", "F", "GH"]
-		self.assertEqual(self.list_compare(result, expect), True)
-
-	def test_reset_my_meta_recursive(self):
-		"""Ensure that the 'recursive' member is reset to 'false'"""
-		self.my_consumer.recursive = True
-		self.my_consumer._DescriptionConsumer__reset_my_meta()
-		self.assertEqual(self.my_consumer.recursive,False)
-
-	def test_reset_my_meta_multi_gram_tokens(self):
-		"""Ensure that the 'multi_gram_tokens' dict is emptied"""
-		self.my_consumer.multi_gram_tokens = {"not" : "empty"}
-		self.my_consumer._DescriptionConsumer__reset_my_meta()
-		self.assertEqual(self.my_consumer.multi_gram_tokens, {})
 
 	def test_reset_my_meta_reset_my_meta(self):
 		"""Ensure that the 'my_meta' member is reset"""
@@ -215,27 +163,5 @@ class DescriptionConsumerTests(unittest.TestCase):
 		result = self.my_consumer._DescriptionConsumer__get_boosted_fields("vector_1")
 		self.assertEqual(self.list_compare(result,expect), True)
 
-	def test_get_subquery_qs_query(self):
-		"""Test that __get_subquery works with a named qs_query subquery."""
-		expect = { 'query_string': { 'boost': 1.0, 'fields': ['name^1.0'], 'query': 'some_term'} }
-		result = self.my_consumer._DescriptionConsumer__get_subquery("some_term", "largest_matching_string")
-		self.assertEqual(expect, result)
-
-	def test_get_subquery_multi_match_query(self):
-		"""Test that __get_subquery works with a named multi_match_query subquery."""
-		expect = { 'multi_match': { 'fields': ['address^1.0', 'factual_id^1.0'],
-			'query': 'some_address', 'type': 'phrase'} }
-		result = self.my_consumer._DescriptionConsumer__get_subquery("some_address", "find_addresses")
-		self.assertEqual(expect, result)
-
-	def test_get_subquery_named_query_not_found(self):
-		"""Test that __get_subquery works with a named multi_match_query subquery."""
-		self.assertRaises(Misconfiguration, self.my_consumer._DescriptionConsumer__get_subquery,
-			"some_term", "not_in_configuration")
-
-#	def test_find_largest_matching_string(self):
-#		"""Ensure that __find_largest_matching_string finds a known string."""
-
 if __name__ == '__main__':
 	unittest.main()
-
