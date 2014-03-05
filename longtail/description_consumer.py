@@ -18,6 +18,7 @@ import queue
 import re
 import sys
 import threading
+import pprint
 
 from elasticsearch import Elasticsearch, helpers
 from scipy.stats.mstats import zscore
@@ -123,79 +124,38 @@ class DescriptionConsumer(threading.Thread):
 
 		cluster_nodes = self.params["elasticsearch"]["cluster_nodes"]
 		self.es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True,
-			sniff_on_connection_fail=True, sniffer_timeout=5, sniff_timeout=5)
+			sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
 
-		self.recursive = False
 		self.my_meta = None
-		self.multi_gram_tokens = None
 		self.__reset_my_meta()
 		self.__set_logger()
 		self.boost_row_labels, self.boost_column_vectors =\
 			self.__build_boost_vectors()
 
 	def __generate_final_query(self):
-		"""Constructs a complete boolean query based upon:
-		1.  Matching Unigrams
-		2.  Matching multi-grams"""
+		"""Constructs a simple query along with boost vectors"""
 
 		logger = logging.getLogger("thread " + str(self.thread_id))
 		hyperparameters = self.hyperparameters
-		subqueries = self.params["elasticsearch"]["subqueries"]
-
-		logger.info("BUILDING FINAL BOOLEAN SEARCH")
-		result_size = self.hyperparameters.get("es_result_size", "10")
-		bool_search = get_bool_query(size = result_size)
 		params = self.params
+		result_size = self.hyperparameters.get("es_result_size", "10")
+
+		# Construct Main Query
+		logger.info("BUILDING FINAL BOOLEAN SEARCH")
+		bool_search = get_bool_query(size = result_size)
 		bool_search["fields"] = params["output"]["results"]["fields"]
 		should_clauses = bool_search["query"]["bool"]["should"]
+		field_boosts = self.__get_boosted_fields("standard_fields")
+		simple_query = get_qs_query(string_cleanse(self.input_string), field_boosts)
+		should_clauses.append(simple_query)
 
-		"""
-		#Add unigram clause
-		should_clauses.append(self.__get_subquery(self.my_meta["unigram_string"], "unigram_string"))
-		#Process multigram clauses
-		for term in self.my_meta["matched_multigrams"]:
-			should_clauses.append(self.__get_subquery(term, self.my_meta["matched_multigrams"][term]))
-
-		"""
-
-		# Force Simple Search
-		simple = {'query_string': 
-					{
-						'boost': 1,
-                  	 	'fields': ['_all'],
-                 	 	'query': ''
-                 	}
-                 }
-
-		simple["query_string"]["query"] = string_cleanse(self.input_string)
-		bool_search["query"]["bool"]["should"] = [simple]
-
-
-		#Show final query
+		# Show Final Query
 		logger.info(json.dumps(bool_search, sort_keys=True, indent=4, separators=(',', ': ')))
 		my_results = self.__search_index(bool_search)
 		metrics = self.my_meta["metrics"]
 		logger.info("Cache Hit / Miss: %i / %i", metrics["cache_count"], metrics["query_count"])
 		self.__display_search_results(my_results)
 		self.__output_to_result_queue(my_results)
-
-	def __get_subquery(self, term, subquery_name):
-		"""Routes to a named subquery to the correct helper function."""
-		subqueries = self.params["elasticsearch"]["subqueries"]
-		if subquery_name not in subqueries:
-			raise Misconfiguration(msg="Subquery name not in config file, '"\
-			+ subquery_name + "'", expr=None)
-
-		#field_boosts = subqueries[subquery_name]["field_boosts"]
-		field_boosts = self.__get_boosted_fields(subqueries[subquery_name]["field_boosts"])
-		query_type = subqueries[subquery_name]["query_type"]
-		if query_type == "qs_query":
-			return get_qs_query(term, field_boosts)
-		elif query_type == "multi_match_query":
-			return get_multi_match_query(term, field_boosts)
-		else:
-			raise UnsupportedQueryType("There is no support for a query of type"\
-			+ query_type, msg="")
 
 	def __output_to_result_queue(self, search_results):
 		"""Decides whether to output and pushes to result_queue"""
@@ -246,18 +206,17 @@ class DescriptionConsumer(threading.Thread):
 
 	def __reset_my_meta(self):
 		"""Purges several object data structures and re-initializes them."""
-		self.recursive = False
-		self.multi_gram_tokens = {}
-		self.my_meta = { "unigram_tokens": [], "tokens": [], "metrics": {
-			"query_count": 0, "cache_count": 0 }}
+		self.my_meta = {"metrics": {"query_count": 0, "cache_count": 0 }}
 
 	def __search_index(self, input_as_object):
 		"""Searches the merchants index and the merchant mapping"""
+
 		logger = logging.getLogger("thread " + str(self.thread_id))
-		#input_data = json.dumps(input_as_object).encode('UTF-8')
+		num_transactions = self.result_queue.qsize() + self.desc_queue.qsize()
 		input_data = json.dumps(input_as_object, sort_keys=True, indent=4\
 		, separators=(',', ': ')).encode('UTF-8')
-		#Check the client cache first
+
+		# Check cache, then run if query is not found
 		hash_object = hashlib.md5(str(input_data).encode())
 		input_hash = hash_object.hexdigest()
 		if input_hash in self.params["search_cache"]:
@@ -270,7 +229,6 @@ class DescriptionConsumer(threading.Thread):
 			logger.debug("Cache miss, searching")
 			sys.stdout.write(str(self.thread_id))
 			sys.stdout.flush()
-			#logger.critical(input_data)
 			try:
 				output_data = self.es_connection.search(
 					index=self.params["elasticsearch"]["index"], body=input_as_object)

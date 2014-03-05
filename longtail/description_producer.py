@@ -73,15 +73,6 @@ def initialize():
 
 	params["search_cache"] = {}
 
-	try:
-		with open("search_cache.pickle", 'rb') as f:
-			params["search_cache"] = pickle.load(f)
-	except IOError:
-		logging.critical("search_cache.pickle not found, starting anyway.")
-
-	if validate_params(params):
-		logging.info("Parameters are valid, proceeding.")
-
 	return params
 
 def load_hyperparameters(params):
@@ -109,8 +100,28 @@ def queue_to_list(result_queue):
 	result_queue.join()
 	return result_list
 
+def load_pickle_cache(params):
+	"""Loads the Pickled Cache"""
+
+	try:
+		with open("search_cache.pickle", 'rb') as f:
+			params["search_cache"] = pickle.load(f)
+	except IOError:
+		logging.critical("search_cache.pickle not found, starting anyway.")
+
+	if validate_params(params):
+		logging.info("Parameters are valid, proceeding.")
+
+	return params
+
 def tokenize(params, desc_queue, hyperparameters, non_physical):
 	"""Opens a number of threads to process the descriptions queue."""
+
+	# Load Pickle Cache if enough transactions
+	if desc_queue.qsize() > 500:
+		params = load_pickle_cache(params)
+
+	# Run the Classifier
 	consumer_threads = 1
 	result_queue = queue.Queue()
 	if "concurrency" in params:
@@ -171,8 +182,6 @@ def validate_params(params):
 	if "hyperparameters" not in params["input"]:
 		params["input"]["hyperparameters"] = "config/hyperparameters/default.json"
 
-	if "subqueries" not in params["elasticsearch"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.subqueries'", expr=None)
 	if "index" not in params["elasticsearch"]:
 		raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.index'", expr=None)
 	if "type" not in params["elasticsearch"]:
