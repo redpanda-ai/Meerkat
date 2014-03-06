@@ -219,7 +219,7 @@ class DescriptionConsumer(threading.Thread):
 		# Check cache, then run if query is not found
 		hash_object = hashlib.md5(str(input_data).encode())
 		input_hash = hash_object.hexdigest()
-		if input_hash in self.params["search_cache"]:
+		if input_hash in self.params["search_cache"] and False:
 			logger.debug("Cache hit, short-cutting")
 			sys.stdout.write("*")
 			sys.stdout.flush()
