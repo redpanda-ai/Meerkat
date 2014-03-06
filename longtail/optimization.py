@@ -21,7 +21,7 @@ def get_initial_values(hyperparameters, params, known, iter=100):
 	top_score = {"precision" : 0, "total_recall" : 0}
 
 	for i in range(iter):
-		randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=0.5)
+		randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=1)
 		print("\n", "ITERATION NUMBER: " + str(i))
 		print("\n", randomized_hyperparameters,"\n")
 
@@ -77,11 +77,11 @@ def run_classifier(hyperparameters, params):
 
 	return accuracy
 
-def run_iteration(top_score, params, known, iter=100, convergence=1):
+def run_iteration(top_score, params, known, learning_rate, iter=100, convergence=1):
 
 	hyperparameters = top_score['hyperparameters']
 	new_top_score = top_score
-	learning_rate = 0.3 * convergence
+	learning_rate = learning_rate * convergence
 
 	for i in range(iter):
 		randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=learning_rate)
@@ -100,15 +100,17 @@ def run_iteration(top_score, params, known, iter=100, convergence=1):
 	#	run_iteration(hyperparameters, known, params, iter=1)
 	#	return
 
-	return new_top_score
+	return new_top_score, learning_rate
 
 def gradient_ascent(initial_values, params, known, iter=10):
 
 	top_score = initial_values
+	learning_rate = 0.3
 	pprint.pprint(top_score, record)
 
 	for i in range(iter):
-		top_score = run_iteration(top_score, params, known, iter=iter, convergence=0.9)
+		print("LEARNING RATE: " + str(learning_rate))
+		top_score, learning_rate = run_iteration(top_score, params, known, learning_rate, iter=iter, convergence=0.9)
 		pprint.pprint(top_score, record)
 
 	return top_score
@@ -135,6 +137,9 @@ def randomized_optimization(hyperparameters, known, params):
 	return top_score
 
 if __name__ == "__main__":
+
+	# Clear Contents from Previous Runs
+	open('initialKeys.txt', 'w').close()
 
 	record = open("initialKeys.txt", "a")
 	params = initialize()
@@ -167,24 +172,24 @@ if __name__ == "__main__":
 	}
 
 	found = {
-		"chain_name": "1.7",
-		"tel": "0.0",
-		"name": "1.7",
-		"locality": "1.5",
-		"country": "0.1",
-		"category_labels": "1.6",
-		"status": "2.0",
-		"region": "0.4",
-		"address_extended": "0.4",
-		"po_box": "1.3",
-		"z_score_threshold": "1.1",
-		"neighborhood": "1.0",
-		"address": "0.8",
-		"fax": "0.1",
-		"admin_region": "0.9",
-		"postcode": "0.8",
-		"post_town": "0.6"
-	} 
+		"po_box": "1",
+		"z_score_threshold": "1",
+		"region": "1",
+		"email": "1",
+		"post_town": "1",
+		"fax": "1",
+		"neighborhood": "1",
+		"locality": "1",
+		"address_extended": "1",
+		"country": "1",
+		"name": "1",
+		"admin_region": "1",
+		"chain_name": "1",
+		"status": "1",
+		"tel": "1",
+		"postcode": "1",
+		"address": "1"
+	}
 
-	randomized_optimization(hyperparameters, known, params)
+	randomized_optimization(found, known, params)
 	record.close()
