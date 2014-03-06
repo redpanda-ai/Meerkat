@@ -20,13 +20,19 @@ def get_initial_values(hyperparameters, params, known, iter=100):
 
 	for i in range(iter):
 		randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=1)
-		accuracy = run_classifier(randomized_hyperparameters)
+		print("\n", "ITERATION NUMBER: " + str(i))
+		print("\n", randomized_hyperparameters,"\n")
+
+		# Run Classifier
+		accuracy = run_classifier(randomized_hyperparameters, params)
 		top_score = {"precision" : 0}
 		if accuracy["precision"] >= top_score["precision"]:
 			top_score = accuracy
-			print(accuracy["precision"])
+			print("\n", "SCORE: " + str(accuracy["precision"]))
 
-	print(top_score)
+		print("\n", randomized_hyperparameters,"\n")
+
+	print("TOP SCORE:" + str(top_score["precision"]))
 	return top_score
 
 def randomize(hyperparameters, known={}, learning_rate=0.3):
