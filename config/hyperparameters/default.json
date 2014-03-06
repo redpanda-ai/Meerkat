@@ -1,7 +1,4 @@
 {
-	"es_result_size" : "28",
-	"z_score_threshold" : "1.67",
-	"business_name_boost" : "0.13",
-	"address_boost" : "0.87",
-	"phone_boost" : "0.4"
+	"es_result_size" : "45",
+	"z_score_threshold" : "1.67"
 }

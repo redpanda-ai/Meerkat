@@ -163,6 +163,8 @@ def tokenize(params, desc_queue, hyperparameters, non_physical):
 		pickle.dump(params["search_cache"], f, pickle.HIGHEST_PROTOCOL)
 	logging.critical("Pickling complete.")
 
+	return accuracy_results
+
 def usage():
 	"""Shows the user which parameters to send into the program."""
 	result = "Usage:\n\t<path_to_json_format_config_file>"
