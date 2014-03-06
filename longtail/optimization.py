@@ -18,16 +18,16 @@ from sklearn.grid_search import RandomizedSearchCV
 def get_initial_values(hyperparameters, params, known, iter=100):
 	"""Do a simple search to find starter values"""
 
-	top_score = {"precision" : 0}
+	top_score = {"precision" : 0, "total_recall" : 0}
 
 	for i in range(iter):
-		randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=1)
+		randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=0.5)
 		print("\n", "ITERATION NUMBER: " + str(i))
 		print("\n", randomized_hyperparameters,"\n")
 
 		# Run Classifier
 		accuracy = run_classifier(randomized_hyperparameters, params)
-		if accuracy["precision"] >= top_score["precision"]:
+		if accuracy["precision"] >= top_score["precision"] and accuracy["precision"] < 100:
 			top_score = accuracy
 			top_score['hyperparameters'] = randomized_hyperparameters
 			print("\n", "SCORE: " + str(accuracy["precision"]))
@@ -49,7 +49,7 @@ def randomize(hyperparameters, known={}, learning_rate=0.3):
 		upper = float(value) + learning_rate
 		upper = upper if upper <=3 else 3
 		new_value = uniform(lower, upper)
-		randomized[key] = str(round(new_value, 1))
+		randomized[key] = str(round(new_value, 3))
 
 	return dict(list(randomized.items()) + list(known.items()))
 
@@ -77,19 +77,20 @@ def run_classifier(hyperparameters, params):
 
 	return accuracy
 
-def run_iteration(top_score, params, known, iter=100):
+def run_iteration(top_score, params, known, iter=100, convergence=1):
 
 	hyperparameters = top_score['hyperparameters']
 	new_top_score = top_score
+	learning_rate = 0.3 * convergence
 
 	for i in range(iter):
-		randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=0.2)
+		randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=learning_rate)
 		print("\n", "ITERATION NUMBER: " + str(i))
 		print("\n", randomized_hyperparameters,"\n")
 
 		# Run Classifier
 		accuracy = run_classifier(randomized_hyperparameters, params)
-		if accuracy["total_recall"] >= new_top_score["total_recall"] and accuracy["precision"] >= new_top_score["precision"]:
+		if accuracy["total_recall"] >= new_top_score["total_recall"] and accuracy["precision"] >= new_top_score["precision"] and accuracy["precision"] < 100:
 			new_top_score = accuracy
 			new_top_score['hyperparameters'] = randomized_hyperparameters
 			print("\n", "SCORE: " + str(accuracy["precision"]))
@@ -104,14 +105,15 @@ def run_iteration(top_score, params, known, iter=100):
 def gradient_ascent(initial_values, params, known, iter=10):
 
 	top_score = initial_values
+	pprint.pprint(top_score, record)
 
 	for i in range(iter):
-		top_score = run_iteration(top_score, params, known, iter=25)
+		top_score = run_iteration(top_score, params, known, iter=iter, convergence=0.9)
 		pprint.pprint(top_score, record)
 
 	return top_score
 
-def randomized_optimization(hyperparameters, known, params, iter=10):
+def randomized_optimization(hyperparameters, known, params):
 
 	"""Generates randomized parameter keys by
 	providing a range to sample from. 
@@ -119,10 +121,10 @@ def randomized_optimization(hyperparameters, known, params, iter=10):
 	provides the top score found"""
 
 	# Init
-	initial_values = get_initial_values(hyperparameters, params, known, iter=10)
+	initial_values = get_initial_values(hyperparameters, params, known, iter=15)
 
 	# Run Gradient Ascent 
-	top_score = gradient_ascent(initial_values, params, known, iter=10)
+	top_score = gradient_ascent(initial_values, params, known, iter=15)
 
 	print("Precision = " + str(top_score['precision']) + "%")
 	print("Best Recall = " + str(top_score['total_recall']) + "%")
@@ -137,6 +139,7 @@ if __name__ == "__main__":
 	record = open("initialKeys.txt", "a")
 	params = initialize()
 	known = {"es_result_size" : "45"}
+
 	hyperparameters = {
 		"factual_id" : "1",      
 	    "name" : "1",             
@@ -163,5 +166,25 @@ if __name__ == "__main__":
 		"z_score_threshold" : "1",
 	}
 
-	randomized_optimization(hyperparameters, known, params, iter=5)
+	found = {
+		"chain_name": "1.7",
+		"tel": "0.0",
+		"name": "1.7",
+		"locality": "1.5",
+		"country": "0.1",
+		"category_labels": "1.6",
+		"status": "2.0",
+		"region": "0.4",
+		"address_extended": "0.4",
+		"po_box": "1.3",
+		"z_score_threshold": "1.1",
+		"neighborhood": "1.0",
+		"address": "0.8",
+		"fax": "0.1",
+		"admin_region": "0.9",
+		"postcode": "0.8",
+		"post_town": "0.6"
+	} 
+
+	randomized_optimization(hyperparameters, known, params)
 	record.close()
