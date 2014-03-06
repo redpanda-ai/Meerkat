@@ -18,6 +18,8 @@ from sklearn.grid_search import RandomizedSearchCV
 def get_initial_values(hyperparameters, params, known, iter=100):
 	"""Do a simple search to find starter values"""
 
+	top_score = {"precision" : 0}
+
 	for i in range(iter):
 		randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=1)
 		print("\n", "ITERATION NUMBER: " + str(i))
@@ -25,7 +27,6 @@ def get_initial_values(hyperparameters, params, known, iter=100):
 
 		# Run Classifier
 		accuracy = run_classifier(randomized_hyperparameters, params)
-		top_score = {"precision" : 0}
 		if accuracy["precision"] >= top_score["precision"]:
 			top_score = accuracy
 			print("\n", "SCORE: " + str(accuracy["precision"]))
