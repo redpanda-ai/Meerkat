@@ -157,11 +157,14 @@ def tokenize(params, desc_queue, hyperparameters, non_physical):
 	except OSError:
 		pass
 
-	#Pickle the search_cache
+	# Pickle the search_cache
 	logging.critical("Begin Pickling.")
 	with open('search_cache.pickle', 'wb') as f:
 		pickle.dump(params["search_cache"], f, pickle.HIGHEST_PROTOCOL)
 	logging.critical("Pickling complete.")
+
+	# Close Loggers
+	logging.shutdown()
 
 	return accuracy_results
 

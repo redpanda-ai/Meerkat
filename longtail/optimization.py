@@ -29,6 +29,7 @@ def get_initial_values(hyperparameters, params, known, iter=100):
 		accuracy = run_classifier(randomized_hyperparameters, params)
 		if accuracy["precision"] >= top_score["precision"]:
 			top_score = accuracy
+			top_score['hyperparameters'] = randomized_hyperparameters
 			print("\n", "SCORE: " + str(accuracy["precision"]))
 
 		print("\n", randomized_hyperparameters,"\n")
@@ -61,49 +62,52 @@ def run_classifier(hyperparameters, params):
 
 	return accuracy
 
-def randomized_optimization(hyperparameters, known, params, iter=10, min_precision=99, min_recall=35):
+def run_iteration(top_score, params, known, iter=50):
+
+	hyperparameters = top_score['hyperparameters']
+	new_top_score = {}
+
+	for i in range(iter):
+		randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=0.3)
+		print("\n", "ITERATION NUMBER: " + str(i))
+		print("\n", randomized_hyperparameters,"\n")
+
+		# Run Classifier
+		accuracy = run_classifier(randomized_hyperparameters, params)
+		if accuracy["total_recall"] >= top_score["total_recall"] and accuracy["precision"] >= top_score["precision"]:
+			new_top_score = accuracy
+			new_top_score['hyperparameters'] = randomized_hyperparameters
+			print("\n", "SCORE: " + str(accuracy["precision"]))
+
+	# We need at least 1 result
+	#if len(results) < 1:
+	#	run_iteration(hyperparameters, known, params, iter=1)
+	#	return
+
+	return new_top_score
+
+def gradient_ascent(initial_values, params, known, iter=10):
+
+	top_score = initial_values
+
+	for i in range(iter):
+		top_score = run_iteration(top_score, params, known, iter=5)
+		pprint.pprint(top_score, record)
+
+	return top_score
+
+def randomized_optimization(hyperparameters, known, params, iter=10):
 
 	"""Generates randomized parameter keys by
 	providing a range to sample from. 
 	Runs the classifier a fixed number of times and
 	provides the top score found"""
 
-	get_initial_values(hyperparameters, params, known)
-	sys.exit()
-
 	# Init
-	results = []
+	initial_values = get_initial_values(hyperparameters, params, known, iter=5)
 
-	# Run a provided number of times
-	for i in range(iter):
-
-		print("\n", "ITERATION NUMBER: " + str(i))
-
-		randomized_hyperparameters = randomize(hyperparameters, known)
-
-		print("\n", randomized_hyperparameters,"\n")
-
-		# Run Classifier
-		accuracy = run_classifier(randomized_hyperparameters, params)
-
-		# Save Good Hyperparameters
-		if accuracy['precision'] >= min_precision and accuracy['total_recall'] >= min_recall:
-			accuracy['hyperparameters'] = randomized_hyperparameters
-			results.append(accuracy)
-			pprint.pprint(accuracy, record)
-
-	# We need at least 1 result
-	if len(results) < 1:
-		randomized_optimization(hyperparameters, known, params, iter=1)
-		return
-
-	# Get Top Score
-	top_score = {"total_recall":0}
-	hyperparameters_used = [result['hyperparameters'] for result in results]
-
-	for score in results:
-		if score["total_recall"] > top_score["total_recall"]:
-			top_score = score
+	# Run Gradient Ascent 
+	top_score = gradient_ascent(initial_values, params, known, iter=iter)
 
 	print("Precision = " + str(top_score['precision']) + "%")
 	print("Best Recall = " + str(top_score['total_recall']) + "%")
@@ -111,16 +115,13 @@ def randomized_optimization(hyperparameters, known, params, iter=10, min_precisi
 	print(top_score["hyperparameters"])
 	print("ALL RESULTS:")
 	
-	print(hyperparameters_used)
-
-	return hyperparameters_used
+	return top_score
 
 if __name__ == "__main__":
 
+	record = open("initialKeys.txt", "a")
 	params = initialize()
 	known = {"es_result_size" : "45"}
-	record = open("initialKeys.txt", "a")
-
 	hyperparameters = {
 		"factual_id" : "1",      
 	    "name" : "1",             
@@ -147,5 +148,5 @@ if __name__ == "__main__":
 		"z_score_threshold" : "1",
 	}
 
-	randomized_optimization(hyperparameters, known, params, iter=3)
+	randomized_optimization(hyperparameters, known, params, iter=5)
 	record.close()

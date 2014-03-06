@@ -291,4 +291,5 @@ class DescriptionConsumer(threading.Thread):
 
 			except queue.Empty:
 				print(str(self.thread_id), " found empty queue, terminating.")
+
 		return True
