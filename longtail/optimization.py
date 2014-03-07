@@ -39,7 +39,7 @@ def get_initial_values(hyperparameters, params, known, iter=100):
 
 def randomize(hyperparameters, known={}, learning_rate=0.3):
 	"""Finds new values within a given range 
-	based on a provided learning rater"""
+	based on a provided learning rate"""
 
 	randomized = {}
 
@@ -107,12 +107,18 @@ def gradient_ascent(initial_values, params, known, iter=10):
 
 	top_score = initial_values
 	learning_rate = 0.3
+	record = open("initialKeys.txt", "a")
 	pprint.pprint(top_score, record)
+	record.close()
 
 	for i in range(iter):
 		print("LEARNING RATE: " + str(learning_rate))
-		top_score, learning_rate = run_iteration(top_score, params, known, learning_rate, iter=25, convergence=0.9)
+		top_score, learning_rate = run_iteration(top_score, params, known, learning_rate, iter=5, convergence=0.9)
+		
+		# Save Iterations Top Hyperparameters
+		record = open("initialKeys.txt", "a")
 		pprint.pprint(top_score, record)
+		record.close()
 
 	return top_score
 
@@ -124,10 +130,10 @@ def randomized_optimization(hyperparameters, known, params):
 	provides the top score found"""
 
 	# Init
-	initial_values = get_initial_values(hyperparameters, params, known, iter=25)
+	initial_values = get_initial_values(hyperparameters, params, known, iter=5)
 
 	# Run Gradient Ascent 
-	top_score = gradient_ascent(initial_values, params, known, iter=10)
+	top_score = gradient_ascent(initial_values, params, known, iter=5)
 
 	print("Precision = " + str(top_score['precision']) + "%")
 	print("Best Recall = " + str(top_score['total_recall']) + "%")
@@ -142,7 +148,6 @@ if __name__ == "__main__":
 	# Clear Contents from Previous Runs
 	open('initialKeys.txt', 'w').close()
 
-	record = open("initialKeys.txt", "a")
 	params = initialize()
 	known = {"es_result_size" : "45"}
 
@@ -169,28 +174,16 @@ if __name__ == "__main__":
 	    "chain_id" : "1",
 	    "pin.location" : "1",   
 	    "composite.address" : "1",
-		"z_score_threshold" : "1",
+		"z_score_threshold" : "1"
 	}
 
-	found = {
-		"po_box": "1",
-		"z_score_threshold": "1",
-		"region": "1",
-		"email": "1",
-		"post_town": "1",
-		"fax": "1",
-		"neighborhood": "1",
-		"locality": "1",
-		"address_extended": "1",
-		"country": "1",
-		"name": "1",
-		"admin_region": "1",
-		"chain_name": "1",
-		"status": "1",
-		"tel": "1",
-		"postcode": "1",
-		"address": "1"
+	settings = {
+		"initial_search_space": 20,
+		"iteration_search_space": 20,
+		"convergence_rate": 1,
+		"initial_learning_rate": 0.3,
+		"gradient_ascent_iterations": 15,
+		"max_precision": 99
 	}
 
-	randomized_optimization(found, known, params)
-	record.close()
+	randomized_optimization(hyperparameters, known, params)

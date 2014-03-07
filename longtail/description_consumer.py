@@ -17,8 +17,9 @@ import pickle
 import queue
 import re
 import sys
-import threading
 import pprint
+import datetime
+import threading
 
 from elasticsearch import Elasticsearch, helpers
 from scipy.stats.mstats import zscore
@@ -31,16 +32,6 @@ def get_bool_query(starting_from = 0, size = 0):
 	"""Returns a "bool" style ElasticSearch query object"""
 	return { "from" : starting_from, "size" : size, "query" : {
 		"bool": { "minimum_number_should_match": 1, "should": [] } } }
-
-def get_match_phrase_query(term, feature_name, boost=1.0):
-	"""Returns a "match" style ElasticSearch query object"""
-	return { "match" : { feature_name : {
-		"query": term, "type": "phrase", "boost": boost } } }
-
-def get_multi_match_query(term, field_list=[]):
-	"""Returns a "match" style ElasticSearch query object"""
-	return { "multi_match" : { "query": term,
-		"type": "phrase", "fields": field_list } }
 
 def get_qs_query(term, field_list=[], boost=1.0):
 	"""Returns a "query_string" style ElasticSearch query object"""
@@ -87,7 +78,7 @@ class DescriptionConsumer(threading.Thread):
 			"[" + str(round(score, 3)) + "] " + " ".join(ordered_hit_fields))
 
 		self.__display_z_score_delta(scores)
-		print(results[0])
+		print(str(self.thread_id), ": ", results[0])
 		return True
 
 	def __display_z_score_delta(self, scores):
@@ -211,34 +202,44 @@ class DescriptionConsumer(threading.Thread):
 	def __search_index(self, input_as_object):
 		"""Searches the merchants index and the merchant mapping"""
 
-		logger = logging.getLogger("thread " + str(self.thread_id))
-		num_transactions = self.result_queue.qsize() + self.desc_queue.qsize()
 		input_data = json.dumps(input_as_object, sort_keys=True, indent=4\
 		, separators=(',', ': ')).encode('UTF-8')
+		output_data = ""
+		logger = logging.getLogger("thread " + str(self.thread_id))
+		num_transactions = self.result_queue.qsize() + self.desc_queue.qsize()
+		use_cache = self.params["elasticsearch"].get("cache_results", True)
+		
+		if use_cache == True:
+			output_data = self.__check_cache(input_data)
+
+		if output_data == "":
+			logger.debug("Cache miss, searching")
+			try:
+				output_data = self.es_connection.search(
+					index=self.params["elasticsearch"]["index"], body=input_as_object)
+				#Add newly found results to the client cache
+				if use_cache == True:
+					self.params["search_cache"][input_hash] = output_data
+			except Exception:
+				logging.critical("Unable to process the following: %s", str(input_as_object))
+				output_data = '{"hits":{"total":0}}'
+
+		self.my_meta["metrics"]["query_count"] += 1
+		return output_data
+
+	def __check_cache(input_data):
 
 		# Check cache, then run if query is not found
 		hash_object = hashlib.md5(str(input_data).encode())
 		input_hash = hash_object.hexdigest()
+
 		if input_hash in self.params["search_cache"]:
 			logger.debug("Cache hit, short-cutting")
 			sys.stdout.write("*")
 			sys.stdout.flush()
 			self.my_meta["metrics"]["cache_count"] += 1
 			output_data = self.params["search_cache"][input_hash]
-		else:
-			logger.debug("Cache miss, searching")
-			sys.stdout.write(str(self.thread_id))
-			sys.stdout.flush()
-			try:
-				output_data = self.es_connection.search(
-					index=self.params["elasticsearch"]["index"], body=input_as_object)
-				#Add newly found results to the client cache
-				self.params["search_cache"][input_hash] = output_data
-			except Exception:
-				logging.critical("Unable to process the following: %s", str(input_as_object))
-				output_data = '{"hits":{"total":0}}'
 
-		self.my_meta["metrics"]["query_count"] += 1
 		return output_data
 
 	def __get_boosted_fields(self, vector_name):

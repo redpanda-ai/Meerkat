@@ -118,15 +118,18 @@ def tokenize(params, desc_queue, hyperparameters, non_physical):
 	"""Opens a number of threads to process the descriptions queue."""
 
 	# Load Pickle Cache if enough transactions
-	if desc_queue.qsize() > 500:
+	use_cache = params["elasticsearch"].get("cache_results", "true")
+
+	if use_cache == "true":
 		params = load_pickle_cache(params)
 
 	# Run the Classifier
-	consumer_threads = 1
+	consumer_threads = 8
 	result_queue = queue.Queue()
 	if "concurrency" in params:
 		consumer_threads = params["concurrency"]
 	start_time = datetime.datetime.now()
+
 	for i in range(consumer_threads):
 		new_consumer = DescriptionConsumer(i, params, desc_queue, result_queue, hyperparameters)
 		new_consumer.setDaemon(True)
@@ -150,6 +153,21 @@ def tokenize(params, desc_queue, hyperparameters, non_physical):
 	# Do Speed Tests
 	speed_tests(start_time, accuracy_results)
 
+	# Save the Cache
+	save_pickle_cache(params)
+
+	# Shutdown Loggers
+	logging.shutdown()
+
+	return accuracy_results
+
+def save_pickle_cache(params):
+
+	use_cache = params["elasticsearch"].get("cache_results", True)
+
+	if use_cache == False:
+		return
+
 	# Destroy the out-dated cache
 	logging.critical("Removing original pickle")
 	try:
@@ -162,11 +180,6 @@ def tokenize(params, desc_queue, hyperparameters, non_physical):
 	with open('search_cache.pickle', 'wb') as f:
 		pickle.dump(params["search_cache"], f, pickle.HIGHEST_PROTOCOL)
 	logging.critical("Pickling complete.")
-
-	# Shutdown Loggers
-	logging.shutdown()
-
-	return accuracy_results
 
 def usage():
 	"""Shows the user which parameters to send into the program."""
