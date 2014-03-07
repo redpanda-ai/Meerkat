@@ -150,7 +150,6 @@ def tokenize(params, desc_queue, hyperparameters, non_physical):
 	# Do Speed Tests
 	speed_tests(start_time, accuracy_results)
 
-	"""
 	# Destroy the out-dated cache
 	logging.critical("Removing original pickle")
 	try:
@@ -162,9 +161,9 @@ def tokenize(params, desc_queue, hyperparameters, non_physical):
 	logging.critical("Begin Pickling.")
 	with open('search_cache.pickle', 'wb') as f:
 		pickle.dump(params["search_cache"], f, pickle.HIGHEST_PROTOCOL)
-	logging.critical("Pickling complete.") """
+	logging.critical("Pickling complete.")
 
-	# Close Loggers
+	# Shutdown Loggers
 	logging.shutdown()
 
 	return accuracy_results
