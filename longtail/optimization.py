@@ -95,6 +95,7 @@ def run_iteration(top_score, params, known, learning_rate, iter=100, convergence
 			new_top_score['hyperparameters'] = randomized_hyperparameters
 			print("\n", "SCORE: " + str(accuracy["precision"]))
 
+	# FIXME
 	# We need at least 1 result
 	#if len(results) < 1:
 	#	run_iteration(hyperparameters, known, params, iter=1)
@@ -110,7 +111,7 @@ def gradient_ascent(initial_values, params, known, iter=10):
 
 	for i in range(iter):
 		print("LEARNING RATE: " + str(learning_rate))
-		top_score, learning_rate = run_iteration(top_score, params, known, learning_rate, iter=iter, convergence=0.9)
+		top_score, learning_rate = run_iteration(top_score, params, known, learning_rate, iter=25, convergence=0.9)
 		pprint.pprint(top_score, record)
 
 	return top_score
@@ -123,10 +124,10 @@ def randomized_optimization(hyperparameters, known, params):
 	provides the top score found"""
 
 	# Init
-	initial_values = get_initial_values(hyperparameters, params, known, iter=15)
+	initial_values = get_initial_values(hyperparameters, params, known, iter=25)
 
 	# Run Gradient Ascent 
-	top_score = gradient_ascent(initial_values, params, known, iter=15)
+	top_score = gradient_ascent(initial_values, params, known, iter=10)
 
 	print("Precision = " + str(top_score['precision']) + "%")
 	print("Best Recall = " + str(top_score['total_recall']) + "%")

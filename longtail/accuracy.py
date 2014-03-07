@@ -114,8 +114,10 @@ def speed_tests(start_time, accuracy_results):
 	"""Run a number of tests related to speed"""
 
 	time_delta = datetime.datetime.now() - start_time
-	time_per_transaction = time_delta.seconds / accuracy_results['total_processed']
-	transactions_per_minute = (accuracy_results['total_processed'] / time_delta.seconds) * 60
+	seconds = time_delta.seconds if time_delta.seconds > 0 else 1
+
+	time_per_transaction = seconds / accuracy_results['total_processed']
+	transactions_per_minute = (accuracy_results['total_processed'] / seconds) * 60
 
 	print("\nSPEED TESTS:")
 	print("{0:35} = {1:11}".format("Total Time Taken", str(time_delta)[0:11]))
