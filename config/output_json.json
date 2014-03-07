@@ -1,6 +1,7 @@
 {
 	"concurrency" : 12,
 	"input" : {
+		"hyperparameters" : "config/hyperparameters/default.json",
 		"filename" : "data/input/100_bank_transaction_descriptions.csv",
 		"encoding" : "utf-8"
 	},
@@ -12,7 +13,7 @@
 	},
 	"output" : {
 		"results" : {
-			"fields" : ["BUSINESSSTANDARDNAME", "HOUSE", "PREDIR", "PERSISTENTRECORDID"]
+			"fields" : ["name", "composite.address", "factual_id"]
 		},
 		"file" : {
 			"format" : "json",

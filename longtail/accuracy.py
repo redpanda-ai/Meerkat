@@ -10,6 +10,7 @@ import logging
 import math
 import os
 import sys
+import pprint
 
 def test_accuracy(file_path=None, non_physical_trans=[], result_list=[]):
 	"""Takes file by default but can accept result
@@ -26,7 +27,7 @@ def test_accuracy(file_path=None, non_physical_trans=[], result_list=[]):
 		return
 
 	#FIXME: Hard-coded?
-	human_labeled_input_file = open("data/misc/verifiedLabeledTrans.factual.csv")
+	human_labeled_input_file = open("data/misc/verifiedLabeledTrans.csv")
 	human_labeled = list(csv.DictReader(human_labeled_input_file))
 	human_labeled_input_file.close()
 
@@ -56,17 +57,17 @@ def test_accuracy(file_path=None, non_physical_trans=[], result_list=[]):
 		# Verify against human labeled
 		for index, human_labeled_row in enumerate(human_labeled):
 			if machine_labeled_row['DESCRIPTION'] == human_labeled_row['DESCRIPTION']:
-				if human_labeled_row['factual_id'] == "":
+				if human_labeled_row['IS_PHYSICAL_TRANSACTION'] == '0':
+					# Transaction is non physical
+					non_physical.append(machine_labeled_row['DESCRIPTION'])
+					break
+				elif human_labeled_row['factual_id'] == "":
 					# Transaction is not yet labeled
 					needs_hand_labeling.append(machine_labeled_row['DESCRIPTION'])
 					break
 				elif machine_labeled_row['factual_id'] == human_labeled_row['factual_id']:
 					# Transaction was correctly labeled
 					correct.append(human_labeled_row['DESCRIPTION'] + " (ACTUAL:" + human_labeled_row['factual_id'] + ")")
-					break
-				elif human_labeled_row['IS_PHYSICAL_TRANSACTION'] == '0':
-					# Transaction is non physical
-					non_physical.append(machine_labeled_row['DESCRIPTION'])
 					break
 				else:
 					# Transaction is mislabeled
@@ -101,6 +102,7 @@ def test_accuracy(file_path=None, non_physical_trans=[], result_list=[]):
 		"non_physical": non_physical,
 		"unlabeled": unlabeled,
 		"num_verified": num_verified,
+		"num_labeled": num_labeled,
 		"mislabeled": mislabeled,
 		"total_recall": rounded_percent(num_labeled / total_processed),
 		"total_recall_non_physical": rounded_percent(num_labeled / total),
@@ -112,8 +114,10 @@ def speed_tests(start_time, accuracy_results):
 	"""Run a number of tests related to speed"""
 
 	time_delta = datetime.datetime.now() - start_time
-	time_per_transaction = time_delta.seconds / accuracy_results['total_processed']
-	transactions_per_minute = (accuracy_results['total_processed'] / time_delta.seconds) * 60
+	seconds = time_delta.seconds if time_delta.seconds > 0 else 1
+
+	time_per_transaction = seconds / accuracy_results['total_processed']
+	transactions_per_minute = (accuracy_results['total_processed'] / seconds) * 60
 
 	print("\nSPEED TESTS:")
 	print("{0:35} = {1:11}".format("Total Time Taken", str(time_delta)[0:11]))
@@ -138,10 +142,13 @@ def print_results(results):
 	print("\n")
 	print("{0:35} = {1:10.2f}%".format("Recall all transactions", results['total_recall']))
 	print("{0:35} = {1:10.2f}%".format("Recall non physical", results['total_recall_non_physical']))
+	print("{0:35} = {1:11}".format("Number of transactions labeled", results['num_labeled']))
 	print("{0:35} = {1:11}".format("Number of transactions verified", results['num_verified']))
 	print("{0:35} = {1:10.2f}%".format("Precision", results['precision']))
 	print("", "MISLABELED:", '\n'.join(results['mislabeled']), sep="\n")
+	print("", "MISLABELED BINARY:", '\n'.join(results['non_physical']), sep="\n")
 
 if __name__ == "__main__":
 	output_path = sys.argv[1] if len(sys.argv) > 1 else "data/output/longtailLabeled.csv"
-	print_results(test_accuracy(file_path=output_path))
+	pprint.pprint(test_accuracy(file_path=output_path))
+	#print_results(test_accuracy(file_path=output_path))

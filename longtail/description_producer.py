@@ -18,10 +18,11 @@ import os
 import pickle
 import queue
 import sys
+import pprint
 
 from longtail.custom_exceptions import InvalidArguments, Misconfiguration
 from longtail.description_consumer import DescriptionConsumer
-from longtail.binary_classifier.bay import predict_if_physical_transaction
+from longtail.binary_classifier.new import predict_if_physical_transaction
 from longtail.accuracy import test_accuracy, print_results, speed_tests
 
 def get_desc_queue(params):
@@ -72,28 +73,19 @@ def initialize():
 
 	params["search_cache"] = {}
 
-	try:
-		with open("search_cache.pickle", 'rb') as f:
-			params["search_cache"] = pickle.load(f)
-	except IOError:
-		logging.critical("search_cache.pickle not found, starting anyway.")
-
-	if validate_params(params):
-		logging.info("Parameters are valid, proceeding.")
-
 	return params
 
-def load_parameter_key(params):
+def load_hyperparameters(params):
 	"""Attempts to load parameter key"""
-	parameter_key = None
+	hyperparameters = None
 	try:
-		input_file = open(params["input"]["parameter_key"], encoding='utf-8')
-		parameter_key = json.loads(input_file.read())
+		input_file = open(params["input"]["hyperparameters"], encoding='utf-8')
+		hyperparameters = json.loads(input_file.read())
 		input_file.close()
 	except IOError:
-		logging.error("%s not found, aborting.", params["input"]["parameter_key"])
+		logging.error("%s not found, aborting.", params["input"]["hyperparameters"])
 		sys.exit()
-	return parameter_key
+	return hyperparameters
 
 def queue_to_list(result_queue):
 	"""Converts queue to list"""
@@ -108,15 +100,35 @@ def queue_to_list(result_queue):
 	result_queue.join()
 	return result_list
 
-def tokenize(params, desc_queue, parameter_key, non_physical):
+def load_pickle_cache(params):
+	"""Loads the Pickled Cache"""
+
+	try:
+		with open("search_cache.pickle", 'rb') as f:
+			params["search_cache"] = pickle.load(f)
+	except IOError:
+		logging.critical("search_cache.pickle not found, starting anyway.")
+
+	if validate_params(params):
+		logging.info("Parameters are valid, proceeding.")
+
+	return params
+
+def tokenize(params, desc_queue, hyperparameters, non_physical):
 	"""Opens a number of threads to process the descriptions queue."""
+
+	# Load Pickle Cache if enough transactions
+	if desc_queue.qsize() > 500:
+		params = load_pickle_cache(params)
+
+	# Run the Classifier
 	consumer_threads = 1
 	result_queue = queue.Queue()
 	if "concurrency" in params:
 		consumer_threads = params["concurrency"]
 	start_time = datetime.datetime.now()
 	for i in range(consumer_threads):
-		new_consumer = DescriptionConsumer(i, params, desc_queue, result_queue, parameter_key)
+		new_consumer = DescriptionConsumer(i, params, desc_queue, result_queue, hyperparameters)
 		new_consumer.setDaemon(True)
 		new_consumer.start()
 	desc_queue.join()
@@ -145,11 +157,16 @@ def tokenize(params, desc_queue, parameter_key, non_physical):
 	except OSError:
 		pass
 
-	#Pickle the search_cache
+	# Pickle the search_cache
 	logging.critical("Begin Pickling.")
 	with open('search_cache.pickle', 'wb') as f:
 		pickle.dump(params["search_cache"], f, pickle.HIGHEST_PROTOCOL)
 	logging.critical("Pickling complete.")
+
+	# Shutdown Loggers
+	logging.shutdown()
+
+	return accuracy_results
 
 def usage():
 	"""Shows the user which parameters to send into the program."""
@@ -167,11 +184,9 @@ def validate_params(params):
 	if params["concurrency"] <= 0:
 		raise Misconfiguration(msg="Misconfiguration: 'concurrency' must be a positive integer", expr=None)
 
-	if "parameter_key" not in params["input"]:
-		params["input"]["parameter_key"] = "config/keys/default.json"
+	if "hyperparameters" not in params["input"]:
+		params["input"]["hyperparameters"] = "config/hyperparameters/default.json"
 
-	if "subqueries" not in params["elasticsearch"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.subqueries'", expr=None)
 	if "index" not in params["elasticsearch"]:
 		raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.index'", expr=None)
 	if "type" not in params["elasticsearch"]:
@@ -216,7 +231,6 @@ def write_output_to_file(params, output_list):
 if __name__ == "__main__":
 	#Runs the entire program.
 	PARAMS = initialize()
-	KEY = load_parameter_key(PARAMS)
+	KEY = load_hyperparameters(PARAMS)
 	DESC_QUEUE, NON_PHYSICAL = get_desc_queue(PARAMS)
 	tokenize(PARAMS, DESC_QUEUE, KEY, NON_PHYSICAL)
-
