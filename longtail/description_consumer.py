@@ -78,7 +78,12 @@ class DescriptionConsumer(threading.Thread):
 			"[" + str(round(score, 3)) + "] " + " ".join(ordered_hit_fields))
 
 		self.__display_z_score_delta(scores)
-		print(str(self.thread_id), ": ", results[0])
+
+		try:
+			print(str(self.thread_id), ": ", results[0])
+		except IndexError:
+			print("INDEX ERROR: ", self.input_string)
+
 		return True
 
 	def __display_z_score_delta(self, scores):

@@ -13,7 +13,7 @@
     },
     "output" : {
         "results" : {
-            "fields" : ["status", "name", "composite.address", "factual_id", "locality", "chain_name", "post_town", "chain_id"]
+            "fields" : ["name", "composite.address", "factual_id", "locality"]
         },
         "file" : {
             "format" : "csv",

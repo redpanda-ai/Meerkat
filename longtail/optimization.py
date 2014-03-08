@@ -18,7 +18,7 @@ from sklearn.grid_search import RandomizedSearchCV
 def get_initial_values(hyperparameters, params, known, iter=100):
 	"""Do a simple search to find starter values"""
 
-	top_score = {"precision" : 0, "total_recall" : 0}
+	top_score = {"precision" : 0, "total_recall_non_physical" : 0}
 
 	for i in range(iter):
 		randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=1)
@@ -27,7 +27,7 @@ def get_initial_values(hyperparameters, params, known, iter=100):
 
 		# Run Classifier
 		accuracy = run_classifier(randomized_hyperparameters, params)
-		if accuracy["precision"] >= top_score["precision"] and accuracy["precision"] <= 96:
+		if accuracy["precision"] >= top_score["precision"] and accuracy["precision"] <= 99:
 			top_score = accuracy
 			top_score['hyperparameters'] = randomized_hyperparameters
 			print("\n", "SCORE: " + str(accuracy["precision"]))
@@ -93,7 +93,7 @@ def run_iteration(top_score, params, known, learning_rate, iter=100, convergence
 
 		# Run Classifier
 		accuracy = run_classifier(randomized_hyperparameters, params)
-		if accuracy["total_recall"] >= new_top_score["total_recall"] and accuracy["precision"] >= new_top_score["precision"] and accuracy["precision"] <= 96:
+		if accuracy["total_recall_non_physical"] >= new_top_score["total_recall_non_physical"] and accuracy["precision"] >= new_top_score["precision"] and accuracy["precision"] <= 99:
 			new_top_score = accuracy
 			new_top_score['hyperparameters'] = randomized_hyperparameters
 			print("\n", "SCORE: " + str(accuracy["precision"]))
@@ -114,7 +114,7 @@ def gradient_ascent(initial_values, params, known, iter=10):
 
 	for i in range(iter):
 		print("LEARNING RATE: " + str(learning_rate))
-		top_score, learning_rate = run_iteration(top_score, params, known, learning_rate, iter=25, convergence=0.99)
+		top_score, learning_rate = run_iteration(top_score, params, known, learning_rate, iter=25, convergence=0.95)
 		
 		# Save Iterations Top Hyperparameters
 		save_top_score(top_score)
@@ -125,7 +125,7 @@ def save_top_score(top_score):
 
 	record = open("top_scores.txt", "a")
 	pprint.pprint("Precision = " + str(top_score['precision']) + "%", record)
-	pprint.pprint("Best Recall = " + str(top_score['total_recall']) + "%", record)
+	pprint.pprint("Best Recall = " + str(top_score['total_recall_non_physical']) + "%", record)
 	pprint.pprint(top_score["hyperparameters"], record)
 	record.close()
 
@@ -143,13 +143,13 @@ def randomized_optimization(hyperparameters, known, params):
 	top_score = gradient_ascent(initial_values, params, known, iter=15)
 
 	print("Precision = " + str(top_score['precision']) + "%")
-	print("Best Recall = " + str(top_score['total_recall']) + "%")
+	print("Best Recall = " + str(top_score['total_recall_non_physical']) + "%")
 	print("HYPERPARAMETERS:")
 	pprint.pprint(top_score["hyperparameters"])
 	print("ALL RESULTS:")
 	
 	# Save Final Parameters
-	file_name = str(top_score['precision']) + "Precision" + str(top_score['total_recall']) + "Recall.json" 
+	file_name = str(top_score['precision']) + "Precision" + str(top_score['total_recall_non_physical']) + "Recall.json" 
 	new_parameters = open(file_name, 'w')
 	pprint.pprint(top_score, new_parameters)
 
@@ -187,7 +187,7 @@ if __name__ == "__main__":
 	    "chain_id" : "1",
 	    "pin.location" : "1",   
 	    "composite.address" : "1",
-		"z_score_threshold" : "2"
+		"z_score_threshold" : "1"
 	}
 
 	settings = {
