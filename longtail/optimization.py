@@ -137,7 +137,7 @@ def randomized_optimization(hyperparameters, known, params):
 	provides the top score found"""
 
 	# Init
-	initial_values = get_initial_values(hyperparameters, params, known, iter=200)
+	initial_values = get_initial_values(hyperparameters, params, known, iter=100)
 
 	# Run Gradient Ascent 
 	top_score = gradient_ascent(initial_values, params, known, iter=10)
@@ -191,32 +191,31 @@ if __name__ == "__main__":
 	}
 
 	found = {
-		"address": "1.192",
-	 	"address_extended": "0.78",
-	 	"admin_region": "0.446",
-	 	"category_ids": "0",
-	 	"category_labels": "0",
-	 	"chain_id": "0",
-	 	"chain_name": "2.07",
-		"composite.address": "0.407",
-		"country": "1.091",
-		"email": "0",
-		"es_result_size": "45",
-		"factual_id": "0",
 		"fax": "0",
-		"locality": "1",
-	 	"name": "1.626",
-	 	"neighborhood": "0.014",
-	 	"pin.location": "0",
-	 	"po_box": "1.681",
-	 	"post_town": "0.728",
-	 	"postcode": "1.629",
-	 	"region": "0.902",
+		"admin_region": "0.279",
+		"z_score_threshold": "1.658",
+		"category_labels": "0",
+		"address": "1.14",
+		"locality": "1.18",
+		"neighborhood": "0.256",
+		"address_extended": "0.597",
+		"pin.location": "0",
+		"chain_name": "2.359",
+		"po_box": "1.718",
+		"name": "1.826",
+		"post_town": "0.761",
+		"composite.address": "0.207",
+		"category_ids": "0",
+		"tel": "0.503",
+		"chain_id": "0",
+		"es_result_size": "45",
 		"status": "0",
-		"tel": "0.242",
-		"z_score_threshold": "1.395"
-	}
-
+		"factual_id": "0",
+		"country": "1.228",
+		"postcode": "1.33",
+		"region": "1.153",
+		"email": "0"
+ 	}
 
 	settings = {
 		"initial_search_space": 20,
