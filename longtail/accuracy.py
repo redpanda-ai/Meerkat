@@ -105,7 +105,7 @@ def test_accuracy(file_path=None, non_physical_trans=[], result_list=[]):
 		"num_labeled": num_labeled,
 		"mislabeled": mislabeled,
 		"total_recall": num_labeled / total_processed * 100,
-		"total_recall_non_physical": rounded_percent(num_labeled / total),
+		"total_recall_non_physical": num_labeled / total * 100,
 		"precision": num_correct / num_verified * 100,
 		"binary_accuracy": 100 - rounded_percent(len(non_physical) / total)
 	}
