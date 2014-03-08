@@ -10,7 +10,7 @@ is resource intensive to exaustively perform a standard grid_search"""
 
 from longtail.description_producer import initialize, get_desc_queue, tokenize, load_hyperparameters
 
-import sys, pprint
+import sys, pprint, datetime
 from random import randint, uniform
 from sklearn.grid_search import RandomizedSearchCV
 
@@ -27,12 +27,15 @@ def get_initial_values(hyperparameters, params, known, iter=100):
 
 		# Run Classifier
 		accuracy = run_classifier(randomized_hyperparameters, params)
-		if accuracy["precision"] >= top_score["precision"] and accuracy["precision"] < 100:
+		if accuracy["precision"] >= top_score["precision"] and accuracy["precision"] <= 96:
 			top_score = accuracy
 			top_score['hyperparameters'] = randomized_hyperparameters
 			print("\n", "SCORE: " + str(accuracy["precision"]))
 
 		print("\n", randomized_hyperparameters,"\n")
+
+	if accuracy["precision"] < 90:
+		get_initial_values(top_score["hyperparameters"], params, known, iter=1)
 
 	print("TOP SCORE:" + str(top_score["precision"]))
 	return top_score
@@ -90,7 +93,7 @@ def run_iteration(top_score, params, known, learning_rate, iter=100, convergence
 
 		# Run Classifier
 		accuracy = run_classifier(randomized_hyperparameters, params)
-		if accuracy["total_recall"] >= new_top_score["total_recall"] and accuracy["precision"] >= new_top_score["precision"] and accuracy["precision"] < 100:
+		if accuracy["total_recall"] >= new_top_score["total_recall"] and accuracy["precision"] >= new_top_score["precision"] and accuracy["precision"] <= 96:
 			new_top_score = accuracy
 			new_top_score['hyperparameters'] = randomized_hyperparameters
 			print("\n", "SCORE: " + str(accuracy["precision"]))
@@ -106,21 +109,25 @@ def run_iteration(top_score, params, known, learning_rate, iter=100, convergence
 def gradient_ascent(initial_values, params, known, iter=10):
 
 	top_score = initial_values
-	learning_rate = 0.3
-	record = open("initialKeys.txt", "a")
-	pprint.pprint(top_score, record)
-	record.close()
+	learning_rate = 0.35
+	save_top_score(initial_values)
 
 	for i in range(iter):
 		print("LEARNING RATE: " + str(learning_rate))
-		top_score, learning_rate = run_iteration(top_score, params, known, learning_rate, iter=5, convergence=0.9)
+		top_score, learning_rate = run_iteration(top_score, params, known, learning_rate, iter=25, convergence=0.99)
 		
 		# Save Iterations Top Hyperparameters
-		record = open("initialKeys.txt", "a")
-		pprint.pprint(top_score, record)
-		record.close()
+		save_top_score(top_score)
 
 	return top_score
+
+def save_top_score(top_score):
+
+	record = open("top_scores.txt", "a")
+	pprint.pprint("Precision = " + str(top_score['precision']) + "%", record)
+	pprint.pprint("Best Recall = " + str(top_score['total_recall']) + "%", record)
+	pprint.pprint(top_score["hyperparameters"], record)
+	record.close()
 
 def randomized_optimization(hyperparameters, known, params):
 
@@ -130,24 +137,30 @@ def randomized_optimization(hyperparameters, known, params):
 	provides the top score found"""
 
 	# Init
-	initial_values = get_initial_values(hyperparameters, params, known, iter=5)
+	initial_values = get_initial_values(hyperparameters, params, known, iter=50)
 
 	# Run Gradient Ascent 
-	top_score = gradient_ascent(initial_values, params, known, iter=5)
+	top_score = gradient_ascent(initial_values, params, known, iter=15)
 
 	print("Precision = " + str(top_score['precision']) + "%")
 	print("Best Recall = " + str(top_score['total_recall']) + "%")
 	print("HYPERPARAMETERS:")
-	print(top_score["hyperparameters"])
+	pprint.pprint(top_score["hyperparameters"])
 	print("ALL RESULTS:")
 	
+	# Save Final Parameters
+	file_name = str(top_score['precision']) + "Precision" + str(top_score['total_recall']) + "Recall.json" 
+	new_parameters = open(file_name, 'w')
+	pprint.pprint(top_score, new_parameters)
+
 	return top_score
 
 if __name__ == "__main__":
 
 	# Clear Contents from Previous Runs
-	open('initialKeys.txt', 'w').close()
+	open('top_scores.txt', 'w').close()
 
+	start_time = datetime.datetime.now()
 	params = initialize()
 	known = {"es_result_size" : "45"}
 
@@ -174,7 +187,7 @@ if __name__ == "__main__":
 	    "chain_id" : "1",
 	    "pin.location" : "1",   
 	    "composite.address" : "1",
-		"z_score_threshold" : "1"
+		"z_score_threshold" : "2"
 	}
 
 	settings = {
@@ -182,8 +195,11 @@ if __name__ == "__main__":
 		"iteration_search_space": 20,
 		"convergence_rate": 1,
 		"initial_learning_rate": 0.3,
+		"gradient_ascent_learning_rate": 0.3,
 		"gradient_ascent_iterations": 15,
 		"max_precision": 99
 	}
 
 	randomized_optimization(hyperparameters, known, params)
+	time_delta = datetime.datetime.now() - start_time
+	print("TOTAL TIME TAKEN FOR OPTIMIZATION: ", time_delta)

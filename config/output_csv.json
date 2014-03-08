@@ -1,7 +1,7 @@
 {
     "concurrency" : 10,
     "input" : {
-        "hyperparameters" : "config/hyperparameters/97Precision28Recall.json",
+        "hyperparameters" : "config/hyperparameters/default.json",
         "filename" : "data/input/small_san_francisco.csv",
         "encoding" : "utf-8"
     },
@@ -13,7 +13,7 @@
     },
     "output" : {
         "results" : {
-            "fields" : ["name", "composite.address", "factual_id", "locality"]
+            "fields" : ["status", "name", "composite.address", "factual_id", "locality", "chain_name", "post_town", "chain_id"]
         },
         "file" : {
             "format" : "csv",

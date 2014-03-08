@@ -27,7 +27,7 @@ def test_accuracy(file_path=None, non_physical_trans=[], result_list=[]):
 		return
 
 	#FIXME: Hard-coded?
-	human_labeled_input_file = open("data/misc/verifiedLabeledTrans.csv")
+	human_labeled_input_file = open("data/misc/verifiedLabeledTrans.csv", encoding="utf-8")
 	human_labeled = list(csv.DictReader(human_labeled_input_file))
 	human_labeled_input_file.close()
 
@@ -50,7 +50,7 @@ def test_accuracy(file_path=None, non_physical_trans=[], result_list=[]):
 	for machine_labeled_row in machine_labeled:
 
 		# Our confidence was not high enough to label
-		if machine_labeled_row['factual_id'] == "":
+		if machine_labeled_row["factual_id"] == "":
 			unlabeled.append(machine_labeled_row['DESCRIPTION'])
 			continue
 
@@ -61,17 +61,17 @@ def test_accuracy(file_path=None, non_physical_trans=[], result_list=[]):
 					# Transaction is non physical
 					non_physical.append(machine_labeled_row['DESCRIPTION'])
 					break
-				elif human_labeled_row['factual_id'] == "":
+				elif human_labeled_row["factual_id"] == "":
 					# Transaction is not yet labeled
 					needs_hand_labeling.append(machine_labeled_row['DESCRIPTION'])
 					break
-				elif machine_labeled_row['factual_id'] == human_labeled_row['factual_id']:
+				elif machine_labeled_row["factual_id"] == human_labeled_row["factual_id"]:
 					# Transaction was correctly labeled
-					correct.append(human_labeled_row['DESCRIPTION'] + " (ACTUAL:" + human_labeled_row['factual_id'] + ")")
+					correct.append(human_labeled_row['DESCRIPTION'] + " (ACTUAL:" + human_labeled_row["factual_id"] + ")")
 					break
 				else:
 					# Transaction is mislabeled
-					mislabeled.append(human_labeled_row['DESCRIPTION'] + " (ACTUAL:" + human_labeled_row['factual_id'] + ")")
+					mislabeled.append(human_labeled_row['DESCRIPTION'] + " (ACTUAL:" + human_labeled_row["factual_id"] + ")")
 					break
 			elif index + 1 == len(human_labeled):
 				needs_hand_labeling.append(machine_labeled_row['DESCRIPTION'])
@@ -104,9 +104,9 @@ def test_accuracy(file_path=None, non_physical_trans=[], result_list=[]):
 		"num_verified": num_verified,
 		"num_labeled": num_labeled,
 		"mislabeled": mislabeled,
-		"total_recall": rounded_percent(num_labeled / total_processed),
+		"total_recall": num_labeled / total_processed * 100,
 		"total_recall_non_physical": rounded_percent(num_labeled / total),
-		"precision": rounded_percent(num_correct / num_verified),
+		"precision": num_correct / num_verified * 100,
 		"binary_accuracy": 100 - rounded_percent(len(non_physical) / total)
 	}
 
