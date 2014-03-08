@@ -21,7 +21,7 @@ def get_initial_values(hyperparameters, params, known, iter=100):
 	top_score = {"precision" : 0, "total_recall_non_physical" : 0}
 
 	for i in range(iter):
-		randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=1)
+		randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=0.3)
 		print("\n", "ITERATION NUMBER: " + str(i))
 		print("\n", randomized_hyperparameters,"\n")
 
@@ -114,7 +114,7 @@ def gradient_ascent(initial_values, params, known, iter=10):
 
 	for i in range(iter):
 		print("LEARNING RATE: " + str(learning_rate))
-		top_score, learning_rate = run_iteration(top_score, params, known, learning_rate, iter=25, convergence=0.95)
+		top_score, learning_rate = run_iteration(top_score, params, known, learning_rate, iter=50, convergence=0.9)
 		
 		# Save Iterations Top Hyperparameters
 		save_top_score(top_score)
@@ -137,10 +137,10 @@ def randomized_optimization(hyperparameters, known, params):
 	provides the top score found"""
 
 	# Init
-	initial_values = get_initial_values(hyperparameters, params, known, iter=50)
+	initial_values = get_initial_values(hyperparameters, params, known, iter=200)
 
 	# Run Gradient Ascent 
-	top_score = gradient_ascent(initial_values, params, known, iter=15)
+	top_score = gradient_ascent(initial_values, params, known, iter=10)
 
 	print("Precision = " + str(top_score['precision']) + "%")
 	print("Best Recall = " + str(top_score['total_recall_non_physical']) + "%")
@@ -190,6 +190,34 @@ if __name__ == "__main__":
 		"z_score_threshold" : "1"
 	}
 
+	found = {
+		"address": "1.192",
+	 	"address_extended": "0.78",
+	 	"admin_region": "0.446",
+	 	"category_ids": "0",
+	 	"category_labels": "0",
+	 	"chain_id": "0",
+	 	"chain_name": "2.07",
+		"composite.address": "0.407",
+		"country": "1.091",
+		"email": "0",
+		"es_result_size": "45",
+		"factual_id": "0",
+		"fax": "0",
+		"locality": "1",
+	 	"name": "1.626",
+	 	"neighborhood": "0.014",
+	 	"pin.location": "0",
+	 	"po_box": "1.681",
+	 	"post_town": "0.728",
+	 	"postcode": "1.629",
+	 	"region": "0.902",
+		"status": "0",
+		"tel": "0.242",
+		"z_score_threshold": "1.395"
+	}
+
+
 	settings = {
 		"initial_search_space": 20,
 		"iteration_search_space": 20,
@@ -200,6 +228,6 @@ if __name__ == "__main__":
 		"max_precision": 99
 	}
 
-	randomized_optimization(hyperparameters, known, params)
+	randomized_optimization(found, known, params)
 	time_delta = datetime.datetime.now() - start_time
 	print("TOTAL TIME TAKEN FOR OPTIMIZATION: ", time_delta)
