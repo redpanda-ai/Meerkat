@@ -2,7 +2,7 @@
     "concurrency" : 10,
     "input" : {
         "hyperparameters" : "config/hyperparameters/default.json",
-        "filename" : "data/input/small_san_francisco.csv",
+        "filename" : "data/input/10K_Bank.csv",
         "encoding" : "utf-8"
     },
     "logging" : {

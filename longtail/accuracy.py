@@ -20,14 +20,14 @@ def test_accuracy(file_path=None, non_physical_trans=[], result_list=[]):
 	if len(result_list) > 0:
 		machine_labeled = result_list
 	elif file_path is not None and os.path.isfile(file_path):
-		ML_file = open(file_path)
+		ML_file = open(file_path, encoding="utf-8", errors='replace')
 		machine_labeled = list(csv.DictReader(ML_file))
 	else:
 		logging.warning("Not enough information provided to perform accuracy tests on")
 		return
 
 	#FIXME: Hard-coded?
-	human_labeled_input_file = open("data/misc/verifiedLabeledTrans.csv", encoding="utf-8")
+	human_labeled_input_file = open("data/misc/10K_Bank.csv", encoding="utf-8", errors='replace')
 	human_labeled = list(csv.DictReader(human_labeled_input_file))
 	human_labeled_input_file.close()
 

@@ -31,27 +31,43 @@ def get_desc_queue(params):
 
 	lines, filename, encoding = None, None, None
 	non_physical = []
+	atm = []
 	desc_queue = queue.Queue()
 
 	try:
 		filename = params["input"]["filename"]
 		encoding = params["input"]["encoding"]
-		with open(filename, 'r', encoding=encoding) as inputfile:
+		with open(filename, 'r', encoding=encoding, errors='replace') as inputfile:
 			lines = inputfile.read()
 	except IOError:
 		logging.critical("Invalid ['input']['filename'] key; Input file: %s"
 			" cannot be found. Correct your config file.", filename)
-
 		sys.exit()
 
+	lines = lines.split("\n")
+
 	# Run Binary Classifier
-	for input_string in lines.split("\n"):
+	for input_string in lines:
 		prediction = predict_if_physical_transaction(input_string)
 		if prediction == "1":
 			desc_queue.put(input_string)
 		elif prediction == "0":
 			non_physical.append(input_string)
 			logging.info("NON-PHYSICAL: %s", input_string)
+		elif prediction == "2":	
+			atm.append(input_string)
+
+	atm_percent = (len(atm) / len(lines)) * 100
+	non_physical_percent = (len(non_physical) / len(lines)) * 100
+	physical_percent = (desc_queue.qsize() / len(lines)) * 100
+
+	print("")
+	print("PHYSICAL: ", round(physical_percent, 2), "%")
+	print("NON-PHYSICAL: ", round(non_physical_percent, 2), "%")
+	print("ATM: ", round(atm_percent, 2), "%")
+	print("")
+
+	non_physical = non_physical + atm
 
 	return desc_queue, non_physical
 

@@ -38,6 +38,11 @@ def get_qs_query(term, field_list=[], boost=1.0):
 	return { "query_string": {
 		"query": term, "fields": field_list, "boost": boost } }
 
+def get_fuzzy_query(term, field_list=["_all"]):
+	"""Returns a "fuzzy_like_this" style ElasticSearch query object"""
+	return { "fuzzy_like_this": {
+		"like_text": term, "fields": field_list} }
+
 class DescriptionConsumer(threading.Thread):
 	''' Acts as a client to an ElasticSearch cluster, tokenizing description
 	strings that it pulls from a synchronized queue. '''
@@ -57,6 +62,11 @@ class DescriptionConsumer(threading.Thread):
 
 	def __display_search_results(self, search_results):
 		"""Displays search results."""
+
+		# Must have results
+		if search_results['hits']['total'] == 0:
+			return False	
+
 		hits = search_results['hits']['hits']
 		scores, results, fields_found = [], [], []
 		params = self.params
@@ -135,6 +145,7 @@ class DescriptionConsumer(threading.Thread):
 		hyperparameters = self.hyperparameters
 		params = self.params
 		result_size = self.hyperparameters.get("es_result_size", "10")
+		fuzziness = self.hyperparameters.get("fuzziness", 0.5)
 
 		# Construct Main Query
 		logger.info("BUILDING FINAL BOOLEAN SEARCH")
@@ -155,6 +166,12 @@ class DescriptionConsumer(threading.Thread):
 
 	def __output_to_result_queue(self, search_results):
 		"""Decides whether to output and pushes to result_queue"""
+
+		# Must be at least one result
+		if search_results['hits']['total'] == 0:
+			print("NO RESULTS: ", self.input_string)
+			return False
+
 		hits = search_results['hits']['hits']
 		scores, fields_found = [], []
 		output_dict = {}
