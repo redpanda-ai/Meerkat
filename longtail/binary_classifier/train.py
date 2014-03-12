@@ -66,13 +66,13 @@ def build_model(trans_train, trans_test, labels_train, labels_test):
 
     parameters = {
         'vect__max_df': (0.5, 0.75, 1.0),
-        'vect__max_features': (500, 750, 1000, 1500),
+        'vect__max_features': (500, 750, 1000, 1250, 2000),
         'vect__ngram_range': ((1, 1), (1, 2)),  # unigrams or bigrams
         'tfidf__use_idf': (True, False),
         'tfidf__norm': ('l1', 'l2'),
         'clf__alpha': (0.00001, 0.000001),
         'clf__penalty': ('l2', 'elasticnet'),
-        'clf__n_iter': (10, 50, 80)
+        'clf__n_iter': (40, 50, 60)
     }
 
     grid_search = GridSearchCV(pipeline, parameters, n_jobs=-1, verbose=1)
@@ -88,7 +88,7 @@ def build_model(trans_train, trans_test, labels_train, labels_test):
     print("Actual Score: " + str(score))
 
     # Save Model
-    joblib.dump(grid_search, 'longtail/binary_classifier/US.pkl', compress=3)
+    joblib.dump(grid_search, 'longtail/binary_classifier/US2.pkl', compress=3)
 
     test_model("data/misc/verifiedLabeledTrans.csv", grid_search)
     test_model("data/misc/10K_Card.csv", grid_search)
