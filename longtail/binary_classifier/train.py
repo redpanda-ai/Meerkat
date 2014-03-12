@@ -38,9 +38,10 @@ def load_data(labeled_transactions="data/misc/verifiedLabeledTrans.csv"):
             labels.append(human_labeled[i]["IS_PHYSICAL_TRANSACTION"])
 
     # Append More
-    #transactions, labels = load_more_data(transactions, labels, "data/misc/10K_Card.csv")     
+    #transactions, labels = load_more_data(transactions, labels, "data/misc/10K_Card.csv")
+    #transactions, labels = load_more_data(transactions, labels, "data/misc/verifiedLabeledTrans.csv")
  
-    trans_train, trans_test, labels_train, labels_test = train_test_split(transactions, labels, test_size=0.5)
+    trans_train, trans_test, labels_train, labels_test = train_test_split(transactions, labels, test_size=0.5, random_state=42)
 
     return trans_train, trans_test, labels_train, labels_test
 
@@ -66,8 +67,8 @@ def build_model(trans_train, trans_test, labels_train, labels_test):
     ])
 
     parameters = {
-        'vect__max_df': (0.75, 1.0),
-        'vect__max_features': (500, 1000, 1500),
+        'vect__max_df': (0.5, 0.75, 1.0),
+        'vect__max_features': (500, 750),
         'vect__ngram_range': ((1, 1), (1, 2)),  # unigrams or bigrams
         'tfidf__use_idf': (True, False),
         'tfidf__norm': ('l1', 'l2'),
@@ -90,6 +91,17 @@ def build_model(trans_train, trans_test, labels_train, labels_test):
 
     # Save Model
     joblib.dump(grid_search, 'longtail/binary_classifier/US.pkl', compress=3)
+
+    test_model("data/misc/verifiedLabeledTrans.csv", grid_search)
+    test_model("data/misc/10K_Card.csv", grid_search)
+    test_model("data/misc/10K_Bank.csv", grid_search)
+
+def test_model(file_to_test, model):
+
+    transactions, labels = load_more_data([], [], file_to_test)
+    score = model.score(transactions, labels)
+
+    print(file_to_test, " Score: ", score)
 
 if __name__ == "__main__":
 

@@ -15,7 +15,6 @@ from sklearn.externals import joblib
 def test_model(file_to_test):
 
     transactions, labels = load_more_data([], [], file_to_test)
-    print(len(transactions))
     grid_search = joblib.load('longtail/binary_classifier/US.pkl')
     score = grid_search.score(transactions, labels)
 
