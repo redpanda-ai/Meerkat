@@ -9,6 +9,7 @@ Created on Feb 25, 2014
 
 import csv, sys, logging, os
 
+from random import random
 from sklearn.cross_validation import train_test_split
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
@@ -17,42 +18,37 @@ from sklearn.grid_search import GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.externals import joblib
 
-def load_data(labeled_transactions="data/misc/verifiedLabeledTrans.csv"):
+def split_data(labeled_transactions="data/misc/verifiedLabeledTrans.csv"):
 
     if not os.path.isfile(labeled_transactions):
         logging.error("Please provide a set of labeled transactions to build the classifier on")
 
-    HL_file = open(labeled_transactions, encoding='utf-8', errors="replace")
-    human_labeled = list(csv.DictReader(HL_file))
-    HL_file.close()
-
-    if len(human_labeled) < 100:
-        logging.error("Not enough labeled data to create a model from")
-
     transactions = []
     labels = []
 
-    for i in range(len(human_labeled)):
-        if human_labeled[i]["IS_PHYSICAL_TRANSACTION"] != "":
-            transactions.append(human_labeled[i]["DESCRIPTION"])
-            labels.append(human_labeled[i]["IS_PHYSICAL_TRANSACTION"])
+    # Load Data
+    transactions, labels = load_data(transactions, labels, labeled_transactions)
 
     # Append More
-    #transactions, labels = load_more_data(transactions, labels, "data/misc/10K_Card.csv")
-    #transactions, labels = load_more_data(transactions, labels, "data/misc/verifiedLabeledTrans.csv")
- 
+    transactions, labels = load_data(transactions, labels, "data/misc/10K_Card.csv")
+    transactions, labels = load_data(transactions, labels, "data/misc/verifiedLabeledTrans.csv")
+
+    # Split into training and testing sets
+    if len(transactions) < 100:
+        logging.error("Not enough labeled data to create a model from")
+
     trans_train, trans_test, labels_train, labels_test = train_test_split(transactions, labels, test_size=0.5, random_state=42)
 
     return trans_train, trans_test, labels_train, labels_test
 
-def load_more_data(transactions, labels, file_name):
+def load_data(transactions, labels, file_name, test_size=1):
 
     HL_file = open(file_name, encoding='utf-8', errors="replace")
     human_labeled = list(csv.DictReader(HL_file))
     HL_file.close()
 
     for i in range(len(human_labeled)):
-        if human_labeled[i]["IS_PHYSICAL_TRANSACTION"] != "":
+        if human_labeled[i]["IS_PHYSICAL_TRANSACTION"] != "" and random() < test_size:
             transactions.append(human_labeled[i]["DESCRIPTION"])
             labels.append(human_labeled[i]["IS_PHYSICAL_TRANSACTION"])
 
@@ -98,7 +94,7 @@ def build_model(trans_train, trans_test, labels_train, labels_test):
 
 def test_model(file_to_test, model):
 
-    transactions, labels = load_more_data([], [], file_to_test)
+    transactions, labels = load_data([], [], file_to_test)
     score = model.score(transactions, labels)
 
     print(file_to_test, " Score: ", score)
@@ -106,8 +102,8 @@ def test_model(file_to_test, model):
 if __name__ == "__main__":
 
     if len(sys.argv) == 2 and os.path.isfile(sys.argv[1]):
-        trans_train, trans_test, labels_train, labels_test = load_data(labeled_transactions=sys.argv[1])
+        trans_train, trans_test, labels_train, labels_test = split_data(labeled_transactions=sys.argv[1])
     else:
-        trans_train, trans_test, labels_train, labels_test = load_data()
+        trans_train, trans_test, labels_train, labels_test = split_data()
 
     build_model(trans_train, trans_test, labels_train, labels_test)
