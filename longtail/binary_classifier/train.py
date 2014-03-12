@@ -39,7 +39,7 @@ def split_data(labeled_transactions="data/misc/10K_Bank.csv"):
     if len(transactions) < 100:
         logging.error("Not enough labeled data to create a model from")
 
-    trans_train, trans_test, labels_train, labels_test = train_test_split(transactions, labels, test_size=0.5, random_state=42)
+    trans_train, trans_test, labels_train, labels_test = train_test_split(transactions, labels, test_size=0.5)
 
     return trans_train, trans_test, labels_train, labels_test
 
@@ -65,14 +65,14 @@ def build_model(trans_train, trans_test, labels_train, labels_test):
     ])
 
     parameters = {
-        'vect__max_df': (0.5, 0.75, 1.0),
-        'vect__max_features': (500, 750, 1000, 1250, 2000),
+        'vect__max_df': (0.05, 0.10, 0.25),
+        'vect__max_features': (1000, 2000, 3000, 4000),
         'vect__ngram_range': ((1, 1), (1, 2)),  # unigrams or bigrams
         'tfidf__use_idf': (True, False),
         'tfidf__norm': ('l1', 'l2'),
         'clf__alpha': (0.00001, 0.000001),
         'clf__penalty': ('l2', 'elasticnet'),
-        'clf__n_iter': (40, 50, 60)
+        'clf__n_iter': (10, 50, 80)
     }
 
     grid_search = GridSearchCV(pipeline, parameters, n_jobs=-1, verbose=1)
@@ -88,7 +88,7 @@ def build_model(trans_train, trans_test, labels_train, labels_test):
     print("Actual Score: " + str(score))
 
     # Save Model
-    joblib.dump(grid_search, 'longtail/binary_classifier/US2.pkl', compress=3)
+    joblib.dump(grid_search, 'longtail/binary_classifier/US3.pkl', compress=3)
 
     test_model("data/misc/verifiedLabeledTrans.csv", grid_search)
     test_model("data/misc/10K_Card.csv", grid_search)
