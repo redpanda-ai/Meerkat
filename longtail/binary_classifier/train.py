@@ -66,7 +66,7 @@ def build_model(trans_train, trans_test, labels_train, labels_test):
 
     parameters = {
         'vect__max_df': (0.5, 0.75, 1.0),
-        'vect__max_features': (500, 750, 1000),
+        'vect__max_features': (500, 750, 1000, 1500),
         'vect__ngram_range': ((1, 1), (1, 2)),  # unigrams or bigrams
         'tfidf__use_idf': (True, False),
         'tfidf__norm': ('l1', 'l2'),
