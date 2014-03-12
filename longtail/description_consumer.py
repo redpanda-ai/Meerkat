@@ -65,7 +65,7 @@ class DescriptionConsumer(threading.Thread):
 
 		# Must have results
 		if search_results['hits']['total'] == 0:
-			return False	
+			return True	
 
 		hits = search_results['hits']['hits']
 		scores, results, fields_found = [], [], []
@@ -169,8 +169,12 @@ class DescriptionConsumer(threading.Thread):
 
 		# Must be at least one result
 		if search_results['hits']['total'] == 0:
+			field_names = self.params["output"]["results"]["fields"]
+			output_dict = dict(zip(field_names, ["" for i in range(len(field_names))]))
+			output_dict["DESCRIPTION"] = self.input_string
+			self.result_queue.put(output_dict)
 			print("NO RESULTS: ", self.input_string)
-			return False
+			return
 
 		hits = search_results['hits']['hits']
 		scores, fields_found = [], []

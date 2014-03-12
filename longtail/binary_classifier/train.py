@@ -22,7 +22,7 @@ def load_data(labeled_transactions="data/misc/verifiedLabeledTrans.csv"):
     if not os.path.isfile(labeled_transactions):
         logging.error("Please provide a set of labeled transactions to build the classifier on")
 
-    HL_file = open(labeled_transactions, encoding='utf-8')
+    HL_file = open(labeled_transactions, encoding='utf-8', errors="replace")
     human_labeled = list(csv.DictReader(HL_file))
     HL_file.close()
 
@@ -37,9 +37,25 @@ def load_data(labeled_transactions="data/misc/verifiedLabeledTrans.csv"):
             transactions.append(human_labeled[i]["DESCRIPTION"])
             labels.append(human_labeled[i]["IS_PHYSICAL_TRANSACTION"])
 
-    trans_train, trans_test, labels_train, labels_test = train_test_split(transactions, labels, test_size=0.50)
+    # Append More
+    #transactions, labels = load_more_data(transactions, labels, "data/misc/10K_Card.csv")     
+ 
+    trans_train, trans_test, labels_train, labels_test = train_test_split(transactions, labels, test_size=0.5)
 
     return trans_train, trans_test, labels_train, labels_test
+
+def load_more_data(transactions, labels, file_name):
+
+    HL_file = open(file_name, encoding='utf-8', errors="replace")
+    human_labeled = list(csv.DictReader(HL_file))
+    HL_file.close()
+
+    for i in range(len(human_labeled)):
+        if human_labeled[i]["IS_PHYSICAL_TRANSACTION"] != "":
+            transactions.append(human_labeled[i]["DESCRIPTION"])
+            labels.append(human_labeled[i]["IS_PHYSICAL_TRANSACTION"])
+
+    return transactions, labels
 
 def build_model(trans_train, trans_test, labels_train, labels_test):
 
@@ -50,8 +66,8 @@ def build_model(trans_train, trans_test, labels_train, labels_test):
     ])
 
     parameters = {
-        'vect__max_df': (0.5, 0.75, 1.0),
-        'vect__max_features': (100, 250, 500, 750, 1000, 2000),
+        'vect__max_df': (0.75, 1.0),
+        'vect__max_features': (500, 1000, 1500),
         'vect__ngram_range': ((1, 1), (1, 2)),  # unigrams or bigrams
         'tfidf__use_idf': (True, False),
         'tfidf__norm': ('l1', 'l2'),
@@ -72,46 +88,8 @@ def build_model(trans_train, trans_test, labels_train, labels_test):
 
     print("Actual Score: " + str(score))
 
-    # Test Model
-    #test_model(labels_test, trans_test, grid_search)
-
     # Save Model
-    #joblib.dump(grid_search, 'longtail/binary_classifier/US.pkl', compress=3)
-
-    # Save Results
-    save_results(grid_search)
-
-def save_results(grid_search):
-
-    trans_file = open(sys.argv[1], encoding='utf-8')
-    trans = list(csv.DictReader(trans_file))
-    trans_file.close()
-
-    for i in range(len(trans)):
-        trans[i]['IS_PHYSICAL_TRANSACTION'] = grid_search.predict([trans[i]["DESCRIPTION"]])[0]
-        if trans[i]['IS_PHYSICAL_TRANSACTION'] == "1":
-            print([trans[i]["DESCRIPTION"]])
-
-    output_file = open("10K_trans_machine.csv", 'w')
-    dict_w = csv.DictWriter(output_file, delimiter="|", fieldnames=trans[0].keys())
-    dict_w.writeheader()
-    dict_w.writerows(trans)
-    output_file.close()
-
-def test_model(labels_test, trans_test, grid_search):
-
-    y_true, y_pred = labels_test, grid_search.predict(trans_test)
-    output = []
-
-    for i in range(len(trans_test)):
-        result = {}
-        result['DESCRIPTION'] = trans_test[i]
-        result['PREDICTED'] = y_pred[i]
-        result['ACTUAL'] = y_true[i]
-        output.append(result)
-
-    for i in range(len(output)):
-        print(output[i])  
+    joblib.dump(grid_search, 'longtail/binary_classifier/US.pkl', compress=3)
 
 if __name__ == "__main__":
 

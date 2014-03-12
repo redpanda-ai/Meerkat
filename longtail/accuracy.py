@@ -85,14 +85,23 @@ def test_accuracy(file_path=None, non_physical_trans=[], result_list=[]):
 					non_physical.append(item)
 					break
 
+	incorrect_non_physical = []
+
+	for item in non_physical_trans:
+		for index, human_labeled_row in enumerate(human_labeled):
+			if item == human_labeled_row['DESCRIPTION']:
+				if human_labeled_row['IS_PHYSICAL_TRANSACTION'] == '1':
+					incorrect_non_physical.append(item)
+
 	# Collect results into dict for easier access
 	num_labeled = total - len(unlabeled)
 	num_verified = num_labeled - len(needs_hand_labeling)
 	num_verified = num_verified if num_verified > 0 else 1
 	num_correct = len(correct)
+	binary_accuracy = 100 - ((len(non_physical) + len(incorrect_non_physical)) / total_processed) * 100
 
-	#rounded percent = lambda function
 	rounded_percent = lambda x: math.ceil(x * 100)
+
 	return {
 		"total_processed": total_processed,
 		"total_physical": len(machine_labeled) / total_processed * 100,
@@ -107,7 +116,7 @@ def test_accuracy(file_path=None, non_physical_trans=[], result_list=[]):
 		"total_recall": num_labeled / total_processed * 100,
 		"total_recall_non_physical": num_labeled / total * 100,
 		"precision": num_correct / num_verified * 100,
-		"binary_accuracy": 100 - rounded_percent(len(non_physical) / total)
+		"binary_accuracy": binary_accuracy
 	}
 
 def speed_tests(start_time, accuracy_results):
