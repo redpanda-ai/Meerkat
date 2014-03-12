@@ -18,7 +18,7 @@ from sklearn.grid_search import GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.externals import joblib
 
-def split_data(labeled_transactions="data/misc/verifiedLabeledTrans.csv"):
+def split_data(labeled_transactions="data/misc/10K_Bank.csv"):
 
     if not os.path.isfile(labeled_transactions):
         logging.error("Please provide a set of labeled transactions to build the classifier on")
@@ -31,7 +31,9 @@ def split_data(labeled_transactions="data/misc/verifiedLabeledTrans.csv"):
 
     # Append More
     transactions, labels = load_data(transactions, labels, "data/misc/10K_Card.csv")
-    transactions, labels = load_data(transactions, labels, "data/misc/verifiedLabeledTrans.csv")
+    #transactions, labels = load_data(transactions, labels, "data/misc/verifiedLabeledTrans.csv")
+
+    print("NUMBER OF TRANSACTIONS: ", len(transactions))
 
     # Split into training and testing sets
     if len(transactions) < 100:
@@ -64,7 +66,7 @@ def build_model(trans_train, trans_test, labels_train, labels_test):
 
     parameters = {
         'vect__max_df': (0.5, 0.75, 1.0),
-        'vect__max_features': (500, 750),
+        'vect__max_features': (500, 750, 1000),
         'vect__ngram_range': ((1, 1), (1, 2)),  # unigrams or bigrams
         'tfidf__use_idf': (True, False),
         'tfidf__norm': ('l1', 'l2'),
