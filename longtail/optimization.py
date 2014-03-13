@@ -15,19 +15,23 @@ from random import randint, uniform
 from sklearn.grid_search import RandomizedSearchCV
 
 
-def get_initial_values(hyperparameters, params, known, iter=100):
+def get_initial_values(hyperparameters, params, known, iter=1):
 	"""Do a simple search to find starter values"""
 
 	top_score = {"precision" : 0, "total_recall_non_physical" : 0}
+	learning_rate = settings["initial_learning_rate"]
 
 	for i in range(iter):
-		randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=0.3)
+		randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=learning_rate)
 		print("\n", "ITERATION NUMBER: " + str(i))
 		print("\n", randomized_hyperparameters,"\n")
 
 		# Run Classifier
 		accuracy = run_classifier(randomized_hyperparameters, params)
-		if accuracy["precision"] >= top_score["precision"] and accuracy["precision"] <= 99:
+		higher_precision = accuracy["precision"] >= top_score["precision"]
+		not_too_high = accuracy["precision"] <= settings["max_precision"]
+
+		if higher_precision and not_too_high:
 			top_score = accuracy
 			top_score['hyperparameters'] = randomized_hyperparameters
 			print("\n", "SCORE: " + str(accuracy["precision"]))
@@ -80,41 +84,41 @@ def run_classifier(hyperparameters, params):
 
 	return accuracy
 
-def run_iteration(top_score, params, known, learning_rate, iter=100, convergence=1):
+def run_iteration(top_score, params, known, learning_rate):
 
 	hyperparameters = top_score['hyperparameters']
 	new_top_score = top_score
-	learning_rate = learning_rate * convergence
+	learning_rate = learning_rate * settings["convergence"]
+	iterations = settings["iteration_search_space"]
 
-	for i in range(iter):
+	for i in range(iterations):
 		randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=learning_rate)
 		print("\n", "ITERATION NUMBER: " + str(i))
 		print("\n", randomized_hyperparameters,"\n")
 
 		# Run Classifier
 		accuracy = run_classifier(randomized_hyperparameters, params)
-		if accuracy["total_recall_non_physical"] >= new_top_score["total_recall_non_physical"] and accuracy["precision"] >= new_top_score["precision"] and accuracy["precision"] <= 99:
+		same_or_higher_recall = accuracy["total_recall_non_physical"] >= new_top_score["total_recall_non_physical"]
+		same_or_higher_precision = accuracy["precision"] >= new_top_score["precision"]
+		not_too_high_precision = accuracy["precision"] <= settings["max_precision"]
+
+		if same_or_higher_recall and same_or_higher_precision and not_too_high_precision:
 			new_top_score = accuracy
 			new_top_score['hyperparameters'] = randomized_hyperparameters
 			print("\n", "SCORE: " + str(accuracy["precision"]))
 
-	# FIXME
-	# We need at least 1 result
-	#if len(results) < 1:
-	#	run_iteration(hyperparameters, known, params, iter=1)
-	#	return
-
 	return new_top_score, learning_rate
 
-def gradient_ascent(initial_values, params, known, iter=10):
+def gradient_ascent(initial_values, params, known):
 
 	top_score = initial_values
-	learning_rate = 0.35
+	learning_rate = settings["iteration_learning_rate"]
 	save_top_score(initial_values)
+	iterations = settings["gradient_ascent_iterations"]
 
-	for i in range(iter):
+	for i in range(iterations):
 		print("LEARNING RATE: " + str(learning_rate))
-		top_score, learning_rate = run_iteration(top_score, params, known, learning_rate, iter=50, convergence=0.9)
+		top_score, learning_rate = run_iteration(top_score, params, known, learning_rate)
 		
 		# Save Iterations Top Hyperparameters
 		save_top_score(top_score)
@@ -137,10 +141,11 @@ def randomized_optimization(hyperparameters, known, params):
 	provides the top score found"""
 
 	# Init
-	initial_values = get_initial_values(hyperparameters, params, known, iter=100)
+	iterations = settings["initial_search_space"]
+	initial_values = get_initial_values(hyperparameters, params, known, iter=iterations)
 
 	# Run Gradient Ascent 
-	top_score = gradient_ascent(initial_values, params, known, iter=10)
+	top_score = gradient_ascent(initial_values, params, known)
 
 	print("Precision = " + str(top_score['precision']) + "%")
 	print("Best Recall = " + str(top_score['total_recall_non_physical']) + "%")
@@ -190,43 +195,16 @@ if __name__ == "__main__":
 		"z_score_threshold" : "1"
 	}
 
-	found = {
-		"fax": "0",
-		"admin_region": "0.279",
-		"z_score_threshold": "1.658",
-		"category_labels": "0",
-		"address": "1.14",
-		"locality": "1.18",
-		"neighborhood": "0.256",
-		"address_extended": "0.597",
-		"pin.location": "0",
-		"chain_name": "2.359",
-		"po_box": "1.718",
-		"name": "1.826",
-		"post_town": "0.761",
-		"composite.address": "0.207",
-		"category_ids": "0",
-		"tel": "0.503",
-		"chain_id": "0",
-		"es_result_size": "45",
-		"status": "0",
-		"factual_id": "0",
-		"country": "1.228",
-		"postcode": "1.33",
-		"region": "1.153",
-		"email": "0"
- 	}
-
 	settings = {
-		"initial_search_space": 20,
-		"iteration_search_space": 20,
-		"convergence_rate": 1,
-		"initial_learning_rate": 0.3,
-		"gradient_ascent_learning_rate": 0.3,
+		"initial_search_space": 50,
+		"initial_learning_rate": 1,
+		"iteration_search_space": 25,
+		"iteration_learning_rate": 0.3,
 		"gradient_ascent_iterations": 15,
+		"convergence": 0.9,
 		"max_precision": 99
 	}
 
-	randomized_optimization(found, known, params)
+	randomized_optimization(hyperparameters, known, params)
 	time_delta = datetime.datetime.now() - start_time
 	print("TOTAL TIME TAKEN FOR OPTIMIZATION: ", time_delta)
