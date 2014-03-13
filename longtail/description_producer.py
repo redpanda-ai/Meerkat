@@ -54,7 +54,7 @@ def get_desc_queue(params):
 		elif prediction == "0":
 			non_physical.append(input_string)
 			logging.info("NON-PHYSICAL: %s", input_string)
-		elif prediction == "2":	
+		elif prediction == "2":
 			atm.append(input_string)
 
 	atm_percent = (len(atm) / len(lines)) * 100

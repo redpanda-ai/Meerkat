@@ -23,6 +23,7 @@ import threading
 
 from elasticsearch import Elasticsearch, helpers
 from scipy.stats.mstats import zscore
+from Levenshtein import ratio
 
 from longtail.custom_exceptions import Misconfiguration, UnsupportedQueryType
 from longtail.various_tools import string_cleanse
@@ -170,7 +171,7 @@ class DescriptionConsumer(threading.Thread):
 		# Must be at least one result
 		if search_results['hits']['total'] == 0:
 			field_names = self.params["output"]["results"]["fields"]
-			output_dict = dict(zip(field_names, ["" for i in range(len(field_names))]))
+			output_dict = dict(zip(field_names, ([""] * len(field_names))))
 			output_dict["DESCRIPTION"] = self.input_string
 			self.result_queue.put(output_dict)
 			print("NO RESULTS: ", self.input_string)
@@ -185,6 +186,7 @@ class DescriptionConsumer(threading.Thread):
 		top_hit = hits[0]
 		hit_fields = top_hit["fields"]
 		fields_in_hit = [field for field in hit_fields]
+		business_names = [result["fields"]["name"] for result in hits]
 		ordered_hit_fields = []
 
 		for hit in hits:
@@ -213,13 +215,28 @@ class DescriptionConsumer(threading.Thread):
 		if z_score_delta > float(hyperparameters.get("z_score_threshold", "2")):
 			output_dict = dict(zip(fields_found, ordered_hit_fields))
 		else:
-			output_dict = dict(zip(fields_found, ([""] * len(fields_found))))
+			output_dict = self.__business_name_fallback(business_names)
 
 		output_dict['DESCRIPTION'] = self.input_string
 		self.result_queue.put(output_dict)
 
 		logging.info("Z_SCORE_DELTA: %.2f", z_score_delta)
 		logging.info("TOP_SCORE: %.4f", top_score)
+
+	def __business_name_fallback(self, business_names):
+		"""Uses the business names as a fallback
+		to finding a specific factual id"""
+
+		fields = self.params["output"]["results"]["fields"]
+		input_string = self.input_string
+		output_dict = dict(zip(fields, ([""] * len(fields))))
+		business_names = business_names[0:3]
+		all_equal = business_names.count(business_names[0]) == len(business_names)
+
+		if all_equal and len(business_names[0]) >= 7:
+			output_dict['name'] = business_names[0]
+		
+		return output_dict
 
 	def __reset_my_meta(self):
 		"""Purges several object data structures and re-initializes them."""
