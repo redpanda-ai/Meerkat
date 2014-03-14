@@ -7,6 +7,7 @@ import logging
 import queue
 import sys
 import threading
+from pprint import pprint
 
 from elasticsearch import Elasticsearch, helpers
 from datetime import datetime
@@ -43,7 +44,7 @@ def load_document_queue(params):
 		filename = params["input"]["filename"]
 		encoding = params["input"]["encoding"]
 		with open(filename, 'r', encoding=encoding) as inputfile:
-			records = [line.rstrip() for line in inputfile]
+			records = [line.rstrip('\n') for line in inputfile]
 	except IOError:
 		msg = "Invalid ['input']['filename'] key; Input file: " + filename \
 		+ " cannot be found. Correct your config file."
@@ -144,7 +145,9 @@ class ThreadConsumer(threading.Thread):
 		docs, actions = [], []
 		composite_fields = params["elasticsearch"]["composite_fields"]
 		while len(self.batch_list) > 0:
-			item_list = self.batch_list.pop(0).split("\t")
+			current_item = self.batch_list.pop(0)
+			item_list = current_item.split("\t")
+
 			if len(header) == len(item_list):
 				d = {x: y for (x, y) in list(zip(header, item_list)) if y != ""}
 				#merge latitude and longitude into a point
@@ -181,7 +184,11 @@ class ThreadConsumer(threading.Thread):
 					"timestamp": datetime.now()
 				}
 				actions.append(action)
+		
+		# Make Calls to Elastic Search
 		_, errors = helpers.bulk(self.es_connection, actions)
+		
+		# Evaluate Success Rate
 		success, failure, total = 0, 0, 0
 		for item in errors:
 			if item["index"]["ok"]:
