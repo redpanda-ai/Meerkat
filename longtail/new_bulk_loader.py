@@ -43,14 +43,13 @@ def load_document_queue(params):
 		filename = params["input"]["filename"]
 		encoding = params["input"]["encoding"]
 		with open(filename, 'r', encoding=encoding) as inputfile:
-			lines = inputfile.read()
+			records = [line.rstrip() for line in inputfile]
 	except IOError:
 		msg = "Invalid ['input']['filename'] key; Input file: " + filename \
 		+ " cannot be found. Correct your config file."
 		logging.critical(msg)
 		sys.exit()
 
-	records = lines.split("\n")
 	header = records.pop(0).split("\t")
 	for input_string in records:
 		document_queue.put(input_string)
