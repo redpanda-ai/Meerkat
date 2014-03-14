@@ -212,7 +212,7 @@ def validate_params(params):
 	ensure_keys_in_dictionary(params, my_keys)
 
 	my_keys = ["index", "type_mapping", "type", "cluster_nodes"\
-	, "boost_labels", "boost_vectors", "composite_fields", "subqueries"]
+	, "boost_labels", "boost_vectors", "composite_fields"]
 	ensure_keys_in_dictionary(params["elasticsearch"], my_keys, prefix="elasticsearch.")
 
 	my_keys = ["filename", "encoding"]
@@ -331,4 +331,3 @@ if __name__ == "__main__":
 	logging.info("Documents joined")
 
 	logging.critical("End of program.")
-
