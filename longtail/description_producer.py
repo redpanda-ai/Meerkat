@@ -49,7 +49,7 @@ def get_desc_queue(params):
 	# Run Binary Classifier
 	for input_string in lines:
 		prediction = predict_if_physical_transaction(input_string)
-		if prediction == "1":
+		if prediction == "1" or prediction == "2":
 			desc_queue.put(input_string)
 		elif prediction == "0":
 			non_physical.append(input_string)

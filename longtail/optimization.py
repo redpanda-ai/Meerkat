@@ -38,7 +38,7 @@ def get_initial_values(hyperparameters, params, known, iter=1):
 
 		print("\n", randomized_hyperparameters,"\n")
 
-	if accuracy["precision"] < 90:
+	if accuracy["precision"] < 0:
 		get_initial_values(top_score["hyperparameters"], params, known, iter=1)
 
 	print("TOP SCORE:" + str(top_score["precision"]))
@@ -102,7 +102,7 @@ def run_iteration(top_score, params, known, learning_rate):
 		same_or_higher_precision = accuracy["precision"] >= new_top_score["precision"]
 		not_too_high_precision = accuracy["precision"] <= settings["max_precision"]
 
-		if same_or_higher_recall and same_or_higher_precision and not_too_high_precision:
+		if same_or_higher_precision and not_too_high_precision:
 			new_top_score = accuracy
 			new_top_score['hyperparameters'] = randomized_hyperparameters
 			print("\n", "SCORE: " + str(accuracy["precision"]))
@@ -167,7 +167,7 @@ if __name__ == "__main__":
 
 	start_time = datetime.datetime.now()
 	params = initialize()
-	known = {"es_result_size" : "45"}
+	known = {"es_result_size" : "50"}
 
 	hyperparameters = {
 		"factual_id" : "1",      
@@ -195,16 +195,42 @@ if __name__ == "__main__":
 		"z_score_threshold" : "1"
 	}
 
+	found = {
+		"address": "0.977",
+ 		"address_extended": "1.269",
+ 		"admin_region": "1.927",
+ 		"category_ids": "0.324",
+ 		"category_labels": "0.873",
+ 		"chain_id": "0.129",
+ 		"chain_name": "0.357",
+ 		"composite.address": "2.174",
+ 		"country": "1.141",
+ 		"email": "0.732",
+ 		"factual_id": "0.38",
+ 		"fax": "0.626",
+ 		"locality": "1.942",
+ 		"name": "2.179",
+ 		"neighborhood": "1.788",
+ 		"pin.location": "0.233",
+ 		"po_box": "0.509",
+ 		"post_town": "1.692",
+ 		"postcode": "1.429",
+ 		"region": "2.145",
+ 		"status": "0.415",
+ 		"tel": "0.087",
+ 		"z_score_threshold": "2.803"
+ 	}
+
 	settings = {
-		"initial_search_space": 50,
-		"initial_learning_rate": 1,
-		"iteration_search_space": 25,
+		"initial_search_space": 15,
+		"initial_learning_rate": 0.75,
+		"iteration_search_space": 10,
 		"iteration_learning_rate": 0.3,
-		"gradient_ascent_iterations": 15,
-		"convergence": 0.9,
+		"gradient_ascent_iterations": 30,
+		"convergence": 0.95,
 		"max_precision": 99
 	}
 
-	randomized_optimization(hyperparameters, known, params)
+	randomized_optimization(found, known, params)
 	time_delta = datetime.datetime.now() - start_time
 	print("TOTAL TIME TAKEN FOR OPTIMIZATION: ", time_delta)

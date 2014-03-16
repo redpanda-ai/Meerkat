@@ -52,6 +52,7 @@ def load_document_queue(params):
 		sys.exit()
 
 	header = records.pop(0).split("\t")
+
 	for input_string in records:
 		document_queue.put(input_string)
 	#document_queue.task_done()
