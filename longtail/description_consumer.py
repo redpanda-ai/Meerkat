@@ -147,11 +147,17 @@ class DescriptionConsumer(threading.Thread):
 		params = self.params
 		result_size = self.hyperparameters.get("es_result_size", "10")
 		fuzziness = self.hyperparameters.get("fuzziness", 0.5)
+		fields = params["output"]["results"]["fields"]
 
 		# Construct Main Query
 		logger.info("BUILDING FINAL BOOLEAN SEARCH")
 		bool_search = get_bool_query(size = result_size)
-		bool_search["fields"] = params["output"]["results"]["fields"]
+		bool_search["fields"] = fields
+
+		# Ensure we get location
+		if "pin.location" not in fields:
+			params["output"]["results"]["fields"].append("pin.location")
+
 		should_clauses = bool_search["query"]["bool"]["should"]
 		field_boosts = self.__get_boosted_fields("standard_fields")
 		simple_query = get_qs_query(string_cleanse(self.input_string), field_boosts)
