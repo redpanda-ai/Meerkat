@@ -160,7 +160,14 @@ class DescriptionConsumer(threading.Thread):
 
 		should_clauses = bool_search["query"]["bool"]["should"]
 		field_boosts = self.__get_boosted_fields("standard_fields")
-		simple_query = get_qs_query(string_cleanse(self.input_string), field_boosts)
+		input_string = string_cleanse(self.input_string)
+
+		# String must not be empty
+		if len(input_string) <= 2:
+			return
+
+		# Collect Query Parts
+		simple_query = get_qs_query(input_string, field_boosts)
 		should_clauses.append(simple_query)
 
 		# Show Final Query
