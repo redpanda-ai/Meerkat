@@ -10,7 +10,7 @@ import logging
 import math
 import os
 import sys
-import pprint
+from pprint import pprint
 
 def test_accuracy(file_path=None, non_physical_trans=[], result_list=[]):
 	"""Takes file by default but can accept result
@@ -71,7 +71,7 @@ def test_accuracy(file_path=None, non_physical_trans=[], result_list=[]):
 					break
 				else:
 					# Transaction is mislabeled
-					mislabeled.append(human_labeled_row['DESCRIPTION'] + " (ACTUAL:" + human_labeled_row["factual_id"] + ")")
+					mislabeled.append(human_labeled_row['DESCRIPTION'] + " (ACTUAL:" + human_labeled_row["factual_id"] + ")" + " (FOUND:" + machine_labeled_row["factual_id"] + ")")
 					break
 			elif index + 1 == len(human_labeled):
 				needs_hand_labeling.append(machine_labeled_row['DESCRIPTION'])

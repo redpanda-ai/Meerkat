@@ -191,12 +191,12 @@ class ThreadConsumer(threading.Thread):
 		
 		# Evaluate Success Rate
 		success, failure, total = 0, 0, 0
-		for item in errors:
+		"""for item in errors:
 			if item["index"]["ok"]:
 				success += 1
 			else:
 				failure += 1
-			total += 1
+			total += 1"""
 		my_logger.info("Success/Failure/Total: %i/%i/%i - %i documents in queue.", success, failure\
 		, total, self.document_queue.qsize())
 

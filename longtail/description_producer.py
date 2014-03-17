@@ -157,7 +157,7 @@ def tokenize(params, desc_queue, hyperparameters, non_physical):
 	result_list = queue_to_list(result_queue)
 
 	# Second Pass
-	result_list = second_pass(result_list)
+	#result_list = second_pass(result_list)
 
 	# Writing to an output file, if necessary.
 	if "file" in params["output"] and "format" in params["output"]["file"]\

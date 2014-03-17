@@ -10,7 +10,7 @@ is resource intensive to exaustively perform a standard grid_search"""
 
 from longtail.description_producer import initialize, get_desc_queue, tokenize, load_hyperparameters
 
-import sys, pprint, datetime
+import sys, pprint, datetime, os
 from random import randint, uniform
 from sklearn.grid_search import RandomizedSearchCV
 
@@ -127,7 +127,7 @@ def gradient_ascent(initial_values, params, known):
 
 def save_top_score(top_score):
 
-	record = open("top_scores.txt", "a")
+	record = open(os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_top_scores.txt", "a")
 	pprint.pprint("Precision = " + str(top_score['precision']) + "%", record)
 	pprint.pprint("Best Recall = " + str(top_score['total_recall_non_physical']) + "%", record)
 	pprint.pprint(top_score["hyperparameters"], record)
@@ -154,7 +154,7 @@ def randomized_optimization(hyperparameters, known, params):
 	print("ALL RESULTS:")
 	
 	# Save Final Parameters
-	file_name = str(top_score['precision']) + "Precision" + str(top_score['total_recall_non_physical']) + "Recall.json" 
+	file_name = os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_" + str(top_score['precision']) + "Precision" + str(top_score['total_recall_non_physical']) + "Recall.json" 
 	new_parameters = open(file_name, 'w')
 	pprint.pprint(top_score, new_parameters)
 
@@ -163,7 +163,7 @@ def randomized_optimization(hyperparameters, known, params):
 if __name__ == "__main__":
 
 	# Clear Contents from Previous Runs
-	open('top_scores.txt', 'w').close()
+	open(os.path.splitext(os.path.basename(sys.argv[1]))[0] + '_top_scores.txt', 'w').close()
 
 	start_time = datetime.datetime.now()
 	params = initialize()
@@ -196,41 +196,42 @@ if __name__ == "__main__":
 	}
 
 	found = {
-		"address": "0.977",
- 		"address_extended": "1.269",
- 		"admin_region": "1.927",
- 		"category_ids": "0.324",
- 		"category_labels": "0.873",
- 		"chain_id": "0.129",
- 		"chain_name": "0.357",
- 		"composite.address": "2.174",
- 		"country": "1.141",
- 		"email": "0.732",
- 		"factual_id": "0.38",
- 		"fax": "0.626",
- 		"locality": "1.942",
- 		"name": "2.179",
- 		"neighborhood": "1.788",
- 		"pin.location": "0.233",
- 		"po_box": "0.509",
- 		"post_town": "1.692",
- 		"postcode": "1.429",
- 		"region": "2.145",
- 		"status": "0.415",
- 		"tel": "0.087",
- 		"z_score_threshold": "2.803"
- 	}
+		 "address": "0.609",
+		 "address_extended": "0.315",
+		 "admin_region": "0.635",
+		 "category_ids": "2.178",
+		 "category_labels": "0.815",
+		 "chain_id": "1.102",
+		 "chain_name": "1.642",
+		 "composite.address": "1.407",
+		 "country": "0.64",
+		 "email": "1.0",
+		 "es_result_size": "50",
+		 "factual_id": "0.573",
+		 "fax": "0.728",
+		 "locality": "1.353",
+		 "name": "1.227",
+		 "neighborhood": "0.941",
+		 "pin.location": "0.571",
+		 "po_box": "1.13",
+		 "post_town": "0.885",
+		 "postcode": "0.481",
+		 "region": "0.835",
+		 "status": "1.8",
+		 "tel": "0.801",
+		 "z_score_threshold": "1.167"
+	}
 
 	settings = {
-		"initial_search_space": 15,
-		"initial_learning_rate": 0.75,
-		"iteration_search_space": 10,
+		"initial_search_space": 25,
+		"initial_learning_rate": 1,
+		"iteration_search_space": 25,
 		"iteration_learning_rate": 0.3,
-		"gradient_ascent_iterations": 30,
+		"gradient_ascent_iterations": 15,
 		"convergence": 0.95,
 		"max_precision": 99
 	}
 
-	randomized_optimization(found, known, params)
+	randomized_optimization(hyperparameters, known, params)
 	time_delta = datetime.datetime.now() - start_time
 	print("TOTAL TIME TAKEN FOR OPTIMIZATION: ", time_delta)

@@ -34,6 +34,10 @@ def get_bool_query(starting_from = 0, size = 0):
 	return { "from" : starting_from, "size" : size, "query" : {
 		"bool": { "minimum_number_should_match": 1, "should": [] } } }
 
+def get_basic_query(starting_from=0, size=0):
+	"""Returns an ElasticSearch query object"""
+	return {"from" : starting_from, "size" : size, "query" : {}}
+
 def get_qs_query(term, field_list=[], boost=1.0):
 	"""Returns a "query_string" style ElasticSearch query object"""
 	return { "query_string": {
@@ -42,7 +46,7 @@ def get_qs_query(term, field_list=[], boost=1.0):
 def get_fuzzy_query(term, field_list=["_all"]):
 	"""Returns a "fuzzy_like_this" style ElasticSearch query object"""
 	return { "fuzzy_like_this": {
-		"like_text": term, "fields": field_list} }
+		"like_text": term, "fields": field_list}}
 
 class DescriptionConsumer(threading.Thread):
 	''' Acts as a client to an ElasticSearch cluster, tokenizing description
@@ -79,7 +83,7 @@ class DescriptionConsumer(threading.Thread):
 			ordered_hit_fields = []
 			for ordinal in field_order:
 				if ordinal in fields_in_hit:
-					my_field = str(hit_fields[ordinal])
+					my_field = hit_fields[ordinal][0] if isinstance(hit_fields[ordinal], (list)) else str(hit_fields[ordinal])
 					fields_found.append(ordinal)
 					ordered_hit_fields.append(my_field)
 				else:
@@ -151,7 +155,7 @@ class DescriptionConsumer(threading.Thread):
 
 		# Construct Main Query
 		logger.info("BUILDING FINAL BOOLEAN SEARCH")
-		bool_search = get_bool_query(size = result_size)
+		bool_search = get_bool_query(size=result_size)
 		bool_search["fields"] = fields
 
 		# Ensure we get location
@@ -207,7 +211,7 @@ class DescriptionConsumer(threading.Thread):
 
 		for ordinal in field_order:
 			if ordinal in fields_in_hit:
-				my_field = str(hit_fields[ordinal])
+				my_field = hit_fields[ordinal][0] if isinstance(hit_fields[ordinal], (list)) else str(hit_fields[ordinal])
 				fields_found.append(ordinal)
 				ordered_hit_fields.append(my_field)
 			else:
