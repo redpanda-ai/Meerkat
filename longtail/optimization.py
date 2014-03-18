@@ -64,15 +64,8 @@ def randomize(hyperparameters, known={}, learning_rate=0.3):
 def run_classifier(hyperparameters, params):
 	""" Runs the classifier with a given set of hyperparameters"""
 
-	boost_vectors = {}
-	boost_labels = ["standard_fields"]
-	other = {}
-
-	for key, value in hyperparameters.items():
-		if key == "es_result_size" or key == "z_score_threshold":
-			other[key] = value
-		else:
-			boost_vectors[key] = [value]
+	# Split boosts from other hyperparameters and format accordingly
+	boost_vectors, boost_labels, other = split_hyperparameters(hyperparameters)
 
 	# Override Params
 	params["elasticsearch"]["boost_labels"] = boost_labels
@@ -130,8 +123,24 @@ def save_top_score(top_score):
 	record = open(os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_top_scores.txt", "a")
 	pprint.pprint("Precision = " + str(top_score['precision']) + "%", record)
 	pprint.pprint("Best Recall = " + str(top_score['total_recall_non_physical']) + "%", record)
-	pprint.pprint(top_score["hyperparameters"], record)
+	boost_vectors, boost_labels, other = split_hyperparameters(top_score["hyperparameters"])
+	pprint.pprint(boost_vectors, record)
+	pprint.pprint(other, record)
 	record.close()
+
+def split_hyperparameters(hyperparameters):
+	
+	boost_vectors = {}
+	boost_labels = ["standard_fields"]
+	other = {}
+
+	for key, value in hyperparameters.items():
+		if key == "es_result_size" or key == "z_score_threshold":
+			other[key] = value
+		else:
+			boost_vectors[key] = [value]
+		
+	return boost_vectors, boost_labels, other
 
 def randomized_optimization(hyperparameters, known, params):
 
@@ -169,9 +178,8 @@ if __name__ == "__main__":
 	params = initialize()
 	known = {"es_result_size" : "50"}
 
-	hyperparameters = {
-		"factual_id" : "1",      
-	    "name" : "1",             
+	hyperparameters = {    
+	    "name" : "3",             
 	    "address" : "1",          
 	    "address_extended" : "1", 
 	    "po_box" : "1",           
@@ -184,42 +192,12 @@ if __name__ == "__main__":
 	    "tel" : "1",              
 	    "fax" : "1",              
 	    "neighborhood" : "1",     
-	    "email" : "1",            
-	    "category_ids" : "1",     
+	    "email" : "1",               
 	    "category_labels" : "1",  
 	    "status" : "1",          
-	    "chain_name" : "1",       
-	    "chain_id" : "1",
-	    "pin.location" : "1",   
+	    "chain_name" : "1",        
 	    "composite.address" : "1",
-		"z_score_threshold" : "1"
-	}
-
-	found = {
-		 "address": "0.609",
-		 "address_extended": "0.315",
-		 "admin_region": "0.635",
-		 "category_ids": "2.178",
-		 "category_labels": "0.815",
-		 "chain_id": "1.102",
-		 "chain_name": "1.642",
-		 "composite.address": "1.407",
-		 "country": "0.64",
-		 "email": "1.0",
-		 "es_result_size": "50",
-		 "factual_id": "0.573",
-		 "fax": "0.728",
-		 "locality": "1.353",
-		 "name": "1.227",
-		 "neighborhood": "0.941",
-		 "pin.location": "0.571",
-		 "po_box": "1.13",
-		 "post_town": "0.885",
-		 "postcode": "0.481",
-		 "region": "0.835",
-		 "status": "1.8",
-		 "tel": "0.801",
-		 "z_score_threshold": "1.167"
+		"z_score_threshold" : "3"
 	}
 
 	settings = {
