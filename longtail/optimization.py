@@ -95,7 +95,7 @@ def run_iteration(top_score, params, known, learning_rate):
 		same_or_higher_precision = accuracy["precision"] >= new_top_score["precision"]
 		not_too_high_precision = accuracy["precision"] <= settings["max_precision"]
 
-		if same_or_higher_precision and not_too_high_precision:
+		if same_or_higher_recall and same_or_higher_precision and not_too_high_precision:
 			new_top_score = accuracy
 			new_top_score['hyperparameters'] = randomized_hyperparameters
 			print("\n", "SCORE: " + str(accuracy["precision"]))
@@ -163,9 +163,9 @@ def randomized_optimization(hyperparameters, known, params):
 	print("ALL RESULTS:")
 	
 	# Save Final Parameters
-	file_name = os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_" + str(top_score['precision']) + "Precision" + str(top_score['total_recall_non_physical']) + "Recall.json" 
+	file_name = os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_" + str(round(top_score['precision'], 2)) + "Precision" + str(round(top_score['total_recall_non_physical'], 2)) + "Recall.json" 
 	new_parameters = open(file_name, 'w')
-	pprint.pprint(top_score, new_parameters)
+	pprint.pprint(top_score["hyperparameters"], new_parameters)
 
 	return top_score
 
@@ -176,7 +176,7 @@ if __name__ == "__main__":
 
 	start_time = datetime.datetime.now()
 	params = initialize()
-	known = {"es_result_size" : "50"}
+	known = {"es_result_size" : "45"}
 
 	hyperparameters = {    
 	    "name" : "3",             
@@ -187,29 +187,46 @@ if __name__ == "__main__":
 	    "region" : "1",           
 	    "post_town" : "1",        
 	    "admin_region" : "1",     
-	    "postcode" : "1",         
-	    "country" : "1",          
-	    "tel" : "1",              
-	    "fax" : "1",              
+	    "postcode" : "1",                
+	    "tel" : "1",                            
 	    "neighborhood" : "1",     
 	    "email" : "1",               
-	    "category_labels" : "1",  
-	    "status" : "1",          
-	    "chain_name" : "1",        
-	    "composite.address" : "1",
+	    "category_labels" : "1",           
+	    "chain_name" : "1",
 		"z_score_threshold" : "3"
 	}
 
+	unknown = {
+		"address": "0.203",
+        "address_extended": "1.564",
+        "admin_region": "0.364",
+        "category_labels": "0.564",
+        "chain_name": "1.381",
+        "composite.address": "0.002",
+        "email": "2.004",
+        "es_result_size": "50",
+        "fax": "1.679",
+        "locality": "1.748",
+        "name": "2.99",
+        "neighborhood": "0.62",
+        "po_box": "1.674",
+        "post_town": "1.054",
+        "postcode": "1.924",
+        "region": "2.107",
+        "tel": "0.883",
+        "z_score_threshold": "2.832"
+    }
+
 	settings = {
-		"initial_search_space": 25,
-		"initial_learning_rate": 1,
+		"initial_search_space": 50,
+		"initial_learning_rate": 0.3,
 		"iteration_search_space": 25,
 		"iteration_learning_rate": 0.3,
-		"gradient_ascent_iterations": 15,
-		"convergence": 0.95,
-		"max_precision": 99
+		"gradient_ascent_iterations": 25,
+		"convergence": 1,
+		"max_precision": 96
 	}
 
-	randomized_optimization(hyperparameters, known, params)
+	randomized_optimization(unknown, known, params)
 	time_delta = datetime.datetime.now() - start_time
 	print("TOTAL TIME TAKEN FOR OPTIMIZATION: ", time_delta)

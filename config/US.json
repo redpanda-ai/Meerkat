@@ -13,7 +13,7 @@
     },
     "output" : {
         "results" : {
-            "fields" : ["name", "composite.address", "factual_id", "locality"]
+            "fields" : ["name", "composite.address", "factual_id", "locality", "po_box", "email"]
         },
         "file" : {
             "format" : "csv",
@@ -28,30 +28,25 @@
         "cache_results" : false,
         "index" : "factual_index",
         "type" : "factual_type",
-        "boost_labels" : ["standard_fields", "composite.address", "name"],
+        "boost_labels" : ["standard_fields"],
         "boost_vectors" : {
-            "factual_id" :        [ 0.727, 0.0, 0.0 ],
-            "name" :              [ 2.08, 0.0, 3.0 ],
-            "address" :           [ 1.145, 0.0, 0.0 ],
-            "address_extended" :  [ 1.512, 0.0, 0.0 ],
-            "po_box" :            [ 0.755, 0.0, 0.0 ],
-            "locality" :          [ 1.4 , 0.0, 0.0 ],
-            "region" :            [ 1.656, 0.0, 0.0 ],
-            "post_town" :         [ 1.212, 0.0, 0.0 ],
-            "admin_region" :      [ 1.627, 0.0, 0.0 ],
-            "postcode" :          [ 0.565 , 0.0, 0.0 ],
-            "country" :           [ 0.472 , 0.0, 0.0 ],
-            "tel" :               [ 0.439, 0.0, 0.0 ],
-            "fax" :               [ 0.525, 0.0, 0.0 ],
-            "neighborhood" :      [ 1.713, 0.0, 0.0 ],
-            "email" :             [ 0.465, 0.0, 0.0 ],
-            "category_ids" :      [ 0.767 , 0.0, 0.0 ],
-            "category_labels" :   [ 1.056 , 0.0, 0.0 ],
-            "status" :            [ 0.042 , 0.0, 0.0 ],
-            "chain_name" :        [ 1.29 , 0.0, 0.0 ],
-            "chain_id" :          [ 0.804 , 0.0, 0.0 ],
-            "pin.location" :      [ 0.352 , 0.0, 0.0 ],
-            "composite.address" : [ 2.043 , 3.0, 0.0 ]
+            "address": [0.205],
+            "address_extended": [1.751],
+            "admin_region": [0.54],
+            "category_labels": [0.282],
+            "chain_name": [1.204],
+            "composite.address": [0.686],
+            "country": [0.126],
+            "email": [2.201],
+            "fax": [1.109],
+            "locality": [2.424],
+            "name": [2.825],
+            "neighborhood": [0.044],
+            "po_box": [2.189],
+            "post_town": [0.264],
+            "postcode": [1.358],
+            "region": [1.828],
+            "tel": [0.849]
         }
     }
 }

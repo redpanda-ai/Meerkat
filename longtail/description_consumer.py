@@ -167,7 +167,7 @@ class DescriptionConsumer(threading.Thread):
 		input_string = string_cleanse(self.input_string)
 
 		# String must not be empty
-		if len(input_string) <= 2:
+		if len(input_string.rstrip()) <= 2:
 			return
 
 		# Collect Query Parts
@@ -247,10 +247,10 @@ class DescriptionConsumer(threading.Thread):
 		fields = self.params["output"]["results"]["fields"]
 		input_string = self.input_string
 		output_dict = dict(zip(fields, ([""] * len(fields))))
-		business_names = business_names[0:3]
+		business_names = business_names[0:2]
 		all_equal = business_names.count(business_names[0]) == len(business_names)
 
-		if all_equal and len(business_names[0]) >= 7:
+		if all_equal:
 			output_dict['name'] = business_names[0]
 		
 		return output_dict

@@ -1,31 +1,52 @@
 {
-	"concurrency" : 10,
-	"input" : {
-		"hyperparameters" : "config/hyperparameters/default.json",
-		"filename" : "data/input/short_bank_transaction_descriptions.csv",
-		"encoding" : "utf-8"
-	},
-	"logging" : {
-		"level" : "info",
-		"path" : "logs/logs.log",
-		"formatter" : "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-		"console" : true
-	},
-	"output" : {
-		"results" : {
-			"fields" : ["name", "composite.address", "factual_id"]
-		},
+    "concurrency" : 4,
+    "input" : {
+        "hyperparameters" : "config/hyperparameters/default.json",
+        "filename" : "data/input/10K_Card.csv",
+        "encoding" : "utf-8"
+    },
+    "logging" : {
+        "level" : "warning",
+        "path" : "logs/foo.log",
+        "formatter" : "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        "console" : true
+    },
+    "output" : {
+        "results" : {
+            "fields" : ["name", "factual_id", "composite.address",  "locality"]
+        },
         "file" : {
             "format" : "csv",
-            "path" : "data/output/longtailLabeled.csv"
+            "path" : "data/output/10Card.csv"
         }
-	},
-	"elasticsearch" : {
-		"cluster_nodes" : ["brainstorm0:9200", "brainstorm1:9200", "brainstorm2:9200"
-		, "brainstorm3:9200", "brainstorm4:9200", "brainstorm5:9200", "brainstorm6:9200"
-		, "brainstorm7:9200", "brainstorm8:9200", "brainstorm9:9200", "brainstorma:9200"
-		, "brainstormb:9200"],
-		"index" : "new_index",
-		"type" : "new_type"			
-	}
+    },
+    "elasticsearch" : {
+        "cluster_nodes" : ["localhost:9200", "brainstorm0:9200", "brainstorm1:9200", "brainstorm2:9200"
+        , "brainstorm3:9200", "brainstorm4:9200", "brainstorm5:9200", "brainstorm6:9200"
+        , "brainstorm7:9200", "brainstorm8:9200", "brainstorm9:9200", "brainstorma:9200"
+        , "brainstormb:9200"],
+        "cache_results" : false,
+        "index" : "factual_index",
+        "type" : "factual_type",
+        "boost_labels" : ["standard_fields"],
+        "boost_vectors" : {
+            "address": ["0.71"],
+            "address_extended": ["1.576"],
+            "admin_region": ["0.366"],
+            "category_labels": ["1.448"],
+            "chain_name": ["0.198"],
+            "composite.address": ["0.918"],
+            "country": ["0.816"],
+            "email": ["0.165"],
+            "fax": ["0.262"],
+            "locality": ["1.418"],
+            "name": ["2.69"],
+            "neighborhood": ["1.581"],
+            "po_box": ["1.029"],
+            "post_town": ["0.455"],
+            "postcode": ["0.935"],
+            "region": ["3"],
+            "tel": ["0.921"]
+        }
+    }
 }

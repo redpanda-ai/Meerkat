@@ -22,7 +22,7 @@ import pprint
 
 from longtail.custom_exceptions import InvalidArguments, Misconfiguration
 from longtail.description_consumer import DescriptionConsumer
-from longtail.binary_classifier.new import predict_if_physical_transaction
+from longtail.binary_classifier.load import predict_if_physical_transaction
 from longtail.accuracy import test_accuracy, print_results, speed_tests
 from longtail.location import second_pass
 
