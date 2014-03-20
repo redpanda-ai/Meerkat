@@ -12,8 +12,6 @@ from longtail.description_producer import initialize, get_desc_queue, tokenize, 
 
 import sys, pprint, datetime, os
 from random import randint, uniform
-from sklearn.grid_search import RandomizedSearchCV
-
 
 def get_initial_values(hyperparameters, params, known, iter=1):
 	"""Do a simple search to find starter values"""
@@ -195,27 +193,6 @@ if __name__ == "__main__":
 	    "chain_name" : "1",
 		"z_score_threshold" : "3"
 	}
-
-	unknown = {
-		"address": "0.203",
-        "address_extended": "1.564",
-        "admin_region": "0.364",
-        "category_labels": "0.564",
-        "chain_name": "1.381",
-        "composite.address": "0.002",
-        "email": "2.004",
-        "es_result_size": "50",
-        "fax": "1.679",
-        "locality": "1.748",
-        "name": "2.99",
-        "neighborhood": "0.62",
-        "po_box": "1.674",
-        "post_town": "1.054",
-        "postcode": "1.924",
-        "region": "2.107",
-        "tel": "0.883",
-        "z_score_threshold": "2.832"
-    }
 
 	settings = {
 		"initial_search_space": 50,

@@ -1,0 +1,395 @@
+name,email,DESCRIPTION,pin.location,locality,factual_id,po_box,composite.address
+Thrift Town,,THRIFT TOWN #3         SAN FRANCISCOCAUS,,,,,
+Quince Restaurant,,QUINCE RESTAURANT SAN FRANCISCO CA,,,,,
+,,SCOMAS RESTAURANT SAN FRANCISCO CA,,,,,
+Pet Food Express,,PET FOOD EXPRESS 3046 SAN FRANCISCO CA,,,,,
+,,CVS 02423 08/16 #000228982 PURCHASE 02423--1456 E.Yos Madera CA,,,,,
+Rainbow Grocery,,RAINBOW GROCERY          SAN FRANCISCOCA,,,,,
+,,WESTIN ST. FRANCIS DIN SAN FRANCISCO CA,,,,,
+Herbivore The Earthly Grill,,HERBIVORE           SAN FRANCISCO   CAUS,,,,,
+Mozzarella Di Bufala Pizzeria,,MOZZARRELLA DI BUFALA SAN FRANCISCO CA,"{'coordinates': ['-122.466515', '37.73999'], 'type': 'point'}",San Francisco,041aa0b9-e7b6-4520-b83f-e6a486b0dd24,,"69 W Portal Ave  San Francisco, CA 94127, us"
+,,CHKCARD LEMONGRASS THAI NOODLE SAN FRANCISCO CA,,,,,
+Emmy's Restaurant,,NEW EMMY'S RESTAURANT SAN FRANCISCO CA,"{'coordinates': ['-122.462813', '37.725407'], 'type': 'point'}",San Francisco,03cc35c5-8559-4d32-a8ad-b461b779109c,,"1923 Ocean Ave  San Francisco, CA 94127, us"
+,,SFMOMA ADMISSIONS SAN FRANCISCOCA,,,,,
+Pier 23 Cafe,,PIER 23 CAFE SAN FRANCISCO CA - EATING PLACES,,,,,
+,,CHECKCARD JAMBA JUICE #354 SAN FRANCISCOCA,,,,,
+Cafe Sarafornia,,CAFE SARAFORNIA     CALISTOGA       CAUS,"{'coordinates': ['-122.579105', '38.578987'], 'type': 'point'}",Calistoga,057eaee5-2108-4fb5-91f2-46889b714ce2,,"1413 Lincoln Ave  Calistoga, CA 94515, us"
+Blackbear Diner,,CHECKCARD 0818 BLACKBEAR DINER- M MADERA CA 24224433231105006465166,"{'coordinates': ['-122.221345', '38.134798'], 'type': 'point'}",Vallejo,0cf3bd70-7ee7-427d-933d-1cc8852bed3d,,"Vallejo, CA , us"
+,,CHECKCARD 1017 ST JOHNS BAR & GRILL SUNNYVALE CA 24013393290001066162760,,,,,
+,,CHECKCARD 0423 ST JOHNS BAR & GRILL SUNNYVALE CA 24013393113001431238118,,,,,
+,,CHECKCARD 1114 JACK'S PRIME SAN MATEO CA 24224433320105009474928,,,,,
+,,TOWER BURGER             SAN FRANCISCOCA,,,,,
+,,SPARKYS DINER SAN FRANCISCOCA,,,,,
+Boudin,,BOUDIN BAKER'S HALL SAN FRANCISCOCA,"{'coordinates': ['-122.415387', '37.808599'], 'type': 'point'}",San Francisco,e88f0c16-6c7a-4eeb-9b78-3d5f963c0004,,"San Francisco, CA , us"
+,,SAFEWAY 1476 09/08 #000559884 PURCHASE 1300 WEST SAN CAR SAN JOSE CA,,,,,
+Airport Parking By Anza Parking,,CHECKCARD 0415 ANZA PARKING CORPORATIO BURLINGAME CA 24755423105161056865517,"{'coordinates': ['-122.345169', '37.58968'], 'type': 'point'}",Burlingame,0b5a9de8-0158-42f9-bbd9-9d22c441f3c8,,"615 Airport Blvd  Burlingame, CA 94010, us"
+,,SAFEWAY 1476 09/22 #000910966 PURCHASE 1300 WEST SAN CAR SAN JOSE CA,,,,,
+,,CHECKCARD 0430 JACK'S PRIME SAN MATEO CA 24224433122105005465193,,,,,
+Da Kine Cafe,,CHECKCARD 0109 DA KINE ISLAND GRILL SUNNYVALE CA 24492153010401438005647,"{'coordinates': ['-122.0313', '37.3525'], 'type': 'point'}",Sunnyvale,0b6f0f28-c707-4365-9e73-ed6efb6167bd,,"153 E Fremont Ave  Sunnyvale, CA 94087, us"
+Da Kine Cafe,,CHECKCARD 0307 DA KINE ISLAND GRILL SUNNYVALE CA 24492153066401437000030,"{'coordinates': ['-122.0313', '37.3525'], 'type': 'point'}",Sunnyvale,0b6f0f28-c707-4365-9e73-ed6efb6167bd,,"153 E Fremont Ave  Sunnyvale, CA 94087, us"
+Da Kine Cafe,,CHECKCARD 0324 DA KINE ISLAND GRILL SUNNYVALE CA 24492153083401438000129,"{'coordinates': ['-122.0313', '37.3525'], 'type': 'point'}",Sunnyvale,0b6f0f28-c707-4365-9e73-ed6efb6167bd,,"153 E Fremont Ave  Sunnyvale, CA 94087, us"
+The Vitamin Shoppe,,VITAMIN SHOPPE 06/06 #000487553 PURCHASE 126 EAST EL CAMIN SUNNYVALE CA,"{'coordinates': ['-122.030932', '37.366165'], 'type': 'point'}",Sunnyvale,0c07c0fd-f256-4608-964b-21ce959b202a,,"126 E El Camino Real  Sunnyvale, CA 94087, us"
+Taco Bell,,TACO BELL #28837    PALO ALTO       CAUS,,,,,
+Red Rock Coffee,,CHECKCARD 0129 RED ROCK COFFEE MOUNTAIN VIEWCA 24071053030158158148067,"{'coordinates': ['-122.07889', '37.393723'], 'type': 'point'}",Mountain View,0ba5f85d-8957-4784-935b-0989b881da1f,,"201 Castro St Ste 1 Mountain View, CA 94041, us"
+Dojima-Ann,,DOJIMA ANN SAN FRANCISCOCA,"{'coordinates': ['-122.40852', '37.786108'], 'type': 'point'}",San Francisco,0be33495-75ef-4792-91e1-4d59e6015378,,"219 Ofarrell St  San Francisco, CA 94102, us"
+The Vitamin Shoppe,,VITAMIN SHOPPE 06/11 #000520277 PURCHASE 126 EAST EL CAMIN SUNNYVALE CA,"{'coordinates': ['-122.030932', '37.366165'], 'type': 'point'}",Sunnyvale,0c07c0fd-f256-4608-964b-21ce959b202a,,"126 E El Camino Real  Sunnyvale, CA 94087, us"
+The Vitamin Shoppe,,CHECKCARD 0529 VITAMIN SHOPPE #525 SUNNYVALE CA 24692163150000788647458,"{'coordinates': ['-122.030932', '37.366165'], 'type': 'point'}",Sunnyvale,0c07c0fd-f256-4608-964b-21ce959b202a,,"126 E El Camino Real  Sunnyvale, CA 94087, us"
+,,NEW GARDEN RESTAURANT SAN FRANCISCO CA,,,,,
+Trimmers,,TRIMMERS SAN FRANCISCO CA,"{'coordinates': ['-122.448305', '37.769931'], 'type': 'point'}",San Francisco,0c438d72-ba10-4e2b-8cc0-b0375b13ae31,,"1576 Haight St  San Francisco, CA 94117, us"
+Thirsty Bear Brewing Co.,events@thirstybear.com,THIRSTY BEAR BREWING C SAN FRANCISCO CA,"{'coordinates': ['-122.399679', '37.785553'], 'type': 'point'}",San Francisco,0c9fc4bc-6d4c-48c7-bc33-991db4eb68b5,,"661 Howard St  San Francisco, CA 94105, us"
+Pompei's Grotto,pompeis@aol.com,CHECKCARD POMPEI'S GROTTO SAN FRANCISCO CA,"{'coordinates': ['-122.418104', '37.808003'], 'type': 'point'}",San Francisco,0c85dce0-cd40-012e-5616-003048cad9da,,"340 Jefferson St  San Francisco, CA 94133, us"
+Bi-Rite Market,,BI-RITE MARKET           SAN FRANCISCOCA,,,,,
+Anchor Oyster Bar,,ANCHOR OYSTER BAR INC SAN FRANCISCOCA,"{'coordinates': ['-122.434858', '37.759708'], 'type': 'point'}",San Francisco,0cb36078-f8a4-4005-9da1-a7ea5ddc3dab,,"579 Castro St  San Francisco, CA 94114, us"
+,,BCF - 1600 SAR 06/02 #000065900 PURCHASE BCF - 1600 SARATO SAN JOSE CA,,,,,
+Adelaide Hostel,info@adelaidehostel.com,CHECKCARD ADELAIDE HOSTEL SAN FRANCISCO CA,"{'coordinates': ['-122.412034', '37.787452'], 'type': 'point'}",San Francisco,0da77f65-d27e-4da5-96c7-26f4c8754a28,,"5 Isadora Duncan Ln  San Francisco, CA 94102, us"
+,,CHECKCARD 0403 TOKYO STAR MANGO BAY REDWOOD CITY CA...,,,,,
+Saigon Cuisine,,CHECKCARD 0813 SAIGON CUISINE QUE HUO SAN BRUNO CA 24071053226987124866590,,,,,
+Casa Mexicana,,POS Debit CASA MEXICANA SAN FRANCISCOCA,,,,,
+Blue Barn Gourmet,,BLUE BARN GOURMET DELI SAN FRANCISCO CA,"{'coordinates': ['-122.437844', '37.800585'], 'type': 'point'}",San Francisco,10575415-e13c-48ec-83d0-8425622c60e1,,"2105 Chestnut St  San Francisco, CA 94123, us"
+,,YOUR MARKET SAN FRANCISCO CA,,,,,
+Taqueria El Metate,,EL METATE MEXICAN R BELMONT         CAUS,"{'coordinates': ['-122.266688', '37.52181'], 'type': 'point'}",Belmont,0e365d10-e41d-012e-239f-003048cbf952,,"120 Harbor Blvd  Belmont, CA 94002, us"
+Absinthe Brasserie and Bar,talk@absinthe.com,ABSINTHE BRASSERIE       SAN FRANCISCOCA,"{'coordinates': ['-122.422914', '37.777094'], 'type': 'point'}",San Francisco,0f11379a-fd51-46da-92fa-b294dbb4013c,,"398 Hayes St  San Francisco, CA 94102, us"
+,,ONE DOLLAR ONLY SAN FRANCISCO CA,,,,,
+,,THE WHITE HOUSE GARAGE SAN FRANCISCO CA,,,,,
+,,WORKING GIRLS CAFE #2 SAN FRANCISCO CA,,,,,
+Thep Phanom Restaurant,comment@phupingthai.com,THEP PHANOM THAI CUISI SAN FRANCISCO CA,"{'coordinates': ['-122.430387', '37.771281'], 'type': 'point'}",San Francisco,134d705a-ca97-4bd5-81bf-a5b29906c9bd,,"400 Waller St  San Francisco, CA 94117, us"
+Office Depot,,OFFICE DEPOT 0 04/05 #000818558 PURCHASE 121 EAST EL CAMIN SUNNYVALE CA,"{'coordinates': ['-122.029282', '37.366874'], 'type': 'point'}",Sunnyvale,13cb0c53-ee22-463e-8de3-9bba5039755f,,"121 E El Camino Real  Sunnyvale, CA 94087, us"
+Pizza My Heart,,CHECKCARD 1203 PIZZA MY HEART PALO ALTO CA 24013393338000199654879,,,,,
+,,CHECKCARD BART-POWELL QPS SAN FRANCISCO CA,,,,,
+Caffe Sapore,,CAFFE SAPORE SAN FRANCISCO CA,"{'coordinates': ['-122.414534', '37.802718'], 'type': 'point'}",San Francisco,1501b8d8-c179-4126-9c85-add05d24c7aa,,"790 Lombard St  San Francisco, CA 94133, us"
+,,CENTURY THEATRES 49 SAN BRUNO       CAUS,,,,,
+,,NEW HING LUNG RESTAURA SAN FRANCISCO CA,,,,,
+,,CENTURY THEATRES 49 SAN BRUNO       CAUS,,,,,
+,,096 REDWOOD JOHNNY  REDWOOD CITY    CAUS,,,,,
+Trader Joe's,,TRADER JOE'S # 11/22 #000877061 PURCHASE TRADER JOE'S # SUNNYVALE CA,"{'coordinates': ['-122.032798', '37.366798'], 'type': 'point'}",Sunnyvale,1716a696-5c44-4227-8cc6-0e740398bfda,,"727 Sunnyvale Saratoga Rd "" Sunnyvale"" Sunnyvale, CA 94087, us"
+San Bruno BART Station,,BART SAN BRUNO 01/21 #000149366 PURCHASE BART SAN BRUNO ST SAN BRUNO CA,"{'coordinates': ['-122.416217', '37.637632'], 'type': 'point'}",San Bruno,17194bc8-347f-4f40-a0cb-5cad547866a0,,"1151 Huntington Ave E  San Bruno, CA 94066, us"
+San Bruno BART Station,,BART SAN BRUNO 06/12 #000153033 PURCHASE BART SAN BRUNO ST SAN BRUNO CA,"{'coordinates': ['-122.416217', '37.637632'], 'type': 'point'}",San Bruno,17194bc8-347f-4f40-a0cb-5cad547866a0,,"1151 Huntington Ave E  San Bruno, CA 94066, us"
+San Bruno BART Station,,BART SAN BRUNO 08/01 #000266625 PURCHASE BART SAN BRUNO ST SAN BRUNO CA,"{'coordinates': ['-122.416217', '37.637632'], 'type': 'point'}",San Bruno,17194bc8-347f-4f40-a0cb-5cad547866a0,,"1151 Huntington Ave E  San Bruno, CA 94066, us"
+San Bruno BART Station,,BART SAN BRUNO 06/19 #000406956 PURCHASE BART SAN BRUNO ST SAN BRUNO CA,"{'coordinates': ['-122.416217', '37.637632'], 'type': 'point'}",San Bruno,17194bc8-347f-4f40-a0cb-5cad547866a0,,"1151 Huntington Ave E  San Bruno, CA 94066, us"
+San Bruno BART Station,,BART SAN BRUNO 12/02 #000007164 PURCHASE BART SAN BRUNO ST SAN BRUNO CA,"{'coordinates': ['-122.416217', '37.637632'], 'type': 'point'}",San Bruno,17194bc8-347f-4f40-a0cb-5cad547866a0,,"1151 Huntington Ave E  San Bruno, CA 94066, us"
+San Bruno BART Station,,BART SAN BRUNO 08/13 #000190509 PURCHASE BART SAN BRUNO ST SAN BRUNO CA,"{'coordinates': ['-122.416217', '37.637632'], 'type': 'point'}",San Bruno,17194bc8-347f-4f40-a0cb-5cad547866a0,,"1151 Huntington Ave E  San Bruno, CA 94066, us"
+,,PORT OF SAN FRANCI QPS   SAN FRANCISCOCA,,,,,
+Studio 5 Hair Salon,,CHECKCARD 0227 STUDIO 5 HAIR SALON SUNNYVALE CA 24122473059900012100049,"{'coordinates': ['-122.025484', '37.362638'], 'type': 'point'}",Sunnyvale,1a6e07c4-c101-424b-bff9-ceea9d86fd64,,"583 E El Camino Real  Sunnyvale, CA 94087, us"
+Nopa,info@nopasf.com,NOPA SAN FRANCISCO CA,"{'coordinates': ['-122.437644', '37.774859'], 'type': 'point'}",San Francisco,195047c5-fa71-4849-9c01-381f6ec5a431,,"560 Divisadero St  San Francisco, CA 94117, us"
+,,PALO ALTO CREAMERY  PALO ALTO       CAUS,,,,,
+,,CHECKCARD 0527 MILLBRAE MARKET & GASOL MILLBRAE CA 24765793148980019478503,,,,,
+Studio 5 Hair Salon,,CHECKCARD 0123 STUDIO 5 HAIR SALON SUNNYVALE CA 24122473024900019300107,"{'coordinates': ['-122.025484', '37.362638'], 'type': 'point'}",Sunnyvale,1a6e07c4-c101-424b-bff9-ceea9d86fd64,,"583 E El Camino Real  Sunnyvale, CA 94087, us"
+,,CHECKCARD 0424 MOUNTAIN MIKES PIZZA BELMONT CA 24254773115461169830222,,,,,
+,,PHOENIX IRISH BAR SAN FRANCISCO CA,,,,,
+Le Zinc,,LE ZINC                  SAN FRANCISCOCA,,,,,
+Hayes Valley Bakeworks,bakeworks@fullplateconsulting.com,HAYES VALLEY BAKEWORKS SAN FRANCISCOCA,"{'coordinates': ['-122.423269', '37.778447'], 'type': 'point'}",San Francisco,1c0104ee-44a6-4a42-85a3-bab4ccbcace9,,"550 Gough St  San Francisco, CA 94102, us"
+Valero,,AM VALERO FOOD 08/16 #000099854 PURCHASE 1502 E YOSEMITE A MADERA CA,"{'coordinates': ['-120.0865', '36.982191'], 'type': 'point'}",Madera,1c7ee582-2491-4348-8e50-d10b88b8df87,,"1502 E Yosemite Ave  Madera, CA 93638, us"
+,,CHKCARD VALERO #7262 SAN FRANCISCO CA,,,,,
+Pho Vietnam,,Misc. Debit PHO VIETNAM SAN FRANCISCOCA,,,,,
+,,NEW CHEF HUNG S RESTAURANSAN FRANCISCOCA,,,,,
+Tandoori Oven,,TANDOORI OVEN       PALO ALTO       CAUS,"{'coordinates': ['-122.144237', '37.426844'], 'type': 'point'}",Palo Alto,1d92ab8e-9395-490e-970e-cd86c23d64bf,,"365 N California Ave  Palo Alto, CA 94301, us"
+Visa,,Visa Check Card COLIBRI SAN FRANCISCOCA,,,,,
+Twomey Cellars,,TWOMEY CELLARS      CALISTOGA       CAUS,"{'coordinates': ['-122.556773', '38.566296'], 'type': 'point'}",Calistoga,1df5303c-c509-44c5-ba8f-8bdc920c1e63,,"1183 Dunaweal Ln  Calistoga, CA 94515, us"
+Trick Dog,,TRICK DOG SAN FRANCISCO CA,"{'coordinates': ['-122.411028', '37.759198'], 'type': 'point'}",San Francisco,1e8cb3a9-8218-4e4b-8746-8730dc4e2a33,,"3010 20th St "" 20th"" San Francisco, CA 94110, us"
+,,CHECKCARD 0106 HANA SUSHI TOGO SANTA CLARA CA 24122473007900013100140,,,,,
+Sanppo Restaurant,,SANPPO JAPANESE RESTAURANSAN FRANCISCOCA,"{'coordinates': ['-122.429921', '37.785625'], 'type': 'point'}",San Francisco,2021719f-fd41-45a5-9e8a-3f37009e8b2f,,"1702 Post St  San Francisco, CA 94115, us"
+Katana Sushi and Sake,,CHECKCARD 1118 KATANA SUSHI & SAKE SUNNYVALE CA 24707803323980162402222,,,,,
+T.G.I. Friday's,,CHECKCARD 0823 TGI FRIDAY'S CUPERTINO CUPERTINO CA 24431053236207888700783,"{'coordinates': ['-122.014708', '37.327859'], 'type': 'point'}",Cupertino,1f4edeb9-9890-4306-8597-3aaac2e1422b,,"10343 N Wolfe Rd  Cupertino, CA 95014, us"
+,,CHECKCARD 0918 HOBEE'S #4 BELMONT CA 24431053261207188500345,,,,,
+Yum Yum Fish,,YUM YUM FISH SAN FRANCISCO CA,"{'coordinates': ['-122.481185', '37.763353'], 'type': 'point'}",San Francisco,2106d32f-b2b8-465b-ad70-cd34ffa24063,,"2181 Irving St  San Francisco, CA 94122, us"
+Molosky Charles J II DDS,,CHECKCARD 0813 DR CHARLES MOLOSKY DDS SAN FRANCISCOCA...,"{'coordinates': ['-122.409665', '37.788587'], 'type': 'point'}",San Francisco,2054a1df-f3fa-4a7d-99b4-0a9166ae99e0,,"490 Post St Ste 1540 San Francisco, CA 94102, us"
+Molosky Charles J II DDS,,CHECKCARD 1202 DR CHARLES MOLOSKY DDS SAN FRANCISCOCA...,"{'coordinates': ['-122.409665', '37.788587'], 'type': 'point'}",San Francisco,2054a1df-f3fa-4a7d-99b4-0a9166ae99e0,,"490 Post St Ste 1540 San Francisco, CA 94102, us"
+Rok Bistro,ysbsqa_june13_2@yahoo.com,CHECKCARD 0607 ROK SUNNYVALE CA 24643733160700664290467,"{'coordinates': ['-122.029806', '37.377116'], 'type': 'point'}",Sunnyvale,21f79432-41e6-43c9-883f-035f940a694a,,"124 S Murphy Ave  Sunnyvale, CA 94086, us"
+,,ARCO PAYPOINT 06/08 #000431971 PURCHASE 18605 MONTEREY RD MORGAN HILL CA,,,,,
+Ucsf,,UCSF ORTHOPEDICS SAN FRANCISCO CA,,,,,
+,,ARCO PAYPOINT 06/08 #000915386 PURCHASE 18605 MONTEREY RD MORGAN HILL CA,,,,,
+,,CHECKCARD 0121 GREEN PAPAYA RESTAURANT SAN FRANCISCOCA...,,,,,
+Palisades Deli Cafe,,PALISADES DELI      CALISTOGA       CAUS,,,,,
+Tatami Buffet,,CHECKCARD 0813 TATAMI BUFFET CUPERTINO CA 24431063226207602400083,"{'coordinates': ['-122.015013', '37.326859'], 'type': 'point'}",Cupertino,2614bc14-eff6-4220-a1c4-a5e6c0e1701e,,"Cupertino, CA 95014, us"
+,,MARDINI DELI & CAFE MENLO PARK      CAUS,,,,,
+,,MARDINI DELI & CAFE MENLO PARK CAUS,,,,,
+Frjtz,info@frjtzfries.com,FRJTZ VALENCIA SAN FRANCISCOCA,"{'coordinates': ['-122.421888', '37.763483'], 'type': 'point'}",San Francisco,27856b0e-6302-492e-ba12-5f3fffb146db,,"590 Valencia St  San Francisco, CA 94110, us"
+Tatami Buffet,,CHECKCARD 1009 TATAMI BUFFET CUPERTINO CA 24431063283207602800381,"{'coordinates': ['-122.015013', '37.326859'], 'type': 'point'}",Cupertino,2614bc14-eff6-4220-a1c4-a5e6c0e1701e,,"Cupertino, CA 95014, us"
+Rabbit's Foot Meadery,,CHECKCARD 0830 RABBIT'S FOOT MEADERY SUNNYVALE CA 24506013243980123666572,,,,,
+Rabbit's Foot Meadery,,RABBIT'S FOOT MEADE SUNNYVALE       CAUS,,,,,
+Rabbit's Foot Meadery,,RABBIT'S FOOT MEADE SUNNYVALE CAUS,,,,,
+Trattoria Pinocchio,,TRATTORIA PINOCCHIO SAN FRANCISCOCA,"{'coordinates': ['-122.40811', '37.798759'], 'type': 'point'}",San Francisco,29b32c29-6c3c-43fc-ac92-f8bb0e2ad953,,"401 Columbus Ave  San Francisco, CA 94133, us"
+Fog Harbor Fish House,,CHECKCARD 0827 FOG HARBOR FISH HOUSE SAN FRANCISCOCA 24071053240158141237098,,,,,
+Miette Cakes,,MIETTE CAKES             SAN FRANCISCOCA,,,,,
+Peasant Pies,,PEASANT PIES MISSIOQPS SAN FRANCISCO CA,,,,,
+,,NEW COUNTRY SKY SAN FRANCISCO CA,,,,,
+Macy's,,MACY'S 34 08/02 #000110826 PURCHASE 200 W WASHINGTON SUNNYVALE CA,"{'coordinates': ['-122.031558', '37.375998'], 'type': 'point'}",Sunnyvale,2aa2611e-8f2c-436c-83fd-618e001302f3,,"200 W Washington Ave  Sunnyvale, CA 94086, us"
+,,HAYSTACK PIZZA INC       SAN FRANCISCOCA,,,,,
+,,CHKCARD KIKI JAPANESE RESTAURAN SAN FRANCISCOCA,,,,,
+Cafe Zoe,,CAFE ZOE            MENLO PARK      CAUS,"{'coordinates': ['-122.152589', '37.459209'], 'type': 'point'}",Menlo Park,2de6fd90-ff2a-4aaf-b2a3-43387da2c88a,,"1929 Menalto Ave  Menlo Park, CA 94025, us"
+Cafe Zoe,,CAFE ZOE            MENLO PARK      CAUS,"{'coordinates': ['-122.152589', '37.459209'], 'type': 'point'}",Menlo Park,2de6fd90-ff2a-4aaf-b2a3-43387da2c88a,,"1929 Menalto Ave  Menlo Park, CA 94025, us"
+Cafe Zoe,,CAFE ZOE            MENLO PARK      CAUS,"{'coordinates': ['-122.152589', '37.459209'], 'type': 'point'}",Menlo Park,2de6fd90-ff2a-4aaf-b2a3-43387da2c88a,,"1929 Menalto Ave  Menlo Park, CA 94025, us"
+,,ZCREPES SAN FRANCISCO CA,,,,,
+,,SANJALISCO RESTAURANT    SAN FRANCISCOCA,,,,,
+,,LE CAFE DU SOLEIL SAN FRANCISCO CA,,,,,
+,,ORCHIDHOLIC SAN FRANCISCO CA,,,,,
+Round Table Pizza,,CHECKCARD 1219 ROUND TABLE PI00003228 SAN CARLOS CA 24164073354074240175527,"{'coordinates': ['-122.24992', '37.498263'], 'type': 'point'}",San Carlos,3041744d-b38f-4615-a01a-2551ccfb94e6,,"San Carlos, CA 94070, us"
+,,CAL MART               CALISTOGA    CAUS,,,,,
+Round Table Pizza,,CHECKCARD 1219 ROUND TABLE PI00003228 SAN CARLOS CA 24164073354074240175568,"{'coordinates': ['-122.24992', '37.498263'], 'type': 'point'}",San Carlos,3041744d-b38f-4615-a01a-2551ccfb94e6,,"San Carlos, CA 94070, us"
+New Eritrea Restaurant and Bar,new_eritrea@yahoo.com,NEW ERITREA RSTRT & BA SAN FRANCISCO CA,"{'coordinates': ['-122.467633', '37.763868'], 'type': 'point'}",San Francisco,308b051d-4eee-4b22-8b0f-87fd30f05f9b,,"907 Irving St  San Francisco, CA 94122, us"
+Target,,TARGET T0321 REDWOOD CIREDWOOD CITY CAUS,"{'coordinates': ['-122.217836', '37.475056'], 'type': 'point'}",Redwood City,32fcba34-0261-463d-a652-8c90e8ae5fae,,"2485 El Camino Real  Redwood City, CA 94063, us"
+Target,,TARGET T0321 REDWOOD CIREDWOOD CITY CAUS,"{'coordinates': ['-122.217836', '37.475056'], 'type': 'point'}",Redwood City,32fcba34-0261-463d-a652-8c90e8ae5fae,,"2485 El Camino Real  Redwood City, CA 94063, us"
+,,POS PUR GRUMPY'S SAN FRANCISCO CA,,,,,
+,,MARLOWE LLC SAN FRANCISCOCA,,,,,
+Big 5 Sporting Goods,,BIG 5 SPORTING 06/18 #000014839 PURCHASE BIG 5 SPORTING GO SUNNYVALE CA,"{'coordinates': ['-122.032712', '37.367008'], 'type': 'point'}",Sunnyvale,3325d66a-339d-44a1-ba3b-1d5fc8db1582,,"721 Sunnyvale Saratoga Rd  Sunnyvale, CA 94087, us"
+Big 5 Sporting Goods,,BIG 5 SPORTING 05/06 #000024778 PURCHASE BIG 5 SPORTING GO SUNNYVALE CA,"{'coordinates': ['-122.032712', '37.367008'], 'type': 'point'}",Sunnyvale,3325d66a-339d-44a1-ba3b-1d5fc8db1582,,"721 Sunnyvale Saratoga Rd  Sunnyvale, CA 94087, us"
+Big 5 Sporting Goods,,BIG 5 SPTG GDS 02/20 #000462508 PURCHASE BIG 5 SPTG GDS-00 SUNNYVALE CA,"{'coordinates': ['-122.032712', '37.367008'], 'type': 'point'}",Sunnyvale,3325d66a-339d-44a1-ba3b-1d5fc8db1582,,"721 Sunnyvale Saratoga Rd  Sunnyvale, CA 94087, us"
+Zushi-Puzzle,,ZUSHI - PUZZLE SAN FRANCISCO CA,"{'coordinates': ['-122.433093', '37.800335'], 'type': 'point'}",San Francisco,3368c341-b710-4475-84f9-6d7e42236a5e,,"1910 Lombard St  San Francisco, CA 94123, us"
+The Louisiana Territory,,TARGET SAN FRANCISCOCA,"{'coordinates': ['-121.970322', '37.322223'], 'type': 'point'}",Sf Bay Area,f594af8d-d178-4e4b-8875-3d84f297a95a,,"Moving Target "" Target"" Sf Bay Area, CA , us"
+Ruffin Architecture,dave@san-francisco-architect.com,SPUD SAN FRANCISCO SAN FRANCISCO CA,,Walnut Creek,7eaa1ca3-7b0c-44bf-9680-92edb7c40e7b,,"1131 Studebaker Rd  Walnut Creek, CA 94595, us"
+,,POS PUR ALCATRAZ SAN FRANCISCOCA,,,,,
+,,CHECKCARD 0914 I SUSHI CUUPERTINO CA 24431063257200617600559,,,,,
+Old Navy,,OLD NAVY USA 08/03 #000007006 PURCHASE OLD NAVY USA SAN JOSE CA,,,,,
+Opa Authentic Greek Cuisine,,CHECKCARD 0921 OPA AUTHENTIC GREEK CUS 408-3997417 CA 24744553265134511772374,,,,,
+Old Navy,,OLD NAVY USA 10/17 #000006617 PURCHASE OLD NAVY USA SAN JOSE CA,,,,,
+Old Navy,,OLD NAVY USA 06/02 #000006025 PURCHASE OLD NAVY USA SAN JOSE CA,,,,,
+,,CHECKCARD 0429 HUNTER LABORATORIES CAMPBELL CA 24492153120693011036075,,,,,
+McDonald's,,CHECKCARD MCDONALD'S F11742 SAN FRANCISCOCA,,,,,
+Redwood Theatres,,CENTURY THEATRES 48 REDWOOD CITY    CAUS,,,,,
+Walgreens,,WALGREENS 05/04 #000516935 PURCHASE 121 E EL CAMINO R MOUNTAIN VIEW CA,"{'coordinates': ['-122.072671', '37.379629'], 'type': 'point'}",Mountain View,392181ed-84c6-4383-9b6c-7826cfcf3eed,,"121 E El Camino Real  Mountain View, CA 94040, us"
+Redwood Theatres,,CENTURY THEATRES 48 REDWOOD CITY    CAUS,,,,,
+Yeah Yeah Pony Prince,,YEAH YEAH PONY PRINCE SAN FRANCISCO CA,"{'coordinates': ['-122.406245', '37.797467'], 'type': 'point'}",San Francisco,3b81791b-bd98-4f63-ae6a-2a865f424254,,"241 Columbus Ave  San Francisco, CA 94133, us"
+,,POS PUR FUJIYAMAYA SAN FRANCISCOCA,,,,,
+Kuleto's,information@kuletos.com,KULETO'S SAN FRANCISCO CA - EATING PLACES,"{'coordinates': ['-122.408239', '37.78672'], 'type': 'point'}",San Francisco,3d00b9e5-e0cd-4c8b-9506-a71d8ce6452b,,"221 Powell St  San Francisco, CA 94102, us"
+,,ARAMARK SHORELINE A MOUNTAIN VIEW   CAUS,,,,,
+Quiznos,,QUIZNOS SUB #8615 QPS SAN FRANCISCO CA,"{'coordinates': ['-122.489086', '37.733971'], 'type': 'point'}",San Francisco,3ca74e76-6ba5-4c72-9de3-0def8baaea97,,"1501 Sloat Blvd  San Francisco, CA 94132, us"
+,,COFFEE BAR 1 LLC SAN FRANCISCO CA,,,,,
+Jamba Juice,,JAMBA JUICE #45     REDWOOD CITY    CAUS,,,,,
+Mi Pueblo,,MI PUEBLO FOODS 1731 E. BAYSHORE BLVD. E. PALO ALTO CAUS,"{'coordinates': ['-122.137735', '37.461487'], 'type': 'point'}",East Palo Alto,405765eb-cd7b-461c-890d-1129a70feaf5,,"1731 E Bayshore Rd  East Palo Alto, CA 94303, us"
+Kushitsuru,,KUSHITSURU RESTAURANT SAN FRANCISCO CA,"{'coordinates': ['-122.430415', '37.785418'], 'type': 'point'}",San Francisco,3db27521-4ce0-4db1-9e62-53b5ab134972,,"1737 Post St  San Francisco, CA 94115, us"
+Mi Pueblo,,MI PUEBLO FOODS 1731 E. BAYSHORE BLVD. E. PALO ALTO CAUS,"{'coordinates': ['-122.137735', '37.461487'], 'type': 'point'}",East Palo Alto,405765eb-cd7b-461c-890d-1129a70feaf5,,"1731 E Bayshore Rd  East Palo Alto, CA 94303, us"
+Mi Pueblo,,MI PUEBLO FOODS 1731 E. BAYSHORE BLVD. E. PALO ALTO CAUS,"{'coordinates': ['-122.137735', '37.461487'], 'type': 'point'}",East Palo Alto,405765eb-cd7b-461c-890d-1129a70feaf5,,"1731 E Bayshore Rd  East Palo Alto, CA 94303, us"
+,,76                  MENLO PARK      CAUS,,,,,
+A and S Union 76,,A & S 76        710 WILLOW RD          MENLO PARK   CAUS,"{'coordinates': ['-122.157418', '37.464498'], 'type': 'point'}",Menlo Park,405e29c3-148c-425f-9cd5-ddffaa2644e2,,"710 Willow Rd  Menlo Park, CA 94025, us"
+,,NORDSTROM #0426 SAN FRANCISCO CA,,,,,
+Thai Pepper Cuisine,,CHECKCARD 0420 THAI PEPPER CUISINE LLC SUNNYVALE CA 24431063110286857500028,"{'coordinates': ['-122.031909', '37.352759'], 'type': 'point'}",Sunnyvale,4105e7e6-3547-4e3c-97d4-557c09dc208f,,"103 E Fremont Ave  Sunnyvale, CA 94087, us"
+Thai Pepper Cuisine,,CHECKCARD 0821 THAI PEPPER CUISINE LLC SUNNYVALE CA 24431063234286857700983,"{'coordinates': ['-122.031909', '37.352759'], 'type': 'point'}",Sunnyvale,4105e7e6-3547-4e3c-97d4-557c09dc208f,,"103 E Fremont Ave  Sunnyvale, CA 94087, us"
+Thai Pepper Cuisine,,CHECKCARD 0524 THAI PEPPER CUISINE LLC SUNNYVALE CA 24431063145286857001356,"{'coordinates': ['-122.031909', '37.352759'], 'type': 'point'}",Sunnyvale,4105e7e6-3547-4e3c-97d4-557c09dc208f,,"103 E Fremont Ave  Sunnyvale, CA 94087, us"
+,,KAISER 02090371 1150 VETERANS BLVD     REDWOOD CITY CAUS,,,,,
+Thai Pepper Cuisine,,CHECKCARD 0924 THAI PEPPER CUISINE LLC SUNNYVALE CA 24431063268286857100670,"{'coordinates': ['-122.031909', '37.352759'], 'type': 'point'}",Sunnyvale,4105e7e6-3547-4e3c-97d4-557c09dc208f,,"103 E Fremont Ave  Sunnyvale, CA 94087, us"
+Thai Pepper Cuisine,,CHECKCARD 1005 THAI PEPPER CUISINE LLC SUNNYVALE CA 24431063279286857201012,"{'coordinates': ['-122.031909', '37.352759'], 'type': 'point'}",Sunnyvale,4105e7e6-3547-4e3c-97d4-557c09dc208f,,"103 E Fremont Ave  Sunnyvale, CA 94087, us"
+Thai Pepper Cuisine,,CHECKCARD 1201 THAI PEPPER CUISINE LLC SUNNYVALE CA 24431063336286857800699,"{'coordinates': ['-122.031909', '37.352759'], 'type': 'point'}",Sunnyvale,4105e7e6-3547-4e3c-97d4-557c09dc208f,,"103 E Fremont Ave  Sunnyvale, CA 94087, us"
+Denny's,,DENNY'S #6820       REDWOOD CITY    CAUS,"{'coordinates': ['-122.21467', '37.486792'], 'type': 'point'}",Redwood City,42953ee0-f4de-47e8-9858-f5c00cd93402,,"1201 Broadway St  Redwood City, CA 94063, us"
+El Camino Mongolian BBQ,,CHECKCARD 0830 EL CAMINO MONGOLIAN BBQ SANTA CLARA CA 24122583243980013731367,,,,,
+Denny's,,DENNY'S #6820       REDWOOD CITY    CAUS,"{'coordinates': ['-122.21467', '37.486792'], 'type': 'point'}",Redwood City,42953ee0-f4de-47e8-9858-f5c00cd93402,,"1201 Broadway St  Redwood City, CA 94063, us"
+,,SHELL Service 11/18 #000530556 PURCHASE SHELL Service S MOUNTAIN VIEW CA,,,,,
+,,SHELL Service 12/18 #000748555 PURCHASE SHELL Service S MOUNTAIN VIEW CA,,,,,
+,,CHECKCARD 0308 21ST AMENDMENT BRE SAN FRANCISCOCA 24224433068105013518906,,,,,
+,,SHELL Service 02/12 #000476158 PURCHASE SHELL MOUNTAIN VIEW CA,,,,,
+,,SHELL Service 05/03 #000156643 PURCHASE SHELL MOUNTAIN VIEW CA,,,,,
+,,SHELL Service 07/30 #000427992 PURCHASE SHELL MOUNTAIN VIEW CA,,,,,
+Lava Vine,,LAVA VINE           CALISTOGA       CAUS,"{'coordinates': ['-122.57494', '38.587554'], 'type': 'point'}",Calistoga,45027d14-6912-4f8f-ae9f-2a2694542489,,"965 Silverado Trl  Calistoga, CA 94515, us"
+Casa Lucaz 3,,CASA LUCAZ #3 SAN FRANCISCO CA,"{'coordinates': ['-122.434139', '37.725378'], 'type': 'point'}",San Francisco,46b88435-1c42-4398-8647-176af5865548,,"4555 Mission St  San Francisco, CA 94112, us"
+,,YMCA SILICON VALLEY EAST PALO ALT   CAUS,,,,,
+,,EUROSPA & INN       CALISTOGA       CAUS,,,,,
+,,HARVS SANTA CLARA      SANTA CLARA  CAUS,,,,,
+,,THE SPA AT EUROSPA  CALISTOGA       CAUS,,,,,
+,,EL RANCHO MARKET       MENLO PARK   CAUS,,,,,
+,,EL RANCHO MARKET       MENLO PARK   CAUS,,,,,
+7-Eleven,,7-ELEVEN 02/03 #000186601 PURCHASE 1430 FRUITDALE AV SAN JOSE CA,"{'coordinates': ['-121.915985', '37.310429'], 'type': 'point'}",San Jose,508667fc-ee4c-4a99-973d-c2c7ab3cae6c,,"1430 Fruitdale Ave  San Jose, CA 95128, us"
+Miss Tomato Sandwich Shop,,MISS TOMATO SANDWICH S   SAN FRANCISCOCA,"{'coordinates': ['-122.397797', '37.792259'], 'type': 'point'}",San Francisco,4c96d4c5-21a3-4344-9a64-1579639101ca,,"388 Market St  San Francisco, CA 94111, us"
+,,EL RANCHO MARKET       MENLO PARK   CAUS,,,,,
+,,EL RANCHO MARKET       MENLO PARK   CAUS,,,,,
+,,CHECKCARD MARRIOTT 337F2 SAN FRAN,,,,,
+7-Eleven,,7-ELEVEN 03/10 #000101978 PURCHASE 1430 FRUITDALE AV SAN JOSE CA,"{'coordinates': ['-121.915985', '37.310429'], 'type': 'point'}",San Jose,508667fc-ee4c-4a99-973d-c2c7ab3cae6c,,"1430 Fruitdale Ave  San Jose, CA 95128, us"
+Sankaku,,SANKAKU T3               SAN FRANCISCOCA,"{'coordinates': ['-122.385875', '37.618746'], 'type': 'point'}",San Francisco,52859575-d66e-4d0e-bf58-d7317437e0fa,,"San Francisco, CA 94128, us"
+Murphy's Law,,CHECKCARD 0224 MURPHY'S LAW SUNNYVALE CA 24431063055207794301178,"{'coordinates': ['-122.030205', '37.377053'], 'type': 'point'}",Sunnyvale,512fb58d-4969-44b1-8a1d-02cac484d40a,,"135 S Murphy Ave  Sunnyvale, CA 94086, us"
+Original Gravity Public House,,CHECKCARD 0126 ORIGINAL GRAVITY PUBLIC SAN JOSE CA 24690293027080080270199,"{'coordinates': ['-121.889665', '37.335116'], 'type': 'point'}",San Jose,57681a6a-bad0-442b-8b26-a1a090e6fb5f,,"66 S 1st St  San Jose, CA 95113, us"
+,,CHECKCARD 0804 CALTRAIN TVM SAN CARLOS CA 24492793217436300074283,,,,,
+,,CHECKCARD 1122 CALTRAIN TVM SAN CARLOS CA 24492793328436040065498,,,,,
+R and G Executive Lounge,,R & G LOUNGE SAN FRANCISCO CA,"{'coordinates': ['-122.40483', '37.794097'], 'type': 'point'}",San Francisco,550f0d60-e1f2-4ec6-9394-5b93d1047fea,,"631 Kearny St  San Francisco, CA 94108, us"
+,,GUITAR CENTER #222     SANTA CLARA  CAUS,,,,,
+Original Gravity Public House,,CHECKCARD 0126 ORIGINAL GRAVITY PUBLIC SAN JOSE CA 24690293027080080270199,"{'coordinates': ['-121.889665', '37.335116'], 'type': 'point'}",San Jose,57681a6a-bad0-442b-8b26-a1a090e6fb5f,,"66 S 1st St  San Jose, CA 95113, us"
+,,GUITAR CENTER #222 SANTA CLARA CAUS,,,,,
+,,CHECKCARD 1124 JAKES OF WILLOW GLEN SAN JOSE CA 24690513329207374000596,,,,,
+Bon Chon Chicken,,CHECKCARD 0511 BON CHON CHICKEN SUNNYVALE CA 24275393132900018400894,"{'coordinates': ['-122.026929', '37.362233'], 'type': 'point'}",Sunnyvale,59261b41-bfce-445e-ba78-3c250ab1ffc3,,"572 E El Camino Real  Sunnyvale, CA 94087, us"
+La Hacienda Market,,LA HACIENDA MARKET  MENLO PARK      CAUS,"{'coordinates': ['-122.152641', '37.459345'], 'type': 'point'}",Menlo Park,5a8e4bca-1e34-47da-bbd4-2eb87e5868fe,,"1933 Menalto Ave  Menlo Park, CA 94025, us"
+La Hacienda Market,,LA HACIENDA MAR 1933 MENALTO AVE       MENLO PARK   CAUS,"{'coordinates': ['-122.152641', '37.459345'], 'type': 'point'}",Menlo Park,5a8e4bca-1e34-47da-bbd4-2eb87e5868fe,,"1933 Menalto Ave  Menlo Park, CA 94025, us"
+,,POS PUR PEETS SFO #4 SAN FRANCISCO CA,,,,,
+,,S AND S TIRE A 12/23 #000607706 PURCHASE S AND S TIRE AN SUNNYVALE CA,,,,,
+S and S Tire Auto Repair,,S AND S TIRE A 02/21 #000484150 PURCHASE 597 S MURPHY AVE SUNNYVALE CA,"{'coordinates': ['-122.03312', '37.368603'], 'type': 'point'}",Sunnyvale,5e5860bf-1525-4f2f-af10-b486caa3ac4a,,"597 S Murphy Ave  Sunnyvale, CA 94086, us"
+,,REDWOOD CAFE        COTATI          CAUS,,,,,
+,,HAZELS KITCHEN           SAN FRANCISCOCA,,,,,
+Fry's Electronics,,FRY'S ELECTRON 02/03 #000004564 PURCHASE FRY'S ELECTRONICS SUNNYVALE CA,"{'coordinates': ['-122.001694', '37.382106'], 'type': 'point'}",Sunnyvale,5fd2f311-aaac-4807-8447-308132f64934,,"1077 E Arques Ave  Sunnyvale, CA 94085, us"
+Fry's Electronics,,FRY'S ELECTRON 08/19 #000002186 PURCHASE FRY'S ELECTRONICS SUNNYVALE CA,"{'coordinates': ['-122.001694', '37.382106'], 'type': 'point'}",Sunnyvale,5fd2f311-aaac-4807-8447-308132f64934,,"1077 E Arques Ave  Sunnyvale, CA 94085, us"
+Japan Center,,JAPAN CENTER GARAGE      SAN FRANCISCOCA,"{'coordinates': ['-122.429937', '37.785173'], 'type': 'point'}",San Francisco,5f2f4b06-f54b-4235-a8a9-fd10b4484411,,"1610 Geary Blvd "" Center"" San Francisco, CA 94115, us"
+Fry's Electronics,,CHECKCARD 1018 FRY'S ELECTRONICS #12 SUNNYVALE CA 24492153292769011308086,,,,,
+Fry's Electronics,,FRY'S ELECTRON 05/18 #000010797 PURCHASE FRY'S ELECTRONICS SUNNYVALE CA,"{'coordinates': ['-122.001694', '37.382106'], 'type': 'point'}",Sunnyvale,5fd2f311-aaac-4807-8447-308132f64934,,"1077 E Arques Ave  Sunnyvale, CA 94085, us"
+Panda Express,,PANDA EXPRESS #795  ROHNERT PARK    CAUS,,,,,
+Villa 08,,SMARTNFINAL432 11/08 #000127047 PURCHASE SMARTNFINAL432 MOUNTAIN VIE CA,"{'coordinates': ['-122.079906', '37.394027'], 'type': 'point'}",Mountain View,10e068d8-0bb4-4ed1-b2aa-ffea18f8bde0,,"895 Villa St  Mountain View, CA 94041, us"
+Taqueria El Adobe,,CHECKCARD 0803 EL ADOBE TAQUERIA SUNNYVALE CA 24493983216286626600486,"{'coordinates': ['-122.023556', '37.367017'], 'type': 'point'}",Sunnyvale,612336ec-46a0-4ffe-ab60-c2dd23543ade,,"590 Old San Francisco Rd  Sunnyvale, CA 94086, us"
+AMC Cupertino Square 16,,CHECKCARD 0119 AMC CUPERTINO 01004241 CUPERTINO CA 24164073020931411422992,"{'coordinates': ['-122.014599', '37.325956'], 'type': 'point'}",Cupertino,6232e09c-8914-44ea-b111-b1659dff8eaf,,"Cupertino, CA 95014, us"
+AMC Cupertino Square 16,,CHECKCARD 1210 AMC CUPERTINO SQ #0424 CUPERTINO CA 24610433345072000134112,"{'coordinates': ['-122.014599', '37.325956'], 'type': 'point'}",Cupertino,6232e09c-8914-44ea-b111-b1659dff8eaf,,"Cupertino, CA 95014, us"
+AMC Cupertino Square 16,,CHECKCARD 0223 AMC CUPERTINO 01004241 CUPERTINO CA 24164073055931431213254,"{'coordinates': ['-122.014599', '37.325956'], 'type': 'point'}",Cupertino,6232e09c-8914-44ea-b111-b1659dff8eaf,,"Cupertino, CA 95014, us"
+AMC Cupertino Square 16,,CHECKCARD 0803 AMC CUPERTINO 01004241 CUPERTINO CA 24164073216931401454033,"{'coordinates': ['-122.014599', '37.325956'], 'type': 'point'}",Cupertino,6232e09c-8914-44ea-b111-b1659dff8eaf,,"Cupertino, CA 95014, us"
+AMC Cupertino Square 16,,CHECKCARD 0803 AMC CUPERTINO 01004241 CUPERTINO CA 24164073216931401454041,"{'coordinates': ['-122.014599', '37.325956'], 'type': 'point'}",Cupertino,6232e09c-8914-44ea-b111-b1659dff8eaf,,"Cupertino, CA 95014, us"
+AMC Cupertino Square 16,,CHECKCARD 1218 AMC CUPERTINO SQ #0424 CUPERTINO CA 24610433353072000374741,"{'coordinates': ['-122.014599', '37.325956'], 'type': 'point'}",Cupertino,6232e09c-8914-44ea-b111-b1659dff8eaf,,"Cupertino, CA 95014, us"
+In-N-Out Burger,,IN-N-OUT BURGER #12 MOUNTAIN VIEW   CAUS,,,,,
+,,TARGET T1427 06/02 #000109800 PURCHASE TARGET T1427 SAN SAN JOSE CA,,,,,
+,,TARGET T1427 10/17 #000924439 PURCHASE TARGET T1427 SAN SAN JOSE CA,,,,,
+,,CHIPOTLE 1857 SAN FRANCISCOCA,,,,,
+,,THE OWL TREE SAN FRANCISCO CA,,,,,
+Country Hearth Inn,sanfrancisco@countryhearth.com,CHECKCARD COUNTRY HEARTH INN. SAN FRANCISCO CA,"{'coordinates': ['-122.446137', '37.798541'], 'type': 'point'}",San Francisco,6727f7cd-a436-45af-b3a8-e3257df44d6f,,"2707 Lombard St  San Francisco, CA 94123, us"
+Safeway,,SAFEWAY STORE 12/19 #000924443 PURCHASE SAFEWAY STORE 1 BELMONT CA,,,,,
+Willows Market,,THE WILLOWS MAR 60 MIDDLEFIELD RD.     MENLO PARK   CAUS,"{'coordinates': ['-122.163553', '37.454411'], 'type': 'point'}",Menlo Park,6b3cac9b-53f4-4043-9a76-816257b17dbb,,"60 Middlefield Rd  Menlo Park, CA 94025, us"
+Willow Cove Gas,,WILLOW COVE GAS     MENLO PARK      CAUS,"{'coordinates': ['-122.159704', '37.461578'], 'type': 'point'}",Menlo Park,6d264cc7-8e76-40cb-803d-7a5425863024,,"500 Willow Rd  Menlo Park, CA 94025, us"
+Willows Market,,THE WILLOWS MAR 60 MIDDLEFIELD RD.     MENLO PARK   CAUS,"{'coordinates': ['-122.163553', '37.454411'], 'type': 'point'}",Menlo Park,6b3cac9b-53f4-4043-9a76-816257b17dbb,,"60 Middlefield Rd  Menlo Park, CA 94025, us"
+,,TARGET T2584 03/01 #000018784 PURCHASE TARGET T2584 SUNN SUNNYVALE CA,,,,,
+Willows Market,,THE WILLOWS MAR 60 MIDDLEFIELD RD.     MENLO PARK   CAUS,"{'coordinates': ['-122.163553', '37.454411'], 'type': 'point'}",Menlo Park,6b3cac9b-53f4-4043-9a76-816257b17dbb,,"60 Middlefield Rd  Menlo Park, CA 94025, us"
+Japonica,,JAPONICA SAN FRANCISCO CA,"{'coordinates': ['-122.476587', '37.784143'], 'type': 'point'}",San Francisco,6bc0ea54-0a60-495e-ad06-07d3155f5d64,,"5503 California St  San Francisco, CA 94121, us"
+Willow Cove Gas,,WILLOW COVE GAS 500 WILLOW RD.         MENLO PARK   CAUS,"{'coordinates': ['-122.159704', '37.461578'], 'type': 'point'}",Menlo Park,6d264cc7-8e76-40cb-803d-7a5425863024,,"500 Willow Rd  Menlo Park, CA 94025, us"
+,,TARGET T2584 07/28 #000626225 PURCHASE TARGET T2584 SUNN SUNNYVALE CA,,,,,
+IHOP,,CHECKCARD 0211 IHOP 1719 BELMONT CA 24692163043000992741908,"{'coordinates': ['-122.282645', '37.525649'], 'type': 'point'}",Belmont,71300a43-8052-47eb-8dbe-a0c5375fd9dd,,"510 El Camino Real  Belmont, CA 94002, us"
+IHOP,,CHECKCARD 0321 IHOP #1719 BELMONT CA 24431063081207288600224,"{'coordinates': ['-122.282645', '37.525649'], 'type': 'point'}",Belmont,71300a43-8052-47eb-8dbe-a0c5375fd9dd,,"510 El Camino Real  Belmont, CA 94002, us"
+IHOP,,CHECKCARD 0812 IHOP #1719 BELMONT CA 24431063225207288600353,"{'coordinates': ['-122.282645', '37.525649'], 'type': 'point'}",Belmont,71300a43-8052-47eb-8dbe-a0c5375fd9dd,,"510 El Camino Real  Belmont, CA 94002, us"
+IHOP,,CHECKCARD 1216 IHOP #1719 BELMONT CA 24431063351207288600342,"{'coordinates': ['-122.282645', '37.525649'], 'type': 'point'}",Belmont,71300a43-8052-47eb-8dbe-a0c5375fd9dd,,"510 El Camino Real  Belmont, CA 94002, us"
+IHOP,,CHECKCARD 0114 IHOP 1719 BELMONT CA 24692163015000734926746,"{'coordinates': ['-122.282645', '37.525649'], 'type': 'point'}",Belmont,71300a43-8052-47eb-8dbe-a0c5375fd9dd,,"510 El Camino Real  Belmont, CA 94002, us"
+Sanko Cooking Supply,,CHECKCARD SANKO COOKING SUPPLY SAN FRANCISCO CA,"{'coordinates': ['-122.429978', '37.786382'], 'type': 'point'}",San Francisco,6ed1e248-c541-4edf-9d42-782e094ceaac,,"1758 Buchanan St  San Francisco, CA 94115, us"
+Noriega Teriyaki House,,NORIEGA TERIYAKI HOUSE SAN FRANCISCOCA,"{'coordinates': ['-122.482605', '37.753909'], 'type': 'point'}",San Francisco,712afdbf-0603-471d-89c5-53d0868766f3,,"1755 Noriega St  San Francisco, CA 94122, us"
+In-N-Out Burger,,IN-N-OUT BURGER #11 ROHNERT PARK    CAUS,"{'coordinates': ['-122.714052', '38.361294'], 'type': 'point'}",Rohnert Park,71311bcb-12ff-47b7-9273-9135ccaae07b,,"5145 Redwood Dr  Rohnert Park, CA 94928, us"
+Lers Ros Thai,,CHKCARD LERS ROS THAI NOODLE SAN FRANCISCOCA,,,,,
+Muracci's Japanese Curry and Grill,,MURACCI'S JAPANESE SAN FRANCISCO CA,"{'coordinates': ['-122.404088', '37.790979'], 'type': 'point'}",San Francisco,71e89230-bef8-012e-5614-003048cad9da,,"307 Kearny St  San Francisco, CA 94108, us"
+Kingdom of Dumpling,,KINGDOM OF DUMPLING SAN FRANCISCOCA,"{'coordinates': ['-122.48432', '37.742723'], 'type': 'point'}",San Francisco,71f8a760-bef8-012e-5614-003048cad9da,,"1713 Taraval St  San Francisco, CA 94116, us"
+,,DONUT DELITE        MENLO PARK      CAUS,,,,,
+,,DONUT DELITE        MENLO PARK      CAUS,,,,,
+,,DONUT DELITE        MENLO PARK      CAUS,,,,,
+,,DONUT DELITE        MENLO PARK      CAUS,,,,,
+Sanrio,,SANRIO - #295            SAN FRANCISCOCA,,,,,
+Pizza My Heart,,PIZZA MY HEART      REDWOOD CITY    CAUS,"{'coordinates': ['-122.229094', '37.486047'], 'type': 'point'}",Redwood City,77dd99c3-3ff6-48b5-a51a-738276f8a969,,"831 Middlefield Rd  Redwood City, CA 94063, us"
+San Francisco Bicycle Rentals,,Misc. Debit SF BICYCLE RENTALS SAN FRANCISCO CA,"{'coordinates': ['-122.419482', '37.807829'], 'type': 'point'}",San Francisco,77b61800-1e18-012f-0643-0030487f54d8,,"425 Jefferson St  San Francisco, CA 94109, us"
+San Francisco Bicycle Rentals,,Misc. Debit SF BICYCLE RENTALS SAN FRANCISCO CA,"{'coordinates': ['-122.419482', '37.807829'], 'type': 'point'}",San Francisco,77b61800-1e18-012f-0643-0030487f54d8,,"425 Jefferson St  San Francisco, CA 94109, us"
+,,ARCO PAYPOINT 05/31 #000753861 PURCHASE 1040 SUNNYVALE - SUNNYVALE CA,,,,,
+,,ARCO PAYPOINT 08/22 #000589150 PURCHASE 1040 SUNNYVALE - SUNNYVALE CA,,,,,
+,,ARCO PAYPOINT 10/02 #000577272 PURCHASE 1040 SUNNYVALE - SUNNYVALE CA,,,,,
+Super 8 San Francisco/Union Square Area,,SUPER 8 UNION SQUARESAN FRANCISCO CA,,,,,
+,,TOWER CLEANERS SAN FRANCISCO CA,,,,,
+Lee's Deli,,LEE'S DELI SAN FRANCISCO CA,,,,,
+,,ARCO PAYPOINT 02/16 #000888874 PURCHASE 1040 SUNNYVALE - SUNNYVALE CA,,,,,
+,,CHKCARD SFO PARKING IT-A LEQ96 SAN FRANCISCOCA,,,,,
+,,ARCO PAYPOINT 04/05 #000079544 PURCHASE 1040 SUNNYVALE - SUNNYVALE CA,,,,,
+,,ARCO PAYPOINT 11/27 #000503476 PURCHASE ARCO PAYPOINT SUNNYVALE CA,,,,,
+Le Meridien San Francisco,,LE MERIDIEN SAN FRANCI   SAN FRANCISCOCA,,,,,
+Lee's Deli,,LEE'S DELI-75 BATT SAN FRANCISCO CA,,,,,
+Safeway,,SAFEWAY STORE 12/11 #000626013 PURCHASE SAFEWAY STORE SUNNYVALE CA,,,,,
+Safeway,,SAFEWAY STORE 12/24 #000129940 PURCHASE SAFEWAY STORE SUNNYVALE CA,,,,,
+Safeway,,SAFEWAY 2887 10/01 #000935316 PURCHASE 150 E. EL CAMINO SUNNYVALE CA,,,,,
+Safeway,,SAFEWAY 2887 09/29 #000082625 PURCHASE 150 E. EL CAMINO SUNNYVALE CA,,,,,
+Safeway,,SAFEWAY 2887 10/08 #000255813 PURCHASE 150 E. EL CAMINO SUNNYVALE CA,,,,,
+,,SHOOTERS LOUNGE AND SAN LEANDRO     CAUS,,,,,
+Whispers Cafe and Creperie,,CHECKCARD 0903 WHISPERS CAFE & CREPER BELMONT CA 24071053247158151881416,"{'coordinates': ['-122.284456', '37.526612'], 'type': 'point'}",Belmont,811d1ec0-04c3-012f-96f5-003048c87378,,"390 El Camino Real Ste V Belmont, CA 94002, us"
+Safeway,,SAFEWAY 2887 01/18 #000246958 PURCHASE 150 E. EL CAMINO SUNNYVALE CA,,,,,
+Espetus Churrascaria,info@espetus.com,CHECKCARD 1231 ESPETUS CHURRASCARIA SAN MATEO CA 24431063001207588600061,"{'coordinates': ['-122.319323', '37.562425'], 'type': 'point'}",San Mateo,82383340-f2bb-012e-9399-003048c87378,,"710 S B St  San Mateo, CA 94401, us"
+Sushi Club,,CHECKCARD 0325 SUSHI CLUB SUNNYVALE CA 24460083085980001903830,,,,,
+Sushi Club,,CHECKCARD 0612 SUSHI CLUB SUNNYVALE CA 24460083164980001903891,,,,,
+Sushi Club,,CHECKCARD 1002 SUSHI CLUB SUNNYVALE CA 24765183276980001415552,,,,,
+W Menlo Park Station,,MENLO BBQ           MENLO PARK      CAUS,"{'coordinates': ['-122.20182', '37.431351'], 'type': 'point'}",West Menlo Park,5825c560-29b4-012f-4984-0030487f54d8,,""" Menlo"" West Menlo Park, CA 94025, us"
+,,CHECKCARD 1017 SUSHI BOAT WESTGATE SAN JOSE CA 24122583291980012711155,,,,,
+Gary Danko,information@garydanko.com,CHECKCARD 0804 GARY DANKO SAN FRANCISCOCA 24224433218101045757934,"{'coordinates': ['-122.420523', '37.805758'], 'type': 'point'}",San Francisco,8759900f-86b3-4e19-a487-3cc832428936,,"800 N Point St  San Francisco, CA 94109, us"
+,,NO 9 FISHERMEN'S GROTTO SAN FRANCISCO CA - EATING PLACES,,,,,
+Duc Loi Supermarket,,DUC LOI SUPERMARKET      SAN FRANCISCOCA,"{'coordinates': ['-122.419508', '37.761753'], 'type': 'point'}",San Francisco,8bf77e8d-c917-4a4c-8008-9ac037c75393,,"2200 Mission St  San Francisco, CA 94110, us"
+,,MOLLIE STONES #9 SAN FRANCISCOCA,,,,,
+,,CHECKCARD 0117 LA CORNETA SAN CARLOS CA 24431063018838000046326,,,,,
+,,SAFEWAY STORE   525 El Camino Real     Menlo Park   CAUS,,,,,
+,,CALISTOGA SPA INC   CALISTOGA       CAUS,,,,,
+,,PHO HUYNH HIEP #2 SAN FRANCISCOCA,,,,,
+John's Grill,,CHECKCARD 0801 JOHN'S GRILL SAN FRANCISCOCA 24055233215206112100206,,,,,
+Kwick Pick Market,,KWICK PICK MARKET   ROHNERT PARK    CAUS,"{'coordinates': ['-122.709189', '38.363751'], 'type': 'point'}",Rohnert Park,904aed99-751d-4f52-a435-76737d8644bb,,"101 Golf Course Dr Ste E Rohnert Park, CA 94928, us"
+Armadillo Willy's BBQ,,2 ARMADILLO WILLYS  LOS ALTOS       CAUS,,,,,
+Japanese Tea Garden,,JAPANESE TEA GARDEN      SAN FRANCISCOCA,,,,,
+,,CHECKCARD BART SFIA 0051 SAN FRANCISCO CA,,,,,
+Target,,TARGET T0852 ROHNERT PARohnert Park CAUS,"{'coordinates': ['-122.720141', '38.346825'], 'type': 'point'}",Rohnert Park,96d82b4d-0bc2-4f58-96d1-4b68f76706c7,,"475 Rohnert Park Expy W  Rohnert Park, CA 94928, us"
+Calistoga Bikeshop and Rerntails,calbikes@gmail.com,CALISTOGA BIKESHOP  CALISTOGA       CAUS,"{'coordinates': ['-122.579273', '38.577577'], 'type': 'point'}",Calistoga,9851edf0-9218-41b7-848d-64ad3230547a,,"1318 Lincoln Ave  Calistoga, CA 94515, us"
+,,NOAH'S BAGEL #2113 SAN FRANCISCO CA,,,,,
+You See Sushi,,YOU SEE SUSHI SAN FRANCISCO CA,"{'coordinates': ['-122.462735', '37.762436'], 'type': 'point'}",San Francisco,989fc58a-ec8c-4613-89e9-05d647fc7fd8,,"94 Judah St  San Francisco, CA 94122, us"
+Jack In The Box,,JACK IN THE BOX 347 MENLO PARK      CAUS,"{'coordinates': ['-122.151439', '37.479884'], 'type': 'point'}",Menlo Park,992c8995-c1a9-4f94-9635-f411704899fc,,"1401 Willow Rd  Menlo Park, CA 94025, us"
+,,WALGREENS #6291 SAN FRANCISCO CA,,,,,
+Fort Point,,FORT POINT SAN FRANCISCOCA,,,,,
+Crazy Buffet,,CHECKCARD 1122 CRAZY BUFFET SUNNYVALE CA 24493983327206643001258,"{'coordinates': ['-122.017693', '37.355192'], 'type': 'point'}",Sunnyvale,a31df9b8-bbc7-4ab5-94e2-269ce8b2d0b6,,"830 E El Camino Real  Sunnyvale, CA 94087, us"
+Csi,,CSI-098893/1528 CSI-098893/4990 COMMERCROHNERT PARK CAUS,,,,,
+,,CSI-098893/1528        ROHNERT PARK CAUS,,,,,
+,,SAMS FOR PLAY CAFE  SANTA ROSA      CAUS,,,,,
+Zuni Cafe,,ZUNI CAFE SAN FRANCISCO CA,,,,,
+,,MRS.T`S CAFE SAN FRANCISCO CA,,,,,
+,,KLEINS DELI - 2 8843SAN FRANCISCO CA,,,,,
+Famous Footwear,,FAMOUS FOOTWEA 06/02 #000876407 PURCHASE FAMOUS FOOTWEAR SAN JOSE CA,,,,,
+Famous Footwear,,FAMOUS FOOTWEA 10/17 #000497985 PURCHASE FAMOUS FOOTWEAR SAN JOSE CA,,,,,
+,,BALOMPIE CAFE RESTA SAN FRANCISCO   CAUS,,,,,
+,,CLEO'S BRAZILLIAN S SAN BRUNO       CAUS,,,,,
+Trader Joe's,,TRADER JOE'S #019 QPS SAN FRANCISCOCA,,,,,
+,,TOUT SWEET PATISSE SAN FRANCISCO CA,,,,,
+Jasmine Garden,,JASMINE GARDEN LLC       SAN FRANCISCOCA,"{'coordinates': ['-122.429245', '37.767755'], 'type': 'point'}",San Francisco,abe8aa34-b023-42ff-8457-9cc6198cdf5e,,"708 14th St "" 14th"" San Francisco, CA 94114, us"
+,,WEI LEE SAN FRANCISCO CA,,,,,
+Fair Oaks 76,,FAIR OAKS 76 12/07 #000514106 PURCHASE FAIR OAKS 76 SUNNYVALE CA,"{'coordinates': ['-122.022604', '37.367638'], 'type': 'point'}",Sunnyvale,aa0a7460-e831-4de8-bd58-f054b454a348,,"603 Old San Francisco Rd  Sunnyvale, CA 94086, us"
+Ragazza,,RAGAZZA SAN FRANCISCO CA,"{'coordinates': ['-122.437354', '37.77245'], 'type': 'point'}",San Francisco,b791bd78-f8f8-41bf-8281-563cf723a34d,,"311 Divisadero St  San Francisco, CA 94117, us"
+Specialty's Cafe and Bakery,,CHECKCARD 0812 SPECIALTY'S CAFE & BAK REDWOOD CITY CA...,"{'coordinates': ['-122.256153', '37.536814'], 'type': 'point'}",Redwood City,b1f2888b-be9f-42bb-b1dd-ad85329c0005,,"1100 Island Dr  Redwood City, CA 94065, us"
+The Old Siam Thai Restaurant,,THE OLD SIAM THAI RE SAN FRANCISCO CA,"{'coordinates': ['-122.409618', '37.785257'], 'type': 'point'}",San Francisco,b2f83a62-6cc3-45e1-8281-7ef15318f4d6,,"201 Ellis St  San Francisco, CA 94102, us"
+,,RADISSON SF WHARF SAN FRANCISCO CA,,,,,
+,,SAFEWAY 1990 09/22 #000568832 PURCHASE 3970 RIVERMARK PL SANTA CLARA CA,,,,,
+,,UMAMI PALO ALTO     PALO ALTO       CAUS,,,,,
+,,SAFEWAY 1990 07/04 #000324544 PURCHASE 3970 RIVERMARK PL SANTA CLARA CA,,,,,
+,,CHECKCARD 0524 GODFATHERS BURGER LOU BELMONT CA 24692163145000152820721,,,,,
+Arco,,ARCO PAYPOINT 01/31 #000311596 PURCHASE 470 RALSTON AVE BELMONT CA,"{'coordinates': ['-122.273338', '37.523234'], 'type': 'point'}",Belmont,c5f99796-0d11-47ad-8b4d-5471ec3967b1,,"470 Ralston Ave  Belmont, CA 94002, us"
+,,SAN ZEN NAILS SAN FRANCISCO CA,,,,,
+Wasabi Bistro,,WASABI BISTRO SAN FRANCISCO CA,"{'coordinates': ['-122.435123', '37.760404'], 'type': 'point'}",San Francisco,c4778e2f-bad8-4716-b38e-9e25340fb206,,"524 Castro St  San Francisco, CA 94114, us"
+Arco,,ARCO PAYPOINT 09/03 #000802492 PURCHASE 470 RALSTON AVE BELMONT CA,"{'coordinates': ['-122.273338', '37.523234'], 'type': 'point'}",Belmont,c5f99796-0d11-47ad-8b4d-5471ec3967b1,,"470 Ralston Ave  Belmont, CA 94002, us"
+Arco,,ARCO PAYPOINT 01/22 #000490226 PURCHASE 470 RALSTON AVE BELMONT CA,"{'coordinates': ['-122.273338', '37.523234'], 'type': 'point'}",Belmont,c5f99796-0d11-47ad-8b4d-5471ec3967b1,,"470 Ralston Ave  Belmont, CA 94002, us"
+Plum District,,CHKCARD PLUM DISTRICT SAN FRANCISCOCA,,,,,
+Terroir,,TERROIR SAN FRANCISCO CA,"{'coordinates': ['-122.408281', '37.776484'], 'type': 'point'}",San Francisco,ca6e2eef-5ed9-49dd-b58a-68e67ecfbaff,,"1116 Folsom St  San Francisco, CA 94103, us"
+,,KIMM S FLOWER BASKE SUNNYVALE       CAUS,,,,,
+Subway,,SUBWAY        00521 MENLO PARK      CAUS,,,,,
+Rooster T Feathers Comedy Club,info@roostertfeathers.com,CHECKCARD 0524 ROOSTER T FEATHERS 2 SUNNYVALE CA 24493983145286899800074,"{'coordinates': ['-122.033595', '37.368676'], 'type': 'point'}",Sunnyvale,d4957101-ee2a-49b6-b59c-7ff2c816eb42,,"157 W El Camino Real  Sunnyvale, CA 94087, us"
+Holy Smokes,,HOLY SMOKES     6650 COMMERCE BLVD STE ROHNERT PARK CAUS,"{'coordinates': ['-122.711676', '38.343873'], 'type': 'point'}",Rohnert Park,d1d9436d-be45-4f29-9a10-79accf69bf82,,"6650 Commerce Blvd  Rohnert Park, CA 94928, us"
+Tacolicious,,Visa Check Card TACOLICIOUS SAN FRANCISCO CA,,,,,
+Subway,,SUBWAY        00521 MENLO PARK      CAUS,,,,,
+CVS Pharmacy,,CVS 09700 01/09 #000732357 PURCHASE 09700--576 E El C Sunnyvale CA,"{'coordinates': ['-122.026719', '37.362226'], 'type': 'point'}",Sunnyvale,d99b073e-293a-47d7-ba62-b1d23037ca54,,"576 E El Camino Real  Sunnyvale, CA 94087, us"
+Rooster T Feathers Comedy Club,info@roostertfeathers.com,CHECKCARD 0524 ROOSTER T FEATHERS SUNNYVALE CA 24493983145286619000088,"{'coordinates': ['-122.033595', '37.368676'], 'type': 'point'}",Sunnyvale,d4957101-ee2a-49b6-b59c-7ff2c816eb42,,"157 W El Camino Real  Sunnyvale, CA 94087, us"
+CVS Pharmacy,,CVS 09700 0970 12/08 #000311893 PURCHASE CVS 09700 09700-- Sunnyvale CA,,,,,
+CVS Pharmacy,,CVS 09700 01/29 #000114115 PURCHASE 09700--576 E El C Sunnyvale CA,"{'coordinates': ['-122.026719', '37.362226'], 'type': 'point'}",Sunnyvale,d99b073e-293a-47d7-ba62-b1d23037ca54,,"576 E El Camino Real  Sunnyvale, CA 94087, us"
+CVS Pharmacy,,CVS 09700 01/10 #000015706 PURCHASE 09700--576 E El C Sunnyvale CA,"{'coordinates': ['-122.026719', '37.362226'], 'type': 'point'}",Sunnyvale,d99b073e-293a-47d7-ba62-b1d23037ca54,,"576 E El Camino Real  Sunnyvale, CA 94087, us"
+CVS Pharmacy,,CVS 09700 0970 12/24 #000530279 PURCHASE CVS 09700 09700-- Sunnyvale CA,,,,,
+CVS Pharmacy,,CVS 09700 0970 12/21 #000611345 PURCHASE CVS 09700 09700-- Sunnyvale CA,,,,,
+CVS Pharmacy,,CVS 09700 02/08 #000212653 PURCHASE 09700--576 E El C Sunnyvale CA,"{'coordinates': ['-122.026719', '37.362226'], 'type': 'point'}",Sunnyvale,d99b073e-293a-47d7-ba62-b1d23037ca54,,"576 E El Camino Real  Sunnyvale, CA 94087, us"
+CVS Pharmacy,,CVS 09700 02/10 #000111094 PURCHASE 09700--576 E El C Sunnyvale CA,"{'coordinates': ['-122.026719', '37.362226'], 'type': 'point'}",Sunnyvale,d99b073e-293a-47d7-ba62-b1d23037ca54,,"576 E El Camino Real  Sunnyvale, CA 94087, us"
+CVS Pharmacy,,CVS 09700 02/12 #000710366 PURCHASE 09700--576 E El C Sunnyvale CA,"{'coordinates': ['-122.026719', '37.362226'], 'type': 'point'}",Sunnyvale,d99b073e-293a-47d7-ba62-b1d23037ca54,,"576 E El Camino Real  Sunnyvale, CA 94087, us"
+CVS Pharmacy,,CVS 09700 02/20 #000126667 PURCHASE 09700--576 E El C Sunnyvale CA,"{'coordinates': ['-122.026719', '37.362226'], 'type': 'point'}",Sunnyvale,d99b073e-293a-47d7-ba62-b1d23037ca54,,"576 E El Camino Real  Sunnyvale, CA 94087, us"
+CVS Pharmacy,,CVS 09700 02/24 #000728469 PURCHASE 09700--576 E El C Sunnyvale CA,"{'coordinates': ['-122.026719', '37.362226'], 'type': 'point'}",Sunnyvale,d99b073e-293a-47d7-ba62-b1d23037ca54,,"576 E El Camino Real  Sunnyvale, CA 94087, us"
+CVS Pharmacy,,CVS 09700 03/06 #000224646 PURCHASE 09700--576 E El C Sunnyvale CA,"{'coordinates': ['-122.026719', '37.362226'], 'type': 'point'}",Sunnyvale,d99b073e-293a-47d7-ba62-b1d23037ca54,,"576 E El Camino Real  Sunnyvale, CA 94087, us"
+CVS Pharmacy,,CVS 09700 03/13 #000313947 PURCHASE 09700--576 E El C Sunnyvale CA,"{'coordinates': ['-122.026719', '37.362226'], 'type': 'point'}",Sunnyvale,d99b073e-293a-47d7-ba62-b1d23037ca54,,"576 E El Camino Real  Sunnyvale, CA 94087, us"
+CVS Pharmacy,,CVS 09700 03/18 #000219559 PURCHASE 09700--576 E El C Sunnyvale CA,"{'coordinates': ['-122.026719', '37.362226'], 'type': 'point'}",Sunnyvale,d99b073e-293a-47d7-ba62-b1d23037ca54,,"576 E El Camino Real  Sunnyvale, CA 94087, us"
+CVS Pharmacy,,CVS 09700 03/27 #000215150 PURCHASE 09700--576 E El C Sunnyvale CA,"{'coordinates': ['-122.026719', '37.362226'], 'type': 'point'}",Sunnyvale,d99b073e-293a-47d7-ba62-b1d23037ca54,,"576 E El Camino Real  Sunnyvale, CA 94087, us"
+CVS Pharmacy,,CHECKCARD 0705 CVS PHARMACY #9700 SUNNYVALE CA 24445003187100212984009,,,,,
+CVS Pharmacy,,CVS 09700 03/29 #000109507 PURCHASE 09700--576 E El C Sunnyvale CA,"{'coordinates': ['-122.026719', '37.362226'], 'type': 'point'}",Sunnyvale,d99b073e-293a-47d7-ba62-b1d23037ca54,,"576 E El Camino Real  Sunnyvale, CA 94087, us"
+CVS Pharmacy,,CVS 09700 04/30 #000525206 PURCHASE 09700--576 E El C Sunnyvale CA,"{'coordinates': ['-122.026719', '37.362226'], 'type': 'point'}",Sunnyvale,d99b073e-293a-47d7-ba62-b1d23037ca54,,"576 E El Camino Real  Sunnyvale, CA 94087, us"
+CVS Pharmacy,,CVS 09700 04/01 #000609305 PURCHASE 09700--576 E El C Sunnyvale CA,"{'coordinates': ['-122.026719', '37.362226'], 'type': 'point'}",Sunnyvale,d99b073e-293a-47d7-ba62-b1d23037ca54,,"576 E El Camino Real  Sunnyvale, CA 94087, us"
+Yoppi Yogurt,,YOPPI YOGURT SAN FRANCISCOCA,,,,,
+CVS Pharmacy,,CVS 09700 04/19 #000109254 PURCHASE 09700--576 E El C Sunnyvale CA,"{'coordinates': ['-122.026719', '37.362226'], 'type': 'point'}",Sunnyvale,d99b073e-293a-47d7-ba62-b1d23037ca54,,"576 E El Camino Real  Sunnyvale, CA 94087, us"
+Philz Coffee,,PHILZ COFFEE INC SAN FRANCISCOCA,,,,,
+CVS Pharmacy,,CVS 09700 04/29 #000019316 PURCHASE 09700--576 E El C Sunnyvale CA,"{'coordinates': ['-122.026719', '37.362226'], 'type': 'point'}",Sunnyvale,d99b073e-293a-47d7-ba62-b1d23037ca54,,"576 E El Camino Real  Sunnyvale, CA 94087, us"
+Nob Hill Foods,,NOB HILL  #628         REDWOOD CITY CAUS,"{'coordinates': ['-122.252173', '37.52305'], 'type': 'point'}",Redwood City,e627ffa4-c46c-49e2-a8bc-1aeb2b26f1f1,,"270 Redwood Shores Pkwy "" Redwood"" Redwood City, CA 94065, us"
+,,CALISTOGA KITCHEN L CALISTOGA       CAUS,,,,,
+Nob Hill Foods,,NOB HILL  #628         REDWOOD CITY CAUS,"{'coordinates': ['-122.252173', '37.52305'], 'type': 'point'}",Redwood City,e627ffa4-c46c-49e2-a8bc-1aeb2b26f1f1,,"270 Redwood Shores Pkwy "" Redwood"" Redwood City, CA 94065, us"
+,,CHECKCARD 1130 SMUGGLER'S COVE SAN FRANCISCOCA 24431063335207088500107,,,,,
+Crepevine,,CREPEVINE PALO ALT PALO ALTO       CAUS,"{'coordinates': ['-122.160839', '37.446921'], 'type': 'point'}",Palo Alto,eac2447e-f33a-4f3f-82df-739244b5f2f9,,"367 University Ave  Palo Alto, CA 94301, us"
+,,BEVERAGES & MO 01/31 #000570224 PURCHASE 1247 W EL CAMINO SUNNYVALE CA,,,,,
+San Tung Chinese Restaurant,,SAN TUNG CHINESE RESTA SAN FRANCISCO CA,,,,,
+,,JASPERS CORNER TAP       SAN FRANCISCOCA,,,,,
+Ichiban Kan,,ICHIBAN KAN - SAN FRAN SAN FRANCISCO CA,,,,,
+,,BEVERAGES & MO 02/22 #000609042 PURCHASE 1247 W EL CAMINO SUNNYVALE CA,,,,,
+,,BEVERAGES & MO 09/05 #000640591 PURCHASE 1247 W EL CAMINO SUNNYVALE CA,,,,,
+,,BEVERAGES & MO 03/01 #000646355 PURCHASE 1247 W EL CAMINO SUNNYVALE CA,,,,,
+Beverages and More,,BEVERAGES & MO 11/07 #000886296 PURCHASE BEVERAGES & MOR SUNNYVALE CA,"{'coordinates': ['-122.058035', '37.374661'], 'type': 'point'}",Sunnyvale,4b033d72-d7ed-44c8-a725-c5b7c0bd2748,,"1247 W El Camino Real  Sunnyvale, CA 94087, us"
+,,BEVERAGES & MO 03/16 #000586110 PURCHASE 1247 W EL CAMINO SUNNYVALE CA,,,,,
+Beverages and More,,BEVERAGES & MORE # 67  SUNNYVALE    CAUS,"{'coordinates': ['-122.058035', '37.374661'], 'type': 'point'}",Sunnyvale,4b033d72-d7ed-44c8-a725-c5b7c0bd2748,,"1247 W El Camino Real  Sunnyvale, CA 94087, us"
+Panda Express,,PANDA EXPRESS #1937 SAN JOSE        CAUS,,,,,
+Al's 76,,SUNNYVALE 76 02/23 #000701549 PURCHASE 1296 SUNNYVALE SA SUNNYVALE CA,"{'coordinates': ['-122.031893', '37.352458'], 'type': 'point'}",Sunnyvale,f60620d7-c3d0-49bb-88ed-be92cf4b9c09,,"1296 Sunnyvale Saratoga Rd "" Sunnyvale"" Sunnyvale, CA 94087, us"
+Panda Express,,PANDA EXPRESS #1937 SAN JOSE        CAUS,,,,,
+American Mensa,,CHECKCARD 0302 AMERICAN MENSA LTD 817-607-0060 TX...,"{'coordinates': ['-97.067879', '32.767694'], 'type': 'point'}",Arlington,36b65df8-7797-41b1-a72c-f745bf7c0ab7,,"1229 Corporate Dr W  Arlington, TX 76006, us"
+Nijiya Market,,NIJIYA MARKET 11/08 #000321573 PURCHASE 143 E EL CAMINO R MOUNTAIN VIEW CA,"{'coordinates': ['-122.071605', '37.379254'], 'type': 'point'}",Mountain View,fa753f59-8e4a-4621-89a6-aa96efa943bc,,"143 E El Camino Real  Mountain View, CA 94040, us"
+,,CHECKCARD 1213 THINKGEEK INC THINKGEEK.COMVA...,,,,,
+,,GG DELIVERS         323-6004608     CAUS,,,,,
+24 Hour Fitness,,CHECKCARD 0830 24 HOUR FITNESS SUNNYVALE CA 24692163243000600231696,,,,,
+24 Hour Fitness,,CHECKCARD 0830 24 HOUR FITNESS SUNNYVALE CA 24692163243000600231704,,,,,
+,,SQ *GOT CURRY?      Santa Clara     CAUS,,,,,
+Porkys,,SQ *PORKYS SJ       Sunnyvale       CAUS,,,,,
+Ymca Of Santa Clara Valley,,YMCA SILICON VALLEY SANTA CLARA     CAUS,"{'coordinates': ['-122.061178', '37.340622'], 'type': 'point'}",Sunnyvale,d530ac5d-01eb-4a44-b769-75a7ecf96edf,,"1635 Belleville Way "" Valley"" Sunnyvale, CA 94087, us"
+Ymca Of Santa Clara Valley,,YMCA SILICON VALLEY SANTA CLARA     CAUS,"{'coordinates': ['-122.061178', '37.340622'], 'type': 'point'}",Sunnyvale,d530ac5d-01eb-4a44-b769-75a7ecf96edf,,"1635 Belleville Way "" Valley"" Sunnyvale, CA 94087, us"

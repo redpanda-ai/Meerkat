@@ -17,13 +17,6 @@ def separate_results(result_list):
 		else:
 			hits.append(result)
 
-	"""{'DESCRIPTION': 'CHECKCARD 0818 BLACKBEAR DINER- M MADERA CA 24224433231105006465166',
-  'composite.address': 'Vallejo, CA , us',
-  'factual_id': '0cf3bd70-7ee7-427d-933d-1cc8852bed3d',
-  'locality': 'Vallejo',
-  'name': 'Blackbear Diner',
-  'pin.location': "{'type': 'point', 'coordinates': ['-122.221345', '38.134798']}"},"""
-
 	return hits, non_hits
 
 def second_pass(result_list):
