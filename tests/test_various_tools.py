@@ -7,8 +7,8 @@ class VariousToolsTests(unittest.TestCase):
 
 	"""Our UnitTest class."""
 
-	strings = (("Regular words[]'{}/:", "Regular words'"),
-                ('Trans with "" quotes', 'Trans with  quotes'))
+	strings = (("Weekend at Bernie's[]{}/:", "Weekend at Bernie's"),
+                ('Trans with "" quotes', 'Trans with quotes'))
 
 	numbers = (("[8]6{7}5'3/0-9", "8675309"),
 				('333"6"6"6"999', '333666999'))

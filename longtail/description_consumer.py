@@ -23,7 +23,6 @@ import threading
 
 from elasticsearch import Elasticsearch, helpers
 from scipy.stats.mstats import zscore
-from Levenshtein import ratio
 
 from longtail.custom_exceptions import Misconfiguration, UnsupportedQueryType
 from longtail.various_tools import string_cleanse
