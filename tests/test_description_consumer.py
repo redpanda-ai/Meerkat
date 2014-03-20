@@ -26,7 +26,7 @@ class DescriptionConsumerTests(unittest.TestCase):
 	},
 	"output" : {
 		"results" : {
-			"fields" : ["BUSINESSSTANDARDNAME", "HOUSE", "PREDIR", "PERSISTENTRECORDID"],
+			"fields" : ["name", "factual_id", "pin.location", "locality", "region"],
 			"size" : 1
 		},
 		"file" : {
@@ -38,17 +38,7 @@ class DescriptionConsumerTests(unittest.TestCase):
 		, "brainstorm3:9200", "brainstorm4:9200", "brainstorm5:9200", "brainstorm6:9200"
 		, "brainstorm7:9200", "brainstorm8:9200", "brainstorm9:9200", "brainstorma:9200"
 		, "brainstormb:9200"],
-		"index" : "new_index", "type" : "new_type",
-		"subqueries" : {
-			"largest_matching_string": {
-				"field_boosts" : "standard_fields",
-				"query_type" : "qs_query"
-			},
-			"find_addresses": {
-				"field_boosts" : "composite.address",
-				"query_type" : "multi_match_query"
-			}
-		},
+		"index" : "factual_index", "type" : "factual_type",
 		"boost_labels" : [ "standard_fields", "composite.address" ],
 		"boost_vectors" : {
 			"factual_id" :        [ 0.0, 1.0 ],
@@ -63,12 +53,12 @@ class DescriptionConsumerTests(unittest.TestCase):
 {
 	"hits": {
 		"hits": [
-			{"_score": 3, "_type": "new_type", "_index": "new_index",
-			"_id": "4", "fields": {"PERSISTENTRECORDID": "4"}},
-			{"_score": 2, "_type": "new_type", "_index": "new_index",
-			"_id": "6", "fields": {"PERSISTENTRECORDID": "6"}},
-			{"_score": 1, "_type": "new_type", "_index": "new_index",
-			"_id": "9", "fields": {"PERSISTENTRECORDID": "9"}}
+			{"_score": 3, "_type": "new_type", "_index": "factual_index",
+			"_id": "4", "fields": {"factual_id": "4", "name" : "name1"}},
+			{"_score": 2, "_type": "new_type", "_index": "factual_index",
+			"_id": "6", "fields": {"factual_id": "6", "name" : "name1"}},
+			{"_score": 1, "_type": "new_type", "_index": "factual_index",
+			"_id": "9", "fields": {"factual_id": "9", "name" : "name1"}}
 		],
 	"total": 3,
 	"max_score": 3
@@ -134,7 +124,8 @@ class DescriptionConsumerTests(unittest.TestCase):
 		"""Ensure that __search_index finds a common result."""
 		input_as_object = json.loads(self.input_json)
 		result = self.my_consumer._DescriptionConsumer__search_index(input_as_object)
-		self.assertGreater(result["hits"]["total"],-1)
+		result = json.loads(result)
+		self.assertGreater(result["hits"]["total"], -1)
 
 	def test_build_boost_vectors_boost_row_labels(self):
 		"""Ensure that __build_boost_vectors correctly builds a sorted list of

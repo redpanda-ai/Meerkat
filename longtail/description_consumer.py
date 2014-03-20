@@ -145,31 +145,31 @@ class DescriptionConsumer(threading.Thread):
 	def __generate_final_query(self):
 		"""Constructs a simple query along with boost vectors"""
 
+		# Collect necessary meta info to generate query
 		logger = logging.getLogger("thread " + str(self.thread_id))
 		hyperparameters = self.hyperparameters
 		params = self.params
 		result_size = self.hyperparameters.get("es_result_size", "10")
-		fuzziness = self.hyperparameters.get("fuzziness", 0.5)
 		fields = params["output"]["results"]["fields"]
+		input_string = string_cleanse(self.input_string).rstrip()
+
+		# Input transaction must not be empty
+		if len(input_string) <= 2 and re.match('^[a-zA-Z0-9_]+$', input_string):
+			return
+
+		# Ensure we get mandatory fields
+		mandatory_fields = ["pin.location", "name"]
+
+		for field in mandatory_fields:
+			if field not in fields:
+				fields.append(field)
 
 		# Construct Main Query
 		logger.info("BUILDING FINAL BOOLEAN SEARCH")
 		bool_search = get_bool_query(size=result_size)
 		bool_search["fields"] = fields
-
-		# Ensure we get location
-		if "pin.location" not in fields:
-			params["output"]["results"]["fields"].append("pin.location")
-
 		should_clauses = bool_search["query"]["bool"]["should"]
 		field_boosts = self.__get_boosted_fields("standard_fields")
-		input_string = string_cleanse(self.input_string)
-
-		# String must not be empty
-		if len(input_string.rstrip()) <= 2:
-			return
-
-		# Collect Query Parts
 		simple_query = get_qs_query(input_string, field_boosts)
 		should_clauses.append(simple_query)
 
@@ -178,6 +178,8 @@ class DescriptionConsumer(threading.Thread):
 		my_results = self.__search_index(bool_search)
 		metrics = self.my_meta["metrics"]
 		logger.info("Cache Hit / Miss: %i / %i", metrics["cache_count"], metrics["query_count"])
+
+		# Pass Results Forward for Display and Processing
 		self.__display_search_results(my_results)
 		self.__output_to_result_queue(my_results)
 
@@ -227,7 +229,7 @@ class DescriptionConsumer(threading.Thread):
 			self.result_queue.put(output_dict)
 			return
 
-		#Send to result Queue if score good enough
+		#Send to result Queue if score good enough. Use business name as a fallback.
 		if z_score_delta > float(hyperparameters.get("z_score_threshold", "2")):
 			output_dict = dict(zip(fields_found, ordered_hit_fields))
 		else:
@@ -286,11 +288,12 @@ class DescriptionConsumer(threading.Thread):
 		self.my_meta["metrics"]["query_count"] += 1
 		return output_data
 
-	def __check_cache(input_data):
+	def __check_cache(self, input_data):
 
 		# Check cache, then run if query is not found
 		hash_object = hashlib.md5(str(input_data).encode())
 		input_hash = hash_object.hexdigest()
+		output_data = ""
 
 		if input_hash in self.params["search_cache"]:
 			logger.debug("Cache hit, short-cutting")

@@ -34,10 +34,10 @@ class AccuracyTests(unittest.TestCase):
 		self.assertEqual(self.accuracy_results['binary_accuracy'], 100)
 
 	def test_total_recall(self):
-		self.assertEqual(self.accuracy_results['total_recall'], 6)
+		self.assertEqual(round(self.accuracy_results['total_recall']), 6)
 
 	def test_total_recall_non_physical(self):
-		self.assertEqual(self.accuracy_results['total_recall_non_physical'], 31)
+		self.assertEqual(round(self.accuracy_results['total_recall_non_physical']), 31)
 
 	def test_time_taken(self):
 		self.assertEqual(self.speed_results['time_delta'].seconds, 100)
