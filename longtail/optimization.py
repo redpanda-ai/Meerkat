@@ -246,7 +246,7 @@ if __name__ == "__main__":
 	open(os.path.splitext(os.path.basename(sys.argv[1]))[0] + '_top_scores.txt', 'w').close()
 
 	settings = {
-		"test_size": 0.5,
+		"test_size": 1,
 		"initial_search_space": 50,
 		"initial_learning_rate": 0.3,
 		"iteration_search_space": 25,
