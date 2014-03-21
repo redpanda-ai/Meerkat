@@ -4,6 +4,9 @@ Python project for labeling and classifying Longtail data
 
 Usage
 ------------
+**Load an ElasticSearch Index:**<br>
+From the base directory execute **python3 -m longtail.bulk_loader config/{config file}**
+
 **Run Longtail Classifier:**<br>
 From base directory execute **python3 -m longtail config/{config file}**
 
