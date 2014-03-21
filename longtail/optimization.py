@@ -8,10 +8,12 @@ This module utilizes a common method known as grid search. In particular
 we are using randomized optimization as it works better where it
 is resource intensive to exaustively perform a standard grid_search"""
 
-from longtail.description_producer import initialize, get_desc_queue, tokenize, load_hyperparameters
+from longtail.description_producer import initialize, tokenize, load_hyperparameters
+from longtail.binary_classifier.load import predict_if_physical_transaction
 
-import sys, pprint, datetime, os
-from random import randint, uniform
+import sys, datetime, os, queue, csv
+from pprint import pprint
+from random import randint, uniform, random, shuffle
 
 def get_initial_values(hyperparameters, params, known, iter=1):
 	"""Do a simple search to find starter values"""
@@ -70,7 +72,7 @@ def run_classifier(hyperparameters, params):
 	params["elasticsearch"]["boost_vectors"] = boost_vectors
 
 	# Run Classifier with new Hyperparameters
-	desc_queue, non_physical = get_desc_queue(params)
+	desc_queue, non_physical = get_desc_queue(train)
 	accuracy = tokenize(params, desc_queue, other, non_physical)
 
 	return accuracy
@@ -119,11 +121,11 @@ def gradient_ascent(initial_values, params, known):
 def save_top_score(top_score):
 
 	record = open(os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_top_scores.txt", "a")
-	pprint.pprint("Precision = " + str(top_score['precision']) + "%", record)
-	pprint.pprint("Best Recall = " + str(top_score['total_recall_non_physical']) + "%", record)
+	pprint("Precision = " + str(top_score['precision']) + "%", record)
+	pprint("Best Recall = " + str(top_score['total_recall_non_physical']) + "%", record)
 	boost_vectors, boost_labels, other = split_hyperparameters(top_score["hyperparameters"])
-	pprint.pprint(boost_vectors, record)
-	pprint.pprint(other, record)
+	pprint(boost_vectors, record)
+	pprint(other, record)
 	record.close()
 
 def split_hyperparameters(hyperparameters):
@@ -157,23 +159,103 @@ def randomized_optimization(hyperparameters, known, params):
 	print("Precision = " + str(top_score['precision']) + "%")
 	print("Best Recall = " + str(top_score['total_recall_non_physical']) + "%")
 	print("HYPERPARAMETERS:")
-	pprint.pprint(top_score["hyperparameters"])
+	pprint(top_score["hyperparameters"])
 	print("ALL RESULTS:")
 	
 	# Save Final Parameters
 	file_name = os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_" + str(round(top_score['precision'], 2)) + "Precision" + str(round(top_score['total_recall_non_physical'], 2)) + "Recall.json" 
 	new_parameters = open(file_name, 'w')
-	pprint.pprint(top_score["hyperparameters"], new_parameters)
+	#pprint(top_score["hyperparameters"], new_parameters)
 
 	return top_score
+
+def test_train_split(params):
+	"""Load the verification source, and split the
+	data into a test and training set"""
+
+	verification_source = params.get("verification_source", "data/misc/verifiedLabeledTrans.csv")
+	test_size = settings["test_size"]
+	test, train = [], []
+
+	# Load Data
+	verification_file = open(verification_source, encoding="utf-8", errors='replace')
+	verified_transactions = list(csv.DictReader(verification_file))
+	verification_file.close()
+
+	# Split Data
+	for i in range(len(verified_transactions)):
+		
+		# Get Physical Transactions
+		if verified_transactions[i]["factual_id"] != "":
+			if random() < test_size:
+				test.append(verified_transactions[i])
+			else:
+				train.append(verified_transactions[i])
+
+		# Get Non-Physical Transactions
+		if verified_transactions[i]["IS_PHYSICAL_TRANSACTION"] == "0" or verified_transactions[i]["IS_PHYSICAL_TRANSACTION"] == "2":
+			if random() < test_size:
+				test.append(verified_transactions[i])
+			else:
+				train.append(verified_transactions[i])
+
+	# Shuffle
+	shuffle(train)
+	shuffle(test)
+
+	return test, train
+
+def get_desc_queue(dataset):
+	"""Alt version of get_desc_queue"""
+
+	transactions = [trans["DESCRIPTION"] for trans in dataset]
+	desc_queue, non_physical = queue.Queue(), []
+
+	# Run Binary Classifier
+	for transaction in transactions:
+		prediction = predict_if_physical_transaction(transaction)
+		if prediction == "1":
+			desc_queue.put(transaction)
+		elif prediction == "0":
+			non_physical.append(transaction)
+		elif prediction == "2":
+			desc_queue.put(transaction)
+
+	return desc_queue, non_physical
+
+def cross_validate(top_score):
+	"""Validate model built with training set against
+	test set"""
+
+	# Split boosts from other hyperparameters and format accordingly
+	hyperparameters = top_score["hyperparameters"]
+	boost_vectors, boost_labels, other = split_hyperparameters(hyperparameters)
+
+	# Override Params
+	params["elasticsearch"]["boost_labels"] = boost_labels
+	params["elasticsearch"]["boost_vectors"] = boost_vectors
+
+	# Run Classifier
+	print("\n", "CROSS VALIDATE", "\n")
+	desc_queue, non_physical = get_desc_queue(test)
+	accuracy = tokenize(params, desc_queue, other, non_physical)
 
 if __name__ == "__main__":
 
 	# Clear Contents from Previous Runs
 	open(os.path.splitext(os.path.basename(sys.argv[1]))[0] + '_top_scores.txt', 'w').close()
 
-	start_time = datetime.datetime.now()
-	params = initialize()
+	settings = {
+		"test_size": 1,
+		"initial_search_space": 50,
+		"initial_learning_rate": 0.3,
+		"iteration_search_space": 25,
+		"iteration_learning_rate": 0.3,
+		"gradient_ascent_iterations": 25,
+		"convergence": 1,
+		"max_precision": 96
+	}
+
 	known = {"es_result_size" : "45"}
 
 	hyperparameters = {    
@@ -194,16 +276,15 @@ if __name__ == "__main__":
 		"z_score_threshold" : "3"
 	}
 
-	settings = {
-		"initial_search_space": 50,
-		"initial_learning_rate": 0.3,
-		"iteration_search_space": 25,
-		"iteration_learning_rate": 0.3,
-		"gradient_ascent_iterations": 25,
-		"convergence": 1,
-		"max_precision": 96
-	}
+	# Meta Information
+	start_time = datetime.datetime.now()
+	params = initialize()
+	test, train = test_train_split(params)
 
-	randomized_optimization(hyperparameters, known, params)
+	# Run Randomized Optimization and Cross Validate
+	top_score = randomized_optimization(hyperparameters, known, params)
+	cross_validate(top_score)
+
+	# Run Speed Tests
 	time_delta = datetime.datetime.now() - start_time
 	print("TOTAL TIME TAKEN FOR OPTIMIZATION: ", time_delta)
