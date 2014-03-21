@@ -49,12 +49,13 @@ def get_desc_queue(params):
 	# Run Binary Classifier
 	for input_string in lines:
 		prediction = predict_if_physical_transaction(input_string)
-		if prediction == "1" or prediction == "2":
+		if prediction == "1":
 			desc_queue.put(input_string)
 		elif prediction == "0":
 			non_physical.append(input_string)
 			logging.info("NON-PHYSICAL: %s", input_string)
 		elif prediction == "2":
+			desc_queue.put(input_string)
 			atm.append(input_string)
 
 	atm_percent = (len(atm) / len(lines)) * 100
@@ -66,8 +67,6 @@ def get_desc_queue(params):
 	print("NON-PHYSICAL: ", round(non_physical_percent, 2), "%")
 	print("ATM: ", round(atm_percent, 2), "%")
 	print("")
-
-	non_physical = non_physical + atm
 
 	return desc_queue, non_physical
 
@@ -163,7 +162,7 @@ def tokenize(params, desc_queue, hyperparameters, non_physical):
 		logging.critical("Not configured for file output.")
 
 	# Test Accuracy
-	accuracy_results = test_accuracy(result_list=result_list, non_physical_trans=non_physical)
+	accuracy_results = test_accuracy(params, result_list=result_list, non_physical_trans=non_physical)
 	print_results(accuracy_results)
 
 	# Do Speed Tests

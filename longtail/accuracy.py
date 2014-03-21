@@ -12,7 +12,7 @@ import os
 import sys
 from pprint import pprint
 
-def test_accuracy(file_path=None, non_physical_trans=[], result_list=[]):
+def test_accuracy(params, file_path=None, non_physical_trans=[], result_list=[]):
 	"""Takes file by default but can accept result
 	queue/ non_physical list. Attempts to provide various
 	accuracy tests"""
@@ -26,8 +26,9 @@ def test_accuracy(file_path=None, non_physical_trans=[], result_list=[]):
 		logging.warning("Not enough information provided to perform accuracy tests on")
 		return
 
-	#FIXME: Hard-coded?
-	human_labeled_input_file = open("data/misc/verifiedLabeledTrans.csv", encoding="utf-8", errors='replace')
+	# Load Verification Source
+	verification_source = params.get("verification_source", "data/misc/verifiedLabeledTrans.csv")
+	human_labeled_input_file = open(verification_source, encoding="utf-8", errors='replace')
 	human_labeled = list(csv.DictReader(human_labeled_input_file))
 	human_labeled_input_file.close()
 
