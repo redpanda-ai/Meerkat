@@ -163,7 +163,7 @@ def randomized_optimization(hyperparameters, known, params, dataset):
 	# Save Final Parameters
 	file_name = os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_" + str(round(top_score['precision'], 2)) + "Precision" + str(round(top_score['total_recall_non_physical'], 2)) + "Recall.json" 
 	new_parameters = open(file_name, 'w')
-	#pprint(top_score["hyperparameters"], new_parameters)
+	pprint(top_score["hyperparameters"], new_parameters)
 
 	return top_score
 
