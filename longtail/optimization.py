@@ -204,6 +204,6 @@ if __name__ == "__main__":
 		"max_precision": 96
 	}
 
-	randomized_optimization(unknown, known, params)
+	randomized_optimization(hyperparameters, known, params)
 	time_delta = datetime.datetime.now() - start_time
 	print("TOTAL TIME TAKEN FOR OPTIMIZATION: ", time_delta)

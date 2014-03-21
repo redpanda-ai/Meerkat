@@ -88,7 +88,7 @@ def build_model(trans_train, trans_test, labels_train, labels_test):
     print("Actual Score: " + str(score))
 
     # Save Model
-    joblib.dump(grid_search, 'longtail/binary_classifier/US3.pkl', compress=3)
+    joblib.dump(grid_search, 'longtail/binary_classifier/US.pkl', compress=3)
 
     test_model("data/misc/verifiedLabeledTrans.csv", grid_search)
     test_model("data/misc/10K_Card.csv", grid_search)
