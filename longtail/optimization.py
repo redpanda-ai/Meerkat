@@ -10,25 +10,27 @@ is resource intensive to exaustively perform a standard grid_search"""
 
 from longtail.description_producer import initialize, tokenize, load_hyperparameters
 from longtail.binary_classifier.load import predict_if_physical_transaction
+from longtail.accuracy import print_results
 
 import sys, datetime, os, queue, csv
 from pprint import pprint
 from random import randint, uniform, random, shuffle
 from numpy import array, array_split
 
-def get_initial_values(hyperparameters, params, known, iter=1):
+def get_initial_values(hyperparameters, params, known, dataset):
 	"""Do a simple search to find starter values"""
 
 	top_score = {"precision" : 0, "total_recall_non_physical" : 0}
+	iterations = settings["initial_search_space"]
 	learning_rate = settings["initial_learning_rate"]
 
-	for i in range(iter):
+	for i in range(iterations):
 		randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=learning_rate)
 		print("\n", "ITERATION NUMBER: " + str(i))
 		print("\n", randomized_hyperparameters,"\n")
 
 		# Run Classifier
-		accuracy = run_classifier(randomized_hyperparameters, params)
+		accuracy = run_classifier(randomized_hyperparameters, params, dataset)
 		higher_precision = accuracy["precision"] >= top_score["precision"]
 		not_too_high = accuracy["precision"] <= settings["max_precision"]
 
@@ -38,9 +40,6 @@ def get_initial_values(hyperparameters, params, known, iter=1):
 			print("\n", "SCORE: " + str(accuracy["precision"]))
 
 		print("\n", randomized_hyperparameters,"\n")
-
-	if accuracy["precision"] < 0:
-		get_initial_values(top_score["hyperparameters"], params, known, iter=1)
 
 	print("TOP SCORE:" + str(top_score["precision"]))
 	return top_score
@@ -62,7 +61,7 @@ def randomize(hyperparameters, known={}, learning_rate=0.3):
 	return dict(list(randomized.items()) + list(known.items()))
 
 
-def run_classifier(hyperparameters, params):
+def run_classifier(hyperparameters, params, dataset):
 	""" Runs the classifier with a given set of hyperparameters"""
 
 	# Split boosts from other hyperparameters and format accordingly
@@ -73,16 +72,16 @@ def run_classifier(hyperparameters, params):
 	params["elasticsearch"]["boost_vectors"] = boost_vectors
 
 	# Run Classifier with new Hyperparameters
-	desc_queue, non_physical = get_desc_queue(train)
+	desc_queue, non_physical = get_desc_queue(dataset)
 	accuracy = tokenize(params, desc_queue, other, non_physical)
 
 	return accuracy
 
-def run_iteration(top_score, params, known, learning_rate):
+def run_iteration(top_score, params, known, dataset):
 
 	hyperparameters = top_score['hyperparameters']
 	new_top_score = top_score
-	learning_rate = learning_rate * settings["convergence"]
+	learning_rate = settings["iteration_learning_rate"]
 	iterations = settings["iteration_search_space"]
 
 	for i in range(iterations):
@@ -91,7 +90,7 @@ def run_iteration(top_score, params, known, learning_rate):
 		print("\n", randomized_hyperparameters,"\n")
 
 		# Run Classifier
-		accuracy = run_classifier(randomized_hyperparameters, params)
+		accuracy = run_classifier(randomized_hyperparameters, params, dataset)
 		same_or_higher_recall = accuracy["total_recall_non_physical"] >= new_top_score["total_recall_non_physical"]
 		same_or_higher_precision = accuracy["precision"] >= new_top_score["precision"]
 		not_too_high_precision = accuracy["precision"] <= settings["max_precision"]
@@ -101,9 +100,9 @@ def run_iteration(top_score, params, known, learning_rate):
 			new_top_score['hyperparameters'] = randomized_hyperparameters
 			print("\n", "SCORE: " + str(accuracy["precision"]))
 
-	return new_top_score, learning_rate
+	return new_top_score
 
-def gradient_ascent(initial_values, params, known):
+def gradient_ascent(initial_values, params, known, dataset):
 
 	top_score = initial_values
 	learning_rate = settings["iteration_learning_rate"]
@@ -111,8 +110,7 @@ def gradient_ascent(initial_values, params, known):
 	iterations = settings["gradient_ascent_iterations"]
 
 	for i in range(iterations):
-		print("LEARNING RATE: " + str(learning_rate))
-		top_score, learning_rate = run_iteration(top_score, params, known, learning_rate)
+		top_score = run_iteration(top_score, params, known, dataset)
 		
 		# Save Iterations Top Hyperparameters
 		save_top_score(top_score)
@@ -143,7 +141,7 @@ def split_hyperparameters(hyperparameters):
 		
 	return boost_vectors, boost_labels, other
 
-def randomized_optimization(hyperparameters, known, params):
+def randomized_optimization(hyperparameters, known, params, dataset):
 
 	"""Generates randomized parameter keys by
 	providing a range to sample from. 
@@ -151,11 +149,10 @@ def randomized_optimization(hyperparameters, known, params):
 	provides the top score found"""
 
 	# Init
-	iterations = settings["initial_search_space"]
-	initial_values = get_initial_values(hyperparameters, params, known, iter=iterations)
+	initial_values = get_initial_values(hyperparameters, params, known, dataset)
 
 	# Run Gradient Ascent 
-	top_score = gradient_ascent(initial_values, params, known)
+	top_score = gradient_ascent(initial_values, params, known, dataset)
 
 	print("Precision = " + str(top_score['precision']) + "%")
 	print("Best Recall = " + str(top_score['total_recall_non_physical']) + "%")
@@ -216,7 +213,7 @@ def get_desc_queue(dataset):
 
 	return desc_queue, non_physical
 
-def cross_validate(top_score):
+def cross_validate(top_score, dataset):
 	"""Validate model built with training set against
 	test set"""
 
@@ -230,8 +227,26 @@ def cross_validate(top_score):
 
 	# Run Classifier
 	print("\n", "CROSS VALIDATE", "\n")
-	desc_queue, non_physical = get_desc_queue(test)
+	desc_queue, non_physical = get_desc_queue(dataset)
 	accuracy = tokenize(params, desc_queue, other, non_physical)
+
+	return accuracy
+
+def two_fold(hyperparameters, known, params, d0, d1):
+	"""Run two-fold cross validation. Combine Scores"""
+
+	# Run Randomized Optimization and Cross Validate
+	d0_top_score = randomized_optimization(hyperparameters, known, params, d0)
+	d1_top_score = randomized_optimization(hyperparameters, known, params, d1)
+
+	# Cross Validate
+	d0_results = cross_validate(d0_top_score, d1)
+	d1_results = cross_validate(d1_top_score, d0)
+
+	# See Scores
+	print("FINAL SCORES:")
+	pprint(d0_results)
+	pprint(d1_results)
 
 if __name__ == "__main__":
 
@@ -239,13 +254,12 @@ if __name__ == "__main__":
 	open(os.path.splitext(os.path.basename(sys.argv[1]))[0] + '_top_scores.txt', 'w').close()
 
 	settings = {
-		"test_size": 1,
-		"initial_search_space": 10,
+		"test_size": 0.5,
+		"initial_search_space": 50,
 		"initial_learning_rate": 1,
-		"iteration_search_space": 10,
+		"iteration_search_space": 35,
 		"iteration_learning_rate": 0.3,
-		"gradient_ascent_iterations": 100,
-		"convergence": 1,
+		"gradient_ascent_iterations": 15,
 		"max_precision": 96
 	}
 
@@ -274,9 +288,8 @@ if __name__ == "__main__":
 	params = initialize()
 	test, train = test_train_split(params)
 
-	# Run Randomized Optimization and Cross Validate
-	top_score = randomized_optimization(hyperparameters, known, params)
-	cross_validate(top_score)
+	# Run Two Fold Cross Validation
+	two_fold(hyperparameters, known, params, test, train)
 
 	# Run Speed Tests
 	time_delta = datetime.datetime.now() - start_time
