@@ -14,6 +14,7 @@ from longtail.binary_classifier.load import predict_if_physical_transaction
 import sys, datetime, os, queue, csv
 from pprint import pprint
 from random import randint, uniform, random, shuffle
+from numpy import array, array_split
 
 def get_initial_values(hyperparameters, params, known, iter=1):
 	"""Do a simple search to find starter values"""
@@ -176,32 +177,24 @@ def test_train_split(params):
 	verification_source = params.get("verification_source", "data/misc/verifiedLabeledTrans.csv")
 	test_size = settings["test_size"]
 	test, train = [], []
+	dataset = []
 
 	# Load Data
 	verification_file = open(verification_source, encoding="utf-8", errors='replace')
 	verified_transactions = list(csv.DictReader(verification_file))
 	verification_file.close()
 
-	# Split Data
 	for i in range(len(verified_transactions)):
-		
-		# Get Physical Transactions
-		if verified_transactions[i]["factual_id"] != "":
-			if random() < test_size:
-				test.append(verified_transactions[i])
-			else:
-				train.append(verified_transactions[i])
+		curr = verified_transactions[i]
+		category = "IS_PHYSICAL_TRANSACTION"
+		if curr["factual_id"] != "" or curr[category] == "0" or curr[category] == "2":
+			dataset.append(curr)
 
-		# Get Non-Physical Transactions
-		if verified_transactions[i]["IS_PHYSICAL_TRANSACTION"] == "0" or verified_transactions[i]["IS_PHYSICAL_TRANSACTION"] == "2":
-			if random() < test_size:
-				test.append(verified_transactions[i])
-			else:
-				train.append(verified_transactions[i])
-
-	# Shuffle
-	shuffle(train)
-	shuffle(test)
+	# Shuffle/Split Data
+	shuffle(dataset)
+	split_arr = array_split(array(dataset), 2)
+	test = list(split_arr[0])
+	train = list(split_arr[1])
 
 	return test, train
 
@@ -247,11 +240,11 @@ if __name__ == "__main__":
 
 	settings = {
 		"test_size": 1,
-		"initial_search_space": 50,
-		"initial_learning_rate": 0.3,
-		"iteration_search_space": 25,
+		"initial_search_space": 10,
+		"initial_learning_rate": 1,
+		"iteration_search_space": 10,
 		"iteration_learning_rate": 0.3,
-		"gradient_ascent_iterations": 25,
+		"gradient_ascent_iterations": 100,
 		"convergence": 1,
 		"max_precision": 96
 	}
