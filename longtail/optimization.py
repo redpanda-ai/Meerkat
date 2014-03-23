@@ -255,11 +255,11 @@ if __name__ == "__main__":
 
 	settings = {
 		"test_size": 0.5,
-		"initial_search_space": 50,
-		"initial_learning_rate": 1,
+		"initial_search_space": 35,
+		"initial_learning_rate": 0.75,
 		"iteration_search_space": 35,
-		"iteration_learning_rate": 0.3,
-		"gradient_ascent_iterations": 15,
+		"iteration_learning_rate": 0.35,
+		"gradient_ascent_iterations": 1,
 		"max_precision": 96
 	}
 
