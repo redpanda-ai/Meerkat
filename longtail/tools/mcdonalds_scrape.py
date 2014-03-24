@@ -8,18 +8,40 @@ base_url = "http://www.mccalifornia.com/"
 current_mcdonalds = 3
 found = []
 
+# Clear Contents of Old Run
+#open('mcdonalds_store_numbers.txt', 'w').close()
+
 while current_mcdonalds < 129830:
 
 	browser.visit(base_url + str(current_mcdonalds))
-	new = {
-		"internal_store_number" : ("F" + str(current_mcdonalds)),
-		"address" : ""
-	}
 
 	try:
-		elements = browser.find_by_css("li.address_1 h3, li.address_2 h3, li.address_3 h3")
+
+		# Find Adress on Page
+		elements = browser.find_by_css("li.address_1 h3, li.address_2 h3, li.address_3 h3, li.address_4 h3, li.address_5 h3")
 		div = elements[0]
-		new["address"] = div.value
+
+		# Parse
+		lines = div.value.split('\n')
+		
+		if len(lines) == 2:
+			address, extra = lines
+		elif len(lines) == 3:
+			address, trash, extra = lines
+
+
+		city, extra = extra.split(',')
+		state, zip_code = extra.lstrip(' ').split(' ')
+
+		# Format
+		new = {
+			"internal_store_number" : ("F" + str(current_mcdonalds)),
+			"address" : address,
+			"city" : city,
+			"state" : state,
+			"zip_code" : zip_code
+		}
+
 		found.append(new)
 
 		# Save Result
@@ -27,11 +49,12 @@ while current_mcdonalds < 129830:
 		pprint(new, save_file)
 		save_file.close()
 
-
+		# Print
 		print(str(current_mcdonalds), ":")
 		print(div.value, "\n")
+
 	except ElementDoesNotExist:
-		print("no mcdonalds # ", current_mcdonalds)
+		print("no mcdonalds # ", current_mcdonalds, "\n")
 		current_mcdonalds +=1 
 		continue
 
