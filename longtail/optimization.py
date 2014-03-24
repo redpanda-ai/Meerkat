@@ -240,13 +240,28 @@ def two_fold(hyperparameters, known, params, d0, d1):
 	d1_top_score = randomized_optimization(hyperparameters, known, params, d1)
 
 	# Cross Validate
-	d0_results = cross_validate(d0_top_score, d1)
-	d1_results = cross_validate(d1_top_score, d0)
+	d1_results = cross_validate(d0_top_score, d1)
+	d0_results = cross_validate(d1_top_score, d0)
 
 	# See Scores
+	file_name = os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_" + "cross_validation_results.json" 
+	record = open(file_name, 'w')
 	print("FINAL SCORES:")
 	pprint(d0_results)
 	pprint(d1_results)
+
+	#Save The Scores
+	pprint("d0 as Training Data - Top Score found through Optimization:", record)
+	pprint(d0_top_score, record)
+
+	pprint("d0 as Training Data - Score of d1 on this set of hyperparameters:", record)
+	pprint(d1_results, record)
+
+	pprint("d1 as Training Data - Top Score found through Optimization:", record)
+	pprint(d1_top_score, record)
+
+	pprint("d1 as Training Data - Score of d0 on this set of hyperparameters:", record)
+	pprint(d0_results, record)
 
 if __name__ == "__main__":
 
