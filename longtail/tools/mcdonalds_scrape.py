@@ -5,13 +5,14 @@ import os.path
 
 browser = Browser()
 base_url = "http://www.mccalifornia.com/"
-current_mcdonalds = 3
+current_mcdonalds = 30000
 found = []
+save_file = open("../../data/misc/Store\ Numbers/Clean/mcdonalds_store_numbers.txt", "a")
 
 # Clear Contents of Old Run
 #open('mcdonalds_store_numbers.txt', 'w').close()
 
-while current_mcdonalds < 129830:
+while current_mcdonalds < 40000:
 
 	browser.visit(base_url + str(current_mcdonalds))
 
@@ -45,9 +46,7 @@ while current_mcdonalds < 129830:
 		found.append(new)
 
 		# Save Result
-		save_file = open("mcdonalds_store_numbers.txt", "a")
 		pprint(new, save_file)
-		save_file.close()
 
 		# Print
 		print(str(current_mcdonalds), ":")
@@ -60,4 +59,5 @@ while current_mcdonalds < 129830:
 
 	current_mcdonalds += 1
 
+save_file.close()
 browser.quit()

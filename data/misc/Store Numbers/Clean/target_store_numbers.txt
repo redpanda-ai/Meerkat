@@ -1,0 +1,5465 @@
+{'address': ' 3150 BEL-AIR MALL',
+ 'city': 'MOBILE',
+ 'internal_store_number': 'T0797',
+ 'state': 'AL',
+ 'zip_code': '36606'}
+{'address': ' 1698 US HIGHWAY 98',
+ 'city': 'DAPHNE',
+ 'internal_store_number': 'T1274',
+ 'state': 'AL',
+ 'zip_code': '36526'}
+{'address': ' 372 COX CREEK PARKWAY',
+ 'city': 'FLORENCE',
+ 'internal_store_number': 'T1322',
+ 'state': 'AL',
+ 'zip_code': '35360'}
+{'address': '6275 UNIVERSITY DRIVE',
+ 'city': 'HUNTSVILLE',
+ 'internal_store_number': 'T1346',
+ 'state': 'AL',
+ 'zip_code': '35806'}
+{'address': ' 2750 CARL T JONES DRIVE SE',
+ 'city': 'HUNTSVILLE',
+ 'internal_store_number': 'T1367',
+ 'state': 'AL',
+ 'zip_code': '35802'}
+{'address': ' 790 SCHILLINGER ROAD SOUTH',
+ 'city': 'MOBILE',
+ 'internal_store_number': 'T1376',
+ 'state': 'AL',
+ 'zip_code': '36695'}
+{'address': ' 4616 HIGHWAY 280',
+ 'city': 'BIRMINGHAM',
+ 'internal_store_number': 'T1772',
+ 'state': 'AL',
+ 'zip_code': '35242'}
+{'address': ' 1654 GADSEN HIGHWAY',
+ 'city': 'TRUSSVILLE',
+ 'internal_store_number': 'T1773',
+ 'state': 'AL',
+ 'zip_code': '35235'}
+{'address': ' 1901 13TH AVENUE EAST',
+ 'city': 'TUSCALOOSA',
+ 'internal_store_number': 'T1787',
+ 'state': 'AL',
+ 'zip_code': '35401'}
+{'address': ' 4000 MCCAIN BLVD',
+ 'city': 'N LITTLE ROCK',
+ 'internal_store_number': 'T0162',
+ 'state': 'AR',
+ 'zip_code': '72116'}
+{'address': ' 12700 CHENAL PARKWAY',
+ 'city': 'LITTLE ROCK',
+ 'internal_store_number': 'T1114',
+ 'state': 'AR',
+ 'zip_code': '72211'}
+{'address': ' 66 S DOBSON RD',
+ 'city': 'MESA',
+ 'internal_store_number': 'T0178',
+ 'state': 'AZ',
+ 'zip_code': '85202'}
+{'address': ' 5255 EAST BROADWAY',
+ 'city': 'TUCSON',
+ 'internal_store_number': 'T0179',
+ 'state': 'AZ',
+ 'zip_code': '85711'}
+{'address': ' 740 W CAMELBACK RD',
+ 'city': 'PHOENIX',
+ 'internal_store_number': 'T0209',
+ 'state': 'AZ',
+ 'zip_code': '85013'}
+{'address': ' 4040 NORTH ORACLE ROAD',
+ 'city': 'TUCSON',
+ 'internal_store_number': 'T0211',
+ 'state': 'AZ',
+ 'zip_code': '85705'}
+{'address': ' 10230 N 43RD AVE',
+ 'city': 'GLENDALE',
+ 'internal_store_number': 'T0214',
+ 'state': 'AZ',
+ 'zip_code': '85302'}
+{'address': ' 12602 PARADISE VILLAGE WEST PKWY N',
+ 'city': 'PHOENIX',
+ 'internal_store_number': 'T0233',
+ 'state': 'AZ',
+ 'zip_code': '85032'}
+{'address': ' 1135 S. GILBERT ROAD',
+ 'city': 'MESA',
+ 'internal_store_number': 'T0251',
+ 'state': 'AZ',
+ 'zip_code': '85204'}
+{'address': ' 2150 N. ARIZONA AVENUE',
+ 'city': 'CHANDLER',
+ 'internal_store_number': 'T0252',
+ 'state': 'AZ',
+ 'zip_code': '85224'}
+{'address': ' 16806 NORTH 7TH STREET',
+ 'city': 'PHOENIX',
+ 'internal_store_number': 'T0266',
+ 'state': 'AZ',
+ 'zip_code': '85022'}
+{'address': ' 1818 EAST BASELINE ROAD',
+ 'city': 'TEMPE',
+ 'internal_store_number': 'T0319',
+ 'state': 'AZ',
+ 'zip_code': '85283'}
+{'address': '9000 EAST INDIAN BEND RD.',
+ 'city': 'SCOTTSDALE',
+ 'internal_store_number': 'T0363',
+ 'state': 'AZ',
+ 'zip_code': '85256'}
+{'address': ' 1525 SOUTH POWER ROAD',
+ 'city': 'MESA',
+ 'internal_store_number': 'T0639',
+ 'state': 'AZ',
+ 'zip_code': '85206'}
+{'address': ' 10555 NORTH ORACLE RD.',
+ 'city': 'ORO VALLEY',
+ 'internal_store_number': 'T0700',
+ 'state': 'AZ',
+ 'zip_code': '85737'}
+{'address': ' 4151 E HIGHWAY 90',
+ 'city': 'SIERRA VISTA',
+ 'internal_store_number': 'T0735',
+ 'state': 'AZ',
+ 'zip_code': '85635'}
+{'address': ' 8055 WEST BELL ROAD',
+ 'city': 'PEORIA',
+ 'internal_store_number': 'T0825',
+ 'state': 'AZ',
+ 'zip_code': '85382'}
+{'address': '7409 WEST VIRGINIA AVENUE',
+ 'city': 'PHOENIX',
+ 'internal_store_number': 'T0851',
+ 'state': 'AZ',
+ 'zip_code': '85035'}
+{'address': ' 3901 WEST INA ROAD',
+ 'city': 'TUCSON',
+ 'internal_store_number': 'T0854',
+ 'state': 'AZ',
+ 'zip_code': '85741'}
+{'address': ' 6500 EAST GRANT ROAD',
+ 'city': 'TUCSON',
+ 'internal_store_number': 'T0855',
+ 'state': 'AZ',
+ 'zip_code': '85715'}
+{'address': ' 1851 EAST HIGHWAY 69',
+ 'city': 'PRESCOTT',
+ 'internal_store_number': 'T0884',
+ 'state': 'AZ',
+ 'zip_code': '86301'}
+{'address': ' 4734 EAST RAY ROAD',
+ 'city': 'PHOENIX',
+ 'internal_store_number': 'T0909',
+ 'state': 'AZ',
+ 'zip_code': '85044'}
+{'address': ' 1650 SOUTH MILTON ROAD',
+ 'city': 'FLAGSTAFF',
+ 'internal_store_number': 'T0935',
+ 'state': 'AZ',
+ 'zip_code': '86001'}
+{'address': ' 15444 NORTH FRANK LLOYD WRIGHT BLVD',
+ 'city': 'SCOTTSDALE',
+ 'internal_store_number': 'T0936',
+ 'state': 'AZ',
+ 'zip_code': '85260'}
+{'address': ' 725 WEST 32ND STREET',
+ 'city': 'YUMA',
+ 'internal_store_number': 'T0944',
+ 'state': 'AZ',
+ 'zip_code': '85364'}
+{'address': ' 4515 EAST THOMAS ROAD',
+ 'city': 'PHOENIX',
+ 'internal_store_number': 'T0950',
+ 'state': 'AZ',
+ 'zip_code': '85018'}
+{'address': ' 2727 WEST AGUA FRIA FREEWAY',
+ 'city': 'PHOENIX',
+ 'internal_store_number': 'T1141',
+ 'state': 'AZ',
+ 'zip_code': '85027'}
+{'address': ' 1515 EAST WARNER ROAD',
+ 'city': 'GILBERT',
+ 'internal_store_number': 'T1209',
+ 'state': 'AZ',
+ 'zip_code': '85296'}
+{'address': ' 2880 S ALMA SCHOOL ROAD',
+ 'city': 'CHANDLER',
+ 'internal_store_number': 'T1240',
+ 'state': 'AZ',
+ 'zip_code': '85248'}
+{'address': ' 1515 NORTH LITCHFIELD ROAD',
+ 'city': 'GOODYEAR',
+ 'internal_store_number': 'T1242',
+ 'state': 'AZ',
+ 'zip_code': '85338'}
+{'address': ' 1225 WEST IRVINGTON ROAD',
+ 'city': 'TUCSON',
+ 'internal_store_number': 'T1316',
+ 'state': 'AZ',
+ 'zip_code': '85746'}
+{'address': '32331 NORTH SCOTTSDALE ROAD',
+ 'city': 'SCOTTSDALE',
+ 'internal_store_number': 'T1327',
+ 'state': 'AZ',
+ 'zip_code': '85262'}
+{'address': ' 13731 WEST BELL ROAD',
+ 'city': 'SURPRISE',
+ 'internal_store_number': 'T1335',
+ 'state': 'AZ',
+ 'zip_code': '85374'}
+{'address': '21001 NORTH TATUM BLVD',
+ 'city': 'PHOENIX',
+ 'internal_store_number': 'T1360',
+ 'state': 'AZ',
+ 'zip_code': '85050'}
+{'address': ' 9350 W NORTHERN AVE.',
+ 'city': 'PEORIA',
+ 'internal_store_number': 'T1361',
+ 'state': 'AZ',
+ 'zip_code': '85345'}
+{'address': ' 2151 NORTH POWER ROAD',
+ 'city': 'MESA',
+ 'internal_store_number': 'T1386',
+ 'state': 'AZ',
+ 'zip_code': '85207'}
+{'address': ' 250 WEST ESPLANADE DRIVE',
+ 'city': 'OXNARD',
+ 'internal_store_number': 'T0181',
+ 'state': 'CA',
+ 'zip_code': '93030'}
+{'address': ' 8999 BALBOA BLVD.',
+ 'city': 'NORTHRIDGE',
+ 'internal_store_number': 'T0182',
+ 'state': 'CA',
+ 'zip_code': '91325'}
+{'address': ' 9725 LAUREL CANYON BLVD.',
+ 'city': 'PACOIMA',
+ 'internal_store_number': 'T0183',
+ 'state': 'CA',
+ 'zip_code': '91331'}
+{'address': ' 2120 WEST MAIN STREET',
+ 'city': 'ALHAMBRA',
+ 'internal_store_number': 'T0184',
+ 'state': 'CA',
+ 'zip_code': '91801'}
+{'address': ' 1333 NORTH MOUNTAIN AVE.',
+ 'city': 'ONTARIO',
+ 'internal_store_number': 'T0186',
+ 'state': 'CA',
+ 'zip_code': '91762'}
+{'address': ' 499 ORANGE SHOW ROAD',
+ 'city': 'SAN BERNARDINO',
+ 'internal_store_number': 'T0188',
+ 'state': 'CA',
+ 'zip_code': '92408'}
+{'address': ' 5600 EAST WHITTIER BLVD.',
+ 'city': 'LOS ANGELES',
+ 'internal_store_number': 'T0189',
+ 'state': 'CA',
+ 'zip_code': '90022'}
+{'address': ' 5700 FIRESTONE BLVD.',
+ 'city': 'SOUTH GATE',
+ 'internal_store_number': 'T0190',
+ 'state': 'CA',
+ 'zip_code': '90280'}
+{'address': ' 1881 WEST LINCOLN AVENUE',
+ 'city': 'ANAHEIM',
+ 'internal_store_number': 'T0191',
+ 'state': 'CA',
+ 'zip_code': '92801'}
+{'address': ' 12100 HARBOR BLVD.',
+ 'city': 'GARDEN GROVE',
+ 'internal_store_number': 'T0192',
+ 'state': 'CA',
+ 'zip_code': '92640'}
+{'address': ' 13831 BROOKHURST STREET',
+ 'city': 'GARDEN GROVE',
+ 'internal_store_number': 'T0193',
+ 'state': 'CA',
+ 'zip_code': '92843'}
+{'address': ' 9882 ADAMS AVENUE',
+ 'city': 'HUNTINGTON BEACH',
+ 'internal_store_number': 'T0194',
+ 'state': 'CA',
+ 'zip_code': '92646'}
+{'address': ' 2270 N. BELLFLOWER BLVD.',
+ 'city': 'LONG BEACH',
+ 'internal_store_number': 'T0195',
+ 'state': 'CA',
+ 'zip_code': '90815'}
+{'address': ' 3705 EAST SOUTH STREET',
+ 'city': 'LONG BEACH',
+ 'internal_store_number': 'T0196',
+ 'state': 'CA',
+ 'zip_code': '90805'}
+{'address': ' 10820 JEFFERSON BLVD.',
+ 'city': 'CULVER CITY',
+ 'internal_store_number': 'T0198',
+ 'state': 'CA',
+ 'zip_code': '90230'}
+{'address': ' 1200 NORTH SEPULVEDA BLVD',
+ 'city': 'MANHATTAN BEACH',
+ 'internal_store_number': 'T0199',
+ 'state': 'CA',
+ 'zip_code': '90266'}
+{'address': ' 3433 SEPULVEDA BLVD.',
+ 'city': 'TORRANCE',
+ 'internal_store_number': 'T0200',
+ 'state': 'CA',
+ 'zip_code': '90505'}
+{'address': ' 3245 SPORTS ARENA BLVD.',
+ 'city': 'SAN DIEGO',
+ 'internal_store_number': 'T0201',
+ 'state': 'CA',
+ 'zip_code': '92110'}
+{'address': ' 5454 BALBOA AVENUE',
+ 'city': 'SAN DIEGO',
+ 'internal_store_number': 'T0202',
+ 'state': 'CA',
+ 'zip_code': '92111'}
+{'address': ' 1240 BROADWAY',
+ 'city': 'CHULA VISTA',
+ 'internal_store_number': 'T0203',
+ 'state': 'CA',
+ 'zip_code': '91911'}
+{'address': ' 40 NORTH 4TH AVENUE',
+ 'city': 'CHULA VISTA',
+ 'internal_store_number': 'T0204',
+ 'state': 'CA',
+ 'zip_code': '91910'}
+{'address': ' 8001 OTHELLO AVENUE',
+ 'city': 'SAN DIEGO',
+ 'internal_store_number': 'T0205',
+ 'state': 'CA',
+ 'zip_code': '92111'}
+{'address': ' 3520 TYLER AVENUE',
+ 'city': 'RIVERSIDE',
+ 'internal_store_number': 'T0212',
+ 'state': 'CA',
+ 'zip_code': '92503'}
+{'address': ' 17751 COLIMA ROAD',
+ 'city': 'ROWLAND HEIGHTS',
+ 'internal_store_number': 'T0222',
+ 'state': 'CA',
+ 'zip_code': '91748'}
+{'address': ' 2462 FOOTHILL BLVD.',
+ 'city': 'LA VERNE',
+ 'internal_store_number': 'T0226',
+ 'state': 'CA',
+ 'zip_code': '91750'}
+{'address': ' 10621 CARMENITA ROAD',
+ 'city': 'SANTA FE SPRINGS',
+ 'internal_store_number': 'T0227',
+ 'state': 'CA',
+ 'zip_code': '90670'}
+{'address': ' 6635 FALLBROOK AVENUE',
+ 'city': 'WEST HILLS',
+ 'internal_store_number': 'T0228',
+ 'state': 'CA',
+ 'zip_code': '91307'}
+{'address': ' 6835 KATELLA AVENUE',
+ 'city': 'CYPRESS',
+ 'internal_store_number': 'T0229',
+ 'state': 'CA',
+ 'zip_code': '90630'}
+{'address': ' 2191 NORTH TUSTIN STREET',
+ 'city': 'ORANGE',
+ 'internal_store_number': 'T0230',
+ 'state': 'CA',
+ 'zip_code': '92865'}
+{'address': ' 43525 NORTH 10TH STREET WEST',
+ 'city': 'LANCASTER',
+ 'internal_store_number': 'T0245',
+ 'state': 'CA',
+ 'zip_code': '93534'}
+{'address': '2907 COCHRAN STREET',
+ 'city': 'SIMI VALLEY',
+ 'internal_store_number': 'T0246',
+ 'state': 'CA',
+ 'zip_code': '93065'}
+{'address': ' 25211 SUNNYMEAD BLVD.',
+ 'city': 'MORENO VALLEY',
+ 'internal_store_number': 'T0247',
+ 'state': 'CA',
+ 'zip_code': '92553'}
+{'address': ' 1000 EAST IMPERIAL HIGHWAY',
+ 'city': 'LA HABRA',
+ 'internal_store_number': 'T0248',
+ 'state': 'CA',
+ 'zip_code': '90631'}
+{'address': ' 16400 BEACH BOULEVARD',
+ 'city': 'WESTMINSTER',
+ 'internal_store_number': 'T0249',
+ 'state': 'CA',
+ 'zip_code': '92683'}
+{'address': ' 3300 S. BRISTOL ST.',
+ 'city': 'SANTA ANA',
+ 'internal_store_number': 'T0250',
+ 'state': 'CA',
+ 'zip_code': '92704'}
+{'address': ' 24425 W. MAGIC MOUNTAIN PARKWAY',
+ 'city': 'VALENCIA',
+ 'internal_store_number': 'T0257',
+ 'state': 'CA',
+ 'zip_code': '91355'}
+{'address': '5555 PHILADELPHIA STREET',
+ 'city': 'CHINO',
+ 'internal_store_number': 'T0258',
+ 'state': 'CA',
+ 'zip_code': '91710'}
+{'address': ' 26932 LA PAZ ROAD',
+ 'city': 'ALISO VIEJO',
+ 'internal_store_number': 'T0259',
+ 'state': 'CA',
+ 'zip_code': '92656'}
+{'address': ' 1925 DOUGLAS BLVD.',
+ 'city': 'ROSEVILLE',
+ 'internal_store_number': 'T0267',
+ 'state': 'CA',
+ 'zip_code': '95661'}
+{'address': ' 10881 OLSON DRIVE',
+ 'city': 'RANCHO CORDOVA',
+ 'internal_store_number': 'T0268',
+ 'state': 'CA',
+ 'zip_code': '95670'}
+{'address': ' 3405 MCHENRY AVENUE',
+ 'city': 'MODESTO',
+ 'internal_store_number': 'T0273',
+ 'state': 'CA',
+ 'zip_code': '95350'}
+{'address': ' 1280 AUTO PARKWAY SOUTH',
+ 'city': 'ESCONDIDO',
+ 'internal_store_number': 'T0274',
+ 'state': 'CA',
+ 'zip_code': '92029'}
+{'address': ' 3150 WEST SHAW AVENUE',
+ 'city': 'FRESNO',
+ 'internal_store_number': 'T0275',
+ 'state': 'CA',
+ 'zip_code': '93711'}
+{'address': ' 15321 PALMDALE ROAD',
+ 'city': 'VICTORVILLE',
+ 'internal_store_number': 'T0276',
+ 'state': 'CA',
+ 'zip_code': '92392'}
+{'address': ' 1280 EAST GIBSON ROAD',
+ 'city': 'WOODLAND',
+ 'internal_store_number': 'T0277',
+ 'state': 'CA',
+ 'zip_code': '95776'}
+{'address': ' 1330 EAST 17TH STREET',
+ 'city': 'SANTA ANA',
+ 'internal_store_number': 'T0286',
+ 'state': 'CA',
+ 'zip_code': '92705'}
+{'address': ' 17055 SAN FERNANDO MISSION BLVD',
+ 'city': 'GRANADA HILLS',
+ 'internal_store_number': 'T0287',
+ 'state': 'CA',
+ 'zip_code': '91344'}
+{'address': ' 20801 VENTURA BLVD.',
+ 'city': 'WOODLAND HILLS',
+ 'internal_store_number': 'T0288',
+ 'state': 'CA',
+ 'zip_code': '91364'}
+{'address': ' 20200 BLOOMFIELD_AVENUE',
+ 'city': 'CERRITOS',
+ 'internal_store_number': 'T0289',
+ 'state': 'CA',
+ 'zip_code': '90703'}
+{'address': ' 2169 REDONDO BEACH BLVD.',
+ 'city': 'GARDENA',
+ 'internal_store_number': 'T0290',
+ 'state': 'CA',
+ 'zip_code': '90247'}
+{'address': ' 3333 ARLINGTON AVENUE',
+ 'city': 'RIVERSIDE',
+ 'internal_store_number': 'T0291',
+ 'state': 'CA',
+ 'zip_code': '92506'}
+{'address': ' 950 EAST 33RD STREET',
+ 'city': 'LONG BEACH',
+ 'internal_store_number': 'T0292',
+ 'state': 'CA',
+ 'zip_code': '90807'}
+{'address': ' 2920 YORBA LINDA BLVD.',
+ 'city': 'FULLERTON',
+ 'internal_store_number': 'T0293',
+ 'state': 'CA',
+ 'zip_code': '92631'}
+{'address': ' 11051 VICTORY BLVD.',
+ 'city': 'NORTH HOLLYWOOD',
+ 'internal_store_number': 'T0294',
+ 'state': 'CA',
+ 'zip_code': '91606'}
+{'address': ' 651 WEST SEPULVEDA',
+ 'city': 'CARSON',
+ 'internal_store_number': 'T0295',
+ 'state': 'CA',
+ 'zip_code': '90745'}
+{'address': ' 14823 POMERADO ROAD',
+ 'city': 'POWAY',
+ 'internal_store_number': 'T0296',
+ 'state': 'CA',
+ 'zip_code': '92064'}
+{'address': ' 2380 NORTH STERLING AVE.',
+ 'city': 'SAN BERNARDINO',
+ 'internal_store_number': 'T0297',
+ 'state': 'CA',
+ 'zip_code': '92404'}
+{'address': ' 4200 EAST MAIN STREET',
+ 'city': 'VENTURA',
+ 'internal_store_number': 'T0298',
+ 'state': 'CA',
+ 'zip_code': '93003'}
+{'address': ' 8840 CORBIN AVENUE',
+ 'city': 'NORTHRIDGE',
+ 'internal_store_number': 'T0299',
+ 'state': 'CA',
+ 'zip_code': '91324'}
+{'address': ' 24500 ALICIA PARKWAY',
+ 'city': 'MISSION VIEJO',
+ 'internal_store_number': 'T0300',
+ 'state': 'CA',
+ 'zip_code': '92691'}
+{'address': ' 10576 FOOTHILL BLVD.',
+ 'city': 'RANCHO CUCAMONGA',
+ 'internal_store_number': 'T0301',
+ 'state': 'CA',
+ 'zip_code': '91730'}
+{'address': ' 1050 HUNTINGTON DRIVE',
+ 'city': 'DUARTE',
+ 'internal_store_number': 'T0302',
+ 'state': 'CA',
+ 'zip_code': '91010'}
+{'address': ' 2255 EL CAMINO REAL',
+ 'city': 'OCEANSIDE',
+ 'internal_store_number': 'T0303',
+ 'state': 'CA',
+ 'zip_code': '92054'}
+{'address': ' 250 BROADWAY',
+ 'city': 'EL CAJON',
+ 'internal_store_number': 'T0304',
+ 'state': 'CA',
+ 'zip_code': '92021'}
+{'address': ' 8251 MIRA MESA BLVD.',
+ 'city': 'SAN DIEGO',
+ 'internal_store_number': 'T0305',
+ 'state': 'CA',
+ 'zip_code': '92126'}
+{'address': ' 67750 EAST PALM CANYON',
+ 'city': 'CATHEDRAL CITY',
+ 'internal_store_number': 'T0307',
+ 'state': 'CA',
+ 'zip_code': '92234'}
+{'address': ' 223 E. BETTERAVIA ROAD',
+ 'city': 'SANTA MARIA',
+ 'internal_store_number': 'T0309',
+ 'state': 'CA',
+ 'zip_code': '93454'}
+{'address': ' 2505 RIVERSIDE BLVD.',
+ 'city': 'SACRAMENTO',
+ 'internal_store_number': 'T0310',
+ 'state': 'CA',
+ 'zip_code': '95818'}
+{'address': ' 5001 MADISON AVENUE',
+ 'city': 'SACRAMENTO',
+ 'internal_store_number': 'T0311',
+ 'state': 'CA',
+ 'zip_code': '95841'}
+{'address': ' 1919 FULTON AVENUE',
+ 'city': 'SACRAMENTO',
+ 'internal_store_number': 'T0312',
+ 'state': 'CA',
+ 'zip_code': '95825'}
+{'address': ' 4707 PACIFIC AVENUE',
+ 'city': 'STOCKTON',
+ 'internal_store_number': 'T0313',
+ 'state': 'CA',
+ 'zip_code': '95207'}
+{'address': ' 3173 EAST SHIELDS AVENUE',
+ 'city': 'FRESNO',
+ 'internal_store_number': 'T0314',
+ 'state': 'CA',
+ 'zip_code': '93726'}
+{'address': ' 3434 SOUTH MOONEY BLVD.',
+ 'city': 'VISALIA',
+ 'internal_store_number': 'T0315',
+ 'state': 'CA',
+ 'zip_code': '93277'}
+{'address': ' 1300 WIBLE ROAD',
+ 'city': 'BAKERSFIELD',
+ 'internal_store_number': 'T0316',
+ 'state': 'CA',
+ 'zip_code': '93304'}
+{'address': ' 1951 EAST 20TH STREET',
+ 'city': 'CHICO',
+ 'internal_store_number': 'T0317',
+ 'state': 'CA',
+ 'zip_code': '95928'}
+{'address': ' 1153 BUTTE HOUSE ROAD',
+ 'city': 'YUBA CITY',
+ 'internal_store_number': 'T0318',
+ 'state': 'CA',
+ 'zip_code': '95991'}
+{'address': ' 5001 JUNIPERO SERRA BLVD.',
+ 'city': 'COLMA',
+ 'internal_store_number': 'T0320',
+ 'state': 'CA',
+ 'zip_code': '94014'}
+{'address': ' 2485 EL CAMINO REAL',
+ 'city': 'REDWOOD CITY',
+ 'internal_store_number': 'T0321',
+ 'state': 'CA',
+ 'zip_code': '94061'}
+{'address': ' 555 SHOWERS DRIVE',
+ 'city': 'MOUNTAIN VIEW',
+ 'internal_store_number': 'T0322',
+ 'state': 'CA',
+ 'zip_code': '94040'}
+{'address': ' 20745 STEVENS CREEK BLVD',
+ 'city': 'CUPERTINO',
+ 'internal_store_number': 'T0323',
+ 'state': 'CA',
+ 'zip_code': '95014'}
+{'address': ' 1811 HILLSDALE AVENUE',
+ 'city': 'SAN JOSE',
+ 'internal_store_number': 'T0324',
+ 'state': 'CA',
+ 'zip_code': '95124'}
+{'address': ' 3155 SILVER CREEK ROAD',
+ 'city': 'SAN JOSE',
+ 'internal_store_number': 'T0325',
+ 'state': 'CA',
+ 'zip_code': '95121'}
+{'address': ' 15555 HESPERIAN BLVD.',
+ 'city': 'SAN LEANDRO',
+ 'internal_store_number': 'T0327',
+ 'state': 'CA',
+ 'zip_code': '94579'}
+{'address': ' 7200 AMADOR PLAZA ROAD',
+ 'city': 'DUBLIN',
+ 'internal_store_number': 'T0328',
+ 'state': 'CA',
+ 'zip_code': '94568'}
+{'address': ' 560 CONTRA COSTA BLVD.',
+ 'city': 'PLEASANT HILL',
+ 'internal_store_number': 'T0330',
+ 'state': 'CA',
+ 'zip_code': '94523'}
+{'address': ' 904 ADMIRAL CALLAGHAN LANE',
+ 'city': 'VALLEJO',
+ 'internal_store_number': 'T0331',
+ 'state': 'CA',
+ 'zip_code': '94591'}
+{'address': ' 4301 CENTURY BLVD.',
+ 'city': 'PITTSBURG',
+ 'internal_store_number': 'T0332',
+ 'state': 'CA',
+ 'zip_code': '94565'}
+{'address': '3750 BARRANCA PARKWAY',
+ 'city': 'IRVINE',
+ 'internal_store_number': 'T0336',
+ 'state': 'CA',
+ 'zip_code': '92606'}
+{'address': ' 900 SHAW AVENUE',
+ 'city': 'CLOVIS',
+ 'internal_store_number': 'T0358',
+ 'state': 'CA',
+ 'zip_code': '93612'}
+{'address': ' 29676 RANCHO CALIFORNIA ROAD',
+ 'city': 'TEMECULA',
+ 'internal_store_number': 'T0359',
+ 'state': 'CA',
+ 'zip_code': '92591'}
+{'address': ' 3401 MALL VIEW ROAD',
+ 'city': 'BAKERSFIELD',
+ 'internal_store_number': 'T0614',
+ 'state': 'CA',
+ 'zip_code': '93306'}
+{'address': ' 1280 DANA DRIVE',
+ 'city': 'REDDING',
+ 'internal_store_number': 'T0615',
+ 'state': 'CA',
+ 'zip_code': '96003'}
+{'address': ' 2155 MORRILL AVENUE',
+ 'city': 'SAN JOSE',
+ 'internal_store_number': 'T0626',
+ 'state': 'CA',
+ 'zip_code': '95132'}
+{'address': ' 170 COCHRANE PLAZA',
+ 'city': 'MORGAN HILL',
+ 'internal_store_number': 'T0640',
+ 'state': 'CA',
+ 'zip_code': '95037'}
+{'address': ' 3280 R STREET',
+ 'city': 'MERCED',
+ 'internal_store_number': 'T0641',
+ 'state': 'CA',
+ 'zip_code': '95348'}
+{'address': ' 16964 SLOVER AVENUE',
+ 'city': 'FONTANA',
+ 'internal_store_number': 'T0660',
+ 'state': 'CA',
+ 'zip_code': '92337'}
+{'address': ' 2059 CADENASSO DRIVE',
+ 'city': 'FAIRFIELD',
+ 'internal_store_number': 'T0675',
+ 'state': 'CA',
+ 'zip_code': '94533'}
+{'address': ' 1640 NORTH MAIN STREET',
+ 'city': 'SALINAS',
+ 'internal_store_number': 'T0676',
+ 'state': 'CA',
+ 'zip_code': '93906'}
+{'address': ' 8148 EAST SANTA ANA CANYON ROAD',
+ 'city': 'ANAHEIM',
+ 'internal_store_number': 'T0677',
+ 'state': 'CA',
+ 'zip_code': '92808'}
+{'address': '30251 ANTELOPE ROAD',
+ 'city': 'MENIFEE',
+ 'internal_store_number': 'T0678',
+ 'state': 'CA',
+ 'zip_code': '92584'}
+{'address': ' 39440 10TH STREET WEST',
+ 'city': 'PALMDALE',
+ 'internal_store_number': 'T0685',
+ 'state': 'CA',
+ 'zip_code': '93551'}
+{'address': ' 200 VINTAGE WAY',
+ 'city': 'NOVATO',
+ 'internal_store_number': 'T0692',
+ 'state': 'CA',
+ 'zip_code': '94945'}
+{'address': ' 11450 SAN PABLO AVENUE',
+ 'city': 'EL CERRITO',
+ 'internal_store_number': 'T0697',
+ 'state': 'CA',
+ 'zip_code': '94530'}
+{'address': ' 1363 WEST HENDERSON AVE.',
+ 'city': 'PORTERVILLE',
+ 'internal_store_number': 'T0698',
+ 'state': 'CA',
+ 'zip_code': '93257'}
+{'address': ' 1290 HAMNER AVE',
+ 'city': 'NORCO',
+ 'internal_store_number': 'T0736',
+ 'state': 'CA',
+ 'zip_code': '91760'}
+{'address': ' 1400 FITZGERALD ROAD',
+ 'city': 'PINOLE',
+ 'internal_store_number': 'T0737',
+ 'state': 'CA',
+ 'zip_code': '94564'}
+{'address': ' 2800 NAGLEE ROAD',
+ 'city': 'TRACY',
+ 'internal_store_number': 'T0738',
+ 'state': 'CA',
+ 'zip_code': '95376'}
+{'address': ' 3527 W. FLORIDA AVE',
+ 'city': 'HEMET',
+ 'internal_store_number': 'T0761',
+ 'state': 'CA',
+ 'zip_code': '92545'}
+{'address': ' 888 W. ARROW HIGHWAY',
+ 'city': 'SAN DIMAS',
+ 'internal_store_number': 'T0767',
+ 'state': 'CA',
+ 'zip_code': '91773'}
+{'address': ' 3000 HARBISON DRIVE',
+ 'city': 'VACAVILLE',
+ 'internal_store_number': 'T0827',
+ 'state': 'CA',
+ 'zip_code': '95687'}
+{'address': ' 4300 LAS POSITAS ROAD',
+ 'city': 'LIVERMORE',
+ 'internal_store_number': 'T0828',
+ 'state': 'CA',
+ 'zip_code': '94550'}
+{'address': ' 475 ROHNERT PARK EXPRESSWAY WEST',
+ 'city': 'ROHNERT PARK',
+ 'internal_store_number': 'T0852',
+ 'state': 'CA',
+ 'zip_code': '94928'}
+{'address': ' 2355 WEST KETTLEMAN LANE',
+ 'city': 'LODI',
+ 'internal_store_number': 'T0853',
+ 'state': 'CA',
+ 'zip_code': '95242'}
+{'address': ' 777 EAST COLORADO BOULEVARD',
+ 'city': 'PASADENA',
+ 'internal_store_number': 'T0883',
+ 'state': 'CA',
+ 'zip_code': '91101'}
+{'address': ' 7600 N. BLACKSTONE',
+ 'city': 'FRESNO',
+ 'internal_store_number': 'T0911',
+ 'state': 'CA',
+ 'zip_code': '93720'}
+{'address': ' 3944 GRAND AVENUE',
+ 'city': 'CHINO',
+ 'internal_store_number': 'T0912',
+ 'state': 'CA',
+ 'zip_code': '91710'}
+{'address': ' 26762 PORTOLA PARKWAY',
+ 'city': 'FOOTHILL RANCH',
+ 'internal_store_number': 'T0913',
+ 'state': 'CA',
+ 'zip_code': '92610'}
+{'address': ' 30602 SANTA MARGARITA PARKWAY',
+ 'city': 'RANCHO SANTA MARGARITA',
+ 'internal_store_number': 'T0914',
+ 'state': 'CA',
+ 'zip_code': '92688'}
+{'address': ' 1980 SANTA ROSA AVE',
+ 'city': 'SANTA ROSA',
+ 'internal_store_number': 'T0937',
+ 'state': 'CA',
+ 'zip_code': '95407'}
+{'address': ' 3900 SISK ROAD',
+ 'city': 'MODESTO',
+ 'internal_store_number': 'T0938',
+ 'state': 'CA',
+ 'zip_code': '95356'}
+{'address': ' 19201 BEAR VALLEY ROAD',
+ 'city': 'APPLE VALLEY',
+ 'internal_store_number': 'T0939',
+ 'state': 'CA',
+ 'zip_code': '92308'}
+{'address': ' 72549 HIGHWAY 111',
+ 'city': 'PALM DESERT',
+ 'internal_store_number': 'T0940',
+ 'state': 'CA',
+ 'zip_code': '92260'}
+{'address': ' 1790 AIRLINE HIGHWAY',
+ 'city': 'HOLLISTER',
+ 'internal_store_number': 'T0941',
+ 'state': 'CA',
+ 'zip_code': '95023'}
+{'address': ' 2610 BISHOP DRIVE',
+ 'city': 'SAN RAMON',
+ 'internal_store_number': 'T0949',
+ 'state': 'CA',
+ 'zip_code': '94583'}
+{'address': ' 5500 GROSSMONT CENTER DRIVE, #101',
+ 'city': 'LA MESA',
+ 'internal_store_number': 'T0997',
+ 'state': 'CA',
+ 'zip_code': '91942'}
+{'address': ' 7505 LAGUNA BOULEVARD',
+ 'city': 'ELK GROVE',
+ 'internal_store_number': 'T1025',
+ 'state': 'CA',
+ 'zip_code': '95758'}
+{'address': ' 205 SOSCOL AVENUE',
+ 'city': 'NAPA',
+ 'internal_store_number': 'T1026',
+ 'state': 'CA',
+ 'zip_code': '94559'}
+{'address': ' 209 W. VENTURA BOULEVARD',
+ 'city': 'CAMARILLO',
+ 'internal_store_number': 'T1027',
+ 'state': 'CA',
+ 'zip_code': '93010'}
+{'address': ' 2831 EASTLAND CENTER DRIVE',
+ 'city': 'WEST COVINA',
+ 'internal_store_number': 'T1028',
+ 'state': 'CA',
+ 'zip_code': '91791'}
+{'address': ' 1010 N. EL CAMINO REAL',
+ 'city': 'ENCINITAS',
+ 'internal_store_number': 'T1029',
+ 'state': 'CA',
+ 'zip_code': '92024'}
+{'address': ' 3100 BALDWIN PARK BLVD',
+ 'city': 'BALDWIN PARK',
+ 'internal_store_number': 'T1033',
+ 'state': 'CA',
+ 'zip_code': '91706'}
+{'address': ' 1751 UNIVERSITY DRIVE',
+ 'city': 'VISTA',
+ 'internal_store_number': 'T1040',
+ 'state': 'CA',
+ 'zip_code': '92083'}
+{'address': ' 1150 EL CAMINO REAL',
+ 'city': 'SAN BRUNO',
+ 'internal_store_number': 'T1054',
+ 'state': 'CA',
+ 'zip_code': '94066'}
+{'address': ' 2040 CALIFORNIA AVENUE',
+ 'city': 'SAND CITY',
+ 'internal_store_number': 'T1062',
+ 'state': 'CA',
+ 'zip_code': '93955'}
+{'address': ' 2700 BELL ROAD',
+ 'city': 'AUBURN',
+ 'internal_store_number': 'T1097',
+ 'state': 'CA',
+ 'zip_code': '95603'}
+{'address': ' 430 BLUE RAVINE ROAD',
+ 'city': 'FOLSOM',
+ 'internal_store_number': 'T1098',
+ 'state': 'CA',
+ 'zip_code': '95630'}
+{'address': ' 2705 TELLER ROAD',
+ 'city': 'THOUSAND OAKS',
+ 'internal_store_number': 'T1100',
+ 'state': 'CA',
+ 'zip_code': '91320'}
+{'address': ' 400 NEWPARK MALL',
+ 'city': 'NEWARK',
+ 'internal_store_number': 'T1119',
+ 'state': 'CA',
+ 'zip_code': '94560'}
+{'address': ' 2305 THEATRE DRIVE',
+ 'city': 'PASO ROBLES',
+ 'internal_store_number': 'T1120',
+ 'state': 'CA',
+ 'zip_code': '93446'}
+{'address': ' 5837 SUNRISE BOULEVARD',
+ 'city': 'CITRUS HEIGHTS',
+ 'internal_store_number': 'T1121',
+ 'state': 'CA',
+ 'zip_code': '95610'}
+{'address': ' 2220 BRIDGEPOINTE PARKWAY',
+ 'city': 'SAN MATEO',
+ 'internal_store_number': 'T1122',
+ 'state': 'CA',
+ 'zip_code': '94404'}
+{'address': ' 2911 JAMACHA ROAD',
+ 'city': 'EL CAJON',
+ 'internal_store_number': 'T1140',
+ 'state': 'CA',
+ 'zip_code': '92019'}
+{'address': ' 1415 MAIN STREET',
+ 'city': 'WATSONVILLE',
+ 'internal_store_number': 'T1143',
+ 'state': 'CA',
+ 'zip_code': '95076'}
+{'address': ' 1871 NORTH MAIN STREET',
+ 'city': 'WALNUT CREEK',
+ 'internal_store_number': 'T1208',
+ 'state': 'CA',
+ 'zip_code': '94596'}
+{'address': ' 13200 JAMBOREE ROAD',
+ 'city': 'IRVINE',
+ 'internal_store_number': 'T1238',
+ 'state': 'CA',
+ 'zip_code': '92602'}
+{'address': ' 41040 CALIFORNIA OAKS ROAD',
+ 'city': 'MURRIETA',
+ 'internal_store_number': 'T1283',
+ 'state': 'CA',
+ 'zip_code': '92562'}
+{'address': ' 3030 HARBOR BLVD',
+ 'city': 'COSTA MESA',
+ 'internal_store_number': 'T1293',
+ 'state': 'CA',
+ 'zip_code': '92626'}
+{'address': '3000 COUNTRYSIDE DRIVE',
+ 'city': 'TURLOCK',
+ 'internal_store_number': 'T1304',
+ 'state': 'CA',
+ 'zip_code': '95380'}
+{'address': ' 11525 EAST SOUTH STREET',
+ 'city': 'CERRITOS',
+ 'internal_store_number': 'T1305',
+ 'state': 'CA',
+ 'zip_code': '90703'}
+{'address': ' 3535 SOUTH LACIENGA BLVD.',
+ 'city': 'LOS ANGELES',
+ 'internal_store_number': 'T1306',
+ 'state': 'CA',
+ 'zip_code': '90016'}
+{'address': ' 5711 SEPULVEDA BLVD',
+ 'city': 'VAN NUYS',
+ 'internal_store_number': 'T1307',
+ 'state': 'CA',
+ 'zip_code': '91411'}
+{'address': ' 14920 RAYMER STREET',
+ 'city': 'VAN NUYS',
+ 'internal_store_number': 'T1309',
+ 'state': 'CA',
+ 'zip_code': '91405'}
+{'address': ' 12300 SEAL BEACH BLVD.',
+ 'city': 'SEAL BEACH',
+ 'internal_store_number': 'T1328',
+ 'state': 'CA',
+ 'zip_code': '90740'}
+{'address': ' 3471 WEST CENTURY BLVD.',
+ 'city': 'INGLEWOOD',
+ 'internal_store_number': 'T1329',
+ 'state': 'CA',
+ 'zip_code': '90303'}
+{'address': ' 3121 COLORADO BLVD',
+ 'city': 'PASADENA',
+ 'internal_store_number': 'T1332',
+ 'state': 'CA',
+ 'zip_code': '91107'}
+{'address': ' 10600 FIRESTONE BOULEVARD',
+ 'city': 'NORWALK',
+ 'internal_store_number': 'T1340',
+ 'state': 'CA',
+ 'zip_code': '90650'}
+{'address': ' I-5 AND EMPIRE AVENUE',
+ 'city': 'BURBANK',
+ 'internal_store_number': 'T1362',
+ 'state': 'CA',
+ 'zip_code': '91504'}
+{'address': ' 1893 MALVERN AVE',
+ 'city': 'FULLERTON',
+ 'internal_store_number': 'T1383',
+ 'state': 'CA',
+ 'zip_code': '92632'}
+{'address': '9100 ROSEDALE HWY',
+ 'city': 'BAKERSFIELD',
+ 'internal_store_number': 'T1384',
+ 'state': 'CA',
+ 'zip_code': '93312'}
+{'address': '133 SERRAMONTE CENTER',
+ 'city': 'DALY CITY',
+ 'internal_store_number': 'T1407',
+ 'state': 'CA',
+ 'zip_code': '94015'}
+{'address': ' 2626 COLORADO BLVD',
+ 'city': 'EAGLE ROCK',
+ 'internal_store_number': 'T1408',
+ 'state': 'CA',
+ 'zip_code': '90041'}
+{'address': ' 1288 CAMINO DEL RIO NORTH',
+ 'city': 'SAN DIEGO',
+ 'internal_store_number': 'T1410',
+ 'state': 'CA',
+ 'zip_code': '92103'}
+{'address': ' 3600 ROSEMEAD BLVD',
+ 'city': 'ROSEMEAD',
+ 'internal_store_number': 'T1411',
+ 'state': 'CA',
+ 'zip_code': '91770'}
+{'address': '298 W MCKINLEY AVE',
+ 'city': 'SUNNYVALE',
+ 'internal_store_number': 'T2584',
+ 'state': 'CA',
+ 'zip_code': '94086'}
+{'address': ' 5740 NORTH BLACKSTONE',
+ 'city': 'FRESNO',
+ 'internal_store_number': 'T1417',
+ 'state': 'CA',
+ 'zip_code': '93710'}
+{'address': '1600 SARATOGA AVE',
+ 'city': 'SAN JOSE',
+ 'internal_store_number': 'T1427',
+ 'state': 'CA',
+ 'zip_code': '95129'}
+{'address': ' 4301 VIRGINIA AVE',
+ 'city': 'GLENDALE',
+ 'internal_store_number': 'T0006',
+ 'state': 'CO',
+ 'zip_code': '80222'}
+{'address': ' 1655 OWENS STREET',
+ 'city': 'LAKEWOOD',
+ 'internal_store_number': 'T0007',
+ 'state': 'CO',
+ 'zip_code': '80215'}
+{'address': ' 335 NO ACADEMY BLVD',
+ 'city': 'COLORADO SPRINGS',
+ 'internal_store_number': 'T0018',
+ 'state': 'CO',
+ 'zip_code': '80909'}
+{'address': ' 10301 NORTH WASHINGTON',
+ 'city': 'THORNTON',
+ 'internal_store_number': 'T0040',
+ 'state': 'CO',
+ 'zip_code': '80229'}
+{'address': ' 2155 S SHERIDAN BLVD',
+ 'city': 'DENVER',
+ 'internal_store_number': 'T0041',
+ 'state': 'CO',
+ 'zip_code': '80227'}
+{'address': ' 7899 WADSWORTH BLVD',
+ 'city': 'ARVADA',
+ 'internal_store_number': 'T0048',
+ 'state': 'CO',
+ 'zip_code': '80003'}
+{'address': ' 1200 SOUTH ABILENE ST',
+ 'city': 'AURORA',
+ 'internal_store_number': 'T0049',
+ 'state': 'CO',
+ 'zip_code': '80012'}
+{'address': ' 2800 PEARL STREET',
+ 'city': 'BOULDER',
+ 'internal_store_number': 'T0064',
+ 'state': 'CO',
+ 'zip_code': '80301'}
+{'address': ' 105 TROUTMAN PARKWAY',
+ 'city': 'FORT COLLINS',
+ 'internal_store_number': 'T0079',
+ 'state': 'CO',
+ 'zip_code': '80525'}
+{'address': ' 2424 US 6-50',
+ 'city': 'GRAND JUNCTION',
+ 'internal_store_number': 'T0093',
+ 'state': 'CO',
+ 'zip_code': '81505'}
+{'address': ' 6767 SOUTH CLINTON',
+ 'city': 'ENGLEWOOD',
+ 'internal_store_number': 'T0147',
+ 'state': 'CO',
+ 'zip_code': '80112'}
+{'address': ' 5240 NORTH ACADEMY BLVD.',
+ 'city': 'COLORADO SPRINGS',
+ 'internal_store_number': 'T0154',
+ 'state': 'CO',
+ 'zip_code': '80918'}
+{'address': ' 2626 11TH AVENUE',
+ 'city': 'GREELEY',
+ 'internal_store_number': 'T0213',
+ 'state': 'CO',
+ 'zip_code': '80631'}
+{'address': ' 5801 44TH AVENUE WEST',
+ 'city': 'DENVER',
+ 'internal_store_number': 'T0216',
+ 'state': 'CO',
+ 'zip_code': '80212'}
+{'address': ' 16910 E. QUINCY AVENUE',
+ 'city': 'AURORA',
+ 'internal_store_number': 'T0256',
+ 'state': 'CO',
+ 'zip_code': '80015'}
+{'address': ' 1950 EAST COUNTY LINE ROAD',
+ 'city': 'HIGHLANDS RANCH',
+ 'internal_store_number': 'T0271',
+ 'state': 'CO',
+ 'zip_code': '80126'}
+{'address': ' 3300 DILLON DRIVE',
+ 'city': 'PUEBLO',
+ 'internal_store_number': 'T0618',
+ 'state': 'CO',
+ 'zip_code': '81008'}
+{'address': ' 1630 CHEYENNE MOUNTAIN BLVD.',
+ 'city': 'COLORADO SPRINGS',
+ 'internal_store_number': 'T0739',
+ 'state': 'CO',
+ 'zip_code': '80906'}
+{'address': ' 551 SOUTH HOVER ROAD',
+ 'city': 'LONGMONT',
+ 'internal_store_number': 'T0908',
+ 'state': 'CO',
+ 'zip_code': '80501'}
+{'address': ' 9851 SOUTH PARKER ROAD',
+ 'city': 'PARKER',
+ 'internal_store_number': 'T0933',
+ 'state': 'CO',
+ 'zip_code': '80134'}
+{'address': ' 1660 WEST MIDWAY BLVD.',
+ 'city': 'BROOMFIELD',
+ 'internal_store_number': 'T0951',
+ 'state': 'CO',
+ 'zip_code': '80020'}
+{'address': ' 1725 ROCKY MOUNTAIN AVE.',
+ 'city': 'LOVELAND',
+ 'internal_store_number': 'T1178',
+ 'state': 'CO',
+ 'zip_code': '80538'}
+{'address': '5010 FOUNDERS PARKWAY',
+ 'city': 'CASTLE ROCK',
+ 'internal_store_number': 'T1326',
+ 'state': 'CO',
+ 'zip_code': '80108'}
+{'address': '1001 E 120TH AVE',
+ 'city': 'THORNTON',
+ 'internal_store_number': 'T1372',
+ 'state': 'CO',
+ 'zip_code': '80233'}
+{'address': '400 MARSHALL ROAD',
+ 'city': 'SUPERIOR',
+ 'internal_store_number': 'T1769',
+ 'state': 'CO',
+ 'zip_code': '80027'}
+{'address': ' 9390 W CROSS DRIVE',
+ 'city': 'LITTLETON',
+ 'internal_store_number': 'T1776',
+ 'state': 'CO',
+ 'zip_code': '80123'}
+{'address': ' 20 BUCKLAND ROAD',
+ 'city': 'SOUTH WINDSOR',
+ 'internal_store_number': 'T1249',
+ 'state': 'CT',
+ 'zip_code': '6074'}
+{'address': ' US RT 91 - 90 ELM STREET',
+ 'city': 'ENFIELD',
+ 'internal_store_number': 'T1255',
+ 'state': 'CT',
+ 'zip_code': '6083'}
+{'address': ' 900 HARTFORD - NEW LONDON TURNPIKE',
+ 'city': 'WATERFORD',
+ 'internal_store_number': 'T1267',
+ 'state': 'CT',
+ 'zip_code': '6385'}
+{'address': ' 475 HARTFORD ROAD',
+ 'city': 'NEW BRITAIN',
+ 'internal_store_number': 'T1289',
+ 'state': 'CT',
+ 'zip_code': '6053'}
+{'address': ' 474 CHAMBERLAIN HWY',
+ 'city': 'MERIDEN',
+ 'internal_store_number': 'T1373',
+ 'state': 'CT',
+ 'zip_code': '6451'}
+{'address': ' 1050 BRANDYWINE PARKWAY',
+ 'city': 'WILMINGTON',
+ 'internal_store_number': 'T1146',
+ 'state': 'DE',
+ 'zip_code': '19803'}
+{'address': ' 148 JOHN HUNN BROWN ROAD',
+ 'city': 'DOVER',
+ 'internal_store_number': 'T1312',
+ 'state': 'DE',
+ 'zip_code': '19901'}
+{'address': ' 1760 PALM BEACH LAKES BLVD.',
+ 'city': 'WEST PALM BEACH',
+ 'internal_store_number': 'T0391',
+ 'state': 'FL',
+ 'zip_code': '33401'}
+{'address': ' 8201 WEST FEDERATED ROADWAY',
+ 'city': 'PLANTATION',
+ 'internal_store_number': 'T0395',
+ 'state': 'FL',
+ 'zip_code': '33324'}
+{'address': ' 6250 SAMPLE ROAD',
+ 'city': 'CORAL SPRINGS',
+ 'internal_store_number': 'T0630',
+ 'state': 'FL',
+ 'zip_code': '33067'}
+{'address': ' 21637 STATE ROAD 7',
+ 'city': 'BOCA RATON',
+ 'internal_store_number': 'T0638',
+ 'state': 'FL',
+ 'zip_code': '33428'}
+{'address': ' 1200 LINTON BLVD.',
+ 'city': 'DELRAY BEACH',
+ 'internal_store_number': 'T0642',
+ 'state': 'FL',
+ 'zip_code': '33444'}
+{'address': ' 1901 NORTH CONGRESS AVE.',
+ 'city': 'BOYNTON BEACH',
+ 'internal_store_number': 'T0644',
+ 'state': 'FL',
+ 'zip_code': '33426'}
+{'address': ' 444 MONUMENT ROAD',
+ 'city': 'JACKSONVILLE',
+ 'internal_store_number': 'T0645',
+ 'state': 'FL',
+ 'zip_code': '32225'}
+{'address': ' 1919 WELLS ROAD',
+ 'city': 'ORANGE PARK',
+ 'internal_store_number': 'T0646',
+ 'state': 'FL',
+ 'zip_code': '32073'}
+{'address': ' 886 WEST STATE ROAD 436',
+ 'city': 'ALTAMONTE SPRINGS',
+ 'internal_store_number': 'T0647',
+ 'state': 'FL',
+ 'zip_code': '32714'}
+{'address': ' 718 MAGUIRE BLVD.',
+ 'city': 'ORLANDO',
+ 'internal_store_number': 'T0649',
+ 'state': 'FL',
+ 'zip_code': '32803'}
+{'address': ' 880 SAND LAKE ROAD',
+ 'city': 'ORLANDO',
+ 'internal_store_number': 'T0650',
+ 'state': 'FL',
+ 'zip_code': '32809'}
+{'address': ' 6411 TACOMA DRIVE',
+ 'city': 'PORT RICHEY',
+ 'internal_store_number': 'T0651',
+ 'state': 'FL',
+ 'zip_code': '34668'}
+{'address': ' 900 EAST LAKE ROAD',
+ 'city': 'PALM HARBOR',
+ 'internal_store_number': 'T0652',
+ 'state': 'FL',
+ 'zip_code': '34685'}
+{'address': ' 21750 US HIGHWAY 19 NORTH',
+ 'city': 'CLEARWATER',
+ 'internal_store_number': 'T0653',
+ 'state': 'FL',
+ 'zip_code': '33765'}
+{'address': ' 10500 ULMERTON ROAD EAST',
+ 'city': 'LARGO',
+ 'internal_store_number': 'T0654',
+ 'state': 'FL',
+ 'zip_code': '33771'}
+{'address': ' 15240 NORTH DALE MABRY HIGHWAY',
+ 'city': 'TAMPA',
+ 'internal_store_number': 'T0655',
+ 'state': 'FL',
+ 'zip_code': '33618'}
+{'address': '13658 UNIVERSITY PLAZA',
+ 'city': 'TAMPA',
+ 'internal_store_number': 'T0656',
+ 'state': 'FL',
+ 'zip_code': '33613'}
+{'address': ' 8401 SOUTH TAMIAMI TRAIL',
+ 'city': 'SARASOTA',
+ 'internal_store_number': 'T0665',
+ 'state': 'FL',
+ 'zip_code': '34238'}
+{'address': ' 9041 SOUTHSIDE BLVD.',
+ 'city': 'JACKSONVILLE',
+ 'internal_store_number': 'T0669',
+ 'state': 'FL',
+ 'zip_code': '32256'}
+{'address': ' 4711 BAYOU BOULEVARD',
+ 'city': 'PENSACOLA',
+ 'internal_store_number': 'T0686',
+ 'state': 'FL',
+ 'zip_code': '32503'}
+{'address': ' 3970 S.W. ARCHER ROAD',
+ 'city': 'GAINESVILLE',
+ 'internal_store_number': 'T0687',
+ 'state': 'FL',
+ 'zip_code': '32608'}
+{'address': ' 2380 W. INTERNATIONAL SPEEDWAY BLVD',
+ 'city': 'DAYTONA BEACH',
+ 'internal_store_number': 'T0688',
+ 'state': 'FL',
+ 'zip_code': '32114'}
+{'address': '2750 WEST NEW HAVEN AVE.',
+ 'city': 'MELBOURNE VILLAGE',
+ 'internal_store_number': 'T0689',
+ 'state': 'FL',
+ 'zip_code': '32904'}
+{'address': ' 1400-A TAMIAMI TRAIL',
+ 'city': 'PORT CHARLOTTE',
+ 'internal_store_number': 'T0690',
+ 'state': 'FL',
+ 'zip_code': '33948'}
+{'address': ' 10401 HIGHWAY 441',
+ 'city': 'LEESBURG',
+ 'internal_store_number': 'T0691',
+ 'state': 'FL',
+ 'zip_code': '34788'}
+{'address': '250 MIRACLE STRIP PARKWAY',
+ 'city': 'MARY ESTHER',
+ 'internal_store_number': 'T0740',
+ 'state': 'FL',
+ 'zip_code': '32569'}
+{'address': ' 15005 SW 88TH ST',
+ 'city': 'KENDALL',
+ 'internal_store_number': 'T0746',
+ 'state': 'FL',
+ 'zip_code': '33196'}
+{'address': ' 6295 WEST WATERS AVE',
+ 'city': 'TAMPA',
+ 'internal_store_number': 'T0798',
+ 'state': 'FL',
+ 'zip_code': '33634'}
+{'address': ' 5350 FRUITVILLE ROAD',
+ 'city': 'SARASOTA',
+ 'internal_store_number': 'T0799',
+ 'state': 'FL',
+ 'zip_code': '34232'}
+{'address': ' 2340 HIGHWAY 77',
+ 'city': 'PANAMA CITY',
+ 'internal_store_number': 'T0811',
+ 'state': 'FL',
+ 'zip_code': '32405'}
+{'address': ' 187 BRANDON TOWN CENTER DRIVE',
+ 'city': 'BRANDON',
+ 'internal_store_number': 'T0812',
+ 'state': 'FL',
+ 'zip_code': '33511'}
+{'address': '4271 SOUTH TAMIAMI TRAIL',
+ 'city': 'VENICE',
+ 'internal_store_number': 'T0813',
+ 'state': 'FL',
+ 'zip_code': '34293'}
+{'address': ' 9905 SOUTHERN BLVD.',
+ 'city': 'ROYAL PALM BEACH',
+ 'internal_store_number': 'T0814',
+ 'state': 'FL',
+ 'zip_code': '33411'}
+{'address': ' 12801 WEST SUNRISE BLVD.',
+ 'city': 'SUNRISE',
+ 'internal_store_number': 'T0815',
+ 'state': 'FL',
+ 'zip_code': '33323'}
+{'address': ' 2650 NW FEDERAL HIGHWAY',
+ 'city': 'STUART',
+ 'internal_store_number': 'T0816',
+ 'state': 'FL',
+ 'zip_code': '34994'}
+{'address': ' 6150 14TH STREET WEST',
+ 'city': 'BRADENTON',
+ 'internal_store_number': 'T0817',
+ 'state': 'FL',
+ 'zip_code': '34207'}
+{'address': ' 13711 SOUTH TAMIAMI TRAIL',
+ 'city': 'FORT MYERS',
+ 'internal_store_number': 'T0818',
+ 'state': 'FL',
+ 'zip_code': '33912'}
+{'address': ' 3003 WEST VINE STREET',
+ 'city': 'KISSIMMEE',
+ 'internal_store_number': 'T0829',
+ 'state': 'FL',
+ 'zip_code': '34741'}
+{'address': ' 2120 APALACHEE PARKWAY',
+ 'city': 'TALLAHASSEE',
+ 'internal_store_number': 'T0844',
+ 'state': 'FL',
+ 'zip_code': '32301'}
+{'address': ' 4155 WEST LAKE MARY BLVD.',
+ 'city': 'LAKE MARY',
+ 'internal_store_number': 'T0845',
+ 'state': 'FL',
+ 'zip_code': '32746'}
+{'address': ' 2000 SOUTHWEST COLLEGE ROAD',
+ 'city': 'OCALA',
+ 'internal_store_number': 'T0873',
+ 'state': 'FL',
+ 'zip_code': '34474'}
+{'address': ' 2575 ENTERPRISE ROAD',
+ 'city': 'ORANGE CITY',
+ 'internal_store_number': 'T0874',
+ 'state': 'FL',
+ 'zip_code': '32763'}
+{'address': ' 3251 HOLLYWOOD BLVD.',
+ 'city': 'HOLLYWOOD',
+ 'internal_store_number': 'T0877',
+ 'state': 'FL',
+ 'zip_code': '33021'}
+{'address': ' 820 OVIEDO MARKETPLACE BLVD',
+ 'city': 'OVIEDO',
+ 'internal_store_number': 'T0897',
+ 'state': 'FL',
+ 'zip_code': '32765'}
+{'address': ' 4410 SOUTH U.S. HIGHWAY 17-92',
+ 'city': 'CASSELBERRY',
+ 'internal_store_number': 'T0898',
+ 'state': 'FL',
+ 'zip_code': '32707'}
+{'address': '2324 PINE RIDGE ROAD',
+ 'city': 'NAPLES',
+ 'internal_store_number': 'T0899',
+ 'state': 'FL',
+ 'zip_code': '34109'}
+{'address': '4401 COMMERCIAL WAY',
+ 'city': 'SPRING HILL',
+ 'internal_store_number': 'T0919',
+ 'state': 'FL',
+ 'zip_code': '34606'}
+{'address': ' 11253 PINES BLVD',
+ 'city': 'HOLLYWOOD',
+ 'internal_store_number': 'T0920',
+ 'state': 'FL',
+ 'zip_code': '33026'}
+{'address': ' 490 MARSH LANDING PARKWAY',
+ 'city': 'JACKSONVILLE BEACH',
+ 'internal_store_number': 'T0967',
+ 'state': 'FL',
+ 'zip_code': '32250'}
+{'address': ' 7795 SOUTH WEST 40TH STREET',
+ 'city': 'MIAMI',
+ 'internal_store_number': 'T0968',
+ 'state': 'FL',
+ 'zip_code': '33155'}
+{'address': ' 4450 PARK STREET',
+ 'city': 'ST PETERSBURG',
+ 'internal_store_number': 'T1023',
+ 'state': 'FL',
+ 'zip_code': '33709'}
+{'address': ' 14075 BISCAYNE BLVD.',
+ 'city': 'NORTH MIAMI BEACH',
+ 'internal_store_number': 'T1038',
+ 'state': 'FL',
+ 'zip_code': '33181'}
+{'address': ' 8350 SOUTH DIXIE HIGHWAY',
+ 'city': 'MIAMI',
+ 'internal_store_number': 'T1039',
+ 'state': 'FL',
+ 'zip_code': '33143'}
+{'address': ' 5800 20TH STREET',
+ 'city': 'VERO BEACH',
+ 'internal_store_number': 'T1050',
+ 'state': 'FL',
+ 'zip_code': '32966'}
+{'address': ' 3625 W. GANDY BLVD.',
+ 'city': 'TAMPA',
+ 'internal_store_number': 'T1051',
+ 'state': 'FL',
+ 'zip_code': '33611'}
+{'address': ' 250 CROCKETT BLVD.',
+ 'city': 'MERRITT ISLAND',
+ 'internal_store_number': 'T1053',
+ 'state': 'FL',
+ 'zip_code': '32953'}
+{'address': ' 21265 BISCAYNE BLVD.',
+ 'city': 'AVENTURA',
+ 'internal_store_number': 'T1074',
+ 'state': 'FL',
+ 'zip_code': '33180'}
+{'address': ' 20500 S.W. 112TH AVE',
+ 'city': 'MIAMI',
+ 'internal_store_number': 'T1075',
+ 'state': 'FL',
+ 'zip_code': '33189'}
+{'address': ' 5900 LAKE WORTH ROAD',
+ 'city': 'GREENACRES CITY',
+ 'internal_store_number': 'T1110',
+ 'state': 'FL',
+ 'zip_code': '33463'}
+{'address': ' 26831 S. TAMIAMI TRAIL',
+ 'city': 'BONITA SPRINGS',
+ 'internal_store_number': 'T1123',
+ 'state': 'FL',
+ 'zip_code': '34135'}
+{'address': ' 8151 9TH STREET NORTH',
+ 'city': 'SAINT PETERSBURG',
+ 'internal_store_number': 'T1131',
+ 'state': 'FL',
+ 'zip_code': '33702'}
+{'address': ' 3200 NORTH FEDERAL HIGHWAY',
+ 'city': 'FT. LAUDERDALE',
+ 'internal_store_number': 'T1163',
+ 'state': 'FL',
+ 'zip_code': '33306'}
+{'address': ' 1749 EAST NINE MILE ROAD',
+ 'city': 'PENSACOLA',
+ 'internal_store_number': 'T1273',
+ 'state': 'FL',
+ 'zip_code': '32514'}
+{'address': '1440 US HIGHWAY 1 S',
+ 'city': 'SAINT AUGUSTINE',
+ 'internal_store_number': 'T1294',
+ 'state': 'FL',
+ 'zip_code': '32084'}
+{'address': ' 3570 HARDEN BLVD.',
+ 'city': 'LAKELAND',
+ 'internal_store_number': 'T1299',
+ 'state': 'FL',
+ 'zip_code': '33803'}
+{'address': ' 10490 SAN JOSE BLVD.',
+ 'city': 'JACKSONVILLE',
+ 'internal_store_number': 'T1300',
+ 'state': 'FL',
+ 'zip_code': '32257'}
+{'address': ' 1200 SOUTH FEDERAL HIGHWAY',
+ 'city': 'DEERFIELD BEACH',
+ 'internal_store_number': 'T1337',
+ 'state': 'FL',
+ 'zip_code': '33441'}
+{'address': ' 1201 COUNTY ROAD 581',
+ 'city': 'WESLEY CHAPEL',
+ 'internal_store_number': 'T1382',
+ 'state': 'FL',
+ 'zip_code': '33543'}
+{'address': '325 NORTH ALAFAYA TRAIL',
+ 'city': 'ORLANDO',
+ 'internal_store_number': 'T1760',
+ 'state': 'FL',
+ 'zip_code': '32828'}
+{'address': ' 7730 WEST COMMERCIAL BLVD.',
+ 'city': 'LAUDERHILL',
+ 'internal_store_number': 'T1778',
+ 'state': 'FL',
+ 'zip_code': '33351'}
+{'address': ' 7501 WEST COLONIAL DRIVE',
+ 'city': 'ORLANDO',
+ 'internal_store_number': 'T1781',
+ 'state': 'FL',
+ 'zip_code': '32818'}
+{'address': ' 2155 TOWN CENTER BLVD',
+ 'city': 'ORLANDO',
+ 'internal_store_number': 'T1790',
+ 'state': 'FL',
+ 'zip_code': '32837'}
+{'address': ' 3505 ATLANTA HIGHWAY',
+ 'city': 'ATHENS',
+ 'internal_store_number': 'T0369',
+ 'state': 'GA',
+ 'zip_code': '30606'}
+{'address': ' 235 JOHNSON S FERRY ROAD',
+ 'city': 'ATLANTA',
+ 'internal_store_number': 'T0371',
+ 'state': 'GA',
+ 'zip_code': '30328'}
+{'address': ' 2201 COBB PARKWAY_SE',
+ 'city': 'SMYRNA',
+ 'internal_store_number': 'T0373',
+ 'state': 'GA',
+ 'zip_code': '30080'}
+{'address': ' 2400 DRUID HILLS RD_N.E.',
+ 'city': 'ATLANTA',
+ 'internal_store_number': 'T0377',
+ 'state': 'GA',
+ 'zip_code': '30329'}
+{'address': ' 1648 HIGHWAY 138',
+ 'city': 'CONYERS',
+ 'internal_store_number': 'T0379',
+ 'state': 'GA',
+ 'zip_code': '30013'}
+{'address': ' 2721 DAWSON ROAD',
+ 'city': 'ALBANY',
+ 'internal_store_number': 'T0734',
+ 'state': 'GA',
+ 'zip_code': '31707'}
+{'address': ' 875 LAWRENCEVILLE SUWANEE ROAD',
+ 'city': 'LAWRENCEVILLE',
+ 'internal_store_number': 'T0747',
+ 'state': 'GA',
+ 'zip_code': '30043'}
+{'address': '1940 MT. ZION RD.',
+ 'city': 'MORROW',
+ 'internal_store_number': 'T0748',
+ 'state': 'GA',
+ 'zip_code': '30260'}
+{'address': ' 5950 STATE BRIDGE ROAD',
+ 'city': 'DULUTH',
+ 'internal_store_number': 'T0749',
+ 'state': 'GA',
+ 'zip_code': '30097'}
+{'address': ' 1815 NORMAN DRIVE',
+ 'city': 'VALDOSTA',
+ 'internal_store_number': 'T0750',
+ 'state': 'GA',
+ 'zip_code': '31601'}
+{'address': ' 107 PAVILLION PKWY.',
+ 'city': 'FAYETTEVILLE',
+ 'internal_store_number': 'T0778',
+ 'state': 'GA',
+ 'zip_code': '30214'}
+{'address': ' 514 SHALLOWFORD ROAD',
+ 'city': 'GAINESVILLE',
+ 'internal_store_number': 'T0796',
+ 'state': 'GA',
+ 'zip_code': '30504'}
+{'address': '1905 SCENIC HIGHWAY NORTH',
+ 'city': 'SNELLVILLE',
+ 'internal_store_number': 'T0917',
+ 'state': 'GA',
+ 'zip_code': '30078'}
+{'address': ' 100 CHEROKEE PLACE',
+ 'city': 'CARTERSVILLE',
+ 'internal_store_number': 'T0969',
+ 'state': 'GA',
+ 'zip_code': '30121'}
+{'address': ' 6000 NORTH POINT PARKWAY',
+ 'city': 'ALPHARETTA',
+ 'internal_store_number': 'T0970',
+ 'state': 'GA',
+ 'zip_code': '30022'}
+{'address': ' 740 EARNEST BARRETT PARKWAY',
+ 'city': 'KENNESAW',
+ 'internal_store_number': 'T0981',
+ 'state': 'GA',
+ 'zip_code': '30144'}
+{'address': ' 3200 HOLCOMB BRIDGE ROAD, SUITE 300',
+ 'city': 'NORCROSS',
+ 'internal_store_number': 'T0982',
+ 'state': 'GA',
+ 'zip_code': '30092'}
+{'address': ' 1129 SOUTH PARK STREET',
+ 'city': 'CARROLLTON',
+ 'internal_store_number': 'T1073',
+ 'state': 'GA',
+ 'zip_code': '30117'}
+{'address': ' 235 ROBERT C DANIEL JR PARKWAY',
+ 'city': 'AUGUSTA',
+ 'internal_store_number': 'T1090',
+ 'state': 'GA',
+ 'zip_code': '30909'}
+{'address': '3040 SHALLOWFORD RD NE',
+ 'city': 'MARIETTA',
+ 'internal_store_number': 'T1106',
+ 'state': 'GA',
+ 'zip_code': '30062'}
+{'address': ' 4125 AUSTELL ROAD',
+ 'city': 'AUSTELL',
+ 'internal_store_number': 'T1164',
+ 'state': 'GA',
+ 'zip_code': '30106'}
+{'address': ' 2535 DALLAS HIGHWAY',
+ 'city': 'MARIETTA',
+ 'internal_store_number': 'T1165',
+ 'state': 'GA',
+ 'zip_code': '30064'}
+{'address': ' 2950 CHAPEL HILL ROAD',
+ 'city': 'DOUGLASVILLE',
+ 'internal_store_number': 'T1172',
+ 'state': 'GA',
+ 'zip_code': '30135'}
+{'address': ' 1591 BRADLEY PARK DR.',
+ 'city': 'COLUMBUS',
+ 'internal_store_number': 'T1179',
+ 'state': 'GA',
+ 'zip_code': '31904'}
+{'address': ' 3535 PEACHTREE ROAD NE',
+ 'city': 'ATLANTA',
+ 'internal_store_number': 'T1197',
+ 'state': 'GA',
+ 'zip_code': '30326'}
+{'address': ' 3205 WOODWARD CROSSING BLVD',
+ 'city': 'BUFORD',
+ 'internal_store_number': 'T1206',
+ 'state': 'GA',
+ 'zip_code': '30519'}
+{'address': ' 555 BULLSBORO',
+ 'city': 'NEWNAN',
+ 'internal_store_number': 'T1223',
+ 'state': 'GA',
+ 'zip_code': '30263'}
+{'address': ' 4609 LOG CABIN ROAD',
+ 'city': 'MACON',
+ 'internal_store_number': 'T1379',
+ 'state': 'GA',
+ 'zip_code': '31206'}
+{'address': ' 2929 WATSON BLVD',
+ 'city': 'WARNER ROBINS',
+ 'internal_store_number': 'T1380',
+ 'state': 'GA',
+ 'zip_code': '31093'}
+{'address': ' 4241 LA VISTA ROAD',
+ 'city': 'TUCKER',
+ 'internal_store_number': 'T1390',
+ 'state': 'GA',
+ 'zip_code': '30084'}
+{'address': ' 1525 MARKETPLACE BLVD',
+ 'city': 'CUMMING',
+ 'internal_store_number': 'T1394',
+ 'state': 'GA',
+ 'zip_code': '30041'}
+{'address': '5220 JIMMY LEE SMITH PKWY',
+ 'city': 'HIRAM',
+ 'internal_store_number': 'T1400',
+ 'state': 'GA',
+ 'zip_code': '30141'}
+{'address': ' 2055 WEST PARK PLACE BLVD.',
+ 'city': 'STONE MOUNTAIN',
+ 'internal_store_number': 'T1758',
+ 'state': 'GA',
+ 'zip_code': '30087'}
+{'address': ' 1135 WOODSTOCK ROAD',
+ 'city': 'ROSWELL',
+ 'internal_store_number': 'T1761',
+ 'state': 'GA',
+ 'zip_code': '30075'}
+{'address': ' 3935 VENTURE DRIVE',
+ 'city': 'DULUTH',
+ 'internal_store_number': 'T1779',
+ 'state': 'GA',
+ 'zip_code': '30096'}
+{'address': ' 140 WOODSTOCK SQUARE AVENUE',
+ 'city': 'WOODSTOCK',
+ 'internal_store_number': 'T1780',
+ 'state': 'GA',
+ 'zip_code': '30189'}
+{'address': ' 2309 EUCLID AVENUE',
+ 'city': 'DES MOINES',
+ 'internal_store_number': 'T0029',
+ 'state': 'IA',
+ 'zip_code': '50310'}
+{'address': ' 4501 FIRST AVENUE SE',
+ 'city': 'CEDAR RAPIDS',
+ 'internal_store_number': 'T0033',
+ 'state': 'IA',
+ 'zip_code': '52402'}
+{'address': ' 1800 35TH STREET',
+ 'city': 'WEST DES MOINES',
+ 'internal_store_number': 'T0069',
+ 'state': 'IA',
+ 'zip_code': '50266'}
+{'address': ' 3500 DODGE ST.',
+ 'city': 'DUBUQUE',
+ 'internal_store_number': 'T0086',
+ 'state': 'IA',
+ 'zip_code': '52003'}
+{'address': ' 4340 SERGEANT ROAD',
+ 'city': 'SIOUX CITY',
+ 'internal_store_number': 'T0087',
+ 'state': 'IA',
+ 'zip_code': '51106'}
+{'address': ' 1751 MADISON AVENUE',
+ 'city': 'COUNCIL BLUFFS',
+ 'internal_store_number': 'T0243',
+ 'state': 'IA',
+ 'zip_code': '51503'}
+{'address': ' 5225 ELMORE AVENUE',
+ 'city': 'DAVENPORT',
+ 'internal_store_number': 'T0533',
+ 'state': 'IA',
+ 'zip_code': '52807'}
+{'address': ' 1111 EAST ARMY POST ROAD',
+ 'city': 'DES MOINES',
+ 'internal_store_number': 'T0803',
+ 'state': 'IA',
+ 'zip_code': '50315'}
+{'address': ' 3450 4TH STREET SOUTHWEST',
+ 'city': 'MASON CITY',
+ 'internal_store_number': 'T0804',
+ 'state': 'IA',
+ 'zip_code': '50401'}
+{'address': ' 525 SOUTH GEAR AVENUE',
+ 'city': 'WEST BURLINGTON',
+ 'internal_store_number': 'T0860',
+ 'state': 'IA',
+ 'zip_code': '52655'}
+{'address': ' 2910 1ST AVENUE SOUTH',
+ 'city': 'FORT DODGE',
+ 'internal_store_number': 'T0878',
+ 'state': 'IA',
+ 'zip_code': '50501'}
+{'address': ' 1020 NORTH QUINCY AVENUE',
+ 'city': 'OTTUMWA',
+ 'internal_store_number': 'T0890',
+ 'state': 'IA',
+ 'zip_code': '52501'}
+{'address': ' 2900 SOUTH 25TH STREET',
+ 'city': 'CLINTON',
+ 'internal_store_number': 'T0932',
+ 'state': 'IA',
+ 'zip_code': '52732'}
+{'address': ' 1441 - 27TH AVENUE',
+ 'city': 'CORALVILLE',
+ 'internal_store_number': 'T1113',
+ 'state': 'IA',
+ 'zip_code': '52241'}
+{'address': ' 320 S. DUFF AVE.',
+ 'city': 'AMES',
+ 'internal_store_number': 'T1170',
+ 'state': 'IA',
+ 'zip_code': '50010'}
+{'address': ' 2135 S.E. DELAWARE AVENUE',
+ 'city': 'ANKENY',
+ 'internal_store_number': 'T1767',
+ 'state': 'IA',
+ 'zip_code': '50021'}
+{'address': '1030 BLAIRS FERRY RD NE',
+ 'city': 'CEDAR RAPIDS',
+ 'internal_store_number': 'T1768',
+ 'state': 'IA',
+ 'zip_code': '52402'}
+{'address': ' 3400 EDGEWOOD ROAD S.W.',
+ 'city': 'CEDAR RAPIDS',
+ 'internal_store_number': 'T1771',
+ 'state': 'IA',
+ 'zip_code': '52404'}
+{'address': ' 11148 PLUM DRIVE',
+ 'city': 'URBANDALE',
+ 'internal_store_number': 'T1791',
+ 'state': 'IA',
+ 'zip_code': '50322'}
+{'address': ' 1501 EAST SAN MARNAN DRIVE',
+ 'city': 'WATERLOO',
+ 'internal_store_number': 'T1792',
+ 'state': 'IA',
+ 'zip_code': '50702'}
+{'address': ' 633 NORTH MILWAUKEE STREET',
+ 'city': 'BOISE',
+ 'internal_store_number': 'T0617',
+ 'state': 'ID',
+ 'zip_code': '83704'}
+{'address': ' 315 WEST CANFIELD AVENUE',
+ 'city': 'COEUR D ALENE',
+ 'internal_store_number': 'T0679',
+ 'state': 'ID',
+ 'zip_code': '83814'}
+{'address': ' 1611 NORTH BLUE LAKES BLVD.',
+ 'city': 'TWIN FALLS',
+ 'internal_store_number': 'T0699',
+ 'state': 'ID',
+ 'zip_code': '83301'}
+{'address': ' 2171 SOUTH 2500 EAST',
+ 'city': 'AMMON',
+ 'internal_store_number': 'T1082',
+ 'state': 'ID',
+ 'zip_code': '83406'}
+{'address': ' 6280 EAGLE ROAD',
+ 'city': 'BOISE',
+ 'internal_store_number': 'T1230',
+ 'state': 'ID',
+ 'zip_code': '83713'}
+{'address': ' 10785 LINCOLN TRAIL',
+ 'city': 'FAIRVIEW HEIGHTS',
+ 'internal_store_number': 'T0065',
+ 'state': 'IL',
+ 'zip_code': '62208'}
+{'address': ' 300 E HOMER M ADAMS PKWY',
+ 'city': 'ALTON',
+ 'internal_store_number': 'T0078',
+ 'state': 'IL',
+ 'zip_code': '62002'}
+{'address': ' 301 SOUTH VETERANS PKWY',
+ 'city': 'NORMAL',
+ 'internal_store_number': 'T0137',
+ 'state': 'IL',
+ 'zip_code': '61761'}
+{'address': ' 3445 FREEDOM DRIVE',
+ 'city': 'SPRINGFIELD',
+ 'internal_store_number': 'T0670',
+ 'state': 'IL',
+ 'zip_code': '62704'}
+{'address': ' 3000 WEST DE YOUNG STREET',
+ 'city': 'MARION',
+ 'internal_store_number': 'T0674',
+ 'state': 'IL',
+ 'zip_code': '62959'}
+{'address': ' 2901 SOUTH CICERO AVE',
+ 'city': 'CICERO',
+ 'internal_store_number': 'T0732',
+ 'state': 'IL',
+ 'zip_code': '60804'}
+{'address': ' 2350 TROY ROAD',
+ 'city': 'EDWARDSVILLE',
+ 'internal_store_number': 'T0733',
+ 'state': 'IL',
+ 'zip_code': '62025'}
+{'address': ' 679 EAST DUNDEE ROAD',
+ 'city': 'PALATINE',
+ 'internal_store_number': 'T0753',
+ 'state': 'IL',
+ 'zip_code': '60067'}
+{'address': ' 6560 EAST STATE STREET',
+ 'city': 'ROCKFORD',
+ 'internal_store_number': 'T0810',
+ 'state': 'IL',
+ 'zip_code': '61108'}
+{'address': ' 313 EAST TOWNLINE ROAD',
+ 'city': 'VERNON HILLS',
+ 'internal_store_number': 'T0833',
+ 'state': 'IL',
+ 'zip_code': '60061'}
+{'address': ' 300 SOUTH RANDALL ROAD',
+ 'city': 'ELGIN',
+ 'internal_store_number': 'T0834',
+ 'state': 'IL',
+ 'zip_code': '60123'}
+{'address': ' 2621 W. SCHAUMBURG ROAD',
+ 'city': 'SCHAUMBURG',
+ 'internal_store_number': 'T0835',
+ 'state': 'IL',
+ 'zip_code': '60194'}
+{'address': ' 175 WEST ARMY TRAIL',
+ 'city': 'GLENDALE HEIGHTS',
+ 'internal_store_number': 'T0836',
+ 'state': 'IL',
+ 'zip_code': '60139'}
+{'address': ' 850 W. NORTH AVENUE',
+ 'city': 'MELROSE PARK',
+ 'internal_store_number': 'T0837',
+ 'state': 'IL',
+ 'zip_code': '60160'}
+{'address': ' 601 SOUTH COUNTY FARM ROAD',
+ 'city': 'WHEATON',
+ 'internal_store_number': 'T0838',
+ 'state': 'IL',
+ 'zip_code': '60187'}
+{'address': ' 115 NORTH RANDALL ROAD',
+ 'city': 'BATAVIA',
+ 'internal_store_number': 'T0839',
+ 'state': 'IL',
+ 'zip_code': '60510'}
+{'address': ' 1951 W. JEFFERSON AVENUE',
+ 'city': 'NAPERVILLE',
+ 'internal_store_number': 'T0840',
+ 'state': 'IL',
+ 'zip_code': '60540'}
+{'address': ' 7100 SOUTH CICERO AVENUE',
+ 'city': 'BEDFORD PARK',
+ 'internal_store_number': 'T0841',
+ 'state': 'IL',
+ 'zip_code': '60629'}
+{'address': ' 15850 SOUTH 94TH AVENUE',
+ 'city': 'ORLAND PARK',
+ 'internal_store_number': 'T0842',
+ 'state': 'IL',
+ 'zip_code': '60462'}
+{'address': ' 9250 JOLIET ROAD',
+ 'city': 'HODGKINS',
+ 'internal_store_number': 'T0843',
+ 'state': 'IL',
+ 'zip_code': '60525'}
+{'address': ' 1717 EAST WEST ROAD',
+ 'city': 'CALUMET CITY',
+ 'internal_store_number': 'T0846',
+ 'state': 'IL',
+ 'zip_code': '60409'}
+{'address': ' 6601 WEST GRAND AVENUE',
+ 'city': 'GURNEE',
+ 'internal_store_number': 'T0865',
+ 'state': 'IL',
+ 'zip_code': '60031'}
+{'address': ' 2333 63RD STREET',
+ 'city': 'WOODRIDGE',
+ 'internal_store_number': 'T0866',
+ 'state': 'IL',
+ 'zip_code': '60517'}
+{'address': ' 1188 WEST BOUGHTON ROAD',
+ 'city': 'BOLINGBROOK',
+ 'internal_store_number': 'T0867',
+ 'state': 'IL',
+ 'zip_code': '60440'}
+{'address': ' 5071 WEST CAL-SAG ROAD',
+ 'city': 'CRESTWOOD',
+ 'internal_store_number': 'T0868',
+ 'state': 'IL',
+ 'zip_code': '60445'}
+{'address': ' 21600 SOUTH CICERO AVENUE',
+ 'city': 'MATTESON',
+ 'internal_store_number': 'T0869',
+ 'state': 'IL',
+ 'zip_code': '60443'}
+{'address': ' 5001 BIG HOLLOW ROAD',
+ 'city': 'PEORIA',
+ 'internal_store_number': 'T0871',
+ 'state': 'IL',
+ 'zip_code': '61615'}
+{'address': ' 1235 EAST HIGGINS ROAD',
+ 'city': 'SCHAUMBURG',
+ 'internal_store_number': 'T0880',
+ 'state': 'IL',
+ 'zip_code': '60173'}
+{'address': ' 1071 WEST CARL SANDBURG DRIVE',
+ 'city': 'GALESBURG',
+ 'internal_store_number': 'T0891',
+ 'state': 'IL',
+ 'zip_code': '61401'}
+{'address': '1860 NORTH RICHMOND ROAD',
+ 'city': 'MC HENRY',
+ 'internal_store_number': 'T0892',
+ 'state': 'IL',
+ 'zip_code': '60050'}
+{'address': ' 401 WEST IRVING PARK ROAD',
+ 'city': 'WOOD DALE',
+ 'internal_store_number': 'T0893',
+ 'state': 'IL',
+ 'zip_code': '60191'}
+{'address': ' 2701 ROUTE 30/PLAINFIELD ROAD',
+ 'city': 'JOLIET',
+ 'internal_store_number': 'T0894',
+ 'state': 'IL',
+ 'zip_code': '60435'}
+{'address': '1615 NORTH STATE ROUTE 50',
+ 'city': 'BOURBONNAIS',
+ 'internal_store_number': 'T0895',
+ 'state': 'IL',
+ 'zip_code': '60914'}
+{'address': ' 2555 SYCAMORE ROAD',
+ 'city': 'DE KALB',
+ 'internal_store_number': 'T0902',
+ 'state': 'IL',
+ 'zip_code': '60115'}
+{'address': ' 999 WEST MAIN STREET',
+ 'city': 'WEST DUNDEE',
+ 'internal_store_number': 'T0903',
+ 'state': 'IL',
+ 'zip_code': '60118'}
+{'address': ' 200 BROADVIEW VILLAGE SQUARE',
+ 'city': 'BROADVIEW',
+ 'internal_store_number': 'T0916',
+ 'state': 'IL',
+ 'zip_code': '60155'}
+{'address': ' 900 42ND AVENUE DRIVE',
+ 'city': 'MOLINE',
+ 'internal_store_number': 'T0926',
+ 'state': 'IL',
+ 'zip_code': '61265'}
+{'address': ' 2209 WEST HOWARD STREET',
+ 'city': 'EVANSTON',
+ 'internal_store_number': 'T0927',
+ 'state': 'IL',
+ 'zip_code': '60202'}
+{'address': ' 6150 TOUHY AVE',
+ 'city': 'NILES',
+ 'internal_store_number': 'T0928',
+ 'state': 'IL',
+ 'zip_code': '60714'}
+{'address': ' 4370 VENTURE DRIVE',
+ 'city': 'PERU',
+ 'internal_store_number': 'T0929',
+ 'state': 'IL',
+ 'zip_code': '61354'}
+{'address': ' 2656 NORTH ELSTON_AVENUE',
+ 'city': 'CHICAGO',
+ 'internal_store_number': 'T0942',
+ 'state': 'IL',
+ 'zip_code': '60647'}
+{'address': ' 2102 NORTH PROSPECT AVE',
+ 'city': 'CHAMPAIGN',
+ 'internal_store_number': 'T0943',
+ 'state': 'IL',
+ 'zip_code': '61821'}
+{'address': ' 50 EAST NORTH AVENUE',
+ 'city': 'VILLA PARK',
+ 'internal_store_number': 'T0957',
+ 'state': 'IL',
+ 'zip_code': '60181'}
+{'address': ' 60 YORKTOWN CENTER',
+ 'city': 'LOMBARD',
+ 'internal_store_number': 'T1024',
+ 'state': 'IL',
+ 'zip_code': '60148'}
+{'address': ' 555 SOUTH RAND ROAD',
+ 'city': 'LAKE ZURICH',
+ 'internal_store_number': 'T1036',
+ 'state': 'IL',
+ 'zip_code': '60047'}
+{'address': ' 3050 NORTH LEWIS AVENUE',
+ 'city': 'WAUKEGAN',
+ 'internal_store_number': 'T1070',
+ 'state': 'IL',
+ 'zip_code': '60087'}
+{'address': ' 2002 GOLF MILL CENTER',
+ 'city': 'NILES',
+ 'internal_store_number': 'T1125',
+ 'state': 'IL',
+ 'zip_code': '60714'}
+{'address': ' 5580 NORTHWEST HIGHWAY',
+ 'city': 'CRYSTAL LAKE',
+ 'internal_store_number': 'T1166',
+ 'state': 'IL',
+ 'zip_code': '60014'}
+{'address': ' 2241 WILLOW ROAD',
+ 'city': 'GLENVIEW',
+ 'internal_store_number': 'T1167',
+ 'state': 'IL',
+ 'zip_code': '60025'}
+{'address': ' 2099 SKOKIE VALLEY ROAD',
+ 'city': 'HIGHLAND PARK',
+ 'internal_store_number': 'T1168',
+ 'state': 'IL',
+ 'zip_code': '60035'}
+{'address': ' 1700 EAST RAND ROAD',
+ 'city': 'ARLINGTON HEIGHTS',
+ 'internal_store_number': 'T1176',
+ 'state': 'IL',
+ 'zip_code': '60004'}
+{'address': ' 13460 ARCHER AVENUE',
+ 'city': 'LEMONT',
+ 'internal_store_number': 'T1213',
+ 'state': 'IL',
+ 'zip_code': '60439'}
+{'address': '7000 NORTH MANHIEM ROAD',
+ 'city': 'ROSEMONT',
+ 'internal_store_number': 'T1342',
+ 'state': 'IL',
+ 'zip_code': '60018'}
+{'address': '1400 WEST LAKE COOK ROAD',
+ 'city': 'WHEELING',
+ 'internal_store_number': 'T1385',
+ 'state': 'IL',
+ 'zip_code': '60090'}
+{'address': '3020 ROUTE 34',
+ 'city': 'OSWEGO',
+ 'internal_store_number': 'T1402',
+ 'state': 'IL',
+ 'zip_code': '60543'}
+{'address': ' 12800 SOUTH ROUTE 59',
+ 'city': 'PLAINFIELD',
+ 'internal_store_number': 'T1403',
+ 'state': 'IL',
+ 'zip_code': '60544'}
+{'address': ' 154 WEST HIVELY',
+ 'city': 'ELKHART',
+ 'internal_store_number': 'T0102',
+ 'state': 'IN',
+ 'zip_code': '46517'}
+{'address': ' 3700 SOUTH EAST STREET',
+ 'city': 'INDIANAPOLIS',
+ 'internal_store_number': 'T0103',
+ 'state': 'IN',
+ 'zip_code': '46227'}
+{'address': ' 4401 NATIONAL ROAD EAST',
+ 'city': 'RICHMOND',
+ 'internal_store_number': 'T0105',
+ 'state': 'IN',
+ 'zip_code': '47374'}
+{'address': ' 730 SOUTH GREEN RIVER RD',
+ 'city': 'EVANSVILLE',
+ 'internal_store_number': 'T0106',
+ 'state': 'IN',
+ 'zip_code': '47715'}
+{'address': ' 5501 SCATTERFIELD ROAD',
+ 'city': 'ANDERSON',
+ 'internal_store_number': 'T0107',
+ 'state': 'IN',
+ 'zip_code': '46013'}
+{'address': ' 4000 FIRST AVENUE',
+ 'city': 'EVANSVILLE',
+ 'internal_store_number': 'T0108',
+ 'state': 'IN',
+ 'zip_code': '47710'}
+{'address': ' 1037 SOUTH REED ROAD',
+ 'city': 'KOKOMO',
+ 'internal_store_number': 'T0111',
+ 'state': 'IN',
+ 'zip_code': '46902'}
+{'address': ' 1300 EAST 86TH STREET',
+ 'city': 'INDIANAPOLIS',
+ 'internal_store_number': 'T0112',
+ 'state': 'IN',
+ 'zip_code': '46240'}
+{'address': ' 601 COLLEGE MALL ROAD',
+ 'city': 'BLOOMINGTON',
+ 'internal_store_number': 'T0113',
+ 'state': 'IN',
+ 'zip_code': '47401'}
+{'address': ' 3801 COLDWATER ROAD',
+ 'city': 'FORT WAYNE',
+ 'internal_store_number': 'T0114',
+ 'state': 'IN',
+ 'zip_code': '46805'}
+{'address': ' 7601 SOUTH ANTHONY BLVD',
+ 'city': 'FORT WAYNE',
+ 'internal_store_number': 'T0115',
+ 'state': 'IN',
+ 'zip_code': '46816'}
+{'address': ' 3512 EAST CEDAR',
+ 'city': 'SOUTH BEND',
+ 'internal_store_number': 'T0117',
+ 'state': 'IN',
+ 'zip_code': '46615'}
+{'address': ' 1500 GREENTREE BLVD',
+ 'city': 'CLARKSVILLE',
+ 'internal_store_number': 'T0119',
+ 'state': 'IN',
+ 'zip_code': '47129'}
+{'address': ' 2985 NORTH NATIONAL ROAD',
+ 'city': 'COLUMBUS',
+ 'internal_store_number': 'T0121',
+ 'state': 'IN',
+ 'zip_code': '47201'}
+{'address': ' 1112 SCOTTSDALE MALL RD',
+ 'city': 'SOUTH BEND',
+ 'internal_store_number': 'T0128',
+ 'state': 'IN',
+ 'zip_code': '46614'}
+{'address': ' 8811 HARDEGAN STREET',
+ 'city': 'INDIANAPOLIS',
+ 'internal_store_number': 'T0130',
+ 'state': 'IN',
+ 'zip_code': '46227'}
+{'address': ' 5302 NORTH KEYSTONE',
+ 'city': 'INDIANAPOLIS',
+ 'internal_store_number': 'T0133',
+ 'state': 'IN',
+ 'zip_code': '46220'}
+{'address': ' 6119 STELLHORN ROAD',
+ 'city': 'FORT WAYNE',
+ 'internal_store_number': 'T0134',
+ 'state': 'IN',
+ 'zip_code': '46815'}
+{'address': ' 311 SOUTH BLVD',
+ 'city': 'CRAWFORDSVILLE',
+ 'internal_store_number': 'T0138',
+ 'state': 'IN',
+ 'zip_code': '47933'}
+{'address': ' 2209 STATE STREET',
+ 'city': 'NEW ALBANY',
+ 'internal_store_number': 'T0139',
+ 'state': 'IN',
+ 'zip_code': '47150'}
+{'address': ' 4000 WEST BETHEL AVENUE',
+ 'city': 'MUNCIE',
+ 'internal_store_number': 'T0141',
+ 'state': 'IN',
+ 'zip_code': '47304'}
+{'address': ' 8448 CENTER RUN ROAD',
+ 'city': 'INDIANAPOLIS',
+ 'internal_store_number': 'T0635',
+ 'state': 'IN',
+ 'zip_code': '46250'}
+{'address': ' 10451 INDIANAPOLIS BLVD',
+ 'city': 'HIGHLAND',
+ 'internal_store_number': 'T0731',
+ 'state': 'IN',
+ 'zip_code': '46322'}
+{'address': ' 2673 EAST MAIN STREET',
+ 'city': 'PLAINFIELD',
+ 'internal_store_number': 'T0773',
+ 'state': 'IN',
+ 'zip_code': '46168'}
+{'address': ' 2661 EAST US 30',
+ 'city': 'MERRILLVILLE',
+ 'internal_store_number': 'T0870',
+ 'state': 'IN',
+ 'zip_code': '46410'}
+{'address': ' 6925 WEST 38TH STREET',
+ 'city': 'INDIANAPOLIS',
+ 'internal_store_number': 'T0881',
+ 'state': 'IN',
+ 'zip_code': '46254'}
+{'address': ' 15160 US 31 NORTH',
+ 'city': 'CARMEL',
+ 'internal_store_number': 'T1063',
+ 'state': 'IN',
+ 'zip_code': '46032'}
+{'address': ' 10202 EAST WASHINGTON STREET',
+ 'city': 'INDIANAPOLIS',
+ 'internal_store_number': 'T1214',
+ 'state': 'IN',
+ 'zip_code': '46229'}
+{'address': ' 2450 LAPORTE AVENUE',
+ 'city': 'VALPARAISO',
+ 'internal_store_number': 'T1286',
+ 'state': 'IN',
+ 'zip_code': '46383'}
+{'address': ' 11750 COMMERCIAL',
+ 'city': 'FISHERS',
+ 'internal_store_number': 'T1350',
+ 'state': 'IN',
+ 'zip_code': '46038'}
+{'address': ' 895 SOUTH STATE ROAD 135',
+ 'city': 'GREENWOOD',
+ 'internal_store_number': 'T1364',
+ 'state': 'IN',
+ 'zip_code': '46143'}
+{'address': ' 10401 N MICHIGAN ROAD',
+ 'city': 'CARMEL',
+ 'internal_store_number': 'T1366',
+ 'state': 'IN',
+ 'zip_code': '46032'}
+{'address': ' 3630 STATE ROAD 26 EAST',
+ 'city': 'LAFAYETTE',
+ 'internal_store_number': 'T1762',
+ 'state': 'IN',
+ 'zip_code': '47905'}
+{'address': ' 10209 EAST HWY 36',
+ 'city': 'AVON',
+ 'internal_store_number': 'T1788',
+ 'state': 'IN',
+ 'zip_code': '46123'}
+{'address': ' 4850 EAST SOUTHPORT',
+ 'city': 'INDIANAPOLIS',
+ 'internal_store_number': 'T1789',
+ 'state': 'IN',
+ 'zip_code': '46237'}
+{'address': ' 404 SOUTH TRACY',
+ 'city': 'WICHITA',
+ 'internal_store_number': 'T0091',
+ 'state': 'KS',
+ 'zip_code': '67209'}
+{'address': ' 301 SOUTH ARMOUR',
+ 'city': 'WICHITA',
+ 'internal_store_number': 'T0092',
+ 'state': 'KS',
+ 'zip_code': '67207'}
+{'address': ' 2120 WANAMAKER ROAD SW',
+ 'city': 'TOPEKA',
+ 'internal_store_number': 'T0355',
+ 'state': 'KS',
+ 'zip_code': '66614'}
+{'address': ' 3201 IOWA STREET',
+ 'city': 'LAWRENCE',
+ 'internal_store_number': 'T0531',
+ 'state': 'KS',
+ 'zip_code': '66046'}
+{'address': ' 2939 MARKET PLACE',
+ 'city': 'SALINA',
+ 'internal_store_number': 'T0905',
+ 'state': 'KS',
+ 'zip_code': '67401'}
+{'address': ' 2401 EAST KANSAS AVENUE',
+ 'city': 'GARDEN CITY',
+ 'internal_store_number': 'T0906',
+ 'state': 'KS',
+ 'zip_code': '67846'}
+{'address': ' 1529 EAST 17TH STREET',
+ 'city': 'HUTCHINSON',
+ 'internal_store_number': 'T0946',
+ 'state': 'KS',
+ 'zip_code': '67501'}
+{'address': ' 15345 WEST 119TH STREET',
+ 'city': 'OLATHE',
+ 'internal_store_number': 'T1756',
+ 'state': 'KS',
+ 'zip_code': '66062'}
+{'address': ' 12200 BLUE VALLEY PARKWAY',
+ 'city': 'OVERLAND PARK',
+ 'internal_store_number': 'T1757',
+ 'state': 'KS',
+ 'zip_code': '66213'}
+{'address': ' 15700 SHAWNEE MISSION PARKWAY',
+ 'city': 'SHAWNEE',
+ 'internal_store_number': 'T1759',
+ 'state': 'KS',
+ 'zip_code': '66217'}
+{'address': ' 4174 WESTPORT ROAD',
+ 'city': 'LOUISVILLE',
+ 'internal_store_number': 'T0118',
+ 'state': 'KY',
+ 'zip_code': '40207'}
+{'address': ' 9070 DIXIE HIGHWAY',
+ 'city': 'LOUISVILLE',
+ 'internal_store_number': 'T0120',
+ 'state': 'KY',
+ 'zip_code': '40258'}
+{'address': ' 2034 BASHFORD MANOR LN',
+ 'city': 'LOUISVILLE',
+ 'internal_store_number': 'T0124',
+ 'state': 'KY',
+ 'zip_code': '40218'}
+{'address': ' 7100 PRESTON HIGHWAY',
+ 'city': 'LOUISVILLE',
+ 'internal_store_number': 'T0126',
+ 'state': 'KY',
+ 'zip_code': '40219'}
+{'address': ' 3275 NICHOLASVILLE PIKE',
+ 'city': 'LEXINGTON',
+ 'internal_store_number': 'T0366',
+ 'state': 'KY',
+ 'zip_code': '40503'}
+{'address': ' 5151 FREDERICA STREET',
+ 'city': 'OWENSBORO',
+ 'internal_store_number': 'T0757',
+ 'state': 'KY',
+ 'zip_code': '42301'}
+{'address': ' 1631 RING ROAD',
+ 'city': 'ELIZABETHTOWN',
+ 'internal_store_number': 'T0779',
+ 'state': 'KY',
+ 'zip_code': '42701'}
+{'address': ' 4640 TAYLORSVILLE ROAD',
+ 'city': 'LOUISVILLE',
+ 'internal_store_number': 'T0780',
+ 'state': 'KY',
+ 'zip_code': '40220'}
+{'address': ' 160 AMERICAN AVENUE',
+ 'city': 'BOWLING GREEN',
+ 'internal_store_number': 'T0958',
+ 'state': 'KY',
+ 'zip_code': '42101'}
+{'address': ' 4101 TOWNE CENTER DRIVE',
+ 'city': 'LOUISVILLE',
+ 'internal_store_number': 'T1071',
+ 'state': 'KY',
+ 'zip_code': '40241'}
+{'address': ' 1940 PAVILLON WAY',
+ 'city': 'LEXINGTON',
+ 'internal_store_number': 'T1094',
+ 'state': 'KY',
+ 'zip_code': '40509'}
+{'address': ' 1100 HANSEL AVENUE',
+ 'city': 'FLORENCE',
+ 'internal_store_number': 'T1200',
+ 'state': 'KY',
+ 'zip_code': '41042'}
+{'address': ' 5620 JOHNSTON STREET',
+ 'city': 'LAFAYETTE',
+ 'internal_store_number': 'T0143',
+ 'state': 'LA',
+ 'zip_code': '70503'}
+{'address': ' 2206 MEMORIAL DRIVE',
+ 'city': 'ALEXANDRIA',
+ 'internal_store_number': 'T0167',
+ 'state': 'LA',
+ 'zip_code': '71301'}
+{'address': ' 7110 YOUREE DRIVE',
+ 'city': 'SHREVEPORT',
+ 'internal_store_number': 'T1347',
+ 'state': 'LA',
+ 'zip_code': '71105'}
+{'address': ' 6885 SIEGEN LANE',
+ 'city': 'BATON ROUGE',
+ 'internal_store_number': 'T1369',
+ 'state': 'LA',
+ 'zip_code': '70809'}
+{'address': ' 1720 PRIEN LAKE ROAD',
+ 'city': 'LAKE CHARLES',
+ 'internal_store_number': 'T1399',
+ 'state': 'LA',
+ 'zip_code': '70601'}
+{'address': ' 240 INDEPENDENCE WAY',
+ 'city': 'DANVERS',
+ 'internal_store_number': 'T1187',
+ 'state': 'MA',
+ 'zip_code': '1923'}
+{'address': ' 801 TAUNTON DEPOT DRIVE',
+ 'city': 'TAUNTON',
+ 'internal_store_number': 'T1189',
+ 'state': 'MA',
+ 'zip_code': '2780'}
+{'address': ' 1205 SOUTH WASHINGTON ST.',
+ 'city': 'NORTH ATTLEBORO',
+ 'internal_store_number': 'T1190',
+ 'state': 'MA',
+ 'zip_code': '2760'}
+{'address': ' 1 MYSTIC VIEW ROAD',
+ 'city': 'EVERETT',
+ 'internal_store_number': 'T1229',
+ 'state': 'MA',
+ 'zip_code': '2149'}
+{'address': ' 50 HOLYOKE STREET',
+ 'city': 'HOLYOKE',
+ 'internal_store_number': 'T1232',
+ 'state': 'MA',
+ 'zip_code': '1041'}
+{'address': ' 101 COMMERCE WAY',
+ 'city': 'WOBURN',
+ 'internal_store_number': 'T1266',
+ 'state': 'MA',
+ 'zip_code': '1801'}
+{'address': ' 250 FORTUNE BLVD.',
+ 'city': 'MILFORD',
+ 'internal_store_number': 'T1281',
+ 'state': 'MA',
+ 'zip_code': '1757'}
+{'address': ' 400 LYNN FELLS PARKWAY',
+ 'city': 'SAUGUS',
+ 'internal_store_number': 'T1290',
+ 'state': 'MA',
+ 'zip_code': '1906'}
+{'address': ' 400 COCHITUATE ROAD',
+ 'city': 'FRAMINGHAM',
+ 'internal_store_number': 'T1308',
+ 'state': 'MA',
+ 'zip_code': '1701'}
+{'address': ' 525-545 LINCOLN STREET',
+ 'city': 'WORCESTER',
+ 'internal_store_number': 'T1348',
+ 'state': 'MA',
+ 'zip_code': '1605'}
+{'address': '79 COMMERCE WAY',
+ 'city': 'SEEKONK',
+ 'internal_store_number': 'T1374',
+ 'state': 'MA',
+ 'zip_code': '2771'}
+{'address': '180 SOMERVILLE AVE',
+ 'city': 'SOMERVILLE',
+ 'internal_store_number': 'T1441',
+ 'state': 'MA',
+ 'zip_code': '2143'}
+{'address': '200 MALCOLM DRIVE',
+ 'city': 'WESTMINSTER',
+ 'internal_store_number': 'T1000',
+ 'state': 'MD',
+ 'zip_code': '21157'}
+{'address': ' 5230 CAMPBELL BOULEVARD',
+ 'city': 'BALTIMORE',
+ 'internal_store_number': 'T1001',
+ 'state': 'MD',
+ 'zip_code': '21236'}
+{'address': ' 580 MARKET PLACE DRIVE',
+ 'city': 'BEL AIR',
+ 'internal_store_number': 'T1002',
+ 'state': 'MD',
+ 'zip_code': '21014'}
+{'address': ' 7951 NOLPARK COURT',
+ 'city': 'GLEN BURNIE',
+ 'internal_store_number': 'T1003',
+ 'state': 'MD',
+ 'zip_code': '21061'}
+{'address': ' 4600 MITCHELLVILLE ROAD',
+ 'city': 'BOWIE',
+ 'internal_store_number': 'T1004',
+ 'state': 'MD',
+ 'zip_code': '20716'}
+{'address': ' 10500 CAMPUS WAY SOUTH',
+ 'city': 'LARGO',
+ 'internal_store_number': 'T1006',
+ 'state': 'MD',
+ 'zip_code': '20774'}
+{'address': ' 3343 LAUREL FT. MEADE ROAD',
+ 'city': 'LAUREL',
+ 'internal_store_number': 'T1007',
+ 'state': 'MD',
+ 'zip_code': '20724'}
+{'address': ' 3300 WESTERN PARKWAY',
+ 'city': 'WALDORF',
+ 'internal_store_number': 'T1008',
+ 'state': 'MD',
+ 'zip_code': '20603'}
+{'address': ' 4390 MONTGOMERY ROAD',
+ 'city': 'ELLICOTT CITY',
+ 'internal_store_number': 'T1042',
+ 'state': 'MD',
+ 'zip_code': '21043'}
+{'address': ' 1025 MIDDLETON ROAD',
+ 'city': 'ABERDEEN',
+ 'internal_store_number': 'T1043',
+ 'state': 'MD',
+ 'zip_code': '21001'}
+{'address': ' 6111 DOBBIN ROAD',
+ 'city': 'COLUMBIA',
+ 'internal_store_number': 'T1044',
+ 'state': 'MD',
+ 'zip_code': '21045'}
+{'address': ' 11200 REISTERSTOWN ROAD',
+ 'city': 'OWINGS MILLS',
+ 'internal_store_number': 'T1045',
+ 'state': 'MD',
+ 'zip_code': '21117'}
+{'address': ' 20908 FREDERICK ROAD',
+ 'city': 'GERMANTOWN',
+ 'internal_store_number': 'T1046',
+ 'state': 'MD',
+ 'zip_code': '20876'}
+{'address': ' 5437 URBANA PIKE',
+ 'city': 'FREDERICK',
+ 'internal_store_number': 'T1137',
+ 'state': 'MD',
+ 'zip_code': '21704'}
+{'address': ' 12000 CHERRY HILL ROAD',
+ 'city': 'SILVER SPRING',
+ 'internal_store_number': 'T1138',
+ 'state': 'MD',
+ 'zip_code': '20904'}
+{'address': ' 1238 PUTTY HILL AVENUE',
+ 'city': 'TOWSON',
+ 'internal_store_number': 'T1142',
+ 'state': 'MD',
+ 'zip_code': '21286'}
+{'address': ' 25 GRAND CORNER AVENUE',
+ 'city': 'GAITHERSBURG',
+ 'internal_store_number': 'T1193',
+ 'state': 'MD',
+ 'zip_code': '20878'}
+{'address': ' 125 EAST NORTHPOINTE DRIVE',
+ 'city': 'SALISBURY',
+ 'internal_store_number': 'T1233',
+ 'state': 'MD',
+ 'zip_code': '21804'}
+{'address': ' 17213 COLE ROAD',
+ 'city': 'HAGERSTOWN',
+ 'internal_store_number': 'T1257',
+ 'state': 'MD',
+ 'zip_code': '21740'}
+{'address': ' 45155 FIRST COLONY WAY',
+ 'city': 'CALIFORNIA',
+ 'internal_store_number': 'T1258',
+ 'state': 'MD',
+ 'zip_code': '20619'}
+{'address': ' 9901 YORK ROAD',
+ 'city': 'COCKEYSVILLE',
+ 'internal_store_number': 'T1265',
+ 'state': 'MD',
+ 'zip_code': '21030'}
+{'address': ' 6100 GREENBELT ROAD',
+ 'city': 'GREENBELT',
+ 'internal_store_number': 'T1295',
+ 'state': 'MD',
+ 'zip_code': '20770'}
+{'address': ' 200 RUNNING HILL ROAD',
+ 'city': 'SOUTH PORTLAND',
+ 'internal_store_number': 'T1338',
+ 'state': 'ME',
+ 'zip_code': '4106'}
+{'address': ' 13221 HALL ROAD',
+ 'city': 'UTICA',
+ 'internal_store_number': 'T0278',
+ 'state': 'MI',
+ 'zip_code': '48315'}
+{'address': ' 15901 FORD ROAD',
+ 'city': 'DEARBORN',
+ 'internal_store_number': 'T0279',
+ 'state': 'MI',
+ 'zip_code': '48126'}
+{'address': ' 14099 PARDEE ROAD',
+ 'city': 'TAYLOR',
+ 'internal_store_number': 'T0280',
+ 'state': 'MI',
+ 'zip_code': '48180'}
+{'address': ' 35401 WARREN ROAD',
+ 'city': 'WESTLAND',
+ 'internal_store_number': 'T0281',
+ 'state': 'MI',
+ 'zip_code': '48185'}
+{'address': ' 32001 JOHN R. ROAD',
+ 'city': 'MADISON HEIGHTS',
+ 'internal_store_number': 'T0282',
+ 'state': 'MI',
+ 'zip_code': '48071'}
+{'address': ' 8500 EAST 8 MILE ROAD',
+ 'city': 'DETROIT',
+ 'internal_store_number': 'T0283',
+ 'state': 'MI',
+ 'zip_code': '48234'}
+{'address': ' 355 SUMMIT DRIVE',
+ 'city': 'WATERFORD',
+ 'internal_store_number': 'T0284',
+ 'state': 'MI',
+ 'zip_code': '48328'}
+{'address': ' 2772 TITTABAWASEE ROAD',
+ 'city': 'SAGINAW',
+ 'internal_store_number': 'T0347',
+ 'state': 'MI',
+ 'zip_code': '48604'}
+{'address': 'G-3515 MILLER ROAD',
+ 'city': 'FLINT',
+ 'internal_store_number': 'T0350',
+ 'state': 'MI',
+ 'zip_code': '48507'}
+{'address': ' 2887 ROCHESTER ROAD SOUTH',
+ 'city': 'ROCHESTER HILLS',
+ 'internal_store_number': 'T0351',
+ 'state': 'MI',
+ 'zip_code': '48307'}
+{'address': ' 30007 PLYMOUTH ROAD',
+ 'city': 'LIVONIA',
+ 'internal_store_number': 'T0352',
+ 'state': 'MI',
+ 'zip_code': '48150'}
+{'address': ' 26650 FORD ROAD',
+ 'city': 'DEARBORN HEIGHTS',
+ 'internal_store_number': 'T0353',
+ 'state': 'MI',
+ 'zip_code': '48127'}
+{'address': ' 43670 FORD ROAD',
+ 'city': 'CANTON',
+ 'internal_store_number': 'T0354',
+ 'state': 'MI',
+ 'zip_code': '48187'}
+{'address': ' 500 EAST EDGEWOOD BLVD',
+ 'city': 'LANSING',
+ 'internal_store_number': 'T0361',
+ 'state': 'MI',
+ 'zip_code': '48911'}
+{'address': ' 4890 MARSH ROAD',
+ 'city': 'OKEMOS',
+ 'internal_store_number': 'T0365',
+ 'state': 'MI',
+ 'zip_code': '48864'}
+{'address': ' 3248 ALPINE AVENUE NW',
+ 'city': 'WALKER',
+ 'internal_store_number': 'T0397',
+ 'state': 'MI',
+ 'zip_code': '49544'}
+{'address': ' 4100 28TH STREET SE',
+ 'city': 'KENTWOOD',
+ 'internal_store_number': 'T0398',
+ 'state': 'MI',
+ 'zip_code': '49512'}
+{'address': ' 334 CHICAGO DRIVE',
+ 'city': 'JENISON',
+ 'internal_store_number': 'T0399',
+ 'state': 'MI',
+ 'zip_code': '49428'}
+{'address': ' 12386 FELCH STREET',
+ 'city': 'HOLLAND',
+ 'internal_store_number': 'T0603',
+ 'state': 'MI',
+ 'zip_code': '49424'}
+{'address': ' 6839 SOUTH WESTNEDGE AVE.',
+ 'city': 'PORTAGE',
+ 'internal_store_number': 'T0604',
+ 'state': 'MI',
+ 'zip_code': '49002'}
+{'address': ' 35700 VAN DYKE AVENUE',
+ 'city': 'STERLING HEIGHTS',
+ 'internal_store_number': 'T0605',
+ 'state': 'MI',
+ 'zip_code': '48312'}
+{'address': ' 5700 BECKLEY ROAD',
+ 'city': 'BATTLE CREEK',
+ 'internal_store_number': 'T0610',
+ 'state': 'MI',
+ 'zip_code': '49015'}
+{'address': ' 30020 GRAND RIVER AVENUE',
+ 'city': 'FARMINGTON HILLS',
+ 'internal_store_number': 'T0611',
+ 'state': 'MI',
+ 'zip_code': '48336'}
+{'address': ' 5609 WEST SAGINAW HIGHWAY',
+ 'city': 'LANSING',
+ 'internal_store_number': 'T0616',
+ 'state': 'MI',
+ 'zip_code': '48917'}
+{'address': ' 3701 LAPEER ROAD',
+ 'city': 'FLINT',
+ 'internal_store_number': 'T0629',
+ 'state': 'MI',
+ 'zip_code': '48503'}
+{'address': ' 4135 WILDER ROAD',
+ 'city': 'BAY CITY',
+ 'internal_store_number': 'T0631',
+ 'state': 'MI',
+ 'zip_code': '48706'}
+{'address': ' 4300 24TH AVENUE',
+ 'city': 'FORT GRATIOT',
+ 'internal_store_number': 'T0632',
+ 'state': 'MI',
+ 'zip_code': '48059'}
+{'address': ' 27300 DEQUINDRE ROAD',
+ 'city': 'WARREN',
+ 'internal_store_number': 'T0633',
+ 'state': 'MI',
+ 'zip_code': '48092'}
+{'address': ' 2000 WATERS ROAD',
+ 'city': 'ANN ARBOR',
+ 'internal_store_number': 'T0634',
+ 'state': 'MI',
+ 'zip_code': '48103'}
+{'address': ' 3100 WEST SOUTH AIRPORT ROAD',
+ 'city': 'TRAVERSE CITY',
+ 'internal_store_number': 'T0671',
+ 'state': 'MI',
+ 'zip_code': '49684'}
+{'address': '6820 EASTMAN ROAD',
+ 'city': 'MIDLAND',
+ 'internal_store_number': 'T0672',
+ 'state': 'MI',
+ 'zip_code': '48640'}
+{'address': ' 1076 JACKSON CROSSING',
+ 'city': 'JACKSON',
+ 'internal_store_number': 'T0673',
+ 'state': 'MI',
+ 'zip_code': '49202'}
+{'address': ' 1740 E. SHERMAN BLVD',
+ 'city': 'MUSKEGON',
+ 'internal_store_number': 'T0764',
+ 'state': 'MI',
+ 'zip_code': '49444'}
+{'address': ' 18000 VERNIER ROAD',
+ 'city': 'HARPER WOODS',
+ 'internal_store_number': 'T0776',
+ 'state': 'MI',
+ 'zip_code': '48225'}
+{'address': ' 21400 NORTHWESTERN HWY',
+ 'city': 'SOUTHFIELD',
+ 'internal_store_number': 'T0777',
+ 'state': 'MI',
+ 'zip_code': '48075'}
+{'address': ' 33860 GRATIOT AVENUE SOUTH',
+ 'city': 'CLINTON TOWNSHIP',
+ 'internal_store_number': 'T0819',
+ 'state': 'MI',
+ 'zip_code': '48035'}
+{'address': ' 20100 HAGGERTY ROAD',
+ 'city': 'LIVONIA',
+ 'internal_store_number': 'T0872',
+ 'state': 'MI',
+ 'zip_code': '48152'}
+{'address': ' 495 HAGGERTY ROAD',
+ 'city': 'WALLED LAKE',
+ 'internal_store_number': 'T0896',
+ 'state': 'MI',
+ 'zip_code': '48390'}
+{'address': ' 2121 NORTH MONROE STREET UNIT 100',
+ 'city': 'MONROE',
+ 'internal_store_number': 'T0900',
+ 'state': 'MI',
+ 'zip_code': '48162'}
+{'address': ' 5350 WEST MAIN STREET',
+ 'city': 'KALAMAZOO',
+ 'internal_store_number': 'T0901',
+ 'state': 'MI',
+ 'zip_code': '49009'}
+{'address': ' 8043 CHALLIS ROAD',
+ 'city': 'BRIGHTON',
+ 'internal_store_number': 'T0922',
+ 'state': 'MI',
+ 'zip_code': '48116'}
+{'address': ' 23555 ALLEN ROAD',
+ 'city': 'WOODHAVEN',
+ 'internal_store_number': 'T0923',
+ 'state': 'MI',
+ 'zip_code': '48183'}
+{'address': ' 4097 EAST BLUEGRASS ROAD',
+ 'city': 'MOUNT PLEASANT',
+ 'internal_store_number': 'T0924',
+ 'state': 'MI',
+ 'zip_code': '48858'}
+{'address': ' 51400 GRATIOT AVENUE',
+ 'city': 'CHESTERFIELD TOWNSHIP',
+ 'internal_store_number': 'T0945',
+ 'state': 'MI',
+ 'zip_code': '48051'}
+{'address': ' 5455 CLYDE PARK S. W.',
+ 'city': 'WYOMING',
+ 'internal_store_number': 'T1052',
+ 'state': 'MI',
+ 'zip_code': '49509'}
+{'address': ' 960 FAIRPLAIN DRIVE',
+ 'city': 'BENTON HARBOR',
+ 'internal_store_number': 'T1127',
+ 'state': 'MI',
+ 'zip_code': '49022'}
+{'address': ' 650 BROWN ROAD',
+ 'city': 'AUBURN HILLS',
+ 'internal_store_number': 'T1251',
+ 'state': 'MI',
+ 'zip_code': '48326'}
+{'address': ' 3749 CARPENTER ROAD',
+ 'city': 'YPSILANTI',
+ 'internal_store_number': 'T1285',
+ 'state': 'MI',
+ 'zip_code': '48197'}
+{'address': ' 1301 COOLIDGE HWY',
+ 'city': 'TROY',
+ 'internal_store_number': 'T1313',
+ 'state': 'MI',
+ 'zip_code': '48084'}
+{'address': ' 3250 US HIGHWAY 41 WEST',
+ 'city': 'MARQUETTE',
+ 'internal_store_number': 'T1334',
+ 'state': 'MI',
+ 'zip_code': '49855'}
+{'address': ' 1515 WEST COUNTY RD_B',
+ 'city': 'ROSEVILLE',
+ 'internal_store_number': 'T0001',
+ 'state': 'MN',
+ 'zip_code': '55113'}
+{'address': ' 8900 HIGHWAY 7',
+ 'city': 'ST. LOUIS PARK',
+ 'internal_store_number': 'T0002',
+ 'state': 'MN',
+ 'zip_code': '55426'}
+{'address': ' 5537 WEST BROADWAY',
+ 'city': 'CRYSTAL',
+ 'internal_store_number': 'T0003',
+ 'state': 'MN',
+ 'zip_code': '55428'}
+{'address': ' 1902 MILLER TRUNK HIGHWAY',
+ 'city': 'DULUTH',
+ 'internal_store_number': 'T0004',
+ 'state': 'MN',
+ 'zip_code': '55811'}
+{'address': ' 2555 WEST 79 STREET',
+ 'city': 'BLOOMINGTON',
+ 'internal_store_number': 'T0005',
+ 'state': 'MN',
+ 'zip_code': '55431'}
+{'address': ' 755 53RD AVENUE NE',
+ 'city': 'FRIDLEY',
+ 'internal_store_number': 'T0008',
+ 'state': 'MN',
+ 'zip_code': '55421'}
+{'address': ' 1776 SOUTH ROBERTS ST',
+ 'city': 'WEST ST. PAUL',
+ 'internal_store_number': 'T0009',
+ 'state': 'MN',
+ 'zip_code': '55118'}
+{'address': ' 7000 YORK AVENUE SOUTH',
+ 'city': 'EDINA',
+ 'internal_store_number': 'T0047',
+ 'state': 'MN',
+ 'zip_code': '55435'}
+{'address': ' 2500 EAST LAKE STREET',
+ 'city': 'MINNEAPOLIS',
+ 'internal_store_number': 'T0052',
+ 'state': 'MN',
+ 'zip_code': '55406'}
+{'address': ' 810 WEST COUNTY ROAD 42',
+ 'city': 'BURNSVILLE',
+ 'internal_store_number': 'T0056',
+ 'state': 'MN',
+ 'zip_code': '55337'}
+{'address': ' 1744 SUBURBAN AVENUE',
+ 'city': 'ST. PAUL',
+ 'internal_store_number': 'T0068',
+ 'state': 'MN',
+ 'zip_code': '55106'}
+{'address': ' 13201 RIDGEDALE DRIVE',
+ 'city': 'MINNETONKA',
+ 'internal_store_number': 'T0100',
+ 'state': 'MN',
+ 'zip_code': '55305'}
+{'address': ' 1300 UNIVERSITY AVENUE',
+ 'city': 'ST. PAUL',
+ 'internal_store_number': 'T0160',
+ 'state': 'MN',
+ 'zip_code': '55104'}
+{'address': ' 701 WEST BROADWAY',
+ 'city': 'MINNEAPOLIS',
+ 'internal_store_number': 'T0180',
+ 'state': 'MN',
+ 'zip_code': '55411'}
+{'address': ' 4201 WEST DIVISION STREET',
+ 'city': 'ST. CLOUD',
+ 'internal_store_number': 'T0215',
+ 'state': 'MN',
+ 'zip_code': '56301'}
+{'address': ' 8225 FLYING CLOUD DRIVE',
+ 'city': 'EDEN PRAIRIE',
+ 'internal_store_number': 'T0220',
+ 'state': 'MN',
+ 'zip_code': '55344'}
+{'address': ' 6100 SHINGLE CREEK PARKWAY',
+ 'city': 'BROOKLYN CENTER',
+ 'internal_store_number': 'T0240',
+ 'state': 'MN',
+ 'zip_code': '55430'}
+{'address': ' 3601 SOUTH HIGHWAY 100',
+ 'city': 'ST. LOUIS PARK',
+ 'internal_store_number': 'T0260',
+ 'state': 'MN',
+ 'zip_code': '55416'}
+{'address': '2000 CLIFF LAKE ROAD',
+ 'city': 'EAGAN',
+ 'internal_store_number': 'T0360',
+ 'state': 'MN',
+ 'zip_code': '55122'}
+{'address': ' 3800 LEXINGTON AVENUE',
+ 'city': 'SHOREVIEW',
+ 'internal_store_number': 'T0619',
+ 'state': 'MN',
+ 'zip_code': '55126'}
+{'address': ' 15150 CEDAR AVENUE',
+ 'city': 'APPLE VALLEY',
+ 'internal_store_number': 'T0643',
+ 'state': 'MN',
+ 'zip_code': '55124'}
+{'address': ' 2100 PAUL BUNYAN DRIVE NW',
+ 'city': 'BEMIDJI',
+ 'internal_store_number': 'T0657',
+ 'state': 'MN',
+ 'zip_code': '56601'}
+{'address': ' 3301 HIGHWAY 10 EAST',
+ 'city': 'MOORHEAD',
+ 'internal_store_number': 'T0658',
+ 'state': 'MN',
+ 'zip_code': '56560'}
+{'address': ' 700 DELLWOOD DRIVE NORTH',
+ 'city': 'BAXTER',
+ 'internal_store_number': 'T0659',
+ 'state': 'MN',
+ 'zip_code': '56425'}
+{'address': ' 2505 1ST STREET SOUTH',
+ 'city': 'WILLMAR',
+ 'internal_store_number': 'T0661',
+ 'state': 'MN',
+ 'zip_code': '56201'}
+{'address': ' 8655 EAST POINT DOUGLAS ROAD',
+ 'city': 'COTTAGE GROVE',
+ 'internal_store_number': 'T0662',
+ 'state': 'MN',
+ 'zip_code': '55016'}
+{'address': ' 1850 ADAMS STREET',
+ 'city': 'MANKATO',
+ 'internal_store_number': 'T0663',
+ 'state': 'MN',
+ 'zip_code': '56001'}
+{'address': ' 4175 VINEWOOD LANE NORTH',
+ 'city': 'PLYMOUTH',
+ 'internal_store_number': 'T0664',
+ 'state': 'MN',
+ 'zip_code': '55442'}
+{'address': ' 7535 WEST BROADWAY',
+ 'city': 'BROOKLYN PARK',
+ 'internal_store_number': 'T0693',
+ 'state': 'MN',
+ 'zip_code': '55428'}
+{'address': ' 7200 VALLEY CREEK PLAZA',
+ 'city': 'WOODBURY',
+ 'internal_store_number': 'T0694',
+ 'state': 'MN',
+ 'zip_code': '55125'}
+{'address': ' 975 EAST COUNTY ROAD E',
+ 'city': 'VADNAIS HEIGHTS',
+ 'internal_store_number': 'T0751',
+ 'state': 'MN',
+ 'zip_code': '55127'}
+{'address': ' 8600 SPRINGBROOK DRIVE',
+ 'city': 'COON RAPIDS',
+ 'internal_store_number': 'T0820',
+ 'state': 'MN',
+ 'zip_code': '55433'}
+{'address': ' 4404 HIGHWAY 29 SOUTH',
+ 'city': 'ALEXANDRIA',
+ 'internal_store_number': 'T0821',
+ 'state': 'MN',
+ 'zip_code': '56308'}
+{'address': ' 1001 13TH STREET SOUTH',
+ 'city': 'VIRGINIA',
+ 'internal_store_number': 'T0847',
+ 'state': 'MN',
+ 'zip_code': '55792'}
+{'address': ' 1300 HIGHWAY 55 EAST',
+ 'city': 'BUFFALO',
+ 'internal_store_number': 'T0861',
+ 'state': 'MN',
+ 'zip_code': '55313'}
+{'address': ' 851 WEST 78TH STREET',
+ 'city': 'CHANHASSEN',
+ 'internal_store_number': 'T0862',
+ 'state': 'MN',
+ 'zip_code': '55317'}
+{'address': ' 2140 SOUTH POKEGAMA AVENUE',
+ 'city': 'GRAND RAPIDS',
+ 'internal_store_number': 'T0904',
+ 'state': 'MN',
+ 'zip_code': '55744'}
+{'address': ' 125 LINCOLN AVENUE SOUTHEAST',
+ 'city': 'SAINT CLOUD',
+ 'internal_store_number': 'T0930',
+ 'state': 'MN',
+ 'zip_code': '56304'}
+{'address': '2021 MARKET DRIVE',
+ 'city': 'STILLWATER',
+ 'internal_store_number': 'T0931',
+ 'state': 'MN',
+ 'zip_code': '55082'}
+{'address': ' 19146 FREEPORT AVENUE',
+ 'city': 'ELK RIVER',
+ 'internal_store_number': 'T0956',
+ 'state': 'MN',
+ 'zip_code': '55330'}
+{'address': ' 301 PARK DRIVE N. W.',
+ 'city': 'OWATONNA',
+ 'internal_store_number': 'T1068',
+ 'state': 'MN',
+ 'zip_code': '55060'}
+{'address': ' 1650 NEW BRIGHTON BLVD',
+ 'city': 'MINNEAPOLIS',
+ 'internal_store_number': 'T1095',
+ 'state': 'MN',
+ 'zip_code': '55413'}
+{'address': ' 860 MANKATO AVE',
+ 'city': 'WINONA',
+ 'internal_store_number': 'T1096',
+ 'state': 'MN',
+ 'zip_code': '55987'}
+{'address': ' 33 SOUTH SIXTH STREET',
+ 'city': 'MINNEAPOLIS',
+ 'internal_store_number': 'T1099',
+ 'state': 'MN',
+ 'zip_code': '55402'}
+{'address': ' 3300 124TH AVENUE NW',
+ 'city': 'COON RAPIDS',
+ 'internal_store_number': 'T1144',
+ 'state': 'MN',
+ 'zip_code': '55433'}
+{'address': ' 9450 DUNKIRK LANE',
+ 'city': 'MAPLE GROVE',
+ 'internal_store_number': 'T1145',
+ 'state': 'MN',
+ 'zip_code': '55311'}
+{'address': ' 1701 - 18TH AVENUE NW',
+ 'city': 'AUSTIN',
+ 'internal_store_number': 'T1173',
+ 'state': 'MN',
+ 'zip_code': '55912'}
+{'address': ' 2300 COLLEGE WAY',
+ 'city': 'FERGUS FALLS',
+ 'internal_store_number': 'T1174',
+ 'state': 'MN',
+ 'zip_code': '56537'}
+{'address': ' 2199 EAST HIGHWAY 36',
+ 'city': 'NORTH ST PAUL',
+ 'internal_store_number': 'T1185',
+ 'state': 'MN',
+ 'zip_code': '55109'}
+{'address': ' 1914 SOUTH BROADWAY',
+ 'city': 'NEW ULM',
+ 'internal_store_number': 'T1202',
+ 'state': 'MN',
+ 'zip_code': '56073'}
+{'address': ' 1370 HIGHWAY 15 SOUTH',
+ 'city': 'HUTCHINSON',
+ 'internal_store_number': 'T1210',
+ 'state': 'MN',
+ 'zip_code': '55350'}
+{'address': ' 2323 HIGHWAY 3 SOUTH',
+ 'city': 'NORTHFIELD',
+ 'internal_store_number': 'T1211',
+ 'state': 'MN',
+ 'zip_code': '55057'}
+{'address': ' 356 12TH STREET SW',
+ 'city': 'FOREST LAKE',
+ 'internal_store_number': 'T1244',
+ 'state': 'MN',
+ 'zip_code': '55025'}
+{'address': ' 875 GENERAL SIEBEN DRIVE',
+ 'city': 'HASTINGS',
+ 'internal_store_number': 'T1245',
+ 'state': 'MN',
+ 'zip_code': '55033'}
+{'address': ' 1685 17TH AVENUE EAST',
+ 'city': 'SHAKOPEE',
+ 'internal_store_number': 'T1272',
+ 'state': 'MN',
+ 'zip_code': '55379'}
+{'address': ' 215 BALSAM STREET NORTH-SUITE 100',
+ 'city': 'CAMBRIDGE',
+ 'internal_store_number': 'T1303',
+ 'state': 'MN',
+ 'zip_code': '55008'}
+{'address': ' 3827 MARKETPLACE DRIVE NW',
+ 'city': 'ROCHESTER',
+ 'internal_store_number': 'T1351',
+ 'state': 'MN',
+ 'zip_code': '55901'}
+{'address': ' 111 PIONEER TRAIL',
+ 'city': 'CHASKA',
+ 'internal_store_number': 'T1352',
+ 'state': 'MN',
+ 'zip_code': '55318'}
+{'address': '4802 HIGHWAY 101',
+ 'city': 'MINNETONKA',
+ 'internal_store_number': 'T1356',
+ 'state': 'MN',
+ 'zip_code': '55345'}
+{'address': ' 900 NICOLLET MALL',
+ 'city': 'MINNEAPOLIS',
+ 'internal_store_number': 'T1375',
+ 'state': 'MN',
+ 'zip_code': '55403'}
+{'address': ' 5252 LINDBERGH BLVD SO',
+ 'city': 'ST LOUIS',
+ 'internal_store_number': 'T0011',
+ 'state': 'MO',
+ 'zip_code': '63126'}
+{'address': ' 12275 ST CHARLES ROCK RD.',
+ 'city': 'BRIDGETON',
+ 'internal_store_number': 'T0012',
+ 'state': 'MO',
+ 'zip_code': '63044'}
+{'address': ' 15025 MANCHESTER ROAD',
+ 'city': 'BALLWIN',
+ 'internal_store_number': 'T0026',
+ 'state': 'MO',
+ 'zip_code': '63011'}
+{'address': ' 4255 HAMPTON AVENUE',
+ 'city': 'ST LOUIS',
+ 'internal_store_number': 'T0051',
+ 'state': 'MO',
+ 'zip_code': '63109'}
+{'address': ' 2400 BERNADETTE DRIVE',
+ 'city': 'COLUMBIA',
+ 'internal_store_number': 'T0239',
+ 'state': 'MO',
+ 'zip_code': '65203'}
+{'address': ' 735 WEST STADIUM BLVD',
+ 'city': 'JEFFERSON CITY',
+ 'internal_store_number': 'T0752',
+ 'state': 'MO',
+ 'zip_code': '65109'}
+{'address': ' 3151 EAST 7TH STREET',
+ 'city': 'JOPLIN',
+ 'internal_store_number': 'T0774',
+ 'state': 'MO',
+ 'zip_code': '64801'}
+{'address': ' 202 SIEMERS DRIVE',
+ 'city': 'CAPE GIRARDEAU',
+ 'internal_store_number': 'T0992',
+ 'state': 'MO',
+ 'zip_code': '63701'}
+{'address': ' 1825 EAST PRIMROSE',
+ 'city': 'SPRINGFIELD',
+ 'internal_store_number': 'T1031',
+ 'state': 'MO',
+ 'zip_code': '65804'}
+{'address': ' 6241 MID-RIVERS MALL DRIVE',
+ 'city': 'ST. CHARLES',
+ 'internal_store_number': 'T1035',
+ 'state': 'MO',
+ 'zip_code': '63304'}
+{'address': ' 2341 N. HIGHWAY 67',
+ 'city': 'FLORISSANT',
+ 'internal_store_number': 'T1101',
+ 'state': 'MO',
+ 'zip_code': '63033'}
+{'address': ' 25 BRENTWOOD PROMENADE COURT',
+ 'city': 'BRENTWOOD',
+ 'internal_store_number': 'T1102',
+ 'state': 'MO',
+ 'zip_code': '63144'}
+{'address': ' 8420 N. MADISON AVE.',
+ 'city': 'KANSAS CITY',
+ 'internal_store_number': 'T1177',
+ 'state': 'MO',
+ 'zip_code': '64155'}
+{'address': ' 17810 E. 39TH STREET',
+ 'city': 'INDEPENDENCE',
+ 'internal_store_number': 'T1201',
+ 'state': 'MO',
+ 'zip_code': '64055'}
+{'address': ' 2300 HIGHWAY K',
+ 'city': 'OFALLON',
+ 'internal_store_number': 'T1241',
+ 'state': 'MO',
+ 'zip_code': '63366'}
+{'address': ' 3849 VOGEL ROAD',
+ 'city': 'ARNOLD',
+ 'internal_store_number': 'T1278',
+ 'state': 'MO',
+ 'zip_code': '63010'}
+{'address': ' 1042 SOUTH KIRKWOOD',
+ 'city': 'KIRKWOOD',
+ 'internal_store_number': 'T1279',
+ 'state': 'MO',
+ 'zip_code': '63122'}
+{'address': ' 3881 MEXICO ROAD',
+ 'city': 'ST CHARLES',
+ 'internal_store_number': 'T1280',
+ 'state': 'MO',
+ 'zip_code': '63303'}
+{'address': ' 197 GROVIS BLUFF PLAZA DRIVE',
+ 'city': 'FENTON',
+ 'internal_store_number': 'T1314',
+ 'state': 'MO',
+ 'zip_code': '63026'}
+{'address': '4375 N CHOUTEAU TRFY',
+ 'city': 'KANSAS CITY',
+ 'internal_store_number': 'T1388',
+ 'state': 'MO',
+ 'zip_code': '64117'}
+{'address': ' 1850 NORTHWEST CHIPMAN ROAD',
+ 'city': 'LEES SUMMIT',
+ 'internal_store_number': 'T1392',
+ 'state': 'MO',
+ 'zip_code': '64081'}
+{'address': ' 6365 I-55 NORTH',
+ 'city': 'JACKSON',
+ 'internal_store_number': 'T0754',
+ 'state': 'MS',
+ 'zip_code': '39213'}
+{'address': ' 7255 INTERSTATE BLVD.',
+ 'city': 'HORN LAKE',
+ 'internal_store_number': 'T1169',
+ 'state': 'MS',
+ 'zip_code': '38637'}
+{'address': ' 2601 CENTRAL AVENUE',
+ 'city': 'BILLINGS',
+ 'internal_store_number': 'T0171',
+ 'state': 'MT',
+ 'zip_code': '59102'}
+{'address': ' 2000 10TH AVE. S.',
+ 'city': 'GREAT FALLS',
+ 'internal_store_number': 'T0253',
+ 'state': 'MT',
+ 'zip_code': '59405'}
+{'address': ' 2420 RESERVE STREET',
+ 'city': 'MISSOULA',
+ 'internal_store_number': 'T0885',
+ 'state': 'MT',
+ 'zip_code': '59808'}
+{'address': ' 2550 CATRON STREET',
+ 'city': 'BOZEMAN',
+ 'internal_store_number': 'T1237',
+ 'state': 'MT',
+ 'zip_code': '59718'}
+{'address': ' 3303 NORTH MONTANA AVENUE',
+ 'city': 'HELENA',
+ 'internal_store_number': 'T1282',
+ 'state': 'MT',
+ 'zip_code': '59602'}
+{'address': ' 403 MAIN STREET',
+ 'city': 'BILLINGS',
+ 'internal_store_number': 'T1333',
+ 'state': 'MT',
+ 'zip_code': '59105'}
+{'address': ' 197 OLD NEW HOPE RD',
+ 'city': 'GASTONIA',
+ 'internal_store_number': 'T0387',
+ 'state': 'NC',
+ 'zip_code': '28052'}
+{'address': ' 2056 SKIBO ROAD',
+ 'city': 'FAYETTEVILLE',
+ 'internal_store_number': 'T0755',
+ 'state': 'NC',
+ 'zip_code': '28314'}
+{'address': ' 9531 SOUTH BLVD',
+ 'city': 'CHARLOTTE',
+ 'internal_store_number': 'T0762',
+ 'state': 'NC',
+ 'zip_code': '28273'}
+{'address': ' 1900 MATTHEWS TOWNSHIP PARKWAY',
+ 'city': 'MATTHEWS',
+ 'internal_store_number': 'T0918',
+ 'state': 'NC',
+ 'zip_code': '28105'}
+{'address': ' 4700 GREEN ROAD',
+ 'city': 'RALEIGH',
+ 'internal_store_number': 'T0960',
+ 'state': 'NC',
+ 'zip_code': '27604'}
+{'address': ' 2021 WALNUT STREET',
+ 'city': 'CARY',
+ 'internal_store_number': 'T0961',
+ 'state': 'NC',
+ 'zip_code': '27511'}
+{'address': ' 731 SUTTERS CREEK BLVD.',
+ 'city': 'ROCKY MOUNT',
+ 'internal_store_number': 'T0962',
+ 'state': 'NC',
+ 'zip_code': '27804'}
+{'address': ' 1204 SUNBURST DRIVE',
+ 'city': 'GOLDSBORO',
+ 'internal_store_number': 'T0964',
+ 'state': 'NC',
+ 'zip_code': '27534'}
+{'address': ' 3333 CLOVERLEAF PARKWAY',
+ 'city': 'KANNAPOLIS',
+ 'internal_store_number': 'T0965',
+ 'state': 'NC',
+ 'zip_code': '28083'}
+{'address': ' 9801 SAM FURR ROAD',
+ 'city': 'HUNTERSVILLE',
+ 'internal_store_number': 'T0966',
+ 'state': 'NC',
+ 'zip_code': '28078'}
+{'address': ' 3410 DR. ML KING JR.BLVD.',
+ 'city': 'NEW BERN',
+ 'internal_store_number': 'T1015',
+ 'state': 'NC',
+ 'zip_code': '28562'}
+{'address': ' 3040 SOUTH EVANS STREET',
+ 'city': 'GREENVILLE',
+ 'internal_store_number': 'T1022',
+ 'state': 'NC',
+ 'zip_code': '27834'}
+{'address': '5420 UNIVERSITY PARKWAY',
+ 'city': 'WINSTON����_��SALEM',
+ 'internal_store_number': 'T1077',
+ 'state': 'NC',
+ 'zip_code': '27105'}
+{'address': ' 1212 BRIDFORD PARKWAY',
+ 'city': 'GREENSBORO',
+ 'internal_store_number': 'T1078',
+ 'state': 'NC',
+ 'zip_code': '27407'}
+{'address': ' 1050 MALL LOOP ROAD',
+ 'city': 'HIGH POINT',
+ 'internal_store_number': 'T1079',
+ 'state': 'NC',
+ 'zip_code': '27265'}
+{'address': ' 4841 GROVE BARTON ROAD',
+ 'city': 'RALEIGH',
+ 'internal_store_number': 'T1080',
+ 'state': 'NC',
+ 'zip_code': '27613'}
+{'address': ' 8120 UNIVERSITY CITY BLVD',
+ 'city': 'CHARLOTTE',
+ 'internal_store_number': 'T1081',
+ 'state': 'NC',
+ 'zip_code': '28213'}
+{'address': ' 1040 HANES MALL BLVD.',
+ 'city': 'WINSTON����_��SALEM',
+ 'internal_store_number': 'T1086',
+ 'state': 'NC',
+ 'zip_code': '27103'}
+{'address': ' 7860 REA ROAD',
+ 'city': 'CHARLOTTE',
+ 'internal_store_number': 'T1087',
+ 'state': 'NC',
+ 'zip_code': '28277'}
+{'address': ' 2700 TIMBER DRIVE',
+ 'city': 'GARNER',
+ 'internal_store_number': 'T1104',
+ 'state': 'NC',
+ 'zip_code': '27529'}
+{'address': ' 4711 NEW CENTRE DRIVE',
+ 'city': 'WILMINGTON',
+ 'internal_store_number': 'T1107',
+ 'state': 'NC',
+ 'zip_code': '28405'}
+{'address': ' 2701 LAWNDALE DRIVE',
+ 'city': 'GREENSBORO',
+ 'internal_store_number': 'T1180',
+ 'state': 'NC',
+ 'zip_code': '27408'}
+{'address': ' 1910 CATAWBA VALLEY BLVD. S.E.',
+ 'city': 'HICKORY',
+ 'internal_store_number': 'T1181',
+ 'state': 'NC',
+ 'zip_code': '28602'}
+{'address': ' 1395-D WESTERN BLVD',
+ 'city': 'JACKSONVILLE',
+ 'internal_store_number': 'T1226',
+ 'state': 'NC',
+ 'zip_code': '28546'}
+{'address': ' 4202 13TH AVE SOUTH',
+ 'city': 'FARGO',
+ 'internal_store_number': 'T0061',
+ 'state': 'ND',
+ 'zip_code': '58103'}
+{'address': ' 800 KIRKWOOD PLAZA',
+ 'city': 'BISMARCK',
+ 'internal_store_number': 'T0081',
+ 'state': 'ND',
+ 'zip_code': '58504'}
+{'address': ' 2400 10TH ST S.W.',
+ 'city': 'MINOT',
+ 'internal_store_number': 'T0085',
+ 'state': 'ND',
+ 'zip_code': '58701'}
+{'address': '3601 32ND AVENUE SOUTH',
+ 'city': 'GRAND FORKS',
+ 'internal_store_number': 'T1783',
+ 'state': 'ND',
+ 'zip_code': '58201'}
+{'address': ' 360 N. SADDLE CREEK RD',
+ 'city': 'OMAHA',
+ 'internal_store_number': 'T0036',
+ 'state': 'NE',
+ 'zip_code': '68131'}
+{'address': ' 12990 WEST CENTER ROAD',
+ 'city': 'OMAHA',
+ 'internal_store_number': 'T0059',
+ 'state': 'NE',
+ 'zip_code': '68144'}
+{'address': ' 333 NORTH 48TH STREET',
+ 'city': 'LINCOLN',
+ 'internal_store_number': 'T0217',
+ 'state': 'NE',
+ 'zip_code': '68504'}
+{'address': ' 4001 NORTH 132ND STREET',
+ 'city': 'OMAHA',
+ 'internal_store_number': 'T0530',
+ 'state': 'NE',
+ 'zip_code': '68164'}
+{'address': ' 718 N WASHINGTON',
+ 'city': 'PAPILLION',
+ 'internal_store_number': 'T0532',
+ 'state': 'NE',
+ 'zip_code': '68046'}
+{'address': '1401 FRONTAGE ROAD',
+ 'city': 'SCOTTSBLUFF',
+ 'internal_store_number': 'T0831',
+ 'state': 'NE',
+ 'zip_code': '69361'}
+{'address': ' 1510 MARKET LANE',
+ 'city': 'NORFOLK',
+ 'internal_store_number': 'T0856',
+ 'state': 'NE',
+ 'zip_code': '68701'}
+{'address': ' 4800 3RD AVENUE',
+ 'city': 'KEARNEY',
+ 'internal_store_number': 'T0857',
+ 'state': 'NE',
+ 'zip_code': '68847'}
+{'address': ' 5330 SOUTH 56TH STREET',
+ 'city': 'LINCOLN',
+ 'internal_store_number': 'T0879',
+ 'state': 'NE',
+ 'zip_code': '68516'}
+{'address': ' 17810 WEST CENTER',
+ 'city': 'OMAHA',
+ 'internal_store_number': 'T1777',
+ 'state': 'NE',
+ 'zip_code': '68130'}
+{'address': ' 203-219 SOUTH BROADWAY',
+ 'city': 'SALEM',
+ 'internal_store_number': 'T1186',
+ 'state': 'NH',
+ 'zip_code': '3079'}
+{'address': ' 80 DAMANTE DRIVE',
+ 'city': 'CONCORD',
+ 'internal_store_number': 'T1227',
+ 'state': 'NH',
+ 'zip_code': '3301'}
+{'address': ' 310 DANIEL WEBSTER HIGHWAY',
+ 'city': 'NASHUA',
+ 'internal_store_number': 'T1228',
+ 'state': 'NH',
+ 'zip_code': '3060'}
+{'address': ' 100 PARSONAGE ROAD',
+ 'city': 'EDISON',
+ 'internal_store_number': 'T1055',
+ 'state': 'NJ',
+ 'zip_code': '8837'}
+{'address': ' 2690 US HWY 22 EAST',
+ 'city': 'UNION',
+ 'internal_store_number': 'T1084',
+ 'state': 'NJ',
+ 'zip_code': '7083'}
+{'address': ' 2137 ROUTE 38',
+ 'city': 'CHERRY HILL',
+ 'internal_store_number': 'T1085',
+ 'state': 'NJ',
+ 'zip_code': '8002'}
+{'address': '380 CONSUMER SQUARE',
+ 'city': 'MAYS LANDING',
+ 'internal_store_number': 'T1109',
+ 'state': 'NJ',
+ 'zip_code': '8330'}
+{'address': ' 4001 STATE ROUTE 42',
+ 'city': 'TURNERSVILLE',
+ 'internal_store_number': 'T1132',
+ 'state': 'NJ',
+ 'zip_code': '8012'}
+{'address': ' 1139 WHITE HORSE ROAD',
+ 'city': 'VOORHEES',
+ 'internal_store_number': 'T1133',
+ 'state': 'NJ',
+ 'zip_code': '8043'}
+{'address': ' 500 NASSAU PARK BLVD.',
+ 'city': 'PRINCETON',
+ 'internal_store_number': 'T1151',
+ 'state': 'NJ',
+ 'zip_code': '8540'}
+{'address': ' 400 RYDERS LANE',
+ 'city': 'MILLTOWN',
+ 'internal_store_number': 'T1152',
+ 'state': 'NJ',
+ 'zip_code': '8850'}
+{'address': ' 570 ROUTE 70 WEST',
+ 'city': 'BRICK',
+ 'internal_store_number': 'T1153',
+ 'state': 'NJ',
+ 'zip_code': '8723'}
+{'address': ' 1331 HOOPER AVENUE',
+ 'city': 'TOMS RIVER',
+ 'internal_store_number': 'T1154',
+ 'state': 'NJ',
+ 'zip_code': '8753'}
+{'address': ' 1515 ROUTE 22 WEST',
+ 'city': 'WATCHUNG',
+ 'internal_store_number': 'T1155',
+ 'state': 'NJ',
+ 'zip_code': '7060'}
+{'address': ' 2703 ROUTE 541',
+ 'city': 'BURLINGTON',
+ 'internal_store_number': 'T1158',
+ 'state': 'NJ',
+ 'zip_code': '8016'}
+{'address': ' 632 ROUTE 46 EAST',
+ 'city': 'FAIRFIELD',
+ 'internal_store_number': 'T1175',
+ 'state': 'NJ',
+ 'zip_code': '7004'}
+{'address': '55 US HWY 9 ',
+ 'city': 'MANALAPAN',
+ 'internal_store_number': 'T1184',
+ 'state': 'NJ',
+ 'zip_code': '7726'}
+{'address': ' 2105 ROUTE 35',
+ 'city': 'MIDDLETOWN',
+ 'internal_store_number': 'T1192',
+ 'state': 'NJ',
+ 'zip_code': '7748'}
+{'address': ' 200 PROMENADE BLVD.',
+ 'city': 'BRIDGEWATER',
+ 'internal_store_number': 'T1224',
+ 'state': 'NJ',
+ 'zip_code': '8807'}
+{'address': ' 543 RIVER ROAD',
+ 'city': 'EDGEWATER',
+ 'internal_store_number': 'T1263',
+ 'state': 'NJ',
+ 'zip_code': '7020'}
+{'address': '501-1099 WEST EDGAR ROAD',
+ 'city': 'LINDEN',
+ 'internal_store_number': 'T1315',
+ 'state': 'NJ',
+ 'zip_code': '7036'}
+{'address': ' 630 MAIN STREET',
+ 'city': 'HACKENSACK',
+ 'internal_store_number': 'T1330',
+ 'state': 'NJ',
+ 'zip_code': '7601'}
+{'address': ' 70 PRINCETON HIGHTSTOWN ROAD',
+ 'city': 'EAST WINDSOR',
+ 'internal_store_number': 'T1345',
+ 'state': 'NJ',
+ 'zip_code': '8520'}
+{'address': ' 751 S RTE 73',
+ 'city': 'EVESHAM',
+ 'internal_store_number': 'T1365',
+ 'state': 'NJ',
+ 'zip_code': '8053'}
+{'address': '2331 NEW JERSEY 66',
+ 'city': 'OCEAN TOWNSHIP',
+ 'internal_store_number': 'T1378',
+ 'state': 'NJ',
+ 'zip_code': '7712'}
+{'address': ' 1900 DEPTFORD CENTER ROAD',
+ 'city': 'DEPTFORD',
+ 'internal_store_number': 'T1389',
+ 'state': 'NJ',
+ 'zip_code': '8096'}
+{'address': ' 8710 MONTGOMERY BLVD.NE',
+ 'city': 'ALBUQUERQUE',
+ 'internal_store_number': 'T0356',
+ 'state': 'NM',
+ 'zip_code': '87111'}
+{'address': ' 11120 LOMAS BLVD. NE',
+ 'city': 'ALBUQUERQUE',
+ 'internal_store_number': 'T0357',
+ 'state': 'NM',
+ 'zip_code': '87112'}
+{'address': ' 9371 COORS BLVD. N.W.',
+ 'city': 'ALBUQUERQUE',
+ 'internal_store_number': 'T0625',
+ 'state': 'NM',
+ 'zip_code': '87114'}
+{'address': ' 2541 E LOHMAN',
+ 'city': 'LAS CRUCES',
+ 'internal_store_number': 'T0769',
+ 'state': 'NM',
+ 'zip_code': '88011'}
+{'address': ' 2725 NORTH MAIN STREET',
+ 'city': 'ROSWELL',
+ 'internal_store_number': 'T0832',
+ 'state': 'NM',
+ 'zip_code': '88201'}
+{'address': ' 4900 EAST MAIN STREET',
+ 'city': 'FARMINGTON',
+ 'internal_store_number': 'T0952',
+ 'state': 'NM',
+ 'zip_code': '87402'}
+{'address': ' 3550 ZAFARANO STREET',
+ 'city': 'SANTA FE',
+ 'internal_store_number': 'T1034',
+ 'state': 'NM',
+ 'zip_code': '87505'}
+{'address': ' 4225 CRESTVIEW DRIVE N.E.',
+ 'city': 'RIO RANCHO',
+ 'internal_store_number': 'T1117',
+ 'state': 'NM',
+ 'zip_code': '87124'}
+{'address': ' 505 EAST PRATER WAY',
+ 'city': 'SPARKS',
+ 'internal_store_number': 'T0261',
+ 'state': 'NV',
+ 'zip_code': '89431'}
+{'address': ' 3300 KIETZKE LANE',
+ 'city': 'RENO',
+ 'internal_store_number': 'T0262',
+ 'state': 'NV',
+ 'zip_code': '89502'}
+{'address': ' 278 SOUTH DECATUR BLVD.',
+ 'city': 'LAS VEGAS',
+ 'internal_store_number': 'T0263',
+ 'state': 'NV',
+ 'zip_code': '89107'}
+{'address': ' 1200 SOUTH NELLIS BLVD.',
+ 'city': 'LAS VEGAS',
+ 'internal_store_number': 'T0264',
+ 'state': 'NV',
+ 'zip_code': '89104'}
+{'address': ' 4001 SOUTH MARYLAND PARKWAY',
+ 'city': 'LAS VEGAS',
+ 'internal_store_number': 'T0265',
+ 'state': 'NV',
+ 'zip_code': '89119'}
+{'address': ' 605 STEPHANIE STREET',
+ 'city': 'HENDERSON',
+ 'internal_store_number': 'T0680',
+ 'state': 'NV',
+ 'zip_code': '89014'}
+{'address': ' 3210 NORTH TENAYA WAY',
+ 'city': 'LAS VEGAS',
+ 'internal_store_number': 'T0826',
+ 'state': 'NV',
+ 'zip_code': '89129'}
+{'address': ' 3550 SOUTH RAINBOW BOULEVARD',
+ 'city': 'LAS VEGAS',
+ 'internal_store_number': 'T0850',
+ 'state': 'NV',
+ 'zip_code': '89103'}
+{'address': ' 9725 S. EASTERN AVENUE',
+ 'city': 'LAS VEGAS',
+ 'internal_store_number': 'T1171',
+ 'state': 'NV',
+ 'zip_code': '89123'}
+{'address': ' 8750 WEST CHARLESTON BLVD.',
+ 'city': 'LAS VEGAS',
+ 'internal_store_number': 'T1207',
+ 'state': 'NV',
+ 'zip_code': '89117'}
+{'address': ' 911 JACKS VALLEY ROAD',
+ 'city': 'CARSON CITY',
+ 'internal_store_number': 'T1239',
+ 'state': 'NV',
+ 'zip_code': '89705'}
+{'address': ' 2189 WEST CRAIG ROAD',
+ 'city': 'LAS VEGAS',
+ 'internal_store_number': 'T1243',
+ 'state': 'NV',
+ 'zip_code': '89032'}
+{'address': ' 6845 SIERRA CENTER PARKWAY',
+ 'city': 'RENO',
+ 'internal_store_number': 'T1363',
+ 'state': 'NV',
+ 'zip_code': '89511'}
+{'address': ' 1575 NIAGARA FALLS BLVD.',
+ 'city': 'AMHERST',
+ 'internal_store_number': 'T1010',
+ 'state': 'NY',
+ 'zip_code': '14228'}
+{'address': ' 8290 TRANSIT ROAD',
+ 'city': 'WILLIAMSVILLE',
+ 'internal_store_number': 'T1011',
+ 'state': 'NY',
+ 'zip_code': '14221'}
+{'address': ' 7414 NIAGARA FALLS BLVD',
+ 'city': 'NIAGARA FALLS',
+ 'internal_store_number': 'T1012',
+ 'state': 'NY',
+ 'zip_code': '14304'}
+{'address': ' 2626 DELAWARE AVENUE',
+ 'city': 'BUFFALO',
+ 'internal_store_number': 'T1013',
+ 'state': 'NY',
+ 'zip_code': '14216'}
+{'address': ' 1750 WALDEN AVENUE',
+ 'city': 'CHEEKTOWAGA',
+ 'internal_store_number': 'T1014',
+ 'state': 'NY',
+ 'zip_code': '14225'}
+{'address': ' 3112 VESTAL PARKWAY EAST',
+ 'city': 'VESTAL',
+ 'internal_store_number': 'T1056',
+ 'state': 'NY',
+ 'zip_code': '13850'}
+{'address': ' 5622 AMANDA LANE',
+ 'city': 'ORCHARD PARK',
+ 'internal_store_number': 'T1057',
+ 'state': 'NY',
+ 'zip_code': '14127'}
+{'address': ' 4120 PALISADES CENTER DRIVE',
+ 'city': 'WEST NYACK',
+ 'internal_store_number': 'T1083',
+ 'state': 'NY',
+ 'zip_code': '10994'}
+{'address': ' 98 VETERANS MEMORIAL HIGHWAY',
+ 'city': 'COMMACK',
+ 'internal_store_number': 'T1108',
+ 'state': 'NY',
+ 'zip_code': '11725'}
+{'address': ' 999 CORPORATE DR',
+ 'city': 'WESTBURY',
+ 'internal_store_number': 'T1139',
+ 'state': 'NY',
+ 'zip_code': '11590'}
+{'address': ' 1149 SUNRISE HIGHWAY',
+ 'city': 'COPIAGUE',
+ 'internal_store_number': 'T1147',
+ 'state': 'NY',
+ 'zip_code': '11726'}
+{'address': ' 838 SUNRISE HWY',
+ 'city': 'BAY SHORE',
+ 'internal_store_number': 'T1148',
+ 'state': 'NY',
+ 'zip_code': '11706'}
+{'address': ' 13505 20TH AVENUE',
+ 'city': 'FLUSHING',
+ 'internal_store_number': 'T1150',
+ 'state': 'NY',
+ 'zip_code': '11356'}
+{'address': ' 7500 COMMONS BLVD.',
+ 'city': 'VICTOR',
+ 'internal_store_number': 'T1156',
+ 'state': 'NY',
+ 'zip_code': '14564'}
+{'address': ' 2325 MARKETPLACE DRIVE',
+ 'city': 'ROCHESTER',
+ 'internal_store_number': 'T1157',
+ 'state': 'NY',
+ 'zip_code': '14623'}
+{'address': ' 265 POND PATH ROAD',
+ 'city': 'SOUTH SETAUKET',
+ 'internal_store_number': 'T1191',
+ 'state': 'NY',
+ 'zip_code': '11720'}
+{'address': ' 600 GREECE RIDGE CENTER DRIVE',
+ 'city': 'ROCHESTER',
+ 'internal_store_number': 'T1194',
+ 'state': 'NY',
+ 'zip_code': '14626'}
+{'address': '2161 FAIRPORT NINE MILE POINT RD',
+ 'city': 'FAIRPORT',
+ 'internal_store_number': 'T1195',
+ 'state': 'NY',
+ 'zip_code': '14450'}
+{'address': ' 500 WEST SUNRISE HWY',
+ 'city': 'VALLEY STREAM',
+ 'internal_store_number': 'T1262',
+ 'state': 'NY',
+ 'zip_code': '11581'}
+{'address': ' 3850 HEMPSTEAD TURNPIKE',
+ 'city': 'LEVITTOWN',
+ 'internal_store_number': 'T1264',
+ 'state': 'NY',
+ 'zip_code': '11756'}
+{'address': '1440 CENTRAL AVENUE',
+ 'city': 'COLONIE',
+ 'internal_store_number': 'T1268',
+ 'state': 'NY',
+ 'zip_code': '12205'}
+{'address': ' 3031 ROUTE 50',
+ 'city': 'SARATOGA SPRINGS',
+ 'internal_store_number': 'T1271',
+ 'state': 'NY',
+ 'zip_code': '12866'}
+{'address': ' ONE GALLERIA DRIVE',
+ 'city': 'MIDDLETON',
+ 'internal_store_number': 'T1296',
+ 'state': 'NY',
+ 'zip_code': '10941'}
+{'address': ' 1300 ULSTER AVENUE',
+ 'city': 'KINGSTON',
+ 'internal_store_number': 'T1318',
+ 'state': 'NY',
+ 'zip_code': '12401'}
+{'address': ' 88-01 QUEENS BLVD.',
+ 'city': 'ELMHURST',
+ 'internal_store_number': 'T1344',
+ 'state': 'NY',
+ 'zip_code': '11373'}
+{'address': ' 817 WEST ALEXIS ROAD',
+ 'city': 'TOLEDO',
+ 'internal_store_number': 'T0622',
+ 'state': 'OH',
+ 'zip_code': '43612'}
+{'address': ' 5225 MONROE STREET',
+ 'city': 'TOLEDO',
+ 'internal_store_number': 'T0623',
+ 'state': 'OH',
+ 'zip_code': '43623'}
+{'address': ' 1465 EAST MALL DRIVE',
+ 'city': 'HOLLAND',
+ 'internal_store_number': 'T0624',
+ 'state': 'OH',
+ 'zip_code': '43528'}
+{'address': ' 6000 SAWMILL ROAD',
+ 'city': 'DUBLIN',
+ 'internal_store_number': 'T0666',
+ 'state': 'OH',
+ 'zip_code': '43017'}
+{'address': ' 5855 CHANTRY DRIVE',
+ 'city': 'COLUMBUS',
+ 'internal_store_number': 'T0667',
+ 'state': 'OH',
+ 'zip_code': '43232'}
+{'address': ' 3720 SOLDANO BLVD',
+ 'city': 'COLUMBUS',
+ 'internal_store_number': 'T0668',
+ 'state': 'OH',
+ 'zip_code': '43228'}
+{'address': ' 6850 RIDGE ROAD',
+ 'city': 'PARMA',
+ 'internal_store_number': 'T0792',
+ 'state': 'OH',
+ 'zip_code': '44129'}
+{'address': ' 449 HOWE AVE',
+ 'city': 'CUYAHOGA FALLS',
+ 'internal_store_number': 'T0793',
+ 'state': 'OH',
+ 'zip_code': '44221'}
+{'address': ' 5584 DRESSLER ROAD_N.W.',
+ 'city': 'NORTH CANTON',
+ 'internal_store_number': 'T0794',
+ 'state': 'OH',
+ 'zip_code': '44720'}
+{'address': ' 22735 ROCKSIDE ROAD',
+ 'city': 'BEDFORD',
+ 'internal_store_number': 'T0983',
+ 'state': 'OH',
+ 'zip_code': '44146'}
+{'address': ' 1015 NORTH COURT STREET',
+ 'city': 'MEDINA',
+ 'internal_store_number': 'T0984',
+ 'state': 'OH',
+ 'zip_code': '44256'}
+{'address': ' 18200 ROYALTON ROAD',
+ 'city': 'STRONGSVILLE',
+ 'internal_store_number': 'T0985',
+ 'state': 'OH',
+ 'zip_code': '44136'}
+{'address': ' 2801 WEST MARKET',
+ 'city': 'FAIRLAWN',
+ 'internal_store_number': 'T0986',
+ 'state': 'OH',
+ 'zip_code': '44333'}
+{'address': ' 2400 ROMIG ROAD, SPACE #1',
+ 'city': 'AKRON',
+ 'internal_store_number': 'T0987',
+ 'state': 'OH',
+ 'zip_code': '44322'}
+{'address': ' 4200 KENT ROAD',
+ 'city': 'STOW',
+ 'internal_store_number': 'T0988',
+ 'state': 'OH',
+ 'zip_code': '44224'}
+{'address': ' 270 AIRPORT PARKWAY',
+ 'city': 'HEATH',
+ 'internal_store_number': 'T0989',
+ 'state': 'OH',
+ 'zip_code': '43056'}
+{'address': ' 1300 RIVER VALLEY BLVD',
+ 'city': 'LANCASTER',
+ 'internal_store_number': 'T0990',
+ 'state': 'OH',
+ 'zip_code': '43130'}
+{'address': ' 6775 ROOSEVELT PARKWAY',
+ 'city': 'MIDDLETOWN',
+ 'internal_store_number': 'T0991',
+ 'state': 'OH',
+ 'zip_code': '45044'}
+{'address': ' 900 EAST KEMPER ROAD',
+ 'city': 'SPRINGDALE',
+ 'internal_store_number': 'T1037',
+ 'state': 'OH',
+ 'zip_code': '45246'}
+{'address': ' 1717 OLENTANGY RIVER RD.',
+ 'city': 'COLUMBUS',
+ 'internal_store_number': 'T1058',
+ 'state': 'OH',
+ 'zip_code': '43212'}
+{'address': ' 4199 MORSE CROSSING',
+ 'city': 'COLUMBUS',
+ 'internal_store_number': 'T1072',
+ 'state': 'OH',
+ 'zip_code': '43219'}
+{'address': '9841 WATERSTONE BLVD',
+ 'city': 'CINCINNATI',
+ 'internal_store_number': 'T1091',
+ 'state': 'OH',
+ 'zip_code': '45249'}
+{'address': ' 8680 BEECHMONT AVENUE',
+ 'city': 'CINCINNATI',
+ 'internal_store_number': 'T1092',
+ 'state': 'OH',
+ 'zip_code': '45255'}
+{'address': ' 5045 GLENCROSSING WAY',
+ 'city': 'CINCINNATI',
+ 'internal_store_number': 'T1093',
+ 'state': 'OH',
+ 'zip_code': '45238'}
+{'address': ' 20001 CENTER RIDGE ROAD',
+ 'city': 'ROCKY RIVER',
+ 'internal_store_number': 'T1111',
+ 'state': 'OH',
+ 'zip_code': '44116'}
+{'address': ' 36195 EUCLID AVENUE',
+ 'city': 'WILLOUGHBY',
+ 'internal_store_number': 'T1112',
+ 'state': 'OH',
+ 'zip_code': '44094'}
+{'address': ' 2490 NORTH FAIRFIELD ROAD',
+ 'city': 'BEAVERCREEK',
+ 'internal_store_number': 'T1128',
+ 'state': 'OH',
+ 'zip_code': '45431'}
+{'address': ' 57OO EXECUTIVE BLVD.',
+ 'city': 'HUBER HEIGHTS',
+ 'internal_store_number': 'T1129',
+ 'state': 'OH',
+ 'zip_code': '45424'}
+{'address': ' 2800 SHILOH SPRINGS ROAD',
+ 'city': 'TROTWOOD',
+ 'internal_store_number': 'T1130',
+ 'state': 'OH',
+ 'zip_code': '45426'}
+{'address': '240 MARKET DRIVE',
+ 'city': 'ELYRIA',
+ 'internal_store_number': 'T1215',
+ 'state': 'OH',
+ 'zip_code': '44035'}
+{'address': ' 1485 POLARIS PARKWAY',
+ 'city': 'COLUMBUS',
+ 'internal_store_number': 'T1236',
+ 'state': 'OH',
+ 'zip_code': '43240'}
+{'address': ' 2300 MIAMISBURG-CENTERVILLE ROAD',
+ 'city': 'DAYTON',
+ 'internal_store_number': 'T1252',
+ 'state': 'OH',
+ 'zip_code': '45459'}
+{'address': ' 1885 WEST FIRST STREET',
+ 'city': 'SPRINGFIELD',
+ 'internal_store_number': 'T1277',
+ 'state': 'OH',
+ 'zip_code': '45504'}
+{'address': ' 5555 YOUNGSTOWN- WARREN ROAD #950',
+ 'city': 'NILES',
+ 'internal_store_number': 'T1301',
+ 'state': 'OH',
+ 'zip_code': '44446'}
+{'address': ' 9666 OLD US 20',
+ 'city': 'ROSSFORD',
+ 'internal_store_number': 'T1317',
+ 'state': 'OH',
+ 'zip_code': '43460'}
+{'address': ' 1285 SOM CENTER ROAD',
+ 'city': 'MAYFIELD HEIGHTS',
+ 'internal_store_number': 'T1324',
+ 'state': 'OH',
+ 'zip_code': '44124'}
+{'address': ' 35830 DETROIT ROAD',
+ 'city': 'AVON',
+ 'internal_store_number': 'T1325',
+ 'state': 'OH',
+ 'zip_code': '44011'}
+{'address': ' 2205 WALKER LAKE ROAD',
+ 'city': 'MANSFIELD',
+ 'internal_store_number': 'T1381',
+ 'state': 'OH',
+ 'zip_code': '44903'}
+{'address': ' 100 RIVERS EDGE DRIVE',
+ 'city': 'MILFORD',
+ 'internal_store_number': 'T1393',
+ 'state': 'OH',
+ 'zip_code': '45150'}
+{'address': ' 1701 SOUTH YALE',
+ 'city': 'TULSA',
+ 'internal_store_number': 'T0019',
+ 'state': 'OK',
+ 'zip_code': '74112'}
+{'address': ' 5400 NORTH MAY AVENUE',
+ 'city': 'OKLAHOMA CITY',
+ 'internal_store_number': 'T0043',
+ 'state': 'OK',
+ 'zip_code': '73112'}
+{'address': ' 800 SW 44TH STREET',
+ 'city': 'OKLAHOMA CITY',
+ 'internal_store_number': 'T0044',
+ 'state': 'OK',
+ 'zip_code': '73109'}
+{'address': ' 7601 EAST RENO',
+ 'city': 'MIDWEST CITY',
+ 'internal_store_number': 'T0045',
+ 'state': 'OK',
+ 'zip_code': '73110'}
+{'address': ' 2417 WEST MAIN STREET',
+ 'city': 'NORMAN',
+ 'internal_store_number': 'T0046',
+ 'state': 'OK',
+ 'zip_code': '73069'}
+{'address': ' 7178 SOUTH MEMORIAL DR',
+ 'city': 'TULSA',
+ 'internal_store_number': 'T0063',
+ 'state': 'OK',
+ 'zip_code': '74133'}
+{'address': ' 2201 W. MEMORIAL RD.',
+ 'city': 'OKLAHOMA CITY',
+ 'internal_store_number': 'T0218',
+ 'state': 'OK',
+ 'zip_code': '73134'}
+{'address': ' 14009 EAST 21ST STREET',
+ 'city': 'TULSA',
+ 'internal_store_number': 'T0270',
+ 'state': 'OK',
+ 'zip_code': '74134'}
+{'address': ' 13924 N PENNSYLVANIA AVE.',
+ 'city': 'EDMOND',
+ 'internal_store_number': 'T1397',
+ 'state': 'OK',
+ 'zip_code': '73034'}
+{'address': ' 1200 EAST 2ND STREET',
+ 'city': 'EDMOND',
+ 'internal_store_number': 'T1398',
+ 'state': 'OK',
+ 'zip_code': '73083'}
+{'address': ' 10711 EAST 71ST STREET SOUTH',
+ 'city': 'TULSA',
+ 'internal_store_number': 'T1782',
+ 'state': 'OK',
+ 'zip_code': '74133'}
+{'address': '10775 SW BEAVERTON-HILLSDALE HWY',
+ 'city': 'BEAVERTON',
+ 'internal_store_number': 'T0344',
+ 'state': 'OR',
+ 'zip_code': '97005'}
+{'address': ' 9009 SW HALL BLVD.',
+ 'city': 'TIGARD',
+ 'internal_store_number': 'T0345',
+ 'state': 'OR',
+ 'zip_code': '97223'}
+{'address': ' 9000 SE SUNNYSIDE ROAD',
+ 'city': 'CLACKAMAS',
+ 'internal_store_number': 'T0346',
+ 'state': 'OR',
+ 'zip_code': '97015'}
+{'address': ' 2295 S.E. TUALATIN VALLEY_HWY.',
+ 'city': 'HILLSBORO',
+ 'internal_store_number': 'T0362',
+ 'state': 'OR',
+ 'zip_code': '97123'}
+{'address': ' 3790 CENTER STREET NE',
+ 'city': 'SALEM',
+ 'internal_store_number': 'T0608',
+ 'state': 'OR',
+ 'zip_code': '97301'}
+{'address': ' 2255 14TH AVENUE SE',
+ 'city': 'ALBANY',
+ 'internal_store_number': 'T0609',
+ 'state': 'OR',
+ 'zip_code': '97321'}
+{'address': ' 2750 GATEWAY STREET',
+ 'city': 'SPRINGFIELD',
+ 'internal_store_number': 'T0612',
+ 'state': 'OR',
+ 'zip_code': '97477'}
+{'address': ' 2000 CRATER LAKE HIGHWAY',
+ 'city': 'MEDFORD',
+ 'internal_store_number': 'T0613',
+ 'state': 'OR',
+ 'zip_code': '97501'}
+{'address': ' 11826 N. E. GLISAN STREET',
+ 'city': 'PORTLAND',
+ 'internal_store_number': 'T0765',
+ 'state': 'OR',
+ 'zip_code': '97220'}
+{'address': ' 63435 N HIGHWAY 97',
+ 'city': 'BEND',
+ 'internal_store_number': 'T0766',
+ 'state': 'OR',
+ 'zip_code': '97701'}
+{'address': ' 18101 NW EVERGREEN PARKWAY',
+ 'city': 'BEAVERTON',
+ 'internal_store_number': 'T0910',
+ 'state': 'OR',
+ 'zip_code': '97006'}
+{'address': ' 4575 WEST 11TH AVENUE',
+ 'city': 'EUGENE',
+ 'internal_store_number': 'T1405',
+ 'state': 'OR',
+ 'zip_code': '97402'}
+{'address': ' 21500 NE HALSEY',
+ 'city': 'FAIRVIEW',
+ 'internal_store_number': 'T1406',
+ 'state': 'OR',
+ 'zip_code': '97024'}
+{'address': ' 9800 SE WASHINGTON STREET',
+ 'city': 'PORTLAND',
+ 'internal_store_number': 'T1419',
+ 'state': 'OR',
+ 'zip_code': '97216'}
+{'address': ' 201 SUNRISE BLVD.',
+ 'city': 'EXTON',
+ 'internal_store_number': 'T1134',
+ 'state': 'PA',
+ 'zip_code': '19341'}
+{'address': ' 2331 EAST LINCOLN HIGHWAY',
+ 'city': 'LANGHORNE',
+ 'internal_store_number': 'T1135',
+ 'state': 'PA',
+ 'zip_code': '19047'}
+{'address': ' 857 BALTIMORE PIKE',
+ 'city': 'SPRINGFIELD',
+ 'internal_store_number': 'T1136',
+ 'state': 'PA',
+ 'zip_code': '19064'}
+{'address': ' 125 WITCHWOOD DRIVE',
+ 'city': 'NORTH WALES',
+ 'internal_store_number': 'T1159',
+ 'state': 'PA',
+ 'zip_code': '19454'}
+{'address': ' 153 SIERRA DRIVE',
+ 'city': 'ALTOONA',
+ 'internal_store_number': 'T1160',
+ 'state': 'PA',
+ 'zip_code': '16601'}
+{'address': ' 800 ROCKHILL DRIVE',
+ 'city': 'BENSALEM',
+ 'internal_store_number': 'T1183',
+ 'state': 'PA',
+ 'zip_code': '19020'}
+{'address': ' 401 EASTON ROAD',
+ 'city': 'WARRINGTON',
+ 'internal_store_number': 'T1196',
+ 'state': 'PA',
+ 'zip_code': '18976'}
+{'address': ' 335 WASHINGTON ROAD',
+ 'city': 'WASHINGTON',
+ 'internal_store_number': 'T1216',
+ 'state': 'PA',
+ 'zip_code': '15301'}
+{'address': ' 600 CHAUVET DRIVE',
+ 'city': 'PITTSBURGH',
+ 'internal_store_number': 'T1217',
+ 'state': 'PA',
+ 'zip_code': '15275'}
+{'address': ' 9805 MCKNIGHT ROAD',
+ 'city': 'PITTSBURGH',
+ 'internal_store_number': 'T1218',
+ 'state': 'PA',
+ 'zip_code': '15237'}
+{'address': ' 4004 MONROEVILLE BLVD',
+ 'city': 'MONROEVILLE',
+ 'internal_store_number': 'T1219',
+ 'state': 'PA',
+ 'zip_code': '15146'}
+{'address': ' HEMPFIELD SQUARE, RR6, BOX 216',
+ 'city': 'GREENSBURG',
+ 'internal_store_number': 'T1220',
+ 'state': 'PA',
+ 'zip_code': '15601'}
+{'address': '2610 PLEASANT VALLEY ROAD',
+ 'city': 'YORK',
+ 'internal_store_number': 'T1221',
+ 'state': 'PA',
+ 'zip_code': '17402'}
+{'address': ' 2769 PAPER MILL ROAD',
+ 'city': 'WYOMISSING',
+ 'internal_store_number': 'T1222',
+ 'state': 'PA',
+ 'zip_code': '19610'}
+{'address': '360 EAST WATERFRONT DRIVE',
+ 'city': 'HOMESTEAD',
+ 'internal_store_number': 'T1253',
+ 'state': 'PA',
+ 'zip_code': '15120'}
+{'address': ' 201 PARKCHESTER ROAD',
+ 'city': 'HARRISBURG',
+ 'internal_store_number': 'T1254',
+ 'state': 'PA',
+ 'zip_code': '17112'}
+{'address': ' 1495 OLD YORK ROAD',
+ 'city': 'ABINGTON',
+ 'internal_store_number': 'T1256',
+ 'state': 'PA',
+ 'zip_code': '19001'}
+{'address': ' 1717 ROUTE 228',
+ 'city': 'CRANBERRY',
+ 'internal_store_number': 'T1259',
+ 'state': 'PA',
+ 'zip_code': '16066'}
+{'address': ' 350 POCONO_COMMONS',
+ 'city': 'STROUDSBURG',
+ 'internal_store_number': 'T1260',
+ 'state': 'PA',
+ 'zip_code': '18360'}
+{'address': ' 2250 CHEMICAL ROAD',
+ 'city': 'PLYMOUTH MEETING',
+ 'internal_store_number': 'T1269',
+ 'state': 'PA',
+ 'zip_code': '19462'}
+{'address': ' 1717 LEBANON CHURCH ROAD',
+ 'city': 'WEST MIFFLIN',
+ 'internal_store_number': 'T1270',
+ 'state': 'PA',
+ 'zip_code': '15122'}
+{'address': ' 6700 PEACH STREET',
+ 'city': 'ERIE',
+ 'internal_store_number': 'T1287',
+ 'state': 'PA',
+ 'zip_code': '16509'}
+{'address': ' 315 LOWES BLVD.',
+ 'city': 'STATE COLLEGE',
+ 'internal_store_number': 'T1288',
+ 'state': 'PA',
+ 'zip_code': '16801'}
+{'address': ' 1245 BALD HILL ROAD',
+ 'city': 'WARWICK',
+ 'internal_store_number': 'T1188',
+ 'state': 'RI',
+ 'zip_code': '2888'}
+{'address': '371 PUTNAM PIKE',
+ 'city': 'SMITHFIELD',
+ 'internal_store_number': 'T1404',
+ 'state': 'RI',
+ 'zip_code': '2917'}
+{'address': ' 6110 GARNERS FERRY ROAD',
+ 'city': 'COLUMBIA',
+ 'internal_store_number': 'T0390',
+ 'state': 'SC',
+ 'zip_code': '29209'}
+{'address': ' 1150 SEABOARD STREET',
+ 'city': 'MYRTLE BEACH',
+ 'internal_store_number': 'T0963',
+ 'state': 'SC',
+ 'zip_code': '29577'}
+{'address': '1112 WOODRUFF ROAD',
+ 'city': 'GREENVILLE',
+ 'internal_store_number': 'T1182',
+ 'state': 'SC',
+ 'zip_code': '29607'}
+{'address': ' 3519 CLEMSON BLVD.',
+ 'city': 'ANDERSON',
+ 'internal_store_number': 'T1198',
+ 'state': 'SC',
+ 'zip_code': '29621'}
+{'address': ' 134 HARBISON BOULEVARD',
+ 'city': 'COLUMBIA',
+ 'internal_store_number': 'T1199',
+ 'state': 'SC',
+ 'zip_code': '29212'}
+{'address': ' 1050 FORDING ISLAND ROAD',
+ 'city': 'BLUFFTON',
+ 'internal_store_number': 'T1298',
+ 'state': 'SC',
+ 'zip_code': '29910'}
+{'address': ' 2545 WHISKEY ROAD',
+ 'city': 'AIKEN',
+ 'internal_store_number': 'T1310',
+ 'state': 'SC',
+ 'zip_code': '29803'}
+{'address': ' 10204 TWO NOTCH ROAD',
+ 'city': 'COLUMBIA',
+ 'internal_store_number': 'T1319',
+ 'state': 'SC',
+ 'zip_code': '29223'}
+{'address': ' 8199 GREENVILLE HWY',
+ 'city': 'SPARTANBURG',
+ 'internal_store_number': 'T1349',
+ 'state': 'SC',
+ 'zip_code': '29301'}
+{'address': '1900 SPRINGSTEEN ROAD',
+ 'city': 'ROCK HILL',
+ 'internal_store_number': 'T1371',
+ 'state': 'SC',
+ 'zip_code': '29730'}
+{'address': ' 2070 SAM RITTENBERG BLVD.',
+ 'city': 'CHARLESTON',
+ 'internal_store_number': 'T1391',
+ 'state': 'SC',
+ 'zip_code': '29407'}
+{'address': ' 3600 SOUTH LOUISE AVE',
+ 'city': 'SIOUX FALLS',
+ 'internal_store_number': 'T0076',
+ 'state': 'SD',
+ 'zip_code': '57106'}
+{'address': ' 2200 NORTH MAPLE AVENUE',
+ 'city': 'RAPID CITY',
+ 'internal_store_number': 'T0094',
+ 'state': 'SD',
+ 'zip_code': '57701'}
+{'address': ' 3316 SOUTHEAST 6TH AVENUE',
+ 'city': 'ABERDEEN',
+ 'internal_store_number': 'T0848',
+ 'state': 'SD',
+ 'zip_code': '57401'}
+{'address': ' 2000 9TH AVENUE SOUTHEAST',
+ 'city': 'WATERTOWN',
+ 'internal_store_number': 'T0859',
+ 'state': 'SD',
+ 'zip_code': '57201'}
+{'address': ' 601 COLONIAL ROAD',
+ 'city': 'MEMPHIS',
+ 'internal_store_number': 'T0090',
+ 'state': 'TN',
+ 'zip_code': '38117'}
+{'address': ' 2050 NORTH GALLATIN ROAD',
+ 'city': 'MADISON',
+ 'internal_store_number': 'T0144',
+ 'state': 'TN',
+ 'zip_code': '37115'}
+{'address': ' 5330 CANE RIDGE ROAD',
+ 'city': 'ANTIOCH',
+ 'internal_store_number': 'T0145',
+ 'state': 'TN',
+ 'zip_code': '37013'}
+{'address': ' 26 WHITE BRIDGE ROAD',
+ 'city': 'NASHVILLE',
+ 'internal_store_number': 'T0146',
+ 'state': 'TN',
+ 'zip_code': '37205'}
+{'address': ' 3700 HICKORY HILL ROAD',
+ 'city': 'MEMPHIS',
+ 'internal_store_number': 'T0149',
+ 'state': 'TN',
+ 'zip_code': '38115'}
+{'address': ' 5101 NE BROADWAY',
+ 'city': 'KNOXVILLE',
+ 'internal_store_number': 'T0150',
+ 'state': 'TN',
+ 'zip_code': '37918'}
+{'address': ' 8040 RAY MEARS BLVD',
+ 'city': 'KNOXVILLE',
+ 'internal_store_number': 'T0151',
+ 'state': 'TN',
+ 'zip_code': '37919'}
+{'address': ' 18 NORTHGATE PARK',
+ 'city': 'CHATTANOOGA',
+ 'internal_store_number': 'T0367',
+ 'state': 'TN',
+ 'zip_code': '37415'}
+{'address': '9235 U.S. HIGHWAY 72',
+ 'city': 'GERMANTOWN',
+ 'internal_store_number': 'T0682',
+ 'state': 'TN',
+ 'zip_code': '38138'}
+{'address': ' 1701 GALLERIA BLVD.',
+ 'city': 'FRANKLIN',
+ 'internal_store_number': 'T0695',
+ 'state': 'TN',
+ 'zip_code': '37064'}
+{'address': ' 2116 NORTH ROAN STREET',
+ 'city': 'JOHNSON CITY',
+ 'internal_store_number': 'T0756',
+ 'state': 'TN',
+ 'zip_code': '37601'}
+{'address': ' 6670 CLINTON HIGHWAY',
+ 'city': 'KNOXVILLE',
+ 'internal_store_number': 'T0795',
+ 'state': 'TN',
+ 'zip_code': '37912'}
+{'address': ' 93 STONEBROOK PLACE',
+ 'city': 'JACKSON',
+ 'internal_store_number': 'T0921',
+ 'state': 'TN',
+ 'zip_code': '38305'}
+{'address': ' 2823 WILMA RUDOLPH BLVD.',
+ 'city': 'CLARKSVILLE',
+ 'internal_store_number': 'T0959',
+ 'state': 'TN',
+ 'zip_code': '37040'}
+{'address': ' 7989 STAGE ROAD',
+ 'city': 'CORDOVA',
+ 'internal_store_number': 'T1030',
+ 'state': 'TN',
+ 'zip_code': '38133'}
+{'address': ' 3171 LEBANON PIKE',
+ 'city': 'NASHVILLE',
+ 'internal_store_number': 'T1059',
+ 'state': 'TN',
+ 'zip_code': '37214'}
+{'address': ' 1851 OLD FORT PARKWAY',
+ 'city': 'MURFREESBORO',
+ 'internal_store_number': 'T1126',
+ 'state': 'TN',
+ 'zip_code': '37129'}
+{'address': ' 800 WATKINS ROAD',
+ 'city': 'MARYVILLE',
+ 'internal_store_number': 'T1250',
+ 'state': 'TN',
+ 'zip_code': '37803'}
+{'address': '1816 GUNBARREL ROAD',
+ 'city': 'CHATTANOOGA',
+ 'internal_store_number': 'T1302',
+ 'state': 'TN',
+ 'zip_code': '37421'}
+{'address': ' 11100 PARKSIDE DRIVE',
+ 'city': 'KNOXVILLE',
+ 'internal_store_number': 'T1370',
+ 'state': 'TN',
+ 'zip_code': '37922'}
+{'address': ' 13131 MONTFORT DRIVE',
+ 'city': 'DALLAS',
+ 'internal_store_number': 'T0013',
+ 'state': 'TX',
+ 'zip_code': '75240'}
+{'address': ' 1122 W CENTERVILLE RD',
+ 'city': 'GARLAND',
+ 'internal_store_number': 'T0014',
+ 'state': 'TX',
+ 'zip_code': '75041'}
+{'address': ' 7051 SOUTHWEST FREEWAY',
+ 'city': 'HOUSTON',
+ 'internal_store_number': 'T0016',
+ 'state': 'TX',
+ 'zip_code': '77074'}
+{'address': ' 9429 KATY FREEWAY',
+ 'city': 'HOUSTON',
+ 'internal_store_number': 'T0017',
+ 'state': 'TX',
+ 'zip_code': '77024'}
+{'address': ' 10000 KLECKLEY STREET',
+ 'city': 'HOUSTON',
+ 'internal_store_number': 'T0021',
+ 'state': 'TX',
+ 'zip_code': '77075'}
+{'address': ' 4701 FM 1960 WEST',
+ 'city': 'HOUSTON',
+ 'internal_store_number': 'T0053',
+ 'state': 'TX',
+ 'zip_code': '77069'}
+{'address': ' 212 MEDALLION CENTER',
+ 'city': 'DALLAS',
+ 'internal_store_number': 'T0055',
+ 'state': 'TX',
+ 'zip_code': '75214'}
+{'address': ' 10040 NEW F.M.1960',
+ 'city': 'HUMBLE',
+ 'internal_store_number': 'T0060',
+ 'state': 'TX',
+ 'zip_code': '77338'}
+{'address': ' 120 WEST PARKER ROAD',
+ 'city': 'PLANO',
+ 'internal_store_number': 'T0067',
+ 'state': 'TX',
+ 'zip_code': '75075'}
+{'address': ' 2600 CHERRY LANE',
+ 'city': 'FORT WORTH',
+ 'internal_store_number': 'T0074',
+ 'state': 'TX',
+ 'zip_code': '76116'}
+{'address': ' 10801 WESTHEIMER ROAD',
+ 'city': 'HOUSTON',
+ 'internal_store_number': 'T0075',
+ 'state': 'TX',
+ 'zip_code': '77042'}
+{'address': ' 4317 KEMP BOULEVARD',
+ 'city': 'WICHITA FALLS',
+ 'internal_store_number': 'T0080',
+ 'state': 'TX',
+ 'zip_code': '76308'}
+{'address': ' 7302 UNIVERSITY AVE',
+ 'city': 'LUBBOCK',
+ 'internal_store_number': 'T0083',
+ 'state': 'TX',
+ 'zip_code': '79423'}
+{'address': ' 2620 JOSEY LANE',
+ 'city': 'CARROLLTON',
+ 'internal_store_number': 'T0084',
+ 'state': 'TX',
+ 'zip_code': '75007'}
+{'address': ' 8601 RESEARCH BOULEVARD',
+ 'city': 'AUSTIN',
+ 'internal_store_number': 'T0095',
+ 'state': 'TX',
+ 'zip_code': '78758'}
+{'address': ' 2300 WEST BEN WHITE',
+ 'city': 'AUSTIN',
+ 'internal_store_number': 'T0096',
+ 'state': 'TX',
+ 'zip_code': '78704'}
+{'address': ' 3900 SPENCER HIGHWAY',
+ 'city': 'PASADENA',
+ 'internal_store_number': 'T0097',
+ 'state': 'TX',
+ 'zip_code': '77504'}
+{'address': ' 601 WEST STATE HWY. 6',
+ 'city': 'WACO',
+ 'internal_store_number': 'T0155',
+ 'state': 'TX',
+ 'zip_code': '76710'}
+{'address': ' 1425 BAY AREA BLVD',
+ 'city': 'WEBSTER',
+ 'internal_store_number': 'T0157',
+ 'state': 'TX',
+ 'zip_code': '77598'}
+{'address': ' 5850 EASTEX FREEWAY',
+ 'city': 'BEAUMONT',
+ 'internal_store_number': 'T0158',
+ 'state': 'TX',
+ 'zip_code': '77708'}
+{'address': ' 10701 JONES ROAD',
+ 'city': 'HOUSTON',
+ 'internal_store_number': 'T0161',
+ 'state': 'TX',
+ 'zip_code': '77065'}
+{'address': ' 3212 JUPITER ROAD',
+ 'city': 'GARLAND',
+ 'internal_store_number': 'T0168',
+ 'state': 'TX',
+ 'zip_code': '75044'}
+{'address': ' 2643 NW. LOOP 410',
+ 'city': 'SAN ANTONIO',
+ 'internal_store_number': 'T0173',
+ 'state': 'TX',
+ 'zip_code': '78230'}
+{'address': ' 8215 MARBACH ROAD',
+ 'city': 'SAN ANTONIO',
+ 'internal_store_number': 'T0174',
+ 'state': 'TX',
+ 'zip_code': '78227'}
+{'address': ' 5776 STEMMONS DRIVE',
+ 'city': 'SAN ANTONIO',
+ 'internal_store_number': 'T0175',
+ 'state': 'TX',
+ 'zip_code': '78238'}
+{'address': ' 13700 SAN PEDRO AVENUE',
+ 'city': 'SAN ANTONIO',
+ 'internal_store_number': 'T0176',
+ 'state': 'TX',
+ 'zip_code': '78232'}
+{'address': ' 5330 WALZEM ROAD',
+ 'city': 'SAN ANTONIO',
+ 'internal_store_number': 'T0177',
+ 'state': 'TX',
+ 'zip_code': '78218'}
+{'address': ' 3710 RIDGEMONT DRIVE',
+ 'city': 'ABILENE',
+ 'internal_store_number': 'T0219',
+ 'state': 'TX',
+ 'zip_code': '79606'}
+{'address': ' 8201 I-40 WEST',
+ 'city': 'AMARILLO',
+ 'internal_store_number': 'T0221',
+ 'state': 'TX',
+ 'zip_code': '79121'}
+{'address': ' 2315 COLORADO BLVD.',
+ 'city': 'DENTON',
+ 'internal_store_number': 'T0225',
+ 'state': 'TX',
+ 'zip_code': '76205'}
+{'address': ' 6800 HIGHWAY 6 SOUTH',
+ 'city': 'HOUSTON',
+ 'internal_store_number': 'T0231',
+ 'state': 'TX',
+ 'zip_code': '77083'}
+{'address': '305 WEST LOOP 281',
+ 'city': 'LONGVIEW',
+ 'internal_store_number': 'T0234',
+ 'state': 'TX',
+ 'zip_code': '75605'}
+{'address': ' 1629 NORTH TOWN EAST BLVD',
+ 'city': 'MESQUITE',
+ 'internal_store_number': 'T0235',
+ 'state': 'TX',
+ 'zip_code': '75150'}
+{'address': ' 2315 RICHMOND ROAD NO.9 TOWN WEST',
+ 'city': 'TEXARKANA',
+ 'internal_store_number': 'T0241',
+ 'state': 'TX',
+ 'zip_code': '75503'}
+{'address': ' 4235 SUNSET DRIVE',
+ 'city': 'SAN ANGELO',
+ 'internal_store_number': 'T0254',
+ 'state': 'TX',
+ 'zip_code': '76904'}
+{'address': ' 3333 W. AIRPORT FREEWAY',
+ 'city': 'IRVING',
+ 'internal_store_number': 'T0255',
+ 'state': 'TX',
+ 'zip_code': '75062'}
+{'address': ' 4817 WEST PARK BLVD.',
+ 'city': 'PLANO',
+ 'internal_store_number': 'T0333',
+ 'state': 'TX',
+ 'zip_code': '75093'}
+{'address': ' 13785 RESEARCH BLVD.',
+ 'city': 'AUSTIN',
+ 'internal_store_number': 'T0334',
+ 'state': 'TX',
+ 'zip_code': '78750'}
+{'address': ' 5425 SOUTH PADRE ISLAND DRIVE',
+ 'city': 'CORPUS CHRISTI',
+ 'internal_store_number': 'T0335',
+ 'state': 'TX',
+ 'zip_code': '78411'}
+{'address': ' 6405 SOUTH INTERSTATE HIGHWAY 35',
+ 'city': 'AUSTIN',
+ 'internal_store_number': 'T0683',
+ 'state': 'TX',
+ 'zip_code': '78744'}
+{'address': '1100 LAKE WOODLAND DRIVE',
+ 'city': 'THE WOODLANDS',
+ 'internal_store_number': 'T0684',
+ 'state': 'TX',
+ 'zip_code': '77380'}
+{'address': ' 8550 EAST FREEWAY',
+ 'city': 'FORT WORTH',
+ 'internal_store_number': 'T0758',
+ 'state': 'TX',
+ 'zip_code': '76120'}
+{'address': ' 2940 BOCA CHICA',
+ 'city': 'BROWNSVILLE',
+ 'internal_store_number': 'T0763',
+ 'state': 'TX',
+ 'zip_code': '78521'}
+{'address': ' 4001 N MIDLAND DRIVE',
+ 'city': 'MIDLAND',
+ 'internal_store_number': 'T0770',
+ 'state': 'TX',
+ 'zip_code': '79707'}
+{'address': ' 2810 SW MILITARY DR',
+ 'city': 'SAN ANTONIO',
+ 'internal_store_number': 'T0771',
+ 'state': 'TX',
+ 'zip_code': '78224'}
+{'address': ' 7003 SOUTH BROADWAY',
+ 'city': 'TYLER',
+ 'internal_store_number': 'T0775',
+ 'state': 'TX',
+ 'zip_code': '75703'}
+{'address': ' 2100 TEXAS AVENUE SOUTH',
+ 'city': 'COLLEGE STATION',
+ 'internal_store_number': 'T0800',
+ 'state': 'TX',
+ 'zip_code': '77840'}
+{'address': ' 7501 SAN DARIO',
+ 'city': 'LAREDO',
+ 'internal_store_number': 'T0801',
+ 'state': 'TX',
+ 'zip_code': '78045'}
+{'address': ' 1002 DIXIELAND ROAD',
+ 'city': 'HARLINGEN',
+ 'internal_store_number': 'T0802',
+ 'state': 'TX',
+ 'zip_code': '78552'}
+{'address': ' 801 SUNLAND PARK DRIVE',
+ 'city': 'EL PASO',
+ 'internal_store_number': 'T0822',
+ 'state': 'TX',
+ 'zip_code': '79912'}
+{'address': ' 1901 GEORGE DIETER DRIVE',
+ 'city': 'EL PASO',
+ 'internal_store_number': 'T0823',
+ 'state': 'TX',
+ 'zip_code': '79936'}
+{'address': ' 708 EAST EXPRESSWAY 83',
+ 'city': 'MCALLEN',
+ 'internal_store_number': 'T0824',
+ 'state': 'TX',
+ 'zip_code': '78503'}
+{'address': ' 6000-10A MONTANA AVE',
+ 'city': 'EL PASO',
+ 'internal_store_number': 'T0849',
+ 'state': 'TX',
+ 'zip_code': '79925'}
+{'address': ' 13250 NORTHWEST FREEWAY',
+ 'city': 'HOUSTON',
+ 'internal_store_number': 'T0858',
+ 'state': 'TX',
+ 'zip_code': '77040'}
+{'address': ' 2417 NORTH HASKELL AVENUE',
+ 'city': 'DALLAS',
+ 'internal_store_number': 'T0875',
+ 'state': 'TX',
+ 'zip_code': '75204'}
+{'address': ' 1101 IRA EAST WOODS AVENUE',
+ 'city': 'GRAPEVINE',
+ 'internal_store_number': 'T0876',
+ 'state': 'TX',
+ 'zip_code': '76051'}
+{'address': ' 202 WEST HIGHWAY 332',
+ 'city': 'LAKE JACKSON',
+ 'internal_store_number': 'T0882',
+ 'state': 'TX',
+ 'zip_code': '77566'}
+{'address': ' 2325 SOUTH STEMMONS FREEWAY',
+ 'city': 'LEWISVILLE',
+ 'internal_store_number': 'T0886',
+ 'state': 'TX',
+ 'zip_code': '75067'}
+{'address': ' 4510 GARTH ROAD',
+ 'city': 'BAYTOWN',
+ 'internal_store_number': 'T0887',
+ 'state': 'TX',
+ 'zip_code': '77521'}
+{'address': ' 7608 ZAC LENTZ PARKWAY',
+ 'city': 'VICTORIA',
+ 'internal_store_number': 'T0888',
+ 'state': 'TX',
+ 'zip_code': '77904'}
+{'address': ' 19955 KATY FREEWAY',
+ 'city': 'HOUSTON',
+ 'internal_store_number': 'T0907',
+ 'state': 'TX',
+ 'zip_code': '77094'}
+{'address': ' 1720 WEST UNIVERSITY DRIVE',
+ 'city': 'MCKINNEY',
+ 'internal_store_number': 'T0934',
+ 'state': 'TX',
+ 'zip_code': '75069'}
+{'address': ' 9440 MARSH LANE',
+ 'city': 'DALLAS',
+ 'internal_store_number': 'T0947',
+ 'state': 'TX',
+ 'zip_code': '75220'}
+{'address': ' 12621 I H-10 WEST',
+ 'city': 'SAN ANTONIO',
+ 'internal_store_number': 'T0948',
+ 'state': 'TX',
+ 'zip_code': '78230'}
+{'address': ' 4200 SOUTH MEDFORD DRIVE',
+ 'city': 'LUFKIN',
+ 'internal_store_number': 'T0953',
+ 'state': 'TX',
+ 'zip_code': '75901'}
+{'address': ' 2500 EAST CENTRAL TEXAS EXPRESSWAY',
+ 'city': 'KILLEEN',
+ 'internal_store_number': 'T0954',
+ 'state': 'TX',
+ 'zip_code': '76543'}
+{'address': '4323 SAN FELIPE STREET',
+ 'city': 'HOUSTON',
+ 'internal_store_number': 'T0955',
+ 'state': 'TX',
+ 'zip_code': '77027'}
+{'address': ' 6955 NORTH HIGHWAY 6',
+ 'city': 'HOUSTON',
+ 'internal_store_number': 'T0993',
+ 'state': 'TX',
+ 'zip_code': '77084'}
+{'address': ' 642 SOUTH WALNUT STREET',
+ 'city': 'NEW BRAUNFELS',
+ 'internal_store_number': 'T0994',
+ 'state': 'TX',
+ 'zip_code': '78130'}
+{'address': ' 7845 NORTH MAC ARTHUR BLVD.',
+ 'city': 'IRVING',
+ 'internal_store_number': 'T1032',
+ 'state': 'TX',
+ 'zip_code': '75063'}
+{'address': ' 5300 S. MOPAC',
+ 'city': 'AUSTIN',
+ 'internal_store_number': 'T1061',
+ 'state': 'TX',
+ 'zip_code': '78749'}
+{'address': ' 850 STEGER TOWNE ROAD',
+ 'city': 'ROCKWALL',
+ 'internal_store_number': 'T1065',
+ 'state': 'TX',
+ 'zip_code': '75032'}
+{'address': ' 121 LOUIS HENNA BLVD.',
+ 'city': 'ROUND ROCK',
+ 'internal_store_number': 'T1066',
+ 'state': 'TX',
+ 'zip_code': '78664'}
+{'address': ' 8421 U. S. HWY. 281 N.',
+ 'city': 'SAN ANTONIO',
+ 'internal_store_number': 'T1067',
+ 'state': 'TX',
+ 'zip_code': '78216'}
+{'address': ' 503 I-45 NORTH',
+ 'city': 'CONROE',
+ 'internal_store_number': 'T1115',
+ 'state': 'TX',
+ 'zip_code': '77304'}
+{'address': ' 554 W. I.H. 20',
+ 'city': 'GRAND PRAIRIE',
+ 'internal_store_number': 'T1116',
+ 'state': 'TX',
+ 'zip_code': '75052'}
+{'address': ' 21515 TOMBALL PARKWAY',
+ 'city': 'HOUSTON',
+ 'internal_store_number': 'T1124',
+ 'state': 'TX',
+ 'zip_code': '77070'}
+{'address': ' 1180 THORPE LANE',
+ 'city': 'SAN MARCOS',
+ 'internal_store_number': 'T1203',
+ 'state': 'TX',
+ 'zip_code': '78666'}
+{'address': ' 907 W. MCDERMOTT DRIVE',
+ 'city': 'ALLEN',
+ 'internal_store_number': 'T1231',
+ 'state': 'TX',
+ 'zip_code': '75013'}
+{'address': ' 8500 MAIN STREET',
+ 'city': 'HOUSTON',
+ 'internal_store_number': 'T1336',
+ 'state': 'TX',
+ 'zip_code': '77030'}
+{'address': ' 1600 WEST ARBROOK',
+ 'city': 'ARLINGTON',
+ 'internal_store_number': 'T1339',
+ 'state': 'TX',
+ 'zip_code': '76015'}
+{'address': ' 18255 BLANCO ROAD',
+ 'city': 'SAN ANTONIO',
+ 'internal_store_number': 'T1354',
+ 'state': 'TX',
+ 'zip_code': '78258'}
+{'address': ' 6000 HIGHWAY 6',
+ 'city': 'MISSOURI CITY',
+ 'internal_store_number': 'T1359',
+ 'state': 'TX',
+ 'zip_code': '77459'}
+{'address': ' 1401 W GLADE ROAD',
+ 'city': 'EULESS',
+ 'internal_store_number': 'T1368',
+ 'state': 'TX',
+ 'zip_code': '76039'}
+{'address': '255 MARINA BAY DR',
+ 'city': 'CLEAR LAKE SHORES',
+ 'internal_store_number': 'T1377',
+ 'state': 'TX',
+ 'zip_code': '77565'}
+{'address': ' 725 HEBRON PARKWAY',
+ 'city': 'LEWISVILLE',
+ 'internal_store_number': 'T1395',
+ 'state': 'TX',
+ 'zip_code': '75057'}
+{'address': ' 3201 PRESTON ROAD',
+ 'city': 'FRISCO',
+ 'internal_store_number': 'T1763',
+ 'state': 'TX',
+ 'zip_code': '75034'}
+{'address': ' 2200 DALLAS PARKWAY',
+ 'city': 'PLANO',
+ 'internal_store_number': 'T1764',
+ 'state': 'TX',
+ 'zip_code': '75093'}
+{'address': ' 8000 DENTON HIGHWAY',
+ 'city': 'WATAUGA',
+ 'internal_store_number': 'T1765',
+ 'state': 'TX',
+ 'zip_code': '76148'}
+{'address': ' 1400 PRECINCT LINE ROAD',
+ 'city': 'HURST',
+ 'internal_store_number': 'T1766',
+ 'state': 'TX',
+ 'zip_code': '76053'}
+{'address': ' 5700 OVERTON RIDGE BLVD',
+ 'city': 'FORT WORTH',
+ 'internal_store_number': 'T1770',
+ 'state': 'TX',
+ 'zip_code': '76132'}
+{'address': ' 16731 COIT ROAD',
+ 'city': 'DALLAS',
+ 'internal_store_number': 'T1775',
+ 'state': 'TX',
+ 'zip_code': '75248'}
+{'address': ' 6419 SKILLMAN STREET',
+ 'city': 'DALLAS',
+ 'internal_store_number': 'T1784',
+ 'state': 'TX',
+ 'zip_code': '75231'}
+{'address': ' 11311 BANDERA ROAD',
+ 'city': 'SAN ANTONIO',
+ 'internal_store_number': 'T1785',
+ 'state': 'TX',
+ 'zip_code': '78250'}
+{'address': ' 16300 SOUTHWEST FREEWAY',
+ 'city': 'SUGARLAND',
+ 'internal_store_number': 'T1786',
+ 'state': 'TX',
+ 'zip_code': '77479'}
+{'address': ' 6748 SOUTH REDWOOD ROAD',
+ 'city': 'WEST JORDAN',
+ 'internal_store_number': 'T0768',
+ 'state': 'UT',
+ 'zip_code': '84084'}
+{'address': ' 275 SOUTH RIVER ROAD',
+ 'city': 'ST GEORGE',
+ 'internal_store_number': 'T1357',
+ 'state': 'UT',
+ 'zip_code': '84770'}
+{'address': ' 200 NORTH MARKET PLACE DRIVE',
+ 'city': 'CENTERVILLE',
+ 'internal_store_number': 'T1750',
+ 'state': 'UT',
+ 'zip_code': '84014'}
+{'address': '7025 SOUTH PARK CENTRE DRIVE',
+ 'city': 'SALT LAKE CITY',
+ 'internal_store_number': 'T1751',
+ 'state': 'UT',
+ 'zip_code': '84121'}
+{'address': ' 10130 SOUTH STATE STREET',
+ 'city': 'SANDY',
+ 'internal_store_number': 'T1752',
+ 'state': 'UT',
+ 'zip_code': '84070'}
+{'address': ' 1135 WEST RIVERDALE ROAD',
+ 'city': 'RIVERDALE',
+ 'internal_store_number': 'T1753',
+ 'state': 'UT',
+ 'zip_code': '84405'}
+{'address': ' 175 WEST CENTER STREET',
+ 'city': 'OREM',
+ 'internal_store_number': 'T1754',
+ 'state': 'UT',
+ 'zip_code': '84057'}
+{'address': ' 815 WEST 2000 NORTH',
+ 'city': 'LAYTON',
+ 'internal_store_number': 'T1755',
+ 'state': 'UT',
+ 'zip_code': '84041'}
+{'address': ' 2460 PRINCE WILLIAM PARKWAY',
+ 'city': 'WOODBRIDGE',
+ 'internal_store_number': 'T0759',
+ 'state': 'VA',
+ 'zip_code': '22192'}
+{'address': ' 1180 CARL D SILVER PARKWAY',
+ 'city': 'FREDERICKSBURG',
+ 'internal_store_number': 'T0772',
+ 'state': 'VA',
+ 'zip_code': '22401'}
+{'address': ' 10301 NEW GUINEA ROAD',
+ 'city': 'FAIRFAX',
+ 'internal_store_number': 'T1005',
+ 'state': 'VA',
+ 'zip_code': '22032'}
+{'address': ' 46201 POTOMAC RUN PLAZA',
+ 'city': 'STERLING',
+ 'internal_store_number': 'T1009',
+ 'state': 'VA',
+ 'zip_code': '20164'}
+{'address': ' 721 SOUTHPARK BOULEVARD',
+ 'city': 'COLONIAL HEIGHTS',
+ 'internal_store_number': 'T1016',
+ 'state': 'VA',
+ 'zip_code': '23834'}
+{'address': ' 2530 WEIR ROAD',
+ 'city': 'CHESTER',
+ 'internal_store_number': 'T1017',
+ 'state': 'VA',
+ 'zip_code': '23831'}
+{'address': ' 5401 WEST BROAD STREET',
+ 'city': 'RICHMOND',
+ 'internal_store_number': 'T1018',
+ 'state': 'VA',
+ 'zip_code': '23230'}
+{'address': ' 10100 BROOK ROAD',
+ 'city': 'GLEN ALLEN',
+ 'internal_store_number': 'T1019',
+ 'state': 'VA',
+ 'zip_code': '23060'}
+{'address': ' 1911 SAVILLE ROW',
+ 'city': 'HAMPTON',
+ 'internal_store_number': 'T1020',
+ 'state': 'VA',
+ 'zip_code': '23666'}
+{'address': ' 1316 GREENBRIER PARKWAY',
+ 'city': 'CHESAPEAKE',
+ 'internal_store_number': 'T1021',
+ 'state': 'VA',
+ 'zip_code': '23320'}
+{'address': ' 11301 MIDLOTHIAN TURNPIKE',
+ 'city': 'RICHMOND',
+ 'internal_store_number': 'T1041',
+ 'state': 'VA',
+ 'zip_code': '23235'}
+{'address': ' 525 FIRST COLONIAL ROAD',
+ 'city': 'VIRGINIA BEACH',
+ 'internal_store_number': 'T1047',
+ 'state': 'VA',
+ 'zip_code': '23451'}
+{'address': ' 1245 N. MILITARY HIGHWAY',
+ 'city': 'NORFOLK',
+ 'internal_store_number': 'T1048',
+ 'state': 'VA',
+ 'zip_code': '23502'}
+{'address': ' 11290 WEST BROAD STREET',
+ 'city': 'GLEN ALLEN',
+ 'internal_store_number': 'T1049',
+ 'state': 'VA',
+ 'zip_code': '23060'}
+{'address': ' 3101 JEFFERSON DAVIS HIGHWAY',
+ 'city': 'ALEXANDRIA',
+ 'internal_store_number': 'T1076',
+ 'state': 'VA',
+ 'zip_code': '22301'}
+{'address': ' 12197 SUNSET HILLS ROAD',
+ 'city': 'RESTON',
+ 'internal_store_number': 'T1088',
+ 'state': 'VA',
+ 'zip_code': '20190'}
+{'address': ' 8340 SUDLEY ROAD',
+ 'city': 'MANASSAS',
+ 'internal_store_number': 'T1089',
+ 'state': 'VA',
+ 'zip_code': '20109'}
+{'address': '12130 JEFFERSON AVENUE',
+ 'city': 'NEWPORT NEWS',
+ 'internal_store_number': 'T1103',
+ 'state': 'VA',
+ 'zip_code': '23602'}
+{'address': ' 2060 SOUTH INDEPENDENCE BLVD',
+ 'city': 'VIRGINIA BEACH',
+ 'internal_store_number': 'T1105',
+ 'state': 'VA',
+ 'zip_code': '23456'}
+{'address': ' 4630 MONTICELLO AVENUE',
+ 'city': 'WILLIAMSBURG',
+ 'internal_store_number': 'T1161',
+ 'state': 'VA',
+ 'zip_code': '23188'}
+{'address': ' 4737 VALLEY VIEW BLVD. NW',
+ 'city': 'ROANOKE',
+ 'internal_store_number': 'T1162',
+ 'state': 'VA',
+ 'zip_code': '24012'}
+{'address': ' 4601 COMMONWEALTH CENTRE PKWAY',
+ 'city': 'MIDLOTHIAN',
+ 'internal_store_number': 'T1225',
+ 'state': 'VA',
+ 'zip_code': '23112'}
+{'address': ' 2340 LEGGE BLVD',
+ 'city': 'WINCHESTER',
+ 'internal_store_number': 'T1234',
+ 'state': 'VA',
+ 'zip_code': '22601'}
+{'address': ' 4040 WARDS ROAD',
+ 'city': 'LYNCHBURG',
+ 'internal_store_number': 'T1275',
+ 'state': 'VA',
+ 'zip_code': '24502'}
+{'address': ' 195 CONSTON AVENUE',
+ 'city': 'CHRISTIANSBURG',
+ 'internal_store_number': 'T1292',
+ 'state': 'VA',
+ 'zip_code': '24073'}
+{'address': ' 13047 FAIR LAKES SHOPPING CENTER',
+ 'city': 'FAIRFAX',
+ 'internal_store_number': 'T1341',
+ 'state': 'VA',
+ 'zip_code': '22033'}
+{'address': '6600 SPRINGFIELD MALL',
+ 'city': 'SPRINGFIELD',
+ 'internal_store_number': 'T1416',
+ 'state': 'VA',
+ 'zip_code': '22150'}
+{'address': '1316 GREENBRIER PKWY',
+ 'city': 'CHESAPEAKE',
+ 'internal_store_number': 'T1420',
+ 'state': 'VA',
+ 'zip_code': '23320'}
+{'address': ' 405 SE EVERETT MALL PARKWAY',
+ 'city': 'EVERETT',
+ 'internal_store_number': 'T0337',
+ 'state': 'WA',
+ 'zip_code': '98208'}
+{'address': ' 18305 ALDERWOOD MALL PARKWAY',
+ 'city': 'LYNNWOOD',
+ 'internal_store_number': 'T0338',
+ 'state': 'WA',
+ 'zip_code': '98037'}
+{'address': '4053 FACTORIA SQUARE MALL_SE',
+ 'city': 'BELLEVUE',
+ 'internal_store_number': 'T0339',
+ 'state': 'WA',
+ 'zip_code': '98006'}
+{'address': ' 2141 SOUTH 314TH STREET',
+ 'city': 'FEDERAL WAY',
+ 'internal_store_number': 'T0340',
+ 'state': 'WA',
+ 'zip_code': '98003'}
+{'address': ' 3320 SOUTH 23RD ST.',
+ 'city': 'TACOMA',
+ 'internal_store_number': 'T0341',
+ 'state': 'WA',
+ 'zip_code': '98405'}
+{'address': ' 3310 SOUTH MERIDIAN',
+ 'city': 'PUYALLUP',
+ 'internal_store_number': 'T0342',
+ 'state': 'WA',
+ 'zip_code': '98373'}
+{'address': ' 7809 C NE VANCOUVER PLAZA_DRIVE',
+ 'city': 'VANCOUVER',
+ 'internal_store_number': 'T0343',
+ 'state': 'WA',
+ 'zip_code': '98662'}
+{'address': ' NO. 30 BELLIS FAIR PARKWAY',
+ 'city': 'BELLINGHAM',
+ 'internal_store_number': 'T0348',
+ 'state': 'WA',
+ 'zip_code': '98226'}
+{'address': ' 10509 GRAVELLY LAKE DR SW STE 600',
+ 'city': 'TACOMA',
+ 'internal_store_number': 'T0349',
+ 'state': 'WA',
+ 'zip_code': '98499'}
+{'address': ' 3201 NW RANDALL WAY',
+ 'city': 'SILVERDALE',
+ 'internal_store_number': 'T0606',
+ 'state': 'WA',
+ 'zip_code': '98383'}
+{'address': ' 2925 HARRISON AVE NW',
+ 'city': 'OLYMPIA',
+ 'internal_store_number': 'T0607',
+ 'state': 'WA',
+ 'zip_code': '98502'}
+{'address': ' 301 STRANDER BLVD.',
+ 'city': 'TUKWILA',
+ 'internal_store_number': 'T0627',
+ 'state': 'WA',
+ 'zip_code': '98188'}
+{'address': ' 205 THREE RIVERS DRIVE',
+ 'city': 'KELSO',
+ 'internal_store_number': 'T0628',
+ 'state': 'WA',
+ 'zip_code': '98626'}
+{'address': ' NORTH 9770 NEWPORT HIGHWAY',
+ 'city': 'SPOKANE',
+ 'internal_store_number': 'T0636',
+ 'state': 'WA',
+ 'zip_code': '99218'}
+{'address': ' 2800 S.W. BARTON',
+ 'city': 'SEATTLE',
+ 'internal_store_number': 'T0637',
+ 'state': 'WA',
+ 'zip_code': '98126'}
+{'address': ' 26301 104TH AVENUE SOUTHEAST',
+ 'city': 'KENT',
+ 'internal_store_number': 'T0681',
+ 'state': 'WA',
+ 'zip_code': '98031'}
+{'address': ' 199 CASCADE MALL DRIVE',
+ 'city': 'BURLINGTON',
+ 'internal_store_number': 'T0696',
+ 'state': 'WA',
+ 'zip_code': '98233'}
+{'address': ' 12 NORTH FAIR AVE',
+ 'city': 'YAKIMA',
+ 'internal_store_number': 'T0760',
+ 'state': 'WA',
+ 'zip_code': '98901'}
+{'address': ' 1106 N COLUMBIA CENTER BLVD.',
+ 'city': 'KENNEWICK',
+ 'internal_store_number': 'T0830',
+ 'state': 'WA',
+ 'zip_code': '99336'}
+{'address': '13724 EAST SPRAGUE AVENUE',
+ 'city': 'SPOKANE',
+ 'internal_store_number': 'T0915',
+ 'state': 'WA',
+ 'zip_code': '99216'}
+{'address': ' 17700 NE 76TH STREET',
+ 'city': 'REDMOND',
+ 'internal_store_number': 'T0995',
+ 'state': 'WA',
+ 'zip_code': '98052'}
+{'address': ' 755 NW GILMAN BLVD',
+ 'city': 'ISSAQUAH',
+ 'internal_store_number': 'T0996',
+ 'state': 'WA',
+ 'zip_code': '98027'}
+{'address': ' 1102 SPRINGWATER',
+ 'city': 'WENATCHEE',
+ 'internal_store_number': 'T1064',
+ 'state': 'WA',
+ 'zip_code': '98801'}
+{'address': ' 13950 N.E. 178TH PLACE',
+ 'city': 'WOODINVILLE',
+ 'internal_store_number': 'T1118',
+ 'state': 'WA',
+ 'zip_code': '98072'}
+{'address': '11400 51ST AVE NW',
+ 'city': 'GIG HARBOR',
+ 'internal_store_number': 'T1205',
+ 'state': 'WA',
+ 'zip_code': '98335'}
+{'address': ' 302 N.E. NORTHGATE WAY',
+ 'city': 'SEATTLE',
+ 'internal_store_number': 'T1284',
+ 'state': 'WA',
+ 'zip_code': '98125'}
+{'address': ' 9601 MARKET PLACE',
+ 'city': 'LAKE STEVENS',
+ 'internal_store_number': 'T1331',
+ 'state': 'WA',
+ 'zip_code': '98258'}
+{'address': ' U.S.5 AND SLEATER -KINNEY ROAD SE',
+ 'city': 'LACEY',
+ 'internal_store_number': 'T1355',
+ 'state': 'WA',
+ 'zip_code': '98501'}
+{'address': ' 4777 SOUTH 27TH STREET',
+ 'city': 'GREENFIELD',
+ 'internal_store_number': 'T0024',
+ 'state': 'WI',
+ 'zip_code': '53221'}
+{'address': ' 3900 NORTH 124TH ST',
+ 'city': 'WAUWATOSA',
+ 'internal_store_number': 'T0025',
+ 'state': 'WI',
+ 'zip_code': '53222'}
+{'address': ' 2600 SOUTH 108 STREET',
+ 'city': 'WEST ALLIS',
+ 'internal_store_number': 'T0050',
+ 'state': 'WI',
+ 'zip_code': '53227'}
+{'address': ' 8501 W BROWN DEER RD',
+ 'city': 'MILWAUKEE',
+ 'internal_store_number': 'T0057',
+ 'state': 'WI',
+ 'zip_code': '53224'}
+{'address': ' 2401 KOSSOW ROAD',
+ 'city': 'WAUKESHA',
+ 'internal_store_number': 'T0082',
+ 'state': 'WI',
+ 'zip_code': '53186'}
+{'address': ' 5300 DURAND',
+ 'city': 'RACINE',
+ 'internal_store_number': 'T0152',
+ 'state': 'WI',
+ 'zip_code': '53406'}
+{'address': ' 2950 SOUTH CHASE AVE.',
+ 'city': 'MILWAUKEE',
+ 'internal_store_number': 'T0223',
+ 'state': 'WI',
+ 'zip_code': '53207'}
+{'address': ' 4343 GANNON LANE',
+ 'city': 'APPLETON',
+ 'internal_store_number': 'T0236',
+ 'state': 'WI',
+ 'zip_code': '54913'}
+{'address': ' 2707 SCHOFIELD AVENUE',
+ 'city': 'SCHOFIELD',
+ 'internal_store_number': 'T0364',
+ 'state': 'WI',
+ 'zip_code': '54476'}
+{'address': ' 9400 HIGHWAY 16',
+ 'city': 'ONALASKA',
+ 'internal_store_number': 'T0620',
+ 'state': 'WI',
+ 'zip_code': '54650'}
+{'address': ' 1708 NORTH CENTRAL AVENUE',
+ 'city': 'MARSHFIELD',
+ 'internal_store_number': 'T0805',
+ 'state': 'WI',
+ 'zip_code': '54449'}
+{'address': ' 5300 US HWY 10 EAST',
+ 'city': 'STEVENS POINT',
+ 'internal_store_number': 'T0806',
+ 'state': 'WI',
+ 'zip_code': '54481'}
+{'address': ' 1900 SOUTH KOELLER STREET',
+ 'city': 'OSHKOSH',
+ 'internal_store_number': 'T0807',
+ 'state': 'WI',
+ 'zip_code': '54902'}
+{'address': ' 485 NORTH ROLLING MEADOWS_DRIVE',
+ 'city': 'FOND DU LAC',
+ 'internal_store_number': 'T0808',
+ 'state': 'WI',
+ 'zip_code': '54937'}
+{'address': '2017 HUMES ROAD',
+ 'city': 'JANESVILLE',
+ 'internal_store_number': 'T0809',
+ 'state': 'WI',
+ 'zip_code': '53545'}
+{'address': ' N95 W17707 SHADY LANE',
+ 'city': 'MENOMONEE FALLS',
+ 'internal_store_number': 'T0863',
+ 'state': 'WI',
+ 'zip_code': '53051'}
+{'address': ' 2553 SUN VALLEY DRIVE',
+ 'city': 'DELAFIELD',
+ 'internal_store_number': 'T0864',
+ 'state': 'WI',
+ 'zip_code': '53018'}
+{'address': ' 3535 TOWER AVENUE',
+ 'city': 'SUPERIOR',
+ 'internal_store_number': 'T0889',
+ 'state': 'WI',
+ 'zip_code': '54880'}
+{'address': ' 7450 GREEN BAY ROAD',
+ 'city': 'KENOSHA',
+ 'internal_store_number': 'T0925',
+ 'state': 'WI',
+ 'zip_code': '53142'}
+{'address': ' 201 JUNCTION ROAD',
+ 'city': 'MADISON',
+ 'internal_store_number': 'T1060',
+ 'state': 'WI',
+ 'zip_code': '53717'}
+{'address': ' 4301 LIEN ROAD',
+ 'city': 'MADISON',
+ 'internal_store_number': 'T1069',
+ 'state': 'WI',
+ 'zip_code': '53704'}
+{'address': ' 1250 PORT WASHINGTON ROAD',
+ 'city': 'GRAFTON',
+ 'internal_store_number': 'T1212',
+ 'state': 'WI',
+ 'zip_code': '53024'}
+{'address': ' 2401 COULEE ROAD',
+ 'city': 'HUDSON',
+ 'internal_store_number': 'T1235',
+ 'state': 'WI',
+ 'zip_code': '54016'}
+{'address': ' 410 ASHLAND AVENUE',
+ 'city': 'STURGEON BAY',
+ 'internal_store_number': 'T1246',
+ 'state': 'WI',
+ 'zip_code': '54235'}
+{'address': ' 1001 CORMIER ROAD',
+ 'city': 'GREEN BAY',
+ 'internal_store_number': 'T1247',
+ 'state': 'WI',
+ 'zip_code': '54304'}
+{'address': ' 1800 SOUTH KENSINGTON DRIVE',
+ 'city': 'APPLETON',
+ 'internal_store_number': 'T1248',
+ 'state': 'WI',
+ 'zip_code': '54915'}
+{'address': ' 4798 SOUTH MOORLAND ROAD',
+ 'city': 'NEW BERLIN',
+ 'internal_store_number': 'T1311',
+ 'state': 'WI',
+ 'zip_code': '53151'}
+{'address': ' 3649 SOUTH HASTINGS WAY',
+ 'city': 'EAU CLAIRE',
+ 'internal_store_number': 'T1774',
+ 'state': 'WI',
+ 'zip_code': '54701'}
+{'address': ' 30 RHL_BOULEVARD',
+ 'city': 'CHARLESTON',
+ 'internal_store_number': 'T1261',
+ 'state': 'WV',
+ 'zip_code': '25309'}
+{'address': ' 401 WYOMING BLVD. S.E.',
+ 'city': 'CASPER',
+ 'internal_store_number': 'T0164',
+ 'state': 'WY',
+ 'zip_code': '82609'}
+{'address': ' 1708 DELL RANGE BLVD.',
+ 'city': 'CHEYENNE',
+ 'internal_store_number': 'T0224',
+ 'state': 'WY',
+ 'zip_code': '82009'}

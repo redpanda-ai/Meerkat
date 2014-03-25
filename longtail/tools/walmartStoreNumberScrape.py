@@ -5,40 +5,56 @@ import os.path
 
 browser = Browser()
 base_url = "http://www.walmart.com/storeLocator/ca_storefinder_details_short.do?edit_object_id="
-current_walmart = 1
+current_walmart = 1755
 found = []
+save_file = open("../../data/misc/Store\ Numbers/Clean/walmart_store_numbers.txt", "a")
 
-while current_walmart < 5000:
+# Clear Contents of Old Run
+#open('walmart_store_numbers.txt', 'w').close()
+
+while current_walmart < 6000:
 
 	text_number = str(current_walmart)
 	while len(text_number) < 4:
 		text_number = "0" + text_number
 
 	browser.visit(base_url + str(current_walmart))
-	new = {
-		"internal_store_number" : ("#" + text_number),
-		"address" : ""
-	}
 
 	try:
+
+		# Find Address on Page
 		elements = browser.find_by_css(".StoreAddress")
 		div = elements[0]
-		new["address"] = div.value
+
+		# Parse
+		trash, address, extra = div.value.split('\n')
+		city, extra = extra.split(",")
+		state, zip_code = extra.lstrip(' ').split(' ')
+
+		# Format 
+		new = {
+			"internal_store_number" : ("#" + text_number),
+			"address" : address,
+			"city" : city,
+			"state" : state,
+			"zip_code" : zip_code
+		}
+
 		found.append(new)
 
 		# Save Result
-		save_file = open("walmart_store_numbers.txt", "a")
 		pprint(new, save_file)
-		save_file.close()
 
-
+		# Print
 		print(str(current_walmart), ":")
 		print(div.value, "\n")
+
 	except ElementDoesNotExist:
-		print("no walmart # ", current_walmart)
+		print("no walmart # ", current_walmart, "\n")
 		current_walmart +=1 
 		continue
 
 	current_walmart += 1
 
+save_file.close()
 browser.quit()

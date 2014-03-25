@@ -1,9 +1,9 @@
 {
     "concurrency" : 4,
-    "verification_source" : "data/misc/verifiedLabeledTrans.csv",
+    "verification_source" : "data/misc/matt_8000_card.csv",
     "input" : {
         "hyperparameters" : "config/hyperparameters/default.json",
-        "filename" : "data/input/benchmark.csv",
+        "filename" : "data/input/sofar.csv",
         "encoding" : "utf-8"
     },
     "logging" : {
