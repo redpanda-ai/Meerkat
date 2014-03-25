@@ -82,6 +82,7 @@
 						"status" : { "index" : "analyzed", "type" : "string" },
 						"chain_name" : { "index" : "analyzed", "type" : "string" },
 						"chain_id" : { "index" : "analyzed", "type" : "string" },
+						"internal_store_number" : {"index" : "analyzed", "type" : "string"},
 						"pin" : { "properties" : { "location" : {
 							"type" : "geo_shape", "tree" : "quadtree", "precision" : "1m" } }
 						}
