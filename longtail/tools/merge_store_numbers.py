@@ -48,7 +48,7 @@ def find_merchant(store):
 		return ""
 
 	# Allow User to Verify and Return 
-	formatted = [top_hit["name"], top_hit["address"], top_hit["postcode"], top_hit["locality"], top_hit["region"]]
+	formatted = [top_hit.get("name", ""), top_hit.get("address", ""), top_hit.get("postcode", ""), top_hit.get("locality", ""), top_hit.get("region", ""),]
 	formatted = ", ".join(formatted)
 	print("Z-Score: ", score)
 	print("Top Result: ", formatted)
@@ -59,7 +59,7 @@ def find_merchant(store):
 		return ""
 
 	# Test House Number
-	result_house_number = top_hit["address"].split(" ")[0]
+	result_house_number = top_hit.get("address", "").split(" ")[0]
 	original_house_number = store["address"].split(" ")[0]
 
 	if result_house_number == original_house_number and score > 1:
