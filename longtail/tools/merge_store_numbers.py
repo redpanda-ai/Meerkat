@@ -105,21 +105,23 @@ def run(stores):
 	# Run Search
 	for i in range(len(stores)):
 
-		factual_id = find_merchant(stores[i])
+		# Find Most Likely Merchant
+		store = stores[i]
+		factual_id = find_merchant(store)
 
 		# Attempt to Update Document
 		if len(factual_id) > 0:
-			status = update_merchant(factual_id, stores[i])
+			status = update_merchant(factual_id, store)
 		else:
-			print("Did Not Merge Store Number ", stores[i]["internal_store_number"], " To Index")
-			not_found.append(stores[i])
-
-		print(status, type(status))
+			print("Did Not Merge Store Number ", store["internal_store_number"], " To Index")
+			not_found.append(store)
 
 		# Save Failed Attempts
 		if status == False:
-			print("Did Not Merge Store Number ", stores[i]["internal_store_number"], " To Index")
-			not_found.append(stores[i])
+			print("Did Not Merge Store Number ", store["internal_store_number"], " To Index")
+			not_found.append(store)
+		else:
+			print("Successfully Merged Store Number:", store["internal_store_number"], "into Factual Merchant:", factual_id, "\n")
 
 	# Save Not Found
 	save_not_found(not_found)
@@ -139,7 +141,7 @@ if __name__ == "__main__":
 	cluster_nodes = ["brainstorm0:9200", "brainstorm1:9200", "brainstorm2:9200"
         , "brainstorm3:9200", "brainstorm4:9200", "brainstorm5:9200", "brainstorm6:9200"
         , "brainstorm7:9200", "brainstorm8:9200", "brainstorm9:9200", "brainstorma:9200"
-        , "brainstormb:9200", "localhost:9200"]
+        , "brainstormb:9200"]
 	es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True, sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
 	keywords = ["McDonald's"]
 	file_name = "data/misc/Store Numbers/Clean/mcdonalds_store_numbers.pipe"
