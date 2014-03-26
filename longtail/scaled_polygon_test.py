@@ -5,6 +5,7 @@ from matplotlib.patches import Polygon
 import pylab as pl
 
 def draw_plot(polygon_points, scaled_polygon_points):
+	"""This draws a simple plot to demonstrate scaling."""
 	fig = plt.figure()
 	ax1 = fig.add_subplot(111)
 	ax1.add_patch(Polygon(polygon_points, closed=True, fill=False, color='red'))
@@ -12,9 +13,6 @@ def draw_plot(polygon_points, scaled_polygon_points):
 	ax1.set_xlim((0,20))
 	ax1.set_ylim((0,20))
 	plt.show()
-	#pl.scatter(lons,lats)
-	#pl.show()
-	#pass
 
 def scale_polygon(list_of_points, scale=2.0):
 	"""This function accepts a list of points representing a polygon and scales
@@ -44,6 +42,7 @@ if __name__ == "__main__":
 	scaling_factor = 2
 	original_polygon_points =\
 	[[10.0, 5.0], [5.0, 8.0], [7.0, 14], [13.0, 14.0], [15.0, 8.0]]
+#Use this if you want to try a square
 #		[[11.0, 11.0], [11.0, 13.0], [13.0, 13.0], [13.0, 11.0]]
 	centroid, scaled_polygon_points, M, S =\
 		scale_polygon(original_polygon_points,scale=scaling_factor)
@@ -53,5 +52,3 @@ if __name__ == "__main__":
 	print("Scaled Polygon Points are:\n{0}".format(scaled_polygon_points))
 
 	draw_plot(original_polygon_points, scaled_polygon_points)
-#	draw_plot(M)
-#	draw_plot(S)
