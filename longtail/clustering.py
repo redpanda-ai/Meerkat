@@ -114,7 +114,7 @@ def convex_hull(clusters, locations):
 	return geoshapes, scaled_geoshapes
 
 def convert_geoshapes_coordinates_to_strings(geoshape_list):
-	"""Returns a copy of geoshape where each coordinate is formatted as a comma
+	"""Returns a copy of geoshape_list where each coordinate is formatted as a comma
 	separated pair of string values. """
 	new_geoshape_list = []
 	for geoshape in geoshape_list:
