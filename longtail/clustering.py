@@ -62,7 +62,10 @@ def collect_clusters(scaled_points, labels, location_list):
 				location.append(location_list[index])
 		clusters.append(cluster)
 		locations.append(location)
-	convex_hull(clusters, locations)
+	geoshape_list, scaled_geoshape_list = convex_hull(clusters, locations)
+	#NOTE: The previous version of "convex_hull" converted coordinates from floating point pairs
+	#to strings pairs.  If you need that functionality, use the
+	#"convert_geoshapes_coordinates_to_strings" function provided below.
 
 def convex_hull(clusters, locations):
 
@@ -71,42 +74,59 @@ def convex_hull(clusters, locations):
 	that bound those clusters"""
 
 	locations = np.array(locations)
-	geoshapes, geoshape_floats = [], []
+	geoshapes, scaled_geoshapes = [], []
 
 	for index, cluster in enumerate(clusters):
 
 		lat_lon_points = np.array(locations[index])
 		points = np.array(cluster)
 		hull = ConvexHull(points)
-		geoshape, geoshape_float = [], []
+		geoshape = []
 
 		# Draw lines
 		for simplex in hull.simplices:
 			plt.plot(points[simplex, 1], points[simplex, 0], 'k-')
+		#NOTE: Should we plot scaled_geoshapes?
+		#For now we are merely returning coordinates that could be used by ElasticSearch.
 
 		print("\n")
 
 		# Get Lat Lon Vertices
 		for vertex in hull.vertices:
-			geoshape.append([str(lat_lon_points[vertex, 0]), str(lat_lon_points[vertex, 1])])
-			geoshape_float.append([lat_lon_points[vertex, 0], lat_lon_points[vertex, 1]])
+			geoshape.append([lat_lon_points[vertex, 0], lat_lon_points[vertex, 1]])
 
 		# Elastic Search requires closed polygon, repeat first point
 		geoshape.append(geoshape[0])
-		geoshape_float.append(geoshape_float[0])
 
 		# Add to the list
 		geoshapes.append(geoshape)
-		geoshape_floats.append(geoshape_float)
+
+		# Let's do more
+		_, scaled_geoshape, _, _ = scale_polygon(geoshape, scale = 2.0)
+		scaled_geoshapes.append(scaled_geoshape)
 
 	for geoshape in geoshapes:
 		print("The geoshape is {0}\n".format(geoshape))
 
-	for gsf in geoshape_floats:
-		_, scaled_geoshape, _, _ = scale_polygon(gsf, scale = 2.0)
+	for scaled_geoshape in scaled_geoshapes:
 		print("The scaled geoshape is {0}\n".format(scaled_geoshape))
 
-	return geoshapes
+	return geoshapes, scaled_geoshapes
+
+def convert_geoshapes_coordinates_to_strings(geoshape_list):
+	"""Returns a copy of geoshape where each coordinate is formatted as a comma
+	separated pair of string values. """
+	new_geoshape_list = []
+	for geoshape in geoshape_list:
+		new_geoshape = []
+		new_geoshape_list.append(new_geoshape)
+		for coordinate in geoshape:
+			new_coordinate = []
+			new_geoshape.append(new_coordinate)
+			for dimension in coordinate:
+				new_coordinate.append(str(dimension))
+
+	return new_geoshape_list
 
 if __name__ == "__main__":
 	""" Do some stuff."""

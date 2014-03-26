@@ -10,8 +10,8 @@ def draw_plot(polygon_points, scaled_polygon_points):
 	ax1 = fig.add_subplot(111)
 	ax1.add_patch(Polygon(polygon_points, closed=True, fill=False, color='red'))
 	ax1.add_patch(Polygon(scaled_polygon_points, closed=True, fill=False, color='blue'))
-	ax1.set_xlim((0,20))
-	ax1.set_ylim((0,20))
+	ax1.set_xlim((-5,25))
+	ax1.set_ylim((-5,25))
 	plt.show()
 
 def scale_polygon(list_of_points, scale=2.0):
@@ -25,7 +25,7 @@ def scale_polygon(list_of_points, scale=2.0):
 	num_of_points, _ = M.shape
 	#Divide the column_sums by the number of points to find the average value for each dimension
 	centroid_vector = column_sums / num_of_points
-	#Create a matrix built of centroids, C that is the same shape as M
+	#Create a matrix built of centroids, C, that is the same shape as M
 	C = np.resize(centroid_vector, M.shape)
 	#Subtract C from M to create a matrix of deltas, D, from each point in M to each point in C
 	D = M - C
@@ -38,13 +38,12 @@ def scale_polygon(list_of_points, scale=2.0):
 
 if __name__ == "__main__":
 	"""Do this stuff."""
-	# a 4 x 2 matrix
 	scaling_factor = 2
+
+	#[[10.0, 5.0], [5.0, 8.0], [7.0, 14], [13.0, 14.0], [15.0, 8.0]]
 	original_polygon_points =\
-	[[10.0, 5.0], [5.0, 8.0], [7.0, 14], [13.0, 14.0], [15.0, 8.0]]
-#Use this if you want to try a square
-#		[[11.0, 11.0], [11.0, 13.0], [13.0, 13.0], [13.0, 11.0]]
-	centroid, scaled_polygon_points, M, S =\
+	[[10.0 ,6.0], [7.0, 8.0], [6.0, 11], [8.0,14.0], [12.0, 14.0], [14.0, 11.0], [13.0, 8.0]]
+	centroid, scaled_polygon_points, _, _ =\
 		scale_polygon(original_polygon_points,scale=scaling_factor)
 	print("Original Polygon Points are:\n{0}".format(original_polygon_points))
 	print("Scaling Factor is {0}".format(scaling_factor))
