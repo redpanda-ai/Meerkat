@@ -101,7 +101,9 @@ def convex_hull(clusters, locations):
 		# Add to the list
 		geoshapes.append(geoshape)
 
-		# Let's do more
+		# Using the "scale_polygon" function to generate a shape at twice the scale
+		# centered about the same centroid as "geoshape".  The result will be
+		# added to our list of "scaled_polygons".
 		_, scaled_geoshape, _, _ = scale_polygon(geoshape, scale = 2.0)
 		scaled_geoshapes.append(scaled_geoshape)
 
