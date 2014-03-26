@@ -28,7 +28,7 @@ def z_score_delta(scores):
 def find_merchant(store):
 	"""Match document with store number to factual document"""
 
-	fields = ["address^1.25", "postcode", "name", "locality", "region"]
+	fields = ["address", "postcode", "name", "locality", "region"]
 	search_parts = [store["address"], store["zip_code"], store["city"], store["state"]]
 	search_parts = keywords + search_parts
 	factual_id = ""
@@ -44,6 +44,9 @@ def find_merchant(store):
 	results = search_index(bool_search)
 	score, top_hit = get_top_hit(results)
 
+	if score == False:
+		return ""
+
 	# Allow User to Verify and Return 
 	formatted = [top_hit["name"], top_hit["address"], top_hit["postcode"], top_hit["locality"], top_hit["region"]]
 	formatted = ", ".join(formatted)
@@ -51,10 +54,21 @@ def find_merchant(store):
 	print("Top Result: ", formatted)
 	print("Query Sent: ", query)
 
-	user_verify = input("Does the Query Match the Result? Y/N: ")
+	# Must Be a McDonald's
+	if top_hit["name"] != "McDonald's":
+		return ""
 
-	if user_verify.lower() == "y":
+	# Test House Number
+	result_house_number = top_hit["address"].split(" ")[0]
+	original_house_number = store["address"].split(" ")[0]
+
+	if result_house_number == original_house_number and score > 1:
 		factual_id = top_hit["factual_id"]
+
+	#user_verify = input("Does the Query Match the Result? Y/N: ")
+
+	#if user_verify.lower() == "y":
+	#	factual_id = top_hit["factual_id"]
 
 	return factual_id
 
@@ -62,7 +76,7 @@ def get_top_hit(search_results):
 
 	# Must have results
 	if search_results['hits']['total'] == 0:
-		return False
+		return False, False
 
 	hits = search_results['hits']['hits']
 	scores = [hit['_score'] for hit in hits]
@@ -93,7 +107,7 @@ def search_index(query):
 	try:
 		output_data = es_connection.search(index="factual_index", body=query)
 	except Exception:
-		output_data = '{"hits":{"total":0}}'
+		output_data = {"hits":{"total":0}}
 
 	return output_data
 
@@ -121,7 +135,8 @@ def run(stores):
 			print("Did Not Merge Store Number ", store["internal_store_number"], " To Index")
 			not_found.append(store)
 		else:
-			print("Successfully Merged Store Number:", store["internal_store_number"], "into Factual Merchant:", factual_id, "\n")
+			print("")
+			#print("Successfully Merged Store Number:", store["internal_store_number"], "into Factual Merchant:", factual_id, "\n")
 
 	# Save Not Found
 	save_not_found(not_found)
