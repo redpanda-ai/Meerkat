@@ -28,7 +28,7 @@ def z_score_delta(scores):
 def find_merchant(store):
 	"""Match document with store number to factual document"""
 
-	fields = ["address", "postcode", "name", "locality", "region"]
+	fields = ["address^1.25", "postcode", "name", "locality", "region"]
 	search_parts = [store["address"], store["zip_code"], store["city"], store["state"]]
 	search_parts = keywords + search_parts
 	factual_id = ""
@@ -71,10 +71,17 @@ def get_top_hit(search_results):
 
 	return z_score, top_hit["_source"]
 
-def update_merchant(factual_id, store_number):
+def update_merchant(factual_id, store):
 	"""Update found merchant with store_number"""
 
-	print("Successfully Updated Merchant")
+	body = {"doc" : {"internal_store_number" : store["internal_store_number"]}}
+
+	try:
+		output_data = es_connection.update(index="factual_index", doc_type="factual_type", id=factual_id, body=body)
+	except Exception:
+		print("Failed to Update Merchant")
+
+	return output_data["ok"]
 
 def search_index(query):
 	"""Searches the merchants index and the merchant mapping"""
@@ -97,10 +104,20 @@ def run(stores):
 
 	# Run Search
 	for i in range(len(stores)):
+
 		factual_id = find_merchant(stores[i])
+
+		# Attempt to Update Document
 		if len(factual_id) > 0:
-			update_merchant(factual_id, stores[i]["internal_store_number"])
+			status = update_merchant(factual_id, stores[i])
 		else:
+			print("Did Not Merge Store Number ", stores[i]["internal_store_number"], " To Index")
+			not_found.append(stores[i])
+
+		print(status, type(status))
+
+		# Save Failed Attempts
+		if status == False:
 			print("Did Not Merge Store Number ", stores[i]["internal_store_number"], " To Index")
 			not_found.append(stores[i])
 
@@ -109,6 +126,13 @@ def run(stores):
 
 def save_not_found(not_found):
 	"""Save the stores not found in the index"""
+
+	delimiter = "|"
+	output_file = open("no_results.pipe", 'w')
+	dict_w = csv.DictWriter(output_file, delimiter=delimiter, fieldnames=not_found[0].keys())
+	dict_w.writeheader()
+	dict_w.writerows(not_found)
+	output_file.close()
 
 if __name__ == "__main__":
 
