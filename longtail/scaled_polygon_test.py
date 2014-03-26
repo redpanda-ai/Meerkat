@@ -10,8 +10,8 @@ def draw_plot(polygon_points, scaled_polygon_points):
 	ax1 = fig.add_subplot(111)
 	ax1.add_patch(Polygon(polygon_points, closed=True, fill=False, color='red'))
 	ax1.add_patch(Polygon(scaled_polygon_points, closed=True, fill=False, color='blue'))
-	ax1.set_xlim((-5,25))
-	ax1.set_ylim((-5,25))
+	ax1.set_xlim((-123,-122))
+	ax1.set_ylim((37,38))
 	plt.show()
 
 def scale_polygon(list_of_points, scale=2.0):
@@ -42,7 +42,8 @@ if __name__ == "__main__":
 
 	#[[10.0, 5.0], [5.0, 8.0], [7.0, 14], [13.0, 14.0], [15.0, 8.0]]
 	original_polygon_points =\
-	[[10.0 ,6.0], [7.0, 8.0], [6.0, 11], [8.0,14.0], [12.0, 14.0], [14.0, 11.0], [13.0, 8.0]]
+	[[-122.392586, 37.782428], [-122.434139, 37.725378], [-122.462813, 37.725407], [-122.48432, 37.742723], [-122.482605, 37.753909], [-122.476587, 37.784143], [-122.446137, 37.798541], [-122.419482, 37.807829], [-122.418104, 37.808003], [-122.413038, 37.807794], [-122.397797, 37.792259], [-122.392586, 37.782428]]
+#	[[10.0 ,6.0], [7.0, 8.0], [6.0, 11], [8.0,14.0], [12.0, 14.0], [14.0, 11.0], [13.0, 8.0]]
 	centroid, scaled_polygon_points, _, _ =\
 		scale_polygon(original_polygon_points,scale=scaling_factor)
 	print("Original Polygon Points are:\n{0}".format(original_polygon_points))
