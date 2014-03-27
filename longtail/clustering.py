@@ -15,46 +15,55 @@ import numpy as np
 from longtail.scaled_polygon_test import scale_polygon
 
 def cluster(location_list):
+	"""Cluster Points"""
 
 	# Parse to float
 	location_list[:] = [[float(x[1]), float(x[0])] for x in location_list]
 	X = location_list
 
 	X = StandardScaler().fit_transform(X)
-	db = DBSCAN(eps=0.2, min_samples=6).fit(X)
+	db = DBSCAN(eps=0.25, min_samples=4).fit(X)
 
 	# Find Shapes
-	collect_clusters(X, db.labels_, location_list)
+	geoshapes = collect_clusters(X, db.labels_, location_list)
 
-	core_samples = db.core_sample_indices_
-	labels = db.labels_
+	# Plot Results
+	#plot_clustering(db, X)
+
+	return geoshapes
+
+def plot_clustering(model, normalized_points):
+	"""Plot results of clustering"""
+
+	core_samples = model.core_sample_indices_
+	labels = model.labels_
 	n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
 	unique_labels = set(labels)
 	colors = pl.cm.Spectral(np.linspace(0, 1, len(unique_labels)))
+
 	for k, col in zip(unique_labels, colors):
 		if k == -1:
-			# Black used for noise.
-			col = 'k'
-			markersize = 5
+			# Noise throws off visualization
+			continue
 		class_members = [index[0] for index in np.argwhere(labels == k)]
 		cluster_core_samples = [index for index in core_samples if labels[index] == k]
 		for index in class_members:
-			x = X[index]
-			if index in core_samples and k != -1:
-				markersize = 5
-			else:
-				markersize = 5
-			pl.plot(x[1], x[0], 'o', markerfacecolor=col,
-					markeredgecolor='k', markersize=markersize)
+			x = normalized_points[index]
+			markersize = 5
+			pl.plot(x[1], x[0], 'o', markerfacecolor=col, markeredgecolor='k', markersize=markersize)
+
 	pl.show()
 
 def collect_clusters(scaled_points, labels, location_list):
+	"""Remap Normalized Clusters to location_list
+	and return base geoshapes for further processing"""
+
 	unique_labels = set(labels)
 	clusters, locations = [], []
+
 	for label in unique_labels:
 		if label == -1:
 			continue
-
 		cluster, location = [], []
 		for index, item in enumerate(labels):
 			if item == label:
@@ -62,10 +71,14 @@ def collect_clusters(scaled_points, labels, location_list):
 				location.append(location_list[index])
 		clusters.append(cluster)
 		locations.append(location)
-	geoshape_list, scaled_geoshape_list = convex_hull(clusters, locations)
+
+	geoshape_list = convex_hull(clusters, locations)
+
 	#NOTE: The previous version of "convex_hull" converted coordinates from floating point pairs
 	#to strings pairs.  If you need that functionality, use the
 	#"convert_geoshapes_coordinates_to_strings" function provided below.
+
+	return geoshape_list
 
 def convex_hull(clusters, locations):
 
@@ -101,19 +114,7 @@ def convex_hull(clusters, locations):
 		# Add to the list
 		geoshapes.append(geoshape)
 
-		# Using the "scale_polygon" function to generate a shape at twice the scale
-		# centered about the same centroid as "geoshape".  The result will be
-		# added to our list of "scaled_polygons".
-		_, scaled_geoshape, _, _ = scale_polygon(geoshape, scale = 2.0)
-		scaled_geoshapes.append(scaled_geoshape)
-
-	for geoshape in geoshapes:
-		print("The geoshape is {0}\n".format(geoshape))
-
-	for scaled_geoshape in scaled_geoshapes:
-		print("The scaled geoshape is {0}\n".format(scaled_geoshape))
-
-	return geoshapes, scaled_geoshapes
+	return geoshapes
 
 def convert_geoshapes_coordinates_to_strings(geoshape_list):
 	"""Returns a copy of geoshape_list where each coordinate is formatted as a comma

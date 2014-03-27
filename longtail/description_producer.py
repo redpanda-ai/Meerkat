@@ -24,6 +24,7 @@ from longtail.custom_exceptions import InvalidArguments, Misconfiguration
 from longtail.description_consumer import DescriptionConsumer
 from longtail.binary_classifier.load import predict_if_physical_transaction
 from longtail.accuracy import test_accuracy, print_results, speed_tests
+from longtail.location import second_pass
 
 def get_desc_queue(params):
 	"""Opens a file of descriptions, one per line, and load a description
@@ -153,6 +154,9 @@ def tokenize(params, desc_queue, hyperparameters, non_physical):
 
 	# Convert queue to list
 	result_list = queue_to_list(result_queue)
+
+	# Do a Second Pass to Improve Results
+	result_list = second_pass(result_list)
 
 	# Writing to an output file, if necessary.
 	if "file" in params["output"] and "format" in params["output"]["file"]\

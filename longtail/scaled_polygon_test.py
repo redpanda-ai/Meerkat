@@ -57,6 +57,7 @@ def scale_polygon(list_of_points, scale=2.0):
 	#Add the Scaled Delta matrix (DS) to the Centroid Matrix (C) and call it S
 	S = C + DS
 	#Return the centroid vector, and a list of points representing the scaled polygon
+
 	return centroid_vector, S.tolist(), M, S
 
 if __name__ == "__main__":
