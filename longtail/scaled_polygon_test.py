@@ -15,19 +15,17 @@ def draw_plot(polygon_points, scaled_polygon_points, S, zoom_out_factor = 2.5):
 	#Fetch the minimum and maximum dimension values as 1x2 row vectors
 	min_dimension_values = S.min(axis=0)
 	max_dimension_values = S.max(axis=0)
-	#Stack these vectors vertically to make a 2x2 matrix, of dimension
-	#boundaries (B)
+	#Stack these vectors vertically to make a matrix of boundaries, B
 	B = np.vstack((min_dimension_values, max_dimension_values))
-	#Find the difference between the highest and lowest values for 
-	#each dimension (1x2 row vector)
+	#Calculate the range between the highest and lowest values for 
+	#each dimension
 	dimension_ranges = max_dimension_values - min_dimension_values
-	#Create a 2x1 column vector for zoom_out, that scales according to 
-	#zoom_out_factor 
+	#Create a column vector to represent zoom_out, and scale it
 	zoom_out = np.matrix([[-1],[1]]) * zoom_out_factor
-	#Create a 2x2 matrix that applies zoom_out over dimension ranges
+	#Apply the zoom_out to the dimension_ranges to make a zoom matrix, Z
 	Z = zoom_out * dimension_ranges
-	#Add the zoom matrix Z, to the boundaries matrix B, for the final
-	#matrix containing the page boundaries P
+	#Add the zoom Z, to the original boundaries B, to get your final
+	#page boundaries, P
 	P = B + Z 
 
 	x_boundaries = (P[0,0], P[1,0])
