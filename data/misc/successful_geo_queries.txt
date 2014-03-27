@@ -84,15 +84,24 @@ POST /factual_index/_search
   "query": {
     "filtered": {
       "query": {
-        "query_string": {
+        "bool": {
+          "should": [
+            {
+              "query_string": {
                 "fields": [
+                  "_all",
                   "name",
+                  "address",
+                  "postcode",
                   "locality",
-                  "region",
-                  "address"
+                  "internal_store_number"
                 ],
                 "query": "taco"
+              }
             }
+          ],
+          "minimum_number_should_match": 1
+        }
       },
       "filter": {
         "geo_shape" : {
