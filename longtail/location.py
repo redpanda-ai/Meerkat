@@ -36,13 +36,15 @@ def visualize(location_list, original_geoshapes, scaled_geoshapes):
 	# Plot Points
 	point_lat = [float(point[1]) for point in location_list]
 	point_lon = [float(point[0]) for point in location_list]
-	plt.axis([37, 38, -122.7, -121.5])
-	plt.plot(point_lon, point_lat, 'ro', color='black', ms=2.0)
+	plt.axis([-122.7, -121.5, 37, 38])
+	plt.plot(point_lat, point_lon, 'ro', color='black', ms=2.0)
 
 	# Plot Original Shapes
 	for i in range(len(original_geoshapes)):
-		original = Polygon(original_geoshapes[i], closed=True, fill=False, color='red')
-		scaled = Polygon(scaled_geoshapes[i], closed=True, fill=False, color='blue')
+		o_geo = [point[::-1] for point in original_geoshapes[i]]
+		s_geo = [point[::-1] for point in scaled_geoshapes[i]]
+		original = Polygon(o_geo, closed=True, fill=False, color='red')
+		scaled = Polygon(s_geo, closed=True, fill=False, color='blue')
 		ax1.add_patch(original)
 		ax1.add_patch(scaled)
 	

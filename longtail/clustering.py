@@ -22,7 +22,7 @@ def cluster(location_list):
 	X = location_list
 
 	X = StandardScaler().fit_transform(X)
-	db = DBSCAN(eps=0.25, min_samples=4).fit(X)
+	db = DBSCAN(eps=0.08, min_samples=3).fit(X)
 
 	# Find Shapes
 	geoshapes = collect_clusters(X, db.labels_, location_list)
