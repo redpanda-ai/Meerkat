@@ -97,10 +97,8 @@ def convex_hull(clusters, locations):
 		geoshape = []
 
 		# Draw lines
-		for simplex in hull.simplices:
-			plt.plot(points[simplex, 1], points[simplex, 0], 'k-')
-		#NOTE: Should we plot scaled_geoshapes?
-		#For now we are merely returning coordinates that could be used by ElasticSearch.
+		#for simplex in hull.simplices:
+			#plt.plot(points[simplex, 1], points[simplex, 0], 'k-')
 
 		print("\n")
 
