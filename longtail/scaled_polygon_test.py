@@ -12,7 +12,7 @@ def draw_plot(polygon_points, scaled_polygon_points, S, zoom_out_factor = 2.5):
 		color='red'))
 	ax1.add_patch(Polygon(scaled_polygon_points, closed=True, fill=False,
 		color='blue'))
-	#Fetch the minimum and maximum coordinate points as 1x2 row vectors
+	#Fetch the minimum and maximum dimension values as 1x2 row vectors
 	min_dimensions, max_dimensions = S.min(axis=0), S.max(axis=0)
 	#Stack these vectors vertically to make a 2x2 matrix, of dimension
 	#boundaries (B)
@@ -28,7 +28,6 @@ def draw_plot(polygon_points, scaled_polygon_points, S, zoom_out_factor = 2.5):
 	#Add the zoom matrix Z, to the boundaries matrix B, for the final
 	#matrix containing the page boundaries P
 	P = B + Z 
-	#print("D:\n{0}".format(D))
 
 	x_boundaries = (P[0,0], P[1,0])
 	y_boundaries = (P[0,1], P[1,1])
