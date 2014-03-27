@@ -13,13 +13,14 @@ def draw_plot(polygon_points, scaled_polygon_points, S, zoom_out_factor = 2.5):
 	ax1.add_patch(Polygon(scaled_polygon_points, closed=True, fill=False,
 		color='blue'))
 	#Fetch the minimum and maximum dimension values as 1x2 row vectors
-	min_dimensions, max_dimensions = S.min(axis=0), S.max(axis=0)
+	min_dimension_values = S.min(axis=0)
+	max_dimension_values = S.max(axis=0)
 	#Stack these vectors vertically to make a 2x2 matrix, of dimension
 	#boundaries (B)
-	B = np.vstack((min_dimensions, max_dimensions))
+	B = np.vstack((min_dimension_values, max_dimension_values))
 	#Find the difference between the highest and lowest values for 
 	#each dimension (1x2 row vector)
-	dimension_ranges = max_dimensions - min_dimensions
+	dimension_ranges = max_dimension_values - min_dimension_values
 	#Create a 2x1 column vector for zoom_out, that scales according to 
 	#zoom_out_factor 
 	zoom_out = np.matrix([[-1],[1]]) * zoom_out_factor
