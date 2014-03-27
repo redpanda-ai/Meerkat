@@ -12,7 +12,8 @@ def draw_plot(polygon_points, scaled_polygon_points, S, zoom_out_factor = 2.5):
 		color='red'))
 	ax1.add_patch(Polygon(scaled_polygon_points, closed=True, fill=False,
 		color='blue'))
-	#Fetch the minimum and maximum dimension values as 1x2 row vectors
+	#Fetch the minimum and maximum dimension values for the scaled 
+	#polygon S and store them as 1x2 row vectors
 	min_dimension_values = S.min(axis=0)
 	max_dimension_values = S.max(axis=0)
 	#Stack these vectors vertically to make a matrix of boundaries, B
