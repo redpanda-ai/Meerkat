@@ -20,11 +20,11 @@ def draw_plot(polygon_points, scaled_polygon_points, S, zoom_out_factor = 2.5):
 	#Calculate the range between the highest and lowest values for 
 	#each dimension
 	dimension_ranges = max_dimension_values - min_dimension_values
-	#Create a column vector to represent zoom_out, and scale it
+	#Create a column vector to represent zoom_out, and scale it by a factor
 	zoom_out = np.matrix([[-1],[1]]) * zoom_out_factor
 	#Apply the zoom_out to the dimension_ranges to make a zoom matrix, Z
 	Z = zoom_out * dimension_ranges
-	#Add the zoom Z, to the original boundaries B, to get your final
+	#Add the zoom matrix Z to the original boundaries B, to get your final
 	#page boundaries, P
 	P = B + Z 
 
