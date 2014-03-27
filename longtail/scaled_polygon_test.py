@@ -4,14 +4,37 @@ from matplotlib.path import Path
 from matplotlib.patches import Polygon
 import pylab as pl
 
-def draw_plot(polygon_points, scaled_polygon_points):
+def draw_plot(polygon_points, scaled_polygon_points, S, zoom_out_factor = 2.5):
 	"""This draws a simple plot to demonstrate scaling."""
 	fig = plt.figure()
 	ax1 = fig.add_subplot(111)
-	ax1.add_patch(Polygon(polygon_points, closed=True, fill=False, color='red'))
-	ax1.add_patch(Polygon(scaled_polygon_points, closed=True, fill=False, color='blue'))
-	ax1.set_xlim((-123,-122))
-	ax1.set_ylim((37,38))
+	ax1.add_patch(Polygon(polygon_points, closed=True, fill=False,
+		color='red'))
+	ax1.add_patch(Polygon(scaled_polygon_points, closed=True, fill=False,
+		color='blue'))
+	#Fetch the minimum and maximum coordinate points as 1x2 row vectors
+	min_dimensions, max_dimensions = S.min(axis=0), S.max(axis=0)
+	#Stack these vectors vertically to make a 2x2 matrix, of dimension
+	#boundaries (B)
+	B = np.vstack((min_dimensions, max_dimensions))
+	#Find the difference between the highest and lowest values for 
+	#each dimension (1x2 row vector)
+	dimension_ranges = max_dimensions - min_dimensions
+	#Create a 2x1 column vector for zoom_out, that scales according to 
+	#zoom_out_factor 
+	zoom_out = np.matrix([[-1],[1]]) * zoom_out_factor
+	#Create a 2x2 matrix that applies zoom_out over dimension ranges
+	Z = zoom_out * dimension_ranges
+	#Add the zoom matrix Z, to the boundaries matrix B, for the final
+	#matrix containing the page boundaries P
+	P = B + Z 
+	#print("D:\n{0}".format(D))
+
+	x_boundaries = (P[0,0], P[1,0])
+	y_boundaries = (P[0,1], P[1,1])
+
+	ax1.set_xlim(x_boundaries)
+	ax1.set_ylim(y_boundaries)
 	plt.show()
 
 def scale_polygon(list_of_points, scale=2.0):
@@ -44,11 +67,11 @@ if __name__ == "__main__":
 	original_polygon_points =\
 	[[-122.392586, 37.782428], [-122.434139, 37.725378], [-122.462813, 37.725407], [-122.48432, 37.742723], [-122.482605, 37.753909], [-122.476587, 37.784143], [-122.446137, 37.798541], [-122.419482, 37.807829], [-122.418104, 37.808003], [-122.413038, 37.807794], [-122.397797, 37.792259], [-122.392586, 37.782428]]
 #	[[10.0 ,6.0], [7.0, 8.0], [6.0, 11], [8.0,14.0], [12.0, 14.0], [14.0, 11.0], [13.0, 8.0]]
-	centroid, scaled_polygon_points, _, _ =\
+	centroid, scaled_polygon_points, _, S =\
 		scale_polygon(original_polygon_points,scale=scaling_factor)
 	print("Original Polygon Points are:\n{0}".format(original_polygon_points))
 	print("Scaling Factor is {0}".format(scaling_factor))
 	print("Centroid is {0}".format(centroid))
 	print("Scaled Polygon Points are:\n{0}".format(scaled_polygon_points))
 
-	draw_plot(original_polygon_points, scaled_polygon_points)
+	draw_plot(original_polygon_points, scaled_polygon_points, S, zoom_out_factor = 2)
