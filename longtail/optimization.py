@@ -134,7 +134,7 @@ def split_hyperparameters(hyperparameters):
 	other = {}
 
 	for key, value in hyperparameters.items():
-		if key == "es_result_size" or key == "z_score_threshold":
+		if key == "es_result_size" or key == "z_score_threshold" or key == "qs_boost" or key == "scaling_factor":
 			other[key] = value
 		else:
 			boost_vectors[key] = [value]
@@ -269,11 +269,11 @@ if __name__ == "__main__":
 	open(os.path.splitext(os.path.basename(sys.argv[1]))[0] + '_top_scores.txt', 'w').close()
 
 	settings = {
-		"test_size": 0.5,
-		"initial_search_space": 1,
-		"initial_learning_rate": 0,
-		"iteration_search_space": 10,
-		"iteration_learning_rate": 0.2,
+		"test_size": 1,
+		"initial_search_space": 15,
+		"initial_learning_rate": 0.5,
+		"iteration_search_space": 35,
+		"iteration_learning_rate": 0.3,
 		"gradient_ascent_iterations": 15,
 		"max_precision": 98
 	}
@@ -286,7 +286,7 @@ if __name__ == "__main__":
 	    "address_extended" : "1", 
 	    "po_box" : "1",           
 	    "locality" : "1",         
-	    "region" : "1",           
+	    "region" : "2",           
 	    "post_town" : "1",        
 	    "admin_region" : "1",     
 	    "postcode" : "1",                
@@ -295,10 +295,9 @@ if __name__ == "__main__":
 	    "email" : "1",               
 	    "category_labels" : "1",           
 	    "chain_name" : "1",
+	    "scaling_factor" : "1",
 		"z_score_threshold" : "3"
 	}
-
-	hyperparameters = {"chain_name": "1.514", "post_town": "0.526", "name": "2.698", "z_score_threshold": "2.68", "po_box": "0.299", "tel": "1.426", "category_labels": "1.699", "admin_region": "1.153", "locality": "1.692", "address": "0.987", "region": "0.939", "email": "0.444", "address_extended": "1.463", "postcode": "0.732", "neighborhood": "0.741"} 
 
 	# Meta Information
 	start_time = datetime.datetime.now()
