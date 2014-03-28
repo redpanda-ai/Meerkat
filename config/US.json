@@ -1,5 +1,5 @@
 {
-    "concurrency" : 4,
+    "concurrency" : 6,
     "verification_source" : "data/misc/verifiedLabeledTrans.csv",
     "input" : {
         "hyperparameters" : "config/hyperparameters/default.json",

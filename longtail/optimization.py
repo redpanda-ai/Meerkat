@@ -270,12 +270,12 @@ if __name__ == "__main__":
 
 	settings = {
 		"test_size": 0.5,
-		"initial_search_space": 35,
-		"initial_learning_rate": 0.75,
-		"iteration_search_space": 35,
-		"iteration_learning_rate": 0.35,
-		"gradient_ascent_iterations": 1,
-		"max_precision": 96
+		"initial_search_space": 1,
+		"initial_learning_rate": 0,
+		"iteration_search_space": 10,
+		"iteration_learning_rate": 0.2,
+		"gradient_ascent_iterations": 15,
+		"max_precision": 98
 	}
 
 	known = {"es_result_size" : "45"}
@@ -297,6 +297,8 @@ if __name__ == "__main__":
 	    "chain_name" : "1",
 		"z_score_threshold" : "3"
 	}
+
+	hyperparameters = {"chain_name": "1.514", "post_town": "0.526", "name": "2.698", "z_score_threshold": "2.68", "po_box": "0.299", "tel": "1.426", "category_labels": "1.699", "admin_region": "1.153", "locality": "1.692", "address": "0.987", "region": "0.939", "email": "0.444", "address_extended": "1.463", "postcode": "0.732", "neighborhood": "0.741"} 
 
 	# Meta Information
 	start_time = datetime.datetime.now()

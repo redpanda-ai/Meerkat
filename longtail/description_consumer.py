@@ -23,6 +23,7 @@ import threading
 
 from elasticsearch import Elasticsearch, helpers
 from scipy.stats.mstats import zscore
+from pprint import pprint
 
 from longtail.custom_exceptions import Misconfiguration, UnsupportedQueryType
 from longtail.various_tools import string_cleanse
@@ -33,6 +34,10 @@ def get_bool_query(starting_from = 0, size = 0):
 	return { "from" : starting_from, "size" : size, "query" : {
 		"bool": { "minimum_number_should_match": 1, "should": [] } } }
 
+def get_scrab_query():
+	"""Returns a "bool" style ElasticSearch query object"""
+	return {"bool": {"minimum_number_should_match": 1, "should": [] } }		
+
 def get_basic_query(starting_from=0, size=0):
 	"""Returns an ElasticSearch query object"""
 	return {"from" : starting_from, "size" : size, "query" : {}}
@@ -40,12 +45,7 @@ def get_basic_query(starting_from=0, size=0):
 def get_qs_query(term, field_list=[], boost=1.0):
 	"""Returns a "query_string" style ElasticSearch query object"""
 	return { "query_string": {
-		"query": term, "fields": field_list, "boost": boost } }
-
-def get_fuzzy_query(term, field_list=["_all"]):
-	"""Returns a "fuzzy_like_this" style ElasticSearch query object"""
-	return { "fuzzy_like_this": {
-		"like_text": term, "fields": field_list}}
+		"query": term, "fields": field_list} }
 
 class DescriptionConsumer(threading.Thread):
 	''' Acts as a client to an ElasticSearch cluster, tokenizing description
@@ -68,8 +68,11 @@ class DescriptionConsumer(threading.Thread):
 		"""Displays search results."""
 
 		# Must have results
-		if search_results['hits']['total'] == 0:
-			return True	
+		try:
+			if search_results['hits']['total'] == 0:
+				return True
+		except:
+			return True
 
 		hits = search_results['hits']['hits']
 		scores, results, fields_found = [], [], []
@@ -173,6 +176,26 @@ class DescriptionConsumer(threading.Thread):
 		simple_query = get_qs_query(input_string, field_boosts)
 		should_clauses.append(simple_query)
 
+		# Add Geo
+		geo = {
+			"geo_shape" : {
+				"pin.location" : {
+					"boost": 2.5,
+					"shape" : {
+						"type" : "multipolygon",
+						"coordinates": [
+										[[["-122.392586", "37.782428"], ["-122.434139", "37.725378"], ["-122.462813", "37.725407"], ["-122.48432", "37.742723"], ["-122.482605", "37.753909"], ["-122.476587", "37.784143"], ["-122.446137", "37.798541"], ["-122.419482", "37.807829"], ["-122.418104", "37.808003"], ["-122.413038", "37.807794"], ["-122.397797", "37.792259"], ["-122.392586", "37.782428"]]],
+										[[["-122.072671", "37.379629"], ["-122.030205", "37.377053"], ["-122.023556", "37.367017"], ["-122.015013", "37.326859"], ["-122.061178", "37.340622"], ["-122.072671", "37.379629"]]],
+										[[["-122.152589", "37.459209"], ["-122.163553", "37.454411"], ["-122.159704", "37.461578"], ["-122.157418", "37.464498"], ["-122.152589", "37.459209"]]],
+										[[["-122.24992", "37.498263"], ["-122.284456", "37.526612"], ["-122.256153", "37.536814"], ["-122.252173", "37.52305"], ["-122.24992", "37.498263"]]]
+						]
+					}			
+				}
+			}
+		}
+
+		should_clauses.append(geo)
+
 		# Show Final Query
 		logger.info(json.dumps(bool_search, sort_keys=True, indent=4, separators=(',', ': ')))
 		my_results = self.__search_index(bool_search)
@@ -187,7 +210,7 @@ class DescriptionConsumer(threading.Thread):
 		"""Decides whether to output and pushes to result_queue"""
 
 		# Must be at least one result
-		if search_results['hits']['total'] == 0:
+		if search_results['hits'].get("total", 0) == 0:
 			field_names = self.params["output"]["results"]["fields"]
 			output_dict = dict(zip(field_names, ([""] * len(field_names))))
 			output_dict["DESCRIPTION"] = self.input_string
