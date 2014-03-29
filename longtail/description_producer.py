@@ -20,6 +20,7 @@ import queue
 import sys
 
 from pprint import pprint
+from operator import itemgetter
 from longtail.custom_exceptions import InvalidArguments, Misconfiguration
 from longtail.description_consumer import DescriptionConsumer
 from longtail.binary_classifier.load import predict_if_physical_transaction
@@ -43,6 +44,10 @@ def get_desc_queue(params):
 		logging.critical("Invalid ['input']['filename'] key; Input file: %s"
 			" cannot be found. Correct your config file.", filename)
 		sys.exit()
+
+	# Sort By MEM_ID
+	if "MEM_ID" in transactions[0]:
+		transactions = sorted(transactions, key=itemgetter('MEM_ID')) 
 
 	# Run Binary Classifier
 	for transaction in transactions:

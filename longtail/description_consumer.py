@@ -20,6 +20,7 @@ import sys
 import pprint
 import datetime
 import threading
+import itertools
 
 from elasticsearch import Elasticsearch, helpers
 from scipy.stats.mstats import zscore
@@ -150,6 +151,9 @@ class DescriptionConsumer(threading.Thread):
 		scaling_factor = self.hyperparameters.get("scaling_factor", "1")
 		fields = params["output"]["results"]["fields"]
 		input_string = string_cleanse(self.input_string).rstrip()
+
+		# If we're using masked data, remove anything with 3 X's or more
+		input_string = re.sub("X{3,}", "", input_string)
 
 		# Input transaction must not be empty
 		if len(input_string) <= 2 and re.match('^[a-zA-Z0-9_]+$', input_string):

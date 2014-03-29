@@ -29,7 +29,7 @@ def test_accuracy(params, file_path=None, non_physical_trans=[], result_list=[])
 
 	# Load Verification Source
 	verification_source = params.get("verification_source", "data/misc/verifiedLabeledTrans.csv")
-	human_labeled = load_dict_list(verification_source)
+	human_labeled = load_dict_list(verification_source, delimiter=",")
 
 	#Ensure there is something to process
 	total = len(machine_labeled)
