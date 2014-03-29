@@ -39,7 +39,7 @@ def get_desc_queue(params):
 	try:
 		filename = params["input"]["filename"]
 		encoding = params["input"]["encoding"]
-		transactions = load_dict_list(filename, encoding=encoding)
+		transactions = load_dict_list(filename, encoding=encoding, delimiter="|")
 	except IOError:
 		logging.critical("Invalid ['input']['filename'] key; Input file: %s"
 			" cannot be found. Correct your config file.", filename)

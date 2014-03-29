@@ -187,6 +187,8 @@ def test_train_split(params):
 		if curr["factual_id"] != "" or curr[category] == "0" or curr[category] == "2":
 			dataset.append(curr)
 
+	dataset = verified_transactions
+
 	# Shuffle/Split Data
 	shuffle(dataset)
 	split_arr = array_split(array(dataset), 2)
@@ -198,18 +200,24 @@ def test_train_split(params):
 def get_desc_queue(dataset):
 	"""Alt version of get_desc_queue"""
 
-	transactions = [trans["DESCRIPTION"] for trans in dataset]
+	#transactions = [trans["DESCRIPTION"] for trans in dataset]
+	transactions = dataset
 	desc_queue, non_physical = queue.Queue(), []
 
 	# Run Binary Classifier
-	for transaction in transactions:
+	for row in transactions:
+		if row["factual_id"] == "" and row["IS_PHYSICAL_TRANSACTION"] == "1":
+			continue
+		if row["IS_PHYSICAL_TRANSACTION"] == "" or row["IS_PHYSICAL_TRANSACTION"] == "2":
+			continue
+		transaction = row["DESCRIPTION"]
 		prediction = predict_if_physical_transaction(transaction)
 		if prediction == "1":
-			desc_queue.put(transaction)
-		elif prediction == "0":
-			non_physical.append(transaction)
+			desc_queue.put(row)
+		elif prediction == "0" and random() < 0.2:
+			non_physical.append(row)
 		elif prediction == "2":
-			desc_queue.put(transaction)
+			desc_queue.put(row)
 
 	return desc_queue, non_physical
 
@@ -269,7 +277,7 @@ if __name__ == "__main__":
 	open(os.path.splitext(os.path.basename(sys.argv[1]))[0] + '_top_scores.txt', 'w').close()
 
 	settings = {
-		"test_size": 1,
+		"test_size": 0.5,
 		"initial_search_space": 15,
 		"initial_learning_rate": 0.5,
 		"iteration_search_space": 35,
