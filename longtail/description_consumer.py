@@ -62,7 +62,7 @@ class DescriptionConsumer(threading.Thread):
 			boost_column_vectors[boost_column_labels[i]] = np.array(my_list)
 		return boost_row_labels, boost_column_vectors
 
-	def __display_search_results(self, search_results):
+	def __display_search_results(self, search_results, transaction):
 		"""Displays search results."""
 
 		# Must have results
@@ -94,7 +94,7 @@ class DescriptionConsumer(threading.Thread):
 		try:
 			print(str(self.thread_id), ": ", results[0])
 		except IndexError:
-			print("INDEX ERROR: ", self.input_string)
+			print("INDEX ERROR: ", transaction["DESCRIPTION"])
 
 		return True
 
@@ -121,8 +121,20 @@ class DescriptionConsumer(threading.Thread):
 			quality = "High-grade"
 
 		logger.info("Top Score Quality: %s", quality)
-		
+
 		return z_score_delta
+
+
+	def __decision_boundary(self, z_score_delta):
+		"""Decides whether or not we will label transaction
+		by factual_id"""
+
+		threshold = self.hyperparameters.get("z_score_threshold", "2")
+
+		if z_score_delta > float(threshold):
+			return True
+		else:
+			return False
 
 	def __init__(self, thread_id, params, desc_queue, result_queue, hyperparameters):
 		''' Constructor '''
@@ -154,31 +166,23 @@ class DescriptionConsumer(threading.Thread):
 			transaction = self.user.pop()
 			base_query = self.__generate_base_query(transaction)
 			search_results = self.__run_classifier(base_query)
-			self.__display_search_results(my_results)
+			self.__display_search_results(search_results, transaction)
 			enriched_transaction = self.__process_results(search_results, transaction)
 			enriched_transactions.append(enriched_transaction)
 
 		return enriched_transactions
 
-	def __decision_boundary(self, z_score_delta):
-		"""Decides whether or not we will label transaction
-		by factual_id"""
-
-		threshold = hyperparameters.get("z_score_threshold", "2")
-
-		if z_score_delta > float(threshold):
-			return True
-		else
-			return False
-
 	def __second_pass(self, first_pass_results):
 		"""Classify transactions using geo and text features"""
+
+		return first_pass_results
 
 	def __run_classifier(self, query):
 		"""Runs the classifier and handles the results
 		accordingly"""
 
 		# Show Final Query
+		logger = logging.getLogger("thread " + str(self.thread_id))
 		logger.info(json.dumps(query, sort_keys=True, indent=4, separators=(',', ': ')))
 		my_results = self.__search_index(query)
 		metrics = self.my_meta["metrics"]
@@ -229,7 +233,7 @@ class DescriptionConsumer(threading.Thread):
 		params = self.params
 		result_size = self.hyperparameters.get("es_result_size", "10")
 		fields = params["output"]["results"]["fields"]
-		transaction = string_cleanse(self.transaction).rstrip()
+		transaction = string_cleanse(transaction["DESCRIPTION"]).rstrip()
 
 		# If we're using masked data, remove anything with 3 X's or more
 		transaction = re.sub("X{3,}", "", transaction)
@@ -251,7 +255,7 @@ class DescriptionConsumer(threading.Thread):
 		bool_search["fields"] = fields
 		should_clauses = bool_search["query"]["bool"]["should"]
 		field_boosts = self.__get_boosted_fields("standard_fields")
-		simple_query = get_qs_query(input_string, field_boosts)
+		simple_query = get_qs_query(transaction, field_boosts)
 		should_clauses.append(simple_query)
 
 		return bool_search
@@ -320,63 +324,11 @@ class DescriptionConsumer(threading.Thread):
 
 		return enriched_transaction
 
-	def __output_to_result_queue(self, search_results):
-		"""Decides whether to output and pushes to result_queue"""
+	def __output_to_result_queue(self, enriched_transactions):
+		"""Pushes results to the result queue"""
 
-		# Must be at least one result
-		if search_results["hits"]["total"] == 0:
-			field_names = self.params["output"]["results"]["fields"]
-			output_dict = dict(zip(field_names, ([""] * len(field_names))))
-			output_dict["DESCRIPTION"] = self.input_string
-			self.result_queue.put(output_dict)
-			print("NO RESULTS: ", self.input_string)
-			return
-		
-		hits = search_results['hits']['hits']
-		scores, fields_found = [], []
-		output_dict = {}
-		params = self.params
-		hyperparameters = self.hyperparameters
-		field_order = params["output"]["results"]["fields"]
-		top_hit = hits[0]
-		hit_fields = top_hit["fields"]
-		fields_in_hit = [field for field in hit_fields]
-		business_names = [result["fields"]["name"] for result in hits]
-		ordered_hit_fields = []
-
-		for hit in hits:
-			scores.append(hit['_score'])
-
-		for ordinal in field_order:
-			if ordinal in fields_in_hit:
-				my_field = hit_fields[ordinal][0] if isinstance(hit_fields[ordinal], (list)) else str(hit_fields[ordinal])
-				fields_found.append(ordinal)
-				ordered_hit_fields.append(my_field)
-			else:
-				fields_found.append(ordinal)
-				ordered_hit_fields.append("")
-
-		z_score_delta = self.__generate_z_score_delta(scores)
-		top_score = top_hit['_score']
-
-		#Unable to generate z_score
-		if z_score_delta == None:
-			output_dict = dict(zip(fields_found, ordered_hit_fields))
-			output_dict['DESCRIPTION'] = self.input_string
-			self.result_queue.put(output_dict)
-			return
-
-		#Send to result Queue if score good enough. Use business name as a fallback.
-		if z_score_delta > float(hyperparameters.get("z_score_threshold", "2")):
-			output_dict = dict(zip(fields_found, ordered_hit_fields))
-		else:
-			output_dict = self.__business_name_fallback(business_names)
-
-		output_dict['DESCRIPTION'] = self.input_string
-		self.result_queue.put(output_dict)
-
-		logging.info("Z_SCORE_DELTA: %.2f", z_score_delta)
-		logging.info("TOP_SCORE: %.4f", top_score)
+		for transaction in enriched_transactions:
+			self.result_queue.put(transaction)
 
 	def __business_name_fallback(self, business_names, transaction):
 		"""Uses the business names as a fallback
@@ -388,7 +340,7 @@ class DescriptionConsumer(threading.Thread):
 		all_equal = business_names.count(business_names[0]) == len(business_names)
 
 		if all_equal:
-			enriched_transaction['business_name'] = business_names[0]
+			enriched_transaction['name'] = business_names[0]
 		
 		return enriched_transaction
 
@@ -490,7 +442,10 @@ class DescriptionConsumer(threading.Thread):
 				results = self.__first_pass()
 
 				# Call Second Pass
-				self.__second_pass(results)
+				enriched_transactions = self.__second_pass(results)
+
+				# Output Results to Result Queue
+				self.__output_to_result_queue(enriched_transactions)
 
 				# Done
 				self.desc_queue.task_done()
