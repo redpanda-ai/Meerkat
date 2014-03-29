@@ -12,6 +12,7 @@ ElasticSearch (structured data).
 
 import csv
 import datetime
+import collections
 import json
 import logging
 import os
@@ -32,8 +33,8 @@ def get_desc_queue(params):
 	queue."""
 
 	lines, filename, encoding = None, None, None
-	non_physical = []
-	atm = []
+	physical, non_physical, atm = [], [], []
+	users = collections.defaultdict(list)
 	desc_queue = queue.Queue()
 
 	try:
@@ -45,26 +46,31 @@ def get_desc_queue(params):
 			" cannot be found. Correct your config file.", filename)
 		sys.exit()
 
-	# Sort By MEM_ID
-	if "MEM_ID" in transactions[0]:
-		transactions = sorted(transactions, key=itemgetter('MEM_ID')) 
-
 	# Run Binary Classifier
 	for transaction in transactions:
 		description = transaction["DESCRIPTION"]
 		prediction = predict_if_physical_transaction(description)
 		if prediction == "1":
-			desc_queue.put(transaction)
+			physical.append(transaction)
 		elif prediction == "0":
 			non_physical.append(transaction)
 			logging.info("NON-PHYSICAL: %s", description)
 		elif prediction == "2":
-			desc_queue.put(transaction)
+			physical.append(transaction)
 			atm.append(transaction)
+
+	# Split into user buckets
+	for row in physical:
+		user = row['MEM_ID']
+		users[user].append(row)
+
+	# Add Users to Queue
+	for key, value in users.items():
+		desc_queue.put(users[key])
 
 	atm_percent = (len(atm) / len(transactions)) * 100
 	non_physical_percent = (len(non_physical) / len(transactions)) * 100
-	physical_percent = (desc_queue.qsize() / len(transactions)) * 100
+	physical_percent = (len(physical) / len(transactions)) * 100
 
 	print("")
 	print("PHYSICAL: ", round(physical_percent, 2), "%")
