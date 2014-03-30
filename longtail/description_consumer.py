@@ -333,7 +333,7 @@ class DescriptionConsumer(threading.Thread):
 		fields_in_hit = [field for field in hit_fields]
 
 		# Enrich with the fields we've found. Attach the z_score_delta
-		if decision: 
+		if decision == True: 
 			for field in field_names:
 				if field in fields_in_hit:
 					field_content = hit_fields[field][0] if isinstance(hit_fields[field], (list)) else str(hit_fields[field])
@@ -343,11 +343,11 @@ class DescriptionConsumer(threading.Thread):
 			enriched_transaction["z_score_delta"] = z_score_delta
 
 		# Add a Business Name as a fall back
-		if not decision:
-			enriched_transaction = self.__business_name_fallback(business_names, transaction)
-			enriched_transaction["z_score_delta"] = 0
+		if decision == False:
 			for field in field_names:
 				enriched_transaction[field] = ""
+			enriched_transaction = self.__business_name_fallback(business_names, transaction)
+			enriched_transaction["z_score_delta"] = 0
 
 		return enriched_transaction
 
@@ -469,7 +469,8 @@ class DescriptionConsumer(threading.Thread):
 				results = self.__first_pass()
 
 				# Call Second Pass
-				enriched_transactions = self.__second_pass(results)
+				#enriched_transactions = self.__second_pass(results)
+				enriched_transactions = results
 
 				# Output Results to Result Queue
 				self.__output_to_result_queue(enriched_transactions)

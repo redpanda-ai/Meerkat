@@ -48,6 +48,7 @@ def get_desc_queue(params):
 
 	# Run Binary Classifier
 	for transaction in transactions:
+		transaction['factual_id'] = ""
 		description = transaction["DESCRIPTION"]
 		prediction = predict_if_physical_transaction(description)
 		if prediction == "1":
