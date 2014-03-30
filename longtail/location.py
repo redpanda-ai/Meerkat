@@ -10,6 +10,7 @@ from matplotlib.patches import Polygon
 from pprint import pprint
 from longtail.clustering import cluster
 from longtail.scaled_polygon_test import scale_polygon
+from random import random
 
 def separate_geo(result_list):
 	"""Separate Results From Non Results"""
@@ -25,21 +26,18 @@ def separate_geo(result_list):
 
 	return hits, non_hits
 
-def visualize(arguments):
+def visualize(location_list, original_geoshapes, scaled_geoshapes, user_id):
 	"""Visualize results of clustering and scaling in
 	a useful way"""
 
-	print("HERE: ", arguments)
-
 	# Meta
-	location_list, original_geoshapes, scaled_geoshapes = arguments
-	fig = plt.figure()
-	ax1 = fig.add_subplot(111)
+	ax = plt.gca()
+	#fig = plt.figure()
+	#ax1 = fig.add_subplot(111)
 
 	# Plot Points
 	point_lat = [float(point[1]) for point in location_list]
 	point_lon = [float(point[0]) for point in location_list]
-	plt.axis([-122.7, -121.5, 37, 38])
 	plt.plot(point_lat, point_lon, 'ro', color='black', ms=2.0)
 
 	# Plot Original Shapes
@@ -48,10 +46,10 @@ def visualize(arguments):
 		s_geo = [point[::-1] for point in scaled_geoshapes[i]]
 		original = Polygon(o_geo, closed=True, fill=False, color='red')
 		scaled = Polygon(s_geo, closed=True, fill=False, color='blue')
-		ax1.add_patch(original)
-		ax1.add_patch(scaled)
-	
-	#plt.show()
+		ax.add_patch(original)
+		ax.add_patch(scaled)
+
+	plt.savefig("user-" + user_id + ".png")
 
 def second_pass(result_list):
 

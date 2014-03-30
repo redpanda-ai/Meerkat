@@ -178,6 +178,7 @@ class DescriptionConsumer(threading.Thread):
 	def __second_pass(self, first_pass_results):
 		"""Classify transactions using geo and text features"""
 
+		user_id = first_pass_results[0]['MEM_ID']
 		hits, non_hits = separate_geo(first_pass_results)
 		locations_found = [str(json.loads(hit["pin.location"].replace("'", '"'))["coordinates"]) for hit in hits]
 		unique_locations = set(locations_found)
@@ -196,9 +197,10 @@ class DescriptionConsumer(threading.Thread):
 			scaled_geoshapes = [scale_polygon(geoshape, scale=1.5)[1] for geoshape in original_geoshapes]
 			
 			# Needs to run in it's own process
-			pool = multiprocessing.Pool()
-			arguments = [unique_locations, original_geoshapes, scaled_geoshapes]
-			pool.map(visualize, arguments)
+			if len(unique_locations) > 3:
+				pool = multiprocessing.Pool()
+				arguments = [(unique_locations, original_geoshapes, scaled_geoshapes, user_id)]
+				pool.starmap(visualize, arguments)
 
 		else: 
 			return first_pass_results
