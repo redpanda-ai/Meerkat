@@ -190,14 +190,15 @@ class DescriptionConsumer(threading.Thread):
 			original_geoshapes = cluster(unique_locations)
 
 			if len(original_geoshapes) == 0:
-				return first_pass_results
+				original_geoshapes = [unique_locations]
+				#return first_pass_results
 
 			scaled_geoshapes = [scale_polygon(geoshape, scale=1.5)[1] for geoshape in original_geoshapes]
 			
 			# Needs to run in it's own process
-			#pool = multiprocessing.Pool()
-			#arguments = [unique_locations, original_geoshapes, scaled_geoshapes]
-			#pool.map(visualize, arguments)
+			pool = multiprocessing.Pool()
+			arguments = [unique_locations, original_geoshapes, scaled_geoshapes]
+			pool.map(visualize, arguments)
 
 		else: 
 			return first_pass_results
@@ -469,8 +470,8 @@ class DescriptionConsumer(threading.Thread):
 				results = self.__first_pass()
 
 				# Call Second Pass
-				#enriched_transactions = self.__second_pass(results)
-				enriched_transactions = results
+				enriched_transactions = self.__second_pass(results)
+				#enriched_transactions = results
 
 				# Output Results to Result Queue
 				self.__output_to_result_queue(enriched_transactions)
