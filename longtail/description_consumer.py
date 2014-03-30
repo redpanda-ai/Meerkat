@@ -187,7 +187,6 @@ class DescriptionConsumer(threading.Thread):
 		if len(unique_locations) >= 3:
 
 			# Scale Generated Geo Shapes
-
 			original_geoshapes = cluster(unique_locations)
 
 			if len(original_geoshapes) == 0:
@@ -197,13 +196,10 @@ class DescriptionConsumer(threading.Thread):
 			scaled_geoshapes = [scale_polygon(geoshape, scale=1.5)[1] for geoshape in original_geoshapes]
 			
 			# Needs to run in it's own process
-			if len(unique_locations) > 3:
+			if len(original_geoshapes) > 1:
 				pool = multiprocessing.Pool()
 				arguments = [(unique_locations, original_geoshapes, scaled_geoshapes, user_id)]
 				pool.starmap(visualize, arguments)
-
-		else: 
-			return first_pass_results
 
 		return first_pass_results
 

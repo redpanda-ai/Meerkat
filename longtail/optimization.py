@@ -12,7 +12,7 @@ from longtail.description_producer import initialize, tokenize, load_hyperparame
 from longtail.binary_classifier.load import predict_if_physical_transaction
 from longtail.accuracy import print_results
 
-import sys, datetime, os, queue, csv
+import sys, datetime, os, queue, csv, collections
 from pprint import pprint
 from random import randint, uniform, random, shuffle
 from numpy import array, array_split
@@ -202,7 +202,8 @@ def get_desc_queue(dataset):
 
 	#transactions = [trans["DESCRIPTION"] for trans in dataset]
 	transactions = dataset
-	desc_queue, non_physical = queue.Queue(), []
+	desc_queue, non_physical, physical = queue.Queue(), [], []
+	users = collections.defaultdict(list)
 
 	# Run Binary Classifier
 	for row in transactions:
@@ -213,11 +214,20 @@ def get_desc_queue(dataset):
 		transaction = row["DESCRIPTION"]
 		prediction = predict_if_physical_transaction(transaction)
 		if prediction == "1":
-			desc_queue.put(row)
+			physical.append(row)
 		elif prediction == "0" and random() < 0.2:
 			non_physical.append(row)
 		elif prediction == "2":
-			desc_queue.put(row)
+			physical.append(row)
+
+	# Split into user buckets
+	for row in physical:
+		user = row['MEM_ID']
+		users[user].append(row)
+
+	# Add Users to Queue
+	for key, value in users.items():
+		desc_queue.put(users[key])
 
 	return desc_queue, non_physical
 
@@ -251,14 +261,20 @@ def two_fold(hyperparameters, known, params, d0, d1):
 	d1_results = cross_validate(d0_top_score, d1)
 	d0_results = cross_validate(d1_top_score, d0)
 
-	# See Scores
-	file_name = os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_" + "cross_validation_results.json" 
-	record = open(file_name, 'w')
+	# Show Scores
 	print("FINAL SCORES:")
 	pprint(d0_results)
 	pprint(d1_results)
 
-	#Save The Scores
+	# Save Scores
+	save_cross_fold_results(d0_top_score, d0_results, d1_top_score, d1_results)
+
+def save_cross_fold_results(d0_top_score, d0_results, d1_top_score, d1_results):
+
+	# Save Scores
+	file_name = os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_" + "cross_validation_results.json" 
+	record = open(file_name, 'w')
+
 	pprint("d0 as Training Data - Top Score found through Optimization:", record)
 	pprint(d0_top_score, record)
 
