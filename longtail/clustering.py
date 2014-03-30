@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 import pylab as pl
 import numpy as np
 from longtail.scaled_polygon_test import scale_polygon
+from pprint import pprint
 
 def cluster(location_list):
 	"""Cluster Points"""

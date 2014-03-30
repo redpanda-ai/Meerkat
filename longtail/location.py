@@ -11,7 +11,7 @@ from pprint import pprint
 from longtail.clustering import cluster
 from longtail.scaled_polygon_test import scale_polygon
 
-def separate_results(result_list):
+def separate_geo(result_list):
 	"""Separate Results From Non Results"""
 
 	hits = []
@@ -25,11 +25,14 @@ def separate_results(result_list):
 
 	return hits, non_hits
 
-def visualize(location_list, original_geoshapes, scaled_geoshapes):
+def visualize(arguments):
 	"""Visualize results of clustering and scaling in
 	a useful way"""
 
+	print("HERE: ", arguments)
+
 	# Meta
+	location_list, original_geoshapes, scaled_geoshapes = arguments
 	fig = plt.figure()
 	ax1 = fig.add_subplot(111)
 
@@ -48,14 +51,14 @@ def visualize(location_list, original_geoshapes, scaled_geoshapes):
 		ax1.add_patch(original)
 		ax1.add_patch(scaled)
 	
-	plt.show()
+	#plt.show()
 
 def second_pass(result_list):
 
 	full_results = []
 
 	# Separate Results From Non Results
-	hits, non_hits = separate_results(result_list)
+	hits, non_hits = separate_geo(result_list)
 
 	# Location List
 	location_list = [json.loads(hit["pin.location"].replace("'", '"'))["coordinates"] for hit in hits]

@@ -21,6 +21,7 @@ import pprint
 import datetime
 import threading
 import itertools
+import multiprocessing
 
 from elasticsearch import Elasticsearch, helpers
 from scipy.stats.mstats import zscore
@@ -29,6 +30,8 @@ from pprint import pprint
 from longtail.custom_exceptions import Misconfiguration, UnsupportedQueryType
 from longtail.various_tools import string_cleanse
 from longtail.scaled_polygon_test import scale_polygon
+from longtail.clustering import cluster
+from longtail.location import separate_geo, visualize
 
 #Helper functions
 def get_bool_query(starting_from = 0, size = 0):
@@ -175,6 +178,30 @@ class DescriptionConsumer(threading.Thread):
 	def __second_pass(self, first_pass_results):
 		"""Classify transactions using geo and text features"""
 
+		hits, non_hits = separate_geo(first_pass_results)
+		locations_found = [str(json.loads(hit["pin.location"].replace("'", '"'))["coordinates"]) for hit in hits]
+		unique_locations = set(locations_found)
+		unique_locations = [json.loads(location.replace("'", '"')) for location in unique_locations]
+
+		if len(unique_locations) >= 3:
+
+			# Scale Generated Geo Shapes
+
+			original_geoshapes = cluster(unique_locations)
+
+			if len(original_geoshapes) == 0:
+				return first_pass_results
+
+			scaled_geoshapes = [scale_polygon(geoshape, scale=1.5)[1] for geoshape in original_geoshapes]
+			
+			# Needs to run in it's own process
+			#pool = multiprocessing.Pool()
+			#arguments = [unique_locations, original_geoshapes, scaled_geoshapes]
+			#pool.map(visualize, arguments)
+
+		else: 
+			return first_pass_results
+
 		return first_pass_results
 
 	def __run_classifier(self, query):
@@ -309,7 +336,7 @@ class DescriptionConsumer(threading.Thread):
 		if decision: 
 			for field in field_names:
 				if field in fields_in_hit:
-					field_content = hit_fields[ordinal][0] if isinstance(hit_fields[field], (list)) else str(hit_fields[field])
+					field_content = hit_fields[field][0] if isinstance(hit_fields[field], (list)) else str(hit_fields[field])
 					enriched_transaction[field] = field_content
 				else:
 					enriched_transaction[field] = ""
