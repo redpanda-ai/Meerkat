@@ -32,8 +32,6 @@ def visualize(location_list, original_geoshapes, scaled_geoshapes, user_id):
 
 	# Meta
 	ax = plt.gca()
-	#fig = plt.figure()
-	#ax1 = fig.add_subplot(111)
 
 	# Plot Points
 	point_lat = [float(point[1]) for point in location_list]

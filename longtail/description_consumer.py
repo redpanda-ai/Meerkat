@@ -24,13 +24,14 @@ import itertools
 import multiprocessing
 
 from elasticsearch import Elasticsearch, helpers
+from sklearn.preprocessing import StandardScaler
 from scipy.stats.mstats import zscore
 from pprint import pprint
 
 from longtail.custom_exceptions import Misconfiguration, UnsupportedQueryType
 from longtail.various_tools import string_cleanse
 from longtail.scaled_polygon_test import scale_polygon
-from longtail.clustering import cluster
+from longtail.clustering import cluster, convex_hull, collect_clusters
 from longtail.location import separate_geo, visualize
 
 #Helper functions
@@ -186,20 +187,24 @@ class DescriptionConsumer(threading.Thread):
 
 		if len(unique_locations) >= 3:
 
-			# Scale Generated Geo Shapes
+			# Cluster location and return geoshapes bounding clusters
 			original_geoshapes = cluster(unique_locations)
 
+			# If no clusters are found just use the points themselves
 			if len(original_geoshapes) == 0:
-				original_geoshapes = [unique_locations]
-				#return first_pass_results
+				scaled_points = StandardScaler().fit_transform(unique_locations)
+				labels = [0 for i in range(len(unique_locations))]
+				labels = np.array(labels)
+				original_geoshapes = collect_clusters(scaled_points, labels, unique_locations)
 
+			# Scale generated geo shapes
 			scaled_geoshapes = [scale_polygon(geoshape, scale=1.5)[1] for geoshape in original_geoshapes]
 			
-			# Needs to run in it's own process
-			#if len(original_geoshapes) > 1:
-				#pool = multiprocessing.Pool()
-				#arguments = [(unique_locations, original_geoshapes, scaled_geoshapes, user_id)]
-				#pool.starmap(visualize, arguments)
+			# Save interesting outputs needs to run in it's own process
+			if len(unique_locations) > 2:
+				pool = multiprocessing.Pool()
+				arguments = [(unique_locations, original_geoshapes, scaled_geoshapes, user_id)]
+				pool.starmap(visualize, arguments)
 
 		return first_pass_results
 
@@ -463,12 +468,12 @@ class DescriptionConsumer(threading.Thread):
 				# Select all transactions from user
 				self.user = self.desc_queue.get()
 
-				# Call First Pass
+				# Classify using text features only 
 				results = self.__first_pass()
 
-				# Call Second Pass
-				#enriched_transactions = self.__second_pass(results)
-				enriched_transactions = results
+				# Classify using text and geo features obtained during first pass
+				enriched_transactions = self.__second_pass(results)
+				#enriched_transactions = results
 
 				# Output Results to Result Queue
 				self.__output_to_result_queue(enriched_transactions)
