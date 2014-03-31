@@ -40,7 +40,8 @@ def get_desc_queue(params):
 	try:
 		filename = params["input"]["filename"]
 		encoding = params["input"]["encoding"]
-		transactions = load_dict_list(filename, encoding=encoding, delimiter="|")
+		delimiter = params["input"].get("delimiter", "|")
+		transactions = load_dict_list(filename, encoding=encoding, delimiter=delimiter)
 	except IOError:
 		logging.critical("Invalid ['input']['filename'] key; Input file: %s"
 			" cannot be found. Correct your config file.", filename)
@@ -166,7 +167,7 @@ def tokenize(params, desc_queue, hyperparameters, non_physical):
 	# Writing to an output file, if necessary.
 	if "file" in params["output"] and "format" in params["output"]["file"]\
 	and params["output"]["file"]["format"] in ["csv", "json"]:
-		write_output_to_file(params, result_list)
+		write_output_to_file(params, result_list, non_physical)
 	else:
 		logging.critical("Not configured for file output.")
 
@@ -238,7 +239,7 @@ def validate_params(params):
 		raise Misconfiguration(msg="Misconfiguration: missing key, 'input.encoding'", expr=None)
 	return True
 
-def write_output_to_file(params, output_list):
+def write_output_to_file(params, output_list, non_physical):
 	"""Outputs results to a file"""
 
 	if type(output_list) is queue.Queue:
@@ -248,6 +249,11 @@ def write_output_to_file(params, output_list):
 		logging.warning("No results available to write")
 		return
 
+	# Merge Physical and Non-Physical
+	print(len(output_list), len(non_physical))
+	output_list = output_list + non_physical
+
+	# Get File Save Info
 	file_name = params["output"]["file"].get("path", '../data/output/longtailLabeled.csv')
 	file_format = params["output"]["file"].get("format", 'csv')
 

@@ -201,7 +201,7 @@ class DescriptionConsumer(threading.Thread):
 			scaled_geoshapes = [scale_polygon(geoshape, scale=1.5)[1] for geoshape in original_geoshapes]
 			
 			# Save interesting outputs needs to run in it's own process
-			if len(unique_locations) > 2:
+			if len(unique_locations) >= 3:
 				pool = multiprocessing.Pool()
 				arguments = [(unique_locations, original_geoshapes, scaled_geoshapes, user_id)]
 				pool.starmap(visualize, arguments)

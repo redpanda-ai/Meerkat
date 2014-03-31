@@ -297,10 +297,10 @@ if __name__ == "__main__":
 
 	settings = {
 		"test_size": 0.5,
-		"initial_search_space": 15,
+		"initial_search_space": 50,
 		"initial_learning_rate": 0.5,
-		"iteration_search_space": 35,
-		"iteration_learning_rate": 0.3,
+		"iteration_search_space": 25,
+		"iteration_learning_rate": 0.5,
 		"gradient_ascent_iterations": 15,
 		"max_precision": 98
 	}
