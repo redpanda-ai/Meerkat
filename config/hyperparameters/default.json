@@ -1,4 +1,5 @@
 {
-	"es_result_size" : "45",
-	"z_score_threshold" : "2.101"
+	"es_result_size": "45",
+ 	"scaling_factor": "1.136",
+ 	"z_score_threshold": "2.561"
 }

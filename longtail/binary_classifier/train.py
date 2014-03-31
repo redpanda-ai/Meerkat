@@ -18,7 +18,7 @@ from sklearn.grid_search import GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.externals import joblib
 
-def split_data(labeled_transactions="data/misc/10K_Bank.csv"):
+def split_data(labeled_transactions="data/misc/10K_Card.csv"):
 
     if not os.path.isfile(labeled_transactions):
         logging.error("Please provide a set of labeled transactions to build the classifier on")
@@ -30,8 +30,10 @@ def split_data(labeled_transactions="data/misc/10K_Bank.csv"):
     transactions, labels = load_data(transactions, labels, labeled_transactions)
 
     # Append More
-    transactions, labels = load_data(transactions, labels, "data/misc/10K_Card.csv")
-    #transactions, labels = load_data(transactions, labels, "data/misc/verifiedLabeledTrans.csv")
+    transactions, labels = load_data(transactions, labels, "data/misc/matt_8000_card.csv")
+    transactions, labels = load_data(transactions, labels, "data/misc/verifiedLabeledTrans.csv")
+    transactions, labels = load_data(transactions, labels, "data/misc/10K_Bank.csv")
+
 
     print("NUMBER OF TRANSACTIONS: ", len(transactions))
 
@@ -66,7 +68,7 @@ def build_model(trans_train, trans_test, labels_train, labels_test):
 
     parameters = {
         'vect__max_df': (0.05, 0.10, 0.25),
-        'vect__max_features': (1000, 2000, 3000, 4000),
+        'vect__max_features': (1000, 2000, 3000, 4000, 5000),
         'vect__ngram_range': ((1, 1), (1, 2)),  # unigrams or bigrams
         'tfidf__use_idf': (True, False),
         'tfidf__norm': ('l1', 'l2'),
@@ -88,11 +90,12 @@ def build_model(trans_train, trans_test, labels_train, labels_test):
     print("Actual Score: " + str(score))
 
     # Save Model
-    joblib.dump(grid_search, 'longtail/binary_classifier/US.pkl', compress=3)
+    joblib.dump(grid_search, 'longtail/binary_classifier/final.pkl', compress=3)
 
     test_model("data/misc/verifiedLabeledTrans.csv", grid_search)
     test_model("data/misc/10K_Card.csv", grid_search)
     test_model("data/misc/10K_Bank.csv", grid_search)
+    test_model("data/misc/matt_8000_card.csv", grid_search)
 
 def test_model(file_to_test, model):
 

@@ -11,6 +11,7 @@ import math
 import os
 import sys
 from pprint import pprint
+from longtail.various_tools import load_dict_list
 
 def test_accuracy(params, file_path=None, non_physical_trans=[], result_list=[]):
 	"""Takes file by default but can accept result
@@ -28,9 +29,7 @@ def test_accuracy(params, file_path=None, non_physical_trans=[], result_list=[])
 
 	# Load Verification Source
 	verification_source = params.get("verification_source", "data/misc/verifiedLabeledTrans.csv")
-	human_labeled_input_file = open(verification_source, encoding="utf-8", errors='replace')
-	human_labeled = list(csv.DictReader(human_labeled_input_file))
-	human_labeled_input_file.close()
+	human_labeled = load_dict_list(verification_source, delimiter=",")
 
 	#Ensure there is something to process
 	total = len(machine_labeled)
@@ -115,7 +114,7 @@ def test_accuracy(params, file_path=None, non_physical_trans=[], result_list=[])
 		"num_labeled": num_labeled,
 		"mislabeled": mislabeled,
 		"total_recall": num_labeled / total_processed * 100,
-		"total_recall_non_physical": num_labeled / total * 100,
+		"total_recall_physical": num_labeled / total * 100,
 		"precision": num_correct / num_verified * 100,
 		"binary_accuracy": binary_accuracy
 	}
@@ -151,7 +150,7 @@ def print_results(results):
 	print("{0:35} = {1:10.2f}%".format("Binary Classifier Accuracy", results['binary_accuracy']))
 	print("\n")
 	print("{0:35} = {1:10.2f}%".format("Recall all transactions", results['total_recall']))
-	print("{0:35} = {1:10.2f}%".format("Recall non physical", results['total_recall_non_physical']))
+	print("{0:35} = {1:10.2f}%".format("Recall physical", results['total_recall_physical']))
 	print("{0:35} = {1:11}".format("Number of transactions labeled", results['num_labeled']))
 	print("{0:35} = {1:11}".format("Number of transactions verified", results['num_verified']))
 	print("{0:35} = {1:10.2f}%".format("Precision", results['precision']))
@@ -160,5 +159,5 @@ def print_results(results):
 
 if __name__ == "__main__":
 	output_path = sys.argv[1] if len(sys.argv) > 1 else "data/output/longtailLabeled.csv"
-	pprint.pprint(test_accuracy(file_path=output_path))
+	pprint(test_accuracy(file_path=output_path))
 	#print_results(test_accuracy(file_path=output_path))
