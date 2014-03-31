@@ -62,7 +62,7 @@ def get_desc_queue(params):
 
 	# Split into user buckets
 	for row in physical:
-		user = row['MEM_ID']
+		user = row.get("MEM_ID", "")
 		users[user].append(row)
 
 	# Add Users to Queue

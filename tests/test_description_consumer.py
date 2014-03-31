@@ -105,7 +105,8 @@ class DescriptionConsumerTests(unittest.TestCase):
 	def test_display_search_results_normal_use(self):
 		"""Ensure that display_search_results method completes """
 		search_results = json.loads(self.search_results)
-		result = self.my_consumer._DescriptionConsumer__display_search_results(search_results)
+		transaction = {"DESCRIPTION" : "Ham Sandwich"}
+		result = self.my_consumer._DescriptionConsumer__display_search_results(search_results, transaction)
 		self.assertEqual(result,True)
 
 	def test_output_to_result_queue(self):
@@ -124,7 +125,6 @@ class DescriptionConsumerTests(unittest.TestCase):
 		"""Ensure that __search_index finds a common result."""
 		input_as_object = json.loads(self.input_json)
 		result = self.my_consumer._DescriptionConsumer__search_index(input_as_object)
-		result = json.loads(result)
 		self.assertGreater(result["hits"]["total"], -1)
 
 	def test_build_boost_vectors_boost_row_labels(self):
