@@ -250,7 +250,6 @@ def write_output_to_file(params, output_list, non_physical):
 		return
 
 	# Merge Physical and Non-Physical
-	print(len(output_list), len(non_physical))
 	output_list = output_list + non_physical
 
 	# Get File Save Info
