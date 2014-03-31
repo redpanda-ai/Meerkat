@@ -138,7 +138,7 @@ def split_hyperparameters(hyperparameters):
 	other = {}
 
 	for key, value in hyperparameters.items():
-		if key == "es_result_size" or key == "z_score_threshold" or key == "qs_boost" or key == "scaling_factor":
+		if key == "es_result_size" or key == "z_score_threshold" or key == "qs_boost" or key == "scaling_factor" or key == "name_boost":
 			other[key] = value
 		else:
 			boost_vectors[key] = [value]
@@ -323,9 +323,10 @@ if __name__ == "__main__":
 	    "email" : "1",               
 	    "category_labels" : "1",           
 	    "chain_name" : "1",
-	    "scaling_factor" : "1",
-		"z_score_threshold" : "3",
-		"qs_boost" : "0.5"
+	    "scaling_factor" : "1.5",
+	    "qs_boost" : "1",
+	    "name_boost" : "2",
+		"z_score_threshold" : "3"
 	}
 
 	# Meta Information

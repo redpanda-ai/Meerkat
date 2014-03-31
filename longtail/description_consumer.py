@@ -181,6 +181,7 @@ class DescriptionConsumer(threading.Thread):
 
 		user_id = first_pass_results[0]['MEM_ID']
 		qs_boost = self.hyperparameters.get("qs_boost", "1")
+		name_boost = self.hyperparameters.get("name_boost", "1")
 		hits, non_hits = separate_geo(first_pass_results)
 		locations_found = [str(json.loads(hit["pin.location"].replace("'", '"'))["coordinates"]) for hit in hits]
 		unique_locations = set(locations_found)
@@ -202,10 +203,15 @@ class DescriptionConsumer(threading.Thread):
 			base_query = self.__generate_base_query(transaction, boost=qs_boost)
 			should_clauses = base_query["query"]["bool"]["should"]
 			should_clauses.append(geo_query)
+			should_clauses[0]["query_string"]["fields"] = ["_all", "name^" + str(name_boost)]
 			search_results = self.__run_classifier(json.dumps(base_query))
 			self.__display_search_results(search_results, transaction)
 			enriched_transaction = self.__process_results(search_results, transaction)
-			enriched_transactions.append(enriched_transaction)
+			enriched_transactions.append(enriched_transaction)	
+
+		for i in enriched_transactions:
+			if i["factual_id"] != "":
+				print(i["factual_id"])
 
 		second_pass_results = hits + enriched_transactions
 			
