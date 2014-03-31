@@ -71,8 +71,8 @@ class AccuracyTests(unittest.TestCase):
 	def test_total_recall(self):
 		self.assertEqual(round(self.accuracy_results['total_recall']), 6)
 
-	def test_total_recall_non_physical(self):
-		self.assertEqual(round(self.accuracy_results['total_recall_non_physical']), 31)
+	def test_total_recall_physical(self):
+		self.assertEqual(round(self.accuracy_results['total_recall_physical']), 31)
 
 	def test_time_taken(self):
 		self.assertEqual(self.speed_results['time_delta'].seconds, 100)

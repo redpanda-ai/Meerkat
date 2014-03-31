@@ -114,7 +114,7 @@ def test_accuracy(params, file_path=None, non_physical_trans=[], result_list=[])
 		"num_labeled": num_labeled,
 		"mislabeled": mislabeled,
 		"total_recall": num_labeled / total_processed * 100,
-		"total_recall_non_physical": num_labeled / total * 100,
+		"total_recall_physical": num_labeled / total * 100,
 		"precision": num_correct / num_verified * 100,
 		"binary_accuracy": binary_accuracy
 	}
@@ -150,7 +150,7 @@ def print_results(results):
 	print("{0:35} = {1:10.2f}%".format("Binary Classifier Accuracy", results['binary_accuracy']))
 	print("\n")
 	print("{0:35} = {1:10.2f}%".format("Recall all transactions", results['total_recall']))
-	print("{0:35} = {1:10.2f}%".format("Recall non physical", results['total_recall_non_physical']))
+	print("{0:35} = {1:10.2f}%".format("Recall physical", results['total_recall_physical']))
 	print("{0:35} = {1:11}".format("Number of transactions labeled", results['num_labeled']))
 	print("{0:35} = {1:11}".format("Number of transactions verified", results['num_verified']))
 	print("{0:35} = {1:10.2f}%".format("Precision", results['precision']))

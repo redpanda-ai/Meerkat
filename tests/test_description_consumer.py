@@ -93,13 +93,13 @@ class DescriptionConsumerTests(unittest.TestCase):
 	def test_display_z_score_single_score(self):
 		"""Ensure that list containing one score, returns None for z_score"""
 		scores = [0]
-		result = self.my_consumer._DescriptionConsumer__display_z_score_delta(scores)
+		result = self.my_consumer._DescriptionConsumer__generate_z_score_delta(scores)
 		self.assertEqual(result,None)
 
-	def test_display_z_score_delta(self):
+	def test_generate_z_score_delta(self):
 		"""Ensure that list containing [3, 2, 1], returns 1.225 for z_score"""
 		scores = [3, 2, 1]
-		result = self.my_consumer._DescriptionConsumer__display_z_score_delta(scores)
+		result = self.my_consumer._DescriptionConsumer__generate_z_score_delta(scores)
 		self.assertEqual(result, 1.225)
 
 	def test_display_search_results_normal_use(self):

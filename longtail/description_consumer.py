@@ -76,7 +76,7 @@ class DescriptionConsumer(threading.Thread):
 		scores, results, fields_found = [], [], []
 		params = self.params
 		for hit in hits:
-			hit_fields, score = hit['fields'], hit['_score']
+			hit_fields, score = hit.get("fields", {}), hit['_score']
 			scores.append(score)
 			field_order = params["output"]["results"]["fields"]
 			fields_in_hit = [field for field in hit_fields]
@@ -196,16 +196,15 @@ class DescriptionConsumer(threading.Thread):
 			scaled_geoshapes = [scale_polygon(geoshape, scale=1.5)[1] for geoshape in original_geoshapes]
 			
 			# Needs to run in it's own process
-			if len(original_geoshapes) > 1:
-				pool = multiprocessing.Pool()
-				arguments = [(unique_locations, original_geoshapes, scaled_geoshapes, user_id)]
-				pool.starmap(visualize, arguments)
+			#if len(original_geoshapes) > 1:
+				#pool = multiprocessing.Pool()
+				#arguments = [(unique_locations, original_geoshapes, scaled_geoshapes, user_id)]
+				#pool.starmap(visualize, arguments)
 
 		return first_pass_results
 
 	def __run_classifier(self, query):
-		"""Runs the classifier and handles the results
-		accordingly"""
+		"""Runs the classifier"""
 
 		# Show Final Query
 		logger = logging.getLogger("thread " + str(self.thread_id))
@@ -307,8 +306,8 @@ class DescriptionConsumer(threading.Thread):
 		scores, fields_found = [], []
 		output_dict = transaction
 		top_hit = hits[0]
-		hit_fields = top_hit["fields"]
-		business_names = [result["fields"]["name"] for result in hits]
+		hit_fields = top_hit.get("fields", {})
+		business_names = [result.get("fields", {"name" : ""})["name"] for result in hits]
 		ordered_hit_fields = []
 
 		# Collect Relevancy Scores
@@ -468,8 +467,8 @@ class DescriptionConsumer(threading.Thread):
 				results = self.__first_pass()
 
 				# Call Second Pass
-				enriched_transactions = self.__second_pass(results)
-				#enriched_transactions = results
+				#enriched_transactions = self.__second_pass(results)
+				enriched_transactions = results
 
 				# Output Results to Result Queue
 				self.__output_to_result_queue(enriched_transactions)

@@ -1,0 +1,51 @@
+{
+    "concurrency" : 6,
+    "verification_source" : "data/misc/matt_8000_card.csv",
+    "input" : {
+        "hyperparameters" : "config/hyperparameters/default.json",
+        "filename" : "data/input/users.pipe",
+        "encoding" : "utf-8"
+    },
+    "logging" : {
+        "level" : "critical",
+        "path" : "logs/foo.log",
+        "formatter" : "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        "console" : true
+    },
+    "output" : {
+        "results" : {
+            "fields" : ["name", "composite.address", "factual_id", "locality", "po_box", "email"]
+        },
+        "file" : {
+            "format" : "csv",
+            "path" : "data/output/longtailLabeled.csv"
+        }
+    },
+	"elasticsearch" : {
+        "cluster_nodes" : ["brainstorm1:9200", "brainstorm2:9200"
+        , "brainstorm3:9200", "brainstorm4:9200", "brainstorm5:9200", "brainstorm6:9200"
+        , "brainstorm7:9200", "brainstorm8:9200", "brainstorm9:9200", "brainstorma:9200"
+        , "brainstormb:9200", "localhost:9200"],
+        "cache_results" : false,
+        "index" : "factual_index",
+        "type" : "factual_type",
+        "boost_labels" : ["standard_fields"],
+        "boost_vectors" : {
+            "address": [0.815],
+            "address_extended": [0.949],
+            "admin_region": [0.623],
+            "category_labels": [0.776],
+            "chain_name": [1.499],
+            "email": [1.306],
+            "internal_store_number" : [3.000],
+            "locality": [0.956],
+            "name": [2.947],
+            "neighborhood": [1.313],
+            "po_box": [1.162],
+            "post_town": [1.013],
+            "postcode": [1.288],
+            "region": [2.009],
+            "tel": [1.435]
+        }
+    }
+}

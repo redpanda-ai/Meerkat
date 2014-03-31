@@ -13,6 +13,7 @@ from longtail.binary_classifier.load import predict_if_physical_transaction
 from longtail.accuracy import print_results
 
 import sys, datetime, os, queue, csv, collections
+from copy import deepcopy
 from pprint import pprint
 from random import randint, uniform, random, shuffle
 from numpy import array, array_split
@@ -20,11 +21,12 @@ from numpy import array, array_split
 def get_initial_values(hyperparameters, params, known, dataset):
 	"""Do a simple search to find starter values"""
 
-	top_score = {"precision" : 0, "total_recall_non_physical" : 0}
+	top_score = {"precision" : 0, "total_recall_physical" : 0}
 	iterations = settings["initial_search_space"]
 	learning_rate = settings["initial_learning_rate"]
 
 	for i in range(iterations):
+
 		randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=learning_rate)
 		print("\n", "ITERATION NUMBER: " + str(i))
 		print("\n", randomized_hyperparameters,"\n")
@@ -79,6 +81,8 @@ def run_classifier(hyperparameters, params, dataset):
 
 def run_iteration(top_score, params, known, dataset):
 
+	print(len(dataset))
+
 	hyperparameters = top_score['hyperparameters']
 	new_top_score = top_score
 	learning_rate = settings["iteration_learning_rate"]
@@ -91,7 +95,7 @@ def run_iteration(top_score, params, known, dataset):
 
 		# Run Classifier
 		accuracy = run_classifier(randomized_hyperparameters, params, dataset)
-		same_or_higher_recall = accuracy["total_recall_non_physical"] >= new_top_score["total_recall_non_physical"]
+		same_or_higher_recall = accuracy["total_recall_physical"] >= new_top_score["total_recall_physical"]
 		same_or_higher_precision = accuracy["precision"] >= new_top_score["precision"]
 		not_too_high_precision = accuracy["precision"] <= settings["max_precision"]
 
@@ -121,7 +125,7 @@ def save_top_score(top_score):
 
 	record = open(os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_top_scores.txt", "a")
 	pprint("Precision = " + str(top_score['precision']) + "%", record)
-	pprint("Best Recall = " + str(top_score['total_recall_non_physical']) + "%", record)
+	pprint("Best Recall = " + str(top_score['total_recall_physical']) + "%", record)
 	boost_vectors, boost_labels, other = split_hyperparameters(top_score["hyperparameters"])
 	pprint(boost_vectors, record)
 	pprint(other, record)
@@ -155,13 +159,13 @@ def randomized_optimization(hyperparameters, known, params, dataset):
 	top_score = gradient_ascent(initial_values, params, known, dataset)
 
 	print("Precision = " + str(top_score['precision']) + "%")
-	print("Best Recall = " + str(top_score['total_recall_non_physical']) + "%")
+	print("Best Recall = " + str(top_score['total_recall_physical']) + "%")
 	print("HYPERPARAMETERS:")
 	pprint(top_score["hyperparameters"])
 	print("ALL RESULTS:")
 	
 	# Save Final Parameters
-	file_name = os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_" + str(round(top_score['precision'], 2)) + "Precision" + str(round(top_score['total_recall_non_physical'], 2)) + "Recall.json" 
+	file_name = os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_" + str(round(top_score['precision'], 2)) + "Precision" + str(round(top_score['total_recall_physical'], 2)) + "Recall.json" 
 	new_parameters = open(file_name, 'w')
 	pprint(top_score["hyperparameters"], new_parameters)
 
@@ -200,25 +204,24 @@ def test_train_split(params):
 def get_desc_queue(dataset):
 	"""Alt version of get_desc_queue"""
 
-	#transactions = [trans["DESCRIPTION"] for trans in dataset]
-	transactions = dataset
+	transactions = [deepcopy(X) for X in dataset]
 	desc_queue, non_physical, physical = queue.Queue(), [], []
 	users = collections.defaultdict(list)
 
 	# Run Binary Classifier
 	for row in transactions:
-		if row["factual_id"] == "" and row["IS_PHYSICAL_TRANSACTION"] == "1":
-			continue
-		if row["IS_PHYSICAL_TRANSACTION"] == "" or row["IS_PHYSICAL_TRANSACTION"] == "2":
-			continue
 		transaction = row["DESCRIPTION"]
 		prediction = predict_if_physical_transaction(transaction)
-		if prediction == "1":
+		if prediction == "1" and row["factual_id"] != "":
 			physical.append(row)
-		elif prediction == "0" and random() < 0.2:
+		elif prediction == "0":
 			non_physical.append(row)
-		elif prediction == "2":
+		elif prediction == "2" and row["factual_id"] != "":
 			physical.append(row)
+
+	# Get Equal Lengths Physical and Non-Physical
+	shuffle(non_physical)
+	non_physical = non_physical[0:len(physical)]
 
 	# Split into user buckets
 	for row in physical:
@@ -250,7 +253,7 @@ def cross_validate(top_score, dataset):
 
 	return accuracy
 
-def two_fold(hyperparameters, known, params, d0, d1):
+def two_fold(hyperparameters, known, params):
 	"""Run two-fold cross validation. Combine Scores"""
 
 	# Run Randomized Optimization and Cross Validate
@@ -304,7 +307,8 @@ if __name__ == "__main__":
 
 	known = {"es_result_size" : "45"}
 
-	hyperparameters = {    
+	hyperparameters = {
+		"internal_store_number" : "2",  
 	    "name" : "3",             
 	    "address" : "1",          
 	    "address_extended" : "1", 
@@ -326,10 +330,10 @@ if __name__ == "__main__":
 	# Meta Information
 	start_time = datetime.datetime.now()
 	params = initialize()
-	test, train = test_train_split(params)
+	d0, d1 = test_train_split(params)
 
 	# Run Two Fold Cross Validation
-	two_fold(hyperparameters, known, params, test, train)
+	two_fold(hyperparameters, known, params)
 
 	# Run Speed Tests
 	time_delta = datetime.datetime.now() - start_time
