@@ -180,6 +180,7 @@ class DescriptionConsumer(threading.Thread):
 		"""Classify transactions using geo and text features"""
 
 		user_id = first_pass_results[0]['MEM_ID']
+		qs_boost = self.hyperparameters.get("qs_boost", "1")
 		hits, non_hits = separate_geo(first_pass_results)
 		locations_found = [str(json.loads(hit["pin.location"].replace("'", '"'))["coordinates"]) for hit in hits]
 		unique_locations = set(locations_found)
@@ -198,7 +199,7 @@ class DescriptionConsumer(threading.Thread):
 		
 		# Run transactions again with geo_query
 		for transaction in non_hits:
-			base_query = self.__generate_base_query(transaction)
+			base_query = self.__generate_base_query(transaction, boost=qs_boost)
 			should_clauses = base_query["query"]["bool"]["should"]
 			should_clauses.append(geo_query)
 			search_results = self.__run_classifier(json.dumps(base_query))
@@ -236,10 +237,10 @@ class DescriptionConsumer(threading.Thread):
 			scaled_geoshapes = [scale_polygon(geoshape, scale=scaling_factor)[1] for geoshape in original_geoshapes]
 			
 			# Save interesting outputs needs to run in it's own process
-			if len(unique_locations) >= 3:
-				pool = multiprocessing.Pool()
-				arguments = [(unique_locations, original_geoshapes, scaled_geoshapes, user_id)]
-				pool.starmap(visualize, arguments)
+			#if len(unique_locations) >= 3:
+			#	pool = multiprocessing.Pool()
+			#	arguments = [(unique_locations, original_geoshapes, scaled_geoshapes, user_id)]
+			#	pool.starmap(visualize, arguments)
 
 		return scaled_geoshapes
 
@@ -271,7 +272,7 @@ class DescriptionConsumer(threading.Thread):
 
 		return geo
 
-	def __generate_base_query(self, transaction):
+	def __generate_base_query(self, transaction, boost=1.0):
 		"""Generates the basic final query used for both
 		the first and second passes"""
 
@@ -303,7 +304,7 @@ class DescriptionConsumer(threading.Thread):
 		bool_search["fields"] = fields
 		should_clauses = bool_search["query"]["bool"]["should"]
 		field_boosts = self.__get_boosted_fields("standard_fields")
-		simple_query = get_qs_query(transaction, field_boosts)
+		simple_query = get_qs_query(transaction, field_boosts, boost)
 		should_clauses.append(simple_query)
 
 		return bool_search

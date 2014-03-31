@@ -324,7 +324,8 @@ if __name__ == "__main__":
 	    "category_labels" : "1",           
 	    "chain_name" : "1",
 	    "scaling_factor" : "1",
-		"z_score_threshold" : "3"
+		"z_score_threshold" : "3",
+		"qs_boost" : "0.5"
 	}
 
 	# Meta Information
