@@ -203,17 +203,24 @@ class DescriptionConsumer(threading.Thread):
 			base_query = self.__generate_base_query(transaction, boost=qs_boost)
 			should_clauses = base_query["query"]["bool"]["should"]
 			should_clauses.append(geo_query)
-			should_clauses[0]["query_string"]["fields"] = ["_all", "name^" + str(name_boost)]
+			field_boosts = should_clauses[0]["query_string"]["fields"] 
+
+			for i in range(len(field_boosts)):
+				if "name" in field_boosts[i]:
+					field_boosts[i] = "name^" + str(name_boost)
+				else:
+					key, value = field_boosts[i].split("^")
+					field_boosts[i] = key + "^" + str(float(value) * 0.5)
+	
 			search_results = self.__run_classifier(json.dumps(base_query))
 			self.__display_search_results(search_results, transaction)
 			enriched_transaction = self.__process_results(search_results, transaction)
-			enriched_transactions.append(enriched_transaction)	
+			enriched_transactions.append(enriched_transaction)
 
-		for i in enriched_transactions:
-			if i["factual_id"] != "":
-				print(i["factual_id"])
-
+		added_second_pass = [trans for trans in enriched_transactions if trans["factual_id"] != ""]
 		second_pass_results = hits + enriched_transactions
+
+		print("ADDED SECOND PASS: " + str(len(added_second_pass)))
 			
 		return second_pass_results
 
@@ -497,8 +504,8 @@ class DescriptionConsumer(threading.Thread):
 				results = self.__first_pass()
 
 				# Classify using text and geo features obtained during first pass
-				enriched_transactions = self.__second_pass(results)
-				#enriched_transactions = results
+				#enriched_transactions = self.__second_pass(results)
+				enriched_transactions = results
 
 				# Output Results to Result Queue
 				self.__output_to_result_queue(enriched_transactions)

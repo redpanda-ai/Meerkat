@@ -176,7 +176,7 @@ def test_train_split(params):
 	data into a test and training set"""
 
 	verification_source = params.get("verification_source", "data/misc/verifiedLabeledTrans.csv")
-	test_size = settings["test_size"]
+	folds = settings["folds"]
 	test, train = [], []
 	dataset = []
 
@@ -195,9 +195,9 @@ def test_train_split(params):
 
 	# Shuffle/Split Data
 	shuffle(dataset)
-	split_arr = array_split(array(dataset), 2)
+	split_arr = array_split(array(dataset), folds)
 	test = list(split_arr[0])
-	train = list(split_arr[1])
+	train = list(split_arr[0])
 
 	return test, train
 
@@ -296,9 +296,9 @@ if __name__ == "__main__":
 	open(os.path.splitext(os.path.basename(sys.argv[1]))[0] + '_top_scores.txt', 'w').close()
 
 	settings = {
-		"test_size": 0.5,
-		"initial_search_space": 50,
-		"initial_learning_rate": 0.5,
+		"folds": 1,
+		"initial_search_space": 25,
+		"initial_learning_rate": 1,
 		"iteration_search_space": 25,
 		"iteration_learning_rate": 0.5,
 		"gradient_ascent_iterations": 15,
