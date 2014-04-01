@@ -101,8 +101,6 @@ def convex_hull(clusters, locations):
 		#for simplex in hull.simplices:
 			#plt.plot(points[simplex, 1], points[simplex, 0], 'k-')
 
-		print("\n")
-
 		# Get Lat Lon Vertices
 		for vertex in hull.vertices:
 			geoshape.append([lat_lon_points[vertex, 0], lat_lon_points[vertex, 1]])

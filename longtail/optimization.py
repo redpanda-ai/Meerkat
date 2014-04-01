@@ -138,7 +138,7 @@ def split_hyperparameters(hyperparameters):
 	other = {}
 
 	for key, value in hyperparameters.items():
-		if key == "es_result_size" or key == "z_score_threshold" or key == "qs_boost" or key == "scaling_factor":
+		if key == "es_result_size" or key == "z_score_threshold" or key == "qs_boost" or key == "scaling_factor" or key == "name_boost":
 			other[key] = value
 		else:
 			boost_vectors[key] = [value]
@@ -176,7 +176,7 @@ def test_train_split(params):
 	data into a test and training set"""
 
 	verification_source = params.get("verification_source", "data/misc/verifiedLabeledTrans.csv")
-	test_size = settings["test_size"]
+	folds = settings["folds"]
 	test, train = [], []
 	dataset = []
 
@@ -195,7 +195,7 @@ def test_train_split(params):
 
 	# Shuffle/Split Data
 	shuffle(dataset)
-	split_arr = array_split(array(dataset), 2)
+	split_arr = array_split(array(dataset), folds)
 	test = list(split_arr[0])
 	train = list(split_arr[1])
 
@@ -296,11 +296,11 @@ if __name__ == "__main__":
 	open(os.path.splitext(os.path.basename(sys.argv[1]))[0] + '_top_scores.txt', 'w').close()
 
 	settings = {
-		"test_size": 0.5,
-		"initial_search_space": 15,
-		"initial_learning_rate": 0.5,
-		"iteration_search_space": 35,
-		"iteration_learning_rate": 0.3,
+		"folds": 2,
+		"initial_search_space": 25,
+		"initial_learning_rate": 1,
+		"iteration_search_space": 25,
+		"iteration_learning_rate": 0.5,
 		"gradient_ascent_iterations": 15,
 		"max_precision": 98
 	}
@@ -323,7 +323,9 @@ if __name__ == "__main__":
 	    "email" : "1",               
 	    "category_labels" : "1",           
 	    "chain_name" : "1",
-	    "scaling_factor" : "1",
+	    "scaling_factor" : "1.5",
+	    "qs_boost" : "1",
+	    "name_boost" : "2",
 		"z_score_threshold" : "3"
 	}
 

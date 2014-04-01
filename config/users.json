@@ -3,7 +3,8 @@
     "verification_source" : "data/misc/matt_8000_card.csv",
     "input" : {
         "hyperparameters" : "config/hyperparameters/default.json",
-        "filename" : "data/input/users.pipe",
+        "filename" : "data/input/users.csv",
+        "delimiter" : ",",
         "encoding" : "utf-8"
     },
     "logging" : {
@@ -30,22 +31,22 @@
         "index" : "factual_index",
         "type" : "factual_type",
         "boost_labels" : ["standard_fields"],
-        "boost_vectors" : {
-            "address": [0.815],
-            "address_extended": [0.949],
-            "admin_region": [0.623],
-            "category_labels": [0.776],
-            "chain_name": [1.499],
-            "email": [1.306],
-            "internal_store_number" : [3.000],
-            "locality": [0.956],
-            "name": [2.947],
-            "neighborhood": [1.313],
-            "po_box": [1.162],
-            "post_town": [1.013],
-            "postcode": [1.288],
-            "region": [2.009],
-            "tel": [1.435]
+        "boost_vectors" :  {
+            "address": [0.541],
+            "address_extended": [1.282],
+            "admin_region": [0.69],
+            "category_labels": [1.319],
+            "chain_name": [0.999],
+            "email": [0.516],
+            "internal_store_number": [1.627],
+            "locality": [1.367],
+            "name": [2.781],
+            "neighborhood": [0.801],
+            "po_box": [1.292],
+            "post_town": [0.577],
+            "postcode": [0.914],
+            "region": [1.685],
+            "tel": [0.597]
         }
     }
 }

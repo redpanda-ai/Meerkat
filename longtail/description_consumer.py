@@ -180,11 +180,60 @@ class DescriptionConsumer(threading.Thread):
 		"""Classify transactions using geo and text features"""
 
 		user_id = first_pass_results[0]['MEM_ID']
+		qs_boost = self.hyperparameters.get("qs_boost", "1")
+		name_boost = self.hyperparameters.get("name_boost", "1")
 		hits, non_hits = separate_geo(first_pass_results)
 		locations_found = [str(json.loads(hit["pin.location"].replace("'", '"'))["coordinates"]) for hit in hits]
 		unique_locations = set(locations_found)
 		unique_locations = [json.loads(location.replace("'", '"')) for location in unique_locations]
+		enriched_transactions = []		
 
+		# Locate user
+		scaled_geoshapes = self.__locate_user(unique_locations, user_id)
+
+		# Use first pass results if no location found
+		if not bool(scaled_geoshapes):
+			return first_pass_results
+
+		# Create Query
+		geo_query = self.__generate_geo_query(scaled_geoshapes)
+		
+		# Run transactions again with geo_query
+		for transaction in non_hits:
+			base_query = self.__generate_base_query(transaction, boost=qs_boost)
+			should_clauses = base_query["query"]["bool"]["should"]
+			should_clauses.append(geo_query)
+			field_boosts = should_clauses[0]["query_string"]["fields"] 
+
+			for i in range(len(field_boosts)):
+				if "name" in field_boosts[i]:
+					field_boosts[i] = "name^" + str(name_boost)
+				else:
+					key, value = field_boosts[i].split("^")
+					field_boosts[i] = key + "^" + str(float(value) * 0.5)
+	
+			search_results = self.__run_classifier(json.dumps(base_query))
+			self.__display_search_results(search_results, transaction)
+			enriched_transaction = self.__process_results(search_results, transaction)
+			enriched_transactions.append(enriched_transaction)
+
+		added_second_pass = [trans for trans in enriched_transactions if trans["factual_id"] != ""]
+		second_pass_results = hits + enriched_transactions
+
+		print("ADDED SECOND PASS: " + str(len(added_second_pass)))
+			
+		return second_pass_results
+
+	def __locate_user(self, unique_locations, user_id):
+		"""Uses first pass results, to find an approximation
+		of a users spending area. Returns estimation as
+		a bounded polygon"""
+
+		scaling_factor = self.hyperparameters.get("scaling_factor", "1")
+		scaling_factor = float(scaling_factor)
+		scaled_geoshapes = None
+
+		# Get Scaled Geoshapes
 		if len(unique_locations) >= 3:
 
 			# Cluster location and return geoshapes bounding clusters
@@ -198,15 +247,15 @@ class DescriptionConsumer(threading.Thread):
 				original_geoshapes = collect_clusters(scaled_points, labels, unique_locations)
 
 			# Scale generated geo shapes
-			scaled_geoshapes = [scale_polygon(geoshape, scale=1.5)[1] for geoshape in original_geoshapes]
+			scaled_geoshapes = [scale_polygon(geoshape, scale=scaling_factor)[1] for geoshape in original_geoshapes]
 			
 			# Save interesting outputs needs to run in it's own process
-			if len(unique_locations) > 2:
-				pool = multiprocessing.Pool()
-				arguments = [(unique_locations, original_geoshapes, scaled_geoshapes, user_id)]
-				pool.starmap(visualize, arguments)
+			#if len(unique_locations) >= 3:
+			#	pool = multiprocessing.Pool()
+			#	arguments = [(unique_locations, original_geoshapes, scaled_geoshapes, user_id)]
+			#	pool.starmap(visualize, arguments)
 
-		return first_pass_results
+		return scaled_geoshapes
 
 	def __run_classifier(self, query):
 		"""Runs the classifier"""
@@ -220,30 +269,15 @@ class DescriptionConsumer(threading.Thread):
 
 		return my_results
 
-	def __generate_geo_query(self, original_shapes):
+	def __generate_geo_query(self, scaled_shapes):
 		"""Generate multipolygon query for use with"""
-
-		scaling_factor = self.hyperparameters.get("scaling_factor", "1")
-
-		# Add Geo
-		original_shapes = [
-			[[[-122.392586, 37.782428], [-122.434139, 37.725378], [-122.462813, 37.725407], [-122.48432, 37.742723], [-122.482605, 37.753909], [-122.476587, 37.784143], [-122.446137, 37.798541], [-122.419482, 37.807829], [-122.418104, 37.808003], [-122.413038, 37.807794], [-122.397797, 37.792259], [-122.392586, 37.782428]]],
-			[[[-122.072671, 37.379629], [-122.030205, 37.377053], [-122.023556, 37.367017], [-122.015013, 37.326859], [-122.061178, 37.340622], [-122.072671, 37.379629]]],
-			[[[-122.152589, 37.459209], [-122.163553, 37.454411], [-122.159704, 37.461578], [-122.157418, 37.464498], [-122.152589, 37.459209]]],
-			[[[-122.24992, 37.498263], [-122.284456, 37.526612], [-122.256153, 37.536814], [-122.252173, 37.52305], [-122.24992, 37.498263]]]
-		]
-
-		original_geoshapes = [original_shapes[i][0] for i in range(len(original_shapes))]
-		scaled_geoshapes = [scale_polygon(geoshape, scale=float(scaling_factor))[1] for geoshape in original_geoshapes]
-
-		scaled_shapes = [[shape] for shape in scaled_geoshapes]
 
 		geo = {
 			"geo_shape" : {
 				"pin.location" : {
 					"shape" : {
 						"type" : "multipolygon",
-						"coordinates": scaled_shapes
+						"coordinates": [[scaled_shape] for scaled_shape in scaled_shapes]
 					}			
 				}
 			}
@@ -251,9 +285,7 @@ class DescriptionConsumer(threading.Thread):
 
 		return geo
 
-		#should_clauses.append(geo)
-
-	def __generate_base_query(self, transaction):
+	def __generate_base_query(self, transaction, boost=1.0):
 		"""Generates the basic final query used for both
 		the first and second passes"""
 
@@ -285,7 +317,7 @@ class DescriptionConsumer(threading.Thread):
 		bool_search["fields"] = fields
 		should_clauses = bool_search["query"]["bool"]["should"]
 		field_boosts = self.__get_boosted_fields("standard_fields")
-		simple_query = get_qs_query(transaction, field_boosts)
+		simple_query = get_qs_query(transaction, field_boosts, boost)
 		should_clauses.append(simple_query)
 
 		return bool_search
@@ -472,8 +504,8 @@ class DescriptionConsumer(threading.Thread):
 				results = self.__first_pass()
 
 				# Classify using text and geo features obtained during first pass
-				enriched_transactions = self.__second_pass(results)
-				#enriched_transactions = results
+				#enriched_transactions = self.__second_pass(results)
+				enriched_transactions = results
 
 				# Output Results to Result Queue
 				self.__output_to_result_queue(enriched_transactions)

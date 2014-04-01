@@ -47,7 +47,7 @@ def visualize(location_list, original_geoshapes, scaled_geoshapes, user_id):
 		ax.add_patch(original)
 		ax.add_patch(scaled)
 
-	plt.savefig("user-" + user_id + ".png")
+	plt.savefig("data/output/user_shapes/user-" + user_id + ".png")
 
 if __name__ == "__main__":
 	""" Do Nothing"""
