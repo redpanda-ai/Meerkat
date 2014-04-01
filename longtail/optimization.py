@@ -292,6 +292,11 @@ def save_cross_fold_results(d0_top_score, d0_results, d1_top_score, d1_results):
 
 if __name__ == "__main__":
 
+	# Must Provide Config File
+	if len(sys.argv) != 2:
+		print("Please provide a config file")
+		sys.exit()
+
 	# Clear Contents from Previous Runs
 	open(os.path.splitext(os.path.basename(sys.argv[1]))[0] + '_top_scores.txt', 'w').close()
 
