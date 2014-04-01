@@ -168,14 +168,14 @@ class TokenizeDescriptionTests(unittest.TestCase):
 	def test_write_output_to_file_writes_file(self):
 		"""Ensure actually writes a file"""
 		self.result_queue.put({"PERSISTENTRECORDID":"123456789"})
-		description_producer.write_output_to_file(self.params, self.result_queue)
+		description_producer.write_output_to_file(self.params, self.result_queue, [])
 		self.assertTrue(os.path.isfile("data/input/unittestDeletable.csv"))
 		os.remove("data/input/unittestDeletable.csv")
 
 	def test_write_output_to_file_empties_queue(self):
 		"""Ensure queue is empty at end"""
 		self.result_queue.put({"PERSISTENTRECORDID":"123456789"})
-		description_producer.write_output_to_file(self.params, self.result_queue)
+		description_producer.write_output_to_file(self.params, self.result_queue, [])
 		self.assertTrue(self.result_queue.empty())
 		os.remove("data/input/unittestDeletable.csv")
 

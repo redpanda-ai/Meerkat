@@ -197,7 +197,7 @@ def test_train_split(params):
 	shuffle(dataset)
 	split_arr = array_split(array(dataset), folds)
 	test = list(split_arr[0])
-	train = list(split_arr[0])
+	train = list(split_arr[1])
 
 	return test, train
 
@@ -296,7 +296,7 @@ if __name__ == "__main__":
 	open(os.path.splitext(os.path.basename(sys.argv[1]))[0] + '_top_scores.txt', 'w').close()
 
 	settings = {
-		"folds": 1,
+		"folds": 2,
 		"initial_search_space": 25,
 		"initial_learning_rate": 1,
 		"iteration_search_space": 25,
