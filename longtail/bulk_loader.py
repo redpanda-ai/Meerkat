@@ -5,6 +5,7 @@
 import json
 import logging
 import queue
+import re
 import sys
 import threading
 from pprint import pprint
@@ -145,6 +146,7 @@ class ThreadConsumer(threading.Thread):
 		params = self.params
 		docs, actions = [], []
 		composite_fields = params["elasticsearch"]["composite_fields"]
+		dispersed_fields = params["elasticsearch"]["dispersed_fields"]
 		while len(self.batch_list) > 0:
 			current_item = self.batch_list.pop(0)
 			item_list = current_item.split("\t")
@@ -158,6 +160,7 @@ class ThreadConsumer(threading.Thread):
 					del d["longitude"]
 					del d["latitude"]
 
+				#Routine to create composite fields
 				for field in composite_fields:
 					keys = field.keys()
 					for key in keys:
@@ -175,6 +178,40 @@ class ThreadConsumer(threading.Thread):
 							d["composite"] = {}
 						d["composite"][key] = composite_string
 						my_logger.debug("New dict is: %s", str(d))
+
+				#Routine to create dispersed_fields
+				for field in dispersed_fields:
+					keys = field.keys()
+					for key in keys:
+						my_dict = field[key]
+						dispersion_regex = my_dict["dispersion_regex"]
+						#print("Dispersion regex:\n{0}".format(dispersion_regex))
+						dispersion_re=re.compile(dispersion_regex)
+						components = my_dict['components']
+						#print("components:\n{0}".format(components))
+						#sys.exit()
+						if "dispersed" not in d:
+							d["dispersed"] = {}
+						d["dispersed"][key] = {}
+						for component in components:
+							#print("Component:\n{0}".format(component))
+							component_name = component["name"]
+							#if component_name not in d["dispersed"]:
+							#	d["dispersed"][component_name] = {}
+							#print("d_dispersed:\n{0}".format(d["dispersed"]))
+							if key in d:
+								input_string = d[key]
+								#print("Input string:\n{0}".format(input_string))
+								if dispersion_re.search(input_string):
+									matches = dispersion_re.match(input_string)
+									d["dispersed"][key][component_name] = matches.group(component_name)
+									#print("{0} {1}".format(component_name, matches.group(component_name)))
+				#print("d_dispersed:\n{0}".format(d["dispersed"]))
+
+
+				#sys.exit()
+
+
 
 				docs.append(d)
 				action = {
@@ -220,7 +257,7 @@ def validate_params(params):
 	ensure_keys_in_dictionary(params, my_keys)
 
 	my_keys = ["index", "type_mapping", "type", "cluster_nodes"\
-	, "boost_labels", "boost_vectors", "composite_fields"]
+	, "boost_labels", "boost_vectors", "composite_fields", "dispersed_fields"]
 	ensure_keys_in_dictionary(params["elasticsearch"], my_keys, prefix="elasticsearch.")
 
 	my_keys = ["filename", "encoding"]
@@ -232,9 +269,10 @@ def validate_params(params):
 	if params["concurrency"] <= 0:
 		raise Misconfiguration(msg="'concurrency' must be a positive integer", expr=None)
 
-	composite_fields = params["elasticsearch"]["composite_fields"]
 	my_type = params["elasticsearch"]["type"]
 	my_props = params["elasticsearch"]["type_mapping"]["mappings"][my_type]["properties"]
+
+	composite_fields = params["elasticsearch"]["composite_fields"]
 	my_keys = ["components", "format", "index", "type"]
 	for field in composite_fields:
 		keys = field.keys()
@@ -248,6 +286,18 @@ def validate_params(params):
 					raise Misconfiguration(msg="Component feature '" + component +\
 					"' does not exist and cannot be used to build the '" +\
 					key + "' feature.", expr=None)
+
+	#TODO:  Validate "dispersed_fields" for good regex, valid components
+	dispersed_fields = params["elasticsearch"]["dispersed_fields"]
+	my_keys = ["dispersion_regex", "components"]
+	for field in dispersed_fields:
+		keys = field.keys()
+		for key in keys:
+			my_dict = field[key]
+			ensure_keys_in_dictionary(my_dict, my_keys, prefix="elasticsearch.dispersed_fields.")
+
+
+
 	#Ensure that "boost_labels" and "boost_vectors" row vectors have the same cardinality
 	label_length = len(params["elasticsearch"]["boost_labels"])
 	boost_vectors = params["elasticsearch"]["boost_vectors"]
@@ -258,6 +308,7 @@ def validate_params(params):
 
 	#Ensure that "boost_vectors" is a subset of your mapping properties
 	add_composite_type_mappings(params)
+	add_dispersed_type_mappings(params)
 	my_props = params["elasticsearch"]["type_mapping"]["mappings"][my_type]["properties"]
 	missing_keys = dict.fromkeys(boost_vectors.keys() - my_props, "")
 	found_keys = []
@@ -298,6 +349,24 @@ def add_composite_type_mappings(params):
 				"index" : field[key]["index"],
 				"type" : field[key]["type"]
 			}
+	logging.critical(json.dumps(params, sort_keys=True, indent=4, separators=(',', ':')))
+
+def add_dispersed_type_mappings(params):
+	"""Add additional type mapping properties for dispersed fields."""
+	my_type = params["elasticsearch"]["type"]
+	my_properties = params["elasticsearch"]["type_mapping"]["mappings"][my_type]["properties"]
+	dispersed_fields = params["elasticsearch"]["dispersed_fields"]
+	if "dispersed" not in my_properties:
+		my_properties["dispersed"] = { "properties" : {} }
+	for field in dispersed_fields:
+		keys = field.keys()
+		for key in keys:
+			components = field[key]["components"]
+			for component in components:
+				my_properties["dispersed"]["properties"][component["name"]] = {
+					"index" : component["index"],
+					"type" : component["type"]
+				}
 	logging.critical(json.dumps(params, sort_keys=True, indent=4, separators=(',', ':')))
 
 def guarantee_index_and_doc_type(params):
