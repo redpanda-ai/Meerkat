@@ -383,7 +383,6 @@ def guarantee_index_and_doc_type(params):
 	else:
 		logging.warning("Index does not exist, creating")
 		index_body = params["elasticsearch"]["type_mapping"]
-		#add_composite_type_mappings(params)
 		result = es_connection.indices.create(index=es_index,body=index_body)
 		ok, acknowledged = result["ok"], result["acknowledged"]
 		if ok and acknowledged:

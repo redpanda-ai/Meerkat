@@ -2,7 +2,7 @@
 	"concurrency" : 8,
 	"batch_size" : 500,
 	"input" : {
-		"filename" : "data/input/yodlee_us_places_sample_SF.factual.tab",
+		"filename" : "/Users/jkey/git_deleteme/Longtail/data/input/US_factual.tab",
 		"encoding" : "utf-8"
 	},
 	"logging" : {
@@ -12,10 +12,7 @@
 		"console" : false
 	},
 	"elasticsearch" : {
-		"cluster_nodes" : ["brainstorm0:9200", "brainstorm1:9200", "brainstorm2:9200"
-		, "brainstorm3:9200", "brainstorm4:9200", "brainstorm5:9200", "brainstorm6:9200"
-		, "brainstorm7:9200", "brainstorm8:9200", "brainstorm9:9200", "brainstorma:9200"
-		, "brainstormb:9200"],
+		"cluster_nodes" : ["localhost:9200"],
 		"index" : "dispersed_index",
 		"type" : "dispersed_type",
 		"boost_labels" : [ "query_string", "composite.address" ],
