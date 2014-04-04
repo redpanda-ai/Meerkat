@@ -93,19 +93,20 @@ class DescriptionConsumerTests(unittest.TestCase):
 	def test_display_z_score_single_score(self):
 		"""Ensure that list containing one score, returns None for z_score"""
 		scores = [0]
-		result = self.my_consumer._DescriptionConsumer__display_z_score_delta(scores)
+		result = self.my_consumer._DescriptionConsumer__generate_z_score_delta(scores)
 		self.assertEqual(result,None)
 
-	def test_display_z_score_delta(self):
+	def test_generate_z_score_delta(self):
 		"""Ensure that list containing [3, 2, 1], returns 1.225 for z_score"""
 		scores = [3, 2, 1]
-		result = self.my_consumer._DescriptionConsumer__display_z_score_delta(scores)
+		result = self.my_consumer._DescriptionConsumer__generate_z_score_delta(scores)
 		self.assertEqual(result, 1.225)
 
 	def test_display_search_results_normal_use(self):
 		"""Ensure that display_search_results method completes """
 		search_results = json.loads(self.search_results)
-		result = self.my_consumer._DescriptionConsumer__display_search_results(search_results)
+		transaction = {"DESCRIPTION" : "Ham Sandwich"}
+		result = self.my_consumer._DescriptionConsumer__display_search_results(search_results, transaction)
 		self.assertEqual(result,True)
 
 	def test_output_to_result_queue(self):
@@ -124,7 +125,6 @@ class DescriptionConsumerTests(unittest.TestCase):
 		"""Ensure that __search_index finds a common result."""
 		input_as_object = json.loads(self.input_json)
 		result = self.my_consumer._DescriptionConsumer__search_index(input_as_object)
-		result = json.loads(result)
 		self.assertGreater(result["hits"]["total"], -1)
 
 	def test_build_boost_vectors_boost_row_labels(self):

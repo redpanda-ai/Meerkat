@@ -6,6 +6,6 @@ from longtail.description_producer import initialize, get_desc_queue\
 
 #Runs the entire program.
 PARAMS = initialize()
-KEY = load_hyperparameters(PARAMS)
+HYPERPARAMETERS = load_hyperparameters(PARAMS)
 DESC_QUEUE, NON_PHYSICAL = get_desc_queue(PARAMS)
-tokenize(PARAMS, DESC_QUEUE, KEY, NON_PHYSICAL)
+tokenize(PARAMS, DESC_QUEUE, HYPERPARAMETERS, NON_PHYSICAL)

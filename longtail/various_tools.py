@@ -3,7 +3,7 @@
 """This is where we keep functions that are useful enough to call from
 within multiple scripts."""
 
-import re
+import re, csv
 
 def string_cleanse(original_string):
 	"""Strips out characters that might confuse ElasticSearch."""
@@ -21,3 +21,9 @@ def numeric_cleanse(original_string):
 	bad_character_regex = "|".join(bad_characters)
 	cleanse_pattern = re.compile(bad_character_regex)
 	return re.sub(cleanse_pattern, "", original_string)
+
+def load_dict_list(file_name, encoding='utf-8', delimiter="|"):
+	input_file = open(file_name, encoding=encoding, errors='replace')
+	dict_list = list(csv.DictReader(input_file, delimiter=delimiter, quoting=csv.QUOTE_NONE))
+	input_file.close()
+	return dict_list

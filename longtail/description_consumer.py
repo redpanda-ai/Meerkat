@@ -20,18 +20,25 @@ import sys
 import pprint
 import datetime
 import threading
+import itertools
+import multiprocessing
 
 from elasticsearch import Elasticsearch, helpers
+from sklearn.preprocessing import StandardScaler
 from scipy.stats.mstats import zscore
+from pprint import pprint
 
 from longtail.custom_exceptions import Misconfiguration, UnsupportedQueryType
 from longtail.various_tools import string_cleanse
+from longtail.scaled_polygon_test import scale_polygon
+from longtail.clustering import cluster, convex_hull, collect_clusters
+from longtail.location import separate_geo, visualize
 
 #Helper functions
 def get_bool_query(starting_from = 0, size = 0):
 	"""Returns a "bool" style ElasticSearch query object"""
 	return { "from" : starting_from, "size" : size, "query" : {
-		"bool": { "minimum_number_should_match": 1, "should": [] } } }
+		"bool": { "minimum_number_should_match": 1, "should": [] } } }	
 
 def get_basic_query(starting_from=0, size=0):
 	"""Returns an ElasticSearch query object"""
@@ -40,12 +47,7 @@ def get_basic_query(starting_from=0, size=0):
 def get_qs_query(term, field_list=[], boost=1.0):
 	"""Returns a "query_string" style ElasticSearch query object"""
 	return { "query_string": {
-		"query": term, "fields": field_list, "boost": boost } }
-
-def get_fuzzy_query(term, field_list=["_all"]):
-	"""Returns a "fuzzy_like_this" style ElasticSearch query object"""
-	return { "fuzzy_like_this": {
-		"like_text": term, "fields": field_list}}
+		"query": term, "fields": field_list, "boost" : boost} }
 
 class DescriptionConsumer(threading.Thread):
 	''' Acts as a client to an ElasticSearch cluster, tokenizing description
@@ -64,18 +66,18 @@ class DescriptionConsumer(threading.Thread):
 			boost_column_vectors[boost_column_labels[i]] = np.array(my_list)
 		return boost_row_labels, boost_column_vectors
 
-	def __display_search_results(self, search_results):
+	def __display_search_results(self, search_results, transaction):
 		"""Displays search results."""
 
 		# Must have results
 		if search_results['hits']['total'] == 0:
-			return True	
+			return True
 
 		hits = search_results['hits']['hits']
 		scores, results, fields_found = [], [], []
 		params = self.params
 		for hit in hits:
-			hit_fields, score = hit['fields'], hit['_score']
+			hit_fields, score = hit.get("fields", {}), hit['_score']
 			scores.append(score)
 			field_order = params["output"]["results"]["fields"]
 			fields_in_hit = [field for field in hit_fields]
@@ -91,18 +93,20 @@ class DescriptionConsumer(threading.Thread):
 			results.append(\
 			"[" + str(round(score, 3)) + "] " + " ".join(ordered_hit_fields))
 
-		self.__display_z_score_delta(scores)
+		self.__generate_z_score_delta(scores)
 
 		try:
 			print(str(self.thread_id), ": ", results[0])
 		except IndexError:
-			print("INDEX ERROR: ", self.input_string)
+			print("INDEX ERROR: ", transaction["DESCRIPTION"])
 
 		return True
 
-	def __display_z_score_delta(self, scores):
+	def __generate_z_score_delta(self, scores):
 		"""Display the Z-score delta between the first and second scores."""
+
 		logger = logging.getLogger("thread " + str(self.thread_id))
+
 		if len(scores) < 2:
 			logger.info("Unable to generate Z-Score")
 			return None
@@ -111,7 +115,8 @@ class DescriptionConsumer(threading.Thread):
 		first_score, second_score = z_scores[0:2]
 		z_score_delta = round(first_score - second_score, 3)
 		logger.info("Z-Score delta: [%.2f]", z_score_delta)
-		quality = "Non"
+		quality = ""
+
 		if z_score_delta <= 1:
 			quality = "Low-grade"
 		elif z_score_delta <= 2:
@@ -120,7 +125,20 @@ class DescriptionConsumer(threading.Thread):
 			quality = "High-grade"
 
 		logger.info("Top Score Quality: %s", quality)
+
 		return z_score_delta
+
+
+	def __decision_boundary(self, z_score_delta):
+		"""Decides whether or not we will label transaction
+		by factual_id"""
+
+		threshold = self.hyperparameters.get("z_score_threshold", "2")
+
+		if z_score_delta > float(threshold):
+			return True
+		else:
+			return False
 
 	def __init__(self, thread_id, params, desc_queue, result_queue, hyperparameters):
 		''' Constructor '''
@@ -128,7 +146,7 @@ class DescriptionConsumer(threading.Thread):
 		self.thread_id = thread_id
 		self.desc_queue = desc_queue
 		self.result_queue = result_queue
-		self.input_string = None
+		self.user = None
 		self.params = params
 		self.hyperparameters = hyperparameters
 
@@ -142,8 +160,134 @@ class DescriptionConsumer(threading.Thread):
 		self.boost_row_labels, self.boost_column_vectors =\
 			self.__build_boost_vectors()
 
-	def __generate_final_query(self):
-		"""Constructs a simple query along with boost vectors"""
+	def __first_pass(self):
+		"""Classify transactions using text features only"""
+
+		enriched_transactions = []
+
+		# Call the Classifier on each transaction and return best results
+		while len(self.user) > 0:
+			transaction = self.user.pop()
+			base_query = self.__generate_base_query(transaction)
+			search_results = self.__run_classifier(base_query)
+			self.__display_search_results(search_results, transaction)
+			enriched_transaction = self.__process_results(search_results, transaction)
+			enriched_transactions.append(enriched_transaction)
+
+		return enriched_transactions
+
+	def __second_pass(self, first_pass_results):
+		"""Classify transactions using geo and text features"""
+
+		user_id = first_pass_results[0]['MEM_ID']
+		qs_boost = self.hyperparameters.get("qs_boost", "1")
+		name_boost = self.hyperparameters.get("name_boost", "1")
+		hits, non_hits = separate_geo(first_pass_results)
+		locations_found = [str(json.loads(hit["pin.location"].replace("'", '"'))["coordinates"]) for hit in hits]
+		unique_locations = set(locations_found)
+		unique_locations = [json.loads(location.replace("'", '"')) for location in unique_locations]
+		enriched_transactions = []		
+
+		# Locate user
+		scaled_geoshapes = self.__locate_user(unique_locations, user_id)
+
+		# Use first pass results if no location found
+		if not bool(scaled_geoshapes):
+			return first_pass_results
+
+		# Create Query
+		geo_query = self.__generate_geo_query(scaled_geoshapes)
+		
+		# Run transactions again with geo_query
+		for transaction in non_hits:
+			base_query = self.__generate_base_query(transaction, boost=qs_boost)
+			should_clauses = base_query["query"]["bool"]["should"]
+			should_clauses.append(geo_query)
+			field_boosts = should_clauses[0]["query_string"]["fields"] 
+
+			for i in range(len(field_boosts)):
+				if "name" in field_boosts[i]:
+					field_boosts[i] = "name^" + str(name_boost)
+				else:
+					key, value = field_boosts[i].split("^")
+					field_boosts[i] = key + "^" + str(float(value) * 0.5)
+	
+			search_results = self.__run_classifier(json.dumps(base_query))
+			self.__display_search_results(search_results, transaction)
+			enriched_transaction = self.__process_results(search_results, transaction)
+			enriched_transactions.append(enriched_transaction)
+
+		added_second_pass = [trans for trans in enriched_transactions if trans["factual_id"] != ""]
+		second_pass_results = hits + enriched_transactions
+
+		print("ADDED SECOND PASS: " + str(len(added_second_pass)))
+			
+		return second_pass_results
+
+	def __locate_user(self, unique_locations, user_id):
+		"""Uses first pass results, to find an approximation
+		of a users spending area. Returns estimation as
+		a bounded polygon"""
+
+		scaling_factor = self.hyperparameters.get("scaling_factor", "1")
+		scaling_factor = float(scaling_factor)
+		scaled_geoshapes = None
+
+		# Get Scaled Geoshapes
+		if len(unique_locations) >= 3:
+
+			# Cluster location and return geoshapes bounding clusters
+			original_geoshapes = cluster(unique_locations)
+
+			# If no clusters are found just use the points themselves
+			if len(original_geoshapes) == 0:
+				scaled_points = StandardScaler().fit_transform(unique_locations)
+				labels = [0 for i in range(len(unique_locations))]
+				labels = np.array(labels)
+				original_geoshapes = collect_clusters(scaled_points, labels, unique_locations)
+
+			# Scale generated geo shapes
+			scaled_geoshapes = [scale_polygon(geoshape, scale=scaling_factor)[1] for geoshape in original_geoshapes]
+			
+			# Save interesting outputs needs to run in it's own process
+			#if len(unique_locations) >= 3:
+			#	pool = multiprocessing.Pool()
+			#	arguments = [(unique_locations, original_geoshapes, scaled_geoshapes, user_id)]
+			#	pool.starmap(visualize, arguments)
+
+		return scaled_geoshapes
+
+	def __run_classifier(self, query):
+		"""Runs the classifier"""
+
+		# Show Final Query
+		logger = logging.getLogger("thread " + str(self.thread_id))
+		logger.info(json.dumps(query, sort_keys=True, indent=4, separators=(',', ': ')))
+		my_results = self.__search_index(query)
+		metrics = self.my_meta["metrics"]
+		logger.info("Cache Hit / Miss: %i / %i", metrics["cache_count"], metrics["query_count"])
+
+		return my_results
+
+	def __generate_geo_query(self, scaled_shapes):
+		"""Generate multipolygon query for use with"""
+
+		geo = {
+			"geo_shape" : {
+				"pin.location" : {
+					"shape" : {
+						"type" : "multipolygon",
+						"coordinates": [[scaled_shape] for scaled_shape in scaled_shapes]
+					}			
+				}
+			}
+		}
+
+		return geo
+
+	def __generate_base_query(self, transaction, boost=1.0):
+		"""Generates the basic final query used for both
+		the first and second passes"""
 
 		# Collect necessary meta info to generate query
 		logger = logging.getLogger("thread " + str(self.thread_id))
@@ -151,10 +295,13 @@ class DescriptionConsumer(threading.Thread):
 		params = self.params
 		result_size = self.hyperparameters.get("es_result_size", "10")
 		fields = params["output"]["results"]["fields"]
-		input_string = string_cleanse(self.input_string).rstrip()
+		transaction = string_cleanse(transaction["DESCRIPTION"]).rstrip()
+
+		# If we're using masked data, remove anything with 3 X's or more
+		transaction = re.sub("X{3,}", "", transaction)
 
 		# Input transaction must not be empty
-		if len(input_string) <= 2 and re.match('^[a-zA-Z0-9_]+$', input_string):
+		if len(transaction) <= 2 and re.match('^[a-zA-Z0-9_]+$', transaction):
 			return
 
 		# Ensure we get mandatory fields
@@ -170,91 +317,94 @@ class DescriptionConsumer(threading.Thread):
 		bool_search["fields"] = fields
 		should_clauses = bool_search["query"]["bool"]["should"]
 		field_boosts = self.__get_boosted_fields("standard_fields")
-		simple_query = get_qs_query(input_string, field_boosts)
+		simple_query = get_qs_query(transaction, field_boosts, boost)
 		should_clauses.append(simple_query)
 
-		# Show Final Query
-		logger.info(json.dumps(bool_search, sort_keys=True, indent=4, separators=(',', ': ')))
-		my_results = self.__search_index(bool_search)
-		metrics = self.my_meta["metrics"]
-		logger.info("Cache Hit / Miss: %i / %i", metrics["cache_count"], metrics["query_count"])
+		return bool_search
 
-		# Pass Results Forward for Display and Processing
-		self.__display_search_results(my_results)
-		self.__output_to_result_queue(my_results)
+	def __process_results(self, search_results, transaction):
+		"""Prepare results for decision boundary"""
 
-	def __output_to_result_queue(self, search_results):
-		"""Decides whether to output and pushes to result_queue"""
-
-		# Must be at least one result
-		if search_results['hits']['total'] == 0:
-			field_names = self.params["output"]["results"]["fields"]
-			output_dict = dict(zip(field_names, ([""] * len(field_names))))
-			output_dict["DESCRIPTION"] = self.input_string
-			self.result_queue.put(output_dict)
-			print("NO RESULTS: ", self.input_string)
-			return
-
-		hits = search_results['hits']['hits']
-		scores, fields_found = [], []
-		output_dict = {}
+		field_names = self.params["output"]["results"]["fields"]
 		params = self.params
 		hyperparameters = self.hyperparameters
-		field_order = params["output"]["results"]["fields"]
+
+		# Must be at least one result
+		if search_results["hits"]["total"] == 0:
+
+			for field in field_names:
+				transaction[field] = ""
+				transaction["z_score_delta"] = 0
+
+			return transaction
+
+		# Collect Necessary Information
+		hits = search_results['hits']['hits']
+		scores, fields_found = [], []
+		output_dict = transaction
 		top_hit = hits[0]
-		hit_fields = top_hit["fields"]
-		fields_in_hit = [field for field in hit_fields]
-		business_names = [result["fields"]["name"] for result in hits]
+		hit_fields = top_hit.get("fields", {})
+		business_names = [result.get("fields", {"name" : ""})["name"] for result in hits]
 		ordered_hit_fields = []
 
+		# Collect Relevancy Scores
 		for hit in hits:
 			scores.append(hit['_score'])
 
-		for ordinal in field_order:
-			if ordinal in fields_in_hit:
-				my_field = hit_fields[ordinal][0] if isinstance(hit_fields[ordinal], (list)) else str(hit_fields[ordinal])
-				fields_found.append(ordinal)
-				ordered_hit_fields.append(my_field)
-			else:
-				fields_found.append(ordinal)
-				ordered_hit_fields.append("")
-
-		z_score_delta = self.__display_z_score_delta(scores)
+		z_score_delta = self.__generate_z_score_delta(scores)
 		top_score = top_hit['_score']
+		decision = self.__decision_boundary(z_score_delta)
 
-		#Unable to generate z_score
-		if z_score_delta == None:
-			output_dict = dict(zip(fields_found, ordered_hit_fields))
-			output_dict['DESCRIPTION'] = self.input_string
-			self.result_queue.put(output_dict)
-			return
+		# Enrich Data if Passes Boundary
+		enriched_transaction = self.__enrich_transaction(decision, transaction, hit_fields, z_score_delta, business_names)
 
-		#Send to result Queue if score good enough. Use business name as a fallback.
-		if z_score_delta > float(hyperparameters.get("z_score_threshold", "2")):
-			output_dict = dict(zip(fields_found, ordered_hit_fields))
-		else:
-			output_dict = self.__business_name_fallback(business_names)
+		return enriched_transaction
 
-		output_dict['DESCRIPTION'] = self.input_string
-		self.result_queue.put(output_dict)
+	def __enrich_transaction(self, decision, transaction, hit_fields, z_score_delta, business_names):
+		"""Enriches the transaction if it passes the boundary"""
 
-		logging.info("Z_SCORE_DELTA: %.2f", z_score_delta)
-		logging.info("TOP_SCORE: %.4f", top_score)
+		enriched_transaction = transaction
+		field_names = self.params["output"]["results"]["fields"]
+		fields_in_hit = [field for field in hit_fields]
 
-	def __business_name_fallback(self, business_names):
+		# Enrich with the fields we've found. Attach the z_score_delta
+		if decision == True: 
+			for field in field_names:
+				if field in fields_in_hit:
+					field_content = hit_fields[field][0] if isinstance(hit_fields[field], (list)) else str(hit_fields[field])
+					enriched_transaction[field] = field_content
+				else:
+					enriched_transaction[field] = ""
+			enriched_transaction["z_score_delta"] = z_score_delta
+
+		# Add a Business Name as a fall back
+		if decision == False:
+			for field in field_names:
+				enriched_transaction[field] = ""
+			enriched_transaction = self.__business_name_fallback(business_names, transaction)
+			enriched_transaction["z_score_delta"] = 0
+
+		return enriched_transaction
+
+	def __output_to_result_queue(self, enriched_transactions):
+		"""Pushes results to the result queue"""
+
+		for transaction in enriched_transactions:
+			self.result_queue.put(transaction)
+
+	def __business_name_fallback(self, business_names, transaction):
 		"""Uses the business names as a fallback
 		to finding a specific factual id"""
 
 		fields = self.params["output"]["results"]["fields"]
-		input_string = self.input_string
-		output_dict = dict(zip(fields, ([""] * len(fields))))
+		enriched_transaction = transaction
 		business_names = business_names[0:2]
 		all_equal = business_names.count(business_names[0]) == len(business_names)
 
 		if all_equal:
-			output_dict['name'] = business_names[0]
+			enriched_transaction['name'] = business_names[0]
 		
-		return output_dict
+		return enriched_transaction
 
 	def __reset_my_meta(self):
 		"""Purges several object data structures and re-initializes them."""
@@ -263,13 +413,12 @@ class DescriptionConsumer(threading.Thread):
 	def __search_index(self, input_as_object):
 		"""Searches the merchants index and the merchant mapping"""
 
+		logger = logging.getLogger("thread " + str(self.thread_id))
+		use_cache = self.params["elasticsearch"].get("cache_results", True)
 		input_data = json.dumps(input_as_object, sort_keys=True, indent=4\
 		, separators=(',', ': ')).encode('UTF-8')
 		output_data = ""
-		logger = logging.getLogger("thread " + str(self.thread_id))
-		num_transactions = self.result_queue.qsize() + self.desc_queue.qsize()
-		use_cache = self.params["elasticsearch"].get("cache_results", True)
-		
+
 		if use_cache == True:
 			output_data = self.__check_cache(input_data)
 
@@ -283,9 +432,10 @@ class DescriptionConsumer(threading.Thread):
 					self.params["search_cache"][input_hash] = output_data
 			except Exception:
 				logging.critical("Unable to process the following: %s", str(input_as_object))
-				output_data = '{"hits":{"total":0}}'
+				output_data = {"hits":{"total":0}}
 
 		self.my_meta["metrics"]["query_count"] += 1
+
 		return output_data
 
 	def __check_cache(self, input_data):
@@ -347,9 +497,20 @@ class DescriptionConsumer(threading.Thread):
 	def run(self):
 		while self.desc_queue.qsize() > 0:
 			try:
-				self.input_string = self.desc_queue.get()
-				self.__generate_final_query()
-				self.__reset_my_meta()
+				# Select all transactions from user
+				self.user = self.desc_queue.get()
+
+				# Classify using text features only 
+				results = self.__first_pass()
+
+				# Classify using text and geo features obtained during first pass
+				#enriched_transactions = self.__second_pass(results)
+				enriched_transactions = results
+
+				# Output Results to Result Queue
+				self.__output_to_result_queue(enriched_transactions)
+
+				# Done
 				self.desc_queue.task_done()
 
 			except queue.Empty:

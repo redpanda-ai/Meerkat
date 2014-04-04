@@ -12,7 +12,8 @@ from longtail.description_producer import initialize, tokenize, load_hyperparame
 from longtail.binary_classifier.load import predict_if_physical_transaction
 from longtail.accuracy import print_results
 
-import sys, datetime, os, queue, csv
+import sys, datetime, os, queue, csv, collections
+from copy import deepcopy
 from pprint import pprint
 from random import randint, uniform, random, shuffle
 from numpy import array, array_split
@@ -20,11 +21,12 @@ from numpy import array, array_split
 def get_initial_values(hyperparameters, params, known, dataset):
 	"""Do a simple search to find starter values"""
 
-	top_score = {"precision" : 0, "total_recall_non_physical" : 0}
+	top_score = {"precision" : 0, "total_recall_physical" : 0}
 	iterations = settings["initial_search_space"]
 	learning_rate = settings["initial_learning_rate"]
 
 	for i in range(iterations):
+
 		randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=learning_rate)
 		print("\n", "ITERATION NUMBER: " + str(i))
 		print("\n", randomized_hyperparameters,"\n")
@@ -79,6 +81,8 @@ def run_classifier(hyperparameters, params, dataset):
 
 def run_iteration(top_score, params, known, dataset):
 
+	print(len(dataset))
+
 	hyperparameters = top_score['hyperparameters']
 	new_top_score = top_score
 	learning_rate = settings["iteration_learning_rate"]
@@ -91,7 +95,7 @@ def run_iteration(top_score, params, known, dataset):
 
 		# Run Classifier
 		accuracy = run_classifier(randomized_hyperparameters, params, dataset)
-		same_or_higher_recall = accuracy["total_recall_non_physical"] >= new_top_score["total_recall_non_physical"]
+		same_or_higher_recall = accuracy["total_recall_physical"] >= new_top_score["total_recall_physical"]
 		same_or_higher_precision = accuracy["precision"] >= new_top_score["precision"]
 		not_too_high_precision = accuracy["precision"] <= settings["max_precision"]
 
@@ -121,7 +125,7 @@ def save_top_score(top_score):
 
 	record = open(os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_top_scores.txt", "a")
 	pprint("Precision = " + str(top_score['precision']) + "%", record)
-	pprint("Best Recall = " + str(top_score['total_recall_non_physical']) + "%", record)
+	pprint("Best Recall = " + str(top_score['total_recall_physical']) + "%", record)
 	boost_vectors, boost_labels, other = split_hyperparameters(top_score["hyperparameters"])
 	pprint(boost_vectors, record)
 	pprint(other, record)
@@ -134,7 +138,7 @@ def split_hyperparameters(hyperparameters):
 	other = {}
 
 	for key, value in hyperparameters.items():
-		if key == "es_result_size" or key == "z_score_threshold":
+		if key == "es_result_size" or key == "z_score_threshold" or key == "qs_boost" or key == "scaling_factor" or key == "name_boost":
 			other[key] = value
 		else:
 			boost_vectors[key] = [value]
@@ -155,13 +159,13 @@ def randomized_optimization(hyperparameters, known, params, dataset):
 	top_score = gradient_ascent(initial_values, params, known, dataset)
 
 	print("Precision = " + str(top_score['precision']) + "%")
-	print("Best Recall = " + str(top_score['total_recall_non_physical']) + "%")
+	print("Best Recall = " + str(top_score['total_recall_physical']) + "%")
 	print("HYPERPARAMETERS:")
 	pprint(top_score["hyperparameters"])
 	print("ALL RESULTS:")
 	
 	# Save Final Parameters
-	file_name = os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_" + str(round(top_score['precision'], 2)) + "Precision" + str(round(top_score['total_recall_non_physical'], 2)) + "Recall.json" 
+	file_name = os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_" + str(round(top_score['precision'], 2)) + "Precision" + str(round(top_score['total_recall_physical'], 2)) + "Recall.json" 
 	new_parameters = open(file_name, 'w')
 	pprint(top_score["hyperparameters"], new_parameters)
 
@@ -172,7 +176,7 @@ def test_train_split(params):
 	data into a test and training set"""
 
 	verification_source = params.get("verification_source", "data/misc/verifiedLabeledTrans.csv")
-	test_size = settings["test_size"]
+	folds = settings["folds"]
 	test, train = [], []
 	dataset = []
 
@@ -187,9 +191,11 @@ def test_train_split(params):
 		if curr["factual_id"] != "" or curr[category] == "0" or curr[category] == "2":
 			dataset.append(curr)
 
+	dataset = verified_transactions
+
 	# Shuffle/Split Data
 	shuffle(dataset)
-	split_arr = array_split(array(dataset), 2)
+	split_arr = array_split(array(dataset), folds)
 	test = list(split_arr[0])
 	train = list(split_arr[1])
 
@@ -198,18 +204,33 @@ def test_train_split(params):
 def get_desc_queue(dataset):
 	"""Alt version of get_desc_queue"""
 
-	transactions = [trans["DESCRIPTION"] for trans in dataset]
-	desc_queue, non_physical = queue.Queue(), []
+	transactions = [deepcopy(X) for X in dataset]
+	desc_queue, non_physical, physical = queue.Queue(), [], []
+	users = collections.defaultdict(list)
 
 	# Run Binary Classifier
-	for transaction in transactions:
+	for row in transactions:
+		transaction = row["DESCRIPTION"]
 		prediction = predict_if_physical_transaction(transaction)
-		if prediction == "1":
-			desc_queue.put(transaction)
+		if prediction == "1" and row["factual_id"] != "":
+			physical.append(row)
 		elif prediction == "0":
-			non_physical.append(transaction)
-		elif prediction == "2":
-			desc_queue.put(transaction)
+			non_physical.append(row)
+		elif prediction == "2" and row["factual_id"] != "":
+			physical.append(row)
+
+	# Get Equal Lengths Physical and Non-Physical
+	shuffle(non_physical)
+	non_physical = non_physical[0:len(physical)]
+
+	# Split into user buckets
+	for row in physical:
+		user = row['MEM_ID']
+		users[user].append(row)
+
+	# Add Users to Queue
+	for key, value in users.items():
+		desc_queue.put(users[key])
 
 	return desc_queue, non_physical
 
@@ -232,7 +253,7 @@ def cross_validate(top_score, dataset):
 
 	return accuracy
 
-def two_fold(hyperparameters, known, params, d0, d1):
+def two_fold(hyperparameters, known, params):
 	"""Run two-fold cross validation. Combine Scores"""
 
 	# Run Randomized Optimization and Cross Validate
@@ -243,14 +264,20 @@ def two_fold(hyperparameters, known, params, d0, d1):
 	d1_results = cross_validate(d0_top_score, d1)
 	d0_results = cross_validate(d1_top_score, d0)
 
-	# See Scores
-	file_name = os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_" + "cross_validation_results.json" 
-	record = open(file_name, 'w')
+	# Show Scores
 	print("FINAL SCORES:")
 	pprint(d0_results)
 	pprint(d1_results)
 
-	#Save The Scores
+	# Save Scores
+	save_cross_fold_results(d0_top_score, d0_results, d1_top_score, d1_results)
+
+def save_cross_fold_results(d0_top_score, d0_results, d1_top_score, d1_results):
+
+	# Save Scores
+	file_name = os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_" + "cross_validation_results.json" 
+	record = open(file_name, 'w')
+
 	pprint("d0 as Training Data - Top Score found through Optimization:", record)
 	pprint(d0_top_score, record)
 
@@ -265,28 +292,34 @@ def two_fold(hyperparameters, known, params, d0, d1):
 
 if __name__ == "__main__":
 
+	# Must Provide Config File
+	if len(sys.argv) != 2:
+		print("Please provide a config file")
+		sys.exit()
+
 	# Clear Contents from Previous Runs
 	open(os.path.splitext(os.path.basename(sys.argv[1]))[0] + '_top_scores.txt', 'w').close()
 
 	settings = {
-		"test_size": 0.5,
-		"initial_search_space": 35,
-		"initial_learning_rate": 0.75,
-		"iteration_search_space": 35,
-		"iteration_learning_rate": 0.35,
-		"gradient_ascent_iterations": 1,
-		"max_precision": 96
+		"folds": 2,
+		"initial_search_space": 25,
+		"initial_learning_rate": 1,
+		"iteration_search_space": 25,
+		"iteration_learning_rate": 0.5,
+		"gradient_ascent_iterations": 15,
+		"max_precision": 98
 	}
 
 	known = {"es_result_size" : "45"}
 
-	hyperparameters = {    
+	hyperparameters = {
+		"internal_store_number" : "2",  
 	    "name" : "3",             
 	    "address" : "1",          
 	    "address_extended" : "1", 
 	    "po_box" : "1",           
 	    "locality" : "1",         
-	    "region" : "1",           
+	    "region" : "2",           
 	    "post_town" : "1",        
 	    "admin_region" : "1",     
 	    "postcode" : "1",                
@@ -295,16 +328,19 @@ if __name__ == "__main__":
 	    "email" : "1",               
 	    "category_labels" : "1",           
 	    "chain_name" : "1",
+	    "scaling_factor" : "1.5",
+	    "qs_boost" : "1",
+	    "name_boost" : "2",
 		"z_score_threshold" : "3"
 	}
 
 	# Meta Information
 	start_time = datetime.datetime.now()
 	params = initialize()
-	test, train = test_train_split(params)
+	d0, d1 = test_train_split(params)
 
 	# Run Two Fold Cross Validation
-	two_fold(hyperparameters, known, params, test, train)
+	two_fold(hyperparameters, known, params)
 
 	# Run Speed Tests
 	time_delta = datetime.datetime.now() - start_time
