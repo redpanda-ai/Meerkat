@@ -29,7 +29,7 @@ def cluster(location_list):
 	geoshapes = collect_clusters(X, db.labels_, location_list)
 
 	# Plot Results
-	#plot_clustering(db, X)
+	plot_clustering(db, X)
 
 	return geoshapes
 
@@ -75,7 +75,7 @@ def collect_clusters(scaled_points, labels, location_list):
 
 	geoshape_list = convex_hull(clusters, locations)
 
-	#NOTE: The previous version of "convex_hull" converted coordinates from floating point pairs
+	#The previous version of "convex_hull" converted coordinates from floating point pairs
 	#to strings pairs.  If you need that functionality, use the
 	#"convert_geoshapes_coordinates_to_strings" function provided below.
 
@@ -130,5 +130,4 @@ def convert_geoshapes_coordinates_to_strings(geoshape_list):
 
 if __name__ == "__main__":
 	""" Do some stuff."""
-	some_points = [['-99.728356', '32.434965'], ['-99.680962', '32.413137'], ['-99.789037', '32.428453'], ['-99.763', '32.4023'], ['-99.782975', '32.429731'], ['-97.185053', '32.840261']]
-	cluster(some_points)
+	print("This module is a library that contains useful functions; it should not be run from the console.")
