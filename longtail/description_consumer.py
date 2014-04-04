@@ -9,19 +9,19 @@ Created on Jan 14, 2014
 # pylint: disable=R0914
 
 import copy
+import datetime
 import hashlib
+import itertools
 import json
 import logging
+import multiprocessing
 import numpy as np
 import pickle
+import pprint
 import queue
 import re
 import sys
-import pprint
-import datetime
 import threading
-import itertools
-import multiprocessing
 
 from elasticsearch import Elasticsearch, helpers
 from sklearn.preprocessing import StandardScaler
@@ -29,8 +29,7 @@ from scipy.stats.mstats import zscore
 from pprint import pprint
 
 from longtail.custom_exceptions import Misconfiguration, UnsupportedQueryType
-from longtail.various_tools import string_cleanse
-from longtail.scaled_polygon_test import scale_polygon
+from longtail.various_tools import string_cleanse, scale_polygon
 from longtail.clustering import cluster, convex_hull, collect_clusters
 from longtail.location import separate_geo, visualize
 

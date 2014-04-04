@@ -9,7 +9,7 @@ import matplotlib as mpl
 from matplotlib.patches import Polygon
 from pprint import pprint
 from longtail.clustering import cluster
-from longtail.scaled_polygon_test import scale_polygon
+from longtail.various_tools import scale_polygon
 from random import random
 
 def separate_geo(result_list):
