@@ -20,8 +20,8 @@ def initialize():
 
 	if len(sys.argv) != 2:
 		#usage()
-		raise InvalidArguments(msg="Supply a single argument for the json formatted"\
-		+ " configuration file.", expr=None)
+		raise InvalidArguments(msg="Supply a single argument for the json"\
+		+ "formatted configuration file.", expr=None)
 
 	try:
 		input_file = open(sys.argv[1], encoding='utf-8')
@@ -56,10 +56,8 @@ def load_document_queue(params):
 
 	for input_string in records:
 		document_queue.put(input_string)
-	#document_queue.task_done()
 	document_queue_populated = True
 
-	#logging.warning("Document Queue has " + str(document_queue.qsize()) + " elements")
 	return header, document_queue, document_queue_populated
 
 class ThreadConsumer(threading.Thread):
@@ -108,19 +106,17 @@ class ThreadConsumer(threading.Thread):
 		"""Eats from the document queue and bulk loads."""
 		my_logger = logging.getLogger("thread " + str(self.thread_id))
 		params, document_queue = self.params, self.document_queue
-		batch_list, concurrency_queue = self.batch_list, params["concurrency_queue"]
+		batch_list = self.batch_list
+		concurrency_queue = params["concurrency_queue"]
 		document_queue_populated = params["document_queue_populated"]
 		while True:
 			count = 0
 			if document_queue_populated and document_queue.empty():
 				concurrency_queue.get()
 				concurrency_queue.task_done()
-				#my_logger.info("Consumer finished.")
 				concurrency_qsize = concurrency_queue.qsize()
-				#document_qsize = document_queue.qsize()
-				my_logger.info("Consumer finished, concurrency queue size: %i", concurrency_queue.qsize())
-				#my_logger.info("Concurrency queue size: %i", concurrency_qsize)
-				#my_logger.info("Document queue size: %i", document_qsize)
+				my_logger.info("Consumer finished, concurrency queue size: %i",
+					concurrency_queue.qsize())
 				return
 			for i in range(params["batch_size"]):
 				try:
@@ -142,7 +138,8 @@ class ThreadConsumer(threading.Thread):
 		queue_size = len(self.batch_list)
 		my_logger.debug("Queue size %i", queue_size)
 
-		#Split the batch into cells built of keys and values, excluding blank values
+		#Split the batch into cells built of keys and values, excluding
+		#blank values
 		params = self.params
 		docs, actions = [], []
 		composite_fields = params["elasticsearch"]["composite_fields"]
@@ -155,7 +152,8 @@ class ThreadConsumer(threading.Thread):
 				d = {x: y for (x, y) in list(zip(header, item_list)) if y != ""}
 				#merge latitude and longitude into a point
 				if "longitude" in d and "latitude" in d:
-					d["pin"] = { "location": { "type": "point", "coordinates" : [\
+					d["pin"] = { "location": {
+						"type": "point", "coordinates" : [
 						d["longitude"], d["latitude"] ] } }
 					del d["longitude"]
 					del d["latitude"]
@@ -185,33 +183,18 @@ class ThreadConsumer(threading.Thread):
 					for key in keys:
 						my_dict = field[key]
 						dispersion_regex = my_dict["dispersion_regex"]
-						#print("Dispersion regex:\n{0}".format(dispersion_regex))
 						dispersion_re=re.compile(dispersion_regex)
 						components = my_dict['components']
-						#print("components:\n{0}".format(components))
-						#sys.exit()
 						if "dispersed" not in d:
 							d["dispersed"] = {}
 						d["dispersed"][key] = {}
 						for component in components:
-							#print("Component:\n{0}".format(component))
 							component_name = component["name"]
-							#if component_name not in d["dispersed"]:
-							#	d["dispersed"][component_name] = {}
-							#print("d_dispersed:\n{0}".format(d["dispersed"]))
 							if key in d:
 								input_string = d[key]
-								#print("Input string:\n{0}".format(input_string))
 								if dispersion_re.search(input_string):
 									matches = dispersion_re.match(input_string)
 									d["dispersed"][key][component_name] = matches.group(component_name)
-									#print("{0} {1}".format(component_name, matches.group(component_name)))
-				#print("d_dispersed:\n{0}".format(d["dispersed"]))
-
-
-				#sys.exit()
-
-
 
 				docs.append(d)
 				action = {
@@ -233,9 +216,11 @@ class ThreadConsumer(threading.Thread):
 				success += 1
 			else:
 				failure += 1
-			total += 1"""
-		my_logger.info("Success/Failure/Total: %i/%i/%i - %i documents in queue.", success, failure\
-		, total, self.document_queue.qsize())
+			total += 1
+		my_logger.info("Success/Failure/Total: %i/%i/%i - %i documents in queue."
+			, success, failure, total, self.document_queue.qsize())
+		"""
+		my_logger.info("%i documents in queue.", self.document_queue.qsize())
 
 def start_consumers(params):
 	"""Starts our consumer threads"""
@@ -256,9 +241,10 @@ def validate_params(params):
 	my_keys = ["elasticsearch", "concurrency", "input", "logging", "batch_size"]
 	ensure_keys_in_dictionary(params, my_keys)
 
-	my_keys = ["index", "type_mapping", "type", "cluster_nodes"\
-	, "boost_labels", "boost_vectors", "composite_fields", "dispersed_fields"]
-	ensure_keys_in_dictionary(params["elasticsearch"], my_keys, prefix="elasticsearch.")
+	my_keys = ["index", "type_mapping", "type", "cluster_nodes",
+		"boost_labels", "boost_vectors", "composite_fields", "dispersed_fields"]
+	ensure_keys_in_dictionary(params["elasticsearch"], my_keys,
+		prefix="elasticsearch.")
 
 	my_keys = ["filename", "encoding"]
 	ensure_keys_in_dictionary(params["input"], my_keys, prefix="input.")
@@ -278,7 +264,8 @@ def validate_params(params):
 		keys = field.keys()
 		for key in keys:
 			my_dict = field[key]
-			ensure_keys_in_dictionary(my_dict, my_keys, prefix="elasticsearch.composite_fields.")
+			ensure_keys_in_dictionary(my_dict, my_keys,
+				prefix="elasticsearch.composite_fields.")
 
 			components = my_dict["components"]
 			for component in components:
@@ -294,7 +281,8 @@ def validate_params(params):
 		keys = field.keys()
 		for key in keys:
 			my_dict = field[key]
-			ensure_keys_in_dictionary(my_dict, my_keys, prefix="elasticsearch.dispersed_fields.")
+			ensure_keys_in_dictionary(my_dict, my_keys,
+				prefix="elasticsearch.dispersed_fields.")
 
 
 
@@ -320,8 +308,8 @@ def validate_params(params):
 			if second_key in my_dict:
 				my_dict = my_dict[second_key]
 			else:
-				raise Misconfiguration(msg="The following boost_vector key is missing from the type mapping: "\
-				+ str(key) , expr=None)
+				raise Misconfiguration(msg="The following boost_vector key " +\
+				"is missing from the type mapping: " + str(key) , expr=None)
 			key_count += 1
 			if key_count == key_total:
 				logging.warning("key: '" + key + "' was found.")
@@ -330,8 +318,8 @@ def validate_params(params):
 		del missing_keys[key]
 
 	if missing_keys:
-		raise Misconfiguration(msg="The following boost_vector keys are missing from the type mapping: "\
-		+ str(missing_keys) , expr=None)
+		raise Misconfiguration(msg="The following boost_vector keys are" +\
+		"missing from the type mapping: " + str(missing_keys) , expr=None)
 	return True
 
 def add_composite_type_mappings(params):
@@ -398,8 +386,8 @@ if __name__ == "__main__":
 	guarantee_index_and_doc_type(PARAMS)
 	PARAMS["document_queue_populated"] = False
 	PARAMS["concurrency_queue"] = queue.Queue()
-	PARAMS["header"], PARAMS["document_queue"], PARAMS["document_queue_populated"] =\
-		load_document_queue(PARAMS)
+	PARAMS["header"], PARAMS["document_queue"],\
+	PARAMS["document_queue_populated"] = load_document_queue(PARAMS)
 	start_consumers(PARAMS)
 	PARAMS["concurrency_queue"].join()
 	logging.info("Concurrency joined")
