@@ -8,7 +8,7 @@ def load_store_numbers(file_name):
 	"""Load Store Numbers from provided file"""
 
 	input_file = open(file_name, encoding="utf-8", errors='replace')
-	stores = list(csv.DictReader(input_file, delimiter="|"))
+	stores = list(csv.DictReader(input_file, delimiter=","))
 	input_file.close()
 
 	return stores
@@ -29,8 +29,7 @@ def find_merchant(store):
 	"""Match document with store number to factual document"""
 
 	fields = ["address", "postcode", "name", "locality", "region"]
-	search_parts = [store["address"], store["zip_code"], store["city"], store["state"]]
-	search_parts = keywords + search_parts
+	search_parts = [store["name"], store["address"], store["zip_code"], store["city"], store["state"]]
 	factual_id = ""
 
 	# Generate Query
@@ -54,9 +53,9 @@ def find_merchant(store):
 	print("Top Result: ", formatted)
 	print("Query Sent: ", query)
 
-	# Must Be a McDonald's
-	if top_hit["name"] != "McDonald's":
-		return ""
+	# Must Be a Walmart or Sams Club
+	if not (top_hit["name"] == "Walmart" or top_hit["name"] == "Sam's Club"):
+		return ""	
 
 	# Test House Number
 	result_house_number = top_hit.get("address", "").split(" ")[0]
@@ -88,7 +87,12 @@ def get_top_hit(search_results):
 def update_merchant(factual_id, store):
 	"""Update found merchant with store_number"""
 
-	body = {"doc" : {"internal_store_number" : store["internal_store_number"]}}
+	store_number = store["internal_store_number"]
+	while len(store_number) < 4:
+		store_number = "0" + store_number
+	store_number = "#" + store_number
+
+	body = {"doc" : {"internal_store_number" : store_number}}
 
 	try:
 		output_data = es_connection.update(index="factual_index", doc_type="factual_type", id=factual_id, body=body)
@@ -129,14 +133,14 @@ def run(stores):
 		else:
 			print("Did Not Merge Store Number ", store["internal_store_number"], " To Index")
 			not_found.append(store)
+			continue
 
 		# Save Failed Attempts
 		if status == False:
 			print("Did Not Merge Store Number ", store["internal_store_number"], " To Index")
 			not_found.append(store)
 		else:
-			print("")
-			#print("Successfully Merged Store Number:", store["internal_store_number"], "into Factual Merchant:", factual_id, "\n")
+			print("Successfully Merged Store Number:", store["internal_store_number"], "into Factual Merchant:", factual_id, "\n")
 
 	# Save Not Found
 	save_not_found(not_found)
@@ -158,7 +162,7 @@ if __name__ == "__main__":
         , "brainstorm7:9200", "brainstorm8:9200", "brainstorm9:9200", "brainstorma:9200"
         , "brainstormb:9200"]
 	es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True, sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
-	keywords = ["McDonald's"]
-	file_name = "data/misc/Store Numbers/Clean/mcdonalds_store_numbers.pipe"
+	keywords = ["Sams Club", "Walmart"]
+	file_name = "data/misc/Store Numbers/Clean/walmart_store_numbers.csv"
 	stores = load_store_numbers(file_name)
 	run(stores)

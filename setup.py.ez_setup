@@ -1,0 +1,13 @@
+from ez_setup import use_setuptools
+use_setuptools()
+from setuptools import setup, find_packages
+
+setup(name='Longtail',
+	version='0.9b1',
+	description='Stuff.',
+	url="https://github.com/joeandrewkey/Longtail",
+	long_description='Stuff and junk.',
+	author='J. Andrew Key and Matt Sevrens',
+	author_email='joeandrewkey@gmail.com',
+	packages=find_packages(),
+	)

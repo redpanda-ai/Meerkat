@@ -1,13 +1,14 @@
 {
     "concurrency" : 6,
-    "verification_source" : "data/misc/verifiedLabeledTrans.csv",
+    "verification_source" : "data/misc/matt_8000_card.csv",
     "input" : {
         "hyperparameters" : "config/hyperparameters/default.json",
-        "filename" : "data/input/benchmark.csv",
+        "filename" : "data/input/users.csv",
+        "delimiter" : ",",
         "encoding" : "utf-8"
     },
     "logging" : {
-        "level" : "warning",
+        "level" : "critical",
         "path" : "logs/foo.log",
         "formatter" : "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         "console" : true
@@ -22,7 +23,7 @@
         }
     },
 	"elasticsearch" : {
-        "cluster_nodes" : ["brainstorm0:9200", "brainstorm1:9200", "brainstorm2:9200"
+        "cluster_nodes" : ["brainstorm1:9200", "brainstorm2:9200"
         , "brainstorm3:9200", "brainstorm4:9200", "brainstorm5:9200", "brainstorm6:9200"
         , "brainstorm7:9200", "brainstorm8:9200", "brainstorm9:9200", "brainstorma:9200"
         , "brainstormb:9200", "localhost:9200"],
@@ -30,24 +31,22 @@
         "index" : "factual_index",
         "type" : "factual_type",
         "boost_labels" : ["standard_fields"],
-        "boost_vectors" : {
-            "address": [0.205],
-            "address_extended": [1.751],
-            "admin_region": [0.54],
-            "category_labels": [0.282],
-            "chain_name": [1.204],
-            "composite.address": [0.686],
-            "country": [0.126],
-            "email": [2.201],
-            "fax": [1.109],
-            "locality": [2.424],
-            "name": [2.825],
-            "neighborhood": [0.044],
-            "po_box": [2.189],
-            "post_town": [0.264],
-            "postcode": [1.358],
-            "region": [1.828],
-            "tel": [0.849]
+        "boost_vectors" :  {
+            "address": [0.541],
+            "address_extended": [1.282],
+            "admin_region": [0.69],
+            "category_labels": [1.319],
+            "chain_name": [0.999],
+            "email": [0.516],
+            "internal_store_number": [1.627],
+            "locality": [1.367],
+            "name": [2.781],
+            "neighborhood": [0.801],
+            "po_box": [1.292],
+            "post_town": [0.577],
+            "postcode": [0.914],
+            "region": [1.685],
+            "tel": [0.597]
         }
     }
 }

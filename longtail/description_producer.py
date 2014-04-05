@@ -12,56 +12,67 @@ ElasticSearch (structured data).
 
 import csv
 import datetime
+import collections
 import json
 import logging
 import os
 import pickle
 import queue
 import sys
-import pprint
 
+from pprint import pprint
+from operator import itemgetter
 from longtail.custom_exceptions import InvalidArguments, Misconfiguration
 from longtail.description_consumer import DescriptionConsumer
 from longtail.binary_classifier.load import predict_if_physical_transaction
+from longtail.various_tools import load_dict_list
 from longtail.accuracy import test_accuracy, print_results, speed_tests
-from longtail.location import second_pass
 
 def get_desc_queue(params):
 	"""Opens a file of descriptions, one per line, and load a description
 	queue."""
 
 	lines, filename, encoding = None, None, None
-	non_physical = []
-	atm = []
+	physical, non_physical, atm = [], [], []
+	users = collections.defaultdict(list)
 	desc_queue = queue.Queue()
 
 	try:
 		filename = params["input"]["filename"]
 		encoding = params["input"]["encoding"]
-		with open(filename, 'r', encoding=encoding, errors='replace') as inputfile:
-			lines = inputfile.read()
+		delimiter = params["input"].get("delimiter", "|")
+		transactions = load_dict_list(filename, encoding=encoding, delimiter=delimiter)
 	except IOError:
 		logging.critical("Invalid ['input']['filename'] key; Input file: %s"
 			" cannot be found. Correct your config file.", filename)
 		sys.exit()
 
-	lines = lines.split("\n")
-
 	# Run Binary Classifier
-	for input_string in lines:
-		prediction = predict_if_physical_transaction(input_string)
+	for transaction in transactions:
+		transaction['factual_id'] = ""
+		description = transaction["DESCRIPTION"]
+		prediction = predict_if_physical_transaction(description)
 		if prediction == "1":
-			desc_queue.put(input_string)
+			physical.append(transaction)
 		elif prediction == "0":
-			non_physical.append(input_string)
-			logging.info("NON-PHYSICAL: %s", input_string)
+			non_physical.append(transaction)
+			logging.info("NON-PHYSICAL: %s", description)
 		elif prediction == "2":
-			desc_queue.put(input_string)
-			atm.append(input_string)
+			physical.append(transaction)
+			atm.append(transaction)
 
-	atm_percent = (len(atm) / len(lines)) * 100
-	non_physical_percent = (len(non_physical) / len(lines)) * 100
-	physical_percent = (desc_queue.qsize() / len(lines)) * 100
+	# Split into user buckets
+	for row in physical:
+		user = row.get("MEM_ID", "")
+		users[user].append(row)
+
+	# Add Users to Queue
+	for key, value in users.items():
+		desc_queue.put(users[key])
+
+	atm_percent = (len(atm) / len(transactions)) * 100
+	non_physical_percent = (len(non_physical) / len(transactions)) * 100
+	physical_percent = (len(physical) / len(transactions)) * 100
 
 	print("")
 	print("PHYSICAL: ", round(physical_percent, 2), "%")
@@ -140,10 +151,8 @@ def tokenize(params, desc_queue, hyperparameters, non_physical):
 		params = load_pickle_cache(params)
 
 	# Run the Classifier
-	consumer_threads = 8
+	consumer_threads = params.get("concurrency", 8)
 	result_queue = queue.Queue()
-	if "concurrency" in params:
-		consumer_threads = params["concurrency"]
 	start_time = datetime.datetime.now()
 
 	for i in range(consumer_threads):
@@ -155,13 +164,10 @@ def tokenize(params, desc_queue, hyperparameters, non_physical):
 	# Convert queue to list
 	result_list = queue_to_list(result_queue)
 
-	# Do a Second Pass to Improve Results
-	#result_list = second_pass(result_list)
-
 	# Writing to an output file, if necessary.
 	if "file" in params["output"] and "format" in params["output"]["file"]\
 	and params["output"]["file"]["format"] in ["csv", "json"]:
-		write_output_to_file(params, result_list)
+		write_output_to_file(params, result_list, non_physical)
 	else:
 		logging.critical("Not configured for file output.")
 
@@ -233,7 +239,7 @@ def validate_params(params):
 		raise Misconfiguration(msg="Misconfiguration: missing key, 'input.encoding'", expr=None)
 	return True
 
-def write_output_to_file(params, output_list):
+def write_output_to_file(params, output_list, non_physical):
 	"""Outputs results to a file"""
 
 	if type(output_list) is queue.Queue:
@@ -243,6 +249,10 @@ def write_output_to_file(params, output_list):
 		logging.warning("No results available to write")
 		return
 
+	# Merge Physical and Non-Physical
+	output_list = output_list + non_physical
+
+	# Get File Save Info
 	file_name = params["output"]["file"].get("path", '../data/output/longtailLabeled.csv')
 	file_format = params["output"]["file"].get("format", 'csv')
 
