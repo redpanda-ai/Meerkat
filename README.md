@@ -45,7 +45,7 @@ License information
 -------------------
 All rights reserved.
 
-Contributers
+Contributors
 ------------
 * Matt Sevrens
 * J. Andrew Key
