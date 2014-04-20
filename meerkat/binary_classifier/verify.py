@@ -9,13 +9,13 @@ Created on Mar 11, 2014
 
 import csv, sys, os
 
-from longtail.binary_classifier.train import load_data
+from meerkat.binary_classifier.train import load_data
 from sklearn.externals import joblib
 
 def test_model(file_to_test):
 
     transactions, labels = load_data([], [], file_to_test)
-    grid_search = joblib.load('longtail/binary_classifier/US.pkl')
+    grid_search = joblib.load('meerkat/binary_classifier/US.pkl')
     score = grid_search.score(transactions, labels)
 
     print("Score: ", score)

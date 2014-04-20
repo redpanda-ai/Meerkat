@@ -1,22 +1,22 @@
-Longtail
+Meerkat
 =====
-Python project for labeling and classifying Longtail data
+Python project for labeling and classifying financial transactions
 
 Usage
 ------------
 **Load an ElasticSearch Index:**<br>
-From the base directory execute **python3 -m longtail.bulk_loader config/{config file}**
+From the base directory execute **python3 -m meerkat.bulk_loader config/{config file}**
 
-**Run Longtail Classifier:**<br>
-From base directory execute **python3 -m longtail config/{config file}**
+**Run Meerkat Classifier:**<br>
+From base directory execute **python3 -m meerkat config/{config file}**
 
 **Train Binary Classifier:**<br>
-From base directory execute **python3 -m longtail.binary_classifier.train**<br>
+From base directory execute **python3 -m meerkat.binary_classifier.train**<br>
 Accepts one optional argument, a CSV containing desripitions labeled as physical or non physical<br>
 Defaults to data/misc/verifiedLabeledTrans.csv
 
 **Hand Labeled Transactions:**<br>
-The Longtail classifier uses a combination of supervised learning algorithms and basic search. 
+The Meerkat classifiers use a combination of supervised learning algorithms and basic search. 
 The labeled data requires three columns: DESCRIPTION, factual_id and IS_PHYSICAL_TRANSACTION.
 
 DESCRIPTION is the transaction itself, factual_id is a unique identifier linking to the
@@ -47,5 +47,4 @@ All rights reserved.
 
 Contributors
 ------------
-* Matt Sevrens
-* J. Andrew Key
+* J. Andrew Key and Matt Sevrens

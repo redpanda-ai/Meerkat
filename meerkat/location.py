@@ -8,8 +8,8 @@ import matplotlib as mpl
 
 from matplotlib.patches import Polygon
 from pprint import pprint
-from longtail.clustering import cluster
-from longtail.various_tools import scale_polygon
+from meerkat.clustering import cluster
+from meerkat.various_tools import scale_polygon
 from random import random
 
 def separate_geo(result_list):

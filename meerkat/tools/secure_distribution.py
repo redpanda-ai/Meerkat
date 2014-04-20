@@ -4,7 +4,7 @@ import inspect
 import sys
 import re
 import uuid
-from longtail import bulk_loader
+from meerkat import bulk_loader
 
 def start():
 	try:

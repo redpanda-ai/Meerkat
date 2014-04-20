@@ -13,7 +13,7 @@ from pprint import pprint
 from elasticsearch import Elasticsearch, helpers
 from datetime import datetime
 
-from longtail.custom_exceptions import InvalidArguments, Misconfiguration
+from meerkat.custom_exceptions import InvalidArguments, Misconfiguration
 def initialize():
 	"""Validates the command line arguments."""
 	input_file, params = None, None

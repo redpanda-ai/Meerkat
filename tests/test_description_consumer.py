@@ -1,12 +1,12 @@
-'''Unit tests for longtail.description_consumer'''
+'''Unit tests for meerkat.description_consumer'''
 
 import collections
 import json
 import numpy as np
 import queue
 import unittest
-from longtail.description_consumer import DescriptionConsumer
-from longtail.custom_exceptions import Misconfiguration
+from meerkat.description_consumer import DescriptionConsumer
+from meerkat.custom_exceptions import Misconfiguration
 
 class DescriptionConsumerTests(unittest.TestCase):
 	"""Our UnitTest class."""
@@ -30,7 +30,7 @@ class DescriptionConsumerTests(unittest.TestCase):
 			"size" : 1
 		},
 		"file" : {
-			"format" : "json", "path" : "data/output/longtailLabeled.json"
+			"format" : "json", "path" : "data/output/meerkatLabeled.json"
 		}
 	},
 	"elasticsearch" : {
