@@ -22,11 +22,11 @@ import sys
 
 from pprint import pprint
 from operator import itemgetter
-from longtail.custom_exceptions import InvalidArguments, Misconfiguration
-from longtail.description_consumer import DescriptionConsumer
-from longtail.binary_classifier.load import predict_if_physical_transaction
-from longtail.various_tools import load_dict_list
-from longtail.accuracy import test_accuracy, print_results, speed_tests
+from meerkat.custom_exceptions import InvalidArguments, Misconfiguration
+from meerkat.description_consumer import DescriptionConsumer
+from meerkat.binary_classifier.load import predict_if_physical_transaction
+from meerkat.various_tools import load_dict_list
+from meerkat.accuracy import test_accuracy, print_results, speed_tests
 
 def get_desc_queue(params):
 	"""Opens a file of descriptions, one per line, and load a description
@@ -253,7 +253,7 @@ def write_output_to_file(params, output_list, non_physical):
 	output_list = output_list + non_physical
 
 	# Get File Save Info
-	file_name = params["output"]["file"].get("path", '../data/output/longtailLabeled.csv')
+	file_name = params["output"]["file"].get("path", '../data/output/meerkatLabeled.csv')
 	file_format = params["output"]["file"].get("format", 'csv')
 
 	# Output as CSV

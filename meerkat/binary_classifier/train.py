@@ -87,7 +87,7 @@ def build_model(trans_train, trans_test, labels_train, labels_test):
     print("Actual Score: " + str(score))
 
     # Save Model
-    joblib.dump(grid_search, 'longtail/binary_classifier/final.pkl', compress=3)
+    joblib.dump(grid_search, 'meerkat/binary_classifier/final.pkl', compress=3)
 
     test_model("data/misc/matt_8000_card.csv", grid_search)
 

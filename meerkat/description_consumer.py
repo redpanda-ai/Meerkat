@@ -28,10 +28,10 @@ from sklearn.preprocessing import StandardScaler
 from scipy.stats.mstats import zscore
 from pprint import pprint
 
-from longtail.custom_exceptions import Misconfiguration, UnsupportedQueryType
-from longtail.various_tools import string_cleanse, scale_polygon
-from longtail.clustering import cluster, convex_hull, collect_clusters
-from longtail.location import separate_geo, visualize
+from meerkat.custom_exceptions import Misconfiguration, UnsupportedQueryType
+from meerkat.various_tools import string_cleanse, scale_polygon
+from meerkat.clustering import cluster, convex_hull, collect_clusters
+from meerkat.location import separate_geo, visualize
 
 #Helper functions
 def get_bool_query(starting_from = 0, size = 0):

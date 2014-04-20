@@ -11,7 +11,7 @@ import math
 import os
 import sys
 from pprint import pprint
-from longtail.various_tools import load_dict_list
+from meerkat.various_tools import load_dict_list
 
 def test_accuracy(params, file_path=None, non_physical_trans=[], result_list=[]):
 	"""Takes file by default but can accept result
@@ -158,6 +158,6 @@ def print_results(results):
 	print("", "MISLABELED BINARY:", '\n'.join(results['non_physical']), sep="\n")
 
 if __name__ == "__main__":
-	output_path = sys.argv[1] if len(sys.argv) > 1 else "data/output/longtailLabeled.csv"
+	output_path = sys.argv[1] if len(sys.argv) > 1 else "data/output/meerkatLabeled.csv"
 	pprint(test_accuracy(file_path=output_path))
 	#print_results(test_accuracy(file_path=output_path))

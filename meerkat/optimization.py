@@ -2,15 +2,15 @@
 # pylint: disable=all
 
 """This module performs hyperparameter optimization. This involves
-tuning the keys located under Longtail/config/keys. Those key value
-pairs map to hyperparameters used through out the Longtail Classifier.
+tuning the keys located under Meerkat/config/keys. Those key value
+pairs map to hyperparameters used through out the Meerkat Classifier.
 This module utilizes a common method known as grid search. In particular
 we are using randomized optimization as it works better where it
 is resource intensive to exaustively perform a standard grid_search"""
 
-from longtail.description_producer import initialize, tokenize, load_hyperparameters
-from longtail.binary_classifier.load import predict_if_physical_transaction
-from longtail.accuracy import print_results
+from meerkat.description_producer import initialize, tokenize, load_hyperparameters
+from meerkat.binary_classifier.load import predict_if_physical_transaction
+from meerkat.accuracy import print_results
 
 import sys, datetime, os, queue, csv, collections
 from copy import deepcopy

@@ -1,11 +1,11 @@
 from distutils.core import setup
 
-setup(name='Longtail',
+setup(name='Meerkat',
 	version='0.9b1',
 	description='Stuff.',
-	url="https://github.com/joeandrewkey/Longtail",
+	url="https://github.com/joeandrewkey/Meerkat",
 	long_description='Stuff and junk.',
 	author='J. Andrew Key and Matt Sevrens',
 	author_email='joeandrewkey@gmail.com',
-	packages=['longtail', 'longtail.binary_classifier', 'longtail.tools', 'tests'],
+	packages=['meerkat', 'meerkat.binary_classifier', 'meerkat.tools', 'tests'],
 	)

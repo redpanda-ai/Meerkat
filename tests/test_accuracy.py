@@ -1,7 +1,7 @@
-'''Unit tests for longtail.accuracy'''
+'''Unit tests for meerkat.accuracy'''
 
 import unittest, datetime, pprint, json
-from longtail.accuracy import test_accuracy, speed_tests, print_results
+from meerkat.accuracy import test_accuracy, speed_tests, print_results
 
 class AccuracyTests(unittest.TestCase):
 
@@ -24,7 +24,7 @@ class AccuracyTests(unittest.TestCase):
 			"size" : 1
 		},
 		"file" : {
-			"format" : "csv", "path" : "data/output/longtailLabeled.csv"
+			"format" : "csv", "path" : "data/output/meerkatLabeled.csv"
 		}
 	},
 	"elasticsearch" : {

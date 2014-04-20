@@ -1,7 +1,7 @@
-'''Unit tests for longtail.description_producer'''
+'''Unit tests for meerkat.description_producer'''
 
-from longtail import description_producer
-from longtail.custom_exceptions import InvalidArguments, Misconfiguration
+from meerkat import description_producer
+from meerkat.custom_exceptions import InvalidArguments, Misconfiguration
 import unittest, queue, sys, socket, os, json
 
 class TokenizeDescriptionTests(unittest.TestCase):

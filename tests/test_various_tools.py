@@ -1,6 +1,6 @@
-'''Unit test for longtail.various_tools'''
+'''Unit test for meerkat.various_tools'''
 
-import longtail.various_tools
+import meerkat.various_tools
 import numpy as np
 import unittest
 
@@ -32,37 +32,37 @@ class VariousToolsTests(unittest.TestCase):
 		"""string_cleanse test"""
 
 		for chars, no_chars in self.strings:
-			result = longtail.various_tools.string_cleanse(chars)
+			result = meerkat.various_tools.string_cleanse(chars)
 			self.assertEqual(no_chars, result)
 
 	def test_numeric_cleanse(self):
 		"""numeric_cleanse test"""
 		for chars, no_chars in self.numbers:
-			result = longtail.various_tools.numeric_cleanse(chars)
+			result = meerkat.various_tools.numeric_cleanse(chars)
 			self.assertEqual(no_chars, result)
 
 	def test_scale_polygon__centroid(self):
 		"""scale_polygon test that it correctly calculates the centroid"""
 		expect = [[-122.43501617, 37.7759035]]
-		result, _, _, _ = longtail.various_tools.scale_polygon(self.original_polygon, scale = 2.0)
+		result, _, _, _ = meerkat.various_tools.scale_polygon(self.original_polygon, scale = 2.0)
 		self.assertTrue(np.allclose(expect, result, rtol=1e-05, atol=1e-08))
 
 	def test_scale_polygon__scaled_list_of_points(self):
 		"""scale_polygon test that it converts a list of polygon points to a numpy matrix"""
 		expect = self.doubled_original_polygon
-		_, result, _, _ = longtail.various_tools.scale_polygon(self.original_polygon, scale = 2.0)
+		_, result, _, _ = meerkat.various_tools.scale_polygon(self.original_polygon, scale = 2.0)
 		self.assertTrue(np.allclose(np.matrix(expect), np.matrix(result), rtol=1e-05, atol=1e-08))
 
 	def test_scale_polygon__original_matrix(self):
 		"""scale_polygon test that it converts a list of polygon points to a numpy matrix"""
 		expect = np.matrix(self.original_polygon)
-		_, _, result, _ = longtail.various_tools.scale_polygon(self.original_polygon, scale = 2.0)
+		_, _, result, _ = meerkat.various_tools.scale_polygon(self.original_polygon, scale = 2.0)
 		self.assertTrue(np.allclose(expect, result, rtol=1e-05, atol=1e-08))
 
 	def test_scale_polygon__scaled_matrix(self):
 		"""scale_polygon test that it produces a correctly scaled matrix"""
 		expect = np.matrix(self.doubled_original_polygon)
-		_, _, _, result = longtail.various_tools.scale_polygon(self.original_polygon, scale = 2.0)
+		_, _, _, result = meerkat.various_tools.scale_polygon(self.original_polygon, scale = 2.0)
 		self.assertTrue(np.allclose(expect, result, rtol=1e-05, atol=1e-08))
 
 if __name__ == '__main__':

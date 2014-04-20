@@ -1,5 +1,5 @@
 import csv, sys, json
-from longtail.description_consumer import get_qs_query, get_bool_query
+from meerkat.description_consumer import get_qs_query, get_bool_query
 from elasticsearch import Elasticsearch, helpers
 from scipy.stats.mstats import zscore
 from pprint import pprint

@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 
-from longtail.binary_classifier.bay import process_list
-from longtail.custom_exceptions import InvalidArguments
+from meerkat.binary_classifier.bay import process_list
+from meerkat.custom_exceptions import InvalidArguments
 
 import sys, logging
 
