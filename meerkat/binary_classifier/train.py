@@ -5,7 +5,6 @@ Created on Feb 25, 2014
 '''
 
 #!/usr/local/bin/python3
-# pylint: disable=all
 
 import csv, sys, logging, os
 
@@ -19,90 +18,101 @@ from sklearn.pipeline import Pipeline
 from sklearn.externals import joblib
 
 def split_data(labeled_transactions="data/misc/matt_8000_card.csv"):
+	"""Divides the training set into parts for testing and training."""
+	if not os.path.isfile(labeled_transactions):
+		logging.error("Please provide a set of labeled transactions to"\
+			+ "build the classifier on")
 
-    if not os.path.isfile(labeled_transactions):
-        logging.error("Please provide a set of labeled transactions to build the classifier on")
+	transactions = []
+	labels = []
 
-    transactions = []
-    labels = []
+	# Load Data
+	transactions, labels = load_data(transactions, labels, labeled_transactions)
 
-    # Load Data
-    transactions, labels = load_data(transactions, labels, labeled_transactions)
+	# Append More
+	#transactions, labels = load_data(transactions,
+	#labels, "data/misc/verifiedLabeledTrans.csv")
 
-    # Append More
-    #transactions, labels = load_data(transactions, labels, "data/misc/verifiedLabeledTrans.csv")
+	print("NUMBER OF TRANSACTIONS: ", len(transactions))
 
-    print("NUMBER OF TRANSACTIONS: ", len(transactions))
+	# Split into training and testing sets
+	if len(transactions) < 100:
+		logging.error("Not enough labeled data to create a model from")
 
-    # Split into training and testing sets
-    if len(transactions) < 100:
-        logging.error("Not enough labeled data to create a model from")
+	trans_train, trans_test, labels_train,\
+		labels_test = train_test_split(transactions, labels, test_size=0.5)
 
-    trans_train, trans_test, labels_train, labels_test = train_test_split(transactions, labels, test_size=0.5)
-
-    return trans_train, trans_test, labels_train, labels_test
+	return trans_train, trans_test, labels_train, labels_test
 
 def load_data(transactions, labels, file_name, test_size=1):
+	"""Loads human labeled data from a file."""
 
-    HL_file = open(file_name, encoding='utf-8', errors="replace")
-    human_labeled = list(csv.DictReader(HL_file))
-    HL_file.close()
+	human_labeled_file = open(file_name, encoding='utf-8', errors="replace")
+	human_labeled = list(csv.DictReader(human_labeled_file))
+	human_labeled_file.close()
 
-    for i in range(len(human_labeled)):
-        if human_labeled[i]["IS_PHYSICAL_TRANSACTION"] != "" and random() < test_size:
-            transactions.append(human_labeled[i]["DESCRIPTION"])
-            labels.append(human_labeled[i]["IS_PHYSICAL_TRANSACTION"])
+	for i in range(len(human_labeled)):
+		if human_labeled[i]["IS_PHYSICAL_TRANSACTION"] != "" and random() < test_size:
+			transactions.append(human_labeled[i]["DESCRIPTION"])
+			labels.append(human_labeled[i]["IS_PHYSICAL_TRANSACTION"])
 
-    return transactions, labels
+	return transactions, labels
 
 def build_model(trans_train, trans_test, labels_train, labels_test):
+	"""Creates a classifier using the training set and then scores the
+	result."""
 
-    pipeline = Pipeline([
-        ('vect', CountVectorizer()),
-        ('tfidf', TfidfTransformer()),
-        ('clf', SGDClassifier())
-    ])
+	pipeline = Pipeline([
+		('vect', CountVectorizer()),
+		('tfidf', TfidfTransformer()),
+		('clf', SGDClassifier())
+	])
 
-    parameters = {
-        'vect__max_df': (0.05, 0.10, 0.25),
-        'vect__max_features': (1000, 2000, 3000, 4000, 5000),
-        'vect__ngram_range': ((1, 1), (1, 2)),  # unigrams or bigrams
-        'tfidf__use_idf': (True, False),
-        'tfidf__norm': ('l1', 'l2'),
-        'clf__alpha': (0.00001, 0.000001),
-        'clf__penalty': ('l2', 'elasticnet'),
-        'clf__n_iter': (10, 50, 80)
-    }
+	parameters = {
+		'vect__max_df': (0.05, 0.10, 0.25),
+		'vect__max_features': (1000, 2000, 3000, 4000, 5000),
+		'vect__ngram_range': ((1, 1), (1, 2)),  # unigrams or bigrams
+		'tfidf__use_idf': (True, False),
+		'tfidf__norm': ('l1', 'l2'),
+		'clf__alpha': (0.00001, 0.000001),
+		'clf__penalty': ('l2', 'elasticnet'),
+		'clf__n_iter': (10, 50, 80)
+	}
 
-    grid_search = GridSearchCV(pipeline, parameters, n_jobs=-1, verbose=1)
-    grid_search.fit(trans_train, labels_train)
-    score = grid_search.score(trans_test, labels_test)
+	grid_search = GridSearchCV(pipeline, parameters, n_jobs=-1, verbose=1)
+	grid_search.fit(trans_train, labels_train)
+	score = grid_search.score(trans_test, labels_test)
 
-    print("Best score: %0.3f" % grid_search.best_score_)
-    print("Best parameters set:")
-    best_parameters = grid_search.best_estimator_.get_params()
-    for param_name in sorted(parameters.keys()):
-        print("\t%s: %r" % (param_name, best_parameters[param_name]))
+	print("Best score: %0.3f" % grid_search.best_score_)
+	print("Best parameters set:")
+	best_parameters = grid_search.best_estimator_.get_params()
+	for param_name in sorted(parameters.keys()):
+		print("\t%s: %r" % (param_name, best_parameters[param_name]))
 
-    print("Actual Score: " + str(score))
+	print("Actual Score: " + str(score))
 
-    # Save Model
-    joblib.dump(grid_search, 'meerkat/binary_classifier/final.pkl', compress=3)
+	# Save Model
+	joblib.dump(grid_search, 'meerkat/binary_classifier/final.pkl', compress=3)
 
-    test_model("data/misc/matt_8000_card.csv", grid_search)
+	test_model("data/misc/matt_8000_card.csv", grid_search)
 
 def test_model(file_to_test, model):
+	"""Tests our classifier."""
+	transactions, labels = load_data([], [], file_to_test)
+	score = model.score(transactions, labels)
 
-    transactions, labels = load_data([], [], file_to_test)
-    score = model.score(transactions, labels)
+	print(file_to_test, " Score: ", score)
 
-    print(file_to_test, " Score: ", score)
+def run_from_command_line(command_line_arguments):
+	"""Runs the module when invoked from the command line."""
+	if len(command_line_arguments) == 2\
+	and os.path.isfile(command_line_arguments[1]):
+		trans_train, trans_test, labels_train, labels_test =\
+			split_data(labeled_transactions=command_line_arguments[1])
+	else:
+		trans_train, trans_test, labels_train, labels_test = split_data()
+	build_model(trans_train, trans_test, labels_train, labels_test)
 
 if __name__ == "__main__":
+	run_from_command_line(sys.argv)
 
-    if len(sys.argv) == 2 and os.path.isfile(sys.argv[1]):
-        trans_train, trans_test, labels_train, labels_test = split_data(labeled_transactions=sys.argv[1])
-    else:
-        trans_train, trans_test, labels_train, labels_test = split_data()
-
-    build_model(trans_train, trans_test, labels_train, labels_test)
