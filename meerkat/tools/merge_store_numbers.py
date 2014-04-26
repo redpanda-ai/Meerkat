@@ -29,19 +29,21 @@ def find_merchant(store):
 	"""Match document with store number to factual document"""
 
 	fields = ["address", "postcode", "name", "locality", "region"]
-	search_parts = [store["name"], store["address"], store["zip_code"], store["city"], store["state"]]
+	search_parts = [store["address"], store["zip_code"][0:5], store["keywords"], store["city"], store["state"]]
 	factual_id = ""
 
 	# Generate Query
-	query = ", ".join(search_parts)
 	bool_search = get_bool_query(size=45)
 	should_clauses = bool_search["query"]["bool"]["should"]
-	final_query = get_qs_query(query, fields)
-	should_clauses.append(final_query)
+
+	# Multi Field
+	for i in range(len(fields)):
+		sub_query = get_qs_query(search_parts[i], [fields[i]])
+		should_clauses.append(sub_query)
 
 	# Search Index
 	results = search_index(bool_search)
-	score, top_hit = get_top_hit(results)
+	score, top_hit = get_hit(results, 0)
 
 	if score == False:
 		return ""
@@ -51,27 +53,18 @@ def find_merchant(store):
 	formatted = ", ".join(formatted)
 	print("Z-Score: ", score)
 	print("Top Result: ", formatted)
-	print("Query Sent: ", query)
+	print("Query Sent: ", search_parts)
 
-	# Must Be a Walmart or Sams Club
-	if not (top_hit["name"] == "Walmart" or top_hit["name"] == "Sam's Club"):
+	# Must Match Keywords
+	if not (store["keywords"] in top_hit["name"]):
 		return ""	
 
-	# Test House Number
-	result_house_number = top_hit.get("address", "").split(" ")[0]
-	original_house_number = store["address"].split(" ")[0]
-
-	if result_house_number == original_house_number and score > 1:
-		factual_id = top_hit["factual_id"]
-
-	#user_verify = input("Does the Query Match the Result? Y/N: ")
-
-	#if user_verify.lower() == "y":
-	#	factual_id = top_hit["factual_id"]
+	if score > 0.95:
+		return top_hit["factual_id"]
 
 	return factual_id
 
-def get_top_hit(search_results):
+def get_hit(search_results, index):
 
 	# Must have results
 	if search_results['hits']['total'] == 0:
@@ -80,9 +73,9 @@ def get_top_hit(search_results):
 	hits = search_results['hits']['hits']
 	scores = [hit['_score'] for hit in hits]
 	z_score = z_score_delta(scores)
-	top_hit = hits[0]
+	hit = hits[index]
 
-	return z_score, top_hit["_source"]
+	return z_score, hit["_source"]
 
 def update_merchant(factual_id, store):
 	"""Update found merchant with store_number"""
@@ -119,6 +112,7 @@ def run(stores):
 	"""Run the Program"""
 
 	not_found = []
+	total = len(stores)
 
 	# Run Search
 	for i in range(len(stores)):
@@ -129,27 +123,37 @@ def run(stores):
 
 		# Attempt to Update Document
 		if len(factual_id) > 0:
-			status = update_merchant(factual_id, store)
+			status = True
+			pass
+			#status = update_merchant(factual_id, store)
 		else:
-			print("Did Not Merge Store Number ", store["internal_store_number"], " To Index")
+			print("Did Not Merge Store Number ", store["store_number"], " To Index", "\n")
 			not_found.append(store)
+			status = False
 			continue
 
 		# Save Failed Attempts
 		if status == False:
-			print("Did Not Merge Store Number ", store["internal_store_number"], " To Index")
+			print("Did Not Merge Store Number ", store["store_number"], " To Index")
 			not_found.append(store)
 		else:
-			print("Successfully Merged Store Number:", store["internal_store_number"], "into Factual Merchant:", factual_id, "\n")
+			print("Successfully Merged Store Number:", store["store_number"], "into Factual Merchant:", factual_id, "\n")
+
+	# Show Success Rate
+	misses = len(not_found)
+	hits = total - misses
+	print("HITS: ", hits)
+	print("MISSES: ", misses)
+	print("PERCENT MERGED: ", hits / total)
 
 	# Save Not Found
-	save_not_found(not_found)
+	#save_not_found(not_found)
 
 def save_not_found(not_found):
 	"""Save the stores not found in the index"""
 
-	delimiter = "|"
-	output_file = open("no_results.pipe", 'w')
+	delimiter = ","
+	output_file = open("no_results.csv", 'w')
 	dict_w = csv.DictWriter(output_file, delimiter=delimiter, fieldnames=not_found[0].keys())
 	dict_w.writeheader()
 	dict_w.writerows(not_found)
@@ -162,7 +166,6 @@ if __name__ == "__main__":
         , "brainstorm7:9200", "brainstorm8:9200", "brainstorm9:9200", "brainstorma:9200"
         , "brainstormb:9200"]
 	es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True, sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
-	keywords = ["Sams Club", "Walmart"]
-	file_name = "data/misc/Store Numbers/Clean/walmart_store_numbers.csv"
+	file_name = "data/misc/Store Numbers/Dirty/publix_super_markets.csv"
 	stores = load_store_numbers(file_name)
 	run(stores)
