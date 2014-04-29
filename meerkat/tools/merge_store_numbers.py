@@ -80,11 +80,7 @@ def get_hit(search_results, index):
 def update_merchant(factual_id, store):
 	"""Update found merchant with store_number"""
 
-	store_number = store["internal_store_number"]
-	while len(store_number) < 4:
-		store_number = "0" + store_number
-	store_number = "#" + store_number
-
+	store_number = store["store_number"]
 	body = {"doc" : {"internal_store_number" : store_number}}
 
 	try:
@@ -123,13 +119,10 @@ def run(stores):
 
 		# Attempt to Update Document
 		if len(factual_id) > 0:
-			status = True
-			pass
-			#status = update_merchant(factual_id, store)
+			status = update_merchant(factual_id, store)
 		else:
 			print("Did Not Merge Store Number ", store["store_number"], " To Index", "\n")
 			not_found.append(store)
-			status = False
 			continue
 
 		# Save Failed Attempts
@@ -166,6 +159,6 @@ if __name__ == "__main__":
         , "brainstorm7:9200", "brainstorm8:9200", "brainstorm9:9200", "brainstorma:9200"
         , "brainstormb:9200"]
 	es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True, sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
-	file_name = "data/misc/Store Numbers/Dirty/publix_super_markets.csv"
+	file_name = "data/misc/Store Numbers/Clean/top_merchants.csv"
 	stores = load_store_numbers(file_name)
 	run(stores)
