@@ -18,10 +18,18 @@ PUT user_index/transaction/_mapping
 	            "index" : "analyzed", 
 	            "type" : "string"     
 	        },
-			"date" : { 
+			"transaction_date" : { 
 	            "index" : "analyzed", 
 	            "type" : "date"     
 			},
+            "factual_id" : {
+                "index" : "analyzed",
+                "type" : "string"
+            },
+            "description" : {
+                "index" : "analyzed",
+                "type" : "string"
+            },
 			"pin" : { 
 				"properties" : {
 					"location" : {

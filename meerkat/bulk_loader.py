@@ -9,6 +9,7 @@ import sys
 import threading
 
 from datetime import datetime
+from pprint import pprint
 from elasticsearch import Elasticsearch, helpers
 
 from meerkat.custom_exceptions import InvalidArguments, Misconfiguration
@@ -30,8 +31,9 @@ def initialize():
 		logging.error(sys.argv[1] + " not found, aborting.")
 		sys.exit()
 
-	if validate_params(params):
-		logging.warning("Parameters are valid, proceeding.")
+	#if validate_params(params):
+	#	logging.warning("Parameters are valid, proceeding.")
+
 	return params
 
 def load_document_queue(params):
@@ -404,8 +406,42 @@ def guarantee_index_and_doc_type(params):
 			logging.error("Failed to create index, aborting.")
 			sys.exit()
 
+def build_user_index():
+	"""Build out the user index"""
+
+	# Get proper params
+	try:
+		input_file = open("config/user_index.json", encoding='utf-8')
+		params = json.loads(input_file.read())
+		input_file.close()
+	except IOError:
+		logging.info("config file for user_index not found. Continuing on to factual index")
+		return
+
+	# Initialize
+	cluster_nodes = params["elasticsearch"]["cluster_nodes"]
+	index_name = "user_index"
+	es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True,
+		sniff_on_connection_fail=True, sniffer_timeout=5, sniff_timeout=5)
+
+	# Build the Index
+	if es_connection.indices.exists(index=index_name):
+		logging.info("User Index already exists, continuing")
+		return
+	else:
+		logging.warning("User Index does not exist, creating")
+		index_body = params["elasticsearch"]["type_mapping"]
+		result = es_connection.indices.create(index=index_name, body=index_body)
+		okay, acknowledged = result["ok"], result["acknowledged"]
+		if okay and acknowledged:
+			logging.info("User Index created successfully.")
+		else:
+			logging.error("Failed to create user index, aborting.")
+			sys.exit()
+
 if __name__ == "__main__":
 	#Runs the entire program.
+	build_user_index()
 	PARAMS = initialize()
 	logging.warning(json.dumps(PARAMS, sort_keys=True,
 		indent=4, separators=(',', ':')))
