@@ -471,6 +471,8 @@ class DescriptionConsumer(threading.Thread):
 		update_body["date"] = date
 		update_body["_parent"] = self.user_id
 		update_body["z_score_delta"] = transaction["z_score_delta"]
+		update_body["description"] = transaction["DESCRIPTION"]
+		update_body["factual_id"] = transaction["factual_id"]
 		update_body["pin.location"] = {"lon" : coordinates[0], "lat" : coordinates[1]}
 
 		try:
