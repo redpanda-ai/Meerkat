@@ -1,10 +1,10 @@
 {
-    "concurrency" : 6,
+    "concurrency" : 4,
     "verification_source" : "data/misc/matt_8000_card.csv",
     "input" : {
         "hyperparameters" : "config/hyperparameters/default.json",
-        "filename" : "data/input/users.csv",
-        "delimiter" : ",",
+        "filename" : "data/input/users.tab",
+        "delimiter" : "\t",
         "encoding" : "utf-8"
     },
     "logging" : {
@@ -24,9 +24,9 @@
     },
 	"elasticsearch" : {
         "cluster_nodes" : ["brainstorm1:9200", "brainstorm2:9200"
-        , "brainstorm3:9200", "brainstorm4:9200", "brainstorm5:9200", "brainstorm6:9200"
+        , "brainstorm3:9200", "brainstorm5:9200", "brainstorm6:9200"
         , "brainstorm7:9200", "brainstorm8:9200", "brainstorm9:9200", "brainstorma:9200"
-        , "brainstormb:9200", "localhost:9200"],
+        , "brainstormb:9200"],
         "cache_results" : false,
         "index" : "factual_index",
         "type" : "factual_type",

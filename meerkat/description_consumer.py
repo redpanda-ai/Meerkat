@@ -159,7 +159,7 @@ class DescriptionConsumer(threading.Thread):
 		self.boost_row_labels, self.boost_column_vectors =\
 			self.__build_boost_vectors()
 
-	def __first_pass(self):
+	def __text_features(self):
 		"""Classify transactions using text features only"""
 
 		enriched_transactions = []
@@ -175,13 +175,13 @@ class DescriptionConsumer(threading.Thread):
 
 		return enriched_transactions
 
-	def __second_pass(self, first_pass_results):
+	def __text_and_geo_features(self, text_features_results):
 		"""Classify transactions using geo and text features"""
 
-		user_id = first_pass_results[0]['MEM_ID']
+		user_id = text_features_results[0]['MEM_ID']
 		qs_boost = self.hyperparameters.get("qs_boost", "1")
 		name_boost = self.hyperparameters.get("name_boost", "1")
-		hits, non_hits = separate_geo(first_pass_results)
+		hits, non_hits = separate_geo(text_features_results)
 		locations_found = [str(json.loads(hit["pin.location"].replace("'", '"'))["coordinates"]) for hit in hits]
 		unique_locations = set(locations_found)
 		unique_locations = [json.loads(location.replace("'", '"')) for location in unique_locations]
@@ -192,7 +192,7 @@ class DescriptionConsumer(threading.Thread):
 
 		# Use first pass results if no location found
 		if not bool(scaled_geoshapes):
-			return first_pass_results
+			return text_features_results
 
 		# Create Query
 		geo_query = self.__generate_geo_query(scaled_geoshapes)
@@ -216,12 +216,12 @@ class DescriptionConsumer(threading.Thread):
 			enriched_transaction = self.__process_results(search_results, transaction)
 			enriched_transactions.append(enriched_transaction)
 
-		added_second_pass = [trans for trans in enriched_transactions if trans["factual_id"] != ""]
-		second_pass_results = hits + enriched_transactions
+		added_text_and_geo_features = [trans for trans in enriched_transactions if trans["factual_id"] != ""]
+		text_and_geo_features_results = hits + enriched_transactions
 
-		print("ADDED SECOND PASS: " + str(len(added_second_pass)))
+		print("ADDED SECOND PASS: " + str(len(added_text_and_geo_features)))
 			
-		return second_pass_results
+		return text_and_geo_features_results
 
 	def __locate_user(self, unique_locations, user_id):
 		"""Uses first pass results, to find an approximation
@@ -453,6 +453,47 @@ class DescriptionConsumer(threading.Thread):
 
 		return output_data
 
+	def __save_labeled_transactions(self, enriched_transactions):
+		"""Saves the labeled transactions to our user_index"""
+
+		for transaction in enriched_transactions:
+			if transaction["z_score_delta"] > 0 and transaction["pin.location"] != "" and transaction["TRANSACTION_DATE"] != "":
+				self.__save_transaction(transaction)
+
+	def __save_transaction(self, transaction):
+		"""Saves a transaction to the user index"""
+
+		transaction_id = transaction["COBRAND_ID"] + transaction["MEM_ID"] + transaction["CARD_TRANSACTION_ID"]
+		transaction_id_hash = hashlib.md5(transaction_id.encode()).hexdigest()
+		coordinates = json.loads(transaction["pin.location"].replace("'", '"'))["coordinates"]
+		date = transaction["TRANSACTION_DATE"].replace(".","-")
+		update_body = {}
+		update_body["date"] = date
+		update_body["_parent"] = self.user_id
+		update_body["z_score_delta"] = transaction["z_score_delta"]
+		update_body["pin.location"] = {"lon" : coordinates[0], "lat" : coordinates[1]}
+
+		try:
+			result = self.es_connection.index(index="user_index", doc_type="transaction", id=transaction_id_hash, body=update_body, routing=self.user_id)
+		except Exception:
+			logging.critical("Unable to update the following: %s", str(transaction["DESCRIPTION"]))
+			pprint(update_body)
+
+	def __load_past_transactions(self):
+		"""Loads any past transactions if available"""
+
+		# Ensure user is in index
+		index_body = {"user_id" : self.user_id}
+		result = self.es_connection.index(index="user_index", doc_type="user", id=self.user_id, body=index_body)
+
+	def __generate_user_hash(self):
+		"""Generates a user hash that matches the primary id of the user in our user_index"""
+
+		transaction = self.user[0]
+		user_id = transaction["COBRAND_ID"] + transaction["MEM_ID"]
+		user_id_hash = hashlib.md5(user_id.encode()).hexdigest()
+		self.user_id = user_id_hash
+
 	def __get_boosted_fields(self, vector_name):
 		"""Returns a list of boosted fields built from a boost vector"""
 		boost_vector = self.boost_column_vectors[vector_name]
@@ -499,12 +540,17 @@ class DescriptionConsumer(threading.Thread):
 				# Select all transactions from user
 				self.user = self.desc_queue.get()
 
-				# Classify using text features only 
-				results = self.__first_pass()
+				# Get User Hash
+				self.__generate_user_hash()
 
-				# Classify using text and geo features obtained during first pass
-				#enriched_transactions = self.__second_pass(results)
-				enriched_transactions = results
+				# Load Past Transactions
+				self.__load_past_transactions()
+
+				# Classify using text features only 
+				enriched_transactions = self.__text_features()
+
+				# Save results to user_index
+				self.__save_labeled_transactions(enriched_transactions)
 
 				# Output Results to Result Queue
 				self.__output_to_result_queue(enriched_transactions)
