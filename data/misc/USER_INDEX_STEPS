@@ -73,4 +73,17 @@ PUT user_index/transaction/10006164-10000598-687697?routing=6869dbcff0a40bcf50ea
 
 GET ALL TRANSACTIONS FROM A USER
 
-POST user_index/transaction/_search?routing=6869dbcff0a40bcf50ead9a9c53e4766
+POST user_index/transaction/_search?routing=363f689499bf1ecfc49b66d5ee8ee79c
+
+{
+    "query" : {
+        "has_parent" : {
+            "parent_type" : "user",
+            "query" : {
+                "term" : {
+                    "user_id" : "363f689499bf1ecfc49b66d5ee8ee79c"
+                }
+            }
+        }
+    }
+}
