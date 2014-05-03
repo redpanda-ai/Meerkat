@@ -28,10 +28,10 @@ from sklearn.preprocessing import StandardScaler
 from scipy.stats.mstats import zscore
 from pprint import pprint
 
-from meerkat.custom_exceptions import Misconfiguration, UnsupportedQueryType
-from meerkat.various_tools import string_cleanse, scale_polygon
-from meerkat.clustering import cluster, convex_hull, collect_clusters
-from meerkat.location import separate_geo, visualize
+from .custom_exceptions import Misconfiguration, UnsupportedQueryType
+from .various_tools import string_cleanse, scale_polygon
+from .clustering import cluster, convex_hull, collect_clusters
+from .location import separate_geo, visualize
 
 #Helper functions
 def get_bool_query(starting_from = 0, size = 0):
@@ -134,6 +134,8 @@ class DescriptionConsumer(threading.Thread):
 
 		threshold = self.hyperparameters.get("z_score_threshold", "2")
 
+		if z_score_delta is None:
+			return False
 		if z_score_delta > float(threshold):
 			return True
 		else:
