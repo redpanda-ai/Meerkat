@@ -108,7 +108,7 @@ class DescriptionConsumer(threading.Thread):
 
 		if len(scores) < 2:
 			logger.info("Unable to generate Z-Score")
-			return None
+			return 0
 
 		z_scores = zscore(scores)
 		first_score, second_score = z_scores[0:2]
@@ -467,10 +467,11 @@ class DescriptionConsumer(threading.Thread):
 		transaction_id_hash = hashlib.md5(transaction_id.encode()).hexdigest()
 		coordinates = json.loads(transaction["pin.location"].replace("'", '"'))["coordinates"]
 		date = transaction["TRANSACTION_DATE"].replace(".","-")
+		date = date.replace("/", "-")
 		update_body = {}
 		update_body["date"] = date
 		update_body["_parent"] = self.user_id
-		update_body["z_score_delta"] = transaction["z_score_delta"]
+		update_body["z_score_delta"] = str(transaction["z_score_delta"])
 		update_body["description"] = transaction["DESCRIPTION"]
 		update_body["factual_id"] = transaction["factual_id"]
 		update_body["pin.location"] = {"lon" : coordinates[0], "lat" : coordinates[1]}
