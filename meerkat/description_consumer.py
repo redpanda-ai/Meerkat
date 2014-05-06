@@ -316,6 +316,7 @@ class DescriptionConsumer(threading.Thread):
 		logger.info("BUILDING FINAL BOOLEAN SEARCH")
 		bool_search = get_bool_query(size=result_size)
 		bool_search["fields"] = fields
+		bool_search["_source"] = "pin.*"
 		should_clauses = bool_search["query"]["bool"]["should"]
 		field_boosts = self.__get_boosted_fields("standard_fields")
 		simple_query = get_qs_query(transaction, field_boosts, boost)
@@ -347,6 +348,10 @@ class DescriptionConsumer(threading.Thread):
 		hit_fields = top_hit.get("fields", {})
 		business_names = [result.get("fields", {"name" : ""})["name"] for result in hits]
 		ordered_hit_fields = []
+		
+		# Elasticsearch v1.0 bug workaround
+		if top_hit["_source"].get("pin","") != "":
+			top_hit["fields"]["pin.location"] = top_hit["_source"]["pin"]["location"]
 
 		# Collect Relevancy Scores
 		for hit in hits:
