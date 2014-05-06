@@ -148,6 +148,7 @@ class DescriptionConsumer(threading.Thread):
 		self.user = None
 		self.params = params
 		self.hyperparameters = hyperparameters
+		self.cities = self.get_US_cities()
 
 		cluster_nodes = self.params["elasticsearch"]["cluster_nodes"]
 		self.es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True,
@@ -174,6 +175,14 @@ class DescriptionConsumer(threading.Thread):
 			enriched_transactions.append(enriched_transaction)
 
 		return enriched_transactions
+
+	def get_US_cities(self):
+		"""Load an array of US cities"""
+
+		with open("data/misc/US_Cities.txt") as f:
+			cities = f.readlines()
+
+		return cities
 
 	def __text_and_geo_features(self, text_features_results):
 		"""Classify transactions using geo and text features"""
@@ -399,8 +408,10 @@ class DescriptionConsumer(threading.Thread):
 		enriched_transaction = transaction
 		business_names = business_names[0:2]
 		all_equal = business_names.count(business_names[0]) == len(business_names)
+		name_in_transaction = business_names[0].lower() in transaction["DESCRIPTION"].lower()
+		not_a_city = business_names[0].lower() not in self.cities
 
-		if all_equal:
+		if all_equal or (name_in_transaction and not_a_city):
 			enriched_transaction['name'] = business_names[0]
 		
 		return enriched_transaction
