@@ -318,7 +318,7 @@ class DescriptionConsumer(threading.Thread):
 		bool_search = get_bool_query(size=result_size)
 		bool_search["fields"] = fields
 		
-		if self.es_version = "1.0":
+		if self.es_version == "1.0":
 			bool_search["_source"] = "pin.*"
 			
 		should_clauses = bool_search["query"]["bool"]["should"]
@@ -354,7 +354,7 @@ class DescriptionConsumer(threading.Thread):
 		ordered_hit_fields = []
 		
 		# Elasticsearch v1.0 bug workaround
-		if self.es_version = "1.0" and top_hit["_source"].get("pin","") != "":
+		if self.es_version == "1.0" and top_hit["_source"].get("pin","") != "":
 			top_hit["fields"]["pin.location"] = top_hit["_source"]["pin"]["location"]
 
 		# Collect Relevancy Scores
