@@ -182,6 +182,8 @@ class DescriptionConsumer(threading.Thread):
 		with open("data/misc/US_Cities.txt") as f:
 			cities = f.readlines()
 
+		cities = [city.lower().rstrip('\n') for city in cities]
+
 		return cities
 
 	def __text_and_geo_features(self, text_features_results):
