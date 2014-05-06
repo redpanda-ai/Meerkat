@@ -147,6 +147,7 @@ class DescriptionConsumer(threading.Thread):
 		self.result_queue = result_queue
 		self.user = None
 		self.params = params
+		self.es_version = self.params["elasticsearch"].get("version", "1.0")
 		self.hyperparameters = hyperparameters
 		self.cities = self.get_US_cities()
 
@@ -325,7 +326,10 @@ class DescriptionConsumer(threading.Thread):
 		logger.info("BUILDING FINAL BOOLEAN SEARCH")
 		bool_search = get_bool_query(size=result_size)
 		bool_search["fields"] = fields
-		bool_search["_source"] = "pin.*"
+
+		if self.es_version == "1.0":
+			bool_search["_source"] = "pin.*"
+
 		should_clauses = bool_search["query"]["bool"]["should"]
 		field_boosts = self.__get_boosted_fields("standard_fields")
 		simple_query = get_qs_query(transaction, field_boosts, boost)
@@ -354,12 +358,17 @@ class DescriptionConsumer(threading.Thread):
 		scores, fields_found = [], []
 		output_dict = transaction
 		top_hit = hits[0]
-		hit_fields = top_hit.get("fields", {})
+		hit_fields = top_hit.get("fields", "")
 		business_names = [result.get("fields", {"name" : ""})["name"] for result in hits]
+		business_names = [name[0] for name in business_names if type(name) == list]
 		ordered_hit_fields = []
 
+		# If no results return
+		if hit_fields == "":
+			return transaction
+
 		# Elasticsearch v1.0 bug workaround
-		if top_hit["_source"].get("pin","") != "":
+		if self.es_version == "1.0" and top_hit["_source"].get("pin","") != "":
 			top_hit["fields"]["pin.location"] = top_hit["_source"]["pin"]["location"]
 
 		# Collect Relevancy Scores
@@ -414,11 +423,12 @@ class DescriptionConsumer(threading.Thread):
 		fields = self.params["output"]["results"]["fields"]
 		enriched_transaction = transaction
 		business_names = business_names[0:2]
+		top_name = business_names[0].lower()
 		all_equal = business_names.count(business_names[0]) == len(business_names)
 		name_in_transaction = business_names[0].lower() in transaction["DESCRIPTION"].lower()
-		not_a_city = business_names[0].lower() not in self.cities
+		not_a_city = top_name not in self.cities
 
-		if all_equal or (name_in_transaction and not_a_city):
+		if (all_equal and not_a_city) or (name_in_transaction and not_a_city):
 			enriched_transaction['name'] = business_names[0]
 		
 		return enriched_transaction
@@ -475,7 +485,7 @@ class DescriptionConsumer(threading.Thread):
 		"""Saves the labeled transactions to our user_index"""
 
 		for transaction in enriched_transactions:
-			if transaction["z_score_delta"] > 0 and transaction["pin.location"] != "" and transaction["TRANSACTION_DATE"] != "":
+			if transaction.get("z_score_delta", 0) > 0 and transaction["pin.location"] != "" and transaction["TRANSACTION_DATE"] != "":
 				self.__save_transaction(transaction)
 
 	def __save_transaction(self, transaction):
