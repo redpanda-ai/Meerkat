@@ -76,6 +76,12 @@ class DescriptionConsumer(threading.Thread):
 		scores, results, fields_found = [], [], []
 		params = self.params
 		for hit in hits:
+			#Add latitude and longitude
+			if hit["_source"].get("pin","") != "":
+				coordinates = hit["_source"]["pin"]["location"]["coordinates"]
+				if "fields" in hit:
+					hit["fields"]["longitude"] = [coordinates[0]]
+					hit["fields"]["latitude"] = [coordinates[1]]
 			hit_fields, score = hit.get("fields", {}), hit['_score']
 			scores.append(score)
 			field_order = params["output"]["results"]["fields"]
@@ -147,7 +153,7 @@ class DescriptionConsumer(threading.Thread):
 		self.thread_id = thread_id
 		self.desc_queue = desc_queue
 		self.result_queue = result_queue
-		self.es_version = self.params["elasticsearch"].get("version", "1.0")
+		#self.es_version = self.params["elasticsearch"].get("version", "1.0")
 		self.user = None
 		self.params = params
 		self.hyperparameters = hyperparameters
@@ -307,7 +313,8 @@ class DescriptionConsumer(threading.Thread):
 			return
 
 		# Ensure we get mandatory fields
-		mandatory_fields = ["pin.location", "name"]
+		#mandatory_fields = ["pin.location", "name"]
+		mandatory_fields = []
 
 		for field in mandatory_fields:
 			if field not in fields:
@@ -318,8 +325,8 @@ class DescriptionConsumer(threading.Thread):
 		bool_search = get_bool_query(size=result_size)
 		bool_search["fields"] = fields
 		
-		if self.es_version == "1.0":
-			bool_search["_source"] = "pin.*"
+		#if self.es_version == "1.0":
+		bool_search["_source"] = "pin.*"
 			
 		should_clauses = bool_search["query"]["bool"]["should"]
 		field_boosts = self.__get_boosted_fields("standard_fields")
@@ -354,8 +361,10 @@ class DescriptionConsumer(threading.Thread):
 		ordered_hit_fields = []
 		
 		# Elasticsearch v1.0 bug workaround
-		if self.es_version == "1.0" and top_hit["_source"].get("pin","") != "":
-			top_hit["fields"]["pin.location"] = top_hit["_source"]["pin"]["location"]
+		if top_hit["_source"].get("pin","") != "":
+			coordinates = top_hit["_source"]["pin"]["location"]["coordinates"]
+			top_hit["longitude"] = coordinates[0]
+			top_hit["latitude"] = coordinates[1]
 
 		# Collect Relevancy Scores
 		for hit in hits:
@@ -516,6 +525,7 @@ class DescriptionConsumer(threading.Thread):
 				# Classify using text and geo features obtained during first pass
 				#enriched_transactions = self.__second_pass(results)
 				enriched_transactions = results
+				
 
 				# Output Results to Result Queue
 				self.__output_to_result_queue(enriched_transactions)
