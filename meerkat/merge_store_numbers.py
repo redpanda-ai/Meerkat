@@ -159,6 +159,6 @@ if __name__ == "__main__":
         , "brainstorm7:9200", "brainstorm8:9200", "brainstorm9:9200", "brainstorma:9200"
         , "brainstormb:9200"]
 	es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True, sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
-	file_name = "data/misc/Store Numbers/Clean/top_merchants_3.csv"
+	file_name = "data/misc/Store Numbers/Clean/top_merchants.csv"
 	stores = load_store_numbers(file_name)
 	run(stores)
