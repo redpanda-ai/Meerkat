@@ -56,8 +56,7 @@ def get_desc_queue(params):
 		if prediction == "1":
 			physical.append(transaction)
 		elif prediction == "0":
-			physical.append(transaction)
-			#non_physical.append(transaction)
+			non_physical.append(transaction)
 			logging.info("NON-PHYSICAL: %s", description)
 		elif prediction == "2":
 			physical.append(transaction)
@@ -259,20 +258,20 @@ def write_output_to_file(params, output_list, non_physical):
 	file_format = params["output"]["file"].get("format", 'csv')
 
 	# What is the output_list[0]
- 	print("Output_list[0]:\n{0}".format(output_list[0]))	
- 
+	print("Output_list[0]:\n{0}".format(output_list[0]))
+
  	# Get Headers
- 	header = None
- 	with open(params["input"]["filename"], 'r') as infile:
+	header = None
+	with open(params["input"]["filename"], 'r') as infile:
  		header = infile.readline()
- 	
- 	# Split on delimiter into a list
- 	header_list = [token.strip() for token in header.split(params["input"]["delimiter"])]
+
+	# Split on delimiter into a list
+	header_list = [token.strip() for token in header.split(params["input"]["delimiter"])]
 
  	# Get additional fields for display from config file
- 	additional_fields = params["output"]["results"]["fields"] 
- 	all_fields = header_list + additional_fields
- 	print("ALL_FIELDS: {0}".format(all_fields))
+	additional_fields = params["output"]["results"]["fields"]
+	all_fields = header_list + additional_fields
+	print("ALL_FIELDS: {0}".format(all_fields))
 
 	# Output as CSV
 	if file_format == "csv":

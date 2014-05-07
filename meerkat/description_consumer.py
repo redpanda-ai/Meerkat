@@ -25,6 +25,7 @@ import threading
 
 from elasticsearch import Elasticsearch, helpers
 from sklearn.preprocessing import StandardScaler
+from distutils.version import LooseVersion
 from scipy.stats.mstats import zscore
 from pprint import pprint
 
@@ -337,7 +338,7 @@ class DescriptionConsumer(threading.Thread):
 		bool_search = get_bool_query(size=result_size)
 		bool_search["fields"] = fields
 
-		if float(self.es_version) >= 1.0:
+		if LooseVersion(self.es_version) >= LooseVersion("0.90.7"):
 			bool_search["_source"] = "pin.*"
 
 		should_clauses = bool_search["query"]["bool"]["should"]
@@ -378,7 +379,7 @@ class DescriptionConsumer(threading.Thread):
 			return transaction
 
 		# Elasticsearch v1.0 bug workaround
-		if float(self.es_version) > 1.0 and top_hit["_source"].get("pin","") != "":
+		if LooseVersion(self.es_version) >= LooseVersion("0.90.7") and top_hit["_source"].get("pin","") != "":
 			coordinates = top_hit["_source"]["pin"]["location"]["coordinates"]
 			top_hit["longitude"] = coordinates[0]
 			top_hit["latitude"] = coordinates[1]
@@ -497,7 +498,12 @@ class DescriptionConsumer(threading.Thread):
 		"""Saves the labeled transactions to our user_index"""
 
 		for transaction in enriched_transactions:
-			if transaction.get("z_score_delta", 0) > 0 and transaction["pin.location"] != "" and transaction["TRANSACTION_DATE"] != "":
+
+			found_factual = transaction.get("z_score_delta", 0) > 0 
+			geo_available = transaction["latitude"] != "" and transaction["latitude"] != ""
+			has_date = transaction["TRANSACTION_DATE"] != ""
+
+			if found_factual and geo_available and has_date:
 				self.__save_transaction(transaction)
 
 	def __save_transaction(self, transaction):
@@ -505,7 +511,6 @@ class DescriptionConsumer(threading.Thread):
 
 		transaction_id = transaction["COBRAND_ID"] + transaction["MEM_ID"] + transaction["CARD_TRANSACTION_ID"]
 		transaction_id_hash = hashlib.md5(transaction_id.encode()).hexdigest()
-		coordinates = json.loads(transaction["pin.location"].replace("'", '"'))["coordinates"]
 		date = transaction["TRANSACTION_DATE"].replace(".","-")
 		date = date.replace("/", "-")
 		update_body = {}
@@ -514,7 +519,7 @@ class DescriptionConsumer(threading.Thread):
 		update_body["z_score_delta"] = str(transaction["z_score_delta"])
 		update_body["description"] = transaction["DESCRIPTION"]
 		update_body["factual_id"] = transaction["factual_id"]
-		update_body["pin.location"] = {"lon" : coordinates[0], "lat" : coordinates[1]}
+		update_body["pin.location"] = {"lon" : transaction["longitude"], "lat" : transaction["latitude"]}
 
 		try:
 			result = self.es_connection.index(index="user_index", doc_type="transaction", id=transaction_id_hash, body=update_body, routing=self.user_id)
