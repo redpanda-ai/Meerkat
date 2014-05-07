@@ -509,20 +509,19 @@ class DescriptionConsumer(threading.Thread):
 	def __save_transaction(self, transaction):
 		"""Saves a transaction to the user index"""
 
-		transaction_id = transaction["COBRAND_ID"] + transaction["MEM_ID"] + transaction["CARD_TRANSACTION_ID"]
-		transaction_id_hash = hashlib.md5(transaction_id.encode()).hexdigest()
+		transaction_id = transaction["UNIQUE_TRANSACTION_ID"]
 		date = transaction["TRANSACTION_DATE"].replace(".","-")
 		date = date.replace("/", "-")
 		update_body = {}
 		update_body["date"] = date
-		update_body["_parent"] = self.user_id
+		update_body["_parent"] = transaction["UNIQUE_MEM_ID"]
 		update_body["z_score_delta"] = str(transaction["z_score_delta"])
 		update_body["description"] = transaction["DESCRIPTION"]
 		update_body["factual_id"] = transaction["factual_id"]
 		update_body["pin.location"] = {"lon" : transaction["longitude"], "lat" : transaction["latitude"]}
 
 		try:
-			result = self.es_connection.index(index="user_index", doc_type="transaction", id=transaction_id_hash, body=update_body, routing=self.user_id)
+			result = self.es_connection.index(index="user_index", doc_type="transaction", id=transaction_id, body=update_body, routing=transaction["UNIQUE_MEM_ID"])
 		except Exception:
 			logging.critical("Unable to update the following: %s", str(transaction["DESCRIPTION"]))
 			pprint(update_body)
@@ -531,16 +530,9 @@ class DescriptionConsumer(threading.Thread):
 		"""Loads any past transactions if available"""
 
 		# Ensure user is in index
-		index_body = {"user_id" : self.user_id}
-		result = self.es_connection.index(index="user_index", doc_type="user", id=self.user_id, body=index_body)
-
-	def __generate_user_hash(self):
-		"""Generates a user hash that matches the primary id of the user in our user_index"""
-
-		transaction = self.user[0]
-		user_id = transaction["COBRAND_ID"] + transaction["MEM_ID"]
-		user_id_hash = hashlib.md5(user_id.encode()).hexdigest()
-		self.user_id = user_id_hash
+		unique_member_id = self.user[0]["UNIQUE_MEM_ID"]
+		index_body = {"user_id" : unique_member_id}
+		result = self.es_connection.index(index="user_index", doc_type="user", id=unique_member_id, body=index_body)
 
 	def __get_boosted_fields(self, vector_name):
 		"""Returns a list of boosted fields built from a boost vector"""
@@ -587,9 +579,6 @@ class DescriptionConsumer(threading.Thread):
 			try:
 				# Select all transactions from user
 				self.user = self.desc_queue.get()
-
-				# Get User Hash
-				self.__generate_user_hash()
 
 				# Load Past Transactions
 				self.__load_past_transactions()
