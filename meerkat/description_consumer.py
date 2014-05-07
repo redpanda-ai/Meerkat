@@ -500,8 +500,8 @@ class DescriptionConsumer(threading.Thread):
 		for transaction in enriched_transactions:
 
 			found_factual = transaction.get("z_score_delta", 0) > 0 
-			geo_available = transaction["latitude"] != "" and transaction["latitude"] != ""
-			has_date = transaction["TRANSACTION_DATE"] != ""
+			geo_available = transaction.get("longitude", "") != "" and transaction.get("latitude", "") != ""
+			has_date = transaction.get("TRANSACTION_DATE", "") != ""
 
 			if found_factual and geo_available and has_date:
 				self.__save_transaction(transaction)
