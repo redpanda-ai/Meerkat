@@ -14,6 +14,7 @@ class TokenizeDescriptionTests(unittest.TestCase):
 	"input" : {
 		"hyperparameters" : "config/hyperparameters/made_up_key_name.json",
 		"filename" : "data/input/100_bank_transaction_descriptions.csv",
+		"delimiter" : ",",
 		"encoding" : "utf-8"
 	},
 	"logging" : {
@@ -24,19 +25,19 @@ class TokenizeDescriptionTests(unittest.TestCase):
 	},
 	"output" : {
 		"results" : {
-			"fields" : ["BUSINESSSTANDARDNAME", "HOUSE", "PREDIR", "PERSISTENTRECORDID"],
-			"size" : 10
-		},
+            "fields" : ["name", "chain_id", "category_labels", "address", "locality", "region", "postcode", "website", "tel", "chain_name", "latitude", "longitude", "neighborhood", "factual_id"],
+            "labels" : ["BUSINESS_NAME", "STORE_ID", "FACTUAL_CATEGORY", "STREET", "CITY", "STATE", "ZIP_CODE", "WEBSITE", "PHONE_NUMBER", "CHAIN_NAME", "LATITUDE", "LONGITUDE", "NEIGHBORHOOD", "FACTUAL_ID"]
+        },
 		"file" : {
 			"format" : "csv",
 			"path" : "data/input/unittestDeletable.csv"
 		}
 	},
 	"elasticsearch" : {
-		"cluster_nodes" : ["brainstorm0:9200", "brainstorm1:9200", "brainstorm2:9200"
-		, "brainstorm3:9200", "brainstorm4:9200", "brainstorm5:9200", "brainstorm6:9200"
-		, "brainstorm7:9200", "brainstorm8:9200", "brainstorm9:9200", "brainstorma:9200"
-		, "brainstormb:9200"],
+		"cluster_nodes" : ["s0:9200", "s1:9200", "s2:9200"
+		, "s3:9200", "s4:9200", "s5:9200", "s6:9200"
+		, "s7:9200", "s8:9200", "s9:9200", "s10:9200"
+		, "s11:9200"],
 		"index" : "new_index",
 		"type" : "new_type",
 		"subqueries" : {

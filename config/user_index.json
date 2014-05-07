@@ -6,10 +6,10 @@
 		"console" : false
 	},
 	"elasticsearch" : {
-		"cluster_nodes" : ["brainstorm1:9200", "brainstorm2:9200"
-        , "brainstorm3:9200", "brainstorm5:9200", "brainstorm6:9200"
-        , "brainstorm7:9200", "brainstorm8:9200", "brainstorm9:9200", "brainstorma:9200"
-        , "brainstormb:9200"],
+		"cluster_nodes" : ["s0:9200", "s1:9200", "s2:9200"
+        , "s3:9200", "s5:9200", "s6:9200"
+        , "s7:9200", "s8:9200", "s9:9200", "s10:9200"
+        , "s11:9200"],
 		"index" : "user_index",
 		"type" : "user",
 		"type_mapping" : {
@@ -35,6 +35,10 @@
 			                "type" : "string"     
 			            },
 			            "factual_id" : {
+			                "index" : "analyzed",
+			                "type" : "string"
+			            },
+			            "business_name" : {
 			                "index" : "analyzed",
 			                "type" : "string"
 			            },
