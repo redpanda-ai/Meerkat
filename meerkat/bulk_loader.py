@@ -31,8 +31,8 @@ def initialize():
 		logging.error(sys.argv[1] + " not found, aborting.")
 		sys.exit()
 
-	#if validate_params(params):
-	#	logging.warning("Parameters are valid, proceeding.")
+	if validate_params(params):
+		logging.warning("Parameters are valid, proceeding.")
 
 	return params
 
