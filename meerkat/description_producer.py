@@ -172,19 +172,19 @@ def tokenize(params, desc_queue, hyperparameters, non_physical):
 		logging.critical("Not configured for file output.")
 
 	# Test Accuracy
-	accuracy_results = test_accuracy(params, result_list=result_list, non_physical_trans=non_physical)
-	print_results(accuracy_results)
+	#accuracy_results = test_accuracy(params, result_list=result_list, non_physical_trans=non_physical)
+	#print_results(accuracy_results)
 
 	# Do Speed Tests
-	speed_tests(start_time, accuracy_results)
+	#speed_tests(start_time, accuracy_results)
 
 	# Save the Cache
-	save_pickle_cache(params)
+	#save_pickle_cache(params)
 
 	# Shutdown Loggers
 	logging.shutdown()
 
-	return accuracy_results
+	#return accuracy_results
 
 def save_pickle_cache(params):
 
@@ -256,14 +256,40 @@ def write_output_to_file(params, output_list, non_physical):
 	file_name = params["output"]["file"].get("path", '../data/output/meerkatLabeled.csv')
 	file_format = params["output"]["file"].get("format", 'csv')
 
+	#What is the output_list[0]
+	print("Output_list[0]:\n{0}".format(output_list[0]))	
+
+	#Get Headers
+	header = None
+	with open(params["input"]["filename"], 'r') as infile:
+		header = infile.readline()
+	
+	#Split on delimiter into a list
+	#header_list = header.split(params["input"]["delimiter"])
+	header_list = [token.strip() for token in header.split(params["input"]["delimiter"])]
+	#print("HEADER: {0}".format(header))		
+	#print("HEADER_LIST: {0}".format(header_list))		
+
+	#get additional fields for display from config file
+	additional_fields = params["output"]["results"]["fields"]
+	#print("ADDITONAL_FIELDS: {0}".format(additional_fields))
+
+	all_fields = header_list + additional_fields
+	print("ALL_FIELDS: {0}".format(all_fields))
 	# Output as CSV
 	if file_format == "csv":
 		delimiter = params["output"]["file"].get("delimiter", ',')
-		output_file = open(file_name, 'w')
-		dict_w = csv.DictWriter(output_file, delimiter=delimiter, fieldnames=output_list[0].keys())
-		dict_w.writeheader()
-		dict_w.writerows(output_list)
-		output_file.close()
+
+		new_header_list = header_list + params["output"]["results"]["labels"]
+		new_header = delimiter.join(new_header_list)
+		with open(file_name, 'w') as output_file:
+			output_file.write(new_header + "\n")
+		with open(file_name, 'a') as output_file:
+			output_file = open(file_name, 'a')
+			dict_w = csv.DictWriter(output_file, delimiter=delimiter, fieldnames=all_fields, extrasaction='ignore')
+			#dict_w.writeheader()
+			dict_w.writerows(output_list)
+			#output_file.close()
 
 	# Output as JSON
 	if file_format == "json":

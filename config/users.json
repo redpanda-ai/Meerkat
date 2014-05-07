@@ -1,10 +1,10 @@
 {
-    "concurrency" : 6,
+    "concurrency" : 24,
     "verification_source" : "data/misc/matt_8000_card.csv",
     "input" : {
         "hyperparameters" : "config/hyperparameters/default.json",
-        "filename" : "data/input/users.csv",
-        "delimiter" : ",",
+        "filename" : "data/input/20140503_YODLEE_CARD_PANEL_UNMASKED.txt",
+        "delimiter" : "|",
         "encoding" : "utf-8"
     },
     "logging" : {
@@ -15,18 +15,30 @@
     },
     "output" : {
         "results" : {
-            "fields" : ["name", "composite.address", "factual_id", "locality", "po_box", "email"]
+            "fields" : ["name", "chain_id", "category_labels", "address", "locality", "region", "postcode", "website", "tel", "chain_name", "latitude", "longitude", "neighborhood", "factual_id"],
+            "labels" : ["BUSINESS_NAME", "STORE_ID", "FACTUAL_CATEGORY", "STREET", "CITY", "STATE", "ZIP_CODE", "WEBSITE", "PHONE_NUMBER", "CHAIN_NAME", "LATITUDE", "LONGITUDE", "NEIGHBORHOOD", "FACTUAL_ID"] 
         },
         "file" : {
             "format" : "csv",
-            "path" : "data/output/longtailLabeled.csv"
+            "path" : "data/output/20140503_YODLEE_CARD_PANEL_MEERKAT.txt",
+	    "delimiter" : "|"
         }
     },
 	"elasticsearch" : {
-        "cluster_nodes" : ["brainstorm1:9200", "brainstorm2:9200"
-        , "brainstorm3:9200", "brainstorm4:9200", "brainstorm5:9200", "brainstorm6:9200"
-        , "brainstorm7:9200", "brainstorm8:9200", "brainstorm9:9200", "brainstorma:9200"
-        , "brainstormb:9200", "localhost:9200"],
+        "cluster_nodes" : [
+		"s0:9200",
+		"s1:9200",
+		"s2:9200",
+		"s3:9200",
+		"s4:9200",
+		"s5:9200",
+		"s6:9200",
+		"s7:9200",
+		"s8:9200",
+		"s9:9200",
+		"s10:9200",
+		"s11:9200"
+	],
         "cache_results" : false,
         "index" : "factual_index",
         "type" : "factual_type",
