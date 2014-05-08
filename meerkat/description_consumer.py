@@ -25,7 +25,6 @@ import threading
 
 from elasticsearch import Elasticsearch, helpers
 from sklearn.preprocessing import StandardScaler
-from distutils.version import LooseVersion
 from scipy.stats.mstats import zscore
 from pprint import pprint
 
@@ -157,7 +156,6 @@ class DescriptionConsumer(threading.Thread):
 		self.result_queue = result_queue
 		self.user = None
 		self.params = params
-		self.es_version = self.params["elasticsearch"].get("version", "1.0")
 		self.hyperparameters = hyperparameters
 		self.cities = self.get_US_cities()
 
@@ -337,9 +335,7 @@ class DescriptionConsumer(threading.Thread):
 		logger.info("BUILDING FINAL BOOLEAN SEARCH")
 		bool_search = get_bool_query(size=result_size)
 		bool_search["fields"] = fields
-
-		if LooseVersion(self.es_version) >= LooseVersion("0.90.7"):
-			bool_search["_source"] = "pin.*"
+		bool_search["_source"] = "pin.*"
 
 		should_clauses = bool_search["query"]["bool"]["should"]
 		field_boosts = self.__get_boosted_fields("standard_fields")
@@ -379,7 +375,7 @@ class DescriptionConsumer(threading.Thread):
 			return transaction
 
 		# Elasticsearch v1.0 bug workaround
-		if LooseVersion(self.es_version) >= LooseVersion("0.90.7") and top_hit["_source"].get("pin","") != "":
+		if top_hit["_source"].get("pin","") != "":
 			coordinates = top_hit["_source"]["pin"]["location"]["coordinates"]
 			top_hit["longitude"] = coordinates[0]
 			top_hit["latitude"] = coordinates[1]

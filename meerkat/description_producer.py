@@ -281,9 +281,6 @@ def write_output_to_file(params, output_list, non_physical):
 
 		with open(file_name, 'w') as output_file:
 			output_file.write(new_header + "\n")
-
-		with open(file_name, 'a') as output_file:
-			output_file = open(file_name, 'a')
 			dict_w = csv.DictWriter(output_file, delimiter=delimiter, fieldnames=all_fields, extrasaction='ignore')
 			dict_w.writerows(output_list)
 
