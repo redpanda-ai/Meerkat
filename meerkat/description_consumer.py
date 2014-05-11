@@ -9,7 +9,6 @@ Created on Jan 14, 2014
 # pylint: disable=R0914
 
 import copy
-import datetime
 import hashlib
 import itertools
 import json
