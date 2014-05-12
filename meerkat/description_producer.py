@@ -51,6 +51,7 @@ def get_desc_queue(params):
 		description = transaction["DESCRIPTION"]
 		prediction = predict_if_physical_transaction(description)
 		transaction["IS_PHYSICAL_TRANSACTION"] = prediction
+		print(description + ": " + prediction)
 		if prediction == "1":
 			physical.append(transaction)
 		elif prediction == "0":
