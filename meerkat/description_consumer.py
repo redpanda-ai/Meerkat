@@ -102,7 +102,9 @@ class DescriptionConsumer(threading.Thread):
 			ordered_hit_fields = []
 			for ordinal in field_order:
 				if ordinal in fields_in_hit:
-					my_field = hit_fields[ordinal][0] if isinstance(hit_fields[ordinal], (list)) else str(hit_fields[ordinal])
+					my_field = (hit_fields[ordinal][0]\
+						if isinstance(hit_fields[ordinal], (list))\
+						else str(hit_fields[ordinal]))
 					fields_found.append(ordinal)
 					ordered_hit_fields.append(my_field)
 				else:
@@ -158,7 +160,8 @@ class DescriptionConsumer(threading.Thread):
 		else:
 			return False
 
-	def __init__(self, thread_id, params, desc_queue, result_queue, hyperparameters):
+	def __init__(self, thread_id, params, desc_queue, result_queue,\
+		hyperparameters):
 		''' Constructor '''
 		threading.Thread.__init__(self)
 		self.thread_id = thread_id
@@ -202,9 +205,17 @@ class DescriptionConsumer(threading.Thread):
 		qs_boost = self.hyperparameters.get("qs_boost", "1")
 		name_boost = self.hyperparameters.get("name_boost", "1")
 		hits, non_hits = separate_geo(text_features_results)
-		locations_found = [str(json.loads(hit["pin.location"].replace("'", '"'))["coordinates"]) for hit in hits]
+
+		locations_found = [
+		str(json.loads(hit["pin.location"].replace("'", '"'))["coordinates"])
+		for hit in hits]
+
 		unique_locations = set(locations_found)
-		unique_locations = [json.loads(location.replace("'", '"')) for location in unique_locations]
+
+		unique_locations = [
+		json.loads(location.replace("'", '"'))
+		for location in unique_locations]
+
 		enriched_transactions = []
 
 		# Locate user
@@ -234,7 +245,9 @@ class DescriptionConsumer(threading.Thread):
 			enriched_transaction = self.__process_results(search_results, transaction)
 			enriched_transactions.append(enriched_transaction)
 
-		added_text_and_geo_features = [trans for trans in enriched_transactions if trans["factual_id"] != ""]
+		added_text_and_geo_features = [trans for trans in enriched_transactions
+		if trans["factual_id"] != ""]
+
 		text_and_geo_features_results = hits + enriched_transactions
 
 		print("ADDED SECOND PASS: " + str(len(added_text_and_geo_features)))
@@ -260,10 +273,12 @@ class DescriptionConsumer(threading.Thread):
 				scaled_points = StandardScaler().fit_transform(unique_locations)
 				labels = [0 for i in range(len(unique_locations))]
 				labels = np.array(labels)
-				original_geoshapes = collect_clusters(scaled_points, labels, unique_locations)
+				original_geoshapes = collect_clusters(scaled_points,\
+					labels, unique_locations)
 
 			# Scale generated geo shapes
-			scaled_geoshapes = [scale_polygon(geoshape, scale=scaling_factor)[1] for geoshape in original_geoshapes]
+			scaled_geoshapes = [scale_polygon(geoshape, scale=scaling_factor)[1]
+			for geoshape in original_geoshapes]
 			# Save interesting outputs needs to run in it's own process
 			#if len(unique_locations) >= 3:
 			#	pool = multiprocessing.Pool()
@@ -400,7 +415,8 @@ class DescriptionConsumer(threading.Thread):
 		business_names = business_names[0:2]
 		top_name = business_names[0].lower()
 		all_equal = business_names.count(business_names[0]) == len(business_names)
-		name_in_transaction = business_names[0].lower() in transaction["DESCRIPTION"].lower()
+		name_in_transaction =\
+			business_names[0].lower() in transaction["DESCRIPTION"].lower()
 		not_a_city = top_name not in self.cities
 
 		if (all_equal and not_a_city) or (name_in_transaction and not_a_city):
@@ -432,7 +448,8 @@ class DescriptionConsumer(threading.Thread):
 					#FIXME: 'input_hash' variable is undefined, this does not work!
 					self.params["search_cache"][input_hash] = output_data
 			except Exception:
-				logging.critical("Unable to process the following: %s", str(input_as_object))
+				logging.critical("Unable to process the following: %s",\
+					str(input_as_object))
 				output_data = {"hits":{"total":0}}
 
 		self.my_meta["metrics"]["query_count"] += 1
@@ -458,7 +475,8 @@ class DescriptionConsumer(threading.Thread):
 		"""Saves the labeled transactions to our user_index"""
 		for transaction in enriched_transactions:
 			found_factual = transaction.get("z_score_delta", 0) > 0
-			geo_available = transaction.get("longitude", "") != "" and transaction.get("latitude", "") != ""
+			geo_available = transaction.get("longitude", "") != ""\
+				and transaction.get("latitude", "") != ""
 			has_date = transaction.get("TRANSACTION_DATE", "") != ""
 			if found_factual and geo_available and has_date:
 				self.__save_transaction(transaction)
@@ -481,9 +499,12 @@ class DescriptionConsumer(threading.Thread):
 		}
 
 		try:
-			_ = self.es_connection.index(index="user_index", doc_type="transaction", id=transaction_id, body=update_body, routing=transaction["UNIQUE_MEM_ID"])
+			_ = self.es_connection.index(index="user_index",\
+				doc_type="transaction", id=transaction_id, body=update_body,\
+				routing=transaction["UNIQUE_MEM_ID"])
 		except Exception:
-			logging.critical("Unable to update the following: %s", str(transaction["DESCRIPTION"]))
+			logging.critical("Unable to update the following: %s",\
+				str(transaction["DESCRIPTION"]))
 			pprint(update_body)
 
 	def __load_past_transactions(self):
@@ -491,13 +512,15 @@ class DescriptionConsumer(threading.Thread):
 		# Ensure user is in index
 		unique_member_id = self.user[0]["UNIQUE_MEM_ID"]
 		index_body = {"user_id" : unique_member_id}
-		_ = self.es_connection.index(index="user_index", doc_type="user", id=unique_member_id, body=index_body)
+		_ = self.es_connection.index(index="user_index",\
+			doc_type="user", id=unique_member_id, body=index_body)
 
 	def __get_boosted_fields(self, vector_name):
 		"""Returns a list of boosted fields built from a boost vector"""
 		boost_vector = self.boost_column_vectors[vector_name]
-		fields = [x + "^" + str(y) for x, y in zip(self.boost_row_labels, boost_vector) if y != 0.0]
-		return fields
+		return [x + "^" + str(y)
+		for x, y in zip(self.boost_row_labels, boost_vector)
+		if y != 0.0]
 
 	def __set_logger(self):
 		"""Creates a logger, based upon the supplied config object."""
