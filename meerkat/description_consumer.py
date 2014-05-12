@@ -88,7 +88,7 @@ class DescriptionConsumer(threading.Thread):
 
 		for hit in hits:
 			# Add Latitude and Longitude
-			if hit["_source"].get("pin", "") != "":
+			if hit.get("_source", {}).get("pin", "") != "":
 				coordinates = hit["_source"]["pin"]["location"]["coordinates"]
 				if "fields" in hit:
 					hit["fields"]["longitude"] = [coordinates[0]]
