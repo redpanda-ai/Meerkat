@@ -1,55 +1,70 @@
 {
-    "concurrency" : 24,
-    "verification_source" : "data/misc/matt_8000_card.csv",
-    "input" : {
-        "hyperparameters" : "config/hyperparameters/default.json",
-        "filename" : "data/input/20140503_YODLEE_CARD_PANEL_UNMASKED.txt",
-        "delimiter" : "|",
-        "encoding" : "utf-8"
-    },
-    "logging" : {
-        "level" : "critical",
-        "path" : "logs/foo.log",
-        "formatter" : "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        "console" : true
-    },
-    "output" : {
-        "results" : {
-            "fields" : ["name", "chain_id", "category_labels", "address", "locality", "region", "postcode", "website", "tel", "chain_name", "latitude", "longitude", "neighborhood", "factual_id"],
-            "labels" : ["BUSINESS_NAME", "STORE_ID", "FACTUAL_CATEGORY", "STREET", "CITY", "STATE", "ZIP_CODE", "WEBSITE", "PHONE_NUMBER", "CHAIN_NAME", "LATITUDE", "LONGITUDE", "NEIGHBORHOOD", "FACTUAL_ID"]
-        },
-        "file" : {
-            "format" : "csv",
-            "path" : "data/output/20140503_YODLEE_CARD_PANEL_MEERKAT.txt",
-            "delimiter" : "|"
-        }
-    },
+	"concurrency" : 24,
+	"verification_source" : "data/misc/matt_8000_card.csv",
+	"input" : {
+		"hyperparameters" : "config/hyperparameters/default.json",
+		"filename" : "data/input/20140503_YODLEE_CARD_PANEL_UNMASKED.txt",
+		"delimiter" : "|",
+		"encoding" : "utf-8"
+	},
+	"logging" : {
+		"level" : "critical",
+		"path" : "logs/foo.log",
+		"formatter" : "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+		"console" : true
+	},
+	"output" : {
+		"results" : {
+			"fields" : [
+				"name", "chain_id", "category_labels", "address", "locality",
+				"region", "postcode", "website", "tel", "chain_name",
+				"latitude", "longitude", "neighborhood", "factual_id"],
+			"labels" : [
+				"BUSINESS_NAME", "STORE_ID", "FACTUAL_CATEGORY", "STREET", "CITY",
+				"STATE", "ZIP_CODE", "WEBSITE", "PHONE_NUMBER", "CHAIN_NAME",
+				"LATITUDE", "LONGITUDE", "NEIGHBORHOOD", "FACTUAL_ID"]
+		},
+		"file" : {
+			"format" : "csv",
+			"path" : "data/output/20140503_YODLEE_CARD_PANEL_MEERKAT.txt",
+			"delimiter" : "|"
+		}
+	},
 	"elasticsearch" : {
-        "cluster_nodes" : ["s0:9200", "s1:9200", "s2:9200"
-        , "s3:9200", "s5:9200", "s6:9200"
-        , "s7:9200", "s8:9200", "s9:9200", "s10:9200"
-        , "s11:9200"],
-        "version" : "1.1.1",
-        "cache_results" : false,
-        "index" : "factual_index",
-        "type" : "factual_type",
-        "boost_labels" : ["standard_fields"],
-        "boost_vectors" :  {
-            "address": [0.541],
-            "address_extended": [1.282],
-            "admin_region": [0.69],
-            "category_labels": [1.319],
-            "chain_name": [0.999],
-            "email": [0.516],
-            "internal_store_number": [1.9],
-            "locality": [1.367],
-            "name": [2.781],
-            "neighborhood": [0.801],
-            "po_box": [1.292],
-            "post_town": [0.577],
-            "postcode": [0.914],
-            "region": [1.685],
-            "tel": [0.597]
-        }
-    }
+		"cluster_nodes" : [
+		"s0:9200",
+		"s1:9200",
+		"s2:9200",
+		"s3:9200",
+		"s4:9200",
+		"s5:9200",
+		"s6:9200",
+		"s7:9200",
+		"s8:9200",
+		"s9:9200",
+		"s10:9200",
+		"s11:9200"
+	],
+		"cache_results" : false,
+		"index" : "factual_index",
+		"type" : "factual_type",
+		"boost_labels" : ["standard_fields"],
+		"boost_vectors" :  {
+			"address": [0.541],
+			"address_extended": [1.282],
+			"admin_region": [0.69],
+			"category_labels": [1.319],
+			"chain_name": [0.999],
+			"email": [0.516],
+			"internal_store_number": [1.9],
+			"locality": [1.367],
+			"name": [2.781],
+			"neighborhood": [0.801],
+			"po_box": [1.292],
+			"post_town": [0.577],
+			"postcode": [0.914],
+			"region": [1.685],
+			"tel": [0.597]
+		}
+	}
 }

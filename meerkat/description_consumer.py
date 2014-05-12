@@ -87,14 +87,12 @@ class DescriptionConsumer(threading.Thread):
 		params = self.params
 
 		for hit in hits:
-
 			# Add Latitude and Longitude
 			if hit["_source"].get("pin", "") != "":
 				coordinates = hit["_source"]["pin"]["location"]["coordinates"]
 				if "fields" in hit:
 					hit["fields"]["longitude"] = [coordinates[0]]
 					hit["fields"]["latitude"] = [coordinates[1]]
-
 			hit_fields, score = hit.get("fields", {}), hit['_score']
 			scores.append(score)
 			field_order = params["output"]["results"]["fields"]
@@ -155,6 +153,8 @@ class DescriptionConsumer(threading.Thread):
 
 		threshold = self.hyperparameters.get("z_score_threshold", "2")
 
+		if z_score_delta is None:
+			return False
 		if z_score_delta > float(threshold):
 			return True
 		else:
@@ -311,19 +311,12 @@ class DescriptionConsumer(threading.Thread):
 		# Input transaction must not be empty
 		if len(transaction) <= 2 and re.match('^[a-zA-Z0-9_]+$', transaction):
 			return
-		# Ensure we get mandatory fields
-		#mandatory_fields = ["pin.location", "name"]
-		mandatory_fields = []
-		for field in mandatory_fields:
-			if field not in fields:
-				fields.append(field)
 
 		# Construct Main Query
 		logger.info("BUILDING FINAL BOOLEAN SEARCH")
 		bool_search = get_bool_query(size=result_size)
 		bool_search["fields"] = fields
 		bool_search["_source"] = "pin.*"
-
 		should_clauses = bool_search["query"]["bool"]["should"]
 		field_boosts = self.__get_boosted_fields("standard_fields")
 		simple_query = get_qs_query(transaction, field_boosts, boost)
