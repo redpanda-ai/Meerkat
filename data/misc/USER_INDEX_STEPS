@@ -1,0 +1,97 @@
+RUN BULK LOADER WITH user_index.json
+
+ADD TRANSACTION MAPPING
+
+PUT user_index/transaction/_mapping
+
+{
+    "transaction" : {
+        "_parent" : {
+			"type" : "user"
+		},
+		"properties": {
+			 "z_score_delta" : { 
+	            "index" : "analyzed", 
+	            "type" : "float"     
+			},
+	        "transaction_id" : {
+	            "index" : "analyzed", 
+	            "type" : "string"     
+	        },
+			"transaction_date" : { 
+	            "index" : "analyzed", 
+	            "type" : "date"     
+			},
+            "factual_id" : {
+                "index" : "analyzed",
+                "type" : "string"
+            },
+            "description" : {
+                "index" : "analyzed",
+                "type" : "string"
+            },
+			"pin" : { 
+				"properties" : {
+					"location" : {
+						"type" : "geo_shape", 
+						"tree" : "quadtree", 
+						"precision" : "1m"
+					}
+				}
+			}   
+		}
+	}			
+}
+
+LOAD SOME USERS
+
+PUT user_index/user/6869dbcff0a40bcf50ead9a9c53e4766
+{
+    "user_id" : "6869dbcff0a40bcf50ead9a9c53e4766"
+}
+
+PUT user_index/user/204ed8518a89d34b4823045d1b1a4699
+{
+    "user_id" : "204ed8518a89d34b4823045d1b1a4699"
+}
+
+LOAD SOME TRANSACTIONS
+
+PUT user_index/transaction/10006164-10000598-687695?routing=6869dbcff0a40bcf50ead9a9c53e4766
+{
+    "_parent" : "6869dbcff0a40bcf50ead9a9c53e4766",
+    "date" : "2014-03-15",
+    "z_score_delta" : "4.195",
+    "pin.location" : {
+        "lat" : "37.554411",
+        "lon" : "-122.167553"
+    }
+}
+
+PUT user_index/transaction/10006164-10000598-687697?routing=6869dbcff0a40bcf50ead9a9c53e4766
+{
+    "_parent" : "6869dbcff0a40bcf50ead9a9c53e4766",
+    "date" : "2014-03-14",
+    "z_score_delta" : "5.102",
+    "pin.location" : {
+        "lat" : "37.557411",
+        "lon" : "-122.167593"
+    }
+}
+
+GET ALL TRANSACTIONS FROM A USER
+
+POST user_index/transaction/_search?routing=363f689499bf1ecfc49b66d5ee8ee79c
+
+{
+    "query" : {
+        "has_parent" : {
+            "parent_type" : "user",
+            "query" : {
+                "term" : {
+                    "user_id" : "363f689499bf1ecfc49b66d5ee8ee79c"
+                }
+            }
+        }
+    }
+}

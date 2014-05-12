@@ -93,5 +93,3 @@ def string_cleanse(original_string):
 	cleanse_pattern = re.compile(bad_character_regex)
 	with_spaces = re.sub(cleanse_pattern, " ", original_string)
 	return ' '.join(with_spaces.split())
-
-

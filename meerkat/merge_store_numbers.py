@@ -140,7 +140,7 @@ def run(stores):
 	print("PERCENT MERGED: ", hits / total)
 
 	# Save Not Found
-	#save_not_found(not_found)
+	save_not_found(not_found)
 
 def save_not_found(not_found):
 	"""Save the stores not found in the index"""

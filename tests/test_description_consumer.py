@@ -34,10 +34,10 @@ class DescriptionConsumerTests(unittest.TestCase):
 		}
 	},
 	"elasticsearch" : {
-		"cluster_nodes" : ["brainstorm0:9200", "brainstorm1:9200", "brainstorm2:9200"
-		, "brainstorm3:9200", "brainstorm4:9200", "brainstorm5:9200", "brainstorm6:9200"
-		, "brainstorm7:9200", "brainstorm8:9200", "brainstorm9:9200", "brainstorma:9200"
-		, "brainstormb:9200"],
+		"cluster_nodes" : ["s0:9200", "s1:9200", "s2:9200"
+		, "s3:9200", "s4:9200", "s5:9200", "s6:9200"
+		, "s7:9200", "s8:9200", "s9:9200", "s10:9200"
+		, "s11:9200"],
 		"index" : "factual_index", "type" : "factual_type",
 		"boost_labels" : [ "standard_fields", "composite.address" ],
 		"boost_vectors" : {
@@ -94,7 +94,7 @@ class DescriptionConsumerTests(unittest.TestCase):
 		"""Ensure that list containing one score, returns None for z_score"""
 		scores = [0]
 		result = self.my_consumer._DescriptionConsumer__generate_z_score_delta(scores)
-		self.assertEqual(result,None)
+		self.assertEqual(result, 0)
 
 	def test_generate_z_score_delta(self):
 		"""Ensure that list containing [3, 2, 1], returns 1.225 for z_score"""

@@ -1,0 +1,71 @@
+{
+	"logging" : {
+		"level" : "info",
+		"path" : "logs/logs.log",
+		"formatter" : "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+		"console" : false
+	},
+	"elasticsearch" : {
+		"cluster_nodes" : ["s0:9200", "s1:9200", "s2:9200"
+        , "s3:9200", "s5:9200", "s6:9200"
+        , "s7:9200", "s8:9200", "s9:9200", "s10:9200"
+        , "s11:9200"],
+		"index" : "user_index",
+		"type" : "user",
+		"type_mapping" : {
+			"mappings" : {
+				"user" : {
+        			"properties" : {
+            			"user_id" : {
+            				"type" : "string"
+            			}
+        			}
+   				},
+   				"transaction" : {
+   					"_parent" : {
+			    		"type" : "user"
+					},
+					"properties" : {
+						"z_score_delta" : { 
+			                "index" : "analyzed", 
+			                "type" : "float"     
+			    		},
+			            "transaction_id" : {
+			                "index" : "analyzed", 
+			                "type" : "string"     
+			            },
+			            "factual_id" : {
+			                "index" : "analyzed",
+			                "type" : "string"
+			            },
+			            "business_name" : {
+			                "index" : "analyzed",
+			                "type" : "string"
+			            },
+			            "description" : {
+			                "index" : "analyzed",
+			                "type" : "string"
+			            },
+						"date" : { 
+			                "index" : "analyzed", 
+			                "type" : "date"     
+			    		},
+						"pin" : { 
+							"properties" : {
+								"location" : {
+									"type" : "geo_shape", 
+									"tree" : "quadtree", 
+									"precision" : "1m"
+								}
+							}
+						}
+			        }    
+				}
+			},
+			"settings" : {
+				"number_of_replicas" : 1,
+				"number_of_shards" : 12
+			}
+		}
+	}
+}

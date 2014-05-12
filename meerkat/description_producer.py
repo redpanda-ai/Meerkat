@@ -1,5 +1,4 @@
 #!/usr/local/bin/python3
-# pylint: disable=C0301
 
 """This script scans, tokenizes, and constructs queries to match transaction
 description strings (unstructured data) to merchant data indexed with
@@ -20,19 +19,17 @@ import pickle
 import queue
 import sys
 
-from pprint import pprint
-from operator import itemgetter
-from meerkat.custom_exceptions import InvalidArguments, Misconfiguration
-from meerkat.description_consumer import DescriptionConsumer
-from meerkat.binary_classifier.load import predict_if_physical_transaction
-from meerkat.various_tools import load_dict_list
-from meerkat.accuracy import test_accuracy, print_results, speed_tests
+from .custom_exceptions import InvalidArguments, Misconfiguration
+from .description_consumer import DescriptionConsumer
+from .binary_classifier.load import predict_if_physical_transaction
+from .various_tools import load_dict_list
+from .accuracy import test_accuracy, print_results, speed_tests
 
 def get_desc_queue(params):
 	"""Opens a file of descriptions, one per line, and load a description
 	queue."""
 
-	lines, filename, encoding = None, None, None
+	filename, encoding = None, None
 	physical, non_physical, atm = [], [], []
 	users = collections.defaultdict(list)
 	desc_queue = queue.Queue()
@@ -41,7 +38,8 @@ def get_desc_queue(params):
 		filename = params["input"]["filename"]
 		encoding = params["input"]["encoding"]
 		delimiter = params["input"].get("delimiter", "|")
-		transactions = load_dict_list(filename, encoding=encoding, delimiter=delimiter)
+		transactions = load_dict_list(filename, encoding=encoding,\
+			delimiter=delimiter)
 	except IOError:
 		logging.critical("Invalid ['input']['filename'] key; Input file: %s"
 			" cannot be found. Correct your config file.", filename)
@@ -52,6 +50,7 @@ def get_desc_queue(params):
 		transaction['factual_id'] = ""
 		description = transaction["DESCRIPTION"]
 		prediction = predict_if_physical_transaction(description)
+		transaction["IS_PHYSICAL_TRANSACTION"] = prediction
 		if prediction == "1":
 			physical.append(transaction)
 		elif prediction == "0":
@@ -63,11 +62,11 @@ def get_desc_queue(params):
 
 	# Split into user buckets
 	for row in physical:
-		user = row.get("MEM_ID", "")
+		user = row.get("UNIQUE_MEM_ID", "")
 		users[user].append(row)
 
 	# Add Users to Queue
-	for key, value in users.items():
+	for key, _ in users.items():
 		desc_queue.put(users[key])
 
 	atm_percent = (len(atm) / len(transactions)) * 100
@@ -131,8 +130,8 @@ def load_pickle_cache(params):
 	"""Loads the Pickled Cache"""
 
 	try:
-		with open("search_cache.pickle", 'rb') as f:
-			params["search_cache"] = pickle.load(f)
+		with open("search_cache.pickle", 'rb') as client_cache_file:
+			params["search_cache"] = pickle.load(client_cache_file)
 	except IOError:
 		logging.critical("search_cache.pickle not found, starting anyway.")
 
@@ -153,10 +152,11 @@ def tokenize(params, desc_queue, hyperparameters, non_physical):
 	# Run the Classifier
 	consumer_threads = params.get("concurrency", 8)
 	result_queue = queue.Queue()
-	start_time = datetime.datetime.now()
+	#start_time = datetime.datetime.now()
 
 	for i in range(consumer_threads):
-		new_consumer = DescriptionConsumer(i, params, desc_queue, result_queue, hyperparameters)
+		new_consumer = DescriptionConsumer(i, params, desc_queue,\
+			result_queue, hyperparameters)
 		new_consumer.setDaemon(True)
 		new_consumer.start()
 	desc_queue.join()
@@ -187,7 +187,7 @@ def tokenize(params, desc_queue, hyperparameters, non_physical):
 	#return accuracy_results
 
 def save_pickle_cache(params):
-
+	"""Saves search results into a picked file."""
 	use_cache = params["elasticsearch"].get("cache_results", True)
 
 	if use_cache == False:
@@ -202,8 +202,8 @@ def save_pickle_cache(params):
 
 	# Pickle the search_cache
 	logging.critical("Begin Pickling.")
-	with open('search_cache.pickle', 'wb') as f:
-		pickle.dump(params["search_cache"], f, pickle.HIGHEST_PROTOCOL)
+	with open('search_cache.pickle', 'wb') as client_cache_file:
+		pickle.dump(params["search_cache"], client_cache_file, pickle.HIGHEST_PROTOCOL)
 	logging.critical("Pickling complete.")
 
 def usage():
@@ -236,7 +236,8 @@ def validate_params(params):
 	if "filename" not in params["input"]:
 		raise Misconfiguration(msg="Misconfiguration: missing key, 'input.filename'", expr=None)
 	if "encoding" not in params["input"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'input.encoding'", expr=None)
+		raise Misconfiguration(msg="Misconfiguration: missing key, 'input.encoding'",\
+			expr=None)
 	return True
 
 def write_output_to_file(params, output_list, non_physical):
@@ -253,43 +254,38 @@ def write_output_to_file(params, output_list, non_physical):
 	output_list = output_list + non_physical
 
 	# Get File Save Info
-	file_name = params["output"]["file"].get("path", '../data/output/meerkatLabeled.csv')
+	file_name = params["output"]["file"].get("path",\
+		'../data/output/meerkatLabeled.csv')
 	file_format = params["output"]["file"].get("format", 'csv')
 
-	#What is the output_list[0]
-	print("Output_list[0]:\n{0}".format(output_list[0]))	
+	# What is the output_list[0]
+	print("Output_list[0]:\n{0}".format(output_list[0]))
 
-	#Get Headers
+ 	# Get Headers
 	header = None
 	with open(params["input"]["filename"], 'r') as infile:
 		header = infile.readline()
-	
-	#Split on delimiter into a list
-	#header_list = header.split(params["input"]["delimiter"])
-	header_list = [token.strip() for token in header.split(params["input"]["delimiter"])]
-	#print("HEADER: {0}".format(header))		
-	#print("HEADER_LIST: {0}".format(header_list))		
 
-	#get additional fields for display from config file
+	# Split on delimiter into a list
+	split_header = header.split(params["input"]["delimiter"])
+	header_list = [token.strip() for token in split_header]
+
+ 	# Get additional fields for display from config file
 	additional_fields = params["output"]["results"]["fields"]
-	#print("ADDITONAL_FIELDS: {0}".format(additional_fields))
-
 	all_fields = header_list + additional_fields
 	print("ALL_FIELDS: {0}".format(all_fields))
+
 	# Output as CSV
 	if file_format == "csv":
 		delimiter = params["output"]["file"].get("delimiter", ',')
-
 		new_header_list = header_list + params["output"]["results"]["labels"]
 		new_header = delimiter.join(new_header_list)
+
 		with open(file_name, 'w') as output_file:
 			output_file.write(new_header + "\n")
-		with open(file_name, 'a') as output_file:
-			output_file = open(file_name, 'a')
-			dict_w = csv.DictWriter(output_file, delimiter=delimiter, fieldnames=all_fields, extrasaction='ignore')
-			#dict_w.writeheader()
+			dict_w = csv.DictWriter(output_file, delimiter=delimiter,\
+				fieldnames=all_fields, extrasaction='ignore')
 			dict_w.writerows(output_list)
-			#output_file.close()
 
 	# Output as JSON
 	if file_format == "json":
