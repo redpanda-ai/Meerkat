@@ -9,4 +9,4 @@ def predict_if_physical_transaction(description=None):
 	return result
 
 # Load Classifier
-GRID_SEARCH = joblib.load('meerkat/binary_classifier/final.pkl')
+GRID_SEARCH = joblib.load('meerkat/binary_classifier/final_card.pkl')
