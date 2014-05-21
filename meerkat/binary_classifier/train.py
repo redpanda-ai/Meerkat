@@ -40,7 +40,7 @@ def split_data(labeled_transactions="data/misc/matt_8000_card.csv"):
 		logging.error("Not enough labeled data to create a model from")
 
 	trans_train, trans_test, labels_train,\
-		labels_test = train_test_split(transactions, labels, test_size=0.5)
+		labels_test = train_test_split(transactions, labels, test_size=0.2)
 
 	return trans_train, trans_test, labels_train, labels_test
 
@@ -48,7 +48,7 @@ def load_data(transactions, labels, file_name, test_size=1):
 	"""Loads human labeled data from a file."""
 
 	human_labeled_file = open(file_name, encoding='utf-8', errors="replace")
-	human_labeled = list(csv.DictReader(human_labeled_file))
+	human_labeled = list(csv.DictReader(human_labeled_file, delimiter='\t'))
 	human_labeled_file.close()
 
 	for i in range(len(human_labeled)):
@@ -69,17 +69,17 @@ def build_model(trans_train, trans_test, labels_train, labels_test):
 	])
 
 	parameters = {
-		'vect__max_df': (0.05, 0.10, 0.25),
-		'vect__max_features': (1000, 2000, 3000, 4000, 5000),
-		'vect__ngram_range': ((1, 1), (1, 2)),  # unigrams or bigrams
+		'vect__max_df': (0.05, 0.10, 0.25, 0.5),
+		'vect__max_features': (1000, 2000, 3000, 4000, 5000, 6000),
+		'vect__ngram_range': ((1, 1), (1,2)),  # unigrams or bigrams
 		'tfidf__use_idf': (True, False),
 		'tfidf__norm': ('l1', 'l2'),
-		'clf__alpha': (0.00001, 0.000001),
+		'clf__alpha': (0.00001, 0.0000055, 0.000001),
 		'clf__penalty': ('l2', 'elasticnet'),
 		'clf__n_iter': (10, 50, 80)
 	}
 
-	grid_search = GridSearchCV(pipeline, parameters, n_jobs=-1, verbose=1)
+	grid_search = GridSearchCV(pipeline, parameters, n_jobs=-1, verbose=1, cv=4)
 	grid_search.fit(trans_train, labels_train)
 	score = grid_search.score(trans_test, labels_test)
 
@@ -92,9 +92,9 @@ def build_model(trans_train, trans_test, labels_train, labels_test):
 	print("Actual Score: " + str(score))
 
 	# Save Model
-	joblib.dump(grid_search, 'meerkat/binary_classifier/final.pkl', compress=3)
+	joblib.dump(grid_search, 'meerkat/binary_classifier/final_bank.pkl', compress=3)
 
-	test_model("data/misc/matt_8000_card.csv", grid_search)
+	test_model("data/misc/10K_Bank.txt", grid_search)
 
 def test_model(file_to_test, model):
 	"""Tests our classifier."""

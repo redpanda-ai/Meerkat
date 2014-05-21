@@ -304,6 +304,7 @@ class DescriptionConsumer(threading.Thread):
 		params = self.params
 		result_size = self.hyperparameters.get("es_result_size", "10")
 		fields = params["output"]["results"]["fields"]
+		good_description = transaction["GOOD_DESCRIPTION"]
 		transaction = string_cleanse(transaction["DESCRIPTION"]).rstrip()
 
 		# If we're using masked data, remove anything with 3 X's or more
@@ -321,6 +322,11 @@ class DescriptionConsumer(threading.Thread):
 		field_boosts = self.__get_boosted_fields("standard_fields")
 		simple_query = get_qs_query(transaction, field_boosts, boost)
 		should_clauses.append(simple_query)
+
+		# Hack Names
+		if good_description != "":
+			name_query = get_qs_query(good_description, ['name'], 2)
+			should_clauses.append(name_query)
 
 		return bool_search
 
@@ -342,11 +348,22 @@ class DescriptionConsumer(threading.Thread):
 		scores = []
 		top_hit = hits[0]
 		hit_fields = top_hit.get("fields", "")
-		business_names = [result.get("fields", {"name" : ""})["name"] for result in hits]
-		business_names = [name[0] for name in business_names if type(name) == list]
-
+		
 		# If no results return
 		if hit_fields == "":
+			return transaction
+
+		# Collect Business Names
+		business_names = [result.get("fields", {"name" : ""})["name"] for result in hits]
+		business_names = [name[0] for name in business_names if type(name) == list]
+		
+		# Need Names
+		if len(business_names) < 2:
+			return transaction
+
+		# City Names Cause issues
+		if business_names[0] in self.cities:
+			print("City Name: ", business_names[0], " omitted as result")
 			return transaction
 
 		# Elasticsearch v1.0 bug workaround
@@ -391,6 +408,9 @@ class DescriptionConsumer(threading.Thread):
 			enriched_transaction = self.__business_name_fallback(business_names, transaction)
 			enriched_transaction["z_score_delta"] = 0
 
+		# Remove Good Description
+		enriched_transaction["GOOD_DESCRIPTION"] = ""
+
 		return enriched_transaction
 
 	def __output_to_result_queue(self, enriched_transactions):
@@ -412,8 +432,12 @@ class DescriptionConsumer(threading.Thread):
 			business_names[0].lower() in transaction["DESCRIPTION"].lower()
 		not_a_city = top_name not in self.cities
 
-		if (all_equal and not_a_city) or (name_in_transaction and not_a_city):
+		if (all_equal and not_a_city):
 			enriched_transaction['name'] = business_names[0]
+
+		if enriched_transaction['GOOD_DESCRIPTION'] != "":
+			enriched_transaction['name'] = enriched_transaction['GOOD_DESCRIPTION']
+
 		return enriched_transaction
 
 	def __reset_my_meta(self):
@@ -562,7 +586,7 @@ class DescriptionConsumer(threading.Thread):
 				enriched_transactions = self.__text_features()
 
 				# Save results to user_index
-				self.__save_labeled_transactions(enriched_transactions)
+				#self.__save_labeled_transactions(enriched_transactions)
 
 				# Output Results to Result Queue
 				self.__output_to_result_queue(enriched_transactions)

@@ -270,6 +270,7 @@ def write_output_to_file(params, output_list, non_physical):
 	# Split on delimiter into a list
 	split_header = header.split(params["input"]["delimiter"])
 	header_list = [token.strip() for token in split_header]
+	header_list.append("IS_PHYSICAL_TRANSACTION")
 
  	# Get additional fields for display from config file
 	additional_fields = params["output"]["results"]["fields"]
@@ -281,6 +282,7 @@ def write_output_to_file(params, output_list, non_physical):
 		delimiter = params["output"]["file"].get("delimiter", ',')
 		new_header_list = header_list + params["output"]["results"]["labels"]
 		new_header = delimiter.join(new_header_list)
+		new_header = new_header.replace("GOOD_DESCRIPTION", "NON_PHYSICAL_TRANSACTION")
 
 		with open(file_name, 'w') as output_file:
 			output_file.write(new_header + "\n")
