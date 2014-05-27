@@ -1,13 +1,15 @@
+#!/usr/local/bin/python3
+
 """
 Created on Mar 11, 2014
 @author: Matt Sevrens
 
-Please add something meaningful about this module to the doc-string
+A script that tests the accuracy of a previously generated
+model using a provided human labeled file
+
 """
 
-#!/usr/local/bin/python3
-import os
-import sys
+import os, sys
 
 from meerkat.binary_classifier.train import load_data
 from sklearn.externals import joblib
