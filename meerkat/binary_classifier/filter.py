@@ -48,6 +48,7 @@ def classify(classifier, description):
 	or non physical"""
 
 	result = list(classifier.predict([description]))[0]
+	print(description, " : ", result)
 
 	return result
 
@@ -75,7 +76,7 @@ def verify_arguments():
 if __name__ == "__main__":
 
 	verify_arguments()
-	transactions = load_dict_list(sys.argv[3], delimiter="\t")
+	transactions = load_dict_list(sys.argv[3])
 	filtered_transactions = filter_transactions(transactions)
 	basepath = splitext(basename(sys.argv[3]))[0]
 	category = sys.argv[2]
