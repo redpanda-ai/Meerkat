@@ -18,6 +18,14 @@ def load_dict_list(file_name, encoding='utf-8', delimiter="|"):
 	input_file.close()
 	return dict_list
 
+def write_dict_list(dict_list, file_name, encoding="utf-8", delimiter="|"):
+	""" Saves a lists of dicts with uniform keys to file """
+
+	with open(file_name, 'w') as output_file:
+		dict_w = csv.DictWriter(output_file, delimiter=delimiter, fieldnames=dict_list[0].keys(), extrasaction='ignore')
+		dict_w.writeheader()
+		dict_w.writerows(dict_list)
+
 def numeric_cleanse(original_string):
 	"""Strips out characters that might confuse ElasticSearch."""
 	bad_characters = [r"\[", r"\]", r"'", r"\{", r"\}", r'"', r"/", r"-"]
@@ -88,8 +96,22 @@ def string_cleanse(original_string):
 	original_string = original_string.replace("OR", "or")
 	original_string = original_string.replace("AND", "and")
 	bad_characters = [r"\[", r"\]", r"\{", r"\}", r'"', r"/", r"\\", r"\:",
-		r"\(", r"\)", r"-", r"\+", r">", r"!", r"\*", r"\|\|", r"&&", r"~"]
+		r"\(", r"\)", r"-", r"\+", r">", r"!", r"\*", r"\|\|", r"&&", r"~", r"[0-9]"]
 	bad_character_regex = "|".join(bad_characters)
 	cleanse_pattern = re.compile(bad_character_regex)
 	with_spaces = re.sub(cleanse_pattern, " ", original_string)
 	return ' '.join(with_spaces.split())
+
+def synonyms(transaction):
+	"""Replaces transactions tokens with manually
+	mapped factual representations"""
+
+	rep = {
+		"WAL-MART" : "Walmart",
+		"SAMSCLUB" : "Sam's Club"
+	}
+
+	rep = dict((re.escape(k), v) for k, v in rep.items())
+	pattern = re.compile("|".join(rep.keys()))
+	text = pattern.sub(lambda m: rep[re.escape(m.group(0))], transaction)
+
