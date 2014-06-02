@@ -81,6 +81,6 @@ if __name__ == "__main__":
 	basepath = splitext(basename(sys.argv[3]))[0]
 	category = sys.argv[2]
 	file_suffix = "_non_physical.txt" if category == "0" else "_physical.txt"
-	output_folder = "data/output/"
+	output_folder = "/mnt/ephemeral"
 	output_file = output_folder + basepath + file_suffix
 	write_dict_list(filtered_transactions, output_file)

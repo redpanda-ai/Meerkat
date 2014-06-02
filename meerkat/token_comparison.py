@@ -19,7 +19,7 @@ def random_sample(corpus, sample_size):
 
 def vectorize(corpus):
 	"""Takes a bag of words approach to vectorizing our text corpus"""
-	vectorizer = CountVectorizer(min_df=0.005, max_df=0.95, ngram_range=(1,1))
+	vectorizer = CountVectorizer(min_df=500, ngram_range=(1,1))
 	countVector = vectorizer.fit_transform(corpus).toarray()
 	num_samples, num_features = countVector.shape
 	vocab = vectorizer.get_feature_names()
@@ -84,9 +84,9 @@ def compareTokens(dataset_a, dataset_b):
 if __name__ == "__main__":
 
 	# Load Files from Datasets
-	factual_merchants = load_dict_list("/home/ec2-user/1.5_Million_Factual.txt", delimiter="\t")
+	factual_merchants = load_dict_list("/mnt/ephemeral/Factual_1.5_Million.txt", delimiter="\t")
 	factual_merchants = [string_cleanse(merchant["address"] + " " + merchant["name"] + " " + merchant["region"] + " " + merchant["locality"]) for merchant in factual_merchants]
-	transactions = load_dict_list("/media/ephemeral0/unmasked_panels/writable_place/20140410_YODLEE_CARD_PANEL_UNMASKED_physical.txt")
+	transactions = load_dict_list("/mnt/ephemeral/20140415_YODLEE_CARD_PANEL_UNMASKED_physical.txt")
 	transactions = [string_cleanse(transaction["DESCRIPTION"]) for transaction in transactions]
 	
 	# TODO Strip numbers

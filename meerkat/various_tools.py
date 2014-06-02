@@ -96,7 +96,7 @@ def string_cleanse(original_string):
 	original_string = original_string.replace("OR", "or")
 	original_string = original_string.replace("AND", "and")
 	bad_characters = [r"\[", r"\]", r"\{", r"\}", r'"', r"/", r"\\", r"\:",
-		r"\(", r"\)", r"-", r"\+", r">", r"!", r"\*", r"\|\|", r"&&", r"~", r"[0-9]"]
+		r"\(", r"\)", r"-", r"\+", r">", r"!", r"\*", r"\|\|", r"&&", r"~"]
 	bad_character_regex = "|".join(bad_characters)
 	cleanse_pattern = re.compile(bad_character_regex)
 	with_spaces = re.sub(cleanse_pattern, " ", original_string)
@@ -108,7 +108,8 @@ def synonyms(transaction):
 
 	rep = {
 		"WAL-MART" : "Walmart",
-		"SAMSCLUB" : "Sam's Club"
+		"SAMSCLUB" : "Sam's Club",
+		"USPS" : "US Post Office"
 	}
 
 	rep = dict((re.escape(k), v) for k, v in rep.items())
