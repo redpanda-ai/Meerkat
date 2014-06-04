@@ -6,7 +6,6 @@ ElasticSearch (structured data).
 
 @author: J. Andrew Key
 @author: Matthew Sevrens
-
 """
 
 import csv
@@ -262,7 +261,7 @@ def write_output_to_file(params, output_list, non_physical):
 	# What is the output_list[0]
 	print("Output_list[0]:\n{0}".format(output_list[0]))
 
- 	# Get Headers
+	# Get Headers
 	header = None
 	with open(params["input"]["filename"], 'r') as infile:
 		header = infile.readline()
