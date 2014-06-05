@@ -22,7 +22,7 @@ from sklearn.preprocessing import StandardScaler
 from scipy.stats.mstats import zscore
 from pprint import pprint
 
-from .various_tools import string_cleanse, scale_polygon
+from .various_tools import string_cleanse, scale_polygon, synonyms
 from .clustering import cluster, collect_clusters
 from .location import separate_geo
 
@@ -307,11 +307,12 @@ class DescriptionConsumer(threading.Thread):
 		good_description = transaction["GOOD_DESCRIPTION"]
 		transaction = string_cleanse(transaction["DESCRIPTION"]).rstrip()
 
-		# If we're using masked data, remove anything with 3 X's or more
-		transaction = re.sub("X{3,}", "", transaction)
 		# Input transaction must not be empty
 		if len(transaction) <= 2 and re.match('^[a-zA-Z0-9_]+$', transaction):
 			return
+
+		# Replace synonyms
+		transaction = synonyms(transaction)
 
 		# Construct Main Query
 		logger.info("BUILDING FINAL BOOLEAN SEARCH")
