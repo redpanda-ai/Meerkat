@@ -88,7 +88,11 @@ def update_merchant(factual_id, store):
 	except Exception:
 		print("Failed to Update Merchant")
 
-	return output_data["ok"]
+	print(output_data.get("_id", ""))
+
+	status = True if output_data.get("_id", "") != "" else False
+
+	return status
 
 def search_index(query):
 	"""Searches the merchants index and the merchant mapping"""
@@ -154,10 +158,27 @@ def save_not_found(not_found):
 
 if __name__ == "__main__":
 
-	cluster_nodes = ["brainstorm0:9200", "brainstorm1:9200", "brainstorm2:9200"
-        , "brainstorm3:9200", "brainstorm4:9200", "brainstorm5:9200", "brainstorm6:9200"
-        , "brainstorm7:9200", "brainstorm8:9200", "brainstorm9:9200", "brainstorma:9200"
-        , "brainstormb:9200"]
+	cluster_nodes = [
+                "s01:9200",
+                "s02:9200",
+                "s03:9200",
+                "s04:9200",
+                "s05:9200",
+                "s06:9200",
+                "s07:9200",
+                "s08:9200",
+                "s09:9200",
+                "s10:9200",
+                "s11:9200",
+                "s12:9200",
+                "s13:9200",
+                "s14:9200",
+                "s15:9200",
+                "s16:9200",
+                "s17:9200",
+                "s18:9200"
+    ]
+
 	es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True, sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
 	file_name = "data/misc/Store Numbers/Clean/top_merchants.csv"
 	stores = load_store_numbers(file_name)

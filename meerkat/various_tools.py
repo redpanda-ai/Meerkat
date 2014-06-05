@@ -107,12 +107,26 @@ def synonyms(transaction):
 	mapped factual representations"""
 
 	rep = {
-		"WAL-MART" : "Walmart",
-		"SAMSCLUB" : "Sam's Club",
-		"USPS" : "US Post Office"
+		"wal-mart" : "Walmart",
+		"samsclub" : "Sam's Club",
+		"usps" : "US Post Office",
+		"qps" : "",
+		"q03" : "",
+		"lowes" : "Lowe's",
+		"wholefds" : "Whole Foods",
+		"Shell Oil" : "Shell Gas",
+		"wm supercenter" : "Walmart",
+		"exxonmobil" : "exxonmobil exxon mobil",
+		"mcdonalds" : "mcdonald's",
+		"costco whse" : "costco",
+		"franciscoca" : "francisco ca"
 	}
 
+	transaction = transaction.lower()
 	rep = dict((re.escape(k), v) for k, v in rep.items())
 	pattern = re.compile("|".join(rep.keys()))
 	text = pattern.sub(lambda m: rep[re.escape(m.group(0))], transaction)
+	
+	return text
+
 

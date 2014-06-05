@@ -19,7 +19,7 @@ def random_sample(corpus, sample_size):
 
 def vectorize(corpus):
 	"""Takes a bag of words approach to vectorizing our text corpus"""
-	vectorizer = CountVectorizer(min_df=500, ngram_range=(1,1))
+	vectorizer = CountVectorizer(min_df=50, ngram_range=(1,1))
 	countVector = vectorizer.fit_transform(corpus).toarray()
 	num_samples, num_features = countVector.shape
 	vocab = vectorizer.get_feature_names()
@@ -90,6 +90,10 @@ if __name__ == "__main__":
 	transactions = [string_cleanse(transaction["DESCRIPTION"]) for transaction in transactions]
 	
 	# TODO Strip numbers
+
+	# Sub Sample
+	factual_merchants = random_sample(factual_merchants, 25000)
+	transactions = random_sample(transactions, 25000)
 
 	# Run Analysis
 	factual_tokens = vectorize(factual_merchants)
