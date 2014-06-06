@@ -22,20 +22,19 @@ import sys
 from .custom_exceptions import InvalidArguments, Misconfiguration
 from .description_consumer import DescriptionConsumer
 from .binary_classifier.load import predict_if_physical_transaction
-from .various_tools import load_dict_list
+from .various_tools import load_dict_list, split_csv
 from .accuracy import test_accuracy, print_results, speed_tests
 
-def get_desc_queue(params):
+def get_desc_queue(filename, params):
 	"""Opens a file of descriptions, one per line, and load a description
 	queue."""
 
-	filename, encoding = None, None
+	encoding = None
 	physical, non_physical, atm = [], [], []
 	users = collections.defaultdict(list)
 	desc_queue = queue.Queue()
 
 	try:
-		filename = params["input"]["filename"]
 		encoding = params["input"]["encoding"]
 		delimiter = params["input"].get("delimiter", "|")
 		transactions = load_dict_list(filename, encoding=encoding,\
@@ -73,11 +72,11 @@ def get_desc_queue(params):
 	non_physical_percent = (len(non_physical) / len(transactions)) * 100
 	physical_percent = (len(physical) / len(transactions)) * 100
 
-	print("")
-	print("PHYSICAL: ", round(physical_percent, 2), "%")
-	print("NON-PHYSICAL: ", round(non_physical_percent, 2), "%")
-	print("ATM: ", round(atm_percent, 2), "%")
-	print("")
+	#print("")
+	#print("PHYSICAL: ", round(physical_percent, 2), "%")
+	#print("NON-PHYSICAL: ", round(non_physical_percent, 2), "%")
+	#print("ATM: ", round(atm_percent, 2), "%")
+	#print("")
 
 	return desc_queue, non_physical
 
@@ -259,7 +258,7 @@ def write_output_to_file(params, output_list, non_physical):
 	file_format = params["output"]["file"].get("format", 'csv')
 
 	# What is the output_list[0]
-	print("Output_list[0]:\n{0}".format(output_list[0]))
+	#print("Output_list[0]:\n{0}".format(output_list[0]))
 
  	# Get Headers
 	header = None
@@ -273,7 +272,7 @@ def write_output_to_file(params, output_list, non_physical):
  	# Get additional fields for display from config file
 	additional_fields = params["output"]["results"]["fields"]
 	all_fields = header_list + additional_fields
-	print("ALL_FIELDS: {0}".format(all_fields))
+	#print("ALL_FIELDS: {0}".format(all_fields))
 
 	# Output as CSV
 	if file_format == "csv":
@@ -281,8 +280,14 @@ def write_output_to_file(params, output_list, non_physical):
 		new_header_list = header_list + params["output"]["results"]["labels"]
 		new_header = delimiter.join(new_header_list)
 
-		with open(file_name, 'w') as output_file:
-			output_file.write(new_header + "\n")
+		#We only write the header for the first file
+		if params["add_header"] is True:
+			with open(file_name, 'w') as output_file:
+				output_file.write(new_header + "\n")
+				params["add_header"] = False
+
+		#We append for every split
+		with open(file_name, 'a') as output_file:
 			dict_w = csv.DictWriter(output_file, delimiter=delimiter,\
 				fieldnames=all_fields, extrasaction='ignore')
 			dict_w.writerows(output_list)
@@ -292,9 +297,54 @@ def write_output_to_file(params, output_list, non_physical):
 		with open(file_name, 'w') as outfile:
 			json.dump(output_list, outfile)
 
+def	hms_to_seconds(t):
+	h, m, s = [i.lstrip("0") if len(i.lstrip("0")) != 0 else 0 for i in t.split(':')]
+	print ("H: {0}, M: {1}, S: {2}".format(h, m, s))
+	return 3600 * h + 60 * m + float(s)
+
+def begin():
+	params = initialize()
+	row_limit = None
+	key = load_hyperparameters(params)
+	try:
+		filename = params["input"]["filename"]
+		split_path = params["input"]["split"]["path"]
+		row_limit = params["input"]["split"]["row_limit"]
+		delimiter = params["input"].get("delimiter", "|")
+		#Break the input file into segments
+		split_list = split_csv(open(filename, 'r'), delimiter=delimiter,
+			row_limit=row_limit, output_path=split_path)
+	except IOError:
+		logging.critical("Invalid ['input']['filename'] key; Input file: %s"
+			" cannot be found. Correct your config file.", filename)
+		sys.exit()
+
+	#Loop through input segements
+	params["add_header"] = True
+	#Start a timer
+	split_count = 0
+	split_total = len(split_list)
+	start_time = datetime.datetime.now()
+	for split in split_list:
+		split_count += 1
+		logging.warning("Working with the following split: %s", split)
+		split_start_time = datetime.datetime.now()
+		desc_queue, non_physical = get_desc_queue(split, params)
+		tokenize(params, desc_queue, key, non_physical)
+		end_time = datetime.datetime.now()
+		total_time = end_time - start_time
+		split_time = end_time - split_start_time
+		remaining_splits = split_total - split_count
+		completion_percentage = split_count / split_total * 100.0
+		my_rate = row_limit / hms_to_seconds(str(split_time))
+		logging.warning("Elapsed time: %s, ETA: %s",\
+			str(total_time)[:7], str(split_time * remaining_splits)[:7])
+		logging.warning("Rate: %10.2f, Completion: %2.2f%%",\
+			my_rate, completion_percentage)
+	logging.warning("Complete.")
+
+
 if __name__ == "__main__":
 	#Runs the entire program.
-	PARAMS = initialize()
-	KEY = load_hyperparameters(PARAMS)
-	DESC_QUEUE, NON_PHYSICAL = get_desc_queue(PARAMS)
-	tokenize(PARAMS, DESC_QUEUE, KEY, NON_PHYSICAL)
+	begin()
+
