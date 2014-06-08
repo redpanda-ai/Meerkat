@@ -1,0 +1,426 @@
+Keywords,city,Agg store_number,store_number,address,state,zip_code
+Big 5 Sporting Goods,Inglewood,3,03 3,301 S. Market Street,CA,90301
+Big 5 Sporting Goods,Chula Vista,6,06 6,364 East 'h' Street,CA,91910
+Big 5 Sporting Goods,Las Vegas,9,09 9,2797 S. Maryland Parkway,NV,89109
+Big 5 Sporting Goods,Las Vegas,12,012 12,1140 S. Decatur Blvd.,NV,89102
+Big 5 Sporting Goods,Torrance,18,018 18,18308 Hawthorne Blvd.,CA,90504
+Big 5 Sporting Goods,Tacoma,21,021 21,"2505 S. 38th St., Suite F",WA,98409
+Big 5 Sporting Goods,Los Angeles,24,024 24,6601 Wilshire Blvd.,CA,90048
+Big 5 Sporting Goods,Canoga Park,27,027 27,7000 Topanga Canyon Blvd.,CA,91303
+Big 5 Sporting Goods,Lakewood,30,030 30,5247 Lakewood Blvd.,CA,90712
+Big 5 Sporting Goods,Pomona,33,033 33,696 West Holt,CA,91768
+Big 5 Sporting Goods,Culver City,36,036 36,4343 Sepulveda Blvd,CA,90230
+Big 5 Sporting Goods,Costa Mesa,39,039 39,2324 Harbor Blvd.,CA,92626
+Big 5 Sporting Goods,Tustin,42,042 42,520 E First Street,CA,92780
+Big 5 Sporting Goods,El Monte,45,045 45,3600 Peck Road,CA,91731
+Big 5 Sporting Goods,Downey,48,048 48,9100 E. Firestone Blvd.,CA,90241
+Big 5 Sporting Goods,San Diego,51,051 51,4838 Convoy Street,CA,92111
+Big 5 Sporting Goods,Corte Madera,54,054 54,110 Nellen Avenue,CA,94925
+Big 5 Sporting Goods,San Jose,57,057 57,3132 Steven'S Creek Blvd.,CA,95117
+Big 5 Sporting Goods,San Jose,60,060 60,946 Blossom Hill Road,CA,95123
+Big 5 Sporting Goods,San Diego,63,063 63,3729 Rosecrans Street,CA,92110
+Big 5 Sporting Goods,Fresno,66,066 66,5488 N. Blackstone Avenue,CA,93710
+Big 5 Sporting Goods,San Bernardino,69,069 69,245 North E St,CA,92401
+Big 5 Sporting Goods,Orange,72,072 72,2445 N. Tustin Avenue,CA,92865
+Big 5 Sporting Goods,El Cajon,78,078 78,666 Fletcher Parkway,CA,92020
+Big 5 Sporting Goods,San Jose,81,081 81,2249 Tully Road,CA,95122
+Big 5 Sporting Goods,Bakersfield,84,084 84,3214 Ming Avenue,CA,93304
+Big 5 Sporting Goods,Riverside,87,087 87,6491 Magnolia Avenue,CA,92506
+Big 5 Sporting Goods,Sacramento,90,090 90,3420 Arden Way,CA,95825
+Big 5 Sporting Goods,Daly City,93,093 93,314 Gellert Blvd. Street,CA,94015
+Big 5 Sporting Goods,Westminster,96,096 96,14970 Golden West Street,CA,92683
+Big 5 Sporting Goods,Sunnyvale,99,099 99,721 Sunnyvale-Saratoga Road,CA,94087
+Big 5 Sporting Goods,Stockton,102,0102 102,1053 March Lane,CA,95207
+Big 5 Sporting Goods,Visalia,105,0105 105,1430 S. Mooney Lane,CA,93277
+Big 5 Sporting Goods,Reno,108,0108 108,4986 S. Virginia,NV,89502
+Big 5 Sporting Goods,San Lorenzo,111,0111 111,15556 Hesperian,CA,94580
+Big 5 Sporting Goods,Fremont,114,0114 114,3820 Mowry Avenue,CA,94538
+Big 5 Sporting Goods,Citrus Heights,117,0117 117,7833 Greenback Lane,CA,95610
+Big 5 Sporting Goods,Modesto,120,0120 120,"3250 Dale Road, Suite K",CA,95350
+Big 5 Sporting Goods,El Toro,123,0123 123,24314 Swartz Drive,CA,92630
+Big 5 Sporting Goods,Anaheim,126,0126 126,2320 Harbor Blvd.,CA,92802
+Big 5 Sporting Goods,Redwood City,129,0129 129,242 Walnut Street,CA,94064
+Big 5 Sporting Goods,Simi Valley,132,0132 132,1203 Los Angeles Avenue,CA,93065
+Big 5 Sporting Goods,Granada Hills,135,0135 135,16900 San Fernando Mission,CA,91344
+Big 5 Sporting Goods,Santa Monica,138,0138 138,3121 Wilshire Blvd.,CA,90403
+Big 5 Sporting Goods,Pinole,141,0141 141,1572 Fitzgerald Drive,CA,94564
+Big 5 Sporting Goods,Santa Rosa,144,0144 144,360 Coddingtown Center,CA,95401
+Big 5 Sporting Goods,Santa Barbara,147,0147 147,3935 State Street,CA,93105
+Big 5 Sporting Goods,Sacramento,150,0150 150,6251 Mack Road,CA,95823
+Big 5 Sporting Goods,Van Nuys,153,0153 153,7250 Van Nuys Blvd.,CA,91405
+Big 5 Sporting Goods,Merced,156,0156 156,760 Merced Mall,CA,95340
+Big 5 Sporting Goods,Fairfield,162,0162 162,1902 N. Texas Street,CA,94533
+Big 5 Sporting Goods,La Habra,165,0165 165,1610 Whittier Blvd.,CA,90631
+Big 5 Sporting Goods,San Ramon,168,0168 168,3209 Crow Canyon Place,CA,94583
+Big 5 Sporting Goods,Oceanside,171,0171 171,2301 Vista Way,CA,92054
+Big 5 Sporting Goods,San Luis Obispo,174,0174 174,281-c Madonna Road,CA,93405
+Big 5 Sporting Goods,Rowland Heights,177,0177 177,17390 Colima Road,CA,91748
+Big 5 Sporting Goods,Pasadena,180,0180 180,3719 E. Colorado Blvd.,CA,91107
+Big 5 Sporting Goods,Salinas,183,0183 183,1000 Northridge Shopping Ctr.,CA,93906
+Big 5 Sporting Goods,Seattle,186,0186 186,2500 S.W. Barton,WA,98126
+Big 5 Sporting Goods,Seattle,189,0189 189,125 S.W. 148th,WA,98166
+Big 5 Sporting Goods,Federal Way,192,0192 192,1916 S. 320th,WA,98003
+Big 5 Sporting Goods,Bellevue,195,0195 195,4055 Factoria Blvd. S.E.,WA,98006
+Big 5 Sporting Goods,Kirkland,198,0198 198,12520-120th N.E.,WA,98034
+Big 5 Sporting Goods,Lynwood,201,0201 201,"18600-a 33rd Ave., West",WA,98037
+Big 5 Sporting Goods,Escondido,204,0204 204,1253 E. Valley Parkway,CA,92027
+Big 5 Sporting Goods,Cerritos,207,0207 207,11310 183rd Street,CA,90701
+Big 5 Sporting Goods,San Mateo,210,0210 210,2825 S. El Camino Real,CA,94403
+Big 5 Sporting Goods,Redding,213,0213 213,2500 Hilltop Drive,CA,96002
+Big 5 Sporting Goods,Torrance,216,0216 216,2745 Pacific Coast Highway,CA,90505
+Big 5 Sporting Goods,Everett,219,0219 219,1201 S.E. Everett Mall Way,WA,98208
+Big 5 Sporting Goods,Chico,222,0222 222,"1717 Mangrove Ave., Suite C",CA,95926
+Big 5 Sporting Goods,Studio City,225,0225 225,12033 Ventura Place,CA,91604
+Big 5 Sporting Goods,Yuba City,228,0228 228,1252 Colusa Avenue,CA,95991
+Big 5 Sporting Goods,Clovis,231,0231 231,480 East Shaw Avenue,CA,93612
+Big 5 Sporting Goods,San Rafael,234,0234 234,160 Northgate One,CA,94903
+Big 5 Sporting Goods,Santa Clarita,237,0237 237,24329 Magic Mountain Pkwy,CA,91355
+Big 5 Sporting Goods,Buena Park,240,0240 240,8990 Knott Avenue,CA,90620
+Big 5 Sporting Goods,Victorville,243,0243 243,14390 Bear Valley Road,CA,92392
+Big 5 Sporting Goods,Vallejo,246,0246 246,3485 Sonoma Blvd. Larwin Plaza,CA,94590
+Big 5 Sporting Goods,Anaheim,249,0249 249,96 E. Orangethorpe Avenue,CA,92801
+Big 5 Sporting Goods,Burbank,252,0252 252,510 North Victory Blvd.,CA,91502
+Big 5 Sporting Goods,Chino,255,0255 255,"5250 Philadelphia St., Suite A",CA,91710
+Big 5 Sporting Goods,Riverside,258,0258 258,10251 Magnolia Avenue,CA,92503
+Big 5 Sporting Goods,Lancaster,261,0261 261,43521 13th Street,CA,93534
+Big 5 Sporting Goods,Pittsburg,264,0264 264,4701 Century Blvd.,CA,94565
+Big 5 Sporting Goods,Santa Maria,267,0267 267,305 Towne Center West,CA,93454
+Big 5 Sporting Goods,San Dimas,270,0270 270,1073 West Arrow Highway,CA,91773
+Big 5 Sporting Goods,Pico Rivera,273,0273 273,9426 Whittier Blvd.,CA,90660
+Big 5 Sporting Goods,Las Vegas,276,0276 276,4275 E. Charleston Blvd.,NV,89104
+Big 5 Sporting Goods,Alhambra,282,0282 282,620 E. Valley Blvd.,CA,91801
+Big 5 Sporting Goods,San Diego,285,0285 285,8145 Mira Mesa,CA,92126
+Big 5 Sporting Goods,Napa,288,0288 288,1305 Trancas Street,CA,94558
+Big 5 Sporting Goods,Milpitas,291,0291 291,757 E. Calavera Blvd.,CA,95035
+Big 5 Sporting Goods,Eureka,294,0294 294,3240 Broadway,CA,95501
+Big 5 Sporting Goods,San Diego,297,0297 297,6061A El Cajon Blvd,CA,92115
+Big 5 Sporting Goods,Kent,300,0300 300,24216 104th Avenue S.E.,WA,98031
+Big 5 Sporting Goods,Davis,303,0303 303,1301 W. Covell Blvd.,CA,95616
+Big 5 Sporting Goods,Turlock,306,0306 306,599 N. Golden State Blvd.,CA,95380
+Big 5 Sporting Goods,Northridge,309,0309 309,9120-b Reseda Blvd.,CA,91324
+Big 5 Sporting Goods,Walnut Creek,312,0312 312,1630 Mt. Diablo Blvd.,CA,94596
+Big 5 Sporting Goods,Irvine,315,0315 315,"3831 Alton Parkway, Suite A",CA,92606
+Big 5 Sporting Goods,Bell Gardens,318,0318 318,7111 Eastern Avenue,CA,90201
+Big 5 Sporting Goods,Alameda,321,0321 321,325 Park Street,CA,94501
+Big 5 Sporting Goods,Seattle,324,0324 324,4315 University Way N.E.,WA,98105
+Big 5 Sporting Goods,El Segundo,327,0327 327,2515 E. El Segundo Blvd.,CA,90245
+Big 5 Sporting Goods,San Pedro,330,0330 330,529 S. Gaffey,CA,90731
+Big 5 Sporting Goods,Menlo Park,333,0333 333,700 El Camino Real,CA,94025
+Big 5 Sporting Goods,Roseville,336,0336 336,1909 Douglas Blvd.,CA,95661
+Big 5 Sporting Goods,San Bernardino,339,0339 339,2150 East Highland,CA,92404
+Big 5 Sporting Goods,Fresno,342,0342 342,3022 West Shaw Avenue,CA,93711
+Big 5 Sporting Goods,Rancho Cucamonga,345,0345 345,"10570 Foothill Blvd 'a', Ste. #140",CA,91730
+Big 5 Sporting Goods,Moreno Valley,348,0348 348,23901-a Sunnymead Blvd.,CA,92553
+Big 5 Sporting Goods,Fontana,351,0351 351,16873 Valley Blvd.,CA,92335
+Big 5 Sporting Goods,Brea,354,0354 354,"705 East Birch St., Suite A",CA,92821
+Big 5 Sporting Goods,Thousand Oaks,357,0357 357,43 W. Thousand Oaks Blvd.,CA,91360
+Big 5 Sporting Goods,Morgan Hill,360,0360 360,150 Cochrane Road,CA,95037
+Big 5 Sporting Goods,Monterey Park,363,0363 363,2062 S. Atlantic Blvd.,CA,91754
+Big 5 Sporting Goods,Olympia,366,0366 366,909 Cooper Point Road S.W.,WA,98502
+Big 5 Sporting Goods,Petaluma,369,0369 369,105 N. Mc Dowell Road,CA,94954
+Big 5 Sporting Goods,Ukiah,372,0372 372,540 E. Perkins Street,CA,95482
+Big 5 Sporting Goods,Vacaville,375,0375 375,2030 Harbison Drive,CA,95687
+Big 5 Sporting Goods,Manteca,378,0378 378,1011 S. Main Street,CA,95337
+Big 5 Sporting Goods,San Francisco,381,0381 381,1533 Sloat Blvd.,CA,94132
+Big 5 Sporting Goods,Dana Point,384,0384 384,34101 Doheny Park Road,CA,92624
+Big 5 Sporting Goods,Porterville,387,0387 387,1287 W. Henderson Avenue,CA,93257
+Big 5 Sporting Goods,Hanford,390,0390 390,"1675 W. Lacey Blvd., Space #e-1",CA,93230
+Big 5 Sporting Goods,Livermore,393,0393 393,4514 Las Positas Road,CA,94550
+Big 5 Sporting Goods,Yuma,396,0396 396,505 Catalina Drive,AZ,85364
+Big 5 Sporting Goods,El Centro,399,0399 399,905 N. Imperial Avenue,CA,92243
+Big 5 Sporting Goods,Tempe,402,0402 402,921 E. Southern Avenue,AZ,85282
+Big 5 Sporting Goods,Phoenix,405,0405 405,4623 E. Cactus Road,AZ,85032
+Big 5 Sporting Goods,Spokane,408,0408 408,North 7501 Division Street,WA,99208
+Big 5 Sporting Goods,Spokane,411,0411 411,East 5725 Sprague Street,WA,99212
+Big 5 Sporting Goods,Yakima,414,0414 414,2801 W. Nob Hill Blvd.,WA,98902
+Big 5 Sporting Goods,Kennewick,417,0417 417,812 Vineyard Drive,WA,99336
+Big 5 Sporting Goods,Long Beach,420,0420 420,4780 E. Pacific Coast Highway,CA,90804
+Big 5 Sporting Goods,Puyallup,423,0423 423,17014 Meridian E,WA,98375
+Big 5 Sporting Goods,Redlands,426,0426 426,1573 W. Redlands Blvd.,CA,92373
+Big 5 Sporting Goods,Shoreline,429,0429 429,1133 N. 205th Street,WA,98133
+Big 5 Sporting Goods,Watsonville,432,0432 432,1083 S. Green Valley Road,CA,95076
+Big 5 Sporting Goods,Phoenix,435,0435 435,1919 W. Bell Road,AZ,85023
+Big 5 Sporting Goods,Phoenix,438,0438 438,3560 E. Thomas Road,AZ,85018
+Big 5 Sporting Goods,El Cerrito,441,0441 441,11060 San Pablo Avenue,CA,94530
+Big 5 Sporting Goods,Auburn,444,0444 444,2556 Grass Valley Highway,CA,95603
+Big 5 Sporting Goods,Lompoc,447,0447 447,"1512 N. 'h' Street, Suite H",CA,93436
+Big 5 Sporting Goods,Capitola,450,0450 450,1600 41st Avenue,CA,95010
+Big 5 Sporting Goods,Burlington,453,0453 453,910 S. Burlington Blvd.,WA,98233
+Big 5 Sporting Goods,Coeur D'Alene,456,0456 456,101 Best Avenue,ID,83814
+Big 5 Sporting Goods,Wenatchee,459,0459 459,144 Easy Way,WA,98801
+Big 5 Sporting Goods,Murrieta,462,0462 462,25274 Madison Avenue,CA,92562
+Big 5 Sporting Goods,Lodi,465,0465 465,2411 W. Kettleman Lane,CA,95242
+Big 5 Sporting Goods,Chandler,468,0468 468,2000 N. Arizona Avenue,AZ,85225
+Big 5 Sporting Goods,Encino,471,0471 471,17019 Ventura Blvd.,CA,91316
+Big 5 Sporting Goods,Fresno,474,0474 474,4902 E. Kings Canyon Road,CA,93727
+Big 5 Sporting Goods,Corona,477,0477 477,320 N. Mckinley Street,CA,92879
+Big 5 Sporting Goods,Portland,480,0480 480,12339 S.E. Stark Street,OR,97233
+Big 5 Sporting Goods,Medford,483,0483 483,65 E. Stewart Avenue,OR,97501
+Big 5 Sporting Goods,El Paso,486,0486 486,8900 Viscount Blvd.,TX,79925
+Big 5 Sporting Goods,Albuquerque,489,0489 489,2720 San Mateo Blvd.,NM,87110
+Big 5 Sporting Goods,Albuquerque,492,0492 492,1915 Juan Tabo N.E.,NM,87112
+Big 5 Sporting Goods,Albuquerque,495,0495 495,9391 Coors Blvd. N.W.,NM,87114
+Big 5 Sporting Goods,Santa Fe,498,0498 498,2860 Cerrillos Road,NM,87505
+Big 5 Sporting Goods,Farmington,501,0501 501,910 E. Main Street,NM,87401
+Big 5 Sporting Goods,Springfield,504,0504 504,2720 Gateway Street,OR,97477
+Big 5 Sporting Goods,Sierra Vista,507,0507 507,135 South Highway 92,AZ,85635
+Big 5 Sporting Goods,Rancho Santa Margarita,510,0510 510,30682 Santa Margarita Pkwy,CA,92688
+Big 5 Sporting Goods,Hillsboro,513,0513 513,1500 S.E. 21st Avenue,OR,97123
+Big 5 Sporting Goods,Bend,516,0516 516,61545 South Highway 97,OR,97702
+Big 5 Sporting Goods,Flagstaff,519,0519 519,2775 Woodlands Village Blvd.,AZ,86001
+Big 5 Sporting Goods,Sonora,522,0522 522,1051 Sanguinetti Road,CA,95370
+Big 5 Sporting Goods,Hemet,525,0525 525,2920 West Florida Avenue,CA,92545
+Big 5 Sporting Goods,Salem,528,0528 528,2245 Lancaster Drive N.E.,OR,97305
+Big 5 Sporting Goods,Corvallis,534,0534 534,595 N.E. Circle Blvd.,OR,97330
+Big 5 Sporting Goods,Paso Robles,537,0537 537,170 Niblick Road,CA,93446
+Big 5 Sporting Goods,St. George,543,0543 543,245 North Red Cliffs Road,UT,84770
+Big 5 Sporting Goods,Tracy,546,0546 546,"3200 S. Naglee Rd., Ste 300, W. Vly Mall",CA,95376
+Big 5 Sporting Goods,Issaquah,552,0552 552,"1810 -12th Avenue, Nw, Suite B-1",WA,98027
+Big 5 Sporting Goods,Klamath Falls,555,0555 555,3500 Washburn Way,OR,97601
+Big 5 Sporting Goods,Bullhead,558,0558 558,1835 Highway 95,AZ,86439
+Big 5 Sporting Goods,Solana Beach,561,0561 561,949 Lomas Santa Fe Drive,CA,92075
+Big 5 Sporting Goods,North Highlands,564,0564 564,3637 Elkhorn Blvd.,CA,95660
+Big 5 Sporting Goods,Lubbock,567,0567 567,5112 - 56th Street,TX,79414
+Big 5 Sporting Goods,Grants Pass,573,0573 573,310 N.E. Agness Street,OR,97526
+Big 5 Sporting Goods,Whittier,576,0576 576,13440-1 Whittier Blvd.,CA,90605
+Big 5 Sporting Goods,Milwaukie,579,0579 579,16074-12 S.e.mcloughlin Blvd.,OR,97267
+Big 5 Sporting Goods,Rancho Bernardo,582,0582 582,16773-b Bernardo Center Drive,CA,92128
+Big 5 Sporting Goods,Layton,585,0585 585,1129 North Main Street,UT,84041
+Big 5 Sporting Goods,West Valley,588,0588 588,2660 West 3500 South,UT,84119
+Big 5 Sporting Goods,Tigard,591,0591 591,11705 Sw Pacific Highway,OR,97223
+Big 5 Sporting Goods,Odessa,594,0594 594,3875 E. 42nd Street,TX,79763
+Big 5 Sporting Goods,Amarillo,597,0597 597,8004 I-40 West,TX,79106
+Big 5 Sporting Goods,Placerville,600,0600 600,284 Placerville Road,CA,95667
+Big 5 Sporting Goods,Lake Havasu City,606,0606 606,251 South Lake Havasu Avenue,AZ,86403
+Big 5 Sporting Goods,Dublin,609,0609 609,6750 Amador Plaza Road,CA,94568
+Big 5 Sporting Goods,Ammon,612,0612 612,1851 S. 25th East (hitt Road),ID,83406
+Big 5 Sporting Goods,Tucson,615,0615 615,5695 East Speedway Blvd.,AZ,85712
+Big 5 Sporting Goods,Seattle (ballard),618,0618 618,1101 N.W. Leary Way,WA,98107
+Big 5 Sporting Goods,Gresham,621,0621 621,2095-c East Burnside Road,OR,97030
+Big 5 Sporting Goods,Woodland,624,0624 624,431 Pioneer Avenue,CA,95776
+Big 5 Sporting Goods,Clovis,627,0627 627,4001 N. Prince Street,NM,88101
+Big 5 Sporting Goods,Roseburg,630,0630 630,2655 N.W. Stewart Parkway,OR,97470
+Big 5 Sporting Goods,Folsom,633,0633 633,606 E. Bidwell Street,CA,95630
+Big 5 Sporting Goods,Twin Falls,636,0636 636,"1036 Blue Lakes Blvd., North",ID,83301
+Big 5 Sporting Goods,Elko,642,0642 642,2409 Mountain City Hwy,NV,89801
+Big 5 Sporting Goods,El Paso,645,0645 645,"1313 George Dieter Drive, Suite-A",TX,79936
+Big 5 Sporting Goods,Casa Grande,651,0651 651,1320 Florence Blvd.,AZ,85222
+Big 5 Sporting Goods,Las Vegas (north),654,0654 654,"2020 West Craig Road, Suite #100",NV,89031
+Big 5 Sporting Goods,Moses Lake,657,0657 657,"815 North Stratford Road, Suite A",WA,98837
+Big 5 Sporting Goods,Salt Lake City,660,0660 660,"2236 South 1300 East, Space C-1",UT,84106
+Big 5 Sporting Goods,Murray,663,0663 663,5950 South State Street,UT,84107
+Big 5 Sporting Goods,Prescott Valley,666,0666 666,6106 Highway 69,AZ,86314
+Big 5 Sporting Goods,Yorba Linda,669,0669 669,20455 Yorba Linda Blvd.,CA,92886
+Big 5 Sporting Goods,Rohnert Park,672,0672 672,470 Rohnert Park Expressway,CA,94928
+Big 5 Sporting Goods,Ridgecrest,675,0675 675,780 N. China Lake Blvd.,CA,93555
+Big 5 Sporting Goods,Mcminnville,678,0678 678,2525 N.E. Highway 99 West,OR,97128
+Big 5 Sporting Goods,Oakdale,681,0681 681,1596 East f Street,CA,95361
+Big 5 Sporting Goods,Elk Grove,684,0684 684,6608 Laguna Blvd.,CA,95758
+Big 5 Sporting Goods,Las Cruces,687,0687 687,3060 E. Lohman Avenue,NM,88005
+Big 5 Sporting Goods,Pocatello,690,0690 690,700 W. Quinn Road,ID,83202
+Big 5 Sporting Goods,El Paso,693,0693 693,"7410 Remcon Circle, Suite A",TX,79912
+Big 5 Sporting Goods,Durango,696,0696 696,"400 South Camino Del Rio, Suite A",CO,81301
+Big 5 Sporting Goods,Mesa,699,0699 699,2930 North Power Road,AZ,85215
+Big 5 Sporting Goods,Peoria,702,0702 702,10030 North 91st Avenue,AZ,85345
+Big 5 Sporting Goods,Bakersfield,705,0705 705,3203 Mall View Road,CA,93306
+Big 5 Sporting Goods,Los Angeles,708,0708 708,3420 Wilshire Blvd.,CA,90010
+Big 5 Sporting Goods,Los Lunas,711,0711 711,2359 Main Street S.E.,NM,87031
+Big 5 Sporting Goods,Pueblo,714,0714 714,4330 North Freeway Road,CO,81008
+Big 5 Sporting Goods,Albany,717,0717 717,2280 Pacific Blvd. S.E.,OR,97321
+Big 5 Sporting Goods,Las Vegas,720,0720 720,3975 South Buffalo Drive Suite-103,NV,89147
+Big 5 Sporting Goods,Lewiston,723,0723 723,2310 Thain Grade,ID,83501
+Big 5 Sporting Goods,Boise,726,0726 726,101 North Milwaukee Street,ID,83704
+Big 5 Sporting Goods,Tucson,729,0729 729,6441 South Midvale Park Road,AZ,85746
+Big 5 Sporting Goods,Orem,732,0732 732,1290 South State Street,UT,84097
+Big 5 Sporting Goods,Walla Walla,735,0735 735,1711 Twin Creek Place,WA,99362
+Big 5 Sporting Goods,Palmdale,738,0738 738,37026 47th Street East,CA,93552
+Big 5 Sporting Goods,Ogden,741,0741 741,972 Wall Avenue,UT,84404
+Big 5 Sporting Goods,Sequim,744,0744 744,171 Valley Center Place,WA,98382
+Big 5 Sporting Goods,Ceres,747,0747 747,1450 E. Hatch Rd. Suite A,CA,95307
+Big 5 Sporting Goods,Grass Valley,750,0750 750,123 West Mcknight Way,CA,95949
+Big 5 Sporting Goods,Carmichael,753,0753 753,4794 Manzanita Avenue Suite 1,CA,95608
+Big 5 Sporting Goods,Oak Harbor,756,0756 756,31956 N. State Highway 20,WA,98277
+Big 5 Sporting Goods,Vista,759,0759 759,760 Sycamore Avenue,CA,92083
+Big 5 Sporting Goods,Phoenix,762,0762 762,1717 W. Bethany Home Road,AZ,85015
+Big 5 Sporting Goods,Tulare,765,0765 765,1106 E. Prosperity Avenue,CA,93274
+Big 5 Sporting Goods,Richland,768,0768 768,75 Columbia Point Drive,WA,99352
+Big 5 Sporting Goods,Rancho Cordova,771,0771 771,10755 Folsom Blvd.,CA,95670
+Big 5 Sporting Goods,Chehalis,774,0774 774,1505 N.W. Louisiana Avenue,WA,98532
+Big 5 Sporting Goods,Sparks,777,0777 777,558 North Mccarran Blvd.,NV,89431
+Big 5 Sporting Goods,South Ogden,780,0780 780,3990 Riverdale Road,UT,84405
+Big 5 Sporting Goods,Lacey,783,0783 783,1351 Galaxy Drive North East,WA,98516
+Big 5 Sporting Goods,West Jordan,786,0786 786,1390 West 9000 South,UT,84088
+Big 5 Sporting Goods,Phoenix,792,0792 792,4722 East Ray Road,AZ,85044
+Big 5 Sporting Goods,Henderson,795,0795 795,2712 North Green Valley Parkway,NV,89014
+Big 5 Sporting Goods,Antioch,798,0798 798,4859 Lone Tree Way,CA,94531
+Big 5 Sporting Goods,Phoenix,801,0801 801,7710 West Thomas Road,AZ,85033
+Big 5 Sporting Goods,Yucca Valley,804,0804 804,58111 Twenty-Nine Palms Highway,CA,92284
+Big 5 Sporting Goods,Moscow,807,0807 807,2122 Pullman Highway,ID,83843
+Big 5 Sporting Goods,Mesa,810,0810 810,"1244 South Gilbert Road, Suite 101",AZ,85204
+Big 5 Sporting Goods,Nampa,813,0813 813,1601 Caldwell Blvd. Space #25,ID,83651
+Big 5 Sporting Goods,Littleton,816,0816 816,"10027 W. Remington Ave., Suite 100",CO,80127
+Big 5 Sporting Goods,Thornton,819,0819 819,1401 East 120th Avenue,CO,80233
+Big 5 Sporting Goods,Henderson,822,0822 822,1211 South Boulder Highway,NV,89015
+Big 5 Sporting Goods,Phoenix,825,0825 825,10202 Metro Parkway West,AZ,85051
+Big 5 Sporting Goods,La Quinta,828,0828 828,78-710 Highway 111,CA,92253
+Big 5 Sporting Goods,Centerville,831,0831 831,132 North Frontage Road,UT,84014
+Big 5 Sporting Goods,Monroe,834,0834 834,18669 State Route 2,WA,98272
+Big 5 Sporting Goods,Vancouver,837,0837 837,15500 S.E. Mill Plain Blvd.,WA,98684
+Big 5 Sporting Goods,Tucson,840,0840 840,"4901 North Stone Avenue, Suite 4",AZ,85704
+Big 5 Sporting Goods,Palm Desert,843,0843 843,72284 Highway 111,CA,92260
+Big 5 Sporting Goods,Aurora,846,0846 846,10051 East Iliff Avenue,CO,80247
+Big 5 Sporting Goods,El Paso,849,0849 849,"9813 Dyer Street, Suite 500",TX,79924
+Big 5 Sporting Goods,Sacramento,852,0852 852,"980 Florin Road, Suite A",CA,95831
+Big 5 Sporting Goods,Campbell,855,0855 855,1600 West Campbell Avenue,CA,95008
+Big 5 Sporting Goods,Albuquerque,858,0858 858,3140 Coors Blvd. N.W.,NM,87120
+Big 5 Sporting Goods,Colorado Springs,861,0861 861,5905 Constitution Avenue,CO,80915
+Big 5 Sporting Goods,Spring Valley,864,0864 864,"9805 Campo Road, Suite 195",CA,91977
+Big 5 Sporting Goods,Imperial Beach,867,0867 867,595 Saturn Blvd.,CA,92154
+Big 5 Sporting Goods,Colorado Springs,870,0870 870,5075 North Academy Blvd.,CO,80918
+Big 5 Sporting Goods,Scottsdale,873,0873 873,3330 Hayden Road,AZ,85251
+Big 5 Sporting Goods,Gilbert,876,0876 876,965 South Val Vista Drive,AZ,85296
+Big 5 Sporting Goods,Long Beach,879,0879 879,"205 East 4th Street, #b-115",CA,90802
+Big 5 Sporting Goods,Sandy,882,0882 882,960 E 10600 S,UT,84094
+Big 5 Sporting Goods,Scottsdale,885,0885 885,14987 North Northsight Blvd.,AZ,85260
+Big 5 Sporting Goods,Lakewood,888,0888 888,7111 West Alameda Avenue,CO,80226
+Big 5 Sporting Goods,Glendale,891,0891 891,144 North Central Avenue,CA,91203
+Big 5 Sporting Goods,Arvada,894,0894 894,7669 West 88th Avenue,CO,80005
+Big 5 Sporting Goods,Greeley,897,0897 897,"4743 West 29th Street, Unit B",CO,80634
+Big 5 Sporting Goods,Carson,900,0900 900,"20700 Avalon Blvd., Suite #425",CA,90746
+Big 5 Sporting Goods,Aberdeen,903,0903 903,1161 East Wishkah Street,WA,98520
+Big 5 Sporting Goods,Las Vegas,906,0906 906,"6720 North Durango Drive, Suite 110",NV,89149
+Big 5 Sporting Goods,Chino,909,0909 909,3975 Grand Avenue,CA,91710
+Big 5 Sporting Goods,Highlands Ranch,912,0912 912,8675 S. Quebec St.,CO,80130
+Big 5 Sporting Goods,Longmont,915,0915 915,1610 Main Street,CO,80501
+Big 5 Sporting Goods,Hollister,918,0918 918,251 Mccray Street,CA,95023
+Big 5 Sporting Goods,American Fork,921,0921 921,45 North 700 West,UT,84003
+Big 5 Sporting Goods,Los Banos,924,0924 924,2200 East Pacheco Blvd.,CA,93635
+Big 5 Sporting Goods,Pismo Beach,927,0927 927,829 Oak Park Blvd.,CA,93449
+Big 5 Sporting Goods,Salem,930,0930 930,4665 Commercial Street S.E.,OR,97302
+Big 5 Sporting Goods,Glendale,933,0933 933,"5490 West Bell Road, Suite A",AZ,85308
+Big 5 Sporting Goods,La Puente,936,0936 936,1809 N. Hacienda Blvd.,CA,91744
+Big 5 Sporting Goods,Port Orchard,942,0942 942,1025 Bethel Avenue,WA,98366
+Big 5 Sporting Goods,Los Angeles,945,0945 945,3730 Crenshaw Boulevard,CA,90016
+Big 5 Sporting Goods,Santa Ana,948,0948 948,1421 W. 17th Street,CA,92706
+Big 5 Sporting Goods,Vancouver,951,0951 951,8313 N. E. Highway 99,WA,98665
+Big 5 Sporting Goods,Marysville,954,0954 954,9620 State Ave. Unit a,WA,98270
+Big 5 Sporting Goods,Alamogordo,957,0957 957,3312 North White Sands Blvd.,NM,88310
+Big 5 Sporting Goods,Kingman,960,0960 960,3320 N. Stockton Hill Rd. Bldg. F,AZ,86401
+Big 5 Sporting Goods,Fresno,963,0963 963,1544 E. Champlain Drive,CA,93720
+Big 5 Sporting Goods,Lakewood,966,0966 966,"5700 100th Street, Suite 600",WA,98499
+Big 5 Sporting Goods,Minden,969,0969 969,"1770 Highway 395, Space A-2",NV,89423
+Big 5 Sporting Goods,Roswell,972,0972 972,2801 N. Main St. Space z,NM,88201
+Big 5 Sporting Goods,Oroville,975,0975 975,1050 Oroville Dam Blvd.,CA,95965
+Big 5 Sporting Goods,Aurora,978,0978 978,19330 E. Quincy Ave.,CO,80016
+Big 5 Sporting Goods,Temecula,981,0981 981,33385 Highway 79 South,CA,92592
+Big 5 Sporting Goods,Avondale,984,0984 984,1623 North Dysart Road,AZ,85323
+Big 5 Sporting Goods,Redmond,987,0987 987,14890 Ne 24th Street,WA,98052
+Big 5 Sporting Goods,Portland,990,0990 990,5420 Se 82nd Ave.,OR,97266
+Big 5 Sporting Goods,Reseda,993,0993 993,"19403 Victory Blvd., Suite 23",CA,91335
+Big 5 Sporting Goods,Lake Elsinore,996,0996 996,18298 Collier Avenue,CA,92530
+Big 5 Sporting Goods,Henderson,999,0999 999,9540 S. Eastern Avenue,NV,89123
+Big 5 Sporting Goods,The Dalles,1002,01002 1002,420 Mt. Hood Street,OR,97058
+Big 5 Sporting Goods,Covina,1005,01005 1005,543 Azuza Avenue,CA,91722
+Big 5 Sporting Goods,Denver,1008,01008 1008,1430 S. Colorado Blvd.,CO,80222
+Big 5 Sporting Goods,Monterey,1011,01011 1011,2259 N. Fremont Street,CA,93940
+Big 5 Sporting Goods,Fort Collins,1014,01014 1014,"2211 S. College Avenue, Suite 100",CO,80525
+Big 5 Sporting Goods,Selma,1017,01017 1017,3356 Floral Avenue,CA,93662
+Big 5 Sporting Goods,Denver,1020,01020 1020,"7306 E. 36th Ave. Bldg. 2, Suite 201",CO,80222
+Big 5 Sporting Goods,Concord,1023,01023 1023,2689 Clayton Road,CA,94519
+Big 5 Sporting Goods,Atascadero,1026,01026 1026,2120 El Camino Real,CA,93422
+Big 5 Sporting Goods,Oro Valley,1032,01032 1032,10390 North La Canada Drive,AZ,85737
+Big 5 Sporting Goods,Spanish Fork,1035,01035 1035,141 East 1000 North,UT,84660
+Big 5 Sporting Goods,Hobbs,1038,01038 1038,1814 N. Turner St.,NM,88240
+Big 5 Sporting Goods,Wheatridge,1041,01041 1041,5185 Kipling Street,CO,80033
+Big 5 Sporting Goods,Logan,1044,01044 1044,"981 S. Main, Ste 110",UT,84321
+Big 5 Sporting Goods,Rexburg,1047,01047 1047,650 North 2nd East,ID,83440
+Big 5 Sporting Goods,Colorado Springs,1050,01050 1050,1810 W. Unitah Street,CO,80904
+Big 5 Sporting Goods,Apple Valley,1053,01053 1053,"19083 Bear Valley, Suite D",CA,92308
+Big 5 Sporting Goods,Lawton,1056,01056 1056,4009 N.W. Cache Road,OK,73505
+Big 5 Sporting Goods,Eugene,1059,01059 1059,2856 Willamette Street,OR,97405
+Big 5 Sporting Goods,Boise,1062,01062 1062,6762 North Glenwood Street,ID,83714
+Big 5 Sporting Goods,Clinton,1065,01065 1065,"1803 West 1800 North, Unit H-1",UT,84015
+Big 5 Sporting Goods,Sunnyside,1068,01068 1068,1719 Morgan Road,WA,98944
+Big 5 Sporting Goods,Red Bluff,1071,01071 1071,545 South Main St,CA,96080
+Big 5 Sporting Goods,Ventura,1074,01074 1074,3970 East Main Street,CA,93003
+Big 5 Sporting Goods,Huntington Park,1077,01077 1077,7604 Alameda Street,CA,90255
+Big 5 Sporting Goods,Golden,1080,01080 1080,17205 S. Golden Road,CO,80401
+Big 5 Sporting Goods,Mesa,1083,01083 1083,10745 E. Apache Trail Suite 101,AZ,85120
+Big 5 Sporting Goods,Hermiston,1086,01086 1086,1968 N. First Street,OR,97838
+Big 5 Sporting Goods,Perris,1089,01089 1089,101 W. Nuevo Rd. Suite E,CA,92571
+Big 5 Sporting Goods,Castle Rock,1092,01092 1092,5650 Allen Way Suite 112,CO,80108
+Big 5 Sporting Goods,Fontana,1095,01095 1095,16963 Sierra Lakes Parkway,CA,92336
+Big 5 Sporting Goods,Madera,1098,01098 1098,2140 W. Cleveland Avenue Suite 104,CA,93637
+Big 5 Sporting Goods,Redmond,1101,01101 1101,"2925 South Highway 97, Suite 100",OR,97756
+Big 5 Sporting Goods,Show Low,1104,01104 1104,4441 South White Mountain Road. Suite 101,AZ,85901
+Big 5 Sporting Goods,Tooele,1107,01107 1107,152 N. Main St.,UT,84074
+Big 5 Sporting Goods,Albuquerque,1110,01110 1110,8102 Wyoming Blvd. Ne,NM,87113
+Big 5 Sporting Goods,Atwater,1113,01113 1113,1231 Commerce Ave.,CA,95301
+Big 5 Sporting Goods,Carlsbad,1116,01116 1116,2302 West Pierce St. (building B-1),NM,88220
+Big 5 Sporting Goods,Sandpoint,1119,01119 1119,615 N. 5th Avenue,ID,83864
+Big 5 Sporting Goods,Rio Rancho,1122,01122 1122,"7800 Carr Way Ne, Suite A",NM,87144
+Big 5 Sporting Goods,Parker,1125,01125 1125,9257 South Parker Road,CO,80134
+Big 5 Sporting Goods,Las Vegas,1128,01128 1128,8445 West Warm Springs Rd,NV,89120
+Big 5 Sporting Goods,Canyon Country,1131,01131 1131,19232 Soledad Canyon Rd,CA,91351
+Big 5 Sporting Goods,Tucson,1134,01134 1134,"3860 W, Ina Road",AZ,85741
+Big 5 Sporting Goods,Cheyenne,1137,01137 1137,2152 Dell Range Blvd.,WY,82009
+Big 5 Sporting Goods,Tehachapi,1140,01140 1140,685 Tucker Road,CA,93561
+Big 5 Sporting Goods,Oxnard,1143,01143 1143,2361 N. Oxnard Blvd.,CA,93036
+Big 5 Sporting Goods,Santa Rosa,1149,01149 1149,2503 Cleveland Avenue,CA,95403
+Big 5 Sporting Goods,Seattle,1152,01152 1152,818 N.E. Northgate Way,WA,98125
+Big 5 Sporting Goods,Las Vegas,1155,01155 1155,7351 W. Lake Mead Blvd.,NV,89128
+Big 5 Sporting Goods,Beaverton,1158,01158 1158,11975 S.W. Canyon Road,OR,97005
+Big 5 Sporting Goods,Dinuba,1161,01161 1161,900 W. El Monte Way,CA,93618
+Big 5 Sporting Goods,Renton,1164,01164 1164,"601 South Grady Way, Suite F",WA,98057
+Big 5 Sporting Goods,Gig Harbor,1167,01167 1167,11010 Harbor Hill Dr. Suite A,WA,98332
+Big 5 Sporting Goods,Jackson,1170,01170 1170,11974 State Highway 88 Suite#2084,CA,95642
+Big 5 Sporting Goods,Vancouver,1173,01173 1173,11505 Ne Fourth Plain Road Suite C,WA,98662
+Big 5 Sporting Goods,Camarillo,1176,01176 1176,2590 Las Posas Road,CA,93010
+Big 5 Sporting Goods,Inglewood,1179,01179 1179,11310 Crenshaw Blvd.,CA,90303
+Big 5 Sporting Goods,Huntington Beach,1182,01182 1182,18621 Main St.,CA,92648
+Big 5 Sporting Goods,Carson City,1185,01185 1185,4219 South Carson Street,NV,89701
+Big 5 Sporting Goods,San Bruno,1188,01188 1188,855 El Camino Real,CA,94066
+Big 5 Sporting Goods,Coalinga,1191,01191 1191,159 West Polk Street Suite #205,CA,93210
+Big 5 Sporting Goods,Covington,1194,01194 1194,"17307 S.E. 272nd Street, Suite 120",WA,98042
+Big 5 Sporting Goods,La Mirada,1197,01197 1197,15254 Rosecrans Avenue,CA,90638
+Big 5 Sporting Goods,Pleasant Hill,1200,01200 1200,510 Contra Costa Blvd.,CA,94523
+Big 5 Sporting Goods,Omak,1203,01203 1203,703 A Omache Drive,WA,98841
+Big 5 Sporting Goods,Ontario,1206,01206 1206,"180 East Lane, Suite 9",OR,97914
+Big 5 Sporting Goods,Cottonwood,1209,01209 1209,745 South Main Street,AZ,86326
+Big 5 Sporting Goods,Warrenton,1212,01212 1212,"180 S.E. Neptune Drive, Suite B",OR,97146
+Big 5 Sporting Goods,Ramona,1215,01215 1215,1312 Main Street,CA,92065
+Big 5 Sporting Goods,Oakhurst,1218,01218 1218,"40072 Highway 49, Suite A",CA,93644
+Big 5 Sporting Goods,Palm Springs,1220,01220 1220,"2465 East Palm Canyon Dr., Suite 805",CA,92264
+Big 5 Sporting Goods,Chandler,1223,01223 1223,"4180 South Arizona Ave., Suite 3",AZ,85248
+Big 5 Sporting Goods,Thatcher,1226,01226 1226,"2281 West US Highway 70, Suite C",AZ,85552
+Big 5 Sporting Goods,Duncan,1229,01229 1229,1318 North Highway 81,OK,73533
+Big 5 Sporting Goods,Plainview,1232,01232 1232,3220 Olton Road,TX,79072
+Big 5 Sporting Goods,Bellingham,1235,01235 1235,108 West Stuart Road,WA,98226
+Big 5 Sporting Goods,Upland,1238,01238 1238,80 West Foothill Blvd.,CA,91786
+Big 5 Sporting Goods,Pomona,1241,01241 1241,309 E. Foothill Blvd.,CA,91767
+Big 5 Sporting Goods,Ruidoso,1244,01244 1244,"26090 Highway 70, Unit 2",NM,88345
+Big 5 Sporting Goods,Price,1247,01247 1247,716 East Main Street,UT,84501
+Big 5 Sporting Goods,Bothell,1250,01250 1250,"22631 Bothwell-Everett Highway, Suite A",WA,98021
+Big 5 Sporting Goods,Big Bear,1255,01255 1255,41385 Big Bear Blvd.,CA,92315
+Big 5 Sporting Goods,Payson,1258,01258 1258,220 East Highway 260,AZ,85541
+Big 5 Sporting Goods,Richfield,1266,01266 1266,25 East 800 South,UT,84701
+Big 5 Sporting Goods,South Lake Tahoe,1267,01267 1267,2062 S. Lake Tahoe Blvd.,CA,96150
+Big 5 Sporting Goods,Merced,1268,01268 1268,1746 W. Olive Ave.,CA,95348
+Big 5 Sporting Goods,Poway,1271,01271 1271,12630 Poway Road,CA,92064
+Big 5 Sporting Goods,Longview,1274,01274 1274,600 Triangle Center Suite 150,WA,98632
+Big 5 Sporting Goods,Phoenix,1276,01276 1276,3610 W. Baseline Road Suite B2,AZ,85041
+Big 5 Sporting Goods,Barstow,1277,01277 1277,1312 East Main Street,CA,92311
+Big 5 Sporting Goods,Gallup,1280,01280 1280,710 US 491,NM,87301
+Big 5 Sporting Goods,Coachella,1282,01282 1282,49301 Grapefruit Blvd,CA,92236
+Big 5 Sporting Goods,Canon City,1285,01285 1285,3215 E. US Highway 50,CO,81212
+Big 5 Sporting Goods,Sahuarita,1286,01286 1286,714 W. Calle Arroyo Sur,AZ,85614
+Big 5 Sporting Goods,Taos,1288,01288 1288,223 Paseo Del Pueblo Sur,NM,87571
+Big 5 Sporting Goods,Susanville,1291,01291 1291,2581 Main Street,CA,96130
+Big 5 Sporting Goods,Hayward,1294,01294 1294,22400 Foothill Blvd.,CA,94541
+Big 5 Sporting Goods,Phoenix,1297,01297 1297,34648 N North Valley Parkway Suite 130,AZ,85086
+Big 5 Sporting Goods,Santa Paula,1300,01300 1300,568 W. Main Street,CA,93060
+Big 5 Sporting Goods,Silverdale,15,015 15,9989 Silverdale Way N.W.,WA,98383
+Big 5 Sporting Goods,North Bend (coos Bay),648,0648 648,"1659 Virginia Avenue, Suite-A",OR,97459
+Big 5 Sporting Goods,Surprise,1029,01029 1029,12801 W. Bell Road Suite 125,AZ,85374
+Big 5 Sporting Goods,Poulsbo,1146,01146 1146,21800 Market Place Nw (suite 201),WA,98370
+Big 5 Sporting Goods,Stephenville,1261,01261 1261,2125 West Washington Street,TX,76401

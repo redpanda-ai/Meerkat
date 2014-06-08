@@ -1,0 +1,438 @@
+Keywords,city,Agg store_number,store_number,address,state,zip_code
+Trader Joe's,Palm Desert,3,#3 #03 #003 3,44250 Town Center Way,CA,92260
+Trader Joe's,Santa Monica,6,#6 #06 #006 6,3212 Pico Blvd,CA,90405
+Trader Joe's,Los Angeles,7,#7 #07 #007 7,10850 National Blvd,CA,90064
+Trader Joe's,Fresno,8,#8 #08 #008 8,5376 N Blackstone,CA,93710
+Trader Joe's,Modesto,9,#9 #09 #009 9,3250 Dale Road,CA,95356
+Trader Joe's,Brea,11,#11 #011 #0011 11,2500 E Imperial Hwy,CA,92821
+Trader Joe's,Santa Clarita,13,#13 #013 #0013 13,26517 Bouquet Canyon Rd,CA,91350
+Trader Joe's,Riverside,15,#15 #015 #0015 15,6225 Riverside Plaza,CA,92506
+Trader Joe's,San Clemente,16,#16 #016 #0016 16,638 Camino de Los Mares,CA,92673
+Trader Joe's,Los Angeles,17,#17 #017 #0017 17,2738 Hyperion Ave,CA,90027
+Trader Joe's,S. Pasadena,18,#18 #018 #0018 18,613 Mission St,CA,91030
+Trader Joe's,San Francisco,19,#19 #019 #0019 19,401 Bay St,CA,94133
+Trader Joe's,La Jolla,20,#20 #020 #0020 20,8657 Villa la Jolla Dr,CA,92037
+Trader Joe's,San Diego,21,#21 #021 #0021 21,1211 Garnet Ave,CA,92109
+Trader Joe's,Oceanside,22,#22 #022 #0022 22,2570 Vista Way,CA,92054
+Trader Joe's,San Diego,23,#23 #023 #0023 23,11955 Carmel Mountain Rd,CA,92128
+Trader Joe's,LaMesa,24,#24 #024 #0024 24,5495 Grossmont Center Dr,CA,91942
+Trader Joe's,Encinitas,25,#25 #025 #0025 25,115 N El Camino Real,CA,92024
+Trader Joe's,Rancho Santa Margarita,27,#27 #027 #0027 27,30652 Santa Margarita Pkwy,CA,92688
+Trader Joe's,San Dimas,28,#28 #028 #0028 28,856 W Arrow Hwy,CA,91773
+Trader Joe's,Torrance,29,#29 #029 #0029 29,2545 Pacific Coast Hwy,CA,90505
+Trader Joe's,Simi Valley,30,#30 #030 #0030 30,2975-A Cochran St,CA,93065
+Trader Joe's,Los Angeles,31,#31 #031 #0031 31,263 S La Brea Ave,CA,90036
+Trader Joe's,San Gabriel,32,#32 #032 #0032 32,7260 N Rosemead Blvd,CA,91775
+Trader Joe's,Westchester,33,#33 #033 #0033 33,8645 S Sepulveda,CA,90045
+Trader Joe's,Manhattan Bch.,34,#34 #034 #0034 34,1821 Manhattan Beach Blvd,CA,90266
+Trader Joe's,Costa Mesa,35,#35 #035 #0035 35,640 W 17th St,CA,92627
+Trader Joe's,Culver City,36,#36 #036 #0036 36,9290 Culver Blvd,CA,90232
+Trader Joe's,Irvine,37,#37 #037 #0037 37,14443 Culver Dr,CA,92604
+Trader Joe's,Redondo Bch.,38,#38 #038 #0038 38,1761 S Elena Ave,CA,90277
+Trader Joe's,Laguna Hills,39,#39 #039 #0039 39,24321 Avenida De La Carlota,CA,92653
+Trader Joe's,San Luis Obispo,41,#41 #041 #0041 41,3977 Higuera Street,CA,93401
+Trader Joe's,La Canada,42,#42 #042 #0042 42,475 Foothill Blvd,CA,91011
+Trader Joe's,Long Beach,43,#43 #043 #0043 43,6451 E Pacific Coast  Hwy,CA,90803
+Trader Joe's,Granada Hills,44,#44 #044 #0044 44,11114 Balboa Blvd,CA,91344
+Trader Joe's,Ventura,45,#45 #045 #0045 45,1795 S. Victoria Ave,CA,93003
+Trader Joe's,Orange,46,#46 #046 #0046 46,2114 N Tustin St,CA,92865
+Trader Joe's,Huntington Beach,47,#47 #047 #0047 47,18681 Main St,CA,92648
+Trader Joe's,Whittier,48,#48 #048 #0048 48,15025 E Whittier Blvd,CA,90603
+Trader Joe's,Sherman Oaks,49,#49 #049 #0049 49,14119 Riverside Dr,CA,91423
+Trader Joe's,West Hills,50,#50 #050 #0050 50,6751 Fallbrook Ave,CA,91307
+Trader Joe's,Pasadena,51,#51 #051 #0051 51,610 S Arroyo Pkwy,CA,91105
+Trader Joe's,Montrose,52,#52 #052 #0052 52,2462 Honolulu Ave,CA,91020
+Trader Joe's,Glendale,53,#53 #053 #0053 53,130 N Glendale Ave,CA,91206
+Trader Joe's,Toluca Lake,54,#54 #054 #0054 54,10130 Riverside Dr,CA,91602
+Trader Joe's,Eagle Rock,55,#55 #055 #0055 55,1566 Colorado Blvd,CA,90041
+Trader Joe's,Encino,56,#56 #056 #0056 56,17640 Burbank Blvd,CA,91316
+Trader Joe's,Rancho Palos Verdes,57,#57 #057 #0057 57,28901 S Western Ave,CA,90275
+Trader Joe's,Westlake Village,58,#58 #058 #0058 58,3835 E Thousand Oaks Blvd,CA,91362
+Trader Joe's,Santa Barbara,59,#59 #059 #0059 59,29 S. Milpas St,CA,93103
+Trader Joe's,Concord,60,#60 #060 #0060 60,1150 Concord Ave,CA,94520
+Trader Joe's,San Rafael,61,#61 #061 #0061 61,337 3rd St,CA,94901
+Trader Joe's,San Jose,62,#62 #062 #0062 62,5269 Prospect,CA,95129
+Trader Joe's,San Jose,63,#63 #063 #0063 63,5353 Almaden Expressway #J-38,CA,95118
+Trader Joe's,Capitola,64,#64 #064 #0064 64,3555 Clares St #D,CA,95010
+Trader Joe's,Danville,65,#65 #065 #0065 65,85 Railroad Ave,CA,94526
+Trader Joe's,Pleasanton,66,#66 #066 #0066 66,4040 Pimlico #150,CA,94588
+Trader Joe's,San Mateo,67,#67 #067 #0067 67,1820-22 S Grant Street,CA,94402
+Trader Joe's,Sunnyvale,68,#68 #068 #0068 68,316 West El Camino Real,CA,94087
+Trader Joe's,Menlo Park,69,#69 #069 #0069 69,720 Menlo Ave,CA,94025
+Trader Joe's,Sacramento,70,#70 #070 #0070 70,2625 Marconi Ave,CA,95821
+Trader Joe's,Fair Oaks,71,#71 #071 #0071 71,5309 Sunrise Blvd,CA,95628
+Trader Joe's,Emeryville,72,#72 #072 #0072 72,5700 Christie Ave,CA,94608
+Trader Joe's,Campbell,73,#73 #073 #0073 73,1875 Bascom Ave,CA,95008
+Trader Joe's,Daly City,74,#74 #074 #0074 74,417 Westlake Center,CA,94015
+Trader Joe's,Santa Rosa,75,#75 #075 #0075 75,3225 Cleveland Ave,CA,95403
+Trader Joe's,Stockton,76,#76 #076 #0076 76,6535 Pacific Ave,CA,95207
+Trader Joe's,Fremont,77,#77 #077 #0077 77,39324 Argonaut Way,CA,94538
+Trader Joe's,San Francisco,78,#78 #078 #0078 78,555 9th St,CA,94103
+Trader Joe's,Pacific Grove,79,#79 #079 #0079 79,1170 Forest Ave,CA,93950
+Trader Joe's,Roseville,80,#80 #080 #0080 80,1117 Roseville Square,CA,95678
+Trader Joe's,Mountain View,81,#81 #081 #0081 81,590 Showers Dr,CA,94040
+Trader Joe's,Reno,82,#82 #082 #0082 82,5035 S McCarran Blvd,NV,89502
+Trader Joe's,Concord,83,#83 #083 #0083 83,785 Oak Grove Rd,CA,94518
+Trader Joe's,Castro Valley,84,#84 #084 #0084 84,22224 Redwood Rd,CA,94546
+Trader Joe's,Glendale,85,#85 #085 #0085 85,7720 West Bell Rd,AZ,85308
+Trader Joe's,Las Vegas,86,#86 #086 #0086 86,7575 W Washington,NV,89128
+Trader Joe's,Scottsdale,87,#87 #087 #0087 87,7555 E Frank Lloyd Wright,AZ,85260
+Trader Joe's,Tucson,88,#88 #088 #0088 88,4766 E Grant Rd,AZ,85712
+Trader Joe's,Mesa,89,#89 #089 #0089 89,2050 E Baseline Rd,AZ,85204
+Trader Joe's,Phoenix,90,#90 #090 #0090 90,4821 N 20th St,AZ,85016
+Trader Joe's,Surprise,92,#92 #092 #0092 92,14095 W Grand Ave,AZ,85374
+Trader Joe's,Tempe,93,#93 #093 #0093 93,6460 S McClintock Dr,AZ,85283
+Trader Joe's,Scottsdale,94,#94 #094 #0094 94,6202 N Scottsdale Rd,AZ,85253
+Trader Joe's,Oro Valley,96,#96 #096 #0096 96,7912 N Oracle,AZ,85704
+Trader Joe's,Henderson,97,#97 #097 #0097 97,2716 N Green Valley Pkwy,NV,89014
+Trader Joe's,Las Vegas,98,#98 #098 #0098 98,2101 S Decatur Blvd,NV,89102
+Trader Joe's,Redlands,99,#99 #099 #0099 99,552 Orange St,CA,92374
+Trader Joe's,San Francisco,100,#100 #0100 #00100 100,3 Masonic Ave,CA,94118
+Trader Joe's,Temecula,102,#102 #0102 #00102 102,40665 Winchester Rd,CA,92591
+Trader Joe's,Laguna Niguel,103,#103 #0103 #00103 103,32351 Street of the Golden Lantern,CA,92677
+Trader Joe's,Cerritos,104,#104 #0104 #00104 104,12861 Towne Center Dr,CA,90703
+Trader Joe's,Escondido,105,#105 #0105 #00105 105,1885 S Centre City Pkwy,CA,92025
+Trader Joe's,Manhattan Beach,106,#106 #0106 #00106 106,1800 Rosecrans Blvd,CA,90266
+Trader Joe's,Petaluma,107,#107 #0107 #00107 107,169 N McDowell Blvd,CA,94954
+Trader Joe's,El Cerrito,108,#108 #0108 #00108 108,225 El Cerrito Plaza,CA,94530
+Trader Joe's,Alameda,109,#109 #0109 #00109 109,2217 South Shore Center,CA,94501
+Trader Joe's,Goleta,110,#110 #0110 #00110 110,5767 Calle Real,CA,93117
+Trader Joe's,Irvine,111,#111 #0111 #00111 111,4225 Campus Dr,CA,92612
+Trader Joe's,Monrovia,112,#112 #0112 #00112 112,604 W Huntington Dr,CA,91016
+Trader Joe's,Santa Ana,113,#113 #0113 #00113 113,3329 S Bristol St,CA,92704
+Trader Joe's,Camarillo,114,#114 #0114 #00114 114,363 Carmen Dr,CA,93010
+Trader Joe's,Lafayette,115,#115 #0115 #00115 115,3649 Mt Diablo Blvd,CA,94549
+Trader Joe's,Long Beach,116,#116 #0116 #00116 116,4121 Atlantic Ave,CA,90807
+Trader Joe's,Arroyo Grande,117,#117 #0117 #00117 117,955 Rancho Pkwy,CA,93420
+Trader Joe's,Cathedral City,118,#118 #0118 #00118 118,67720 E Palm Canyon Dr,CA,92234
+Trader Joe's,Los Angeles,119,#119 #0119 #00119 119,3456 S Sepulveda Blvd,CA,90034
+Trader Joe's,Torrance,121,#121 #0121 #00121 121,19720 Hawthorne Blvd,CA,90503
+Trader Joe's,Studio City,122,#122 #0122 #00122 122,11976 Ventura Blvd,CA,91604
+Trader Joe's,Walnut Creek,123,#123 #0123 #00123 123,1372 S California Blvd,CA,94596
+Trader Joe's,Burbank,124,#124 #0124 #00124 124,214 E Alameda Ave,CA,91502
+Trader Joe's,Newport Beach,125,#125 #0125 #00125 125,8086 E Pacific Coast Hwy,CA,92657
+Trader Joe's,Mission Viejo,126,#126 #0126 #00126 126,25410 Marguerite Pkwy,CA,92692
+Trader Joe's,Los Altos,127,#127 #0127 #00127 127,2310 Homestead Rd,CA,94024
+Trader Joe's,Napa,128,#128 #0128 #00128 128,3654 Bel Aire Plaza,CA,94558
+Trader Joe's,Lynnwood,129,#129 #0129 #00129 129,19500 Hwy 99,WA,98036
+Trader Joe's,Seattle,130,#130 #0130 #00130 130,1700 Madison St,WA,98122
+Trader Joe's,Bellevue,131,#131 #0131 #00131 131,15563 NE 24th St,WA,98007
+Trader Joe's,Kirkland,132,#132 #0132 #00132 132,12632 120th Ave NE,WA,98034
+Trader Joe's,Burien,133,#133 #0133 #00133 133,15868 1st Ave S,WA,98148
+Trader Joe's,Federal Way,134,#134 #0134 #00134 134,1758 S 320th St,WA,98003
+Trader Joe's,Seattle,135,#135 #0135 #00135 135,112 West Galer St,WA,98119
+Trader Joe's,Vancouver,136,#136 #0136 #00136 136,305 SE Chkalov Dr,WA,98683
+Trader Joe's,Seattle,137,#137 #0137 #00137 137,4555 Roosevelt Way NE,WA,98105
+Trader Joe's,Issaquah,138,#138 #0138 #00138 138,975 NW Gilman Blvd,WA,98027
+Trader Joe's,Everett,139,#139 #0139 #00139 139,811 SE Everett Mall Way,WA,98208
+Trader Joe's,Redmond,140,#140 #0140 #00140 140,15932 Redmond Way,WA,98052
+Trader Joe's,Beaverton,141,#141 #0141 #00141 141,11753 SW Beaverton Hillsdale Hwy,OR,97005
+Trader Joe's,Lake Oswego,142,#142 #0142 #00142 142,15391 SW Bangy Rd,OR,97035
+Trader Joe's,Portland,143,#143 #0143 #00143 143,4715 SE Cesar Chavez Blvd,OR,97202
+Trader Joe's,Portland,144,#144 #0144 #00144 144,4121 NE Halsey St,OR,97232
+Trader Joe's,Eugene,145,#145 #0145 #00145 145,85 Oakway Center,OR,97401
+Trader Joe's,Portland,146,#146 #0146 #00146 146,2122 NW Glisan St,OR,97210
+Trader Joe's,Seattle,147,#147 #0147 #00147 147,4609 14th Ave NW,WA,98107
+Trader Joe's,University Place,148,#148 #0148 #00148 148,3800 Bridgeport Way W,WA,98466
+Trader Joe's,Hillsboro,149,#149 #0149 #00149 149,2285 NW 185th Ave,OR,97124
+Trader Joe's,Bend,150,#150 #0150 #00150 150,63455 N Hwy 97,OR,97701
+Trader Joe's,Bellingham,151,#151 #0151 #00151 151,2410 James St,WA,98225
+Trader Joe's,Clackamas,152,#152 #0152 #00152 152,9345 SE 82nd Ave,OR,97086
+Trader Joe's,Salem,153,#153 #0153 #00153 153,4450 Commercial St,OR,97302
+Trader Joe's,Olympia,156,#156 #0156 #00156 156,1530 Black Lake Blvd SW,WA,98502
+Trader Joe's,Seattle,157,#157 #0157 #00157 157,4545 Fauntleroy Way SW,WA,98116
+Trader Joe's,Silverdale,158,#158 #0158 #00158 158,9991 Mickelberry Rd,WA,98383
+Trader Joe's,Spokane,159,#159 #0159 #00159 159,2975 East 29th Ave,WA,99223
+Trader Joe's,Sammamish,160,#160 #0160 #00160 160,490 228th Ave NE,WA,98074
+Trader Joe's,Santa Fe,165,#165 #0165 #00165 165,530 W Cordova Rd,NM,87505
+Trader Joe's,Albuquerque,166,#166 #0166 #00166 166,8928 Holly Ave NE,NM,87122
+Trader Joe's,Albuquerque,167,#167 #0167 #00167 167,2200 Uptown Loop NE,NM,87110
+Trader Joe's,Millbrae,170,#170 #0170 #00170 170,765 Broadway,CA,94030
+Trader Joe's,Pasadena,171,#171 #0171 #00171 171,467 N Rosemead Blvd,CA,91107
+Trader Joe's,Folsom,172,#172 #0172 #00172 172,850 East Bidwell,CA,95630
+Trader Joe's,West Hollywood,173,#173 #0173 #00173 173,8611 Santa Monica Blvd,CA,90069
+Trader Joe's,San Carlos,174,#174 #0174 #00174 174,1482 El Camino Real,CA,94070
+Trader Joe's,Sacramento,175,#175 #0175 #00175 175,5000 Folsom Blvd,CA,95819
+Trader Joe's,Yorba Linda,176,#176 #0176 #00176 176,19655 Yorba Linda Blvd,CA,92886
+Trader Joe's,Santa Rosa,178,#178 #0178 #00178 178,2100 Santa Rosa Ave,CA,95407
+Trader Joe's,Pasadena,179,#179 #0179 #00179 179,345 S Lake Ave,CA,91101
+Trader Joe's,Clovis,180,#180 #0180 #00180 180,1077 N Willow Ave,CA,93611
+Trader Joe's,Los Gatos,181,#181 #0181 #00181 181,15466 Los Gatos Blvd,CA,95032
+Trader Joe's,Davis,182,#182 #0182 #00182 182,885 Russell Blvd,CA,95616
+Trader Joe's,Santa Barbara,183,#183 #0183 #00183 183,3025 De La Vina St,CA,93105
+Trader Joe's,Chatsworth,184,#184 #0184 #00184 184,10330 Mason Ave,CA,91311
+Trader Joe's,Palmdale,185,#185 #0185 #00185 185,39507 10th St W,CA,93551
+Trader Joe's,Berkeley,186,#186 #0186 #00186 186,1885 University Ave,CA,94703
+Trader Joe's,South San Francisco,187,#187 #0187 #00187 187,301 MC Lellan Dr,CA,94080
+Trader Joe's,San Diego,188,#188 #0188 #00188 188,2401 Truxtun Rd,CA,92106
+Trader Joe's,La Quinta,189,#189 #0189 #00189 189,46400 Washington St,CA,92253
+Trader Joe's,Elk Grove,190,#190 #0190 #00190 190,9670 Bruceville Road,CA,95757
+Trader Joe's,Tucson,191,#191 #0191 #00191 191,4209 N Campbell Ave,AZ,85719
+Trader Joe's,Los Angeles,192,#192 #0192 #00192 192,8000 W Sunset Blvd,CA,90046
+Trader Joe's,Santa Cruz,193,#193 #0193 #00193 193,700 Front St,CA,95060
+Trader Joe's,Long Beach,194,#194 #0194 #00194 194,2222 Bellflower Blvd,CA,90815
+Trader Joe's,Aliso Viejo,195,#195 #0195 #00195 195,26541 Aliso Creek Rd,CA,92656
+Trader Joe's,Thousand Oaks,196,#196 #0196 #00196 196,451 Avenida De Los Arboles,CA,91360
+Trader Joe's,Tustin,197,#197 #0197 #00197 197,12932  Newport Ave,CA,92780
+Trader Joe's,Novato,198,#198 #0198 #00198 198,7514 Redwood Blvd,CA,94945
+Trader Joe's,Brentwood,201,#201 #0201 #00201 201,5451 Lone Tree Way,CA,94513
+Trader Joe's,Morgan Hill,202,#202 #0202 #00202 202,17035 Laurel Rd,CA,95037
+Trader Joe's,Oakland,203,#203 #0203 #00203 203,3250 Lakeshore Ave,CA,94610
+Trader Joe's,Los Angeles,206,#206 #0206 #00206 206,1600 N Vine St,CA,90028
+Trader Joe's,Palo Alto,207,#207 #0207 #00207 207,855 El Camino Real,CA,94301
+Trader Joe's,Livermore,208,#208 #0208 #00208 208,1122 A East Stanley Blvd,CA,94550
+Trader Joe's,Woodland Hills,209,#209 #0209 #00209 209,21055 Ventura Blvd,CA,91364
+Trader Joe's,Irvine,210,#210 #0210 #00210 210,6222 Irvine Blvd,CA,92620
+Trader Joe's,Templeton,211,#211 #0211 #00211 211,1111 Rossi Road,CA,93465
+Trader Joe's,San Jose,212,#212 #0212 #00212 212,635 Coleman Ave,CA,95110
+Trader Joe's,Corona,213,#213 #0213 #00213 213,2790 Cabot Dr,CA,92883
+Trader Joe's,Claremont,214,#214 #0214 #00214 214,475 W Foothill Blvd,CA,91711
+Trader Joe's,Los Angeles,215,#215 #0215 #00215 215,11755 Olympic Blvd,CA,90064
+Trader Joe's,Chino Hills,216,#216 #0216 #00216 216,13911 Peyton Drive,CA,91709
+Trader Joe's,Rancho Cucamonga,217,#217 #0217 #00217 217,6401 Haven Ave,CA,91737
+Trader Joe's,Redding,219,#219 #0219 #00219 219,845 Browning St,CA,96003
+Trader Joe's,Carlsbad,220,#220 #0220 #00220 220,2629 Gateway Rd,CA,92009
+Trader Joe's,San Diego,221,#221 #0221 #00221 221,9850 Hibert St,CA,92131
+Trader Joe's,San Diego,222,#222 #0222 #00222 222,1072 Camino Del Rio North,CA,92108
+Trader Joe's,Pinole,230,#230 #0230 #00230 230,2742 Pinole Valley Rd,CA,94564
+Trader Joe's,Oakland,231,#231 #0231 #00231 231,5727 College Ave,CA,94618
+Trader Joe's,San Jose,232,#232 #0232 #00232 232,7250 Bollinger Rd,CA,95129
+Trader Joe's,Rancho Palos Verdes,233,#233 #0233 #00233 233,31176 Hawthorne Blvd,CA,90275
+Trader Joe's,Los Angeles,234,#234 #0234 #00234 234,1000 Glendon Ave,CA,90024
+Trader Joe's,Greenbrae,235,#235 #0235 #00235 235,2052 Redwood Hwy,CA,94904
+Trader Joe's,San Francisco,236,#236 #0236 #00236 236,265 Winston Dr,CA,94132
+Trader Joe's,Los Angeles,237,#237 #0237 #00237 237,8500 Burton Way,CA,90048
+Trader Joe's,Santa Maria,239,#239 #0239 #00239 239,1303 S Bradley Rd,CA,93454
+Trader Joe's,Los Angeles,240,#240 #0240 #00240 240,175 South Fairfax Ave,CA,90036
+Trader Joe's,Huntington Beach,241,#241 #0241 #00241 241,21431 Brookhurst St,CA,92646
+Trader Joe's,Thousand Oaks,243,#243 #0243 #00243 243,125 N Reino Road,CA,91320
+Trader Joe's,Huntington Beach,244,#244 #0244 #00244 244,16821 Algonquin St,CA,92649
+Trader Joe's,San Mateo,245,#245 #0245 #00245 245,45 W Hillsdale Blvd,CA,94403
+Trader Joe's,Agoura Hills,247,#247 #0247 #00247 247,28941 Canwood St,CA,91301
+Trader Joe's,Henderson,280,#280 #0280 #00280 280,10345 S Eastern Ave,NV,89052
+Trader Joe's,Carson City,281,#281 #0281 #00281 281,3790 US Hwy 395 S,NV,89705
+Trader Joe's,Phoenix,282,#282 #0282 #00282 282,4726 East Shea Blvd,AZ,85028
+Trader Joe's,Prescott,283,#283 #0283 #00283 283,252 N Lee Blvd,AZ,86303
+Trader Joe's,Denver,300,#300 #0300 #00300 300,750 N Colorado Blvd,CO,80206
+Trader Joe's,Boulder,301,#301 #0301 #00301 301,1906 28th St,CO,80301
+Trader Joe's,Denver,302,#302 #0302 #00302 302,390 East 7th Ave,CO,80203
+Trader Joe's,Greenwood Village,303,#303 #0303 #00303 303,"5910 S University Blvd, Suite E1",CO,80121
+Trader Joe's,Denver,310,#310 #0310 #00310 310,790 N Colorado Blvd,CO,80206
+Trader Joe's,Salt Lake City,350,#350 #0350 #00350 350,634 East 400 South,UT,84102
+Trader Joe's,Boise,360,#360 #0360 #00360 360,300 S Capitol Blvd,ID,83702
+Trader Joe's,Dallas,401,#401 #0401 #00401 401,7939 Walnut Hill Lane,TX,75230
+Trader Joe's,Fort Worth,404,#404 #0404 #00404 404,2701 S Hulen St,TX,76109
+Trader Joe's,Houston,426,#426 #0426 #00426 426,2922 S Shepherd Drive,TX,77098
+Trader Joe's,Houston,427,#427 #0427 #00427 427,1440 South Voss Road,TX,77057
+Trader Joe's,The Woodlands,428,#428 #0428 #00428 428,10868 Kuykendahl Road,TX,77381
+Trader Joe's,Katy,429,#429 #0429 #00429 429,2717 Commercial Center Blvd,TX,77494
+Trader Joe's,San Antonio,451,#451 #0451 #00451 451,350 East Basse Road,TX,78209
+Trader Joe's,Austin,452,#452 #0452 #00452 452,"211 Seaholm Drive, Suite 100",TX,78703
+Trader Joe's,Austin,453,#453 #0453 #00453 453,2805 Bee Cave Rd,TX,78746
+Trader Joe's,Austin,454,#454 #0454 #00454 454,9722 Great Hills Trail,TX,78759
+Trader Joe's,San Antonio,455,#455 #0455 #00455 455,403 N Loop 1604 W,TX,78232
+Trader Joe's,Brookline,501,#501 #0501 #00501 501,1317 Beacon St,MA,2446
+Trader Joe's,Cambridge,502,#502 #0502 #00502 502,748 Memorial Dr,MA,2139
+Trader Joe's,Framingham,503,#503 #0503 #00503 503,659 Worcester Rd,MA,1701
+Trader Joe's,Needham,504,#504 #0504 #00504 504,958 Highland Ave,MA,2494
+Trader Joe's,Arlington,505,#505 #0505 #00505 505,1427 Massachusetts Ave,MA,2476
+Trader Joe's,Saugus,506,#506 #0506 #00506 506,358 Broadway,MA,1906
+Trader Joe's,Nashua,507,#507 #0507 #00507 507,262 Daniel Webster HWY,NH,3060
+Trader Joe's,Shrewsbury,508,#508 #0508 #00508 508,77 Boston Turnpike,MA,1545
+Trader Joe's,West Newton,509,#509 #0509 #00509 509,1121 Washington St,MA,2465
+Trader Joe's,Boston,510,#510 #0510 #00510 510,899 Boylston St,MA,2115
+Trader Joe's,Acton,511,#511 #0511 #00511 511,145 Great Rd,MA,1720
+Trader Joe's,Hadley,512,#512 #0512 #00512 512,375 Russell St,MA,1035
+Trader Joe's,Hanover,513,#513 #0513 #00513 513,1775 Washington St,MA,2339
+Trader Joe's,Burlington,515,#515 #0515 #00515 515,51 Middlesex Turnpike,MA,1803
+Trader Joe's,Peabody,516,#516 #0516 #00516 516,300 Andover St,MA,1960
+Trader Joe's,Cambridge,517,#517 #0517 #00517 517,211 Alewife Brook Pkwy,MA,2138
+Trader Joe's,Warwick,518,#518 #0518 #00518 518,1000 Bald Hill Rd,RI,2886
+Trader Joe's,Portland,519,#519 #0519 #00519 519,87 Marginal Way,ME,4101
+Trader Joe's,Westport,521,#521 #0521 #00521 521,400 Post Road E,CT,6880
+Trader Joe's,Darien,522,#522 #0522 #00522 522,436 Boston Post Rd,CT,6820
+Trader Joe's,Fairfield,523,#523 #0523 #00523 523,2258 Black Rock Turnpike,CT,6825
+Trader Joe's,Orange,524,#524 #0524 #00524 524,560 Boston Post Rd,CT,6477
+Trader Joe's,Danbury,525,#525 #0525 #00525 525,113 Mill Plain Rd,CT,6811
+Trader Joe's,West Hartford,526,#526 #0526 #00526 526,1489 New Britain Ave,CT,6110
+Trader Joe's,Foxborough,528,#528 #0528 #00528 528,350 Patriot Place,MA,2035
+Trader Joe's,Stamford,529,#529 #0529 #00529 529,1041 High Ridge Rd,CT,6905
+Trader Joe's,Hingham,530,#530 #0530 #00530 530,5 Essington Drive,MA,2043
+Trader Joe's,Scarsdale,531,#531 #0531 #00531 531,727 White Plains Rd,NY,10583
+Trader Joe's,Larchmont,532,#532 #0532 #00532 532,1260 Boston Post Rd,NY,10538
+Trader Joe's,Hartsdale,533,#533 #0533 #00533 533,215 N Central Ave,NY,10530
+Trader Joe's,Rochester,534,#534 #0534 #00534 534,3349 Monroe Ave,NY,14618
+Trader Joe's,Colonie,535,#535 #0535 #00535 535,79 Wolf Rd,NY,12205
+Trader Joe's,Buffalo,536,#536 #0536 #00536 536,1565 Niagara Falls Blvd,NY,14228
+Trader Joe's,New York,542,#542 #0542 #00542 542,2073 Broadway,NY,10023
+Trader Joe's,New York,543,#543 #0543 #00543 543,675 6th Ave,NY,10010
+Trader Joe's,Garden City,550,#550 #0550 #00550 550,900 Old Country Rd,NY,11530
+Trader Joe's,Commack,551,#551 #0551 #00551 551,5010 Jericho Turnpike,NY,11725
+Trader Joe's,Oceanside,552,#552 #0552 #00552 552,3418 Long Beach Rd,NY,11572
+Trader Joe's,Merrick,553,#553 #0553 #00553 553,1714 Merrick Rd,NY,11566
+Trader Joe's,Hewlett,554,#554 #0554 #00554 554,1280 West Broadway,NY,11557
+Trader Joe's,Plainview,555,#555 #0555 #00555 555,425 S Oyster Bay Rd,NY,11803
+Trader Joe's,Lake Grove,556,#556 #0556 #00556 556,2085 Smith Haven Plaza,NY,11755
+Trader Joe's,Rego Park,557,#557 #0557 #00557 557,9030 Metropolitan Ave,NY,11374
+Trader Joe's,Brooklyn,558,#558 #0558 #00558 558,130 Court St,NY,11201
+Trader Joe's,Staten Island,559,#559 #0559 #00559 559,2385 Richmond Ave,NY,10314
+Trader Joe's,Westfield,601,#601 #0601 #00601 601,155 Elm St,NJ,7090
+Trader Joe's,Westwood,602,#602 #0602 #00602 602,20 Irvington St,NJ,7675
+Trader Joe's,Wayne,603,#603 #0603 #00603 603,1172 Hamburg Turnpike,NJ,7470
+Trader Joe's,Florham Park,604,#604 #0604 #00604 604,176 Columbia Turnpike,NJ,7932
+Trader Joe's,Paramus,605,#605 #0605 #00605 605,404 Rt 17 N,NJ,7652
+Trader Joe's,Edgewater,606,#606 #0606 #00606 606,715 River Rd,NJ,7020
+Trader Joe's,Princeton,607,#607 #0607 #00607 607,3528 Brunswick Pike,NJ,8540
+Trader Joe's,Shrewsbury,608,#608 #0608 #00608 608,1031 Broad St,NJ,7702
+Trader Joe's,Millburn,609,#609 #0609 #00609 609,187 Millburn Ave,NJ,7041
+Trader Joe's,Clifton,610,#610 #0610 #00610 610,259 Allwood Road,NJ,7012
+Trader Joe's,Lexington,626,#626 #0626 #00626 626,2320 Nicholasville Road,KY,40503
+Trader Joe's,Lexington,627,#627 #0627 #00627 627,2326 Nicholasville Rd,KY,40503
+Trader Joe's,Louisville,628,#628 #0628 #00628 628,4600 Shelbyville Rd Ste 111,KY,40207
+Trader Joe's,State College,629,#629 #0629 #00629 629,243 Patriot Lane,PA,16803
+Trader Joe's,Pittsburgh,630,#630 #0630 #00630 630,1630 Washington Rd,PA,15241
+Trader Joe's,Marlton,631,#631 #0631 #00631 631,300 P Route 73 S,NJ,8053
+Trader Joe's,Wayne,632,#632 #0632 #00632 632,171 E Swedesford Rd,PA,19087
+Trader Joe's,Jenkintown,633,#633 #0633 #00633 633,933 Old York Rd,PA,19046
+Trader Joe's,Philadelphia,634,#634 #0634 #00634 634,2121 Market St,PA,19103
+Trader Joe's,Ardmore,635,#635 #0635 #00635 635,112 Coulter Ave,PA,19003
+Trader Joe's,Wilmington,636,#636 #0636 #00636 636,5605 Concord Pike,DE,19803
+Trader Joe's,Media,637,#637 #0637 #00637 637,12 E State St,PA,19063
+Trader Joe's,Pittsburgh,638,#638 #0638 #00638 638,6343 Penn Ave,PA,15206
+Trader Joe's,North Wales,639,#639 #0639 #00639 639,1460 Bethlehem Pike,PA,19454
+Trader Joe's,Arlington,640,#640 #0640 #00640 640,1109 N Highland St,VA,22201
+Trader Joe's,Falls Church,641,#641 #0641 #00641 641,7514 Leesburg Turnpike,VA,22043
+Trader Joe's,Rockville,642,#642 #0642 #00642 642,12268-H Rockville Pike,MD,20852
+Trader Joe's,Fairfax,643,#643 #0643 #00643 643,9464 Main St,VA,22031
+Trader Joe's,Bailey's Crossroads,644,#644 #0644 #00644 644,5847 Leesburg Pike,VA,22041
+Trader Joe's,Bethesda,645,#645 #0645 #00645 645,6831 Wisconsin Ave,MD,20815
+Trader Joe's,Reston,646,#646 #0646 #00646 646,11958 Killingsworth Ave,VA,20194
+Trader Joe's,Alexandria,647,#647 #0647 #00647 647,612 N Saint Asaph St,VA,22314
+Trader Joe's,Gaithersburg,648,#648 #0648 #00648 648,18270 Contour Rd,MD,20877
+Trader Joe's,Towson,649,#649 #0649 #00649 649,1 E Joppa Rd,MD,21286
+Trader Joe's,Annapolis,650,#650 #0650 #00650 650,160 F Jennifer Rd,MD,21401
+Trader Joe's,Springfield,651,#651 #0651 #00651 651,6394 Springfield Plaza,VA,22150
+Trader Joe's,Silver Spring,652,#652 #0652 #00652 652,10741 Columbia Pike,MD,20901
+Trader Joe's,Washington,653,#653 #0653 #00653 653,1101 25th Street NW,DC,20037
+Trader Joe's,Centreville,654,#654 #0654 #00654 654,14100 Lee Hwy,VA,20120
+Trader Joe's,Pikesville,655,#655 #0655 #00655 655,1809 Reisterstown Rd,MD,21208
+Trader Joe's,Newport News,656,#656 #0656 #00656 656,12551 Jefferson Ave,VA,23602
+Trader Joe's,Williamsburg,657,#657 #0657 #00657 657,5000 Settlers Market Blvd,VA,23188
+Trader Joe's,Elkridge,658,#658 #0658 #00658 658,6610 Marie Curie Dr,MD,21075
+Trader Joe's,Glen Allen,659,#659 #0659 #00659 659,11331 W Broad St,VA,23060
+Trader Joe's,Virginia Beach,660,#660 #0660 #00660 660,503 Hilltop Plaza,VA,23454
+Trader Joe's,Charlottesville,661,#661 #0661 #00661 661,2025 Bond St.,VA,22901
+Trader Joe's,Washington,662,#662 #0662 #00662 662,1914 14th St NW,DC,20009
+Trader Joe's,Knoxville,663,#663 #0663 #00663 663,8001 Kingston Pike,TN,37919
+Trader Joe's,Nashville,664,#664 #0664 #00664 664,3909 Hillsboro Pike,TN,37215
+Trader Joe's,Grosse Pointe,665,#665 #0665 #00665 665,17028 Kercheval Ave,MI,48230
+Trader Joe's,Northville,667,#667 #0667 #00667 667,20490 Haggerty Rd,MI,48167
+Trader Joe's,Rochester Hills,668,#668 #0668 #00668 668,3044 Walton Blvd,MI,48309
+Trader Joe's,Cincinnati,669,#669 #0669 #00669 669,7788 Montgomery Rd,OH,45236
+Trader Joe's,Indianapolis,670,#670 #0670 #00670 670,2902 W 86th St,IN,46268
+Trader Joe's,Indianapolis,671,#671 #0671 #00671 671,5473 E 82nd St,IN,46250
+Trader Joe's,Dublin,672,#672 #0672 #00672 672,6355 Sawmill Rd,OH,43017
+Trader Joe's,Kettering,673,#673 #0673 #00673 673,328 East Stroop Rd,OH,45429
+Trader Joe's,Royal Oak,674,#674 #0674 #00674 674,27880 Woodward Ave,MI,48067
+Trader Joe's,Bloomfield Hills,675,#675 #0675 #00675 675,6536 Telegraph Rd,MI,48301
+Trader Joe's,Woodmere,676,#676 #0676 #00676 676,28809 Chagrin Blvd,OH,44122
+Trader Joe's,Westlake,677,#677 #0677 #00677 677,175 Market St,OH,44145
+Trader Joe's,Ann Arbor,678,#678 #0678 #00678 678,2398 East Stadium Blvd,MI,48104
+Trader Joe's,Columbus,679,#679 #0679 #00679 679,3888 Townsfair Way,OH,43219
+Trader Joe's,Glen Ellyn,680,#680 #0680 #00680 680,680 Roosevelt Rd,IL,60137
+Trader Joe's,Glenview,681,#681 #0681 #00681 681,1407 Waukegan Rd,IL,60025
+Trader Joe's,Northbrook,682,#682 #0682 #00682 682,127 Skokie Blvd,IL,60062
+Trader Joe's,Downers Grove,683,#683 #0683 #00683 683,122 Ogden Ave,IL,60515
+Trader Joe's,Lake Zurich,684,#684 #0684 #00684 684,735 W Route 22,IL,60047
+Trader Joe's,La Grange,685,#685 #0685 #00685 685,25 N La Grange Rd,IL,60525
+Trader Joe's,Orland Park,686,#686 #0686 #00686 686,14924 S La Grange Rd,IL,60462
+Trader Joe's,Arlington Heights,687,#687 #0687 #00687 687,17 W Rand Rd,IL,60004
+Trader Joe's,Chicago,688,#688 #0688 #00688 688,3745 N Lincoln Ave,IL,60613
+Trader Joe's,Batavia,689,#689 #0689 #00689 689,1942 W Fabyan Pkwy,IL,60510
+Trader Joe's,Naperville,690,#690 #0690 #00690 690,44 W Gartner Rd,IL,60540
+Trader Joe's,Chicago,691,#691 #0691 #00691 691,1840 N Clybourn Ave,IL,60614
+Trader Joe's,Brentwood,692,#692 #0692 #00692 692,48 Brentwood Promenade Court,MO,63144
+Trader Joe's,Chesterfield,693,#693 #0693 #00693 693,1679 Clarkson Rd,MO,63017
+Trader Joe's,Creve Coeur,694,#694 #0694 #00694 694,11505 Olive Blvd,MO,63141
+Trader Joe's,Des Peres,695,#695 #0695 #00695 695,13343 Manchester Rd,MO,63131
+Trader Joe's,Chicago,696,#696 #0696 #00696 696,44 E Ontario St,IL,60611
+Trader Joe's,Oak Park,697,#697 #0697 #00697 697,483 N Harlem Ave,IL,60301
+Trader Joe's,Park Ridge,698,#698 #0698 #00698 698,190 N NW Highway,IL,60068
+Trader Joe's,Algonquin,699,#699 #0699 #00699 699,1800 S Randall Rd,IL,60102
+Trader Joe's,Chicago,701,#701 #0701 #00701 701,1147 S Wabash Ave,IL,60605
+Trader Joe's,Evanston,702,#702 #0702 #00702 702,1211 Chicago Avenue,IL,60202
+Trader Joe's,Chicago,703,#703 #0703 #00703 703,667 W Diversey Pkwy,IL,60614
+Trader Joe's,Libertyville,704,#704 #0704 #00704 704,1600 S Milwaukee Ave,IL,60048
+Trader Joe's,St. Louis Park,710,#710 #0710 #00710 710,4500 Excelsior Blvd,MN,55416
+Trader Joe's,Milwaukee,711,#711 #0711 #00711 711,5600 N Port Washington Rd,WI,53217
+Trader Joe's,Madison,712,#712 #0712 #00712 712,1810 Monroe St,WI,53711
+Trader Joe's,Maple Grove,713,#713 #0713 #00713 713,12105 Elm Creek Blvd N,MN,55369
+Trader Joe's,Minnetonka,714,#714 #0714 #00714 714,11220 Wayzata Blvd,MN,55305
+Trader Joe's,Woodbury,715,#715 #0715 #00715 715,8960 Hudson Rd. Ste. 801,MN,55125
+Trader Joe's,St. Paul,716,#716 #0716 #00716 716,484 Lexington Pkwy S,MN,55105
+Trader Joe's,Rochester,718,#718 #0718 #00718 718,1200 16th St SW,MN,55902
+Trader Joe's,Omaha,719,#719 #0719 #00719 719,10305 Pacific St,NE,68114
+Trader Joe's,Kansas City,720,#720 #0720 #00720 720,8600 Ward Pkwy,MO,64114
+Trader Joe's,Leawood,723,#723 #0723 #00723 723,4201 W 119th St,KS,66209
+Trader Joe's,Bloomington,724,#724 #0724 #00724 724,4270 W 78th St,MN,55435
+Trader Joe's,Brookfield,726,#726 #0726 #00726 726,12665 W. Bluemound Rd,WI,53005
+Trader Joe's,Shoreview,727,#727 #0727 #00727 727,1041 Red Fox Rd,MN,55126
+Trader Joe's,Atlanta,730,#730 #0730 #00730 730,931 Monroe Dr,GA,30308
+Trader Joe's,Sandy Springs,731,#731 #0731 #00731 731,6277 Roswell Road NE,GA,30328
+Trader Joe's,Marietta,732,#732 #0732 #00732 732,4250 Roswell Road NE,GA,30062
+Trader Joe's,Roswell,733,#733 #0733 #00733 733,635 W Crossville Rd,GA,30075
+Trader Joe's,Atlanta,735,#735 #0735 #00735 735,3183 Peachtree Rd,GA,30305
+Trader Joe's,Asheville,740,#740 #0740 #00740 740,120 Merrimon Ave,NC,28801
+Trader Joe's,Cary,741,#741 #0741 #00741 741,1393 Kildaire Farm Rd,NC,27511
+Trader Joe's,Charlotte,742,#742 #0742 #00742 742,6418 Rea Rd,NC,28277
+Trader Joe's,Charlotte,743,#743 #0743 #00743 743,1820 E Arbors Dr,NC,28262
+Trader Joe's,Charlotte,744,#744 #0744 #00744 744,1133 Metropolitan Ave,NC,28204
+Trader Joe's,Chapel Hill,745,#745 #0745 #00745 745,1800 E Franklin St,NC,27514
+Trader Joe's,Raleigh,746,#746 #0746 #00746 746,3000 Wake Forest Rd,NC,27609
+Trader Joe's,Wilmington,747,#747 #0747 #00747 747,1437 S College Rd,NC,28403
+Trader Joe's,Winston Salem,749,#749 #0749 #00749 749,252 South Stratford Road,NC,27103
+Trader Joe's,Greenville,751,#751 #0751 #00751 751,59 Woodruff Industrial Ln,SC,29607
+Trader Joe's,Mt. Pleasant,752,#752 #0752 #00752 752,401 Johnnie Dodds Blvd,SC,29464
+Trader Joe's,Columbia,753,#753 #0753 #00753 753,4516 Forest Drive,SC,29206
+Trader Joe's,Baton Rouge,754,#754 #0754 #00754 754,3535 Perkins Rd,LA,70808
+Trader Joe's,Sarasota,761,#761 #0761 #00761 761,4101 S Tamiami Trail,FL,34231
+Trader Joe's,Naples,762,#762 #0762 #00762 762,10600 Tamiami Trail N,FL,34108
+Trader Joe's,Gainesville,764,#764 #0764 #00764 764,3724 SW Archer Rd,FL,32608
+Trader Joe's,Tampa,766,#766 #0766 #00766 766,3808 W Swann Ave,FL,33609
+Trader Joe's,Miami,770,#770 #0770 #00770 770,9205 S Dixie Hwy,FL,33156
+Trader Joe's,Boca Raton,773,#773 #0773 #00773 773,855 S Federal Hwy,FL,33432
+Trader Joe's,Bakersfield,14,#14 #014 #0014 14,8200 Stockdale Hwy,CA,93311
+Trader Joe's,San Diego,26,#26 #026 #0026 26,1090 University,CA,92103
+Trader Joe's,W. Hollywood,40,#40 #040 #0040 40,7304 Santa Monica Blvd,CA,90046
+Trader Joe's,Tucson,95,#95 #095 #0095 95,1101 N Wilmot Rd,AZ,85712
+Trader Joe's,Fairfield,101,#101 #0101 #00101 101,1350 Gateway Blvd,CA,94533
+Trader Joe's,Chula Vista,120,#120 #0120 #00120 120,878 Eastlake Pkwy,CA,91914
+Trader Joe's,Corvallis,154,#154 #0154 #00154 154,1550 NW 9th St,OR,97330
+Trader Joe's,Medford,155,#155 #0155 #00155 155,55 Rossanley Drive,OR,97501
+Trader Joe's,Phoenix,177,#177 #0177 #00177 177,4025 E Chandler Blvd,AZ,85048
+Trader Joe's,Chico,199,#199 #0199 #00199 199,801 East Ave,CA,95926
+Trader Joe's,San Francisco,200,#200 #0200 #00200 200,1095 Hyde St,CA,94109
+Trader Joe's,Monterey,204,#204 #0204 #00204 204,570 Munras Ave,CA,93940
+Trader Joe's,Ventura,218,#218 #0218 #00218 218,103 S Mills Rd,CA,93003
+Trader Joe's,Las Vegas,284,#284 #0284 #00284 284,2315 Summa Dr,NV,89135
+Trader Joe's,Colorado Springs,305,#305 #0305 #00305 305,5342 N Nevada Ave,CO,80918
+Trader Joe's,Cottonwood Heights,351,#351 #0351 #00351 351,6989 S 1300 E,UT,84047
+Trader Joe's,Plano,402,#402 #0402 #00402 402,2400 Preston Rd,TX,75093
+Trader Joe's,Dallas,403,#403 #0403 #00403 403,2001 Greenville Ave,TX,75206
+Trader Joe's,Dallas,405,#405 #0405 #00405 405,5550 W Lovers Lane,TX,75209
+Trader Joe's,McKinney,408,#408 #0408 #00408 408,2975 Craig Dr,TX,75070
+Trader Joe's,Hyannis,514,#514 #0514 #00514 514,655 Route 132,MA,2601
+Trader Joe's,Portsmouth,520,#520 #0520 #00520 520,45 Gosling Rd,NH,3801
+Trader Joe's,South Burlington,527,#527 #0527 #00527 527,200 Dorset St,VT,5403
+Trader Joe's,New York,540,#540 #0540 #00540 540,142 E 14th St,NY,10003
+Trader Joe's,New York,541,#541 #0541 #00541 541,138 E 14th St,NY,10003
+Trader Joe's,Louisville,625,#625 #0625 #00625 625,4600 Shelbyville Rd Ste 112,KY,40207
+Trader Joe's,West Des Moines,721,#721 #0721 #00721 721,6305 Mills Civic Pkwy,IA,50266
+Trader Joe's,Lincoln,722,#722 #0722 #00722 722,3120 Pine Lake Rd,NE,68516
+Trader Joe's,Norcross,734,#734 #0734 #00734 734,5185 Peachtree Pkwy,GA,30092
+Trader Joe's,Athens,736,#736 #0736 #00736 736,1850 Epps Bridge Pkwy,GA,30606
+Trader Joe's,Tallahassee,763,#763 #0763 #00763 763,3425 Thomasville Rd,FL,32309
+Trader Joe's,Winter Park,765,#765 #0765 #00765 765,131 N Orlando Ave,FL,32789
+Trader Joe's,St. Petersburg,767,#767 #0767 #00767 767,2742 4th St N,FL,33704
+Trader Joe's,Wellington,774,#774 #0774 #00774 774,2877 South State Rd 7,FL,33414
+Trader Joe's,Fort Lauderdale,776,#776 #0776 #00776 776,1590 N Federal Hwy,FL,33304

@@ -1,0 +1,1756 @@
+Keywords,city,Agg store_number,store_number,address,state,zip_code
+Panera Bread,Yulee,201673,#201673,463861 State Road 200,FL,32097
+Panera Bread,Norridge,201714,#201714,4244 N. Harlem Avenue,IL,60706
+Panera Bread,Overland Park,202700,#202700,11022 Metcalf Avenue,KS,66210
+Panera Bread,Overland Park,202702,#202702,11319 West 95th Street,KS,66214
+Panera Bread,Prairie Village,202703,#202703,8300 Mission Road,KS,66206
+Panera Bread,Wichita,202704,#202704,1605 N Rock Road,KS,67206
+Panera Bread,Lawrence,202705,#202705,520 W 23rd Street,KS,66046
+Panera Bread,Kansas City,202706,#202706,4117 Mill Street,MO,64111
+Panera Bread,Overland Park,202707,#202707,8803 West 75th Street,KS,66204
+Panera Bread,Leawood,202708,#202708,11751 Nall Avenue,KS,66209
+Panera Bread,Olathe,202709,#202709,15108 West 119th Street,KS,66062
+Panera Bread,Topeka,202710,#202710,1421 SW Wanamaker Road,KS,66604
+Panera Bread,Kansas City,202711,#202711,6145 NW Barry Road,MO,64154
+Panera Bread,Lee's Summit,202712,#202712,1305 NE Douglas Street,MO,64086
+Panera Bread,Independence,202713,#202713,18800 East 40 Highway,MO,64055
+Panera Bread,Wichita,202714,#202714,2441 North Maize Road,KS,67205
+Panera Bread,Lenexa,202716,#202716,15221 West 87th Street,KS,66219
+Panera Bread,Overland Park,202717,#202717,6800 West 135th Street,KS,66223
+Panera Bread,Kansas City,202718,#202718,8580 Church Road,MO,64157
+Panera Bread,Wichita,202719,#202719,3333 E Central Avenue,KS,67208
+Panera Bread,Kansas City,202720,#202720,4700 Pennsylvania Avenue,MO,64112
+Panera Bread,Manhattan,202721,#202721,315 Southwind Place,KS,66503
+Panera Bread,Olathe,202722,#202722,20120 West 153rd Street,KS,66062
+Panera Bread,Mission,202723,#202723,7070 Martway Street,KS,66202
+Panera Bread,Shawnee Mission,202724,#202724,10606 Shawnee Mission Parkway,KS,66203
+Panera Bread,Kansas City,202725,#202725,2405 Grand Boulevard,MO,64108
+Panera Bread,Kansas City,202726,#202726,1811 Village West Parkway,KS,66111
+Panera Bread,Kansas City,202727,#202727,1128 West 103rd Street,MO,64114
+Panera Bread,Kansas City,202729,#202729,311 NE Englewood Road,MO,64118
+Panera Bread,St. Joseph,202730,#202730,1209 N. Belt Highway,MO,64506
+Panera Bread,Blue Springs,202731,#202731,605 NE Coronado Drive,MO,64014
+Panera Bread,Lee's Summit,202732,#202732,1686 Northwest Chipman Road,MO,64081
+Panera Bread,Wichita,202733,#202733,420 South Ridge Road,KS,67209
+Panera Bread,Derby,202734,#202734,1500 North Rock Road,KS,67037
+Panera Bread,Kansas City,202735,#202735,6301 Brookside,MO,64113
+Panera Bread,Sedalia,202736,#202736,3171 West Broadway,MO,65301
+Panera Bread,Springfield,202800,#202800,1670 East Battlefield Road,MO,65804
+Panera Bread,Springfield,202802,#202802,500 South National Avenue,MO,65802
+Panera Bread,Joplin,202804,#202804,2401 East 32nd Street,MO,64804
+Panera Bread,Springfield,202805,#202805,2924 East Sunshine Street,MO,65804
+Panera Bread,Springfield,202806,#202806,3738 S Campbell Avenue,MO,65807
+Panera Bread,Branson,202807,#202807,2407 Green Mountain Drive,MO,65616
+Panera Bread,Springfield,202808,#202808,2535 North Kansas Expressway,MO,65803
+Panera Bread,Fort Smith,202809,#202809,2917 South 74th Street,AR,72903
+Panera Bread,Tulsa,202812,#202812,1624 East 15th Street,OK,74120
+Panera Bread,Tulsa,202814,#202814,6981 South Lewis Avenue,OK,74136
+Panera Bread,Tulsa,202815,#202815,5601 East 41st Street,OK,74135
+Panera Bread,Oklahoma City,202816,#202816,3321 Northwest Expressway,OK,73112
+Panera Bread,Edmond,202817,#202817,1472 South Bryant Avenue,OK,73034
+Panera Bread,Fayetteville,202818,#202818,3638 North Front Street,AR,72701
+Panera Bread,Oklahoma City,202819,#202819,4401 West Memorial Road,OK,73134
+Panera Bread,Oklahoma City,202820,#202820,6816 North Western Avenue,OK,73116
+Panera Bread,Broken Arrow,202821,#202821,2201 W Detroit Street,OK,74012
+Panera Bread,Oklahoma City,202822,#202822,10600 S Pennsylvania Avenue,OK,73170
+Panera Bread,Owasso,202824,#202824,12417 E 96th Street N,OK,74055
+Panera Bread,Norman,202825,#202825,2200 West Main Street,OK,73069
+Panera Bread,Tulsa,202827,#202827,11123 East 71st Street,OK,74133
+Panera Bread,Stillwater,202828,#202828,113 West Hall of Fame Avenue,OK,74075
+Panera Bread,Midwest City,202829,#202829,7199 SE 29th Street,OK,73110
+Panera Bread,Tulsa,202830,#202830,8920 S Memorial Drive,OK,74133
+Panera Bread,Oklahoma City,202831,#202831,7101 Northwest Expressway Street,OK,73116
+Panera Bread,Tulsa,202833,#202833,7547A S. Olympia Avenue West,OK,74132
+Panera Bread,Oklahoma City,202834,#202834,6410 SW 3rd Street,OK,73128
+Panera Bread,Bentonville,202835,#202835,1320 SE Walton Blvd,AR,72712
+Panera Bread,Little Rock,202851,#202851,11525 Cantrell Road,AR,72201
+Panera Bread,Little Rock,202853,#202853,314 S University Suite 100,AR,72205
+Panera Bread,Conway,202854,#202854,1050 Ellis Aveneu,AR,72032
+Panera Bread,North Little Rock,202855,#202855,2812 Lakewood Village Drive,AR,72116
+Panera Bread,Little Rock,202856,#202856,10701 Kanis Road,AR,77221
+Panera Bread,Tucson,202870,#202870,4362 North Oracle Road Suite 100,AZ,85705
+Panera Bread,Tucson,202871,#202871,4821 E. Grant Road,AZ,85712
+Panera Bread,Tucson,202872,#202872,6129 East Broadway Boulevard,AZ,85711
+Panera Bread,Jefferson City,202891,#202891,2226 Missouri Boulevard,MO,65109
+Panera Bread,Rolla,202892,#202892,1651 North Bishop Avenue,MO,65401
+Panera Bread,Osage Beach,202894,#202894,4840 Osage Beach Parkway,MO,65065
+Panera Bread,St. Robert,202895,#202895,138 Old Route 66,MO,65584
+Panera Bread,Cincinnati,203031,#203031,8115 Montgomery Road,OH,45236
+Panera Bread,Cincinnati,203032,#203032,7711 Beechmont Avenue,OH,45255
+Panera Bread,Fairfield,203033,#203033,500 Kolb Drive,OH,45014
+Panera Bread,Kettering,203034,#203034,4110 Far Hills Avenue,OH,45429
+Panera Bread,Blue Ash,203035,#203035,11033 Reed Hartman Highway,OH,45242
+Panera Bread,Beavercreek,203036,#203036,2751 Fairfield Commons Boulevard,OH,45431
+Panera Bread,Dayton,203037,#203037,1203 Brown Street,OH,45409
+Panera Bread,Crestview Hills,203039,#203039,2911 Dixie Highway,KY,41017
+Panera Bread,Cincinnati,203040,#203040,11397 Montgomery Road,OH,45249
+Panera Bread,Springdale,203041,#203041,405 East Kemper Road,OH,45246
+Panera Bread,Cincinnati,203042,#203042,3806 Paxton Avenue,OH,45209
+Panera Bread,Cincinnati,203043,#203043,5555 Glenway Avenue,OH,45238
+Panera Bread,Cincinnati,203044,#203044,9530 Colerain Avenue,OH,45251
+Panera Bread,West Chester,203045,#203045,7725 Voice of America Centre Drive,OH,45069
+Panera Bread,Florence,203046,#203046,7150 Houston Road,KY,41042
+Panera Bread,Dayton,203047,#203047,2500 Miamisburg Centerville Road,OH,45459
+Panera Bread,Mason,203048,#203048,5095 Deerfield Boulevard,OH,45040
+Panera Bread,West Chester,203049,#203049,9444 Civic Centre Boulevard,OH,45069
+Panera Bread,Dayton,203050,#203050,6550 Miller Lane,OH,45414
+Panera Bread,Cincinnati,203051,#203051,8420 Winton Road,OH,45231
+Panera Bread,Centerville,203052,#203052,11 North Main Street,OH,45459
+Panera Bread,Milford,203053,#203053,1066 State Route 28,OH,45150
+Panera Bread,Beavercreek,203054,#203054,49 Chestnut Street,OH,45440
+Panera Bread,Cincinnati,203055,#203055,120 Calhoun Street,OH,45219
+Panera Bread,Springfield,203056,#203056,1950 North Bechtle Avenue,OH,45504
+Panera Bread,Dayton,203058,#203058,6130 Wilmington Pike,OH,45459
+Panera Bread,Hamilton,203059,#203059,3417 Princeton Road,OH,45011
+Panera Bread,Aurora,203062,#203062,12293 East Iliff Avenue,CO,80014
+Panera Bread,Denver,203063,#203063,1330 Grant Street,CO,80203
+Panera Bread,Highlands Ranch,203064,#203064,9579 S University Boulevard,CO,80126
+Panera Bread,Greenwood Village,203066,#203066,5910 South Holly Street,CO,80111
+Panera Bread,Denver,203067,#203067,4955 S Ulster Street,CO,80237
+Panera Bread,Littleton,203068,#203068,7301 South Santa Fe Drive,CO,80120
+Panera Bread,Littleton,203069,#203069,8501 West Bowles Avenue,CO,80123
+Panera Bread,Colorado Springs,203070,#203070,1845 Briargate Parkway,CO,80920
+Panera Bread,Colorado Springs,203071,#203071,7344 North Academy Blvd,CO,80920
+Panera Bread,Lone Tree,203072,#203072,9233 Park Meadows Drive,CO,80124
+Panera Bread,Denver,203073,#203073,3700 Quebec Street,CO,80207
+Panera Bread,Colorado Springs,203074,#203074,1832 Southgate Road,CO,80906
+Panera Bread,Arvada,203075,#203075,7739 Wadsworth Boulevard,CO,80003
+Panera Bread,Colorado Springs,203076,#203076,3120 New Center Point,CO,80922
+Panera Bread,Westminster,203077,#203077,10450 Town Center Drive,CO,80021
+Panera Bread,Longmont,203078,#203078,425 Ken Pratt Boulevard,CO,80501
+Panera Bread,Fort Collins,203079,#203079,3700 South College Avenue,CO,80525
+Panera Bread,Superior,203080,#203080,302 Center Drive,CO,80027
+Panera Bread,Loveland,203081,#203081,1550 Fall River Drive,CO,80538
+Panera Bread,Fort Collins,203082,#203082,2721 Council Tree Avenue,CO,80525
+Panera Bread,Boulder,203083,#203083,1855 29th Street,CO,80301
+Panera Bread,Parker,203084,#203084,11290 S. Twenty Mile Road,CO,80134
+Panera Bread,Aurora,203085,#203085,6770 S. Cornerstar Way Suite E,CO,80016
+Panera Bread,Sheridan,203086,#203086,3702 Riverpoint Parkway Unit A,CO,80110
+Panera Bread,Colorado Springs,203087,#203087,5230 North Nevada Avenue,CO,80918
+Panera Bread,Glendale,203088,#203088,640 South Colorado Boulevard,CO,80246
+Panera Bread,Denver,203089,#203089,2466 S. Colorado Boulevard,CO,80222
+Panera Bread,Castle Rock,203091,#203091,32 E. Allen Street,CO,80108
+Panera Bread,Lakewood,203092,#203092,650 S. Wadsworth Blvd.,CO,80226
+Panera Bread,Aurora,203093,#203093,13100 E. Colfax Avenue,CO,80011
+Panera Bread,Lakewood,203095,#203095,14740 W Colfax Avenue #110,CO,80401
+Panera Bread,Greeley,203099,#203099,4533 Centerplace Drive,CO,80634
+Panera Bread,Denver,203102,#203102,6385 E. Hampden Avenue,CO,80222
+Panera Bread,Denver,203104,#203104,3545 38th Street,CO,80211
+Panera Bread,Troy,203131,#203131,1920 W Main Street,OH,45373
+Panera Bread,Cincinnati,203132,#203132,876 Eastgate North Drive,OH,45245
+Panera Bread,Cincinnati,203135,#203135,1 East 6th Street,OH,45263
+Panera Bread,Miamisburg,203136,#203136,10551 Innovation Drive,OH,45342
+Panera Bread,Newport,203137,#203137,169 Pavilion Parkway,KY,41071
+Panera Bread,Thousand Oaks,203176,#203176,205 N Moorpark Road,CA,91360
+Panera Bread,Simi Valley,203178,#203178,2900 Cochran Street,CA,93065
+Panera Bread,Santa Maria,203180,#203180,540 East Betteravia Road,CA,93454
+Panera Bread,Camarillo,203181,#203181,740 E. Ventura Blvd,CA,93010
+Panera Bread,San Luis Obispo,203182,#203182,299 Madonna Road,CA,93405
+Panera Bread,Santa Barbara,203183,#203183,3851 State Street,CA,93105
+Panera Bread,Ventura,203184,#203184,4910 Telephone Road,CA,93003
+Panera Bread,Oxnard,203185,#203185,2720 Portico Way,CA,93036
+Panera Bread,Santa Barbara,203187,#203187,700 State Street,CA,93111
+Panera Bread,Arroyo Grande,203190,#203190,139 N West End Blvd,CA,93420
+Panera Bread,Davenport,203201,#203201,3410 Elmore Avenue,IA,52807
+Panera Bread,Moline,203202,#203202,4044 38th Avenue,IL,61265
+Panera Bread,Coralville,203203,#203203,1451 Coral Ridge Avenue,IA,52241
+Panera Bread,Cedar Rapids,203204,#203204,5010 Council Street NE,IA,52402
+Panera Bread,West Des Moines,203205,#203205,4150 Westown Parkway,IA,50266
+Panera Bread,Urbandale,203206,#203206,2839 86th Street,IA,50322
+Panera Bread,West Des Moines,203207,#203207,6740 University Avenue,IA,50266
+Panera Bread,Iowa City,203208,#203208,1646 Sycamore Street,IA,52240
+Panera Bread,Cedar Rapids,203209,#203209,2665 Edgewood Road SW,IA,52404
+Panera Bread,Cedar Falls,203210,#203210,6403 University Avenue,IA,50613
+Panera Bread,Waterloo,203211,#203211,1818 LaPorte Road,IA,50702
+Panera Bread,Ames,203212,#203212,309 S Duff Avenue,IA,50010
+Panera Bread,Ankeny,203213,#203213,2310 SE Delaware Avenue,IA,50021
+Panera Bread,Dubuque,203214,#203214,3243 Kennedy Circle,IA,52002
+Panera Bread,West Des Moines,203215,#203215,101 Jordan Creek Parkway,IA,50266
+Panera Bread,Johnston,203216,#203216,5525 Merle Hay Road,IA,50131
+Panera Bread,Des Moines,203217,#203217,215 10th Street Suite 150,IA,50309
+Panera Bread,Davenport,203218,#203218,414 W. Kimberly Road,IA,52806
+Panera Bread,Fullerton,203256,#203256,2415 East Chapman Avenue,CA,92838
+Panera Bread,Fullerton,203257,#203257,1981 Sunnycrest Drive,CA,92835
+Panera Bread,Westminster,203260,#203260,16340 Beach Boulevard,CA,92683
+Panera Bread,Brea,203262,#203262,423 South Associated Road,CA,92821
+Panera Bread,LaHabra,203263,#203263,1331 W Imperial Highway,CA,90631
+Panera Bread,Seal Beach,203264,#203264,12241 Seal Beach Blvd,CA,90740
+Panera Bread,Santa Ana,203265,#203265,3941 S. Bristol Street,CA,92704
+Panera Bread,Costa Mesa,203267,#203267,3030 Harbor Boulevard Space G3,CA,92626
+Panera Bread,Huntington Beach,203268,#203268,19461 Main Street,CA,92648
+Panera Bread,Deerfield,203281,#203281,190 Waukegan Road,IL,60015
+Panera Bread,Buffalo Grove,203282,#203282,1228 West Dundee Road,IL,60089
+Panera Bread,Glenview,203283,#203283,2512 Waukegan Road,IL,60025
+Panera Bread,Geneva,203284,#203284,1492 South Randall Road,IL,60134
+Panera Bread,Libertyville,203285,#203285,832 South Milwaukee Avenue,IL,60048
+Panera Bread,Crystal Lake,203286,#203286,6000 Northwest Highway,IL,60014
+Panera Bread,Arlington Heights,203287,#203287,5 W Rand Road,IL,60004
+Panera Bread,St. Charles,203288,#203288,2871 East Main Street,IL,60174
+Panera Bread,Deer Park,203289,#203289,20530 Rand Rd. Suite 448,IL,60010
+Panera Bread,Joliet,203290,#203290,3340 Mall Loop Drive,IL,60431
+Panera Bread,Algonquin,203291,#203291,451 South Randall Road,IL,60102
+Panera Bread,Round Lake Beach,203294,#203294,254 East Rollins Road,IL,60073
+Panera Bread,Altamonte Springs,203310,#203310,696 E Altamonte Drive,FL,32701
+Panera Bread,Orlando,203312,#203312,11472 University Boulevard,FL,32817
+Panera Bread,Orlando,203313,#203313,296 E Michigan Street,FL,32806
+Panera Bread,Orlando,203314,#203314,227 N Eola Drive,FL,32806
+Panera Bread,Lake Mary,203315,#203315,1210 S International Parkway,FL,32746
+Panera Bread,Altamonte Springs,203316,#203316,200 S State Road 434,FL,32714
+Panera Bread,Orlando,203317,#203317,473 N Alafaya Trail,FL,32828
+Panera Bread,Orlando,203318,#203318,7826 W Sandlake Road,FL,32819
+Panera Bread,Orlando,203319,#203319,3463 East Colonial Drive,FL,32803
+Panera Bread,Ormond Beach,203322,#203322,250 N Nova Road,FL,32174
+Panera Bread,Lady Lake,203323,#203323,1181 Main Street,FL,32159
+Panera Bread,Stuart,203324,#203324,2750 NW Federal Highway,FL,34994
+Panera Bread,Melbourne,203325,#203325,4100 N Wickham Road,FL,32935
+Panera Bread,Orlando,203326,#203326,4200 Conroy Road,FL,32839
+Panera Bread,Ocala,203327,#203327,2370 SW College Road,FL,34474
+Panera Bread,Orlando,203328,#203328,1117 Florida Mall Avenue,FL,32809
+Panera Bread,Winter Springs,203330,#203330,5717 Red Bug Lake Road,FL,32708
+Panera Bread,Tampa,203339,#203339,11860 Bruce B. Downs Boulevard,FL,33612
+Panera Bread,Tampa,203340,#203340,112 West Shore Boulevard,FL,33609
+Panera Bread,Clearwater,203341,#203341,2285 Ulmerton Road,FL,33762
+Panera Bread,Largo,203342,#203342,10801 Starkey Road,FL,33777
+Panera Bread,Tampa,203343,#203343,18011 Highwoods Preserve,FL,33647
+Panera Bread,Tampa,203344,#203344,13256 North Dale Mabry Highway,FL,33618
+Panera Bread,St. Petersburg,203345,#203345,1908 4th Street North,FL,33704
+Panera Bread,Tampa,203346,#203346,709 South Howard Avenue,FL,33606
+Panera Bread,Belleair Bluffs,203347,#203347,2928 W Bay Drive,FL,33770
+Panera Bread,Oldsmar,203349,#203349,3181 Tampa Road,FL,34677
+Panera Bread,Clearwater,203350,#203350,2679 Gulf To Bay Boulevard,FL,33759
+Panera Bread,Valrico,203351,#203351,3490 Lithia Pinecrest Road,FL,33594
+Panera Bread,St. Petersburg,203352,#203352,2420 66th Street North,FL,33710
+Panera Bread,Pinellas Park,203353,#203353,7380 US Highway 19 North,FL,33781
+Panera Bread,Clermont,203354,#203354,2260 East Highway 50,FL,34711
+Panera Bread,Plant City,203356,#203356,2909 James L. Redman Parkway,FL,33566
+Panera Bread,Palm City,203357,#203357,2894 SW Town Center Way,FL,34990
+Panera Bread,Riverview,203358,#203358,10631 Big Bend Road,FL,33569
+Panera Bread,Boardman,203365,#203365,377 Boardman Poland Road,OH,44512
+Panera Bread,Canton,203367,#203367,4370 Belden Village Road,OH,44718
+Panera Bread,Westlake,203368,#203368,26137 Detroit Road,OH,44145
+Panera Bread,Warren,203369,#203369,3641 Elm Road Northeast,OH,44483
+Panera Bread,Akron,203371,#203371,3895 Medina Road,OH,44333
+Panera Bread,Hudson,203374,#203374,118 W Streetsboro Street,OH,44236
+Panera Bread,Rocky River,203375,#203375,19705 Center Ridge Road,OH,44116
+Panera Bread,Broadview Heights,203379,#203379,2000 E Edgerton Road,OH,44147
+Panera Bread,Broadview Heights,203380,#203380,10037 Broadview Road,OH,44147
+Panera Bread,Medina,203382,#203382,4065 Pearl Road,OH,44256
+Panera Bread,Mentor,203383,#203383,9587 Mentor Avenue,OH,44060
+Panera Bread,North Olmsted,203384,#203384,26086 Brookpark Road,OH,44070
+Panera Bread,Solon,203385,#203385,6130 Kruse Drive,OH,44139
+Panera Bread,Avon,203386,#203386,35860 Detroit Road,OH,44011
+Panera Bread,Mentor,203387,#203387,7357 Mentor Avenue,OH,44060
+Panera Bread,Brecksville,203388,#203388,8447 Chippewa Road,OH,44141
+Panera Bread,Amherst,203389,#203389,46402 Middle Ridge Road,OH,44001
+Panera Bread,Amherst,203390,#203390,7998 Leavitt Road,OH,44001
+Panera Bread,Strongsville,203391,#203391,17090 Royalton Road,OH,44136
+Panera Bread,Cuyahoga Falls,203392,#203392,689 Howe Avenue,OH,44221
+Panera Bread,Brooklyn,203393,#203393,5090 Tiedeman Road,OH,44144
+Panera Bread,Middleburg Heights,203394,#203394,18324 Bagley Road,OH,44130
+Panera Bread,North Canton,203396,#203396,6543 Strip Avenue NW,OH,44720
+Panera Bread,Fairlawn,203397,#203397,2855 West Market Street,OH,44333
+Panera Bread,Northfield,203398,#203398,8233 Golden Link Boulevard,OH,44067
+Panera Bread,Youngstown,203399,#203399,5503 Mahoning Avenue,OH,44515
+Panera Bread,Massillon,203401,#203401,2010 Lincoln Way East,OH,44646
+Panera Bread,Canfield,203403,#203403,4205 Boardman Canfield Road,OH,44406
+Panera Bread,Akron,203404,#203404,790 Arlington Ridge,OH,44319
+Panera Bread,Framingham,203405,#203405,400 Cochituate Road,MA,1701
+Panera Bread,Portsmouth,203406,#203406,1465 Woodbury Avenue,NH,3801
+Panera Bread,Bedford,203407,#203407,7 Colby Court,NH,3110
+Panera Bread,South Portland,203408,#203408,343 Gorham Road,ME,4106
+Panera Bread,Concord,203409,#203409,75 Fort Eddy Road,NH,3301
+Panera Bread,North Andover,203410,#203410,58 Peters Street,MA,1845
+Panera Bread,Woburn,203411,#203411,296 Mishawum Road,MA,1801
+Panera Bread,Shrewsbury,203412,#203412,50 Boston Turnpike,MA,1545
+Panera Bread,Manchester,203413,#203413,52 March Avenue,NH,3103
+Panera Bread,Keene,203414,#203414,298 West Street,NH,3431
+Panera Bread,Nashua,203416,#203416,8 Spit Brook Road,NH,3060
+Panera Bread,Augusta,203418,#203418,37 Xavier Loop,ME,4330
+Panera Bread,Leominster,203419,#203419,100 Commercial Road,MA,1453
+Panera Bread,Chelmsford,203420,#203420,66 Parkhurst Road,MA,1824
+Panera Bread,West Lebanon,203421,#203421,267 Plainfield Road,NH,3784
+Panera Bread,Nashua,203422,#203422,590 Amherst Street,NH,3063
+Panera Bread,East Longmeadow,203424,#203424,450 North Main Street,MA,1028
+Panera Bread,Westbrook,203425,#203425,11 Main Street,ME,4092
+Panera Bread,Marlborough,203426,#203426,197 Boston Post Road W,MA,1752
+Panera Bread,Hadley,203427,#203427,351 Russell Street,MA,1035
+Panera Bread,West Springfield,203428,#203428,935 Riverdale Street,MA,1089
+Panera Bread,Beverly,203429,#203429,57 Dodge Street,MA,1915
+Panera Bread,Biddeford,203430,#203430,130 Shops Way,ME,4005
+Panera Bread,Westborough,203431,#203431,600 Union Street,MA,1581
+Panera Bread,Chicopee,203433,#203433,601 Memorial Drive,MA,1020
+Panera Bread,Dover,203434,#203434,841 Central Avenue,NH,3820
+Panera Bread,Pittsfield,203436,#203436,635 Merrill Road,MA,1201
+Panera Bread,Natick,203437,#203437,841 Worcester Street,MA,1760
+Panera Bread,Worcester,203440,#203440,120 Gold Star Boulevard,MA,1606
+Panera Bread,Newburyport,203441,#203441,55 Storey Avenue,MA,1950
+Panera Bread,Plaistow,203442,#203442,4 Plaistow Road,NH,3865
+Panera Bread,Derry,203444,#203444,19B Manchester Road,NH,3038
+Panera Bread,Auburn,203445,#203445,759 Turner Street,ME,4210
+Panera Bread,Topsham,203446,#203446,75 Topsham Fair Mall Road,ME,4086
+Panera Bread,Rochester,203463,#203463,460 Crossroads Drive SW,MN,55902
+Panera Bread,Mankato,203467,#203467,1901 E Madison Avenue,MN,56001
+Panera Bread,Rochester,203473,#203473,3780 Market Place Drive NW,MN,55901
+Panera Bread,Hermitage,203480,#203480,2390 East State Street,PA,16148
+Panera Bread,Pittsburgh,203482,#203482,942 Freeport Road,PA,15238
+Panera Bread,Erie,203483,#203483,1935 Keystone Drive,PA,16505
+Panera Bread,Cranberry Township,203487,#203487,20111 Route 19,PA,16066
+Panera Bread,Mount Lebanon,203488,#203488,1500 Washington Road,PA,15228
+Panera Bread,Pittsburgh,203489,#203489,400 Penn Center Boulevard,PA,15235
+Panera Bread,Wexford,203490,#203490,12071 Perry Highway,PA,15090
+Panera Bread,Morgantown,203491,#203491,357 Patteson Drive,WV,26505
+Panera Bread,Pittsburgh,203492,#203492,250 McHolme Drive,PA,15275
+Panera Bread,Pleasant Hills,203493,#203493,623 Clairton Boulevard,PA,15236
+Panera Bread,West Homestead,203494,#203494,210 West Bridge Street,PA,15120
+Panera Bread,Bethel Park,203495,#203495,5243 Library Road,PA,15102
+Panera Bread,Pittsburgh,203497,#203497,1900 Greentree Road,PA,15220
+Panera Bread,Erie,203498,#203498,2501 West 12th Street,PA,16506
+Panera Bread,Pittsburgh,203499,#203499,3401 Boulevard of the Allies,PA,15213
+Panera Bread,Canonsburg,203500,#203500,4127 Washington Road,PA,15317
+Panera Bread,Monroeville,203501,#203501,4172 William Penn Highway,PA,15146
+Panera Bread,Clarksburg,203502,#203502,103 Emily Drive,WV,26301
+Panera Bread,Oakland,203503,#203503,3800 Forbes Avenue,PA,15213
+Panera Bread,Allison Park,203504,#203504,4960 William Flynn Highway,PA,15101
+Panera Bread,Butler,203505,#203505,330 New Castle Road,PA,16001
+Panera Bread,Pittsburgh,203506,#203506,7217 McKnight Road,PA,15237
+Panera Bread,Washington,203507,#203507,108 Trinity Pointe Drive,PA,15301
+Panera Bread,Pittsburgh,203508,#203508,5430 Centre Avenue,PA,15232
+Panera Bread,Altoona,203509,#203509,156 Falon Lane,PA,16602
+Panera Bread,Chattanooga,203510,#203510,417 Market Street,TN,37415
+Panera Bread,Knoxville,203511,#203511,4855 Kingston Pike,TN,37919
+Panera Bread,Cleveland,203512,#203512,375 Paul Huff Parkway,TN,37312
+Panera Bread,Knoxville,203513,#203513,2000 Cumberland Avenue,TN,37916
+Panera Bread,Chattanooga,203514,#203514,1810 Gunbarrel Road,TN,37421
+Panera Bread,Watertown,203542,#203542,321 Arsenal Street,MA,2472
+Panera Bread,Burlington,203543,#203543,34 Cambridge Street,MA,1803
+Panera Bread,Quincy,203544,#203544,200 Hancock Street,MA,2171
+Panera Bread,Everett,203545,#203545,27 Mystic View Road,MA,2149
+Panera Bread,Franklin,203546,#203546,270 Franklin Village Drive,MA,2038
+Panera Bread,Danvers,203548,#203548,100 Independence Way,MA,1923
+Panera Bread,Dedham,203549,#203549,797 Providence Highway,MA,2026
+Panera Bread,Waltham,203550,#203550,1100 Lexington Street,MA,2452
+Panera Bread,Hyannis,203551,#203551,790 Iyannough Road,MA,2601
+Panera Bread,Saugus,203552,#203552,647 Broadway,MA,1906
+Panera Bread,Stoughton,203553,#203553,1334 Park Street,MA,2072
+Panera Bread,Hanover,203554,#203554,1401 Washington Street,MA,2339
+Panera Bread,Hingham,203555,#203555,92 Derby Street,MA,2043
+Panera Bread,Plymouth,203557,#203557,46 Shops at 5 Way,MA,2360
+Panera Bread,Needham,203558,#203558,120 Highland Avenue,MA,2494
+Panera Bread,Towson,203560,#203560,1238 Putty Hill Avenue,MD,21286
+Panera Bread,Columbia,203561,#203561,10300 Little Patuxent Parkway,MD,21044
+Panera Bread,Pikesville,203562,#203562,1852 Reisterstown Road,MD,21208
+Panera Bread,Pasadena,203564,#203564,8125 Ritchie Highway,MD,21122
+Panera Bread,Aspen Hill,203565,#203565,13521 Connecticut Avenue,MD,20906
+Panera Bread,Bowie,203566,#203566,3931 Bowie Town Center,MD,20716
+Panera Bread,Frederick,203567,#203567,5600 A Urbana Pike,MD,21702
+Panera Bread,Rockville,203569,#203569,1780 E Jefferson Street,MD,20852
+Panera Bread,Timonium,203571,#203571,2131 York Road,MD,21093
+Panera Bread,Chevy Chase,203572,#203572,4459 Willard Avenue,MD,20815
+Panera Bread,Waldorf,203573,#203573,2930 Festival Way,MD,20601
+Panera Bread,Rockville,203574,#203574,14921 Shady Grove Road,MD,20850
+Panera Bread,Bel Air,203575,#203575,5 Bel Air South Parkway,MD,21015
+Panera Bread,Baltimore,203576,#203576,6307 York Road,MD,21212
+Panera Bread,Silver Spring,203577,#203577,8541 Georgia Avenue,MD,20910
+Panera Bread,Gaithersburg,203578,#203578,598 North Frederick Avenue,MD,20877
+Panera Bread,Columbia,203579,#203579,6435 Dobbin Road,MD,21045
+Panera Bread,Rosedale,203580,#203580,8640 Pulaski Highway,MD,21237
+Panera Bread,Nottingham,203581,#203581,5110 Campbell Boulevard,MD,21236
+Panera Bread,Glen Burnie,203583,#203583,6633 Ritchie Highway,MD,21061
+Panera Bread,Hanover,203584,#203584,7648 Arundel Mills Boulevard,MD,21076
+Panera Bread,Hunt Valley,203585,#203585,110 Shawan Road,MD,21030
+Panera Bread,Catonsville,203587,#203587,6600 Baltimore National Pike,MD,21228
+Panera Bread,Baltimore,203588,#203588,7169 Security Boulevard,MD,21244
+Panera Bread,Frederick,203589,#203589,1700 Kingfisher Drive,MD,21701
+Panera Bread,Hagerstown,203590,#203590,17772 Garland Groh Boulevard,MD,21740
+Panera Bread,California,203591,#203591,45250 Worth Avenue,MD,20619
+Panera Bread,Westminster,203592,#203592,200 Clifton Boulevard,MD,21157
+Panera Bread,Salisbury,203593,#203593,2618 North Salisbury Boulevard,MD,21801
+Panera Bread,Eldersburg,203595,#203595,6300 Georgetown Boulevard,MD,21784
+Panera Bread,Prince Frederick,203596,#203596,874 Costley Way,MD,20678
+Panera Bread,Annapolis,203597,#203597,2341 Forest Drive,MD,21401
+Panera Bread,Bowie,203598,#203598,10531 Martin Luther King Jr Highway,MD,20720
+Panera Bread,Edgewater,203599,#203599,3046 Solomons Island Road,MD,21037
+Panera Bread,Boston,203705,#203705,200 High Street,MA,2110
+Panera Bread,High Point,203710,#203710,2400 Penny Road,NC,27265
+Panera Bread,Greensboro,203711,#203711,2645 Lawndale Drive,NC,27408
+Panera Bread,Winston-Salem,203712,#203712,2209 Cloverdale Avenue,NC,27103
+Panera Bread,Burlington,203714,#203714,422 Huffman Mill Road,NC,27215
+Panera Bread,Winston-Salem,203715,#203715,105 Hanes Square Circle,NC,27103
+Panera Bread,Kernersville,203716,#203716,970 South Main Street,NC,27284
+Panera Bread,Greensboro,203717,#203717,4203 West Wendover Avenue,NC,27407
+Panera Bread,Mooresville,203718,#203718,109 Williamson Road,NC,28117
+Panera Bread,Grandville,203720,#203720,3700 Rivertown Parkway SW,MI,49418
+Panera Bread,Kentwood,203721,#203721,3770 28th Street SE,MI,49512
+Panera Bread,Grand Rapids,203722,#203722,6080 28th Street SE,MI,49546
+Panera Bread,Holland,203723,#203723,3067 West Shore Drive,MI,49424
+Panera Bread,Kalamazoo,203724,#203724,5119 West Main Street,MI,49009
+Panera Bread,Portage,203725,#203725,5970 South Westnedge Avenue,MI,49002
+Panera Bread,Grand Rapids,203726,#203726,2044 Celebration Drive NE,MI,49525
+Panera Bread,Grandville,203727,#203727,32 44th Street SW,MI,49418
+Panera Bread,Grand Haven,203728,#203728,1099 South Beacon Boulevard,MI,49417
+Panera Bread,Grand Rapids,203729,#203729,3150 Alpine Avenue NW,MI,49544
+Panera Bread,Caledonia,203730,#203730,1669 Marketplace Drive SE,MI,49316
+Panera Bread,Jackson,203731,#203731,1285 Boardman Road,MI,49202
+Panera Bread,St. Joseph,203732,#203732,3260 Niles Road,MI,49085
+Panera Bread,Kalamazoo,203733,#203733,5627 Gull Road,MI,49048
+Panera Bread,Battle Creek,203734,#203734,2810 Capital Avenue SW,MI,49015
+Panera Bread,Muskegon,203735,#203735,1710 East Sherman Boulevard,MI,49444
+Panera Bread,Walker,203736,#203736,4400 Lake Michigan Dr NW,MI,49534
+Panera Bread,Mt. Pleasant,203737,#203737,2111 South Mission St,MI,48858
+Panera Bread,Grand Rapids,203738,#203738,99 Monroe Avenue,MI,49503
+Panera Bread,Clemmons,203740,#203740,6281 Towncenter Drive,NC,27012
+Panera Bread,Greensboro,203741,#203741,1604 Highwoods Boulevard,NC,27410
+Panera Bread,Greensboro,203742,#203742,303 Pisgah Church Road,NC,27455
+Panera Bread,Boone,203743,#203743,1180 Blowing Rock Road,NC,28607
+Panera Bread,Hickory,203744,#203744,970 Second Street NE,NC,28601
+Panera Bread,Salisbury,203745,#203745,825 East Innes Street,NC,28144
+Panera Bread,Laurel,203760,#203760,3301 Corridor Marketplace,MD,20724
+Panera Bread,Silver Spring,203761,#203761,12285 Tech Road,MD,20904
+Panera Bread,Baltimore,203762,#203762,600 E Pratt Street,MD,21202
+Panera Bread,Easton,203763,#203763,8933 Ocean Gateway,MD,21601
+Panera Bread,Ocean City,203764,#203764,12641-300 Ocean Gateway,MD,21842
+Panera Bread,Baltimore,203765,#203765,3600 Boston Street,MD,21224
+Panera Bread,Aberdeen,203766,#203766,1022 Beards Hill Road,MD,21001
+Panera Bread,Gaithersburg,203767,#203767,285 Kentlands Boulevard,MD,20878
+Panera Bread,La Plata,203769,#203769,3 Shining Willow Way,MD,20646
+Panera Bread,Wheaton,203770,#203770,11160 Veirs Mill Road,MD,20902
+Panera Bread,Olney,203771,#203771,18141 Town Center Drive,MD,20832
+Panera Bread,Germantown,203772,#203772,19965 Century Boulevard,MD,20874
+Panera Bread,Gambrills,203773,#203773,1402 South Main Chapel Way,MD,21054
+Panera Bread,Abingdon,203774,#203774,3412 Merchant Boulevard,MD,21009
+Panera Bread,Baltimore,203776,#203776,413 West Baltimore Street,MD,21201
+Panera Bread,Germantown,203777,#203777,20680 Seneca Meadows Parkway,MD,20876
+Panera Bread,Bethesda,203779,#203779,7201 Wisconsin Avenue,MD,20814
+Panera Bread,Beltsville,203780,#203780,10914 Baltimore Avenue,MD,20705
+Panera Bread,Norcross,203790,#203790,3280 Holcomb Bridge Northwest,GA,30092
+Panera Bread,Smyrna,203791,#203791,3625 Spring Hill Parkway SE,GA,30080
+Panera Bread,Gainesville,203792,#203792,625 Dawsonville Highway,GA,30501
+Panera Bread,Athens,203793,#203793,3151 Atlanta Highway,GA,30606
+Panera Bread,Lawrenceville,203794,#203794,911 Lawrenceville Suwanee Road,GA,30043
+Panera Bread,Duluth,203795,#203795,11715 Medlock Bridge Road,GA,30097
+Panera Bread,Duluth,203796,#203796,5958 State Bridge Road,GA,30097
+Panera Bread,Cumming,203797,#203797,500 Lakeland Plaza,GA,30040
+Panera Bread,Conyers,203798,#203798,1655 Georgia 138,GA,30013
+Panera Bread,Newark,203805,#203805,715 Christiana Mall Road,DE,19702
+Panera Bread,Rehoboth Beach,203806,#203806,18423 Coastal Highway,DE,19971
+Panera Bread,Deptford,203807,#203807,2000 Clements Bridge Road,NJ,8096
+Panera Bread,Michigan City,203820,#203820,5673 S Franklin Street,IN,46360
+Panera Bread,Knoxville,203830,#203830,205 North Peters Road,TN,37923
+Panera Bread,Asheville,203832,#203832,1843 Hendersonville Road,NC,28803
+Panera Bread,Johnson City,203833,#203833,3140 Peoples Street,TN,37604
+Panera Bread,Knoxville,203834,#203834,11361 Parkside Drive,TN,37934
+Panera Bread,Knoxville,203835,#203835,4893 N Broadway Street,TN,37918
+Panera Bread,Kingsport,203836,#203836,1880 N. Eastman Road,TN,37660
+Panera Bread,Dalton,203837,#203837,1303 West Walnut Avenue Suite 1,GA,30720
+Panera Bread,Oak Ridge,203838,#203838,471 South Illinois Avenue,TN,37830
+Panera Bread,Cranston,203855,#203855,5 New London Avenue,RI,2920
+Panera Bread,North Attleboro,203856,#203856,1250 South Washington Street,MA,2760
+Panera Bread,Smithfield,203857,#203857,180 Smithfield Crossing,RI,2917
+Panera Bread,Glastonbury,203858,#203858,2450 Main Street,CT,6033
+Panera Bread,Manchester,203859,#203859,179 Deming Street,CT,6042
+Panera Bread,North Dartmouth,203860,#203860,84 N Dartmouth Mall,MA,2747
+Panera Bread,Newport,203861,#203861,49 Long Wharf Mall,RI,2840
+Panera Bread,Enfield,203862,#203862,90 Elm Street,CT,6082
+Panera Bread,Bristol,203863,#203863,1214 Farmington Avenue,CT,6010
+Panera Bread,Waterford,203865,#203865,903 Hartford Turnpike,CT,6385
+Panera Bread,East Greenwich,203866,#203866,1000 Division Street,RI,2818
+Panera Bread,Canton,203867,#203867,110 Albany Turnpike,CT,6019
+Panera Bread,Newington,203868,#203868,3120 Berlin Turnpike,CT,6111
+Panera Bread,Seekonk,203869,#203869,221 A Highland Avenue,MA,2771
+Panera Bread,Ledyard,203871,#203871,39 Norwich Westerly Road,CT,6339
+Panera Bread,West Hartford,203872,#203872,2534 Albany Avenue,CT,6117
+Panera Bread,Plainville,203873,#203873,103 Taunton Street,MA,2762
+Panera Bread,Wakefield,203874,#203874,160 Old Tower Hill Road,RI,2879
+Panera Bread,Warwick,203875,#203875,1000 Bald Hill Road,RI,2886
+Panera Bread,Manchester,203878,#203878,194 Buckland Hills Drive,CT,6040
+Panera Bread,Lisbon,203879,#203879,160 River Road Suite 175,CT,6351
+Panera Bread,Sarasota,203880,#203880,6589 South Tamiami Trail,FL,34231
+Panera Bread,Sarasota,203881,#203881,2821 University Parkway,FL,34243
+Panera Bread,Bradenton,203883,#203883,1520 Cortez Road West,FL,34208
+Panera Bread,Hixson,203890,#203890,620 Northgate Mall,TN,37343
+Panera Bread,Fort Oglethorpe,203892,#203892,2620 Battlefield Parkway,GA,30742
+Panera Bread,Alcoa,203893,#203893,733 Louisville Road,TN,37701
+Panera Bread,Providence,203900,#203900,43 Providence Place,RI,2903
+Panera Bread,Groton,203901,#203901,220 Route 12,CT,6340
+Panera Bread,Wethersfield,203902,#203902,1129 Silas Deane Highway,CT,6109
+Panera Bread,Farmington,203903,#203903,1600 Southeast Rd,CT,6032
+Panera Bread,Lincoln,203905,#203905,613 George Washington Highway,RI,2865
+Panera Bread,Hartford,203906,#203906,10 State House Square,CT,6103
+Panera Bread,Southington,203908,#203908,365 Queen St,CT,6489
+Panera Bread,Tyler,203941,#203941,5755 S. Broadway Avenue,TX,75703
+Panera Bread,Longview,203942,#203942,481 East Loop 281,TX,75605
+Panera Bread,Shreveport,203943,#203943,1705 East 70th Street,LA,71105
+Panera Bread,Norristown,203950,#203950,601 S Trooper Road,PA,19403
+Panera Bread,Moorestown,203951,#203951,1500 Nixon Drive,NJ,8057
+Panera Bread,Springfield,203952,#203952,1022 Baltimore Pike,PA,19064
+Panera Bread,Conshohocken,203953,#203953,48 Ridge Pike,PA,19428
+Panera Bread,Willow Grove,203954,#203954,30 Park Avenue,PA,19090
+Panera Bread,Marlton,203955,#203955,500 South Route 73,NJ,8053
+Panera Bread,Wilmington,203956,#203956,5619 Concord Pike,DE,19803
+Panera Bread,Feasterville,203957,#203957,152 E Street Road,PA,19053
+Panera Bread,Howell,203958,#203958,4715 State Route 9,NJ,7731
+Panera Bread,Norristown,203959,#203959,101 Germantown Pike,PA,19401
+Panera Bread,Shrewsbury,203961,#203961,1050 Broad Street,NJ,7702
+Panera Bread,Wilmington,203962,#203962,3650 Kirkwood Highway,DE,19808
+Panera Bread,Middletown,203963,#203963,776 Route 35,NJ,7748
+Panera Bread,Levittown,203964,#203964,1345 Lincoln Highway,PA,19056
+Panera Bread,North Wales,203965,#203965,801 Bethlehem Pike,PA,19454
+Panera Bread,Freehold,203966,#203966,531 Soloman Way,NJ,7728
+Panera Bread,Mount Laurel,203967,#203967,48 Centerton Road,NJ,8054
+Panera Bread,Voorhees,203972,#203972,1200 White Horse Road,NJ,8043
+Panera Bread,Newark,203974,#203974,140 East Main Street,DE,19711
+Panera Bread,Ocean Township,203976,#203976,1100 Route 35,NJ,7712
+Panera Bread,West Chester,203977,#203977,1115 West Chester Pike,PA,19382
+Panera Bread,Cherry Hill,203978,#203978,2010 Marlton Pike W,NJ,8003
+Panera Bread,Warrington,203980,#203980,1521 Main Street,PA,18976
+Panera Bread,Delran,203981,#203981,4004 Route 130 North,NJ,8075
+Panera Bread,Wayne,203983,#203983,267 E Swedesford Road,PA,19087
+Panera Bread,Wynnewood,203984,#203984,278 East Lancaster Avenue,PA,19096
+Panera Bread,Bensalem,203986,#203986,2605 Street Road,PA,19020
+Panera Bread,Exton,203987,#203987,151 East Swedesford Road,PA,19341
+Panera Bread,Broomall,203988,#203988,1991 Sproul Road,PA,19008
+Panera Bread,King of Prussia,203989,#203989,150 Allendale Road,PA,19406
+Panera Bread,Doylestown,203990,#203990,73 Old Dublin Pike,PA,18901
+Panera Bread,Wayne,203991,#203991,319 E. Lancaster Avenue,PA,19087
+Panera Bread,Jenkintown,203992,#203992,1641 Fairway Valley Road,PA,19046
+Panera Bread,Wilmington,203993,#203993,2311 Concord Pike,DE,19803
+Panera Bread,Havertown,203995,#203995,116 Township Line Road,PA,19083
+Panera Bread,Newtown Square,203996,#203996,3554 West Chester Pike,PA,19073
+Panera Bread,Quakertown,203997,#203997,139 N. West End Boulevard,PA,18951
+Panera Bread,Collegeville,203998,#203998,51 Town Center Drive,PA,19426
+Panera Bread,Batavia,204002,#204002,154 West Wilson Street,IL,60510
+Panera Bread,Oswego,204003,#204003,2970 West Route 34,IL,60543
+Panera Bread,Gurnee,204004,#204004,6557 Grand Avenue,IL,60031
+Panera Bread,McHenry,204005,#204005,1711 North Richmond Road,IL,60050
+Panera Bread,South Elgin,204006,#204006,322 Randall Road,IL,60177
+Panera Bread,Dekalb,204007,#204007,2476 Sycamore Road,IL,60115
+Panera Bread,Riverwoods,204008,#204008,2001 Milwaukee Avenue,IL,60015
+Panera Bread,Aurora,204009,#204009,1330 N Orchard Road,IL,60506
+Panera Bread,Yorkville,204010,#204010,1206 North Bridge Street,IL,60560
+Panera Bread,Lake Bluff,204011,#204011,305 South Waukegan Road,IL,60044
+Panera Bread,Plainfield,204012,#204012,2360 South Route 59,IL,60586
+Panera Bread,Frankfort,204014,#204014,11069 West Lincoln Highway,IL,60423
+Panera Bread,Fox River Grove,204015,#204015,730 Northwest Highway,IL,60021
+Panera Bread,Naperville,204016,#204016,2775 Showplace Drive Suite 123,IL,60564
+Panera Bread,Elgin,204017,#204017,2484 North Randall Road,IL,60123
+Panera Bread,Bolingbrook,204018,#204018,714 East Boughton Road,IL,60440
+Panera Bread,Bannockburn,204019,#204019,1211 Half Day Road,IL,60015
+Panera Bread,Plainfield,204020,#204020,12632 South Route 59,IL,60585
+Panera Bread,South Barrington,204022,#204022,100 West Higgins Road,IL,60010
+Panera Bread,Woodstock,204024,#204024,925 Country Club Road,IL,60098
+Panera Bread,South Holland,204025,#204025,300 E. 162nd Street,IL,60473
+Panera Bread,Houston,204030,#204030,12220 FM 1960 West,TX,77065
+Panera Bread,Houston,204031,#204031,13704 Northwest Freeway,TX,77040
+Panera Bread,Houston,204032,#204032,22521 Tomball Parkway,TX,77375
+Panera Bread,Conroe,204033,#204033,1302 West Davis Street,TX,77304
+Panera Bread,The Woodlands,204034,#204034,1201 Lake Woodlands Drive,TX,77380
+Panera Bread,Houston,204035,#204035,19502 Katy Freeway,TX,77094
+Panera Bread,Houston,204036,#204036,6915 Cypress Creek Pkwy,TX,77066
+Panera Bread,Spring,204038,#204038,1448 Louetta Road,TX,77388
+Panera Bread,Conroe,204040,#204040,3113 College Park Drive,TX,77384
+Panera Bread,Cypress,204041,#204041,26003 NW Freeway,TX,77429
+Panera Bread,Tomball,204042,#204042,28403 State Highway 249,TX,77377
+Panera Bread,Carle Place,204051,#204051,165 Old Country Road,NY,11514
+Panera Bread,Hicksville,204052,#204052,358 Broadway Mall,NY,11801
+Panera Bread,East Northport,204054,#204054,4097 Jericho Turnpike,NY,11731
+Panera Bread,Hauppauge,204055,#204055,399 Nesconset Highway,NY,11788
+Panera Bread,Bohemia,204057,#204057,5191 Sunrise Highway,NY,11716
+Panera Bread,Huntington Station,204059,#204059,160 Walt Whitman Road,NY,11746
+Panera Bread,Mineola,204060,#204060,520 Jericho Turnpike,NY,11501
+Panera Bread,East Meadow,204061,#204061,2501 Hempstead Turnpike,NY,11554
+Panera Bread,West Babylon,204063,#204063,1025 West Montauk Highway,NY,11704
+Panera Bread,Rockville Centre,204064,#204064,313 Merrick Road,NY,11570
+Panera Bread,Farmingdale,204065,#204065,919 Route 110 N,NY,11735
+Panera Bread,Bay Shore,204068,#204068,1701 Sunrise Highway,NY,11706
+Panera Bread,Riverhead,204069,#204069,11 Commerce Drive,NY,11901
+Panera Bread,Bridgehampton,204070,#204070,2044 Montauk Highway,NY,11932
+Panera Bread,North Babylon,204071,#204071,1258 Deer Park Avenue,NY,11703
+Panera Bread,Massapequa,204072,#204072,5274 Sunrise Highway,NY,11762
+Panera Bread,Staten Island,204075,#204075,280 Marsh Avenue,NY,10314
+Panera Bread,Staten Island,204076,#204076,2965 Veterans Road West,NY,10309
+Panera Bread,Port Jefferson Station,204077,#204077,4959 Nesconset Highway,NY,11776
+Panera Bread,Brooklyn,204078,#204078,345 Adams Street,NY,11201
+Panera Bread,Brooklyn,204079,#204079,5158 King's Plaza,NY,11234
+Panera Bread,Henderson,204080,#204080,605 Mall Ring Circle,NV,89015
+Panera Bread,Las Vegas,204081,#204081,5130 South Fort Apache Road,NV,89148
+Panera Bread,Henderson,204082,#204082,9911 South Eastern Avenue,NV,89123
+Panera Bread,Henderson,204084,#204084,2235 Village Walk Drive,NV,89074
+Panera Bread,Las Vegas,204085,#204085,7175 West Lake Mead Boulevard,NV,89128
+Panera Bread,Las Vegas,204087,#204087,740 S. Rampart Boulevard Suite 3,NV,89145
+Panera Bread,Pasadena,204100,#204100,5855 Fairmont Parkway,TX,77505
+Panera Bread,Sugar Land,204102,#204102,1928 Highway 6,TX,77478
+Panera Bread,Houston,204103,#204103,680 Memorial City Mall,TX,77024
+Panera Bread,Pearland,204104,#204104,10621 Broadway Street,TX,77584
+Panera Bread,Atascocita,204106,#204106,7041 FM 1960 East,TX,77346
+Panera Bread,Houston,204109,#204109,7049 Highway 6,TX,77095
+Panera Bread,Katy,204110,#204110,23501 Cinco Ranch Boulevard,TX,77494
+Panera Bread,Houston,204111,#204111,1709 Post Oak,TX,77056
+Panera Bread,East College Station,204113,#204113,1407 University Drive,TX,77840
+Panera Bread,Houston,204114,#204114,3151 W. Holcombe Blvd Suite A,TX,77025
+Panera Bread,Rosenberg,204115,#204115,22401 Southwest Freeway Suite 100,TX,77469
+Panera Bread,League City,204116,#204116,2630 Gulf Freeway Suite A,TX,77573
+Panera Bread,Baytown,204117,#204117,6439 Garth Road,TX,77521
+Panera Bread,Houston,204118,#204118,15450 Wallisville Road,TX,77015
+Panera Bread,Kingwood,204119,#204119,25665 U.S. Highway 59 North Kingwood,TX,77339
+Panera Bread,Newport Beach,204125,#204125,1348 Bison Avenue,CA,92660
+Panera Bread,Irvine,204126,#204126,3988 Barranca Parkway,CA,92606
+Panera Bread,Orange,204127,#204127,2214 North Tustin Street,CA,92865
+Panera Bread,Tustin,204128,#204128,2467 Park Avenue,CA,92782
+Panera Bread,Aliso Viejo,204129,#204129,26541 Aliso Creek Road #F,CA,92656
+Panera Bread,Irvine,204130,#204130,6372 Irvine Boulevard,CA,92620
+Panera Bread,Costa Mesa,204131,#204131,235 East 17th Street,CA,92627
+Panera Bread,Lake Forest,204132,#204132,23592 Rockfield Boulevard,CA,92630
+Panera Bread,San Clemente,204133,#204133,802 Avenida Talega Suite 100,CA,92673
+Panera Bread,Tustin,204134,#204134,13205 Jamboree Road,CA,92782
+Panera Bread,San Juan Capistrano,204135,#204135,31882 Del Obispo,CA,92675
+Panera Bread,Mission Viejo,204136,#204136,25523 Marguerite Parkway Suite A2,CA,92692
+Panera Bread,Rancho Santa Margarita,204137,#204137,30642 Santa Margarita Parkway Suite E-102,CA,92688
+Panera Bread,Indian Harbour Beach,204151,#204151,275 Eau Gallie Boulevard East,FL,32937
+Panera Bread,Gainesville,204152,#204152,3443 SW Archer Road,FL,32608
+Panera Bread,Port Orange,204153,#204153,1781 Dunlawton Avenue,FL,32127
+Panera Bread,Melbourne,204155,#204155,2290 Town Center Avenue,FL,32940
+Panera Bread,Kissimmee,204156,#204156,3270 North John Young Parkway,FL,34741
+Panera Bread,Altamonte Springs,204157,#204157,2480 State Road 434 West,FL,32714
+Panera Bread,Tarpon Springs,204158,#204158,40968 US Highway 19 North,FL,34689
+Panera Bread,Sanford,204160,#204160,1457 W.P. Ball Road,FL,32772
+Panera Bread,Daytona Beach,204161,#204161,2400 International Speedway Blvd,FL,32124
+Panera Bread,Clearwater,204162,#204162,2532 State Road 580,FL,33761
+Panera Bread,Port St Lucie,204163,#204163,1707 NW St Lucie West Blvd Ste 174,FL,34986
+Panera Bread,Orlando,204165,#204165,8600 Vineland Avenue,FL,32821
+Panera Bread,Winter Park,204166,#204166,329 N Park Avenue,FL,32789
+Panera Bread,Ocala,204167,#204167,4414 S.W. College Road #1540,FL,34474
+Panera Bread,Winter Garden,204168,#204168,3131 Daniels Road,FL,34787
+Panera Bread,Vero Beach,204169,#204169,2001 Indian River Boulevard,FL,32960
+Panera Bread,Lake Mary,204170,#204170,864 South Sun Drive,FL,32746
+Panera Bread,West Melbourne,204171,#204171,245 Palm Bay Road,FL,32904
+Panera Bread,Winter Park,204172,#204172,2516 Aloma Avenue,FL,32792
+Panera Bread,Kissimmee,204173,#204173,1483 E. Osceola Parkway,FL,34744
+Panera Bread,Apopka,204174,#204174,1538 W. Orange Blossom Trail,FL,32712
+Panera Bread,Palm Coast,204175,#204175,5880 State Route 100,FL,32164
+Panera Bread,Orlando,204177,#204177,4700 S Apopka Vineland Road,FL,32819
+Panera Bread,Orlando,204179,#204179,10739 International Drive,FL,32821
+Panera Bread,Kissimmee,204180,#204180,8120 Irlo Bronson Memorial Highway,FL,34747
+Panera Bread,Oviedo,204181,#204181,205 E Mitchell Hammock Road,FL,32765
+Panera Bread,Orlando,204182,#204182,9607 Lake Nona Village Place,FL,32827
+Panera Bread,Stuart,204183,#204183,3500 SE Federal Hwy,FL,34997
+Panera Bread,Orlando,204185,#204185,6424 Semoran Boulevard,FL,32822
+Panera Bread,Celebration,204186,#204186,51 Celebration Place,FL,34747
+Panera Bread,Orlando,204188,#204188,2415 N Orange Avenue,FL,32804
+Panera Bread,Brandon,204190,#204190,504 Brandon Town Center Mall,FL,33511
+Panera Bread,Largo,204191,#204191,10500 Ulmerton Road,FL,33771
+Panera Bread,Spring Hill,204193,#204193,1403 Commercial Way,FL,34607
+Panera Bread,The Villages,204194,#204194,1010 Lake Sumter Landing,FL,32162
+Panera Bread,Tampa,204196,#204196,3420 W. Dr. MLK Jr. Blvd,FL,33607
+Panera Bread,Wesley Chapel,204197,#204197,28332 Willet Way,FL,33543
+Panera Bread,Los Angeles,204200,#204200,8647 South Sepulveda Boulevard,CA,90045
+Panera Bread,Torrance,204201,#204201,2733 Pacific Coast Highway,CA,90505
+Panera Bread,Santa Monica,204202,#204202,501 Wilshire Boulevard,CA,90403
+Panera Bread,Marina Del Rey,204203,#204203,4720 Lincoln Boulevard,CA,90292
+Panera Bread,Carson,204204,#204204,20700 Avalon Boulevard,CA,90746
+Panera Bread,Philadelphia,204210,#204210,48 North 12th Street,PA,19107
+Panera Bread,Palmdale,204225,#204225,39403 10th Street West,CA,93551
+Panera Bread,Studio City,204227,#204227,12131 Ventura Boulevard,CA,91604
+Panera Bread,Santa Clarita,204228,#204228,24133 Baywood Lane,CA,91350
+Panera Bread,Santa Clarita,204229,#204229,19185 Golden Valley Road,CA,91387
+Panera Bread,Lancaster,204231,#204231,43458 10th Street,CA,93534
+Panera Bread,Northridge,204232,#204232,19662 Nordhoff Street,CA,91324
+Panera Bread,North Hollywood,204233,#204233,5300 Lankershim Blvd,CA,91601
+Panera Bread,Palmdale,204234,#204234,38029 47th Street East,CA,93552
+Panera Bread,Glendale,204235,#204235,300 N Brand Blvd.,CA,91203
+Panera Bread,Burbank,204236,#204236,132 East Palm Avenue,CA,91502
+Panera Bread,Encino,204237,#204237,16624 Ventura Blvd,CA,91436
+Panera Bread,Sherman Oaks,204238,#204238,14708 Ventura Blvd Unit A,CA,91403
+Panera Bread,Westlake Village,204239,#204239,5784 Lindero Canyon Rd,CA,91362
+Panera Bread,Onalaska,204250,#204250,1230 Crossing Meadow Drive,WI,54650
+Panera Bread,Eau Claire,204251,#204251,4601 Keystone Crossing,WI,54701
+Panera Bread,Escondido,204275,#204275,1286 Auto Park Way,CA,92029
+Panera Bread,Carlsbad,204276,#204276,1935 Calle Barcelona,CA,92009
+Panera Bread,Vista,204278,#204278,401 Vista Village Drive,CA,92083
+Panera Bread,San Diego,204279,#204279,10751 Westview Parkway,CA,92126
+Panera Bread,San Marcos,204280,#204280,575 Grand Avenue,CA,92078
+Panera Bread,San Diego,204281,#204281,12156 Carmel Mountain Road,CA,92128
+Panera Bread,San Diego,204282,#204282,10430 Craftsman Way,CA,92127
+Panera Bread,Solana Beach,204283,#204283,667 San Rodolfo Drive,CA,92075
+Panera Bread,Chula Vista,204284,#204284,555 Broadway,CA,91910
+Panera Bread,Escondido,204285,#204285,200 East Via Rancho Parkway,CA,92025
+Panera Bread,La Mesa,204286,#204286,5500 Grossmont Center Drive,CA,91942
+Panera Bread,Chula Vista,204287,#204287,2015 Birch Road,CA,91915
+Panera Bread,Coronado,204288,#204288,980 Orange Avenue,CA,92118
+Panera Bread,San Diego,204289,#204289,2445 Truxtun Road,CA,92106
+Panera Bread,San Diego,204291,#204291,225 Broadway Suite 160,CA,92101
+Panera Bread,La Jolla,204292,#204292,7863 Girard Avenue,CA,92037
+Panera Bread,Hillcrest,204293,#204293,1270 Cleveland Avenue,CA,92103
+Panera Bread,San Diego,204294,#204294,5620 Balboa Avenue,CA,92117
+Panera Bread,Carlsbad,204296,#204296,2521 Palomar Airport Road Suite 100,CA,92011
+Panera Bread,Marietta,204300,#204300,4475 Roswell Road,GA,30062
+Panera Bread,Newnan,204302,#204302,379 Bullsboro Drive,GA,30263
+Panera Bread,Rome,204303,#204303,14 River Bend Drive,GA,30161
+Panera Bread,Marietta,204304,#204304,3625 Dallas Highway,GA,30064
+Panera Bread,Peachtree City,204305,#204305,1263 North Peachtree Parkway,GA,30269
+Panera Bread,Kennesaw,204306,#204306,600 Chastain Road NW,GA,30144
+Panera Bread,Roswell,204307,#204307,1195 Woodstock Road,GA,30075
+Panera Bread,Woodstock,204309,#204309,2625 Towne Lake Parkway,GA,30189
+Panera Bread,Kennesaw,204310,#204310,964 Barrett Parkway,GA,30144
+Panera Bread,Fayetteville,204311,#204311,104 Ellis Drive,GA,30214
+Panera Bread,South Uniontown,204325,#204325,105 Matthew Drive,PA,15401
+Panera Bread,Murrysville,204326,#204326,4899 William Penn Highway,PA,15668
+Panera Bread,Greensburg,204327,#204327,300 Greengate Center Circle,PA,15601
+Panera Bread,Charleston,204328,#204328,2830 Mountaineer Boulevard,WV,25309
+Panera Bread,Tarentum,204329,#204329,2021 Butler Logan Road,PA,15084
+Panera Bread,Vienna,204330,#204330,810 Grand Central Avenue,WV,26105
+Panera Bread,North Huntingdon,204331,#204331,8901 Route 30,PA,15642
+Panera Bread,Barboursville,204332,#204332,905 Ring Road,WV,25504
+Panera Bread,St. Clairsville,204333,#204333,67800 Mall Ring Road,OH,43950
+Panera Bread,Triadelphia,204334,#204334,506 Cabela Drive,WV,26059
+Panera Bread,Monaca,204335,#204335,100 Wagner Road,PA,15061
+Panera Bread,Pittsburgh,204337,#204337,295 Settlers Ridge Drive,PA,15205
+Panera Bread,Johnstown,204338,#204338,400 Town Centre Drive,PA,15904
+Panera Bread,Ashland,204340,#204340,500 Winchester Avenue,KY,41101
+Panera Bread,Greensburg,204341,#204341,5256 Route 30,PA,15601
+Panera Bread,Oakmont,204342,#204342,666 Allegheny River Boulevard,PA,15139
+Panera Bread,Charleston,204343,#204343,3000 Charleston Town Center,WV,25320
+Panera Bread,Pittsburgh,204344,#204344,136 Bakery Square Boulevard,PA,15206
+Panera Bread,Morgantown,204345,#204345,207 Willey Street,WV,26505
+Panera Bread,Beckley,204346,#204346,1410 N. Eisenhower Drive,WV,25801
+Panera Bread,Bridgeville,204348,#204348,1025 Washington Pike,PA,15017
+Panera Bread,Nanuet,204350,#204350,24A Rockland Plaza North Middletown Road,NY,10954
+Panera Bread,Poughkeepsie,204351,#204351,2020 South Road,NY,12601
+Panera Bread,Middletown,204352,#204352,444 Route 211 East,NY,10940
+Panera Bread,Port Chester,204353,#204353,10 Westchester Avenue,NY,10573
+Panera Bread,Scarsdale,204354,#204354,915 Central Park Avenue,NY,10583
+Panera Bread,Yorktown Heights,204355,#204355,6 Triangle Center,NY,10598
+Panera Bread,Fishkill,204356,#204356,11 Merritt Boulevard,NY,12524
+Panera Bread,Newburgh,204357,#204357,1278 Route 300,NY,12550
+Panera Bread,Bronx,204359,#204359,340 Baychester Avenue,NY,10475
+Panera Bread,White Plains,204361,#204361,1 North Broadway,NY,10601
+Panera Bread,Mohegan Lake,204363,#204363,3083 East Main Street,NY,10547
+Panera Bread,Bedford Hills,204364,#204364,719 Bedford Road,NY,10507
+Panera Bread,Poughkeepsie,204366,#204366,712 Dutchess Turnpike,NY,12603
+Panera Bread,Yonkers,204369,#204369,1015 Mall Walk,NY,10704
+Panera Bread,Monroe,204370,#204370,340 Larkin Drive,NY,10950
+Panera Bread,Columbia,204380,#204380,6080 Garners Ferry Road,SC,29209
+Panera Bread,Charleston,204381,#204381,5070 International Boulevard,SC,29418
+Panera Bread,Charleston,204382,#204382,2000 Sam Rittenberg Boulevard,SC,29407
+Panera Bread,Evans,204383,#204383,4237 Washington Road,GA,30809
+Panera Bread,Augusta,204384,#204384,254 Robert Daniel Parkway,GA,30909
+Panera Bread,Savannah,204385,#204385,8108 Abercorn Street,GA,31406
+Panera Bread,Columbia,204386,#204386,1007 Bower Parkway,SC,29212
+Panera Bread,Bluffton,204387,#204387,1264 Fording Island Drive,SC,29910
+Panera Bread,Savannah,204389,#204389,1 W Broughton Street,GA,31401
+Panera Bread,Hilton Head Island,204390,#204390,1012 William Hilton Parkway,SC,29928
+Panera Bread,Columbia,204391,#204391,631 Promenade Place #6,SC,29229
+Panera Bread,Statesboro,204392,#204392,810 Buckhead Drive,GA,30458
+Panera Bread,Summerville,204393,#204393,1311 Main Street,SC,29483
+Panera Bread,Hinesville,204394,#204394,1190 E. Oglethorpe Highway,GA,31313
+Panera Bread,Pooler,204395,#204395,234 Pooler Parkway,GA,31322
+Panera Bread,Long Island City,204401,#204401,3801 35th Avenue,NY,11101
+Panera Bread,Little Neck,204402,#204402,25441 Horace Harding Expressway,NY,11362
+Panera Bread,Glendale,204403,#204403,7325 Woodhaven Boulevard,NY,11385
+Panera Bread,Bayside,204404,#204404,2358 Bell Boulevard,NY,11360
+Panera Bread,Rego Park,204405,#204405,6135 Junction Boulevard,NY,11374
+Panera Bread,Harrisonburg,204425,#204425,295 Burgess Road,VA,22801
+Panera Bread,Warrenton,204426,#204426,251 West Lee Highway,VA,20186
+Panera Bread,Charlottesville,204427,#204427,1121 Emmet Street N,VA,22903
+Panera Bread,Lynchburg,204428,#204428,3911 Wards Road,VA,24502
+Panera Bread,Charlottesville,204429,#204429,121 Community Street,VA,22911
+Panera Bread,Roanoke,204430,#204430,4202 Electric Road,VA,24018
+Panera Bread,Ranson,204431,#204431,72 Oak Lee Drive,WV,25438
+Panera Bread,Roanoke,204432,#204432,4822 Valley View Boulevard NW,VA,24012
+Panera Bread,Christiansburg,204433,#204433,2610 N Franklin Street,VA,24073
+Panera Bread,Winchester,204434,#204434,2605 S Pleasant Valley Road,VA,22601
+Panera Bread,Blacksburg,204435,#204435,715 University City Boulevard,VA,24060
+Panera Bread,Lynchburg,204437,#204437,3901 Old Forest Road,VA,24501
+Panera Bread,Waynesboro,204438,#204438,1101 Red Top Orchard Road,VA,22980
+Panera Bread,Culpepper,204440,#204440,15241 Creativity Drive,VA,22701
+Panera Bread,Austin,204445,#204445,4625 West William Cannon Road,TX,78749
+Panera Bread,Austin,204446,#204446,2805 Bee Caves Road,TX,78746
+Panera Bread,Austin,204447,#204447,10900 Lakeline Mall Drive,TX,78717
+Panera Bread,San Antonio,204448,#204448,999 E Basse Road,TX,78209
+Panera Bread,Bee Cave,204449,#204449,12901 Hill Country Boulevard,TX,78738
+Panera Bread,San Antonio,204450,#204450,1203 N Loop 1604 W. Suite 121,TX,78258
+Panera Bread,Austin,204451,#204451,9901 North Capital of Texas Highway,TX,78759
+Panera Bread,San Antonio,204452,#204452,11075 I-10 #304,TX,78230
+Panera Bread,Live Oak,204453,#204453,8235 Agora Parkway Suite 115,TX,78233
+Panera Bread,San Antonio,204454,#204454,8531 State Highway 151,TX,78245
+Panera Bread,San Antonio,204455,#204455,13025 San Pedro Avenue,TX,78216
+Panera Bread,San Marcos,204456,#204456,2315 South Interstate Highway 35,TX,78666
+Panera Bread,Gilroy,204470,#204470,6865 Camino Arroyo,CA,95020
+Panera Bread,Cupertino,204471,#204471,20807 Stevens Creek Boulevard,CA,95014
+Panera Bread,San Jose,204472,#204472,503 Coleman Avenue,CA,95110
+Panera Bread,Millbrae,204473,#204473,320 Adrian Road,CA,94030
+Panera Bread,Campbell,204476,#204476,501 East Hamilton Avenue,CA,95008
+Panera Bread,San Jose,204477,#204477,2199 Monterey Highway #80,CA,95125
+Panera Bread,San Jose,204478,#204478,1706 Oakland Road,CA,95131
+Panera Bread,Sunnyvale,204479,#204479,118 East El Camino Real,CA,94087
+Panera Bread,Los Gatos,204480,#204480,15200 Los Gatos Blvd. Suite 100,CA,95032
+Panera Bread,San Jose,204481,#204481,4180 N. First Street,CA,95134
+Panera Bread,Mountain View,204485,#204485,1035 El Monte Avenue,CA,94041
+Panera Bread,San Francisco,204517,#204517,301 King Street,CA,94158
+Panera Bread,San Rafael,204520,#204520,5800 North Gate Mall,CA,94903
+Panera Bread,Mobile,204558,#204558,3691 Airport Boulevard,AL,36608
+Panera Bread,Mobile,204559,#204559,750 Schillinger Road South,AL,36695
+Panera Bread,Spanish Fort,204560,#204560,10200 Eastern Shore Boulevard,AL,36527
+Panera Bread,Metairie,204586,#204586,4848 Veterans Boulevard,LA,70006
+Panera Bread,Covington,204587,#204587,70411 Highway 21,LA,70433
+Panera Bread,New Orleans,204589,#204589,309 N. Carrollton Avenue Ste 3,LA,70119
+Panera Bread,Lake Charles,204590,#204590,3404 Nelson Road,LA,70605
+Panera Bread,Cordova,204601,#204601,714 Germantown Parkway Suite 39,TN,38018
+Panera Bread,Memphis,204602,#204602,4530 Poplar Avenue Suite 101,TN,38117
+Panera Bread,Germantown,204604,#204604,7850 Poplar Avenue,TN,38138
+Panera Bread,Memphis,204605,#204605,5865 Poplar Avenue (US Highway 72),TN,38119
+Panera Bread,Jackson,204606,#204606,1145 Vann Drive Suite 107,TN,38305
+Panera Bread,Jonesboro,204608,#204608,2213 Stadium Blvd,AR,72401
+Panera Bread,Olive Branch,204609,#204609,7501 Goodman Road,MS,38654
+Panera Bread,Memphis,204611,#204611,1961 Union Avenue,TN,38104
+Panera Bread,Warrensville Heights,204625,#204625,4301 Richmond Road,OH,44122
+Panera Bread,Stow,204626,#204626,4338 Kent Road,OH,44224
+Panera Bread,Seven Hills,204627,#204627,7337 Broadview Road,OH,44131
+Panera Bread,Strongsville,204628,#204628,1304 Southpark Center,OH,44136
+Panera Bread,Highland Heights,204631,#204631,6345 Wilson Mills Road,OH,44143
+Panera Bread,Lakewood,204632,#204632,14701 Detroit Road,OH,44107
+Panera Bread,Amherst,204633,#204633,8000 Oak Point Drive,OH,44001
+Panera Bread,South Euclid,204634,#204634,13901 Cedar Road,OH,44118
+Panera Bread,Wadsworth,204635,#204635,135 Great Oaks Trail,OH,44281
+Panera Bread,Bainbridge Township,204636,#204636,8480 East Washington Street,OH,44023
+Panera Bread,Alliance,204637,#204637,1670 West State St.,OH,44601
+Panera Bread,North Ridgeville,204638,#204638,32305 Lorain Road,OH,44039
+Panera Bread,Twinsburg,204639,#204639,8928 Darrow Rd,OH,44087
+Panera Bread,Independence,204640,#204640,6700 Rockside Road,OH,44131
+Panera Bread,Niles,204641,#204641,5675 Youngstown-Warren Road,OH,44446
+Panera Bread,Cleveland,204642,#204642,11490 Euclid Avenue,OH,44106
+Panera Bread,Willoughby,204643,#204643,36099 Euclid Avenue,OH,44094
+Panera Bread,Erie,204646,#204646,4014 Peach St.,PA,16509
+Panera Bread,Brunswick,204647,#204647,1405 Parschen Blvd,OH,44212
+Panera Bread,New Springfield,204648,#204648,12500 Beard Street,OH,44443
+Panera Bread,New Springfield,204649,#204649,3500 E South Range Road,OH,44443
+Panera Bread,Sheffield Village,204651,#204651,5382 Abbe Rd,OH,44035
+Panera Bread,Mayfield Heights,204652,#204652,6036 Mayfield Road,OH,44124
+Panera Bread,Erie,204653,#204653,4299 N. Buffalo Road,PA,16510
+Panera Bread,Hampton Bays,204655,#204655,180 West Montauk Highway,NY,11946
+Panera Bread,Lawrence,204656,#204656,345 Rockaway Turnpike,NY,11559
+Panera Bread,New Hyde Park,204657,#204657,669 Hillside Avenue,NY,11040
+Panera Bread,Lake Grove,204658,#204658,143 Alexander Avenue,NY,11755
+Panera Bread,Syosset,204659,#204659,407 Jericho Turnpike,NY,11791
+Panera Bread,Huntington,204660,#204660,345 Main Street,NY,11743
+Panera Bread,Plainview,204663,#204663,1082 Old Country Road,NY,11803
+Panera Bread,Bellmore,204664,#204664,2375 Merrick Road,NY,11710
+Panera Bread,Island Park,204665,#204665,4575 Austin Boulevard,NY,11558
+Panera Bread,Boca Raton,204701,#204701,20437 State Road 7,FL,33498
+Panera Bread,Wellington,204702,#204702,10540 W Forest Hill Boulevard,FL,33414
+Panera Bread,Boca Raton,204703,#204703,222 Yamato Boulevard,FL,33431
+Panera Bread,Fort Lauderdale,204704,#204704,1762 North Federal Highway,FL,33305
+Panera Bread,Del Ray Beach,204706,#204706,1701 S Federal Highway,FL,33483
+Panera Bread,Palm Beach Gardens,204707,#204707,4540 PGA Boulevard,FL,33418
+Panera Bread,Coral Springs,204708,#204708,2015 North University Drive,FL,33071
+Panera Bread,Boynton Beach,204709,#204709,701 N Congress Avenue,FL,33436
+Panera Bread,Sunrise,204710,#204710,13815 West Sunrise Boulevard,FL,33323
+Panera Bread,Weston,204711,#204711,4547 Weston Road,FL,33331
+Panera Bread,West Palm Beach,204712,#204712,771 Village Boulevard,FL,33409
+Panera Bread,Miramar,204713,#204713,2955 SW 160th Avenue,FL,33027
+Panera Bread,Pompano Beach,204714,#204714,2101 North Federal Highway,FL,33062
+Panera Bread,Palm Beach Gardens,204715,#204715,3186 Northlake Boulevard,FL,33403
+Panera Bread,Boca Raton,204716,#204716,5050 Town Center Circle,FL,33486
+Panera Bread,Coral Springs,204717,#204717,4328 N. State Road 7,FL,33067
+Panera Bread,Pembroke Pines,204718,#204718,11029 Pines Boulevard,FL,33026
+Panera Bread,West Palm Beach,204719,#204719,700 S. Rosemary Avenue,FL,33401
+Panera Bread,Boynton Beach,204720,#204720,8784 Boynton Beach Boulevard,FL,33437
+Panera Bread,Royal Palm Beach,204721,#204721,11131 Southern Boulevard,FL,33411
+Panera Bread,Jupiter,204722,#204722,6671 W. Indiantown Road,FL,33458
+Panera Bread,Ft. Lauderdale,204723,#204723,1461 SE 17th Street,FL,33316
+Panera Bread,Ft. Lauderdale,204724,#204724,5975 N. Federal Highway,FL,33308
+Panera Bread,Lake Worth,204726,#204726,6300 Lantana Road,FL,33463
+Panera Bread,Deerfield Beach,204728,#204728,3720 West Hillsboro Boulevard,FL,33442
+Panera Bread,Davie,204729,#204729,2699 South University Drive,FL,33328
+Panera Bread,Boynton Beach,204731,#204731,548 East Woolbright Road,FL,33435
+Panera Bread,Columbus,204751,#204751,875 Bethel Road,OH,43214
+Panera Bread,Dublin,204752,#204752,5043 Tuttle Crossing Boulevard,OH,43016
+Panera Bread,Dublin,204753,#204753,2750 Martin Road,OH,43017
+Panera Bread,Columbus,204754,#204754,6887 East Broad Street,OH,43213
+Panera Bread,Columbus,204755,#204755,3942 Townsfair Way,OH,43219
+Panera Bread,Columbus,204756,#204756,3278 Tremont Road,OH,43221
+Panera Bread,Columbus,204757,#204757,2924 East Broad Street,OH,43209
+Panera Bread,Columbus,204758,#204758,1391 Polaris Parkway,OH,43240
+Panera Bread,Dublin,204759,#204759,6665 Perimeter Loop Road,OH,43017
+Panera Bread,Grandview,204760,#204760,1307 Grandview Avenue,OH,43212
+Panera Bread,Reynoldsburg,204761,#204761,2374 Taylor Road,OH,43068
+Panera Bread,Hilliard,204762,#204762,3625 Fishinger Boulevard,OH,43026
+Panera Bread,Powell,204763,#204763,8823 Owenfield Drive,OH,43065
+Panera Bread,Columbus,204764,#204764,4965 North Hamilton Road,OH,43230
+Panera Bread,Columbus,204765,#204765,4519 N High Street,OH,43214
+Panera Bread,Westerville,204766,#204766,782 North State Street,OH,43082
+Panera Bread,Columbus,204767,#204767,1619 North High Street,OH,43201
+Panera Bread,Westerville,204768,#204768,555 South State Street,OH,43081
+Panera Bread,Lancaster,204769,#204769,1374 Ety Road,OH,43130
+Panera Bread,Hilliard,204770,#204770,1531 Hilliard Rome Road,OH,43026
+Panera Bread,Powell,204771,#204771,9755 Liberty Market Way,OH,43065
+Panera Bread,Grove City,204772,#204772,1786 Stringtown Road,OH,43123
+Panera Bread,Columbus,204775,#204775,300 W. Lane Avenue,OH,43201
+Panera Bread,Heath,204776,#204776,729 Hebron Road,OH,43056
+Panera Bread,Worthington,204777,#204777,85 Worthington Mall Suite 120,OH,43085
+Panera Bread,Gahanna,204778,#204778,91 N. Hamilton Road,OH,43230
+Panera Bread,Marion,204779,#204779,1623 Marion-Mt. Gilead Road,OH,43302
+Panera Bread,Mansfield,204780,#204780,2070 Walker Lake Road,OH,44903
+Panera Bread,Wooster,204781,#204781,3934 Burbank Road,OH,44691
+Panera Bread,Lima,204783,#204783,2330 Elida Road Ste A,OH,45805
+Panera Bread,Lima,204784,#204784,1830 Harding Highway,OH,45804
+Panera Bread,Mansfield,204787,#204787,1402 Lexington Avenue,OH,44907
+Panera Bread,Columbus,204791,#204791,684 S. High Street,OH,43215
+Panera Bread,New Albany,204792,#204792,5477 New Albany Road West,OH,43054
+Panera Bread,Stow,204813,#204813,1059 Graham Road,OH,44224
+Panera Bread,Oakville,205004,#205004,2530 Winston Park Drive,ON,L6H 7E5
+Panera Bread,Etobicoke,205005,#205005,197 North Queen St.,ON,M9C1A7
+Panera Bread,Mississauga,205006,#205006,5935 Mavis Road Unit #2A,ON,ON L5V 3T7
+Panera Bread,Mississauga,205007,#205007,2575 Eglinton Avenue West,ON,L5M 7E1
+Panera Bread,Vaughan,205008,#205008,16 Famous Avenue,ON,L4L 9M3
+Panera Bread,Oakville,205009,#205009,220 N Service Road W,ON,L6M 2Y4
+Panera Bread,Kirkwood,600601,#600601,10312 Manchester Street,MO,63122
+Panera Bread,Chesterfield,600603,#600603,14888 Clayton Road,MO,63017
+Panera Bread,Creve Coeur,600607,#600607,447 North New Ballas Road,MO,63141
+Panera Bread,St. Louis,600612,#600612,9920 Kennerly Road,MO,63128
+Panera Bread,St. Louis,600614,#600614,3114 South Grand Boulevard,MO,63118
+Panera Bread,Chesterfield,600616,#600616,46 Four Seasons Shopping Center,MO,63017
+Panera Bread,Florissant,600617,#600617,2375 North Highway 67,MO,63033
+Panera Bread,Winchester,600620,#600620,14560 Manchester Road,MO,63011
+Panera Bread,Columbia,600621,#600621,102 South 9th Street,MO,65201
+Panera Bread,St. Louis,600622,#600622,5696 Telegraph Road,MO,63129
+Panera Bread,Chesterfield,600624,#600624,238 Chesterfield Mall,MO,63017
+Panera Bread,Atlanta,600626,#600626,2274 Peachtree Road NW,GA,30309
+Panera Bread,St. Charles,600627,#600627,2079 Zumbehl Road,MO,63303
+Panera Bread,Clayton,600628,#600628,6701 Clayton Road,MO,63117
+Panera Bread,Atlanta,600629,#600629,2100 Henderson Mill Rd,GA,30345
+Panera Bread,Columbia,600630,#600630,2300 Bernadette Drive,MO,65203
+Panera Bread,Maryland Heights,600634,#600634,147 Westport Plaza,MO,63146
+Panera Bread,Atlanta,600635,#600635,3393 Peachtree Rd NE,GA,30326
+Panera Bread,Brentwood,600636,#600636,1909 Brentwood Boulevard,MO,63144
+Panera Bread,Wilmette,600639,#600639,1199 Wilmette Avenue,IL,60091
+Panera Bread,Aurora,600641,#600641,1304 Fox Valley Center,IL,60504
+Panera Bread,Winnetka,600644,#600644,940 Green Bay Road,IL,60093
+Panera Bread,Evanston,600645,#600645,1700 Sherman Avenue,IL,60201
+Panera Bread,Wheaton,600647,#600647,25 Rice Lake Square,IL,60187
+Panera Bread,Dunwoody,600648,#600648,1625 Mount Vernon Road,GA,30338
+Panera Bread,Belleville,600650,#600650,113 East Main Street,IL,62220
+Panera Bread,Vernon Hills,600651,#600651,700 North Milwaukee Avenue,IL,60061
+Panera Bread,Greenville,600654,#600654,700 Haywood Road,SC,29607
+Panera Bread,LaGrange Park,600656,#600656,439 North Lagrange Road,IL,60526
+Panera Bread,Park Ridge,600657,#600657,39 South Northwest Highway,IL,60068
+Panera Bread,Schaumburg,600658,#600658,1140 Plaza Drive,IL,60173
+Panera Bread,Schaumburg,600659,#600659,2415 West Schaumburg Road,IL,60194
+Panera Bread,Camp Hill,600660,#600660,1500 Camp Hill Mall,PA,17011
+Panera Bread,Lathrup Village,600662,#600662,27651 Southfield Road,MI,48076
+Panera Bread,Livonia,600663,#600663,28551 Schoolcraft Road,MI,48150
+Panera Bread,West Bloomfield,600664,#600664,6399 Orchard Lake Road,MI,48322
+Panera Bread,Swampscott,600666,#600666,433 Paradise Road,MA,1907
+Panera Bread,Novi,600667,#600667,25875 Novi Road,MI,48375
+Panera Bread,Sunset Hills,600668,#600668,10740 Sunset Plaza,MO,63127
+Panera Bread,Arlington Heights,600669,#600669,31 South Evergreen Avenue,IL,60005
+Panera Bread,Bolingbrook,600670,#600670,1196 West Boughton Road,IL,60440
+Panera Bread,Sterling Heights,600671,#600671,14600 Lakeside Circle,MI,48313
+Panera Bread,St. Louis,600673,#600673,6607 Chippewa Street,MO,63109
+Panera Bread,Niles,600674,#600674,9465 North Milwaukee Avenue,IL,60714
+Panera Bread,Rochester Hills,600676,#600676,37 South Livernois Road,MI,48309
+Panera Bread,Elmwood Park,600678,#600678,7330 West North Avenue,IL,60707
+Panera Bread,Niles,600679,#600679,7023 West Dempster Street,IL,60714
+Panera Bread,Southfield,600680,#600680,23719 Greenfield Road,MI,48075
+Panera Bread,Glen Ellyn,600684,#600684,541 Roosevelt Road,IL,60137
+Panera Bread,University City,600685,#600685,6630 Delmar Boulevard,MO,63130
+Panera Bread,Glen Allen,600687,#600687,10301 West Broad Street,VA,23060
+Panera Bread,Troy,600688,#600688,823 East Big Beaver Road,MI,48084
+Panera Bread,Farmington,600689,#600689,37611 12 Mile Road,MI,48331
+Panera Bread,Livonia,600690,#600690,37091 Six Mile Road,MI,48152
+Panera Bread,Wildwood,600691,#600691,16508 Manchester Road,MO,63040
+Panera Bread,O'Fallon,600692,#600692,1300 Highway K,MO,63366
+Panera Bread,Farmington,600693,#600693,34635 Grand River Avenue,MI,48335
+Panera Bread,Troy,600694,#600694,268 John R Road,MI,48083
+Panera Bread,Alexandria,600695,#600695,3201 Duke Street,VA,22314
+Panera Bread,Dearborn Heights,600698,#600698,26580 Ford Road,MI,48127
+Panera Bread,Downers Grove,600701,#600701,1400 Butterfield Road,IL,60515
+Panera Bread,Orland Park,600702,#600702,15252 South LaGrange Road,IL,60462
+Panera Bread,Fenton,600704,#600704,453 Old Smizer Mill Road,MO,63026
+Panera Bread,Bailey's Crossroads,600705,#600705,5857 Leesburg Pike,VA,22041
+Panera Bread,Schererville,600706,#600706,144 US Highway 41,IN,46375
+Panera Bread,Troy,600707,#600707,1325 Coolidge Highway,MI,48084
+Panera Bread,Creve Coeur,600708,#600708,10550 Old Olive Street Road,MO,63141
+Panera Bread,Alexandria,600709,#600709,5926 Kingstowne Towne Center,VA,22315
+Panera Bread,Lancaster,600710,#600710,2092 Fruitville Pike,PA,17601
+Panera Bread,Chicago,600711,#600711,2070 North Clybourn Avenue,IL,60614
+Panera Bread,Manassas,600713,#600713,8085 Sudley Road,VA,20109
+Panera Bread,Okemos,600715,#600715,4738 Central Park Drive,MI,48864
+Panera Bread,Des Peres,600717,#600717,13275 Manchester Road,MO,63131
+Panera Bread,Chesterfield,600718,#600718,17132 Chesterfield Airport Road,MO,63005
+Panera Bread,Roseville,600719,#600719,31960 Gratiot Avenue,MI,48066
+Panera Bread,Shelby Township,600720,#600720,14121 Hall Road,MI,48315
+Panera Bread,Skokie,600721,#600721,9611 Skokie Boulevard,IL,60077
+Panera Bread,Lansing,600722,#600722,310 North Clippert Street,MI,48912
+Panera Bread,Fairfax,600723,#600723,12120 Fairfax Towne Center,VA,22033
+Panera Bread,Vienna,600724,#600724,8365 Leesburg Pike,VA,22180
+Panera Bread,Reston,600725,#600725,1825 Discovery Street,VA,20190
+Panera Bread,Webster Groves,600729,#600729,21 Allen Avenue,MO,63119
+Panera Bread,Downers Grove,600734,#600734,160 Ogden Avenue,IL,60515
+Panera Bread,Naperville,600735,#600735,1191 East Ogden Avenue,IL,60563
+Panera Bread,Falls Church,600737,#600737,450 West Broad Street,VA,22046
+Panera Bread,Merrillville,600738,#600738,303 East 81st Avenue,IN,46410
+Panera Bread,Columbia,600739,#600739,3709 South Providence Road,MO,65203
+Panera Bread,Albany,600740,#600740,161 Washington Ave Extension,NY,12205
+Panera Bread,Latham,600741,#600741,601 Troy Schenectady Rd,NY,12110
+Panera Bread,Reading,600742,#600742,2733 Papermill Rd,PA,19610
+Panera Bread,Lansing,600743,#600743,5330 West Saginaw Highway,MI,48917
+Panera Bread,Whitehall,600746,#600746,2669 MacArthur Rd,PA,18052
+Panera Bread,Plymouth,600748,#600748,400 South Main Street,MI,48170
+Panera Bread,Rochester Hills,600749,#600749,2921 South Rochester Road,MI,48307
+Panera Bread,Waterford,600750,#600750,5175 Highland Road,MI,48327
+Panera Bread,St. Louis,600752,#600752,130 South County Center Way,MO,63129
+Panera Bread,Bridgeton,600753,#600753,12252 St. Charles Rock Road,MO,63044
+Panera Bread,Virginia Beach,600757,#600757,737 First Colonial Road,VA,23451
+Panera Bread,Harrisburg,600759,#600759,4263 Old Union Deposit Rd,PA,17111
+Panera Bread,Norfolk,600761,#600761,739 West 21st Street,VA,23517
+Panera Bread,Midlothian,600763,#600763,4701 Brad McNeer Parkway,VA,23113
+Panera Bread,Jacksonville,600764,#600764,9810 Baymeadows Rd,FL,32256
+Panera Bread,Jacksonville Beach,600766,#600766,2104 3rd St S,FL,32250
+Panera Bread,Jacksonville,600767,#600767,11111 San Jose Blvd,FL,32223
+Panera Bread,Elmhurst,600768,#600768,108 West North Avenue,IL,60126
+Panera Bread,York,600769,#600769,2801 E Market St,PA,17402
+Panera Bread,Glen Allen,600770,#600770,9960 Brook Road,VA,23059
+Panera Bread,Fairview Heights,600771,#600771,5917 North Illinois Street,IL,62208
+Panera Bread,Matthews,600774,#600774,1904 Matthews Township Parkway,NC,28105
+Panera Bread,Jacksonville,600776,#600776,4403 Roosevelt Blvd,FL,32210
+Panera Bread,Aurora,600777,#600777,740 North Route 59,IL,60504
+Panera Bread,Saratoga Springs,600778,#600778,3070 New York 50,NY,12866
+Panera Bread,Woodbridge,600780,#600780,2804 Prince William Parkway,VA,22192
+Panera Bread,Fairfax,600781,#600781,10702 Lee Highway,VA,22030
+Panera Bread,Chesapeake,600782,#600782,1412 Greenbrier Parkway,VA,23320
+Panera Bread,Midlothian,600783,#600783,11649 Midlothian Turnpike,VA,23113
+Panera Bread,Brighton,600785,#600785,8365 West Grand River Avenue,MI,48116
+Panera Bread,St. Louis,600787,#600787,116 N 6th Street,MO,63101
+Panera Bread,River Forest,600788,#600788,7349 Lake Street,IL,60305
+Panera Bread,Birmingham,600790,#600790,143 Summit Boulevard,AL,35243
+Panera Bread,Montgomery,600791,#600791,7224 Eastchase Parkway,AL,36117
+Panera Bread,Schenectady,600793,#600793,412 Balltown Rd,NY,12309
+Panera Bread,Carlisle,600794,#600794,40 Noble Blvd,PA,17013
+Panera Bread,Liverpool,600795,#600795,3815 State Route 31,NY,13090
+Panera Bread,Fayetteville,600796,#600796,530 Towne Drive,NY,13066
+Panera Bread,Meriden,600797,#600797,533 South Broad Street,CT,6450
+Panera Bread,Hanover,600798,#600798,75 Eisenhower Dr,PA,17331
+Panera Bread,Kingston,600801,#600801,1165 Ulster Avenue,NY,12401
+Panera Bread,Chesterfield,600802,#600802,51490 Gratiot Avenue,MI,48051
+Panera Bread,Hoover,600804,#600804,161 Main St,AL,35244
+Panera Bread,Fredericksburg,600805,#600805,1760 Carl D Silver Parkway,VA,22404
+Panera Bread,Vestavia,600809,#600809,700 Montgomery Highway,AL,35216
+Panera Bread,Homewood,600810,#600810,18416 Governors Highway,IL,60430
+Panera Bread,Valparaiso,600811,#600811,2710 LaPorte Avenue,IN,46383
+Panera Bread,Carbondale,600812,#600812,1126 East Walnut Street,IL,62901
+Panera Bread,Grosse Pointe,600813,#600813,17150 Kercheval Avenue,MI,48230
+Panera Bread,Leesburg,600814,#600814,215 Fort Evans Road NE,VA,20176
+Panera Bread,St. Peters,600815,#600815,6185 Mid Rivers Mall Drive,MO,63304
+Panera Bread,Shiloh,600816,#600816,3120 Green Mount Crossing Road,IL,62269
+Panera Bread,Mesquite,600819,#600819,18641 Lyndon B. Johnson Freeway,TX,75150
+Panera Bread,Nashville,600820,#600820,406 21st Ave S,TN,37203
+Panera Bread,Anderson,600821,#600821,103 Station Road,SC,29621
+Panera Bread,Louisville,600824,#600824,601 S. Hurstbourne Pkwy,KY,40222
+Panera Bread,Lexington,600825,#600825,2573 Richmond Rd,KY,40502
+Panera Bread,Louisville,600826,#600826,6221 Dutchmans Lane,KY,40205
+Panera Bread,Virginia Beach,600827,#600827,2137 Upton Drive,VA,23454
+Panera Bread,Fenton,600828,#600828,3500 Owen Road,MI,48430
+Panera Bread,Fort Worth,600831,#600831,1700 S University Dr,TX,76107
+Panera Bread,Hummelstown,600833,#600833,1178 Mae St,PA,17036
+Panera Bread,Allentown,600836,#600836,3100 West Tilghman Street,PA,18104
+Panera Bread,Matteson,600838,#600838,4864 211th Street,IL,60443
+Panera Bread,Chicago,600840,#600840,6059 North Lincoln Avenue,IL,60659
+Panera Bread,Westland,600841,#600841,35300 Warren Road,MI,48185
+Panera Bread,New Hartford,600842,#600842,4821 Commercial Drive,NY,13413
+Panera Bread,Birmingham,600845,#600845,200 Doug Baker Blvd,AL,35242
+Panera Bread,Denton,600846,#600846,1601 Brinker Rd,TX,76208
+Panera Bread,Richmond,600847,#600847,9200 Stony Point Parkway,VA,23235
+Panera Bread,Auburn,600848,#600848,1550 Opelika Rd,AL,36830
+Panera Bread,Rock Hill,600849,#600849,526 John Ross Parkway,SC,29730
+Panera Bread,Webster,600851,#600851,935 Holt Rd,NY,14580
+Panera Bread,Concord,600852,#600852,8034 Concord Mills Boulevard,NC,28027
+Panera Bread,Rochester,600855,#600855,300 Hylan Dr,NY,14623
+Panera Bread,Hendersonville,600857,#600857,1037 Glenbrook Way,TN,37075
+Panera Bread,Cedar Hill,600858,#600858,416 E Pleasant Run Rd,TX,75104
+Panera Bread,Simpsonville,600859,#600859,375 Harrison Bridge Road,SC,29680
+Panera Bread,Jacksonville,600861,#600861,12959 Atlantic Blvd,FL,32225
+Panera Bread,Alexandria,600862,#600862,6670 Richmond Highway,VA,22306
+Panera Bread,Charlotte,600863,#600863,14835 Ballantyne Village Way,NC,28277
+Panera Bread,Canton,600864,#600864,41950 Ford Road,MI,48187
+Panera Bread,Queensbury,600865,#600865,820 State Route 9,NY,12804
+Panera Bread,Chicago Ridge,600866,#600866,103 Chicago Ridge Mall Drive,IL,60415
+Panera Bread,Maumee,600867,#600867,491 West Dussel Drive,OH,43537
+Panera Bread,Toledo,600868,#600868,7115 West Central Avenue,OH,43617
+Panera Bread,Toledo,600869,#600869,4050 Talmadge Road,OH,43623
+Panera Bread,Perrysburg,600870,#600870,10981 Fremont Pike,OH,43551
+Panera Bread,Monroe,600871,#600871,393 North Telegraph Road,MI,48162
+Panera Bread,Bowling Green,600872,#600872,139 South Main Street,OH,43402
+Panera Bread,Woodhaven,600873,#600873,23061 Allen Road,MI,48183
+Panera Bread,Ann Arbor,600874,#600874,903 West Eisenhower Parkway,MI,48103
+Panera Bread,Southgate,600875,#600875,13665 Eureka Road,MI,48195
+Panera Bread,Ann Arbor,600876,#600876,3205 Washtenaw Avenue,MI,48104
+Panera Bread,Findlay,600877,#600877,1971 Tiffin Avenue,OH,45840
+Panera Bread,Ann Arbor,600878,#600878,5340 Jackson Road,MI,48103
+Panera Bread,Spartanburg,600879,#600879,1935 East Main Street,SC,29307
+Panera Bread,Bethlehem,600880,#600880,3301 Bath Pike,PA,18017
+Panera Bread,Frankfort,600881,#600881,101 Westridge Drive,KY,40601
+Panera Bread,Richmond,600882,#600882,11703 West Broad Street,VA,23233
+Panera Bread,St. Louis,600883,#600883,99 Grasso Plaza,MO,63123
+Panera Bread,Lakeland,600884,#600884,4208 S Florida Avenue,FL,33813
+Panera Bread,Sherman,600885,#600885,4040 North US Highway 75,TX,75090
+Panera Bread,Clifton Park,600887,#600887,22 Maxwell Dr,NY,12065
+Panera Bread,Columbus,600888,#600888,6301 Whitesville Rd,GA,31904
+Panera Bread,Madison,600891,#600891,1799 Gallatin Pike North,TN,37115
+Panera Bread,Jacksonville,600892,#600892,8635 Blanding Blvd,FL,32244
+Panera Bread,Easton,600893,#600893,4442 Southmont Way,PA,18045
+Panera Bread,Elk Grove,600894,#600894,8519 Bond Rd,CA,95624
+Panera Bread,Nashville,600895,#600895,2117 Green Hills Village Drive,TN,37215
+Panera Bread,Bloomingdale,600896,#600896,370-420 West Army Trail Road,IL,60108
+Panera Bread,Gainesville,600897,#600897,7351 Atlas Walk Way,VA,20155
+Panera Bread,Stafford,600899,#600899,1005 Stafford Marketplace,VA,22556
+Panera Bread,North Haven,600900,#600900,132 Universal Drive North,CT,6473
+Panera Bread,Destin,600902,#600902,4220 Legendary Dr,FL,32541
+Panera Bread,Milford,600903,#600903,1201 Boston Post Road,CT,6460
+Panera Bread,Louisville,600904,#600904,10451 Champion Farms Dr,KY,40241
+Panera Bread,Wilkes-Barre,600905,#600905,3570 Wilkes Barre Commons,PA,18702
+Panera Bread,Gastonia,600907,#600907,2625 East Franklin Boulevard,NC,28056
+Panera Bread,Sacramento,600908,#600908,901 Howe Ave,CA,95825
+Panera Bread,Rensselaer,600909,#600909,279 Troy Rd,NY,12144
+Panera Bread,Wentzville,600910,#600910,1212 West Pearce Road,MO,63385
+Panera Bread,Greenville,600911,#600911,1125 Woodruff Road,SC,29607
+Panera Bread,Pensacola,600912,#600912,5100 North 9th Avenue,FL,32504
+Panera Bread,Streamwood,600913,#600913,971 West Irving Park Road,IL,60107
+Panera Bread,Waco,600915,#600915,2516 West Loop 340,TX,76701
+Panera Bread,Sterling Heights,600916,#600916,36808 Van Dyke Avenue,MI,48312
+Panera Bread,Macon,600918,#600918,181 Tom Hill Sr Blvd,GA,31210
+Panera Bread,New Port Richey,600921,#600921,3234 Little Rd,FL,34655
+Panera Bread,Charlotte,600922,#600922,8152 S Tryon Street,NC,28273
+Panera Bread,Lithonia,600923,#600923,8200 Mall Parkway,GA,30038
+Panera Bread,McKinney,600924,#600924,3050 South Central Expressway,TX,75070
+Panera Bread,Hurst,600925,#600925,1804 Precinct Line Road,TX,76054
+Panera Bread,Fremont,600928,#600928,2650 Mowry Avenue,CA,94538
+Panera Bread,Antioch,600929,#600929,5897 Lone Tree Way,CA,94531
+Panera Bread,Concord,600931,#600931,1975 Diamond Boulevard,CA,94520
+Panera Bread,Chicago,600933,#600933,2314 West 95th Street,IL,60643
+Panera Bread,Oak Lawn,600934,#600934,10553 South Cicero Avenue,IL,60453
+Panera Bread,Fremont,600935,#600935,43317 Christy Street,CA,94538
+Panera Bread,Hamden,600936,#600936,2100 Dixwell Avenue,CT,6514
+Panera Bread,Manassas,600939,#600939,9508 Liberia Avenue,VA,20110
+Panera Bread,Taylors,600940,#600940,6015 Wade Hampton Blvd Suite E,SC,29687
+Panera Bread,Atlanta,600942,#600942,4531 Olde Perimeter Way,GA,30346
+Panera Bread,Jacksonville,600943,#600943,4720 Town Crossing Drive,FL,32246
+Panera Bread,Chesterfield,600945,#600945,1650 Clarkson Road,MO,63017
+Panera Bread,Bloomsburg,600946,#600946,76 Lunger Drive,PA,17815
+Panera Bread,Cicero,600947,#600947,5701 East Circle Dr,NY,13039
+Panera Bread,Rochester,600948,#600948,1621 Penfield Rd,NY,14625
+Panera Bread,Mechanicsville,600955,#600955,7225 Bell Creek Road,VA,23111
+Panera Bread,Jacksonville,600957,#600957,9301 Atlantic Blvd,FL,32225
+Panera Bread,Newport News,600958,#600958,12531 Jefferson Avenue,VA,23602
+Panera Bread,Toledo,600960,#600960,3043 Glendale Avenue,OH,43614
+Panera Bread,Lakewood,600961,#600961,5606 Lakewood Towne Center Blvd SW,WA,98499
+Panera Bread,Orland Park,600962,#600962,15845 Harlem Avenue,IL,60462
+Panera Bread,Brentwood,600964,#600964,782 Old Hickory Blvd,TN,37027
+Panera Bread,Dumfries,600965,#600965,4402 Fortuna Center Plaza,VA,22025
+Panera Bread,Roseville,600966,#600966,916 Pleasant Grove Blvd,CA,95678
+Panera Bread,Lynnwood,600967,#600967,3000 184th Street SW,WA,98037
+Panera Bread,Lodi,600968,#600968,2533 W Kettleman Ln,CA,95242
+Panera Bread,Elk Grove Village,600969,#600969,90 Biesterfield Road,IL,60007
+Panera Bread,Sandusky,600970,#600970,5203 Milan Road,OH,44870
+Panera Bread,Stockton,600972,#600972,10718 Trinity Parkway,CA,95219
+Panera Bread,Redmond,600973,#600973,17262 Redmond Way,WA,98052
+Panera Bread,Nicholasville,600974,#600974,101 Cynthia Dr,KY,40356
+Panera Bread,St. Louis,600977,#600977,4561 Forest Park Avenue,MO,63108
+Panera Bread,Dickson City,600978,#600978,1101 Commerce Blvd,PA,18519
+Panera Bread,Naples,600982,#600982,6424 Naples Blvd,FL,34109
+Panera Bread,Miami,600983,#600983,13617 South Dixie Highway,FL,33176
+Panera Bread,Tallahassee,600984,#600984,101 North Blairstone Road,FL,32301
+Panera Bread,Murfreesboro,600985,#600985,1970 Old Fort Parkway,TN,37129
+Panera Bread,York,600986,#600986,1221 Carlisle Rd,PA,17404
+Panera Bread,Chicago,600987,#600987,1101 South Canal Street,IL,60607
+Panera Bread,Nashville,600988,#600988,5552 Old Hickory Blvd,TN,37076
+Panera Bread,Arlington,600989,#600989,4238 Wilson Boulevard,VA,22203
+Panera Bread,Watertown,600990,#600990,21872 Towne Center Drive,NY,13601
+Panera Bread,Charlotte,600991,#600991,601 Providence Road,NC,28207
+Panera Bread,Estero,600992,#600992,8072 Mediterranean Dr,FL,33928
+Panera Bread,Dallas,600994,#600994,7839 Park Lane,TX,75225
+Panera Bread,Virginia Beach,600995,#600995,869 Lynnhaven Parkway,VA,23452
+Panera Bread,Amherst,601001,#601001,1593 Niagara Falls Boulevard,NY,14226
+Panera Bread,North Miami,601002,#601002,12205 Biscayne Boulevard,FL,33181
+Panera Bread,Chicago,601004,#601004,501 South State Street,IL,60605
+Panera Bread,Colonial Heights,601005,#601005,796 Southpark Blvd,VA,23834
+Panera Bread,Fredericksburg,601006,#601006,10059 Jefferson Davis Highway,VA,22407
+Panera Bread,Seattle,601009,#601009,401 NE Northgate Way,WA,98125
+Panera Bread,Cape Girardeau,601010,#601010,3219 Williams Street,MO,63703
+Panera Bread,Ashburn,601011,#601011,43670 Greenway Corporate Drive,VA,20147
+Panera Bread,Mount Juliet,601012,#601012,401 South Mount Juliet Road,TN,37122
+Panera Bread,Franklin,601013,#601013,3046 Columbia Ave,TN,37064
+Panera Bread,Lockport,601014,#601014,5744 South Transit Road,NY,14094
+Panera Bread,Amherst,601015,#601015,8200 Transit Road,NY,14221
+Panera Bread,Whittier,601016,#601016,15620 Whittwood Lane,CA,90603
+Panera Bread,Issaquah,601017,#601017,775 NW Gilman Blvd,WA,98027
+Panera Bread,Lexington,601018,#601018,2380 Norman Lane,KY,40503
+Panera Bread,Westchester,601019,#601019,11215 West Cermak Road,IL,60154
+Panera Bread,Evansville,601020,#601020,220 N. Burkhardt Rd,IN,47715
+Panera Bread,Allentown,601021,#601021,6379 Hamilton Blvd,PA,18106
+Panera Bread,Shelton,601022,#601022,850 Bridgeport Avenue,CT,6484
+Panera Bread,Elmira,601023,#601023,950 County Road 64,NY,14903
+Panera Bread,Schaumburg,601024,#601024,622 East Golf Road,IL,60173
+Panera Bread,Lake Saint Louis,601026,#601026,861 Robert Raymond Drive,MO,63367
+Panera Bread,Jacksonville,601027,#601027,13820 Old St Augustine Rd,FL,32258
+Panera Bread,Panama City Beach,601028,#601028,101 Bluefish Dr,FL,32413
+Panera Bread,Port Charlotte,601029,#601029,1808 Tamiami Trail,FL,33948
+Panera Bread,Lacey,601031,#601031,1320 Marvin Road NE,WA,98516
+Panera Bread,Clarksville,601032,#601032,1040 Veterans Parkway,IN,47129
+Panera Bread,Sacramento,601033,#601033,3571 N Freeway Blvd Suite 1100,CA,95834
+Panera Bread,Lakeland,601034,#601034,4159 US Highway 98 North,FL,33809
+Panera Bread,Sacramento,601035,#601035,2731 Del Paso Rd,CA,95835
+Panera Bread,West Covina,601038,#601038,1036 West Covina Parkway,CA,91790
+Panera Bread,Herndon,601039,#601039,2328 Woodland Crossing Drive,VA,20171
+Panera Bread,LaMirada,601041,#601041,15224 Rosecrans Avenue,CA,90638
+Panera Bread,Glenmont,601042,#601042,241 Route 9W,NY,12077
+Panera Bread,Charlotte,601043,#601043,9321 J.W. Clay Boulevard,NC,28262
+Panera Bread,Festus,601044,#601044,1075 West Gannon Drive,MO,63028
+Panera Bread,Grand Blanc,601046,#601046,6224 Saginaw Road,MI,48439
+Panera Bread,Jacksonville,601047,#601047,13271 City Station Dr,FL,32218
+Panera Bread,Williamsburg,601048,#601048,5218 Monticello Avenue,VA,23188
+Panera Bread,Federal Way,601049,#601049,2107 South 320th Street,WA,98003
+Panera Bread,Charlotte,601050,#601050,9309 Center Lake Drive,NC,28216
+Panera Bread,Brooksville,601052,#601052,13151 Cortez Boulevard,FL,34613
+Panera Bread,Hampton,601053,#601053,2170 Coliseum Drive,VA,23666
+Panera Bread,Richmond,601055,#601055,1601 Willow Lawn Drive,VA,23230
+Panera Bread,Allen Park,601056,#601056,3112 Fairlane Drive,MI,48101
+Panera Bread,Waterbury,601057,#601057,920 Wolcott Street,CT,6705
+Panera Bread,Miami,601058,#601058,13672 N Kendall Drive,FL,33186
+Panera Bread,Hanford,601060,#601060,150 N 12th Avenue Suite 101,CA,93230
+Panera Bread,Des Plaines,601061,#601061,1518 Market Street,IL,60016
+Panera Bread,Elizabethtown,601062,#601062,115 Towne Dr,KY,42701
+Panera Bread,Vancouver,601063,#601063,915 SE 164th Avenue,WA,98683
+Panera Bread,Bowling Green,601064,#601064,1770 Campbell Lane,KY,42104
+Panera Bread,Indianapolis,601067,#601067,5025 East 82nd Street,IN,46250
+Panera Bread,West Lafayette,601068,#601068,328 East State Street,IN,47906
+Panera Bread,Indianapolis,601069,#601069,2902 West 86th Street,IN,46268
+Panera Bread,Fort Wayne,601070,#601070,4110 West Jefferson Boulevard,IN,46804
+Panera Bread,Greenwood,601071,#601071,789 US 31 North,IN,46142
+Panera Bread,Bloomington,601072,#601072,322 S. College Mall Road,IN,47401
+Panera Bread,Carmel,601073,#601073,2001 East Greyhound Pass,IN,46033
+Panera Bread,Muncie,601074,#601074,800 East McGalliard,IN,47303
+Panera Bread,Noblesville,601075,#601075,17177 Mercantile Boulevard,IN,46060
+Panera Bread,Mishawaka,601076,#601076,4310 N Main St,IN,46545
+Panera Bread,Kokomo,601077,#601077,1941 S Reed Road,IN,46902
+Panera Bread,Fort Wayne,601079,#601079,526 Coliseum Boulevard,IN,46805
+Panera Bread,Anderson,601080,#601080,4730 South Scatterfield Road,IN,46013
+Panera Bread,Indianapolis,601081,#601081,55 South Raceway Road,IN,46231
+Panera Bread,Indianapolis,601082,#601082,9145 E. 56th Street,IN,46216
+Panera Bread,Fishers,601083,#601083,8510 East 96th Street,IN,46037
+Panera Bread,Goshen,601084,#601084,4536 Elkhart Rd,IN,46526
+Panera Bread,Indianapolis,601085,#601085,5335 E Southport Road Suite 100,IN,46237
+Panera Bread,South Bend,601086,#601086,1290 East Ireland Road,IN,46614
+Panera Bread,Lafayette,601087,#601087,2415 Sagamore Parkway South,IN,47905
+Panera Bread,Terre Haute,601088,#601088,5653 S. US Highway 41,IN,47802
+Panera Bread,Burbank,601089,#601089,7909 South Harlem Avenue,IL,60459
+Panera Bread,Miramar Beach,601091,#601091,10652 US 98,FL,32550
+Panera Bread,Orland Park,601093,#601093,9505 West 142nd Street,IL,60462
+Panera Bread,Naples,601094,#601094,2415 Tarpon Bay Blvd,FL,34119
+Panera Bread,Greece,601095,#601095,2373 Ridge Road W,NY,14626
+Panera Bread,Edwardsville,601096,#601096,6683 Edwardsville Crossing,IL,62025
+Panera Bread,Visalia,601100,#601100,4103 S Mooney Blvd,CA,93277
+Panera Bread,Hayward,601101,#601101,24133 Southland Drive,CA,94545
+Panera Bread,Kent,601102,#601102,521 2nd Place North,WA,98032
+Panera Bread,Charlotte,601104,#601104,7510 Pineville Matthews Road,NC,28226
+Panera Bread,Ann Arbor,601105,#601105,1773 Plymouth Road,MI,48105
+Panera Bread,Newtown,601106,#601106,228 South Main Street,CT,6470
+Panera Bread,Syracuse,601107,#601107,3409 Erie Boulevard East,NY,13214
+Panera Bread,Rochester,601108,#601108,1501 Howard Rd,NY,14624
+Panera Bread,Tonawanda,601109,#601109,1747 Sheridan Drive,NY,14223
+Panera Bread,Eureka,601110,#601110,201 East 5th Street,MO,63025
+Panera Bread,Louisville,601111,#601111,3131 Poplar Level Rd,KY,40213
+Panera Bread,Plainfield,601112,#601112,313 Metropolis Mile,IN,46168
+Panera Bread,South Miami,601114,#601114,5701 Sunset Drive,FL,33143
+Panera Bread,Naples,601115,#601115,13555 Tamiami Trail N,FL,34110
+Panera Bread,Rochester Hills,601116,#601116,2508 S Adams Road,MI,48309
+Panera Bread,Turlock,601117,#601117,3050 Hotel Dr,CA,95380
+Panera Bread,Lakewood,601118,#601118,135 Lakewood Center Mall,CA,90712
+Panera Bread,Orchard Park,601119,#601119,3995 N Buffalo Rd Suite 100,NY,14127
+Panera Bread,Hillsboro,601120,#601120,7202 NE Cornell Rd,OR,97124
+Panera Bread,Dublin,601121,#601121,7030 Amador Plaza Road,CA,94568
+Panera Bread,Rochester,601123,#601123,1902 Monroe Ave,NY,14618
+Panera Bread,Doral,601124,#601124,9717 NW 41st Street,FL,33178
+Panera Bread,Norfolk,601126,#601126,1140 North Military Highway,VA,23502
+Panera Bread,Albany,601127,#601127,65 Wolf Rd,NY,12205
+Panera Bread,Buffalo,601128,#601128,3701 McKinley Parkway,NY,14219
+Panera Bread,Brookline,601129,#601129,299 Harvard Street,MA,2446
+Panera Bread,Allentown,601130,#601130,915 Airport Center Dr,PA,18109
+Panera Bread,Lancaster,601131,#601131,2405 Covered Bridge Dr,PA,17602
+Panera Bread,Vestal,601133,#601133,3700 Vestal Parkway E,NY,13850
+Panera Bread,Bloomfield Hills,601134,#601134,2125 S Telegraph Road,MI,48302
+Panera Bread,Livonia,601135,#601135,20140 Haggerty Road,MI,48152
+Panera Bread,Commerce Township,601136,#601136,39450 W 14 Mile Road,MI,48390
+Panera Bread,Indian Trail,601137,#601137,14035 Independence Boulevard,NC,28079
+Panera Bread,Newport News,601138,#601138,12368 Warwick Boulevard,VA,23606
+Panera Bread,Chester,601139,#601139,12540 Jefferson Davis Highway,VA,23831
+Panera Bread,Richmond,601140,#601140,8800 Staples Mill Road,VA,23228
+Panera Bread,Jacksonville,601141,#601141,13740 Beach Blvd,FL,32224
+Panera Bread,Nashville,601143,#601143,401 Commerce St,TN,37203
+Panera Bread,Cape Coral,601144,#601144,1830 NE Pine Island Rd,FL,33909
+Panera Bread,Richardson,601146,#601146,730 E Campbell Rd Suite 300,TX,75080
+Panera Bread,Pasadena,601149,#601149,3521 E Foothill Boulevard,CA,91107
+Panera Bread,Alton,601151,#601151,1837 Homer M. Adams Parkway,IL,62002
+Panera Bread,Chicago,601152,#601152,2310 W Logan Boulevard,IL,60647
+Panera Bread,Brighton,601153,#601153,9430 Village Place Boulevard,MI,48116
+Panera Bread,Gig Harbor,601154,#601154,4751 Point Fosdick Dr NW,WA,98335
+Panera Bread,Mechanicsburg,601155,#601155,6416 Carlisle Pike,PA,17050
+Panera Bread,Collinsville,601156,#601156,525 N Bluff Road,IL,62234
+Panera Bread,Oak Brook,601157,#601157,1600 16th Street,IL,60523
+Panera Bread,Holland,601158,#601158,6658 Airport Highway,OH,43528
+Panera Bread,South Riding,601160,#601160,25042 Riding Plaza Drive,VA,20152
+Panera Bread,Greenville,601161,#601161,1922 Augusta Street,SC,29605
+Panera Bread,Merrifield,601162,#601162,8191 Strawberry Lane,VA,22042
+Panera Bread,Leesburg,601164,#601164,19325 Promenade Drive,VA,20176
+Panera Bread,Vacaville,601165,#601165,1637 E Monte Vista Avenue,CA,95688
+Panera Bread,Brookfield,601167,#601167,143 Federal Road,CT,6804
+Panera Bread,Tualatin,601168,#601168,7149 SW Nyberg Rd,OR,97062
+Panera Bread,Chicago,601170,#601170,635 N Fairbanks Court,IL,60611
+Panera Bread,Tuscaloosa,601171,#601171,1800 McFarland Blvd E,AL,35404
+Panera Bread,Chambersburg,601172,#601172,979 Norland Ave,PA,17201
+Panera Bread,Moosic,601173,#601173,1151 Shoppes Blvd,PA,18507
+Panera Bread,Huntsville,601174,#601174,6886 Governors West NW,AL,35806
+Panera Bread,Clifton,601175,#601175,5774 Union Mill Road,VA,20124
+Panera Bread,Lexington,601176,#601176,3705 Palomar Centre Dr,KY,40513
+Panera Bread,Miami,601177,#601177,8870 SW 72nd Court,FL,33156
+Panera Bread,Beaverton,601178,#601178,3435 SW Cedar Hills Blvd Suite A,OR,97005
+Panera Bread,Darien,601179,#601179,1063 Boston Post Road,CT,6820
+Panera Bread,Roseville,601181,#601181,1850 Douglas Blvd,CA,95661
+Panera Bread,Orange Park,601182,#601182,1510 County Road 220,FL,32003
+Panera Bread,Owensboro,601184,#601184,4600 Frederica Street,KY,42301
+Panera Bread,Alexandria,601185,#601185,5578 Vincent Gate Terrace,VA,22312
+Panera Bread,Woodbridge,601186,#601186,4300 Merchant Plaza,VA,22192
+Panera Bread,Quincy,601187,#601187,3720 Broadway Street,IL,62301
+Panera Bread,Willowbrook,601188,#601188,7165 Kingery Highway,IL,60527
+Panera Bread,Torrington,601189,#601189,1902 E Main Street,CT,6790
+Panera Bread,Chicago,601190,#601190,250 South Wacker Drive,IL,60606
+Panera Bread,Fairport,601194,#601194,16 Courtney Dr,NY,14450
+Panera Bread,Atlanta,601197,#601197,2311 N Druid Hills Road,GA,30329
+Panera Bread,Huntsville,601199,#601199,4800 Whitesburg Dr S,AL,35802
+Panera Bread,Sacramento,601200,#601200,3328 El Camino Avenue,CA,95821
+Panera Bread,State College,601201,#601201,148 South Allen Street,PA,16801
+Panera Bread,Omaha,601202,#601202,7825 Dodge St,NE,68114
+Panera Bread,Omaha,601203,#601203,3219 Oak View Dr,NE,68144
+Panera Bread,Omaha,601204,#601204,13410 West Maple Road,NE,68164
+Panera Bread,Lincoln,601205,#601205,2940 Pine Lake Rd,NE,68516
+Panera Bread,Omaha,601207,#601207,17730 W Center Rd,NE,68130
+Panera Bread,Omaha,601208,#601208,10000 California St Suite 2801,NE,68114
+Panera Bread,Sioux City,601209,#601209,1909 Hamilton Blvd,IA,51104
+Panera Bread,Bellevue,601210,#601210,10503 S 15th St,NE,68123
+Panera Bread,Omaha,601211,#601211,344 North Saddlecreek Road,NE,68131
+Panera Bread,Lincoln,601212,#601212,201 N 66th St,NE,68505
+Panera Bread,Sioux Falls,601213,#601213,5117 South Louise Avenue,SD,57108
+Panera Bread,Papillion,601214,#601214,8650 S 71st Plaza,NE,68133
+Panera Bread,Tukwila,601215,#601215,17250 Southcenter Parkway,WA,98188
+Panera Bread,Plymouth,601216,#601216,138 Colony Place,MA,2360
+Panera Bread,Huntersville,601217,#601217,9905 Knockando Drive,NC,28078
+Panera Bread,Charlotte,601218,#601218,5940 Fairview Road,NC,28210
+Panera Bread,Venice,601219,#601219,4179 Tamiami Trail South,FL,34293
+Panera Bread,Stroudsburg,601220,#601220,362 Charles Way,PA,18360
+Panera Bread,Jacksonville,601223,#601223,9570 Crosshill Blvd Suite 106,FL,32244
+Panera Bread,Dallas,601225,#601225,3826 Lemmon Ave,TX,75219
+Panera Bread,Dallas,601226,#601226,5325 Belt Line Rd,TX,75254
+Panera Bread,Norwalk,601227,#601227,596 Westport Avenue,CT,6851
+Panera Bread,St. Louis,601228,#601228,2018 S 7th Street,MO,63104
+Panera Bread,Herndon,601230,#601230,460 Elden Street,VA,20170
+Panera Bread,Fairfax,601231,#601231,3955 Chain Bridge Road,VA,22030
+Panera Bread,Mary Esther,601232,#601232,350 Mary Esther Blvd,FL,32569
+Panera Bread,Fort Myers,601233,#601233,5037 Cleveland Ave,FL,33907
+Panera Bread,Virginia Beach,601236,#601236,300 Constitution Drive,VA,23462
+Panera Bread,Indianapolis,601239,#601239,6055 N Keystone Avenue,IN,46220
+Panera Bread,Arlington,601240,#601240,1409 N Collins St,TX,76011
+Panera Bread,Franklin,601241,#601241,2000 Mallory Lane,TN,37067
+Panera Bread,Decatur,601243,#601243,1241 Point Mallard Parkway,AL,35601
+Panera Bread,Riverside,601249,#601249,3560 Riverside Plaza Drive,CA,92506
+Panera Bread,Fontana,601250,#601250,15258 Summit Avenue,CA,92336
+Panera Bread,Rancho Cucamonga,601251,#601251,8055 Haven Avenue,CA,91730
+Panera Bread,Corona,601252,#601252,2570 Tuscany Street,CA,92881
+Panera Bread,Redlands,601253,#601253,470 E Cypress Avenue,CA,92372
+Panera Bread,La Quinta,601254,#601254,79124 Highway 111,CA,92253
+Panera Bread,Temecula,601255,#601255,41793 Nicole Lane,CA,92591
+Panera Bread,San Bernardino,601256,#601256,1092 E Hospitality Lane,CA,92408
+Panera Bread,Sebring,601259,#601259,1760 U.S. 27 North,FL,33870
+Panera Bread,Nashville,601260,#601260,2829 West End Ave,TN,37203
+Panera Bread,Happy Valley,601264,#601264,12190 SE 82nd Ave,OR,97086
+Panera Bread,Atlanta,601265,#601265,1545 N Decatur Rd NE,GA,30307
+Panera Bread,St. Louis,601266,#601266,1008 Loughborough Avenue,MO,63111
+Panera Bread,McLean,601267,#601267,7939L Tysons Corner Center Mall,VA,22102
+Panera Bread,Boston,601272,#601272,201 Brookline Avenue,MA,2215
+Panera Bread,Chino Hills,601276,#601276,13865 City Center Drive,CA,91709
+Panera Bread,Indianapolis,601277,#601277,6050 West 86th Street,IN,46278
+Panera Bread,Birmingham,601281,#601281,100 N Old Woodward Avenue,MI,48009
+Panera Bread,Louisville,601283,#601283,7900 Shelbyville Rd,KY,40222
+Panera Bread,Springfield,601289,#601289,3101 W White Oaks Drive,IL,62704
+Panera Bread,Normal,601290,#601290,208 Greenbriar Drive,IL,61761
+Panera Bread,Champaign,601291,#601291,1765 West Kirby Avenue,IL,61821
+Panera Bread,Peoria,601292,#601292,2601 West Lake Avenue,IL,61615
+Panera Bread,Decatur,601293,#601293,255 E Ash Avenue,IL,62526
+Panera Bread,Peoria,601294,#601294,1101 W Bird Boulevard,IL,61615
+Panera Bread,Bloomington,601295,#601295,1401 South Veterans Parkway,IL,61701
+Panera Bread,Springfield,601296,#601296,3019 South Dirksen Parkway,IL,62703
+Panera Bread,Champaign,601297,#601297,1903 Convenience Place,IL,61820
+Panera Bread,East Peoria,601298,#601298,815 West Camp Street,IL,61611
+Panera Bread,Eagan,601299,#601299,1260 Promenade Place,MN,55121
+Panera Bread,Plymouth,601300,#601300,16875 County Road 24,MN,55447
+Panera Bread,Woodbury,601301,#601301,1775 Radio Drive,MN,55125
+Panera Bread,Coon Rapids,601302,#601302,12465 Riverdale Boulevard NW,MN,55433
+Panera Bread,Maple Grove,601303,#601303,7778 Main Street N,MN,55369
+Panera Bread,Brooklyn Center,601304,#601304,6064 Shingle Creek Parkway,MN,55430
+Panera Bread,Maplewood,601305,#601305,2515 White Bear Avenue N,MN,55109
+Panera Bread,Apple Valley,601306,#601306,15052 Gleason Path,MN,55124
+Panera Bread,St. Louis Park,601307,#601307,8332 Highway 7,MN,55426
+Panera Bread,Vadnais Heights,601308,#601308,959 County Road E,MN,55127
+Panera Bread,Blaine,601309,#601309,8601 Springbrook Drive NW,MN,55433
+Panera Bread,Eden Prairie,601312,#601312,8251 Flying Cloud Drive,MN,55344
+Panera Bread,Elk River,601313,#601313,18210 Zane Street NW,MN,55330
+Panera Bread,Edina,601315,#601315,3345 Hazelton Road,MN,55435
+Panera Bread,Shakopee,601316,#601316,8062 Old Carriage Court,MN,55379
+Panera Bread,St. Cloud,601317,#601317,2801 W Division Street,MN,56301
+Panera Bread,Minneapolis,601318,#601318,809 Nicollet Mall,MN,55402
+Panera Bread,Burnsville,601319,#601319,901 County Road 42 W,MN,55306
+Panera Bread,Roseville,601320,#601320,817 Rosedale Center,MN,55113
+Panera Bread,Naples,601323,#601323,2184 Tamiami Trail N,FL,34102
+Panera Bread,Bellevue,601326,#601326,1100 Bellevue Way NE,WA,98004
+Panera Bread,Plano,601328,#601328,1900 Preston Rd,TX,75093
+Panera Bread,Clovis,601329,#601329,1260 Shaw Ave Suite 111,CA,93612
+Panera Bread,Alpharetta,601336,#601336,6480 Northpoint Parkway,GA,30022
+Panera Bread,Washington,601339,#601339,880 Washington Corners,MO,63090
+Panera Bread,Sarasota,601342,#601342,5864 Bee Ridge Rd,FL,34232
+Panera Bread,City of Industry,601343,#601343,17501 Colima Road,CA,91748
+Panera Bread,Louisville,601350,#601350,400 W Market St,KY,40202
+Panera Bread,Panama City,601353,#601353,908 E 23rd St,FL,32405
+Panera Bread,Indianapolis,601354,#601354,110 West Washington Street,IN,46204
+Panera Bread,Palm Springs,601356,#601356,5200 Ramon Road,CA,92264
+Panera Bread,Arnold,601358,#601358,909 Arnold Commons Drive,MO,63010
+Panera Bread,Boston,601359,#601359,888 Commonwealth Avenue,MA,2115
+Panera Bread,State College,601360,#601360,1613 N Atherton St,PA,16803
+Panera Bread,East Walpole,601362,#601362,130 Providence Highway,MA,2032
+Panera Bread,Richmond,601363,#601363,2073 Lantern Ridge Dr Suite 100,KY,40475
+Panera Bread,Bakersfield,601364,#601364,10900 Stockdale Hwy,CA,93311
+Panera Bread,Richmond Heights,601365,#601365,1445 St. Louis Galleria,MO,63117
+Panera Bread,Ann Arbor,601366,#601366,777 N. University Avenue,MI,48104
+Panera Bread,Southlake,601367,#601367,2140 E Southlake Blvd Suite S,TX,76092
+Panera Bread,Champaign,601369,#601369,616 E Green Street,IL,61820
+Panera Bread,Alameda,601372,#601372,2249 South Shore Center Drive,CA,94501
+Panera Bread,Syracuse,601373,#601373,3401 West Genesee Street,NY,13219
+Panera Bread,Lincoln,601374,#601374,211 N 12th St,NE,68508
+Panera Bread,Richmond,601375,#601375,810 West Grace Street Suite 2,VA,23220
+Panera Bread,Cerritos,601376,#601376,11300 South Street,CA,90703
+Panera Bread,Orion,601377,#601377,4804 S Baldwin Road,MI,48359
+Panera Bread,Milton,601378,#601378,5304 Windward Parkway Suite A109,GA,30004
+Panera Bread,St. Peters,601379,#601379,290 Mid Rivers Mall Circle Drive,MO,63376
+Panera Bread,Ithaca,601381,#601381,748 South Meadow Street,NY,14850
+Panera Bread,Louisville,601382,#601382,1801 Rudy Lane,KY,40207
+Panera Bread,Snellville,601383,#601383,1905 Scenic Highway,GA,30078
+Panera Bread,Irving,601385,#601385,7600 N MacArthur Blvd Suite 100,TX,75063
+Panera Bread,Minnetonka,601386,#601386,12967 Ridgedale Drive,MN,55305
+Panera Bread,Raynham,601388,#601388,300 New State Highway,MA,2767
+Panera Bread,Richmond,601389,#601389,1517-B North Parham Road,VA,23229
+Panera Bread,Hingham,601390,#601390,One Shipyard Drive,MA,2043
+Panera Bread,Alabaster,601391,#601391,100 Colonial Promenade,AL,35007
+Panera Bread,Fresno,601393,#601393,7780 North Blackstone Avenue,CA,93720
+Panera Bread,West Springfield,601394,#601394,6230 W Rolling Road,VA,22152
+Panera Bread,Braintree,601396,#601396,400 Franklin Street,MA,2184
+Panera Bread,Williamsville,601397,#601397,5311 Main Street Suite 100,NY,14221
+Panera Bread,St. Louis Park,601398,#601398,5680 Cedar Lake Road,MN,55416
+Panera Bread,Nashville,601400,#601400,2534 Powell Ave,TN,37204
+Panera Bread,LaVerne,601401,#601401,2315 Foothill Boulevard,CA,91750
+Panera Bread,La Canada,601402,#601402,990 Town Center Suite A,CA,91011
+Panera Bread,Newton,601403,#601403,1241 Centre Street,MA,2459
+Panera Bread,Allen,601404,#601404,951 W Bethany Dr,TX,75013
+Panera Bread,Charlotte,601406,#601406,201 S. College Street,NC,28244
+Panera Bread,Columbus,601407,#601407,3056 Columbus Center,IN,47203
+Panera Bread,Sarasota,601408,#601408,1277 S Tamiami Trail,FL,34239
+Panera Bread,West St. Paul,601409,#601409,1740 South Robert Streeet Suite 102,MN,55118
+Panera Bread,Suffolk,601410,#601410,6255 College Drive Suite F,VA,23435
+Panera Bread,West Roxbury,601411,#601411,75 Spring Street,MA,2132
+Panera Bread,Bellevue,601413,#601413,4004 Factoria Blvd SE Suite A6,WA,98006
+Panera Bread,Plattsburgh,601414,#601414,100 Consumer Square,NY,12901
+Panera Bread,Boston,601415,#601415,289 Huntington Avenue,MA,2115
+Panera Bread,Paducah,601416,#601416,2950 James Sanders Boulevard,KY,42001
+Panera Bread,Spartanburg,601418,#601418,108 E Blackstock Road,SC,29301
+Panera Bread,Tallahassee,601419,#601419,800 Ocala Rd,FL,32304
+Panera Bread,Washington,601420,#601420,1350 Connecticut Avenue,DC,20036
+Panera Bread,Palm Desert,601422,#601422,73075 Highway 111,CA,92260
+Panera Bread,Olympia,601423,#601423,2525 Capital Mall Drive,WA,98502
+Panera Bread,Cheektowaga,601424,#601424,4910 Transit Road,NY,14043
+Panera Bread,Coral Gables,601425,#601425,137 Miracle Mile,FL,33133
+Panera Bread,Munster,601426,#601426,8131 Calumet Avenue,IN,46321
+Panera Bread,Dorchester,601429,#601429,8 Allstate Avenue (Southbay),MA,2125
+Panera Bread,Seattle,601431,#601431,1620 Broadway Suite 100A,WA,98122
+Panera Bread,St. Augustine,601432,#601432,600 Tingle Court,FL,32086
+Panera Bread,Watauga,601434,#601434,8416 Denton Highway Suite 100,TX,76148
+Panera Bread,Dallas,601435,#601435,11661 Preston Rd Suite 222,TX,75230
+Panera Bread,Walnut Creek,601436,#601436,1140 Locust Street,CA,94596
+Panera Bread,Tacoma,601437,#601437,4502 S Steele St Suite 125,WA,98409
+Panera Bread,Trumbull,601438,#601438,5065 Main Street,CT,6611
+Panera Bread,Brockton,601440,#601440,1301 Belmont Street,MA,2301
+Panera Bread,Williston,601441,#601441,62 Merchants Row,VT,5495
+Panera Bread,Citrus Heights,601443,#601443,7901 Greenback Lane,CA,95610
+Panera Bread,Albany,601444,#601444,50 New Scotland Ave,NY,12208
+Panera Bread,Williamsport,601445,#601445,202 Basin St,PA,17701
+Panera Bread,Vienna,601446,#601446,136 Maple Avenue,VA,22180
+Panera Bread,Addison,601447,#601447,1600 West Lake Street,IL,60101
+Panera Bread,Port Richey,601448,#601448,9405 US Highway 19,FL,34668
+Panera Bread,Boston,601449,#601449,450 Boylston Street,MA,2116
+Panera Bread,Walnut Creek,601453,#601453,744 Bancroft,CA,94598
+Panera Bread,St. Louis,601455,#601455,10336 Clayton Road,MO,63131
+Panera Bread,Acworth,601456,#601456,3384 Cobb Parkway,GA,30101
+Panera Bread,Milford,601457,#601457,91 Medway Road,MA,1757
+Panera Bread,Woodinville,601458,#601458,13780 NE 175th St Suite 102,WA,98072
+Panera Bread,Warner Robins,601459,#601459,2971 Watson Blvd Suite 200,GA,31093
+Panera Bread,Milbury,601460,#601460,70 Worcester-Providence Turnpike,MA,1527
+Panera Bread,San Ramon,601461,#601461,3121 Crow Canyon Place,CA,94583
+Panera Bread,Atlanta,601463,#601463,3714 Roswell Rd NE,GA,30342
+Panera Bread,Auburn,601464,#601464,6 Plaza Drive,NY,13021
+Panera Bread,West Orange,601465,#601465,495 Prospect Ave,NJ,7052
+Panera Bread,Paramus,601466,#601466,700 Paramus Park,NJ,7652
+Panera Bread,Westfield,601467,#601467,143 E Broad St,NJ,7090
+Panera Bread,Wayne,601468,#601468,1619 State Route 23,NJ,7470
+Panera Bread,North Brunswick,601469,#601469,871 B Route 1 South,NJ,8902
+Panera Bread,Princeton,601470,#601470,136 Nassau Street,NJ,8542
+Panera Bread,Ramsey,601471,#601471,1300 New Jersey 17,NJ,7446
+Panera Bread,Short Hills,601472,#601472,722 Morris Turnpike,NJ,7078
+Panera Bread,Woodcliff Lake,601473,#601473,445 Chestnut Ridge Rd,NJ,7677
+Panera Bread,Caldwell,601474,#601474,804 Bloomfield Ave,NJ,7006
+Panera Bread,Paramus,601475,#601475,165 E State Route 4,NJ,7652
+Panera Bread,Princeton,601476,#601476,510 Nassau Park Blvd,NJ,8540
+Panera Bread,Succasunna,601477,#601477,275 State Route 10 E,NJ,7876
+Panera Bread,Watchung,601478,#601478,1680 US Highway 22,NJ,7069
+Panera Bread,Hackettstown,601479,#601479,2045 State Route 57,NJ,7840
+Panera Bread,Phillipsburg,601480,#601480,1196 US Highway 22,NJ,8865
+Panera Bread,Hoboken,601481,#601481,310 Washington Str,NJ,7030
+Panera Bread,Denville,601482,#601482,3056 State Route 10,NJ,7834
+Panera Bread,Edison,601483,#601483,1551 US Highway 1,NJ,8837
+Panera Bread,Flemington,601484,#601484,325 U.S. Hwy 202,NJ,8822
+Panera Bread,Flanders,601485,#601485,30 International Drive S,NJ,7836
+Panera Bread,Gillette,601486,#601486,977 Valley Rd,NJ,7933
+Panera Bread,Raritan,601487,#601487,300 Route 202,NJ,8869
+Panera Bread,East Rutherford,601488,#601488,95 State Highway 17,NJ,7073
+Panera Bread,Edgewater,601489,#601489,26 The Promenade,NJ,7020
+Panera Bread,Trenton,601490,#601490,375 Marketplace Blvd,NJ,8691
+Panera Bread,Woodbridge,601491,#601491,21 Woodbridge Center Drive,NJ,7095
+Panera Bread,Piscataway,601492,#601492,1333 Centennial Ave,NJ,8854
+Panera Bread,Rockaway,601493,#601493,395 Mount Hope Avenue,NJ,7866
+Panera Bread,Fair Lawn,601494,#601494,23-02 Fair Lawn Ave,NJ,7410
+Panera Bread,Florham Park,601495,#601495,187 Columbia Turnpike,NJ,7932
+Panera Bread,Sparta,601496,#601496,25 Center St,NJ,7871
+Panera Bread,Northvale,601497,#601497,269 Livingston Street,NJ,7647
+Panera Bread,Old Bridge,601498,#601498,3809 US Highway 9,NJ,8857
+Panera Bread,Springfield,601499,#601499,295 Route 22 East,NJ,7081
+Panera Bread,Basking Ridge,601500,#601500,25 Mountain View Boulevard,NJ,7920
+Panera Bread,Montclair,601501,#601501,15 Bloomfield Avenue,NJ,7042
+Panera Bread,Washington,601502,#601502,4501 Wisconsin Ave NW,DC,20016
+Panera Bread,Fairfield,601503,#601503,1630 Gateway Boulevard,CA,94533
+Panera Bread,Tallahassee,601504,#601504,3523 Thomasville Rd,FL,32308
+Panera Bread,Dothan,601505,#601505,3515 Ross Clark Circle,AL,36303
+Panera Bread,Council Bluffs,601506,#601506,3617 Denmark Dr,IA,51501
+Panera Bread,Cambridge,601507,#601507,5 White Street,MA,2140
+Panera Bread,Emeryville,601508,#601508,1525 40th Street,CA,94608
+Panera Bread,Moreno Valley,601509,#601509,12510 Day Street,CA,92553
+Panera Bread,Pensacola,601511,#601511,9239 University Parkway,FL,32514
+Panera Bread,Atlanta,601513,#601513,1544 Piedmont Ave NE,GA,30324
+Panera Bread,Renton,601514,#601514,921 North 10th Street Suite E,WA,98057
+Panera Bread,Edmonds,601515,#601515,7929 Lake Ballinger Way,WA,98026
+Panera Bread,Rutland,601517,#601517,241 South Main Street,VT,5701
+Panera Bread,Burlington,601518,#601518,37 Church Street,VT,5401
+Panera Bread,Lexington,601521,#601521,1684 Massachusetts Avenue,MA,2420
+Panera Bread,Corvallis,601523,#601523,335 Northwest 4th Street,OR,97330
+Panera Bread,Redondo Beach,601524,#601524,1511 Hawthorne Boulevard,CA,90278
+Panera Bread,Miami Beach,601525,#601525,1428 Alton Ct,FL,33139
+Panera Bread,Bothell,601527,#601527,21221 Bothell Everett Highway,WA,98021
+Panera Bread,Louisville,601528,#601528,1534 Bardstown Rd,KY,40205
+Panera Bread,Santa Rosa,601529,#601529,150 Steele Lane,CA,95401
+Panera Bread,East Brunswick,601530,#601530,755 State Highway 18,NJ,8816
+Panera Bread,Shelby Township,601531,#601531,8492 26 Mile Road,MI,48316
+Panera Bread,Syracuse,601532,#601532,9542 Destiny USA Drive,NY,13290
+Panera Bread,New York,601533,#601533,330 7th Avenue,NY,10001
+Panera Bread,Hemet,601534,#601534,3013 W. Florida Ave,CA,92545
+Panera Bread,New York,601535,#601535,120 East 86th Street,NY,10028
+Panera Bread,Waltham,601537,#601537,1030 Main Street,MA,2451
+Panera Bread,Washington,601538,#601538,3100 14th Street NW,DC,20010
+Panera Bread,Chicago,601539,#601539,2 N. Michigan Ave,IL,60602
+Panera Bread,Boston,601540,#601540,115 Stuart Street,MA,2116
+Panera Bread,Duluth,601541,#601541,6575 Sugarloaf Parkway,GA,30097
+Panera Bread,Fort Worth,601542,#601542,4611 S Hulen St,TX,76132
+Panera Bread,Green Bay,601543,#601543,2627 Oneida Street,WI,54304
+Panera Bread,Appleton,601544,#601544,3320 W College Avenue,WI,54914
+Panera Bread,Brookfield,601545,#601545,2095 North Calhoun Road,WI,53005
+Panera Bread,Greenfield,601546,#601546,7840 West Layton Avenue,WI,53220
+Panera Bread,Pewaukee,601547,#601547,1301 Capitol Drive,WI,53072
+Panera Bread,Wauwatosa,601548,#601548,2500 North Mayfair Road,WI,53226
+Panera Bread,Madison,601549,#601549,601 Junction Road,WI,53717
+Panera Bread,Mequon,601550,#601550,1300 West Mequon Road,WI,53092
+Panera Bread,Madison,601551,#601551,2627 E Springs Drive,WI,53704
+Panera Bread,Fitchburg,601552,#601552,2960 Cahill Main,WI,53711
+Panera Bread,Menomonee Falls,601553,#601553,W. 176 N. 9340 Rivercrest Drive,WI,53051
+Panera Bread,Kenosha,601554,#601554,6935 75th Street,WI,53142
+Panera Bread,Milwaukee,601555,#601555,600 East Ogden Avenue,WI,53202
+Panera Bread,Racine,601556,#601556,5630 Washington Avenue,WI,53406
+Panera Bread,Madison,601557,#601557,3416 University Avenue,WI,53705
+Panera Bread,Glendale,601558,#601558,5595 N Port Washington Road,WI,53217
+Panera Bread,Rockford,601559,#601559,609 South Perryville Road,IL,61108
+Panera Bread,Machesney Park,601560,#601560,1512 West Lane Road,IL,61115
+Panera Bread,Delavan,601561,#601561,1905 East Geneva Street,WI,53115
+Panera Bread,Delafield,601562,#601562,3200 Golf Road,WI,53018
+Panera Bread,Oak Creek,601563,#601563,8907 South Howell Avenue,WI,53154
+Panera Bread,Brookfield,601564,#601564,15040 West Greenfield Avenue,WI,53005
+Panera Bread,Madison,601565,#601565,6613 Mineral Point Rd,WI,53705
+Panera Bread,West Bend,601566,#601566,1604 S Main Street,WI,53095
+Panera Bread,Madison,601567,#601567,656 West Washington Avenue,WI,53703
+Panera Bread,Cambridge,601568,#601568,1288 Massachusetts Avenue,MA,1238
+Panera Bread,Secaucus,601570,#601570,200 Mill Creek Drive,NJ,7094
+Panera Bread,New York,601571,#601571,452 5th Avenue,NY,10018
+Panera Bread,Florence,601572,#601572,304 Cox Creek Parkway,AL,35630
+Panera Bread,Fresno,601573,#601573,3590 West Shaw Avenue,CA,93711
+Panera Bread,Lynnfield,601574,#601574,430 Market Street,MA,1940
+Panera Bread,Jacksonville,601575,#601575,1440 Hendricks Avenue,FL,32207
+Panera Bread,Easton,601576,#601576,3714 Easton Nazareth Highway,PA,18045
+Panera Bread,Danbury,601578,#601578,5A Sugar Hollow Road,CT,6810
+Panera Bread,Sterling,601579,#601579,46300 Potomac Run Plaza Suite 140,VA,20164
+Panera Bread,Columbia,601580,#601580,100 Brickton Road Suite 100,MO,65201
+Panera Bread,Napa,601581,#601581,1725 Trancas Street \u2013 Suite B,CA,94558
+Panera Bread,Miami Gardens,601583,#601583,18538 NW 67th Avenue,FL,33015
+Panera Bread,St. Paul,601584,#601584,2056 Ford Parkway,MN,55116
+Panera Bread,Davis,601585,#601585,609 3rd St,CA,95616
+Panera Bread,Southbury,601586,#601586,100 Main Street North,CT,6488
+Panera Bread,Folsom,601591,#601591,380 Palladio Parkway Suite 301,CA,95630
+Panera Bread,Wilmington,601592,#601592,228 Main Street,MA,1887
+Panera Bread,Westford,601593,#601593,2 Cornerstone Square,MA,1886
+Panera Bread,Chesapeake,601594,#601594,237 Battlefield Boulevard,VA,23322
+Panera Bread,New York,601595,#601595,10 Union Square East,NY,10003
+Panera Bread,Bourbonnais,601596,#601596,1694 North State Road 50,IL,60914
+Panera Bread,Rancho Cucamonga,601597,#601597,11550 East 4th Street,CA,91730
+Panera Bread,Selinsgrove,601599,#601599,1563 N. Susquehanna Trail,PA,17870
+Panera Bread,North Port,601600,#601600,17899 Tamiami Trail,FL,34287
+Panera Bread,Winter Haven,601601,#601601,137 Landings Blvd,FL,33880
+Panera Bread,Burlington,601602,#601602,1749 S Burlington Blvd,WA,98233
+Panera Bread,Grand Island,601604,#601604,1040 Allen Dr,NE,68803
+Panera Bread,Mt Prospect,601605,#601605,1065 Elmhurst Road,IL,60056
+Panera Bread,Manalapan,601607,#601607,31 US Highway 9,NJ,7726
+Panera Bread,Morristown,601608,#601608,66 Morris Street,NJ,7960
+Panera Bread,Menifee,601610,#601610,30318 Haun Road,CA,92584
+Panera Bread,Mashpee,601611,#601611,8 Steeple Street,MA,2649
+Panera Bread,South Burlington,601612,#601612,1184 Shelburne Road,VT,5403
+Panera Bread,Midland,601614,#601614,6707 Eastman Avenue,MI,48642
+Panera Bread,Montgomery,601615,#601615,2998 Carter Hill Rd,AL,36106
+Panera Bread,Smyrna,601616,#601616,499 Chaney Rd,TN,37167
+Panera Bread,Suffolk,601617,#601617,1217 N Main Street Suite 109,VA,23434
+Panera Bread,Madison,601618,#601618,8179 Highway 72 W,AL,35758
+Panera Bread,Homestead,601619,#601619,2493 N.E 9 Ct.,FL,33033
+Panera Bread,Niagara Falls,601620,#601620,1508 Military Road,NY,14304
+Panera Bread,Westport,601621,#601621,1860 Post Road East,CT,6880
+Panera Bread,Pinole,601623,#601623,1376 Fitzgerald Drive,CA,94564
+Panera Bread,Aventura,601625,#601625,18111 Biscayne Boulevard,FL,33160
+Panera Bread,Chestnut Hill,601626,#601626,220 Boylston Street,MA,2467
+Panera Bread,Oxford,601627,#601627,21 Commons Way,AL,36203
+Panera Bread,Richmond,601628,#601628,10 N. Nansemond Street,VA,23221
+Panera Bread,Walnut,601630,#601630,21627 Valley Boulevard,CA,91789
+Panera Bread,Wayland,601631,#601631,400 Boston Post Road,MA,1778
+Panera Bread,Southfield,601632,#601632,28681 Telegraph Road,MI,48034
+Panera Bread,Petaluma,601634,#601634,401 Kenilworth Drive,CA,94952
+Panera Bread,Amsterdam,601635,#601635,500 Amsterdam Commons,NY,12010
+Panera Bread,Lutz,601637,#601637,23388 State Road 54,FL,33549
+Panera Bread,New Haven,601638,#601638,1060 Chapel Street,CT,6511
+Panera Bread,Richmond,601639,#601639,4483 S Laburnum Avenue,VA,23231
+Panera Bread,Chicago,601640,#601640,400 West Division Street,IL,60610
+Panera Bread,Raleigh,601641,#601641,4325 Glenwood Avenue,NC,27612
+Panera Bread,Cary,601642,#601642,2234 Walnut Street,NC,27511
+Panera Bread,Cary,601643,#601643,1065 Darrington Drive,NC,27513
+Panera Bread,Raleigh,601644,#601644,4421 Six Forks Road,NC,27615
+Panera Bread,Durham,601645,#601645,6702 Fayetteville Road,NC,27713
+Panera Bread,Chapel Hill,601646,#601646,213 W Franklin Street,NC,27516
+Panera Bread,Greenville,601647,#601647,518 Greenville Boulevard,NC,27858
+Panera Bread,Raleigh,601648,#601648,6123 Capital Boulevard,NC,27616
+Panera Bread,Raleigh,601649,#601649,7840 Alexander Promenade Place,NC,27617
+Panera Bread,Apex,601650,#601650,1001 Beaver Creek Commons Drive,NC,27502
+Panera Bread,Durham,601651,#601651,3603 Witherspoon Blvd Suite 101,NC,27707
+Panera Bread,Aberdeen,601652,#601652,11088 US 15,NC,28315
+Panera Bread,Morehead City,601653,#601653,5176 Highway 70,NC,28557
+Panera Bread,Wilmington,601654,#601654,1156 Military Cutoff,NC,28405
+Panera Bread,Fayetteville,601655,#601655,1933 Skibo Road,NC,28314
+Panera Bread,Raleigh,601656,#601656,8511 Colonnade Center Drive Suite 110,NC,27615
+Panera Bread,Fairfield,601657,#601657,2320 Black Rock Turnpike,CT,6825
+Panera Bread,Carmel,601658,#601658,1346 S Range Line Road,IN,46032
+Panera Bread,Puyallup,601660,#601660,3610 S. Meridian,WA,98373
+Panera Bread,Merced,601661,#601661,3110 R Street,CA,95348
+Panera Bread,Norwalk,601662,#601662,650 Main Avenue,CT,6851
+Panera Bread,Washington,601663,#601663,673 H Street NW,DC,20001
+Panera Bread,Clarksville,601664,#601664,108 Morris Road,TN,37040
+Panera Bread,Keizer,601665,#601665,6110 Keizer Boulevard,OR,97317
+Panera Bread,Marion,601667,#601667,2704 W. DeYoung Street,IL,62959
+Panera Bread,Louisville,601669,#601669,13000 Shelbyville Road,KY,40243
+Panera Bread,Victorville,601670,#601670,11838 Amargosa Road,CA,92392
+Panera Bread,Cambridge,601672,#601672,174 Alewife Brook Parkway,MA,2138
+Panera Bread,Yulee,601673,#601673,463861 State Road 200,FL,32097
+Panera Bread,Richmond,601674,#601674,7104 Midlothian Turnpike,VA,23225
+Panera Bread,Woodridge,601675,#601675,1001 West 75th Street,IL,60517
+Panera Bread,Buffalo,601676,#601676,765 Elmwood Avenue,NY,14222
+Panera Bread,Everett,601678,#601678,304 SE Everett Mall Way,WA,98208
+Panera Bread,Silverdale,601679,#601679,9995 Silverdale Way,WA,98383
+Panera Bread,Fort Gratiot,601681,#601681,4290 24th Avenue,MI,48059
+Panera Bread,Webster,601683,#601683,2 Worcester Road,MA,1570
+Panera Bread,Reading,601684,#601684,4395 Perkiomen Avenue,PA,19606
+Panera Bread,Arlington,601685,#601685,1700 N. Moore Street,VA,22209
+Panera Bread,Charlotte,601686,#601686,3207 Pineville Mathews Road,NC,28226
+Panera Bread,Sioux City,601687,#601687,5120 Sergeant Road,IA,51106
+Panera Bread,Denton,601688,#601688,2510 W. University,TX,76201
+Panera Bread,Elizabeth City,601689,#601689,1708 W. Ehringhaus Street,NC,27909
+Panera Bread,Portland,601691,#601691,1400 N. Tomahawk Island Drive,OR,97217
+Panera Bread,Glenville,601692,#601692,8 Glenridge Road,NY,12302
+Panera Bread,Zephyrhills,601693,#601693,7242 Gall Boulevard,FL,33541
+Panera Bread,Fredericksburg,601694,#601694,24 South Gateway Drive,VA,22406
+Panera Bread,Upland,601695,#601695,1053 E. 19th Street,CA,91784
+Panera Bread,Novato,601696,#601696,132 Vintage Way,CA,94945
+Panera Bread,Nashville,601697,#601697,96 White Bridge Road Suite 105,TN,37205
+Panera Bread,Berlin,601698,#601698,1450 Barre-Montpelier Road,VT,5641
+Panera Bread,Jacksonville,601699,#601699,1619 Western Boulevard,NC,28546
+Panera Bread,Wausau,601700,#601700,1700 Stewart Avenue,WI,54401
+Panera Bread,Rolling Meadows,601702,#601702,1321 Golf Road,IL,60008
+Panera Bread,Pico Rivera,601703,#601703,8700 Washington Boulevard,CA,90660
+Panera Bread,Oneonta,601705,#601705,5006 New York 23,NY,13820
+Panera Bread,Clifton,601706,#601706,352 Route 3 West,NJ,7014
+Panera Bread,Charlotte,601707,#601707,306 S Sharon Amity Road,NC,28211
+Panera Bread,Arlington,601708,#601708,1100 S. Hayes Street,VA,22202
+Panera Bread,Livermore,601711,#601711,4685 1st Street,CA,94551
+Panera Bread,Edison,601712,#601712,55 Parsonage Road,NJ,8837
+Panera Bread,East Windsor,601713,#601713,392 Route 130,NJ,8520
+Panera Bread,Norridge,601714,#601714,4244 N Harlem Avenue,IL,60706
+Panera Bread,Sioux Falls,601715,#601715,500 S. Foss Avenue,SD,57104
+Panera Bread,Boston,601717,#601717,1 Union Street,MA,2108
+Panera Bread,Atlanta,601719,#601719,1080 Peachtree Street NE,GA,30309
+Panera Bread,Fargo,601721,#601721,4000 West 13th Ave SW,ND,58103
+Panera Bread,Monrovia,601722,#601722,600 W. Huntington Drive,CA,91016
+Panera Bread,New York,601723,#601723,330 5th Avenue,NY,10001
+Panera Bread,Kearney,601724,#601724,5004 2nd Avenue,NE,68847
+Panera Bread,Gulf Breeze,601725,#601725,700 Gulf Breeze Parkway,FL,32561
+Panera Bread,Grand Forks,601726,#601726,2515 South 32nd Avenue,ND,58201
+Panera Bread,Rancho Cordova,601727,#601727,3289 Zinfandel Drive,CA,95670
+Panera Bread,Enterprise,601729,#601729,847 Boll Weevil Circle,AL,36330
+Panera Bread,Rohnert Park,601734,#601734,6305 Commerce Blvd,CA,94928
+Panera Bread,Hallandale Beach,601736,#601736,1729 E Hallandale Beach Boulevard,FL,33009
+Panera Bread,Lewisburg,601740,#601740,6951 Westbranch Highway,PA,17837
+Panera Bread,Minot,601742,#601742,1807 22nd Ave SW,ND,58701
+Panera Bread,Saginaw,601743,#601743,2710 Tittabawassee Road,MI,48604
+Panera Bread,Duluth,601747,#601747,2108 Maple Grove Road,MN,55811
+Panera Bread,Gresham,601748,#601748,1017 NW Civic Drive,OR,97030
+Panera Bread,Durham,601749,#601749,737 9th Street,NC,27705
+Panera Bread,Gardendale,601754,#601754,521 Fieldstown Road,AL,35071
+Panera Bread,Phoenix,601829,#601829,2845 N Central Ave,AZ,85012
+Panera Bread,Chandler,601830,#601830,3991 S Arizona Ave,AZ,85248
+Panera Bread,Bedford,607001,#607001,213 Burlington Road,MA,1730
+Panera Bread,Louisville,607002,#607002,2125 S Hurstbourne Pkwy,KY,40220
+Panera Bread,Indianapolis,608004,#608004,2902 West 86th Street,IN,46268
+Panera Bread,Brookfield,608005,#608005,2095 N. Calhourn Road,WI,53005
+Panera Bread,Omaha,608006,#608006,344 N. Saddlecreek Road,NE,68131
+Panera Bread,Albuquerque,610043,#610043,6600 Menaul Blvd NE Suite 1000-A,NM,87110
+Panera Bread,Albuquerque,610048,#610048,6500 Holly Avenue NE Suite A-8,NM,87113
+Panera Bread,Albuquerque,610055,#610055,3550 South Highway 528 NW,NM,87114
+Panera Bread,Santa Fe,610059,#610059,3535 Zafarano Drive,NM,87507
+Panera Bread,Mississauga,620002,#620002,55 Square One Drive Unit #1,ON,L5B 0E2
+Panera Bread,Richmond Hill,620003,#620003,9350 Yonge Street #Y005,ON,L4C 5G2
+Panera Bread,Thornhill,620004,#620004,1020 Centre Street,ON,L4J 3M8
+Panera Bread,Toronto,620006,#620006,322 Yonge Street,ON,M5B 1R8
+Panera Bread,Markham,620007,#620007,3987 Highway 7 Unit 1,ON,L3R 5M6
+Panera Bread,Toronto,620009,#620009,1066 Don Mills Road,ON,M3C 0H8
+Panera Bread,Barrie,620011,#620011,149 Park Place Boulevard,ON,L4N 6P1
+Panera Bread,Ottawa,620013,#620013,320 West Hunt Club Road,ON,K2E 0B7
