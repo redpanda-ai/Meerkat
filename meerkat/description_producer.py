@@ -6,7 +6,6 @@ ElasticSearch (structured data).
 
 @author: J. Andrew Key
 @author: Matthew Sevrens
-
 """
 
 import csv
@@ -22,20 +21,19 @@ import sys
 from .custom_exceptions import InvalidArguments, Misconfiguration
 from .description_consumer import DescriptionConsumer
 from .binary_classifier.load import predict_if_physical_transaction
-from .various_tools import load_dict_list
+from .various_tools import load_dict_list, split_csv
 from .accuracy import test_accuracy, print_results, speed_tests
 
-def get_desc_queue(params):
+def get_desc_queue(filename, params):
 	"""Opens a file of descriptions, one per line, and load a description
 	queue."""
 
-	filename, encoding = None, None
+	encoding = None
 	physical, non_physical, atm = [], [], []
-	users = collections.defaultdict(list)
+	#users = collections.defaultdict(list)
 	desc_queue = queue.Queue()
 
 	try:
-		filename = params["input"]["filename"]
 		encoding = params["input"]["encoding"]
 		delimiter = params["input"].get("delimiter", "|")
 		transactions = load_dict_list(filename, encoding=encoding,\
@@ -51,7 +49,7 @@ def get_desc_queue(params):
 		description = transaction["DESCRIPTION"]
 		prediction = predict_if_physical_transaction(description)
 		transaction["IS_PHYSICAL_TRANSACTION"] = prediction
-		print(description + ": " + prediction)
+		#print(description + ": " + prediction)
 		if prediction == "1":
 			physical.append(transaction)
 		elif prediction == "0":
@@ -62,23 +60,23 @@ def get_desc_queue(params):
 			atm.append(transaction)
 
 	# Split into user buckets
-	for row in physical:
-		user = row.get("UNIQUE_MEM_ID", "")
-		users[user].append(row)
+	#for row in physical:
+	#	user = row.get("UNIQUE_MEM_ID", "")
+	#	users[user].append(row)
 
 	# Add Users to Queue
-	for key, _ in users.items():
-		desc_queue.put(users[key])
+	#for key, _ in users.items():
+	#	desc_queue.put(users[key])
 
-	atm_percent = (len(atm) / len(transactions)) * 100
-	non_physical_percent = (len(non_physical) / len(transactions)) * 100
-	physical_percent = (len(physical) / len(transactions)) * 100
+	#atm_percent = (len(atm) / len(transactions)) * 100
+	#non_physical_percent = (len(non_physical) / len(transactions)) * 100
+	#physical_percent = (len(physical) / len(transactions)) * 100
 
-	print("")
-	print("PHYSICAL: ", round(physical_percent, 2), "%")
-	print("NON-PHYSICAL: ", round(non_physical_percent, 2), "%")
-	print("ATM: ", round(atm_percent, 2), "%")
-	print("")
+	#print("")
+	#print("PHYSICAL: ", round(physical_percent, 2), "%")
+	#print("NON-PHYSICAL: ", round(non_physical_percent, 2), "%")
+	#print("ATM: ", round(atm_percent, 2), "%")
+	#print("")
 
 	return desc_queue, non_physical
 
@@ -249,7 +247,7 @@ def write_output_to_file(params, output_list, non_physical):
 
 	if len(output_list) < 1:
 		logging.warning("No results available to write")
-		return
+		#return
 
 	# Merge Physical and Non-Physical
 	output_list = output_list + non_physical
@@ -260,9 +258,9 @@ def write_output_to_file(params, output_list, non_physical):
 	file_format = params["output"]["file"].get("format", 'csv')
 
 	# What is the output_list[0]
-	print("Output_list[0]:\n{0}".format(output_list[0]))
+	#print("Output_list[0]:\n{0}".format(output_list[0]))
 
- 	# Get Headers
+	# Get Headers
 	header = None
 	with open(params["input"]["filename"], 'r') as infile:
 		header = infile.readline()
@@ -275,7 +273,7 @@ def write_output_to_file(params, output_list, non_physical):
  	# Get additional fields for display from config file
 	additional_fields = params["output"]["results"]["fields"]
 	all_fields = header_list + additional_fields
-	print("ALL_FIELDS: {0}".format(all_fields))
+	#print("ALL_FIELDS: {0}".format(all_fields))
 
 	# Output as CSV
 	if file_format == "csv":
@@ -284,8 +282,11 @@ def write_output_to_file(params, output_list, non_physical):
 		new_header = delimiter.join(new_header_list)
 		new_header = new_header.replace("GOOD_DESCRIPTION", "NON_PHYSICAL_TRANSACTION")
 
-		with open(file_name, 'w') as output_file:
-			output_file.write(new_header + "\n")
+		with open(file_name, 'a') as output_file:
+			#We only write the header for the first file
+			if params["add_header"] is True:
+				output_file.write(new_header + "\n")
+				params["add_header"] = False
 			dict_w = csv.DictWriter(output_file, delimiter=delimiter,\
 				fieldnames=all_fields, extrasaction='ignore')
 			dict_w.writerows(output_list)
@@ -295,9 +296,30 @@ def write_output_to_file(params, output_list, non_physical):
 		with open(file_name, 'w') as outfile:
 			json.dump(output_list, outfile)
 
+def begin():
+	params = initialize()
+	key = load_hyperparameters(params)
+	try:
+		filename = params["input"]["filename"]
+		split_path = params["input"]["split"]["path"]
+		row_limit = params["input"]["split"]["row_limit"]
+		delimiter = params["input"].get("delimiter", "|")
+		#Break the input file into segments
+		split_list = split_csv(open(filename, 'r'), delimiter=delimiter,
+			row_limit=row_limit, output_path=split_path)
+	except IOError:
+		logging.critical("Invalid ['input']['filename'] key; Input file: %s"
+			" cannot be found. Correct your config file.", filename)
+		sys.exit()
+
+	#Loop through input segements
+	params["add_header"] = True
+	for split in split_list:
+		print("Working with the following split: {0}".format(split))
+		desc_queue, non_physical = get_desc_queue(filename, params)
+		tokenize(params, desc_queue, key, non_physical)
+	print("Complete.")
+
 if __name__ == "__main__":
-	#Runs the entire program.
-	PARAMS = initialize()
-	KEY = load_hyperparameters(PARAMS)
-	DESC_QUEUE, NON_PHYSICAL = get_desc_queue(PARAMS)
-	tokenize(PARAMS, DESC_QUEUE, KEY, NON_PHYSICAL)
+	begin()
+
