@@ -1,5 +1,5 @@
 {
-	"concurrency" : 18,
+	"concurrency" : 36,
 	"verification_source" : "data/misc/matt_8000_card.csv",
 	"input" : {
 		"hyperparameters" : "config/hyperparameters/default.json",
@@ -12,7 +12,7 @@
 		}
 	},
 	"logging" : {
-		"level" : "critical",
+		"level" : "warning",
 		"path" : "logs/foo.log",
 		"formatter" : "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 		"console" : true
@@ -30,7 +30,7 @@
 		},
 		"file" : {
 			"format" : "csv",
-			"path" : "data/output/foo.5000",
+			"path" : "data/output/",
 			"delimiter" : "|"
 		}
 	},

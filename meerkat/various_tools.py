@@ -56,6 +56,14 @@ def plot_double_polygon(polygon_points, scaled_polygon_points, S, zoom_out_facto
 	ax1.set_ylim(y_boundaries)
 	plt.show()
 
+def safely_remove_file(filename):
+	print("Removing {0}".format(filename))
+	try:
+		os.remove(filename)
+	except OSError:
+		print("Unable to remove {0}".format(filename))
+	print("File removed.")
+
 def scale_polygon(list_of_points, scale=2.0):
 	"""This function accepts a list of points representing a polygon and scales
 	them about its centroid."""
