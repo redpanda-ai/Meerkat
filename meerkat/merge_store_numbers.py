@@ -200,8 +200,12 @@ def process_multiple_merchants():
 
 	# Process Merchants
 	for merchant in merchant_files:
-		stores = load_store_numbers(merchant)
-		run(stores)
+
+		try:
+			stores = load_store_numbers(merchant)
+			run(stores)
+		except: 
+			continue
 
 def process_single_merchant():
 	"""Merge in store numbers from a single files"""
