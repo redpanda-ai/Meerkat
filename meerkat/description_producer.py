@@ -309,7 +309,7 @@ def	hms_to_seconds(t):
 	print ("H: {0}, M: {1}, S: {2}".format(h, m, s))
 	return 3600 * float(h) + 60 * float(m) + float(s)
 
-def pre_begin():
+def process_bucket():
 
 	try:
 		conn = boto.connect_s3()
@@ -344,9 +344,30 @@ def pre_begin():
 						logging.warning("%s unzipped.", new_filename)
 				safely_remove_file(new_filename)
 				logging.warning("Beginning with %s", unzipped_name)
-				begin(params, unzipped_name)
+				process_panel(params, unzipped_name)
 
-def begin(params, filename):
+def merge_split_files(params, split_list):
+	"""Takes a split list and merges the files back together
+	after processing is complete"""
+
+	file_name = params["output"]["file"]["name"]
+	base_path = params["output"]["file"]["path"]
+	first_file = base_path + split_list.pop(0)
+	output = open(file_name, "a")
+
+	for line in open(first_file):
+		output.write(line)
+
+	for split in split_list:
+		with open(base_path + split) as chunk:
+			chunk.next()
+			for line in chunk:
+				output.write(line)
+		safely_remove_file(base_path + split)
+
+	output.close()
+
+def process_panel(params, filename):
 	#params = initialize()
 	row_limit = None
 	key = load_hyperparameters(params)
@@ -393,11 +414,12 @@ def begin(params, filename):
 		logging.warning("Deleting {0}".format(split))
 		safely_remove_file(split)
 
-	# Merge Files and Push to S3
+	# Merge Files, GZIP and Push to S3
+	merge_split_files(params, split_list)
 		
 	logging.warning("Complete.")
 
 if __name__ == "__main__":
 	#Runs the entire program.
 
-	pre_begin()
+	process_bucket()
