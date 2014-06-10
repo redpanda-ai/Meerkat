@@ -581,7 +581,7 @@ class DescriptionConsumer(threading.Thread):
 				self.user = self.desc_queue.get()
 
 				# Load Past Transactions
-				self.__load_past_transactions()
+				#self.__load_past_transactions()
 
 				# Classify using text features only
 				enriched_transactions = self.__text_features()
