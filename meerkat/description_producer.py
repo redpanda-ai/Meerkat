@@ -44,8 +44,8 @@ def get_desc_queue(filename, params):
 		transactions = load_dict_list(filename, encoding=encoding,\
 			delimiter=delimiter)
 	except IOError:
-		logging.critical("Invalid ['input']['filename'] key; Input file: %s"
-			" cannot be found. Correct your config file.", filename)
+		logging.critical("Input file: %s"
+			" cannot be found. Terminating", filename)
 		sys.exit()
 
 	# Run Binary Classifier
@@ -309,7 +309,8 @@ def	hms_to_seconds(t):
 	print ("H: {0}, M: {1}, S: {2}".format(h, m, s))
 	return 3600 * float(h) + 60 * float(m) + float(s)
 
-def process_bucket():
+def process_bucket(params):
+	"""Process an entire s3 bucket"""
 
 	try:
 		conn = boto.connect_s3()
@@ -321,7 +322,6 @@ def process_bucket():
 	path_regex = re.compile(path_string)
 	bucket = conn.get_bucket(bucket_string,Location.USWest2)
 	keep_going = True
-	params = initialize()
 
 	for k in bucket.list():
 		if path_regex.search(k.key):
@@ -346,29 +346,9 @@ def process_bucket():
 				logging.warning("Beginning with %s", unzipped_name)
 				process_panel(params, unzipped_name)
 
-def merge_split_files(params, split_list):
-	"""Takes a split list and merges the files back together
-	after processing is complete"""
-
-	file_name = params["output"]["file"]["name"]
-	base_path = params["output"]["file"]["path"]
-	first_file = base_path + split_list.pop(0)
-	output = open(file_name, "a")
-
-	for line in open(first_file):
-		output.write(line)
-
-	for split in split_list:
-		with open(base_path + split) as chunk:
-			chunk.next()
-			for line in chunk:
-				output.write(line)
-		safely_remove_file(base_path + split)
-
-	output.close()
-
 def process_panel(params, filename):
-	#params = initialize()
+	"""Process a single panel"""
+
 	row_limit = None
 	key = load_hyperparameters(params)
 	try:
@@ -419,7 +399,29 @@ def process_panel(params, filename):
 		
 	logging.warning("Complete.")
 
+def merge_split_files(params, split_list):
+	"""Takes a split list and merges the files back together
+	after processing is complete"""
+
+	file_name = params["output"]["file"]["name"]
+	base_path = params["output"]["file"]["path"]
+	first_file = base_path + split_list.pop(0)
+	output = open(file_name, "a")
+
+	for line in open(first_file):
+		output.write(line)
+
+	for split in split_list:
+		with open(base_path + split) as chunk:
+			chunk.next()
+			for line in chunk:
+				output.write(line)
+		safely_remove_file(base_path + split)
+
+	output.close()
+
 if __name__ == "__main__":
 	#Runs the entire program.
 
-	process_bucket()
+	params = initialize()
+	process_bucket(params)
