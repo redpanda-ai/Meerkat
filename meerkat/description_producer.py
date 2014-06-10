@@ -259,7 +259,7 @@ def write_output_to_file(params, output_list, non_physical, split):
 
 	# Get File Save Info
 	file_path = os.path.basename(split)
-	file_name = params["output"]["file"]["path"] + file_path
+	file_name = params["output"]["file"]["processing_location"] + file_path
 	file_format = params["output"]["file"].get("format", 'csv')
 
 	# What is the output_list[0]
@@ -312,37 +312,49 @@ def	hms_to_seconds(t):
 def process_bucket(params):
 	"""Process an entire s3 bucket"""
 
+	# Connect to S3
 	try:
 		conn = boto.connect_s3()
 	except boto.s3.connection.HostRequiredError:
 		print("Error connecting to S3, check your credentials")
+		sys.exit()
 
-	bucket_string = "s3yodlee"
-	path_string = "meerkat/input/gpanel/card/([^/]+)"
-	path_regex = re.compile(path_string)
-	bucket = conn.get_bucket(bucket_string,Location.USWest2)
+	# Init
+	s3_location = params["input"]["bucket_key"]
+	bucket_name = "s3yodlee"
+	regex = "([^/]+)"
+	path_regex = re.compile(s3_location + regex)
+	bucket = conn.get_bucket(bucket_name, Location.USWest2)
 	keep_going = True
 
+	# Loop through Panels in Bucket
 	for k in bucket.list():
 		if path_regex.search(k.key):
+
 			matches = path_regex.match(k.key)
-			input_split_path = params["input"]["split"]["path"]
+			input_split_path = params["input"]["split"]["processing_location"]
 			new_filename = input_split_path + matches.group(1)
+
 			if keep_going:
+
+				# Download from S3
 				keep_going = False
-				#print(k.key, k.size, k.encrypted)
 				logging.warning("Fetching %s from S3.", k.key)
-				#print("Creating new file at {0}.".format(new_filename))
-				local_input_path = params["input"]["split"]["path"]
+				local_input_path = params["input"]["split"]["processing_location"]
 				k.get_contents_to_filename(new_filename)
 				params["output"]["file"]["name"] = matches.group(1)[:-3]
 				logging.warning("Fetch of %s complete.", new_filename)
+
+				# Gunzip
 				with gzip.open(new_filename, 'rb') as gzipped_input:
 					unzipped_name = new_filename[:-3]
 					with open(unzipped_name, 'wb') as unzipped_input:
 						unzipped_input.write(gzipped_input.read())
 						logging.warning("%s unzipped.", new_filename)
+
 				safely_remove_file(new_filename)
+
+				# Run Panel
 				logging.warning("Beginning with %s", unzipped_name)
 				process_panel(params, unzipped_name)
 
@@ -352,8 +364,7 @@ def process_panel(params, filename):
 	row_limit = None
 	key = load_hyperparameters(params)
 	try:
-		#filename = params["input"]["filename"]
-		split_path = params["input"]["split"]["path"]
+		split_path = params["input"]["split"]["processing_location"]
 		row_limit = params["input"]["split"]["row_limit"]
 		delimiter = params["input"].get("delimiter", "|")
 		#Break the input file into segments
@@ -407,24 +418,38 @@ def merge_split_files(params, split_list):
 	after processing is complete"""
 
 	file_name = params["output"]["file"]["name"]
-	base_path = params["output"]["file"]["path"]
-	first_file = base_path + split_list.pop(0)
-	output = open(file_name, "a")
-
-	for line in open(first_file):
-		output.write(line)
+	base_path = params["output"]["file"]["processing_location"]
+	output = open(base_path + file_name, "a")
 
 	for split in split_list:
-		with open(base_path + split) as chunk:
-			chunk.next()
+		base_file = os.path.basename(split)
+		with open(base_path + base_file) as chunk:
 			for line in chunk:
 				output.write(line)
-		safely_remove_file(base_path + split)
+		safely_remove_file(base_path + base_file)
 
 	output.close()
+
+def mode_switch(params):
+	"""Switches mode between, single file, s3 bucket,
+	card mode, and bank mode"""
+
+	input_file = params["input"].get("filename", "")
+	input_bucket = params["input"].get("bucket_key", "")
+
+	if os.path.isfile(input_file):
+		print("Processing Single Local File: ", input_file)
+		params["output"]["file"]["name"] = os.path.basename(input_file)
+		process_panel(params, input_file)
+	elif input_bucket != "":
+		print("Processing S3 Bucket: ", input_bucket)
+		process_bucket(params)
+	else:
+		logging.critical("Please provide a local file or s3 buck for procesing. Terminating")
+		sys.exit()
 
 if __name__ == "__main__":
 	#Runs the entire program.
 
 	params = initialize()
-	process_bucket(params)
+	mode_switch(params)

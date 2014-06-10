@@ -3,11 +3,12 @@
 	"verification_source" : "data/misc/matt_8000_card.csv",
 	"input" : {
 		"hyperparameters" : "config/hyperparameters/default.json",
-		"filename" : "data/input/foo.5000",
+		"filename" : "/mnt/ephemeral/input/15000_Card.txt",
+		"bucket_key" : "meerkat/input/gpanel/card/",
 		"delimiter" : "|",
 		"encoding" : "utf-8",
 		"split" : {
-			"path" : "/mnt/ephemeral/input/",
+			"processing_location" : "/mnt/ephemeral/input/",
 			"row_limit" : 1000
 		}
 	},
@@ -30,7 +31,7 @@
 		},
 		"file" : {
 			"format" : "csv",
-			"path" : "/mnt/ephemeral/output/",
+			"processing_location" : "/mnt/ephemeral/output/",
 			"delimiter" : "|"
 		}
 	},

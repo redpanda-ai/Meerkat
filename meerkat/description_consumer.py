@@ -115,7 +115,7 @@ class DescriptionConsumer(threading.Thread):
 
 		try:
 			logger.debug("%s: %s", str(self.thread_id), str(results[0]))
-			#print(str(self.thread_id), ": ", results[0])
+			print(str(self.thread_id), ": ", results[0])
 		except IndexError:
 			logger.warning("INDEX ERROR: %s", transaction["DESCRIPTION"])
 			#print("INDEX ERROR: ", transaction["DESCRIPTION"])
