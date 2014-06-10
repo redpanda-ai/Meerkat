@@ -419,8 +419,10 @@ def merge_split_files(params, split_list):
 
 	file_name = params["output"]["file"]["name"]
 	base_path = params["output"]["file"]["processing_location"]
-	output = open(base_path + file_name, "a")
+	full_path = base_path + file_name
+	output = open(full_path, "a")
 
+	# Merge
 	for split in split_list:
 		base_file = os.path.basename(split)
 		with open(base_path + base_file) as chunk:
@@ -429,6 +431,16 @@ def merge_split_files(params, split_list):
 		safely_remove_file(base_path + base_file)
 
 	output.close()
+
+	# GZIP 
+	unzipped = open(full_path, "rb")
+	zipped = gzip.open(full_path + ".gz", "wb")
+	zipped.writelines(unzipped)
+	zipped.close()
+	unzipped.close()
+
+	# Cleanup
+	safely_remove_file(full_path)
 
 def mode_switch(params):
 	"""Switches mode between, single file, s3 bucket,

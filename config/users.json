@@ -3,7 +3,7 @@
 	"verification_source" : "data/misc/matt_8000_card.csv",
 	"input" : {
 		"hyperparameters" : "config/hyperparameters/default.json",
-		"filename" : "/mnt/ephemeral/input/15000_Card.txt",
+		"filename" : "/mnt/ephemeral/input/5000_Card.txt",
 		"bucket_key" : "meerkat/input/gpanel/card/",
 		"delimiter" : "|",
 		"encoding" : "utf-8",
