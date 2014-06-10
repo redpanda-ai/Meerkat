@@ -399,6 +399,9 @@ def process_panel(params, filename):
 		
 	logging.warning("Complete.")
 
+	# Only do one
+	sys.exit()
+
 def merge_split_files(params, split_list):
 	"""Takes a split list and merges the files back together
 	after processing is complete"""

@@ -328,7 +328,8 @@ class DescriptionConsumer(threading.Thread):
 
 		# Hack Names
 		if good_description != "":
-			name_query = get_qs_query(good_description, ['name'], 2)
+
+			name_query = get_qs_query(string_cleanse(good_description), ['name'], 2)
 			should_clauses.append(name_query)
 
 		return bool_search
