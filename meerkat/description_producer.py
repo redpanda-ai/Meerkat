@@ -54,7 +54,7 @@ def get_desc_queue(filename, params):
 		description = transaction["DESCRIPTION"]
 		prediction = predict_if_physical_transaction(description)
 		transaction["IS_PHYSICAL_TRANSACTION"] = prediction
-		#print(description + ": " + prediction)
+		print(description + ": " + prediction)
 		if prediction == "1":
 			physical.append(transaction)
 		elif prediction == "0":
@@ -310,16 +310,19 @@ def	hms_to_seconds(t):
 	return 3600 * float(h) + 60 * float(m) + float(s)
 
 def pre_begin():
+
 	try:
 		conn = boto.connect_s3()
 	except boto.s3.connection.HostRequiredError:
 		print("Error connecting to S3, check your credentials")
+
 	bucket_string = "s3yodlee"
 	path_string = "meerkat/input/gpanel/card/([^/]+)"
 	path_regex = re.compile(path_string)
 	bucket = conn.get_bucket(bucket_string,Location.USWest2)
 	keep_going = True
 	params = initialize()
+
 	for k in bucket.list():
 		if path_regex.search(k.key):
 			matches = path_regex.match(k.key)
@@ -395,5 +398,5 @@ def begin(params, filename):
 
 if __name__ == "__main__":
 	#Runs the entire program.
+
 	pre_begin()
-	#begin()

@@ -7,7 +7,7 @@
 		"delimiter" : "|",
 		"encoding" : "utf-8",
 		"split" : {
-			"path" : "data/input/",
+			"path" : "/mnt/ephemeral/input/",
 			"row_limit" : 1000
 		}
 	},
@@ -30,7 +30,7 @@
 		},
 		"file" : {
 			"format" : "csv",
-			"path" : "data/output/",
+			"path" : "/mnt/ephemeral/output/",
 			"delimiter" : "|"
 		}
 	},
