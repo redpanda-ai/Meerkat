@@ -144,7 +144,7 @@ def load_pickle_cache(params):
 
 	return params
 
-def tokenize(params, desc_queue, hyperparameters, non_physical):
+def tokenize(params, desc_queue, hyperparameters, non_physical, split):
 	"""Opens a number of threads to process the descriptions queue."""
 
 	# Load Pickle Cache if enough transactions
@@ -171,7 +171,7 @@ def tokenize(params, desc_queue, hyperparameters, non_physical):
 	# Writing to an output file, if necessary.
 	if "file" in params["output"] and "format" in params["output"]["file"]\
 	and params["output"]["file"]["format"] in ["csv", "json"]:
-		write_output_to_file(params, result_list, non_physical)
+		write_output_to_file(params, result_list, non_physical, split)
 	else:
 		logging.critical("Not configured for file output.")
 
@@ -244,7 +244,7 @@ def validate_params(params):
 			expr=None)
 	return True
 
-def write_output_to_file(params, output_list, non_physical):
+def write_output_to_file(params, output_list, non_physical, split):
 	"""Outputs results to a file"""
 
 	if type(output_list) is queue.Queue:
@@ -258,8 +258,8 @@ def write_output_to_file(params, output_list, non_physical):
 	output_list = output_list + non_physical
 
 	# Get File Save Info
-	file_name = params["output"]["file"]["path"] +\
-		params["output"]["file"]["name"]
+	file_path = os.path.basename(split)
+	file_name = params["output"]["file"]["path"] + file_path
 	file_format = params["output"]["file"].get("format", 'csv')
 
 	# What is the output_list[0]
@@ -267,7 +267,7 @@ def write_output_to_file(params, output_list, non_physical):
 
 	# Get Headers
 	header = None
-	with open(params["input"]["filename"], 'r') as infile:
+	with open(split, 'r') as infile:
 		header = infile.readline()
 
 	# Split on delimiter into a list
@@ -345,8 +345,6 @@ def pre_begin():
 				safely_remove_file(new_filename)
 				logging.warning("Beginning with %s", unzipped_name)
 				begin(params, unzipped_name)
-	print("It's over")
-	sys.exit()
 
 def begin(params, filename):
 	#params = initialize()
@@ -381,7 +379,7 @@ def begin(params, filename):
 		logging.warning("Working with the following split: %s", split)
 		split_start_time = datetime.datetime.now()
 		desc_queue, non_physical = get_desc_queue(split, params)
-		tokenize(params, desc_queue, key, non_physical)
+		tokenize(params, desc_queue, key, non_physical, split)
 		end_time = datetime.datetime.now()
 		total_time = end_time - start_time
 		split_time = end_time - split_start_time
@@ -394,6 +392,9 @@ def begin(params, filename):
 			my_rate, completion_percentage)
 		logging.warning("Deleting {0}".format(split))
 		safely_remove_file(split)
+
+	# Merge Files and Push to S3
+		
 	logging.warning("Complete.")
 
 if __name__ == "__main__":
