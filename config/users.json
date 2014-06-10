@@ -1,15 +1,18 @@
 {
-	"concurrency" : 24,
+	"concurrency" : 36,
 	"verification_source" : "data/misc/matt_8000_card.csv",
 	"input" : {
 		"hyperparameters" : "config/hyperparameters/default.json",
-		"type" : "card",
-		"filename" : "/mnt/ephemeral/20140429_YODLEE_CARD_PANEL_UNMASKED.txt",
+		"filename" : "data/input/foo.5000",
 		"delimiter" : "|",
-		"encoding" : "utf-8"
+		"encoding" : "utf-8",
+		"split" : {
+			"path" : "data/input/",
+			"row_limit" : 1000
+		}
 	},
 	"logging" : {
-		"level" : "critical",
+		"level" : "warning",
 		"path" : "logs/foo.log",
 		"formatter" : "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 		"console" : true
@@ -27,7 +30,7 @@
 		},
 		"file" : {
 			"format" : "csv",
-			"path" : "/mnt/ephemeral/20140429_YODLEE_CARD_PANEL_UNMASKED_Meerkat_labeled.txt",
+			"path" : "data/output/",
 			"delimiter" : "|"
 		}
 	},

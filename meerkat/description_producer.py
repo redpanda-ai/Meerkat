@@ -8,21 +8,26 @@ ElasticSearch (structured data).
 @author: Matthew Sevrens
 """
 
+import boto
 import csv
 import datetime
 import collections
+import gzip
 import json
 import logging
 import os
 import pickle
+import re
 import queue
 import sys
 
 from .custom_exceptions import InvalidArguments, Misconfiguration
 from .description_consumer import DescriptionConsumer
 from .binary_classifier.load import predict_if_physical_transaction
-from .various_tools import load_dict_list, split_csv
+from .various_tools import load_dict_list, safely_remove_file, split_csv
 from .accuracy import test_accuracy, print_results, speed_tests
+
+from boto.s3.connection import Location, S3Connection
 
 def get_desc_queue(filename, params):
 	"""Opens a file of descriptions, one per line, and load a description
@@ -30,7 +35,7 @@ def get_desc_queue(filename, params):
 
 	encoding = None
 	physical, non_physical, atm = [], [], []
-	#users = collections.defaultdict(list)
+	users = collections.defaultdict(list)
 	desc_queue = queue.Queue()
 
 	try:
@@ -60,23 +65,23 @@ def get_desc_queue(filename, params):
 			atm.append(transaction)
 
 	# Split into user buckets
-	#for row in physical:
-	#	user = row.get("UNIQUE_MEM_ID", "")
-	#	users[user].append(row)
+	for row in physical:
+		user = row.get("UNIQUE_MEM_ID", "")
+		users[user].append(row)
 
 	# Add Users to Queue
-	#for key, _ in users.items():
-	#	desc_queue.put(users[key])
+	for key, _ in users.items():
+		desc_queue.put(users[key])
 
-	#atm_percent = (len(atm) / len(transactions)) * 100
-	#non_physical_percent = (len(non_physical) / len(transactions)) * 100
-	#physical_percent = (len(physical) / len(transactions)) * 100
+	atm_percent = (len(atm) / len(transactions)) * 100
+	non_physical_percent = (len(non_physical) / len(transactions)) * 100
+	physical_percent = (len(physical) / len(transactions)) * 100
 
-	#print("")
-	#print("PHYSICAL: ", round(physical_percent, 2), "%")
-	#print("NON-PHYSICAL: ", round(non_physical_percent, 2), "%")
-	#print("ATM: ", round(atm_percent, 2), "%")
-	#print("")
+	print("")
+	print("PHYSICAL: ", round(physical_percent, 2), "%")
+	print("NON-PHYSICAL: ", round(non_physical_percent, 2), "%")
+	print("ATM: ", round(atm_percent, 2), "%")
+	print("")
 
 	return desc_queue, non_physical
 
@@ -253,8 +258,8 @@ def write_output_to_file(params, output_list, non_physical):
 	output_list = output_list + non_physical
 
 	# Get File Save Info
-	file_name = params["output"]["file"].get("path",\
-		'../data/output/meerkatLabeled.csv')
+	file_name = params["output"]["file"]["path"] +\
+		params["output"]["file"]["name"]
 	file_format = params["output"]["file"].get("format", 'csv')
 
 	# What is the output_list[0]
@@ -282,11 +287,14 @@ def write_output_to_file(params, output_list, non_physical):
 		new_header = delimiter.join(new_header_list)
 		new_header = new_header.replace("GOOD_DESCRIPTION", "NON_PHYSICAL_TRANSACTION")
 
-		with open(file_name, 'a') as output_file:
-			#We only write the header for the first file
-			if params["add_header"] is True:
+		#We only write the header for the first file
+		if params["add_header"] is True:
+			with open(file_name, 'w') as output_file:
 				output_file.write(new_header + "\n")
 				params["add_header"] = False
+
+		#We append for every split
+		with open(file_name, 'a') as output_file:
 			dict_w = csv.DictWriter(output_file, delimiter=delimiter,\
 				fieldnames=all_fields, extrasaction='ignore')
 			dict_w.writerows(output_list)
@@ -296,11 +304,53 @@ def write_output_to_file(params, output_list, non_physical):
 		with open(file_name, 'w') as outfile:
 			json.dump(output_list, outfile)
 
-def begin():
+def	hms_to_seconds(t):
+	h, m, s = [i.lstrip("0") if len(i.lstrip("0")) != 0 else 0 for i in t.split(':')]
+	print ("H: {0}, M: {1}, S: {2}".format(h, m, s))
+	return 3600 * float(h) + 60 * float(m) + float(s)
+
+def pre_begin():
+	try:
+		conn = boto.connect_s3()
+	except boto.s3.connection.HostRequiredError:
+		print("Error connecting to S3, check your credentials")
+	bucket_string = "s3yodlee"
+	path_string = "meerkat/input/gpanel/card/([^/]+)"
+	path_regex = re.compile(path_string)
+	bucket = conn.get_bucket(bucket_string,Location.USWest2)
+	keep_going = True
 	params = initialize()
+	for k in bucket.list():
+		if path_regex.search(k.key):
+			matches = path_regex.match(k.key)
+			input_split_path = params["input"]["split"]["path"]
+			new_filename = input_split_path + matches.group(1)
+			if keep_going:
+				keep_going = False
+				#print(k.key, k.size, k.encrypted)
+				logging.warning("Fetching %s from S3.", k.key)
+				#print("Creating new file at {0}.".format(new_filename))
+				local_input_path = params["input"]["split"]["path"]
+				k.get_contents_to_filename(new_filename)
+				params["output"]["file"]["name"] = matches.group(1)[:-3]
+				logging.warning("Fetch of %s complete.", new_filename)
+				with gzip.open(new_filename, 'rb') as gzipped_input:
+					unzipped_name = new_filename[:-3]
+					with open(unzipped_name, 'wb') as unzipped_input:
+						unzipped_input.write(gzipped_input.read())
+						logging.warning("%s unzipped.", new_filename)
+				safely_remove_file(new_filename)
+				logging.warning("Beginning with %s", unzipped_name)
+				begin(params, unzipped_name)
+	print("It's over")
+	sys.exit()
+
+def begin(params, filename):
+	#params = initialize()
+	row_limit = None
 	key = load_hyperparameters(params)
 	try:
-		filename = params["input"]["filename"]
+		#filename = params["input"]["filename"]
 		split_path = params["input"]["split"]["path"]
 		row_limit = params["input"]["split"]["row_limit"]
 		delimiter = params["input"].get("delimiter", "|")
@@ -312,14 +362,38 @@ def begin():
 			" cannot be found. Correct your config file.", filename)
 		sys.exit()
 
+	#Removing original file
+	safely_remove_file(filename)
+
 	#Loop through input segements
 	params["add_header"] = True
+	#Start a timer
+	split_count = 0
+	split_total = len(split_list)
+	logging.warning("There are %i splits to process", split_total)
+	#print("There are {0} splits to process.".format(split_total))
+	start_time = datetime.datetime.now()
 	for split in split_list:
-		print("Working with the following split: {0}".format(split))
-		desc_queue, non_physical = get_desc_queue(filename, params)
+		split_count += 1
+		logging.warning("Working with the following split: %s", split)
+		split_start_time = datetime.datetime.now()
+		desc_queue, non_physical = get_desc_queue(split, params)
 		tokenize(params, desc_queue, key, non_physical)
-	print("Complete.")
+		end_time = datetime.datetime.now()
+		total_time = end_time - start_time
+		split_time = end_time - split_start_time
+		remaining_splits = split_total - split_count
+		completion_percentage = split_count / split_total * 100.0
+		my_rate = row_limit / hms_to_seconds(str(split_time))
+		logging.warning("Elapsed time: %s, ETA: %s",\
+			str(total_time)[:7], str(split_time * remaining_splits)[:7])
+		logging.warning("Rate: %10.2f, Completion: %2.2f%%",\
+			my_rate, completion_percentage)
+		logging.warning("Deleting {0}".format(split))
+		safely_remove_file(split)
+	logging.warning("Complete.")
 
 if __name__ == "__main__":
-	begin()
-
+	#Runs the entire program.
+	pre_begin()
+	#begin()

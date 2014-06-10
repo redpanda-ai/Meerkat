@@ -77,7 +77,7 @@ class DescriptionConsumer(threading.Thread):
 
 	def __display_search_results(self, search_results, transaction):
 		"""Displays search results."""
-
+		logger = logging.getLogger("thread " + str(self.thread_id))
 		# Must have results
 		if search_results['hits']['total'] == 0:
 			return True
@@ -114,9 +114,11 @@ class DescriptionConsumer(threading.Thread):
 		self.__generate_z_score_delta(scores)
 
 		try:
-			print(str(self.thread_id), ": ", results[0])
+			logger.debug("%s: %s", str(self.thread_id), str(results[0]))
+			#print(str(self.thread_id), ": ", results[0])
 		except IndexError:
-			print("INDEX ERROR: ", transaction["DESCRIPTION"])
+			logger.warning("INDEX ERROR: %s", transaction["DESCRIPTION"])
+			#print("INDEX ERROR: ", transaction["DESCRIPTION"])
 
 		return True
 

@@ -67,6 +67,14 @@ def plot_double_polygon(polygon_points, scaled_polygon_points, S
 	ax1.set_ylim(y_boundaries)
 	plt.show()
 
+def safely_remove_file(filename):
+	print("Removing {0}".format(filename))
+	try:
+		os.remove(filename)
+	except OSError:
+		print("Unable to remove {0}".format(filename))
+	print("File removed.")
+
 def scale_polygon(list_of_points, scale=2.0):
 	"""This function accepts a list of points representing a polygon and scales
 	them about its centroid."""
@@ -91,6 +99,44 @@ def scale_polygon(list_of_points, scale=2.0):
 	#Return the centroid vector, and a list of points representing
 	#the scaled polygon
 	return centroid_vector, S.tolist(), M, S
+
+def string_cleanse(original_string):
+	"""Strips out characters that might confuse ElasticSearch."""
+	original_string = original_string.replace("OR", "or")
+	original_string = original_string.replace("AND", "and")
+	bad_characters = [r"\[", r"\]", r"\{", r"\}", r'"', r"/", r"\\", r"\:",
+		r"\(", r"\)", r"-", r"\+", r">", r"!", r"\*", r"\|\|", r"&&", r"~"]
+	bad_character_regex = "|".join(bad_characters)
+	cleanse_pattern = re.compile(bad_character_regex)
+	with_spaces = re.sub(cleanse_pattern, " ", original_string)
+	return ' '.join(with_spaces.split())
+
+def synonyms(transaction):
+	"""Replaces transactions tokens with manually
+	mapped factual representations"""
+
+	rep = {
+		"wal-mart" : "Walmart",
+		"samsclub" : "Sam's Club",
+		"usps" : "US Post Office",
+		"qps" : "",
+		"q03" : "",
+		"lowes" : "Lowe's",
+		"wholefds" : "Whole Foods",
+		"Shell Oil" : "Shell Gas",
+		"wm supercenter" : "Walmart",
+		"exxonmobil" : "exxonmobil exxon mobil",
+		"mcdonalds" : "mcdonald's",
+		"costco whse" : "costco",
+		"franciscoca" : "francisco ca"
+	}
+
+	transaction = transaction.lower()
+	rep = dict((re.escape(k), v) for k, v in rep.items())
+	pattern = re.compile("|".join(rep.keys()))
+	text = pattern.sub(lambda m: rep[re.escape(m.group(0))], transaction)
+
+	return text
 
 def split_csv(filehandler, delimiter=',', row_limit=10000, 
 	output_name_template='output_%s.csv', output_path='.', keep_headers=True):
@@ -139,41 +185,3 @@ def split_csv(filehandler, delimiter=',', row_limit=10000,
 		current_out_writer.writerow(row)
 	#Return complete list of chunks
 	return file_list
-
-def string_cleanse(original_string):
-	"""Strips out characters that might confuse ElasticSearch."""
-	original_string = original_string.replace("OR", "or")
-	original_string = original_string.replace("AND", "and")
-	bad_characters = [r"\[", r"\]", r"\{", r"\}", r'"', r"/", r"\\", r"\:",
-		r"\(", r"\)", r"-", r"\+", r">", r"!", r"\*", r"\|\|", r"&&", r"~"]
-	bad_character_regex = "|".join(bad_characters)
-	cleanse_pattern = re.compile(bad_character_regex)
-	with_spaces = re.sub(cleanse_pattern, " ", original_string)
-	return ' '.join(with_spaces.split())
-
-def synonyms(transaction):
-	"""Replaces transactions tokens with manually
-	mapped factual representations"""
-
-	rep = {
-		"wal-mart" : "Walmart",
-		"samsclub" : "Sam's Club",
-		"usps" : "US Post Office",
-		"qps" : "",
-		"q03" : "",
-		"lowes" : "Lowe's",
-		"wholefds" : "Whole Foods",
-		"Shell Oil" : "Shell Gas",
-		"wm supercenter" : "Walmart",
-		"exxonmobil" : "exxonmobil exxon mobil",
-		"mcdonalds" : "mcdonald's",
-		"costco whse" : "costco",
-		"franciscoca" : "francisco ca"
-	}
-
-	transaction = transaction.lower()
-	rep = dict((re.escape(k), v) for k, v in rep.items())
-	pattern = re.compile("|".join(rep.keys()))
-	text = pattern.sub(lambda m: rep[re.escape(m.group(0))], transaction)
-
-	return text
