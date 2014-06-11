@@ -3,15 +3,27 @@
 
 from sklearn.externals import joblib
 
-def predict_if_physical_transaction(description=None):
+def select_model(mode):
+	"""Load either Card or Bank classifier depending on
+	requested model"""
 
-	"""This method uses a previously generated model to
-	classify a single transaction as either physical 
-	or non physical"""
+	# Switch on Models
+	if mode == "card":
+		print("--- Classifying Transactions in Card Mode ---")
+		model_path = "meerkat/binary_classifier/models/final_card.pkl"
+	elif mode == "bank":
+		print("--- Classifying Transactions in Bank Mode ---")
+		model_path = "meerkat/binary_classifier/models/final_bank.pkl"
+	else:
+		print("--- Binary Classifier requested not found. Terminating ---")
+		sys.exit()
 
-	result = list(GRID_SEARCH.predict([description]))[0]
+	# Load Model
+	model = joblib.load(model_path)
 
-	return result
-
-# Load Classifier
-GRID_SEARCH = joblib.load('meerkat/binary_classifier/models/final_card.pkl')
+	# Generate Helper Function
+	def classifier(description=None):
+		result = list(model.predict([description]))[0]
+		return result
+			
+	return classifier

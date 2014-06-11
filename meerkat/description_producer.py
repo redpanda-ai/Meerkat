@@ -16,20 +16,19 @@ import gzip
 import json
 import logging
 import os
-import pickle
 import re
 import queue
 import sys
 
 from .custom_exceptions import InvalidArguments, Misconfiguration
 from .description_consumer import DescriptionConsumer
-from .binary_classifier.load import predict_if_physical_transaction
+from .binary_classifier.load import select_model
 from .various_tools import load_dict_list, safely_remove_file, split_csv
 from .accuracy import test_accuracy, print_results, speed_tests
 
 from boto.s3.connection import Location, S3Connection
 
-def get_desc_queue(filename, params):
+def get_desc_queue(filename, params, classifier):
 	"""Opens a file of descriptions, one per line, and load a description
 	queue."""
 
@@ -52,7 +51,7 @@ def get_desc_queue(filename, params):
 	for transaction in transactions:
 		transaction['factual_id'] = ""
 		description = transaction["DESCRIPTION"]
-		prediction = predict_if_physical_transaction(description)
+		prediction = classifier(description)
 		transaction["IS_PHYSICAL_TRANSACTION"] = prediction
 		print(description + ": " + prediction)
 		if prediction == "1":
@@ -130,39 +129,19 @@ def queue_to_list(result_queue):
 	result_queue.join()
 	return result_list
 
-def load_pickle_cache(params):
-	"""Loads the Pickled Cache"""
-
-	try:
-		with open("search_cache.pickle", 'rb') as client_cache_file:
-			params["search_cache"] = pickle.load(client_cache_file)
-	except IOError:
-		logging.critical("search_cache.pickle not found, starting anyway.")
-
-	if validate_params(params):
-		logging.info("Parameters are valid, proceeding.")
-
-	return params
-
 def tokenize(params, desc_queue, hyperparameters, non_physical, split):
 	"""Opens a number of threads to process the descriptions queue."""
-
-	# Load Pickle Cache if enough transactions
-	use_cache = params["elasticsearch"].get("cache_results", "true")
-
-	if use_cache == "true":
-		params = load_pickle_cache(params)
 
 	# Run the Classifier
 	consumer_threads = params.get("concurrency", 8)
 	result_queue = queue.Queue()
-	#start_time = datetime.datetime.now()
 
 	for i in range(consumer_threads):
 		new_consumer = DescriptionConsumer(i, params, desc_queue,\
 			result_queue, hyperparameters)
 		new_consumer.setDaemon(True)
 		new_consumer.start()
+
 	desc_queue.join()
 
 	# Convert queue to list
@@ -179,36 +158,10 @@ def tokenize(params, desc_queue, hyperparameters, non_physical, split):
 	#accuracy_results = test_accuracy(params, result_list=result_list, non_physical_trans=non_physical)
 	#print_results(accuracy_results)
 
-	# Do Speed Tests
-	#speed_tests(start_time, accuracy_results)
-
-	# Save the Cache
-	#save_pickle_cache(params)
-
 	# Shutdown Loggers
 	logging.shutdown()
 
 	#return accuracy_results
-
-def save_pickle_cache(params):
-	"""Saves search results into a picked file."""
-	use_cache = params["elasticsearch"].get("cache_results", True)
-
-	if use_cache == False:
-		return
-
-	# Destroy the out-dated cache
-	logging.critical("Removing original pickle")
-	try:
-		os.remove("search_cache.pickle")
-	except OSError:
-		pass
-
-	# Pickle the search_cache
-	logging.critical("Begin Pickling.")
-	with open('search_cache.pickle', 'wb') as client_cache_file:
-		pickle.dump(params["search_cache"], client_cache_file, pickle.HIGHEST_PROTOCOL)
-	logging.critical("Pickling complete.")
 
 def usage():
 	"""Shows the user which parameters to send into the program."""
@@ -363,6 +316,16 @@ def process_panel(params, filename):
 
 	row_limit = None
 	key = load_hyperparameters(params)
+	params["add_header"] = True
+	split_count = 0
+
+	# Determine Mode
+	if "bank" in filename.lower():
+		classifier = select_model("bank")
+	elif "card" in filename.lower():
+		classifier = select_model("card")
+
+	# Load and Split Files
 	try:
 		split_path = params["input"]["split"]["processing_location"]
 		row_limit = params["input"]["split"]["row_limit"]
@@ -375,22 +338,21 @@ def process_panel(params, filename):
 			" cannot be found. Correct your config file.", filename)
 		sys.exit()
 
-	#Removing original file
+	# Remove original file
 	safely_remove_file(filename)
 
-	#Loop through input segements
-	params["add_header"] = True
-	#Start a timer
-	split_count = 0
-	split_total = len(split_list)
-	logging.warning("There are %i splits to process", split_total)
-	#print("There are {0} splits to process.".format(split_total))
+	# Start a timer
 	start_time = datetime.datetime.now()
+	split_total = len(split_list)
+
+	logging.warning("There are %i splits to process", split_total)
+
+	# Loop through input segements
 	for split in split_list:
 		split_count += 1
 		logging.warning("Working with the following split: %s", split)
 		split_start_time = datetime.datetime.now()
-		desc_queue, non_physical = get_desc_queue(split, params)
+		desc_queue, non_physical = get_desc_queue(split, params, classifier)
 		tokenize(params, desc_queue, key, non_physical, split)
 		end_time = datetime.datetime.now()
 		total_time = end_time - start_time
@@ -406,8 +368,7 @@ def process_panel(params, filename):
 		safely_remove_file(split)
 
 	# Merge Files, GZIP and Push to S3
-	merge_split_files(params, split_list)
-		
+	output_location = merge_split_files(params, split_list)
 	logging.warning("Complete.")
 
 	# Only do one
@@ -441,6 +402,8 @@ def merge_split_files(params, split_list):
 
 	# Cleanup
 	safely_remove_file(full_path)
+
+	return full_path + ".gz"
 
 def mode_switch(params):
 	"""Switches mode between, single file, s3 bucket,
