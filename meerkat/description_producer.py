@@ -307,9 +307,9 @@ def process_bucket(params):
 
 				# Run Panel
 				logging.warning("Beginning with %s", unzipped_name)
-				process_panel(params, unzipped_name)
+				process_panel(params, unzipped_name, conn)
 
-def process_panel(params, filename):
+def process_panel(params, filename, S3):
 	"""Process a single panel"""
 
 	row_limit = None
@@ -319,8 +319,10 @@ def process_panel(params, filename):
 
 	# Determine Mode
 	if "bank" in filename.lower():
+		params["mode"] = "bank"
 		classifier = select_model("bank")
 	elif "card" in filename.lower():
+		params["mode"] = "card"
 		classifier = select_model("card")
 
 	# Load and Split Files
@@ -367,7 +369,8 @@ def process_panel(params, filename):
 
 	# Merge Files, GZIP and Push to S3
 	output_location = merge_split_files(params, split_list)
-	move_to_S3(output_location)
+	if params["input"].get("bucket_key", "") != "":
+		move_to_S3(params, output_location, S3)
 
 	logging.warning("Complete.")
 
@@ -406,8 +409,7 @@ def merge_split_files(params, split_list):
 	return full_path + ".gz"
 
 def mode_switch(params):
-	"""Switches mode between, single file, s3 bucket,
-	card mode, and bank mode"""
+	"""Switches mode between, single file / s3 bucket mode"""
 
 	input_file = params["input"].get("filename", "")
 	input_bucket = params["input"].get("bucket_key", "")
@@ -423,8 +425,12 @@ def mode_switch(params):
 		logging.critical("Please provide a local file or s3 buck for procesing. Terminating")
 		sys.exit()
 
-def move_to_S3(filepath):
+def move_to_S3(params, filepath, S3):
 	"""Pushes a file back to S3"""
+
+	s3_location = "/meerkat/output/gpanel/" + params["mode"] + "/"
+	bucket_name = "s3yodlee"
+	bucket = conn.get_bucket(bucket_name, Location.USWest2)
 
 if __name__ == "__main__":
 	#Runs the entire program.
