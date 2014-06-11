@@ -306,7 +306,7 @@ class DescriptionConsumer(threading.Thread):
 		result_size = self.hyperparameters.get("es_result_size", "10")
 		fields = params["output"]["results"]["fields"]
 		good_description = transaction["GOOD_DESCRIPTION"]
-		transaction = string_cleanse(transaction["DESCRIPTION"]).rstrip()
+		transaction = string_cleanse(transaction["UNMASKED_DESCRIPTION"]).rstrip()
 
 		# Input transaction must not be empty
 		if len(transaction) <= 2 and re.match('^[a-zA-Z0-9_]+$', transaction):
@@ -431,8 +431,6 @@ class DescriptionConsumer(threading.Thread):
 		business_names = business_names[0:2]
 		top_name = business_names[0].lower()
 		all_equal = business_names.count(business_names[0]) == len(business_names)
-		name_in_transaction =\
-			business_names[0].lower() in transaction["DESCRIPTION"].lower()
 		not_a_city = top_name not in self.cities
 
 		if (all_equal and not_a_city):

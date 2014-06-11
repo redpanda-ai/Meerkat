@@ -184,7 +184,7 @@ def save_not_found(not_found, percent_missed):
 	"""Save the stores not found in the index"""
 
 	store_name = not_found[0]['keywords']
-	file_name = "data/output/" + store_name + "_not_found_" + str(percent_missed) + "_of_total" + ".csv"
+	file_name = "/mnt/ephemeral/AggData_Factual_Merge/" + store_name + "_not_found_" + str(percent_missed * 100) + "%_of_total" + ".csv"
 	delimiter = ","
 	output_file = open(file_name, 'w')
 	dict_w = csv.DictWriter(output_file, delimiter=delimiter, fieldnames=not_found[0].keys())
