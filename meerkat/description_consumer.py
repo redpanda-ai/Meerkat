@@ -295,7 +295,6 @@ class DescriptionConsumer(threading.Thread):
 		logger.info(json.dumps(query, sort_keys=True, indent=4, separators=(',', ': ')))
 		my_results = self.__search_index(query)
 		metrics = self.my_meta["metrics"]
-		logger.info("Cache Hit / Miss: %i / %i", metrics["cache_count"], metrics["query_count"])
 		return my_results
 
 	def __generate_base_query(self, transaction, boost=1.0):
@@ -446,50 +445,26 @@ class DescriptionConsumer(threading.Thread):
 
 	def __reset_my_meta(self):
 		"""Purges several object data structures and re-initializes them."""
-		self.my_meta = {"metrics": {"query_count": 0, "cache_count": 0}}
+		self.my_meta = {"metrics": {"query_count": 0}}
 
 	def __search_index(self, input_as_object):
 		"""Searches the merchants index and the merchant mapping"""
 		logger = logging.getLogger("thread " + str(self.thread_id))
-		use_cache = self.params["elasticsearch"].get("cache_results", True)
 		input_data = json.dumps(input_as_object, sort_keys=True, indent=4\
 		, separators=(',', ': ')).encode('UTF-8')
+
 		output_data = ""
 
-		if use_cache == True:
-			output_data = self.__check_cache(input_data)
-
-		if output_data == "":
-			logger.debug("Cache miss, searching")
-			try:
-				output_data = self.es_connection.search(
-					index=self.params["elasticsearch"]["index"], body=input_as_object)
-				#Add newly found results to the client cache
-				if use_cache == True:
-					#FIXME: 'input_hash' variable is undefined, this does not work!
-					self.params["search_cache"][input_hash] = output_data
-			except Exception:
-				logging.critical("Unable to process the following: %s",\
-					str(input_as_object))
-				output_data = {"hits":{"total":0}}
+		try:
+			output_data = self.es_connection.search(
+				index=self.params["elasticsearch"]["index"], body=input_as_object)
+		except Exception:
+			logging.critical("Unable to process the following: %s",\
+				str(input_as_object))
+			output_data = {"hits":{"total":0}}
 
 		self.my_meta["metrics"]["query_count"] += 1
 
-		return output_data
-
-	def __check_cache(self, input_data):
-		"""Check cache, then run if query is not found"""
-		my_logger = logging.getLogger("thread " + str(self.thread_id))
-		hash_object = hashlib.md5(str(input_data).encode())
-		input_hash = hash_object.hexdigest()
-		output_data = ""
-
-		if input_hash in self.params["search_cache"]:
-			my_logger.debug("Cache hit, short-cutting")
-			sys.stdout.write("*")
-			sys.stdout.flush()
-			self.my_meta["metrics"]["cache_count"] += 1
-			output_data = self.params["search_cache"][input_hash]
 		return output_data
 
 	def __save_labeled_transactions(self, enriched_transactions):

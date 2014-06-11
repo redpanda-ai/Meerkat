@@ -100,8 +100,6 @@ def initialize():
 		logging.error("%s not found, aborting.", sys.argv[1])
 		sys.exit()
 
-	params["search_cache"] = {}
-
 	return params
 
 def load_hyperparameters(params):
@@ -129,7 +127,7 @@ def queue_to_list(result_queue):
 	result_queue.join()
 	return result_list
 
-def tokenize(params, desc_queue, hyperparameters, non_physical, split):
+def run_classifier(params, desc_queue, hyperparameters, non_physical, split):
 	"""Opens a number of threads to process the descriptions queue."""
 
 	# Run the Classifier
@@ -353,7 +351,7 @@ def process_panel(params, filename):
 		logging.warning("Working with the following split: %s", split)
 		split_start_time = datetime.datetime.now()
 		desc_queue, non_physical = get_desc_queue(split, params, classifier)
-		tokenize(params, desc_queue, key, non_physical, split)
+		run_classifier(params, desc_queue, key, non_physical, split)
 		end_time = datetime.datetime.now()
 		total_time = end_time - start_time
 		split_time = end_time - split_start_time
@@ -369,6 +367,8 @@ def process_panel(params, filename):
 
 	# Merge Files, GZIP and Push to S3
 	output_location = merge_split_files(params, split_list)
+	move_to_S3(output_location)
+
 	logging.warning("Complete.")
 
 	# Only do one
@@ -422,6 +422,9 @@ def mode_switch(params):
 	else:
 		logging.critical("Please provide a local file or s3 buck for procesing. Terminating")
 		sys.exit()
+
+def move_to_S3(filepath):
+	"""Pushes a file back to S3"""
 
 if __name__ == "__main__":
 	#Runs the entire program.
