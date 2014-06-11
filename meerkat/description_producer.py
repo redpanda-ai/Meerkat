@@ -27,7 +27,6 @@ from .various_tools import load_dict_list, safely_remove_file, split_csv
 from .accuracy import test_accuracy, print_results, speed_tests
 
 from boto.s3.connection import Location, S3Connection
-
 def get_desc_queue(filename, params, classifier):
 	"""Opens a file of descriptions, one per line, and load a description
 	queue."""
@@ -428,9 +427,15 @@ def mode_switch(params):
 def move_to_S3(params, filepath, S3):
 	"""Pushes a file back to S3"""
 
-	s3_location = "/meerkat/output/gpanel/" + params["mode"] + "/"
+	# Get Connection
+	s3_location = "meerkat/output/gpanel/" + params["mode"] + "/"
+	key = s3_location + os.path.basename(filepath)
 	bucket_name = "s3yodlee"
 	bucket = conn.get_bucket(bucket_name, Location.USWest2)
+
+	# Move to S3
+	key = bucket.new_key(key)
+	key.set_contents_from_filename(filepath)
 
 if __name__ == "__main__":
 	#Runs the entire program.

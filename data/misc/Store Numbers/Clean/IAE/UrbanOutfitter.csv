@@ -1,4 +1,4 @@
-Keywords,city, agg store_number,store_number,address,state,zip_code
+keywords,city,Aggdata Store Number,store_number,address,state,zip_code
 Urban Outfitters,Philadelphia,1,1 #0001 #001 #1 0001 00001,110 South 36th St.,PA,19104-3211
 Urban Outfitters,Cambridge,2,2 #0002 #002 0002 0002 00002,11 J.F.Kennedy St.,MA,02138-4908
 Urban Outfitters,Philadelphia,3,3 #0003 #003 00003 0003 00003,1627 Walnut St.,PA,19103-5402

@@ -1,4 +1,4 @@
-Keywords,city,store_number,Agg store_number,address,state,zip_code
+keywords,city,Aggdata Store Number,store_number,address,state,zip_code
 Target,Milwaukee,57,57 0000057 000057,8501 W Brown Deer Rd,WI,53224-2112
 Target,Fort Collins,79,79 0000079 000079,105 W Troutman Pkwy,CO,80525-3038
 Target,Wichita Falls,80,80 0000080 000080,4317 Kemp Blvd,TX,76308-3717

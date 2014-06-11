@@ -1,6 +1,9 @@
 #!/usr/local/bin/python3
 # pylint: disable=all
 
+"""This module aims to collect most of the
+functionality related to geolocation"""
+
 import json, sys
 import numpy as np
 import matplotlib.pyplot as plt

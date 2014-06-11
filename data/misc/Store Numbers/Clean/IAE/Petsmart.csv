@@ -1,4 +1,4 @@
-Keywords,city,store_number,Agg store_number,address,state,zip_code
+keywords,city,Aggdata Store Number,store_number,address,state,zip_code
 PetSmart,Rohnert Park,47,47 #47 047,575 Rohnert Park Expwy,CA,94928
 PetSmart,Roseville,48,48 #48 048,318 N Sunrise Blvd,CA,95661
 PetSmart,Rancho Cordova,49,49 #49 049,10830 Olson Dr,CA,95670

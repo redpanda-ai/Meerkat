@@ -1,4 +1,4 @@
-Keywords,city, Agg store_number,store_number,address,state,zip_code
+keywords,city,Aggdata Store Number,store_number,address,state,zip_code
 Nordstrom,Seattle,1,1 #01 #1,500 Pine Street,WA,98101
 Nordstrom,Seattle,2,2 #02 #2,401 NE Northgate Way,WA,98125
 Nordstrom,Bellevue,4,4 #04 #4,100 Bellevue Square,WA,98004
