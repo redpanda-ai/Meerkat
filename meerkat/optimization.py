@@ -5,21 +5,22 @@
 engine. It allows us to rapidly evaluate many
 possible configurations if provided a well
 labeled dataset. Iteratively it runs Meerkat
-with randomized levels of configurations. 
+with randomized levels of configurations and
+then converge on the best possible values. 
 
-In context of the code itself, this module 
+In context of Machine Leaning, this module 
 performs hyperparameter optimization. This 
-involves tuning the numeric values located under  
+involves tuning the numeric values located at  
 Meerkat/config/hyperparameters. These key 
 value pairs map to hyperparameters used through 
 out the Meerkat Classifier in aid of tuning or
-refining the queries.
+refining the queries used with ElasticSearch.
 
-This module utilizes a common method known 
-as grid search. In particular we are using 
-randomized optimization as it works better 
-where it is resource intensive to exaustively 
-perform a standard grid_search
+This module utilizes a common method known as 
+grid search. In particular we are using a custom
+implementation of randomized optimization as it 
+works better where it is resource intensive to 
+exaustively perform a standard grid_search.
 
 @author: Matthew Sevrens
 """

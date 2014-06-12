@@ -1,4 +1,4 @@
-#!/bin/python3.3
+#!/usr/local/bin/python3.3
 
 """This module constructs ElasticSearch queries to match 
 a transaction to merchant data indexed with ElasticSearch.

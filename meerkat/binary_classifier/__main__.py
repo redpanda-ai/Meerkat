@@ -1,4 +1,7 @@
-#!/usr/local/bin/python3
+#!/usr/local/bin/python3.3
+
+"""This file is run first when executing 
+binary_classifier as a subpackage"""
 
 from meerkat.binary_classifier.bay import process_list
 from meerkat.custom_exceptions import InvalidArguments

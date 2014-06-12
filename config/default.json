@@ -55,7 +55,6 @@
             "s17:9200",
             "s18:9200"
         ],
-        "cache_results" : false,
         "index" : "factual_index",
         "type" : "factual_type",
         "boost_labels" : ["standard_fields"],

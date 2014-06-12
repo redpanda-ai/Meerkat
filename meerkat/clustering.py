@@ -4,7 +4,7 @@
 """This module clusters a list of a users previously found
 transaction locations. Provided at least 25 latitude / longitude
 pairs, this module can group these points into separate categories
-such as work or home by analyzing how close the points are to 
+such as Work or Home by analyzing how close the points are to 
 each other. After clustering, we find the outermost points that 
 bound a users typical shopping area represented as geopolygons, 
 scale these polygons inward or outward, and then generate a 

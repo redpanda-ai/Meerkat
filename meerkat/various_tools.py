@@ -1,7 +1,7 @@
-#!/usr/bin/python3.3
+#!/usr/local/bin/python3.3
 
-"""This is where we keep functions that are useful enough to call from
-within multiple scripts.
+"""This is where we keep functions that are useful 
+enough to call from within multiple scripts.
 
 @author: J. Andrew Key
 @author: Matthew Sevrens
@@ -9,11 +9,7 @@ within multiple scripts.
 
 import csv
 import re
-import matplotlib.pyplot as plt
-import numpy as np
 import os
-
-from matplotlib.patches import Polygon
 
 def load_dict_list(file_name, encoding='utf-8', delimiter="|"):
 	"""Loads a dictionary of input from a file into a list."""

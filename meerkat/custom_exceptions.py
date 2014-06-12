@@ -1,4 +1,4 @@
-#!/usr/bin/python3.3
+#!/usr/local/bin/python3.3
 
 """This is where we keeping custom exception classes 
 for use within multiple scripts.

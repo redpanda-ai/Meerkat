@@ -1,7 +1,11 @@
 #!/usr/local/bin/python3.3
 
-"""This script collects the most common tokens in our corpus that 
-are either not found in factual data, or found significantly less often
+"""This script collects the most common tokens 
+in a provided transaction set that are either 
+not found in Factual data, or found significantly 
+less often. This information is then used with the 
+synonyms function found in various_tools to patch 
+differences between datasets.
 
 @author: Matthew Sevrens
 """

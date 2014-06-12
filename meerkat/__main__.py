@@ -1,5 +1,7 @@
 #!/usr/local/bin/python3.3
-"""Docstring for our __main__.py module"""
+
+"""This file is the file first run when 
+Meerkat is executed as a package"""
 
 from meerkat.description_producer import mode_switch, initialize
 
