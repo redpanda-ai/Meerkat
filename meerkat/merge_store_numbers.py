@@ -6,7 +6,8 @@ their associated manually formatted store numbers.
 The records are matched against Factual and if
 a matching merchant is found the store numbers are
 merged into the index. Merchants not found are saved
-for further processing
+for further processing. This is aimed at feature
+engineering.
 
 @author: Matthew Sevrens
 """

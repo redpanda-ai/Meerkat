@@ -27,6 +27,7 @@ from .various_tools import load_dict_list, safely_remove_file, split_csv
 from .accuracy import test_accuracy, print_results, speed_tests
 
 from boto.s3.connection import Location, S3Connection
+
 def get_desc_queue(filename, params, classifier):
 	"""Opens a file of descriptions, one per line, and load a description
 	queue."""

@@ -27,9 +27,9 @@ from sklearn.preprocessing import StandardScaler
 from scipy.stats.mstats import zscore
 from pprint import pprint
 
-from .various_tools import string_cleanse, scale_polygon, synonyms
+from .various_tools import string_cleanse, synonyms
 from .clustering import cluster, collect_clusters
-from .location import separate_geo
+from .location import separate_geo, scale_polygon
 
 #Helper functions
 def get_bool_query(starting_from=0, size=0):
