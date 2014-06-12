@@ -306,7 +306,7 @@ class DescriptionConsumer(threading.Thread):
 		result_size = self.hyperparameters.get("es_result_size", "10")
 		fields = params["output"]["results"]["fields"]
 		good_description = transaction["GOOD_DESCRIPTION"]
-		transaction = string_cleanse(transaction["UNMASKED_DESCRIPTION"]).rstrip()
+		transaction = string_cleanse(transaction["DESCRIPTION_UNMASKED"]).rstrip()
 
 		# Input transaction must not be empty
 		if len(transaction) <= 2 and re.match('^[a-zA-Z0-9_]+$', transaction):

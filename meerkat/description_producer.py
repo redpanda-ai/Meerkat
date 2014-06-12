@@ -49,7 +49,7 @@ def get_desc_queue(filename, params, classifier):
 	# Run Binary Classifier
 	for transaction in transactions:
 		transaction['factual_id'] = ""
-		description = transaction["DESCRIPTION"]
+		description = transaction["DESCRIPTION_UNMASKED"]
 		prediction = classifier(description)
 		transaction["IS_PHYSICAL_TRANSACTION"] = prediction
 		print(description + ": " + prediction)
