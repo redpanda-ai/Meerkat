@@ -408,8 +408,10 @@ def move_to_S3(params, filepath, S3):
 	key = bucket.new_key(key)
 	key.set_contents_from_filename(filepath)
 
-if __name__ == "__main__":
-	#Runs the entire program.
-
+def run_from_command_line(command_line_arguments):
+	"""Runs these commands if the module is invoked from the command line"""
 	params = initialize()
 	mode_switch(params)
+
+if __name__ == "__main__":
+	run_from_command_line(sys.argv)

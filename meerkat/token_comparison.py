@@ -89,7 +89,8 @@ def compareTokens(dataset_a, dataset_b):
 
 	#print(deltas)
 
-if __name__ == "__main__":
+def run_from_command_line(command_line_arguments):
+	"""Runs these commands if the module is invoked from the command line"""
 
 	# Load Files from Datasets
 	factual_merchants = load_dict_list("/mnt/ephemeral/Factual_1.5_Million.txt", delimiter="\t")
@@ -108,3 +109,7 @@ if __name__ == "__main__":
 	yodlee_tokens = vectorize(transactions)
 
 	compareTokens(yodlee_tokens, factual_tokens)
+
+if __name__ == "__main__":
+	run_from_command_line(sys.argv)
+	

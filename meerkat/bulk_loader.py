@@ -449,21 +449,25 @@ def build_user_index():
 			logging.error("Failed to create user index, aborting.")
 			sys.exit()
 
-if __name__ == "__main__":
-	#Runs the entire program.
+def run_from_command_line(command_line_arguments):
+	"""Runs these commands if the module is invoked from the command line"""
+
 	build_user_index()
-	PARAMS = initialize()
-	logging.warning(json.dumps(PARAMS, sort_keys=True,
+	global params = initialize()
+	logging.warning(json.dumps(params, sort_keys=True,
 		indent=4, separators=(',', ':')))
-	guarantee_index_and_doc_type(PARAMS)
-	PARAMS["document_queue_populated"] = False
-	PARAMS["concurrency_queue"] = queue.Queue()
-	PARAMS["header"], PARAMS["document_queue"],\
-	PARAMS["document_queue_populated"] = load_document_queue(PARAMS)
-	start_consumers(PARAMS)
-	PARAMS["concurrency_queue"].join()
+	guarantee_index_and_doc_type(params)
+	params["document_queue_populated"] = False
+	params["concurrency_queue"] = queue.Queue()
+	params["header"], params["document_queue"],\
+	params["document_queue_populated"] = load_document_queue(params)
+	start_consumers(params)
+	params["concurrency_queue"].join()
 	logging.info("Concurrency joined")
-	PARAMS["document_queue"].join()
+	params["document_queue"].join()
 	logging.info("Documents joined")
 
 	logging.critical("End of program.")
+
+if __name__ == "__main__":
+	run_from_command_line(sys.argv)

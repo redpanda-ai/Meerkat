@@ -318,7 +318,7 @@ if __name__ == "__main__":
 	# Clear Contents from Previous Runs
 	open(os.path.splitext(os.path.basename(sys.argv[1]))[0] + '_top_scores.txt', 'w').close()
 
-	settings = {
+	global settings = {
 		"folds": 2,
 		"initial_search_space": 25,
 		"initial_learning_rate": 1,

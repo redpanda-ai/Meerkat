@@ -119,4 +119,3 @@ def run_from_command_line(command_line_arguments):
 
 if __name__ == "__main__":
 	run_from_command_line(sys.argv)
-

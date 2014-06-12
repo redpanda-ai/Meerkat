@@ -76,15 +76,19 @@ def verify_arguments():
 	if not classifier_included or not transactions_included or not supported_category:
 		print("Erroneous arguments. Please see usage")
 		sys.exit()
-		
-if __name__ == "__main__":
+
+def run_from_command_line(command_line_arguments):
+	"""Runs these commands if the module is invoked from the command line"""
 
 	verify_arguments()
-	transactions = load_dict_list(sys.argv[3])
+	transactions = load_dict_list(command_line_arguments[3])
 	filtered_transactions = filter_transactions(transactions)
-	basepath = splitext(basename(sys.argv[3]))[0]
-	category = sys.argv[2]
+	basepath = splitext(basename(command_line_arguments[3]))[0]
+	category = command_line_arguments[2]
 	file_suffix = "_non_physical.txt" if category == "0" else "_physical.txt"
 	output_folder = "/mnt/ephemeral"
 	output_file = output_folder + basepath + file_suffix
 	write_dict_list(filtered_transactions, output_file)
+		
+if __name__ == "__main__":
+	run_from_command_line(sys.argv)
