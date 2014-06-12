@@ -1,5 +1,14 @@
 #!/usr/local/bin/python3
-"""This module loads our general classifier."""
+
+"""This module loads our general classifier
+and produces a helper function that will
+classify a single transaction. Depending
+on the mode provided (Bank or Card) this
+module will load a different previously
+generated and pickled SciKit model
+
+@author: Matthew Sevrens
+"""
 
 from sklearn.externals import joblib
 

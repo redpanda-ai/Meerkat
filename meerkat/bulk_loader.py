@@ -1,6 +1,15 @@
-#!/usr/local/bin/python3
+#!/usr/local/bin/python3.3
 
-"""This bulk loader handles multiple threads."""
+"""The bulk loader is a tool that takes as an
+input a text based multifield merchant dataset, and
+indexes it into Elasticsearch for further processing
+and analysis against transactions or other merchant
+datasets
+
+@author: J. Andrew Key
+@author: Matthew Sevrens
+"""
+
 import json
 import logging
 import queue

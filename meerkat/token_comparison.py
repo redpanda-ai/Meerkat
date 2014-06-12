@@ -1,7 +1,10 @@
-#!/usr/local/bin/python3
+#!/usr/local/bin/python3.3
 
 """This script collects the most common tokens in our corpus that 
-are either not found in factual data, or found significantly less often"""
+are either not found in factual data, or found significantly less often
+
+@author: Matthew Sevrens
+"""
 
 import random, numpy, sys
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer

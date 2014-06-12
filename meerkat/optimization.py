@@ -1,12 +1,28 @@
-#!/usr/local/bin/python3
+#!/usr/local/bin/python3.3
 # pylint: disable=all
 
-"""This module performs hyperparameter optimization. This involves
-tuning the keys located under Meerkat/config/keys. Those key value
-pairs map to hyperparameters used through out the Meerkat Classifier.
-This module utilizes a common method known as grid search. In particular
-we are using randomized optimization as it works better where it
-is resource intensive to exaustively perform a standard grid_search"""
+"""This module is the core of the Meerkat
+engine. It allows us to rapidly evaluate many
+possible configurations if provided a well
+labeled dataset. Iteratively it runs Meerkat
+with randomized levels of configurations. 
+
+In context of the code itself, this module 
+performs hyperparameter optimization. This 
+involves tuning the numeric values located under  
+Meerkat/config/hyperparameters. These key 
+value pairs map to hyperparameters used through 
+out the Meerkat Classifier in aid of tuning or
+refining the queries.
+
+This module utilizes a common method known 
+as grid search. In particular we are using 
+randomized optimization as it works better 
+where it is resource intensive to exaustively 
+perform a standard grid_search
+
+@author: Matthew Sevrens
+"""
 
 from meerkat.description_producer import initialize, tokenize, load_hyperparameters
 from meerkat.binary_classifier.load import predict_if_physical_transaction

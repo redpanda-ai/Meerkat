@@ -1,10 +1,13 @@
-'''
-Created on Feb 25, 2014
+#!/usr/local/bin/python3.3
 
-@author: Matt Sevrens
-'''
+"""This module generates and trains
+a binary classification model for transactions
+using SciKit Learn. Specifically it uses
+a Stochastic Gradient Descent classifier
+that is optimized using Grid Search
 
-#!/usr/local/bin/python3
+@author: Matthew Sevrens
+"""
 
 import csv, sys, logging, os
 

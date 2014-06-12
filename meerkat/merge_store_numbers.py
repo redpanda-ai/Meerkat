@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3
+#!/usr/local/bin/python3.3
 # pylint: disable=all
 
 """This module takes a set of merchants with
@@ -6,7 +6,10 @@ their associated manually formatted store numbers.
 The records are matched against Factual and if
 a matching merchant is found the store numbers are
 merged into the index. Merchants not found are saved
-for further processing"""
+for further processing
+
+@author: Matthew Sevrens
+"""
 
 #################### USAGE ##########################
 

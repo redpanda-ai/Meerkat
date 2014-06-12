@@ -1,8 +1,8 @@
-#!/usr/local/bin/python3
+#!/usr/local/bin/python3.3
 
-"""This script scans, tokenizes, and constructs queries to match transaction
-description strings (unstructured data) to merchant data indexed with
-ElasticSearch (structured data).
+"""This module loads and processes transactions
+in preparation for analysis and search though
+our structured ElasticSearch merchant index. 
 
 @author: J. Andrew Key
 @author: Matthew Sevrens

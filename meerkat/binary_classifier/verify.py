@@ -1,12 +1,10 @@
-#!/usr/local/bin/python3
+#!/usr/local/bin/python3.3
 
-"""
-Created on Mar 11, 2014
-@author: Matt Sevrens
-
-A script that tests the accuracy of a previously generated
+"""A script that tests the accuracy of a previously generated
 model using a provided human labeled file
 
+Created on Mar 11, 2014
+@author: Matthew Sevrens
 """
 
 import os, sys
@@ -17,7 +15,7 @@ from sklearn.externals import joblib
 def test_model(file_to_test):
 	"""Tests a classifier model using the provided file."""
 	transactions, labels = load_data([], [], file_to_test)
-	grid_search = joblib.load('meerkat/binary_classifier/US.pkl')
+	grid_search = joblib.load('meerkat/binary_classifier/final_card.pkl')
 	score = grid_search.score(transactions, labels)
 	print("Score: ", score)
 

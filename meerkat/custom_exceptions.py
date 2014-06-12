@@ -1,7 +1,10 @@
 #!/usr/bin/python3.3
 
-"""This is where we keeping custom exception classes for use within multiple
-scripts."""
+"""This is where we keeping custom exception classes 
+for use within multiple scripts.
+
+@author: J. Andrew Key
+"""
 
 class FileProblem(Exception):
 	"""Wraps exceptions pertaining to failures to open files."""

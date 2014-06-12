@@ -1,7 +1,19 @@
-#!/usr/local/bin/python3
+#!/usr/local/bin/python3.3
 # pylint: disable=C0301
 
-"""This script clusters a list of latitude/ longitude pairs"""
+"""This module clusters a list of a users previously found
+transaction locations. Provided at least 25 latitude / longitude
+pairs, this module can group these points into separate categories
+such as work or home by analyzing how close the points are to 
+each other. After clustering, we find the outermost points that 
+bound a users typical shopping area represented as geopolygons, 
+scale these polygons inward or outward, and then generate a 
+geopolygon query for ElasticSearch. This added context allows 
+Meerkat to resolve ambiguous transactions that may not include a 
+City or State to aid in indentification. 
+
+@author: Matthew Sevrens
+"""
 
 import sys
 from sklearn.cluster import DBSCAN
@@ -12,7 +24,7 @@ from scipy.spatial import ConvexHull
 import matplotlib.pyplot as plt
 import pylab as pl
 import numpy as np
-from meerkat.various_tools import scale_polygon
+from meerkat.location import scale_polygon
 from pprint import pprint
 
 def cluster(location_list):

@@ -7,7 +7,10 @@ outputs a file containing either only physical
 transactions or only non physical transactions
 depending on a provided argument. This is useful in
 terms of evaluating how well we deal with both
-classes of transactions"""
+classes of transactions
+
+@author: Matthew Sevrens
+"""
 
 #################### USAGE ##########################
 
