@@ -37,3 +37,7 @@ def select_model(mode):
 		return result
 			
 	return classifier
+
+if __name__ == "__main__":
+	"""Print a warning to not execute this file as a module"""
+	print("This module is a library that contains useful functions; it should not be run from the console.")

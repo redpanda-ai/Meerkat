@@ -142,5 +142,5 @@ def convert_geoshapes_coordinates_to_strings(geoshape_list):
 	return new_geoshape_list
 
 if __name__ == "__main__":
-	""" Do some stuff."""
+	"""Print a warning to not execute this file as a module"""
 	print("This module is a library that contains useful functions; it should not be run from the console.")

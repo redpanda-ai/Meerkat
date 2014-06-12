@@ -159,3 +159,7 @@ def split_csv(filehandler, delimiter=',', row_limit=10000,
 	safely_remove_file(full_path)
 
 	return full_path + ".gz"
+
+if __name__ == "__main__":
+	"""Print a warning to not execute this file as a module"""
+	print("This module is a library that contains useful functions; it should not be run from the console.")
