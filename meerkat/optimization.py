@@ -38,8 +38,8 @@ from random import randint, uniform, random, shuffle
 from pprint import pprint
 from numpy import array, array_split
 
-from meerkat.description_producer import initialize, tokenize, load_hyperparameters
-from meerkat.binary_classifier.load import predict_if_physical_transaction
+from meerkat.description_producer import initialize, run_meerkat, load_hyperparameters
+from meerkat.binary_classifier.load import select_model
 from meerkat.accuracy import print_results
 
 def get_initial_values(hyperparameters, params, known, dataset):
@@ -272,7 +272,7 @@ def cross_validate(top_score, dataset):
 
 	# Run Classifier
 	print("\n", "CROSS VALIDATE", "\n")
-	desc_queue, non_physical = get_desc_queue(dataset)
+	desc_queue, non_physicfal = get_desc_queue(dataset)
 	accuracy = tokenize(params, desc_queue, other, non_physical)
 
 	return accuracy
@@ -333,6 +333,8 @@ if __name__ == "__main__":
 		"gradient_ascent_iterations": 15,
 		"max_precision": 98
 	}
+
+	global predict_if_physical_transaction = select_model("card")
 
 	known = {"es_result_size" : "45"}
 

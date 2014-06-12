@@ -128,7 +128,7 @@ def queue_to_list(result_queue):
 	result_queue.join()
 	return result_list
 
-def run_classifier(params, desc_queue, hyperparameters, non_physical, split):
+def run_meerkat(params, desc_queue, hyperparameters, non_physical, split):
 	"""Opens a number of threads to process the descriptions queue."""
 
 	# Run the Classifier
@@ -354,7 +354,7 @@ def process_panel(params, filename, S3):
 		logging.warning("Working with the following split: %s", split)
 		split_start_time = datetime.datetime.now()
 		desc_queue, non_physical = get_desc_queue(split, params, classifier)
-		run_classifier(params, desc_queue, key, non_physical, split)
+		run_meerkat(params, desc_queue, key, non_physical, split)
 		end_time = datetime.datetime.now()
 		total_time = end_time - start_time
 		split_time = end_time - split_start_time
