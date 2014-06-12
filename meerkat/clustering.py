@@ -17,15 +17,17 @@ Created on March 16, 2014
 """
 
 import sys
+
+import pylab as pl
+import numpy as np
+import matplotlib.pyplot as plt
+
 from sklearn.cluster import DBSCAN
 from sklearn import metrics
 from sklearn.datasets.samples_generator import make_blobs
 from sklearn.preprocessing import StandardScaler
 from scipy.spatial import ConvexHull
-import matplotlib.pyplot as plt
-import pylab as pl
-import numpy as np
-from meerkat.location import scale_polygon
+
 from pprint import pprint
 
 def cluster(location_list):

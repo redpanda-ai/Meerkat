@@ -11,11 +11,15 @@ Created on May 21, 2014
 @author: Matthew Sevrens
 """
 
-import random, numpy, sys
-from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
-from meerkat.various_tools import load_dict_list, string_cleanse
-from pprint import pprint
+import random
+import sys
 from collections import OrderedDict
+
+import numpy
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+from pprint import pprint
+
+from meerkat.various_tools import load_dict_list, string_cleanse
 
 def random_sample(corpus, sample_size):
 	"""Takes a bag of words approach to vectorizing our text corpus"""

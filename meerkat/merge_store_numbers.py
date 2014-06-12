@@ -32,11 +32,16 @@ Created on March 25, 2014
 
 #####################################################
 
-import csv, sys, json, os
-from meerkat.description_consumer import get_qs_query, get_bool_query
-from elasticsearch import Elasticsearch, helpers
+import csv 
+import sys
+import json
+import os
+
 from scipy.stats.mstats import zscore
 from pprint import pprint
+from elasticsearch import Elasticsearch, helpers
+
+from meerkat.description_consumer import get_qs_query, get_bool_query
 
 def load_store_numbers(file_name):
 	"""Load Store Numbers from provided file"""

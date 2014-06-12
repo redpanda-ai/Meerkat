@@ -23,9 +23,10 @@ Created on May 27, 2014
 #####################################################
 
 import sys
-
 from os.path import basename, splitext
+
 from sklearn.externals import joblib
+
 from meerkat.various_tools import load_dict_list, write_dict_list
 
 def filter_transactions(transactions):

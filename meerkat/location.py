@@ -9,11 +9,12 @@ Created on Jan 27, 2014
 @author: J. Andrew Key
 """
 
-import json, sys
+import json
+import sys
+
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-
 from matplotlib.patches import Polygon
 from pprint import pprint
 from random import random

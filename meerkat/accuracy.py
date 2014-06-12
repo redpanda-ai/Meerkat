@@ -25,7 +25,9 @@ import datetime
 import logging
 import os
 import sys
+
 from pprint import pprint
+
 from meerkat.various_tools import load_dict_list
 
 def test_pinpoint_classifier(machine_labeled, human_labeled, my_lists):

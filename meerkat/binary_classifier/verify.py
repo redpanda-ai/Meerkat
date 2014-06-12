@@ -7,10 +7,12 @@ Created on Mar 11, 2014
 @author: Matthew Sevrens
 """
 
-import os, sys
+import os
+import sys
+
+from sklearn.externals import joblib
 
 from meerkat.binary_classifier.train import load_data
-from sklearn.externals import joblib
 
 def test_model(file_to_test):
 	"""Tests a classifier model using the provided file."""

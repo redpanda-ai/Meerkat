@@ -26,15 +26,21 @@ Created on Feb 26, 2014
 @author: Matthew Sevrens
 """
 
+import sys 
+import datetime
+import os
+import queue
+import csv
+import collections
+from copy import deepcopy
+from random import randint, uniform, random, shuffle
+
+from pprint import pprint
+from numpy import array, array_split
+
 from meerkat.description_producer import initialize, tokenize, load_hyperparameters
 from meerkat.binary_classifier.load import predict_if_physical_transaction
 from meerkat.accuracy import print_results
-
-import sys, datetime, os, queue, csv, collections
-from copy import deepcopy
-from pprint import pprint
-from random import randint, uniform, random, shuffle
-from numpy import array, array_split
 
 def get_initial_values(hyperparameters, params, known, dataset):
 	"""Do a simple search to find starter values"""

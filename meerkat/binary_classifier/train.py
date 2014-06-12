@@ -10,9 +10,12 @@ Created on Feb 25, 2014
 @author: Matthew Sevrens
 """
 
-import csv, sys, logging, os
-
+import csv
+import sys
+import logging
+import os
 from random import random
+
 from sklearn.cross_validation import train_test_split
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer

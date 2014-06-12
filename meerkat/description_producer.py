@@ -21,13 +21,13 @@ import re
 import queue
 import sys
 
+from boto.s3.connection import Location, S3Connection
+
 from .custom_exceptions import InvalidArguments, Misconfiguration
 from .description_consumer import DescriptionConsumer
 from .binary_classifier.load import select_model
 from .various_tools import load_dict_list, safely_remove_file, split_csv, merge_split_files
 from .accuracy import test_accuracy, print_results, speed_tests
-
-from boto.s3.connection import Location, S3Connection
 
 def get_desc_queue(filename, params, classifier):
 	"""Opens a file of descriptions, one per line, and load a description
