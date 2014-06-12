@@ -23,7 +23,7 @@ import sys
 from .custom_exceptions import InvalidArguments, Misconfiguration
 from .description_consumer import DescriptionConsumer
 from .binary_classifier.load import select_model
-from .various_tools import load_dict_list, safely_remove_file, split_csv
+from .various_tools import load_dict_list, safely_remove_file, split_csv, merge_split_files
 from .accuracy import test_accuracy, print_results, speed_tests
 
 from boto.s3.connection import Location, S3Connection
@@ -376,37 +376,6 @@ def process_panel(params, filename, S3):
 
 	# Only do one
 	sys.exit()
-
-def merge_split_files(params, split_list):
-	"""Takes a split list and merges the files back together
-	after processing is complete"""
-
-	file_name = params["output"]["file"]["name"]
-	base_path = params["output"]["file"]["processing_location"]
-	full_path = base_path + file_name
-	output = open(full_path, "a")
-
-	# Merge
-	for split in split_list:
-		base_file = os.path.basename(split)
-		with open(base_path + base_file) as chunk:
-			for line in chunk:
-				output.write(line)
-		safely_remove_file(base_path + base_file)
-
-	output.close()
-
-	# GZIP 
-	unzipped = open(full_path, "rb")
-	zipped = gzip.open(full_path + ".gz", "wb")
-	zipped.writelines(unzipped)
-	zipped.close()
-	unzipped.close()
-
-	# Cleanup
-	safely_remove_file(full_path)
-
-	return full_path + ".gz"
 
 def mode_switch(params):
 	"""Switches mode between, single file / s3 bucket mode"""

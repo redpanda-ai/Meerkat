@@ -131,3 +131,34 @@ def split_csv(filehandler, delimiter=',', row_limit=10000,
 		current_out_writer.writerow(row)
 	#Return complete list of chunks
 	return file_list
+
+	def merge_split_files(params, split_list):
+	"""Takes a split list and merges the files back together
+	after processing is complete"""
+
+	file_name = params["output"]["file"]["name"]
+	base_path = params["output"]["file"]["processing_location"]
+	full_path = base_path + file_name
+	output = open(full_path, "a")
+
+	# Merge
+	for split in split_list:
+		base_file = os.path.basename(split)
+		with open(base_path + base_file) as chunk:
+			for line in chunk:
+				output.write(line)
+		safely_remove_file(base_path + base_file)
+
+	output.close()
+
+	# GZIP 
+	unzipped = open(full_path, "rb")
+	zipped = gzip.open(full_path + ".gz", "wb")
+	zipped.writelines(unzipped)
+	zipped.close()
+	unzipped.close()
+
+	# Cleanup
+	safely_remove_file(full_path)
+
+	return full_path + ".gz"
