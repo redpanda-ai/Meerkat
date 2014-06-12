@@ -6,6 +6,7 @@ indexes it into Elasticsearch for further processing
 and analysis against transactions or other merchant
 datasets
 
+Created on Feb 18, 2014
 @author: J. Andrew Key
 @author: Matthew Sevrens
 """

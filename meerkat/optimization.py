@@ -22,6 +22,7 @@ implementation of randomized optimization as it
 works better where it is resource intensive to 
 exaustively perform a standard grid_search.
 
+Created on Feb 26, 2014
 @author: Matthew Sevrens
 """
 

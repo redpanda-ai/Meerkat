@@ -4,6 +4,7 @@
 in preparation for analysis and search though
 our structured ElasticSearch merchant index. 
 
+Created on Dec 9, 2013
 @author: J. Andrew Key
 @author: Matthew Sevrens
 """

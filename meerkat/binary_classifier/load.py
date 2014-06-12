@@ -7,6 +7,7 @@ on the mode provided (Bank or Card) this
 module will load a different previously
 generated and pickled SciKit model
 
+Created on Feb 25, 2014
 @author: Matthew Sevrens
 """
 

@@ -15,6 +15,7 @@ params["verification_source"]. This should be
 a reference to a file containing manually labeled 
 transactions.
 
+Created on Jan 8, 2014
 @author: Matthew Sevrens
 @author: J. Andrew Key
 """

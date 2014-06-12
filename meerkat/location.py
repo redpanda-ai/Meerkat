@@ -4,6 +4,7 @@
 """This module aims to collect the functionality 
 related to geolocation used throughout Meerkat.
 
+Created on Jan 27, 2014
 @author: Matthew Sevrens
 @author: J. Andrew Key
 """

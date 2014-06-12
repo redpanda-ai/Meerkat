@@ -7,6 +7,7 @@ less often. This information is then used with the
 synonyms function found in various_tools to patch 
 differences between datasets.
 
+Created on May 21, 2014
 @author: Matthew Sevrens
 """
 

@@ -12,6 +12,7 @@ geopolygon query for ElasticSearch. This added context allows
 Meerkat to resolve ambiguous transactions that may not include a 
 City or State to aid in indentification. 
 
+Created on March 16, 2014
 @author: Matthew Sevrens
 """
 

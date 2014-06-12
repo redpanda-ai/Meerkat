@@ -7,7 +7,7 @@ record to a well structured index. In our multithreaded
 system, this is what processes the queue of data provided 
 by description_producer.
 
-Created on Jan 14, 2014
+Created on Jan 16, 2014
 @author: J. Andrew Key
 @author: Matthew Sevrens
 """

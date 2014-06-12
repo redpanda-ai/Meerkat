@@ -9,6 +9,7 @@ depending on a provided argument. This is useful in
 terms of evaluating how well we deal with both
 classes of transactions
 
+Created on May 27, 2014
 @author: Matthew Sevrens
 """
 

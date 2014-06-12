@@ -3,6 +3,7 @@
 """This is where we keep functions that are useful 
 enough to call from within multiple scripts.
 
+Created on Dec 20, 2013
 @author: J. Andrew Key
 @author: Matthew Sevrens
 """

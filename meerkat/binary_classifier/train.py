@@ -6,6 +6,7 @@ using SciKit Learn. Specifically it uses
 a Stochastic Gradient Descent classifier
 that is optimized using Grid Search
 
+Created on Feb 25, 2014
 @author: Matthew Sevrens
 """
 
