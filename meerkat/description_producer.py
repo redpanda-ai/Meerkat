@@ -9,6 +9,10 @@ Created on Dec 9, 2013
 @author: Matthew Sevrens
 """
 
+#################### USAGE ##########################
+
+#####################################################
+
 import boto
 import csv
 import datetime

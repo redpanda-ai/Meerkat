@@ -26,6 +26,10 @@ Created on Feb 26, 2014
 @author: Matthew Sevrens
 """
 
+#################### USAGE ##########################
+
+#####################################################
+
 import sys 
 import datetime
 import os

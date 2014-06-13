@@ -20,6 +20,12 @@ Created on Jan 8, 2014
 @author: J. Andrew Key
 """
 
+#################### USAGE ##########################
+
+# Note: Hand labeled file must be pipe delimited.
+
+#####################################################
+
 import csv
 import datetime
 import logging

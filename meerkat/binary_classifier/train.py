@@ -10,6 +10,10 @@ Created on Feb 25, 2014
 @author: Matthew Sevrens
 """
 
+#################### USAGE ##########################
+
+#####################################################
+
 import csv
 import sys
 import logging

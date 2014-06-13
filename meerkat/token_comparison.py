@@ -11,6 +11,10 @@ Created on May 21, 2014
 @author: Matthew Sevrens
 """
 
+#################### USAGE ##########################
+
+#####################################################
+
 import random
 import sys
 from collections import OrderedDict

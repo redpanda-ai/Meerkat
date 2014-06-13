@@ -11,6 +11,10 @@ Created on Feb 18, 2014
 @author: Matthew Sevrens
 """
 
+#################### USAGE ##########################
+
+#####################################################
+
 import json
 import logging
 import queue
