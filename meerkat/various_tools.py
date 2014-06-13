@@ -164,6 +164,7 @@ def merge_split_files(params, split_list):
 	unzipped.close()
 
 	# Cleanup
+	safely_remove_file(first_file)
 	safely_remove_file(full_path)
 
 	return full_path + ".gz"
