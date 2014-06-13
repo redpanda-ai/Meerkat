@@ -137,12 +137,19 @@ def merge_split_files(params, split_list):
 	file_name = params["output"]["file"]["name"]
 	base_path = params["output"]["file"]["processing_location"]
 	full_path = base_path + file_name
+	first_file = base_path + os.path.basename(split_list.pop(0))
 	output = open(full_path, "a", encoding="utf-8")
+
+	# Write first file with header
+	with open(first_file, "r", encoding="utf-8") as head_file:
+		for line in head_file:
+			output.write(line)
 
 	# Merge
 	for split in split_list:
 		base_file = os.path.basename(split)
 		with open(base_path + base_file, 'r', encoding="utf-8") as chunk:
+			next(chunk)
 			for line in chunk:
 				output.write(line)
 		safely_remove_file(base_path + base_file)

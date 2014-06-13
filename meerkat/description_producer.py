@@ -61,7 +61,7 @@ def get_desc_queue(filename, params, classifier):
 		description = transaction["DESCRIPTION_UNMASKED"]
 		prediction = classifier(description)
 		transaction["IS_PHYSICAL_TRANSACTION"] = prediction
-		print(description + ": " + prediction)
+		print(str(description.encode("utf-8")) + ": " + str(prediction.encode("utf-8")))
 		if prediction == "1":
 			physical.append(transaction)
 		elif prediction == "0":
