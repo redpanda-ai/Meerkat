@@ -11,6 +11,9 @@ Created on Dec 9, 2013
 
 #################### USAGE ##########################
 
+# python3.3 -m meerkat [config_file]
+# python3.3 -m meerkat config/users.json
+
 #####################################################
 
 import boto

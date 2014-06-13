@@ -22,7 +22,7 @@ Created on Jan 8, 2014
 
 #################### USAGE ##########################
 
-# Note: Hand labeled file must be pipe delimited.
+# Note: Needs refining. Experts only!
 
 #####################################################
 
