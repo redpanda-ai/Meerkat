@@ -136,7 +136,7 @@ def merge_split_files(params, split_list):
 	file_name = params["output"]["file"]["name"]
 	base_path = params["output"]["file"]["processing_location"]
 	full_path = base_path + file_name
-	output = open(full_path, "a")
+	output = open(full_path, "a", encoding="utf-8")
 
 	# Merge
 	for split in split_list:
@@ -149,7 +149,7 @@ def merge_split_files(params, split_list):
 	output.close()
 
 	# GZIP 
-	unzipped = open(full_path, "rb")
+	unzipped = open(full_path, "rb", encoding="utf-8")
 	zipped = gzip.open(full_path + ".gz", "wb")
 	zipped.writelines(unzipped)
 	zipped.close()
