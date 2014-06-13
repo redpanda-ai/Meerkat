@@ -507,7 +507,7 @@ class DescriptionConsumer(threading.Thread):
 				routing=transaction["UNIQUE_MEM_ID"])
 		except Exception:
 			logging.critical("Unable to update the following: %s",\
-				str(transaction["DESCRIPTION"]))
+				str(transaction["DESCRIPTION_UNMASKED"]))
 			pprint(update_body)
 
 	def __load_past_transactions(self):

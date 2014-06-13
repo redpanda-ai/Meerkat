@@ -16,7 +16,6 @@ Created on Dec 9, 2013
 
 #####################################################
 
-import boto
 import csv
 import datetime
 import collections
@@ -28,6 +27,7 @@ import re
 import queue
 import sys
 
+import boto
 from boto.s3.connection import Location, S3Connection
 
 from .custom_exceptions import InvalidArguments, Misconfiguration
@@ -417,6 +417,7 @@ def move_to_S3(params, filepath, S3):
 
 def run_from_command_line(command_line_arguments):
 	"""Runs these commands if the module is invoked from the command line"""
+	
 	params = initialize()
 	mode_switch(params)
 
