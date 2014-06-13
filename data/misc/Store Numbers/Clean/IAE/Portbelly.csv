@@ -1,0 +1,337 @@
+keywords,city,Aggdata Store Number,store_number,address,state,zip_code
+Potbelly,Chicago,1,01 1,2264 N. Lincoln Ave,IL,60614
+Potbelly,Chicago,2,02 2,303 W. Madison Street,IL,60606
+Potbelly,Chicago,3,03 3,190 N. State Street,IL,60601
+Potbelly,Chicago,4,04 4,1422 W. Webster Ave,IL,60614
+Potbelly,Evanston,5,05 5,630 Davis Street,IL,60201
+Potbelly,Chicago,6,06 6,520 N. Michigan Avenue,IL,60610
+Potbelly,Chicago,7,07 7,Midway Airport,IL,60638
+Potbelly,Deerfield,8,08 8,740 Waukegan Road,IL,60015
+Potbelly,Chicago,9,09 9,508 N. Clark St,IL,60654
+Potbelly,Chicago,10,010 10,111 E. Wacker Drive,IL,60601
+Potbelly,Chicago,11,011 11,175 W. Jackson Blvd.,IL,60604
+Potbelly,Washington,12,012 12,"555 12th Street, NW",DC,20004
+Potbelly,Rockville,13,013 13,199K East Montgomery Ave,MD,20850
+Potbelly,Arlington,14,014 14,4250 Fairfax Drive,VA,22203
+Potbelly,Naperville,15,015 15,236 S. Washington St,IL,60540
+Potbelly,Skokie,16,016 16,4999 Old Orchard Center,IL,60077
+Potbelly,Geneva,17,017 17,1530 Commons Drive,IL,60134
+Potbelly,Chicago,18,018 18,"55 W. Monroe, Space 100D",IL,60603
+Potbelly,Lincolnshire,19,019 19,"275 Parkway Dr., Suite 317",IL,60069
+Potbelly,Washington,20,020 20,718 14th St. NW.,DC,20005
+Potbelly,Washington,21,021 21,1900 L Street NW,DC,20036
+Potbelly,Chicago,22,022 22,3424 N. Southport,IL,60657
+Potbelly,Arlington,23,023 23,1615 Crystal Square Arcade,VA,22202
+Potbelly,Reston,25,025 25,12150 Sunset Hills Road,VA,20190
+Potbelly,Ann Arbor,26,026 26,300 S State Street,MI,48104
+Potbelly,Oak Lawn,27,027 27,5129 W 95th St,IL,60453
+Potbelly,Troy,29,029 29,3111 Crooks Rd.,MI,48084
+Potbelly,Chicago,30,030 30,225 W. Randolph Street,IL,60606
+Potbelly,Chicago,31,031 31,1 N LaSalle,IL,60602
+Potbelly,Chicago,32,032 32,55 E Jackson,IL,60604
+Potbelly,Lombard,33,033 33,"2830 S Highland Ave, Unit A",IL,60148
+Potbelly,Madison,34,034 34,564 State St,WI,53703
+Potbelly,Kildeer,35,035 35,20505 N Rand Rd,IL,60047
+Potbelly,Silver Spring,36,036 36,917 Ellsworth Drive,MD,20910
+Potbelly,Orland Park,37,037 37,15825 S LaGrange Rd,IL,60462
+Potbelly,Detroit,38,038 38,"300 Ren Center , Ste 1304",MI,48243
+Potbelly,Glenview,39,039 39,1840 Tower Drive,IL,60025
+Potbelly,Fairfax,40,040 40,4201 Fairfax Corner East Ave,VA,22030
+Potbelly,Milwaukee,41,041 41,135 W. Wisconsin Ave,WI,53203
+Potbelly,Highland Park,42,042 42,1845 2nd Street,IL,60035
+Potbelly,Warrenville,43,043 43,28361 Diehl Rd,IL,60555
+Potbelly,Chicago,44,044 44,222 Merchandise Mart - Floor 1,IL,60654
+Potbelly,Annapolis,45,045 45,2462 Solomons Island Rd,MD,21401
+Potbelly,Maple Grove,46,046 46,12409 Elm Creek Blvd A28,MN,55369
+Potbelly,Chicago,47,047 47,1625 N. Damen Ave,IL,60647
+Potbelly,Dearborn,48,048 48,22941 Michigan Ave,MI,48124
+Potbelly,Washington,49,049 49,1701 Pennsylvania Ave NW,DC,20006
+Potbelly,College Park,50,050 50,7422 Baltimore Road,MD,20740
+Potbelly,Rockford,51,051 51,6243 E State Street,IL,61108
+Potbelly,Dallas,52,052 52,4447 N Central Expressway,TX,75205
+Potbelly,Livonia,54,054 54,17374 Haggerty Rd,MI,48152
+Potbelly,Eden Prairie,55,055 55,"8251 Flying Cloud Drive, #2329",MN,55344
+Potbelly,Richfield,56,056 56,7644 Lyndale Ave S #200,MN,55423
+Potbelly,Minneapolis,57,057 57,"210 IDS Center, 80 S 8th",MN,55402
+Potbelly,Bloomington,58,058 58,101 N. Veterans Parkway,IL,61701
+Potbelly,Addison,59,059 59,4945 Belt Line Road,TX,75254
+Potbelly,Washington,61,061 61,1660 L Street NW,DC,20036
+Potbelly,Rolling Meadows,62,062 62,1402 Golf Road,IL,60008
+Potbelly,Dallas,63,063 63,"1201 Elm Street, Suite LL09",TX,75270
+Potbelly,Royal Oak,65,065 65,31991 Woodward Ave,MI,48073
+Potbelly,Chicago,66,066 66,277 E. Ontario,IL,60611
+Potbelly,Chicago,67,067 67,7601 S. Cicero,IL,60652
+Potbelly,Chicago,68,068 68,542 S. Dearborn St.,IL,60605
+Potbelly,Champaign,69,069 69,501 E. Green St.,IL,61820
+Potbelly,Chicago,70,070 70,1459 W. Taylor Street,IL,60607
+Potbelly,Chicago,71,071 71,150 S. Wacker,IL,60606
+Potbelly,Brookfield,72,072 72,17800 W. Bluemound Rd A-1,WI,53045
+Potbelly,Gaithersburg,73,073 73,128 Boardwalk Place,MD,20878
+Potbelly,Dublin,74,074 74,6695 Avery-Muirfield Drive,OH,43016
+Potbelly,Bloomingdale,75,075 75,358 Army Trail Road #190,IL,60108
+Potbelly,Ft. Worth,76,076 76,3058 S. University Drive,TX,76109
+Potbelly,Ann Arbor,77,077 77,3785 Washtenaw Avenue,MI,48104
+Potbelly,Chicago,78,078 78,900 N. Michigan Avenue,IL,60611
+Potbelly,Columbus,79,079 79,10 E. 11th Ave,OH,43201
+Potbelly,Normal,80,080 80,609 S. Main Street,IL,61761
+Potbelly,Vernon Hills,81,081 81,700 N. Milwaukee Avenue,IL,60061
+Potbelly,Ft. Worth,82,082 82,4825 Overton Ridge,TX,76132
+Potbelly,Manassas,83,083 83,10388 Festival Lane,VA,20109
+Potbelly,Blaine,84,084 84,599 Northtown Drive,MN,55434
+Potbelly,Columbus,85,085 85,1380 Polaris Parkway,OH,43240
+Potbelly,Columbus,86,086 86,17 S. High Street #175,OH,43215
+Potbelly,Cincinnati,88,088 88,7800 Montgomery Road,OH,45236
+Potbelly,The Woodlands,89,089 89,9595 Six Pines Dr. #930,TX,77380
+Potbelly,Plano,90,090 90,601 W 15th Street,TX,75075
+Potbelly,Richardson,91,091 91,101 W. Campbell Road,TX,75080
+Potbelly,Garland,92,092 92,4430 Lavon Drive #300,TX,75040
+Potbelly,Coon Rapids,93,093 93,12485 Riverdale Blvd NW,MN,55433
+Potbelly,Willowbrook,94,094 94,7500 Kingery Hwy,IL,60527
+Potbelly,Irving,95,095 95,7717 N Macarthur Blvd. #150,TX,75063
+Potbelly,Dallas,96,096 96,5921 Forest Lane #100,TX,75230
+Potbelly,Ft. Worth,97,097 97,540 Throckmorton Street,TX,76102
+Potbelly,Norridge,98,098 98,4207 N Harlem Avenue,IL,60634
+Potbelly,Gurnee,99,099 99,"6641 Grand Avenue, Suite F",IL,60031
+Potbelly,Chicago,100,0100 100,209 S. LaSalle Street,IL,60604
+Potbelly,Hanover,101,0101 101,7049 Arundel Mills Blvd #103,MD,21076
+Potbelly,Chicago,102,0102 102,5428 S. Lake Park Ave.,IL,60615
+Potbelly,Cincinnati,103,0103 103,210 Calhoun Street #228,OH,45219
+Potbelly,Plymouth,104,0104 104,"3235 Vicksburg Lane North, Ste A",MN,55447
+Potbelly,Merrillville,105,0105 105,2118 Southlake Mall,IN,46410
+Potbelly,Dulles,106,0106 106,Dulles Intl Airport Terminal C,VA,20166
+Potbelly,Madison,107,0107 107,112 West Towne Mall,WI,53719
+Potbelly,Chicago,108,0108 108,924 West Belmont Avenue,IL,60657
+Potbelly,Glendale,109,0109 109,5725 N. Bayshore Drive,WI,53217
+Potbelly,Minneapolis,110,0110 110,326 14th Ave SE,MN,55414
+Potbelly,Washington,111,0111 111,637 Indiana NW,DC,20004
+Potbelly,Brookfield,112,0112 112,12455 W. Capitol Drive,WI,53005
+Potbelly,Dallas,113,0113 113,2222 McKinney Avenue,TX,75201
+Potbelly,Chicago,114,0114 114,4709 N. Lincoln Avenue,IL,60625
+Potbelly,Houston,115,0115 115,1200 McKinney,TX,77010
+Potbelly,Des Plaines,116,0116 116,1506 Market Street,IL,60016
+Potbelly,Bethesda,117,0117 117,4731 Elm Street,MD,20814
+Potbelly,Lake Geneva,118,0118 118,899 Main St,WI,53147
+Potbelly,Beavercreek,119,0119 119,48 Plum Street,OH,45440
+Potbelly,Washington,120,0120 120,616 23rd Street NW,DC,20037
+Potbelly,Bolingbrook,122,0122 122,695 E. Boughton Rd,IL,60440
+Potbelly,Naperville,123,0123 123,2860 Showplace Drive #118,IL,60564
+Potbelly,Dulles,124,0124 124,Dulles Intl Airport Terminal B,VA,20166
+Potbelly,Minneapolis,125,0125 125,527 Marquette Avenue,MN,55402
+Potbelly,Des Plaines,126,0126 126,2695 Mannheim Road,IL,60018
+Potbelly,Southfield,127,0127 127,26221 Evergreen Road,MI,48076
+Potbelly,College Station,128,0128 128,409-B University Drive,TX,77840
+Potbelly,East Lansing,129,0129 129,233 E. Grand River Ave,MI,48823
+Potbelly,Plano,130,0130 130,5717 Legacy Drive #160,TX,75024-3644
+Potbelly,Arlington,131,0131 131,2100 N. Collins,TX,76011
+Potbelly,Houston,132,0132 132,3800 Southwest Freeway,TX,77027
+Potbelly,Houston,133,0133 133,1141-05 Uptown Blvd.,TX,77056
+Potbelly,Washington,134,0134 134,4300 Connecticut NW,DC,20008-2314
+Potbelly,Crestwood,135,0135 135,13134 S. Cicero Ave.,IL,60445
+Potbelly,Arlington,136,0136 136,3900 Arlington Highlands Blvd,TX,76018
+Potbelly,Washington,137,0137 137,Ronald Reagan Washington National Airport,DC,20001
+Potbelly,Chicago,138,0138 138,5709 S. Harlem Avenue,IL,60638-3107
+Potbelly,Woodbury,139,0139 139,7230 Valley Creek Plaza 102B,MN,55125
+Potbelly,Washington,140,0140 140,409 3rd St SW,DC,20024
+Potbelly,Houston,141,0141 141,8383 Westheimer Road,TX,77063
+Potbelly,Ashburn,142,0142 142,44060 Pipeline Plaza Suite 100,VA,20147-5888
+Potbelly,Wheeling,143,0143 143,1520 E. Lake Cook Road,IL,60090
+Potbelly,DeKalb,144,0144 144,1013 W. Lincoln Highway,IL,60115
+Potbelly,Farmington Hills,145,0145 145,31373 Orchard Lake Road,MI,48334
+Potbelly,Northlake,146,0146 146,112 West North Avenue,IL,60164
+Potbelly,Madison,148,0148 148,4833 Annamark Drive,WI,53704
+Potbelly,Highland,149,0149 149,10441 Indianapolis Blvd. #26A,IN,46322
+Potbelly,Highland Village,150,0150 150,1700 Cottonwood Creek #110,TX,75077
+Potbelly,Austin,151,0151 151,2316 Guadalupe St.,TX,78705
+Potbelly,Washington,152,0152 152,1299 Pennsylvania NW,DC,20004
+Potbelly,Eagan,153,0153 153,1298 Promenade Place,MN,55121
+Potbelly,Chicago,154,0154 154,545 W. Madison Street,IL,60661
+Potbelly,Herndon,155,0155 155,905 Herndon Pkwy,VA,20170
+Potbelly,Baltimore,157,0157 157,Baltimore Washington International Airport,MD,21090
+Potbelly,Northbrook,158,0158 158,816 Skokie Blvd,IL,60062
+Potbelly,Northbrook,159,0159 159,"984 Willow Road, Suite A",IL,60062-6806
+Potbelly,Cincinnati,160,0160 160,2692 Madison Rd.,OH,45208
+Potbelly,Austin,161,0161 161,10515 N. Mopac Expy,TX,78759
+Potbelly,Baltimore,162,0162 162,621 E. Pratt Street (Inner Harbor),MD,21202
+Potbelly,Fairfax,163,0163 163,3955 Chainbridge Rd. Suite 107,VA,22030
+Potbelly,Philadelphia,164,0164 164,One Convention Ave.,PA,19104
+Potbelly,Novi,165,0165 165,43350 Grand River Avenue,MI,48375-1738
+Potbelly,Glen Ellyn,167,0167 167,552 Roosevelt Road,IL,60137
+Potbelly,Livonia,168,0168 168,29579 Plymouth,MI,48150
+Potbelly,Chicago,169,0169 169,9501 S. Western Ave.,IL,60643
+Potbelly,College Park,170,0170 170,10260 Baltimore Avenue,MD,20740
+Potbelly,Sugar Land,171,0171 171,1815 Highway 6 South,TX,77478
+Potbelly,Macomb,172,0172 172,17673 Hall Road,MI,48044
+Potbelly,Dayton,173,0173 173,1200 Brown Street #130,OH,45409
+Potbelly,Algonquin,174,0174 174,1519 S Randall Road,IL,60102
+Potbelly,Chicago,175,0175 175,409 W. Washington St. #110,IL,60606
+Potbelly,Allen Park,176,0176 176,3167 Fairlane Drive,MI,48101
+Potbelly,Dulles,177,0177 177,22035 Dulles Retail Plaza #100,VA,20166
+Potbelly,Waukegan,178,0178 178,760 Waukegan Road,IL,60085-6723
+Potbelly,Cincinnati,179,0179 179,"511 Walnut Street, Suite 13",OH,45202
+Potbelly,Roseville,180,0180 180,10 Rosedale Mall Space 1015,MN,55113
+Potbelly,Park Ridge,181,0181 181,107 S. Northwest Highway #10,IL,60068-4228
+Potbelly,Alexandria,182,0182 182,401 John Carlyle Street,VA,22314
+Potbelly,Chicago,183,0183 183,547 W. Jackson Blvd. #120,IL,60661
+Potbelly,Philadelphia,184,0184 184,4040 E. City Avenue,PA,19131
+Potbelly,Southfield,185,0185 185,24556 W. 12 Mile,MI,48034
+Potbelly,Houston,186,0186 186,"142 Vintage Park Blvd, Building A",TX,77070
+Potbelly,Philadelphia,187,0187 187,1635 Market Street,PA,19103
+Potbelly,Washington,189,0189 189,1240 Maryland Ave. SW,DC,20024
+Potbelly,Chicago,190,0190 190,48 E. Roosevelt Road,IL,60605
+Potbelly,South Barrington,192,0192 192,100 W. Higgins Rd. Suite M-20,IL,60010
+Potbelly,South Elgin,193,0193 193,392 Randall Road,IL,60177
+Potbelly,Chicago,194,0194 194,8300 S. Holland Rd.,IL,60620
+Potbelly,Washington,195,0195 195,1400 Irving Street NW,DC,20010
+Potbelly,Irving,196,0196 196,2350 N. Belt Line Rd.,TX,75062
+Potbelly,Ann Arbor,197,0197 197,980C W. Eisenhower Pkwy,MI,48103
+Potbelly,Oxon Hill,198,0198 198,146 National Plaza,MD,20745
+Potbelly,Dallas,199,0199 199,5715 Lemmon,TX,75219
+Potbelly,Reston,200,0200 200,11919 A Freedom Dr.,VA,20190
+Potbelly,Florence,201,0201 201,4960 Houston Rd.,KY,41042
+Potbelly,Austin,202,0202 202,5300 S. Mopac,TX,78749
+Potbelly,Chicago,204,0204 204,565 Diversey Parkway,IL,60614
+Potbelly,Laurel,205,0205 205,14398 Baltimore Ave.,MD,20707
+Potbelly,Webster,206,0206 206,19411 Gulf Freeway # 2,TX,77598
+Potbelly,St. Paul,208,0208 208,444 Cedar St. Suite 201,MN,55101
+Potbelly,Chicago,210,0210 210,2739 N. Elston Ave.,IL,60647
+Potbelly,Tinley Park,213,0213 213,15901 Harlem Ave.,IL,60477
+Potbelly,Chicago,214,0214 214,959 W. Diversey Parkway,IL,60614
+Potbelly,Annapolis,216,0216 216,2002 Annapolis Mall,MD,21401
+Potbelly,Edina,218,0218 218,3863 Gallagher Dr.,MN,55435
+Potbelly,Canton,219,0219 219,42477 Ford Rd.,MI,48187
+Potbelly,Katy,220,0220 220,23701 Cinco Ranch Blvd. Ste.180,TX,77494
+Potbelly,Dallas,229,0229 229,"13350 Dallas Parkway, Suite 600",TX,75240
+Potbelly,Baltimore,230,0230 230,519 W. Pratt St. (Next to U of M Medical Center),MD,21201
+Potbelly,Houston,231,0231 231,"1000 Main Street, Suite T-70",TX,77002
+Potbelly,Washington,233,0233 233,"1275 1st Street NE, Bldg 1 Ste. J",DC,20002
+Potbelly,Dallas,234,0234 234,5500 Greenville Ave. Suite #1207,TX,75206
+Potbelly,West Lafayette,235,0235 235,117 Northwestern Ave. Suite A,IN,47906
+Potbelly,Plano,236,0236 236,6202 W. Park Blvd,TX,75093
+Potbelly,Washington,237,0237 237,"50 Massachusetts Avenue, NE",DC,20002
+Potbelly,Chicago,238,0238 238,5304 N. Clark,IL,60640
+Potbelly,Oak Park,239,0239 239,1100 Lake St,IL,60301
+Potbelly,Houston,240,0240 240,11700 Westheimer Rd.,TX,77077
+Potbelly,Gainesville,241,0241 241,7352 Atlas Walk Way,VA,20155
+Potbelly,West University Place,242,0242 242,5800 Kirby Drive,TX,77005
+Potbelly,Chicago,243,0243 243,57 E. Chicago Avenue,IL,60611
+Potbelly,Washington,244,0244 244,"900 19th Street, NW",DC,20006
+Potbelly,Chicago,245,0245 245,"200 S. Michigan Avenue, Suite 140",IL,60604
+Potbelly,Seattle,246,0246 246,1429 4th Avenue,WA,98101
+Potbelly,Bellevue,247,0247 247,10650 NE 4th Street,WA,98004
+Potbelly,Washington,248,0248 248,1050 K Street NW,DC,20001
+Potbelly,Washington,249,0249 249,1445 K Street,DC,20005
+Potbelly,Bloomington,250,0250 250,517 E. Kirkwood Ave.,IN,47408
+Potbelly,New York,251,0251 251,101 Maiden Lane,NY,10038
+Potbelly,New York,252,0252 252,150 East 44th Street,NY,10017
+Potbelly,Washington,253,0253 253,"470 L'Enfant Plaza East, SW Promenade Level",DC,20024
+Potbelly,New York,254,0254 254,30 Rockefeller Center,NY,10020
+Potbelly,New York,255,0255 255,22 East 17th Street,NY,10003
+Potbelly,Washington,256,0256 256,"301 Tingey Street, Suite 1B",DC,20003
+Potbelly,New York,257,0257 257,501 7th Avenue,NY,10018
+Potbelly,Seattle,258,0258 258,1111 3rd Ave,WA,98101
+Potbelly,Washington,259,0259 259,2301 Georgia Avenue NW,DC,20001
+Potbelly,Ft. Worth,260,0260 260,"4701 I-30 West Freeway, Ste. 200",TX,76107
+Potbelly,New York,261,0261 261,366 5th Ave.,NY,10001
+Potbelly,Wheaton,262,0262 262,337 Rice Lake Square,IL,60189
+Potbelly,Elmhurst,263,0263 263,544 W. St. Charles Rd.,IL,60126
+Potbelly,New York,264,0264 264,280 Broadway,NY,10007
+Potbelly,Washington,265,0265 265,1200 New Hampshire NW,DC,20036
+Potbelly,New York,267,0267 267,41 W. 14th Street,NY,10011
+Potbelly,Boston,268,0268 268,Logan International Airport 1 Harborside Dr,MA,2128
+Potbelly,Phoenix,269,0269 269,2131 E. Camelback Rd.,AZ,85016
+Potbelly,New York,270,0270 270,127 West Fulton Street,NY,10038
+Potbelly,Redmond,271,0271 271,8867 161st Ave. NE,WA,98052
+Potbelly,Columbia,272,0272 272,6490 Dobbin Center Way,MD,21045
+Potbelly,New York,273,0273 273,46 W. 56th St.,NY,10019
+Potbelly,New York,274,0274 274,150 E. 52nd Street,NY,10022
+Potbelly,Towson,275,0275 275,8600 LaSalle Road,MD,21286
+Potbelly,Mayfield Heights,276,0276 276,1278-1280 SOM Center Road,OH,44124
+Potbelly,Cleveland,277,0277 277,515 Euclid Avenue,OH,44114
+Potbelly,Boston,278,0278 278,263 Washington Street,MA,2109
+Potbelly,New York,279,0279 279,333 Park Avenue South,NY,10010
+Potbelly,New York,280,0280 280,90 Broad Street,NY,10004
+Potbelly,Woodbridge,281,0281 281,15000 Potomac Town Place,VA,22191
+Potbelly,Phoenix,282,0282 282,534 W. McDowell Rd.,AZ,85003
+Potbelly,Denton,283,0283 283,1216 W. Hickory Street,TX,76201
+Potbelly,Portland,284,0284 284,802 SW 6th Ave,OR,97204
+Potbelly,Phoenix,285,0285 285,"1 East Washington Street, Suite 170",AZ,85004
+Potbelly,Crystal Lake,286,0286 286,"6000 Northwest Hwy., Ste. 13-I",IL,60014
+Potbelly,Seattle,287,0287 287,1208 Madison #121,WA,98104
+Potbelly,Portland,288,0288 288,2096 NW Stucki Avenue,OR,97124
+Potbelly,Jersey City,289,0289 289,15 Exchange Place,NJ,7302
+Potbelly,Brooklyn,290,0290 290,345 Adams Street,NY,11201
+Potbelly,New York,291,0291 291,19 West 45th Street,NY,10036
+Potbelly,Boston,292,0292 292,"1 Federal Street, Suite 100 D",MA,2110
+Potbelly,Tysons Corner,293,0293 293,"1577 Spring Hill Rd., Suite 100",VA,22182
+Potbelly,Burlington,294,0294 294,2 Wayside Rd.,MA,1803
+Potbelly,Maywood,295,0295 295,85 W Spring Valley Ave (Bergen Town Center Mall),NJ,7607
+Potbelly,Scottsdale,296,0296 296,"13604 N. Scottsdale Road, Unit 103",AZ,85254
+Potbelly,Hurst,297,0297 297,1460 Precinct Line Rd.,TX,76053
+Potbelly,Arlington,298,0298 298,1301 S. Cooper Street,TX,76010
+Potbelly,Independence,299,0299 299,6901 Rockside Rd.,OH,44131
+Potbelly,Renton,301,0301 301,727 N. 10th Street,WA,98057
+Potbelly,Baltimore,302,0302 302,1201 N. Charles Street,MD,21201
+Potbelly,Baltimore,303,0303 303,"3201 Saint Paul Street., Unit B",MD,21218
+Potbelly,Braintree,304,0304 304,30 Forbes Rd.,MA,2184
+Potbelly,New York,305,0305 305,333 7th Avenue,NY,10001
+Potbelly,Canton,306,0306 306,4460 Belden Village Street NW,OH,44718
+Potbelly,Houston,307,0307 307,2625 Louisiana Street,TX,77006
+Potbelly,Lake Oswego,308,0308 308,9 Centerpointe Drive,OR,97305
+Potbelly,Houston,309,0309 309,"19235 Katy Freeway, Suite 500",TX,77094
+Potbelly,Cambridge,310,0310 310,1 Porter Square,MA,2140
+Potbelly,California,311,0311 311,23064 Three Notch Rd. Suite 101,MD,20619
+Potbelly,Kansas City,312,0312 312,4725 Broadway,MO,64112
+Potbelly,Chicago,313,0313 313,"5961 N. Lincoln Ave., Suite 104",IL,60659
+Potbelly,Schaumburg,314,0314 314,880 N. Meacham Rd.,IL,60173
+Potbelly,Tempe,315,0315 315,1717 S. Rural Rd. Suite 102,AZ,85281
+Potbelly,Saint Paul,316,0316 316,2130 Ford Parkway,MN,55116
+Potbelly,Overland Park,317,0317 317,6751 College Blvd.,KS,66210
+Potbelly,Milwaukee,318,0318 318,2239 North Prospect Avenue,WI,53202
+Potbelly,West Hartford,319,0319 319,51 Memorial Road. Suite C50,CT,6107
+Potbelly,Grandville,320,0320 320,3076 44th Street SW. Suite J4,MI,49418
+Potbelly,Chicago,321,0321 321,1018 S Canal St.,IL,60607
+Potbelly,Philadelphia,322,0322 322,111 Cecil B Moore Ave.,PA,19122
+Potbelly,Oswego,323,0323 323,2332 US Highway 34,IL,60543
+Potbelly,Scottsdale,324,0324 324,15641 N. Hayden Rd. Suite B1/B2,AZ,85260
+Potbelly,Portland,325,0325 325,222 SW Columbia Street,OR,97201
+Potbelly,Chicago,326,0326 326,1506 N Wells St.,IL,60610
+Potbelly,Cleveland,327,0327 327,11401 Euclid Ave.,OH,44106
+Potbelly,New York,328,0328 328,100 Park Avenue and E 40th St,NY,10017
+Potbelly,Beaverton,330,0330 330,11639 SW Beaverton-Hilldale Hwy,OR,97005
+Potbelly,Detroit,331,0331 331,777 Woodward Ave Suite 150,MI,48226
+Potbelly,Cincinnati,332,0332 332,9727 Colerain Ave,OH,45251
+Potbelly,Columbus,334,0334 334,1171 Olentangy River Road,OH,43212
+Potbelly,Chicago,335,0335 335,1293 N. Milwaukee Ave,IL,60622
+Potbelly,Washington,336,0336 336,"655 Michigan Avenue NE, Suite B-4",DC,20017
+Potbelly,Minnetonka,337,0337 337,"4907 County Road 101, Suite 102",MN,55345
+Potbelly,Phoenix,338,0338 338,3121 W Peoria Ave.,AZ,85029
+Potbelly,Chantilly,339,0339 339,14396 Chantilly Crossing Lane,VA,20151
+Potbelly,Germantown,340,0340 340,20940 Frederick Road,MD,20876
+Potbelly,Washington,341,0341 341,709 H St NW,DC,20001
+Potbelly,Tucson,344,0344 344,1031 N Park Ave.,AZ,85719
+Potbelly,Houston,345,0345 345,9102 West Sam Houston Pkwy N,TX,77064
+Potbelly,Issaquah,346,0346 346,755 NW Gilman Blvd.,WA,98027
+Potbelly,Denver,347,0347 347,2720 S Colorado Blvd.,CO,80222
+Potbelly,Fredericksburg,348,0348 348,1240 Carl D. Silver Pkwy.,VA,22401
+Potbelly,Tucson,350,0350 350,5545 E Broadway Blvd.,AZ,85711
+Potbelly,Seattle,352,0352 352,4520 University Ave.,WA,98105
+Potbelly,Lakewood,354,0354 354,375 Union Blvd.,CO,80228
+Potbelly,Chicago,356,0356 356,3636 N Western Ave.,IL,60618
+Potbelly,Bothell,358,0358 358,19122 112th Ave NE,WA,98041
+Potbelly,Arden Hills,359,0359 359,3833 Lexington Ave N,MN,55126
+Potbelly,El Paso,501,0501 501,1373 George Dieter Drive,TX,79936
+Potbelly,Toledo,502,0502 502,4038 Talmadge Road,OH,43623
+Potbelly,Indianapolis,503,0503 503,55 Monument Circle,IN,46204
+Potbelly,Louisville,504,0504 504,302 South 4th Street,KY,40202
+Potbelly,Creve Coeur,505,0505 505,11615 A Olive Blvd,MO,63141
+Potbelly,Rochester,506,0506 506,318 1st Avenue SW,MN,55902
+Potbelly,East Peoria,507,0507 507,318 W. Washington,IL,61611
+Potbelly,Glen Allen,508,0508 508,10921 W. Broad Street,VA,23060
+Potbelly,Lubbock,510,0510 510,2402 9th Street,TX,79401
+Potbelly,Knoxville,511,0511 511,11661 Parkside Drive,TN,37934
+Potbelly,Louisville,512,0512 512,4023 Summit Plaza Drive,KY,40241
+Potbelly,Clayton,513,0513 513,12 S. Bemiston,MO,63105
+Potbelly,El Paso,514,0514 514,2900 N. Mesa St.,TX,79902
+Potbelly,Little Rock,516,0516 516,314 S University Ste 160,AR,72205
+Potbelly,Fargo,518,0518 518,4445 17th Ave S,ND,58103
+Potbelly,Sioux Falls,520,0520 520,2101 West 41st Street,SD,57105

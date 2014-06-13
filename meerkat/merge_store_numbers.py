@@ -97,7 +97,7 @@ def find_merchant(store):
 	formatted = [top_hit.get("name", ""), top_hit.get("address", ""), top_hit.get("postcode", ""), top_hit.get("locality", ""), top_hit.get("region", ""),]
 	formatted = ", ".join(formatted)
 	print("Z-Score: ", score)
-	print("Top Result: ", formatted)
+	print("Top Result: ", formatted.encode("utf-8"))
 	print("Query Sent: ", search_parts)
 
 	# Must Match Keywords
