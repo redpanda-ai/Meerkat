@@ -141,7 +141,7 @@ def merge_split_files(params, split_list):
 	# Merge
 	for split in split_list:
 		base_file = os.path.basename(split)
-		with open(base_path + base_file) as chunk:
+		with open(base_path + base_file, 'r', encoding="utf-8") as chunk:
 			for line in chunk:
 				output.write(line)
 		safely_remove_file(base_path + base_file)
@@ -150,7 +150,7 @@ def merge_split_files(params, split_list):
 
 	# GZIP 
 	unzipped = open(full_path, "rb", encoding="utf-8")
-	zipped = gzip.open(full_path + ".gz", "wb")
+	zipped = gzip.open(full_path + ".gz", "wb", encoding="utf-8")
 	zipped.writelines(unzipped)
 	zipped.close()
 	unzipped.close()
