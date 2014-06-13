@@ -17,7 +17,7 @@ from meerkat.binary_classifier.train import load_data
 def test_model(file_to_test):
 	"""Tests a classifier model using the provided file."""
 	transactions, labels = load_data([], [], file_to_test)
-	grid_search = joblib.load('meerkat/binary_classifier/final_card.pkl')
+	grid_search = joblib.load('meerkat/binary_classifier/models/final_card.pkl')
 	score = grid_search.score(transactions, labels)
 	print("Score: ", score)
 

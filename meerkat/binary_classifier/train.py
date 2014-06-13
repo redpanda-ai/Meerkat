@@ -99,7 +99,7 @@ def build_model(trans_train, trans_test, labels_train, labels_test):
 	print("Actual Score: " + str(score))
 
 	# Save Model
-	joblib.dump(grid_search, 'meerkat/binary_classifier/final_bank.pkl', compress=3)
+	joblib.dump(grid_search, 'meerkat/binary_classifier/models/final_bank.pkl', compress=3)
 
 	test_model("data/misc/10K_Bank.txt", grid_search)
 

@@ -129,7 +129,7 @@ def split_csv(filehandler, delimiter=',', row_limit=10000,
 	#Return complete list of chunks
 	return file_list
 
-	def merge_split_files(params, split_list):
+def merge_split_files(params, split_list):
 	"""Takes a split list and merges the files back together
 	after processing is complete"""
 

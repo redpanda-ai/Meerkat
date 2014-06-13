@@ -2,8 +2,8 @@
 # pylint: disable=all
 
 """This module is a utility tool. It takes a file of 
-transactions with a column header of DESCRIPTION and 
-outputs a file containing either only physical 
+transactions with a column header of DESCRIPTION_UNMASKED 
+and outputs a file containing either only physical 
 transactions or only non physical transactions
 depending on a provided argument. This is useful in
 terms of evaluating how well we deal with both
@@ -39,7 +39,7 @@ def filter_transactions(transactions):
 
 	for transaction in transactions:
 
-		prediction = classify(classifier, transaction["DESCRIPTION"])
+		prediction = classify(classifier, transaction["DESCRIPTION_UNMASKED"])
 
 		if prediction == desired_category:
 			filtered_transactions.append(transaction)
@@ -87,7 +87,7 @@ def run_from_command_line(command_line_arguments):
 	basepath = splitext(basename(command_line_arguments[3]))[0]
 	category = command_line_arguments[2]
 	file_suffix = "_non_physical.txt" if category == "0" else "_physical.txt"
-	output_folder = "/mnt/ephemeral"
+	output_folder = "/mnt/ephemeral/output/"
 	output_file = output_folder + basepath + file_suffix
 	write_dict_list(filtered_transactions, output_file)
 		

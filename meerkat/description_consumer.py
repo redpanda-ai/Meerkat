@@ -43,13 +43,17 @@ def get_basic_query(starting_from=0, size=0):
 
 def get_geo_query(scaled_shapes):
 	"""Generate multipolygon query for use with"""
+	
 	return {
 		"geo_shape" : {
 			"pin.location" : {
 				"shape" : {
 					"type" : "multipolygon",
 					"coordinates": [[scaled_shape] for scaled_shape in scaled_shapes]
-				}}}}
+				}
+			}
+		}
+	}
 
 def get_qs_query(term, field_list=[], boost=1.0):
 	"""Returns a "query_string" style ElasticSearch query object"""
