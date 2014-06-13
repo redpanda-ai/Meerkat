@@ -123,8 +123,8 @@ class DescriptionConsumer(threading.Thread):
 		self.__generate_z_score_delta(scores)
 
 		try:
-			logger.debug("%s: %s", str(self.thread_id), str(results[0]))
-			print(str(self.thread_id), ": ", results[0])
+			logger.debug("%s: %s", str(self.thread_id), results[0].encode("utf-8"))
+			print(str(self.thread_id), ": ", results[0].encode("utf-8"))
 		except IndexError:
 			logger.warning("INDEX ERROR: %s", transaction["DESCRIPTION"])
 			#print("INDEX ERROR: ", transaction["DESCRIPTION"])

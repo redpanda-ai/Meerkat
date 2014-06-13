@@ -230,7 +230,7 @@ def write_output_to_file(params, output_list, non_physical, split):
 
 	# Get Headers
 	header = None
-	with open(split, 'r') as infile:
+	with open(split, 'r', encoding="utf-8") as infile:
 		header = infile.readline()
 
 	# Split on delimiter into a list
@@ -252,12 +252,12 @@ def write_output_to_file(params, output_list, non_physical, split):
 
 		#We only write the header for the first file
 		if params["add_header"] is True:
-			with open(file_name, 'w') as output_file:
+			with open(file_name, 'w', encoding="utf-8") as output_file:
 				output_file.write(new_header + "\n")
 				params["add_header"] = False
 
 		#We append for every split
-		with open(file_name, 'a') as output_file:
+		with open(file_name, 'a', encoding="utf-8") as output_file:
 			dict_w = csv.DictWriter(output_file, delimiter=delimiter,\
 				fieldnames=all_fields, extrasaction='ignore')
 			dict_w.writerows(output_list)
