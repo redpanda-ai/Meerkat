@@ -257,6 +257,14 @@ def verify_arguments():
 def run_from_command_line(command_line_arguments):
 	"""Runs these commands if the module is invoked from the command line"""
 
+	# Load and Process Merchants
+	if os.path.isfile(sys.argv[1]):
+		process_single_merchant()
+	elif os.path.isdir(sys.argv[1]):
+		process_multiple_merchants()
+
+if __name__ == "__main__":
+
 	verify_arguments()
 
 	cluster_nodes = [
@@ -280,13 +288,5 @@ def run_from_command_line(command_line_arguments):
         "s18:9200"
     ]
 
-	global es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True, sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
-
-	# Load and Process Merchants
-	if os.path.isfile(sys.argv[1]):
-		process_single_merchant()
-	elif os.path.isdir(sys.argv[1]):
-		process_multiple_merchants()
-
-if __name__ == "__main__":
+	es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True, sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
 	run_from_command_line(sys.argv)
