@@ -11,6 +11,7 @@ Created on Dec 20, 2013
 import csv
 import re
 import os
+import gzip
 
 def load_dict_list(file_name, encoding='utf-8', delimiter="|"):
 	"""Loads a dictionary of input from a file into a list."""
@@ -149,8 +150,8 @@ def merge_split_files(params, split_list):
 	output.close()
 
 	# GZIP 
-	unzipped = open(full_path, "rb", encoding="utf-8")
-	zipped = gzip.open(full_path + ".gz", "wb", encoding="utf-8")
+	unzipped = open(full_path, "rb")
+	zipped = gzip.open(full_path + ".gz", "wb")
 	zipped.writelines(unzipped)
 	zipped.close()
 	unzipped.close()
