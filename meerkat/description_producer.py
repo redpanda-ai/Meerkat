@@ -275,14 +275,8 @@ def	hms_to_seconds(t):
 def process_bucket(params):
 	"""Process an entire s3 bucket"""
 
-	# Connect to S3
-	try:
-		conn = boto.connect_s3()
-	except boto.s3.connection.HostRequiredError:
-		print("Error connecting to S3, check your credentials")
-		sys.exit()
-
 	# Init
+	conn = boto.connect_s3()
 	s3_location = params["input"]["bucket_key"]
 	bucket_name = "s3yodlee"
 	regex = "([^/]+)"
@@ -342,16 +336,14 @@ def process_panel(params, filename, S3):
 		split_path = params["input"]["split"]["processing_location"]
 		row_limit = params["input"]["split"]["row_limit"]
 		delimiter = params["input"].get("delimiter", "|")
+		encoding = params["input"].get("encoding", "utf-8")
 		#Break the input file into segments
-		split_list = split_csv(open(filename, 'r'), delimiter=delimiter,
+		split_list = split_csv(open(filename, 'r', encoding=encoding), delimiter=delimiter,
 			row_limit=row_limit, output_path=split_path)
 	except IOError:
 		logging.critical("Invalid ['input']['filename'] key; Input file: %s"
 			" cannot be found. Correct your config file.", filename)
 		sys.exit()
-
-	# Remove original file
-	safely_remove_file(filename)
 
 	# Start a timer
 	start_time = datetime.datetime.now()
@@ -398,13 +390,25 @@ def mode_switch(params):
 	if os.path.isfile(input_file):
 		print("Processing Single Local File: ", input_file)
 		params["output"]["file"]["name"] = os.path.basename(input_file)
-		process_panel(params, input_file)
+		conn = connect_to_S3()
+		process_panel(params, input_file, conn)
 	elif input_bucket != "":
 		print("Processing S3 Bucket: ", input_bucket)
 		process_bucket(params)
 	else:
-		logging.critical("Please provide a local file or s3 buck for procesing. Terminating")
+		logging.critical("Please provide a local file or s3 bucket for procesing. Terminating")
 		sys.exit()
+
+def connect_to_S3():
+	"""Returns a connection to S3"""
+
+	try:
+		conn = boto.connect_s3()
+	except boto.s3.connection.HostRequiredError:
+		print("Error connecting to S3, check your credentials")
+		sys.exit()
+
+	return conn
 
 def move_to_S3(params, filepath, S3):
 	"""Pushes a file back to S3"""

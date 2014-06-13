@@ -3,7 +3,7 @@
 	"verification_source" : "data/misc/matt_8000_card.csv",
 	"input" : {
 		"hyperparameters" : "config/hyperparameters/default.json",
-		"filename" : "/mnt/ephemeral/15000_Bank.txt",
+		"filename" : "/mnt/ephemeral/input/15000_Bank.txt",
 		"delimiter" : "|",
 		"encoding" : "utf-8",
 		"split" : {

@@ -110,7 +110,7 @@ def split_csv(filehandler, delimiter=',', row_limit=10000,
 	)
 	#Create a list of file pieces
 	file_list = [current_out_path]
-	current_out_writer = csv.writer(open(current_out_path, 'w'), delimiter=delimiter)
+	current_out_writer = csv.writer(open(current_out_path, 'w', encoding="utf-8"), delimiter=delimiter)
 	current_limit = row_limit
 	if keep_headers:
 		headers = reader.__next__()
@@ -122,7 +122,7 @@ def split_csv(filehandler, delimiter=',', row_limit=10000,
 			current_limit = row_limit * current_piece
 			current_out_path = os.path.join( output_path, output_name_template  % current_piece)
 			file_list.append(current_out_path)
-			current_out_writer = csv.writer(open(current_out_path, 'w'), delimiter=delimiter)
+			current_out_writer = csv.writer(open(current_out_path, 'w', encoding="utf-8"), delimiter=delimiter)
 			if keep_headers:
 				current_out_writer.writerow(headers)
 		current_out_writer.writerow(row)
