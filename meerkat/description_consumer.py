@@ -421,6 +421,9 @@ class DescriptionConsumer(threading.Thread):
 			enriched_transaction["z_score_delta"] = 0
 
 		# Remove Good Description
+		if enriched_transaction['GOOD_DESCRIPTION'] != "":
+			enriched_transaction['name'] = enriched_transaction['GOOD_DESCRIPTION']
+			
 		enriched_transaction["GOOD_DESCRIPTION"] = ""
 
 		return enriched_transaction
