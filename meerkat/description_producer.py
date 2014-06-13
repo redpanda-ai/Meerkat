@@ -177,7 +177,10 @@ def usage():
 
 def validate_params(params):
 	"""Ensures that the correct parameters are supplied."""
+
 	mandatory_keys = ["elasticsearch", "concurrency", "input", "logging"]
+
+	# Ensure Mandatory Keys are in Config
 	for key in mandatory_keys:
 		if key not in params:
 			raise Misconfiguration(msg="Misconfiguration: missing key, '" + key + "'", expr=None)
@@ -188,6 +191,7 @@ def validate_params(params):
 	if "hyperparameters" not in params["input"]:
 		params["input"]["hyperparameters"] = "config/hyperparameters/default.json"
 
+	# Ensure Other Various Parameters Available
 	if "index" not in params["elasticsearch"]:
 		raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.index'", expr=None)
 	if "type" not in params["elasticsearch"]:
@@ -196,11 +200,11 @@ def validate_params(params):
 		raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.cluster_nodes'", expr=None)
 	if "path" not in params["logging"]:
 		raise Misconfiguration(msg="Misconfiguration: missing key, 'logging.path'", expr=None)
-	if "filename" not in params["input"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'input.filename'", expr=None)
+	if "filename" not in params["input"] and "bucket_key" not in params["input"]:
+		raise Misconfiguration(msg="Misconfiguration: missing key, 'input.filename' or 'input.bucket_key'", expr=None)
 	if "encoding" not in params["input"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'input.encoding'",\
-			expr=None)
+		raise Misconfiguration(msg="Misconfiguration: missing key, 'input.encoding'", expr=None)
+
 	return True
 
 def write_output_to_file(params, output_list, non_physical, split):
@@ -419,6 +423,7 @@ def run_from_command_line(command_line_arguments):
 	"""Runs these commands if the module is invoked from the command line"""
 	
 	params = initialize()
+	validate_params(params)
 	mode_switch(params)
 
 if __name__ == "__main__":
