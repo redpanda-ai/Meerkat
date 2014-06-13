@@ -55,12 +55,12 @@ def load_data(transactions, labels, file_name, test_size=1):
 	"""Loads human labeled data from a file."""
 
 	human_labeled_file = open(file_name, encoding='utf-8', errors="replace")
-	human_labeled = list(csv.DictReader(human_labeled_file, delimiter='\t'))
+	human_labeled = list(csv.DictReader(human_labeled_file, delimiter='|'))
 	human_labeled_file.close()
 
 	for i in range(len(human_labeled)):
 		if human_labeled[i]["IS_PHYSICAL_TRANSACTION"] != "" and random() < test_size:
-			transactions.append(human_labeled[i]["DESCRIPTION"])
+			transactions.append(human_labeled[i]["DESCRIPTION_UNMASKED"])
 			labels.append(human_labeled[i]["IS_PHYSICAL_TRANSACTION"])
 
 	return transactions, labels
