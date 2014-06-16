@@ -1,0 +1,415 @@
+keywords,city,Aggdata Store Number,store_number,address,state,zip_code
+24 Hour Fitness,Carlsbad,24,#24,1265 Laurel Tree Lane Suite 100,CA,92011
+25 Hour Fitness,Alamo,43,#43,140 A Alamo Plaza,CA,94507
+26 Hour Fitness,Fountain Valley,48,#48,18305 Brookhurst St.,CA,92708
+27 Hour Fitness,Ladera Ranch,53,#53,200 Corporate Drive,CA,92694
+28 Hour Fitness,Santa Barbara,54,#54,820 State Street,CA,93101
+29 Hour Fitness,Hawthorne,55,#55,2831 West 120th Street,CA,90250
+30 Hour Fitness,San Diego,57,#57,"6348 College Grove Way, Suite 109",CA,92115
+31 Hour Fitness,City of Industry,58,#58,1600 S. Azusa Avenue,CA,91748
+32 Hour Fitness,San Diego,59,#59,"1 Horton Plaza, Space 25",CA,92101
+33 Hour Fitness,La Mesa,60,#60,3633 Avocado Blvd,CA,91941
+34 Hour Fitness,Altadena,62,#62,"2180 Lincoln Avenue, BLDG. 4",CA,91001
+35 Hour Fitness,Orange,63,#63,3600 West Orangewood Ave,CA,92868
+36 Hour Fitness,Anaheim,64,#64,1430 No. Lemon St.,CA,92801
+37 Hour Fitness,San Diego,65,#65,909 Garnet Avenue,CA,92109
+38 Hour Fitness,Las Vegas,66,#66,9875 S Maryland Parkway,NV,89123
+39 Hour Fitness,San Diego,67,#67,1640 Camino del Rio N. Ste 315,CA,92108
+40 Hour Fitness,Santa Monica,68,#68,1417 2nd Street,CA,90401
+41 Hour Fitness,Santa Fe Springs,69,#69,13312 Imperial Highway,CA,90670
+42 Hour Fitness,Sherman Oaks,70,#70,15301 Ventura Blvd,CA,91403
+43 Hour Fitness,Chula Vista,71,#71,320 Third Avenue,CA,91910
+44 Hour Fitness,Lake Forest,73,#73,26781 Rancho Parkway,CA,92630
+45 Hour Fitness,Las Vegas,74,#74,5035 West Tropicana Ave,NV,89103
+46 Hour Fitness,La Mirada,77,#77,13395 Beach Blvd.,CA,90638
+47 Hour Fitness,Costa Mesa,78,#78,589 Anton Blvd,CA,92626
+48 Hour Fitness,Las Vegas,79,#79,4480 E Charleston Blvd.,NV,89104
+49 Hour Fitness,Oceanside,80,#80,4655 Frazee Road,CA,92056
+50 Hour Fitness,West Covina,81,#81,1530 West Covina Pkwy,CA,91790
+51 Hour Fitness,Henderson,82,#82,"498 South Boulder Hwy, Suite B",NV,89015
+52 Hour Fitness,Chula Vista,84,#84,870 Amena Court,CA,91910
+53 Hour Fitness,Laguna Niguel,85,#85,32451 Golden Lantern,CA,92677
+54 Hour Fitness,Hollywood,88,#88,6380 West Sunset Blvd.,CA,90028
+55 Hour Fitness,Thousand Oaks,89,#89,2595 East Thousand Oaks Blvd,CA,91360
+56 Hour Fitness,San Diego,90,#90,"3965 5th Avenue, Suite 100",CA,92103
+57 Hour Fitness,San Diego,94,#94,9550 Miramar Road,CA,92126
+58 Hour Fitness,Escondido,95,#95,400 La Terraza Blvd,CA,92025
+59 Hour Fitness,Hermosa Beach,97,#97,1601 Pacific Coast Highway Suite 100,CA,90254
+60 Hour Fitness,Camarillo,98,#98,453 Carmen Drive,CA,93011
+61 Hour Fitness,North Las Vegas,99,#99,2106 West Craig Road,NV,89031
+62 Hour Fitness,La Mesa,101,#101,7450 University Avenue,CA,91941
+63 Hour Fitness,Chula Vista,102,#102,1660 Broadway,CA,91911
+64 Hour Fitness,San Diego,103,#103,3675 Midway Drive,CA,92110
+65 Hour Fitness,Santee,104,#104,9906 Mission Gorge Road,CA,92071
+66 Hour Fitness,Huntington Beach,105,#105,5858 Warner Avenue,CA,92649
+67 Hour Fitness,Oceanside,107,#107,2213 South El Camino Real,CA,92054
+68 Hour Fitness,San Diego,109,#109,5885 Rancho Mission Rd,CA,92108
+69 Hour Fitness,Los Alamitos,111,#111,4951 Katella Avenue,CA,90720
+70 Hour Fitness,Glendale,113,#113,240 North Brand Blvd.,CA,91203
+71 Hour Fitness,Encinitas,114,#114,455 Santa Fe Drive,CA,92024
+72 Hour Fitness,Bakersfield,116,#116,4302 Gosford Road,CA,93313
+73 Hour Fitness,Palmdale,117,#117,1335 W. Rancho Vista Blvd.,CA,93551
+74 Hour Fitness,Los Angeles,118,#118,"3699 Wilshire Blvd, Suite 110",CA,90010
+75 Hour Fitness,Los Angeles,120,#120,9911 West Pico Blvd,CA,90035
+76 Hour Fitness,Costa Mesa,121,#121,1600 Adams Ave,CA,92626
+77 Hour Fitness,Los Angeles,122,#122,5959 W. Century Blvd.,CA,90045
+78 Hour Fitness,Whittier,123,#123,10125 Whittwood Drive,CA,90603
+79 Hour Fitness,Laguna Hills,124,#124,25252 McIntyre St.,CA,92653
+80 Hour Fitness,Yorba Linda,125,#125,18200 Yorba Linda Blvd,CA,92887
+81 Hour Fitness,Orange,127,#127,3521 East Chapman Ave.,CA,92869
+82 Hour Fitness,Bakersfield,128,#128,3633 Rosedale Hwy,CA,93308
+83 Hour Fitness,Torrance,130,#130,2685 Pacific Coast Hwy,CA,90505
+84 Hour Fitness,Moreno Valley,131,#131,23750 Alessandro Blvd,CA,92553
+85 Hour Fitness,San Bernardino,133,#133,295 E Caroline St.,CA,92408
+86 Hour Fitness,Arvada,140,#140,8105 N Sheridan Blvd,CO,80003
+87 Hour Fitness,San Juan Capistrano,143,#143,"27131 Calle Arroyo, Suite 1701",CA,92675
+88 Hour Fitness,Panorama City,145,#145,8350 Van Nuys Blvd,CA,91402
+89 Hour Fitness,Redlands,147,#147,700 East Redlands Blvd,CA,92373
+90 Hour Fitness,Irvine,149,#149,"4255 Campus Drive, A150",CA,92612
+91 Hour Fitness,Irvine,150,#150,15315 Culver Drive 165,CA,92604
+92 Hour Fitness,Henderson,151,#151,2556 Wigwam Pkwy,NV,89074
+93 Hour Fitness,Long Beach,154,#154,"100 Oceangate, Plaza Level",CA,90802
+94 Hour Fitness,Garden Grove,156,#156,9561 Chapman Avenue,CA,92841
+95 Hour Fitness,Mission Viejo,157,#157,23166 Los Alisos Blvd 140,CA,92691
+96 Hour Fitness,Aliso Viejo,158,#158,27141 Aliso Creek Road,CA,92656
+97 Hour Fitness,Brea,159,#159,965 E Birch Street,CA,92821
+98 Hour Fitness,San Diego,160,#160,17170 Bernardo Center Drive,CA,92128
+99 Hour Fitness,Las Vegas,162,#162,2605 South Eastern Ave,NV,89169
+100 Hour Fitness,Manhattan Beach,163,#163,1500 Rosecrans Ave,CA,90266
+101 Hour Fitness,Bakersfield,164,#164,3400 Bernard Street,CA,93306
+102 Hour Fitness,Upland,165,#165,685 W. Foothill Blvd.,CA,91786
+103 Hour Fitness,Henderson,166,#166,2893 North Green Valley Parkway,NV,89014
+104 Hour Fitness,La Jolla,167,#167,7680 Girard Ave. Suite 200,CA,92037
+105 Hour Fitness,Victorville,168,#168,16200 Bear Valley Road,CA,92392
+106 Hour Fitness,Santa Clarita,169,#169,18645 Via Princessa,CA,91351
+107 Hour Fitness,Monrovia,170,#170,715 East Huntington Drive,CA,91016
+108 Hour Fitness,Rancho Santa Margarita,171,#171,22331 El Paseo,CA,92688
+109 Hour Fitness,Pasadena,173,#173,465 North Halstead St.,CA,91107
+110 Hour Fitness,Solana Beach,174,#174,975 Lomas Santa Fe. Dr.,CA,92075
+111 Hour Fitness,Newport Beach,175,#175,600 Newport Center Drive,CA,92660
+112 Hour Fitness,Simi Valley,176,#176,1352 Madera Road,CA,93065
+113 Hour Fitness,Huntington Beach,177,#177,303 3rd Street,CA,92648
+114 Hour Fitness,La Mesa,178,#178,5601 Grossmont Center Dr,CA,91942
+115 Hour Fitness,Pasadena,179,#179,525 East Colorado Blvd,CA,91101
+116 Hour Fitness,Chino Hills,180,#180,"4200 Chino Hills Parkway, Suite 780",CA,91709
+117 Hour Fitness,San Marcos,181,#181,641 South Rancho Santa Fe Rd,CA,92069
+118 Hour Fitness,Gilbert,182,#182,97 S. Val Vista Drive,AZ,85234
+119 Hour Fitness,Santa Monica,183,#183,2929 31st Street,CA,90405
+120 Hour Fitness,West Hollywood,184,#184,8612 Santa Monica Blvd,CA,90069
+121 Hour Fitness,Costa Mesa,185,#185,555 West 19th Street,CA,92627
+122 Hour Fitness,Long Beach,186,#186,3030 N Bellflower Blvd,CA,90808
+123 Hour Fitness,Irvine,189,#189,18007 Von Karman Avenue,CA,92612
+124 Hour Fitness,San Diego,191,#191,10025 Carmel Mountain Road,CA,92129
+125 Hour Fitness,Carson,192,#192,945 E. Dominguez St.,CA,90746
+126 Hour Fitness,Anaheim,195,#195,300 South Festival Drive,CA,92808
+127 Hour Fitness,Irvine,196,#196,8697 Irvine Center Drive,CA,92618
+128 Hour Fitness,Rancho Cucamonga,197,#197,11787 Foothill Blvd,CA,91730
+129 Hour Fitness,Corona,198,#198,275 Teller Street Suite 100,CA,92882
+130 Hour Fitness,Memphis,200,#200,1285 Ridgeway Rd.,TN,38119
+131 Hour Fitness,Austin,202,#202,10616 Research Blvd.,TX,78759
+132 Hour Fitness,Tempe,203,#203,2145 E. Baseline Rd.,AZ,85283
+133 Hour Fitness,Phoenix,204,#204,3233 E. Camelback Rd.,AZ,85018
+134 Hour Fitness,Scottsdale,205,#205,13220 N. Scottsdale Rd.,AZ,85254
+135 Hour Fitness,Houston,206,#206,7300 W. Greens Rd.,TX,77064
+136 Hour Fitness,Sugar Land,208,#208,14111 Southwest Freeway,TX,77478
+137 Hour Fitness,Houston,209,#209,10707 Westheimer Rd.,TX,77042
+138 Hour Fitness,Las Vegas,210,#210,601 S. Rainbow Blvd,NV,89145
+139 Hour Fitness,Mesquite,211,#211,3600 W Emporium Circle,TX,75150
+140 Hour Fitness,Plano,212,#212,4600 West Park Blvd,TX,75093
+141 Hour Fitness,Richardson,213,#213,1375 E. Campbell Rd.,TX,75081
+142 Hour Fitness,Arlington,214,#214,1131 W. Arbrook Blvd.,TX,76015
+143 Hour Fitness,Bedford,215,#215,2100 Plaza Parkway,TX,76021
+144 Hour Fitness,Coral Springs,216,#216,9800 W. Atlantic Blvd.,FL,33071
+145 Hour Fitness,Plantation,217,#217,700 South Pine Island Rd.,FL,33324
+146 Hour Fitness,Fort Worth,218,#218,5001 Overton Ridge Blvd.,TX,76132
+147 Hour Fitness,Glendale,219,#219,450 North Brand Blvd,CA,91203
+148 Hour Fitness,Las Vegas,228,#228,2090 Village Center Circle,NV,89134
+149 Hour Fitness,Houston,301,#301,11528 Gulf Freeway,TX,77034
+150 Hour Fitness,Houston,304,#304,15542 FM 529,TX,77095
+151 Hour Fitness,Houston,305,#305,5721 Westheimer Rd.,TX,77057
+152 Hour Fitness,Houston,306,#306,9336 Westview Dr.,TX,77055
+153 Hour Fitness,Dallas,307,#307,7622 Campbell Road,TX,75248
+154 Hour Fitness,Carrollton,310,#310,2770 East Trinity Mills Rd,TX,75006
+155 Hour Fitness,Houston,313,#313,1017 Bay Area Blvd,TX,77058
+156 Hour Fitness,Katy,319,#319,1550 S. Mason Road,TX,77450
+157 Hour Fitness,Lewisville,323,#323,"724 W Main St., Suite190",TX,75067
+158 Hour Fitness,Colorado Springs,324,#324,3650 Austin Bluffs Pkwy Unit 197,CO,80918
+159 Hour Fitness,Lakewood,326,#326,12039 W. Alameda Parkway,CO,80228
+160 Hour Fitness,Littleton,329,#329,6044 South Kipling Pkwy,CO,80127
+161 Hour Fitness,Omaha,331,#331,2718 North 118th Circle,NE,68164
+162 Hour Fitness,Jacinto City,332,#332,11420 East Fwy,TX,77029
+163 Hour Fitness,Houston,334,#334,6425 San Felipe Street,TX,77057
+164 Hour Fitness,Bedford,335,#335,1805 Highway 121,TX,76021
+165 Hour Fitness,Sandy,336,#336,10365 South 1300 East,UT,84094
+166 Hour Fitness,Broomfield,337,#337,4650 West 120th Avenue,CO,80020
+167 Hour Fitness,Chesterfield,338,#338,14885 West Clayton Road,MO,63017
+168 Hour Fitness,Arnold,339,#339,215 Arnold Crossing,MO,63010
+169 Hour Fitness,Houston,340,#340,10920 FM 1960 West,TX,77070
+170 Hour Fitness,Dallas,341,#341,5100 Belt Line Road,TX,75248
+171 Hour Fitness,Salt Lake City,342,#342,1121 East Ashton Ave,UT,84106
+172 Hour Fitness,Provo,343,#343,2121 North 550 West,UT,84604
+173 Hour Fitness,Irving,344,#344,2407 West Airport Freeway,TX,75062
+174 Hour Fitness,Papillion,345,#345,845 Tara Plaza,NE,68046
+175 Hour Fitness,Colorado Springs,346,#346,1892 Southgate Road,CO,80906
+176 Hour Fitness,Spring,347,#347,18541 Kuykendahl Road,TX,77379
+177 Hour Fitness,Omaha,348,#348,4007 S. 145th Plaza,NE,68137
+178 Hour Fitness,Humble,349,#349,7068 FM 1960 East,TX,77346
+179 Hour Fitness,Englewood,350,#350,11798 E Oswego St.,CO,80112
+180 Hour Fitness,Denver,351,#351,4120 E. Alameda Avenue,CO,80246
+181 Hour Fitness,Denver,352,#352,7400 East Hampden Avenue,CO,80231
+182 Hour Fitness,Friendswood,353,#353,130 W Parkwood Ave,TX,77546
+183 Hour Fitness,Allen,354,#354,510 N Watters Road,TX,75013
+184 Hour Fitness,Littleton,355,#355,333 Dad Clark Drive,CO,80126
+185 Hour Fitness,Houston,356,#356,21614 Tomball Parkway,TX,77070
+186 Hour Fitness,Independence,358,#358,3850 South Crackerneck Rd,MO,64055
+187 Hour Fitness,St. Charles,359,#359,1095 Regency Parkway,MO,63303
+188 Hour Fitness,Dallas,360,#360,700 N. Harwood,TX,75201
+189 Hour Fitness,Overland Park,361,#361,12075 Metcalf Avenue,KS,66213
+190 Hour Fitness,The Woodlands,362,#362,1800 Lake Woodlands Drive,TX,77380
+191 Hour Fitness,Kansas City,364,#364,301 NE Englewood Road,MO,64118
+192 Hour Fitness,Dallas,365,#365,11100 Central Expressway,TX,75243
+193 Hour Fitness,Houston,366,#366,8650 Endicott Ln,TX,77096
+194 Hour Fitness,Dallas,369,#369,5706 East Mockingbird Lane,TX,75206
+195 Hour Fitness,Austin,372,#372,1000 East 41st Street,TX,78751
+196 Hour Fitness,Round Rock,373,#373,1208 N INTERSTATE 35 STE S,TX,78681
+197 Hour Fitness,Phoenix,374,#374,3301 E. Bell Road,AZ,85032
+198 Hour Fitness,Southlake,375,#375,301 N. Nolen Drive,TX,76092
+199 Hour Fitness,Austin,377,#377,13802 N HWY 183,TX,78750
+200 Hour Fitness,Overland Park,378,#378,7420 Metcalf Ave.,KS,66204
+201 Hour Fitness,Aurora,383,#383,18737 E. Hampden Ave.,CO,80013
+202 Hour Fitness,Houston,392,#392,12708 Northwest Freeway,TX,77092
+203 Hour Fitness,Frisco,393,#393,3865 Preston Road,TX,75034
+204 Hour Fitness,Bellevue,399,#399,"188 106th Ave NE, Suite 500",WA,98004
+205 Hour Fitness,Lakewood,402,#402,"5919 Lakewood Town Ctr Blvd, Suite SW K",WA,98499
+206 Hour Fitness,Seattle,403,#403,20202 Ballinger Way NE,WA,98155
+207 Hour Fitness,Federal Way,406,#406,2130 South 314th Street,WA,98003
+208 Hour Fitness,Seattle,407,#407,2500 SW Barton Street,WA,98126
+209 Hour Fitness,Vancouver,411,#411,800 SE Tech Center Drive,WA,98683
+210 Hour Fitness,Seattle,412,#412,1827 Yale Avenue,WA,98101
+211 Hour Fitness,Portland,413,#413,1407 SW 4th Avenue,OR,97201
+212 Hour Fitness,Beaverton,415,#415,11100 SW Murray Scholls Place,OR,97007
+213 Hour Fitness,Lynnwood,418,#418,18930 29th Avenue West,WA,98036
+214 Hour Fitness,Seattle,419,#419,229 Queen Anne Avenue North,WA,98109
+215 Hour Fitness,Portland,423,#423,10052 SE Washington Street,OR,97216
+216 Hour Fitness,Portland,425,#425,4546 SE McLoughlin Blvd.,OR,97202
+217 Hour Fitness,Auburn,428,#428,915 Auburn Way North,WA,98002
+218 Hour Fitness,Kansas City,430,#430,8600 Ward Pkwy Ste 7,MO,64114
+219 Hour Fitness,Taylorsville,431,#431,5766 South 1900 West,UT,84129
+220 Hour Fitness,Shawnee,432,#432,11311 W. Shawnee Mission Pkwy,KS,66203
+221 Hour Fitness,Murray,433,#433,5684 South 900 East,UT,84121
+222 Hour Fitness,Salt Lake City,434,#434,515 South 700 East,UT,84102
+223 Hour Fitness,San Francisco,435,#435,45 Montgomery St.,CA,94104
+224 Hour Fitness,West Jordan,436,#436,3813 W. Center View Way,UT,84084
+225 Hour Fitness,Aurora,437,#437,512 South Chambers Road,CO,80017
+226 Hour Fitness,Centennial,438,#438,6839 South Vine Street,CO,80122
+227 Hour Fitness,Issaquah,439,#439,5712 East Lake Sammamish Parkway,WA,98029
+228 Hour Fitness,Pacifica,487,#487,555 Oceana Blvd.,CA,94044
+229 Hour Fitness,Hayward,488,#488,2480 Whipple Rd,CA,94544
+230 Hour Fitness,Kirkland,489,#489,12526 Totem Lake Boulevard Northeast,WA,98034
+231 Hour Fitness,Los Angeles,490,#490,5045 W. Slauson Ave.,CA,90056
+232 Hour Fitness,Tigard,491,#491,17942 SW McEwan Road,OR,97224
+233 Hour Fitness,Redmond,492,#492,7320 170th Ave NE,WA,98052
+234 Hour Fitness,Fremont,493,#493,4500 Auto Mall Parkway,CA,94538
+235 Hour Fitness,Richmond,494,#494,2126 Hilltop Mall Rd,CA,94806
+236 Hour Fitness,Pearl City,496,#496,1000 Kamehameha Hwy,HI,96782
+237 Hour Fitness,San Jose,497,#497,6223 Santa Teresa Blvd,CA,95119
+238 Hour Fitness,Antelope,498,#498,7905 Walerga Rd.,CA,95843
+239 Hour Fitness,San Leandro,501,#501,304 Bayfair Mall,CA,94578
+240 Hour Fitness,San Francisco,502,#502,1200 Van Ness Avenue,CA,94109
+241 Hour Fitness,San Mateo,503,#503,500 S. El Camino Real,CA,94402
+242 Hour Fitness,San Jose,504,#504,1825 - A Hillsdale Avenue,CA,95124
+243 Hour Fitness,San Jose,505,#505,375A North Capitol Ave,CA,95133
+244 Hour Fitness,Sunnyvale,506,#506,150 East Fremont Avenue,CA,94087
+245 Hour Fitness,Daly City,507,#507,373 Gellert Blvd,CA,94015
+246 Hour Fitness,Larkspur,508,#508,1001 Larkspur Landing Circle,CA,94939
+247 Hour Fitness,Santa Rosa,510,#510,3550 Industrial Drive,CA,95403
+248 Hour Fitness,Concord,511,#511,359 Sun Valley Mall,CA,94520
+249 Hour Fitness,San Ramon,512,#512,4450 Norris Canyon Road,CA,94583
+250 Hour Fitness,Mountain View,513,#513,550 Showers Drive,CA,94040
+251 Hour Fitness,Castro Valley,514,#514,3839 East Castro Valley Blvd,CA,94552
+252 Hour Fitness,Vallejo,515,#515,4300 Sonoma Blvd 408,CA,94589
+253 Hour Fitness,Walnut Creek,516,#516,2033 North Main St.,CA,94596
+254 Hour Fitness,Santa Cruz,517,#517,1261 Soquel Avenue,CA,95062
+255 Hour Fitness,San Francisco,518,#518,303 Second Street,CA,94107
+256 Hour Fitness,San Francisco,519,#519,350 Bay Street,CA,94133
+257 Hour Fitness,San Francisco,521,#521,"100 California Street, Suite 200",CA,94111
+258 Hour Fitness,Citrus Heights,523,#523,6633 Auburn Blvd,CA,95621
+259 Hour Fitness,Sacramento,528,#528,9574 Micron Avenue,CA,95827
+260 Hour Fitness,Oakland,532,#532,2050 Webster Street,CA,94612
+261 Hour Fitness,Morgan Hill,533,#533,850 Tennant Station,CA,95037
+262 Hour Fitness,Manteca,535,#535,1090 North Main Street,CA,95336
+263 Hour Fitness,Hayward,536,#536,24727 Amador Street,CA,94544
+264 Hour Fitness,Reno,538,#538,1595 Sky Mountain Drive,NV,89503
+265 Hour Fitness,San Francisco,539,#539,1850 Ocean Avenue,CA,94112
+266 Hour Fitness,Honolulu,540,#540,1680 Kapiolani Blvd,HI,96814
+267 Hour Fitness,Honolulu,541,#541,2490 Kalakaua Avenue,HI,96815
+268 Hour Fitness,Fremont,543,#543,39300 Paseo Padre Pkwy,CA,94538
+269 Hour Fitness,San Jose,544,#544,1531 Parkmoor Avenue,CA,95128
+270 Hour Fitness,San Francisco,545,#545,1645 Bryant Street,CA,94103
+271 Hour Fitness,Newark,546,#546,5234 Newpark Mall,CA,94560
+272 Hour Fitness,San Francisco,547,#547,2145 Market Street,CA,94114
+273 Hour Fitness,Mililani,548,#548,95-221 Kipapa Dr.,HI,96789
+274 Hour Fitness,Reno,549,#549,6155 Neil Road,NV,89511
+275 Hour Fitness,Sacramento,552,#552,8785 Center Parkway,CA,95823
+276 Hour Fitness,Aurora,553,#553,4100 South Parker Road,CO,80014
+277 Hour Fitness,Honolulu,555,#555,1000 Bishop St.,HI,96813
+278 Hour Fitness,Antioch,556,#556,2632 Somersville Road,CA,94509
+279 Hour Fitness,Stockton,557,#557,3137 W. Benjamin Holt Dr.,CA,95219
+280 Hour Fitness,Kahului,558,#558,150 Hana Highway,HI,96732
+281 Hour Fitness,Kaneohe,559,#559,45-480 Kaneohe Bay Dr.,HI,96744
+282 Hour Fitness,Sacramento,560,#560,7600 Greenhaven Drive 15,CA,95831
+283 Hour Fitness,Beaverton,561,#561,4145 SW Watson Avenue,OR,97005
+284 Hour Fitness,Portland,562,#562,1210 NW Johnson St.,OR,97209
+285 Hour Fitness,Sacramento,571,#571,1314 Fulton Ave.,CA,95825
+286 Hour Fitness,Denver,572,#572,7600 E. Academy Blvd.,CO,80230
+287 Hour Fitness,Salem,573,#573,451 Lancaster Drive NE,OR,97301
+288 Hour Fitness,Hillsboro,575,#575,6095 SE Tualatin Valley Hwy,OR,97123
+289 Hour Fitness,Petaluma,577,#577,6 Petaluma Blvd North,CA,94952
+290 Hour Fitness,Berkeley,583,#583,2072 Addison St.,CA,94704
+291 Hour Fitness,Roseville,592,#592,336 North Sunrise Ave.,CA,95661
+292 Hour Fitness,Honolulu,593,#593,7120 Kalanianaole Hwy,HI,96825
+293 Hour Fitness,Sunnyvale,594,#594,1211 E. Arques Ave.,CA,94086
+294 Hour Fitness,San Carlos,595,#595,1650 Industrial Rd.,CA,94070
+295 Hour Fitness,Sacramento,598,#598,1020 7th Street,CA,95814
+296 Hour Fitness,Milpitas,601,#601,301 Jacklin Road,CA,95035
+297 Hour Fitness,Annapolis,611,#611,200 Harker Place,MD,21401
+298 Hour Fitness,Paramus,616,#616,260 East Route 4,NJ,7652
+299 Hour Fitness,Miami,621,#621,2982 Grand Ave.,FL,33133
+300 Hour Fitness,Pembroke Pines,623,#623,8333 Pines Blvd.,FL,33024
+301 Hour Fitness,Miami,624,#624,8400 Mills Drive,FL,33183
+302 Hour Fitness,Greenacres,627,#627,6846 Forest Hill Blvd,FL,33413
+303 Hour Fitness,Miami,628,#628,20851 South Dixie Highway,FL,33189
+304 Hour Fitness,Miramar,629,#629,"11645 Red Road, Space H-1",FL,33025
+305 Hour Fitness,Boynton Beach,630,#630,1775 N. Congress Avenue,FL,33426
+306 Hour Fitness,Sunrise,631,#631,9919 W. Oakland Park Blvd.,FL,33351
+307 Hour Fitness,Orlando,632,#632,15 West Crystal Lake,FL,32806
+308 Hour Fitness,Rockwall,651,#651,405 E Interstate 30 Suite 115,TX,75087
+309 Hour Fitness,Fort Worth,653,#653,5901 Golden Triangle Blvd.,TX,76244
+310 Hour Fitness,Hasbrouck Heights,654,#654,459 Route 17,NJ,7604
+311 Hour Fitness,Bronx,655,#655,400 East Fordham Road,NY,10458
+312 Hour Fitness,Murphy,656,#656,229 East FM 544,TX,75094
+313 Hour Fitness,Fort Worth,657,#657,2701 Halloran Street,TX,76107
+314 Hour Fitness,Pflugerville,658,#658,1401 Town Center,TX,78660
+315 Hour Fitness,Houston,659,#659,2500 Dunstan Road,TX,77005
+316 Hour Fitness,Richmond,660,#660,5270 West Grand Parkway South,TX,77406
+317 Hour Fitness,Aurora,663,#663,15900 E. Briarwood Circle,CO,80016
+318 Hour Fitness,Littleton,664,#664,2650 W. Belleview Ave.,CO,80123
+319 Hour Fitness,Fort Worth,665,#665,6000 Quebec St.,TX,76135
+320 Hour Fitness,Fort Collins,667,#667,2208 E. Harmony Road,CO,80528
+321 Hour Fitness,Boulder,668,#668,2900 Iris Avenue,CO,80301
+322 Hour Fitness,Austin,676,#676,4625 W. William Cannon Dr.,TX,78749
+323 Hour Fitness,Houston,677,#677,19734 Saums Road,TX,77084
+324 Hour Fitness,Pearland,679,#679,10011 Broadway St.,TX,77584
+325 Hour Fitness,Cedar Hill,680,#680,213 N Highway 67,TX,75104
+326 Hour Fitness,North Richland Hills,681,#681,6601 Northeast Loop 820,TX,76180
+327 Hour Fitness,Austin,682,#682,12400 N IH 35,TX,78753
+328 Hour Fitness,Kirkwood,683,#683,10320 Manchester Road,MO,63122
+329 Hour Fitness,Cypress,684,#684,25632 Highway 290,TX,77429
+330 Hour Fitness,The Woodlands,685,#685,10860 Kuykendahl Road,TX,77381
+331 Hour Fitness,Omaha,686,#686,7777 Cass St,NE,68114
+332 Hour Fitness,Irving,687,#687,2280 Market Place Blvd,TX,75063
+333 Hour Fitness,Fort Worth,688,#688,6500 Old Denton Rd.,TX,76131
+334 Hour Fitness,Pasadena,689,#689,5946 Fairmont Parkway,TX,77505
+335 Hour Fitness,Houston,690,#690,4425 FM 1960 Rd West,TX,77068
+336 Hour Fitness,Mansfield,691,#691,1101 N. Walnut Creek Drive,TX,76063
+337 Hour Fitness,League City,692,#692,2765 Gulf Freeway South,TX,77573
+338 Hour Fitness,Olathe,693,#693,13370 S. Blackfoot Drive,KS,66062
+339 Hour Fitness,Little Elm,694,#694,2700 E. Eldorado Pkwy Ste 300,TX,75068
+340 Hour Fitness,Baytown,695,#695,3501 Garth Road,TX,77521
+341 Hour Fitness,Houston,696,#696,3201 Louisiana Street,TX,77006
+342 Hour Fitness,Houston,697,#697,12553 Westheimer Road,TX,77077
+343 Hour Fitness,Lee's Summit,698,#698,900 NE Deerbrook Street,MO,64086
+344 Hour Fitness,Grand Prairie,699,#699,5208 South State HWY 360,TX,75050
+345 Hour Fitness,San Francisco,701,#701,3800 24th Street Suite 2,CA,94114
+346 Hour Fitness,Berkeley,704,#704,1775 Solano Ave,CA,94707
+347 Hour Fitness,New York,726,#726,136 Crosby,NY,10012
+348 Hour Fitness,New York,727,#727,225 Fifth Avenue,NY,10010
+349 Hour Fitness,New York,728,#728,153 East 53rd Street,NY,10022
+350 Hour Fitness,Nanuet,729,#729,5205 Fashion Drive,NY,10954
+351 Hour Fitness,Carmichael,801,#801,5114 Arden Way,CA,95608
+352 Hour Fitness,Oakland,802,#802,3950 Alameda Ave.,CA,94601
+353 Hour Fitness,Fairfield,803,#803,1519 Gateway Blvd.,CA,94533
+354 Hour Fitness,Millbrae,805,#805,979 Broadway Avenue,CA,94030
+355 Hour Fitness,Sacramento,806,#806,6061 Florin Road,CA,95823
+356 Hour Fitness,Gold River,807,#807,2280 Sunrise Blvd.,CA,95670
+357 Hour Fitness,Elk Grove,808,#808,8461 Elk Grove Florin Road,CA,95624
+358 Hour Fitness,Folsom,809,#809,1006 Riley Street,CA,95630
+359 Hour Fitness,San Jose,810,#810,2306 Almaden Rd Suite 140,CA,95125
+360 Hour Fitness,San Jose,811,#811,1610 Crane Court,CA,95112
+361 Hour Fitness,Moraga,812,#812,351 Rheem Blvd.,CA,94556
+362 Hour Fitness,San Mateo,813,#813,93 Bovet Rd,CA,94402
+363 Hour Fitness,Mountain View,814,#814,2535 California Street,CA,94040
+364 Hour Fitness,Rohnert Park,815,#815,6345 Commerce Blvd,CA,94928
+365 Hour Fitness,Vienna,817,#817,1500 Cornerside Blvd.,VA,22182
+366 Hour Fitness,Falls Church,818,#818,1000 East Broad Street,VA,22042
+367 Hour Fitness,Pleasanton,836,#836,4770 Willow Road,CA,94588
+368 Hour Fitness,San Clemente,845,#845,100 Avenida La Pata,CA,92673
+369 Hour Fitness,Highlands Ranch,848,#848,6830 E. County Line Rd.,CO,80126
+370 Hour Fitness,Beaverton,849,#849,1265 NW Waterhouse Avenue,OR,97006
+371 Hour Fitness,Huntington Beach,851,#851,7887 Center Ave,CA,92647
+372 Hour Fitness,Chandler,852,#852,1085 South Arizona Avenue,AZ,85248
+373 Hour Fitness,Temecula,853,#853,27520 Ynez Road,CA,92591
+374 Hour Fitness,Scottsdale,854,#854,14150 North 100th Street,AZ,85260
+375 Hour Fitness,Buena Park,855,#855,8430 On the Mall,CA,90620
+376 Hour Fitness,Glendale,856,#856,4316 W. Bell Road,AZ,85308
+377 Hour Fitness,Mesa,857,#857,1919 N. Power Road,AZ,85205
+378 Hour Fitness,Anaheim,858,#858,321 W. Katella Ave. Suite 94,CA,92802
+379 Hour Fitness,Escondido,859,#859,1529 E. Valley Parkway,CA,92027
+380 Hour Fitness,City of Industry,860,#860,21560 Valley Blvd.,CA,91789
+381 Hour Fitness,Phoenix,861,#861,10046 N. Metro Parkway West,AZ,85051
+382 Hour Fitness,Laguna Niguel,862,#862,27921 La Paz Road,CA,92677
+383 Hour Fitness,Irvine,863,#863,31 Fortune Drive Suite 100,CA,92618
+384 Hour Fitness,Westminster,864,#864,6731 Westminster Blvd. Suite 113,CA,92683
+385 Hour Fitness,Northridge,866,#866,19350 Nordhoff Street Unit D,CA,91324
+386 Hour Fitness,Monterey Park,867,#867,500 N. Atlantic Blvd. Suite A-102-1,CA,91754
+387 Hour Fitness,Vista,868,#868,324 Sycamore Avenue,CA,92083
+388 Hour Fitness,Mesa,869,#869,1844 Rio Salado Parkway,AZ,85201
+389 Hour Fitness,Las Vegas,870,#870,5651 Centennial Center Blvd.,NV,89149
+390 Hour Fitness,Apple Valley,871,#871,18825 Bear Valley Road,CA,92308
+391 Hour Fitness,San Diego,872,#872,4345 Imperial Avenue,CA,92113
+392 Hour Fitness,Lancaster,878,#878,1220 West Avenue K,CA,93534
+393 Hour Fitness,El Cajon,880,#880,198 W Main St,CA,92020
+394 Hour Fitness,Lewisville,881,#881,4866 State Highway 121,TX,75056
+395 Hour Fitness,Houston,882,#882,5070 Richmond Ave,TX,77056
+396 Hour Fitness,Burbank,883,#883,1903 W. Empire Avenue,CA,91504
+397 Hour Fitness,Irvine,884,#884,13752 Jamboree Rd,CA,92602
+398 Hour Fitness,Walnut Creek,885,#885,2800 N. Main St,CA,94597
+399 Hour Fitness,Seattle,886,#886,507 NE Northgate Way,WA,98125
+400 Hour Fitness,Sunnyvale,887,#887,762 Sunnyvale Saratoga Road,CA,94087
+401 Hour Fitness,San Diego,888,#888,4425 La Jolla Village Dr,CA,92122
+402 Hour Fitness,North Hollywood,889,#889,5300 Lankershim Blvd Ste 100,CA,91601
+403 Hour Fitness,Lakewood,890,#890,4821 Del Amo Blvd.,CA,90712
+404 Hour Fitness,Costa Mesa,891,#891,1870 Harbor Blvd Suite B4,CA,92627
+405 Hour Fitness,San Diego,892,#892,7715 Balboa Ave,CA,92111
+406 Hour Fitness,Eastvale,893,#893,12354 Limonite Avenue,CA,91752
+407 Hour Fitness,Livermore,895,#895,2650 Kittyhawk Rd.,CA,94551
+408 Hour Fitness,Yorba Linda,896,#896,4848 Valley View Rd,CA,92886
+409 Hour Fitness,Chino,897,#897,12155 Central Ave,CA,91710
+410 Hour Fitness,Montclair,901,#901,9790 Central Avenue,CA,91763
+411 Hour Fitness,Torrance,902,#902,4240 Redondo Beach Blvd,CA,90504
+412 Hour Fitness,Simi Valley,903,#903,2350 Tapo Street,CA,93063
+413 Hour Fitness,West Hills,904,#904,6653 Fallbrook Ave.,CA,91307
+414 Hour Fitness,Los Angeles,905,#905,"505 South Flower Street, Level B",CA,90071
+415 Hour Fitness,Arcadia,906,#906,125 North First Avenue,CA,91006
+416 Hour Fitness,Fontana,907,#907,15310 Summit Avenue,CA,92336
+417 Hour Fitness,Glendora,910,#910,1357 E. Gladstone St.,CA,91741
+418 Hour Fitness,Murrieta,912,#912,40396 Murrieta Hot Springs Road,CA,92563
+419 Hour Fitness,Las Vegas,914,#914,100 City Parkway Suite 160,NV,89106
+420 Hour Fitness,Compton,916,#916,110 Towne Center Drive,CA,90220
+421 Hour Fitness,West Covina,917,#917,1422 S. Azusa Avenue,CA,91791
+422 Hour Fitness,Oxnard,919,#919,1651 Victoria Avenue Suite 160,CA,93035
+423 Hour Fitness,Ontario,920,#920,2580 S. Archibald Avenue,CA,91761
+424 Hour Fitness,Indio,921,#921,42900 Jackson Street,CA,92203
+425 Hour Fitness,Orange,922,#922,2102 N Tustin Ave,CA,92865
+426 Hour Fitness,Fontana,923,#923,17204 Slover Ave,CA,92337
+427 Hour Fitness,Denver,951,#951,2770 So. Colorado Blvd.,CO,80222
+428 Hour Fitness,Renton,952,#952,4110 NE 4th Street,WA,98059
+429 Hour Fitness,Clackamas,954,#954,8720 SE Sunnybrook Blvd.,OR,97015
+430 Hour Fitness,Portland,955,#955,4224 NE Halsey St.,OR,97213
+431 Hour Fitness,Denver,956,#956,4600 West 38th Avenue,CO,80212
+432 Hour Fitness,Olympia,957,#957,621 Black Lake Blvd SW,WA,98502
+433 Hour Fitness,Vancouver,958,#958,2913 NE 72nd Drive,WA,98661
+434 Hour Fitness,Colorado Springs,959,#959,7720 N. Academy Boulevard,CO,80920
+435 Hour Fitness,Vancouver,960,#960,13019 NE Fourth Plain Road,WA,98682
+436 Hour Fitness,Kent,961,#961,12922 SE Kent Kangley Road,WA,98030
+437 Hour Fitness,Everett,962,#962,11014 19th Ave SE Suite 4,WA,98208
