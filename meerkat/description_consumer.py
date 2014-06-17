@@ -448,8 +448,8 @@ class DescriptionConsumer(threading.Thread):
 		city_names = city_names[0:2]
 		state_names = state_names[0:2]
 		states_equal = state_names.count(state_names[0]) == len(state_names)
-		city_in_transaction = (city_names[0] in enriched_transaction["DESCRIPTION_UNMASKED"])
-		state_in_transaction = (state_names[0] in enriched_transaction["DESCRIPTION_UNMASKED"])
+		city_in_transaction = (city_names[0].lower() in enriched_transaction["DESCRIPTION_UNMASKED"].lower())
+		state_in_transaction = (state_names[0].lower() in enriched_transaction["DESCRIPTION_UNMASKED"].lower())
 
 		if (city_in_transaction):
 			enriched_transaction['locality'] = city_names[0]
