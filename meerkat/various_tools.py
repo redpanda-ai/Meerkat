@@ -37,12 +37,19 @@ def numeric_cleanse(original_string):
 	return re.sub(cleanse_pattern, "", original_string)
 
 def safely_remove_file(filename):
+	"""Safely removes a file"""
 	print("Removing {0}".format(filename))
 	try:
 		os.remove(filename)
 	except OSError:
 		print("Unable to remove {0}".format(filename))
 	print("File removed.")
+
+def purge(dir, pattern):
+	"""Cleans up processing location on System Exit"""
+	for f in os.listdir(dir):
+		if re.search(pattern, f):
+			os.remove(os.path.join(dir, f))
 
 def string_cleanse(original_string):
 	"""Strips out characters that might confuse ElasticSearch."""

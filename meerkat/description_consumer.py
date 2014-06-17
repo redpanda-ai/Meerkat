@@ -365,9 +365,13 @@ class DescriptionConsumer(threading.Thread):
 		if hit_fields == "":
 			return transaction
 
-		# Collect Business Names
+		# Collect Business Names, City Names, and State Names
 		business_names = [result.get("fields", {"name" : ""})["name"] for result in hits]
 		business_names = [name[0] for name in business_names if type(name) == list]
+		city_names = [result.get("fields", {"locality" : ""}).get("locality", "") for result in hits]
+		city_names = [name[0] for name in city_names if type(name) == list]
+		state_names = [result.get("fields", {"region" : ""}).get("region", "") for result in hits]
+		state_names = [name[0] for name in state_names if type(name) == list]
 		
 		# Need Names
 		if len(business_names) < 2:
@@ -392,11 +396,11 @@ class DescriptionConsumer(threading.Thread):
 		decision = self.__decision_boundary(z_score_delta)
 
 		# Enrich Data if Passes Boundary
-		enriched_transaction = self.__enrich_transaction(decision, transaction, hit_fields, z_score_delta, business_names)
+		enriched_transaction = self.__enrich_transaction(decision, transaction, hit_fields, z_score_delta, business_names, city_names, state_names)
 
 		return enriched_transaction
 
-	def __enrich_transaction(self, decision, transaction, hit_fields, z_score_delta, business_names):
+	def __enrich_transaction(self, decision, transaction, hit_fields, z_score_delta, business_names, city_names, state_names):
 		"""Enriches the transaction if it passes the boundary"""
 
 		enriched_transaction = transaction
@@ -413,11 +417,12 @@ class DescriptionConsumer(threading.Thread):
 					enriched_transaction[field] = ""
 			enriched_transaction["z_score_delta"] = z_score_delta
 
-		# Add a Business Name as a fall back
+		# Add Business Name, City and State as a fallback
 		if decision == False:
 			for field in field_names:
 				enriched_transaction[field] = ""
 			enriched_transaction = self.__business_name_fallback(business_names, transaction)
+			enriched_transaction = self.__geo_fallback(city_names, state_names, transaction)
 			enriched_transaction["z_score_delta"] = 0
 
 		# Remove Good Description
@@ -434,9 +439,29 @@ class DescriptionConsumer(threading.Thread):
 		for transaction in enriched_transactions:
 			self.result_queue.put(transaction)
 
+	def __geo_fallback(self, city_names, state_names, transaction):
+		"""Basic logic to obtain a fallback for city and state
+		when no factual_id is found"""
+
+		fields = self.params["output"]["results"]["fields"]
+		enriched_transaction = transaction
+		city_names = city_names[0:2]
+		state_names = state_names[0:2]
+		states_equal = state_names.count(state_names[0]) == len(state_names)
+		city_in_transaction = (city_names[0] in enriched_transaction["DESCRIPTION_UNMASKED"])
+		state_in_transaction = (state_names[0] in enriched_transaction["DESCRIPTION_UNMASKED"])
+
+		if (city_in_transaction):
+			enriched_transaction['locality'] = city_names[0]
+
+		if (states_equal and state_in_transaction):
+			enriched_transaction['region'] = state_names[0]
+
+		return enriched_transaction
+
 	def __business_name_fallback(self, business_names, transaction):
-		"""Uses the business names as a fallback
-		to finding a specific factual id"""
+		"""Basic logic to obtain a fallback for business name
+		when no factual_id is found"""
 
 		fields = self.params["output"]["results"]["fields"]
 		enriched_transaction = transaction
@@ -568,13 +593,13 @@ class DescriptionConsumer(threading.Thread):
 				# Select all transactions from user
 				self.user = self.desc_queue.get()
 
-				# Load Past Transactions
+				# Load Past Transactions (User Context: Currently Disabled)
 				#self.__load_past_transactions()
 
 				# Classify using text features only
 				enriched_transactions = self.__text_features()
 
-				# Save results to user_index
+				# Save results to user_index (User Context: Currently Disabled)
 				#self.__save_labeled_transactions(enriched_transactions)
 
 				# Output Results to Result Queue

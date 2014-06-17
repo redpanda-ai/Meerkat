@@ -3,7 +3,7 @@
 	"verification_source" : "data/misc/matt_8000_card.csv",
 	"input" : {
 		"hyperparameters" : "config/hyperparameters/default.json",
-		"filename" : "/mnt/ephemeral/input/20140515_GPANEL_BANK_subsample_1000000.txt",
+		"filename" : "/mnt/ephemeral/input/30000_Card.txt",
 		"delimiter" : "|",
 		"encoding" : "utf-8",
 		"split" : {
