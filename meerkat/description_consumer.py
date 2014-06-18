@@ -432,7 +432,7 @@ class DescriptionConsumer(threading.Thread):
 		enriched_transaction["GOOD_DESCRIPTION"] = ""
 
 		# Ensure Proper Casing
-		if enriched_transaction['name'] == enriched_transaction.upper()
+		if enriched_transaction['name'] == enriched_transaction['name'].upper():
 			enriched_transaction['name'] = enriched_transaction['name'].title()
 
 		return enriched_transaction
