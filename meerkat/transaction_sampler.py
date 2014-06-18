@@ -8,7 +8,7 @@ import sys
 from random import shuffle
 
 def clean_line(line):
-	return str(line)[2:-5]
+	return str(line)[2:-3]
 
 def bucket_me(input_file, d):
 	#print("Processing {0}".format(input_file))
