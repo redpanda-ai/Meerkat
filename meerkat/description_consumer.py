@@ -132,7 +132,7 @@ class DescriptionConsumer(threading.Thread):
 		return True
 
 	def __generate_z_score_delta(self, scores):
-		"""Display the Z-score delta between the first and second scores."""
+		"""Generate the Z-score delta between the first and second scores."""
 
 		logger = logging.getLogger("thread " + str(self.thread_id))
 
@@ -238,6 +238,7 @@ class DescriptionConsumer(threading.Thread):
 
 		# Create Query
 		geo_query = get_geo_query(scaled_geoshapes)
+
 		# Run transactions again with geo_query
 		for transaction in non_hits:
 			base_query = self.__generate_base_query(transaction, boost=qs_boost)
@@ -265,7 +266,7 @@ class DescriptionConsumer(threading.Thread):
 		return text_and_geo_features_results
 
 	def __locate_user(self, unique_locations, user_id):
-		"""Uses first pass results, to find an approximation
+		"""Uses previous results, to find an approximation
 		of a users spending area. Returns estimation as
 		a bounded polygon"""
 
@@ -290,11 +291,13 @@ class DescriptionConsumer(threading.Thread):
 			# Scale generated geo shapes
 			scaled_geoshapes = [scale_polygon(geoshape, scale=scaling_factor)[1]
 			for geoshape in original_geoshapes]
+
 			# Save interesting outputs needs to run in it's own process
 			#if len(unique_locations) >= 3:
 			#	pool = multiprocessing.Pool()
 			#	arguments = [(unique_locations, original_geoshapes, scaled_geoshapes, user_id)]
 			#	pool.starmap(visualize, arguments)
+			
 		return scaled_geoshapes
 
 	def __run_classifier(self, query):
