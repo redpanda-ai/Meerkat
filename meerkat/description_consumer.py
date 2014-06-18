@@ -431,6 +431,10 @@ class DescriptionConsumer(threading.Thread):
 			
 		enriched_transaction["GOOD_DESCRIPTION"] = ""
 
+		# Ensure Proper Casing
+		if enriched_transaction['name'] == enriched_transaction.upper()
+			enriched_transaction['name'] = enriched_transaction['name'].title()
+
 		return enriched_transaction
 
 	def __output_to_result_queue(self, enriched_transactions):
