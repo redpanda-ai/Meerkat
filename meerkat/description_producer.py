@@ -306,7 +306,8 @@ def process_bucket(params):
 				with gzip.open(new_filename, 'rb') as gzipped_input:
 					unzipped_name = new_filename[:-3]
 					with open(unzipped_name, 'wb') as unzipped_input:
-						unzipped_input.write(gzipped_input.read())
+						for line in gzipped_input:
+							unzipped_input.write(line)
 						logging.warning("%s unzipped.", new_filename)
 
 				safely_remove_file(new_filename)
