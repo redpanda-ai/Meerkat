@@ -64,7 +64,8 @@ def string_cleanse(original_string):
 
 def synonyms(transaction):
 	"""Replaces transactions tokens with manually
-	mapped factual representations"""
+	mapped factual representations. This method
+	should be expanded to manage a file of synonyms"""
 
 	rep = {
 		"wal-mart" : "Walmart",
