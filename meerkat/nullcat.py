@@ -4,6 +4,7 @@ import re
 
 from boto.s3.connection import Key, Location, S3Connection
 from copy import deepcopy
+from .various_tools import safely_remove_file
 
 OUTPUT_FORMAT = [
 	"UNIQUE_MEM_ID",
@@ -62,8 +63,8 @@ def connect():
 	conn = boto.connect_s3()
 	bucket_src_name = "s3yodlee"
 	bucket_dst_name = "s3yodlee"
-	s3_path_regex = re.compile("meerkat/test_a/([^/]+)")
-#	s3_path_regex = re.compile("ctprocessed/gpanel/bank/([^/]+)")
+#	s3_path_regex = re.compile("meerkat/test_a/([^/]+)")
+	s3_path_regex = re.compile("ctprocessed/gpanel/card/([^/]+)")
 	local_src_path = "data/input/src/"
 	local_dst_path = "data/input/dst/"
 	bucket_src = conn.get_bucket(bucket_src_name, Location.USWest2)
@@ -73,20 +74,22 @@ def connect():
 			s3_file_list.append(k)
 	s3_file_list.reverse()
 	bucket_dst = conn.get_bucket(bucket_dst_name, Location.USWest2)
-	dst_s3_path = "meerkat/test_b/"
+	dst_s3_path = "meerkat/nullcat/card"
 	for item in s3_file_list:
-		file_name = s3_path_regex.search(item.key).group(1)
-		dst_file_name = file_name
-		print(file_name)
-		item.get_contents_to_filename(local_src_path + file_name)
-		header, header_name_pos, header_pos_name = get_header(file_name, local_src_path, local_dst_path)
+		src_file_name = s3_path_regex.search(item.key).group(1)
+		dst_file_name = src_file_name
+		print(src_file_name)
+		item.get_contents_to_filename(local_src_path + src_file_name)
+		header, header_name_pos, header_pos_name = get_header(src_file_name, local_src_path, local_dst_path)
 		result_name_pos, result_pos_name = get_output_structure(header_name_pos)
-		get_line(file_name, local_src_path, dst_file_name, local_dst_path, result_pos_name, header_pos_name, result_name_pos)
+		process_file(src_file_name, local_src_path, dst_file_name, local_dst_path, result_pos_name, header_pos_name, result_name_pos)
+		safely_remove_file(local_src_path + src_file_name)
 		dst_key = Key(bucket_dst)
-		dst_key.key = dst_s3_path + file_name
-		dst_key.set_contents_from_filename(local_src_path + file_name)
+		dst_key.key = dst_s3_path + src_file_name
+		dst_key.set_contents_from_filename(local_dst_path + dst_file_name, encrypt_key=True)
+		safely_remove_file(local_dst_path + dst_file_name)
 
-def get_line(src_file_name, local_src_path, dst_file_name, local_dst_path, result_pos_name, header_pos_name, result_name_pos):
+def process_file(src_file_name, local_src_path, dst_file_name, local_dst_path, result_pos_name, header_pos_name, result_name_pos):
 	blank_result = [""] * len(OUTPUT_FORMAT)
 	with gzip.open(local_src_path + src_file_name, "rb") as gzipped_input:
 		with gzip.open(local_dst_path + dst_file_name, "wb") as gzipped_output:
@@ -125,9 +128,5 @@ def get_header(src_file_name, local_src_path, local_dst_path):
 				header_pos_name[counter] = column
 				counter += 1
 			return line, header_name_pos, header_pos_name
-
-"""
-MEM_ID|CARD_ACCOUNT_ID|CARD_TRANSACTION_ID|AMOUNT|DESCRIPTION|TRANSACTION_DATE|POST_DATE|TYPE|TRANSACTION_CATEGORY_ID|TRANSACTION_CATEGORY_NAME|AMOUNT_CURR|COBRAND_ID|GOOD_DESCRIPTION|KEYWORD|SUM_INFO_ID|CURRENCY_ID|CONVERTED_AMOUNT|CURRENCY_CONV_RATE|UNIQUE_MEM_ID|UNIQUE_ACCOUNT_ID|UNIQUE_TRANSACTION_ID|FILE_CREATED_DATE|DESCRIPTION_UNMASKED
-"""
 
 connect()
