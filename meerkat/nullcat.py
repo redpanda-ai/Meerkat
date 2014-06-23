@@ -1,6 +1,7 @@
 import boto
 import gzip
 import re
+import sys
 
 from boto.s3.connection import Key, Location, S3Connection
 from copy import deepcopy
@@ -61,38 +62,55 @@ def get_output_structure(header_name_pos):
 
 def connect():
 	conn = boto.connect_s3()
-	bucket_src_name = "s3yodlee"
-	bucket_dst_name = "s3yodlee"
-#	s3_path_regex = re.compile("meerkat/test_a/([^/]+)")
-	s3_path_regex = re.compile("ctprocessed/gpanel/card/([^/]+)")
-	local_src_path = "data/input/src/"
-	local_dst_path = "data/input/dst/"
-	bucket_src = conn.get_bucket(bucket_src_name, Location.USWest2)
+	src_bucket_name = "s3yodlee"
+	src_s3_path_regex = re.compile("ctprocessed/gpanel/card/([^/]+)")
+	src_local_path = "data/input/src/"
+
+	dst_bucket_name = "s3yodlee"
+	dst_s3_path_regex = re.compile("meerkat/nullcat/card/([^/]+)")
+	dst_local_path = "data/input/dst/"
+
+	#Get completed list
+	dst_bucket = conn.get_bucket(dst_bucket_name, Location.USWest2)
+	completed_list = []
+	for j in dst_bucket.list():
+		if dst_s3_path_regex.search(j.key):
+			completed_list.append(dst_s3_path_regex.search(j.key).group(1))
+
+	#print(completed_list)
+	#End get completed list
+	src_bucket = conn.get_bucket(src_bucket_name, Location.USWest2)
 	s3_file_list = []
-	for k in bucket_src.list():
-		if s3_path_regex.search(k.key):
-			s3_file_list.append(k)
+	for k in src_bucket.list():
+		if src_s3_path_regex.search(k.key):
+			file_name = src_s3_path_regex.search(k.key).group(1)
+			if file_name in completed_list:
+				print("Ignoring {0}".format(file_name))
+			else:
+				s3_file_list.append(k)
 	s3_file_list.reverse()
-	bucket_dst = conn.get_bucket(bucket_dst_name, Location.USWest2)
-	dst_s3_path = "meerkat/nullcat/card"
+	#for item in s3_file_list:
+	#	print(item)
+	bucket_dst = conn.get_bucket(dst_bucket_name, Location.USWest2)
+	dst_s3_path = "meerkat/nullcat/card/"
 	for item in s3_file_list:
-		src_file_name = s3_path_regex.search(item.key).group(1)
+		src_file_name = src_s3_path_regex.search(item.key).group(1)
 		dst_file_name = src_file_name
 		print(src_file_name)
-		item.get_contents_to_filename(local_src_path + src_file_name)
-		header, header_name_pos, header_pos_name = get_header(src_file_name, local_src_path, local_dst_path)
+		item.get_contents_to_filename(src_local_path + src_file_name)
+		header, header_name_pos, header_pos_name = get_header(src_file_name, src_local_path, dst_local_path)
 		result_name_pos, result_pos_name = get_output_structure(header_name_pos)
-		process_file(src_file_name, local_src_path, dst_file_name, local_dst_path, result_pos_name, header_pos_name, result_name_pos)
-		safely_remove_file(local_src_path + src_file_name)
+		process_file(src_file_name, src_local_path, dst_file_name, dst_local_path, result_pos_name, header_pos_name, result_name_pos)
+		safely_remove_file(src_local_path + src_file_name)
 		dst_key = Key(bucket_dst)
 		dst_key.key = dst_s3_path + src_file_name
-		dst_key.set_contents_from_filename(local_dst_path + dst_file_name, encrypt_key=True)
-		safely_remove_file(local_dst_path + dst_file_name)
+		dst_key.set_contents_from_filename(dst_local_path + dst_file_name, encrypt_key=True)
+		safely_remove_file(dst_local_path + dst_file_name)
 
-def process_file(src_file_name, local_src_path, dst_file_name, local_dst_path, result_pos_name, header_pos_name, result_name_pos):
+def process_file(src_file_name, src_local_path, dst_file_name, dst_local_path, result_pos_name, header_pos_name, result_name_pos):
 	blank_result = [""] * len(OUTPUT_FORMAT)
-	with gzip.open(local_src_path + src_file_name, "rb") as gzipped_input:
-		with gzip.open(local_dst_path + dst_file_name, "wb") as gzipped_output:
+	with gzip.open(src_local_path + src_file_name, "rb") as gzipped_input:
+		with gzip.open(dst_local_path + dst_file_name, "wb") as gzipped_output:
 			first_line = True
 			for line in gzipped_input:
 				if first_line:
@@ -116,8 +134,8 @@ def process_file(src_file_name, local_src_path, dst_file_name, local_dst_path, r
 				output_line = bytes(output_line + "\n", 'UTF-8')
 				gzipped_output.write(output_line)
 
-def get_header(src_file_name, local_src_path, local_dst_path):
-	with gzip.open(local_src_path + src_file_name, "rb") as gzipped_input:
+def get_header(src_file_name, src_local_path, dst_local_path):
+	with gzip.open(src_local_path + src_file_name, "rb") as gzipped_input:
 		for line in gzipped_input:
 			header = clean_line(line)
 			header_list = header.split("|")
