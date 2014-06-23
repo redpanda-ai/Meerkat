@@ -23,28 +23,28 @@ def begin_processing_loop(some_container):
 	"""Fetches a list of input files to process from S3 and loops over them."""
 	conn = boto.connect_s3()
 
-	#Source details
-	src_bucket_name = "s3yodlee"
-	src_s3_path_regex = re.compile("ctprocessed/gpanel/" + some_container +\
-	"/([^/]+)")
-	src_local_path = "data/input/src/"
-
-	#Destination details
+	#Set destination details
 	dst_bucket_name = "s3yodlee"
 	dst_s3_path_regex = re.compile("meerkat/nullcat/" + some_container +\
 	"/([^/]+)")
 	dst_local_path = "data/input/dst/"
-
-	#Get the list of files that are ALREADY completed
 	dst_bucket = conn.get_bucket(dst_bucket_name, Location.USWest2)
+
+	#Get the list of completed files (already proceseed)
 	completed_list = []
 	for j in dst_bucket.list():
 		if dst_s3_path_regex.search(j.key):
 			completed_list.append(dst_s3_path_regex.search(j.key).group(1))
 
-	#Get list of files to process
+	#Set source details
+	src_bucket_name = "s3yodlee"
+	src_s3_path_regex = re.compile("ctprocessed/gpanel/" + some_container +\
+	"/([^/]+)")
+	src_local_path = "data/input/src/"
 	src_bucket = conn.get_bucket(src_bucket_name, Location.USWest2)
-	s3_file_list = []
+
+	#Get list of pending files (yet to be processed)
+	pending_list = []
 	for k in src_bucket.list():
 		if src_s3_path_regex.search(k.key):
 			file_name = src_s3_path_regex.search(k.key).group(1)
@@ -52,14 +52,14 @@ def begin_processing_loop(some_container):
 				#Remove files that have already been completed
 				print("Ignoring {0}".format(file_name))
 			else:
-				s3_file_list.append(k)
-	#Reverse the list so that they are processed in reverse chronological order
-	s3_file_list.reverse()
+				pending_list.append(k)
+	#Reverse the pending list so that they are processed in reverse
+	#chronological order
+	pending_list.reverse()
 
-	dst_bucket = conn.get_bucket(dst_bucket_name, Location.USWest2)
-	dst_s3_path = "meerkat/nullcat/" + some_container + "/"
 	#Loop through each file in the list of files to process
-	for item in s3_file_list:
+	dst_s3_path = "meerkat/nullcat/" + some_container + "/"
+	for item in pending_list:
 		src_file_name = src_s3_path_regex.search(item.key).group(1)
 		dst_file_name = src_file_name
 		print(src_file_name)
