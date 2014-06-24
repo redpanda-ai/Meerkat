@@ -237,6 +237,7 @@ def write_output_to_file(params, output_list, non_physical, split):
 	split_header = header.split(params["input"]["delimiter"])
 	header_list = [token.strip() for token in split_header]
 	header_list.append("IS_PHYSICAL_TRANSACTION")
+	header_list.append("z_score_delta")
 
  	# Get additional fields for display from config file
 	additional_fields = params["output"]["results"]["fields"]
@@ -331,6 +332,8 @@ def process_panel(params, filename, S3):
 	elif "card" in filename.lower():
 		params["mode"] = "card"
 		classifier = select_model("card")
+	else: 
+		print("Panel name must include type (bank or card).")
 
 	# Load and Split Files
 	try:

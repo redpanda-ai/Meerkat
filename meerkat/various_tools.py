@@ -80,8 +80,10 @@ def synonyms(transaction):
 		"exxonmobil" : "exxonmobil exxon mobil",
 		"mcdonalds" : "mcdonald's",
 		"costco whse" : "costco",
-		"franciscoca" : "francisco ca"
-	}
+		"franciscoca" : "francisco ca",
+		"QT" : "Quicktrip",
+		"Macy's East" : "Macy's"
+ 	}
 
 	transaction = transaction.lower()
 	rep = dict((re.escape(k), v) for k, v in rep.items())
