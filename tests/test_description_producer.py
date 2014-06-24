@@ -1,8 +1,10 @@
 """Unit tests for meerkat.description_producer"""
 
+import unittest, queue, sys, socket, os, json
+
 from meerkat import description_producer
 from meerkat.custom_exceptions import InvalidArguments, Misconfiguration
-import unittest, queue, sys, socket, os, json
+from meerkat.binary_classifier.load import select_model
 
 class TokenizeDescriptionTests(unittest.TestCase):
 
@@ -12,8 +14,8 @@ class TokenizeDescriptionTests(unittest.TestCase):
 		"concurrency" : 1,
 		"input" : {
 			"hyperparameters" : "config/hyperparameters/made_up_key_name.json",
-			"filename" : "data/input/100_bank_transaction_descriptions.csv",
-			"delimiter" : ",",
+			"filename" : "data/input/100_bank_transaction_descriptions.txt",
+			"delimiter" : "|",
 			"encoding" : "utf-8"
 		},
 		"logging" : {
@@ -153,12 +155,14 @@ class TokenizeDescriptionTests(unittest.TestCase):
 
 	def test_get_desc_queue_returns_queue(self):
 		"""Ensure returns an instance of Queue"""
-		my_queue, non_physical = description_producer.get_desc_queue(self.params)
+		classifier = select_model('bank')
+		my_queue, non_physical = description_producer.get_desc_queue(self.params["input"]["filename"], self.params, classifier)
 		self.assertTrue(isinstance(my_queue, queue.Queue))
 
 	def test_get_desc_queue_is_not_empty(self):
 		"""Ensure queue is not empty"""
-		my_queue, non_physical = description_producer.get_desc_queue(self.params)
+		classifier = select_model('bank')
+		my_queue, non_physical = description_producer.get_desc_queue(self.params["input"]["filename"], self.params, classifier)
 		self.assertFalse(my_queue.empty())
 
 	def test_initialize_no_file_name(self):

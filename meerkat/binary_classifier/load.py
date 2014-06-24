@@ -32,7 +32,7 @@ def select_model(mode):
 	model = joblib.load(model_path)
 
 	# Generate Helper Function
-	def classifier(description=None):
+	def classifier(description):
 		result = list(model.predict([description]))[0]
 		return result
 			

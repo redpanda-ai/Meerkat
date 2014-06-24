@@ -1,8 +1,9 @@
 """Unit tests for scaling meerkat.location"""
 
+import unittest
+
 import numpy as np
 import pylab as pl
-
 import matplotlib.pyplot as plt
 from matplotlib.path import Path
 from matplotlib.patches import Polygon
@@ -29,25 +30,25 @@ class VariousToolsTests(unittest.TestCase):
 	def test_scale_polygon__centroid(self):
 		"""scale_polygon test that it correctly calculates the centroid"""
 		expect = [[-122.43501617, 37.7759035]]
-		result, _, _, _ = meerkat.various_tools.scale_polygon(self.original_polygon, scale = 2.0)
+		result, _, _, _ = meerkat.location.scale_polygon(self.original_polygon, scale = 2.0)
 		self.assertTrue(np.allclose(expect, result, rtol=1e-05, atol=1e-08))
 
 	def test_scale_polygon__scaled_list_of_points(self):
 		"""scale_polygon test that it converts a list of polygon points to a numpy matrix"""
 		expect = self.doubled_original_polygon
-		_, result, _, _ = meerkat.various_tools.scale_polygon(self.original_polygon, scale = 2.0)
+		_, result, _, _ = meerkat.location.scale_polygon(self.original_polygon, scale = 2.0)
 		self.assertTrue(np.allclose(np.matrix(expect), np.matrix(result), rtol=1e-05, atol=1e-08))
 
 	def test_scale_polygon__original_matrix(self):
 		"""scale_polygon test that it converts a list of polygon points to a numpy matrix"""
 		expect = np.matrix(self.original_polygon)
-		_, _, result, _ = meerkat.various_tools.scale_polygon(self.original_polygon, scale = 2.0)
+		_, _, result, _ = meerkat.location.scale_polygon(self.original_polygon, scale = 2.0)
 		self.assertTrue(np.allclose(expect, result, rtol=1e-05, atol=1e-08))
 
 	def test_scale_polygon__scaled_matrix(self):
 		"""scale_polygon test that it produces a correctly scaled matrix"""
 		expect = np.matrix(self.doubled_original_polygon)
-		_, _, _, result = meerkat.various_tools.scale_polygon(self.original_polygon, scale = 2.0)
+		_, _, _, result = meerkat.location.scale_polygon(self.original_polygon, scale = 2.0)
 		self.assertTrue(np.allclose(expect, result, rtol=1e-05, atol=1e-08))
 
 def draw_plot(polygon_points, scaled_polygon_points, S, zoom_out_factor = 2.5):

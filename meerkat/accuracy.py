@@ -39,41 +39,42 @@ from meerkat.various_tools import load_dict_list
 def test_pinpoint_classifier(machine_labeled, human_labeled, my_lists):
 	"""Tests both the recall and precision of the pinpoint classifier against
 	human-labeled training data."""
+
 	for machine_labeled_row in machine_labeled:
 		# Our confidence was not high enough to label
 		if machine_labeled_row["factual_id"] == "":
-			my_lists["unlabeled"].append(machine_labeled_row['DESCRIPTION'])
+			my_lists["unlabeled"].append(machine_labeled_row['DESCRIPTION_UNMASKED'])
 			continue
 		# Verify against human labeled
 		for index, human_labeled_row in enumerate(human_labeled):
-			if machine_labeled_row['DESCRIPTION'] == human_labeled_row['DESCRIPTION']:
+			if machine_labeled_row['DESCRIPTION_UNMASKED'] == human_labeled_row['DESCRIPTION_UNMASKED']:
 				if human_labeled_row['IS_PHYSICAL_TRANSACTION'] == '0':
 					# Transaction is non physical
-					my_lists["non_physical"].append(machine_labeled_row['DESCRIPTION'])
+					my_lists["non_physical"].append(machine_labeled_row['DESCRIPTION_UNMASKED'])
 					break
 				elif human_labeled_row["factual_id"] == "":
 					# Transaction is not yet labeled
-					my_lists["needs_hand_labeling"].append(machine_labeled_row['DESCRIPTION'])
+					my_lists["needs_hand_labeling"].append(machine_labeled_row['DESCRIPTION_UNMASKED'])
 					break
 				elif machine_labeled_row["factual_id"] == human_labeled_row["factual_id"]:
 					# Transaction was correctly labeled
-					my_lists["correct"].append(human_labeled_row['DESCRIPTION']\
+					my_lists["correct"].append(human_labeled_row['DESCRIPTION_UNMASKED']\
 						+ " (ACTUAL:" + human_labeled_row["factual_id"] + ")")
 					break
 				else:
 					# Transaction is mislabeled
-					my_lists["mislabeled"].append(human_labeled_row['DESCRIPTION']\
+					my_lists["mislabeled"].append(human_labeled_row['DESCRIPTION_UNMASKED']\
 						+ " (ACTUAL:" + human_labeled_row["factual_id"] + ")"\
 						+ " (FOUND:" + machine_labeled_row["factual_id"] + ")")
 					break
 			elif index + 1 == len(human_labeled):
-				my_lists["needs_hand_labeling"].append(machine_labeled_row['DESCRIPTION'])
+				my_lists["needs_hand_labeling"].append(machine_labeled_row['DESCRIPTION_UNMASKED'])
 
 def test_bulk_classifier(human_labeled, non_physical_trans, my_lists):
 	"""Tests for accuracy of the bulk (binary) classifier"""
 	for item in my_lists["unlabeled"]:
 		for _, human_labeled_row in enumerate(human_labeled):
-			if item == human_labeled_row['DESCRIPTION']:
+			if item == human_labeled_row['DESCRIPTION_UNMASKED']:
 				if human_labeled_row['IS_PHYSICAL_TRANSACTION'] == '0':
 					# Transaction is non physical
 					my_lists["non_physical"].append(item)
@@ -81,7 +82,7 @@ def test_bulk_classifier(human_labeled, non_physical_trans, my_lists):
 
 	for item in non_physical_trans:
 		for _, human_labeled_row in enumerate(human_labeled):
-			if item == human_labeled_row['DESCRIPTION']:
+			if item == human_labeled_row['DESCRIPTION_UNMASKED']:
 				if human_labeled_row['IS_PHYSICAL_TRANSACTION'] == '1':
 					my_lists["incorrect_non_physical"].append(item)
 
@@ -108,8 +109,8 @@ def test_accuracy(params, file_path=None, non_physical_trans=None,
 
 	# Load Verification Source
 	verification_source = params.get("verification_source",
-		"data/misc/verifiedLabeledTrans.csv")
-	human_labeled = load_dict_list(verification_source, delimiter=",")
+		"data/misc/verifiedLabeledTrans.txt")
+	human_labeled = load_dict_list(verification_source)
 
 	my_counters = {
 		"total": len(machine_labeled),
