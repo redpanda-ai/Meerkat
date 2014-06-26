@@ -19,14 +19,14 @@ OUTPUT_FORMAT = [\
 "LATITUDE", "LONGITUDE", "NEIGHBOURHOOD", "TRANSACTION_ORIGIN",\
 "CONFIDENCE_SCORE", "FACTUAL_ID", "FILE_CREATED_DATE"]
 
-def begin_processing_loop(some_container):
+def begin_processing_loop(some_container, filter_expression):
 	"""Fetches a list of input files to process from S3 and loops over them."""
 	conn = boto.connect_s3()
 
 	#Set destination details
 	dst_bucket_name = "s3yodlee"
 	dst_s3_path_regex = re.compile("meerkat/nullcat/" + some_container +\
-	"/([^/]+)")
+	"/(" + filter_expression + "[^/]+)")
 	#dst_local_path = "data/input/dst/"
 	dst_local_path = "/mnt/ephemeral/output/"
 	dst_bucket = conn.get_bucket(dst_bucket_name, Location.USWest2)
@@ -44,7 +44,7 @@ def begin_processing_loop(some_container):
 	#Set source details
 	src_bucket_name = "s3yodlee"
 	src_s3_path_regex = re.compile("ctprocessed/gpanel/" + some_container +\
-	"/([^/]+)")
+	"/(" + filter_expression + "[^/]+)")
 	#src_local_path = "data/input/src/"
 	src_local_path = "/mnt/ephemeral/input/"
 	src_bucket = conn.get_bucket(src_bucket_name, Location.USWest2)
@@ -196,4 +196,8 @@ header_pos_name, map_of_column_positions, container):
 				gzipped_output.write(output_line)
 
 #Main program
-begin_processing_loop(sys.argv[1])
+#USAGE:
+#	python3.3 -m meerkat.nullcat <bank_or_card> <regex_filter>
+#
+#		Example: python3.3 -m meercat.nullcat bank 201306.*[02468]
+begin_processing_loop(sys.argv[1], sys.argv[2])
