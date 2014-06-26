@@ -27,20 +27,26 @@ def begin_processing_loop(some_container):
 	dst_bucket_name = "s3yodlee"
 	dst_s3_path_regex = re.compile("meerkat/nullcat/" + some_container +\
 	"/([^/]+)")
-	dst_local_path = "data/input/dst/"
+	#dst_local_path = "data/input/dst/"
+	dst_local_path = "/mnt/ephemeral/output/"
 	dst_bucket = conn.get_bucket(dst_bucket_name, Location.USWest2)
 
 	#Get the list of completed files (already proceseed)
-	completed_list = []
+	#completed_list = []
+	completed = {}
 	for j in dst_bucket.list():
 		if dst_s3_path_regex.search(j.key):
-			completed_list.append(dst_s3_path_regex.search(j.key).group(1))
+			completed[dst_s3_path_regex.search(j.key).group(1)] = j.size
 
+	#print(completed_names)
+	#print(completed_sizes)
+	#sys.exit()
 	#Set source details
 	src_bucket_name = "s3yodlee"
 	src_s3_path_regex = re.compile("ctprocessed/gpanel/" + some_container +\
 	"/([^/]+)")
-	src_local_path = "data/input/src/"
+	#src_local_path = "data/input/src/"
+	src_local_path = "/mnt/ephemeral/input/"
 	src_bucket = conn.get_bucket(src_bucket_name, Location.USWest2)
 
 	#Get list of pending files (yet to be processed)
@@ -48,15 +54,20 @@ def begin_processing_loop(some_container):
 	for k in src_bucket.list():
 		if src_s3_path_regex.search(k.key):
 			file_name = src_s3_path_regex.search(k.key).group(1)
-			if file_name in completed_list:
-				#Remove files that have already been completed
-				print("Ignoring {0}".format(file_name))
+			if file_name in completed:
+				#Exclude files that have already been completed
+				ratio = float(k.size) / completed[file_name]
+				#Completed incorrectly
+				if ratio >= 1.8:
+					print("Completed Size, Source Size, Ratio: {0}, {1}, {2:.2f}".format(completed[file_name], k.size, ratio))
+					print("Re-running {0}".format(file_name))
+					pending_list.append(k)
 			else:
 				pending_list.append(k)
 	#Reverse the pending list so that they are processed in reverse
 	#chronological order
 	pending_list.reverse()
-
+	#sys.exit()
 	#Loop through each file in the list of files to process
 	dst_s3_path = "meerkat/nullcat/" + some_container + "/"
 	for item in pending_list:
@@ -76,8 +87,9 @@ def begin_processing_loop(some_container):
 		#Push the results from the local file system to S3
 		dst_key = Key(dst_bucket)
 		dst_key.key = dst_s3_path + src_file_name
-		dst_key.set_contents_from_filename(dst_local_path + dst_file_name,\
-		encrypt_key=True)
+		bytes_written = dst_key.set_contents_from_filename(dst_local_path + dst_file_name,\
+		encrypt_key=True, replace=True)
+		print("{0} bytes written".format(bytes_written))
 		safely_remove_file(dst_local_path + dst_file_name)
 
 def clean_line(line):
@@ -143,14 +155,29 @@ header_pos_name, map_of_column_positions, container):
 				#Treat the first line differently, since it is a header
 				if first_line:
 					first_line = False
+					line = clean_line(line)
 					output_line = "|".join(output_format)
+					if "|GOOD_DESCRIPTION|" not in line:
+						error_msg = "Error, no header found in source file."
+						print(error_msg)
+						line = clean_line(line)
+						print("FIRST LINE:\n{0}".format(line))
+						gzipped_output.write(bytes(error_msg + "\n", 'UTF-8'))
+						return
 				else:
 					line = clean_line(line)
 					split_list = line.split("|")
 					result = deepcopy(blank_result)
 					count = 0
 					for item in split_list:
-						name = header_pos_name[count]
+						try:
+							name = header_pos_name[count]
+						except:
+							gzipped_output.close()
+							with gzip.open(dst_local_path + dst_file_name, "wb") as gzipped_output_error:
+								error_msg = "Source data is corrupt; found improperly structured record on line " + str(count)
+								gzipped_output_error.write(bytes(error_msg + "\n", 'UTF-8'))
+								return
 						if name in map_of_column_positions:
 							position = map_of_column_positions[name][0]
 							result[position] = item
