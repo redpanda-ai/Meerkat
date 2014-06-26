@@ -459,7 +459,8 @@ def run_from_command_line(command_line_arguments):
 	"""Runs these commands if the module is invoked from the command line"""
 
 	build_user_index()
-	global params = initialize()
+	global params
+	params = initialize()
 	logging.warning(json.dumps(params, sort_keys=True,
 		indent=4, separators=(',', ':')))
 	guarantee_index_and_doc_type(params)
