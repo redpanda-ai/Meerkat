@@ -189,13 +189,13 @@ def run(stores):
 	print("PERCENT MERGED: ", percent_merged)
 
 	# Save Not Found
-	save_not_found(not_found, percent_missed)
+	save_not_found(not_found, percent_merged)
 
-def save_not_found(not_found, percent_missed):
+def save_not_found(not_found, percent_merged):
 	"""Save the stores not found in the index"""
 
 	store_name = not_found[0]['keywords']
-	file_name = "/mnt/ephemeral/AggData_Factual_Merge/" + store_name + "_not_found_" + str(percent_missed * 100) + "%_of_total" + ".csv"
+	file_name = "/mnt/ephemeral/AggData_Factual_Merge/" + store_name + "_" + str(percent_merged * 100) + "%_success_rate" + ".csv"
 	delimiter = ","
 	output_file = open(file_name, 'w')
 	dict_w = csv.DictWriter(output_file, delimiter=delimiter, fieldnames=not_found[0].keys())
