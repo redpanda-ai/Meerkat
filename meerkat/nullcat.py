@@ -62,7 +62,7 @@ def begin_processing_loop(some_container, filter_expression):
 					print("Completed Size, Source Size, Ratio: {0}, {1}, {2:.2f}".format(completed[file_name], k.size, ratio))
 					print("Re-running {0}".format(file_name))
 					pending_list.append(k)
-			else:
+			elif k.size > 0:
 				pending_list.append(k)
 	#Reverse the pending list so that they are processed in reverse
 	#chronological order
