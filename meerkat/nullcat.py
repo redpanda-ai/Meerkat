@@ -13,10 +13,10 @@ OUTPUT_FORMAT = [\
 "UNIQUE_MEM_ID", "UNIQUE___BLANK_ACCOUNT_ID", "UNIQUE___BLANK_TRANSACTION_ID",\
 "MEM_ID", "__BLANK_ACCOUNT_ID", "__BLANK_TRANSACTION_ID", "COBRAND_ID",\
 "SUM_INFO_ID", "AMOUNT", "CURRENCY_ID", "DESCRIPTION", "TRANSACTION_DATE",\
-"POST_DATE", "TRANSACITON_BASE_TYPE", "TRANSACTION_CATEGORY_ID",\
+"POST_DATE", "TRANSACTION_BASE_TYPE", "TRANSACTION_CATEGORY_ID",\
 "TRANSACTION_CATEGORY_NAME", "MERCHANT_NAME", "STORE_ID", "FACTUAL_CATEGORY",\
 "STREET", "CITY", "STATE", "ZIP_CODE", "WEBSITE", "PHONE_NUMBER", "FAX_NUMBER",\
-"LATITUDE", "LONGITUDE", "NEIGHBOURHOOD", "TRANSACTION_ORIGIN",\
+"CHAIN_NAME", "LATITUDE", "LONGITUDE", "NEIGHBOURHOOD", "TRANSACTION_ORIGIN",\
 "CONFIDENCE_SCORE", "FACTUAL_ID", "FILE_CREATED_DATE"]
 
 def begin_processing_loop(some_container, filter_expression):
@@ -184,10 +184,10 @@ header_pos_name, map_of_column_positions, container):
 						count += 1
 					#Add composite columns, not explicitly provided from the input
 					result[1] = str(result[map_of_column_positions["COBRAND_ID"][0]])\
-					+ "." + str(result[map_of_column_positions[my_container\
+					+ str(result[map_of_column_positions[my_container\
 					+ "_ACCOUNT_ID"][0]])
 					result[2] = str(result[map_of_column_positions["COBRAND_ID"][0]])\
-					+ "." + str(result[map_of_column_positions[my_container\
+					+ str(result[map_of_column_positions[my_container\
 					+ "_TRANSACTION_ID"][0]])
 					#Turn the output list into a pipe-delimited string
 					output_line = "|".join(result)
