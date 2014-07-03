@@ -78,7 +78,7 @@ def begin_processing_loop(some_container):
 		if dst_s3_path_regex.search(m.key):
 			file_name = dst_s3_path_regex.search(m.key).group(1)
 			if file_name in error_list:
-				print("Found {0}".format(m.key))
+				print("\ns3yodlee/ctprocessed/gpanel/{0}".format(file_name))
 				m.get_contents_to_filename(dst_local_path + "current_error")
 				with gzip.open(dst_local_path + "current_error", "rb") as gzipped_input:
 					for line in gzipped_input:

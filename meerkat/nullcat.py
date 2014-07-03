@@ -156,9 +156,11 @@ header_pos_name, map_of_column_positions, container):
 	blank_result = [""] * len(output_format)
 	my_container = container.upper()
 	with gzip.open(src_local_path + src_file_name, "rb") as gzipped_input:
+		line_count = 0
 		with gzip.open(dst_local_path + dst_file_name, "wb") as gzipped_output:
 			first_line = True
 			for line in gzipped_input:
+				line_count +=1
 				line = clean_line(line)
 				#Treat the first line differently, since it is a header
 				if first_line:
@@ -179,7 +181,7 @@ header_pos_name, map_of_column_positions, container):
 						except:
 							#Verify that each line has the correct number of delimiters
 							gzipped_output.close()
-							write_error_file(dst_local_path, dst_file_name, line, "Improperly structured line #" + str(count))
+							write_error_file(dst_local_path, dst_file_name, line, "Improperly structured line #" + str(line_count))
 							return
 						if name in map_of_column_positions:
 							position = map_of_column_positions[name][0]
@@ -190,7 +192,7 @@ header_pos_name, map_of_column_positions, container):
 					if output_line[0] == "|":
 						#Verify the each line begins with a non-pipe
 						gzipped_output.close()
-						write_error_file(dst_local_path, dst_file_name, output_line, "Output line was corrupt on line #" + str(count))
+						write_error_file(dst_local_path, dst_file_name, output_line, "Output line was corrupt on line #" + str(line_count))
 						return
 				#Encode the line as bytes in UTF-8 and write them to a gzipped file
 				output_line = bytes(output_line + "\n", 'UTF-8')
