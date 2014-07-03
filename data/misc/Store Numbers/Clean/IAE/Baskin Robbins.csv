@@ -1,0 +1,2429 @@
+keywords,city,Aggdata Store Number,store_number,address,state,zip_code
+Baskin-Robbins,Holbrook,1,#XX1 XX1,411 Furrows Rd,NY,11741
+Baskin-Robbins,Raynham,2,#XX2 XX2,406 New State Hwy (Rt 44),MA,2767
+Baskin-Robbins,Brooklyn,3,#XX3 XX3,1213 Liberty Ave,NY,11208
+Baskin-Robbins,Newburgh,4,#XX4 XX4,674 Broadway,NY,12550
+Baskin-Robbins,Cos Cob,5,#XX5 XX5,375 E Putnam Ave,CT,6807
+Baskin-Robbins,Baltimore,6,#XX6 XX6,5401 Harford Rd,MD,21214
+Baskin-Robbins,Whiting,7,#XX7 XX7,1531 Indianapolis Blvd,IN,46394
+Baskin-Robbins,Union,8,#XX8 XX8,2639 Morris Ave,NJ,7083
+Baskin-Robbins,Flushing,9,#XX9 XX9,14625 Northern Blvd,NY,11354
+Baskin-Robbins,Commack,10,#XX10 XX10,2073 Jericho Tpke,NY,11725
+Baskin-Robbins,Roslyn,11,#XX11 XX11,1063 Northern Blvd,NY,11576
+Baskin-Robbins,Kenilworth,12,#XX12 XX12,705 Boulevard,NJ,7033
+Baskin-Robbins,Lodi,13,#XX13 XX13,380 Essex Street,NJ,7644
+Baskin-Robbins,Chicago,14,#XX14 XX14,4547 N Broadway St,IL,60640
+Baskin-Robbins,Catonsville,15,#XX15 XX15,580 Frederick Rd,MD,21228
+Baskin-Robbins,Berwyn,16,#XX16 XX16,6601 Cermak Rd,IL,60402
+Baskin-Robbins,Chicago,17,#XX17 XX17,1743 W. Lawrence Ave,IL,60640
+Baskin-Robbins,Des Plaines,18,#XX18 XX18,850 Elmhurst Rd,IL,60016
+Baskin-Robbins,Westland,19,#XX19 XX19,34417 Ford Rd,MI,48185
+Baskin-Robbins,Glen Burnie,20,#XX20 XX20,7152 Ritchie Hwy,MD,21061
+Baskin-Robbins,Berwyn,21,#XX21 XX21,7020 Ogden Ave,IL,60402
+Baskin-Robbins,Closter,22,#XX22 XX22,278 Closter Dock Rd,NJ,7624
+Baskin-Robbins,Staten Island,23,#XX23 XX23,2425 Hylan Blvd,NY,10306
+Baskin-Robbins,Oak Park,24,#XX24 XX24,25170 Greenfield Rd,MI,48237
+Baskin-Robbins,Blue Island,25,#XX25 XX25,2323 W. 127th St,IL,60406
+Baskin-Robbins,Chicago,26,#XX26 XX26,1755 W Addison St,IL,60613
+Baskin-Robbins,Hempstead,27,#XX27 XX27,247 Greenwich St,NY,11550
+Baskin-Robbins,Yorkville,28,#XX28 XX28,1604 N Bridge St,IL,60560
+Baskin-Robbins,Southfield,29,#XX29 XX29,24740 Telegraph Rd,MI,48034
+Baskin-Robbins,Madison Heights,30,#XX30 XX30,28875 Dequindre Rd,MI,48071
+Baskin-Robbins,Chicago,31,#XX31 XX31,3132 W. Devon Ave,IL,60659
+Baskin-Robbins,Calumet City,32,#XX32 XX32,664 River Oaks Dr,IL,60409
+Baskin-Robbins,Bergenfield,33,#XX33 XX33,275 S Washington Ave,NJ,7621
+Baskin-Robbins,Fort Lauderdale,34,#XX34 XX34,1900 N Federal Hwy,FL,33305
+Baskin-Robbins,Worth,35,#XX35 XX35,6707 W 111th St,IL,60482
+Baskin-Robbins,Chicago,36,#XX36 XX36,7171 W Irving Park Rd,IL,60634
+Baskin-Robbins,Southgate,37,#XX37 XX37,15067 Eureka Rd,MI,48195
+Baskin-Robbins,Cicero,38,#XX38 XX38,5600 W 16th St,IL,60804
+Baskin-Robbins,Chicago,39,#XX39 XX39,4045 W Lawrence Ave,IL,60630
+Baskin-Robbins,Wallington,40,#XX40 XX40,443 Paterson Ave,NJ,7057
+Baskin-Robbins,Chicago,41,#XX41 XX41,5000 W. Irving Park Rd,IL,60641
+Baskin-Robbins,East Northport,42,#XX42 XX42,314 Larkfield Rd,NY,11731
+Baskin-Robbins,Patchogue,43,#XX43 XX43,369 E Main St,NY,11772
+Baskin-Robbins,Arlington Heights,44,#XX44 XX44,1010 E Rand Rd,IL,60004
+Baskin-Robbins,Schaumburg,45,#XX45 XX45,893 E. Schaumburg Rd,IL,60194
+Baskin-Robbins,Mundelein,46,#XX46 XX46,346 N Lake St,IL,60060
+Baskin-Robbins,Homewood,47,#XX47 XX47,2353 183rd St,IL,60430
+Baskin-Robbins,Saint Joseph,48,#XX48 XX48,2731 Niles Ave,MI,49085
+Baskin-Robbins,Taylor,49,#XX49 XX49,11111 Telegraph Rd,MI,48180
+Baskin-Robbins,Boynton Beach,50,#XX50 XX50,1317 S Federal Hwy,FL,33435
+Baskin-Robbins,Chicago,51,#XX51 XX51,2337 N Cicero Ave,IL,60639
+Baskin-Robbins,Valparaiso,52,#XX52 XX52,3310 Calumet Ave,IN,46383
+Baskin-Robbins,Gary,53,#XX53 XX53,6060 W Ridge Rd,IN,46408
+Baskin-Robbins,Merrillville,54,#XX54 XX54,5775 S Broadway,IN,46410
+Baskin-Robbins,Brentwood,55,#XX55 XX55,1694 Islip Ave,NY,11717
+Baskin-Robbins,Hampton Bays,56,#XX56 XX56,127 E Montauk Hwy,NY,11946
+Baskin-Robbins,Dumfries,57,#XX57 XX57,18021 Main St,VA,22026
+Baskin-Robbins,Elkridge,58,#XX58 XX58,6305 Washington Blvd,MD,21075
+Baskin-Robbins,Deer Park,59,#XX59 XX59,1906 Deer Park Ave,NY,11729
+Baskin-Robbins,Athens,60,#XX60 XX60,771 Prince Ave,GA,30606
+Baskin-Robbins,Westmont,61,#XX61 XX61,19 W 63rd St,IL,60559
+Baskin-Robbins,Oakbrook Terrace,62,#XX62 XX62,17521 Roosevelt Rd,IL,60181
+Baskin-Robbins,Woodhaven,63,#XX63 XX63,20050 West Rd,MI,48183
+Baskin-Robbins,Chicago,64,#XX64 XX64,3101 W Irving Park Rd,IL,60618
+Baskin-Robbins,Riverhead,65,#XX65 XX65,1051 Old Country Rd,NY,11901
+Baskin-Robbins,Coram,66,#XX66 XX66,350 Middle Country Rd,NY,11727
+Baskin-Robbins,Glen Cove,67,#XX67 XX67,5 Brewster St,NY,11542
+Baskin-Robbins,Decatur,68,#XX68 XX68,4760 Memorial Dr,GA,30032
+Baskin-Robbins,Columbia,69,#XX69 XX69,1525 Broad River Rd,SC,29210
+Baskin-Robbins,Belmar,70,#XX70 XX70,1732 State Route 35,NJ,7719
+Baskin-Robbins,Dayton,71,#XX71 XX71,7777 Springboro Pike,OH,45449
+Baskin-Robbins,Decatur,72,#XX72 XX72,2704 Candler Rd,GA,30034
+Baskin-Robbins,Atlanta,73,#XX73 XX73,2651 Cobb Pky NW,GA,30339
+Baskin-Robbins,Barrington,74,#XX74 XX74,108 S Northwest Hwy,IL,60010
+Baskin-Robbins,Baldwin,75,#XX75 XX75,1680 Grand Ave,NY,11510
+Baskin-Robbins,Smithtown,76,#XX76 XX76,235 W. Main St,NY,11787
+Baskin-Robbins,West Hempstead,77,#XX77 XX77,475 Hempstead Tpke,NY,11552
+Baskin-Robbins,Massapequa,78,#XX78 XX78,1399 Hicksville Rd,NY,11758
+Baskin-Robbins,Brooklyn,79,#XX79 XX79,8301 Flatlands Ave,NY,11236
+Baskin-Robbins,Tampa,80,#XX80 XX80,1505 E Fowler Ave,FL,33612
+Baskin-Robbins,Port Jefferson Station,81,#XX81 XX81,5017 Nesconset Hwy,NY,11776
+Baskin-Robbins,Columbus,82,#XX82 XX82,2255 E Dublin Granville Rd,OH,43229
+Baskin-Robbins,Bellmore,83,#XX83 XX83,2800 Merrick Rd,NY,11710
+Baskin-Robbins,Parsippany,84,#XX84 XX84,820 Us Highway 46,NJ,7054
+Baskin-Robbins,Bay Shore,85,#XX85 XX85,529 E. Main St,NY,11706
+Baskin-Robbins,Middleburg Heights,86,#XX86 XX86,17801 Bagley Rd,OH,44130
+Baskin-Robbins,Lindenhurst,87,#XX87 XX87,280 E Sunrise Hwy,NY,11757
+Baskin-Robbins,Bayville,88,#XX88 XX88,477 Us Highway 9,NJ,8721
+Baskin-Robbins,Chicago Heights,89,#XX89 XX89,3225 Chicago Rd,IL,60411
+Baskin-Robbins,Bayside,90,#XX90 XX90,21920 Northern Blvd,NY,11361
+Baskin-Robbins,Shirley,91,#XX91 XX91,545 William Floyd Pkwy,NY,11967
+Baskin-Robbins,Melville,92,#XX92 XX92,116 Broadhollow Rd,NY,11747
+Baskin-Robbins,Hyattsville,93,#XX93 XX93,2057 University Blvd E,MD,20783
+Baskin-Robbins,Chicago,94,#XX94 XX94,3039 N. Central Ave,IL,60634
+Baskin-Robbins,Lake Mary,95,#XX95 XX95,4610 W. Lake Mary Blvd,FL,32746
+Baskin-Robbins,Palm Harbor,96,#XX96 XX96,33240 US Highway 19 N,FL,34684
+Baskin-Robbins,Floral Park,97,#XX97 XX97,25420 Hillside Ave,NY,11004
+Baskin-Robbins,Flushing,98,#XX98 XX98,16822 Union Tpke,NY,11366
+Baskin-Robbins,Duluth,99,#XX99 XX99,3435 Peachtree Industrial Blvd,GA,30096
+Baskin-Robbins,Crest Hill,100,#XX100 XX100,1724 N Plainfield Rd,IL,60435
+Baskin-Robbins,New Hyde Park,101,#XX101 XX101,2062 Lakeville Rd,NY,11040
+Baskin-Robbins,College Point,102,#XX102 XX102,13210 14th Ave,NY,11356
+Baskin-Robbins,Chicago,103,#XX103 XX103,2801 S. Kedzie Ave,IL,60623
+Baskin-Robbins,Stone Mountain,104,#XX104 XX104,5161 Highway 78,GA,30087
+Baskin-Robbins,Long Island City,105,#XX105 XX105,4202 Northern Blvd,NY,11101
+Baskin-Robbins,Laurel,106,#XX106 XX106,14903 Baltimore Ave,MD,20707
+Baskin-Robbins,Stuart,107,#XX107 XX107,6001 Us 1,FL,34997
+Baskin-Robbins,Waukegan,108,#XX108 XX108,2900 Belvidere Rd,IL,60085
+Baskin-Robbins,West Chicago,109,#XX109 XX109,330 S. Neltnor Blvd,IL,60185
+Baskin-Robbins,Merrick,110,#XX110 XX110,1731 Merrick Rd,NY,11566
+Baskin-Robbins,Palatka,111,#XX111 XX111,1401 Reid St,FL,32177
+Baskin-Robbins,Chicago,112,#XX112 XX112,6250 N Clark St,IL,60660
+Baskin-Robbins,Elmhurst,113,#XX113 XX113,936 N York Rd,IL,60126
+Baskin-Robbins,Peoria,114,#XX114 XX114,4525 N Sterling Ave,IL,61615
+Baskin-Robbins,Annapolis,115,#XX115 XX115,2004 West St,MD,21401
+Baskin-Robbins,Suitland,116,#XX116 XX116,4767 Allentown Rd,MD,20746
+Baskin-Robbins,Easton,117,#XX117 XX117,8461 Ocean Gtwy,MD,21601
+Baskin-Robbins,EAST MEADOW,118,#XX118 XX118,2080 HEMPSTEAD TPKE,NY,11554
+Baskin-Robbins,North Versailles,119,#XX119 XX119,1121 Lincoln Hwy,PA,15137
+Baskin-Robbins,New Castle,120,#XX120 XX120,134 N Mill St,PA,16101
+Baskin-Robbins,Stafford,121,#XX121 XX121,305 Garrisonville Rd,VA,22554
+Baskin-Robbins,Novi,122,#XX122 XX122,39415 W 10 Mile Rd,MI,48375
+Baskin-Robbins,Flushing,123,#XX123 XX123,15367 Horace Harding Expy,NY,11367
+Baskin-Robbins,Joliet,124,#XX124 XX124,20 S Larkin Ave,IL,60436
+Baskin-Robbins,Kissimmee,125,#XX125 XX125,807 W Vine St,FL,34741
+Baskin-Robbins,Elmont,126,#XX126 XX126,23819 Linden Blvd,NY,11003
+Baskin-Robbins,Brooklyn,127,#XX127 XX127,373 Kings Hwy,NY,11223
+Baskin-Robbins,Uniondale,128,#XX128 XX128,976 Hempstead Tpke,NY,11553
+Baskin-Robbins,Severna Park,129,#XX129 XX129,604 Ritchie Hwy,MD,21146
+Baskin-Robbins,Albuquerque,131,#XX131 XX131,5502 4th St NW,NM,87107
+Baskin-Robbins,Elmont,132,#XX132 XX132,219 Hempstead Tpke,NY,11003
+Baskin-Robbins,Bronx,133,#XX133 XX133,2172 Westchester Ave,NY,10462
+Baskin-Robbins,Brooklyn,134,#XX134 XX134,1922 Flatbush Ave # L,NY,11210
+Baskin-Robbins,Brooklyn,135,#XX135 XX135,13 Graham Ave,NY,11206
+Baskin-Robbins,Iselin,136,#XX136 XX136,US Highway 1 & Green St,NJ,8830
+Baskin-Robbins,Brooklyn,137,#XX137 XX137,9243 4th Ave,NY,11209
+Baskin-Robbins,Brooklyn,138,#XX138 XX138,2630 86th St,NY,11223
+Baskin-Robbins,Norwalk,139,#XX139 XX139,458 Westport Ave,CT,6851
+Baskin-Robbins,Flushing,140,#XX140 XX140,6103 Flushing Ave,NY,11378
+Baskin-Robbins,Brooklyn Park,141,#XX141 XX141,5601 Ritchie Hwy,MD,21225
+Baskin-Robbins,Largo,142,#XX142 XX142,3515 E Bay Dr,FL,33771
+Baskin-Robbins,Farmington Hills,143,#XX143 XX143,27919 Grand River Ave,MI,48336
+Baskin-Robbins,Sterling Heights,144,#XX144 XX144,39151 Van Dyke Ave,MI,48313
+Baskin-Robbins,Jamaica,145,#XX145 XX145,9405 Rockaway Blvd,NY,11417
+Baskin-Robbins,Rego Park,146,#XX146 XX146,6365 Woodhaven Blvd,NY,11374
+Baskin-Robbins,Brooklyn,147,#XX147 XX147,711 Brighton Beach Ave,NY,11235
+Baskin-Robbins,Lauderhill,148,#XX148 XX148,7340 W Commercial Blvd,FL,33319
+Baskin-Robbins,Lake Worth,149,#XX149 XX149,4644 Lake Worth Rd,FL,33463
+Baskin-Robbins,Orland Park,150,#XX150 XX150,14461 S La Grange Rd,IL,60462
+Baskin-Robbins,Brooklyn,151,#XX151 XX151,137 12th St,NY,11215
+Baskin-Robbins,Bellwood,152,#XX152 XX152,502 Mannheim Rd,IL,60104
+Baskin-Robbins,Chicago,153,#XX153 XX153,3000 N Ashland Ave,IL,60657
+Baskin-Robbins,Skokie,154,#XX154 XX154,5150 Touhy Ave,IL,60077
+Baskin-Robbins,North Miami Beach,155,#XX155 XX155,95 NW 167th St,FL,33169
+Baskin-Robbins,Oakland Park,156,#XX156 XX156,1801 W Oakland Park Blvd,FL,33311
+Baskin-Robbins,Union City,157,#XX157 XX157,704 Kennedy Blvd,NJ,7087
+Baskin-Robbins,West New York,158,#XX158 XX158,5915 Bergenline Ave,NJ,7093
+Baskin-Robbins,Chicago,159,#XX159 XX159,3801 W. Belmont Ave,IL,60618
+Baskin-Robbins,Miami,160,#XX160 XX160,658 Nw 103rd St,FL,33150
+Baskin-Robbins,Highland,161,#XX161 XX161,9228 Indianapolis Blvd,IN,46322
+Baskin-Robbins,Chicago,162,#XX162 XX162,4302 S. Ashland Ave,IL,60609
+Baskin-Robbins,Albuquerque,163,#XX163 XX163,1902 Central Ave SE,NM,87106
+Baskin-Robbins,Woodbridge,164,#XX164 XX164,13607 Jefferson Davis Hwy,VA,22191
+Baskin-Robbins,Little Neck,165,#XX165 XX165,24809 Northern Blvd,NY,11362
+Baskin-Robbins,West Palm Beach,166,#XX166 XX166,1675 S Military Trl,FL,33415
+Baskin-Robbins,Chicago,167,#XX167 XX167,3310 W Addison St,IL,60618
+Baskin-Robbins,Marietta,168,#XX168 XX168,2765 Sandy Plains Rd,GA,30066
+Baskin-Robbins,Flushing,169,#XX169 XX169,7016 Northern Blvd,NY,11372
+Baskin-Robbins,Chicago,170,#XX170 XX170,3200 N Clark St,IL,60657
+Baskin-Robbins,Chicago,171,#XX171 XX171,6925 S. Pulaski Rd,IL,60629
+Baskin-Robbins,Elmwood Park,172,#XX172 XX172,7201 W Grand Ave,IL,60707
+Baskin-Robbins,Chicago,173,#XX173 XX173,6100 S. Western Ave,IL,60636
+Baskin-Robbins,Staten Island,174,#XX174 XX174,1351 Forest Ave,NY,10302
+Baskin-Robbins,Hallandale Beach,175,#XX175 XX175,825 W Hallandale Beach Blvd,FL,33009
+Baskin-Robbins,Chicago,176,#XX176 XX176,6342 N Milwaukee Ave,IL,60646
+Baskin-Robbins,North Olmsted,177,#XX177 XX177,26963 Lorain Rd,OH,44070
+Baskin-Robbins,Chicago,178,#XX178 XX178,3910 S. Archer Ave,IL,60632
+Baskin-Robbins,Ocean City,179,#XX179 XX179,11901 Coastal Hwy,MD,21842
+Baskin-Robbins,Largo,180,#XX180 XX180,13013 66th St,FL,33773
+Baskin-Robbins,Melrose Park,181,#XX181 XX181,912 Winston Plaza,IL,60160
+Baskin-Robbins,Tucson,182,#XX182 XX182,1655 W. Valencia Rd,AZ,85746
+Baskin-Robbins,Bay Shore,183,#XX183 XX183,1261 Sunrise Hwy,NY,11706
+Baskin-Robbins,Glenview,184,#XX184 XX184,1750 Milwaukee Ave,IL,60025
+Baskin-Robbins,Palos Heights,185,#XX185 XX185,12807 S Harlem Ave,IL,60463
+Baskin-Robbins,Detroit,186,#XX186 XX186,14900 E 8 Mile Rd,MI,48205
+Baskin-Robbins,Chicago,187,#XX187 XX187,6254 N Western Ave,IL,60659
+Baskin-Robbins,Canton,188,#XX188 XX188,41511 Ford Rd.,MI,48188
+Baskin-Robbins,Highland Park,189,#XX189 XX189,1990 Skokie Valley Rd,IL,60035
+Baskin-Robbins,Chicago,190,#XX190 XX190,4701 S Kedzie Ave,IL,60632
+Baskin-Robbins,Covington,191,#XX191 XX191,2410 High St,KY,41017
+Baskin-Robbins,Evanston,192,#XX192 XX192,2658 Green Bay Rd,IL,60201
+Baskin-Robbins,Crofton,193,#XX193 XX193,1200 Route 3,MD,21114
+Baskin-Robbins,Virginia Beach,194,#XX194 XX194,3900 Holland Rd,VA,23452
+Baskin-Robbins,Plano,195,#XX195 XX195,2001 Coit Rd,TX,75075
+Baskin-Robbins,Aurora,196,#XX196 XX196,1255 N Farnsworth Ave,IL,60505
+Baskin-Robbins,Vernon Hills,197,#XX197 XX197,700 N Milwaukee Ave,IL,60061
+Baskin-Robbins,Richton Park,198,#XX198 XX198,3937 Sauk Trl,IL,60471
+Baskin-Robbins,Melrose Park,199,#XX199 XX199,2033 N. Mannheim Rd,IL,60160
+Baskin-Robbins,Ferndale,200,#XX200 XX200,22451 Woodward Ave,MI,48220
+Baskin-Robbins,Atlanta,201,#XX201 XX201,3802 E Roswell Rd,GA,30342
+Baskin-Robbins,Brooklyn,202,#XX202 XX202,4740 Ridge Rd,OH,44144
+Baskin-Robbins,Miami,203,#XX203 XX203,11790 Sw 88th Street,FL,33186
+Baskin-Robbins,Cicero,204,#XX204 XX204,2147 S Cicero Ave,IL,60804
+Baskin-Robbins,Naperville,205,#XX205 XX205,602 S State Rte 59,IL,60540
+Baskin-Robbins,Chesapeake,206,#XX206 XX206,1435 Battlefield Blvd N,VA,23320
+Baskin-Robbins,North Chicago,207,#XX207 XX207,2829 22nd St,IL,60064
+Baskin-Robbins,Chicago,208,#XX208 XX208,5200 N. Lincoln Ave,IL,60625
+Baskin-Robbins,Raleigh,209,#XX209 XX209,3209 S Wilmington St,NC,27603
+Baskin-Robbins,Long Island City,210,#XX210 XX210,3401 Broadway,NY,11106
+Baskin-Robbins,Chicago,211,#XX211 XX211,1927 W Fullerton Ave,IL,60614
+Baskin-Robbins,Niles,212,#XX212 XX212,7525 N Harlem Ave,IL,60714
+Baskin-Robbins,Grafton,213,#XX213 XX213,5026 George Washington Mem Hwy,VA,23692
+Baskin-Robbins,New York,214,#XX214 XX214,321 Broadway,NY,10007
+Baskin-Robbins,Port Jervis,215,#XX215 XX215,290 E Main St,NY,12771
+Baskin-Robbins,Flushing,216,#XX216 XX216,3015 Stratton St,NY,11354
+Baskin-Robbins,Lake Zurich,217,#XX217 XX217,485 South Rand Rd,IL,60047
+Baskin-Robbins,Bronx,218,#XX218 XX218,3080 Boston Rd,NY,10469
+Baskin-Robbins,Rolling Meadows,219,#XX219 XX219,2230 Algonquin Rd,IL,60008
+Baskin-Robbins,Valparaiso,220,#XX220 XX220,1651 Morthland Dr,IN,46385
+Baskin-Robbins,Macon,221,#XX221 XX221,121 Tom Hill Sr Blvd,GA,31210
+Baskin-Robbins,Chicago,222,#XX222 XX222,3481 S. Dr Martin L King Jr Dr,IL,60616
+Baskin-Robbins,Brooklyn,223,#XX223 XX223,1410 Avenue J,NY,11230
+Baskin-Robbins,Spring Hill,224,#XX224 XX224,11089 Spring Hill Dr,FL,34608
+Baskin-Robbins,Jacksonville,225,#XX225 XX225,433a Western Blvd,NC,28546
+Baskin-Robbins,Chicago,226,#XX226 XX226,814 E. 87th St,IL,60619
+Baskin-Robbins,Fort Pierce,227,#XX227 XX227,4822 S US Highway 1,FL,34982
+Baskin-Robbins,Flushing,228,#XX228 XX228,5615 Myrtle Ave,NY,11385
+Baskin-Robbins,Leesburg,229,#XX229 XX229,521J E. Market St,VA,20176
+Baskin-Robbins,Marietta,230,#XX230 XX230,670 S Marietta Pkwy,GA,30060
+Baskin-Robbins,Chicago,231,#XX231 XX231,4867 N. Milwaukee Ave,IL,60630
+Baskin-Robbins,Duluth,232,#XX232 XX232,3725 Club Dr,GA,30096
+Baskin-Robbins,Woodhaven,233,#XX233 XX233,8413 Jamaica Ave,NY,11421
+Baskin-Robbins,Chicago,234,#XX234 XX234,31 E Adams St,IL,60603
+Baskin-Robbins,Columbia,235,#XX235 XX235,8765 Centre Park Dr,MD,21045
+Baskin-Robbins,Chicago,236,#XX236 XX236,1244 N Ashland Ave,IL,60622
+Baskin-Robbins,River Grove,237,#XX237 XX237,8257 W. Belmont Ave,IL,60171
+Baskin-Robbins,Hoffman Estates,238,#XX238 XX238,1165 N Barrington Rd,IL,60194
+Baskin-Robbins,New York,239,#XX239 XX239,536 Avenue Of The Americas,NY,10011
+Baskin-Robbins,Bartlett,240,#XX240 XX240,751 S Route #59,IL,60103
+Baskin-Robbins,Oyster Bay,241,#XX241 XX241,159 Pine Hollow Rd,NY,11771
+Baskin-Robbins,Merrick,242,#XX242 XX242,1766 Merrick Ave N,NY,11566
+Baskin-Robbins,Marietta,243,#XX243 XX243,2885 Canton Hwy,GA,30066
+Baskin-Robbins,Winter Park,244,#XX244 XX244,2265 Aloma Ave,FL,32792
+Baskin-Robbins,Wantagh,245,#XX245 XX245,3267 Sunrise Hwy,NY,11793
+Baskin-Robbins,Chicago,246,#XX246 XX246,233 N Michigan Ave,IL,60601
+Baskin-Robbins,Perth Amboy,247,#XX247 XX247,587 Fayette St,NJ,8862
+Baskin-Robbins,Brooklyn,248,#XX248 XX248,245 Highland Pl,NY,11208
+Baskin-Robbins,New York,249,#XX249 XX249,302 5th Ave,NY,10001
+Baskin-Robbins,Marietta,250,#XX250 XX250,2475 Dallas Hwy SW,GA,30064
+Baskin-Robbins,Sebastian,251,#XX251 XX251,900 US Highway 1,FL,32958
+Baskin-Robbins,Brooklyn,252,#XX252 XX252,892 Manhattan Ave,NY,11222
+Baskin-Robbins,Kent,253,#XX253 XX253,110 Washington Ave N,WA,98032
+Baskin-Robbins,College Park,254,#XX254 XX254,9701 Baltimore Ave,MD,20740
+Baskin-Robbins,Elgin,255,#XX255 XX255,263 S Randall Rd,IL,60123
+Baskin-Robbins,Goldens Bridge,256,#XX256 XX256,5 Goldens Bridge Shopping Ctr,NY,10526
+Baskin-Robbins,Chicago,257,#XX257 XX257,1231 S Wabash Ave,IL,60605
+Baskin-Robbins,Astoria,258,#XX258 XX258,2502 31st St,NY,11102
+Baskin-Robbins,Souderton,259,#XX259 XX259,653 E. Broad St,PA,18964
+Baskin-Robbins,Glastonbury,260,#XX260 XX260,141 Hebron Ave,CT,6033
+Baskin-Robbins,Smithtown,261,#XX261 XX261,560 Smithtown Byp,NY,11787
+Baskin-Robbins,Hodgkins,262,#XX262 XX262,9400 Joliet Rd,IL,60525
+Baskin-Robbins,Henderson,263,#XX263 XX263,4640 E Sunset Rd,NV,89014
+Baskin-Robbins,Hammond,264,#XX264 XX264,4614 Calumet Ave,IN,46327
+Baskin-Robbins,Clifton,265,#XX265 XX265,1053 Bloomfield Ave,NJ,7011
+Baskin-Robbins,New York,266,#XX266 XX266,2730 Frederick Douglass Blvd,NY,10039
+Baskin-Robbins,Orlando,268,#XX268 XX268,12236 S Apopka Vineland Rd,FL,32836
+Baskin-Robbins,Bethpage,269,#XX269 XX269,4025B Hempstead Tpke,NY,11714
+Baskin-Robbins,Amityville,270,#XX270 XX270,355 Broadway,NY,11701
+Baskin-Robbins,East Islip,271,#XX271 XX271,13 W. Main St,NY,11730
+Baskin-Robbins,Jersey City,272,#XX272 XX272,40 Journal Sq,NJ,7306
+Baskin-Robbins,Sea Cliff,273,#XX273 XX273,347 Glen Cove Ave,NY,11579
+Baskin-Robbins,Brooklyn,274,#XX274 XX274,1285 Broadway,NY,11221
+Baskin-Robbins,Chicago,275,#XX275 XX275,6408 W. Irving Park Rd,IL,60634
+Baskin-Robbins,Bel Air,276,#XX276 XX276,18a Bel Air South Parkway,MD,21015
+Baskin-Robbins,Woodside,277,#XX277 XX277,3956 61st St,NY,11377
+Baskin-Robbins,Albertson,278,#XX278 XX278,1051 Willis Ave,NY,11507
+Baskin-Robbins,Flushing,279,#XX279 XX279,3547 Francis Lewis Blvd,NY,11358
+Baskin-Robbins,Orlando,280,#XX280 XX280,1131 S Semoran Blvd,FL,32807
+Baskin-Robbins,Winston Salem,281,#XX281 XX281,7815 N Point Blvd,NC,27106
+Baskin-Robbins,Winchester,282,#XX282 XX282,992 Millwood Pike,VA,22602
+Baskin-Robbins,Front Royal,283,#XX283 XX283,202 S Commerce Ave,VA,22630
+Baskin-Robbins,Yonkers,284,#XX284 XX284,2248 Central Park Ave,NY,10710
+Baskin-Robbins,Garden City,285,#XX285 XX285,165 7th St,NY,11530
+Baskin-Robbins,Woodstock,286,#XX286 XX286,345 W Reservoir Rd,VA,22664
+Baskin-Robbins,Chicago,287,#XX287 XX287,1441 W Montrose Ave,IL,60613
+Baskin-Robbins,Flushing,288,#XX288 XX288,9925 Horace Harding Expy,NY,11368
+Baskin-Robbins,Havelock,289,#XX289 XX289,113 E Main St,NC,28532
+Baskin-Robbins,Centereach,290,#XX290 XX290,1311 Middle Country Rd,NY,11720
+Baskin-Robbins,Lincolnwood,291,#XX291 XX291,3910 W Touhy Ave,IL,60712
+Baskin-Robbins,New York,292,#XX292 XX292,728 W 181st St,NY,10033
+Baskin-Robbins,River Vale,293,#XX293 XX293,636 Westwood Ave,NJ,7675
+Baskin-Robbins,Brooklyn,294,#XX294 XX294,610 Utica Ave,NY,11203
+Baskin-Robbins,Bronx,295,#XX295 XX295,2702 E. Tremont Ave,NY,10461
+Baskin-Robbins,New Rochelle,296,#XX296 XX296,96 E Main St,NY,10801
+Baskin-Robbins,Miami Beach,297,#XX297 XX297,341 41st St,FL,33140
+Baskin-Robbins,Long Island City,298,#XX298 XX298,3102 36th Ave,NY,11106
+Baskin-Robbins,Middletown,299,#XX299 XX299,1 Galleria Dr,NY,10941
+Baskin-Robbins,Hilo,300,#XX300 XX300,2100 Kanoelehua Ave D2,HI,96720
+Baskin-Robbins,Morehead City,301,#XX301 XX301,2908 Arendell St,NC,28557
+Baskin-Robbins,Chamblee,302,#XX302 XX302,5558 Peachtree Industrial Blvd,GA,30341
+Baskin-Robbins,Longview,303,#XX303 XX303,3302 N 4th St,TX,75605
+Baskin-Robbins,San Antonio,304,#XX304 XX304,5238 Dezavala Rd,TX,78249
+Baskin-Robbins,Flower Mound,305,#XX305 XX305,2704 Cross Timbers Rd,TX,75028
+Baskin-Robbins,Plano,306,#XX306 XX306,5960 W. Parker Rd,TX,75093
+Baskin-Robbins,Yorktown Heights,307,#XX307 XX307,3399 Crompond Rd,NY,10598
+Baskin-Robbins,Yardley,308,#XX308 XX308,1589 Big Oak Rd,PA,19067
+Baskin-Robbins,Grand Prairie,309,#XX309 XX309,4136 S. Carrier Pkwy,TX,75052
+Baskin-Robbins,New Braunfels,310,#XX310 XX310,606 S Walnut Ave,TX,78130
+Baskin-Robbins,Rio Rancho,311,#XX311 XX311,4320 Ridgecrest Dr SE,NM,87124
+Baskin-Robbins,Downey,312,#XX312 XX312,7938 E Florence Ave,CA,90240
+Baskin-Robbins,Waianae,313,#XX313 XX313,87-2070 Farrington Hwy,HI,96792
+Baskin-Robbins,Silver Spring,314,#XX314 XX314,12200 Viers Mill Rd,MD,20906
+Baskin-Robbins,Gaithersburg,315,#XX315 XX315,12168 Darnestown Rd,MD,20878
+Baskin-Robbins,Oak Lawn,316,#XX316 XX316,8723 Ridgeland Ave,IL,60453
+Baskin-Robbins,Moorpark,317,#XX317 XX317,557 W Los Angeles Ave,CA,93021
+Baskin-Robbins,Antioch,318,#XX318 XX318,4538 Lone Tree Wy,CA,94509
+Baskin-Robbins,Bloomingdale,319,#XX319 XX319,148 S Gary Ave,IL,60108
+Baskin-Robbins,Reno,320,#XX320 XX320,18120 Wedge Pkwy,NV,89511
+Baskin-Robbins,Tracy,321,#XX321 XX321,965 S. Tracy Blvd,CA,95376
+Baskin-Robbins,Las Vegas,322,#XX322 XX322,9151 W. Sahara Ave,NV,89117
+Baskin-Robbins,Turlock,323,#XX323 XX323,1684 Countryside Dr #G-2,CA,95380
+Baskin-Robbins,Seaside,324,#XX324 XX324,1534d Freemont Blvd,CA,93955
+Baskin-Robbins,Kahului,325,#XX325 XX325,70 E Kaahumanu Ave,HI,96732
+Baskin-Robbins,Conyers,326,#XX326 XX326,2280 Salem Rd Se,GA,30013
+Baskin-Robbins,Slidell,327,#XX327 XX327,1597 Gause Blvd,LA,70458
+Baskin-Robbins,Albuquerque,328,#XX328 XX328,"2200 Sunport Blvd, SE",NM,87106
+Baskin-Robbins,Norwalk,329,#XX329 XX329,196 East Ave,CT,6855
+Baskin-Robbins,Hailey,330,#XX330 XX330,600 N. Main St,ID,83333
+Baskin-Robbins,Arlington,331,#XX331 XX331,3411 169th Pl NE #1,WA,98223
+Baskin-Robbins,Lacey,332,#XX332 XX332,4810-A Yelm Hwy SE,WA,98503
+Baskin-Robbins,Beebe,333,#XX333 XX333,2015 W. Dewitt Henry Dr,AR,72012
+Baskin-Robbins,Farmingville,334,#XX334 XX334,628 Horseblock Rd,NY,11738
+Baskin-Robbins,Kissimmee,335,#XX335 XX335,7644 W Irlo Bronson Mem Hwy,FL,34747
+Baskin-Robbins,Springfield,336,#XX336 XX336,719 Mountain Ave,NJ,7081
+Baskin-Robbins,Cumming,337,#XX337 XX337,1165 Buford Hwy,GA,30041
+Baskin-Robbins,Wood Dale,338,#XX338 XX338,516 W. Irving Park Rd,IL,60191
+Baskin-Robbins,Delmar,339,#XX339 XX339,8600 Ocean Hwy,MD,21875
+Baskin-Robbins,Jamaica,340,#XX340 XX340,8347 Parsons Blvd,NY,11432
+Baskin-Robbins,Brooklyn,341,#XX341 XX341,1443 Myrtle Ave,NY,11237
+Baskin-Robbins,Wayne,342,#XX342 XX342,572 Valley Rd,NJ,7470
+Baskin-Robbins,Monterey Park,343,#XX343 XX343,2084 S. Atlantic Blvd,CA,91754
+Baskin-Robbins,South Amboy,344,#XX344 XX344,973 Route 9 North,NJ,8879
+Baskin-Robbins,Lake Jackson,345,#XX345 XX345,121 State Hwy 332 W,TX,77566
+Baskin-Robbins,Mckinney,346,#XX346 XX346,3001 Hardin Blvd,TX,75070
+Baskin-Robbins,Napa,347,#XX347 XX347,269 Soscol Ave,CA,94559
+Baskin-Robbins,Santa Clarita,348,#XX348 XX348,25884 The Old Rd,CA,91381
+Baskin-Robbins,Paramus,349,#XX349 XX349,494 N State Rt 17,NJ,7652
+Baskin-Robbins,Sunnyside,350,#XX350 XX350,4513 Queens Blvd,NY,11104
+Baskin-Robbins,Long Island City,351,#XX351 XX351,3326 21st St,NY,11106
+Baskin-Robbins,Fort Meade,352,#XX352 XX352,McArthur Blvd,MD,20755
+Baskin-Robbins,Allentown,353,#XX353 XX353,3219 Hamilton Blvd,PA,18103
+Baskin-Robbins,Colorado Springs,354,#XX354 XX354,1690 E Cheyenne Mountain Blvd,CO,80906
+Baskin-Robbins,Carmel,355,#XX355 XX355,2336 E 116th St,IN,46032
+Baskin-Robbins,Fort Walton Beach,356,#XX356 XX356,91 Eglin Pkwy NE,FL,32548
+Baskin-Robbins,Murfreesboro,357,#XX357 XX357,1723 Memorial Blvd,TN,37129
+Baskin-Robbins,Corpus Christi,358,#XX358 XX358,4701 S Padre Island Dr,TX,78411
+Baskin-Robbins,Ridgewood,359,#XX359 XX359,6040 Myrtle Ave,NY,11385
+Baskin-Robbins,Bay Shore,360,#XX360 XX360,19 Bay Shore Rd,NY,11706
+Baskin-Robbins,Temecula,361,#XX361 XX361,29105 Front St,CA,92590
+Baskin-Robbins,Brownstown,362,#XX362 XX362,21980 Sibley Rd,MI,48192
+Baskin-Robbins,Hayward,363,#XX363 XX363,247 W Jackson St,CA,94544
+Baskin-Robbins,San Jose,364,#XX364 XX364,840 El Paseo De Saratoga,CA,95130
+Baskin-Robbins,Oakdale,365,#XX365 XX365,111 S. Maag Ave,CA,95361
+Baskin-Robbins,Granada Hills,366,#XX366 XX366,18100 Chatsworth St,CA,91344
+Baskin-Robbins,Oceanside,367,#XX367 XX367,4201 Oceanside Blvd,CA,92056
+Baskin-Robbins,Houston,368,#XX368 XX368,7510 Highway 6 N,TX,77095
+Baskin-Robbins,Winchester,369,#XX369 XX369,303 W Boscawen St,VA,22601
+Baskin-Robbins,Houston,370,#XX370 XX370,2431 University Blvd,TX,77005
+Baskin-Robbins,Rolling Meadows,371,#XX371 XX371,3350 Kirchoff Rd.,IL,60008
+Baskin-Robbins,Elgin,372,#XX372 XX372,95 Clock Tower Plz,IL,60120
+Baskin-Robbins,Modesto,373,#XX373 XX373,2900 Standiford Ave,CA,95350
+Baskin-Robbins,Roseland,374,#XX374 XX374,14 Eisenhower Pkwy,NJ,7068
+Baskin-Robbins,Cliffwood,375,#XX375 XX375,307 State Route 35,NJ,7721
+Baskin-Robbins,Knightdale,376,#XX376 XX376,7137 Us Hwy 64 East,NC,27545
+Baskin-Robbins,Arleta,377,#XX377 XX377,13310 Osborne St,CA,91331
+Baskin-Robbins,Arlington,378,#XX378 XX378,3100 Columbia Pike,VA,22204
+Baskin-Robbins,Clermont,379,#XX379 XX379,1110 E. Hwy 50,FL,34711
+Baskin-Robbins,Chicago,380,#XX380 XX380,3427 W Diversey Ave,IL,60647
+Baskin-Robbins,Brea,381,#XX381 XX381,203 W. Imperial Hwy,CA,92821
+Baskin-Robbins,South Holland,382,#XX382 XX382,460 E. 162nd St,IL,60473
+Baskin-Robbins,Los Angeles,383,#XX383 XX383,2215 Westwood Blvd,CA,90064
+Baskin-Robbins,JAMAICA,384,#XX384 XX384,17915 HILLSIDE AVE,NY,11432
+Baskin-Robbins,Little Ferry,385,#XX385 XX385,250 Bergen Tpke,NJ,7643
+Baskin-Robbins,Fremont,386,#XX386 XX386,35670 Fremont Blvd,CA,94536
+Baskin-Robbins,Yonkers,387,#XX387 XX387,1591 Central Park Ave,NY,10710
+Baskin-Robbins,Sugar Hill,388,#XX388 XX388,4450K Nelson Blogden Blvd,GA,30518
+Baskin-Robbins,Anaheim,389,#XX389 XX389,2065 E. Katella,CA,92806
+Baskin-Robbins,Huntington Station,390,#XX390 XX390,281 Walt Whitman Rd,NY,11746
+Baskin-Robbins,Fallbrook,391,#XX391 XX391,1123 S. Mission Rd,CA,92028
+Baskin-Robbins,Riverbank,392,#XX392 XX392,6333 Oakdale Rd,CA,95367
+Baskin-Robbins,Williams,393,#XX393 XX393,301 Vann St,CA,95987
+Baskin-Robbins,Bakersfield,394,#XX394 XX394,2110 White Ln,CA,93304
+Baskin-Robbins,Bakersfield,395,#XX395 XX395,2673 Fashion Pl,CA,93306
+Baskin-Robbins,Los Angeles,396,#XX396 XX396,6104 W Sunset Blvd,CA,90028
+Baskin-Robbins,The Woodlands,397,#XX397 XX397,8000 Research Forest Dr,TX,77382
+Baskin-Robbins,Clovis,398,#XX398 XX398,1928 Clovis Ave,CA,93612
+Baskin-Robbins,Carson,399,#XX399 XX399,21737 Avalon Blvd,CA,90745
+Baskin-Robbins,Augusta,400,#XX400 XX400,3024 Washington Rd,GA,30907
+Baskin-Robbins,Eugene,401,#XX401 XX401,45 Division St,OR,97404
+Baskin-Robbins,Fort Oglethorpe,402,#XX402 XX402,101 Lafayette Rd,GA,30742
+Baskin-Robbins,Kent,403,#XX403 XX403,16729 SE 272nd St,WA,98042
+Baskin-Robbins,Puyallup,404,#XX404 XX404,17404 Meridian E,WA,98375
+Baskin-Robbins,Newcastle,405,#XX405 XX405,6935 Coal Creek Pkwy Se,WA,98059
+Baskin-Robbins,Salem,406,#XX406 XX406,831 Lancaster Dr NE,OR,97301
+Baskin-Robbins,Bothell,407,#XX407 XX407,22833 Bothell Everett Hwy,WA,98021
+Baskin-Robbins,Oregon City,408,#XX408 XX408,1839 Molalla Ave,OR,97045
+Baskin-Robbins,Beaverton,409,#XX409 XX409,16015 Sw Walker Rd,OR,97006
+Baskin-Robbins,York,410,#XX410 XX410,4700 S. Lincoln Ave,NE,68467
+Baskin-Robbins,Kearney,411,#XX411 XX411,3000 Highway 30 W,NE,68847
+Baskin-Robbins,Holly Springs,412,#XX412 XX412,621 Hwy 7 S,MS,38635
+Baskin-Robbins,Mena,413,#XX413 XX413,901 Highway 71 N,AR,71953
+Baskin-Robbins,Cleveland,414,#XX414 XX414,300 N. Davis Ave,MS,38732
+Baskin-Robbins,Osceola,415,#XX415 XX415,4610 W. Keiser Ave,AR,72370
+Baskin-Robbins,Senatobia,416,#XX416 XX416,510 East Main St,MS,38668
+Baskin-Robbins,Greenbrier,417,#XX417 XX417,1075 Hwy 65 N,AR,72058
+Baskin-Robbins,Vero Beach,418,#XX418 XX418,504 21st St,FL,32960
+Baskin-Robbins,Rancho Cucamonga,419,#XX419 XX419,7379 Milliken Ave,CA,91730
+Baskin-Robbins,Vancouver,420,#XX420 XX420,16600 SE Mcgillivray Blvd,WA,98683
+Baskin-Robbins,Stockton,421,#XX421 XX421,6021 Pacific Ave,CA,95207
+Baskin-Robbins,Sevierville,422,#XX422 XX422,1420 Parkway,TN,37862
+Baskin-Robbins,Lincoln,423,#XX423 XX423,3111 Nw 12th St,NE,68521
+Baskin-Robbins,Wynne,424,#XX424 XX424,988 S. Falls Blvd,AR,72396
+Baskin-Robbins,Lakewood,425,#XX425 XX425,1091 River Ave,NJ,8701
+Baskin-Robbins,Aurora,426,#XX426 XX426,1155 S. Havana St,CO,80012
+Baskin-Robbins,Falls Church,427,#XX427 XX427,1140 W Broad St,VA,22046
+Baskin-Robbins,San Francisco,428,#XX428 XX428,570 Battery St,CA,94111
+Baskin-Robbins,Mahwah,429,#XX429 XX429,1001 Macarthur Blvd,NJ,7430
+Baskin-Robbins,Mc Cook,430,#XX430 XX430,312 E B St,NE,69001
+Baskin-Robbins,Chicago,431,#XX431 XX431,4010 N. Western Ave.,IL,60618
+Baskin-Robbins,Marion,432,#XX432 XX432,3148 Interstate 55,AR,72364
+Baskin-Robbins,New York,433,#XX433 XX433,1342 Amsterdam Ave,NY,10027
+Baskin-Robbins,Citrus Heights,434,#XX434 XX434,7301 Greenback Ln #C,CA,95621
+Baskin-Robbins,Roseville,435,#XX435 XX435,6706 Stanford Ranch Rd #D1,CA,95678
+Baskin-Robbins,Fresno,436,#XX436 XX436,3183 W Shaw Ave,CA,93711
+Baskin-Robbins,Union City,437,#XX437 XX437,32232 Dyer St,CA,94587
+Baskin-Robbins,Gilroy,438,#XX438 XX438,5920 Travel Park Cir,CA,95020
+Baskin-Robbins,Folsom,439,#XX439 XX439,900 E Bidwell St,CA,95630
+Baskin-Robbins,Chicago,440,#XX440 XX440,5650 W Fullerton Ave,IL,60639
+Baskin-Robbins,Pasco,441,#XX441 XX441,2307 W Court St,WA,99301
+Baskin-Robbins,Water Valley,442,#XX442 XX442,Highway 75 & Highway 32,MS,38965
+Baskin-Robbins,Orlando,443,#XX443 XX443,12173 S. Orange Blossom Trl,FL,32837
+Baskin-Robbins,Portland,444,#XX444 XX444,7321 SW Garden Home Rd,OR,97223
+Baskin-Robbins,North Bend,445,#XX445 XX445,458 SW Mt Si Blvd,WA,98045
+Baskin-Robbins,Grass Valley,446,#XX446 XX446,151 W Mcknight Way,CA,95949
+Baskin-Robbins,Miramar,447,#XX447 XX447,14305 Miramar Parkway,FL,33027
+Baskin-Robbins,Savannah,448,#XX448 XX448,1100 Wayne Rd,TN,38372
+Baskin-Robbins,Kodak,449,#XX449 XX449,3423 Winfield Dunn Pkwy,TN,37764
+Baskin-Robbins,Winona,450,#XX450 XX450,314 Highway 82,MS,38967
+Baskin-Robbins,Lebec,451,#XX451 XX451,5821 Dennis Mcarthur Rd,CA,93243
+Baskin-Robbins,Harahan,452,#XX452 XX452,5171 Citrus Blvd,LA,70123
+Baskin-Robbins,Mandeville,453,#XX453 XX453,4350 Hwy 22,LA,70471
+Baskin-Robbins,Burbank,454,#XX454 XX454,109 E. Alameda Ave,CA,91502
+Baskin-Robbins,Bronx,455,#XX455 XX455,2 E Kingsbridge Ave,NY,10468
+Baskin-Robbins,Helotes,456,#XX456 XX456,11846 Bandera Rd,TX,78023
+Baskin-Robbins,Lutz,457,#XX457 XX457,22722 State Road 54,FL,33549
+Baskin-Robbins,Casa Grande,458,#XX458 XX458,5000 Sunland Gin Rd,AZ,85222
+Baskin-Robbins,Philadelphia,459,#XX459 XX459,9834 Bustleton Ave,PA,19115
+Baskin-Robbins,Frankfort,460,#XX460 XX460,20551 S. Lagrange Rd,IL,60423
+Baskin-Robbins,Yonkers,461,#XX461 XX461,132 Bronx River Rd,NY,10704
+Baskin-Robbins,Ocala,462,#XX462 XX462,2431 E. Silver Springs Blvd,FL,34470
+Baskin-Robbins,Orange City,463,#XX463 XX463,1142 Saxon Blvd,FL,32763
+Baskin-Robbins,Buena Ventura Lakes,464,#XX464 XX464,1935 East Osceola Pkwy,FL,34743
+Baskin-Robbins,Cypress,465,#XX465 XX465,13040 Louetta Rd,TX,77429
+Baskin-Robbins,Sacramento,466,#XX466 XX466,5648 Folsom Blvd,CA,95819
+Baskin-Robbins,Elk Grove,467,#XX467 XX467,4720 Laguna Blvd.,CA,95758
+Baskin-Robbins,Tampa,468,#XX468 XX468,3108 N. Boundary,FL,33608
+Baskin-Robbins,Fort Gordon,469,#XX469 XX469,3rd Ave,GA,30905
+Baskin-Robbins,Hickam AFB,470,#XX470 XX470,10 Hickam Ct,HI,96853
+Baskin-Robbins,Travis Air Force Base,471,#XX471 XX471,Skymaster Dr,CA,94536
+Baskin-Robbins,San Antonio,472,#XX472 XX472,2180 Reese St,TX,78263
+Baskin-Robbins,Fort Sam Houston,473,#XX473 XX473,2490 7th St,TX,78234
+Baskin-Robbins,Fort Knox,474,#XX474 XX474,Gold Vault Rd,KY,40121
+Baskin-Robbins,Eglin Air Force Base,475,#XX475 XX475,Memorial Trl,FL,32542
+Baskin-Robbins,Fort Huachuca,476,#XX476 XX476,1666 Bissell Ave,AZ,85613
+Baskin-Robbins,Fort Irwin,477,#XX477 XX477,Langford Lake Rd,CA,92310
+Baskin-Robbins,Fort Campbell,478,#XX478 XX478,Batogne Ave,KY,42223
+Baskin-Robbins,Edwards Air Force Base,479,#XX479 XX479,240 W. Fitzgerald Blvd,CA,93524
+Baskin-Robbins,Fort Leonard Wood,480,#XX480 XX480,143 Replacement Ave,MO,65473
+Baskin-Robbins,Norcross,481,#XX481 XX481,5075 Peachtree Pkwy,GA,30092
+Baskin-Robbins,Washington,482,#XX482 XX482,2420 New York Ave Ne,DC,20002
+Baskin-Robbins,Sacramento,483,#XX483 XX483,4355 Arden Way,CA,95864
+Baskin-Robbins,Foster City,484,#XX484 XX484,901d Edgewater Blvd,CA,94404
+Baskin-Robbins,East Elmhurst,485,#XX485 XX485,10009 Astoria Blvd,NY,11369
+Baskin-Robbins,Helena,486,#XX486 XX486,571 Oakland Ave,AR,72342
+Baskin-Robbins,Fresno,487,#XX487 XX487,7010 N Marks Ave,CA,93711
+Baskin-Robbins,Chico,488,#XX488 XX488,241 W East Ave,CA,95926
+Baskin-Robbins,Cameron Park,489,#XX489 XX489,3378 Coach Lane,CA,95682
+Baskin-Robbins,Santa Fe,490,#XX490 XX490,4056 Cerrillos Rd,NM,87505
+Baskin-Robbins,Miami,491,#XX491 XX491,15469 Sw 137th Ave,FL,33177
+Baskin-Robbins,Raleigh,492,#XX492 XX492,5265 Six Forks Rd.,NC,27609
+Baskin-Robbins,Visalia,493,#XX493 XX493,423 W. Main St,CA,93291
+Baskin-Robbins,Hope,494,#XX494 XX494,1615 N. Hervey,AR,71801
+Baskin-Robbins,Jersey City,495,#XX495 XX495,215 Fourteenth St,NJ,7310
+Baskin-Robbins,Jamesburg,496,#XX496 XX496,200 Buckelew Ave,NJ,8831
+Baskin-Robbins,Brooklyn,497,#XX497 XX497,137 Wyckoff Ave.,NY,11237
+Baskin-Robbins,Paterson,498,#XX498 XX498,1212 Madison Avenue,NJ,7503
+Baskin-Robbins,Chicago,499,#XX499 XX499,801 West Diversey Pkwy,IL,60614
+Baskin-Robbins,Piscataway,500,#XX500 XX500,1254 Stelton Rd,NJ,8854
+Baskin-Robbins,Salt Lake City,501,#XX501 XX501,576 E 400 S,UT,84102
+Baskin-Robbins,Lilburn,553,#XX553 XX553,3935 Lawrenceville Hwy,GA,30047
+Baskin-Robbins,Romeoville,554,#XX554 XX554,649 N Independence Blvd,IL,60446
+Baskin-Robbins,Kissimmee,555,#XX555 XX555,5889 W Irlo Bronson Hwy,FL,34746
+Baskin-Robbins,Chambersburg,556,#XX556 XX556,1479 Lincoln Way E,PA,17201
+Baskin-Robbins,Henderson,557,#XX557 XX557,10604 S Eastern Ave,NV,89052
+Baskin-Robbins,Franklin Square,558,#XX558 XX558,166 New Hyde Park Rd,NY,11010
+Baskin-Robbins,Dermott,559,#XX559 XX559,3309 Highway 65 N,AR,71638
+Baskin-Robbins,Belmont,560,#XX560 XX560,52 Church St,MA,2478
+Baskin-Robbins,Sheridan,561,#XX561 XX561,100 N. Rock,AR,72150
+Baskin-Robbins,Brooklyn,562,#XX562 XX562,737 4th Avenue,NY,11232
+Baskin-Robbins,Rancho Cordova,563,#XX563 XX563,10109 Folsom Blvd,CA,95670
+Baskin-Robbins,Tupelo,564,#XX564 XX564,836 Harmony Ln,MS,38804
+Baskin-Robbins,Seaford,565,#XX565 XX565,4007 Merrick Rd,NY,11783
+Baskin-Robbins,Los Angeles,566,#XX566 XX566,2919 Los Feliz Blvd/#3,CA,90039
+Baskin-Robbins,Studio City,567,#XX567 XX567,10941 Ventura Blvd,CA,91604
+Baskin-Robbins,Searcy,568,#XX568 XX568,1250 Truman Baker Dr,AR,72143
+Baskin-Robbins,Yuba City,569,#XX569 XX569,885 Colusa Ave,CA,95991
+Baskin-Robbins,San Diego,570,#XX570 XX570,3737 Murphy Canyon Drive,CA,92123
+Baskin-Robbins,Alexandria,571,#XX571 XX571,3325 Jefferson Davis Hwy,VA,22305
+Baskin-Robbins,Oak Lawn,572,#XX572 XX572,10801 S. Cicero Ave,IL,60453
+Baskin-Robbins,Sterling,573,#XX573 XX573,47010 Community Plz,VA,20164
+Baskin-Robbins,Lawrenceville,574,#XX574 XX574,1278 Lawrence Rd,NJ,8648
+Baskin-Robbins,Maryville,575,#XX575 XX575,1764 W Broadway,TN,37803
+Baskin-Robbins,Corryton,576,#XX576 XX576,7501 Tazewell Pike,TN,37721
+Baskin-Robbins,Maryville,577,#XX577 XX577,2428 Lamar Alexander Parkway,TN,37804
+Baskin-Robbins,Toms River,578,#XX578 XX578,"1245 Lakewood Rd, Rt 166",NJ,8753
+Baskin-Robbins,Staten Island,579,#XX579 XX579,770 Forest Ave,NY,10310
+Baskin-Robbins,Staten Island,580,#XX580 XX580,1131 Bay St,NY,10305
+Baskin-Robbins,Pocahontas,581,#XX581 XX581,647 Highway 67 S,AR,72455
+Baskin-Robbins,La Grande,582,#XX582 XX582,2310 Island Ave,OR,97850
+Baskin-Robbins,Pontotoc,583,#XX583 XX583,125 Highway 15 N,MS,38863
+Baskin-Robbins,Starkville,584,#XX584 XX584,868 Highway 12 W,MS,39759
+Baskin-Robbins,Howell,585,#XX585 XX585,4199 Route 9 N,NJ,7731
+Baskin-Robbins,Falls Church,586,#XX586 XX586,5701 Columbia Pike,VA,22042
+Baskin-Robbins,Chicago,587,#XX587 XX587,5959 Diversey Ave,IL,60639
+Baskin-Robbins,Chicago,588,#XX588 XX588,205 W Randolph St,IL,60606
+Baskin-Robbins,Orange,589,#XX589 XX589,424 S. Main St,CA,92868
+Baskin-Robbins,Brooklyn,590,#XX590 XX590,3015 Mermaid Ave,NY,11224
+Baskin-Robbins,Lexington,591,#XX591 XX591,2607 Plum Creek Pkwy,NE,68850
+Baskin-Robbins,Fort Lee,592,#XX592 XX592,1430 Route 46 East,NJ,7024
+Baskin-Robbins,Columbia,593,#XX593 XX593,1406 Forum Blvd,MO,65203
+Baskin-Robbins,Chicago,594,#XX594 XX594,5615 S Harlem Ave,IL,60638
+Baskin-Robbins,Jersey City,595,#XX595 XX595,1513-1515 Kennedy Blvd,NJ,7305
+Baskin-Robbins,West Memphis,596,#XX596 XX596,600 W Broadway,AR,72301
+Baskin-Robbins,Temecula,597,#XX597 XX597,26580 Ynez Rd. Unit C,CA,92591
+Baskin-Robbins,Huntington Beach,598,#XX598 XX598,7101 W. Yorktown Ave,CA,92648
+Baskin-Robbins,Chicago,599,#XX599 XX599,7578 N Western Ave,IL,60645
+Baskin-Robbins,Woodstock,600,#XX600 XX600,875 Towne Lake Parkway,GA,30188
+Baskin-Robbins,Palmdale,601,#XX601 XX601,39340 10th Street W,CA,93551
+Baskin-Robbins,Margate,602,#XX602 XX602,399 South State Road 7,FL,33068
+Baskin-Robbins,Henderson,603,#XX603 XX603,864 E. Main St,TN,38340
+Baskin-Robbins,Pittsburg,604,#XX604 XX604,2130 Railroad Avenue,CA,94565
+Baskin-Robbins,Modesto,605,#XX605 XX605,2221 McHenry Ave,CA,95350
+Baskin-Robbins,Fullerton,606,#XX606 XX606,136 W Orangethorpe Ave,CA,92832
+Baskin-Robbins,Clinton,607,#XX607 XX607,2180 N. Charles G Seivers Blvd,TN,37716
+Baskin-Robbins,Naperville,608,#XX608 XX608,1991 Brookdale Rd,IL,60563
+Baskin-Robbins,Roseville,609,#XX609 XX609,8690 Sierra College Blvd,CA,95661
+Baskin-Robbins,Benton,610,#XX610 XX610,2908 Congo Rd.S/O Fina Big Red,AR,72015
+Baskin-Robbins,Jonesboro,611,#XX611 XX611,1853 East Highland,AR,72401
+Baskin-Robbins,Lorain,612,#XX612 XX612,5494 Leavitt Rd,OH,44053
+Baskin-Robbins,Kennesaw,613,#XX613 XX613,741 Townpark Ln NW,GA,30144
+Baskin-Robbins,Evans,614,#XX614 XX614,4366 Washington Rd,GA,30809
+Baskin-Robbins,Selma,615,#XX615 XX615,8250 Agora Pkwy,TX,78154
+Baskin-Robbins,North Aurora,616,#XX616 XX616,407 S. Lincolnway,IL,60542
+Baskin-Robbins,Kingdom City,617,#XX617 XX617,3300 Gold Rd/Conoco,MO,65262
+Baskin-Robbins,Orlando,618,#XX618 XX618,4580 S. Semoran Blvd,FL,32822
+Baskin-Robbins,Orlando,619,#XX619 XX619,13781 S. John Young Pkwy,FL,32837
+Baskin-Robbins,Jacksonville,620,#XX620 XX620,5150 University Blvd W,FL,32216
+Baskin-Robbins,Jacksonville,621,#XX621 XX621,741 Cassat Ave,FL,32205
+Baskin-Robbins,Oldsmar,622,#XX622 XX622,3720 Tampa Rd,FL,34677
+Baskin-Robbins,Tampa,623,#XX623 XX623,18003 Highwoods Preserve Pkwy,FL,33647
+Baskin-Robbins,Orlando,624,#XX624 XX624,3042 W. Sand Lake Rd,FL,32809
+Baskin-Robbins,New Port Richey,625,#XX625 XX625,7635 State Road #54,FL,34653
+Baskin-Robbins,Champaign,626,#XX626 XX626,515 S. Neil St,IL,61826
+Baskin-Robbins,Schererville,627,#XX627 XX627,1695 U.S. Route 41,IN,46375
+Baskin-Robbins,Lansing,628,#XX628 XX628,17733 Torrence Ave,IL,60438
+Baskin-Robbins,Oak Forest,629,#XX629 XX629,5159 159th St,IL,60452
+Baskin-Robbins,Crown Point,630,#XX630 XX630,1126 N. Main St,IN,46307
+Baskin-Robbins,Oak Park,631,#XX631 XX631,6820 W. Roosevelt,IL,60304
+Baskin-Robbins,Elmhurst,632,#XX632 XX632,506 W North Ave,IL,60126
+Baskin-Robbins,Elgin,633,#XX633 XX633,1730 N. State St,IL,60123
+Baskin-Robbins,Fresno,634,#XX634 XX634,7685 N. Blackstone Avenue,CA,93720
+Baskin-Robbins,Chico,635,#XX635 XX635,2009 Forest Ave,CA,95928
+Baskin-Robbins,Mount Prospect,636,#XX636 XX636,1001 S Busse Rd,IL,60056
+Baskin-Robbins,Niles,637,#XX637 XX637,7039 W Dempster St,IL,60714
+Baskin-Robbins,Addison,638,#XX638 XX638,33 E Lake St,IL,60101
+Baskin-Robbins,Tampa,639,#XX639 XX639,8714 W. Hillsborough Ave,FL,33615
+Baskin-Robbins,Southfield,640,#XX640 XX640,29285 Southfield Rd,MI,48076
+Baskin-Robbins,Wixom,641,#XX641 XX641,28040 S. Wixom Rd,MI,48393
+Baskin-Robbins,Warren,642,#XX642 XX642,27460 Van Dyke Ave,MI,48093
+Baskin-Robbins,Sterling Heights,643,#XX643 XX643,44603 Mound Rd,MI,48314
+Baskin-Robbins,Patterson,644,#XX644 XX644,3115 Route 22,NY,12563
+Baskin-Robbins,Pearl,645,#XX645 XX645,414 Riverwind Dr,MS,39208
+Baskin-Robbins,Jamaica,646,#XX646 XX646,146-17 Jamaica Ave,NY,11435
+Baskin-Robbins,Corona,647,#XX647 XX647,1312 E. Ontario Ave,CA,92881
+Baskin-Robbins,Elgin,648,#XX648 XX648,812 E Chicago St,IL,60120
+Baskin-Robbins,Woodhaven,649,#XX649 XX649,9217 Jamaica Ave,NY,11421
+Baskin-Robbins,Chicago,650,#XX650 XX650,1651 W Roosevelt Rd,IL,60608
+Baskin-Robbins,Klamath Falls,651,#XX651 XX651,1781 Washburn Way,OR,97603
+Baskin-Robbins,South Richmond Hill,652,#XX652 XX652,11611 Liberty Ave,NY,11419
+Baskin-Robbins,Franklin Park,653,#XX653 XX653,10131 W Grand Ave,IL,60131
+Baskin-Robbins,Schaumburg,654,#XX654 XX654,477 West Golf Rd,IL,60194
+Baskin-Robbins,Anchorage,655,#XX655 XX655,3030 Denali St,AK,99503
+Baskin-Robbins,Anchorage,656,#XX656 XX656,800 E. Dimond Blvd,AK,99515
+Baskin-Robbins,Addison,657,#XX657 XX657,1750 West Lake St,IL,60101
+Baskin-Robbins,Orland Park,658,#XX658 XX658,8940 W 159th St,IL,60462
+Baskin-Robbins,Joliet,659,#XX659 XX659,3011 Plainfield Rd,IL,60432
+Baskin-Robbins,Elk Grove,661,#XX661 XX661,8417 Elk Grove Florin Road,CA,95624
+Baskin-Robbins,Point Pleasant,662,#XX662 XX662,216 Rt 35 South,NJ,8742
+Baskin-Robbins,Palatine,663,#XX663 XX663,801 East Dundee Rd,IL,60074
+Baskin-Robbins,El Paso,664,#XX664 XX664,12135 Montwood Dr,TX,79936
+Baskin-Robbins,Howell,665,#XX665 XX665,1994 Route 9,NJ,7731
+Baskin-Robbins,Bellevue,666,#XX666 XX666,166 Bellevue Sq,WA,98004
+Baskin-Robbins,Lexington,667,#XX667 XX667,115 N Locust Hill Dr,KY,40509
+Baskin-Robbins,Olympia Fields,668,#XX668 XX668,2520 W Lincoln Hwy,IL,60461
+Baskin-Robbins,Chicago,669,#XX669 XX669,8753 S. Stony Island Ave,IL,60617
+Baskin-Robbins,Bloomington,670,#XX670 XX670,2306 East Oakland Ave,IL,61701
+Baskin-Robbins,Cleveland,671,#XX671 XX671,16204 Lorain Ave,OH,44111
+Baskin-Robbins,Billings,672,#XX672 XX672,405 Main St,MT,59105
+Baskin-Robbins,Fairfield,673,#XX673 XX673,378 Passiac Ave,NJ,7004
+Baskin-Robbins,Chattanooga,674,#XX674 XX674,2100 Hamilton Place Blvd.,TN,37421
+Baskin-Robbins,Hobart,675,#XX675 XX675,1621 East 37th Ave,IN,46342
+Baskin-Robbins,Mission Viejo,676,#XX676 XX676,25276 Marguerite Pkwy .,CA,92692
+Baskin-Robbins,Hillsboro,677,#XX677 XX677,22035 NW Imbrie Dr,OR,97124
+Baskin-Robbins,East Palo Alto,678,#XX678 XX678,1741 East Bayshore Road,CA,94303
+Baskin-Robbins,Malvern,679,#XX679 XX679,1605 Riverpark Plaza,AR,72104
+Baskin-Robbins,Orange,680,#XX680 XX680,1610 E Chapman Ave,CA,92866
+Baskin-Robbins,Boynton Beach,681,#XX681 XX681,8324 Jog Road,FL,33437
+Baskin-Robbins,Fontana,682,#XX682 XX682,14600 Baseline Rd,CA,92336
+Baskin-Robbins,Hanover Park,683,#XX683 XX683,7450 Barrington Rd,IL,60133
+Baskin-Robbins,Sacramento,684,#XX684 XX684,8240 Calvine Rd,CA,95828
+Baskin-Robbins,Blackwood,685,#XX685 XX685,651 College Drive,NJ,8012
+Baskin-Robbins,Palm Coast,686,#XX686 XX686,1310 Palm Coast Pkwy SW,FL,32137
+Baskin-Robbins,North Lauderdale,687,#XX687 XX687,7135 W. Mcnab Rd.,FL,33068
+Baskin-Robbins,Rock Hill,688,#XX688 XX688,1932 Springsteen Rd,SC,29730
+Baskin-Robbins,Saint Joseph,689,#XX689 XX689,2301 North Belt Hwy,MO,64506
+Baskin-Robbins,South Ozone Park,690,#XX690 XX690,13320 Rockaway Blvd,NY,11420
+Baskin-Robbins,Lisle,691,#XX691 XX691,819 E Ogden Ave,IL,60532
+Baskin-Robbins,El Dorado Hills,693,#XX693 XX693,4311 Town Center Blvd,CA,95762
+Baskin-Robbins,Tucson,694,#XX694 XX694,4676 E. Grant Rd,AZ,85712
+Baskin-Robbins,Spring Hill,695,#XX695 XX695,13179 Cortez Blvd,FL,34613
+Baskin-Robbins,Ocoee,696,#XX696 XX696,1719 E Silver Star Rd,FL,34761
+Baskin-Robbins,Deerfield,697,#XX697 XX697,499 Lake Cook Rd,IL,60015
+Baskin-Robbins,Orlando,698,#XX698 XX698,2900 S Kirkman Rd,FL,32811
+Baskin-Robbins,Galt,699,#XX699 XX699,10444D Twin Cities Rd,CA,95632
+Baskin-Robbins,Dolton,700,#XX700 XX700,1136 E. Sibley Blvd,IL,60419
+Baskin-Robbins,Cameron,701,#XX701 XX701,1518 Bob Griffin Road,MO,64429
+Baskin-Robbins,Lake City,702,#XX702 XX702,5663 Jonesboro Rd,GA,30260
+Baskin-Robbins,Woodstock,703,#XX703 XX703,9755 Hwy 92,GA,30188
+Baskin-Robbins,Statesville,704,#XX704 XX704,241 Turnersburg Hwy,NC,28625
+Baskin-Robbins,Pine Beach,705,#XX705 XX705,118 Rt 9 North,NJ,8741
+Baskin-Robbins,Justice,706,#XX706 XX706,8029 W. 79th St.,IL,60458
+Baskin-Robbins,Brea,707,#XX707 XX707,3000 E. Imperial Hwy,CA,92821
+Baskin-Robbins,Vallejo,708,#XX708 XX708,10 Sage St,CA,94589
+Baskin-Robbins,Gardena,709,#XX709 XX709,1699 Artesia Blvd,CA,90248
+Baskin-Robbins,San Diego,710,#XX710 XX710,8650 Genesee Avenue,CA,92122
+Baskin-Robbins,Haskell,711,#XX711 XX711,1353 Ringwood Ave,NJ,7420
+Baskin-Robbins,Gurnee,712,#XX712 XX712,5414 Grand Ave,IL,60031
+Baskin-Robbins,San Jose,713,#XX713 XX713,430 W. Capitol Expy,CA,95136
+Baskin-Robbins,Anaheim,714,#XX714 XX714,212 S State College Blvd,CA,92806
+Baskin-Robbins,Markham,715,#XX715 XX715,3011 W. 159th St,IL,60426
+Baskin-Robbins,Morgan Hill,716,#XX716 XX716,315 Vineyard Town Ctr,CA,95037
+Baskin-Robbins,Pendleton,717,#XX717 XX717,220 Sw 12th Street,OR,97801
+Baskin-Robbins,Alhambra,718,#XX718 XX718,838 E. Valley Blvd,CA,91801
+Baskin-Robbins,Paramount,719,#XX719 XX719,16280 Paramount Blvd,CA,90723
+Baskin-Robbins,La Crescenta,720,#XX720 XX720,2611 Foothill Blvd,CA,91214
+Baskin-Robbins,Freehold,721,#XX721 XX721,511 Soloman Way,NJ,7728
+Baskin-Robbins,Aurora,722,#XX722 XX722,1237 N Eola Rd,IL,60504
+Baskin-Robbins,Pontiac,723,#XX723 XX723,600 S Opdyke Rd,MI,48341
+Baskin-Robbins,Lincoln,724,#XX724 XX724,6835 N. 27th St,NE,68521
+Baskin-Robbins,Sacramento,725,#XX725 XX725,2101 Natomas Crossing Dr,CA,95834
+Baskin-Robbins,Sterling Heights,726,#XX726 XX726,43761 Schoenherr,MI,48311
+Baskin-Robbins,Castaic,727,#XX727 XX727,31826 Castaic Rd,CA,91384
+Baskin-Robbins,Vancouver,728,#XX728 XX728,800 NE Tenney Rd,WA,98685
+Baskin-Robbins,Beaverton,729,#XX729 XX729,11421 SW Beaverton Hillsdale Hwy,OR,97005
+Baskin-Robbins,Honesdale,730,#XX730 XX730,1181 Texas Palmyra Highway,PA,18431
+Baskin-Robbins,Newark,731,#XX731 XX731,596 Market St,NJ,7105
+Baskin-Robbins,Germantown,732,#XX732 XX732,7820 Poplar Ave,TN,38138
+Baskin-Robbins,Newark,733,#XX733 XX733,802 S. Orange Ave,NJ,7106
+Baskin-Robbins,New York,734,#XX734 XX734,53 West 116th St,NY,10026
+Baskin-Robbins,Charlotte,735,#XX735 XX735,1831 South Blvd,NC,28203
+Baskin-Robbins,Memphis,736,#XX736 XX736,7110 Winchester Road,TN,38125
+Baskin-Robbins,Lakewood,737,#XX737 XX737,1500 Ocean Avenue,NJ,8701
+Baskin-Robbins,Suisun City,738,#XX738 XX738,1200 Anderson Drive,CA,94585
+Baskin-Robbins,Chicago,739,#XX739 XX739,2477 S Archer Ave,IL,60616
+Baskin-Robbins,Coram,740,#XX740 XX740,1852 Route 112,NY,11727
+Baskin-Robbins,Indian Trail,741,#XX741 XX741,14055 Hwy 74 West,NC,28079
+Baskin-Robbins,El Paso,742,#XX742 XX742,1320 Zaragoza Road,TX,79936
+Baskin-Robbins,Marlboro,743,#XX743 XX743,34 Rt 9 North,NJ,7751
+Baskin-Robbins,Fort Lauderdale,744,#XX744 XX744,1601 E Sunrise Blvd,FL,33304
+Baskin-Robbins,Montebello,745,#XX745 XX745,521 N. Montebello Blvd,CA,90640
+Baskin-Robbins,Copiague,746,#XX746 XX746,925 Montauk Hwy,NY,11726
+Baskin-Robbins,West Chicago,747,#XX747 XX747,185 W. North Ave,IL,60185
+Baskin-Robbins,Baltimore,748,#XX748 XX748,840 Guilford Ave,MD,21202
+Baskin-Robbins,San Jose,749,#XX749 XX749,171 Branham Ln,CA,95136
+Baskin-Robbins,Sacramento,750,#XX750 XX750,1441 Meadowview Rd,CA,95832
+Baskin-Robbins,El Paso,751,#XX751 XX751,3434 N. Mesa Street,TX,79902
+Baskin-Robbins,Hillsborough,752,#XX752 XX752,315 Rt 206,NJ,8844
+Baskin-Robbins,Tucson,753,#XX753 XX753,904 E. University Blvd,AZ,85719
+Baskin-Robbins,Albuquerque,754,#XX754 XX754,5241 Ouray Rd Nw #C,NM,87120
+Baskin-Robbins,Bronx,755,#XX755 XX755,3276 Westchester Ave,NY,10461
+Baskin-Robbins,Staten Island,756,#XX756 XX756,1854 Hylan Blvd,NY,10306
+Baskin-Robbins,Brooklyn,757,#XX757 XX757,1427 Sheepshead Bay Rd,NY,11235
+Baskin-Robbins,Jamaica,758,#XX758 XX758,10962 Francis Lewis Blvd,NY,11429
+Baskin-Robbins,New York,759,#XX759 XX759,2083 Lexington Ave,NY,10035
+Baskin-Robbins,Bronx,760,#XX760 XX760,1733 Jerome Avenue,NY,10453
+Baskin-Robbins,Bronx,761,#XX761 XX761,5501 Broadway,NY,10460
+Baskin-Robbins,Costa Mesa,762,#XX762 XX762,1460 Baker Street,CA,92626
+Baskin-Robbins,Zion,763,#XX763 XX763,2101 Sheridan Rd,IL,60099
+Baskin-Robbins,New York,764,#XX764 XX764,1225 1st Ave,NY,10021
+Baskin-Robbins,Old Bridge,765,#XX765 XX765,1076 Route 9,NJ,8857
+Baskin-Robbins,Far Rockaway,766,#XX766 XX766,269 Beach 116th St,NY,11694
+Baskin-Robbins,Pompton Plains,767,#XX767 XX767,560 Route 23,NJ,7444
+Baskin-Robbins,Old Bridge,768,#XX768 XX768,164 Rte 34 N,NJ,8857
+Baskin-Robbins,Jackson,769,#XX769 XX769,400 South New Prospect Rd,NJ,8527
+Baskin-Robbins,Chicago,770,#XX770 XX770,5050 N Cicero Ave,IL,60630
+Baskin-Robbins,Jamaica,771,#XX771 XX771,13850 Jamaica Ave,NY,11435
+Baskin-Robbins,Roseville,772,#XX772 XX772,28351 Groesbeck Hwy,MI,48066
+Baskin-Robbins,Shelby Township,773,#XX773 XX773,14016 23 Mile Rd,MI,48315
+Baskin-Robbins,Carpentersville,774,#XX774 XX774,2270 Randall Rd,IL,60110
+Baskin-Robbins,Winchester,775,#XX775 XX775,1462 N Frederick Pike,VA,22603
+Baskin-Robbins,Pearland,777,#XX777 XX777,10504 Broadway St,TX,77584
+Baskin-Robbins,Katy,778,#XX778 XX778,1560 S Mason Rd,TX,77450
+Baskin-Robbins,Merrick,779,#XX779 XX779,56 E Sunrise Hwy,NY,11566
+Baskin-Robbins,Staten Island,780,#XX780 XX780,901 Huguenot Ave,NY,10312
+Baskin-Robbins,Lynnwood,781,#XX781 XX781,4615 196th St SW STE #142,WA,98036
+Baskin-Robbins,Charlotte,782,#XX782 XX782,9033 S Tryon St,NC,28273
+Baskin-Robbins,North Brunswick,783,#XX783 XX783,1345 Rte 1,NJ,8902
+Baskin-Robbins,Chicago,784,#XX784 XX784,3977 W Columbus Ave,IL,60652
+Baskin-Robbins,Washington,785,#XX785 XX785,Shirley Memorial Hwy,DC,20301
+Baskin-Robbins,Mchenry,786,#XX786 XX786,4502 W Elm St,IL,60050
+Baskin-Robbins,Mount Prospect,787,#XX787 XX787,820 E. Rand Rd,IL,60056
+Baskin-Robbins,Edison,789,#XX789 XX789,976-977 Inman Ave,NJ,8820
+Baskin-Robbins,Bronx,790,#XX790 XX790,4115 3rd Ave,NY,10457
+Baskin-Robbins,Long Beach,791,#XX791 XX791,510 Long Beach Blvd,CA,90802
+Baskin-Robbins,Redford,792,#XX792 XX792,9406 Telegraph Rd,MI,48239
+Baskin-Robbins,Bryant,793,#XX793 XX793,2400 Springhill Rd,AR,72022
+Baskin-Robbins,Gatlinburg,794,#XX794 XX794,815 Parkway,TN,37738
+Baskin-Robbins,Oakland Gardens,795,#XX795 XX795,61-58 Springfield Blvd,NY,11364
+Baskin-Robbins,Simi Valley,796,#XX796 XX796,2410 Sycamore Dr,CA,93065
+Baskin-Robbins,Sacramento,797,#XX797 XX797,2620 Gateway Oaks Dr,CA,95833
+Baskin-Robbins,New Brunswick,798,#XX798 XX798,1 Railroad Plz,NJ,8901
+Baskin-Robbins,Lexington,799,#XX799 XX799,10 Woburn St,MA,2420
+Baskin-Robbins,West Point,800,#XX800 XX800,1140 Highway 45 S,MS,39773
+Baskin-Robbins,Tampa,801,#XX801 XX801,4325 Hillsborough Plz,FL,33614
+Baskin-Robbins,Evanston,802,#XX802 XX802,1900 Dempster St,IL,60202
+Baskin-Robbins,Orlando,803,#XX803 XX803,7440-A International Drive,FL,32819
+Baskin-Robbins,Spring Hill,804,#XX804 XX804,4471 Commercial Way,FL,34606
+Baskin-Robbins,Winter Park,805,#XX805 XX805,6627 University Blvd,FL,32792
+Baskin-Robbins,YORK,806,#XX806 XX806,1015 Mt. Rose Ave,PA,17403
+Baskin-Robbins,Jackson,807,#XX807 XX807,2089 North Highland Ave,TN,38305
+Baskin-Robbins,Willoughby,808,#XX808 XX808,35535 Euclid Ave,OH,44094
+Baskin-Robbins,Newark,809,#XX809 XX809,311 Springfield Ave #313,NJ,7103
+Baskin-Robbins,Carson,810,#XX810 XX810,603-A-East University Dr,CA,90746
+Baskin-Robbins,Astoria,811,#XX811 XX811,3117 30th Ave,NY,11102
+Baskin-Robbins,Tustin,812,#XX812 XX812,535 E Main St,CA,92780
+Baskin-Robbins,Jackson,813,#XX813 XX813,907 Vann Dr,TN,38305
+Baskin-Robbins,Lincolnwood,814,#XX814 XX814,3946 W Devon Ave,IL,60712
+Baskin-Robbins,Syosset,815,#XX815 XX815,59 Jackson Ave,NY,11791
+Baskin-Robbins,Freeport,816,#XX816 XX816,389 Atlantic Ave,NY,11520
+Baskin-Robbins,Temple City,817,#XX817 XX817,5709 Rosemead Blvd,CA,91780
+Baskin-Robbins,Brooklyn,818,#XX818 XX818,148 Smith St,NY,11201
+Baskin-Robbins,Brooklyn,819,#XX819 XX819,6402 7th Ave,NY,11220
+Baskin-Robbins,Gwynn Oak,820,#XX820 XX820,6929 Liberty Rd,MD,21207
+Baskin-Robbins,Bronx,821,#XX821 XX821,1041 Prospect Ave,NY,10459
+Baskin-Robbins,Cabot,822,#XX822 XX822,111 Bill Foster Memorial Hwy,AR,72023
+Baskin-Robbins,Blytheville,823,#XX823 XX823,3701 S Division St,AR,72315
+Baskin-Robbins,Manahawkin,824,#XX824 XX824,601 Washington Ave,NJ,8050
+Baskin-Robbins,Antelope,825,#XX825 XX825,4241 Elverta Rd,CA,95843
+Baskin-Robbins,Commack,826,#XX826 XX826,115 Veterans Highway,NY,11725
+Baskin-Robbins,Oakhurst,827,#XX827 XX827,2112 State Route 35,NJ,7755
+Baskin-Robbins,Sugar Land,828,#XX828 XX828,19970 Southwest Freeway,TX,77479
+Baskin-Robbins,Coconut Creek,829,#XX829 XX829,4660 W Hillsboro Blvd,FL,33073
+Baskin-Robbins,Pico Rivera,830,#XX830 XX830,8750 Washington Blvd,CA,90660
+Baskin-Robbins,Jericho,831,#XX831 XX831,81 Jericho Tpke,NY,11753
+Baskin-Robbins,Tinley Park,832,#XX832 XX832,9510 179th St,IL,60477
+Baskin-Robbins,Arlington,833,#XX833 XX833,6115 Airline Rd,TN,38002
+Baskin-Robbins,South Amboy,834,#XX834 XX834,139-145 Broadway,NJ,8879
+Baskin-Robbins,Sauk Village,835,#XX835 XX835,2703 E Sauk Trail,IL,60411
+Baskin-Robbins,North Riverside,836,#XX836 XX836,7501 W Cermak Rd,IL,60546
+Baskin-Robbins,Ladera Ranch,837,#XX837 XX837,27642 Antonio Pkwy,CA,92694
+Baskin-Robbins,Rosemead,838,#XX838 XX838,3002 San Gabriel Blvd,CA,91770
+Baskin-Robbins,Streetsboro,839,#XX839 XX839,9168 State Route 14,OH,44241
+Baskin-Robbins,Myrtle Beach,840,#XX840 XX840,301 S. Kings Hwy,SC,29577
+Baskin-Robbins,Little River,841,#XX841 XX841,593 Highway 90 E,SC,29566
+Baskin-Robbins,Astoria,842,#XX842 XX842,4322 Ditmars Blvd,NY,11105
+Baskin-Robbins,Redwood City,843,#XX843 XX843,1501 El Camino Real,CA,94063
+Baskin-Robbins,New York,844,#XX844 XX844,875 3rd Ave,NY,10022
+Baskin-Robbins,Jamaica,845,#XX845 XX845,18711 Jamaica Ave,NY,11423
+Baskin-Robbins,Philadelphia,846,#XX846 XX846,7104 Ridge Ave,PA,19128
+Baskin-Robbins,Plainfield,847,#XX847 XX847,13313 S. State Route 59,IL,60544
+Baskin-Robbins,East Brunswick,848,#XX848 XX848,680 Rte 18 N,NJ,8816
+Baskin-Robbins,Elmwood Park,849,#XX849 XX849,210 Us-46,NJ,7407
+Baskin-Robbins,Loganville,850,#XX850 XX850,4152 Atlanta Hwy,GA,30052
+Baskin-Robbins,Sanford,851,#XX851 XX851,3768 S Orlando Dr.,FL,32773
+Baskin-Robbins,Fern Park,852,#XX852 XX852,429 Ridge Rd,FL,32730
+Baskin-Robbins,Orlando,853,#XX853 XX853,7707 E Colonial Dr,FL,32807
+Baskin-Robbins,Davie,854,#XX854 XX854,2321 S Univeristy Dr,FL,33324
+Baskin-Robbins,Patterson,855,#XX855 XX855,1055 Sperry Ave,CA,95363
+Baskin-Robbins,Bellingham,856,#XX856 XX856,1253 W. Bakerview Rd,WA,98226
+Baskin-Robbins,Port Saint Lucie,857,#XX857 XX857,134 Sw Port Saint Lucie Blvd,FL,34984
+Baskin-Robbins,Mokena,858,#XX858 XX858,11212 W. Lincoln Hwy,IL,60448
+Baskin-Robbins,Bronx,859,#XX859 XX859,2241 Southern Blvd,NY,10458
+Baskin-Robbins,Austin,860,#XX860 XX860,9911 Brodie Lane,TX,78748
+Baskin-Robbins,New York,861,#XX861 XX861,601 2nd Ave,NY,10016
+Baskin-Robbins,Stuttgart,862,#XX862 XX862,408 E. 22nd St,AR,72160
+Baskin-Robbins,Jensen Beach,863,#XX863 XX863,4320 NW Federal Hwy,FL,34957
+Baskin-Robbins,Stuart,864,#XX864 XX864,7850 Sw Lost River Rd,FL,34997
+Baskin-Robbins,Shorewood,865,#XX865 XX865,955 Brook Forest Ave,IL,60404
+Baskin-Robbins,Orlando,866,#XX866 XX866,1650 N Alafaya Trl,FL,32828
+Baskin-Robbins,Wauconda,867,#XX867 XX867,469 W Liberty St,IL,60084
+Baskin-Robbins,Eustis,868,#XX868 XX868,2390 E Burleigh Blvd,FL,32726
+Baskin-Robbins,Brooklyn,869,#XX869 XX869,1815 Avenue U,NY,11229
+Baskin-Robbins,Bronx,870,#XX870 XX870,1650 Bruckner Blvd,NY,10473
+Baskin-Robbins,Inglewood,871,#XX871 XX871,3351 W Century Blvd #104,CA,90303
+Baskin-Robbins,Buchanan,872,#XX872 XX872,113 Albany Post Rd,NY,10511
+Baskin-Robbins,Killingworth,873,#XX873 XX873,177 Clinton St.,CT,6419
+Baskin-Robbins,Chicago,874,#XX874 XX874,200 E Ohio St,IL,60611
+Baskin-Robbins,Staten Island,875,#XX875 XX875,2222 Forest Ave,NY,10303
+Baskin-Robbins,Gilroy,876,#XX876 XX876,6965 Camino Arroyo,CA,95020
+Baskin-Robbins,Brooklyn,877,#XX877 XX877,1710 Eastern Pkwy,NY,11223
+Baskin-Robbins,Staten Island,878,#XX878 XX878,1700 Richmond Ave,NY,10314
+Baskin-Robbins,New York,879,#XX879 XX879,1630 Madison Ave,NY,10029
+Baskin-Robbins,Irvine,880,#XX880 XX880,14001 Jeffrey Rd,CA,92620
+Baskin-Robbins,Peekskill,881,#XX881 XX881,422 Washington Ave,NY,10566
+Baskin-Robbins,Perkasie,882,#XX882 XX882,230 Rte 313/#1,PA,18944
+Baskin-Robbins,Ossining,883,#XX883 XX883,94 Croton Ave,NY,10562
+Baskin-Robbins,Brooklyn,884,#XX884 XX884,906 Coney Island Ave,NY,11218
+Baskin-Robbins,Paramus,885,#XX885 XX885,440-A Forest Ave,NJ,7652
+Baskin-Robbins,Cambridge,886,#XX886 XX886,1 Bow St,MA,2138
+Baskin-Robbins,Dresden,887,#XX887 XX887,8603 Hwy 22,TN,38225
+Baskin-Robbins,Greenfield,888,#XX888 XX888,1907 N Meridan St,TN,38230
+Baskin-Robbins,Margate,889,#XX889 XX889,5000 W. Atlantic Blvd,FL,33063
+Baskin-Robbins,White Plains,890,#XX890 XX890,81 Knollwood Rd,NY,10607
+Baskin-Robbins,Hagerstown,891,#XX891 XX891,1427 Dual Highway,MD,21740
+Baskin-Robbins,Ronkonkoma,892,#XX892 XX892,125 Portion Rd,NY,11779
+Baskin-Robbins,Apopka,893,#XX893 XX893,212 E. Main St,FL,32703
+Baskin-Robbins,Crestwood,894,#XX894 XX894,5443 W 127th St,IL,60445
+Baskin-Robbins,Glenside,895,#XX895 XX895,230 S Easton Rd,PA,19038
+Baskin-Robbins,Richboro,896,#XX896 XX896,800 Bustleton Pke,PA,18954
+Baskin-Robbins,Colby,897,#XX897 XX897,700 Horton Ave,KS,67701
+Baskin-Robbins,Riverside,898,#XX898 XX898,7024 Magnolia Ave,CA,92506
+Baskin-Robbins,Orlando,899,#XX899 XX899,6215 S. Orange Ave,FL,32809
+Baskin-Robbins,Bayonne,900,#XX900 XX900,171 Lefante Way,NJ,7002
+Baskin-Robbins,Brooklyn,901,#XX901 XX901,43 Jamaica Ave,NY,11207
+Baskin-Robbins,Brooklyn,902,#XX902 XX902,1993 Atlantic Ave,NY,11233
+Baskin-Robbins,Victorville,903,#XX903 XX903,12602 Amargosa Rd.,CA,92392
+Baskin-Robbins,Springfield,904,#XX904 XX904,633 Morris Tpke,NJ,7081
+Baskin-Robbins,New York,905,#XX905 XX905,289 7th Ave,NY,10001
+Baskin-Robbins,Jackson,906,#XX906 XX906,715 Bennets Mills Rd,NJ,8527
+Baskin-Robbins,Saint John,907,#XX907 XX907,9405 Wicker Ave,IN,46373
+Baskin-Robbins,Burbank,908,#XX908 XX908,8049 S Harlem Ave,IL,60459
+Baskin-Robbins,Raleigh,909,#XX909 XX909,2727 Capital Blvd,NC,27604
+Baskin-Robbins,Dyer,910,#XX910 XX910,1371 Joliet St,IN,46311
+Baskin-Robbins,North Babylon,911,#XX911 XX911,1201 Deer Park Ave,NY,11703
+Baskin-Robbins,Corona,912,#XX912 XX912,3804 Junction Blvd,NY,11368
+Baskin-Robbins,Medford,913,#XX913 XX913,178 Route 70,NJ,8055
+Baskin-Robbins,Winnetka,914,#XX914 XX914,20165 Saticoy St,CA,91306
+Baskin-Robbins,Spokane,915,#XX915 XX915,2727 S Mount Vernon St,WA,99223
+Baskin-Robbins,Homer Glen,916,#XX916 XX916,14135 S. Bell Rd.,IL,60491
+Baskin-Robbins,Urbana,917,#XX917 XX917,404 W University Ave,IL,61801
+Baskin-Robbins,Orlando,918,#XX918 XX918,2603 Edgewater Dr,FL,32804
+Baskin-Robbins,Houston,920,#XX920 XX920,11660 Westheimer Rd,TX,77077
+Baskin-Robbins,Philadelphia,921,#XX921 XX921,6110 Woodland Ave,PA,19142
+Baskin-Robbins,Tulsa,922,#XX922 XX922,9210 S Sheridan Rd,OK,74133
+Baskin-Robbins,Spotswood,923,#XX923 XX923,434 Main St,NJ,8884
+Baskin-Robbins,Tucson,924,#XX924 XX924,7555 N. La Cholla Blvd,AZ,85741
+Baskin-Robbins,Englishtown,925,#XX925 XX925,14 Wilson Ave,NJ,7726
+Baskin-Robbins,Suffern,926,#XX926 XX926,270 Route 59,NY,10901
+Baskin-Robbins,Monroe,927,#XX927 XX927,135 Main St,CT,6468
+Baskin-Robbins,Brooklyn,928,#XX928 XX928,5702 2nd Ave,NY,11220
+Baskin-Robbins,New York,929,#XX929 XX929,110 West 145th St,NY,10039
+Baskin-Robbins,New York,930,#XX930 XX930,250 E Houston St,NY,10002
+Baskin-Robbins,Cypress,931,#XX931 XX931,12312 Barker Cypress Rd,TX,77429
+Baskin-Robbins,Huntington,932,#XX932 XX932,200 E Main St,NY,11743
+Baskin-Robbins,Richmond Hill,933,#XX933 XX933,11602 Metropolitan Ave,NY,11418
+Baskin-Robbins,Hackensack,934,#XX934 XX934,150 Passaic St,NJ,7601
+Baskin-Robbins,Memphis,935,#XX935 XX935,8057 Highway 64,TN,38133
+Baskin-Robbins,Harvey,936,#XX936 XX936,16242 S. Halsted,IL,60426
+Baskin-Robbins,Brooklyn,937,#XX937 XX937,1467 Nostrand Ave,NY,11226
+Baskin-Robbins,Staten Island,938,#XX938 XX938,680 Arthur Kill Rd,NY,10308
+Baskin-Robbins,Camden,939,#XX939 XX939,4080 Dupont Hwy,DE,19934
+Baskin-Robbins,Orland Park,940,#XX940 XX940,11309 W. 143rd St,IL,60467
+Baskin-Robbins,Waterford,942,#XX942 XX942,307 N Telegraph,MI,48328
+Baskin-Robbins,Southfield,943,#XX943 XX943,23113 Greenfield Rd,MI,48075
+Baskin-Robbins,Country Club Hills,944,#XX944 XX944,4021 W 183rd St,IL,60478
+Baskin-Robbins,Emerson,946,#XX946 XX946,441 Old Hook Rd,NJ,7630
+Baskin-Robbins,Odenton,947,#XX947 XX947,1614 Annapolis Rd.,MD,21113
+Baskin-Robbins,Philadelphia,948,#XX948 XX948,1630 E Wadsworth Ave,PA,19150
+Baskin-Robbins,Benton,950,#XX950 XX950,620 Military Rd,AR,72015
+Baskin-Robbins,Vilonia,951,#XX951 XX951,1094 Main St,AR,72173
+Baskin-Robbins,Howell,952,#XX952 XX952,763 S. Michigan Ave,MI,48843
+Baskin-Robbins,Garwood,953,#XX953 XX953,323 North Ave,NJ,7027
+Baskin-Robbins,Mineola,954,#XX954 XX954,265 East Jericho Tpk,NY,11501
+Baskin-Robbins,Union City,955,#XX955 XX955,4801 Park Ave,NJ,7087
+Baskin-Robbins,Brooklyn,956,#XX956 XX956,5901 Church Avenue,NY,11203
+Baskin-Robbins,Plainsboro,957,#XX957 XX957,10 Schalks Crossing Rd,NJ,8536
+Baskin-Robbins,West Hartford,958,#XX958 XX958,1253 New Britain Ave,CT,6110
+Baskin-Robbins,Carrollton,959,#XX959 XX959,1008 W. Hebron Pkwy,TX,75010
+Baskin-Robbins,Newark,960,#XX960 XX960,51 E Main St,DE,19711
+Baskin-Robbins,Huntingdon,961,#XX961 XX961,21020 E Main St,TN,38344
+Baskin-Robbins,Newbern,962,#XX962 XX962,305 E Highway 77,TN,38059
+Baskin-Robbins,Trenton,963,#XX963 XX963,111 W Armory St,TN,38382
+Baskin-Robbins,Mc Ewen,964,#XX964 XX964,9330 Us Highway 70 East,TN,37101
+Baskin-Robbins,New Johnsonville,965,#XX965 XX965,998 Broadway Ave,TN,37134
+Baskin-Robbins,Wyckoff,966,#XX966 XX966,525 Cedar Hill Ave,NJ,7481
+Baskin-Robbins,Cheltenham,967,#XX967 XX967,81 Cheltenham Ave,PA,19012
+Baskin-Robbins,Chicago,968,#XX968 XX968,6001 West Addison Ave,IL,60634
+Baskin-Robbins,Chicago,969,#XX969 XX969,600 S. Wabash Ave,IL,60605
+Baskin-Robbins,Tulare,970,#XX970 XX970,1543 Retherford St,CA,93274
+Baskin-Robbins,Valley Stream,971,#XX971 XX971,207 W. Merrick Rd,NY,11580
+Baskin-Robbins,Sanford,972,#XX972 XX972,4510 W State Road 46,FL,32771
+Baskin-Robbins,Bethpage,973,#XX973 XX973,597 Hicksville Rd,NY,11714
+Baskin-Robbins,New York,974,#XX974 XX974,269 8th Ave,NY,10011
+Baskin-Robbins,Totowa,975,#XX975 XX975,410 Minnisink Rd,NJ,7512
+Baskin-Robbins,Allentown,976,#XX976 XX976,1870 Catasauqua Rd,PA,18102
+Baskin-Robbins,Clarksville,977,#XX977 XX977,12210 Clarksville Pike,MD,21029
+Baskin-Robbins,Hammond,978,#XX978 XX978,7306 Calumet Ave,IN,46324
+Baskin-Robbins,Merrillville,979,#XX979 XX979,2050 W. 81st Ave,IN,46410
+Baskin-Robbins,Middle Village,980,#XX980 XX980,6122 Fresh Pond Rd,NY,11379
+Baskin-Robbins,Jamaica,981,#XX981 XX981,13328 Springfield Blvd,NY,11413
+Baskin-Robbins,Smithtown,982,#XX982 XX982,731 Nesconset Hwy,NY,11787
+Baskin-Robbins,Far Rockaway,983,#XX983 XX983,239 Beach 20th St,NY,11691
+Baskin-Robbins,Huntley,984,#XX984 XX984,12090 Princeton Dr,IL,60142
+Baskin-Robbins,Phoenix,985,#XX985 XX985,4025 E. Chandler Blvd,AZ,85048
+Baskin-Robbins,Miami,986,#XX986 XX986,5128 Biscayne Blvd,FL,33137
+Baskin-Robbins,Fresh Pond,987,#XX987 XX987,6667 Fresh Pond Rd,NY,11385
+Baskin-Robbins,Plantation,988,#XX988 XX988,6299 W Sunrise Blvd,FL,33313
+Baskin-Robbins,Chicago,989,#XX989 XX989,75 E. Washington St.,IL,60602
+Baskin-Robbins,Brooklyn,990,#XX990 XX990,2302 Knapp St # 2310,NY,11229
+Baskin-Robbins,New York,991,#XX991 XX991,1760 2nd Ave,NY,10128
+Baskin-Robbins,Hollywood,992,#XX992 XX992,7003 Taft St,FL,33024
+Baskin-Robbins,Ocala,993,#XX993 XX993,1600 State Road 484,FL,34473
+Baskin-Robbins,Hamburg,994,#XX994 XX994,1618 Mountain Rd,PA,19526
+Baskin-Robbins,Clinton,995,#XX995 XX995,186 Center St.,NJ,8809
+Baskin-Robbins,Marlboro,996,#XX996 XX996,2 Ryan Road,NJ,7746
+Baskin-Robbins,Fort Wayne,997,#XX997 XX997,6747 Jefferson Blvd,IN,46804
+Baskin-Robbins,Kinnelon,998,#XX998 XX998,1161 State Rt 23,NJ,7405
+Baskin-Robbins,Naperville,999,#XX999 XX999,3108 State Route 59,IL,60564
+Baskin-Robbins,Huntington Station,1000,#XX1000 XX1000,795 East Jericho Tpk,NY,11746
+Baskin-Robbins,West New York,1001,#XX1001 XX1001,4914-22 Kennedy Blvd,NJ,7093
+Baskin-Robbins,Kent,1002,#XX1002 XX1002,25620 102nd Place SE,WA,98030
+Baskin-Robbins,Harvard,1004,#XX1004 XX1004,188 Ayer Rd,MA,1451
+Baskin-Robbins,Plainview,1005,#XX1005 XX1005,587 Old Country Rd,NY,11803
+Baskin-Robbins,Oxford,1006,#XX1006 XX1006,485 Hwy 6 W,MS,38655
+Baskin-Robbins,Yonkers,1007,#XX1007 XX1007,1034 North Broadway,NY,10701
+Baskin-Robbins,Gleason,1008,#XX1008 XX1008,202 North Cedar St.,TN,38229
+Baskin-Robbins,Dyer,1009,#XX1009 XX1009,187 South Main St.,TN,38330
+Baskin-Robbins,Tiptonville,1010,#XX1010 XX1010,100 Highway 78 South,TN,38079
+Baskin-Robbins,East Wenatchee,1011,#XX1011 XX1011,505A Grant Rd,WA,98802
+Baskin-Robbins,Jensen Beach,1012,#XX1012 XX1012,1864 Jensen Beach Blvd,FL,34957
+Baskin-Robbins,Accokeek,1013,#XX1013 XX1013,15793 Livingston Rd,MD,20607
+Baskin-Robbins,Chicago,1014,#XX1014 XX1014,2640 N. Naragansett,IL,60639
+Baskin-Robbins,Hanover,1015,#XX1015 XX1015,1348 Ashton Rd.,MD,21076
+Baskin-Robbins,Baltimore,1016,#XX1016 XX1016,4535 Falls Rd.,MD,21209
+Baskin-Robbins,Port Saint Lucie,1018,#XX1018 XX1018,1401 SE Village Green Dr,FL,34952
+Baskin-Robbins,Pompano Beach,1019,#XX1019 XX1019,2768-2770 W Atlantic Blvd,FL,33069
+Baskin-Robbins,Secaucus,1020,#XX1020 XX1020,20 Meadowlands Pky,NJ,7094
+Baskin-Robbins,Redondo Beach,1021,#XX1021 XX1021,4051 Inglewood Ave #104,CA,90278
+Baskin-Robbins,Woodlawn,1022,#XX1022 XX1022,6900 Dogwood Rd,MD,21244
+Baskin-Robbins,Ontario,1023,#XX1023 XX1023,1218 SW 4th Ave,OR,97914
+Baskin-Robbins,Glendale,1024,#XX1024 XX1024,7007 Myrtle Ave,NY,11385
+Baskin-Robbins,Rosemont,1025,#XX1025 XX1025,9781 W. Higgins Rd,IL,60018
+Baskin-Robbins,Forest Hills,1026,#XX1026 XX1026,11716 Queens Blvd,NY,11375
+Baskin-Robbins,Bayside,1027,#XX1027 XX1027,4008 Bell Blvd,NY,11361
+Baskin-Robbins,Dearborn,1028,#XX1028 XX1028,24235 Michigan Ave,MI,48124
+Baskin-Robbins,Hopewell,1029,#XX1029 XX1029,5113 Oaklawn Blvd,VA,23860
+Baskin-Robbins,Glen Rock,1030,#XX1030 XX1030,886 Prospect St,NJ,7452
+Baskin-Robbins,New York,1031,#XX1031 XX1031,476 Second Ave,NY,10016
+Baskin-Robbins,Westmont,1032,#XX1032 XX1032,15 E. Ogden Ave,IL,60559
+Baskin-Robbins,North Riverside,1033,#XX1033 XX1033,8360 W. Cermak Ave,IL,60546
+Baskin-Robbins,Brooklyn,1034,#XX1034 XX1034,1375 Rockaway Parkway,NY,11236
+Baskin-Robbins,Mastic,1035,#XX1035 XX1035,1495 Montauk Hwy,NY,11950
+Baskin-Robbins,Fresh Meadows,1036,#XX1036 XX1036,6120 Fresh Meadow Ln,NY,11365
+Baskin-Robbins,Bronx,1037,#XX1037 XX1037,636 City Island Ave,NY,10464
+Baskin-Robbins,Mentor,1038,#XX1038 XX1038,9584 Mentor Ave,OH,44060
+Baskin-Robbins,Concord,1039,#XX1039 XX1039,1924 Grant St,CA,94520
+Baskin-Robbins,Third Lake,1040,#XX1040 XX1040,34484 N. U.S. Highway 45,IL,60030
+Baskin-Robbins,Chicago,1041,#XX1041 XX1041,4821 N. Kedzie Ave,IL,60625
+Baskin-Robbins,Lauderdale By The Sea,1042,#XX1042 XX1042,4721 N. Ocean Dr,FL,33308
+Baskin-Robbins,Blandon,1043,#XX1043 XX1043,8448 Allentown Pike,PA,19510
+Baskin-Robbins,Woodstock,1044,#XX1044 XX1044,335 S. Eastwood Dr,IL,60098
+Baskin-Robbins,Clayton,1045,#XX1045 XX1045,770 Enterprise Drive,NC,27520
+Baskin-Robbins,Griffin,1046,#XX1046 XX1046,1800 N Expressway,GA,30223
+Baskin-Robbins,Murrells Inlet,1047,#XX1047 XX1047,2901 S. Highway 17,SC,29576
+Baskin-Robbins,Chicago,1048,#XX1048 XX1048,2247 N. Milwaukee Ave,IL,60647
+Baskin-Robbins,Charlotte,1049,#XX1049 XX1049,701 S. Kings Dr,NC,28204
+Baskin-Robbins,Colorado Springs,1050,#XX1050 XX1050,6048 Stetson Hill Blvd,CO,80922
+Baskin-Robbins,New Milford,1051,#XX1051 XX1051,754 River Rd,NJ,7646
+Baskin-Robbins,Brooklyn,1052,#XX1052 XX1052,3701 Nostrand Ave,NY,11235
+Baskin-Robbins,Brooklyn,1053,#XX1053 XX1053,578 Atlantic Ave,NY,11217
+Baskin-Robbins,Clearwater,1054,#XX1054 XX1054,2551 Gulf To Bay Blvd,FL,33765
+Baskin-Robbins,Lawrenceville,1055,#XX1055 XX1055,4110 Quakerbridge Rd Bldg A,NJ,8648
+Baskin-Robbins,Brooklyn,1056,#XX1056 XX1056,448 Fifth Ave,NY,11215
+Baskin-Robbins,Chardon,1057,#XX1057 XX1057,370 Center St,OH,44024
+Baskin-Robbins,Leola,1058,#XX1058 XX1058,366 W. Main St,PA,17540
+Baskin-Robbins,Bronx,1059,#XX1059 XX1059,1040 Westchester Ave,NY,10459
+Baskin-Robbins,Tampa,1060,#XX1060 XX1060,7004 N. Dale Mabry Hwy,FL,33614
+Baskin-Robbins,Brooklyn,1061,#XX1061 XX1061,1510 Elm Avenue,NY,11230
+Baskin-Robbins,Brooklyn,1062,#XX1062 XX1062,241-A Rockaway Pkwy,NY,11212
+Baskin-Robbins,Holiday,1063,#XX1063 XX1063,2409 Us Highway 19,FL,34691
+Baskin-Robbins,Glen Burnie,1064,#XX1064 XX1064,7061 Baltimore Annapolis Blvd,MD,21061
+Baskin-Robbins,Bronx,1065,#XX1065 XX1065,46 E 167th St,NY,10452
+Baskin-Robbins,Olympia Fields,1066,#XX1066 XX1066,3252 Vollmer Rd,IL,60461
+Baskin-Robbins,Prospect Heights,1067,#XX1067 XX1067,1204 S. Milwaukee Ave,IL,60070
+Baskin-Robbins,Pasadena,1069,#XX1069 XX1069,350 Mountain Rd,MD,21122
+Baskin-Robbins,Millersville,1070,#XX1070 XX1070,8564 Veterans Hwy,MD,21108
+Baskin-Robbins,Fort Wainwright,1071,#XX1071 XX1071,Building 3703-B Oak St,AK,99703
+Baskin-Robbins,Medina,1072,#XX1072 XX1072,2739 Medina Rd,OH,44256
+Baskin-Robbins,New York,1073,#XX1073 XX1073,140 Delancey Street,NY,10002
+Baskin-Robbins,Warner Robins,1074,#XX1074 XX1074,3111 Watson Blvd,GA,31093
+Baskin-Robbins,Warrensville Heights,1075,#XX1075 XX1075,4959 Richmond Rd,OH,44146
+Baskin-Robbins,Brooklyn,1076,#XX1076 XX1076,126 35th St,NY,11232
+Baskin-Robbins,GLEN COVE,1077,#XX1077 XX1077,285-291 Glen Street,NY,11542
+Baskin-Robbins,Jackson Heights,1078,#XX1078 XX1078,74-13 Roosevelt Ave,NY,11372
+Baskin-Robbins,Palm Bay,1079,#XX1079 XX1079,898 Malabar Rd Se,FL,32907
+Baskin-Robbins,Owings Mills,1080,#XX1080 XX1080,9419 Common Brook Dr,MD,21117
+Baskin-Robbins,Fairview Park,1081,#XX1081 XX1081,21015 Lorain Rd,OH,44126
+Baskin-Robbins,Des Plaines,1082,#XX1082 XX1082,782 W. Oakton,IL,60018
+Baskin-Robbins,Myrtle Beach,1083,#XX1083 XX1083,4883-A Highway 501,SC,29579
+Baskin-Robbins,Island Lake,1084,#XX1084 XX1084,510 Auburn Drive,IL,60042
+Baskin-Robbins,The Villages,1085,#XX1085 XX1085,3460 Wedgewood Ln,FL,32162
+Baskin-Robbins,East Ridge,1086,#XX1086 XX1086,6510 Ringgold Rd,TN,37412
+Baskin-Robbins,Royal Oak,1087,#XX1087 XX1087,1700 W 14 Mile Rd,MI,48073
+Baskin-Robbins,Havre De Grace,1088,#XX1088 XX1088,1057 Pulaski Hwy,MD,21078
+Baskin-Robbins,Mohegan Lake,1089,#XX1089 XX1089,1851 E Main St,NY,10547
+Baskin-Robbins,Charlotte,1090,#XX1090 XX1090,5029 Beatties Ford Rd,NC,28216
+Baskin-Robbins,Odenton,1091,#XX1091 XX1091,8743 Piney Orchard Pkwy,MD,21113
+Baskin-Robbins,Medina,1092,#XX1092 XX1092,760 Highway 45 East,TN,38355
+Baskin-Robbins,Martin,1093,#XX1093 XX1093,200 Mt Pelia Rd.,TN,38237
+Baskin-Robbins,Ewa Beach,1094,#XX1094 XX1094,91-1001 Kaimalie St.,HI,96706
+Baskin-Robbins,Surfside Beach,1095,#XX1095 XX1095,8709 U.S. Hwy 17,SC,29575
+Baskin-Robbins,Deland,1096,#XX1096 XX1096,1540 Garfield Ave,FL,32724
+Baskin-Robbins,Temple,1097,#XX1097 XX1097,5334 Allentown Pike,PA,19560
+Baskin-Robbins,New Market,1098,#XX1098 XX1098,11715 Old National Pike,MD,21774
+Baskin-Robbins,Sumner,1099,#XX1099 XX1099,1201 Valley Ave,WA,98390
+Baskin-Robbins,Melbourne,1100,#XX1100 XX1100,4640 W Eau Gallie Blvd,FL,32934
+Baskin-Robbins,Westampton,1101,#XX1101 XX1101,100 Springside Rancocas Rd,NJ,8060
+Baskin-Robbins,Reisterstown,1102,#XX1102 XX1102,48 Main St.,MD,21136
+Baskin-Robbins,Altoona,1103,#XX1103 XX1103,3132 Pleasant Valley Blvd,PA,16602
+Baskin-Robbins,Corona,1104,#XX1104 XX1104,5401 108th St,NY,11368
+Baskin-Robbins,Florham Park,1105,#XX1105 XX1105,176 Columbia Turnpike,NJ,7932
+Baskin-Robbins,Lexington,1106,#XX1106 XX1106,1400 East Church St.,TN,38351
+Baskin-Robbins,New York,1107,#XX1107 XX1107,815 10th Ave,NY,10019
+Baskin-Robbins,Alsip,1108,#XX1108 XX1108,12150 S. Cicero Ave,IL,60803
+Baskin-Robbins,Hempstead,1110,#XX1110 XX1110,579 Peninsula Blvd,NY,11550
+Baskin-Robbins,Sunnyside,1111,#XX1111 XX1111,4128 Queens Blvd,NY,11104
+Baskin-Robbins,Fayetteville,1112,#XX1112 XX1112,3411 Ramsey St,NC,28311
+Baskin-Robbins,New York,1113,#XX1113 XX1113,250 E. 40th St,NY,10016
+Baskin-Robbins,Dearborn Heights,1114,#XX1114 XX1114,4345 S Telegraph Rd,MI,48125
+Baskin-Robbins,Chicago,1115,#XX1115 XX1115,7905 S. Cicero,IL,60652
+Baskin-Robbins,Staunton,1116,#XX1116 XX1116,1028 Richmond Ave,VA,24401
+Baskin-Robbins,Bronx,1117,#XX1117 XX1117,2366 Grand Concourse,NY,10458
+Baskin-Robbins,Midlothian,1118,#XX1118 XX1118,13847 Hull Street Rd,VA,23112
+Baskin-Robbins,Denver,1119,#XX1119 XX1119,2055 N. Reading Rd,PA,17517
+Baskin-Robbins,Lackland Air Force Base,1120,#XX1120 XX1120,1530 Femoyer St,TX,78236
+Baskin-Robbins,Dunnellon,1121,#XX1121 XX1121,11325 N Williams St,FL,34432
+Baskin-Robbins,Highland Park,1122,#XX1122 XX1122,55 Raritan Ave,NJ,8904
+Baskin-Robbins,Brooksville,1123,#XX1123 XX1123,1185 S. Broad St,FL,34601
+Baskin-Robbins,Rehoboth Beach,1124,#XX1124 XX1124,123 Route 1 North,DE,19971
+Baskin-Robbins,Collierville,1125,#XX1125 XX1125,915 W. Poplar Ave.,TN,38017
+Baskin-Robbins,Elmhurst,1127,#XX1127 XX1127,90-15 Queens Blvd.,NY,11373
+Baskin-Robbins,Mentor,1128,#XX1128 XX1128,7742 Lakeshore Blvd,OH,44060
+Baskin-Robbins,High Point,1129,#XX1129 XX1129,274 Eastchester Drive,NC,27262
+Baskin-Robbins,Seffner,1130,#XX1130 XX1130,11200 East M. L. King Blvd,FL,33584
+Baskin-Robbins,Lake Grove,1131,#XX1131 XX1131,2815 Middle Country Rd,NY,11755
+Baskin-Robbins,Park Ridge,1132,#XX1132 XX1132,184 Kinderkamack Rd Unit D,NJ,7656
+Baskin-Robbins,Brooklyn,1133,#XX1133 XX1133,3319 Fulton St,NY,11208
+Baskin-Robbins,Tampa,1134,#XX1134 XX1134,1909 E. Bearss Ave,FL,33613
+Baskin-Robbins,Riverview,1135,#XX1135 XX1135,7028 S. US Hwy 301,FL,33578
+Baskin-Robbins,Redford,1136,#XX1136 XX1136,14855 Telegraph Rd,MI,48239
+Baskin-Robbins,Jacksonville,1137,#XX1137 XX1137,7171 Phillips Highway,FL,32256
+Baskin-Robbins,Scaggsville,1138,#XX1138 XX1138,8305 Ice Crystal Drive,MD,20723
+Baskin-Robbins,Bronx,1139,#XX1139 XX1139,140 E. 170th St,NY,10452
+Baskin-Robbins,New Albany,1140,#XX1140 XX1140,239 Highway 30 West,MS,38652
+Baskin-Robbins,New York,1141,#XX1141 XX1141,395 Hudson St,NY,10014
+Baskin-Robbins,Riviera Beach,1142,#XX1142 XX1142,1850 W. Blue Heron Blvd.,FL,33404
+Baskin-Robbins,Winter Haven,1143,#XX1143 XX1143,1578 3rd Street SW,FL,33880
+Baskin-Robbins,Gahanna,1144,#XX1144 XX1144,1111 N. Hamilton Rd,OH,43230
+Baskin-Robbins,Brandon,1145,#XX1145 XX1145,950 Lumsden Rd,FL,33511
+Baskin-Robbins,Perry Hall,1146,#XX1146 XX1146,5003 Honeygo Center Dr,MD,21128
+Baskin-Robbins,Ramsey,1147,#XX1147 XX1147,233 N. Franklin Turnpike,NJ,7446
+Baskin-Robbins,Kosciusko,1148,#XX1148 XX1148,98 Veteran'S Blvd,MS,39090
+Baskin-Robbins,Marianna,1149,#XX1149 XX1149,421 W. Chestnut,AR,72360
+Baskin-Robbins,Winston Salem,1150,#XX1150 XX1150,2561 Peters Creek Pkwy,NC,27127
+Baskin-Robbins,Shillington,1151,#XX1151 XX1151,2241 Lancaster Pike,PA,19607
+Baskin-Robbins,Rock Hill,1152,#XX1152 XX1152,2677 Celanese Rd,SC,29732
+Baskin-Robbins,Chicago,1153,#XX1153 XX1153,5050 W. Grand Ave,IL,60639
+Baskin-Robbins,Ashburn,1154,#XX1154 XX1154,42876 Truro Parish Dr,VA,20148
+Baskin-Robbins,Chicago,1155,#XX1155 XX1155,4644 W Diversey,IL,60639
+Baskin-Robbins,Wyomissing,1156,#XX1156 XX1156,1 Cheltenham Drive,PA,19610
+Baskin-Robbins,Ambler,1157,#XX1157 XX1157,881 W. Butler Pike,PA,19002
+Baskin-Robbins,Humboldt,1158,#XX1158 XX1158,299 Highway 45 North,TN,38343
+Baskin-Robbins,Huntersville,1159,#XX1159 XX1159,10310 Wilmington St,NC,28078
+Baskin-Robbins,Bayonne,1160,#XX1160 XX1160,4 North St,NJ,7002
+Baskin-Robbins,Germantown,1161,#XX1161 XX1161,12915 Wisteria Dr,MD,20874
+Baskin-Robbins,Elizabeth,1162,#XX1162 XX1162,460 Elizabeth Ave,NJ,7206
+Baskin-Robbins,Oakland,1163,#XX1163 XX1163,28575 Highway 32,MS,38948
+Baskin-Robbins,Portland,1164,#XX1164 XX1164,14801 Se Stark St,OR,97233
+Baskin-Robbins,Kings Park,1165,#XX1165 XX1165,101 Pulaski Rd,NY,11754
+Baskin-Robbins,Independence,1166,#XX1166 XX1166,4555b S. Noland Rd,MO,64055
+Baskin-Robbins,Arlington Heights,1167,#XX1167 XX1167,122 S Arlington Heights Rd,IL,60005
+Baskin-Robbins,Woodbridge,1168,#XX1168 XX1168,13585 Minnieville Rd,VA,22192
+Baskin-Robbins,Bound Brook,1169,#XX1169 XX1169,109 E Main St,NJ,8805
+Baskin-Robbins,Prairie Village,1170,#XX1170 XX1170,7628 Stateline Rd,KS,66208
+Baskin-Robbins,Owings Mills,1171,#XX1171 XX1171,10902 Boulevard Circle,MD,21117
+Baskin-Robbins,Mundelein,1172,#XX1172 XX1172,722 S. Rt. 83,IL,60060
+Baskin-Robbins,Waukegan,1173,#XX1173 XX1173,926 N. Green Bay Rd,IL,60085
+Baskin-Robbins,Munster,1174,#XX1174 XX1174,8235 Calumet Ave,IN,46321
+Baskin-Robbins,New York,1175,#XX1175 XX1175,3600 Broadway,NY,10031
+Baskin-Robbins,Fuquay Varina,1177,#XX1177 XX1177,1450 N Main Street,NC,27526
+Baskin-Robbins,Lakeland,1178,#XX1178 XX1178,5614 US Highway 98 N,FL,33809
+Baskin-Robbins,New York,1179,#XX1179 XX1179,100 Chambers St,NY,10007
+Baskin-Robbins,Racine,1180,#XX1180 XX1180,6026 Washington Ave,WI,53406
+Baskin-Robbins,New Lenox,1181,#XX1181 XX1181,970 Laraway Rd,IL,60451
+Baskin-Robbins,Alameda,1182,#XX1182 XX1182,2601 Blanding Ave,CA,94501
+Baskin-Robbins,Lake Ridge,1183,#XX1183 XX1183,2201 Old Bridge Rd,VA,22192
+Baskin-Robbins,Hemet,1184,#XX1184 XX1184,3503 W. Stetson Ave,CA,92545
+Baskin-Robbins,Mooresville,1185,#XX1185 XX1185,842 Williamson Rd,NC,28117
+Baskin-Robbins,Chicago,1186,#XX1186 XX1186,1982 N Clybourn,IL,60614
+Baskin-Robbins,Charlotte,1187,#XX1187 XX1187,5605 N Tryon St,NC,28213
+Baskin-Robbins,Brooklyn,1188,#XX1188 XX1188,1556 Ralph Ave,NY,11236
+Baskin-Robbins,Mint Hill,1189,#XX1189 XX1189,7001 Matthews Mint Hill Rd,NC,28227
+Baskin-Robbins,Medford,1190,#XX1190 XX1190,3197 Horseblock Road,NY,11763
+Baskin-Robbins,Tampa,1191,#XX1191 XX1191,13510 Cypress Glenn Lane,FL,33637
+Baskin-Robbins,Jefferson City,1192,#XX1192 XX1192,1922 Missouri Blvd,MO,65109
+Baskin-Robbins,Hicksville,1193,#XX1193 XX1193,24 Newbridge Rd,NY,11801
+Baskin-Robbins,Southport,1194,#XX1194 XX1194,3355 Post Rd,CT,6890
+Baskin-Robbins,Los Gatos,1195,#XX1195 XX1195,1444 Pollard Rd,CA,95032
+Baskin-Robbins,Darien,1196,#XX1196 XX1196,25 Old Kings Hwy North,CT,6820
+Baskin-Robbins,Arlington Heights,1197,#XX1197 XX1197,2106 S Arlington Heights Rd,IL,60005
+Baskin-Robbins,Joliet,1198,#XX1198 XX1198,2959 W. Jefferson St,IL,60435
+Baskin-Robbins,Oak Forest,1199,#XX1199 XX1199,4152 W. 167th St,IL,60452
+Baskin-Robbins,New Smyrna Beach,1200,#XX1200 XX1200,441 3rd Ave,FL,32169
+Baskin-Robbins,Des Plaines,1201,#XX1201 XX1201,1552 Rand Rd,IL,60016
+Baskin-Robbins,New York,1202,#XX1202 XX1202,51 East 34th St,NY,10016
+Baskin-Robbins,Cooper City,1203,#XX1203 XX1203,12397 Sheridan St,FL,33026
+Baskin-Robbins,Bronx,1204,#XX1204 XX1204,699 Morris Park Ave,NY,10462
+Baskin-Robbins,Brooklyn,1205,#XX1205 XX1205,573 Lafayette Ave,NY,11205
+Baskin-Robbins,Miami,1206,#XX1206 XX1206,4880A NW 183rd St,FL,33055
+Baskin-Robbins,Geneva,1207,#XX1207 XX1207,1150 S. Broadway,OH,44041
+Baskin-Robbins,Bono,1208,#XX1208 XX1208,10144 Highway 63 North,AR,72416
+Baskin-Robbins,Paterson,1209,#XX1209 XX1209,251 Market St,NJ,7505
+Baskin-Robbins,Bryant,1210,#XX1210 XX1210,1611 N. Reynolds,AR,72022
+Baskin-Robbins,Olive Branch,1211,#XX1211 XX1211,4805 Bethel Rd,MS,38654
+Baskin-Robbins,Chicago,1212,#XX1212 XX1212,3210 W. 87th St,IL,60652
+Baskin-Robbins,Rantoul,1213,#XX1213 XX1213,402 S. Century Blvd,IL,61866
+Baskin-Robbins,Baldwin,1214,#XX1214 XX1214,989 Atlantic Ave,NY,11510
+Baskin-Robbins,White Plains,1215,#XX1215 XX1215,80 Virginia Rd,NY,10603
+Baskin-Robbins,Aurora,1216,#XX1216 XX1216,2380 South Eola Rd,IL,60504
+Baskin-Robbins,Pennsburg,1217,#XX1217 XX1217,400 Main St,PA,18073
+Baskin-Robbins,Teaneck,1218,#XX1218 XX1218,332 Cedar Ln,NJ,7666
+Baskin-Robbins,Los Angeles,1219,#XX1219 XX1219,1950 W. Slauson Ave,CA,90047
+Baskin-Robbins,Watsonville,1220,#XX1220 XX1220,1097 S. Green Valley Rd,CA,95076
+Baskin-Robbins,Grayslake,1221,#XX1221 XX1221,813 E. Belvidere Rd,IL,60030
+Baskin-Robbins,Ridgefield Park,1223,#XX1223 XX1223,209 Main St,NJ,7660
+Baskin-Robbins,Painesville,1224,#XX1224 XX1224,255 Richmond St,OH,44077
+Baskin-Robbins,Nashville,1225,#XX1225 XX1225,3919 Nolensville Road,TN,37211
+Baskin-Robbins,Cary,1226,#XX1226 XX1226,2740 NC Hwy 55,NC,27519
+Baskin-Robbins,Leonia,1227,#XX1227 XX1227,353 Broad Ave,NJ,7605
+Baskin-Robbins,Elmhurst,1228,#XX1228 XX1228,9507 57th Ave,NY,11373
+Baskin-Robbins,Tampa,1229,#XX1229 XX1229,3203 E. Busch Blvd,FL,33612
+Baskin-Robbins,Lehigh Acres,1230,#XX1230 XX1230,2706 Lee Blvd,FL,33971
+Baskin-Robbins,Franklin Lakes,1231,#XX1231 XX1231,754 Franklin Ave,NJ,7417
+Baskin-Robbins,Long Island City,1232,#XX1232 XX1232,3500 48th St.,NY,11101
+Baskin-Robbins,Lawrenceville,1233,#XX1233 XX1233,1625 Princeton Ave,NJ,8648
+Baskin-Robbins,Chicago,1234,#XX1234 XX1234,901 W Washington Blvd,IL,60607
+Baskin-Robbins,Rehoboth Beach,1235,#XX1235 XX1235,146 Rehoboth Ave,DE,19971
+Baskin-Robbins,Baltimore,1236,#XX1236 XX1236,10 S. Howard St,MD,21201
+Baskin-Robbins,Oakdale,1237,#XX1237 XX1237,1243 Montauk Hwy,NY,11769
+Baskin-Robbins,New York,1238,#XX1238 XX1238,360 W. 31st St,NY,10001
+Baskin-Robbins,Lemont,1239,#XX1239 XX1239,12371 Derby Ln,IL,60439
+Baskin-Robbins,Trenton,1240,#XX1240 XX1240,1072 Chambers St,NJ,8611
+Baskin-Robbins,Kennett Square,1241,#XX1241 XX1241,745 W. Cypress St.,PA,19348
+Baskin-Robbins,Colorado Springs,1242,#XX1242 XX1242,7489 North Academy Blvd,CO,80920
+Baskin-Robbins,Huntington Park,1243,#XX1243 XX1243,2661 E. Florence Ave,CA,90255
+Baskin-Robbins,Flushing,1245,#XX1245 XX1245,Grand Central Pkwy,NY,11371
+Baskin-Robbins,Jessup,1246,#XX1246 XX1246,7916 Dorsey Run Road,MD,20794
+Baskin-Robbins,Newtown,1247,#XX1247 XX1247,30 Richboro Newtown Rd,PA,18940
+Baskin-Robbins,Old Bethpage,1248,#XX1248 XX1248,726 Old Bethpage Rd,NY,11804
+Baskin-Robbins,New York,1249,#XX1249 XX1249,55 West 55th St,NY,10019
+Baskin-Robbins,Northlake,1250,#XX1250 XX1250,148 W North Ave,IL,60164
+Baskin-Robbins,New York,1251,#XX1251 XX1251,361 First Avenue,NY,10010
+Baskin-Robbins,New York,1252,#XX1252 XX1252,130 Dyckman St,NY,10040
+Baskin-Robbins,Charlotte,1253,#XX1253 XX1253,231 N Graham St,NC,28202
+Baskin-Robbins,Manhattan,1254,#XX1254 XX1254,319 Southwind Rd,KS,66502
+Baskin-Robbins,Long Valley,1255,#XX1255 XX1255,62 East Mill Rd,NJ,7853
+Baskin-Robbins,Brooklyn,1256,#XX1256 XX1256,6502 14th Ave,NY,11219
+Baskin-Robbins,Hicksville,1257,#XX1257 XX1257,100 North Broadway,NY,11801
+Baskin-Robbins,Charlotte,1258,#XX1258 XX1258,6763 Albemarle Rd,NC,28212
+Baskin-Robbins,Paramus,1259,#XX1259 XX1259,344 Route 4 East,NJ,7652
+Baskin-Robbins,Naperville,1260,#XX1260 XX1260,1580 West Ogden Ave,IL,60540
+Baskin-Robbins,Tampa,1261,#XX1261 XX1261,3512 E Hillsborough Ave,FL,33610
+Baskin-Robbins,Chicago,1262,#XX1262 XX1262,1614 W 59th St,IL,60636
+Baskin-Robbins,Chicago,1263,#XX1263 XX1263,5205 N Nagle Avenue,IL,60630
+Baskin-Robbins,Plainfield,1265,#XX1265 XX1265,215 West Front Street,NJ,7060
+Baskin-Robbins,Arlington,1266,#XX1266 XX1266,3520 Lee Hwy,VA,22207
+Baskin-Robbins,Raleigh,1267,#XX1267 XX1267,2316 Hillsborough St,NC,27607
+Baskin-Robbins,Mililani,1268,#XX1268 XX1268,95-1249 Meheula Parkway,HI,96789
+Baskin-Robbins,Baltimore,1269,#XX1269 XX1269,2401 Liberty Heights Ave,MD,21215
+Baskin-Robbins,Toms River,1270,#XX1270 XX1270,1111 Route 37 W,NJ,8755
+Baskin-Robbins,Las Vegas,1271,#XX1271 XX1271,6454 Sky Pointe Dr,NV,89131
+Baskin-Robbins,Mooresville,1272,#XX1272 XX1272,651 River Hwy,NC,28117
+Baskin-Robbins,Fairfield,1273,#XX1273 XX1273,6641 Dixie Hwy,OH,45014
+Baskin-Robbins,Hicksville,1274,#XX1274 XX1274,420 Newbridge Rd,NY,11801
+Baskin-Robbins,Janesville,1275,#XX1275 XX1275,1905 Center Ave,WI,53546
+Baskin-Robbins,Glen Head,1276,#XX1276 XX1276,36 Glenhead Rd,NY,11545
+Baskin-Robbins,Shirley,1277,#XX1277 XX1277,440 William Floyd Pkwy,NY,11967
+Baskin-Robbins,Atlanta,1278,#XX1278 XX1278,230 Hammond Dr,GA,30328
+Baskin-Robbins,Cleveland,1280,#XX1280 XX1280,16969 Chagrin Blvd,OH,44120
+Baskin-Robbins,Scottsdale,1281,#XX1281 XX1281,6501 E. Greenway Pkwy,AZ,85254
+Baskin-Robbins,Palos Hills,1282,#XX1282 XX1282,10340 S. Harlem Ave,IL,60465
+Baskin-Robbins,Schiller Park,1283,#XX1283 XX1283,4740 N River Road,IL,60176
+Baskin-Robbins,Cuyahoga Falls,1284,#XX1284 XX1284,310 Tallmadge Rd,OH,44221
+Baskin-Robbins,Gilroy,1285,#XX1285 XX1285,785 1st St,CA,95020
+Baskin-Robbins,Knoxville,1286,#XX1286 XX1286,11051 Parkside Dr,TN,37922
+Baskin-Robbins,Edmond,1287,#XX1287 XX1287,1498 S. Bryant,OK,73034
+Baskin-Robbins,Taneytown,1288,#XX1288 XX1288,500 E. Baltimore St,MD,21787
+Baskin-Robbins,Libertyville,1289,#XX1289 XX1289,210 Peterson Rd,IL,60048
+Baskin-Robbins,Charlotte,1290,#XX1290 XX1290,2037 W. Sugar Creek Rd,NC,28262
+Baskin-Robbins,Gastonia,1291,#XX1291 XX1291,2302 S. New Hope Rd,NC,28054
+Baskin-Robbins,Washington,1292,#XX1292 XX1292,801 Pennsylvania Avenue SE,DC,20003
+Baskin-Robbins,Parma,1294,#XX1294 XX1294,2080 Snow Rd,OH,44134
+Baskin-Robbins,Lebanon,1295,#XX1295 XX1295,2199 Cumberland St,PA,17042
+Baskin-Robbins,Evergreen Park,1296,#XX1296 XX1296,9800 S. Western Ave.,IL,60805
+Baskin-Robbins,Baltimore,1297,#XX1297 XX1297,5800 Reisterstown Rd,MD,21215
+Baskin-Robbins,Harrisburg,1298,#XX1298 XX1298,808 E. Jackson,AR,72432
+Baskin-Robbins,Tucson,1299,#XX1299 XX1299,5405 E. Granite St,AZ,85707
+Baskin-Robbins,New York,1300,#XX1300 XX1300,159 E.116th St,NY,10029
+Baskin-Robbins,Baltimore,1301,#XX1301 XX1301,3600 Boston St,MD,21224
+Baskin-Robbins,Aberdeen,1302,#XX1302 XX1302,993 Beards Hill Rd,MD,21001
+Baskin-Robbins,Chicago,1303,#XX1303 XX1303,800 N. Kedzie,IL,60651
+Baskin-Robbins,Brooklyn,1304,#XX1304 XX1304,7121 18th Ave,NY,11204
+Baskin-Robbins,Brooklyn,1305,#XX1305 XX1305,352 Graham Ave,NY,11211
+Baskin-Robbins,Staten Island,1306,#XX1306 XX1306,1445 Richmond Ave,NY,10314
+Baskin-Robbins,Nanuet,1307,#XX1307 XX1307,213 W Route 59,NY,10954
+Baskin-Robbins,Staten Island,1308,#XX1308 XX1308,77 A Richmond Hill Rd,NY,10314
+Baskin-Robbins,Peoria,1309,#XX1309 XX1309,1600 N. Knoxville Ave,IL,61603
+Baskin-Robbins,Salem,1310,#XX1310 XX1310,1124 Wallace Road NW,OR,97304
+Baskin-Robbins,Chicago,1311,#XX1311 XX1311,4851 W. Belmont Ave,IL,60641
+Baskin-Robbins,Florence,1312,#XX1312 XX1312,8509 US Route 42,KY,41042
+Baskin-Robbins,Chicago,1313,#XX1313 XX1313,555 W. Lake St,IL,60661
+Baskin-Robbins,Kingston,1314,#XX1314 XX1314,1318 Wyoming Ave,PA,18704
+Baskin-Robbins,New York,1315,#XX1315 XX1315,1392 Lexington Avenue,NY,10128
+Baskin-Robbins,Mokena,1316,#XX1316 XX1316,18700 S. Wolf Rd,IL,60448
+Baskin-Robbins,Brooklyn,1317,#XX1317 XX1317,643 Manhattan Ave,NY,11222
+Baskin-Robbins,New York,1318,#XX1318 XX1318,153 E. 53rd St,NY,10022
+Baskin-Robbins,Bayonne,1319,#XX1319 XX1319,545 Broadway,NJ,7002
+Baskin-Robbins,Dunedin,1320,#XX1320 XX1320,1461 Main St,FL,34698
+Baskin-Robbins,Atlantic Beach,1321,#XX1321 XX1321,719 Atlantic Blvd,FL,32233
+Baskin-Robbins,Brooklyn,1322,#XX1322 XX1322,2344 Flatbush Ave,NY,11234
+Baskin-Robbins,Adelanto,1323,#XX1323 XX1323,12100 Palmdale Rd,CA,92301
+Baskin-Robbins,Apple Valley,1324,#XX1324 XX1324,12285 Apple Valley Rd,CA,92307
+Baskin-Robbins,Waipahu,1325,#XX1325 XX1325,94673 Kupuohi St,HI,96797
+Baskin-Robbins,East Stroudsburg,1326,#XX1326 XX1326,246 N Courtland St,PA,18301
+Baskin-Robbins,New York,1327,#XX1327 XX1327,218 E. 14th St,NY,10003
+Baskin-Robbins,Fairfield,1328,#XX1328 XX1328,3069 Travis Blvd,CA,94534
+Baskin-Robbins,East Aurora,1329,#XX1329 XX1329,230 Main St,NY,14052
+Baskin-Robbins,Southaven,1330,#XX1330 XX1330,7075 Malco Blvd,MS,38671
+Baskin-Robbins,Carle Place,1331,#XX1331 XX1331,202 Glen Clove Rd,NY,11514
+Baskin-Robbins,Ripon,1332,#XX1332 XX1332,150 N Wilma Ave,CA,95366
+Baskin-Robbins,New York,1333,#XX1333 XX1333,100 1st Ave,NY,10009
+Baskin-Robbins,Massapequa,1334,#XX1334 XX1334,5477-5515 Merrick Road,NY,11758
+Baskin-Robbins,Arlington,1335,#XX1335 XX1335,9915 US Highway 64,TN,38002
+Baskin-Robbins,New York,1336,#XX1336 XX1336,4942 Broadway,NY,10034
+Baskin-Robbins,Berlin,1337,#XX1337 XX1337,11001 Manklin Creek Rd,MD,21811
+Baskin-Robbins,Ranson,1338,#XX1338 XX1338,33 W. Virginia Way,WV,25438
+Baskin-Robbins,Baltimore,1339,#XX1339 XX1339,7529 Belair Rd,MD,21236
+Baskin-Robbins,Salisbury,1340,#XX1340 XX1340,715 Jake Alexander Blvd W,NC,28147
+Baskin-Robbins,Salem,1342,#XX1342 XX1342,2823 E. State St,OH,44460
+Baskin-Robbins,Brooklyn,1343,#XX1343 XX1343,383 Court St,NY,11231
+Baskin-Robbins,Swarthmore,1344,#XX1344 XX1344,1 S Chester Rd,PA,19081
+Baskin-Robbins,New York,1345,#XX1345 XX1345,2258 1st Ave,NY,10035
+Baskin-Robbins,Baltimore,1346,#XX1346 XX1346,2016-B N. Maryland Ave,MD,21218
+Baskin-Robbins,Downingtown,1347,#XX1347 XX1347,376 W. Uwchlan,PA,19335
+Baskin-Robbins,Chicago,1348,#XX1348 XX1348,5707 W North Ave,IL,60639
+Baskin-Robbins,Hickory Hills,1349,#XX1349 XX1349,7847 W. 95th St,IL,60457
+Baskin-Robbins,Hagerstown,1354,#XX1354 XX1354,13108 Pennsylvania Ave,MD,21742
+Baskin-Robbins,Chicago,1355,#XX1355 XX1355,3401 W. Peterson Ave,IL,60659
+Baskin-Robbins,New York,1356,#XX1356 XX1356,567 3rd Ave,NY,10016
+Baskin-Robbins,New York,1357,#XX1357 XX1357,240 W. 40th St,NY,10018
+Baskin-Robbins,De Queen,1358,#XX1358 XX1358,800 E Collin Raye Dr,AR,71832
+Baskin-Robbins,Takoma Park,1359,#XX1359 XX1359,6851 New Hampshire Avenue,MD,20912
+Baskin-Robbins,Chicago,1360,#XX1360 XX1360,3347 W. North Ave,IL,60647
+Baskin-Robbins,South Euclid,1361,#XX1361 XX1361,4233 Mayfield Rd,OH,44121
+Baskin-Robbins,Minooka,1363,#XX1363 XX1363,106 N. Ridge Rd,IL,60447
+Baskin-Robbins,Harrisburg,1364,#XX1364 XX1364,4342 Linglestown Rd,PA,17112
+Baskin-Robbins,Troy,1365,#XX1365 XX1365,722 North US Highway 51 South,TN,38260
+Baskin-Robbins,Brooklyn,1366,#XX1366 XX1366,2926 Avenue I,NY,11210
+Baskin-Robbins,Lusby,1367,#XX1367 XX1367,174 Village Center Dr,MD,20657
+Baskin-Robbins,Alexandria,1368,#XX1368 XX1368,1500 Belle View Blvd,VA,22307
+Baskin-Robbins,Lynwood,1369,#XX1369 XX1369,10930 Long Beach Blvd,CA,90262
+Baskin-Robbins,Jamaica,1370,#XX1370 XX1370,16804 Jamaica Ave,NY,11432
+Baskin-Robbins,Plant City,1371,#XX1371 XX1371,2307 James L. Redmond Pkwy,FL,33563
+Baskin-Robbins,Gambrills,1372,#XX1372 XX1372,1336 Defense Highway,MD,21114
+Baskin-Robbins,Stephens City,1373,#XX1373 XX1373,760 Warrior Dr,VA,22655
+Baskin-Robbins,Maryville,1374,#XX1374 XX1374,2825 Old Knoxville Hwy,TN,37804
+Baskin-Robbins,Bronx,1375,#XX1375 XX1375,508 259th St,NY,10471
+Baskin-Robbins,Levittown,1376,#XX1376 XX1376,2944 Hempstead Tpke,NY,11756
+Baskin-Robbins,Turrell,1377,#XX1377 XX1377,16251 Highway 77,AR,72384
+Baskin-Robbins,Lathrop,1378,#XX1378 XX1378,15108 S. Harlan Rd,CA,95330
+Baskin-Robbins,Houston,1379,#XX1379 XX1379,8076 S Gessner Dr,TX,77036
+Baskin-Robbins,Memphis,1380,#XX1380 XX1380,1680 Union Ave,TN,38104
+Baskin-Robbins,Chicago,1381,#XX1381 XX1381,782 N Laramie Ave,IL,60644
+Baskin-Robbins,Capital Heights,1384,#XX1384 XX1384,9183A Central Ave,MD,20743
+Baskin-Robbins,Tampa,1385,#XX1385 XX1385,5227 Ehrlich Rd,FL,33624
+Baskin-Robbins,Gilbert,1386,#XX1386 XX1386,2487 S. Gilbert Rd,AZ,85295
+Baskin-Robbins,Smyrna,1387,#XX1387 XX1387,806 Nissan Dr,TN,37167
+Baskin-Robbins,Blue Springs,1388,#XX1388 XX1388,1005 N. 7 Hwy,MO,64014
+Baskin-Robbins,Franklin,1389,#XX1389 XX1389,9100A Carothers Pkwy,TN,37067
+Baskin-Robbins,McLean,1390,#XX1390 XX1390,8119 Watson St,VA,22102
+Baskin-Robbins,Inverness,1391,#XX1391 XX1391,599 S. Stone Way,FL,34453
+Baskin-Robbins,Myrtle Beach,1392,#XX1392 XX1392,7600 N. Kings Hwy,SC,29572
+Baskin-Robbins,Crystal River,1393,#XX1393 XX1393,631 NE 5th St,FL,34429
+Baskin-Robbins,Washington,1394,#XX1394 XX1394,2750 14th St NW,DC,20009
+Baskin-Robbins,Oviedo,1395,#XX1395 XX1395,3635 Aloma Ave,FL,32765
+Baskin-Robbins,Oakland,1396,#XX1396 XX1396,338 Ramapo Valley Rd,NJ,7436
+Baskin-Robbins,Fox River Grove,1397,#XX1397 XX1397,916 Northwest Hwy,IL,60021
+Baskin-Robbins,Ellicott City,1398,#XX1398 XX1398,9469 Baltimore National Pk,MD,21042
+Baskin-Robbins,Bayside,1399,#XX1399 XX1399,21522 73rd Ave,NY,11364
+Baskin-Robbins,Bronx,1400,#XX1400 XX1400,1167 Webster Ave,NY,10456
+Baskin-Robbins,Chesapeake,1401,#XX1401 XX1401,1100 Cedar Rd,VA,23322
+Baskin-Robbins,York,1402,#XX1402 XX1402,2175 S. Queen St,PA,17402
+Baskin-Robbins,Gainesville,1403,#XX1403 XX1403,3710 NW 13th St,FL,32609
+Baskin-Robbins,Orange,1404,#XX1404 XX1404,306 Main St,NJ,7050
+Baskin-Robbins,Franklin Square,1405,#XX1405 XX1405,662 Dogwood Ave,NY,11010
+Baskin-Robbins,Elizabethtown,1406,#XX1406 XX1406,4971 Dixie Hwy,KY,42701
+Baskin-Robbins,Broadview,1407,#XX1407 XX1407,1940 Roosevelt Rd,IL,60155
+Baskin-Robbins,Litchfield Park,1408,#XX1408 XX1408,13000 W. Indian School Rd,AZ,85340
+Baskin-Robbins,Gambrills,1409,#XX1409 XX1409,1051 State Route 3 N,MD,21054
+Baskin-Robbins,Arlington,1410,#XX1410 XX1410,4654 South Cooper,TX,76017
+Baskin-Robbins,Honolulu,1411,#XX1411 XX1411,930 Valkenburgh St,HI,96818
+Baskin-Robbins,Jamaica,1412,#XX1412 XX1412,11420 Sutphin Blvd,NY,11434
+Baskin-Robbins,Tucson,1413,#XX1413 XX1413,8140 S. Houghton Rd,AZ,85747
+Baskin-Robbins,Chicago,1414,#XX1414 XX1414,5931 S. Kedzie Ave,IL,60629
+Baskin-Robbins,New York,1415,#XX1415 XX1415,355 3rd Ave,NY,10010
+Baskin-Robbins,Lake Elsinore,1417,#XX1417 XX1417,29991 Canyon Hills Rd,CA,92532
+Baskin-Robbins,West Orange,1418,#XX1418 XX1418,382 Main St,NJ,7052
+Baskin-Robbins,Murphy,1419,#XX1419 XX1419,158 W. FM 544,TX,75094
+Baskin-Robbins,Brooklyn,1420,#XX1420 XX1420,7602 13th Ave,NY,11228
+Baskin-Robbins,Midland Park,1421,#XX1421 XX1421,80 Godwin Ave,NJ,7432
+Baskin-Robbins,New York,1422,#XX1422 XX1422,455 Park Ave S,NY,10016
+Baskin-Robbins,Tinley Park,1423,#XX1423 XX1423,7086 W. 183rd St,IL,60477
+Baskin-Robbins,Manassas,1424,#XX1424 XX1424,8525 Rolling Rd,VA,20110
+Baskin-Robbins,Woodbine,1425,#XX1425 XX1425,703 Lisbon Center Dr,MD,21797
+Baskin-Robbins,Schertz,1426,#XX1426 XX1426,17460 IH 35 North,TX,78154
+Baskin-Robbins,Watchung,1427,#XX1427 XX1427,750 Somerset St,NJ,7069
+Baskin-Robbins,Corona,1428,#XX1428 XX1428,7056 Archibald St,CA,92880
+Baskin-Robbins,Alexandria,1429,#XX1429 XX1429,6451 Edsall Rd,VA,22312
+Baskin-Robbins,Saint James,1430,#XX1430 XX1430,430 North Country Rd,NY,11780
+Baskin-Robbins,Lake Forest,1431,#XX1431 XX1431,23647 El Toro Rd,CA,92630
+Baskin-Robbins,Manassas,1432,#XX1432 XX1432,9685 Liberia Ave,VA,20110
+Baskin-Robbins,Millsboro,1433,#XX1433 XX1433,200 E. DuPont Hwy,DE,19966
+Baskin-Robbins,Pocomoke City,1434,#XX1434 XX1434,223 Pocomoke Marketplace,MD,21851
+Baskin-Robbins,Morrisville,1435,#XX1435 XX1435,3570 Davis Dr,NC,27560
+Baskin-Robbins,Camp Lejeune,1436,#XX1436 XX1436,1238 Birch St,NC,28547
+Baskin-Robbins,Pickens,1437,#XX1437 XX1437,4850 Hwy 17,MS,39146
+Baskin-Robbins,Byhalia,1438,#XX1438 XX1438,525 Highway 309 S,MS,38611
+Baskin-Robbins,Lyons,1439,#XX1439 XX1439,8001 Ogden Ave,IL,60534
+Baskin-Robbins,Cincinnati,1440,#XX1440 XX1440,435 E. Martin Luther King Dr,OH,45229
+Baskin-Robbins,Batavia,1441,#XX1441 XX1441,2002 W Wilson St,IL,60510
+Baskin-Robbins,Tucson,1442,#XX1442 XX1442,7250 S. Tucson Blvd,AZ,85706
+Baskin-Robbins,Conyers,1443,#XX1443 XX1443,1890 Highway 20 SE,GA,30013
+Baskin-Robbins,Westbury,1444,#XX1444 XX1444,840 Carman Ave,NY,11590
+Baskin-Robbins,Bowie,1445,#XX1445 XX1445,6101 Highbridge Rd,MD,20720
+Baskin-Robbins,Apex,1446,#XX1446 XX1446,800 Perry Road,NC,27502
+Baskin-Robbins,Bedminster,1447,#XX1447 XX1447,1109 Route 202/206,NJ,8807
+Baskin-Robbins,Tampa,1448,#XX1448 XX1448,10960 B-Cross Creek,FL,33647
+Baskin-Robbins,Bronx,1449,#XX1449 XX1449,274 E. 149th St,NY,10451
+Baskin-Robbins,Corinth,1450,#XX1450 XX1450,2105 S. Harper Rd,MS,38834
+Baskin-Robbins,Crystal Lake,1451,#XX1451 XX1451,4817 Northwest Hwy,IL,60014
+Baskin-Robbins,Cookeville,1452,#XX1452 XX1452,889-A S. Jefferson Ave,TN,38501
+Baskin-Robbins,Deer Park,1453,#XX1453 XX1453,501 Commack Rd,NY,11729
+Baskin-Robbins,Brooklyn,1454,#XX1454 XX1454,1903 Kings Hwy,NY,11229
+Baskin-Robbins,Bayshore,1455,#XX1455 XX1455,1750 Fifth Ave,NY,11706
+Baskin-Robbins,Orangeburg,1456,#XX1456 XX1456,26 W. Orangeburg Rd,NY,10962
+Baskin-Robbins,New York,1457,#XX1457 XX1457,243 3rd Ave,NY,10003
+Baskin-Robbins,Goodlettsville,1458,#XX1458 XX1458,430 Long Hollow Pike,TN,37072
+Baskin-Robbins,Brooklyn,1460,#XX1460 XX1460,1243 Surf Ave,NY,11224
+Baskin-Robbins,Uniondale,1461,#XX1461 XX1461,545 Uniondale Ave,NY,11553
+Baskin-Robbins,Centreville,1462,#XX1462 XX1462,14117 Saint Germain Dr,VA,20121
+Baskin-Robbins,Charlotte,1463,#XX1463 XX1463,16131 Lancaster Hwy,NC,28277
+Baskin-Robbins,New Canaan,1464,#XX1464 XX1464,103 Main St,CT,6840
+Baskin-Robbins,Wesley Chapel,1465,#XX1465 XX1465,3745A Bruce B Downs Blvd,FL,33544
+Baskin-Robbins,Red Lion,1466,#XX1466 XX1466,3103 Cape Horn Rd,PA,17356
+Baskin-Robbins,Anchorage,1467,#XX1467 XX1467,5800 Westover Ave,AK,99506
+Baskin-Robbins,Charlotte,1468,#XX1468 XX1468,3014 Driwood Ct,NC,28269
+Baskin-Robbins,Paramus,1469,#XX1469 XX1469,One Garden State Plaza,NJ,7652
+Baskin-Robbins,Renton,1470,#XX1470 XX1470,17819 108th Ave SE,WA,98055
+Baskin-Robbins,Pine Bluff,1471,#XX1471 XX1471,3701 Camden Rd,AR,71603
+Baskin-Robbins,Albuquerque,1472,#XX1472 XX1472,300 San Pedro NE,NM,87108
+Baskin-Robbins,Frederick,1473,#XX1473 XX1473,8925 Fingerboard Rd,MD,21704
+Baskin-Robbins,Old Hickory,1474,#XX1474 XX1474,14835 Lebanon Rd,TN,37138
+Baskin-Robbins,Hermitage,1475,#XX1475 XX1475,5205 Old Hickory Blvd,TN,37076
+Baskin-Robbins,Matthews,1476,#XX1476 XX1476,3114 Fincher Farm Rd,NC,28105
+Baskin-Robbins,Forest Hills,1477,#XX1477 XX1477,6366 108th St,NY,11375
+Baskin-Robbins,Highlands Ranch,1478,#XX1478 XX1478,3626 Highlands Ranch Pkwy,CO,80126
+Baskin-Robbins,Sedalia,1479,#XX1479 XX1479,3040 W. Broadway,MO,65301
+Baskin-Robbins,Canton,1480,#XX1480 XX1480,1534 W. Peace St,MS,39046
+Baskin-Robbins,Albuquerque,1481,#XX1481 XX1481,3410 State Highway 528 NW,NM,87114
+Baskin-Robbins,Muncie,1482,#XX1482 XX1482,3308 N. Wheeling Ave,IN,47304
+Baskin-Robbins,Lubbock,1483,#XX1483 XX1483,6301 82nd St,TX,79424
+Baskin-Robbins,Chicago,1484,#XX1484 XX1484,5130 N. Broadway St,IL,60640
+Baskin-Robbins,Memphis,1485,#XX1485 XX1485,85 S. Highland St,TN,38111
+Baskin-Robbins,Memphis,1486,#XX1486 XX1486,4012 Elvis Presley Blvd,TN,38116
+Baskin-Robbins,Chandler,1487,#XX1487 XX1487,4960 S. Alma School Rd,AZ,85248
+Baskin-Robbins,Olive Branch,1488,#XX1488 XX1488,5208 Highway 305,MS,38654
+Baskin-Robbins,Phoenix,1489,#XX1489 XX1489,29455 N. Cave Creek Rd,AZ,85331
+Baskin-Robbins,Dallas,1490,#XX1490 XX1490,5500 Greenville Ave,TX,75206
+Baskin-Robbins,Peoria,1491,#XX1491 XX1491,24870 N. Lake Pleasant Pkwy,AZ,85383
+Baskin-Robbins,New York,1492,#XX1492 XX1492,1880 3rd Ave,NY,10029
+Baskin-Robbins,Pace,1493,#XX1493 XX1493,4795 US Hwy 90,FL,32571
+Baskin-Robbins,Sonoma,1494,#XX1494 XX1494,201 W Napa,CA,95476
+Baskin-Robbins,Pflugerville,1495,#XX1495 XX1495,1552 FM 685,TX,78660
+Baskin-Robbins,Whittier,1496,#XX1496 XX1496,13435 Telegraph Rd,CA,90605
+Baskin-Robbins,Antioch,1497,#XX1497 XX1497,2553 Murfreesboro Pike,TN,37217
+Baskin-Robbins,Wayne,1498,#XX1498 XX1498,1957 Route 23 S,NJ,7470
+Baskin-Robbins,Roosevelt,1499,#XX1499 XX1499,306 Nassau Rd,NY,11575
+Baskin-Robbins,Portage,1500,#XX1500 XX1500,6550 U.S. Highway 6,IN,46368
+Baskin-Robbins,West Covina,1501,#XX1501 XX1501,1014 Plaza Dr,CA,91790
+Baskin-Robbins,Forest Park,1502,#XX1502 XX1502,7660 W. Madison St,IL,60130
+Baskin-Robbins,Chicago,1503,#XX1503 XX1503,233 S. Wacker Dr,IL,60606
+Baskin-Robbins,Honolulu,1504,#XX1504 XX1504,694 Schofield Barracks,HI,96857
+Baskin-Robbins,New York,1505,#XX1505 XX1505,606 10th Avenue,NY,10036
+Baskin-Robbins,Rockwall,1506,#XX1506 XX1506,2951 Ridge Rd,TX,75032
+Baskin-Robbins,Waukegan,1507,#XX1507 XX1507,1609 Grand Ave,IL,60085
+Baskin-Robbins,Dallas,1508,#XX1508 XX1508,13535 Preston Rd,TX,75240
+Baskin-Robbins,Fort Mill,1509,#XX1509 XX1509,5009 Lake Vista Dr,SC,29708
+Baskin-Robbins,Wichita,1510,#XX1510 XX1510,2556 N Maize Ct,KS,67205
+Baskin-Robbins,Fort Benning,1511,#XX1511 XX1511,FC Mall 9220,GA,31905
+Baskin-Robbins,Katy,1512,#XX1512 XX1512,6920 S. Fry Rd,TX,77494
+Baskin-Robbins,Gallup,1513,#XX1513 XX1513,1205 E Highway 66,NM,87301
+Baskin-Robbins,Durham,1515,#XX1515 XX1515,2608 Erwin Rd,NC,27705
+Baskin-Robbins,South Jordan,1516,#XX1516 XX1516,11428 S. District Dr,UT,84095
+Baskin-Robbins,Rock Hill,1517,#XX1517 XX1517,9524 Manchester Rd,MO,63119
+Baskin-Robbins,Grants Pass,1518,#XX1518 XX1518,300 Union Ave,OR,97527
+Baskin-Robbins,Frisco,1519,#XX1519 XX1519,7410 Preston Rd,TX,75034
+Baskin-Robbins,Columbia,1521,#XX1521 XX1521,2540 Broadway Bluffs Dr,MO,65201
+Baskin-Robbins,Cedar Park,1522,#XX1522 XX1522,1335 E. Whitestone Blvd,TX,78613
+Baskin-Robbins,Cabot,1523,#XX1523 XX1523,12410 Highway 5,AR,72023
+Baskin-Robbins,Des Moines,1524,#XX1524 XX1524,4221 Fleur Drive,IA,50321
+Baskin-Robbins,Atwater,1525,#XX1525 XX1525,1607 Bellevue Rd,CA,95301
+Baskin-Robbins,Livingston,1526,#XX1526 XX1526,Livingston Mall,NJ,7039
+Baskin-Robbins,Bloomingdale,1527,#XX1527 XX1527,152 Stratford Square Mall,IL,60108
+Baskin-Robbins,Gallatin,1529,#XX1529 XX1529,1545 Nashville Pike,TN,37066
+Baskin-Robbins,Columbus,1530,#XX1530 XX1530,1523 Veterans Pkwy,GA,31901
+Baskin-Robbins,Euless,1531,#XX1531 XX1531,2750 State Highway121,TX,76039
+Baskin-Robbins,Astoria,1532,#XX1532 XX1532,2514 Broadway,NY,11106
+Baskin-Robbins,Lamar,1533,#XX1533 XX1533,2710 Highway 72,MS,38642
+Baskin-Robbins,Piperton,1534,#XX1534 XX1534,1220 Highway 57,TN,38017
+Baskin-Robbins,Randolph,1535,#XX1535 XX1535,3600 Randolph Rd,MO,64161
+Baskin-Robbins,Bossier City,1536,#XX1536 XX1536,2628 Beene Blvd,LA,71111
+Baskin-Robbins,Las Vegas,1537,#XX1537 XX1537,4360 Blue Diamond Rd,NV,89139
+Baskin-Robbins,Fort Worth,1538,#XX1538 XX1538,9629 White Settlement Rd,TX,76108
+Baskin-Robbins,Campbellsville,1539,#XX1539 XX1539,545 Campbellsville ByPass,KY,42718
+Baskin-Robbins,Michigan City,1540,#XX1540 XX1540,5234 Franklin St,IN,46360
+Baskin-Robbins,Compton,1541,#XX1541 XX1541,1850 W. Rosecrans Ave,CA,90220
+Baskin-Robbins,Littleton,1542,#XX1542 XX1542,91 W. Mineral Ave,CO,80120
+Baskin-Robbins,Butler,1543,#XX1543 XX1543,307 Main St,NJ,7405
+Baskin-Robbins,Clearwater,1544,#XX1544 XX1544,534 Cleveland St,FL,33755
+Baskin-Robbins,Dumas,1545,#XX1545 XX1545,701 Highway 65 S,AR,71639
+Baskin-Robbins,Somerville,1546,#XX1546 XX1546,12940 Highway 64,TN,38068
+Baskin-Robbins,Poway,1547,#XX1547 XX1547,13477 Poway Rd,CA,92064
+Baskin-Robbins,Paramus,1548,#XX1548 XX1548,2701 Bergen Town Ctr,NJ,7652
+Baskin-Robbins,Norwalk,1549,#XX1549 XX1549,10939 Firestone Blvd,CA,90650
+Baskin-Robbins,Palm Coast,1550,#XX1550 XX1550,5290 East SR 100,FL,32164
+Baskin-Robbins,Chicago,1551,#XX1551 XX1551,500 W. Roosevelt Rd,IL,60607
+Baskin-Robbins,Dyersburg,1552,#XX1552 XX1552,730 US Highway 51 BYP W,TN,38024
+Baskin-Robbins,Wayne,1553,#XX1553 XX1553,1467 Route 23,NJ,7470
+Baskin-Robbins,New York,1554,#XX1554 XX1554,2103 Frederick Douglass Blvd.,NY,10026
+Baskin-Robbins,Portland,1555,#XX1555 XX1555,7000 NE Airport Way,OR,97218
+Baskin-Robbins,Beaumont,1556,#XX1556 XX1556,4030 Dowlen Rd,TX,77706
+Baskin-Robbins,Millsboro,1557,#XX1557 XX1557,25938 John J. Williams Hwy,DE,19966
+Baskin-Robbins,Lawrenceburg,1559,#XX1559 XX1559,100 W. Eads Pkwy,IN,47025
+Baskin-Robbins,Mount Prospect,1560,#XX1560 XX1560,1301 N Wolf Rd,IL,60056
+Baskin-Robbins,Dublin,1561,#XX1561 XX1561,6752 Perimeter Loop Rd,OH,43017
+Baskin-Robbins,Olive Branch,1562,#XX1562 XX1562,8120 Camp Creek Blvd,MS,38654
+Baskin-Robbins,Lutherville,1563,#XX1563 XX1563,1504 York Rd,MD,21093
+Baskin-Robbins,New York,1564,#XX1564 XX1564,140 E. 34th St,NY,10016
+Baskin-Robbins,Baltimore,1565,#XX1565 XX1565,2001 W Patapsco Ave,MD,21230
+Baskin-Robbins,Santa Ana,1566,#XX1566 XX1566,Westfield Main Place,CA,92705
+Baskin-Robbins,Shreveport,1567,#XX1567 XX1567,7503 Youree Dr,LA,71105
+Baskin-Robbins,Chicago,1568,#XX1568 XX1568,9100 S Commercial Ave,IL,60617
+Baskin-Robbins,Batesville,1569,#XX1569 XX1569,1509 S. Saint Louis St,AR,72501
+Baskin-Robbins,Oklahoma City,1570,#XX1570 XX1570,7502 N. May Ave,OK,73116
+Baskin-Robbins,Edgerton,1571,#XX1571 XX1571,11180 Goede Rd,WI,53534
+Baskin-Robbins,Santa Ana,1572,#XX1572 XX1572,710 E. Dyer Rd,CA,92705
+Baskin-Robbins,Monticello,1573,#XX1573 XX1573,4231 East Hwy 90,KY,42633
+Baskin-Robbins,Clinton,1574,#XX1574 XX1574,101 Johnston Pl,MS,39056
+Baskin-Robbins,San Antonio,1575,#XX1575 XX1575,20821 US Highway 281 N,TX,78258
+Baskin-Robbins,Austin,1576,#XX1576 XX1576,9900 W. Parmer Ln,TX,78717
+Baskin-Robbins,Stockton,1577,#XX1577 XX1577,10742 Trinity Pkwy,CA,95219
+Baskin-Robbins,Santa Ana,1578,#XX1578 XX1578,3770 W McFadden Ave,CA,92704
+Baskin-Robbins,Las Vegas,1579,#XX1579 XX1579,4500 W. Tropicana Ave,NV,89103
+Baskin-Robbins,Dinuba,1580,#XX1580 XX1580,700 E. El Monte Way,CA,93618
+Baskin-Robbins,Flower Mound,1581,#XX1581 XX1581,2221 Justin Road,TX,75028
+Baskin-Robbins,Greenville,1582,#XX1582 XX1582,1885 Firetower Rd,NC,27858
+Baskin-Robbins,INDIANAPOLIS,1583,#XX1583 XX1583,1337 W 86th St,IN,46260
+Baskin-Robbins,Lorton,1584,#XX1584 XX1584,9457 Lorton Market St,VA,22079
+Baskin-Robbins,Bakersfield,1585,#XX1585 XX1585,7695 White Ln,CA,93309
+Baskin-Robbins,Annapolis,1586,#XX1586 XX1586,1342 Cape Saint Claire Rd,MD,21409
+Baskin-Robbins,Riverdale,1587,#XX1587 XX1587,7087 Highway 85,GA,30274
+Baskin-Robbins,Oak Park,1588,#XX1588 XX1588,217 W Madison St,IL,60302
+Baskin-Robbins,Los Angeles,1589,#XX1589 XX1589,5039 Whittier Blvd,CA,90022
+Baskin-Robbins,Rancho Cucamonga,1590,#XX1590 XX1590,9659 Milliken Ave,CA,91730
+Baskin-Robbins,Terre Haute,1591,#XX1591 XX1591,85 S. Fruitridge Ave,IN,47803
+Baskin-Robbins,Sparks,1592,#XX1592 XX1592,1145 N. McCarran Blvd,NV,89431
+Baskin-Robbins,Liberty,1593,#XX1593 XX1593,118 N. Conistor St,MO,64068
+Baskin-Robbins,Houma,1594,#XX1594 XX1594,301 Bayou Garden Blvd,LA,70364
+Baskin-Robbins,Waukegan,1595,#XX1595 XX1595,3925 Fountain Square Place,IL,60085
+Baskin-Robbins,McAllen,1600,#XX1600 XX1600,1420 E. Expressway 83,TX,78503
+Baskin-Robbins,Sun Valley,1601,#XX1601 XX1601,7956 Vineland Ave,CA,91352
+Baskin-Robbins,Windsor,1602,#XX1602 XX1602,420 Emily Rose Cir,CA,95492
+Baskin-Robbins,Davenport,1603,#XX1603 XX1603,1724 W Locust St,IA,52804
+Baskin-Robbins,Kailua,1604,#XX1604 XX1604,108 Hekili Street,HI,96734
+Baskin-Robbins,Columbus,1605,#XX1605 XX1605,2445 Airport Thruway,GA,31904
+Baskin-Robbins,West Bloomfield,1606,#XX1606 XX1606,6243 Orchard Lake Rd,MI,48322
+Baskin-Robbins,Boyce,1607,#XX1607 XX1607,8153 John Mosby Hwy,VA,22620
+Baskin-Robbins,Palm Desert,1608,#XX1608 XX1608,77912 Country Club Dr,CA,92211
+Baskin-Robbins,Longmont,1609,#XX1609 XX1609,815 E 17th Ave,CO,80504
+Baskin-Robbins,Colorado Springs,1610,#XX1610 XX1610,3244 Centennial Blvd,CO,80907
+Baskin-Robbins,Wyckoff,1611,#XX1611 XX1611,386 Franklin Ave,NJ,7481
+Baskin-Robbins,Brinkley,1612,#XX1612 XX1612,1414 N. Main St,AR,72021
+Baskin-Robbins,Mobile,1613,#XX1613 XX1613,700 Schillinger Rd S,AL,36695
+Baskin-Robbins,Brandon,1614,#XX1614 XX1614,645 Holly Bush Rd,MS,39047
+Baskin-Robbins,San Jose,1615,#XX1615 XX1615,2663 Cropley Ave,CA,95132
+Baskin-Robbins,Menifee,1616,#XX1616 XX1616,30080 Haun Rd.,CA,92584
+Baskin-Robbins,Wichita,1617,#XX1617 XX1617,2126 N Webb Rd,KS,67206
+Baskin-Robbins,McAllen,1618,#XX1618 XX1618,100 E Nolana Ave,TX,78504
+Baskin-Robbins,Aiea,1619,#XX1619 XX1619,Pearl Kai Shopping Center,HI,96701
+Baskin-Robbins,Little Elm,1620,#XX1620 XX1620,2700 E Eldorado Pkwy,TX,75068
+Baskin-Robbins,Brandon,1621,#XX1621 XX1621,1291 W. Government St,MS,39042
+Baskin-Robbins,Canton,1622,#XX1622 XX1622,137 Yandell Rd,MS,39046
+Baskin-Robbins,New Orleans,1623,#XX1623 XX1623,5961 Bullard Ave,LA,70128
+Baskin-Robbins,Honolulu,1624,#XX1624 XX1624,Kamehameha Shopping Center,HI,96817
+Baskin-Robbins,Calverton,1625,#XX1625 XX1625,4123 Middle Country Rd,NY,11933
+Baskin-Robbins,Ashland,1626,#XX1626 XX1626,3500 Winchester Ave,KY,41101
+Baskin-Robbins,Lake Village,1627,#XX1627 XX1627,736 Highway 65 & 82,AR,71653
+Baskin-Robbins,Tulsa,1628,#XX1628 XX1628,7021 S Memorial Drive,OK,74133
+Baskin-Robbins,Southlake,1629,#XX1629 XX1629,2063 West Southlake Blvd.,TX,76092
+Baskin-Robbins,Warren,1630,#XX1630 XX1630,27033 Van Dyke Ave,MI,48093
+Baskin-Robbins,Albuquerque,1631,#XX1631 XX1631,5920 Holly Avenue NE,NM,87113
+Baskin-Robbins,Newark,1632,#XX1632 XX1632,1 Raymond Plz W,NJ,7102
+Baskin-Robbins,Des Plaines,1633,#XX1633 XX1633,1960 S Mount Prospect Rd,IL,60018
+Baskin-Robbins,Powder Springs,1634,#XX1634 XX1634,4150 Macland Rd,GA,30127
+Baskin-Robbins,Pasadena,1635,#XX1635 XX1635,60 E. Colorado Boulevard,CA,91105
+Baskin-Robbins,Torrance,1636,#XX1636 XX1636,3614 Pacific Coast Hwy,CA,90505
+Baskin-Robbins,Espanola,1637,#XX1637 XX1637,1111 N Riverside Dr,NM,87532
+Baskin-Robbins,Modesto,1638,#XX1638 XX1638,1717 Oakdale Road,CA,95355
+Baskin-Robbins,Humble,1639,#XX1639 XX1639,3809 Atascocita Road,TX,77396
+Baskin-Robbins,Indianapolis,1640,#XX1640 XX1640,2201 E 62nd St,IN,46220
+Baskin-Robbins,St Louis,1641,#XX1641 XX1641,10701 Lambert Intl Blvd,MO,63145
+Baskin-Robbins,Saint Louis,1642,#XX1642 XX1642,10701 Lambert Intl Blvd,MO,63145
+Baskin-Robbins,Honolulu,1643,#XX1643 XX1643,2255 Kalakaua Avenue,HI,96815
+Baskin-Robbins,Pigeon Forge,1644,#XX1644 XX1644,3270 Parkway,TN,37863
+Baskin-Robbins,Biloxi,1645,#XX1645 XX1645,"503 Larcher Blvd, Bldg 2306",MS,39534
+Baskin-Robbins,Culver City,1646,#XX1646 XX1646,6000 Sepulveda Blvd,CA,90230
+Baskin-Robbins,Castle Rock,1647,#XX1647 XX1647,4833 Front St,CO,80104
+Baskin-Robbins,Avondale,1648,#XX1648 XX1648,2900 Highway 90,LA,70094
+Baskin-Robbins,Homosassa,1651,#XX1651 XX1651,6885 S Suncoast Blvd,FL,34446
+Baskin-Robbins,Fresno,1652,#XX1652 XX1652,5150 E Kings Canyon Rd,CA,93727
+Baskin-Robbins,Lombard,1654,#XX1654 XX1654,119 Yorktown Ctr,IL,60148
+Baskin-Robbins,Mount Airy,1655,#XX1655 XX1655,1401 S Main St,MD,21771
+Baskin-Robbins,Lynbrook,1656,#XX1656 XX1656,6 Ocean Ave,NY,11563
+Baskin-Robbins,Forrest City,1657,#XX1657 XX1657,2319 N Washington St,AR,72335
+Baskin-Robbins,Virginia Beach,1658,#XX1658 XX1658,5636 Princess Anne Rd,VA,23462
+Baskin-Robbins,Prairieville,1659,#XX1659 XX1659,17100 Airline Hwy,LA,70769
+Baskin-Robbins,Chatham,1662,#XX1662 XX1662,641 Shunpike Rd,NJ,7928
+Baskin-Robbins,Commack,1663,#XX1663 XX1663,20 Vanderbilt Pkwy,NY,11725
+Baskin-Robbins,National City,1664,#XX1664 XX1664,3030 Plaza Bonita Rd #2075,CA,91950
+Baskin-Robbins,Charlottesville,1665,#XX1665 XX1665,1509 University Ave,VA,22903
+Baskin-Robbins,Chalmette,1666,#XX1666 XX1666,1515 E Judge Perez Dr,LA,70043
+Baskin-Robbins,Flowood,1667,#XX1667 XX1667,153 Ridgeway Rd,MS,39232
+Baskin-Robbins,Brighton,1668,#XX1668 XX1668,8281 Grand River Rd,MI,48114
+Baskin-Robbins,Irving,1669,#XX1669 XX1669,2666 N Belt Line Rd,TX,75062
+Baskin-Robbins,Astoria,1670,#XX1670 XX1670,2412 Steinway St,NY,11103
+Baskin-Robbins,San Antonio,1671,#XX1671 XX1671,10003 NW Military Hwy,TX,78231
+Baskin-Robbins,Georgetown,1672,#XX1672 XX1672,3303 Williams Dr,TX,78628
+Baskin-Robbins,Burtonsville,1673,#XX1673 XX1673,15640 Old Columbia Pike,MD,20866
+Baskin-Robbins,Wantagh,1674,#XX1674 XX1674,1148 Wantagh Ave,NY,11793
+Baskin-Robbins,Fort Bliss,1675,#XX1675 XX1675,Marshall Rd,TX,79906
+Baskin-Robbins,New Lenox,1676,#XX1676 XX1676,429 E Lincoln Hwy,IL,60451
+Baskin-Robbins,Stony Brook,1677,#XX1677 XX1677,1085 Route 25A,NY,11790
+Baskin-Robbins,New York,1678,#XX1678 XX1678,316 W 34th St,NY,10001
+Baskin-Robbins,Brunswick,1679,#XX1679 XX1679,41 Torras Ave,GA,31520
+Baskin-Robbins,Goodyear,1680,#XX1680 XX1680,15530 W Roosevelt St,AZ,85338
+Baskin-Robbins,Queen Creek,1681,#XX1681 XX1681,21151 E Rittenhouse Rd,AZ,85142
+Baskin-Robbins,Jessup,1682,#XX1682 XX1682,8600 Washington Blvd,MD,20794
+Baskin-Robbins,Raleigh,1683,#XX1683 XX1683,8401 Capital Blvd,NC,27616
+Baskin-Robbins,Chicago,1684,#XX1684 XX1684,1201 N Clark St,IL,60610
+Baskin-Robbins,Waldorf,1685,#XX1685 XX1685,2040 Crain Hwy,MD,20601
+Baskin-Robbins,Laurel,1686,#XX1686 XX1686,3503 Laurel Fort Meade Rd,MD,20724
+Baskin-Robbins,Houston,1687,#XX1687 XX1687,7596 FM 1960 Rd W,TX,77070
+Baskin-Robbins,Colorado Springs,1688,#XX1688 XX1688,1710 Briargate Blvd.,CO,80920
+Baskin-Robbins,Houston,1689,#XX1689 XX1689,1354 W 43rd St,TX,77018
+Baskin-Robbins,Houston,1690,#XX1690 XX1690,7800 Airport Blvd,TX,77061
+Baskin-Robbins,Glen Burnie,1691,#XX1691 XX1691,BWI Airport Rd,MD,21061
+Baskin-Robbins,Brooklyn,1692,#XX1692 XX1692,322 Livingston St,NY,11217
+Baskin-Robbins,Little Rock,1693,#XX1693 XX1693,13000 Chenal Pkwy,AR,72211
+Baskin-Robbins,Tallahassee,1694,#XX1694 XX1694,6676 Thomasville Rd #2,FL,32312
+Baskin-Robbins,Torrance,1695,#XX1695 XX1695,2455 Sepulveda Blvd,CA,90501
+Baskin-Robbins,Richland,1696,#XX1696 XX1696,140 Gage Blvd,WA,99352
+Baskin-Robbins,Harrisonville,1697,#XX1697 XX1697,2013 N Commercial St,MO,64701
+Baskin-Robbins,Olney,1698,#XX1698 XX1698,18147 Town Center Dr,MD,20832
+Baskin-Robbins,Milpitas,1699,#XX1699 XX1699,357 Jacklin Rd,CA,95035
+Baskin-Robbins,Lake Orion,1700,#XX1700 XX1700,378 S Broadway St,MI,48362
+Baskin-Robbins,Houston,1701,#XX1701 XX1701,4414 North Freeway,TX,77022
+Baskin-Robbins,Erie,1702,#XX1702 XX1702,654 Millcreek Mall Unit 570,PA,16565
+Baskin-Robbins,Jackson,1703,#XX1703 XX1703,587 Beasley Rd,MS,39206
+Baskin-Robbins,Madera,1704,#XX1704 XX1704,2180 W Cleveland Ave,CA,93637
+Baskin-Robbins,Chicago,1705,#XX1705 XX1705,1418 E 53rd St,IL,60615
+Baskin-Robbins,Aiken,1706,#XX1706 XX1706,1909B Whiskey Rd,SC,29803
+Baskin-Robbins,Waterford,1707,#XX1707 XX1707,4399 Highland Rd,MI,48328
+Baskin-Robbins,Pensacola,1709,#XX1709 XX1709,312 E Nine Mile Rd,FL,32514
+Baskin-Robbins,Spring,1710,#XX1710 XX1710,25114 Grogans Mill Rd,TX,77380
+Baskin-Robbins,San Antonio,1711,#XX1711 XX1711,5539 W Loop 1604 N,TX,78253
+Baskin-Robbins,Brunswick,1712,#XX1712 XX1712,4435 Altama Ave,GA,31520
+Baskin-Robbins,Tallahassee,1713,#XX1713 XX1713,3440 Thomasville Rd,FL,32309
+Baskin-Robbins,Houston,1714,#XX1714 XX1714,9203 Highway 6 S,TX,77083
+Baskin-Robbins,Cedar Park,1715,#XX1715 XX1715,1851 S Lakeline Blvd,TX,78613
+Baskin-Robbins,Los Angeles,1716,#XX1716 XX1716,759 S Vermont Ave,CA,90005
+Baskin-Robbins,Houston,1717,#XX1717 XX1717,15242 Wallisville Rd,TX,77049
+Baskin-Robbins,Farmingdale,1718,#XX1718 XX1718,2109 Broadhollow Rd,NY,11735
+Baskin-Robbins,Bethany Beach,1719,#XX1719 XX1719,33292 Coastal Hwy,DE,19930
+Baskin-Robbins,Kingsland,1720,#XX1720 XX1720,1317 E King Ave,GA,31548
+Baskin-Robbins,New York,1721,#XX1721 XX1721,406 6th Ave,NY,10011
+Baskin-Robbins,Lexington,1722,#XX1722 XX1722,3061 Fieldstone Way,KY,40513
+Baskin-Robbins,Thomasville,1723,#XX1723 XX1723,2701 E Pinetree Blvd,GA,31792
+Baskin-Robbins,Damascus,1724,#XX1724 XX1724,9803 Main St,MD,20872
+Baskin-Robbins,Jacksonville,1725,#XX1725 XX1725,4419 Southside Blvd,FL,32216
+Baskin-Robbins,Bartlett,1726,#XX1726 XX1726,7601 Highway 70,TN,38133
+Baskin-Robbins,Glenview,1727,#XX1727 XX1727,1410 Waukegan Rd,IL,60025
+Baskin-Robbins,Paradise,1728,#XX1728 XX1728,6848 Skyway,CA,95969
+Baskin-Robbins,Long Island City,1729,#XX1729 XX1729,4902 Vernon Blvd.,NY,11101
+Baskin-Robbins,Key West,1730,#XX1730 XX1730,3124 N Roosevelt Blvd,FL,33040
+Baskin-Robbins,Cedar Hill,1731,#XX1731 XX1731,650 Uptown Blvd,TX,75104
+Baskin-Robbins,Chicago,1732,#XX1732 XX1732,1651 N Western Ave,IL,60647
+Baskin-Robbins,Auburndale,1733,#XX1733 XX1733,501 Magnolia Ave,FL,33823
+Baskin-Robbins,Clinton,1734,#XX1734 XX1734,115 N 2nd St,MO,64735
+Baskin-Robbins,Manchester,1735,#XX1735 XX1735,2221 Hillsboro Blvd,TN,37355
+Baskin-Robbins,Charlotte,1736,#XX1736 XX1736,8334 Pineville Matthews Rd,NC,28226
+Baskin-Robbins,Watkinsville,1737,#XX1737 XX1737,2081 Hog Mountain Rd,GA,30677
+Baskin-Robbins,Waycross,1738,#XX1738 XX1738,2403 Plant Ave,GA,31501
+Baskin-Robbins,Arverne,1739,#XX1739 XX1739,6820 Rockaway Beach Blvd,NY,11692
+Baskin-Robbins,Memphis,1740,#XX1740 XX1740,5150 Poplar Ave,TN,38117
+Baskin-Robbins,El Paso,1741,#XX1741 XX1741,931 N Resler Dr,TX,79912
+Baskin-Robbins,Palmetto,1743,#XX1743 XX1743,612 10th St E,FL,34221
+Baskin-Robbins,Bend,1744,#XX1744 XX1744,1106 NE 3rd St,OR,97701
+Baskin-Robbins,Yazoo City,1745,#XX1745 XX1745,741 E Fifteenth St,MS,39194
+Baskin-Robbins,Lady Lake,1746,#XX1746 XX1746,1561 Bella Cruz Dr,FL,32159
+Baskin-Robbins,Elmhurst,1747,#XX1747 XX1747,8111 Broadway,NY,11373
+Baskin-Robbins,Paxico,1748,#XX1748 XX1748,18094 SW Vera Frontage Rd,KS,66526
+Baskin-Robbins,Atlanta,1749,#XX1749 XX1749,682 Boulevard NE,GA,30308
+Baskin-Robbins,Madison,1750,#XX1750 XX1750,7830 Highway 72 W,AL,35758
+Baskin-Robbins,Chattanooga,1751,#XX1751 XX1751,625 Signal Mountain Rd,TN,37405
+Baskin-Robbins,Deltona,1752,#XX1752 XX1752,3140 Howland Blvd,FL,32725
+Baskin-Robbins,New York,1753,#XX1753 XX1753,484 9th Ave,NY,10018
+Baskin-Robbins,Brooklyn,1754,#XX1754 XX1754,5510 5th Ave,NY,11220
+Baskin-Robbins,Atkins,1755,#XX1755 XX1755,100 Fish Lake Rd,AR,72823
+Baskin-Robbins,Jackson,1756,#XX1756 XX1756,123 W Northside Dr,MS,39206
+Baskin-Robbins,Everett,1757,#XX1757 XX1757,13116 39th Ave SE,WA,98208
+Baskin-Robbins,Chula Vista,1758,#XX1758 XX1758,2260 Otay Lakes Rd,CA,91915
+Baskin-Robbins,Deer Park,1759,#XX1759 XX1759,3811 Center St,TX,77536
+Baskin-Robbins,Charleston,1760,#XX1760 XX1760,1798 Ashley River Rd,SC,29407
+Baskin-Robbins,Portland,1761,#XX1761 XX1761,6990 SW Beaverton Hillsdale Hw,OR,97225
+Baskin-Robbins,Olympia,1762,#XX1762 XX1762,9335 Martin Way E,WA,98516
+Baskin-Robbins,San Diego,1763,#XX1763 XX1763,10550 Craftsman Way,CA,92127
+Baskin-Robbins,Columbus,1764,#XX1764 XX1764,3201 Macon Rd,GA,31906
+Baskin-Robbins,Spring Hill,1765,#XX1765 XX1765,2098 Wall St,TN,37174
+Baskin-Robbins,Athens,1766,#XX1766 XX1766,1045 Gaines School Rd,GA,30605
+Baskin-Robbins,Vancouver,1767,#XX1767 XX1767,11600 SE Mill Plain Blvd,WA,98684
+Baskin-Robbins,Flushing,1768,#XX1768 XX1768,13640 39th Ave,NY,11354
+Baskin-Robbins,Hyattstown,1769,#XX1769 XX1769,1896 Urbana Pike,MD,20871
+Baskin-Robbins,Meridian,1770,#XX1770 XX1770,1394 W Chinden Blvd,ID,83646
+Baskin-Robbins,Union City,1771,#XX1771 XX1771,4760 Jonesboro Rd,GA,30291
+Baskin-Robbins,Colleyville,1772,#XX1772 XX1772,5695 Colleyville Blvd,TX,76034
+Baskin-Robbins,Thousand Oaks,1773,#XX1773 XX1773,1772 E Avenida De Los Arboles,CA,91362
+Baskin-Robbins,Prescott,1774,#XX1774 XX1774,1144 W Iron Springs Rd,AZ,86305
+Baskin-Robbins,Dallas,1775,#XX1775 XX1775,8008 Cedar Springs,TX,75235
+Baskin-Robbins,Indian Land,1776,#XX1776 XX1776,8374 Charlotte Hwy,SC,29707
+Baskin-Robbins,Upper Lake,1777,#XX1777 XX1777,775 W State Highway 20,CA,95485
+Baskin-Robbins,Pomona,1778,#XX1778 XX1778,631 Indian Hill Blvd,CA,91767
+Baskin-Robbins,Richmond,1779,#XX1779 XX1779,11 S Nansemond St,VA,23221
+Baskin-Robbins,Nashville,1780,#XX1780 XX1780,7635 Highway 70 S,TN,37221
+Baskin-Robbins,Odessa,1781,#XX1781 XX1781,6900 East Ridge Rd,TX,79765
+Baskin-Robbins,Conway,1782,#XX1782 XX1782,105 E Oak St,AR,72032
+Baskin-Robbins,New York,1783,#XX1783 XX1783,25 W 43rd St,NY,10036
+Baskin-Robbins,Simpsonville,1784,#XX1784 XX1784,1 Ray E Talley Ct,SC,29680
+Baskin-Robbins,Cypress,1785,#XX1785 XX1785,6895 Katella Ave,CA,90630
+Baskin-Robbins,Brunswick,1786,#XX1786 XX1786,110 Dungeness Dr,GA,31523
+Baskin-Robbins,Midland,1787,#XX1787 XX1787,5400 Briarwood Ave,TX,79707
+Baskin-Robbins,Temple Terrace,1788,#XX1788 XX1788,5610 E Fowler Ave,FL,33617
+Baskin-Robbins,Houston,1790,#XX1790 XX1790,14460 Hillcroft St,TX,77085
+Baskin-Robbins,Freehold,1791,#XX1791 XX1791,3710 Route 9,NJ,7728
+Baskin-Robbins,Glen Ellyn,1792,#XX1792 XX1792,651 Roosevelt Rd,IL,60137
+Baskin-Robbins,New York,1793,#XX1793 XX1793,1703 3rd Ave,NY,10128
+Baskin-Robbins,DeKalb,1794,#XX1794 XX1794,1101 W Lincoln Hwy,IL,60115
+Baskin-Robbins,Gaithersburg,1795,#XX1795 XX1795,18558 Woodfield Rd,MD,20879
+Baskin-Robbins,Pasadena,1796,#XX1796 XX1796,4130 Fairmont Pkwy,TX,77504
+Baskin-Robbins,Shelbyville,1797,#XX1797 XX1797,1205 N Main St,TN,37160
+Baskin-Robbins,New York,1798,#XX1798 XX1798,201 Madison St,NY,10002
+Baskin-Robbins,Des Peres,1799,#XX1799 XX1799,1078 N Ballas Rd,MO,63131
+Baskin-Robbins,Independence,1800,#XX1800 XX1800,2110 Independence Center,MO,64057
+Baskin-Robbins,El Paso,1801,#XX1801 XX1801,12379 Edgemere Blvd,TX,79938
+Baskin-Robbins,Carmichael,1802,#XX1802 XX1802,4005 Manzanita Ave,CA,95608
+Baskin-Robbins,Ridgecrest,1803,#XX1803 XX1803,501 N China Lake Blvd,CA,93555
+Baskin-Robbins,Albemarle,1804,#XX1804 XX1804,716 NC 24/27 Byp E,NC,28001
+Baskin-Robbins,Windcrest,1805,#XX1805 XX1805,5105 Walzem Rd,TX,78218
+Baskin-Robbins,Owensboro,1806,#XX1806 XX1806,3245 Mount Mariah Ave,KY,42303
+Baskin-Robbins,Okeechobee,1807,#XX1807 XX1807,MM 184 FL TPKE,FL,34972
+Baskin-Robbins,Milledgeville,1808,#XX1808 XX1808,1966 N Columbia St,GA,31061
+Baskin-Robbins,Wellesley,1809,#XX1809 XX1809,98 Central St,MA,2482
+Baskin-Robbins,Metairie,1810,#XX1810 XX1810,4300 Veterans Memorial Blvd,LA,70006
+Baskin-Robbins,North Little Rock,1811,#XX1811 XX1811,6725 John F Kennedy Blvd,AR,72116
+Baskin-Robbins,Santa Clarita,1812,#XX1812 XX1812,26582 Bouquet Canyon Rd,CA,91350
+Baskin-Robbins,San Diego,1813,#XX1813 XX1813,3840 Valley Centre Dr,CA,92130
+Baskin-Robbins,Glenwood,1814,#XX1814 XX1814,104 N 1st St,AR,71943
+Baskin-Robbins,Windsor,1815,#XX1815 XX1815,200 S Main St,MO,65360
+Baskin-Robbins,New York,1816,#XX1816 XX1816,323 W 42nd St,NY,10036
+Baskin-Robbins,Loveland,1817,#XX1817 XX1817,281 E 29th St,CO,80538
+Baskin-Robbins,Cockeysville,1818,#XX1818 XX1818,11121 York Rd,MD,21030
+Baskin-Robbins,Far Rockaway,1819,#XX1819 XX1819,11320 Beach Channel Dr,NY,11694
+Baskin-Robbins,San Antonio,1820,#XX1820 XX1820,634 NW Loop 410,TX,78216
+Baskin-Robbins,New Orleans,1822,#XX1822 XX1822,406 N Carrollton Ave,LA,70119
+Baskin-Robbins,Hampton,1823,#XX1823 XX1823,11286 Tara Blvd,GA,30228
+Baskin-Robbins,Chicago,1824,#XX1824 XX1824,71 E Monroe St,IL,60603
+Baskin-Robbins,Great Bend,1825,#XX1825 XX1825,1305 K 96 Hwy,KS,67530
+Baskin-Robbins,Brooklyn,1826,#XX1826 XX1826,8509 5th Ave,NY,11209
+Baskin-Robbins,Fresh Meadows,1827,#XX1827 XX1827,18823 Union Tpke,NY,11366
+Baskin-Robbins,Jackson,1828,#XX1828 XX1828,5701 Medgar Evers Blvd,MS,39213
+Baskin-Robbins,North Las Vegas,1829,#XX1829 XX1829,5515 Camino Al Norte,NV,89031
+Baskin-Robbins,Miller place,1830,#XX1830 XX1830,725 Route 25A,NY,11764
+Baskin-Robbins,El Cajon,1831,#XX1831 XX1831,328 N 2nd St,CA,92021
+Baskin-Robbins,Whitestone,1833,#XX1833 XX1833,1030 154th St,NY,11357
+Baskin-Robbins,Pasadena,1834,#XX1834 XX1834,561 S. Lake Ave,CA,91101
+Baskin-Robbins,Burbank,1835,#XX1835 XX1835,1201 S Victory Blvd,CA,91502
+Baskin-Robbins,Lompoc,1836,#XX1836 XX1836,419 N H St,CA,93436
+Baskin-Robbins,Van Nuys,1837,#XX1837 XX1837,15224 Vanowen St,CA,91405
+Baskin-Robbins,West Covina,1838,#XX1838 XX1838,410 S Glendora Ave,CA,91790
+Baskin-Robbins,San Gabriel,1839,#XX1839 XX1839,613 W Las Tunas Dr,CA,91776
+Baskin-Robbins,Long Beach,1840,#XX1840 XX1840,3543 Atlantic Ave,CA,90807
+Baskin-Robbins,Gardena,1841,#XX1841 XX1841,1423 W Redondo Beach Blvd,CA,90247
+Baskin-Robbins,Burbank,1842,#XX1842 XX1842,910 N San Fernando Blvd,CA,91504
+Baskin-Robbins,Santa Maria,1843,#XX1843 XX1843,403 N Broadway,CA,93454
+Baskin-Robbins,South Pasadena,1844,#XX1844 XX1844,432 Fair Oaks Ave,CA,91030
+Baskin-Robbins,Huntington Beach,1845,#XX1845 XX1845,19465 Brookhurst St,CA,92646
+Baskin-Robbins,Anaheim,1846,#XX1846 XX1846,2657 W Lincoln Ave,CA,92801
+Baskin-Robbins,Pacific Palisades,1847,#XX1847 XX1847,1026 Swarthmore,CA,90272
+Baskin-Robbins,Covina,1848,#XX1848 XX1848,177 E. College St,CA,91723
+Baskin-Robbins,Huntington Beach,1849,#XX1849 XX1849,5971 Warner Ave,CA,92649
+Baskin-Robbins,Arcadia,1850,#XX1850 XX1850,1427 S Baldwin Ave,CA,91007
+Baskin-Robbins,Redondo Beach,1851,#XX1851 XX1851,320 Avenue I,CA,90277
+Baskin-Robbins,Granada Hills,1852,#XX1852 XX1852,10226 Balboa Blvd,CA,91344
+Baskin-Robbins,Los Angeles,1853,#XX1853 XX1853,6843 La Tijera Blvd,CA,90045
+Baskin-Robbins,Camarillo,1854,#XX1854 XX1854,738 Arneill Rd,CA,93010
+Baskin-Robbins,Manhattan Beach,1855,#XX1855 XX1855,925 N Sepulveda Blvd,CA,90266
+Baskin-Robbins,San Bernardino,1856,#XX1856 XX1856,202 E. Highland Ave,CA,92404
+Baskin-Robbins,Rancho Palos Verdes,1857,#XX1857 XX1857,29121 S Western Ave,CA,90275
+Baskin-Robbins,Panorama City,1858,#XX1858 XX1858,13773 Roscoe Blvd,CA,91402
+Baskin-Robbins,Gardena,1859,#XX1859 XX1859,13424 Crenshaw Blvd,CA,90249
+Baskin-Robbins,Los Angeles,1860,#XX1860 XX1860,4066 S. Victoria Ave,CA,90008
+Baskin-Robbins,La Mesa,1861,#XX1861 XX1861,8807 1/2 La Mesa Blvd,CA,91941
+Baskin-Robbins,Oceanside,1862,#XX1862 XX1862,1112 S Coast Hwy,CA,92054
+Baskin-Robbins,Ventura,1863,#XX1863 XX1863,2853 E Main St,CA,93003
+Baskin-Robbins,Burbank,1864,#XX1864 XX1864,4314 W Magnolia Blvd,CA,91505
+Baskin-Robbins,Canoga Park,1865,#XX1865 XX1865,7620 Topanga Canyon Blvd,CA,91304
+Baskin-Robbins,Rolling Hills,1866,#XX1866 XX1866,21D Penninsula Ctr,CA,90274
+Baskin-Robbins,Pasadena,1867,#XX1867 XX1867,3657 E Foothill Blvd,CA,91107
+Baskin-Robbins,Northridge,1868,#XX1868 XX1868,9514 Reseda Blvd,CA,91324
+Baskin-Robbins,Los Angeles,1869,#XX1869 XX1869,1832 N. Western Ave,CA,90027
+Baskin-Robbins,Oxnard,1870,#XX1870 XX1870,3520 S. Saviers Rd,CA,93030
+Baskin-Robbins,Rialto,1871,#XX1871 XX1871,211 E Foothill Blvd,CA,92376
+Baskin-Robbins,Los Angeles,1872,#XX1872 XX1872,7150 Melrose Ave,CA,90046
+Baskin-Robbins,Long Beach,1873,#XX1873 XX1873,3585 N. Los Coyotes Diagonal,CA,90808
+Baskin-Robbins,Los Angeles,1874,#XX1874 XX1874,1800 S. Robertson Blvd,CA,90035
+Baskin-Robbins,Santa Paula,1875,#XX1875 XX1875,318 E. Main St,CA,93060
+Baskin-Robbins,San Fernando,1876,#XX1876 XX1876,307 N Maclay Ave,CA,91340
+Baskin-Robbins,Santa Barbara,1877,#XX1877 XX1877,3611 1/2 State St,CA,93105
+Baskin-Robbins,Los Angeles,1878,#XX1878 XX1878,11127 Venice Blvd,CA,90034
+Baskin-Robbins,Redlands,1879,#XX1879 XX1879,405a E State St,CA,92373
+Baskin-Robbins,Glendora,1880,#XX1880 XX1880,856 E Alosta Ave,CA,91740
+Baskin-Robbins,Claremont,1881,#XX1881 XX1881,973 W Foothill Blvd,CA,91711
+Baskin-Robbins,Ontario,1882,#XX1882 XX1882,1137 N. Mountain Ave,CA,91762
+Baskin-Robbins,Lakewood,1883,#XX1883 XX1883,5455 Del Amo Blvd,CA,90712
+Baskin-Robbins,San Diego,1884,#XX1884 XX1884,4015 W. Point Loma Blvd,CA,92110
+Baskin-Robbins,Buena Park,1885,#XX1885 XX1885,6989 La Palma Ave,CA,90620
+Baskin-Robbins,Whittier,1886,#XX1886 XX1886,15234 Whittier Blvd,CA,90603
+Baskin-Robbins,El Cajon,1887,#XX1887 XX1887,2396 Fletcher Pkwy,CA,92020
+Baskin-Robbins,Orange,1888,#XX1888 XX1888,434 N Tustin St,CA,92867
+Baskin-Robbins,Chatsworth,1889,#XX1889 XX1889,20445 Devonshire St,CA,91311
+Baskin-Robbins,Garden Grove,1890,#XX1890 XX1890,12833 W. Chapman Ave,CA,92840
+Baskin-Robbins,Bellflower,1891,#XX1891 XX1891,10212 Alondra Blvd,CA,90706
+Baskin-Robbins,Visalia,1892,#XX1892 XX1892,1632 S. Mooney Blvd,CA,93277
+Baskin-Robbins,Salinas,1893,#XX1893 XX1893,1100 S Main St,CA,93901
+Baskin-Robbins,Sacramento,1894,#XX1894 XX1894,4500 Florin Rd,CA,95823
+Baskin-Robbins,Palo Alto,1895,#XX1895 XX1895,2615 Middlefield Rd,CA,94306
+Baskin-Robbins,Chico,1896,#XX1896 XX1896,668 Mangrove Ave,CA,95926
+Baskin-Robbins,Redwood City,1897,#XX1897 XX1897,2107 Roosevelt Ave,CA,94061
+Baskin-Robbins,Los Altos,1898,#XX1898 XX1898,264 State St,CA,94022
+Baskin-Robbins,Vallejo,1899,#XX1899 XX1899,1658 Tennessee St,CA,94590
+Baskin-Robbins,Santa Clara,1900,#XX1900 XX1900,3591 Homestead Rd,CA,95051
+Baskin-Robbins,Mountain View,1901,#XX1901 XX1901,1249 W El Camino Real,CA,94040
+Baskin-Robbins,San Leandro,1902,#XX1902 XX1902,100 Pelton Center Way,CA,94577
+Baskin-Robbins,San Carlos,1903,#XX1903 XX1903,1648 El Camino Real,CA,94070
+Baskin-Robbins,San Jose,1904,#XX1904 XX1904,1105 S White Rd,CA,95127
+Baskin-Robbins,San Jose,1905,#XX1905 XX1905,1137 S De Anza Blvd,CA,95129
+Baskin-Robbins,Millbrae,1906,#XX1906 XX1906,669 Broadway,CA,94030
+Baskin-Robbins,Burlingame,1907,#XX1907 XX1907,1409 Burlingame Ave,CA,94010
+Baskin-Robbins,Fresno,1908,#XX1908 XX1908,310 E Shields Ave,CA,93704
+Baskin-Robbins,San Jose,1909,#XX1909 XX1909,2467 Forest Ave,CA,95128
+Baskin-Robbins,Lodi,1910,#XX1910 XX1910,135 Lakewood Mall,CA,95242
+Baskin-Robbins,San Jose,1911,#XX1911 XX1911,5353 Almaden Expy,CA,95118
+Baskin-Robbins,San Mateo,1912,#XX1912 XX1912,133 E Third Ave,CA,94401
+Baskin-Robbins,Concord,1913,#XX1913 XX1913,785 C Oak Grove Road,CA,94518
+Baskin-Robbins,Davis,1914,#XX1914 XX1914,236 E St,CA,95616
+Baskin-Robbins,Menlo Park,1915,#XX1915 XX1915,863 Santa Cruz Ave,CA,94025
+Baskin-Robbins,Fremont,1916,#XX1916 XX1916,3850 Mowry Ave,CA,94538
+Baskin-Robbins,Novato,1917,#XX1917 XX1917,1769 Grant Ave,CA,94945
+Baskin-Robbins,Stockton,1918,#XX1918 XX1918,2300 Pacific Ave,CA,95204
+Baskin-Robbins,Castro Valley,1919,#XX1919 XX1919,20560 Redwood Rd,CA,94546
+Baskin-Robbins,Durango,1920,#XX1920 XX1920,32 Town Plaza,CO,81301
+Baskin-Robbins,Las Cruces,1921,#XX1921 XX1921,1492 Missouri Ave,NM,88001
+Baskin-Robbins,Albuquerque,1922,#XX1922 XX1922,2201 Central Ave NW,NM,87104
+Baskin-Robbins,Albuquerque,1923,#XX1923 XX1923,11052 Montgomery Blvd NE,NM,87111
+Baskin-Robbins,Farmington,1924,#XX1924 XX1924,3030 E Main St,NM,87402
+Baskin-Robbins,Colorado Springs,1925,#XX1925 XX1925,1534 N Circle Dr,CO,80909
+Baskin-Robbins,Colorado Springs,1926,#XX1926 XX1926,3865 E. Pikes Peak Ave,CO,80909
+Baskin-Robbins,Evergreen,1927,#XX1927 XX1927,28206 Highway 74,CO,80439
+Baskin-Robbins,Tucson,1928,#XX1928 XX1928,2648 E. Speedway Blvd,AZ,85716
+Baskin-Robbins,Tucson,1929,#XX1929 XX1929,8670 E. Broadway Blvd,AZ,85710
+Baskin-Robbins,Tucson,1930,#XX1930 XX1930,7856 E. Wrightstown Rd,AZ,85715
+Baskin-Robbins,Wheat Ridge,1931,#XX1931 XX1931,3912 Wadsworth Blvd,CO,80033
+Baskin-Robbins,Phoenix,1932,#XX1932 XX1932,3953 E Camelback Rd,AZ,85018
+Baskin-Robbins,Phoenix,1933,#XX1933 XX1933,4021 N. 75th Ave,AZ,85033
+Baskin-Robbins,Tempe,1934,#XX1934 XX1934,1715 E Guadalupe Rd,AZ,85283
+Baskin-Robbins,Goodyear,1935,#XX1935 XX1935,13220 W. Van Buren St,AZ,85338
+Baskin-Robbins,Flagstaff,1936,#XX1936 XX1936,1104 S Milton Rd,AZ,86001
+Baskin-Robbins,Bayside,1937,#XX1937 XX1937,8820 N Port Washington Rd,WI,53217
+Baskin-Robbins,Wauwatosa,1938,#XX1938 XX1938,1417 N. Wauwatosa Ave,WI,53213
+Baskin-Robbins,Mission,1939,#XX1939 XX1939,5425 Johnson Dr,KS,66205
+Baskin-Robbins,Topeka,1940,#XX1940 XX1940,4400 SW 21st St,KS,66604
+Baskin-Robbins,Hyattsville,1941,#XX1941 XX1941,3004 Hamilton St,MD,20782
+Baskin-Robbins,Alexandria,1942,#XX1942 XX1942,1701 Centre Plz,VA,22302
+Baskin-Robbins,Kensington,1943,#XX1943 XX1943,10592b Metropolitan Ave,MD,20895
+Baskin-Robbins,Springfield,1944,#XX1944 XX1944,6432 Brandon Ave,VA,22150
+Baskin-Robbins,Falls Church,1945,#XX1945 XX1945,6664 Arlington Blvd,VA,22042
+Baskin-Robbins,Fairfax,1946,#XX1946 XX1946,10400 Lee Highway,VA,22030
+Baskin-Robbins,Arlington,1947,#XX1947 XX1947,2511 N. Harrison St,VA,22207
+Baskin-Robbins,Potomac,1948,#XX1948 XX1948,7909 Tuckerman Ln Ctr,MD,20854
+Baskin-Robbins,Baltimore,1949,#XX1949 XX1949,2310 E Joppa Rd,MD,21234
+Baskin-Robbins,Salisbury,1950,#XX1950 XX1950,1012 S. Salisbury Blvd,MD,21801
+Baskin-Robbins,Reston,1951,#XX1951 XX1951,1446 Reston Pkwy,VA,20194
+Baskin-Robbins,Philadelphia,1952,#XX1952 XX1952,7606 City Ave,PA,19151
+Baskin-Robbins,Rockville,1953,#XX1953 XX1953,1617 Rockville Pike,MD,20852
+Baskin-Robbins,Northbrook,1954,#XX1954 XX1954,1344 Shermer Rd,IL,60062
+Baskin-Robbins,Rockford,1955,#XX1955 XX1955,2579 N Mulford Rd,IL,61114
+Baskin-Robbins,Peoria,1956,#XX1956 XX1956,4125 N Sheridan Rd,IL,61614
+Baskin-Robbins,Darien,1957,#XX1957 XX1957,737 Plainfield Rd,IL,60559
+Baskin-Robbins,Wheeling,1958,#XX1958 XX1958,524 W. Dundee Rd,IL,60090
+Baskin-Robbins,Springfield,1959,#XX1959 XX1959,1925 W. Monroe St,IL,62704
+Baskin-Robbins,Windsor Heights,1960,#XX1960 XX1960,7666 Hickman Rd,IA,50322
+Baskin-Robbins,Bozeman,1961,#XX1961 XX1961,200 S 23rd St,MT,59718
+Baskin-Robbins,Pittsburgh,1962,#XX1962 XX1962,1110 Freeport Rd,PA,15238
+Baskin-Robbins,Ann Arbor,1963,#XX1963 XX1963,1952 W. Stadium Blvd,MI,48103
+Baskin-Robbins,Roseville,1964,#XX1964 XX1964,18679 E Ten Mile Rd,MI,48066
+Baskin-Robbins,Allen Park,1965,#XX1965 XX1965,7205 Allen Rd,MI,48101
+Baskin-Robbins,Plymouth,1966,#XX1966 XX1966,985 W Ann Arbor Rd,MI,48170
+Baskin-Robbins,Warren,1967,#XX1967 XX1967,11560 E. 12 Mile Rd,MI,48093
+Baskin-Robbins,Bay City,1968,#XX1968 XX1968,801 N Euclid Ave,MI,48706
+Baskin-Robbins,Grand Blanc,1969,#XX1969 XX1969,11507 S. Saginaw St,MI,48439
+Baskin-Robbins,Livonia,1970,#XX1970 XX1970,17138 Farmington Rd,MI,48152
+Baskin-Robbins,Troy,1971,#XX1971 XX1971,2979 E Big Beaver Rd,MI,48083
+Baskin-Robbins,Toledo,1972,#XX1972 XX1972,4015 Secor Rd,OH,43623
+Baskin-Robbins,Lincoln Park,1973,#XX1973 XX1973,4005 Dix Hwy,MI,48146
+Baskin-Robbins,Houston,1974,#XX1974 XX1974,12740 Memorial Dr,TX,77024
+Baskin-Robbins,Bellaire,1975,#XX1975 XX1975,5408 Bellaire Blvd,TX,77401
+Baskin-Robbins,Houston,1976,#XX1976 XX1976,1011 Edgebrook Dr,TX,77034
+Baskin-Robbins,Houston,1977,#XX1977 XX1977,1634 Gessner Dr,TX,77080
+Baskin-Robbins,Houston,1978,#XX1978 XX1978,3266 Westheimer Rd,TX,77098
+Baskin-Robbins,Houston,1979,#XX1979 XX1979,1051 Nasa Rd,TX,77058
+Baskin-Robbins,Houston,1980,#XX1980 XX1980,6755 Bissonnet,TX,77074
+Baskin-Robbins,Texas City,1981,#XX1981 XX1981,2802 Palmer Hwy,TX,77590
+Baskin-Robbins,San Antonio,1982,#XX1982 XX1982,6418 N. New Braunfels Ave,TX,78209
+Baskin-Robbins,San Antonio,1983,#XX1983 XX1983,6914 W Military Dr,TX,78227
+Baskin-Robbins,Houston,1984,#XX1984 XX1984,14501 Memorial Dr,TX,77079
+Baskin-Robbins,Houston,1985,#XX1985 XX1985,9315 Katy Fwy,TX,77024
+Baskin-Robbins,Austin,1986,#XX1986 XX1986,730 W Stassney Ln,TX,78745
+Baskin-Robbins,Houston,1987,#XX1987 XX1987,4547 FM1960 Rd W,TX,77069
+Baskin-Robbins,Ladue,1988,#XX1988 XX1988,9842 Clayton Rd,MO,63124
+Baskin-Robbins,Franklin,1989,#XX1989 XX1989,214 E Main St,TN,37064
+Baskin-Robbins,Saint Louis,1990,#XX1990 XX1990,11730 Baptist Church Rd,MO,63128
+Baskin-Robbins,Brentwood,1991,#XX1991 XX1991,127 Franklin Rd,TN,37027
+Baskin-Robbins,Bowling Green,1992,#XX1992 XX1992,1705 Us 31w Byp,KY,42101
+Baskin-Robbins,Lexington,1993,#XX1993 XX1993,3383 Tates Creek Pke,KY,40502
+Baskin-Robbins,Elizabethtown,1994,#XX1994 XX1994,910 N Dixie Ave,KY,42701
+Baskin-Robbins,Frankfort,1995,#XX1995 XX1995,1303 US Highway 127 S,KY,40601
+Baskin-Robbins,Louisville,1996,#XX1996 XX1996,3959 Taylorsville Rd,KY,40220
+Baskin-Robbins,Louisville,1997,#XX1997 XX1997,9413 Westport Rd,KY,40241
+Baskin-Robbins,Danville,1998,#XX1998 XX1998,464 W Main Street,KY,40422
+Baskin-Robbins,Huntington,1999,#XX1999 XX1999,1598 Washington Blvd,WV,25701
+Baskin-Robbins,Atlanta,2000,#XX2000 XX2000,2335 Peachtree Rd NE,GA,30305
+Baskin-Robbins,Huntsville,2001,#XX2001 XX2001,5000 Whitesburg Dr S,AL,35802
+Baskin-Robbins,Orange Park,2002,#XX2002 XX2002,1910 Wells Road,FL,32073
+Baskin-Robbins,Statesboro,2003,#XX2003 XX2003,606 Fair Rd,GA,30458
+Baskin-Robbins,Long Beach,2004,#XX2004 XX2004,170 E. Park Ave,NY,11561
+Baskin-Robbins,New Hyde Park,2005,#XX2005 XX2005,1596 Hillside Ave,NY,11040
+Baskin-Robbins,Port Washington,2006,#XX2006 XX2006,923 Port Washington Blvd,NY,11050
+Baskin-Robbins,Rego Park,2007,#XX2007 XX2007,95-56 Queens Blvd,NY,11374
+Baskin-Robbins,Corvallis,2008,#XX2008 XX2008,366 SW Washington Ave,OR,97333
+Baskin-Robbins,Portland,2009,#XX2009 XX2009,6371 SW Capitol Hwy,OR,97201
+Baskin-Robbins,Seattle,2010,#XX2010 XX2010,3200 NE 45th St,WA,98105
+Baskin-Robbins,Portland,2011,#XX2011 XX2011,11011 NE Halsey St,OR,97220
+Baskin-Robbins,Milwaukie,2012,#XX2012 XX2012,13735 SE McLoughlin Blvd,OR,97222
+Baskin-Robbins,Salem,2013,#XX2013 XX2013,3239 Market St NE,OR,97301
+Baskin-Robbins,Bellevue,2014,#XX2014 XX2014,1400 156th Ave Ne,WA,98007
+Baskin-Robbins,Tacoma,2015,#XX2015 XX2015,6125 100th St Sw,WA,98499
+Baskin-Robbins,Yakima,2016,#XX2016 XX2016,816 Summitview Ave,WA,98902
+Baskin-Robbins,Portland,2017,#XX2017 XX2017,1815 NE 39th St,OR,97212
+Baskin-Robbins,Seattle,2018,#XX2018 XX2018,826 NE Northgate Way,WA,98125
+Baskin-Robbins,Albany,2019,#XX2019 XX2019,2705 Santiam Hwy SE,OR,97322
+Baskin-Robbins,Everett,2020,#XX2020 XX2020,5802 Evergreen Way,WA,98203
+Baskin-Robbins,Tacoma,2021,#XX2021 XX2021,6214 6th Ave,WA,98406
+Baskin-Robbins,Spokane,2022,#XX2022 XX2022,1230 S Grand Ave,WA,99202
+Baskin-Robbins,Everett,2023,#XX2023 XX2023,4019 Colby Ave,WA,98201
+Baskin-Robbins,Seattle,2024,#XX2024 XX2024,12825 Ambaun Blvd Sw,WA,98146
+Baskin-Robbins,Seattle,2025,#XX2025 XX2025,926 N 185th,WA,98133
+Baskin-Robbins,Walla Walla,2026,#XX2026 XX2026,2003 E Isaacs Ave,WA,99362
+Baskin-Robbins,Edmonds,2027,#XX2027 XX2027,614 5th Ave S,WA,98020
+Baskin-Robbins,Seattle,2028,#XX2028 XX2028,115 S 160th St,WA,98148
+Baskin-Robbins,Beaverton,2029,#XX2029 XX2029,2975 SW Cedar Hills Blvd,OR,97005
+Baskin-Robbins,Vancouver,2030,#XX2030 XX2030,7000 NE Highway 99,WA,98665
+Baskin-Robbins,Seattle,2031,#XX2031 XX2031,660 Elliott Ave W,WA,98119
+Baskin-Robbins,Bellevue,2032,#XX2032 XX2032,15100 Se 38th St,WA,98006
+Baskin-Robbins,Tacoma,2033,#XX2033 XX2033,12155 Pacific Ave S,WA,98444
+Baskin-Robbins,Richland,2034,#XX2034 XX2034,890 Stevens Dr,WA,99352
+Baskin-Robbins,Salem,2035,#XX2035 XX2035,4060 River Rd N,OR,97303
+Baskin-Robbins,Renton,2036,#XX2036 XX2036,520 Rainer Ave S,WA,98055
+Baskin-Robbins,Seattle,2037,#XX2037 XX2037,6025 Martin Luther King Jr Way,WA,98118
+Baskin-Robbins,Bothell,2038,#XX2038 XX2038,10007 Main St,WA,98011
+Baskin-Robbins,Auburn,2039,#XX2039 XX2039,918 Auburn Way S,WA,98002
+Baskin-Robbins,Hillsboro,2040,#XX2040 XX2040,658 Se 10th Ave,OR,97123
+Baskin-Robbins,Puyallup,2041,#XX2041 XX2041,1422 E Main Ave,WA,98372
+Baskin-Robbins,Federal Way,2042,#XX2042 XX2042,31434 Pacific Hwy S,WA,98003
+Baskin-Robbins,Seattle,2043,#XX2043 XX2043,4111 SW Admiral Way,WA,98116
+Baskin-Robbins,Aberdeen,2044,#XX2044 XX2044,1014 E Wishkah St,WA,98520
+Baskin-Robbins,Kirkland,2045,#XX2045 XX2045,12673 NE 85th St,WA,98033
+Baskin-Robbins,Coeur D Alene,2046,#XX2046 XX2046,101 E Best Ave,ID,83814
+Baskin-Robbins,Spokane,2047,#XX2047 XX2047,12510 E. Sprague Ave,WA,99216
+Baskin-Robbins,Twin Falls,2048,#XX2048 XX2048,677 Blue Lakes Blvd N,ID,83301
+Baskin-Robbins,Boise,2049,#XX2049 XX2049,7172 Fairview Ave,ID,83704
+Baskin-Robbins,Longview,2050,#XX2050 XX2050,1540 15th Ave,WA,98632
+Baskin-Robbins,Des Moines,2051,#XX2051 XX2051,23627 Pacific Hwy S,WA,98198
+Baskin-Robbins,Kennewick,2052,#XX2052 XX2052,2803 W. Clearwater Ave,WA,99336
+Baskin-Robbins,Vancouver,2053,#XX2053 XX2053,8700 Ne Vancouver Mall Dr,WA,98662
+Baskin-Robbins,Tukwila,2054,#XX2054 XX2054,993 Southcenter Mall,WA,98188
+Baskin-Robbins,Portland,2055,#XX2055 XX2055,4102 SE Powell Blvd,OR,97202
+Baskin-Robbins,Port Angeles,2056,#XX2056 XX2056,1611 E. Front St,WA,98362
+Baskin-Robbins,Pullman,2057,#XX2057 XX2057,480 E Main St,WA,99163
+Baskin-Robbins,North Bend,2058,#XX2058 XX2058,3395 Broadway St,OR,97459
+Baskin-Robbins,Moses Lake,2059,#XX2059 XX2059,525 N Statford Rd,WA,98837
+Baskin-Robbins,Spokane,2060,#XX2060 XX2060,9111 N Country Homes Rd,WA,99218
+Baskin-Robbins,Nampa,2061,#XX2061 XX2061,1108 Caldwell Blvd,ID,83651
+Baskin-Robbins,Dallas,2062,#XX2062 XX2062,2433 W. Kiest Blvd,TX,75233
+Baskin-Robbins,Dallas,2063,#XX2063 XX2063,6025 Royal Ln,TX,75230
+Baskin-Robbins,Waco,2064,#XX2064 XX2064,1547 Wooded Acres Dr,TX,76710
+Baskin-Robbins,Richardson,2065,#XX2065 XX2065,1748 E. Belt Line Rd,TX,75081
+Baskin-Robbins,San Angelo,2066,#XX2066 XX2066,3303 Sherwood Way,TX,76901
+Baskin-Robbins,Midland,2067,#XX2067 XX2067,2101 W. Wadley Ave,TX,79705
+Baskin-Robbins,Hollywood,2068,#XX2068 XX2068,4917 Sheridan St,FL,33021
+Baskin-Robbins,Lakeland,2069,#XX2069 XX2069,2106 S Florida Ave,FL,33803
+Baskin-Robbins,Gulf Breeze,2070,#XX2070 XX2070,205 Gulf Breeze Pkwy,FL,32561
+Baskin-Robbins,Sumter,2071,#XX2071 XX2071,1106 Broad St,SC,29150
+Baskin-Robbins,Memphis,2072,#XX2072 XX2072,4307 Summer Ave,TN,38122
+Baskin-Robbins,Jackson,2073,#XX2073 XX2073,957 Ellis Ave,MS,39209
+Baskin-Robbins,Cleveland,2074,#XX2074 XX2074,3455 Keith St Nw,TN,37312
+Baskin-Robbins,Memphis,2075,#XX2075 XX2075,6114 Quince Rd,TN,38119
+Baskin-Robbins,Little Rock,2076,#XX2076 XX2076,10102 N Rodney Parham Rd,AR,72227
+Baskin-Robbins,Columbia,2077,#XX2077 XX2077,1317 S. James Campbell Blvd,TN,38401
+Baskin-Robbins,Tupelo,2078,#XX2078 XX2078,1011 West Main St,MS,38801
+Baskin-Robbins,Chattanooga,2079,#XX2079 XX2079,4795 Hwy 58,TN,37416
+Baskin-Robbins,Pigeon Forge,2080,#XX2080 XX2080,3668 Parkway,TN,37863
+Baskin-Robbins,Bartlett,2081,#XX2081 XX2081,5788 Stage Rd.,TN,38134
+Baskin-Robbins,Millington,2082,#XX2082 XX2082,4758 Navy Rd,TN,38053
+Baskin-Robbins,Morristown,2083,#XX2083 XX2083,3346 W Andrew Johnson Hwy,TN,37814
+Baskin-Robbins,Chattanooga,2084,#XX2084 XX2084,6990 E Brainerd Rd,TN,37421
+Baskin-Robbins,Ridgeland,2085,#XX2085 XX2085,1910 E County Line Rd,MS,39157
+Baskin-Robbins,Ridgefield,2086,#XX2086 XX2086,90 Danbury Rd,CT,6877
+Baskin-Robbins,Baton Rouge,2087,#XX2087 XX2087,11222 Florida Blvd,LA,70815
+Baskin-Robbins,Baton Rouge,2088,#XX2088 XX2088,7529 Jefferson Hwy,LA,70806
+Baskin-Robbins,Hattiesburg,2089,#XX2089 XX2089,3720 Hardy St,MS,39402
+Baskin-Robbins,Metairie,2090,#XX2090 XX2090,739 Veterans Memorial Blvd,LA,70005
+Baskin-Robbins,New Orleans,2091,#XX2091 XX2091,706 S Carrollton Ave,LA,70118
+Baskin-Robbins,Terrytown,2092,#XX2092 XX2092,700 Terry Pkwy,LA,70056
+Baskin-Robbins,New Iberia,2093,#XX2093 XX2093,1104 E Main St,LA,70560
+Baskin-Robbins,Hammond,2094,#XX2094 XX2094,2202 W Thomas St,LA,70401
+Baskin-Robbins,Baton Rouge,2095,#XX2095 XX2095,1839 Staring Ln,LA,70810
+Baskin-Robbins,Marrero,2096,#XX2096 XX2096,5013 Lapalco Blvd,LA,70072
+Baskin-Robbins,Gretna,2097,#XX2097 XX2097,605 Lapalco Blvd,LA,70056
+Baskin-Robbins,Kenner,2098,#XX2098 XX2098,3600 Williams Blvd,LA,70065
+Baskin-Robbins,Denham Springs,2099,#XX2099 XX2099,650 S. Range Ave,LA,70726
+Baskin-Robbins,Baton Rouge,2100,#XX2100 XX2100,2834 S. Sherwood Forest Blvd,LA,70816
+Baskin-Robbins,Baker,2101,#XX2101 XX2101,234 Main St,LA,70714
+Baskin-Robbins,Lafayette,2102,#XX2102 XX2102,4807 Johnston St,LA,70503
+Baskin-Robbins,Richmond,2103,#XX2103 XX2103,1404 N. Parham Rd,VA,23229
+Baskin-Robbins,Raleigh,2104,#XX2104 XX2104,2018 Cameron St,NC,27605
+Baskin-Robbins,Richmond,2105,#XX2105 XX2105,6940 Forest Hill Ave,VA,23225
+Baskin-Robbins,Fayetteville,2106,#XX2106 XX2106,1850 Skibo Rd,NC,28303
+Baskin-Robbins,Richmond,2107,#XX2107 XX2107,5510 W Broad St,VA,23230
+Baskin-Robbins,Wilmington,2108,#XX2108 XX2108,3809 Oleander Dr,NC,28403
+Baskin-Robbins,Greensboro,2109,#XX2109 XX2109,1620 Battleground Ave,NC,27408
+Baskin-Robbins,Williamsburg,2110,#XX2110 XX2110,416 Prince George St,VA,23185
+Baskin-Robbins,Newport News,2111,#XX2111 XX2111,14371 Warwick Blvd,VA,23602
+Baskin-Robbins,Herndon,2112,#XX2112 XX2112,1258 Elden St,VA,20170
+Baskin-Robbins,Greensboro,2113,#XX2113 XX2113,118a Four Seasons Town Ctr,NC,27407
+Baskin-Robbins,El Cerrito,2114,#XX2114 XX2114,10598 San Pablo Ave,CA,94530
+Baskin-Robbins,San Jose,2115,#XX2115 XX2115,1302 S. Winchester Blvd,CA,95128
+Baskin-Robbins,Fresno,2116,#XX2116 XX2116,633 E. Shaw Ave,CA,93710
+Baskin-Robbins,Citrus Heights,2117,#XX2117 XX2117,6142 Sunrise Mall,CA,95610
+Baskin-Robbins,Fresno,2118,#XX2118 XX2118,3002 N Cedar Ave,CA,93703
+Baskin-Robbins,Mountain View,2119,#XX2119 XX2119,703 E El Camino Real,CA,94040
+Baskin-Robbins,Belmont,2120,#XX2120 XX2120,1023 Alameda De Las Pulgas,CA,94002
+Baskin-Robbins,Vallejo,2121,#XX2121 XX2121,5182 Sonoma Blvd,CA,94589
+Baskin-Robbins,Dublin,2122,#XX2122 XX2122,7225 Regional St,CA,94568
+Baskin-Robbins,Merced,2123,#XX2123 XX2123,293 Merced Mall,CA,95348
+Baskin-Robbins,Vacaville,2124,#XX2124 XX2124,812 Alamo Dr,CA,95688
+Baskin-Robbins,Fresno,2125,#XX2125 XX2125,5711 N. 1st St,CA,93710
+Baskin-Robbins,Capitola,2126,#XX2126 XX2126,1601 41st Ave,CA,95010
+Baskin-Robbins,Petaluma,2127,#XX2127 XX2127,60 E Washington St,CA,94952
+Baskin-Robbins,San Bruno,2128,#XX2128 XX2128,851 Cherry Ave,CA,94066
+Baskin-Robbins,Santa Rosa,2129,#XX2129 XX2129,214 Coddingtown Ctr,CA,95401
+Baskin-Robbins,Daly City,2130,#XX2130 XX2130,310 Westlake Center,CA,94015
+Baskin-Robbins,Pleasanton,2131,#XX2131 XX2131,4001 Santa Rita Rd,CA,94588
+Baskin-Robbins,San Jose,2132,#XX2132 XX2132,2968 Aborn Square Rd,CA,95121
+Baskin-Robbins,Woodland,2133,#XX2133 XX2133,91 W. Court St,CA,95695
+Baskin-Robbins,Ukiah,2134,#XX2134 XX2134,514 E Perkins St,CA,95482
+Baskin-Robbins,Sacramento,2135,#XX2135 XX2135,5359 Elkhorn Blvd,CA,95842
+Baskin-Robbins,Sacramento,2136,#XX2136 XX2136,6375 Riverside Blvd,CA,95831
+Baskin-Robbins,Sacramento,2137,#XX2137 XX2137,9197A Kiefer Blvd,CA,95826
+Baskin-Robbins,Santa Clara,2138,#XX2138 XX2138,2070 El Camino Real,CA,95050
+Baskin-Robbins,Manteca,2139,#XX2139 XX2139,970 N Main St,CA,95336
+Baskin-Robbins,Santa Rosa,2140,#XX2140 XX2140,130 Calistoga Rd,CA,95409
+Baskin-Robbins,Rohnert Park,2141,#XX2141 XX2141,6585 Commerce Blvd,CA,94928
+Baskin-Robbins,Fresno,2142,#XX2142 XX2142,1731 W Bullard Ave,CA,93711
+Baskin-Robbins,Visalia,2143,#XX2143 XX2143,3505 W Walnut Ave,CA,93277
+Baskin-Robbins,Hanford,2144,#XX2144 XX2144,533 N. 11th Ave,CA,93230
+Baskin-Robbins,Stockton,2145,#XX2145 XX2145,1219 W. March Ln,CA,95207
+Baskin-Robbins,Hayward,2146,#XX2146 XX2146,26953 Mission Blvd,CA,94544
+Baskin-Robbins,Santa Rosa,2147,#XX2147 XX2147,2700 Yulupa Ave,CA,95405
+Baskin-Robbins,Citrus Heights,2148,#XX2148 XX2148,8215 Auburn Blvd,CA,95610
+Baskin-Robbins,Concord,2149,#XX2149 XX2149,5100 Clayton Rd Ste 28,CA,94521
+Baskin-Robbins,Red Bluff,2150,#XX2150 XX2150,333 S Main St,CA,96080
+Baskin-Robbins,Fair Oaks,2151,#XX2151 XX2151,8894 Madison Ave,CA,95628
+Baskin-Robbins,Provo,2152,#XX2152 XX2152,29 E 1230 N,UT,84604
+Baskin-Robbins,Ogden,2153,#XX2153 XX2153,1166 Washington Blvd,UT,84404
+Baskin-Robbins,Bountiful,2154,#XX2154 XX2154,530 S Main St,UT,84010
+Baskin-Robbins,Ogden,2155,#XX2155 XX2155,3675 Harrison Blvd,UT,84403
+Baskin-Robbins,Cheyenne,2156,#XX2156 XX2156,723 E 16th St,WY,82001
+Baskin-Robbins,Orem,2157,#XX2157 XX2157,210 N. State St,UT,84057
+Baskin-Robbins,Salt Lake City,2158,#XX2158 XX2158,1465 E. 2100 S,UT,84105
+Baskin-Robbins,Idaho Falls,2159,#XX2159 XX2159,1253 E 17th St,ID,83404
+Baskin-Robbins,Clearfield,2160,#XX2160 XX2160,435 State St,UT,84015
+Baskin-Robbins,West Valley City,2161,#XX2161 XX2161,3490 W 3500 S,UT,84119
+Baskin-Robbins,Sandy,2162,#XX2162 XX2162,9497 S. 700 E,UT,84070
+Baskin-Robbins,Layton,2163,#XX2163 XX2163,1088 E Gentile St,UT,84041
+Baskin-Robbins,Saint George,2164,#XX2164 XX2164,490 W. Saint George Blvd,UT,84770
+Baskin-Robbins,Staten Island,2165,#XX2165 XX2165,1716 Victory Blvd,NY,10314
+Baskin-Robbins,Fresno,2166,#XX2166 XX2166,6648 N. Cedar Ave,CA,93710
+Baskin-Robbins,San Jose,2167,#XX2167 XX2167,2303 Mckee Rd,CA,95116
+Baskin-Robbins,Placerville,2168,#XX2168 XX2168,1216A Broadway,CA,95667
+Baskin-Robbins,Elk Grove,2169,#XX2169 XX2169,8755 Elk Grove Blvd,CA,95624
+Baskin-Robbins,Lodi,2170,#XX2170 XX2170,480 S Cherokee Ln,CA,95240
+Baskin-Robbins,Aptos,2171,#XX2171 XX2171,100 Rancho Del Mar,CA,95003
+Baskin-Robbins,Sacramento,2172,#XX2172 XX2172,606 W El Camino Ave,CA,95833
+Baskin-Robbins,Salinas,2173,#XX2173 XX2173,196 E. Laurel Dr,CA,93906
+Baskin-Robbins,Scotts Valley,2174,#XX2174 XX2174,245 Mount Hermon Rd,CA,95066
+Baskin-Robbins,Rocklin,2175,#XX2175 XX2175,4829 Granite Dr,CA,95677
+Baskin-Robbins,San Jose,2176,#XX2176 XX2176,5647 Cottle Rd,CA,95123
+Baskin-Robbins,Los Gatos,2177,#XX2177 XX2177,15730 Los Gatos Blvd,CA,95032
+Baskin-Robbins,Jackson,2178,#XX2178 XX2178,11960 W. Highway 88,CA,95642
+Baskin-Robbins,Martinez,2179,#XX2179 XX2179,1175a Arnold Dr,CA,94553
+Baskin-Robbins,Stockton,2180,#XX2180 XX2180,7908 West Ln,CA,95210
+Baskin-Robbins,Monterey,2181,#XX2181 XX2181,406 Lighthouse Ave,CA,93940
+Baskin-Robbins,Sebastopol,2182,#XX2182 XX2182,704 Gravenstein Hwy N,CA,95472
+Baskin-Robbins,Modesto,2183,#XX2183 XX2183,1630 E Hatch Rd,CA,95351
+Baskin-Robbins,Benicia,2184,#XX2184 XX2184,191 Military E,CA,94510
+Baskin-Robbins,Vacaville,2185,#XX2185 XX2185,3103 Alamo Dr,CA,95687
+Baskin-Robbins,Rancho Cordova,2186,#XX2186 XX2186,2246 Sunrise Blvd,CA,95670
+Baskin-Robbins,Pittsburg,2187,#XX2187 XX2187,4493 Century Blvd,CA,94565
+Baskin-Robbins,San Ramon,2188,#XX2188 XX2188,2005 Crow Canyon Pl,CA,94583
+Baskin-Robbins,San Jose,2189,#XX2189 XX2189,7040 Santa Teresa Blvd,CA,95139
+Baskin-Robbins,Brentwood,2190,#XX2190 XX2190,1145 2nd St,CA,94513
+Baskin-Robbins,Morgan Hill,2191,#XX2191 XX2191,230 Cochrane Plz,CA,95037
+Baskin-Robbins,Modesto,2192,#XX2192 XX2192,901 N. Carpenter Rd,CA,95351
+Baskin-Robbins,Manteca,2193,#XX2193 XX2193,1111 S Main St Unit B2,CA,95337
+Baskin-Robbins,San Jose,2194,#XX2194 XX2194,6467 Almaden Expy,CA,95120
+Baskin-Robbins,Clovis,2195,#XX2195 XX2195,950 Herndon Ave Ste 107,CA,93612
+Baskin-Robbins,Las Vegas,2196,#XX2196 XX2196,4420 E Charleston Blvd,NV,89104
+Baskin-Robbins,Reno,2197,#XX2197 XX2197,5150 Mae Anne Ave,NV,89523
+Baskin-Robbins,Newark,2198,#XX2198 XX2198,34980 Newark Blvd,CA,94560
+Baskin-Robbins,Vacaville,2199,#XX2199 XX2199,1021 Helen Power Dr,CA,95687
+Baskin-Robbins,Half Moon Bay,2200,#XX2200 XX2200,44 Cabrillo Hwy N,CA,94019
+Baskin-Robbins,Carson City,2201,#XX2201 XX2201,3947 S. Carson St,NV,89701
+Baskin-Robbins,Las Vegas,2202,#XX2202 XX2202,4906 W Lone Mountain Rd #A105,NV,89130
+Baskin-Robbins,Greenbelt,2203,#XX2203 XX2203,6000 Greenbelt Rd,MD,20770
+Baskin-Robbins,Silver Spring,2204,#XX2204 XX2204,8639A 16th St,MD,20910
+Baskin-Robbins,Vienna,2205,#XX2205 XX2205,120 Branch Rd,VA,22180
+Baskin-Robbins,Algonquin,2206,#XX2206 XX2206,15 S. Randall Rd,IL,60102
+Baskin-Robbins,Glendale Heights,2207,#XX2207 XX2207,171 E North Ave,IL,60139
+Baskin-Robbins,Schaumburg,2208,#XX2208 XX2208,G140 Woodfield Mall,IL,60173
+Baskin-Robbins,Westlake Village,2209,#XX2209 XX2209,2823 Agoura Rd,CA,91361
+Baskin-Robbins,Riverside,2210,#XX2210 XX2210,3760 Tyler St,CA,92503
+Baskin-Robbins,Glendale,2211,#XX2211 XX2211,1217 N. Central Ave,CA,91202
+Baskin-Robbins,La Jolla,2212,#XX2212 XX2212,7470 La Jolla Blvd,CA,92037
+Baskin-Robbins,Torrance,2213,#XX2213 XX2213,25426 Crenshaw Blvd,CA,90505
+Baskin-Robbins,Placentia,2214,#XX2214 XX2214,104 E. Yorba Linda Blvd,CA,92870
+Baskin-Robbins,Santa Ana,2215,#XX2215 XX2215,3605 S. Bristol St,CA,92704
+Baskin-Robbins,Long Beach,2216,#XX2216 XX2216,1960 Ximeno Ave,CA,90815
+Baskin-Robbins,Bell,2217,#XX2217 XX2217,6907 Atlantic Ave,CA,90201
+Baskin-Robbins,Los Angeles,2218,#XX2218 XX2218,4048 W. 3rd St,CA,90020
+Baskin-Robbins,Los Angeles,2219,#XX2219 XX2219,3171 S Hoover St,CA,90007
+Baskin-Robbins,City of Industry,2220,#XX2220 XX2220,1600 South Azusa Ave,CA,91748
+Baskin-Robbins,Bakersfield,2221,#XX2221 XX2221,5460 Stockdale Hwy,CA,93309
+Baskin-Robbins,Solana Beach,2222,#XX2222 XX2222,905 Lomas Santa Fe Dr,CA,92075
+Baskin-Robbins,Hacienda Heights,2223,#XX2223 XX2223,3127 S Hacienda Blvd,CA,91745
+Baskin-Robbins,Lancaster,2224,#XX2224 XX2224,44150 10th St W,CA,93534
+Baskin-Robbins,Santa Ana,2225,#XX2225 XX2225,201 W 17th St,CA,92706
+Baskin-Robbins,Diamond Bar,2226,#XX2226 XX2226,325 S Diamond Bar Blvd,CA,91765
+Baskin-Robbins,Woodland Hills,2227,#XX2227 XX2227,23369 Mulholland Dr,CA,91364
+Baskin-Robbins,Simi Valley,2228,#XX2228 XX2228,1720 E. Los Angeles Ave,CA,93065
+Baskin-Robbins,Van Nuys,2229,#XX2229 XX2229,13315 Victory Blvd,CA,91401
+Baskin-Robbins,Torrance,2230,#XX2230 XX2230,21113 Hawthorne Blvd,CA,90503
+Baskin-Robbins,San Clemente,2231,#XX2231 XX2231,104 N. El Camino Real,CA,92672
+Baskin-Robbins,San Diego,2232,#XX2232 XX2232,10601 Tierrasanta Blvd,CA,92124
+Baskin-Robbins,Carlsbad,2233,#XX2233 XX2233,2540 El Camino Real,CA,92008
+Baskin-Robbins,Bonita,2234,#XX2234 XX2234,4344 Bonita Rd,CA,91902
+Baskin-Robbins,Palmdale,2235,#XX2235 XX2235,1800 E Palmdale Blvd,CA,93550
+Baskin-Robbins,Fountain Valley,2236,#XX2236 XX2236,18051 Magnolia St,CA,92708
+Baskin-Robbins,Los Angeles,2237,#XX2237 XX2237,11658 Wilshire Blvd,CA,90025
+Baskin-Robbins,Toluca Lake,2238,#XX2238 XX2238,10563 Riverside Dr,CA,91602
+Baskin-Robbins,Newhall,2239,#XX2239 XX2239,23432 Lyons Ave,CA,91321
+Baskin-Robbins,Anaheim,2240,#XX2240 XX2240,5747 E La Palma Ave,CA,92807
+Baskin-Robbins,La Verne,2241,#XX2241 XX2241,1528 Foothill Blvd,CA,91750
+Baskin-Robbins,Torrance,2242,#XX2242 XX2242,3560 Redondo Beach Blvd,CA,90504
+Baskin-Robbins,Cucamonga,2243,#XX2243 XX2243,9691 Baseline Rd,CA,91730
+Baskin-Robbins,Norwalk,2244,#XX2244 XX2244,13933 Pioneer Blvd,CA,90650
+Baskin-Robbins,Spring Valley,2245,#XX2245 XX2245,3509 Sweetwater Springs Blvd,CA,91978
+Baskin-Robbins,Lancaster,2246,#XX2246 XX2246,4019 W Avenue L,CA,93536
+Baskin-Robbins,Cypress,2247,#XX2247 XX2247,4193 Ball Rd,CA,90630
+Baskin-Robbins,Reseda,2248,#XX2248 XX2248,7628 Reseda Blvd,CA,91335
+Baskin-Robbins,Tarzana,2249,#XX2249 XX2249,6040 Reseda Blvd,CA,91356
+Baskin-Robbins,Rancho Cucamonga,2250,#XX2250 XX2250,8786 19th St,CA,91701
+Baskin-Robbins,National City,2251,#XX2251 XX2251,1493 E Plaza Blvd,CA,91950
+Baskin-Robbins,Agoura,2252,#XX2252 XX2252,5697 Kanan Rd,CA,91301
+Baskin-Robbins,Dana Point,2253,#XX2253 XX2253,33621 Del Obispo St,CA,92629
+Baskin-Robbins,Highland Park,2254,#XX2254 XX2254,5802 N. Figueroa St,CA,90042
+Baskin-Robbins,West Hills,2255,#XX2255 XX2255,6422 Platt Ave,CA,91307
+Baskin-Robbins,Newbury Park,2256,#XX2256 XX2256,2389 Michael Dr,CA,91320
+Baskin-Robbins,Los Angeles,2257,#XX2257 XX2257,3516 W Sunset Blvd,CA,90026
+Baskin-Robbins,Anaheim,2258,#XX2258 XX2258,1646 W. Katella Ave #4,CA,92802
+Baskin-Robbins,Chino,2259,#XX2259 XX2259,12192 Central Ave,CA,91710
+Baskin-Robbins,Long Beach,2260,#XX2260 XX2260,5800 Downey Ave,CA,90805
+Baskin-Robbins,San Bernardino,2261,#XX2261 XX2261,2340 N. Sterling Ave,CA,92404
+Baskin-Robbins,North Hills,2262,#XX2262 XX2262,9502 Sepulveda Blvd,CA,91343
+Baskin-Robbins,Long Beach,2263,#XX2263 XX2263,4552 Atlantic Ave,CA,90807
+Baskin-Robbins,Cerritos,2264,#XX2264 XX2264,12540 South St,CA,90703
+Baskin-Robbins,Claremont,2265,#XX2265 XX2265,602 E. Baseline Rd,CA,91711
+Baskin-Robbins,Pico Rivera,2266,#XX2266 XX2266,8648 Whittier Blvd,CA,90660
+Baskin-Robbins,Oxnard,2267,#XX2267 XX2267,501 S Ventura Rd,CA,93030
+Baskin-Robbins,Long Beach,2268,#XX2268 XX2268,400 W Willow St,CA,90806
+Baskin-Robbins,Westminster,2269,#XX2269 XX2269,9511 Bolsa Ave,CA,92683
+Baskin-Robbins,Sun Valley,2270,#XX2270 XX2270,8329 Laurel Canyon Blvd,CA,91352
+Baskin-Robbins,El Monte,2271,#XX2271 XX2271,3818 Peck Rd,CA,91732
+Baskin-Robbins,West Covina,2272,#XX2272 XX2272,3620 Nogales St,CA,91792
+Baskin-Robbins,Los Angeles,2273,#XX2273 XX2273,2700 E 1st St,CA,90033
+Baskin-Robbins,Canyon Country,2274,#XX2274 XX2274,18827 Soledad Canyon Rd,CA,91351
+Baskin-Robbins,Covina,2275,#XX2275 XX2275,1311 N. Grand Ave,CA,91724
+Baskin-Robbins,Fontana,2276,#XX2276 XX2276,9844 Sierra Ave,CA,92335
+Baskin-Robbins,Paramount,2277,#XX2277 XX2277,8524 Rosecrans Ave,CA,90723
+Baskin-Robbins,San Juan Capistrano,2278,#XX2278 XX2278,32341 Camino Capistrano,CA,92675
+Baskin-Robbins,Yorba Linda,2279,#XX2279 XX2279,18322 Imperial Hwy,CA,92886
+Baskin-Robbins,Mission Viejo,2280,#XX2280 XX2280,22922 Los Alisos Blvd,CA,92691
+Baskin-Robbins,Glendale,2281,#XX2281 XX2281,1100 S. Central Ave,CA,91204
+Baskin-Robbins,Costa Mesa,2282,#XX2282 XX2282,1927 Harbor Blvd,CA,92627
+Baskin-Robbins,Irvine,2283,#XX2283 XX2283,15333 Culver Dr,CA,92604
+Baskin-Robbins,Baldwin Park,2284,#XX2284 XX2284,3203 Baldwin Park Blvd,CA,91706
+Baskin-Robbins,San Diego,2285,#XX2285 XX2285,8250 Mira Mesa Blvd,CA,92126
+Baskin-Robbins,Santa Fe,2286,#XX2286 XX2286,1841 Cerrillos Rd,NM,87505
+Baskin-Robbins,Albuquerque,2287,#XX2287 XX2287,3515 San Mateo Blvd NE,NM,87110
+Baskin-Robbins,El Paso,2288,#XX2288 XX2288,9574 Dyer St,TX,79924
+Baskin-Robbins,El Paso,2289,#XX2289 XX2289,10790 Pebble Hills Dr,TX,79935
+Baskin-Robbins,Taos,2290,#XX2290 XX2290,717 Paseo Del Pueblo Sur,NM,87571
+Baskin-Robbins,Los Lunas,2291,#XX2291 XX2291,3457 Highway 47,NM,87031
+Baskin-Robbins,Colorado Springs,2292,#XX2292 XX2292,4845 N. Academy Blvd,CO,80918
+Baskin-Robbins,Littleton,2293,#XX2293 XX2293,6764 W. Coal Mine Ave,CO,80123
+Baskin-Robbins,Denver,2294,#XX2294 XX2294,3944 E. 120th Ave,CO,80233
+Baskin-Robbins,Aurora,2295,#XX2295 XX2295,16861 E. Iliff Ave,CO,80013
+Baskin-Robbins,Westminster,2296,#XX2296 XX2296,8424 Federal Blvd,CO,80031
+Baskin-Robbins,Santa Fe,2297,#XX2297 XX2297,165 Paseo De Peralta,NM,87501
+Baskin-Robbins,Peoria,2298,#XX2298 XX2298,7665 W. Bell Rd,AZ,85380
+Baskin-Robbins,Phoenix,2299,#XX2299 XX2299,4547 E Cactus Rd,AZ,85032
+Baskin-Robbins,Tempe,2300,#XX2300 XX2300,3108 S. McClintock Dr,AZ,85282
+Baskin-Robbins,Glendale,2301,#XX2301 XX2301,4326 W. Bell Rd,AZ,85308
+Baskin-Robbins,Phoenix,2302,#XX2302 XX2302,8841 N.19th Ave,AZ,85021
+Baskin-Robbins,Mesa,2303,#XX2303 XX2303,4406 E. Main St,AZ,85205
+Baskin-Robbins,Mesa,2304,#XX2304 XX2304,1229 S. Power Rd S.,AZ,85206
+Baskin-Robbins,Appleton,2305,#XX2305 XX2305,2436 W College Ave,WI,54914
+Baskin-Robbins,Topeka,2306,#XX2306 XX2306,2837 Se California Ave,KS,66605
+Baskin-Robbins,Kansas City,2307,#XX2307 XX2307,336 West 63rd St,MO,64113
+Baskin-Robbins,Kansas City,2308,#XX2308 XX2308,7711 N Oak Trafficway,MO,64118
+Baskin-Robbins,Junction City,2309,#XX2309 XX2309,1012 W 6th St,KS,66441
+Baskin-Robbins,Tulsa,2310,#XX2310 XX2310,6808 S. Memorial Dr,OK,74133
+Baskin-Robbins,Washington,2311,#XX2311 XX2311,2604 Connecticut Ave Nw,DC,20008
+Baskin-Robbins,Fairfax,2312,#XX2312 XX2312,9547 Braddock Rd,VA,22032
+Baskin-Robbins,Beltsville,2313,#XX2313 XX2313,11601 Beltsville Dr,MD,20705
+Baskin-Robbins,Clinton,2314,#XX2314 XX2314,8813 Branch Ave,MD,20735
+Baskin-Robbins,Owings Mills,2315,#XX2315 XX2315,9900 Reistertown Rd,MD,21117
+Baskin-Robbins,Herndon,2316,#XX2316 XX2316,13344 Franklin Farms Rd,VA,20171
+Baskin-Robbins,Baltimore,2317,#XX2317 XX2317,8802 Belair Rd,MD,21236
+Baskin-Robbins,Frederick,2318,#XX2318 XX2318,1023 W. Patrick St,MD,21702
+Baskin-Robbins,Baltimore,2319,#XX2319 XX2319,8637 Philadelphia Rd,MD,21237
+Baskin-Robbins,Wayne,2320,#XX2320 XX2320,209 W. Lancaster Ave,PA,19087
+Baskin-Robbins,Aurora,2321,#XX2321 XX2321,192 Fox Valley Ctr/B.T.Q 18,IL,60504
+Baskin-Robbins,Rockford,2322,#XX2322 XX2322,4180 Newburg Rd,IL,61108
+Baskin-Robbins,Orland Park,2323,#XX2323 XX2323,408 Orland Square Dr,IL,60462
+Baskin-Robbins,Round Lake Beach,2324,#XX2324 XX2324,807 E. Rollins Rd,IL,60073
+Baskin-Robbins,Forsyth,2325,#XX2325 XX2325,43 Hickory Point Mall,IL,62535
+Baskin-Robbins,West Dundee,2326,#XX2326 XX2326,1086 Springhill Mall,IL,60118
+Baskin-Robbins,Billings,2327,#XX2327 XX2327,111 S. 24th St W,MT,59102
+Baskin-Robbins,Missoula,2328,#XX2328 XX2328,1880 Brooks St,MT,59801
+Baskin-Robbins,Westland,2329,#XX2329 XX2329,8280 N Merriman Rd,MI,48185
+Baskin-Robbins,Clinton Township,2330,#XX2330 XX2330,36590 Garfield Rd,MI,48035
+Baskin-Robbins,Royal Oak,2331,#XX2331 XX2331,603 S Washington St,MI,48067
+Baskin-Robbins,Houston,2332,#XX2332 XX2332,1924 El Dorado Blvd,TX,77062
+Baskin-Robbins,Sugar Land,2333,#XX2333 XX2333,3366 Highway 6,TX,77478
+Baskin-Robbins,San Antonio,2334,#XX2334 XX2334,6727 Bandera Rd,TX,78238
+Baskin-Robbins,Austin,2335,#XX2335 XX2335,12407 N Mo Pac Expy,TX,78758
+Baskin-Robbins,San Antonio,2336,#XX2336 XX2336,12442 Nacogdoches Rd,TX,78217
+Baskin-Robbins,Kingwood,2337,#XX2337 XX2337,1440 Kingwood Dr,TX,77339
+Baskin-Robbins,Charleston,2338,#XX2338 XX2338,4120 MacCorkle Ave SE,WV,25304
+Baskin-Robbins,Nashville,2339,#XX2339 XX2339,850 Hillwood Blvd,TN,37209
+Baskin-Robbins,Evansville,2340,#XX2340 XX2340,848 S Green River Rd,IN,47715
+Baskin-Robbins,Hendersonville,2341,#XX2341 XX2341,170 E Main St.,TN,37075
+Baskin-Robbins,Madison,2342,#XX2342 XX2342,1777 Gallatin Rd N,TN,37115
+Baskin-Robbins,Greenwood,2343,#XX2343 XX2343,1280 Us Highway 31 N,IN,46142
+Baskin-Robbins,Louisville,2344,#XX2344 XX2344,10264 Shelbyville Rd,KY,40223
+Baskin-Robbins,Louisa,2345,#XX2345 XX2345,52 Falls Creek Dr,KY,41230
+Baskin-Robbins,Bohemia,2346,#XX2346 XX2346,4597 Sunrise Hwy,NY,11716
+Baskin-Robbins,Brooklyn,2347,#XX2347 XX2347,1976 86th St,NY,11214
+Baskin-Robbins,Englishtown,2348,#XX2348 XX2348,300 Gordons Corner Rd,NJ,7726
+Baskin-Robbins,Northport,2349,#XX2349 XX2349,834c Fort Salonga Rd,NY,11768
+Baskin-Robbins,Brooklyn,2350,#XX2350 XX2350,11112 Flatlands Ave,NY,11207
+Baskin-Robbins,Astoria,2351,#XX2351 XX2351,3008 Steinway St,NY,11103
+Baskin-Robbins,Brooklyn,2352,#XX2352 XX2352,506 Clarkson Ave,NY,11203
+Baskin-Robbins,Gresham,2353,#XX2353 XX2353,1200 Ne Burnside St,OR,97030
+Baskin-Robbins,Gladstone,2354,#XX2354 XX2354,19510 McLoughlin Blvd,OR,97027
+Baskin-Robbins,Tacoma,2355,#XX2355 XX2355,1314 72nd St E # 4305,WA,98404
+Baskin-Robbins,Olympia,2356,#XX2356 XX2356,3010 Harrison Ave Nw,WA,98502
+Baskin-Robbins,Medford,2357,#XX2357 XX2357,1100 Biddle Rd,OR,97504
+Baskin-Robbins,Salem,2358,#XX2358 XX2358,480 Center St NE,OR,97301
+Baskin-Robbins,Yakima,2359,#XX2359 XX2359,1505 S 1st St,WA,98901
+Baskin-Robbins,Tacoma,2360,#XX2360 XX2360,4502 S. Steele St,WA,98409
+Baskin-Robbins,Centralia,2361,#XX2361 XX2361,1622 S Gold St,WA,98531
+Baskin-Robbins,Tacoma,2362,#XX2362 XX2362,4326 Bridgeport Way W,WA,98466
+Baskin-Robbins,Kirkland,2363,#XX2363 XX2363,14302 124th Ave NE,WA,98034
+Baskin-Robbins,Seattle,2364,#XX2364 XX2364,2001 Rainier Ave S,WA,98144
+Baskin-Robbins,Moscow,2365,#XX2365 XX2365,1244 W Pullman Rd,ID,83843
+Baskin-Robbins,Aloha,2366,#XX2366 XX2366,18605 Sw Farmington Rd,OR,97007
+Baskin-Robbins,Bellevue,2367,#XX2367 XX2367,2255 140th Ave Ne,WA,98005
+Baskin-Robbins,Tacoma,2368,#XX2368 XX2368,622 S Sprague Ave,WA,98405
+Baskin-Robbins,Portland,2369,#XX2369 XX2369,10855 SE 82nd Ave,OR,97266
+Baskin-Robbins,Boise,2370,#XX2370 XX2370,4740 W. State St,ID,83703
+Baskin-Robbins,Tumwater,2371,#XX2371 XX2371,3431 Capitol Blvd S,WA,98501
+Baskin-Robbins,Springfield,2372,#XX2372 XX2372,1131 Mohawk Blvd,OR,97477
+Baskin-Robbins,Portland,2373,#XX2373 XX2373,5330 N Lombard St,OR,97203
+Baskin-Robbins,Issaquah,2374,#XX2374 XX2374,1590 Nw Gilman Blvd,WA,98027
+Baskin-Robbins,Portland,2375,#XX2375 XX2375,3506 Se 122nd Ave,OR,97236
+Baskin-Robbins,Sandy,2376,#XX2376 XX2376,36651 Highway 26,OR,97055
+Baskin-Robbins,Spokane,2377,#XX2377 XX2377,1925 N Monroe St,WA,99205
+Baskin-Robbins,Tigard,2378,#XX2378 XX2378,11705 SW Pacific Hwy,OR,97223
+Baskin-Robbins,Silverdale,2379,#XX2379 XX2379,10315 Silverdale Way Nw,WA,98383
+Baskin-Robbins,Lake Oswego,2380,#XX2380 XX2380,17773 SW Lower Boones Ferry Rd,OR,97035
+Baskin-Robbins,Kalispell,2381,#XX2381 XX2381,649 W Idaho St,MT,59901
+Baskin-Robbins,Marysville,2382,#XX2382 XX2382,9501 State Ave,WA,98270
+Baskin-Robbins,Oak Harbor,2383,#XX2383 XX2383,32760 State Rte 2o,WA,98277
+Baskin-Robbins,Seattle,2384,#XX2384 XX2384,17171 Bothwell Way Ne #5,WA,98155
+Baskin-Robbins,Puyallup,2385,#XX2385 XX2385,3850 Meridian St S #1a,WA,98373
+Baskin-Robbins,Wenatchee,2386,#XX2386 XX2386,1025 N Mission St,WA,98801
+Baskin-Robbins,Mercer Island,2387,#XX2387 XX2387,2900 78th Ave Se,WA,98040
+Baskin-Robbins,Las Vegas,2388,#XX2388 XX2388,4860 S Eastern Ave,NV,89119
+Baskin-Robbins,Las Vegas,2389,#XX2389 XX2389,3301 S Jones Blvd,NV,89146
+Baskin-Robbins,Henderson,2390,#XX2390 XX2390,510 S Boulder Hwy,NV,89015
+Baskin-Robbins,Snohomish,2391,#XX2391 XX2391,1421 Avenue D,WA,98290
+Baskin-Robbins,Federal Way,2392,#XX2392 XX2392,2138 SW 336th St,WA,98023
+Baskin-Robbins,Spokane,2393,#XX2393 XX2393,4750 N Division St #180,WA,99207
+Baskin-Robbins,Great Falls,2394,#XX2394 XX2394,2120 10th Ave S,MT,59405
+Baskin-Robbins,Everett,2395,#XX2395 XX2395,1402 SE Everett Mall Way,WA,98208
+Baskin-Robbins,Portland,2396,#XX2396 XX2396,475 Ne 181st Ave,OR,97230
+Baskin-Robbins,Renton,2397,#XX2397 XX2397,17330 140th Ave SE,WA,98058
+Baskin-Robbins,Lynnwood,2398,#XX2398 XX2398,12822 Mukilteo Speedway #28,WA,98037
+Baskin-Robbins,Enumclaw,2399,#XX2399 XX2399,330 Griffin Ave,WA,98022
+Baskin-Robbins,West Linn,2400,#XX2400 XX2400,19143 Willamette Dr,OR,97068
+Baskin-Robbins,Tigard,2401,#XX2401 XX2401,16200 Sw Pacific Hwy,OR,97224
+Baskin-Robbins,Mill Creek,2402,#XX2402 XX2402,15704 Mill Creek Blvd #20,WA,98012
+Baskin-Robbins,Puyallup,2403,#XX2403 XX2403,11012 Canyon Rd E,WA,98373
+Baskin-Robbins,Issaquah,2404,#XX2404 XX2404,3052 Issaquah Pine Lake Rd SE,WA,98029
+Baskin-Robbins,Portland,2405,#XX2405 XX2405,625 Sw Broadway,OR,97205
+Baskin-Robbins,Gig Harbor,2406,#XX2406 XX2406,5500 Olympic Dr,WA,98335
+Baskin-Robbins,Orchards,2407,#XX2407 XX2407,7411 NE 117th Ave,WA,98662
+Baskin-Robbins,Federal Way,2408,#XX2408 XX2408,1946 S. Seatac Mall B-42,WA,98003
+Baskin-Robbins,Yakima,2409,#XX2409 XX2409,3802 W Nob Hill Blvd,WA,98902
+Baskin-Robbins,Salem,2410,#XX2410 XX2410,474 Lancaster Dr Ne,OR,97301
+Baskin-Robbins,Auburn,2411,#XX2411 XX2411,1702 Auburn Way N,WA,98002
+Baskin-Robbins,Seattle,2412,#XX2412 XX2412,401 Northgate Mall,WA,98125
+Baskin-Robbins,Bonney Lake,2413,#XX2413 XX2413,20911 State Route 410 E,WA,98391
+Baskin-Robbins,Woodinville,2414,#XX2414 XX2414,14027 NE Woodinville Duvall Rd,WA,98072
+Baskin-Robbins,Monroe,2415,#XX2415 XX2415,18817 State Rd 2,WA,98272
+Baskin-Robbins,Portland,2416,#XX2416 XX2416,10910 Sw Barnes Rd,OR,97225
+Baskin-Robbins,Ellensburg,2417,#XX2417 XX2417,1307 Canyon Rd,WA,98926
+Baskin-Robbins,Wilsonville,2418,#XX2418 XX2418,29911 SW Boones Ferry Rd,OR,97070
+Baskin-Robbins,Bend,2419,#XX2419 XX2419,61535 Highway 97,OR,97702
+Baskin-Robbins,Hillsboro,2420,#XX2420 XX2420,6589 SE Tualatin Valley Hwy,OR,97123
+Baskin-Robbins,Fort Worth,2421,#XX2421 XX2421,6248 Rufe Snow Dr #402,TX,76148
+Baskin-Robbins,Spring,2422,#XX2422 XX2422,16836 Stuebner Airline Rd,TX,77379
+Baskin-Robbins,Plano,2423,#XX2423 XX2423,3020 Legacy Dr,TX,75023
+Baskin-Robbins,Pensacola,2424,#XX2424 XX2424,4350 Bayou Blvd,FL,32503
+Baskin-Robbins,Daytona Beach,2425,#XX2425 XX2425,215 N Atlantic Ave,FL,32118
+Baskin-Robbins,Mount Pleasant,2426,#XX2426 XX2426,280 W. Coleman Blvd,SC,29464
+Baskin-Robbins,Columbia,2427,#XX2427 XX2427,4711 Forest Dr,SC,29206
+Baskin-Robbins,Oak Ridge,2428,#XX2428 XX2428,104 E Tulsa Rd,TN,37830
+Baskin-Robbins,Cordova,2429,#XX2429 XX2429,859 N Germantown Pkwy,TN,38018
+Baskin-Robbins,Seattle,2430,#XX2430 XX2430,13201 Aurora Ave N,WA,98133
+Baskin-Robbins,Everett,2431,#XX2431 XX2431,530 Sw Everett Mall Way,WA,98204
+Baskin-Robbins,Clackamas,2432,#XX2432 XX2432,12054 Se Sunnyside Rd,OR,97015
+Baskin-Robbins,Everett,2433,#XX2433 XX2433,11014 19th Ave SE,WA,98208
+Baskin-Robbins,Clarkston,2434,#XX2434 XX2434,1291 Bridge St,WA,99403
+Baskin-Robbins,Redmond,2435,#XX2435 XX2435,17181 Redmond Way,WA,98052
+Baskin-Robbins,Sherwood,2436,#XX2436 XX2436,15994 Sw Tualatin-Sherwood Rd,OR,97140
+Baskin-Robbins,Meridian,2437,#XX2437 XX2437,1770 E Fairview Ave,ID,83642
+Baskin-Robbins,Waipahu,2438,#XX2438 XX2438,94-799 Lumiaina St,HI,96797
+Baskin-Robbins,Kailua Kona,2439,#XX2439 XX2439,75-5595 Palani Rd,HI,96740
+Baskin-Robbins,Kaneohe,2440,#XX2440 XX2440,45-480 Kaneohe Bay Dr,HI,96744
+Baskin-Robbins,Wahiawa,2441,#XX2441 XX2441,823 California Ave,HI,96786
+Baskin-Robbins,Kapolei,2442,#XX2442 XX2442,590 Farrington Hwy,HI,96707
+Baskin-Robbins,Honolulu,2443,#XX2443 XX2443,1618 S. King St,HI,96826
+Baskin-Robbins,Parker,2444,#XX2444 XX2444,10920 S. Parker Rd,CO,80134
+Baskin-Robbins,El Paso,2445,#XX2445 XX2445,5640 Montana Ave #A,TX,79925
+Baskin-Robbins,Albuquerque,2446,#XX2446 XX2446,8400 Menaul Blvd Ne Ste E,NM,87112
+Baskin-Robbins,Sunland,2447,#XX2447 XX2447,8700 Foothill Blvd,CA,91040
+Baskin-Robbins,Upland,2448,#XX2448 XX2448,870 E Foothill Blvd,CA,91786
+Baskin-Robbins,Ventura,2449,#XX2449 XX2449,1413 S Victoria Ave,CA,93003
+Baskin-Robbins,La Mirada,2450,#XX2450 XX2450,14750 Beach Blvd,CA,90638
+Baskin-Robbins,North Hollywood,2451,#XX2451 XX2451,6700 Laurel Canyon Blvd,CA,91606
+Baskin-Robbins,Orange,2452,#XX2452 XX2452,18551 E Chapman Ave,CA,92869
+Baskin-Robbins,Los Angeles,2453,#XX2453 XX2453,1693 N. Eastern Ave,CA,90063
+Baskin-Robbins,Monrovia,2454,#XX2454 XX2454,104 W Foothill Blvd,CA,91016
+Baskin-Robbins,Corona,2455,#XX2455 XX2455,2210 Griffin Way,CA,92879
+Baskin-Robbins,San Pedro,2456,#XX2456 XX2456,1013 S Gaffey St,CA,90731
+Baskin-Robbins,La Puente,2457,#XX2457 XX2457,1443 N Hacienda Blvd,CA,91744
+Baskin-Robbins,San Dimas,2458,#XX2458 XX2458,557 W Arrow Hwy,CA,91773
+Baskin-Robbins,Whittier,2459,#XX2459 XX2459,10820 Beverly Blvd,CA,90601
+Baskin-Robbins,Hemet,2460,#XX2460 XX2460,1881 E. Florida Ave,CA,92544
+Baskin-Robbins,San Marcos,2461,#XX2461 XX2461,730 Nordahl Rd,CA,92069
+Baskin-Robbins,Moreno Valley,2462,#XX2462 XX2462,12625 Frederick St,CA,92553
+Baskin-Robbins,Woodland Hills,2463,#XX2463 XX2463,19942 1/2 Ventura Blvd,CA,91364
+Baskin-Robbins,Corona,2464,#XX2464 XX2464,1206 Magnolia Ave,CA,92881
+Baskin-Robbins,Chino Hills,2465,#XX2465 XX2465,4200 Chino Hills Pkwy,CA,91709
+Baskin-Robbins,Huntington Beach,2466,#XX2466 XX2466,201 Main St,CA,92648
+Baskin-Robbins,Westminster,2467,#XX2467 XX2467,6731 Westminster Blvd,CA,92683
+Baskin-Robbins,Anaheim,2468,#XX2468 XX2468,701 S. Weir Canyon Rd,CA,92808
+Baskin-Robbins,Highland,2469,#XX2469 XX2469,7247 Boulder Ave,CA,92346
+Baskin-Robbins,Newport Beach,2470,#XX2470 XX2470,1220 Bison Ave,CA,92660
+Baskin-Robbins,La Quinta,2471,#XX2471 XX2471,78520 Highway 111,CA,92253
+Baskin-Robbins,Cathedral City,2472,#XX2472 XX2472,31375 Date Palm Dr,CA,92234
+Baskin-Robbins,Escondido,2473,#XX2473 XX2473,1247 E Valley Pkwy,CA,92027
+Baskin-Robbins,Ontario,2474,#XX2474 XX2474,2510 S Grove Ave,CA,91761
+Baskin-Robbins,Simi Valley,2475,#XX2475 XX2475,5145 E Los Angeles Ave,CA,93063
+Baskin-Robbins,Rancho Santa Margarita,2476,#XX2476 XX2476,22461 Antonio Pkwy,CA,92688
+Baskin-Robbins,Laguna Hills,2477,#XX2477 XX2477,26886 La Paz Rd,CA,92656
+Baskin-Robbins,Tehachapi,2478,#XX2478 XX2478,785 Tucker Rd #E,CA,93561
+Baskin-Robbins,Perris,2479,#XX2479 XX2479,1688 N. Perris Blvd,CA,92571
+Baskin-Robbins,San Diego,2480,#XX2480 XX2480,11495a Carmel Mountain Rd,CA,92128
+Baskin-Robbins,Massapequa,2481,#XX2481 XX2481,997 Carmans Rd,NY,11758
+Baskin-Robbins,Dixon,2482,#XX2482 XX2482,1440 Ary Ln,CA,95620
+Baskin-Robbins,San Jose,2483,#XX2483 XX2483,1060 Willow St,CA,95125
+Baskin-Robbins,Roseville,2484,#XX2484 XX2484,5020 Foothills Blvd,CA,95747
+Baskin-Robbins,Emeryville,2485,#XX2485 XX2485,1199 40th St,CA,94608
+Baskin-Robbins,Sonora,2486,#XX2486 XX2486,1071 Mono Way,CA,95370
+Baskin-Robbins,Reno,2487,#XX2487 XX2487,2875 Northtowne Ln,NV,89512
+Baskin-Robbins,Livermore,2488,#XX2488 XX2488,4323 1st St,CA,94550
+Baskin-Robbins,Hollister,2489,#XX2489 XX2489,1740 Airline Hwy,CA,95023
+Baskin-Robbins,La Habra,2490,#XX2490 XX2490,1493 W Whittier Blvd,CA,90631
+Baskin-Robbins,Woodland Hills,2491,#XX2491 XX2491,5424 Topanga Canyon Blvd,CA,91367
+Baskin-Robbins,Glendale,2492,#XX2492 XX2492,1010 N Glendale Ave,CA,91206
+Baskin-Robbins,Anaheim,2493,#XX2493 XX2493,512 N. Euclid St,CA,92801
+Baskin-Robbins,Evergreen Park,2494,#XX2494 XX2494,9856 S Kedzie Ave,IL,60805
+Baskin-Robbins,Springfield,2495,#XX2495 XX2495,1700 S Macarthur Blvd,IL,62704
+Baskin-Robbins,Deerfield,2496,#XX2496 XX2496,671 Waukegan Rd,IL,60015
+Baskin-Robbins,Buffalo Grove,2497,#XX2497 XX2497,1172 Lake Cook Rd,IL,60089
+Baskin-Robbins,Anchorage,2498,#XX2498 XX2498,901 E. Dimond Blvd,AK,99515
+Baskin-Robbins,Anchorage,2499,#XX2499 XX2499,5678 Debarr Rd,AK,99504
+Baskin-Robbins,Campbell,2500,#XX2500 XX2500,1720 W Campbell Ave,CA,95008
+Baskin-Robbins,Selma,2501,#XX2501 XX2501,3330 Floral Ave,CA,93662
+Baskin-Robbins,Los Banos,2502,#XX2502 XX2502,325 W Pacheco Blvd,CA,93635
+Baskin-Robbins,Clarksville,2503,#XX2503 XX2503,1873 Fort Campbell Blvd,TN,37042
+Baskin-Robbins,Nashville,2504,#XX2504 XX2504,2510 Lebanon Pike,TN,37214
+Baskin-Robbins,Florissant,2505,#XX2505 XX2505,820 N Highway 67,MO,63031
+Baskin-Robbins,Lebanon,2506,#XX2506 XX2506,1023 W Main St,TN,37087
+Baskin-Robbins,Clarksville,2507,#XX2507 XX2507,2531 Wilma Rudolph Blvd,TN,37040
+Baskin-Robbins,O Fallon,2508,#XX2508 XX2508,512 S Main,MO,63366
+Baskin-Robbins,Terre Haute,2509,#XX2509 XX2509,2 W. Honey Creek Pkwy,IN,47802
+Baskin-Robbins,Murfreesboro,2510,#XX2510 XX2510,2170 Old Fort Pkwy,TN,37129
+Baskin-Robbins,Covington,2511,#XX2511 XX2511,3153 Highway 278 NE,GA,30014
+Baskin-Robbins,Columbia,2512,#XX2512 XX2512,9920 Two Notch Rd,SC,29223
+Baskin-Robbins,Round Rock,2513,#XX2513 XX2513,307 W Taylor Ave,TX,78664
+Baskin-Robbins,Union City,2514,#XX2514 XX2514,1602 W Reelfoot Ave,TN,38261
+Baskin-Robbins,Toledo,2515,#XX2515 XX2515,1313 S Reynolds Rd,OH,43615
+Baskin-Robbins,Bardstown,2516,#XX2516 XX2516,228 N 3rd St,KY,40004
+Baskin-Robbins,Dothan,2517,#XX2517 XX2517,3064 Ross Clark Cir,AL,36301
+Baskin-Robbins,City Of Industry,2518,#XX2518 XX2518,18252 E. Gale Ave,CA,91748
+Baskin-Robbins,Lees Summit,2519,#XX2519 XX2519,348 Southwest Blue Parkway,MO,64063
+Baskin-Robbins,Olathe,2520,#XX2520 XX2520,11912 S. Strang Line Rd,KS,66062
+Baskin-Robbins,Alexandria,2521,#XX2521 XX2521,7001H Manchester Blvd,VA,22310
+Baskin-Robbins,Springfield,2522,#XX2522 XX2522,7561 Huntsman Blvd,VA,22153
+Baskin-Robbins,South Charleston,2523,#XX2523 XX2523,512 Maccorkle Ave SW,WV,25303
+Baskin-Robbins,Garden City,2524,#XX2524 XX2524,1521 E. Fulton St,KS,67846
+Baskin-Robbins,Grand Island,2525,#XX2525 XX2525,1904 N Diers Ave,NE,68803
+Baskin-Robbins,Clinton,2526,#XX2526 XX2526,Hwy 65 By-Pass,AR,72031
+Baskin-Robbins,Little Rock,2527,#XX2527 XX2527,101 N Van Buren St,AR,72205
+Baskin-Robbins,Lenoir City,2528,#XX2528 XX2528,1111 Highway 321 N,TN,37771
