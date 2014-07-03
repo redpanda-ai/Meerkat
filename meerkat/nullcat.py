@@ -142,7 +142,7 @@ def get_output_format(some_container):
 
 def write_error_file(path, file_name, line, error_msg):
 	total_line = error_msg + "\nLine was:\n" + line
-	with gzip.open(dst_local_path + dst_file_name, "wb") as gzipped_output:
+	with gzip.open(path + file_name, "wb") as gzipped_output:
 		gzipped_output.write(bytes(total_line + "\n", 'UTF-8'))
 
 def process_file(src_file_name, src_local_path, dst_file_name, dst_local_path,\
