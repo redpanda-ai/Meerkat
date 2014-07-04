@@ -165,6 +165,7 @@ header_pos_name, map_of_column_positions, container):
 				#Treat the first line differently, since it is a header
 				if first_line:
 					first_line = False
+					first_line_delimiter_count = len(line.split("|"))
 					output_line = "|".join(output_format)
 					#Verify that the first line is the header
 					if "|GOOD_DESCRIPTION|" not in line:
@@ -181,7 +182,11 @@ header_pos_name, map_of_column_positions, container):
 						except:
 							#Verify that each line has the correct number of delimiters
 							gzipped_output.close()
-							write_error_file(dst_local_path, dst_file_name, line, "Improperly structured line #" + str(line_count))
+							this_line_delimiter_count = len(line.split("|"))
+							error_msg = "First Line had " + str(first_line_delimiter_count) + " delimiters.\n"
+							error_msg += "This Line had " + str(this_line_delimiter_count) + " delimiters.\n"
+							error_msg += "Improperly structured line #" + str(line_count)
+							write_error_file(dst_local_path, dst_file_name, line, error_msg)
 							return
 						if name in map_of_column_positions:
 							position = map_of_column_positions[name][0]
