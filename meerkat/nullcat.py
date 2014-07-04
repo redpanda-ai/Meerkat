@@ -87,7 +87,7 @@ def begin_processing_loop(some_container, filter_expression):
 
 def clean_line(line):
 	"""Strips out the part of a binary line that is not usable"""
-	return str(line)[2:-3]
+	return str(line)[2:-3].replace("\|", "")
 
 def get_header_dictionaries(some_container, src_file_name, src_local_path):
 	"""Pulls the header from an input file and creates the following:
