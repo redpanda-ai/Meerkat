@@ -30,6 +30,12 @@ def begin_processing_loop(some_container, filter_expression):
 	dst_local_path = "/mnt/ephemeral/output/"
 	dst_bucket = conn.get_bucket(dst_bucket_name, Location.USWest2)
 
+	#Set error destination details
+	error_bucket_name = "s3yodlee"
+	error_local_path = "/mnt/ephemeral/output/"
+	error_bucket = conn.get_bucket(error_bucket_name, Location.USWest2)
+	error_s3_path = "meerkat/nullcat/error/"
+
 	#Get the list of completed files (already proceseed)
 	completed = {}
 	for j in dst_bucket.list():
@@ -74,7 +80,7 @@ def begin_processing_loop(some_container, filter_expression):
 		map_of_column_positions = get_map_of_column_positions(header_name_pos,\
 		some_container)
 		#Process the individual file
-		process_file(src_file_name, src_local_path, dst_file_name, dst_local_path,\
+		had_error = process_file(src_file_name, src_local_path, dst_file_name, dst_local_path,\
 		header_pos_name, map_of_column_positions, some_container)
 		safely_remove_file(src_local_path + src_file_name)
 		#Push the results from the local file system to S3
@@ -84,6 +90,15 @@ def begin_processing_loop(some_container, filter_expression):
 		encrypt_key=True, replace=True)
 		print("{0} bytes written".format(bytes_written))
 		safely_remove_file(dst_local_path + dst_file_name)
+		#write error file
+		if had_error:
+			error_file_name = dst_file_name[:-3] + ".error.gz"
+			error_key = Key(error_bucket)
+			error_key.key = error_s3_path + error_file_name
+			bytes_written = error_key.set_contents_from_filename(dst_local_path + error_file_name,\
+			encrypt_key=True, replace=True)
+			print("{0} bytes written".format(bytes_written))
+			safely_remove_file(dst_local_path + error_file_name)
 
 def clean_line(line):
 	"""Strips out the part of a binary line that is not usable"""
@@ -142,7 +157,7 @@ def get_output_format(some_container):
 
 def write_error_file(path, file_name, line, error_msg):
 	total_line = error_msg + "\nLine was:\n" + line
-	with gzip.open(path + file_name, "wb") as gzipped_output:
+	with gzip.open(path + file_name[:-3] + ".error.gz", "ab") as gzipped_output:
 		gzipped_output.write(bytes(total_line + "\n", 'UTF-8'))
 
 def process_file(src_file_name, src_local_path, dst_file_name, dst_local_path,\
@@ -152,14 +167,17 @@ header_pos_name, map_of_column_positions, container):
 		2. Re-arranges the contents to meet our Meerkat output specification
 		3. Stores the result in a gzipped output file which is written to the
 		   local file system"""
+	had_error = False
 	output_format = get_output_format(container)
 	blank_result = [""] * len(output_format)
 	my_container = container.upper()
 	with gzip.open(src_local_path + src_file_name, "rb") as gzipped_input:
 		line_count = 0
+		line_error_count = 0
 		with gzip.open(dst_local_path + dst_file_name, "wb") as gzipped_output:
 			first_line = True
 			for line in gzipped_input:
+				line_error = False
 				line_count +=1
 				line = clean_line(line)
 				#Treat the first line differently, since it is a header
@@ -170,6 +188,7 @@ header_pos_name, map_of_column_positions, container):
 					#Verify that the first line is the header
 					if "|GOOD_DESCRIPTION|" not in line:
 						gzipped_output.close()
+						had_error = True
 						write_error_file(dst_local_path, dst_file_name, line, "No header found in source file")
 						return
 				else:
@@ -181,27 +200,42 @@ header_pos_name, map_of_column_positions, container):
 							name = header_pos_name[count]
 						except:
 							#Verify that each line has the correct number of delimiters
-							gzipped_output.close()
+							#gzipped_output.close()
+							had_error = True
+							line_error = True
+							line_error_count +=1
 							this_line_delimiter_count = len(line.split("|"))
 							error_msg = "First Line had " + str(first_line_delimiter_count) + " delimiters.\n"
 							error_msg += "This Line had " + str(this_line_delimiter_count) + " delimiters.\n"
 							error_msg += "Improperly structured line #" + str(line_count)
 							write_error_file(dst_local_path, dst_file_name, line, error_msg)
-							return
+							break
+							#return
 						if name in map_of_column_positions:
 							position = map_of_column_positions[name][0]
 							result[position] = item
 						count += 1
 					#Turn the output list into a pipe-delimited string
+					if line_error:
+						continue
 					output_line = "|".join(result)
 					if output_line[0] == "|":
 						#Verify the each line begins with a non-pipe
-						gzipped_output.close()
+						#gzipped_output.close()
+						had_error = True
+						line_error = True
+						line_error_count +=1
 						write_error_file(dst_local_path, dst_file_name, output_line, "Output line was corrupt on line #" + str(line_count))
-						return
+						continue
+						#return
 				#Encode the line as bytes in UTF-8 and write them to a gzipped file
 				output_line = bytes(output_line + "\n", 'UTF-8')
 				gzipped_output.write(output_line)
+		if had_error:
+			error_msg = "Total line count: " + str(line_count) + "\nTotal error count: " + str(line_error_count) +\
+			"\nSuccess Ratio: " + str(1.0 * line_error_count / line_count)
+			write_error_file(dst_local_path, dst_file_name, "", error_msg)
+	return had_error
 
 #Main program
 #USAGE:
