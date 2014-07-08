@@ -19,6 +19,8 @@ OUTPUT_FORMAT = [\
 "CHAIN_NAME", "LATITUDE", "LONGITUDE", "NEIGHBOURHOOD", "TRANSACTION_ORIGIN",\
 "CONFIDENCE_SCORE", "FACTUAL_ID", "FILE_CREATED_DATE"]
 
+CLEAN_PATTERN = re.compile(r"\\+\|")
+
 def begin_processing_loop(some_container, filter_expression):
 	"""Fetches a list of input files to process from S3 and loops over them."""
 	conn = boto.connect_s3()
@@ -102,7 +104,7 @@ def begin_processing_loop(some_container, filter_expression):
 
 def clean_line(line):
 	"""Strips out the part of a binary line that is not usable"""
-	return str(line)[2:-3].replace("\|", "%7C")
+	return CLEAN_PATTERN.sub(" ", str(line)[2:-3])
 
 def get_header_dictionaries(some_container, src_file_name, src_local_path):
 	"""Pulls the header from an input file and creates the following:
