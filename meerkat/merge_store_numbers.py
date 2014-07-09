@@ -73,9 +73,10 @@ def z_score_delta(scores):
 def find_merchant(store):
 	"""Match document with store number to factual document"""
 
-	fields = ["address", "postcode", "name", "locality", "region"]
+	fields = ["address", "postcode", "name^1.5", "locality", "region"]
 	search_parts = [store["address"], store["zip_code"][0:5], store["keywords"], store["city"], store["state"]]
 	factual_id = ""
+	top_result = ""
 
 	# Generate Query
 	bool_search = get_bool_query(size=45)
@@ -91,7 +92,7 @@ def find_merchant(store):
 	score, top_hit = get_hit(results, 0)
 
 	if score == False:
-		return ""
+		return "", ""
 
 	# Allow User to Verify and Return 
 	formatted = [top_hit.get("name", ""), top_hit.get("address", ""), top_hit.get("postcode", ""), top_hit.get("locality", ""), top_hit.get("region", ""),]
@@ -102,12 +103,13 @@ def find_merchant(store):
 
 	# Must Match Keywords
 	if not (store["keywords"].lower() in top_hit["name"].lower()):
-		return ""	
+		return "", formatted	
 
+	# Found a Match
 	if score > 0.95:
-		return top_hit["factual_id"]
+		return top_hit["factual_id"], ""
 
-	return factual_id
+	return factual_id, formatted
 
 def get_hit(search_results, index):
 
@@ -162,7 +164,9 @@ def run(stores):
 
 		# Find Most Likely Merchant
 		store = stores[i]
-		factual_id = find_merchant(store)
+		factual_id, top_result = find_merchant(store)
+		store['factual_id'] = factual_id
+		store['top_result'] = top_result
 
 		# Attempt to Update Document
 		if len(factual_id) > 0:
@@ -189,7 +193,20 @@ def run(stores):
 	print("PERCENT MERGED: ", percent_merged)
 
 	# Save Not Found
-	save_not_found(not_found, percent_merged)
+	save_mapping(stores, percent_merged)
+	#save_not_found(not_found, percent_merged)
+
+def save_mapping(stores, percent_merged):
+	"""Saves all results as a mapping file"""
+
+	store_name = stores[0]['keywords']
+	file_name = "/mnt/ephemeral/AggData_Factual_Merge/" + store_name + "_" + str(percent_merged * 100) + "%_success_rate" + ".csv"
+	delimiter = ","
+	output_file = open(file_name, 'w')
+	dict_w = csv.DictWriter(output_file, delimiter=delimiter, fieldnames=stores[0].keys())
+	dict_w.writeheader()
+	dict_w.writerows(stores)
+	output_file.close()
 
 def save_not_found(not_found, percent_merged):
 	"""Save the stores not found in the index"""
