@@ -42,6 +42,7 @@ from pprint import pprint
 from elasticsearch import Elasticsearch, helpers
 
 from meerkat.description_consumer import get_qs_query, get_bool_query
+from meerkat.various_tools import string_cleanse
 
 def load_store_numbers(file_name):
 	"""Load Store Numbers from provided file"""
@@ -75,6 +76,7 @@ def find_merchant(store):
 
 	fields = ["address", "postcode", "name^1.5", "locality", "region"]
 	search_parts = [store["address"], store["zip_code"][0:5], store["keywords"], store["city"], store["state"]]
+	search_parts = [string_cleanse(part) for part in search_parts]
 	factual_id = ""
 	top_result = ""
 
