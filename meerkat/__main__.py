@@ -1,11 +1,24 @@
-#!/usr/local/bin/python3
-'''Docstring for our __main__.py module'''
+#!/usr/local/bin/python3.3
 
-from meerkat.description_producer import initialize, get_desc_queue\
-, tokenize, load_hyperparameters
+"""This file is the file first run when 
+Meerkat is executed as a package"""
 
-#Runs the entire program.
-PARAMS = initialize()
-HYPERPARAMETERS = load_hyperparameters(PARAMS)
-DESC_QUEUE, NON_PHYSICAL = get_desc_queue(PARAMS)
-tokenize(PARAMS, DESC_QUEUE, HYPERPARAMETERS, NON_PHYSICAL)
+import os, re
+
+from meerkat.description_producer import mode_switch, initialize, validate_params
+from meerkat.various_tools import purge
+
+# Run the Meerkat Classifier
+
+try:
+
+	params = initialize()
+	validate_params(params)
+	mode_switch(params)
+
+except (KeyboardInterrupt, SystemExit) as e:
+
+	input_dir = params["input"]["split"]["processing_location"]
+	output_dir = params["output"]["file"]["processing_location"]
+	purge(input_dir, "output*")
+	purge(output_dir, "output*")

@@ -1,22 +1,52 @@
-#!/usr/local/bin/python3
+#!/usr/local/bin/python3.3
 # pylint: disable=all
 
-"""This module performs hyperparameter optimization. This involves
-tuning the keys located under Meerkat/config/keys. Those key value
-pairs map to hyperparameters used through out the Meerkat Classifier.
-This module utilizes a common method known as grid search. In particular
-we are using randomized optimization as it works better where it
-is resource intensive to exaustively perform a standard grid_search"""
+"""This module is the core of the Meerkat
+engine. It allows us to rapidly evaluate many
+possible configurations if provided a well
+labeled dataset. Iteratively it runs Meerkat
+with randomized levels of configurations and
+then converge on the best possible values. 
 
-from meerkat.description_producer import initialize, tokenize, load_hyperparameters
-from meerkat.binary_classifier.load import predict_if_physical_transaction
-from meerkat.accuracy import print_results
+In context of Machine Leaning, this module 
+performs hyperparameter optimization. This 
+involves tuning the numeric values located at  
+Meerkat/config/hyperparameters. These key 
+value pairs map to hyperparameters used through 
+out the Meerkat Classifier in aid of tuning or
+refining the queries used with ElasticSearch.
 
-import sys, datetime, os, queue, csv, collections
+This module utilizes a common method known as 
+grid search. In particular we are using a custom
+implementation of randomized optimization as it 
+works better where it is resource intensive to 
+exaustively perform a standard grid_search.
+
+Created on Feb 26, 2014
+@author: Matthew Sevrens
+"""
+
+#################### USAGE ##########################
+
+# Note: Experts only! Do not touch!
+
+#####################################################
+
+import sys 
+import datetime
+import os
+import queue
+import csv
+import collections
 from copy import deepcopy
-from pprint import pprint
 from random import randint, uniform, random, shuffle
+
+from pprint import pprint
 from numpy import array, array_split
+
+from meerkat.description_producer import initialize, run_meerkat, load_hyperparameters
+from meerkat.binary_classifier.load import select_model
+from meerkat.accuracy import print_results
 
 def get_initial_values(hyperparameters, params, known, dataset):
 	"""Do a simple search to find starter values"""
@@ -248,7 +278,7 @@ def cross_validate(top_score, dataset):
 
 	# Run Classifier
 	print("\n", "CROSS VALIDATE", "\n")
-	desc_queue, non_physical = get_desc_queue(dataset)
+	desc_queue, non_physicfal = get_desc_queue(dataset)
 	accuracy = tokenize(params, desc_queue, other, non_physical)
 
 	return accuracy
@@ -300,7 +330,7 @@ if __name__ == "__main__":
 	# Clear Contents from Previous Runs
 	open(os.path.splitext(os.path.basename(sys.argv[1]))[0] + '_top_scores.txt', 'w').close()
 
-	settings = {
+	global settings = {
 		"folds": 2,
 		"initial_search_space": 25,
 		"initial_learning_rate": 1,
@@ -309,6 +339,8 @@ if __name__ == "__main__":
 		"gradient_ascent_iterations": 15,
 		"max_precision": 98
 	}
+
+	global predict_if_physical_transaction = select_model("card")
 
 	known = {"es_result_size" : "45"}
 

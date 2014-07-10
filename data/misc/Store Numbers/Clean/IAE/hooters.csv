@@ -1,0 +1,346 @@
+keywords,city,Aggdata Store Number,store_number,address,state,zip_code
+Hooters,Dallas,2,202 #2 002,5005 Belt Line Road,TX,75254
+Hooters,Albuquerque,4,204 #4 004,4601 San Mateo,NM,87109
+Hooters,Amarillo,5,205 #5 005,8101 I-40 West,TX,79121
+Hooters,Arlington,7,207 #7 007,1151 North Collins,TX,76011
+Hooters,Atlantic City,9,209 #9 009,2821 Boardwalk,NJ,8401
+Hooters,Augusta,10,2010 #10 0010,2834 Washington Road,GA,30909
+Hooters,Austin,12,2012 #12 0012,425 W. Riverside,TX,78704
+Hooters,Phoenix,14,2014 #14 0014,455 North 3rd   190 Arizona Center,AZ,85004
+Hooters,Baton Rouge,15,2015 #15 0015,5120 Corporate Blvd,LA,70806
+Hooters,Miami,17,2017 #17 0017,401 Biscayne Blvd Ste. 225,FL,33132
+Hooters,Ft. Lauderdale,18,2018 #18 0018,17 S. Atlantic Blvd Unit 304,FL,33316
+Hooters,Phoenix,19,2019 #19 0019,10223 North Metro Parkway,AZ,85021
+Hooters,Philadelphia,21,2021 #21 0021,9183 Roosevelt Boulevard,PA,19114
+Hooters,Bloomington,25,2025 #25 0025,404 E. Broadway,MN,55425
+Hooters,Bloomington,26,2026 #26 0026,409 N. Hershey Road,IL,61701
+Hooters,Tampa,30,2030 #30 0030,10023 E. Adamo Dr.,FL,33619
+Hooters,Cape Coral,35,2035 #35 0035,3120 Del Prado,FL,33904
+Hooters,Casselberry,36,2036 #36 0036,2699 Cassel Creek Blvd.,FL,32707
+Hooters,Champaign,37,2037 #37 0037,1706 State Street,IL,61820
+Hooters,Charleston,38,2038 #38 0038,5615 Macorkle Ave. S.E.,WV,25304
+Hooters,Chattanooga,41,2041 #41 0041,5912 Brainerd Rd.,TN,37421
+Hooters,Chesapeake,42,2042 #42 0042,1105 Merchants Wat,VA,23320
+Hooters,Chicago,43,2043 #43 0043,660 N. Wells St.,IL,60610
+Hooters,Clarksville,45,2045 #45 0045,941 E. Highway 131,IN,47130
+Hooters,Clearwater,46,2046 #46 0046,2800 Gulf-To-Bay Blvd.,FL,33519
+Hooters,Colorado Springs,50,2050 #50 0050,750 Citadel Dr. East. Ste. 1012,CO,80909
+Hooters,Conyers,54,2054 #54 0054,"1099 Iris Drive, SE",GA,30012
+Hooters,Corpus Christi,55,2055 #55 0055,4551 South Padre island Drive,TX,78411
+Hooters,Atlanta,56,2056 #56 0056,"2977 Cobb Parkway, SE",GA,30339
+Hooters,Dallas,57,2057 #57 0057,2201 North Lamar,TX,75202
+Hooters,Davenport,58,2058 #58 0058,110 E. Kimberly Rd.,IA,58206
+Hooters,Destin,61,2061 #61 0061,15015 Emerald Coast Parkway,FL,32541
+Hooters,Miami,62,2062 #62 0062,8695 N.W. 13th Terrace,FL,33126
+Hooters,Dothan,63,2063 #63 0063,3385 Ross Clark Circle,AL,36303
+Hooters,Daytona Beach,64,2064 #64 0064,2100 International Speedway Drive,FL,32114
+Hooters,Downers Grove,66,2066 #66 0066,1303 Butterfield Rd.,IL,60515
+Hooters,Louisville,67,2067 #67 0067,4120 Dutchman's Lane,KY,40207
+Hooters,El Paso,71,2071 #71 0071,1170 Sunmount,TX,79925
+Hooters,Evansville,73,2073 #73 0073,4620 Lincoln Ave.,IN,47715
+Hooters,Fairfax,74,2074 #74 0074,10334 Lee Highway,VA,22030
+Hooters,Fairview Heights,75,2075 #75 0075,"301 Market Place, Suite C",IL,62208
+Hooters,Fargo,76,2076 #76 0076,3434 Fiechtner Drive. S,ND,58103
+Hooters,Fayetteville,78,2078 #78 0078,516 North McPherson Church Road,NC,28303
+Hooters,Flint,79,2079 #79 0079,3415 Miller Road,MI,48507
+Hooters,Ft. Lauderdale,82,2082 #82 0082,6345 N. Andrews Avenue,FL,33309
+Hooters,Ft. Lauderdale,83,2083 #83 0083,3805 N. University Blvd.,FL,33351
+Hooters,Ft. Myers,84,2084 #84 0084,4411 Cleveland Ave.,FL,33901
+Hooters,Ft. Myers,85,2085 #85 0085,1600 Estero Beach Blvd.,FL,33931
+Hooters,Ft. Worth,87,2087 #87 0087,"5340 S. W. Blvd.,",TX,76109
+Hooters,Gastonia,89,2089 #89 0089,3725 East Franklin Blvd,NC,28054
+Hooters,Indianapolis,92,2092 #92 0092,7551 South U.S. 31,IN,46227
+Hooters,Greensboro,96,2096 #96 0096,3031 High Point Road,NC,27403
+Hooters,Greenville,97,2097 #97 0097,2401 Laurens Road,SC,29607
+Hooters,Gulf Shores,98,2098 #98 0098,300 E. Beach Blvd,AL,36542
+Hooters,Duluth,99,2099 #99 0099,3550 Gwinett Place Drive,GA,30096
+Hooters,Hampton,100,20100 #100 00100,1801 W. Mercury Blvd.,VA,23666
+Hooters,Baltimore,101,20101 #101 00101,301 Light Street  Suite 173,MD,21202
+Hooters,Honolulu,103,20103 #103 00103,One Aloha Tower Dr. #110,HI,96813
+Hooters,Huntsville,105,20105 #105 00105,4730 NW University,AL,35806
+Hooters,Independence,106,20106 #106 00106,19850 E. Valley View Pkwy.,MO,64055
+Hooters,Indianapolis,107,20107 #107 00107,6426 E. 82nd St.,IN,46250
+Hooters,Indianapolis,110,20110 #110 00110,25 W. Georgia Ave.,IN,46225
+Hooters,Irving,111,20111 #111 00111,2522 N. Beltline Rd.,TX,75062
+Hooters,Jackson,114,20114 #114 00114,5465 Frontage Rd,MS,39206
+Hooters,Johnson City,116,20116 #116 00116,2288 N. Roane St.,TN,37601
+Hooters,Overland Park,117,20117 #117 00117,10620 Metcalf Lane,KS,66212
+Hooters,Kennesaw,119,20119 #119 00119,2102 Old Highway 41,GA,30144
+Hooters,Jacksonville,120,20120 #120 00120,8938 San Jose Blvd.,FL,32257
+Hooters,Jacksonville,121,20121 #121 00121,2 Independent Drive  Suite 103,FL,32202
+Hooters,King of Prussia,123,20123 #123 00123,240 North Gulph Road,PA,19406
+Hooters,Lakewood,124,20124 #124 00124,695 Kipling St.,CO,80025
+Hooters,Houston,125,20125 #125 00125,2519 Southwest Freeway,TX,77098
+Hooters,Orlando,126,20126 #126 00126,5300 Kirkman Road,FL,32819
+Hooters,Knoxville,128,20128 #128 00128,8050 Kingston Pike Hwy,TN,37919
+Hooters,Lafayette,129,20129 #129 00129,2327 Sagamore Pkwy South,IN,47905
+Hooters,Lafayette,130,20130 #130 00130,3221 Ambassador Caffrey Pkwy,LA,70506
+Hooters,Orlando,131,20131 #131 00131,8510 Palm Parkway,FL,32836
+Hooters,Lakeland,133,20133 #133 00133,3437 South Florida Ave,FL,33803
+Hooters,Lakeland,134,20134 #134 00134,3400 US 98 North,FL,33809
+Hooters,Lansing,135,20135 #135 00135,17060 S. Torrance Avenue,IL,48912
+Hooters,Las Cruces,136,20136 #136 00136,3530 Foothills Road,NM,88011
+Hooters,Lewisville,139,20139 #139 00139,1960 S. Stemmons,TX,75067
+Hooters,Lexington,140,20140 #140 00140,3101 Richmond Rd. #315,KY,40509
+Hooters,Long Beach,142,20142 #142 00142,71 Aquarium Way,CA,90802
+Hooters,New York,147,20147 #147 00147,211 W. 56th Street,NY,10019
+Hooters,Macon,149,20149 #149 00149,112 Riverside Parkway,GA,31210
+Hooters,Manassas,151,20151 #151 00151,8503 Rixlew Drive,VA,20109
+Hooters,St. Louis,152,20152 #152 00152,11835 Lackland Road,MO,63146
+Hooters,Melbourne,153,20153 #153 00153,877 South Babcock Street,FL,32901
+Hooters,Merrillville,156,20156 #156 00156,771 E. 81st Place,IN,46410
+Hooters,Mesquite,157,20157 #157 00157,3902 Towne Crossing Blvd.,TX,75150
+Hooters,Metairie,158,20158 #158 00158,4748 Veterans Blvd,LA,70006
+Hooters,Milford,160,20160 #160 00160,990 Boston Post Road,CT,6460
+Hooters,San Diego,161,20161 #161 00161,1400 Camino De La Reina Ste. 115,CA,92108
+Hooters,Mobile,162,20162 #162 00162,3869 Airport Blvd,AL,36608
+Hooters,Murfreesboro,164,20164 #164 00164,1310 N.W. Broad St.,TN,37129
+Hooters,Myrtle Beach,166,20166 #166 00166,10133 North Kings Highway,SC,29572
+Hooters,Myrtle Beach,168,20168 #168 00168,3901 North Kings Highway,SC,29577
+Hooters,N. Richland Hills,170,20170 #170 00170,7669 Grapevine Hwy,TX,76180
+Hooters,Webster,172,20172 #172 00172,20790 Gulf Freeway,TX,77598
+Hooters,Nashville,173,20173 #173 00173,217 Largo Dr.,TN,37211
+Hooters,Nashville,174,20174 #174 00174,184 2nd Ave. N.,TN,37201
+Hooters,Newport,176,20176 #176 00176,301 Riverboat Row,KY,41071
+Hooters,Newnan,178,20178 #178 00178,1001 Bullsboro Drive,GA,30265
+Hooters,Newport News,179,20179 #179 00179,12640 Jefferson Ave.,VA,23602
+Hooters,Norfolk,181,20181 #181 00181,1160 North Military Hwy,VA,23502
+Hooters,Tamp,183,20183 #183 00183,13606 Bruce B. Downs Blvd.,FL,33613
+Hooters,Chicago,186,20186 #186 00186,8225 W. Higgins Road,IL,60631
+Hooters,Oaklawn,187,20187 #187 00187,9159 S. Cicero Ave.,IL,60453
+Hooters,Ocean City,189,20189 #189 00189,12207 Coastal Hwy,MD,21842
+Hooters,Oklahoma City,191,20191 #191 00191,3025 NW Expressway,OK,73112
+Hooters,Oklahoma City,192,20192 #192 00192,2109 SW 74th Street,OK,73159
+Hooters,Orland Park,194,20194 #194 00194,15300 Lagrange Rd,IL,60462
+Hooters,Panama City,199,20199 #199 00199,1136 Thomas Drive,FL,32408
+Hooters,Panama City Beach,200,20200 #200 00200,12709 Front Beach Rd.,FL,32407
+Hooters,Paramus,201,20201 #201 00201,393 Rt 17 S.,NJ,7652
+Hooters,Aurora,202,20202 #202 00202,2610 S. Parker Rd.,CO,80014
+Hooters,Pembroke Pines,205,20205 #205 00205,7990 Pines Blvd.,FL,33024
+Hooters,Pensacola,207,20207 #207 00207,5052 Bayou Blvd,FL,32504
+Hooters,Pensacola Beach,208,20208 #208 00208,400 Quietwater Beach Rd.,FL,32561
+Hooters,Plano,210,20210 #210 00210,720 Central Expressway,TX,75074
+Hooters,Orlando,211,20211 #211 00211,"9101 International Dr., Ste. 2210",FL,32819
+Hooters,Port Richey,213,20213 #213 00213,5336 Treadway,FL,34668
+Hooters,Louisville,214,20214 #214 00214,7701 Preston Hwy,KY,40219
+Hooters,Raleigh,216,20216 #216 00216,4206 Old Wake Forest Road,NC,27609
+Hooters,Richmond,218,20218 #218 00218,7912 W. Broad St.,VA,23294
+Hooters,Midlothian,219,20219 #219 00219,1211 Huguenot Rd.,VA,23113
+Hooters,Goodlettsville,220,20220 #220 00220,654 Wade Circle S.,TN,37072
+Hooters,Roseville,226,20226 #226 00226,32976 Gratiot,MI,48066
+Hooters,Roswell,227,20227 #227 00227,795 Holcomb Bridge Road,GA,30076
+Hooters,Round Rock,228,20228 #228 00228,2700 I-H 35,TX,78681
+Hooters,Midvale,230,20230 #230 00230,7157 South State Street,UT,84092
+Hooters,San Antonio,231,20231 #231 00231,849 E. Commerce St. Ste. 105,TX,78205
+Hooters,San Antonio,232,20232 #232 00232,8527 Wurzbach Rd.,TX,78240
+Hooters,San Diego,233,20233 #233 00233,410 Market St.,CA,92101
+Hooters,San Antonio,235,20235 #235 00235,13131 San Pedro,TX,78216
+Hooters,Santa Monica,236,20236 #236 00236,321 Santa Monica Blvd.,CA,90401
+Hooters,Sarasota,237,20237 #237 00237,6507 S. Tamiami Trail,FL,34231
+Hooters,Schaumburg,238,20238 #238 00238,1110 Perimeter Dr.,IL,60173
+Hooters,St. Louis,242,20242 #242 00242,7517 South Lindbergh Boulevard,MO,63125
+Hooters,Houston,243,20243 #243 00243,120 FM 1960 W.,TX,77090
+Hooters,Spring Hill,244,20244 #244 00244,3437 Commercial Way,FL,34607
+Hooters,Springdale,245,20245 #245 00245,12185 Springfield Pike,OH,45246
+Hooters,Springfield,246,20246 #246 00246,2110 E. Independence Ave.,MO,65804
+Hooters,St. Petersburg,248,20248 #248 00248,2250 Tyrone Blvd.,FL,33710
+Hooters,Tallahassee,255,20255 #255 00255,2000 North Monroe Street,FL,32303
+Hooters,Tampa,256,20256 #256 00256,4215 W. Hillsborough Ave.,FL,33614
+Hooters,Jonesboro,257,20257 #257 00257,6785 Tara Boulevard,GA,30236
+Hooters,Taylor,258,20258 #258 00258,21250 Eureka Road,MI,48180
+Hooters,Tempe,259,20259 #259 00259,501 S. Mill Ave. #201,AZ,85281
+Hooters,Toledo,260,20260 #260 00260,4782 Monroe St.,OH,43623
+Hooters,Tucson,261,20261 #261 00261,6335 E. Tanque Verde,AZ,85715
+Hooters,Tucson,262,20262 #262 00262,4385 W. Ina Road,AZ,85741
+Hooters,Warwick,264,20264 #264 00264,667 Airport Rd.,RI,2886
+Hooters,Norfolk,265,20265 #265 00265,333 Waterside Dr. Unit 316,VA,70053
+Hooters,Troy,266,20266 #266 00266,2950 Rochester Road,MI,48083
+Hooters,Tulsa,267,20267 #267 00267,8108 East 61st,OK,74133
+Hooters,Albuquerque,269,20269 #269 00269,1708 Corrales Rd N.W.,NM,87114
+Hooters,Gretna,270,20270 #270 00270,2781 Belle Chasse Hwy,LA,70053
+Hooters,West Palm Beach,271,20271 #271 00271,2020 Palm Beach Lakes Blvd.,FL,33409
+Hooters,Wethersfield,272,20272 #272 00272,1731 Berlin Turnpike,CT,6109
+Hooters,Wichita,273,20273 #273 00273,3151 North Rock Road,KS,67226
+Hooters,Wilmington,274,20274 #274 00274,5112 Market Street,NC,28405
+Hooters,Frisco,278,20278 #278 00278,4224 Preston Road,TX,75035
+Hooters,Wayne,291,20291 #291 00291,25 Route 23 South,NJ,7470
+Hooters,Aurora,293,20293 #293 00293,4395 Fox Valley Ctr. Drive,IL,60504
+Hooters,Orange Park,317,20317 #317 00317,1740 Wells Road,FL,32073
+Hooters,Fredericksburg,318,20318 #318 00318,10400 Spotsylvania Avenue,VA,22408
+Hooters,Tuscaloosa,332,20332 #332 00332,5025 Oscar Baxter Drive,AL,35405
+Hooters,Columbus,333,20333 #333 00333,2650 Adams Farm Road,GA,31909
+Hooters,Anderson,335,20335 #335 00335,112 Interstate Blvd.,SC,29621
+Hooters,Birmingham,336,20336 #336 00336,1278 Oak Grove Road,AL,35209
+Hooters,West Monroe,338,20338 #338 00338,505 Constitution Drive,LA,71292
+Hooters,Concord,339,20339 #339 00339,7702 Gateway Lane,NC,28027
+Hooters,New Castle,348,20348 #348 00348,294 South Dupont Highway,DE,19720
+Hooters,N. Kansas City,349,20349 #349 00349,6411  Barry Rd.,MO,64154
+Hooters,Springfield,352,20352 #352 00352,3241 Horizon Drive,IL,62703
+Hooters,Orlando,358,20358 #358 00358,7222 Auguast National Dr,FL,32822
+Hooters,Peoria,361,20361 #361 00361,"418 S.W. Water St,",IL,61602
+Hooters,Hickory,362,20362 #362 00362,"1211 13th Avenue Drive, S.E.",NC,28602
+Hooters,Rockford,363,20363 #363 00363,6904 Argus Drive,IL,61107
+Hooters,Burlington,364,20364 #364 00364,3122 Garden Road,NC,27216
+Hooters,Merritt Island,366,20366 #366 00366,125 N. Sykes Creek Blvd.,FL,32953
+Hooters,Portage,367,20367 #367 00367,5250 S. Westnedge Ave.,MI,49024
+Hooters,Lansing,369,20369 #369 00369,172 E. Edgewood Blvd,MI,48911
+Hooters,Savannah,371,20371 #371 00371,"4 Gateway Blvd, W.",GA,31409
+Hooters,Louisville,376,20376 #376 00376,4948 Dixie Highway,KY,40216
+Hooters,Oklahoma City,379,20379 #379 00379,111 East California St.,OK,73104
+Hooters,Atlanta,383,20383 #383 00383,209 Peachtree ST NE,GA,30303
+Hooters,Jacksonville,384,20384 #384 00384,463 Western Blvd.,NC,28546
+Hooters,Trussville,385,20385 #385 00385,1917 Edwards Lake Road,AL,32535
+Hooters,Alcoa,386,20386 #386 00386,1099 Hunter Crossing Drive,TN,37701
+Hooters,Horn Lake,387,20387 #387 00387,982 Goodman Rd,MS,38637
+Hooters,Shenandoah,392,20392 #392 00392,19053 I-45 S.,TX,77385
+Hooters,Seabrook,394,20394 #394 00394,1818 NASA Road 1,TX,77586
+Hooters,Tampa,395,20395 #395 00395,4420 West Gandy Blvd.,FL,33611
+Hooters,Canton,400,20400 #400 00400,100 River Pointe Parkway,GA,30114
+Hooters,Grapevine,403,20403 #403 00403,1711 Crossroads Drive,TX,76051
+Hooters,Arlington,408,20408 #408 00408,5821 West I-20,TX,76016
+Hooters,Jeffersonville,409,20409 #409 00409,700 West Riverside Drive,IN,47130
+Hooters,McDonough,412,20412 #412 00412,1858 Jonesboro Road,GA,30253
+Hooters,Winston-Salem,413,20413 #413 00413,120 Hanes Square Circle,NC,27103
+Hooters,Charleston,415,20415 #415 00415,2171 Northwoods Blvd.,SC,29406
+Hooters,Woodbridge,416,20416 #416 00416,2630 Prince William Pkwy,VA,22192
+Hooters,Washington,418,20418 #418 00418,825-29 7th Street NW,DC,20001
+Hooters,Mooresville,419,20419 #419 00419,132 Gallery Center Drive,NC,28117
+Hooters,Houston,420,20420 #420 00420,17599 Tomball Parkway,TX,77064
+Hooters,Morrisville,421,20421 #421 00421,1001 Claren Circle,NC,27560
+Hooters,Chester,423,20423 #423 00423,2401 W. Hundred Road,VA,23831
+Hooters,Rehobeth Beach,424,20424 #424 00424,10 Rehobeth Ave.,DE,19171
+Hooters,Richmond,427,20427 #427 00427,241 Eastern Bypass,KY,40475
+Hooters,Memphis,428,20428 #428 00428,2838 New Brunswick Road,TN,38133
+Hooters,Janesville,430,20430 #430 00430,3300 North Pontiac Drive,WI,53545
+Hooters,Virginia Beach,431,20431 #431 00431,1495 General Booth Blvd.,VA,23456
+Hooters,Novi,435,20435 #435 00435,Fountain Walk Bldg F Space G-155 44175 Twelve Mile Road,MI,48377
+Hooters,Stafford,440,20440 #440 00440,12759 S.W. Freeway,TX,77477
+Hooters,Port Charlotte,441,20441 #441 00441,1360 Tamiani Trail,FL,33948
+Hooters,Greenville,445,20445 #445 00445,316 S.W. Greenville Blvd.,NC,27834
+Hooters,Lawrenceville,446,20446 #446 00446,400 Mercer Mall,NJ,8648
+Hooters,McKinney,453,20453 #453 00453,1775 N. Central Expressway,TX,75070
+Hooters,Hiram,454,20454 #454 00454,5464 Wendy Bagwell Pkwy.,GA,30141
+Hooters,Rock Hill,455,20455 #455 00455,1423 Riverchase Blvd.,SC,29732
+Hooters,Ontario,457,20457 #457 00457,725 N. Milliken Ave.,CA,91764
+Hooters,Tacoma,460,20460 #460 00460,6812 Tacoma Mall Blvd.,WA,98409
+Hooters,Concordville,465,20465 #465 00465,1110 Baltimore Pike,PA,19311
+Hooters,Cartersville,466,20466 #466 00466,"887 Joe Frank Harris Pkwy, SE",GA,30120
+Hooters,Dayton,468,20468 #468 00468,6851 Miller Lane,OH,45414
+Hooters,Kansas City,469,20469 #469 00469,1712 Village West Parkway,KS,66111
+Hooters,Anaheim,470,20470 #470 00470,2438 East Katella Avenue,CA,92806
+Hooters,Selma,471,20471 #471 00471,15412 IH 35 North,TX,78514
+Hooters,Clarksville,472,20472 #472 00472,750 North Riverside Drive,TN,37040
+Hooters,Peoria,473,20473 #473 00473,16550 N. 83rd Avenue,AZ,85381
+Hooters,Daphne,475,20475 #475 00475,28975 US Highway 98,AL,36526
+Hooters,Towson,476,20476 #476 00476,1630 E.Joppa Rd.,MD,21286
+Hooters,Gulfport,480,20480 #480 00480,9495 Highway 49,MS,39503
+Hooters,Houston,486,20486 #486 00486,12914 Northwest Freeway,TX,77040
+Hooters,W. Bradenton,489,20489 #489 00489,4908 14th Street West,FL,34207
+Hooters,Baton Rouge,497,20497 #497 00497,6454 Siegan Lane,LA,70809
+Hooters,West Covina,503,20503 #503 00503,3041 East Garvey North,CA,91791
+Hooters,Tampa,504,20504 #504 00504,615 Channelside Drive,FL,33602
+Hooters,St. Peters,505,20505 #505 00505,4061 Veterans Memorial Pkwy,MO,63376
+Hooters,Fresno,507,20507 #507 00507,7743 North Blackstone Avenue,CA,93720
+Hooters,Florence,508,20508 #508 00508,7200 Houston Road,KY,41042
+Hooters,Mesa,511,20511 #511 00511,1665 South Alma School Road,AZ,85210
+Hooters,Westminster,512,20512 #512 00512,1111 West 120th Avenue,CO,80234
+Hooters,Crestview,514,20514 #514 00514,180 Cracker Barrel Road,FL,32536
+Hooters,Dublin,515,20515 #515 00515,7944 Dublin Blvd.,CA,94568
+Hooters,Hollywood,516,20516 #516 00516,"6922 Hollywood Blvd., Suite 109",CA,90028
+Hooters,Williamsburg,520,20520 #520 00520,112 Bypass Road,VA,23185
+Hooters,McAllen,525,20525 #525 00525,410 East Expressway 83,TX,78503
+Hooters,Pelham,526,20526 #526 00526,400 Cahaba Valley Rd,AL,35124
+Hooters,Bay City,527,20527 #527 00527,966 E. Midland Street,MI,48706
+Hooters,Burbank,528,20528 #528 00528,600 N. 1st Street,CA,92501
+Hooters,Huntington,530,20530 #530 00530,6435 Route 60 East,WV,25504
+Hooters,LaCrosse,531,20531 #531 00531,300 South Third Street,WI,54602
+Hooters,Laurel,532,20532 #532 00532,14707-B Baltimore Avenue,MD,20707
+Hooters,Saginaw,533,20533 #533 00533,5538 Bay Rd,MI,48604
+Hooters,Waldorf,535,20535 #535 00535,3600 Crain Highway,MD,20603
+Hooters,Lubbock,538,20538 #538 00538,4950 South Loop 289,TX,79424
+Hooters,Humble,539,20539 #539 00539,Highway 59 North,TX,77338
+Hooters,Ft. Lauderdale,546,20546 #546 00546,5820 Seminole Way,FL,33314
+Hooters,Hackensack,548,20548 #548 00548,41 Route 4 East,NJ,7601
+Hooters,Knoxville,549,20549 #549 00549,5005 Central Avenue Pike,TN,37912
+Hooters,Colorado Springs,551,20551 #551 00551,7285 Commerce Center Drive,CO,80919
+Hooters,Schererville,554,20554 #554 00554,"1650 U.S. Hwy. 41, Suite A",IN,46375
+Hooters,Killeen,555,20555 #555 00555,1501 E. Central Texas Expressway,TX,76541
+Hooters,Hermitage,556,20556 #556 00556,4119 Lebanon Pike,TN,37076
+Hooters,Boise,557,20557 #557 00557,8000 W. Franklin Road,ID,83709
+Hooters,Oceanside,558,20558 #558 00558,"3186 Vista Way, Suite 100",CA,92054
+Hooters,Manchester,559,20559 #559 00559,1483 Pleasant Valley Road,CT,6040
+Hooters,Bossier City,560,20560 #560 00560,545 Boardwalk Blvd.,LA,71111
+Hooters,Birmingham,564,20564 #564 00564,"5267 Highway 280 South, Suite 100",AL,35242
+Hooters,Memphis,565,20565 #565 00565,"250 Peabody Place, Suite 101",TN,38103
+Hooters,Spokane,567,20567 #567 00567,16208 E. Indiana Avenue,WA,99216
+Hooters,Denton,569,20569 #569 00569,985 S. I-35 East,TX,76205
+Hooters,Columbia,570,20570 #570 00570,7711 Two Notch Road,SC,29223
+Hooters,Cahrlotte,571,20571 #571 00571,9807 South Blvd.,NC,28217
+Hooters,Columbia,572,20572 #572 00572,5195 Fernandina Road,SC,29212
+Hooters,Topeka,573,20573 #573 00573,6100 SW 10th Avenue,KS,66615
+Hooters,Sacramento,576,20576 #576 00576,1785 Challenge Way,CA,95815
+Hooters,Odessa,578,20578 #578 00578,2660 John Ben Shepperd Parkway,TX,79761
+Hooters,Columbia,579,20579 #579 00579,1101 Woodland Springs Court,MO,65201
+Hooters,Mobile,581,20581 #581 00581,5470 Inn Road,AL,36610
+Hooters,Costa Mesa,598,20598 #598 00598,1507 S. Coast Drive,CA,92626
+Hooters,Sacramento,599,20599 #599 00599,"3541 Truxel Road, Bldg. #7",CA,95834
+Hooters,Waco,607,20607 #607 00607,3921 S. Jack Kultgen Freeway,TX,76711
+Hooters,North Little Rock,608,20608 #608 00608,4110 Landers Road,AR,72117
+Hooters,Las Vegas,609,20609 #609 00609,115 East Tropicana Avenue,NV,89109
+Hooters,Loveland,610,20610 #610 00610,4230 Byrd Drive,CO,80538
+Hooters,Joliet,611,20611 #611 00611,3301 Hennepin Drive,IL,60432
+Hooters,Portland,612,20612 #612 00612,11875 N. Jantzen Drive,OR,97217
+Hooters,Sanford,615,20615 #615 00615,550 Towne Center Circle,FL,32771
+Hooters,St. Louis,621,20621 #621 00621,100 North Seventh Street,MO,63101
+Hooters,Lawrenceville,622,20622 #622 00622,860 Duluth Highway Suite 900,GA,30043
+Hooters,Beaumont,634,20634 #634 00634,850 Interstate 10,TX,77707
+Hooters,Florissant,638,20638 #638 00638,2765 North Highway 67,MO,63034
+Hooters,Fort Smith,639,20639 #639 00639,6323 Rogers Avenue,AR,72903
+Hooters,High Point,640,20640 #640 00640,275 Eastchester Drive,NC,27262
+Hooters,Jacksonville,641,20641 #641 00641,4521 Southside Blvd,FL,32216
+Hooters,Traverse City,644,20644 #644 00644,1850 US 31,MI,49686
+Hooters,San Diego,645,20645 #645 00645,16911 W. Bernardo Drive,CA,92127
+Hooters,Naples,646,20646 #646 00646,3625 Gateway Lane,FL,34109
+Hooters,Melrose Park,647,20647 #647 00647,2503 W. North Avenue,IL,60160
+Hooters,Texarkana,657,20657 #657 00657,5101 N. State Line Avenue,TX,75503
+Hooters,Riverside,659,20659 #659 00659,"6225 Valley Springs Parkway, #17",CA,92507
+Hooters,Katy,667,20667 #667 00667,22575 Katy Freeway,TX,77450
+Hooters,Chantilly,669,20669 #669 00669,14441 Brookfield Tower Dr.,VA,20151
+Hooters,Rockville,670,20670 #670 00670,1584 Rockville Pike,MD,20852
+Hooters,Pasadena,672,20672 #672 00672,3656 E. Sam Houston Pkwy.,TX,77505
+Hooters,Bismarck,678,20678 #678 00678,3130 North 14th Street,ND,58501
+Hooters,Beckley,680,20680 #680 00680,2011 Harper Road,WV,25801
+Hooters,Campbell,681,20681 #681 00681,1555 S. Bascom Avenue,CA,95008
+Hooters,Charlotte,682,20682 #682 00682,123 W. Trade Street,NC,28202
+Hooters,Missoula,684,20684 #684 00684,3050 Stock Yard Rd.,MT,59808
+Hooters,Rancho Cordova,685,20685 #685 00685,10750 Olson Drive,CA,95670
+Hooters,Council Bluffs,686,20686 #686 00686,2910 23rd Avenue,IA,51501
+Hooters,Saugus,688,20688 #688 00688,1143 Broadway,MA,1906
+Hooters,Denham Springs,689,20689 #689 00689,254 Range 12 Boulevard,LA,70725
+Hooters,Biloxi,692,20692 #692 00692,1906 Beach Blvd.,MS,39530
+Hooters,Newark,693,20693 #693 00693,207 Capital Trail,DE,19711
+Hooters,Madison,700,20700 #700 00700,2639 East Springs Drive,WI,53704
+Hooters,Brookfield,702,20702 #702 00702,17105 West Bluemound,WI,53005
+Hooters,Bakersfield,708,20708 #708 00708,"4208 Rosedale Highway, Suite 100",CA,93308
+Hooters,Las Vegas,710,20710 #710 00710,7155 S. Rainbow Blvd.,NV,89118
+Hooters,Grand Junction,715,20715 #715 00715,2880 North Avenue,CO,81501
+Hooters,Boca Raton,717,20717 #717 00717,"2240 NW 19th Avenue, Suite 1101-A",FL,33431
+Hooters,San Bruno,718,20718 #718 00718,1150 El Camino Real Suite 210,CA,94066
+Hooters,West Springfield,719,20719 #719 00719,1290 Riverdale Street,MA,1089
+Hooters,East Brunswick,720,20720 #720 00720,195 NJ-18,NJ,8816
+Hooters,Houma,721,20721 #721 00721,1619 Martin Luther King Jr. Blvd.,LA,70360
+Hooters,Ocean City,727,20727 #727 00727,501 Atlantic Avenue,MD,21842
+Hooters,Phoenix,730,20730 #730 00730,2820 North 75th Avenue,AZ,85035
+Hooters,Miami,737,20737 #737 00737,"3301 S.W. 22nd Street, Suite 104, Miami, FL, 33145",FL,33145
+Hooters,Hattiesburg,738,20738 #738 00738,101 Carlisle Street,MS,39402
+Hooters,Madeira Beach,740,20740 #740 00740,192 Johns Pass Boardwalk West,FL,33708
+Hooters,Colonie,742,20742 #742 00742,70 Wolf Road,NY,12205
+Hooters,Los Angeles,744,20744 #744 00744,"1248 S Figueroa, Suite 100",CA,90015
+Hooters,St. Petersburg,745,20745 #745 00745,4125 4th Street North,FL,33703
+Hooters,Rohnert Park,750,20750 #750 00750,6099 Redwood Drive,CA,94928
+Hooters,Thousand Oaks,752,20752 #752 00752,401 N Moorpark Road,CA,91360
+Hooters,Clearwater,754,20754 #754 00754,381 Mandalay Avenue,FL,33767
+Hooters,Ocean City,755,20755 #755 00755,12513 Ocean Gateway,MD,21842
+Hooters,Scottsdale,759,20759 #759 00759,8909 E. Indian Bend Rd.,AZ,85250
+Hooters,Slidell,766,20766 #766 00766,1776 Gause Blvd East,LA,70464
+Hooters,Farmingdale,771,20771 #771 00771,25 Smith Street,NY,11735

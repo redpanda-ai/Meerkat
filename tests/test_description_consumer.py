@@ -1,4 +1,4 @@
-'''Unit tests for meerkat.description_consumer'''
+"""Unit tests for meerkat.description_consumer"""
 
 import collections
 import json
@@ -11,73 +11,93 @@ from meerkat.custom_exceptions import Misconfiguration
 class DescriptionConsumerTests(unittest.TestCase):
 	"""Our UnitTest class."""
 
-	clean_my_meta = '{"metrics" : { "query_count" : 0, "cache_count" : 0}}'
+	clean_my_meta = '{"metrics" : {"query_count" : 0}}'
 
-	config = """
-{
-	"concurrency" : 1,
-	"input" : {
-		"filename" : "data/input/100_bank_transaction_descriptions.csv",
-		"encoding" : "utf-8"
-	},
-	"logging" : {
-		"level" : "warning", "path" : "logs/foo.log", "console" : false,
-		"formatter" : "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-	},
-	"output" : {
-		"results" : {
-			"fields" : ["name", "factual_id", "pin.location", "locality", "region"],
-			"size" : 1
+	config = """{
+		"concurrency" : 1,
+		"input" : {
+			"filename" : "data/input/100_bank_transaction_descriptions.csv",
+			"encoding" : "utf-8"
 		},
-		"file" : {
-			"format" : "json", "path" : "data/output/meerkatLabeled.json"
-		}
-	},
-	"elasticsearch" : {
-		"cluster_nodes" : ["s0:9200", "s1:9200", "s2:9200"
-		, "s3:9200", "s4:9200", "s5:9200", "s6:9200"
-		, "s7:9200", "s8:9200", "s9:9200", "s10:9200"
-		, "s11:9200"],
-		"index" : "factual_index", "type" : "factual_type",
-		"boost_labels" : [ "standard_fields", "composite.address" ],
-		"boost_vectors" : {
-			"factual_id" :        [ 0.0, 1.0 ],
-			"name" :              [ 1.0, 0.0 ],
-			"address" :           [ 0.0, 1.0 ]
-		}
-	},
-	"search_cache" : {}
-}"""
+		"logging" : {
+			"level" : "warning", "path" : "logs/foo.log", "console" : false,
+			"formatter" : "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+		},
+		"output" : {
+			"results" : {
+				"fields" : ["name", "factual_id", "pin.location", "locality", "region"],
+				"size" : 1
+			},
+			"file" : {
+				"format" : "json", "path" : "data/output/meerkatLabeled.json"
+			}
+		},
+		"elasticsearch" : {
+			"cluster_nodes" : [
+			    "s01:9200",
+			    "s02:9200",
+			    "s03:9200",
+			    "s04:9200",
+			    "s05:9200",
+			    "s06:9200",
+			    "s07:9200",
+			    "s08:9200",
+			    "s09:9200",
+			    "s10:9200",
+			    "s11:9200",
+			    "s12:9200",
+			    "s13:9200",
+			    "s14:9200",
+			    "s15:9200",
+			    "s16:9200",
+			    "s17:9200",
+			    "s18:9200"
+	    	],
+			"index" : "factual_index", "type" : "factual_type",
+			"boost_labels" : [ "standard_fields", "composite.address" ],
+			"boost_vectors" : {
+				"factual_id" :        [ 0.0, 1.0 ],
+				"name" :              [ 1.0, 0.0 ],
+				"address" :           [ 0.0, 1.0 ]
+			}
+		},
+		"search_cache" : {}
+	}"""
 
-	search_results = """
-{
-	"hits": {
-		"hits": [
-			{"_score": 3, "_type": "new_type", "_index": "factual_index",
-			"_id": "4", "fields": {"factual_id": "4", "name" : "name1"}},
-			{"_score": 2, "_type": "new_type", "_index": "factual_index",
-			"_id": "6", "fields": {"factual_id": "6", "name" : "name1"}},
-			{"_score": 1, "_type": "new_type", "_index": "factual_index",
-			"_id": "9", "fields": {"factual_id": "9", "name" : "name1"}}
-		],
-	"total": 3,
-	"max_score": 3
-	},
-	"_shards": {"successful": 12, "failed": 0, "total": 12}, "took": 100, "timed_out": false
-}"""
+	search_results = """{
+		"hits": {
+			"hits": [
+				{"_score": 3, "_type": "new_type", "_index": "factual_index",
+				"_id": "4", "fields": {"factual_id": "4", "name" : "name1"}},
+				{"_score": 2, "_type": "new_type", "_index": "factual_index",
+				"_id": "6", "fields": {"factual_id": "6", "name" : "name1"}},
+				{"_score": 1, "_type": "new_type", "_index": "factual_index",
+				"_id": "9", "fields": {"factual_id": "9", "name" : "name1"}}
+			],
+			"total": 3,
+			"max_score": 3
+		},
+		"_shards": {
+			"successful": 12, 
+			"failed": 0, 
+			"total": 12
+		}, 
+		"took": 100, 
+		"timed_out": false
+	}"""
 
-	input_json = """
-{
-	"query": {
-		"bool": {
-			"should": [
-				{"match": {"_all": {"type": "phrase", "query": "SUNNYVALE"}}}
-			], 
-			"minimum_number_should_match": 1
-		}
-	},
-	"from": 0, "size": 0
-}"""
+	input_json = """{
+		"query": {
+			"bool": {
+				"should": [
+					{"match": {"_all": {"type": "phrase", "query": "SUNNYVALE"}}}
+				], 
+				"minimum_number_should_match": 1
+			}
+		},
+		"from": 0, 
+		"size": 0
+	}"""
 
 	list_compare = lambda self, x, y: collections.Counter(x) == collections.Counter(y)
 	my_consumer, hyperparameters = None, ' {"es_result_size":"20"} '

@@ -2,7 +2,7 @@
 	"concurrency" : 8,
 	"batch_size" : 500,
 	"input" : {
-		"filename" : "data/input/yodlee_us_places_sample_SF.factual.tab",
+		"filename" : "/mnt/ephemeral/factual/us_places.factual.2014_05_01.1398986783000.tab",
 		"encoding" : "utf-8"
 	},
 	"logging" : {
@@ -12,7 +12,26 @@
 		"console" : false
 	},
 	"elasticsearch" : {
-		"cluster_nodes" : ["localhost:9200"],
+		"cluster_nodes" : [
+                "s01:9200",
+                "s02:9200",
+                "s03:9200",
+                "s04:9200",
+                "s05:9200",
+                "s06:9200",
+                "s07:9200",
+                "s08:9200",
+                "s09:9200",
+                "s10:9200",
+                "s11:9200",
+                "s12:9200",
+                "s13:9200",
+                "s14:9200",
+                "s15:9200",
+                "s16:9200",
+                "s17:9200",
+                "s18:9200"
+        ],
 		"index" : "factual_index",
 		"type" : "factual_type",
 		"boost_labels" : [ "query_string", "composite.address" ],

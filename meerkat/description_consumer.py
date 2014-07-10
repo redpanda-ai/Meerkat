@@ -1,11 +1,16 @@
-'''
-Created on Jan 14, 2014
+#!/usr/local/bin/python3.3
 
+"""This module constructs ElasticSearch queries to match 
+a transaction to merchant data indexed with ElasticSearch.
+More generally it is used to match an unstructured 
+record to a well structured index. In our multithreaded 
+system, this is what processes the queue of data provided 
+by description_producer.
+
+Created on Jan 16, 2014
 @author: J. Andrew Key
 @author: Matthew Sevrens
-'''
-
-#!/bin/python3
+"""
 
 import hashlib
 import json
@@ -22,9 +27,9 @@ from sklearn.preprocessing import StandardScaler
 from scipy.stats.mstats import zscore
 from pprint import pprint
 
-from .various_tools import string_cleanse, scale_polygon
+from .various_tools import string_cleanse, synonyms
 from .clustering import cluster, collect_clusters
-from .location import separate_geo
+from .location import separate_geo, scale_polygon
 
 #Helper functions
 def get_bool_query(starting_from=0, size=0):
@@ -38,13 +43,17 @@ def get_basic_query(starting_from=0, size=0):
 
 def get_geo_query(scaled_shapes):
 	"""Generate multipolygon query for use with"""
+	
 	return {
 		"geo_shape" : {
 			"pin.location" : {
 				"shape" : {
 					"type" : "multipolygon",
 					"coordinates": [[scaled_shape] for scaled_shape in scaled_shapes]
-				}}}}
+				}
+			}
+		}
+	}
 
 def get_qs_query(term, field_list=[], boost=1.0):
 	"""Returns a "query_string" style ElasticSearch query object"""
@@ -77,7 +86,7 @@ class DescriptionConsumer(threading.Thread):
 
 	def __display_search_results(self, search_results, transaction):
 		"""Displays search results."""
-
+		logger = logging.getLogger("thread " + str(self.thread_id))
 		# Must have results
 		if search_results['hits']['total'] == 0:
 			return True
@@ -114,14 +123,16 @@ class DescriptionConsumer(threading.Thread):
 		self.__generate_z_score_delta(scores)
 
 		try:
-			print(str(self.thread_id), ": ", results[0])
+			logger.debug("%s: %s", str(self.thread_id), results[0].encode("utf-8"))
+			print(str(self.thread_id), ": ", results[0].encode("utf-8"))
 		except IndexError:
-			print("INDEX ERROR: ", transaction["DESCRIPTION"])
+			logger.warning("INDEX ERROR: %s", transaction["DESCRIPTION"])
+			#print("INDEX ERROR: ", transaction["DESCRIPTION"])
 
 		return True
 
 	def __generate_z_score_delta(self, scores):
-		"""Display the Z-score delta between the first and second scores."""
+		"""Generate the Z-score delta between the first and second scores."""
 
 		logger = logging.getLogger("thread " + str(self.thread_id))
 
@@ -227,6 +238,7 @@ class DescriptionConsumer(threading.Thread):
 
 		# Create Query
 		geo_query = get_geo_query(scaled_geoshapes)
+
 		# Run transactions again with geo_query
 		for transaction in non_hits:
 			base_query = self.__generate_base_query(transaction, boost=qs_boost)
@@ -254,7 +266,7 @@ class DescriptionConsumer(threading.Thread):
 		return text_and_geo_features_results
 
 	def __locate_user(self, unique_locations, user_id):
-		"""Uses first pass results, to find an approximation
+		"""Uses previous results, to find an approximation
 		of a users spending area. Returns estimation as
 		a bounded polygon"""
 
@@ -279,11 +291,13 @@ class DescriptionConsumer(threading.Thread):
 			# Scale generated geo shapes
 			scaled_geoshapes = [scale_polygon(geoshape, scale=scaling_factor)[1]
 			for geoshape in original_geoshapes]
+
 			# Save interesting outputs needs to run in it's own process
 			#if len(unique_locations) >= 3:
 			#	pool = multiprocessing.Pool()
 			#	arguments = [(unique_locations, original_geoshapes, scaled_geoshapes, user_id)]
 			#	pool.starmap(visualize, arguments)
+			
 		return scaled_geoshapes
 
 	def __run_classifier(self, query):
@@ -293,7 +307,6 @@ class DescriptionConsumer(threading.Thread):
 		logger.info(json.dumps(query, sort_keys=True, indent=4, separators=(',', ': ')))
 		my_results = self.__search_index(query)
 		metrics = self.my_meta["metrics"]
-		logger.info("Cache Hit / Miss: %i / %i", metrics["cache_count"], metrics["query_count"])
 		return my_results
 
 	def __generate_base_query(self, transaction, boost=1.0):
@@ -304,13 +317,15 @@ class DescriptionConsumer(threading.Thread):
 		params = self.params
 		result_size = self.hyperparameters.get("es_result_size", "10")
 		fields = params["output"]["results"]["fields"]
-		transaction = string_cleanse(transaction["DESCRIPTION"]).rstrip()
+		good_description = transaction["GOOD_DESCRIPTION"]
+		transaction = string_cleanse(transaction["DESCRIPTION_UNMASKED"]).rstrip()
 
-		# If we're using masked data, remove anything with 3 X's or more
-		transaction = re.sub("X{3,}", "", transaction)
 		# Input transaction must not be empty
 		if len(transaction) <= 2 and re.match('^[a-zA-Z0-9_]+$', transaction):
 			return
+
+		# Replace synonyms
+		transaction = synonyms(transaction)
 
 		# Construct Main Query
 		logger.info("BUILDING FINAL BOOLEAN SEARCH")
@@ -321,6 +336,12 @@ class DescriptionConsumer(threading.Thread):
 		field_boosts = self.__get_boosted_fields("standard_fields")
 		simple_query = get_qs_query(transaction, field_boosts, boost)
 		should_clauses.append(simple_query)
+
+		# Hack Names
+		if good_description != "":
+
+			name_query = get_qs_query(string_cleanse(good_description), ['name'], 2)
+			should_clauses.append(name_query)
 
 		return bool_search
 
@@ -342,11 +363,26 @@ class DescriptionConsumer(threading.Thread):
 		scores = []
 		top_hit = hits[0]
 		hit_fields = top_hit.get("fields", "")
-		business_names = [result.get("fields", {"name" : ""})["name"] for result in hits]
-		business_names = [name[0] for name in business_names if type(name) == list]
-
+		
 		# If no results return
 		if hit_fields == "":
+			return transaction
+
+		# Collect Business Names, City Names, and State Names
+		business_names = [result.get("fields", {"name" : ""})["name"] for result in hits]
+		business_names = [name[0] for name in business_names if type(name) == list]
+		city_names = [result.get("fields", {"locality" : ""}).get("locality", "") for result in hits]
+		city_names = [name[0] for name in city_names if type(name) == list]
+		state_names = [result.get("fields", {"region" : ""}).get("region", "") for result in hits]
+		state_names = [name[0] for name in state_names if type(name) == list]
+		
+		# Need Names
+		if len(business_names) < 2:
+			return transaction
+
+		# City Names Cause issues
+		if business_names[0] in self.cities:
+			print("City Name: ", business_names[0], " omitted as result")
 			return transaction
 
 		# Elasticsearch v1.0 bug workaround
@@ -363,11 +399,11 @@ class DescriptionConsumer(threading.Thread):
 		decision = self.__decision_boundary(z_score_delta)
 
 		# Enrich Data if Passes Boundary
-		enriched_transaction = self.__enrich_transaction(decision, transaction, hit_fields, z_score_delta, business_names)
+		enriched_transaction = self.__enrich_transaction(decision, transaction, hit_fields, z_score_delta, business_names, city_names, state_names)
 
 		return enriched_transaction
 
-	def __enrich_transaction(self, decision, transaction, hit_fields, z_score_delta, business_names):
+	def __enrich_transaction(self, decision, transaction, hit_fields, z_score_delta, business_names, city_names, state_names):
 		"""Enriches the transaction if it passes the boundary"""
 
 		enriched_transaction = transaction
@@ -384,12 +420,23 @@ class DescriptionConsumer(threading.Thread):
 					enriched_transaction[field] = ""
 			enriched_transaction["z_score_delta"] = z_score_delta
 
-		# Add a Business Name as a fall back
+		# Add Business Name, City and State as a fallback
 		if decision == False:
 			for field in field_names:
 				enriched_transaction[field] = ""
 			enriched_transaction = self.__business_name_fallback(business_names, transaction)
+			enriched_transaction = self.__geo_fallback(city_names, state_names, transaction)
 			enriched_transaction["z_score_delta"] = 0
+
+		# Remove Good Description
+		if enriched_transaction['GOOD_DESCRIPTION'] != "":
+			enriched_transaction['name'] = enriched_transaction['GOOD_DESCRIPTION']
+			
+		enriched_transaction["GOOD_DESCRIPTION"] = ""
+
+		# Ensure Proper Casing
+		if enriched_transaction['name'] == enriched_transaction['name'].upper():
+			enriched_transaction['name'] = enriched_transaction['name'].title()
 
 		return enriched_transaction
 
@@ -399,69 +446,67 @@ class DescriptionConsumer(threading.Thread):
 		for transaction in enriched_transactions:
 			self.result_queue.put(transaction)
 
+	def __geo_fallback(self, city_names, state_names, transaction):
+		"""Basic logic to obtain a fallback for city and state
+		when no factual_id is found"""
+
+		fields = self.params["output"]["results"]["fields"]
+		enriched_transaction = transaction
+		city_names = city_names[0:2]
+		state_names = state_names[0:2]
+		states_equal = state_names.count(state_names[0]) == len(state_names)
+		city_in_transaction = (city_names[0].lower() in enriched_transaction["DESCRIPTION_UNMASKED"].lower())
+		state_in_transaction = (state_names[0].lower() in enriched_transaction["DESCRIPTION_UNMASKED"].lower())
+
+		if (city_in_transaction):
+			enriched_transaction['locality'] = city_names[0]
+
+		if (states_equal and state_in_transaction):
+			enriched_transaction['region'] = state_names[0]
+
+		return enriched_transaction
+
 	def __business_name_fallback(self, business_names, transaction):
-		"""Uses the business names as a fallback
-		to finding a specific factual id"""
+		"""Basic logic to obtain a fallback for business name
+		when no factual_id is found"""
 
 		fields = self.params["output"]["results"]["fields"]
 		enriched_transaction = transaction
 		business_names = business_names[0:2]
 		top_name = business_names[0].lower()
 		all_equal = business_names.count(business_names[0]) == len(business_names)
-		name_in_transaction =\
-			business_names[0].lower() in transaction["DESCRIPTION"].lower()
 		not_a_city = top_name not in self.cities
 
-		if (all_equal and not_a_city) or (name_in_transaction and not_a_city):
+		if (all_equal and not_a_city):
 			enriched_transaction['name'] = business_names[0]
+
+		if enriched_transaction['GOOD_DESCRIPTION'] != "":
+			enriched_transaction['name'] = enriched_transaction['GOOD_DESCRIPTION']
+
 		return enriched_transaction
 
 	def __reset_my_meta(self):
 		"""Purges several object data structures and re-initializes them."""
-		self.my_meta = {"metrics": {"query_count": 0, "cache_count": 0}}
+		self.my_meta = {"metrics": {"query_count": 0}}
 
 	def __search_index(self, input_as_object):
 		"""Searches the merchants index and the merchant mapping"""
 		logger = logging.getLogger("thread " + str(self.thread_id))
-		use_cache = self.params["elasticsearch"].get("cache_results", True)
 		input_data = json.dumps(input_as_object, sort_keys=True, indent=4\
 		, separators=(',', ': ')).encode('UTF-8')
+
 		output_data = ""
 
-		if use_cache == True:
-			output_data = self.__check_cache(input_data)
-
-		if output_data == "":
-			logger.debug("Cache miss, searching")
-			try:
-				output_data = self.es_connection.search(
-					index=self.params["elasticsearch"]["index"], body=input_as_object)
-				#Add newly found results to the client cache
-				if use_cache == True:
-					#FIXME: 'input_hash' variable is undefined, this does not work!
-					self.params["search_cache"][input_hash] = output_data
-			except Exception:
-				logging.critical("Unable to process the following: %s",\
-					str(input_as_object))
-				output_data = {"hits":{"total":0}}
+		try:
+			output_data = self.es_connection.search(
+				index=self.params["elasticsearch"]["index"], body=input_as_object)
+		except Exception:
+			logging.critical("Unable to process the following: %s",\
+				str(input_as_object))
+			output_data = {"hits":{"total":0}}
 
 		self.my_meta["metrics"]["query_count"] += 1
 
-		return output_data
-
-	def __check_cache(self, input_data):
-		"""Check cache, then run if query is not found"""
-		my_logger = logging.getLogger("thread " + str(self.thread_id))
-		hash_object = hashlib.md5(str(input_data).encode())
-		input_hash = hash_object.hexdigest()
-		output_data = ""
-
-		if input_hash in self.params["search_cache"]:
-			my_logger.debug("Cache hit, short-cutting")
-			sys.stdout.write("*")
-			sys.stdout.flush()
-			self.my_meta["metrics"]["cache_count"] += 1
-			output_data = self.params["search_cache"][input_hash]
 		return output_data
 
 	def __save_labeled_transactions(self, enriched_transactions):
@@ -497,7 +542,7 @@ class DescriptionConsumer(threading.Thread):
 				routing=transaction["UNIQUE_MEM_ID"])
 		except Exception:
 			logging.critical("Unable to update the following: %s",\
-				str(transaction["DESCRIPTION"]))
+				str(transaction["DESCRIPTION_UNMASKED"]))
 			pprint(update_body)
 
 	def __load_past_transactions(self):
@@ -555,14 +600,14 @@ class DescriptionConsumer(threading.Thread):
 				# Select all transactions from user
 				self.user = self.desc_queue.get()
 
-				# Load Past Transactions
-				self.__load_past_transactions()
+				# Load Past Transactions (User Context: Currently Disabled)
+				#self.__load_past_transactions()
 
 				# Classify using text features only
 				enriched_transactions = self.__text_features()
 
-				# Save results to user_index
-				self.__save_labeled_transactions(enriched_transactions)
+				# Save results to user_index (User Context: Currently Disabled)
+				#self.__save_labeled_transactions(enriched_transactions)
 
 				# Output Results to Result Queue
 				self.__output_to_result_queue(enriched_transactions)
@@ -574,3 +619,7 @@ class DescriptionConsumer(threading.Thread):
 				print(str(self.thread_id), " found empty queue, terminating.")
 
 		return True
+
+if __name__ == "__main__":
+	"""Print a warning to not execute this file as a module"""
+	print("This module is a Class; it should not be run from the console.")

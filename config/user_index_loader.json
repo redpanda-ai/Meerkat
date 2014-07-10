@@ -1,0 +1,87 @@
+{
+	"logging" : {
+		"level" : "info",
+		"path" : "logs/logs.log",
+		"formatter" : "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+		"console" : false
+	},
+	"elasticsearch" : {
+		"cluster_nodes" : [
+                "s01:9200",
+                "s02:9200",
+                "s03:9200",
+                "s04:9200",
+                "s05:9200",
+                "s06:9200",
+                "s07:9200",
+                "s08:9200",
+                "s09:9200",
+                "s10:9200",
+                "s11:9200",
+                "s12:9200",
+                "s13:9200",
+                "s14:9200",
+                "s15:9200",
+                "s16:9200",
+                "s17:9200",
+                "s18:9200"
+        ],
+		"index" : "user_index",
+		"type" : "user",
+		"type_mapping" : {
+			"mappings" : {
+				"user" : {
+        			"properties" : {
+            			"user_id" : {
+            				"type" : "string"
+            			}
+        			}
+   				},
+   				"transaction" : {
+   					"_parent" : {
+			    		"type" : "user"
+					},
+					"properties" : {
+						"z_score_delta" : { 
+			                "index" : "analyzed", 
+			                "type" : "float"     
+			    		},
+			            "transaction_id" : {
+			                "index" : "analyzed", 
+			                "type" : "string"     
+			            },
+			            "factual_id" : {
+			                "index" : "analyzed",
+			                "type" : "string"
+			            },
+			            "business_name" : {
+			                "index" : "analyzed",
+			                "type" : "string"
+			            },
+			            "description" : {
+			                "index" : "analyzed",
+			                "type" : "string"
+			            },
+						"date" : { 
+			                "index" : "analyzed", 
+			                "type" : "date"     
+			    		},
+						"pin" : { 
+							"properties" : {
+								"location" : {
+									"type" : "geo_shape", 
+									"tree" : "quadtree", 
+									"precision" : "1m"
+								}
+							}
+						}
+			        }    
+				}
+			},
+			"settings" : {
+				"number_of_replicas" : 1,
+				"number_of_shards" : 12
+			}
+		}
+	}
+}

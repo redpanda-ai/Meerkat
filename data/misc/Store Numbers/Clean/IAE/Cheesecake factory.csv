@@ -1,0 +1,169 @@
+keywords,city,Aggdata Store Number,store_number,address,state,zip_code
+Cheesecake Factory,Beverly Hills,1,#1,364 North Beverly Drive,CA,90210
+Cheesecake Factory,Marina Del Rey,2,#2,4142 Via Marina,CA,90292
+Cheesecake Factory,Redondo Beach,3,#3,605 North Harbor Drive,CA,90277
+Cheesecake Factory,Washington,5,#5,5345 Wisconsin Avenue NW,DC,20015
+Cheesecake Factory,Newport Beach,6,#6,1141 Newport Center Drive,CA,92660
+Cheesecake Factory,Atlanta,8,#8,3024 Peachtree Road,GA,30305
+Cheesecake Factory,Coconut Grove,10,#10,3015 Grand Avenue,FL,33133
+Cheesecake Factory,Boca Raton,11,#11,5530 Glades Road,FL,33431
+Cheesecake Factory,Chicago,12,#12,875 North Michigan Avenue,IL,60611
+Cheesecake Factory,Houston,13,#13,5015 Westheimer Road,TX,77056
+Cheesecake Factory,Skokie,15,#15,4999 Old Orchard Center Space H20,IL,60077
+Cheesecake Factory,Baltimore,16,#16,201 East Pratt Street,MD,21202
+Cheesecake Factory,Kansas City,17,#17,4701 Wyandotte Street,MO,64112
+Cheesecake Factory,Pasadena,18,#18,2 West Colorado Boulevard,CA,91101
+Cheesecake Factory,Denver,19,#19,1201 16th Street,CO,80202
+Cheesecake Factory,Westbury,20,#20,1504 Old Country Road,NY,11590
+Cheesecake Factory,Las Vegas,21,#21,3500 South Las Vegas Boulevard,NV,89109
+Cheesecake Factory,Miami,22,#22,7497 Dadeland Mall,FL,33156
+Cheesecake Factory,Aventura,24,#24,19501 Biscayne Boulevard,FL,33180
+Cheesecake Factory,Irvine,25,#25,71 Fortune Drive,CA,92618
+Cheesecake Factory,Dallas,26,#26,7700 West Northwest Highway,TX,75225
+Cheesecake Factory,Sunrise,27,#27,2612 Sawgrass Mills Circle,FL,33323
+Cheesecake Factory,San Diego,28,#28,7067 Friars Road,CA,92108
+Cheesecake Factory,Thousand Oaks,29,#29,442 West Hillcrest Drive,CA,91360
+Cheesecake Factory,Columbus,30,#30,3975 Townsfair Way,OH,43219
+Cheesecake Factory,Boulder,31,#31,1401 Pearl Street Suite 100,CO,80302
+Cheesecake Factory,Mission Viejo,33,#33,42 The Shops at Mission Viejo,CA,92691
+Cheesecake Factory,San Francisco,34,#34,251 Geary Street 8th Floor,CA,94102
+Cheesecake Factory,Atlanta,35,#35,4400 Ashford-Dunwoody Road Suite 3005,GA,30346
+Cheesecake Factory,Scottsdale,36,#36,15230 North Scottsdale Road,AZ,85254
+Cheesecake Factory,Indianapolis,37,#37,8701 Keystone Crossing Suite 4A,IN,46240
+Cheesecake Factory,Frisco,39,#39,2601 Preston Road Suite 2219,TX,75034
+Cheesecake Factory,Schaumburg,40,#40,53 Woodfield Road F-301,IL,60173
+Cheesecake Factory,West Palm Beach,41,#41,701 South Rosemary Avenue Suite 179,FL,33401
+Cheesecake Factory,Phoenix,42,#42,2402 East Camelback Space #101,AZ,85016
+Cheesecake Factory,Seattle,43,#43,700 Pike Street,WA,98109
+Cheesecake Factory,Sherman Oaks,44,#44,15301 Ventura Boulevard P-1,CA,91403
+Cheesecake Factory,Winter Park,45,#45,520 N. Orlando Avenue Suite 100,FL,32789
+Cheesecake Factory,King of Prussia,46,#46,640 W. Dekalb Pike Suite 1200,PA,19406
+Cheesecake Factory,Bellevue,47,#47,401 Bellevue Square,WA,98004
+Cheesecake Factory,Austin,48,#48,10000 Research Boulevard Suite 4602,TX,78759
+Cheesecake Factory,Chandler,49,#49,3111 W Chandler Boulevard Suite 2100,AZ,85226
+Cheesecake Factory,Tampa,50,#50,2223 North West Shore Boulevard Suite B201,FL,33607
+Cheesecake Factory,San Antonio,51,#51,7400 San Pedro Suite 120,TX,78216
+Cheesecake Factory,Edina,53,#53,2715 Southdale Center,MN,55435
+Cheesecake Factory,Fort Lauderdale,54,#54,600 E Las Olas Boulevard,FL,33301
+Cheesecake Factory,Las Vegas,55,#55,750 S Rampart Boulevard Bldg 17,NV,89145
+Cheesecake Factory,Orlando,56,#56,4200 Conroy Road Space A-148,FL,32839
+Cheesecake Factory,St. Louis,57,#57,1062 St Louis Galleria,MO,63117
+Cheesecake Factory,Santa Clara,58,#58,3041 Stevens Creek Boulevard,CA,95050
+Cheesecake Factory,Charlotte,60,#60,4400 Sharon Road Space A,NC,28211
+Cheesecake Factory,Littleton,61,#61,8405 Park Meadows Center Drive Suite 1001,CO,80124
+Cheesecake Factory,West Nyack,62,#62,1612 Palisades Center Drive,NY,10994
+Cheesecake Factory,Overland Park,63,#63,6675 West 119th Street,KS,66209
+Cheesecake Factory,Sugar Land,64,#64,16535 SW Freeway #2000,TX,77479
+Cheesecake Factory,Palo Alto,65,#65,375 University Avenue,CA,94301
+Cheesecake Factory,McLean,66,#66,1796 International Drive,VA,22102
+Cheesecake Factory,Raleigh,67,#67,4325 Glenwood Avenue,NC,27612
+Cheesecake Factory,Honolulu,68,#68,2301 Kalakaua Avenue,HI,96815
+Cheesecake Factory,White Plains,69,#69,1 Maple Avenue,NY,10601
+Cheesecake Factory,Lyndhurst,70,#70,24265 Cedar Road,OH,44124
+Cheesecake Factory,The Woodlands,71,#71,1201 Lake Woodlands Drive Suite 302,TX,77380
+Cheesecake Factory,Arlington,72,#72,2900 Clarendon Boulevard,VA,22201
+Cheesecake Factory,San Jose,73,#73,925 Blossom Hill Road,CA,95123
+Cheesecake Factory,Cincinnati,74,#74,7875 Montgomery Road,OH,45236
+Cheesecake Factory,Pittsburgh,75,#75,415 South 27th Street,PA,15203
+Cheesecake Factory,Peoria,76,#76,16134 North 83rd Avenue,AZ,85382
+Cheesecake Factory,Birmingham,77,#77,236 Summit Boulevard,AL,35243
+Cheesecake Factory,Sacramento,78,#78,1771 Arden Way,CA,95815
+Cheesecake Factory,Rancho Mirage,81,#81,71800 Highway 111 The River at Rancho Mirage,CA,92270
+Cheesecake Factory,Virginia Beach,82,#82,265 Central Park Avenue,VA,23462
+Cheesecake Factory,Alpharetta,83,#83,2075 North Point Circle,GA,30022
+Cheesecake Factory,Corte Madera,84,#84,1736 Redwood Highway,CA,94925
+Cheesecake Factory,Wauwatosa,85,#85,2350 North Mayfair Road Mayfair Mall,WI,53226
+Cheesecake Factory,Des Moines,86,#86,101 Jordan Creek Parkway,IA,50266
+Cheesecake Factory,Richmond,87,#87,11800 W Broad Street Short Pump Town Center,VA,23233
+Cheesecake Factory,Brea,88,#88,120 Brea Mall Way,CA,92821
+Cheesecake Factory,Naples,89,#89,2090 North Tamiami Trail,FL,34102
+Cheesecake Factory,Jacksonville,90,#90,10260 Midtown Parkway,FL,32246
+Cheesecake Factory,Rancho Cucamonga,91,#91,12379 North Mainstreet,CA,91739
+Cheesecake Factory,Los Angeles,92,#92,189 The Grove Drive K-90,CA,90036
+Cheesecake Factory,Westlake,93,#93,148 Crocker Park Boulevard Crocker Park Mall,OH,44145
+Cheesecake Factory,Palm Beach Gardens,96,#96,11800 Lake Victoria Gardens Downtown at the Gardens,FL,33410
+Cheesecake Factory,Louisville,97,#97,5000 Shelbyville Road,KY,40207
+Cheesecake Factory,Nashville,98,#98,2133 Green Hills Village Drive The Mall at Green Hills,TN,37215
+Cheesecake Factory,Lincolnshire,99,#99,930 Milwaukee Avenue,IL,60069
+Cheesecake Factory,Henderson,100,#100,160 S Green Valley Parkway The District at Green Valley Ranch,NV,89052
+Cheesecake Factory,Tigard,101,#101,9309 Washington Square Rd Washington Square,OR,97223
+Cheesecake Factory,Durham,102,#102,8030 Renaissance Parkway Suite 950,NC,27713
+Cheesecake Factory,Columbia,103,#103,10300 Little Patuxent Parkway,MD,21044
+Cheesecake Factory,Southlake,104,#104,1440 Plaza Place,TX,76092
+Cheesecake Factory,Fresno,105,#105,639 East Shaw Avenue Suite 139,CA,93710
+Cheesecake Factory,Omaha,106,#106,10120 California Street Westroads Mall,NE,68114
+Cheesecake Factory,Chesterfield,107,#107,2028 Chesterfield Mall,MO,63017
+Cheesecake Factory,Huntington Beach,108,#108,7871 Edinger Avenue,CA,92647
+Cheesecake Factory,Pleasanton,109,#109,1350 Stoneridge Mall Road,CA,94588
+Cheesecake Factory,Lake Grove,111,#111,610 Smith Haven Mall Space P-10,NY,11755
+Cheesecake Factory,Beavercreek,112,#112,56 Greene Boulevard Greene Town Center,OH,45440
+Cheesecake Factory,Albany,113,#113,131 Wolf Road Colonie Center Mall #140,NY,12205
+Cheesecake Factory,Fairfax,114,#114,11778 Fair Oaks Fair Oaks Mall,VA,22033
+Cheesecake Factory,Chula Vista,115,#115,2015 Birch Road,CA,91915
+Cheesecake Factory,Cheektowaga,116,#116,1 Walden Galleria Space TH-170,NY,14225
+Cheesecake Factory,Oklahoma City,117,#117,5600 N Penn Avenue Penn Square Mall,OK,73112
+Cheesecake Factory,Dulles,118,#118,21076 Dulles Town Circle,VA,20166
+Cheesecake Factory,Glendale,119,#119,5799 N Bayshore Drive Bayshore Mall #L100,WI,53217
+Cheesecake Factory,Boise,120,#120,330 North Milwaukee Boise Towne Square,ID,83704
+Cheesecake Factory,Atlanta,121,#121,1609 Cumberland Mall,GA,30339
+Cheesecake Factory,Ross Township,122,#122,1000 Ross Park Mall Drive Ross Park Mall,PA,15237
+Cheesecake Factory,Riverside,123,#123,3525 Tyler Street Galleria at Tyler,CA,92503
+Cheesecake Factory,Arcadia,124,#124,903-L 400 S. Baldwin Avenue,CA,91007
+Cheesecake Factory,Brandon,125,#125,781 Brandon Town Center Mall,FL,33511
+Cheesecake Factory,Anaheim,127,#127,321 W Katella Avenue #100,CA,92802
+Cheesecake Factory,Willow Grove,128,#128,2500 West Moreland Road #3225,PA,19090
+Cheesecake Factory,Pittsford,129,#129,3349 Monroe Avenue,NY,14618
+Cheesecake Factory,Tulsa,130,#130,8711 E 71st Street S Woodland Hills Mall,OK,74133
+Cheesecake Factory,Tukwila,131,#131,230 Strander Boulevard Southcenter Mall,WA,98188
+Cheesecake Factory,Arlington,133,#133,3811 S Cooper Street The Parks at Arlington Mall,TX,76015
+Cheesecake Factory,Murray,135,#135,6223 S. State Street Unit 2001,UT,84107
+Cheesecake Factory,Huntington,136,#136,"160 Walt Whitman Road Walt Whitman Mall, Suite 1109B",NY,11746
+Cheesecake Factory,Mesa,138,#138,6613 E Southern Avenue Superstition Springs Center,AZ,85206
+Cheesecake Factory,Greenwood,139,#139,1251 US Highway 31 N Greenwood Park Mall,IN,46142
+Cheesecake Factory,Roseville,140,#140,1127 Galleria Boulevard Westfield Galleria at Roseville,CA,95678
+Cheesecake Factory,Glendale,141,#141,511 Americana Way,CA,91210
+Cheesecake Factory,Allen,142,#142,820 Central Expressway,TX,75013
+Cheesecake Factory,Pembroke Pines,143,#143,"14559 SW 5th Street The Shops at Pembroke Gardens, Suite 4060",FL,33027
+Cheesecake Factory,Columbus,144,#144,1566 Polaris Parkway #124,OH,43240
+Cheesecake Factory,Towson,145,#145,825 Dulaney Valley Road Suite 1159,MD,21204
+Cheesecake Factory,Walnut Creek,146,#146,1181 Locust Street Suite E,CA,94596
+Cheesecake Factory,Annapolis,149,#149,1872 Annapolis Mall,MD,21401
+Cheesecake Factory,Tucson,150,#150,60 West Wetmore Road,AZ,85705
+Cheesecake Factory,Newark,151,#151,350 Christiana Mall,DE,19702
+Cheesecake Factory,Yonkers,152,#152,140 Market Street,NY,10710
+Cheesecake Factory,Memorial City,153,#153,303 Memorial City,TX,77024
+Cheesecake Factory,San Mateo,156,#156,398 Hillsdale Shopping Center Hillsdale Shopping Center,CA,94403
+Cheesecake Factory,Salt Lake City,157,#157,65 Regent Street,UT,84111
+Cheesecake Factory,San Antonio,158,#158,"15900 La Cantera Parkway The Shops at La Cantera Mall, Suite 24100",TX,78256
+Cheesecake Factory,Woodbridge,161,#161,2708 Potomac Mills Circle,VA,22192
+Cheesecake Factory,Friendswood,162,#162,1450 West Bay Area Boulevard,TX,77546
+Cheesecake Factory,Orland Park,163,#163,304 Orland Square Drive,IL,60462
+Cheesecake Factory,Miami,164,#164,"11401 NW 12th Street, Space E512",FL,33172
+Cheesecake Factory,Knoxville,166,#166,201 Morrell Road,TN,37919
+Cheesecake Factory,Novi,167,#167,27679 Novi Road,MI,48377
+Cheesecake Factory,Oak Brook,79,#79,2020 Spring Road,IL,60523
+Cheesecake Factory,Canoga Park,170,#170,6600 Topanga Canyon Boulevard Suite 51,CA,91303
+Cheesecake Factory,Cambridge,23,#23,100 CambridgeSide Place,MA,2141
+Cheesecake Factory,Providence,32,#32,94 Providence Place,RI,2903
+Cheesecake Factory,Hackensack,38,#38,197 Riverside Square,NJ,7601
+Cheesecake Factory,Boston,52,#52,115 Huntington Avenue Suite 181,MA,2199
+Cheesecake Factory,Edison,59,#59,455 Menlo Park Drive,NJ,8837
+Cheesecake Factory,Wayne,80,#80,1700 Willowbrook Boulevard,NJ,7470
+Cheesecake Factory,Burlington,94,#94,75 Middlesex Turnpike #1067 A,MA,1803
+Cheesecake Factory,Braintree,95,#95,250 Granite Street South Shore Plaza,MA,2184
+Cheesecake Factory,Cherry Hill,110,#110,931 Haddonfield Road Market Place at Garden,NJ,8002
+Cheesecake Factory,West Hartford,126,#126,71 Isham Road Suite B 20,CT,6107
+Cheesecake Factory,Freehold,132,#132,3710 US Highway 9 Freehold Raceway Mall,NJ,7728
+Cheesecake Factory,Natick,134,#134,1245 Worcester Street Natick Collection,MA,1760
+Cheesecake Factory,Peabody,137,#137,210 Andover Street Northshore Mall,MA,1960
+Cheesecake Factory,Bridgewater,148,#148,400 Commons Way Suite 270,NJ,8807
+Cheesecake Factory,Short Hills,154,#154,1200 Morris Turnpike Suite D-103,NJ,7078
+Cheesecake Factory,Danbury,155,#155,"7 Backus Avenue Danbury Fair Mall, Space M206",CT,6810
+Cheesecake Factory,Lawrenceville,159,#159,161 Quaker Bridge Mall,NJ,8648
+Cheesecake Factory,Hanover,160,#160,7002 Arundel Mills Circle Suite 7777CCF,MD,21076
+Cheesecake Factory,Escondido,168,#168,200 E. Via Rancho Parkway Suite 370,CA,92025
+Cheesecake Factory,San Diego,169,#169,789 W Harbor Drive Suite C-1,CA,92101
+Cheesecake Factory,Chestnut Hill,171,#171,199 Boylston Street,MA,2467
+Cheesecake Factory,Buford,172,#172,3333 Buford Drive Space VD01H,GA,30519
+Cheesecake Factory,Bethesda,173,#173,7101 Democracy Boulevard,MD,20817
+Cheesecake Factory,Syracuse,174,#174,306 Hiawatha Boulevard West Space J-112,NY,13290

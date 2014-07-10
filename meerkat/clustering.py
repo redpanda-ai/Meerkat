@@ -1,18 +1,33 @@
-#!/usr/local/bin/python3
+#!/usr/local/bin/python3.3
 # pylint: disable=C0301
 
-"""This script clusters a list of latitude/ longitude pairs"""
+"""This module clusters a list of a users previously found
+transaction locations. Provided at least 25 latitude / longitude
+pairs, this module can group these points into separate categories
+such as Work or Home by analyzing how close the points are to 
+each other. After clustering, we find the outermost points that 
+bound a users typical shopping area represented as geopolygons, 
+scale these polygons inward or outward, and then generate a 
+geopolygon query for ElasticSearch. This added context allows 
+Meerkat to resolve ambiguous transactions that may not include a 
+City or State to aid in indentification. 
+
+Created on March 16, 2014
+@author: Matthew Sevrens
+"""
 
 import sys
+
+import pylab as pl
+import numpy as np
+import matplotlib.pyplot as plt
+
 from sklearn.cluster import DBSCAN
 from sklearn import metrics
 from sklearn.datasets.samples_generator import make_blobs
 from sklearn.preprocessing import StandardScaler
 from scipy.spatial import ConvexHull
-import matplotlib.pyplot as plt
-import pylab as pl
-import numpy as np
-from meerkat.various_tools import scale_polygon
+
 from pprint import pprint
 
 def cluster(location_list):
@@ -129,5 +144,5 @@ def convert_geoshapes_coordinates_to_strings(geoshape_list):
 	return new_geoshape_list
 
 if __name__ == "__main__":
-	""" Do some stuff."""
+	"""Print a warning to not execute this file as a module"""
 	print("This module is a library that contains useful functions; it should not be run from the console.")

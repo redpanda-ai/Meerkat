@@ -1,0 +1,713 @@
+keywords,city,Aggdata Store Number,store_number,address,state,zip_code
+Red Lobster,Tallahassee,17,#17 017 17 US000017,2583 North Monroe St,FL,32303
+Red Lobster,Saint Petersburg,19,#19 019 19 US000019,6151 34th Street,FL,33714
+Red Lobster,Sarasota,24,#24 024 24 US000024,6747 S Tamiami Trail,FL,34231
+Red Lobster,Bradenton,27,#27 027 27 US000027,5711 14th Street West,FL,34207
+Red Lobster,Tampa,28,#28 028 28 US000028,2625 East Busch Blvd.,FL,33612
+Red Lobster,Fort Lauderdale,29,#29 029 29 US000029,5950 N Federal Hwy,FL,33308
+Red Lobster,West Palm Beach,33,#33 033 33 US000033,2201 Palm Beach Lakes Blvd.,FL,33409
+Red Lobster,Albany,34,#34 034 34 US000034,2403 N. Slappey Blvd.,GA,31701
+Red Lobster,Columbus,35,#35 035 35 US000035,1425 13th Street,GA,31901
+Red Lobster,Athens,36,#36 036 36 US000036,1956 W. Broad Street,GA,30606
+Red Lobster,Miamisburg,38,#38 038 38 US000038,8200 Springboro Pike,OH,45342
+Red Lobster,Pensacola,39,#39 039 39 US000039,5110 N 9th Ave,FL,32504
+Red Lobster,Mobile,40,#40 040 40 US000040,3941 Airport Blvd.,AL,36608
+Red Lobster,Madison,45,#45 045 45 US000045,1814 Gallatin Pike N,TN,37115
+Red Lobster,Vestavia Hills,46,#46 046 46 US000046,1030 Montgomery Highway-S.,AL,35216
+Red Lobster,Knoxville,47,#47 047 47 US000047,8040 Kingston Pike,TN,37919
+Red Lobster,Macon,48,#48 048 48 US000048,2077 Riverside Drive,GA,31204
+Red Lobster,Decatur,49,#49 049 49 US000049,2522 Candler Rd,GA,30032
+Red Lobster,Jonesboro,55,#55 055 55 US000055,6550 Tara Blvd,GA,30236
+Red Lobster,Saint Louis,56,#56 056 56 US000056,5733 S. Lindbergh Blvd.,MO,63123
+Red Lobster,Evansville,58,#58 058 58 US000058,4605 Bellemeade Ave,IN,47714
+Red Lobster,Independence,60,#60 060 60 US000060,4328 Noland Rd,MO,64055
+Red Lobster,Bridgeton,61,#61 061 61 US000061,12235 Saint Charles Rock Rd,MO,63044
+Red Lobster,Springfield,63,#63 063 63 US000063,2141 S. Glenstone Ave,MO,65804
+Red Lobster,Terre Haute,70,#70 070 70 US000070,3407 South U.S. Hwy 41,IN,47802
+Red Lobster,Daytona,71,#71 071 71 US000071,2625 West International Speedway,FL,32114
+Red Lobster,Merritt Island,75,#75 075 75 US000075,215 E Merritt Island Causeway,FL,32952
+Red Lobster,Fort Wayne,76,#76 076 76 US000076,4825 Coldwater Road,IN,46825
+Red Lobster,Fort Myers,79,#79 079 79 US000079,3801 Cleveland Ave,FL,33901
+Red Lobster,Columbus,81,#81 081 81 US000081,2147 S. Hamilton Road,OH,43232
+Red Lobster,Indianapolis,82,#82 082 82 US000082,690 East Thompson Road,IN,46227
+Red Lobster,Kissimmee,83,#83 083 83 US000083,4010 West Vine Street,FL,34741
+Red Lobster,Tucker,91,#91 091 91 US000091,3937 Lavista Road,GA,30084
+Red Lobster,Austin,95,#95 095 95 US000095,109 W. Anderson Lane,TX,78752
+Red Lobster,Indianapolis,97,#97 097 97 US000097,1752 N. Shadeland Ave,IN,46219
+Red Lobster,Orlando,108,#108 0108 108 US0000108,5936 International Drive,FL,32819
+Red Lobster,Toledo,109,#109 0109 109 US0000109,4990 Monroe St,OH,43623
+Red Lobster,Cincinnati,110,#110 0110 110 US0000110,3564 Springdale Road,OH,45251
+Red Lobster,Crestwood,112,#112 0112 112 US0000112,9838 Watson Road,MO,63126
+Red Lobster,Omaha,115,#115 0115 115 US0000115,330 S. 72nd Street,NE,68114
+Red Lobster,Parma,116,#116 0116 116 US0000116,7607 Day Drive,OH,44129
+Red Lobster,Aurora,118,#118 0118 118 US0000118,10854 East Alameda Avenue,CO,80012
+Red Lobster,Wheat Ridge,119,#119 0119 119 US0000119,4455 Wadsworth Blvd,CO,80033
+Red Lobster,Canton,121,#121 0121 121 US0000121,4600 Belden Village Ave,OH,44718
+Red Lobster,Maumee,122,#122 0122 122 US0000122,1422 Reynolds Road,OH,43537
+Red Lobster,Dearborn Heights,124,#124 0124 124 US0000124,6850 Telegraph Road,MI,48127
+Red Lobster,Westland,125,#125 0125 125 US0000125,5774 North Wayne Road,MI,48185
+Red Lobster,Cuyahoga Falls,126,#126 0126 126 US0000126,1090 Graham Road,OH,44224
+Red Lobster,Kentwood,129,#129 0129 129 US0000129,3920 28th Street. S.E.,MI,49512
+Red Lobster,Bloomington,130,#130 0130 130 US0000130,714 Eldorado Road,IL,61704
+Red Lobster,Madison Heights,131,#131 0131 131 US0000131,101 W.12 Mile Road,MI,48071
+Red Lobster,Warren,132,#132 0132 132 US0000132,25901 Hoover Road,MI,48089
+Red Lobster,Davenport,133,#133 0133 133 US0000133,3420 East Kimberly Road,IA,52807
+Red Lobster,Muncie,136,#136 0136 136 US0000136,223 West McGalliard Road,IN,47303
+Red Lobster,San Antonio,137,#137 0137 137 US0000137,8210 I-H 35 North,TX,78239
+Red Lobster,Matteson,139,#139 0139 139 US0000139,3915 Westt 211th Street,IL,60443
+Red Lobster,Suitland,142,#142 0142 142 US0000142,5051 Auth Road,MD,20746
+Red Lobster,Greenfield,146,#146 0146 146 US0000146,4645 South 76th Street,WI,53220
+Red Lobster,Wauwatosa,150,#150 0150 150 US0000150,2801 North Mayfair Road,WI,53222
+Red Lobster,Portage,152,#152 0152 152 US0000152,6535 S Westnedge Avenue,MI,49081
+Red Lobster,Virginia Beach,153,#153 0153 153 US0000153,709 Independence Blvd.,VA,23455
+Red Lobster,Roseville,154,#154 0154 154 US0000154,2330 Prior Avenue,MN,55113
+Red Lobster,Ashwaubenon,155,#155 0155 155 US0000155,1251 Lombardi Access Road,WI,54304
+Red Lobster,Golden Valley,157,#157 0157 157 US0000157,8900 Golden Valley Road,MN,55427
+Red Lobster,Oak Lawn,158,#158 0158 158 US0000158,9500 Southwest Highway,IL,60453
+Red Lobster,Huntsville,159,#159 0159 159 US0000159,1818 University Drive N.W.,AL,35801
+Red Lobster,Saginaw,160,#160 0160 160 US0000160,4141 Bay Road,MI,48603
+Red Lobster,Beaumont,161,#161 0161 161 US0000161,2820 IH-10 East,TX,77703
+Red Lobster,Corpus Christi,163,#163 0163 163 US0000163,5825 South Padre Island Drive,TX,78412
+Red Lobster,Amarillo,168,#168 0168 168 US0000168,3311 I-40 West,TX,79109
+Red Lobster,Lubbock,169,#169 0169 169 US0000169,5034 50th Street,TX,79414
+Red Lobster,Greenville,171,#171 0171 171 US0000171,1940 Wade Hampton Blvd,SC,29615
+Red Lobster,Cayce,172,#172 0172 172 US0000172,1270 Knox Abbott Drive,SC,29033
+Red Lobster,Savannah,173,#173 0173 173 US0000173,11 W Montgomery Cross Roads,GA,31406
+Red Lobster,Augusta,174,#174 0174 174 US0000174,440 Walton Way,GA,30901
+Red Lobster,Anderson,179,#179 0179 179 US0000179,3426 Clemson Blvd,SC,29621
+Red Lobster,Vestal,180,#180 0180 180 US0000180,1200 Vestal Parkway East,NY,13850
+Red Lobster,Saint Peters,181,#181 0181 181 US0000181,4101 Veterans Memorial Pkwy,MO,63376
+Red Lobster,Munster,184,#184 0184 184 US0000184,9311 Calumet Avenue,IN,46321
+Red Lobster,Florence,185,#185 0185 185 US0000185,7921 Dream Street,KY,41042
+Red Lobster,Rockford,186,#186 0186 186 US0000186,5827 East State Street,IL,61108
+Red Lobster,Lexington,188,#188 0188 188 US0000188,2550 Nicholasville Road,KY,40503
+Red Lobster,Henrietta,189,#189 0189 189 US0000189,655 West Jefferson Road,NY,14623
+Red Lobster,Tulsa,191,#191 0191 191 US0000191,4525 East 51st. Street,OK,74135
+Red Lobster,Flint,192,#192 0192 192 US0000192,4417 West Pierson Road,MI,48504
+Red Lobster,Pittsburgh,193,#193 0193 193 US0000193,259 Clairton Blvd.,PA,15236
+Red Lobster,Mechanicsburg,195,#195 0195 195 US0000195,4711 Carlisle Pike,PA,17050
+Red Lobster,Pasadena,198,#198 0198 198 US0000198,4002 Spencer Highway,TX,77504
+Red Lobster,Gaithersburg,200,#200 0200 200 US0000200,15700 Shady Grove Road,MD,20877
+Red Lobster,Lansing,201,#201 0201 201 US0000201,3130 East Saginaw Street,MI,48912
+Red Lobster,Little Rock,202,#202 0202 202 US0000202,8407 W. Markham Street,AR,72205
+Red Lobster,East Brunswick,203,#203 0203 203 US0000203,750 Highway 18 North,NJ,8816
+Red Lobster,Durham,210,#210 0210 210 US0000210,4416 Chapel Hill Blvd,NC,27707
+Red Lobster,Stony Brook,217,#217 0217 217 US0000217,2220 Nesconset Highway,NY,11790
+Red Lobster,Reading,218,#218 0218 218 US0000218,945 Woodland Road,PA,19610
+Red Lobster,Odessa,220,#220 0220 220 US0000220,4536 E. University Blvd.,TX,79762
+Red Lobster,Jackson,223,#223 0223 223 US0000223,2400 Shirley Drive,MI,49202
+Red Lobster,Blaine,224,#224 0224 224 US0000224,8500 Hwy. 47,MN,55433
+Red Lobster,Mansfield,227,#227 0227 227 US0000227,2322 West 4th Street,OH,44906
+Red Lobster,Amherst,228,#228 0228 228 US0000228,7520 Transit Road,NY,14221
+Red Lobster,Pittsburgh,229,#229 0229 229 US0000229,4766 McKnight Road,PA,15237
+Red Lobster,Monroeville,230,#230 0230 230 US0000230,3941 William Penn Highway,PA,15146
+Red Lobster,Fairfax,231,#231 0231 231 US0000231,10325 Fairfax Blvd,VA,22030
+Red Lobster,Cincinnati,232,#232 0232 232 US0000232,8220 Montgomery Road,OH,45236
+Red Lobster,Alexandria,235,#235 0235 235 US0000235,555 S. Van Dorn Street,VA,22304
+Red Lobster,Lincoln,236,#236 0236 236 US0000236,6540 O Street,NE,68510
+Red Lobster,Oklahoma City,237,#237 0237 237 US0000237,4243 NW Expressway Street,OK,73116
+Red Lobster,Beachwood,238,#238 0238 238 US0000238,3655 Orange Place,OH,44122
+Red Lobster,Lawrenceville,239,#239 0239 239 US0000239,3255 Brunswick Pike,NJ,8648
+Red Lobster,Lancaster,240,#240 0240 240 US0000240,2090 Lincoln Highway East,PA,17602
+Red Lobster,Philadelphia,241,#241 0241 241 US0000241,9140 Roosevelt Blvd E.,PA,19115
+Red Lobster,Mentor,243,#243 0243 243 US0000243,7744 Reynolds Rd,OH,44060
+Red Lobster,Oakhurst,244,#244 0244 244 US0000244,2200 Highway 35,NJ,7755
+Red Lobster,Hialeah,246,#246 0246 246 US0000246,1750 West 49th Street,FL,33012
+Red Lobster,Syracuse,247,#247 0247 247 US0000247,2965 Erie Blvd. E,NY,13224
+Red Lobster,Springfield,248,#248 0248 248 US0000248,2696 South Dirksen Parkway,IL,62703
+Red Lobster,Bloomington,249,#249 0249 249 US0000249,1951 American Blvd West,MN,55431
+Red Lobster,Columbia,250,#250 0250 250 US0000250,1716 I-70 Drive,MO,65203
+Red Lobster,Richmond,251,#251 0251 251 US0000251,8009 West Broad Street,VA,23294
+Red Lobster,Whitehall,252,#252 0252 252 US0000252,800 Lehigh Valley Mall,PA,18052
+Red Lobster,Knoxville,253,#253 0253 253 US0000253,305 Merchants Rd,TN,37912
+Red Lobster,Wayne,255,#255 0255 255 US0000255,520 Highway 46,NJ,7470
+Red Lobster,Fayetteville,256,#256 0256 256 US0000256,533 N McPherson Church Rd,NC,28303
+Red Lobster,Orange Park,257,#257 0257 257 US0000257,32 Blanding Blvd,FL,32073
+Red Lobster,North Charleston,259,#259 0259 259 US0000259,2460 Mall Drive,SC,29406
+Red Lobster,Ann Arbor,260,#260 0260 260 US0000260,2420 Carpenter Road,MI,48108
+Red Lobster,Saint Joseph,263,#263 0263 263 US0000263,4101 Frederick Blvd,MO,64506
+Red Lobster,Carle Place,264,#264 0264 264 US0000264,211-217 Old Country Rd.,NY,11514
+Red Lobster,Lanham,265,#265 0265 265 US0000265,8905 Annapolis Rd.,MD,20706
+Red Lobster,Merrillville,266,#266 0266 266 US0000266,1450 E 82nd Ave,IN,46410
+Red Lobster,Iselin,267,#267 0267 267 US0000267,635 Route 1 And Gills Lane,NJ,8830
+Red Lobster,Roanoke,269,#269 0269 269 US0000269,3529 Franklin Rd. SW,VA,24014
+Red Lobster,Dothan,271,#271 0271 271 US0000271,3116 Montgomery Highway,AL,36303
+Red Lobster,Rome,273,#273 0273 273 US0000273,700 Shorter Ave NW,GA,30165
+Red Lobster,Norridge,274,#274 0274 274 US0000274,4401 N Cumberland Ave,IL,60706
+Red Lobster,Battle Creek,275,#275 0275 275 US0000275,2565 Capitol Ave. S.W.,MI,49015
+Red Lobster,Chicago,277,#277 0277 277 US0000277,5201 S. Pulaski Road,IL,60632
+Red Lobster,Burnsville,281,#281 0281 281 US0000281,1301 County Road 42 West,MN,55306
+Red Lobster,Abilene,282,#282 0282 282 US0000282,1280 S Clack,TX,79605
+Red Lobster,Maplewood,283,#283 0283 283 US0000283,2925 White Bear Ave.,MN,55109
+Red Lobster,Wichita Falls,284,#284 0284 284 US0000284,4401 Kemp Blvd.,TX,76308
+Red Lobster,Chattanooga,285,#285 0285 285 US0000285,2131 Northgate Mall Dr,TN,37415
+Red Lobster,Nanuet,286,#286 0286 286 US0000286,198 West Route 59,NY,10954
+Red Lobster,Orland Park,287,#287 0287 287 US0000287,14750 S Lagrange Rd,IL,60462
+Red Lobster,Cincinnati,288,#288 0288 288 US0000288,616 Ohio Pike,OH,45245
+Red Lobster,Augusta,290,#290 0290 290 US0000290,2847 Washington Road,GA,30909
+Red Lobster,Albuquerque,291,#291 0291 291 US0000291,5555 Montgomery NE,NM,87109
+Red Lobster,Gadsden,292,#292 0292 292 US0000292,1725 Rainbow Dr.,AL,35901
+Red Lobster,Oklahoma City,293,#293 0293 293 US0000293,1000 SW 74th Street,OK,73139
+Red Lobster,Virginia Beach,296,#296 0296 296 US0000296,821 Lynnhaven Pkwy,VA,23452
+Red Lobster,Kokomo,297,#297 0297 297 US0000297,1900 S. U.S. 31 By-Pass,IN,46902
+Red Lobster,Tuscaloosa,298,#298 0298 298 US0000298,2620 McFarland Blvd. E,AL,35405
+Red Lobster,Paramus,302,#302 0302 302 US0000302,211 Route 17 S,NJ,7652
+Red Lobster,Sioux Falls,305,#305 0305 305 US0000305,3901 W 41st Street,SD,57106
+Red Lobster,Amherst,307,#307 0307 307 US0000307,4010 Maple Rd.,NY,14226
+Red Lobster,Fargo,309,#309 0309 309 US0000309,4215 13th Ave S,ND,58103
+Red Lobster,Joplin,310,#310 0310 310 US0000310,3131 Range Line Rd.,MO,64801
+Red Lobster,Poughkeepsie,311,#311 0311 311 US0000311,2255 Route 9,NY,12601
+Red Lobster,Johnson City,312,#312 0312 312 US0000312,1909 N Roan Street,TN,37601
+Red Lobster,Hicksville,313,#313 0313 313 US0000313,1 Nevada Street,NY,11801
+Red Lobster,Austin,314,#314 0314 314 US0000314,3815 S. Lamar Blvd.,TX,78704
+Red Lobster,Longview,315,#315 0315 315 US0000315,3515 McCann Rd.,TX,75605
+Red Lobster,Raleigh,318,#318 0318 318 US0000318,4408 Old Wake Forest Road,NC,27609
+Red Lobster,North Little Rock,319,#319 0319 319 US0000319,3707 McCain Blvd,AR,72116
+Red Lobster,Lawton,320,#320 0320 320 US0000320,3112 N.W. Cache Road,OK,73505
+Red Lobster,Bloomingdale,322,#322 0322 322 US0000322,391 West Army Trail Road,IL,60108
+Red Lobster,Citrus Heights,323,#323 0323 323 US0000323,6231 Sunrise Blvd,CA,95610
+Red Lobster,Akron,324,#324 0324 324 US0000324,3901 Medina Road,OH,44333
+Red Lobster,Northglenn,328,#328 0328 328 US0000328,1350 West 104th Ave.,CO,80234
+Red Lobster,McAllen,329,#329 0329 329 US0000329,701 Expressway 83,TX,78503
+Red Lobster,Tampa,330,#330 0330 330 US0000330,11601 N. Dale Mabry,FL,33618
+Red Lobster,Roswell,331,#331 0331 331 US0000331,1050 Holcomb Bridge Rd,GA,30076
+Red Lobster,Coral Springs,332,#332 0332 332 US0000332,2000 University Dr,FL,33071
+Red Lobster,Fort Worth,334,#334 0334 334 US0000334,4805 S. Hulen Street,TX,76132
+Red Lobster,Modesto,335,#335 0335 335 US0000335,3000 Sisk Rd,CA,95350
+Red Lobster,Las Vegas,339,#339 0339 339 US0000339,200 S. Decatur Blvd.,NV,89107
+Red Lobster,West Dundee,340,#340 0340 340 US0000340,701 Spring Hill Ring Road,IL,60118
+Red Lobster,Tyler,343,#343 0343 343 US0000343,"1500 W Southwest, Loop 32",TX,75701
+Red Lobster,Anderson,344,#344 0344 344 US0000344,5806 Scatterfield Road,IN,46013
+Red Lobster,Lake Worth,345,#345 0345 345 US0000345,6638 Lake Worth Road,FL,33467
+Red Lobster,Owensboro,347,#347 0347 347 US0000347,3410 Frederica Street,KY,42301
+Red Lobster,Clearwater,348,#348 0348 348 US0000348,26320 U.S. 19th North,FL,33761
+Red Lobster,Bowling Green,349,#349 0349 349 US0000349,2525 Scottsville Road,KY,42104
+Red Lobster,Scarsdale,351,#351 0351 351 US0000351,999 Central Park Ave,NY,10583
+Red Lobster,Ocala,352,#352 0352 352 US0000352,3393 SW College Road,FL,34474
+Red Lobster,Youngstown,353,#353 0353 353 US0000353,1410 Boardman-Poland Rd,OH,44514
+Red Lobster,Scottsdale,354,#354 0354 354 US0000354,4802 E Cactus Road,AZ,85254
+Red Lobster,Webster,356,#356 0356 356 US0000356,888 W. Bay Area Blvd.,TX,77598
+Red Lobster,Norman,357,#357 0357 357 US0000357,302 N Interstate Drive,OK,73072
+Red Lobster,Wichita,361,#361 0361 361 US0000361,555 South West Street,KS,67213
+Red Lobster,Colorado Springs,364,#364 0364 364 US0000364,4925 N Academy Blvd,CO,80918
+Red Lobster,Antioch,365,#365 0365 365 US0000365,5259 Hickory Hollow Pkwy,TN,37013
+Red Lobster,Niles,366,#366 0366 366 US0000366,5701 Youngstown-Warren Rd,OH,44446
+Red Lobster,Sacramento,367,#367 0367 367 US0000367,1400 Howe Avenue,CA,95825
+Red Lobster,Tucson,369,#369 0369 369 US0000369,5061 North Oracle Road,AZ,85704
+Red Lobster,Eau Claire,370,#370 0370 370 US0000370,1019 W. Clairemont Ave.,WI,54701
+Red Lobster,Indianapolis,371,#371 0371 371 US0000371,6410 E. 82nd Street,IN,46250
+Red Lobster,Lynchburg,372,#372 0372 372 US0000372,3425 Candlers Mountains Rd,VA,24502
+Red Lobster,Valley Stream,374,#374 0374 374 US0000374,606 West Sunrise Hwy.,NY,11581
+Red Lobster,Springfield,375,#375 0375 375 US0000375,1 Baltimore Pike,PA,19064
+Red Lobster,Madison,377,#377 0377 377 US0000377,4502 East Towne Blvd.,WI,53704
+Red Lobster,South Plainfield,379,#379 0379 379 US0000379,7000 Hadley Rd.,NJ,7080
+Red Lobster,Alton,380,#380 0380 380 US0000380,170 Homer M Adams Parkway,IL,62002
+Red Lobster,Stockton,381,#381 0381 381 US0000381,2283 W. March Lane,CA,95207
+Red Lobster,San Jose,382,#382 0382 382 US0000382,5343 Almaden Expressway,CA,95118
+Red Lobster,San Jose,383,#383 0383 383 US0000383,2040 Aborn Road,CA,95121
+Red Lobster,Jacksonville,385,#385 0385 385 US0000385,8720 Baymeadows,FL,32256
+Red Lobster,San Antonio,386,#386 0386 386 US0000386,1381 S.W. Loop 410,TX,78227
+Red Lobster,Montgomery,387,#387 0387 387 US0000387,300 Eastdale Circle,AL,36117
+Red Lobster,Novi,389,#389 0389 389 US0000389,27760 Novi Road,MI,48377
+Red Lobster,Smyrna,392,#392 0392 392 US0000392,2579 Cobb Parkway,GA,30080
+Red Lobster,Fort Collins,393,#393 0393 393 US0000393,3301 S. College Ave.,CO,80525
+Red Lobster,Harrisburg,396,#396 0396 396 US0000396,4300 Jonestown Road,PA,17109
+Red Lobster,Duluth,397,#397 0397 397 US0000397,2055 Pleasant Hill Road,GA,30096
+Red Lobster,Annapolis,398,#398 0398 398 US0000398,183 Jennifer Road,MD,21401
+Red Lobster,Charleston,399,#399 0399 399 US0000399,2080 Sam Rittenburg Blvd,SC,29407
+Red Lobster,Sterling Heights,401,#401 0401 401 US0000401,13800 Hall Road,MI,48313
+Red Lobster,Fayetteville,402,#402 0402 402 US0000402,3885 N Shiloh Drive,AR,72703
+Red Lobster,Fremont,403,#403 0403 403 US0000403,39401 Fremont Blvd,CA,94538
+Red Lobster,Baytown,404,#404 0404 404 US0000404,4717 Highway 10,TX,77521
+Red Lobster,Victoria,406,#406 0406 406 US0000406,7404 Zac Lentz Pkwy,TX,77904
+Red Lobster,Lake Jackson,408,#408 0408 408 US0000408,104 Highway 332,TX,77566
+Red Lobster,San Angelo,409,#409 0409 409 US0000409,3909 Sunset Drive,TX,76904
+Red Lobster,Rochester,410,#410 0410 410 US0000410,1515 West Ridge Road,NY,14615
+Red Lobster,Huntington,411,#411 0411 411 US0000411,200 10th Street,WV,25701
+Red Lobster,Daytona Beach,412,#412 0412 412 US0000412,3162 S Atlantic Ave.,FL,32118
+Red Lobster,Omaha,414,#414 0414 414 US0000414,2707 S 140th Street,NE,68144
+Red Lobster,Mesquite,416,#416 0416 416 US0000416,3906 Towne Crossing Blvd,TX,75150
+Red Lobster,Hampton,417,#417 0417 417 US0000417,1046 W Mercury Blvd,VA,23666
+Red Lobster,York,420,#420 0420 420 US0000420,2555 E Market Street,PA,17402
+Red Lobster,Wichita,421,#421 0421 421 US0000421,333 S. Towne East Mall Drive,KS,67207
+Red Lobster,Sandusky,423,#423 0423 423 US0000423,4016 Milan Road,OH,44870
+Red Lobster,Pembroke Pines,424,#424 0424 424 US0000424,296 N University Drive,FL,33024
+Red Lobster,Brandon,425,#425 0425 425 US0000425,2604 West Brandon Blvd,FL,33511
+Red Lobster,Buffalo,426,#426 0426 426 US0000426,1000 McKinley Mall,NY,14220
+Red Lobster,Erie,430,#430 0430 430 US0000430,2040 Edinboror Road,PA,16509
+Red Lobster,Kennesaw,433,#433 0433 433 US0000433,2626 George Busbee Pkwy,GA,30144
+Red Lobster,Livonia,434,#434 0434 434 US0000434,29980 Plymouth Road,MI,48150
+Red Lobster,Kissimmee,435,#435 0435 435 US0000435,5690 Irlo Bronson Memorial Hwy,FL,34746
+Red Lobster,Tulsa,436,#436 0436 436 US0000436,6728 S Memorial Drive,OK,74133
+Red Lobster,Delran,438,#438 0438 438 US0000438,3003 Route 130 South,NJ,8075
+Red Lobster,Union,442,#442 0442 442 US0000442,2520 US Highway Route 22,NJ,7083
+Red Lobster,Lansdale,443,#443 0443 443 US0000443,640 Cowpath Road,PA,19446
+Red Lobster,Naples,444,#444 0444 444 US0000444,2355 N US 41,FL,34103
+Red Lobster,Wilkes-Barre,445,#445 0445 445 US0000445,10 East End Center,PA,18702
+Red Lobster,Littleton,446,#446 0446 446 US0000446,5656 S. Wadsworth Blvd.,CO,80123
+Red Lobster,Plantation,447,#447 0447 447 US0000447,803 S. University Drive,FL,33324
+Red Lobster,Federal Way,448,#448 0448 448 US0000448,2006 S. 320th Street,WA,98003
+Red Lobster,Greensburg,449,#449 0449 449 US0000449,5080 Rt 30 E,PA,15601
+Red Lobster,Orlando,452,#452 0452 452 US0000452,12557 State Road 535,FL,32836
+Red Lobster,Tacoma,453,#453 0453 453 US0000453,1929 S 72nd Street,WA,98408
+Red Lobster,Largo,454,#454 0454 454 US0000454,10500 E Ulmerton Road,FL,33771
+Red Lobster,Altoona,455,#455 0455 455 US0000455,3341 Pleasant Valley Blvd,PA,16602
+Red Lobster,Vancouver,456,#456 0456 456 US0000456,8219 NE Vancouver Mall Dr,WA,98662
+Red Lobster,Tigard,457,#457 0457 457 US0000457,10330 SW Greenburg Road,OR,97223
+Red Lobster,Fort Walton Beach,458,#458 0458 458 US0000458,326 Miracle Strip Pkwy S.W.,FL,32548
+Red Lobster,Hickory,459,#459 0459 459 US0000459,1846 Us-70 SE,NC,28602
+Red Lobster,Rapid City,460,#460 0460 460 US0000460,120 Disk Drive,SD,57701
+Red Lobster,Jensen Beach,461,#461 0461 461 US0000461,3544 NW Federal Hwy,FL,34957
+Red Lobster,North Miami,464,#464 0464 464 US0000464,13300 Biscayne Blvd.,FL,33181
+Red Lobster,Arlington,468,#468 0468 468 US0000468,4233 S. Cooper Street,TX,76015
+Red Lobster,Bronx,469,#469 0469 469 US0000469,2090 Bartow Avenue,NY,10475
+Red Lobster,Southgate,470,#470 0470 470 US0000470,13999 Eureka Road,MI,48195
+Red Lobster,Peoria,473,#473 0473 473 US0000473,4625 N Sterling Ave,IL,61615
+Red Lobster,Florence,474,#474 0474 474 US0000474,243 Cox Creek Parkway,AL,35630
+Red Lobster,Clarksville,476,#476 0476 476 US0000476,2838 Wilma Rudolph Blvd.,TN,37040
+Red Lobster,Santa Fe,478,#478 0478 478 US0000478,4450 Rodeo Road,NM,87507
+Red Lobster,Port Charlotte,479,#479 0479 479 US0000479,1331 Tamiami Trail,FL,33948
+Red Lobster,Leesburg,480,#480 0480 480 US0000480,10010 US Highway 441,FL,34788
+Red Lobster,Lynnwood,481,#481 0481 481 US0000481,4231 196th SW,WA,98036
+Red Lobster,Pueblo,482,#482 0482 482 US0000482,3306 N Elizabeth Street,CO,81008
+Red Lobster,Greeley,484,#484 0484 484 US0000484,2885 23rd Ave,CO,80631
+Red Lobster,Paducah,485,#485 0485 485 US0000485,5151 Hinkleville Road,KY,42001
+Red Lobster,Florence,486,#486 0486 486 US0000486,2540 David H McLeod Blvd,SC,29501
+Red Lobster,Bismarck,487,#487 0487 487 US0000487,1130 E Century Avenue,ND,58503
+Red Lobster,Brownsville,488,#488 0488 488 US0000488,1075 Fm 802,TX,78526
+Red Lobster,New Hartford,489,#489 0489 489 US0000489,4573 Commercial Drive,NY,13413
+Red Lobster,Downers Grove,492,#492 0492 492 US0000492,3001 Finley Road,IL,60515
+Red Lobster,Saint Cloud,493,#493 0493 493 US0000493,2920 W. Division Street,MN,56301
+Red Lobster,Bradley,494,#494 0494 494 US0000494,1604 N State Road Route 50,IL,60915
+Red Lobster,Talleyville,496,#496 0496 496 US0000496,309 Rocky Run Parkway,DE,19803
+Red Lobster,Rochester Hills,497,#497 0497 497 US0000497,2825 S Rochester Road,MI,48307
+Red Lobster,Douglasville,498,#498 0498 498 US0000498,3100 Bill Arp Road,GA,30135
+Red Lobster,La Mesa,504,#504 0504 504 US0000504,8703 Murray Drive,CA,91942
+Red Lobster,Waco,508,#508 0508 508 US0000508,5925 West Waco Drive,TX,76710
+Red Lobster,Brea,510,#510 0510 510 US0000510,250 Brea Mall,CA,92821
+Red Lobster,Valencia,511,#511 0511 511 US0000511,27524 The Old Road,CA,91355
+Red Lobster,Torrance,512,#512 0512 512 US0000512,21233 Hawthorne Blvd,CA,90503
+Red Lobster,La Puente,513,#513 0513 513 US0000513,17601 Castleton Street,CA,91748
+Red Lobster,San Bernardino,516,#516 0516 516 US0000516,195 E. Hospitality Lane,CA,92408
+Red Lobster,Garden Grove,518,#518 0518 518 US0000518,12892 Harbor Blvd,CA,92840
+Red Lobster,San Diego,519,#519 0519 519 US0000519,3780 Sports Arena,CA,92110
+Red Lobster,San Diego,520,#520 0520 520 US0000520,8330 Mira Mesa Blvd,CA,92126
+Red Lobster,Riverside,523,#523 0523 523 US0000523,3700 Park Sierra,CA,92505
+Red Lobster,Canoga Park,525,#525 0525 525 US0000525,22800 Van Owen Ave,CA,91307
+Red Lobster,Lakewood,528,#528 0528 528 US0000528,4333 Candlewood,CA,90712
+Red Lobster,Montclair,529,#529 0529 529 US0000529,9345 Monte Vista,CA,91763
+Red Lobster,Milpitas,532,#532 0532 532 US0000532,503 E. Calaveras Blvd.,CA,95035
+Red Lobster,Killeen,538,#538 0538 538 US0000538,1001 E Central Texas Expressway,TX,76541
+Red Lobster,Auburn,539,#539 0539 539 US0000539,1805 Opelika Hwy,AL,36830
+Red Lobster,Aiken,540,#540 0540 540 US0000540,950 Aiken Mall Drive,SC,29803
+Red Lobster,Monroe,543,#543 0543 543 US0000543,4601 Pecanland Mall,LA,71203
+Red Lobster,Lima,544,#544 0544 544 US0000544,2150 Harding Hwy,OH,45804
+Red Lobster,North Richland Hills,545,#545 0545 545 US0000545,7800 Bedford-Euless Road,TX,76180
+Red Lobster,La Crosse,546,#546 0546 546 US0000546,3333 State Road 16,WI,54601
+Red Lobster,Sioux City,547,#547 0547 547 US0000547,4290 Sergeant Road,IA,51106
+Red Lobster,Heath,548,#548 0548 548 US0000548,909 Hebron Road,OH,43056
+Red Lobster,San Bruno,549,#549 0549 549 US0000549,1210 El Camino Real,CA,94066
+Red Lobster,Chambersburg,550,#550 0550 550 US0000550,935 Wayne Ave,PA,17201
+Red Lobster,Rocky Mount,551,#551 0551 551 US0000551,1010 N Wesleyan Blvd,NC,27802
+Red Lobster,Dover,552,#552 0552 552 US0000552,271 N Dupont Highway,DE,19901
+Red Lobster,Lancaster,553,#553 0553 553 US0000553,"1515 River Valley Circle, N.",OH,43130
+Red Lobster,Meadville,554,#554 0554 554 US0000554,16736 Conneaut Lake Road,PA,16335
+Red Lobster,Redding,555,#555 0555 555 US0000555,1345 Dana Drive,CA,96003
+Red Lobster,Danville,556,#556 0556 556 US0000556,3217 Vermillion Street,IL,61832
+Red Lobster,Waldorf,557,#557 0557 557 US0000557,11035 Mall Circle,MD,20603
+Red Lobster,Oxford,559,#559 0559 559 US0000559,515 Quintard Drive,AL,36203
+Red Lobster,Marion,560,#560 0560 560 US0000560,1318 Mount Vernon Avenue,OH,43302
+Red Lobster,Louisville,563,#563 0563 563 US0000563,4639 Outer Loop,KY,40219
+Red Lobster,New Philadelphia,564,#564 0564 564 US0000564,"255 Graff Road, S.E.",OH,44663
+Red Lobster,Deptford,566,#566 0566 566 US0000566,1500 Almonesson Rd,NJ,8096
+Red Lobster,Toms River,568,#568 0568 568 US0000568,1298 Hooper Ave,NJ,8753
+Red Lobster,Uniontown,569,#569 0569 569 US0000569,515 W Main Street,PA,15401
+Red Lobster,Greenville,571,#571 0571 571 US0000571,3501 S Memorial Drive,NC,27834
+Red Lobster,Fredericksburg,572,#572 0572 572 US0000572,3109 Spotsylvania Mall Drive,VA,22407
+Red Lobster,Gresham,573,#573 0573 573 US0000573,240 NW Burnside Road,OR,97030
+Red Lobster,Las Cruces,574,#574 0574 574 US0000574,575 S Telshor Blvd,NM,88011
+Red Lobster,Mays Landing,575,#575 0575 575 US0000575,4411 Black Horse Pike,NJ,8330
+Red Lobster,Medford,576,#576 0576 576 US0000576,2200 Crater Lake Highway,OR,97504
+Red Lobster,Palmdale,577,#577 0577 577 US0000577,1041 W Avenue P,CA,93551
+Red Lobster,Joliet,578,#578 0578 578 US0000578,2950 Plainfield Road,IL,60435
+Red Lobster,Fresno,579,#579 0579 579 US0000579,1460 E Shaw Avenue,CA,93710
+Red Lobster,Findlay,580,#580 0580 580 US0000580,2340 Tiffin Avenue,OH,45840
+Red Lobster,Lincolnwood,582,#582 0582 582 US0000582,3301 W Touhy Avenue,IL,60712
+Red Lobster,Columbus,585,#585 0585 585 US0000585,2000 25th Street,IN,47201
+Red Lobster,Appleton,587,#587 0587 587 US0000587,1200 N Casaloma Drive,WI,54913
+Red Lobster,Salt Lake City,589,#589 0589 589 US0000589,2294 S 1300 E,UT,84106
+Red Lobster,Oklahoma City,591,#591 0591 591 US0000591,2625 W Memorial Rd,OK,73134
+Red Lobster,Valdosta,595,#595 0595 595 US0000595,1179 N Saint Augustine Road,GA,31601
+Red Lobster,Oxnard,596,#596 0596 596 US0000596,1740 East Ventura Blvd,CA,93036
+Red Lobster,Yakima,597,#597 0597 597 US0000597,905 North First Street,WA,98901
+Red Lobster,Cary,598,#598 0598 598 US0000598,1805 Walnut Street,NC,27511
+Red Lobster,Chesapeake,599,#599 0599 599 US0000599,4115 Chesapeake Square Blvd,VA,23321
+Red Lobster,Farmington,600,#600 0600 600 US0000600,3451 E Main Street,NM,87401
+Red Lobster,Pineville,601,#601 0601 601 US0000601,9415 Pineville-Matthews Road,NC,28134
+Red Lobster,Murfreesboro,604,#604 0604 604 US0000604,1745 Old Fort Parkway,TN,37129
+Red Lobster,Kansas City,605,#605 0605 605 US0000605,450 NW Barry Road,MO,64155
+Red Lobster,Zanesville,606,#606 0606 606 US0000606,755 Zane Street,OH,43701
+Red Lobster,Snellville,607,#607 0607 607 US0000607,4001 Highway 78 W,GA,30078
+Red Lobster,Victorville,608,#608 0608 608 US0000608,12180 Amargosa Road,CA,92392
+Red Lobster,Rohnert Park,609,#609 0609 609 US0000609,6440 Redwood Drive,CA,94928
+Red Lobster,Michigan City,610,#610 0610 610 US0000610,4353 Franklin Street,IN,46360
+Red Lobster,Sebring,611,#611 0611 611 US0000611,721 US 27 North,FL,33870
+Red Lobster,Gainesville,612,#612 0612 612 US0000612,1707 Browns Bridge Road,GA,30501
+Red Lobster,Murray,613,#613 0613 613 US0000613,298 E Winchester Street,UT,84107
+Red Lobster,Copiague,614,#614 0614 614 US0000614,801 Sunrise Highway,NY,11726
+Red Lobster,Salisbury,615,#615 0615 615 US0000615,2314 N Salisbury Blvd,MD,21801
+Red Lobster,Horseheads,616,#616 0616 616 US0000616,3328 Chambers Road S.,NY,14845
+Red Lobster,Salinas,617,#617 0617 617 US0000617,1720 N Main Street,CA,93906
+Red Lobster,Clarksville,619,#619 0619 619 US0000619,951 E Lewis And Clark Parkway,IN,47129
+Red Lobster,Franklin,620,#620 0620 620 US0000620,1718 Galleria Blvd,TN,37067
+Red Lobster,Marion,621,#621 0621 621 US0000621,2900 W. Deyoung Street,IL,62959
+Red Lobster,Prescott,623,#623 0623 623 US0000623,1821 E State Route 69,AZ,86301
+Red Lobster,Hagerstown,625,#625 0625 625 US0000625,1681 Wesel Blvd.,MD,21740
+Red Lobster,Duluth,630,#630 0630 630 US0000630,301 S Lake Avenue,MN,55802
+Red Lobster,Elyria,632,#632 0632 632 US0000632,6935 Midway Mall,OH,44035
+Red Lobster,Nottingham,634,#634 0634 634 US0000634,8019 Honeygo Blvd,MD,21236
+Red Lobster,Wethersfield,636,#636 0636 636 US0000636,1324 Silas Deane Highway,CT,6109
+Red Lobster,Cheyenne,639,#639 0639 639 US0000639,1923 Dell Range Blvd.,WY,82009
+Red Lobster,Kennewick,640,#640 0640 640 US0000640,1120 Columbia Center Blvd.,WA,99336
+Red Lobster,Grand Forks,641,#641 0641 641 US0000641,2675 32nd Avenue South,ND,58201
+Red Lobster,Hermitage,642,#642 0642 642 US0000642,3370 Shenango Valley Freeway,PA,16148
+Red Lobster,Johnstown,643,#643 0643 643 US0000643,525 Galleria Drive,PA,15904
+Red Lobster,Williamsport,644,#644 0644 644 US0000644,1951 E. Third Street,PA,17701
+Red Lobster,Colonial Heights,645,#645 0645 645 US0000645,119 Temple Lake Drive,VA,23834
+Red Lobster,Manassas,647,#647 0647 647 US0000647,7505 Broken Branch Lane,VA,20109
+Red Lobster,Elkhart,648,#648 0648 648 US0000648,3009 Brittany Court,IN,46514
+Red Lobster,Silverdale,649,#649 0649 649 US0000649,3208 NW Randall Way,WA,98383
+Red Lobster,Monrovia,651,#651 0651 651 US0000651,928 W. Huntington Ave.,CA,91016
+Red Lobster,Pittsburg,653,#653 0653 653 US0000653,4095 Century Blvd,CA,94565
+Red Lobster,Watertown,654,#654 0654 654 US0000654,20831 State Route 3,NY,13601
+Red Lobster,Butler,655,#655 0655 655 US0000655,104 Moraine Pointe,PA,16001
+Red Lobster,Billings,661,#661 0661 661 US0000661,2250 King Ave W,MT,59102
+Red Lobster,Middletown,663,#663 0663 663 US0000663,450 Route 211 E,NY,10940
+Red Lobster,Bossier City,664,#664 0664 664 US0000664,2968 E Texas Ave.,LA,71111
+Red Lobster,Dublin,665,#665 0665 665 US0000665,2105 Veterans Blvd,GA,31021
+Red Lobster,Mesa,667,#667 0667 667 US0000667,6149 E Southern Ave,AZ,85206
+Red Lobster,Richmond,669,#669 0669 669 US0000669,828 Eastern Bypass,KY,40475
+Red Lobster,Chico,671,#671 0671 671 US0000671,2010 Business Lane,CA,95928
+Red Lobster,Honolulu,672,#672 0672 672 US0000672,1765 Ala Moana Blvd,HI,96815
+Red Lobster,Salem,673,#673 0673 673 US0000673,521 Lancaster Drive N.E.,OR,97301
+Red Lobster,Layton,674,#674 0674 674 US0000674,979 N Hill Field Road,UT,84041
+Red Lobster,Williamsburg,675,#675 0675 675 US0000675,2100 Richmond Road,VA,23185
+Red Lobster,Marquette,678,#678 0678 678 US0000678,2923 U.S. 41 West,MI,49855
+Red Lobster,Decatur,679,#679 0679 679 US0000679,2027 Beltline Road S.W.,AL,35601
+Red Lobster,Saint Augustine,680,#680 0680 680 US0000680,100 State Road 312 W,FL,32086
+Red Lobster,Bel-Air,681,#681 0681 681 US0000681,615 Bel-Air Road,MD,21014
+Red Lobster,Adrian,683,#683 0683 683 US0000683,1420 S. Main Street,MI,49221
+Red Lobster,Mankato,684,#684 0684 684 US0000684,1890 E Madison Ave,MN,56001
+Red Lobster,Grand Junction,685,#685 0685 685 US0000685,575 24 1/2 Road,CO,81505
+Red Lobster,Harrisonburg,686,#686 0686 686 US0000686,2121 E Market Street,VA,22801
+Red Lobster,Bay City,687,#687 0687 687 US0000687,4109 Wilder Road,MI,48706
+Red Lobster,Tupelo,688,#688 0688 688 US0000688,895 Barnes Crossing Road,MS,38804
+Red Lobster,Mount Pleasant,690,#690 0690 690 US0000690,4062 E. Bluegrass Road,MI,48858
+Red Lobster,Duncanville,691,#691 0691 691 US0000691,603 N Cockrell Hill Road,TX,75116
+Red Lobster,Kingston,692,#692 0692 692 US0000692,1 Miron Lane,NY,12401
+Red Lobster,Vallejo,693,#693 0693 693 US0000693,1180 Admiral Callaghan Lane,CA,94591
+Red Lobster,Ledgewood,695,#695 0695 695 US0000695,303 Route 10-Roxbury Township,NJ,7852
+Red Lobster,Spring Hill,696,#696 0696 696 US0000696,2328 Commercial Way,FL,34606
+Red Lobster,Hot Springs,697,#697 0697 697 US0000697,4500 Central Avenue,AR,71913
+Red Lobster,Beavercreek,698,#698 0698 698 US0000698,2803 N. Fairfield Road,OH,45431
+Red Lobster,Kelso,700,#700 0700 700 US0000700,203 Three Rivers Drive,WA,98626
+Red Lobster,Oak Ridge,702,#702 0702 702 US0000702,359 S. Illinois Ave.,TN,37830
+Red Lobster,Salina,704,#704 0704 704 US0000704,2925 S. 9th Street,KS,67401
+Red Lobster,Chillicothe,705,#705 0705 705 US0000705,1079 N. Bridge Street,OH,45601
+Red Lobster,Piqua,706,#706 0706 706 US0000706,991 E. Ash Street,OH,45356
+Red Lobster,Cape Girardeau,707,#707 0707 707 US0000707,3269 William Street,MO,63703
+Red Lobster,Roswell,708,#708 0708 708 US0000708,2625 N. Main,NM,88201
+Red Lobster,Metaire,709,#709 0709 709 US0000709,3020 N. Causeway Blvd.,LA,70002
+Red Lobster,Visalia,710,#710 0710 710 US0000710,1545 S. Mooney Blvd.,CA,93277
+Red Lobster,Statesville,712,#712 0712 712 US0000712,1145 Glenway Drive,NC,28625
+Red Lobster,Pocatello,713,#713 0713 713 US0000713,4105 Yellowstone Hwy.,ID,83202
+Red Lobster,Parkersburg,716,#716 0716 716 US0000716,3705 Murdock Avenue,WV,26101
+Red Lobster,Santa Maria,718,#718 0718 718 US0000718,1525 S. Bradley Road,CA,93454
+Red Lobster,Jackson,719,#719 0719 719 US0000719,123 Stonebrook Place,TN,38305
+Red Lobster,Shawnee,721,#721 0721 721 US0000721,435 Shawnee Mall Drive,OK,74804
+Red Lobster,Jacksonville,722,#722 0722 722 US0000722,304 A Western Blvd.,NC,28546
+Red Lobster,Greenwood,724,#724 0724 724 US0000724,1616 72 By-pass N.e.,SC,29646
+Red Lobster,Myrtle Beach,725,#725 0725 725 US0000725,10000 Hwy. 17 N.,SC,29572
+Red Lobster,Fairfield,727,#727 0727 727 US0000727,1525 Travis Blvd.,CA,94533
+Red Lobster,Pine Bluff,728,#728 0728 728 US0000728,3000 Pines Mall Drive,AR,71601
+Red Lobster,Muskogee,729,#729 0729 729 US0000729,225 W. Shawnee,OK,74401
+Red Lobster,Fort Pierce,730,#730 0730 730 US0000730,6401 Darter Court,FL,34945
+Red Lobster,Cookeville,731,#731 0731 731 US0000731,1410 Interstate Drive,TN,38501
+Red Lobster,Greenville,732,#732 0732 732 US0000732,7601 Wesley Street,TX,75402
+Red Lobster,Jefferson City,733,#733 0733 733 US0000733,3519 Country Club Drive,MO,65109
+Red Lobster,Grand Island,734,#734 0734 734 US0000734,3430 W. 13th Street,NE,68803
+Red Lobster,Du Bois,736,#736 0736 736 US0000736,813 E. Dubois Street,PA,15801
+Red Lobster,Gastonia,737,#737 0737 737 US0000737,200 N. New Hope Road,NC,28054
+Red Lobster,Peru,738,#738 0738 738 US0000738,4381 Venture Drive,IL,61354
+Red Lobster,Tifton,739,#739 0739 739 US0000739,101 S. Virginia Ave.,GA,31794
+Red Lobster,Lakewood,745,#745 0745 745 US0000745,295 E Fairmount Avenue,NY,14750
+Red Lobster,Sumter,746,#746 0746 746 US0000746,1034 Broad Street,SC,29150
+Red Lobster,Ames,747,#747 0747 747 US0000747,1100 Buckeye Ave.,IA,50010
+Red Lobster,Vineland,748,#748 0748 748 US0000748,3849 South Delsea Drive,NJ,8360
+Red Lobster,Clovis,749,#749 0749 749 US0000749,2601 North Prince,NM,88101
+Red Lobster,Langhorne,758,#758 0758 758 US0000758,2275 E. Lincoln Highway,PA,19047
+Red Lobster,Meridian,762,#762 0762 762 US0000762,201 S. Frontage Road,MS,39301
+Red Lobster,Wooster,766,#766 0766 766 US0000766,3805 Burbank Road.,OH,44691
+Red Lobster,Columbia,768,#768 0768 768 US0000768,9011 Snowden Square Drive,MD,21046
+Red Lobster,Lake City,769,#769 0769 769 US0000769,2847 W. US Highway 90,FL,32055
+Red Lobster,King of Prussia,778,#778 0778 778 US0000778,425 W. Dekalb Pike,PA,19406
+Red Lobster,Council Bluffs,779,#779 0779 779 US0000779,3040 Dial Drive,IA,51501
+Red Lobster,Dalton,782,#782 0782 782 US0000782,901 W. Bridge Rd,GA,30720
+Red Lobster,Queensbury,788,#788 0788 788 US0000788,750 Upper Glen Street,NY,12804
+Red Lobster,Pottstown,789,#789 0789 789 US0000789,223 Shoemaker Road,PA,19464
+Red Lobster,Danbury,792,#792 0792 792 US0000792,34 Backus Avenue,CT,6810
+Red Lobster,West Des Moines,796,#796 0796 796 US0000796,3838 Westown Parkway,IA,50266
+Red Lobster,Miami,797,#797 0797 797 US0000797,8705 SW 136th Street,FL,33176
+Red Lobster,Hanover,798,#798 0798 798 US0000798,407 Eisenhower Drive,PA,17331
+Red Lobster,Olympia,799,#799 0799 799 US0000799,4505 Martin Way East,WA,98516
+Red Lobster,Bridgewater,827,#827 0827 827 US0000827,1271 U.S. Route 22,NJ,8807
+Red Lobster,Stillwater,828,#828 0828 828 US0000828,102 E. Hall Of Fame Ave.,OK,74075
+Red Lobster,Coeur D'Alene,834,#834 0834 834 US0000834,212 Neider Ave.,ID,83815
+Red Lobster,Kearney,835,#835 0835 835 US0000835,121 Second Ave. East,NE,68847
+Red Lobster,Monroe,836,#836 0836 836 US0000836,1553 N. Dixie Hghway,MI,48162
+Red Lobster,Orlando,838,#838 0838 838 US0000838,8003 Golden Sky Lane,FL,32809
+Red Lobster,Danville,839,#839 0839 839 US0000839,370 Mall Drive,VA,24540
+Red Lobster,Houston,840,#840 0840 840 US0000840,302 Fm 1960 West,TX,77090
+Red Lobster,Houston,841,#841 0841 841 US0000841,13232 NW Freeway,TX,77040
+Red Lobster,Tullahoma,843,#843 0843 843 US0000843,1913 N. Jackson Street,TN,37388
+Red Lobster,San Marcos,844,#844 0844 844 US0000844,100 Ih 35 North,TX,78666
+Red Lobster,Flagstaff,845,#845 0845 845 US0000845,2500 S. Beulah Blvd.,AZ,86001
+Red Lobster,Scottsdale,846,#846 0846 846 US0000846,3360 N Scottsdale Road,AZ,85251
+Red Lobster,Lewiston,847,#847 0847 847 US0000847,2115 Thain Grade,ID,83501
+Red Lobster,Sanford,848,#848 0848 848 US0000848,20 Towne Center Circle,FL,32771
+Red Lobster,Richmond,850,#850 0850 850 US0000850,5400 National Road East,IN,47374
+Red Lobster,Christiansburg,853,#853 0853 853 US0000853,75 Peppers Ferry Road,VA,24073
+Red Lobster,Saint George,857,#857 0857 857 US0000857,263 N Red Cliffs Drive,UT,84790
+Red Lobster,Hattiesburg,858,#858 0858 858 US0000858,4670 Hardy Street,MS,39402
+Red Lobster,Staunton,860,#860 0860 860 US0000860,1477 Greenville Ave,VA,24401
+Red Lobster,Gainesville,861,#861 0861 861 US0000861,6910 W. Newberry Road,FL,32605
+Red Lobster,Greensboro,862,#862 0862 862 US0000862,4415 W. Wendover Ave.,NC,27407
+Red Lobster,Ashtabula,863,#863 0863 863 US0000863,3013 North Ridge Rd. East,OH,44004
+Red Lobster,Houston,864,#864 0864 864 US0000864,2760 S. Highway 6,TX,77082
+Red Lobster,Bridgeport,865,#865 0865 865 US0000865,4485 Main Street,CT,6606
+Red Lobster,Peoria,867,#867 0867 867 US0000867,7921 West Bell Rd.,AZ,85382
+Red Lobster,Springfield,868,#868 0868 868 US0000868,1898 W. First Street,OH,45504
+Red Lobster,Tucson,869,#869 0869 869 US0000869,5870 E. Broadway Blvd,AZ,85711
+Red Lobster,Cedar Rapids,870,#870 0870 870 US0000870,163 Collins Rd NE,IA,52402
+Red Lobster,Dallas,873,#873 0873 873 US0000873,9069 Vantage Point Dr.,TX,75243
+Red Lobster,Perry,874,#874 0874 874 US0000874,1359 Sam Nunn Blvd.,GA,31069
+Red Lobster,Lufkin,876,#876 0876 876 US0000876,1919 S. First Street,TX,75901
+Red Lobster,Irving,877,#877 0877 877 US0000877,4205 W. Airport Freeway,TX,75062
+Red Lobster,Bloomington,878,#878 0878 878 US0000878,2617 E 3rd Street,IN,47401
+Red Lobster,Lewisville,882,#882 0882 882 US0000882,2497 S Stemmons Freeway,TX,75067
+Red Lobster,Chattanooga,883,#883 0883 883 US0000883,2200 Bams Drive,TN,37421
+Red Lobster,Dallas,884,#884 0884 884 US0000884,10290 E. Technology Blvd.,TX,75220
+Red Lobster,Orlando,885,#885 0885 885 US0000885,7373 W Colonial Drive,FL,32818
+Red Lobster,El Paso,887,#887 0887 887 US0000887,800 Sunland Park Drive,TX,79912
+Red Lobster,Cartersville,889,#889 0889 889 US0000889,375 Cherokee Place,GA,30121
+Red Lobster,Traverse City,891,#891 0891 891 US0000891,2691 North U.S. 31 South,MI,49684
+Red Lobster,Columbus,893,#893 0893 893 US0000893,1691 Dublin-Granville Rd,OH,43229
+Red Lobster,Saint Matthews,894,#894 0894 894 US0000894,986 Breckenridge Lane,KY,40207
+Red Lobster,Newnan,895,#895 0895 895 US0000895,990 Bullsboro Drive,GA,30265
+Red Lobster,Indianapolis,897,#897 0897 897 US0000897,5090 W. 38th Street,IN,46254
+Red Lobster,Orlando,899,#899 0899 899 US0000899,3552 E. Colonial Drive,FL,32803
+Red Lobster,Palm Coast,5803,#5803 05803 5803 US00005803,5294 E Highway 100,FL,32164
+Red Lobster,Beaufort,5806,#5806 05806 5806 US00005806,2045 Boundary St,SC,29902
+Red Lobster,Brunswick,5809,#5809 05809 5809 US00005809,600 Glynn Isles,GA,31525
+Red Lobster,Thomasville,5812,#5812 05812 5812 US00005812,254 Liberty Street,GA,31757
+Red Lobster,Waycross,5815,#5815 05815 5815 US00005815,2497 Memorial Drive,GA,31503
+Red Lobster,Wilkesboro,5818,#5818 05818 5818 US00005818,1852 US Highway 421,NC,28697
+Red Lobster,Saint Clairsville,6201,#6201 06201 6201 US00006201,50740 Valley Center Blvd,OH,43950
+Red Lobster,Spartanburg,6203,#6203 06203 6203 US00006203,170 E Blackstock Road,SC,29301
+Red Lobster,Fairview Heights,6204,#6204 06204 6204 US00006204,110 Ludwig Drive,IL,62208
+Red Lobster,Melbourne,6205,#6205 06205 6205 US00006205,2355 W. New Haven Ave.,FL,32904
+Red Lobster,Winston-Salem,6206,#6206 06206 6206 US00006206,1690 Westbrookplaza Drive,NC,27103
+Red Lobster,Winter Haven,6207,#6207 06207 6207 US00006207,230 Cypress Garden Blvd.,FL,33880
+Red Lobster,Lakeland,6208,#6208 06208 6208 US00006208,3706 North Road 98,FL,33809
+Red Lobster,Topeka,6209,#6209 06209 6209 US00006209,2011 SW Wanamaker Road,KS,66604
+Red Lobster,Frederick,6211,#6211 06211 6211 US00006211,1020 W Patrick Street,MD,21703
+Red Lobster,Gurnee,6212,#6212 06212 6212 US00006212,6230 Grand Ave.,IL,60031
+Red Lobster,Waterford,6213,#6213 06213 6213 US00006213,479 Telegraph Road,MI,48328
+Red Lobster,El Paso,6214,#6214 06214 6214 US00006214,8401 Gateway Blvd. West,TX,79925
+Red Lobster,Littleton,6215,#6215 06215 6215 US00006215,9067 East Westview Rd,CO,80124
+Red Lobster,Memphis,6216,#6216 06216 6216 US00006216,8161 Highway 64,TN,38133
+Red Lobster,Jackson,6217,#6217 06217 6217 US00006217,6357 I-55 North,MS,39213
+Red Lobster,Phoenix,6218,#6218 06218 6218 US00006218,2810 North 75th Ave.,AZ,85035
+Red Lobster,Mesa,6219,#6219 06219 6219 US00006219,1403 S Alma School Rd,AZ,85210
+Red Lobster,Port Richey,6220,#6220 06220 6220 US00006220,8909 US Highway 19,FL,34668
+Red Lobster,State College,6221,#6221 06221 6221 US00006221,1670 N Atherton Street,PA,16803
+Red Lobster,Altamonte Springs,6222,#6222 06222 6222 US00006222,340 West SR 436,FL,32714
+Red Lobster,Phoenix,6223,#6223 06223 6223 US00006223,10220 N 28th Drive,AZ,85051
+Red Lobster,Fort Smith,6225,#6225 06225 6225 US00006225,7401 Rogers Ave.,AR,72903
+Red Lobster,Champaign,6226,#6226 06226 6226 US00006226,1901 N. Prospect Ave.,IL,61822
+Red Lobster,Owings Mills,6227,#6227 06227 6227 US00006227,3 Restaurant Park Drive,MD,21117
+Red Lobster,Colonie,6228,#6228 06228 6228 US00006228,170 Wolf Road,NY,12205
+Red Lobster,Canton,6229,#6229 06229 6229 US00006229,1405 Riverstone Parkway,GA,30114
+Red Lobster,Chandler,6230,#6230 06230 6230 US00006230,7240 West Ray Rd,AZ,85226
+Red Lobster,Woodbridge,6231,#6231 06231 6231 US00006231,2544 Prince William Parkway,VA,22192
+Red Lobster,Branson,6232,#6232 06232 6232 US00006232,3559 Shepherd Of The Hills Expressway,MO,65616
+Red Lobster,Buford,6233,#6233 06233 6233 US00006233,3230 Buford Drive,GA,30519
+Red Lobster,Aurora,6234,#6234 06234 6234 US00006234,1036 N Route 59,IL,60504
+Red Lobster,Longmont,6235,#6235 06235 6235 US00006235,2177 Ken Pratt Blvd.,CO,80501
+Red Lobster,Schaumburg,6236,#6236 06236 6236 US00006236,800 E Golf Road,IL,60173
+Red Lobster,Cherry Hill,6237,#6237 06237 6237 US00006237,2100 Route 38,NJ,8002
+Red Lobster,Conyers,6238,#6238 06238 6238 US00006238,1560 Dogwood Drive,GA,30013
+Red Lobster,Las Vegas,6239,#6239 06239 6239 US00006239,2325 E Flamingo Road,NV,89119
+Red Lobster,San Antonio,6240,#6240 06240 6240 US00006240,17415 US 281 North,TX,78232
+Red Lobster,Concord,6241,#6241 06241 6241 US00006241,8012 Concord Mills Blvd.,NC,28027
+Red Lobster,Round Rock,6242,#6242 06242 6242 US00006242,2702 Paker Road,TX,78681
+Red Lobster,Grandville,6243,#6243 06243 6243 US00006243,3464 River Towne Point,MI,49418
+Red Lobster,Orem,6244,#6244 06244 6244 US00006244,1261 S. 800 East,UT,84097
+Red Lobster,Frisco,6245,#6245 06245 6245 US00006245,3056 Preston Road,TX,75034
+Red Lobster,Orlando,6246,#6246 06246 6246 US00006246,617 N. Alafaya Trail,FL,32828
+Red Lobster,Sugar Land,6247,#6247 06247 6247 US00006247,2323 Highway 6,TX,77478
+Red Lobster,Tampa,6249,#6249 06249 6249 US00006249,17021 Palm Pointe Drive,FL,33647
+Red Lobster,Austell,6250,#6250 06250 6250 US00006250,1805 East-West Connector S.W.,GA,30106
+Red Lobster,Maple Grove,6251,#6251 06251 6251 US00006251,"12515 Elm Creek Blvd.,n.",MN,55369
+Red Lobster,Scranton,6252,#6252 06252 6252 US00006252,1502 Scranton-Carbondale Hwy,PA,18508
+Red Lobster,Bolingbrook,6253,#6253 06253 6253 US00006253,209 South Weber Road,IL,60490
+Red Lobster,Muskegon,6254,#6254 06254 6254 US00006254,1681 Sternberg Road,MI,49444
+Red Lobster,Sterling,6255,#6255 06255 6255 US00006255,21065 Dulles Town Center,VA,20166
+Red Lobster,Katy,6256,#6256 06256 6256 US00006256,25408 Bell Patna,TX,77494
+Red Lobster,Henderson,6257,#6257 06257 6257 US00006257,570 Marks Street,NV,89014
+Red Lobster,Coralville,6258,#6258 06258 6258 US00006258,2671 2nd Street,IA,52241
+Red Lobster,Boise,6259,#6259 06259 6259 US00006259,550 N Milwaukee Street,ID,83704
+Red Lobster,Avon,6260,#6260 06260 6260 US00006260,10189 E. US Highway 36,IN,46123
+Red Lobster,Chesterfield,6261,#6261 06261 6261 US00006261,17204 Chesterfield Airport Rd,MO,63005
+Red Lobster,Brooklyn,6262,#6262 06262 6262 US00006262,455 Gateway Drive,NY,11207
+Red Lobster,Kissimmee,6263,#6263 06263 6263 US00006263,7780 W. Irlo Bronson Memorial Hwy,FL,34747
+Red Lobster,Columbus,6265,#6265 06265 6265 US00006265,1270 Polaris Parkway,OH,43240
+Red Lobster,Waterloo,6267,#6267 06267 6267 US00006267,941 East San Marnan,IA,50702
+Red Lobster,Forsyth,6269,#6269 06269 6269 US00006269,997 S. State Route 51,IL,62535
+Red Lobster,Ontario,6270,#6270 06270 6270 US00006270,4413 E. Mills Circle,CA,91764
+Red Lobster,Columbus,6271,#6271 06271 6271 US00006271,1520 Georgesville Road,OH,43228
+Red Lobster,Fort Gratiot,6272,#6272 06272 6272 US00006272,4220 24th Avenue,MI,48059
+Red Lobster,Elmhurst,6273,#6273 06273 6273 US00006273,88-01 Queens Blvd.,NY,11373
+Red Lobster,Sevierville,6275,#6275 06275 6275 US00006275,1600 Parkway,TN,37862
+Red Lobster,Cincinnati,6276,#6276 06276 6276 US00006276,320 Cincinnati Mills Drive,OH,45240
+Red Lobster,Overland Park,6278,#6278 06278 6278 US00006278,9475 Metcalf Avenue,KS,66212
+Red Lobster,Newport News,6279,#6279 06279 6279 US00006279,12580 Jefferson Ave,VA,23602
+Red Lobster,Albuquerque,6280,#6280 06280 6280 US00006280,10520 Coors By-pass Nw,NM,87114
+Red Lobster,Miami,6282,#6282 06282 6282 US00006282,1695 NW 87th Ave,FL,33172
+Red Lobster,Midlothian,6283,#6283 06283 6283 US00006283,13236 Rittenhouse Drive,VA,23112
+Red Lobster,Shenandoah,6284,#6284 06284 6284 US00006284,18446 Interstate 45 South,TX,77384
+Red Lobster,Hollywood,6285,#6285 06285 6285 US00006285,2900 Oakwood Blvd.,FL,33020
+Red Lobster,Dayton,6286,#6286 06286 6286 US00006286,6500 Miller Lane,OH,45414
+Red Lobster,Mishawaka,6287,#6287 06287 6287 US00006287,3930 North Main Street,IN,46545
+Red Lobster,Surprise,6288,#6288 06288 6288 US00006288,13709 West Bell Road,AZ,85374
+Red Lobster,Bakersfield,6289,#6289 06289 6289 US00006289,8180 Rosedale Highway,CA,93312
+Red Lobster,Washington,6290,#6290 06290 6290 US00006290,1005 Trinity Circle,PA,15301
+Red Lobster,Laredo,6291,#6291 06291 6291 US00006291,5315 San Dario Avenue,TX,78041
+Red Lobster,Jacksonville,6292,#6292 06292 6292 US00006292,416 Commerce Center Drive,FL,32225
+Red Lobster,Silver Springs,6293,#6293 06293 6293 US00006293,8533 Georgia Ave,MD,20910
+Red Lobster,Asheville,6294,#6294 06294 6294 US00006294,139 Tunnel Road,NC,28805
+Red Lobster,Burleson,6295,#6295 06295 6295 US00006295,1175 N. Burleson Blvd,TX,76028
+Red Lobster,Atlanta,6296,#6296 06296 6296 US00006296,3360 Camp Creek Parkway,GA,30344
+Red Lobster,Elizabethtown,6297,#6297 06297 6297 US00006297,2020 North Dixie Highway,KY,42701
+Red Lobster,New York,6298,#6298 06298 6298 US00006298,"5 Times Square, Nyc/5",NY,10036
+Red Lobster,Geneva,6299,#6299 06299 6299 US00006299,902 Commons Drive,IL,60134
+Red Lobster,Charleston,6300,#6300 06300 6300 US00006300,101 Cross Terrace Blvd,WV,25309
+Red Lobster,Columbia,6301,#6301 06301 6301 US00006301,10136 Two Notch Road,SC,29229
+Red Lobster,McDonough,6302,#6302 06302 6302 US00006302,1846 Jonesboro Road,GA,30253
+Red Lobster,Orlando,6303,#6303 06303 6303 US00006303,9892 International Drive,FL,32819
+Red Lobster,Texarkana,6304,#6304 06304 6304 US00006304,3002 Saint Michael Drive,TX,75503
+Red Lobster,Pittsburgh,6305,#6305 06305 6305 US00006305,6150 Robinson Center Drive,PA,15205
+Red Lobster,Laurel,6306,#6306 06306 6306 US00006306,14368 Baltimore Ave,MD,20707
+Red Lobster,Plano,6308,#6308 06308 6308 US00006308,3501 Central Expressway,TX,75023
+Red Lobster,San Antonio,6310,#6310 06310 6310 US00006310,5815 N. Loop 1604 West,TX,78249
+Red Lobster,Ronkonkoma,6311,#6311 06311 6311 US00006311,5010 Expressway Drive South,NY,11779
+Red Lobster,Strongsville,6312,#6312 06312 6312 US00006312,17227 Southpark Center,OH,44136
+Red Lobster,Temecula,6313,#6313 06313 6313 US00006313,41649 Margarita Rd,CA,92591
+Red Lobster,Secaucus,6314,#6314 06314 6314 US00006314,700 Plaza Drive,NJ,7094
+Red Lobster,Panama City,6315,#6315 06315 6315 US00006315,910 East 23rd Street,FL,32405
+Red Lobster,Humble,6316,#6316 06316 6316 US00006316,20414 US Highway 59 North,TX,77338
+Red Lobster,Bristol,6317,#6317 06317 6317 US00006317,3167 Linden Drive,VA,24202
+Red Lobster,Myrtle Beach,6318,#6318 06318 6318 US00006318,1230 North Retail Court,SC,29577
+Red Lobster,Newark,6319,#6319 06319 6319 US00006319,1249 New Churchman's Rd,DE,19713
+Red Lobster,Gilbert,6320,#6320 06320 6320 US00006320,3845 S. Gilbert Road,AZ,85296
+Red Lobster,Winchester,6321,#6321 06321 6321 US00006321,2400 S. Pleasant Valley Rd,VA,22601
+Red Lobster,Southaven,6322,#6322 06322 6322 US00006322,6535 Airways Blvd,MS,38671
+Red Lobster,Liverpool,6323,#6323 06323 6323 US00006323,3938 State Route 31,NY,13090
+Red Lobster,Maplewood,6324,#6324 06324 6324 US00006324,2381 Maplewood Commons Drive,MO,63143
+Red Lobster,Columbus,6325,#6325 06325 6325 US00006325,5555 Whittlesey Blvd,GA,31909
+Red Lobster,Oakdale,6326,#6326 06326 6326 US00006326,8350 3rd Street North,MN,55128
+Red Lobster,Inglewood,6327,#6327 06327 6327 US00006327,3400 W. Century Blvd,CA,90303
+Red Lobster,North Olmsted,6328,#6328 06328 6328 US00006328,25615 Brookpark Rd,OH,44070
+Red Lobster,Boynton Beach,6329,#6329 06329 6329 US00006329,700 N Congress Ave,FL,33426
+Red Lobster,Reno,6330,#6330 06330 6330 US00006330,5015 Kietzke Lane,NV,89511
+Red Lobster,Lakewood,6331,#6331 06331 6331 US00006331,810 S. Wadsworth Blvd,CO,80226
+Red Lobster,Sherman,6332,#6332 06332 6332 US00006332,3600 N. US Highway 75,TX,75090
+Red Lobster,Yuma,6333,#6333 06333 6333 US00006333,1521 S. Yuma Palms Parkway,AZ,85365
+Red Lobster,Aurora,6334,#6334 06334 6334 US00006334,6139 S. Southlands Parkway,CO,80016
+Red Lobster,Denver,6335,#6335 06335 6335 US00006335,8268 E Northfield Blvd,CO,80238
+Red Lobster,College Station,6336,#6336 06336 6336 US00006336,1200 University Drive,TX,77840
+Red Lobster,El Paso,6337,#6337 06337 6337 US00006337,1860 Joe Battle Blvd,TX,79936
+Red Lobster,Morgantown,6338,#6338 06338 6338 US00006338,1002 University Towne Center Dr.,WV,26501
+Red Lobster,Richmond,6339,#6339 06339 6339 US00006339,4415 S. Laburnum Ave,VA,23231
+Red Lobster,Clermont,6340,#6340 06340 6340 US00006340,2475 Highway 27 South,FL,34711
+Red Lobster,Memphis,6341,#6341 06341 6341 US00006341,7750 Winchester Road,TN,38125
+Red Lobster,Goodyear,6342,#6342 06342 6342 US00006342,15311 W McDowell Road,AZ,85395
+Red Lobster,Jacksonville,6343,#6343 06343 6343 US00006343,13090 City Station Drive,FL,32218
+Red Lobster,Pearland,6344,#6344 06344 6344 US00006344,11104 Broadway Street,TX,77584
+Red Lobster,The Villages,6345,#6345 06345 6345 US00006345,3830 Wedgewood Drive,FL,32162
+Red Lobster,Rogers,6346,#6346 06346 6346 US00006346,1710 S 46th Street,AR,72758
+Red Lobster,North Haven,6347,#6347 06347 6347 US00006347,320 Universal Drive North,CT,6473
+Red Lobster,Mount Juliet,6348,#6348 06348 6348 US00006348,401 S Mount Juliet Rd,TN,37122
+Red Lobster,Denton,6349,#6349 06349 6349 US00006349,2801 South I-35 East,TX,76210
+Red Lobster,Oro Valley,6350,#6350 06350 6350 US00006350,11695 N Oracle Road,AZ,85737
+Red Lobster,Dublin,6351,#6351 06351 6351 US00006351,6091 Sawmill Road,OH,43017
+Red Lobster,Spokane,6352,#6352 06352 6352 US00006352,4703 N Division Street,WA,99207
+Red Lobster,Tucson,6354,#6354 06354 6354 US00006354,5315 South Calle Santa Cruz,AZ,85706
+Red Lobster,Colorado Springs,6355,#6355 06355 6355 US00006355,3510 New Center Point,CO,80922
+Red Lobster,McAllen,6356,#6356 06356 6356 US00006356,7617 N 10th Street,TX,78504
+Red Lobster,D'Iberville,6357,#6357 06357 6357 US00006357,3897 Promenade Parkway,MS,39540
+Red Lobster,Bartonsville,6358,#6358 06358 6358 US00006358,3588 Rt. 611,PA,18321
+Red Lobster,Homestead,6359,#6359 06359 6359 US00006359,2301 NE 8th Street,FL,33033
+Red Lobster,Hanover,6360,#6360 06360 6360 US00006360,7063 Arundel Mills Circle,MD,21076
+Red Lobster,Charlottesville,6361,#6361 06361 6361 US00006361,1648 Rio Road E,VA,22901
+Red Lobster,San Antonio,6362,#6362 06362 6362 US00006362,4550 NW Loop 410,TX,78229
+Red Lobster,San Antonio,6363,#6363 06363 6363 US00006363,7835 Interstate 35 S,TX,78224
+Red Lobster,Kansas City,6364,#6364 06364 6364 US00006364,10700 Parallel Parkway,KS,66109
+Red Lobster,Lee's Summit,6365,#6365 06365 6365 US00006365,670 NW Blue Parkway,MO,64063
+Red Lobster,Eugene,6366,#6366 06366 6366 US00006366,1085 Valley River Way,OR,97401
+Red Lobster,Oceanside,6367,#6367 06367 6367 US00006367,2471 Vista Way,CA,92054
+Red Lobster,Baton Rouge,6368,#6368 06368 6368 US00006368,6051 Bluebonnet Blvd,LA,70809
+Red Lobster,Rochester,6369,#6369 06369 6369 US00006369,1280 Highway 14 SW,MN,55902
+Red Lobster,Yonkers,6370,#6370 06370 6370 US00006370,5135 Xavier Drive,NY,10704
+Red Lobster,Jonesboro,6371,#6371 06371 6371 US00006371,2642 Stadium Blvd,AR,72401
+Red Lobster,Conroe,6372,#6372 06372 6372 US00006372,2944 Interstate 45 N,TX,77303
+Red Lobster,Miami,6373,#6373 06373 6373 US00006373,11550 SW 88th St,FL,33176
+Red Lobster,Casper,6374,#6374 06374 6374 US00006374,5010 East 2nd Street,WY,82609
+Red Lobster,Lafayette,6375,#6375 06375 6375 US00006375,120 Creasy Lane South,IN,47905
+Red Lobster,Birmingham,6376,#6376 06376 6376 US00006376,3525 Roosevelt Blvd,AL,35235
+Red Lobster,Burlington,6377,#6377 06377 6377 US00006377,1726 Glidewell Drive,NC,27215
+Red Lobster,Palm Desert,6378,#6378 06378 6378 US00006378,72291 Highway 111,CA,92260
+Red Lobster,Lexington,6379,#6379 06379 6379 US00006379,1848 Alysheba Way,KY,40509
+Red Lobster,Thousand Oaks,6380,#6380 06380 6380 US00006380,156 W Hillcrest Drive,CA,91360
+Red Lobster,Mount Pleasant,6381,#6381 06381 6381 US00006381,2800 S Green Bay Rd,WI,53406
+Red Lobster,Matthews,6382,#6382 06382 6382 US00006382,9801 Independence Pointe Parkway,NC,28105
+Red Lobster,Chula Vista,6383,#6383 06383 6383 US00006383,598 H Street,CA,91910
+Red Lobster,Olathe,6384,#6384 06384 6384 US00006384,14904 West 119th Street,KS,66062
+Red Lobster,New York,6385,#6385 06385 6385 US00006385,261 W 125th Street,NY,10027
+Red Lobster,Windsor,8101,#8101 08101 8101 US00008101,6575 Tecumseh Rd. East,ON,N8T 1E7
+Red Lobster,Burlington,8103,#8103 08103 8103 US00008103,2423 Fairview Street,ON,L7R 2E4
+Red Lobster,Scarborough,8104,#8104 08104 8104 US00008104,3252 Sheppard Ave. East,ON,M1T 3K3
+Red Lobster,Mississauga,8105,#8105 08105 8105 US00008105,790 Burnhamthorpe Rd. W.,ON,L5C 3X3
+Red Lobster,Brampton,8111,#8111 08111 8111 US00008111,368 Queen Street E.,ON,L6V 1C3
+Red Lobster,Oshawa,8114,#8114 08114 8114 US00008114,311 King Street W.,ON,L1J 2J8
+Red Lobster,Thornhill,8115,#8115 08115 8115 US00008115,7291 Yonge Street,ON,L3T 2A9
+Red Lobster,London,8116,#8116 08116 8116 US00008116,667 Wwellington Road South,ON,N6C 4R4
+Red Lobster,Kitchener,8118,#8118 08118 8118 US00008118,1732 King Street East,ON,N2G 2P1
+Red Lobster,Barrie,8119,#8119 08119 8119 US00008119,319 Bayfield Street,ON,L4M 3C2
+Red Lobster,Ottawa,8124,#8124 08124 8124 US00008124,1499 St. Laurent Blvd,ON,K1G 0Z9
+Red Lobster,Niagara Falls,8126,#8126 08126 8126 US00008126,6220 Lundy'S Lane,ON,L2G 1T6
+Red Lobster,Brantford,8129,#8129 08129 8129 US00008129,67 King George Road,ON,N3R 5K2
+Red Lobster,Peterborough,8134,#8134 08134 8134 US00008134,870 Lansdowne Street W.,ON,K9J 1Z7
+Red Lobster,Kingston,8135,#8135 08135 8135 US00008135,410 Bath Road,ON,K7M 4X6
+Red Lobster,Toronto,8155,#8155 08155 8155 US00008155,3200 Dufferin Street,ON,M6A 2T3
+Red Lobster,Winnipeg,8157,#8157 08157 8157 US00008157,1540 Portage Ave,MB,R3G 0W9
+Red Lobster,Sudbury,8158,#8158 08158 8158 US00008158,1600 Lasalle Blvd,ON,P3A 1Z7
+Red Lobster,Edmonton,8166,#8166 08166 8166 US00008166,10111 171st Street,AB,T5S 1S6
+Red Lobster,Regina,8167,#8167 08167 8167 US00008167,890 Albert Street,SK,S4R 2P5
+Red Lobster,Edmonton,8168,#8168 08168 8168 US00008168,4111 Calgary Trail South,AB,T6J 6S6
+Red Lobster,Saskatoon,8170,#8170 08170 8170 US00008170,2501 8th Street East,SK,S7H 0V4
+Red Lobster,Toronto,8176,#8176 08176 8176 US00008176,20 Dundas Street West,ON,M5G 2C2
+Red Lobster,Calgary,8177,#8177 08177 8177 US00008177,312 35th Street N.E.,AB,T2A 6S7
+Red Lobster,Calgary,8181,#8181 08181 8181 US00008181,100-6100 MacLeod Trail S.W.,AB,T2H 0K5
+Red Lobster,Etobicoke,8183,#8183 08183 8183 US00008183,1790 The Queensway,ON,M9C 5H5
+Red Lobster,Ottawa,8184,#8184 08184 8184 US00008184,1595 Merivale Road,ON,K2G 3J4

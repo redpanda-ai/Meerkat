@@ -1,3 +1,4 @@
-#!/usr/local/bin/python3
+#!/usr/local/bin/python3.3
 
-"""This is to define the src directory as a package"""
+"""This file must exist to define Meerkat
+as a runnable package"""
