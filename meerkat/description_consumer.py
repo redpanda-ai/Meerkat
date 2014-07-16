@@ -34,15 +34,29 @@ from .location import separate_geo, scale_polygon
 #Helper functions
 def get_bool_query(starting_from=0, size=0):
 	"""Returns a "bool" style ElasticSearch query object"""
-	return {"from" : starting_from, "size" : size, "query" : {
-		"bool": {"minimum_number_should_match": 1, "should": []}}}
+
+	return {
+		"from" : starting_from, 
+		"size" : size, 
+		"query" : {
+			"bool": {
+				"minimum_number_should_match": 1, 
+				"should": []
+			}
+		}
+	}
 
 def get_basic_query(starting_from=0, size=0):
 	"""Returns an ElasticSearch query object"""
-	return {"from" : starting_from, "size" : size, "query" : {}}
+
+	return {
+		"from" : starting_from, 
+		"size" : size, 
+		"query" : {}
+	}
 
 def get_geo_query(scaled_shapes):
-	"""Generate multipolygon query for use with"""
+	"""Generate multipolygon query for use with user context"""
 	
 	return {
 		"geo_shape" : {
@@ -57,8 +71,14 @@ def get_geo_query(scaled_shapes):
 
 def get_qs_query(term, field_list=[], boost=1.0):
 	"""Returns a "query_string" style ElasticSearch query object"""
-	return {"query_string": {
-		"query": term, "fields": field_list, "boost" : boost}}
+
+	return {
+		"query_string": {
+			"query": term, 
+			"fields": field_list, 
+			"boost" : boost
+		}
+	}
 
 def get_us_cities():
 	"""Load an array of US cities"""
@@ -86,6 +106,7 @@ class DescriptionConsumer(threading.Thread):
 
 	def __display_search_results(self, search_results, transaction):
 		"""Displays search results."""
+
 		logger = logging.getLogger("thread " + str(self.thread_id))
 		# Must have results
 		if search_results['hits']['total'] == 0:
@@ -139,6 +160,8 @@ class DescriptionConsumer(threading.Thread):
 		if len(scores) < 2:
 			logger.info("Unable to generate Z-Score")
 			return 0
+
+		# !!!!! Explore using score / z_score
 
 		z_scores = zscore(scores)
 		first_score, second_score = z_scores[0:2]
@@ -212,7 +235,7 @@ class DescriptionConsumer(threading.Thread):
 	def __text_and_geo_features(self, text_features_results):
 		"""Classify transactions using geo and text features"""
 
-		user_id = text_features_results[0]['MEM_ID']
+		user_id = text_features_results[0]['UNIQUE_MEM_ID']
 		qs_boost = self.hyperparameters.get("qs_boost", "1")
 		name_boost = self.hyperparameters.get("name_boost", "1")
 		hits, non_hits = separate_geo(text_features_results)
@@ -339,8 +362,8 @@ class DescriptionConsumer(threading.Thread):
 
 		# Hack Names
 		if good_description != "":
-
-			name_query = get_qs_query(string_cleanse(good_description), ['name'], 2)
+			good_description_boost = self.hyperparameters.get("good_description", 2)
+			name_query = get_qs_query(string_cleanse(good_description), ['name'], good_description_boost)
 			should_clauses.append(name_query)
 
 		return bool_search

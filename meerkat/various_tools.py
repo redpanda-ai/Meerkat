@@ -12,6 +12,7 @@ import csv
 import re
 import os
 import gzip
+import json
 
 def load_dict_list(file_name, encoding='utf-8', delimiter="|"):
 	"""Loads a dictionary of input from a file into a list."""
@@ -28,6 +29,52 @@ def write_dict_list(dict_list, file_name, encoding="utf-8", delimiter="|"):
 		dict_w = csv.DictWriter(output_file, delimiter=delimiter, fieldnames=dict_list[0].keys(), extrasaction='ignore')
 		dict_w.writeheader()
 		dict_w.writerows(dict_list)
+
+def queue_to_list(result_queue):
+	"""Converts queue to list"""
+	result_list = []
+	while result_queue.qsize() > 0:
+		try:
+			result_list.append(result_queue.get())
+			result_queue.task_done()
+
+		except queue.Empty:
+			break
+	result_queue.join()
+	return result_list
+
+def load_params(filename):
+	"""Load a set of parameters provided a filename"""
+
+	input_file = open(filename, encoding='utf-8')
+	params = json.loads(input_file.read())
+	input_file.close()
+
+	return params
+
+def get_es_connection(params):
+	"""Fetch a connection to the factual index"""
+
+	from elasticsearch import Elasticsearch
+
+	cluster_nodes = params["elasticsearch"]["cluster_nodes"]
+	es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True,
+	sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
+
+	return es_connection
+
+def get_merchant_by_id(factual_id, es_connection, fields=["name", "region", "locality", "internal_store_number"]):
+	"""Fetch the details for a single factual_id"""
+	
+	try:
+		result = es_connection.get(index="factual_index", doc_type='factual_type', id=factual_id)
+		hit = result["_source"]
+		formatted = [hit.get(field, "") for field in fields] + [factual_id]
+		formatted = ", ".join(formatted)
+		return formatted
+	except:
+		print("Couldn't get load factual merchant")
+		return factual_id
 
 def numeric_cleanse(original_string):
 	"""Strips out characters that might confuse ElasticSearch."""

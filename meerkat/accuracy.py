@@ -34,9 +34,9 @@ import sys
 
 from pprint import pprint
 
-from meerkat.various_tools import load_dict_list
+from meerkat.various_tools import load_dict_list, get_es_connection, get_merchant_by_id
 
-def test_pinpoint_classifier(machine_labeled, human_labeled, my_lists):
+def test_pinpoint_classifier(machine_labeled, human_labeled, my_lists, params):
 	"""Tests both the recall and precision of the pinpoint classifier against
 	human-labeled training data."""
 
@@ -48,11 +48,7 @@ def test_pinpoint_classifier(machine_labeled, human_labeled, my_lists):
 		# Verify against human labeled
 		for index, human_labeled_row in enumerate(human_labeled):
 			if machine_labeled_row['DESCRIPTION_UNMASKED'] == human_labeled_row['DESCRIPTION_UNMASKED']:
-				if human_labeled_row['IS_PHYSICAL_TRANSACTION'] == '0':
-					# Transaction is non physical
-					my_lists["non_physical"].append(machine_labeled_row['DESCRIPTION_UNMASKED'])
-					break
-				elif human_labeled_row["factual_id"] == "":
+				if human_labeled_row["factual_id"] == "":
 					# Transaction is not yet labeled
 					my_lists["needs_hand_labeling"].append(machine_labeled_row['DESCRIPTION_UNMASKED'])
 					break
@@ -64,8 +60,8 @@ def test_pinpoint_classifier(machine_labeled, human_labeled, my_lists):
 				else:
 					# Transaction is mislabeled
 					my_lists["mislabeled"].append(human_labeled_row['DESCRIPTION_UNMASKED']\
-						+ " (ACTUAL:" + human_labeled_row["factual_id"] + ")"\
-						+ " (FOUND:" + machine_labeled_row["factual_id"] + ")")
+						+ " (ACTUAL: " + human_labeled_row["factual_id"] + ")"\
+						+ " (FOUND: " + machine_labeled_row["factual_id"] + ")")
 					break
 			elif index + 1 == len(human_labeled):
 				my_lists["needs_hand_labeling"].append(machine_labeled_row['DESCRIPTION_UNMASKED'])
@@ -91,6 +87,8 @@ def test_accuracy(params, file_path=None, non_physical_trans=None,
 	"""Takes file by default but can accept result
 	queue/ non_physical list. Attempts to provide various
 	accuracy tests"""
+
+	#params["es_connection"] = get_es_connection(params)
 
 	if non_physical_trans is None:
 		non_physical_trans = []
@@ -128,10 +126,10 @@ def test_accuracy(params, file_path=None, non_physical_trans=None,
 	}
 
 	# Test Pinpoint Classifier for recall and precision
-	test_pinpoint_classifier(machine_labeled, human_labeled, my_lists)
+	test_pinpoint_classifier(machine_labeled, human_labeled, my_lists, params)
 
 	# Test Bulk (binary) Classifier for accuracy
-	test_bulk_classifier(human_labeled, non_physical_trans, my_lists)
+	#test_bulk_classifier(human_labeled, non_physical_trans, my_lists)
 
 	# Collect results into dict for easier access
 	my_counters["num_labeled"] = my_counters["total"] - len(my_lists["unlabeled"])

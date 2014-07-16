@@ -33,7 +33,7 @@ from boto.s3.connection import Location, S3Connection
 from .custom_exceptions import InvalidArguments, Misconfiguration
 from .description_consumer import DescriptionConsumer
 from .binary_classifier.load import select_model
-from .various_tools import load_dict_list, safely_remove_file, split_csv, merge_split_files
+from .various_tools import load_dict_list, safely_remove_file, split_csv, merge_split_files, queue_to_list
 from .accuracy import test_accuracy, print_results, speed_tests
 
 def get_desc_queue(filename, params, classifier):
@@ -42,6 +42,7 @@ def get_desc_queue(filename, params, classifier):
 
 	encoding = None
 	physical, non_physical, atm = [], [], []
+	training_fields = ["PHYSICAL_MERCHANT",	"STORE_NUMBER", "CITY",	"STATE", "LATITUDE", "LONGITUDE", "FACTUAL_ID", "STREET"]
 	users = collections.defaultdict(list)
 	desc_queue = queue.Queue()
 
@@ -70,6 +71,13 @@ def get_desc_queue(filename, params, classifier):
 		elif prediction == "2":
 			physical.append(transaction)
 			atm.append(transaction)
+
+	# Hold on to GOOD_DESCRIPTION, clear fields
+	if params.get("mode", "") == "test":
+		for row in physical:
+			for field in training_fields:
+				row[field] = ""
+			row["MERCHANT_NAME"] = row["GOOD_DESCRIPTION"]
 
 	# Split into user buckets
 	for row in physical:
@@ -122,19 +130,6 @@ def load_hyperparameters(params):
 		sys.exit()
 	return hyperparameters
 
-def queue_to_list(result_queue):
-	"""Converts queue to list"""
-	result_list = []
-	while result_queue.qsize() > 0:
-		try:
-			result_list.append(result_queue.get())
-			result_queue.task_done()
-
-		except queue.Empty:
-			break
-	result_queue.join()
-	return result_list
-
 def run_meerkat(params, desc_queue, hyperparameters, non_physical, split):
 	"""Opens a number of threads to process the descriptions queue."""
 
@@ -160,14 +155,14 @@ def run_meerkat(params, desc_queue, hyperparameters, non_physical, split):
 	else:
 		logging.critical("Not configured for file output.")
 
-	# Test Accuracy
-	#accuracy_results = test_accuracy(params, result_list=result_list, non_physical_trans=non_physical)
-	#print_results(accuracy_results)
-
 	# Shutdown Loggers
 	logging.shutdown()
 
-	#return accuracy_results
+	# Test Accuracy
+	if params.get("mode", "") == "test":
+		accuracy_results = test_accuracy(params, result_list=result_list, non_physical_trans=non_physical)
+		print_results(accuracy_results)
+		return accuracy_results
 
 def usage():
 	"""Shows the user which parameters to send into the program."""
@@ -238,6 +233,7 @@ def write_output_to_file(params, output_list, non_physical, split):
 	header_list = [token.strip() for token in split_header]
 	header_list.append("IS_PHYSICAL_TRANSACTION")
 	header_list.append("z_score_delta")
+	header_list.append("MERCHANT_NAME")
 
  	# Get additional fields for display from config file
 	additional_fields = params["output"]["results"]["fields"]
@@ -327,10 +323,10 @@ def process_panel(params, filename, S3):
 
 	# Determine Mode
 	if "bank" in filename.lower():
-		params["mode"] = "bank"
+		params["transaction_type"] = "bank"
 		classifier = select_model("bank")
 	elif "card" in filename.lower():
-		params["mode"] = "card"
+		params["transaction_type"] = "card"
 		classifier = select_model("card")
 	else: 
 		print("Panel name must include type (bank or card).")
@@ -383,6 +379,7 @@ def process_panel(params, filename, S3):
 	logging.warning("Complete.")
 
 	# Only do one
+	print("Exiting after one panel file. Modify code to enable bucket processing.")
 	sys.exit()
 
 def mode_switch(params):
@@ -418,7 +415,7 @@ def move_to_S3(params, filepath, S3):
 	"""Pushes a file back to S3"""
 
 	# Get Connection
-	s3_location = "meerkat/output/gpanel/" + params["mode"] + "/"
+	s3_location = "meerkat/output/gpanel/" + params["transaction_type"] + "/"
 	key = s3_location + os.path.basename(filepath)
 	bucket_name = "s3yodlee"
 	bucket = conn.get_bucket(bucket_name, Location.USWest2)

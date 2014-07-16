@@ -75,8 +75,7 @@ def find_merchant(store):
 	"""Match document with store number to factual document"""
 
 	fields = ["address", "postcode", "name^1.5", "locality", "region"]
-	search_parts = [store["address"], store["zip_code"][0:5], store["keywords"], store["city"], store["state"]]
-	search_parts = [string_cleanse(part) for part in search_parts]
+	search_parts = [store["address"], store["zip_code"][0:5], store["keywords"], store["city"], string_cleanse(store["state"])]
 	factual_id = ""
 	top_result = ""
 
