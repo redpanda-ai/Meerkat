@@ -25,7 +25,7 @@ def load_dict_list(file_name, encoding='utf-8', delimiter="|"):
 def write_dict_list(dict_list, file_name, encoding="utf-8", delimiter="|"):
 	""" Saves a lists of dicts with uniform keys to file """
 
-	with open(file_name, 'w') as output_file:
+	with open(file_name, 'w', encoding=encoding, errors='replace') as output_file:
 		dict_w = csv.DictWriter(output_file, delimiter=delimiter, fieldnames=dict_list[0].keys(), extrasaction='ignore')
 		dict_w.writeheader()
 		dict_w.writerows(dict_list)
@@ -66,15 +66,16 @@ def get_es_connection(params):
 def get_merchant_by_id(factual_id, es_connection, fields=["name", "region", "locality", "internal_store_number"]):
 	"""Fetch the details for a single factual_id"""
 	
+	if factual_id == "NULL":
+		return None
+
 	try:
 		result = es_connection.get(index="factual_index", doc_type='factual_type', id=factual_id)
 		hit = result["_source"]
-		formatted = [hit.get(field, "") for field in fields] + [factual_id]
-		formatted = ", ".join(formatted)
-		return formatted
+		return hit
 	except:
 		print("Couldn't get load factual merchant")
-		return factual_id
+		return None
 
 def numeric_cleanse(original_string):
 	"""Strips out characters that might confuse ElasticSearch."""
