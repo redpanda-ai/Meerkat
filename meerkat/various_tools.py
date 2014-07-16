@@ -52,6 +52,18 @@ def load_params(filename):
 
 	return params
 
+def load_hyperparameters(params):
+	"""Attempts to load parameter key"""
+	hyperparameters = None
+	try:
+		input_file = open(params["input"]["hyperparameters"], encoding='utf-8')
+		hyperparameters = json.loads(input_file.read())
+		input_file.close()
+	except IOError:
+		logging.error("%s not found, aborting.", params["input"]["hyperparameters"])
+		sys.exit()
+	return hyperparameters
+
 def get_es_connection(params):
 	"""Fetch a connection to the factual index"""
 

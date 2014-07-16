@@ -33,8 +33,12 @@ from boto.s3.connection import Location, S3Connection
 from .custom_exceptions import InvalidArguments, Misconfiguration
 from .description_consumer import DescriptionConsumer
 from .binary_classifier.load import select_model
-from .various_tools import load_dict_list, safely_remove_file, split_csv, merge_split_files, queue_to_list
+from .various_tools import load_dict_list, safely_remove_file, load_hyperparameters
+from .various_tools import split_csv, merge_split_files, queue_to_list
 from .accuracy import test_accuracy, print_results, speed_tests
+from meerkat.optimization import run_meerkat as test_meerkat
+from meerkat.optimization import get_desc_queue as get_simple_queue
+from meerkat.optimization import load_dataset
 
 def get_desc_queue(filename, params, classifier):
 	"""Opens a file of descriptions, one per line, and load a description
@@ -118,18 +122,6 @@ def initialize():
 
 	return params
 
-def load_hyperparameters(params):
-	"""Attempts to load parameter key"""
-	hyperparameters = None
-	try:
-		input_file = open(params["input"]["hyperparameters"], encoding='utf-8')
-		hyperparameters = json.loads(input_file.read())
-		input_file.close()
-	except IOError:
-		logging.error("%s not found, aborting.", params["input"]["hyperparameters"])
-		sys.exit()
-	return hyperparameters
-
 def run_meerkat(params, desc_queue, hyperparameters, non_physical, split):
 	"""Opens a number of threads to process the descriptions queue."""
 
@@ -173,7 +165,7 @@ def usage():
 def validate_params(params):
 	"""Ensures that the correct parameters are supplied."""
 
-	mandatory_keys = ["elasticsearch", "concurrency", "input", "logging"]
+	mandatory_keys = ["elasticsearch", "concurrency", "input", "logging", "mode"]
 
 	# Ensure Mandatory Keys are in Config
 	for key in mandatory_keys:
@@ -185,6 +177,11 @@ def validate_params(params):
 
 	if "hyperparameters" not in params["input"]:
 		params["input"]["hyperparameters"] = "config/hyperparameters/default.json"
+
+	# Ensure Test Mode Requirements
+	if params["mode"] == "test":
+		if params.get("verification_source", "") == "":
+			raise Misconfiguration(msg="Please provide verification_source to run in test mode", expr=None)
 
 	# Ensure Other Various Parameters Available
 	if "index" not in params["elasticsearch"]:
@@ -338,7 +335,7 @@ def process_panel(params, filename, S3):
 		delimiter = params["input"].get("delimiter", "|")
 		encoding = params["input"].get("encoding", "utf-8")
 		#Break the input file into segments
-		split_list = split_csv(open(filename, 'r', encoding=encoding), delimiter=delimiter,
+		split_list = split_csv(open(filename, 'r', encoding=encoding, errors='replace'), delimiter=delimiter,
 			row_limit=row_limit, output_path=split_path)
 	except IOError:
 		logging.critical("Invalid ['input']['filename'] key; Input file: %s"
@@ -388,7 +385,9 @@ def mode_switch(params):
 	input_file = params["input"].get("filename", "")
 	input_bucket = params["input"].get("bucket_key", "")
 
-	if os.path.isfile(input_file):
+	if params.get("mode", "") == "test":
+		test_training_data(params)
+	elif os.path.isfile(input_file):
 		print("Processing Single Local File: ", input_file)
 		params["output"]["file"]["name"] = os.path.basename(input_file)
 		conn = connect_to_S3()
@@ -399,6 +398,15 @@ def mode_switch(params):
 	else:
 		logging.critical("Please provide a local file or s3 bucket for procesing. Terminating")
 		sys.exit()
+
+def test_training_data(params):
+	"""An easy way to test the accuracy of a small set
+	provided a set of hyperparameters"""
+
+	hyperparameters = load_hyperparameters(params)
+	dataset = load_dataset(params)
+	desc_queue = get_simple_queue(dataset)
+	test_meerkat(params, desc_queue, hyperparameters)
 
 def connect_to_S3():
 	"""Returns a connection to S3"""

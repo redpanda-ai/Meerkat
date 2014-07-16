@@ -51,10 +51,78 @@ from pprint import pprint
 from numpy import array, array_split
 
 from meerkat.description_consumer import DescriptionConsumer
-from meerkat.description_producer import initialize, load_hyperparameters
 from meerkat.binary_classifier.load import select_model
 from meerkat.accuracy import print_results, test_accuracy
-from meerkat.various_tools import load_dict_list, queue_to_list
+from meerkat.various_tools import load_dict_list, queue_to_list, load_params, load_hyperparameters
+
+def test_train_split(dataset):
+	"""Load the verification source, and split the
+	data into a test and training set"""
+
+	# Shuffle/Split Data
+	test, train = [], []
+	shuffle(dataset)
+	split_arr = array_split(array(dataset), 2)
+	test = list(split_arr[0])
+	train = list(split_arr[1])
+
+	return test, train
+
+def two_fold(hyperparameters, known, params):
+	"""Run two-fold cross validation. Combine Scores"""
+
+	# Run Randomized Optimization and Cross Validate
+	d0_top_score = randomized_optimization(hyperparameters, known, params, d0)
+	d1_top_score = randomized_optimization(hyperparameters, known, params, d1)
+
+	# Cross Validate
+	d1_results = cross_validate(d0_top_score, d1)
+	d0_results = cross_validate(d1_top_score, d0)
+
+	# Show Scores
+	print("FINAL SCORES:")
+	pprint(d0_results)
+	pprint(d1_results)
+
+	# Save Scores
+	save_cross_fold_results(d0_top_score, d0_results, d1_top_score, d1_results)
+
+def cross_validate(top_score, dataset):
+	"""Validate model built with training set against
+	test set"""
+
+	# Split boosts from other hyperparameters and format accordingly
+	hyperparameters = top_score["hyperparameters"]
+	boost_vectors, boost_labels, hyperparameters = split_hyperparameters(hyperparameters)
+
+	# Override Params
+	params["elasticsearch"]["boost_labels"] = boost_labels
+	params["elasticsearch"]["boost_vectors"] = boost_vectors
+
+	# Run Classifier
+	print("\n", "CROSS VALIDATE", "\n")
+	desc_queue = get_desc_queue(dataset)
+	accuracy = run_meerkat(params, desc_queue, hyperparameters)
+
+	return accuracy
+
+def save_cross_fold_results(d0_top_score, d0_results, d1_top_score, d1_results):
+
+	# Save Scores
+	file_name = os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_" + "cross_validation_results.json" 
+	record = open(file_name, 'w')
+
+	pprint("d0 as Training Data - Top Score found through Optimization:", record)
+	pprint(d0_top_score, record)
+
+	pprint("d0 as Training Data - Score of d1 on this set of hyperparameters:", record)
+	pprint(d1_results, record)
+
+	pprint("d1 as Training Data - Top Score found through Optimization:", record)
+	pprint(d1_top_score, record)
+
+	pprint("d1 as Training Data - Score of d0 on this set of hyperparameters:", record)
+	pprint(d0_results, record)
 
 def run_meerkat(params, desc_queue, hyperparameters):
 	"""Run meerkat on a set of transactions"""
@@ -79,19 +147,6 @@ def run_meerkat(params, desc_queue, hyperparameters):
 
 	return accuracy_results
 
-def test_train_split(dataset):
-	"""Load the verification source, and split the
-	data into a test and training set"""
-
-	# Shuffle/Split Data
-	test, train = [], []
-	shuffle(dataset)
-	split_arr = array_split(array(dataset), 2)
-	test = list(split_arr[0])
-	train = list(split_arr[1])
-
-	return test, train
-
 def load_dataset(params):
 	"""Load a verified dataset"""
 
@@ -109,25 +164,6 @@ def load_dataset(params):
 
 	return dataset
 
-def two_fold(hyperparameters, known, params):
-	"""Run two-fold cross validation. Combine Scores"""
-
-	# Run Randomized Optimization and Cross Validate
-	d0_top_score = randomized_optimization(hyperparameters, known, params, d0)
-	d1_top_score = randomized_optimization(hyperparameters, known, params, d1)
-
-	# Cross Validate
-	d1_results = cross_validate(d0_top_score, d1)
-	d0_results = cross_validate(d1_top_score, d0)
-
-	# Show Scores
-	print("FINAL SCORES:")
-	pprint(d0_results)
-	pprint(d1_results)
-
-	# Save Scores
-	save_cross_fold_results(d0_top_score, d0_results, d1_top_score, d1_results)
-
 def randomized_optimization(hyperparameters, known, params, dataset):
 
 	"""Generates randomized parameter keys by
@@ -136,10 +172,15 @@ def randomized_optimization(hyperparameters, known, params, dataset):
 	provides the top score found"""
 
 	# Init
+	base_name = os.path.splitext(os.path.basename(sys.argv[1]))[0]
 	initial_values = get_initial_values(hyperparameters, params, known, dataset)
 
 	# Run Gradient Ascent 
 	top_score = gradient_descent(initial_values, params, known, dataset)
+
+	# Save All Scores
+	with open(base_name + "_all_scores.txt", "w") as fout:
+		pprint(params["scores"], fout)
 
 	print("Precision = " + str(top_score['precision']) + "%")
 	print("Best Recall = " + str(top_score['total_recall_physical']) + "%")
@@ -148,7 +189,7 @@ def randomized_optimization(hyperparameters, known, params, dataset):
 	print("ALL RESULTS:")
 	
 	# Save Final Parameters
-	file_name = os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_" + str(round(top_score['precision'], 2)) + "Precision" + str(round(top_score['total_recall_physical'], 2)) + "Recall.json" 
+	file_name = base_name + "_" + str(round(top_score['precision'], 2)) + "Precision" + str(round(top_score['total_recall_physical'], 2)) + "Recall.json" 
 	new_parameters = open(file_name, 'w')
 	pprint(top_score["hyperparameters"], new_parameters)
 
@@ -171,12 +212,23 @@ def get_initial_values(hyperparameters, params, known, dataset):
 		# Run Classifier
 		accuracy = run_classifier(randomized_hyperparameters, params, dataset)
 		higher_precision = accuracy["precision"] >= top_score["precision"]
+		higher_recall = accuracy["total_recall_physical"] >= top_score["total_recall_physical"]
 		not_too_high = accuracy["precision"] <= settings["max_precision"]
 
-		if higher_precision and not_too_high:
+		if higher_recall:
 			top_score = accuracy
 			top_score['hyperparameters'] = randomized_hyperparameters
-			print("\n", "SCORE: " + str(accuracy["precision"]))
+			print("\n", "SCORE PRECISION: " + str(round(accuracy["precision"], 2)))
+			print("\n", "SCORE RECALL: " + str(round(accuracy["total_recall_physical"], 2)))
+
+		# Keep Track of All Scores
+		score = {
+			"hyperparameters" : randomized_hyperparameters,
+			"precision" : round(accuracy["precision"], 2),
+			"recall" : round(accuracy["total_recall_physical"], 2)
+		}
+
+		params["scores"].append(score)
 		
 		print("\n", randomized_hyperparameters,"\n")
 
@@ -224,7 +276,8 @@ def run_iteration(top_score, params, known, dataset):
 		if same_or_higher_recall and same_or_higher_precision and not_too_high_precision:
 			new_top_score = accuracy
 			new_top_score['hyperparameters'] = randomized_hyperparameters
-			print("\n", "SCORE: " + str(accuracy["precision"]))
+			print("\n", "SCORE PRECISION: " + str(round(accuracy["precision"], 2)))
+			print("\n", "SCORE RECALL: " + str(round(accuracy["total_recall_physical"], 2)))
 
 	return new_top_score
 
@@ -286,25 +339,6 @@ def get_desc_queue(dataset):
 
 	return desc_queue
 
-def cross_validate(top_score, dataset):
-	"""Validate model built with training set against
-	test set"""
-
-	# Split boosts from other hyperparameters and format accordingly
-	hyperparameters = top_score["hyperparameters"]
-	boost_vectors, boost_labels, hyperparameters = split_hyperparameters(hyperparameters)
-
-	# Override Params
-	params["elasticsearch"]["boost_labels"] = boost_labels
-	params["elasticsearch"]["boost_vectors"] = boost_vectors
-
-	# Run Classifier
-	print("\n", "CROSS VALIDATE", "\n")
-	desc_queue = get_desc_queue(dataset)
-	accuracy = run_meerkat(params, desc_queue, hyperparameters)
-
-	return accuracy
-
 def run_classifier(hyperparameters, params, dataset):
 	""" Runs the classifier with a given set of hyperparameters"""
 
@@ -320,24 +354,6 @@ def run_classifier(hyperparameters, params, dataset):
 	accuracy = run_meerkat(params, desc_queue, hyperparameters)
 
 	return accuracy
-
-def save_cross_fold_results(d0_top_score, d0_results, d1_top_score, d1_results):
-
-	# Save Scores
-	file_name = os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_" + "cross_validation_results.json" 
-	record = open(file_name, 'w')
-
-	pprint("d0 as Training Data - Top Score found through Optimization:", record)
-	pprint(d0_top_score, record)
-
-	pprint("d0 as Training Data - Score of d1 on this set of hyperparameters:", record)
-	pprint(d1_results, record)
-
-	pprint("d1 as Training Data - Top Score found through Optimization:", record)
-	pprint(d1_top_score, record)
-
-	pprint("d1 as Training Data - Score of d0 on this set of hyperparameters:", record)
-	pprint(d0_results, record)
 
 def verify_arguments():
 	"""Verify Usage"""
@@ -355,17 +371,19 @@ if __name__ == "__main__":
 	# Meta Information
 	start_time = datetime.datetime.now()
 	verify_arguments()
-	params = initialize()
+	params = load_params(sys.argv[1])
 
 	params["settings"] = {
 		"folds": 1,
 		"initial_search_space": 100,
-		"initial_learning_rate": 1,
+		"initial_learning_rate": 3,
 		"iteration_search_space": 25,
 		"iteration_learning_rate": 0.5,
 		"gradient_descent_iterations": 2,
-		"max_precision": 97
+		"max_precision": 95
 	}
+
+	params["scores"] = []
 
 	known = {"es_result_size" : "45"}
 

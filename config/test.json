@@ -9,7 +9,7 @@
 		"encoding" : "utf-8",
 		"split" : {
 			"processing_location" : "/mnt/ephemeral/input/",
-			"row_limit" : 2000
+			"row_limit" : 10000
 		}
 	},
 	"logging" : {

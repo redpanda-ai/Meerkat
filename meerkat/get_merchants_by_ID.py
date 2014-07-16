@@ -41,7 +41,7 @@ def enrich_transactions(params, es_connection):
 		# Enrich 
 		location = merchant.get("pin", {}).get("location", {}).get("coordinates", ["",""])
 		latitude = location[1]
-		latitude = location[0]
+		longitude = location[0]
 		transaction["PHYSICAL_MERCHANT"] = merchant.get("name", "")
 		transaction["STORE_NUMBER"] = merchant.get("internal_store_number", "")
 		transaction["CITY"] = merchant.get("locality", "")
