@@ -74,7 +74,7 @@ def z_score_delta(scores):
 def find_merchant(store):
 	"""Match document with store number to factual document"""
 
-	fields = ["address", "postcode", "name^1.5", "locality", "region"]
+	fields = ["address", "postcode", "name", "locality", "region"]
 	search_parts = [store["address"], store["zip_code"][0:5], store["keywords"], store["city"], string_cleanse(store["state"])]
 	factual_id = ""
 	top_result = ""
@@ -132,7 +132,7 @@ def update_merchant(factual_id, store):
 	body = {"doc" : {"internal_store_number" : store_number}}
 
 	try:
-		output_data = es_connection.update(index="factual_index", doc_type="factual_type", id=factual_id, body=body)
+		output_data = es_connection.update(index="factual_index_2", doc_type="factual_type", id=factual_id, body=body)
 	except Exception:
 		print("Failed to Update Merchant")
 
@@ -148,7 +148,7 @@ def search_index(query):
 	output_data = ""
 
 	try:
-		output_data = es_connection.search(index="factual_index", body=query)
+		output_data = es_connection.search(index="factual_index_2", body=query)
 	except Exception:
 		output_data = {"hits":{"total":0}}
 

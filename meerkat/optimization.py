@@ -203,6 +203,8 @@ def get_initial_values(hyperparameters, params, known, dataset):
 	iterations = settings["initial_search_space"]
 	learning_rate = settings["initial_learning_rate"]
 
+	print("Training on " + str(len(dataset)) + " unique transactions")
+
 	for i in range(iterations):
 
 		randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=learning_rate)
@@ -252,9 +254,6 @@ def gradient_descent(initial_values, params, known, dataset):
 	return top_score
 
 def run_iteration(top_score, params, known, dataset):
-
-	# ?????
-	print(len(dataset))
 
 	settings = params["settings"]
 	hyperparameters = top_score['hyperparameters']
@@ -389,17 +388,15 @@ if __name__ == "__main__":
 
 	hyperparameters = {
 		"internal_store_number" : "2",
-		"good_description" : "1",
-	    "name" : "3",             
-	    "address" : "1",          
-	    "address_extended" : "1", 
+	    "name" : "2",
+	    "good_description" : "2",
+	    "address" : "0.5",         
 	    "po_box" : "1",           
-	    "locality" : "1",         
+	    "locality" : "2",         
 	    "region" : "2",           
 	    "post_town" : "1",        
 	    "admin_region" : "1",     
-	    "postcode" : "1",                
-	    "tel" : "1",                            
+	    "postcode" : "1",                                          
 	    "neighborhood" : "1",     
 	    "email" : "1",               
 	    "category_labels" : "1",           
