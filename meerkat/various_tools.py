@@ -5,9 +5,12 @@ within multiple scripts."""
 
 import csv
 import re
+import logging
 import matplotlib.pyplot as plt
 import numpy as np
+import time
 
+from functools import wraps
 from matplotlib.patches import Polygon
 
 def load_dict_list(file_name, encoding='utf-8', delimiter="|"):
@@ -93,3 +96,30 @@ def string_cleanse(original_string):
 	cleanse_pattern = re.compile(bad_character_regex)
 	with_spaces = re.sub(cleanse_pattern, " ", original_string)
 	return ' '.join(with_spaces.split())
+
+def timethis(func):
+	"""Decorator that reports execution time."""
+	@wraps(func)
+	def wrapper(*args, **kwargs):
+		start = time.time()
+		result = func(*args, **kwargs)
+		end = time.time()
+		print(func.__name__, end-start)
+		return result
+	return wrapper
+
+def logged(level, name=None, message=None):
+	"""Decorator to add logging to a function."""
+	def decorate(func):
+		logname = name if name else func.__module__
+		log = logging.getLogger(logname)
+		logmsg = message if message else func.__name__
+
+		@wraps(func)
+		def wrapper(*args, **kwargs):
+			log.log(level, logmsg)
+			return func(*args, **kwargs)
+		return wrapper
+	return decorate
+
+

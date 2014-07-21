@@ -18,18 +18,30 @@ import sys
 import threading
 
 from elasticsearch import Elasticsearch
+from pprint import pprint
 from sklearn.preprocessing import StandardScaler
 from scipy.stats.mstats import zscore
-from pprint import pprint
 
-from .various_tools import string_cleanse, scale_polygon
 from .clustering import cluster, collect_clusters
 from .location import separate_geo
+from .various_tools import string_cleanse, scale_polygon
 
 #Helper functions
+
+def timethis(func):
+	'''Decorator that reports execution time.'''
+	@wraps(func)
+	def wrapper(*args, **kwargs):
+		start = time.time()
+		result = func(*args, **kwargs)
+		end = time.time()
+		print(func.__name__, end-start)
+		return result
+	return wrapper
+
 def get_bool_query(starting_from=0, size=0):
 	"""Returns a "bool" style ElasticSearch query object"""
-	return {"from" : starting_from, "size" : size, "query" : {
+	return {"from" : starting_from, "size" : size, "query" : {\
 		"bool": {"minimum_number_should_match": 1, "should": []}}}
 
 def get_basic_query(starting_from=0, size=0):
@@ -38,18 +50,17 @@ def get_basic_query(starting_from=0, size=0):
 
 def get_geo_query(scaled_shapes):
 	"""Generate multipolygon query for use with"""
-	return {
-		"geo_shape" : {
-			"pin.location" : {
-				"shape" : {
-					"type" : "multipolygon",
-					"coordinates": [[scaled_shape] for scaled_shape in scaled_shapes]
-				}}}}
+	return {"geo_shape" : {"pin.location" : {"shape" : {\
+		"type" : "multipolygon",\
+		"coordinates": [[scaled_shape] for scaled_shape in scaled_shapes]\
+		}}}}
 
-def get_qs_query(term, field_list=[], boost=1.0):
+def get_qs_query(term, field_list=None, boost=1.0):
 	"""Returns a "query_string" style ElasticSearch query object"""
-	return {"query_string": {
-		"query": term, "fields": field_list, "boost" : boost}}
+	if field_list is None:
+		field_list = []
+	return {"query_string": {"query": term, "fields": field_list,\
+		"boost" : boost}}
 
 def get_us_cities():
 	"""Load an array of US cities"""
@@ -83,7 +94,9 @@ class DescriptionConsumer(threading.Thread):
 			return True
 
 		hits = search_results['hits']['hits']
-		scores, results, fields_found = [], [], []
+		#Sigma holds a dictionary of meta information about the hits
+		hit_meta = {"scores" : [], "results" : [], "fields_found" : []}
+		#scores, results, fields_found = [], [], []
 		params = self.params
 
 		for hit in hits:
@@ -94,7 +107,7 @@ class DescriptionConsumer(threading.Thread):
 					hit["fields"]["longitude"] = [coordinates[0]]
 					hit["fields"]["latitude"] = [coordinates[1]]
 			hit_fields, score = hit.get("fields", {}), hit['_score']
-			scores.append(score)
+			hit_meta["scores"].append(score)
 			field_order = params["output"]["results"]["fields"]
 			fields_in_hit = [field for field in hit_fields]
 			ordered_hit_fields = []
@@ -103,15 +116,15 @@ class DescriptionConsumer(threading.Thread):
 					my_field = (hit_fields[ordinal][0]\
 						if isinstance(hit_fields[ordinal], (list))\
 						else str(hit_fields[ordinal]))
-					fields_found.append(ordinal)
+					hit_meta["fields_found"].append(ordinal)
 					ordered_hit_fields.append(my_field)
 				else:
-					fields_found.append(ordinal)
+					hit_meta["fields_found"].append(ordinal)
 					ordered_hit_fields.append("")
-			results.append(\
+			hit_meta["results"].append(\
 			"[" + str(round(score, 3)) + "] " + " ".join(ordered_hit_fields))
 
-		self.__generate_z_score_delta(scores)
+		self.__generate_z_score_delta(hit_meta["scores"])
 
 		try:
 			print(str(self.thread_id), ": ", results[0])
@@ -173,7 +186,7 @@ class DescriptionConsumer(threading.Thread):
 		self.cities = get_us_cities()
 
 		cluster_nodes = self.params["elasticsearch"]["cluster_nodes"]
-		self.es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True,
+		self.es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True,\
 			sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
 
 		self.my_meta = None
@@ -206,15 +219,15 @@ class DescriptionConsumer(threading.Thread):
 		name_boost = self.hyperparameters.get("name_boost", "1")
 		hits, non_hits = separate_geo(text_features_results)
 
-		locations_found = [
-		str(json.loads(hit["pin.location"].replace("'", '"'))["coordinates"])
-		for hit in hits]
+		locations_found = [\
+			str(json.loads(hit["pin.location"].replace("'", '"'))["coordinates"])\
+			for hit in hits]
 
 		unique_locations = set(locations_found)
 
-		unique_locations = [
-		json.loads(location.replace("'", '"'))
-		for location in unique_locations]
+		unique_locations = [\
+			json.loads(location.replace("'", '"'))\
+			for location in unique_locations]
 
 		enriched_transactions = []
 
@@ -245,8 +258,8 @@ class DescriptionConsumer(threading.Thread):
 			enriched_transaction = self.__process_results(search_results, transaction)
 			enriched_transactions.append(enriched_transaction)
 
-		added_text_and_geo_features = [trans for trans in enriched_transactions
-		if trans["factual_id"] != ""]
+		added_text_and_geo_features = [trans for trans in enriched_transactions\
+			if trans["factual_id"] != ""]
 
 		text_and_geo_features_results = hits + enriched_transactions
 
@@ -277,12 +290,13 @@ class DescriptionConsumer(threading.Thread):
 					labels, unique_locations)
 
 			# Scale generated geo shapes
-			scaled_geoshapes = [scale_polygon(geoshape, scale=scaling_factor)[1]
-			for geoshape in original_geoshapes]
+			scaled_geoshapes = [scale_polygon(geoshape,\
+				scale=scaling_factor)[1] for geoshape in original_geoshapes]
 			# Save interesting outputs needs to run in it's own process
 			#if len(unique_locations) >= 3:
 			#	pool = multiprocessing.Pool()
-			#	arguments = [(unique_locations, original_geoshapes, scaled_geoshapes, user_id)]
+			#	arguments = [(unique_locations, original_geoshapes,\
+			#	scaled_geoshapes, user_id)]
 			#	pool.starmap(visualize, arguments)
 		return scaled_geoshapes
 
@@ -290,10 +304,12 @@ class DescriptionConsumer(threading.Thread):
 		"""Runs the classifier"""
 		# Show Final Query
 		logger = logging.getLogger("thread " + str(self.thread_id))
-		logger.info(json.dumps(query, sort_keys=True, indent=4, separators=(',', ': ')))
+		logger.info(json.dumps(query, sort_keys=True, indent=4,\
+		separators=(',', ': ')))
 		my_results = self.__search_index(query)
 		metrics = self.my_meta["metrics"]
-		logger.info("Cache Hit / Miss: %i / %i", metrics["cache_count"], metrics["query_count"])
+		logger.info("Cache Hit / Miss: %i / %i", metrics["cache_count"],\
+		metrics["query_count"])
 		return my_results
 
 	def __generate_base_query(self, transaction, boost=1.0):
@@ -327,7 +343,6 @@ class DescriptionConsumer(threading.Thread):
 	def __process_results(self, search_results, transaction):
 		"""Prepare results for decision boundary"""
 		field_names = self.params["output"]["results"]["fields"]
-		hyperparameters = self.hyperparameters
 
 		# Must be at least one result
 		if search_results["hits"]["total"] == 0:
@@ -342,8 +357,10 @@ class DescriptionConsumer(threading.Thread):
 		scores = []
 		top_hit = hits[0]
 		hit_fields = top_hit.get("fields", "")
-		business_names = [result.get("fields", {"name" : ""})["name"] for result in hits]
-		business_names = [name[0] for name in business_names if type(name) == list]
+		business_names = [result.get("fields", {"name" : ""})["name"] \
+			for result in hits]
+		business_names = [name[0] for name in business_names \
+			if type(name) == list]
 
 		# If no results return
 		if hit_fields == "":
@@ -363,11 +380,13 @@ class DescriptionConsumer(threading.Thread):
 		decision = self.__decision_boundary(z_score_delta)
 
 		# Enrich Data if Passes Boundary
-		enriched_transaction = self.__enrich_transaction(decision, transaction, hit_fields, z_score_delta, business_names)
+		enriched_transaction = self.__enrich_transaction(decision,\
+			transaction, hit_fields, z_score_delta, business_names)
 
 		return enriched_transaction
 
-	def __enrich_transaction(self, decision, transaction, hit_fields, z_score_delta, business_names):
+	def __enrich_transaction(self, decision, transaction, hit_fields,\
+		z_score_delta, business_names):
 		"""Enriches the transaction if it passes the boundary"""
 
 		enriched_transaction = transaction
@@ -378,7 +397,9 @@ class DescriptionConsumer(threading.Thread):
 		if decision == True:
 			for field in field_names:
 				if field in fields_in_hit:
-					field_content = hit_fields[field][0] if isinstance(hit_fields[field], (list)) else str(hit_fields[field])
+					field_content = hit_fields[field][0] \
+						if isinstance(hit_fields[field], (list)) \
+						else str(hit_fields[field])
 					enriched_transaction[field] = field_content
 				else:
 					enriched_transaction[field] = ""
@@ -388,7 +409,8 @@ class DescriptionConsumer(threading.Thread):
 		if decision == False:
 			for field in field_names:
 				enriched_transaction[field] = ""
-			enriched_transaction = self.__business_name_fallback(business_names, transaction)
+			enriched_transaction = self.__business_name_fallback(\
+				business_names, transaction)
 			enriched_transaction["z_score_delta"] = 0
 
 		return enriched_transaction
@@ -403,7 +425,6 @@ class DescriptionConsumer(threading.Thread):
 		"""Uses the business names as a fallback
 		to finding a specific factual id"""
 
-		fields = self.params["output"]["results"]["fields"]
 		enriched_transaction = transaction
 		business_names = business_names[0:2]
 		top_name = business_names[0].lower()
@@ -434,19 +455,18 @@ class DescriptionConsumer(threading.Thread):
 		if output_data == "":
 			logger.debug("Cache miss, searching")
 			try:
-				output_data = self.es_connection.search(
+				output_data = self.es_connection.search(\
 					index=self.params["elasticsearch"]["index"], body=input_as_object)
 				#Add newly found results to the client cache
-				if use_cache == True:
-					#FIXME: 'input_hash' variable is undefined, this does not work!
-					self.params["search_cache"][input_hash] = output_data
+				#if use_cache == True:
+				#'input_hash' variable is undefined, this does not work!
+				#self.params["search_cache"][input_hash] = output_data
 			except Exception:
 				logging.critical("Unable to process the following: %s",\
 					str(input_as_object))
 				output_data = {"hits":{"total":0}}
 
 		self.my_meta["metrics"]["query_count"] += 1
-
 		return output_data
 
 	def __check_cache(self, input_data):
@@ -479,17 +499,15 @@ class DescriptionConsumer(threading.Thread):
 		transaction_id = transaction["UNIQUE_TRANSACTION_ID"]
 		date = transaction["TRANSACTION_DATE"].replace(".", "-")
 		date = date.replace("/", "-")
-		update_body = {
-			"date": date,
-			"_parent": transaction["UNIQUE_MEM_ID"],
-			"z_score_delta": str(transaction["z_score_delta"]),
-			"description": transaction["DESCRIPTION"],
-			"factual_id": transaction["factual_id"],
-			"pin.location": {
-				"lon" : transaction["longitude"],
-				"lat" : transaction["latitude"]
-			}
-		}
+		update_body = {\
+			"date": date, "_parent": transaction["UNIQUE_MEM_ID"],\
+			"z_score_delta": str(transaction["z_score_delta"]),\
+			"description": transaction["DESCRIPTION"],\
+			"factual_id": transaction["factual_id"],\
+			"pin.location": {\
+				"lon" : transaction["longitude"],\
+				"lat" : transaction["latitude"]\
+			}}
 
 		try:
 			_ = self.es_connection.index(index="user_index",\
@@ -511,17 +529,15 @@ class DescriptionConsumer(threading.Thread):
 	def __get_boosted_fields(self, vector_name):
 		"""Returns a list of boosted fields built from a boost vector"""
 		boost_vector = self.boost_column_vectors[vector_name]
-		return [x + "^" + str(y)
-		for x, y in zip(self.boost_row_labels, boost_vector)
-		if y != 0.0]
+		return [x + "^" + str(y) \
+			for x, y in zip(self.boost_row_labels, boost_vector)\
+			if y != 0.0]
 
 	def __set_logger(self):
 		"""Creates a logger, based upon the supplied config object."""
-		levels = {
-			'debug': logging.DEBUG, 'info': logging.INFO,
-			'warning': logging.WARNING, 'error': logging.ERROR,
-			'critical': logging.CRITICAL
-		}
+		levels = {'debug': logging.DEBUG, 'info': logging.INFO,\
+			'warning': logging.WARNING, 'error': logging.ERROR,\
+			'critical': logging.CRITICAL}
 		params = self.params
 		my_level = params["logging"]["level"]
 		if my_level in levels:
