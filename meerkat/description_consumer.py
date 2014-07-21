@@ -19,8 +19,8 @@ import threading
 
 from elasticsearch import Elasticsearch
 from pprint import pprint
-from sklearn.preprocessing import StandardScaler
 from scipy.stats.mstats import zscore
+from sklearn.preprocessing import StandardScaler
 
 from .clustering import cluster, collect_clusters
 from .decorators import arguments
@@ -194,7 +194,6 @@ class DescriptionConsumer(threading.Thread):
 			enriched_transaction = self.__business_name_fallback(\
 				kwargs["business_names"], kwargs["transaction"])
 			enriched_transaction["z_score_delta"] = 0
-
 		return enriched_transaction
 
 	def __generate_base_query(self, transaction, boost=1.0):
@@ -222,12 +221,10 @@ class DescriptionConsumer(threading.Thread):
 		field_boosts = self.__get_boosted_fields("standard_fields")
 		simple_query = get_qs_query(transaction, field_boosts, boost)
 		should_clauses.append(simple_query)
-
 		return bool_search
 
 	def __generate_z_score_delta(self, scores):
 		"""Display the Z-score delta between the first and second scores."""
-
 		logger = logging.getLogger("thread " + str(self.init_args["thread_id"]))
 
 		if len(scores) < 2:
@@ -248,7 +245,6 @@ class DescriptionConsumer(threading.Thread):
 			quality = "High-grade"
 
 		logger.info("Top Score Quality: %s", quality)
-
 		return z_score_delta
 
 	def __get_boosted_fields(self, vector_name):
@@ -296,17 +292,14 @@ class DescriptionConsumer(threading.Thread):
 		"""Uses first pass results, to find an approximation
 		of a users spending area. Returns estimation as
 		a bounded polygon"""
-
 		scaling_factor = self.init_args["hyperparameters"].get("scaling_factor", "1")
 		scaling_factor = float(scaling_factor)
 		scaled_geoshapes = None
 
 		# Get Scaled Geoshapes
 		if len(unique_locations) >= 3:
-
 			# Cluster location and return geoshapes bounding clusters
 			original_geoshapes = cluster(unique_locations)
-
 			# If no clusters are found just use the points themselves
 			if len(original_geoshapes) == 0:
 				scaled_points = StandardScaler().fit_transform(unique_locations)
@@ -340,7 +333,6 @@ class DescriptionConsumer(threading.Thread):
 			for field in field_names:
 				transaction[field] = ""
 				transaction["z_score_delta"] = 0
-
 			return transaction
 
 		# Collect Necessary Information
@@ -373,7 +365,6 @@ class DescriptionConsumer(threading.Thread):
 		# Enrich Data if Passes Boundary
 		enriched_transaction = self.__enrich_transaction(decision,\
 			transaction, hit_fields, z_score_delta, business_names)
-
 		return enriched_transaction
 
 	def __reset_my_meta(self):
@@ -385,26 +376,19 @@ class DescriptionConsumer(threading.Thread):
 			try:
 				# Select all transactions from user
 				self.user = self.init_args["desc_queue"].get()
-
 				# Load Past Transactions
 				self.__load_past_transactions()
-
 				# Classify using text features only
 				enriched_transactions = self.__text_features()
-
 				# Save results to user_index
 				self.__save_labeled_transactions(enriched_transactions)
-
 				# Output Results to Result Queue
 				self.__output_to_result_queue(enriched_transactions)
-
 				# Done
 				self.init_args["desc_queue"].task_done()
-
 			except queue.Empty:
 				print(str(self.init_args["thread_id"]),\
 					" found empty queue, terminating.")
-
 		return True
 
 	def __run_classifier(self, query):
@@ -518,7 +502,6 @@ class DescriptionConsumer(threading.Thread):
 
 	def __text_and_geo_features(self, text_features_results):
 		"""Classify transactions using geo and text features"""
-
 		#Build 'text_features', dictionary of information about the
 		#text_features_results.
 		text_features = {
@@ -547,6 +530,7 @@ class DescriptionConsumer(threading.Thread):
 			"name_boost" : self.init_args["hyperparameters"].get("name_boost", "1")
 		}
 		enriched_transactions = []
+
 		# Run transactions again with geo_query
 		for transaction in text_features["non_hits"]:
 			query_parts["base_query"] = self.__generate_base_query(transaction,
@@ -577,9 +561,7 @@ class DescriptionConsumer(threading.Thread):
 
 	def __text_features(self):
 		"""Classify transactions using text features only"""
-
 		enriched_transactions = []
-
 		# Call the Classifier on each transaction and return best results
 		while len(self.user) > 0:
 			transaction = self.user.pop()
@@ -588,7 +570,5 @@ class DescriptionConsumer(threading.Thread):
 			self.__display_search_results(search_results, transaction)
 			enriched_transaction = self.__process_results(search_results, transaction)
 			enriched_transactions.append(enriched_transaction)
-
 		return enriched_transactions
-
 
