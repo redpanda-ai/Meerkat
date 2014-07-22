@@ -132,6 +132,7 @@ def update_merchant(factual_id, store):
 	body = {"doc" : {"internal_store_number" : store_number}}
 
 	try:
+		#TODO NO HARDCODED INDEX!!!
 		output_data = es_connection.update(index="factual_index_2", doc_type="factual_type", id=factual_id, body=body)
 	except Exception:
 		print("Failed to Update Merchant")
@@ -143,11 +144,10 @@ def update_merchant(factual_id, store):
 def search_index(query):
 	"""Searches the merchants index and the merchant mapping"""
 
-	input_data = json.dumps(query, sort_keys=True, indent=4\
-	, separators=(',', ': ')).encode('UTF-8')
 	output_data = ""
 
 	try:
+		#TODO NO HARDCODED INDEX!!!
 		output_data = es_connection.search(index="factual_index_2", body=query)
 	except Exception:
 		output_data = {"hits":{"total":0}}

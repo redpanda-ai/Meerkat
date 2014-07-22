@@ -70,19 +70,23 @@ def get_es_connection(params):
 	from elasticsearch import Elasticsearch
 
 	cluster_nodes = params["elasticsearch"]["cluster_nodes"]
-	es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True,
+	index = params["elasticsearch"]["index"]
+	print(index)
+	es_connection = Elasticsearch(cluster_nodes, index=index, sniff_on_start=True,
 	sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
 
 	return es_connection
 
-def get_merchant_by_id(factual_id, es_connection, fields=["name", "region", "locality", "internal_store_number"]):
+def get_merchant_by_id(params, factual_id, es_connection, fields=["name", "region", "locality", "internal_store_number", "postcode"]):
 	"""Fetch the details for a single factual_id"""
+
+	index = params.get("elasticsearch", {}).get("index", "")
 	
 	if factual_id == "NULL":
 		return None
 
 	try:
-		result = es_connection.get(index="factual_index", doc_type='factual_type', id=factual_id)
+		result = es_connection.get(index=index, doc_type='factual_type', id=factual_id)
 		hit = result["_source"]
 		return hit
 	except:

@@ -28,7 +28,7 @@ Created on Feb 26, 2014
 
 #################### USAGE ##########################
 
-# python3.3 -m meerkat.optimization config/training.json
+# python3.3 -m meerkat.optimization config/train.json
 # Note: Experts only! Do not touch!
 
 #FEATURE_IDEA: Memory of each round of configuration
@@ -199,7 +199,7 @@ def get_initial_values(hyperparameters, params, known, dataset):
 	"""Do a simple search to find starter values"""
 
 	settings = params["settings"]
-	top_score = {"precision" : 0, "total_recall_physical" : 0}
+	top_score = {"precision" : 0, "total_recall_physical" : 0, "f1" : 0}
 	iterations = settings["initial_search_space"]
 	learning_rate = settings["initial_learning_rate"]
 
@@ -213,12 +213,17 @@ def get_initial_values(hyperparameters, params, known, dataset):
 
 		# Run Classifier
 		accuracy = run_classifier(randomized_hyperparameters, params, dataset)
-		higher_precision = accuracy["precision"] >= top_score["precision"]
-		higher_recall = accuracy["total_recall_physical"] >= top_score["total_recall_physical"]
-		not_too_high = accuracy["precision"] <= settings["max_precision"]
+		precision = accuracy["precision"]
+		recall = accuracy["total_recall_physical"]
+		f1 = 2 * (((precision / 100) * 1.3 * recall) / (((precision / 100) * 1.3) + recall))
+		higher_f1 = f1 >= top_score["f1"]
+		higher_precision = precision >= top_score["precision"]
+		higher_recall = recall >= top_score["total_recall_physical"]
+		not_too_high = precision <= settings["max_precision"]
 
 		if higher_recall:
 			top_score = accuracy
+			top_score["f1"] = f1
 			top_score['hyperparameters'] = randomized_hyperparameters
 			print("\n", "SCORE PRECISION: " + str(round(accuracy["precision"], 2)))
 			print("\n", "SCORE RECALL: " + str(round(accuracy["total_recall_physical"], 2)))
@@ -278,6 +283,14 @@ def run_iteration(top_score, params, known, dataset):
 			print("\n", "SCORE PRECISION: " + str(round(accuracy["precision"], 2)))
 			print("\n", "SCORE RECALL: " + str(round(accuracy["total_recall_physical"], 2)))
 
+		score = {
+			"hyperparameters" : randomized_hyperparameters,
+			"precision" : round(accuracy["precision"], 2),
+			"recall" : round(accuracy["total_recall_physical"], 2)
+		}
+
+		params["scores"].append(score)
+
 	return new_top_score
 
 def randomize(hyperparameters, known={}, learning_rate=0.3):
@@ -310,10 +323,11 @@ def split_hyperparameters(hyperparameters):
 	
 	boost_vectors = {}
 	boost_labels = ["standard_fields"]
+	non_boost = ["es_result_size", "z_score_threshold", "good_description"]
 	other = {}
 
 	for key, value in hyperparameters.items():
-		if key == "es_result_size" or key == "z_score_threshold" or key == "qs_boost" or key == "scaling_factor" or key == "name_boost":
+		if key in non_boost:
 			other[key] = value
 		else:
 			boost_vectors[key] = [value]
@@ -376,9 +390,9 @@ if __name__ == "__main__":
 		"folds": 1,
 		"initial_search_space": 100,
 		"initial_learning_rate": 3,
-		"iteration_search_space": 25,
+		"iteration_search_space": 5,
 		"iteration_learning_rate": 0.5,
-		"gradient_descent_iterations": 2,
+		"gradient_descent_iterations": 10,
 		"max_precision": 95
 	}
 
@@ -387,19 +401,22 @@ if __name__ == "__main__":
 	known = {"es_result_size" : "45"}
 
 	hyperparameters = {
-		"internal_store_number" : "2",
-	    "name" : "2",
-	    "good_description" : "2",
-	    "address" : "0.5",         
-	    "po_box" : "1",           
-	    "locality" : "2",         
-	    "region" : "2",           
-	    "post_town" : "1",        
+		"internal_store_number" : "2",  
+	    "name" : "3",
+	    "good_description" : "2",             
+	    "address" : "0.5",          
+	    "address_extended" : "1.25", 
+	    "po_box" : "1.25",           
+	    "locality" : "1.5",         
+	    "region" : "1.5",           
+	    "post_town" : "0.5",        
 	    "admin_region" : "1",     
-	    "postcode" : "1",                                          
+	    "postcode" : "1",                
+	    "tel" : "0.5",                            
 	    "neighborhood" : "1",     
-	    "email" : "1",               
-	    "category_labels" : "1",           
+	    "email" : "0.5",               
+	    "category_labels" : "1.25",           
+	    "chain_name" : "1",
 		"z_score_threshold" : "3"
 	}
 

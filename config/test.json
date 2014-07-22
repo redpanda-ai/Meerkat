@@ -55,7 +55,7 @@
 		    "s17:9200",
 		    "s18:9200"
     	],
-		"index" : "factual_index",
+		"index" : "factual_index_2",
 		"type" : "factual_type",
 		"boost_labels" : ["standard_fields"],
 		"boost_vectors" :  {

@@ -362,7 +362,7 @@ class DescriptionConsumer(threading.Thread):
 
 		# Use Good Description in Query
 		if good_description != "" and self.hyperparameters.get("good_description", "") != "":
-			good_description_boost = self.hyperparameters.get["good_description"]
+			good_description_boost = self.hyperparameters["good_description"]
 			name_query = get_qs_query(string_cleanse(good_description), ['name'], good_description_boost)
 			should_clauses.append(name_query)
 

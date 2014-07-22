@@ -28,11 +28,11 @@ from meerkat.various_tools import load_params, get_es_connection, get_merchant_b
 def enrich_transactions(params, es_connection):
 	"""Enrich a set of transactions using a provided factual_id"""
 
-	transactions = load_dict_list(params["input"]["filename"])
+	transactions = load_dict_list(sys.argv[2])
 
 	for transaction in transactions:
 
-		merchant = get_merchant_by_id(transaction["factual_id"], es_connection)
+		merchant = get_merchant_by_id(params, transaction["factual_id"], es_connection)
 
 		# No merchant found for factual_id
 		if merchant == None:
