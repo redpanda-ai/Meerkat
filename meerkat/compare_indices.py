@@ -37,6 +37,7 @@ def relink_transactions(params, es_connection):
 
 	transactions = load_dict_list(sys.argv[2])
 
+	# Locate Changes
 	for transaction in transactions:
 
 		# Null
@@ -49,17 +50,24 @@ def relink_transactions(params, es_connection):
 		new_mapping = enrich_transaction(params, transaction, es_connection, index=sys.argv[4])
 
 		if new_mapping["merchant_found"] == False:
-			params["compare_indices"]["id_changed"].append(transaction)
+			params["compare_indices"]["id_changed"].append(old_mapping)
 			continue
 
 		mapping_changed = has_mapping_changed(params, old_mapping, new_mapping)
 
-		# Reconcile Mapping
-		#if mapping_changed:
-			#merchant = find_merchant_by_address(params, old_mapping, es_connection)
+		if mapping_changed:
+			params["compare_indices"]["details_changed"].append(transaction)
+			continue
 
-	print("Percent Changed Factual: ", len(params["compare_indices"]["id_changed"]) / len(transactions))
+		params["compare_indices"]["no_change"].append(transaction)
+
+	# Fix Changes
+	reconcile_changed_ids(params, es_connection)
+
+	print("Percent Changed ID: ", len(params["compare_indices"]["id_changed"]) / len(transactions))
 	print("Percent Changed Details: ", len(params["compare_indices"]["details_changed"]) / len(transactions))
+	print("Percent Unchanged: ", len(params["compare_indices"]["no_change"]) / len(transactions))
+	print("Percent Null: ", len(params["compare_indices"]["NULL"]) / len(transactions))
 
 def has_mapping_changed(params, old_mapping, new_mapping):
 	"""Compares two transactions for similarity"""
@@ -69,10 +77,23 @@ def has_mapping_changed(params, old_mapping, new_mapping):
 	new_fields = [new_mapping.get(field, "") for field in fields_to_compare]
 
 	if old_fields != new_fields:
-		params["compare_indices"]["details_changed"].append(new_mapping)
 		return True
 
 	return False
+
+def reconcile_null():
+	"""Attempt to find a factual_id for a NULL entry"""
+
+def reconcile_changed_ids(params, es_connection):
+	"""Attempt to find a matching factual_id using address"""
+
+	changed_ids = params["compare_indices"]["id_changed"]
+
+	for transaction in changed_ids:
+		merchant = find_merchant_by_address(params, transaction, es_connection)
+
+def reconcile_changed_details():
+	"""Decide whether new details are erroneous"""
 
 def enrich_transaction(params, transaction, es_connection, index=""):
 	"""Enrich a set of transactions using a provided factual_id"""
@@ -121,6 +142,7 @@ def find_merchant_by_address(params, store, es_connection):
 		results = {"hits":{"total":0}}
 
 	score, top_hit = get_hit(results, 0)
+	_, second_hit = get_hit(results, 1)
 
 	if score == False:
 		return "", ""
@@ -137,11 +159,12 @@ def find_merchant_by_address(params, store, es_connection):
 		print("DESCRIPTION_UNMASKED: ", transaction)
 		print("Query Sent: ", search_parts, " ")
 		print("Top Result: ", formatted_new.encode("utf-8"))
+		print("Second Result", ", ".join([second_hit.get(field, "") for field in fields_to_print]).encode("utf-8"))
 		print("Z-Score: ", score, "\n")
 		print("Old ID ", store["factual_id"])
 		print("New ID ", top_hit["factual_id"], "\n")
 
-		#input_var = input("Enter something: ")
+		input_var = input("Enter something: ")
 
 def get_hit(search_results, index):
 
@@ -194,6 +217,7 @@ def add_local_params(params):
 	params["compare_indices"]["NULL"] = []
 	params["compare_indices"]["id_changed"] = []
 	params["compare_indices"]["details_changed"] = []
+	params["compare_indices"]["no_change"] = []
 
 	return params
 
