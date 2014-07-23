@@ -77,10 +77,11 @@ def get_es_connection(params):
 
 	return es_connection
 
-def get_merchant_by_id(params, factual_id, es_connection, fields=["name", "region", "locality", "internal_store_number", "postcode"]):
+def get_merchant_by_id(params, factual_id, es_connection, index="", fields=["name", "region", "locality", "internal_store_number", "postcode"]):
 	"""Fetch the details for a single factual_id"""
 
-	index = params.get("elasticsearch", {}).get("index", "")
+	if index == "":
+		index = params.get("elasticsearch", {}).get("index", "")
 	
 	if factual_id == "NULL":
 		return None
@@ -90,7 +91,7 @@ def get_merchant_by_id(params, factual_id, es_connection, fields=["name", "regio
 		hit = result["_source"]
 		return hit
 	except:
-		print("Couldn't get load factual merchant")
+		#print("Couldn't load factual merchant")
 		return None
 
 def numeric_cleanse(original_string):
