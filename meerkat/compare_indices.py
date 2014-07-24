@@ -99,17 +99,17 @@ def reconcile_changed_ids(params, es_connection):
 	"""Attempt to find a matching factual_id using address"""
 
 	while len(params["compare_indices"]["id_changed"]) > 0:
-		print("--------------------", "\n")
+		print("------------------", "\n")
 		changed_ids = params["compare_indices"]["id_changed"]
 		random.shuffle(changed_ids)
 		transaction = changed_ids.pop()
 		results = find_merchant_by_address(params, transaction, es_connection)
 		decision_boundary(params, transaction, results)
 
-def reconcile_changed_details():
+def reconcile_changed_details(params, es_connection):
 	"""Decide whether new details are erroneous"""
 
-def reconcile_null():
+def reconcile_null(params, es_connection):
 	"""Attempt to find a factual_id for a NULL entry"""
 
 def decision_boundary(params, store, results):
@@ -123,7 +123,8 @@ def decision_boundary(params, store, results):
 
 	# Add transaction back to the queue for later analysis if nothing found
 	if score == False:
-		params["compare_indices"]["id_changed"].insert(0, store)
+		print("No matches found", "\n")
+		params["compare_indices"]["skipped"].append(store)
 		return
 
 	# Compare Results
