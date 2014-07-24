@@ -23,6 +23,7 @@ Created on July 21, 2014
 
 import os
 import sys
+import random
 
 from pprint import pprint
 from copy import deepcopy
@@ -35,9 +36,19 @@ from meerkat.various_tools import get_merchant_by_id, load_dict_list, write_dict
 def relink_transactions(params, es_connection):
 	"""Relink transactions to their new factual_ids"""
 
+	# Locate Changes
+	identify_changes(params, es_connection)
+
+	# Fix Changes
+	reconcile_changed_ids(params, es_connection)
+	reconcile_changed_details(params, es_connection)
+	reconcile_null(params, es_connection)
+
+def identify_changes(params, es_connection):
+	"""Locate changes in training data between indices"""
+
 	transactions = load_dict_list(sys.argv[2])
 
-	# Locate Changes
 	for transaction in transactions:
 
 		# Null
@@ -61,13 +72,16 @@ def relink_transactions(params, es_connection):
 
 		params["compare_indices"]["no_change"].append(transaction)
 
-	# Fix Changes
-	reconcile_changed_ids(params, es_connection)
+	print_diff_stats(params, transactions)
 
-	print("Percent Changed ID: ", len(params["compare_indices"]["id_changed"]) / len(transactions))
-	print("Percent Changed Details: ", len(params["compare_indices"]["details_changed"]) / len(transactions))
-	print("Percent Unchanged: ", len(params["compare_indices"]["no_change"]) / len(transactions))
-	print("Percent Null: ", len(params["compare_indices"]["NULL"]) / len(transactions))
+def print_diff_stats(params, transactions):
+	"""Display a set of diff stats"""
+
+	print("Number of transactions: ", len(transactions))
+	print("Number Changed ID: ", len(params["compare_indices"]["id_changed"]))
+	print("Number Changed Details: ", len(params["compare_indices"]["details_changed"]))
+	print("Number Unchanged: ", len(params["compare_indices"]["no_change"]))
+	print("Number Null: ", len(params["compare_indices"]["NULL"]), "\n")
 
 def has_mapping_changed(params, old_mapping, new_mapping):
 	"""Compares two transactions for similarity"""
@@ -81,22 +95,60 @@ def has_mapping_changed(params, old_mapping, new_mapping):
 
 	return False
 
-def reconcile_null():
-	"""Attempt to find a factual_id for a NULL entry"""
-
 def reconcile_changed_ids(params, es_connection):
 	"""Attempt to find a matching factual_id using address"""
 
-	changed_ids = params["compare_indices"]["id_changed"]
-
-	for transaction in changed_ids:
-		merchant = find_merchant_by_address(params, transaction, es_connection)
+	while len(params["compare_indices"]["id_changed"]) > 0:
+		print("--------------------", "\n")
+		changed_ids = params["compare_indices"]["id_changed"]
+		random.shuffle(changed_ids)
+		transaction = changed_ids.pop()
+		results = find_merchant_by_address(params, transaction, es_connection)
+		decision_boundary(params, transaction, results)
 
 def reconcile_changed_details():
 	"""Decide whether new details are erroneous"""
 
+def reconcile_null():
+	"""Attempt to find a factual_id for a NULL entry"""
+
+def decision_boundary(params, store, results):
+	"""Decide if there is a match"""
+
+	fields = ["name", "address", "locality", "region", "postcode"]
+	old_details = [store["PHYSICAL_MERCHANT"], store["STREET"], store["CITY"], string_cleanse(store["STATE"]), store["ZIP_CODE"]]
+	accepted_inputs = [str(x) for x in list(range(5))]
+	accepted_inputs.append("y")
+	score, top_hit = get_hit(results, 0)
+
+	# Add transaction back to the queue for later analysis if nothing found
+	if score == False:
+		params["compare_indices"]["id_changed"].insert(0, store)
+		return
+
+	# Compare Results
+	old_details = [part.encode("utf-8") for part in old_details]
+	new_details = [top_hit.get(field, "").encode("utf-8") for field in fields[0:5]]
+
+	# Don't require input on matching details
+	if new_details == old_details:
+		print("Record autolinked", "\n")
+		user_input = "0"
+	else:
+		user_input = user_prompt(params, old_details, results, store)
+
+	# Chage factual_id, move to relinked
+	if user_input in accepted_inputs:
+		score, hit = get_hit(results, int(user_input))
+		store["new_id"] = hit["factual_id"]
+		params["compare_indices"]["relinked"].append(store)
+	else:
+		# Add transaction to another queue for later analysis
+		params["compare_indices"]["skipped"].append(store)
+
 def enrich_transaction(params, transaction, es_connection, index=""):
-	"""Enrich a set of transactions using a provided factual_id"""
+	"""Return a copy of a transaction, enriched with data from a 
+	provided factual_id"""
 
 	transaction = deepcopy(transaction)
 	transaction["merchant_found"] = True
@@ -120,11 +172,9 @@ def find_merchant_by_address(params, store, es_connection):
 	"""Match document with address to factual document"""
 
 	fields = ["name", "address", "locality", "region", "postcode"]
-	search_parts = [store["PHYSICAL_MERCHANT"], store["STREET"], store["CITY"], string_cleanse(store["STATE"]), store["ZIP_CODE"]]
-	transaction = store["DESCRIPTION_UNMASKED"]
+	old_details = [store["PHYSICAL_MERCHANT"], store["STREET"], store["CITY"], string_cleanse(store["STATE"]), store["ZIP_CODE"]]
 	index = sys.argv[4]
-	factual_id = ""
-	result = ""
+	results = ""
 
 	# Generate Query
 	bool_search = get_bool_query(size=45)
@@ -132,7 +182,7 @@ def find_merchant_by_address(params, store, es_connection):
 
 	# Multi Field
 	for i in range(len(fields)):
-		sub_query = get_qs_query(search_parts[i], [fields[i]])
+		sub_query = get_qs_query(old_details[i], [fields[i]])
 		should_clauses.append(sub_query)
 
 	# Search
@@ -141,30 +191,44 @@ def find_merchant_by_address(params, store, es_connection):
 	except Exception:
 		results = {"hits":{"total":0}}
 
-	score, top_hit = get_hit(results, 0)
-	_, second_hit = get_hit(results, 1)
+	return results
 
-	if score == False:
-		return "", ""
+def user_prompt(params, old_details, results, store):
+	"""Prompt a user for input to continue"""
 
-	# Tests
-	if top_hit.get("factual_id", "") != store["factual_id"]:
+	num_changed = len(params["compare_indices"]["id_changed"])
+	num_relinked = len(params["compare_indices"]["relinked"])
+	num_skipped = len(params["compare_indices"]["skipped"])
+	total = num_changed + num_relinked + num_skipped
+	percentage_relinked = num_relinked / total
+	percentage_formatted = str(round(percentage_relinked * 100, 2)) + "%"
+	print("Number id_changed remaining: ", num_changed)
+	print("Number relinked: ", num_relinked)
+	print("Number skipped: ", num_skipped)
+	print("Percent Relinked: ", percentage_formatted, "\n")
 
-		# Print results
-		fields_to_print = ["name", "address", "locality", "region", "postcode", "internal_store_number"]
-		formatted_new = [top_hit.get(field, "") for field in fields_to_print]
-		formatted_new = ", ".join(formatted_new)
-		search_parts = [part.encode("utf-8") for part in search_parts]
+	print("DESCRIPTION_UNMASKED: ", store["DESCRIPTION_UNMASKED"].encode("utf-8"))
+	print("Query Sent: ", old_details, " ")
+	
+	for i in range(5):
+		print_formatted_result(results, i)
 
-		print("DESCRIPTION_UNMASKED: ", transaction)
-		print("Query Sent: ", search_parts, " ")
-		print("Top Result: ", formatted_new.encode("utf-8"))
-		print("Second Result", ", ".join([second_hit.get(field, "") for field in fields_to_print]).encode("utf-8"))
-		print("Z-Score: ", score, "\n")
-		print("Old ID ", store["factual_id"])
-		print("New ID ", top_hit["factual_id"], "\n")
+	print("[enter] None of the above", "\n")
+	user_input = input("Please select a location, or press enter to skip: \n")
 
-		input_var = input("Enter something: ")
+	return user_input
+
+def print_formatted_result(results, index):
+	"""Display a potential result in readable format"""
+
+	fields_to_print = ["name", "address", "locality", "region", "postcode", "internal_store_number"]
+	score, hit = get_hit(results, index)
+	details_formatted = [hit.get(field, "") for field in fields_to_print]
+	details_formatted = ", ".join(details_formatted)
+	print("[" + str(index) + "]", details_formatted.encode("utf-8"))
+
+def validate_hit():
+	"""Rely on user input to validate a potential match"""
 
 def get_hit(search_results, index):
 
@@ -217,7 +281,9 @@ def add_local_params(params):
 	params["compare_indices"]["NULL"] = []
 	params["compare_indices"]["id_changed"] = []
 	params["compare_indices"]["details_changed"] = []
+	params["compare_indices"]["skipped"] = []
 	params["compare_indices"]["no_change"] = []
+	params["compare_indices"]["relinked"] = []
 
 	return params
 

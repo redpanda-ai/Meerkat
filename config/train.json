@@ -1,10 +1,10 @@
 {
 	"concurrency" : 36,
 	"verification_source" : "data/misc/ground_truth_card.txt",
-	"mode" : "test",
+	"mode" : "train",
 	"input" : {
 		"hyperparameters" : "config/hyperparameters/default.json",
-		"filename" : "data/misc/ground_truth_card.txt",
+		"filename" : "/mnt/ephemeral/training_data/processed/card_sample_978.txt",
 		"delimiter" : "|",
 		"encoding" : "utf-8",
 		"split" : {
@@ -23,15 +23,15 @@
 			"fields" : [
 				"name", "chain_id", "category_labels", "address", "locality",
 				"region", "postcode", "website", "tel", "chain_name",
-				"latitude", "longitude", "neighborhood", "factual_id"],
+				"latitude", "longitude", "neighborhood", "factual_id", "internal_store_number"],
 			"labels" : [
 				"PHYSICAL_MERCHANT", "STORE_ID", "FACTUAL_CATEGORY", "STREET", "CITY",
 				"STATE", "ZIP_CODE", "WEBSITE", "PHONE_NUMBER", "CHAIN_NAME",
-				"LATITUDE", "LONGITUDE", "NEIGHBORHOOD", "FACTUAL_ID"]
+				"LATITUDE", "LONGITUDE", "NEIGHBORHOOD", "FACTUAL_ID", "STORE_NUMBER"]
 		},
 		"file" : {
 			"format" : "csv",
-			"processing_location" : "/data/output/",
+			"processing_location" : "/mnt/ephemeral/training_data/processed/third_batch/",
 			"delimiter" : "|"
 		}
 	},

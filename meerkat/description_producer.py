@@ -77,7 +77,7 @@ def get_desc_queue(filename, params, classifier):
 			atm.append(transaction)
 
 	# Hold on to GOOD_DESCRIPTION, clear fields
-	if params.get("mode", "") == "test":
+	if params.get("mode", "") == "train":
 		for row in physical:
 			for field in training_fields:
 				row[field] = ""
