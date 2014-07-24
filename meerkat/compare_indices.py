@@ -133,13 +133,83 @@ def reconcile_changed_details(params, es_connection):
 def reconcile_null(params, es_connection):
 	"""Attempt to find a factual_id for a NULL entry"""
 
+	null = params["compare_indices"]["NULL"]
+	null_len = len(null)
+	skipped = params["compare_indices"]["skipped"]
+	params["compare_indices"]["NULL"] = []
+	params["compare_indices"]["skipped"] = []
+
+	# Do null then skipped
+	while len(null) > 0:
+		print("------------------", "\n")
+		progress = 100 - ((len(null) / null_len) * 100)
+		print(round(progress, 2), "% ", "done with NULL")
+		transaction = null.pop()
+		results = search_with_user_input(params, es_connection, transaction)
+		if results == False:
+			continue
+		null_decision_boundary(params, transaction, results)
+
+def search_with_user_input(params, es_connection, transaction):
+	"""Search for a location by providing additional data"""
+
+	index = sys.argv[4]
+	prompt = "Base query: " + transaction["DESCRIPTION_UNMASKED"]
+	prompt = prompt + " is insufficient to uniquely identify, please provide additional data \n"
+	user_input = input(prompt)
+
+	if user_input == "rm":
+		return False
+
+	# Generate new query
+	bool_search = get_bool_query(size=45)
+	should_clauses = bool_search["query"]["bool"]["should"]
+
+	trans_query = get_qs_query(transaction["DESCRIPTION_UNMASKED"], ["_all"])
+	user_query = get_qs_query(user_input, ["_all"])
+	should_clauses.append(trans_query)
+	should_clauses.append(user_query)
+
+	# Search
+	try:
+		results = es_connection.search(index=index, body=bool_search)
+	except Exception:
+		results = {"hits":{"total":0}}
+
+	return results
+
+def null_decision_boundary(params, store, results):
+	"""Decide if there is a match when evaluating NULL"""
+
+	accepted_inputs = [str(x) for x in list(range(5))]
+
+	for i in range(5):
+		print_formatted_result(results, i)
+
+	print("[enter] NULL")
+	print("[rm] transaction is not physical, remove it from data", "\n")
+
+	user_input = input("Please select a choice above: \n")
+
+	# Remove from Set
+	if user_input == "rm":
+		return
+
+	# Change factual_id, move to relinked
+	if user_input in accepted_inputs:
+		score, hit = get_hit(results, int(user_input))
+		store["new_id"] = hit["factual_id"]
+		params["compare_indices"]["relinked"].append(store)
+	else:
+		# Add transaction to another queue for later analysis
+		params["compare_indices"]["NULL"].append(store)
+
 def decision_boundary(params, store, results):
 	"""Decide if there is a match"""
 
 	fields = ["name", "address", "locality", "region", "postcode"]
 	old_details = [store["PHYSICAL_MERCHANT"], store["STREET"], store["CITY"], string_cleanse(store["STATE"]), store["ZIP_CODE"]]
 	accepted_inputs = [str(x) for x in list(range(5))]
-	accepted_inputs.append("y")
 	score, top_hit = get_hit(results, 0)
 
 	# Add transaction back to the queue for later analysis if nothing found
@@ -159,7 +229,11 @@ def decision_boundary(params, store, results):
 	else:
 		user_input = user_prompt(params, old_details, results, store)
 
-	# Chage factual_id, move to relinked
+	# Remove is transaction isn't physical
+	if user_input == "rm":
+		return
+
+	# Change factual_id, move to relinked
 	if user_input in accepted_inputs:
 		score, hit = get_hit(results, int(user_input))
 		store["new_id"] = hit["factual_id"]
@@ -193,13 +267,17 @@ def enrich_transaction(params, transaction, es_connection, index=""):
 
 	return transaction
 
-def find_merchant_by_address(params, store, es_connection):
+def find_merchant_by_address(params, store, es_connection, additional_data=""):
 	"""Match document with address to factual document"""
 
-	fields = ["name", "address", "locality", "region", "postcode"]
+	fields = ["name^2", "address", "locality", "region", "postcode"]
 	old_details = [store["PHYSICAL_MERCHANT"], store["STREET"], store["CITY"], string_cleanse(store["STATE"]), store["ZIP_CODE"]]
 	index = sys.argv[4]
 	results = ""
+
+	# Append additional data
+	fields.append("_all")
+	old_details.append(additional_data)
 
 	# Generate Query
 	bool_search = get_bool_query(size=45)
@@ -227,18 +305,22 @@ def user_prompt(params, old_details, results, store):
 	total = num_changed + num_relinked + num_skipped
 	percentage_relinked = num_relinked / total
 	percentage_formatted = str(round(percentage_relinked * 100, 2)) + "%"
+	old_details_formatted = [detail.decode("utf-8") for detail in old_details]
+	old_details_formatted =  ", ".join(old_details_formatted)
+
 	print("Number id_changed remaining: ", num_changed)
 	print("Number relinked: ", num_relinked)
 	print("Number skipped: ", num_skipped)
 	print("Percent Relinked: ", percentage_formatted, "\n")
 
 	print("DESCRIPTION_UNMASKED: ", store["DESCRIPTION_UNMASKED"].encode("utf-8"))
-	print("Query Sent: ", old_details, " ")
+	print("Query Sent: ", old_details_formatted.encode("utf-8"), " ")
 	
 	for i in range(5):
 		print_formatted_result(results, i)
 
-	print("[enter] None of the above", "\n")
+	print("[enter] None of the above")
+	print("[rm] transaction is not physical, remove it from data", "\n")
 	user_input = input("Please select a location, or press enter to skip: \n")
 
 	return user_input
