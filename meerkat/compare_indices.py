@@ -24,6 +24,7 @@ Created on July 21, 2014
 import os
 import sys
 import random
+import contextlib
 
 from pprint import pprint
 from copy import deepcopy
@@ -32,6 +33,16 @@ from scipy.stats.mstats import zscore
 from meerkat.description_consumer import get_qs_query, get_bool_query
 from meerkat.various_tools import load_params, get_es_connection, string_cleanse
 from meerkat.various_tools import get_merchant_by_id, load_dict_list, write_dict_list
+
+class DummyFile(object):
+    def write(self, x): pass
+
+@contextlib.contextmanager
+def nostderr():
+    save_stderr = sys.stderr
+    sys.stderr = DummyFile()
+    yield
+    sys.stderr = save_stderr
 
 def relink_transactions(params, es_connection):
 	"""Relink transactions to their new factual_ids"""
@@ -49,7 +60,16 @@ def identify_changes(params, es_connection):
 
 	transactions = load_dict_list(sys.argv[2])
 
-	for transaction in transactions:
+	print("Locating changes in training set:")
+
+	for i, transaction in enumerate(transactions):
+
+		# Progress
+		progress = (i / len(transactions)) * 100
+		progress = str(round(progress, 0)) + "%"
+		sys.stdout.write('\r')
+		sys.stdout.write(progress)
+		sys.stdout.flush()
 
 		# Null
 		if transaction["factual_id"] == "NULL":
@@ -77,6 +97,7 @@ def identify_changes(params, es_connection):
 def print_diff_stats(params, transactions):
 	"""Display a set of diff stats"""
 
+	sys.stdout.write('\n\n')
 	print("Number of transactions: ", len(transactions))
 	print("Number Changed ID: ", len(params["compare_indices"]["id_changed"]))
 	print("Number Changed Details: ", len(params["compare_indices"]["details_changed"]))
@@ -154,7 +175,10 @@ def enrich_transaction(params, transaction, es_connection, index=""):
 	transaction = deepcopy(transaction)
 	transaction["merchant_found"] = True
 	fields_to_get = ["name", "region", "locality", "internal_store_number", "postcode", "address"]
-	merchant = get_merchant_by_id(params, transaction["factual_id"], es_connection, index=index, fields=fields_to_get)
+	
+	# Get merchant and suppress errors
+	with nostderr():
+		merchant = get_merchant_by_id(params, transaction["factual_id"], es_connection, index=index, fields=fields_to_get)
 
 	if merchant == None:
 		merchant = {}

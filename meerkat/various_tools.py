@@ -71,7 +71,6 @@ def get_es_connection(params):
 
 	cluster_nodes = params["elasticsearch"]["cluster_nodes"]
 	index = params["elasticsearch"]["index"]
-	print(index)
 	es_connection = Elasticsearch(cluster_nodes, index=index, sniff_on_start=True,
 	sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
 
