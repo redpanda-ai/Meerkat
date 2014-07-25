@@ -120,7 +120,7 @@ def reconcile_changed_ids(params, es_connection):
 	"""Attempt to find a matching factual_id using address"""
 
 	while len(params["compare_indices"]["id_changed"]) > 0:
-		print("------------------", "\n")
+		br()
 		changed_ids = params["compare_indices"]["id_changed"]
 		random.shuffle(changed_ids)
 		transaction = changed_ids.pop()
@@ -136,12 +136,30 @@ def reconcile_null(params, es_connection):
 	null = params["compare_indices"]["NULL"]
 	null_len = len(null)
 	skipped = params["compare_indices"]["skipped"]
+	skipped_len = len(skipped)
 	params["compare_indices"]["NULL"] = []
 	params["compare_indices"]["skipped"] = []
 
-	# Do null then skipped
+	# Prompt a mode change
+	break_point = ""
+	while break_point != "OK":
+		break_point = input("--- Entering skipped mode. Type OK to continue --- \n")
+
+	# Fix Skipped
+	while len(skipped) > 0:
+		br()
+		progress = 100 - ((len(skipped) / skipped_len) * 100)
+		print(round(progress, 2), "% ", "done with Skipped")
+		transaction = skipped.pop()
+		user_input = skipped_details_prompt(params, transaction, es_connection)
+		results = find_merchant_by_address(params, transaction, es_connection, additional_data=user_input)
+		if results == False:
+			continue
+		null_decision_boundary(params, transaction, results)
+
+	# Fix Null
 	while len(null) > 0:
-		print("------------------", "\n")
+		br()
 		progress = 100 - ((len(null) / null_len) * 100)
 		print(round(progress, 2), "% ", "done with NULL")
 		transaction = null.pop()
@@ -149,6 +167,23 @@ def reconcile_null(params, es_connection):
 		if results == False:
 			continue
 		null_decision_boundary(params, transaction, results)
+
+def br():
+	"""Prints a break line to show current record has changed"""
+	print("------------------", "\n")
+
+def skipped_details_prompt(params, transaction, es_connection):
+	"""Prompt the users to provide additional data"""
+
+	print("Base query: " + transaction["DESCRIPTION_UNMASKED"])
+	store = enrich_transaction(params, transaction, es_connection, index=sys.argv[3])
+	old_details = [store["PHYSICAL_MERCHANT"], store["STREET"], store["CITY"], string_cleanse(store["STATE"]), store["ZIP_CODE"],]
+	old_details_formatted = ", ".join(old_details)
+	print("Old index details: ", old_details_formatted.encode("utf-8"), " ")
+	prompt = "Please provide additional details such as an alternate name or address: \n"
+	user_input = input(prompt)
+
+	return user_input
 
 def search_with_user_input(params, es_connection, transaction):
 	"""Search for a location by providing additional data"""
@@ -242,7 +277,7 @@ def decision_boundary(params, store, results):
 		# Add transaction to another queue for later analysis
 		params["compare_indices"]["skipped"].append(store)
 
-def enrich_transaction(params, transaction, es_connection, index=""):
+def enrich_transaction(params, transaction, es_connection, index="", factual_id=""):
 	"""Return a copy of a transaction, enriched with data from a 
 	provided factual_id"""
 
@@ -251,8 +286,11 @@ def enrich_transaction(params, transaction, es_connection, index=""):
 	fields_to_get = ["name", "region", "locality", "internal_store_number", "postcode", "address"]
 	
 	# Get merchant and suppress errors
+	if factual_id == "":
+		factual_id = transaction["factual_id"]
+
 	with nostderr():
-		merchant = get_merchant_by_id(params, transaction["factual_id"], es_connection, index=index, fields=fields_to_get)
+		merchant = get_merchant_by_id(params, factual_id, es_connection, index=index, fields=fields_to_get)
 
 	if merchant == None:
 		merchant = {}
@@ -321,6 +359,7 @@ def user_prompt(params, old_details, results, store):
 
 	print("[enter] None of the above")
 	print("[rm] transaction is not physical, remove it from data", "\n")
+	user_input = ""
 	user_input = input("Please select a location, or press enter to skip: \n")
 
 	return user_input
