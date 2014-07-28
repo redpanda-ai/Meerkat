@@ -143,7 +143,23 @@ def reconcile_null(params, es_connection):
 	# Prompt a mode change
 	break_point = ""
 	while break_point != "OK":
-		break_point = input("--- Entering skipped mode. Type OK to continue --- \n")
+		break_point = input("--- Entering NULL mode. Type OK to continue. Despair at the lack of a save progress feature --- \n")
+
+	# Fix Null
+	while len(null) > 0:
+		br()
+		progress = 100 - ((len(null) / null_len) * 100)
+		print(round(progress, 2), "% ", "done with NULL")
+		transaction = null.pop()
+		results = search_with_user_input(params, es_connection, transaction)
+		if results == False:
+			continue
+		null_decision_boundary(params, transaction, results)
+
+	# Prompt a mode change
+	break_point = ""
+	while break_point != "OK":
+		break_point = input("--- Entering skipped mode. Type OK to continue. Despair at the lack of a save progress feature --- \n")
 
 	# Fix Skipped
 	while len(skipped) > 0:
@@ -157,16 +173,8 @@ def reconcile_null(params, es_connection):
 			continue
 		null_decision_boundary(params, transaction, results)
 
-	# Fix Null
-	while len(null) > 0:
-		br()
-		progress = 100 - ((len(null) / null_len) * 100)
-		print(round(progress, 2), "% ", "done with NULL")
-		transaction = null.pop()
-		results = search_with_user_input(params, es_connection, transaction)
-		if results == False:
-			continue
-		null_decision_boundary(params, transaction, results)
+def save_relinked_transactions(params):
+	""""Save the completed file set"""
 
 def br():
 	"""Prints a break line to show current record has changed"""
