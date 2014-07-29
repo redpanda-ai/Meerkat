@@ -8,6 +8,12 @@ import os
 import sys
 from random import shuffle
 
+class Printer():
+	"""Print things to stdout on one line dynamically."""
+	def __init__(self, data):
+		sys.stdout.write("\r\x1b[K" + data.__str__())
+		sys.stdout.flush()
+
 def clean_line(line):
 	"""Trims binary junk from a gzipped line"""
 	return str(line)[2:-3]
@@ -15,15 +21,15 @@ def clean_line(line):
 def bucket_me(input_file, shuffle_dict):
 	"""Buckets an input file, placing hte result in a dictionary"""
 	#print("Processing {0}".format(input_file))
-	logging.critical("Processing %s", input_file)
+	logging.critical("Bucket Processing %s", input_file)
 	count = 0
 	with gzip.open(input_file, "rb") as gzipped_input:
 		is_first_line = True
 		for line in gzipped_input:
 			count += 1
-			if count % 20000 == 0:
-				sys.stdout.write(".")
-				sys.stdout.flush()
+			if count % CHUNK_SIZE == 0:
+				output = "Bucket %d chunks completed" % (count / CHUNK_SIZE)
+				Printer(output)
 			line = clean_line(line)
 			if is_first_line:
 				header = "SHUFFLE_ID|" + line
@@ -33,6 +39,7 @@ def bucket_me(input_file, shuffle_dict):
 			if shuffle_id not in shuffle_dict:
 				shuffle_dict[shuffle_id] = 0
 			shuffle_dict[shuffle_id] += 1
+	print("\n")
 	make_histogram(shuffle_dict)
 	return header
 
@@ -70,16 +77,19 @@ def filter_me(input_file, y):
 		count = 0
 		for line in gzipped_input:
 			count += 1
-			if count % 20000 == 0:
-				sys.stdout.write(".")
-				sys.stdout.flush()
+			if count % CHUNK_SIZE == 0:
+				output = "Filter %d chunks completed" % (count / CHUNK_SIZE)
+				Printer(output)
 			line = clean_line(line)
 			line_tokens = line.split("|")
 			key = line_tokens[0]
 			if key in y:
 				y[key].append(line)
+	print("\n")
 
 def start(input_path):
+	"""Runs the main program, writing results to a gzipped output
+	file."""
 	os.chdir(input_path)
 	input_files = sorted(glob.glob('*.gz'))
 
@@ -94,22 +104,26 @@ def start(input_path):
 	logging.critical("Shuffling")
 	shuffle(shuffle_list)
 
-	sample_size_in_members = 20000
-	shuffle_list = shuffle_list[:sample_size_in_members]
+	shuffle_list = shuffle_list[:SAMPLE_SIZE_IN_MEMBERS]
 	for item in shuffle_list:
 		y[item] = []
 	[filter_me(z, y) for z in input_files]
-	with open("outfile", "w") as outfile:
-		outfile.write(header + "\n")
+	with gzip.open("outfile.gz", "wb") as output_file:
+		output_line = bytes(header + "\n", "UTF-8")
+		output_file.write(output_line)
 		for c in range(len(shuffle_list)):
 			count = 0
 			for item in y[shuffle_list[c]]:
 				count += 1
-				if count % 20000 == 0:
-					sys.stdout.write(".")
-					sys.stdout.flush()
-				line = str(c) + "|" + item + "\n"
-				outfile.write(line)
+				if count % CHUNK_SIZE == 0:
+					output = "Output %d chunks completed" % (count / CHUNK_SIZE)
+					Printer(output)
+				output_line = bytes(str(c) + "|" + str(item) + "\n", "UTF-8")
+				output_file.write(output_line)
+			print("\n")
 
 #Main program
+CHUNK_SIZE = 10000
+SAMPLE_SIZE_IN_MEMBERS = 20000
+#SAMPLE_SIZE_IN_MEMBERS = 2
 start(sys.argv[1])
