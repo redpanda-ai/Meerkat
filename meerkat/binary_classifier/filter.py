@@ -37,7 +37,14 @@ def filter_transactions(transactions):
 	classifier = joblib.load(sys.argv[1])
 	desired_category = sys.argv[2]
 
-	for transaction in transactions:
+	for i, transaction in enumerate(transactions):
+
+		# Progress
+		progress = (i / len(transactions)) * 100
+		progress = str(round(progress, 2)) + "%"
+		sys.stdout.write('\r')
+		sys.stdout.write(progress)
+		sys.stdout.flush()
 
 		prediction = classify(classifier, transaction["DESCRIPTION_UNMASKED"])
 
@@ -53,7 +60,7 @@ def classify(classifier, description):
 	or non physical"""
 
 	result = list(classifier.predict([description]))[0]
-	print(description, " : ", result)
+	#print(description, " : ", result)
 
 	return result
 
@@ -82,12 +89,13 @@ def run_from_command_line(command_line_arguments):
 	"""Runs these commands if the module is invoked from the command line"""
 
 	verify_arguments()
+	print("Loading file, please wait \n")
 	transactions = load_dict_list(command_line_arguments[3])
 	filtered_transactions = filter_transactions(transactions)
 	basepath = splitext(basename(command_line_arguments[3]))[0]
 	category = command_line_arguments[2]
 	file_suffix = "_non_physical.txt" if category == "0" else "_physical.txt"
-	output_folder = "/mnt/ephemeral/output/"
+	output_folder = "/mnt/ephemeral/training_data/"
 	output_file = output_folder + basepath + file_suffix
 	write_dict_list(filtered_transactions, output_file)
 		
