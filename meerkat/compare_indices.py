@@ -25,6 +25,7 @@ import os
 import sys
 import random
 import contextlib
+import collections
 
 from pprint import pprint
 from copy import deepcopy
@@ -47,13 +48,45 @@ def nostderr():
 def relink_transactions(params, es_connection):
 	"""Relink transactions to their new factual_ids"""
 
+	# Generate User Context
+	generate_user_context(params, es_connection)
+
 	# Locate Changes
 	identify_changes(params, es_connection)
 
 	# Fix Changes
 	reconcile_changed_ids(params, es_connection)
-	reconcile_changed_details(params, es_connection)
 	reconcile_null(params, es_connection)
+	reconcile_changed_details(params, es_connection)
+
+	# Save Changes
+	save_relinked_transactions(params)
+
+def generate_user_context(params, es_connection):
+	"""Generate a list of cities common to a user"""
+
+	transactions = load_dict_list(sys.argv[2])
+
+	print("Generating User Context:")
+
+	for i, transaction in enumerate(transactions):
+
+		# Progress
+		progress = (i / len(transactions)) * 100
+		progress = str(round(progress, 0)) + "%"
+		sys.stdout.write('\r')
+		sys.stdout.write(progress)
+		sys.stdout.flush()
+
+		# Save Context
+		enriched = enrich_transaction(params, transaction, es_connection, index=sys.argv[3])
+		unique_mem_id = enriched["UNIQUE_MEM_ID"]
+		location = enriched["CITY"] + ", " + enriched["STATE"]
+
+		if location not in params["compare_indices"]["user_context"][unique_mem_id] and location != ", ":
+			params["compare_indices"]["user_context"][unique_mem_id].append(location)
+
+	sys.stdout.write('\n\n')
 
 def identify_changes(params, es_connection):
 	"""Locate changes in training data between indices"""
@@ -139,22 +172,7 @@ def reconcile_null(params, es_connection):
 	skipped_len = len(skipped)
 	params["compare_indices"]["NULL"] = []
 	params["compare_indices"]["skipped"] = []
-
-	# Prompt a mode change
-	break_point = ""
-	while break_point != "OK":
-		break_point = input("--- Entering NULL mode. Type OK to continue. Despair at the lack of a save progress feature --- \n")
-
-	# Fix Null
-	while len(null) > 0:
-		br()
-		progress = 100 - ((len(null) / null_len) * 100)
-		print(round(progress, 2), "% ", "done with NULL")
-		transaction = null.pop()
-		results = search_with_user_input(params, es_connection, transaction)
-		if results == False:
-			continue
-		null_decision_boundary(params, transaction, results)
+	random.shuffle(null)
 
 	# Prompt a mode change
 	break_point = ""
@@ -173,8 +191,33 @@ def reconcile_null(params, es_connection):
 			continue
 		null_decision_boundary(params, transaction, results)
 
+	# Prompt a mode change
+	break_point = ""
+	while break_point != "OK":
+		break_point = input("--- Entering NULL mode. Type OK to continue. Despair at the lack of a save progress feature --- \n")
+
+	# Fix Null
+	while len(null) > 0:
+		br()
+		progress = 100 - ((len(null) / null_len) * 100)
+		print(round(progress, 2), "% ", "done with NULL")
+		transaction = null.pop()
+		results = search_with_user_input(params, es_connection, transaction)
+		if results == False:
+			continue
+		null_decision_boundary(params, transaction, results)
+
 def save_relinked_transactions(params):
 	""""Save the completed file set"""
+
+	file_name = input("What should the output file be named? \n")
+	changed_details = params["compare_indices"]["details_changed"]
+	null = params["compare_indices"]["NULL"]
+	no_change = params["compare_indices"]["no_change"]
+	relinked = params["compare_indices"]["relinked"]
+	transactions = changed_details + null + no_change + relinked
+
+	write_dict_list(transactions, file_name)
 
 def br():
 	"""Prints a break line to show current record has changed"""
@@ -188,10 +231,9 @@ def skipped_details_prompt(params, transaction, es_connection):
 	old_details = [store["PHYSICAL_MERCHANT"], store["STREET"], store["CITY"], string_cleanse(store["STATE"]), store["ZIP_CODE"],]
 	old_details_formatted = ", ".join(old_details)
 	print("Old index details: ", old_details_formatted.encode("utf-8"), " ")
-	prompt = "Please provide additional details such as an alternate name or address: \n"
-	user_input = input(prompt)
+	address = input("What is the address of this location?")
 
-	return user_input
+	return address
 
 def search_with_user_input(params, es_connection, transaction):
 	"""Search for a location by providing additional data"""
@@ -199,19 +241,26 @@ def search_with_user_input(params, es_connection, transaction):
 	index = sys.argv[4]
 	prompt = "Base query: " + transaction["DESCRIPTION_UNMASKED"]
 	prompt = prompt + " is insufficient to uniquely identify, please provide additional data \n"
-	user_input = input(prompt)
+	print(prompt)
 
-	if user_input == "rm":
-		return False
+	# Give context to user
+	print("User " + str(transaction["UNIQUE_MEM_ID"]) + " Context: ")
+	print(params["compare_indices"]["user_context"][transaction["UNIQUE_MEM_ID"]], "\n")
+
+	# Collect Additional Data
+	store_name = input("What is the name of the business? \n")
+	store_address = input("What is the store address with state, city and zip? \n")
 
 	# Generate new query
 	bool_search = get_bool_query(size=45)
 	should_clauses = bool_search["query"]["bool"]["should"]
 
-	trans_query = get_qs_query(transaction["DESCRIPTION_UNMASKED"], ["_all"])
-	user_query = get_qs_query(user_input, ["_all"])
+	name_query = get_qs_query(store_name, ["name"], boost=4)
+	geo_query = get_qs_query(store_address, ["address", "locality", "region", "postcode"], boost=2)
+	trans_query = get_qs_query(string_cleanse(transaction["DESCRIPTION_UNMASKED"]), ["_all"])
 	should_clauses.append(trans_query)
-	should_clauses.append(user_query)
+	should_clauses.append(name_query)
+	should_clauses.append(geo_query)
 
 	# Search
 	try:
@@ -321,13 +370,14 @@ def find_merchant_by_address(params, store, es_connection, additional_data=""):
 	index = sys.argv[4]
 	results = ""
 
-	# Append additional data
-	fields.append("_all")
-	old_details.append(additional_data)
-
 	# Generate Query
 	bool_search = get_bool_query(size=45)
 	should_clauses = bool_search["query"]["bool"]["should"]
+
+	# Additional Details
+	if additional_data != "":
+		additional_query = get_qs_query(additional_data, ["address"])
+		should_clauses.append(additional_query)
 
 	# Multi Field
 	for i in range(len(fields)):
@@ -438,6 +488,7 @@ def add_local_params(params):
 	params["compare_indices"]["skipped"] = []
 	params["compare_indices"]["no_change"] = []
 	params["compare_indices"]["relinked"] = []
+	params["compare_indices"]["user_context"] = collections.defaultdict(list)
 
 	return params
 
