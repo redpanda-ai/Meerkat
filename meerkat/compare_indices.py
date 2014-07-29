@@ -67,6 +67,7 @@ def generate_user_context(params, es_connection):
 
 	transactions = load_dict_list(sys.argv[2])
 
+	sys.stdout.write('\n')
 	print("Generating User Context:")
 
 	for i, transaction in enumerate(transactions):
@@ -177,7 +178,10 @@ def reconcile_null(params, es_connection):
 	# Prompt a mode change
 	break_point = ""
 	while break_point != "OK":
-		break_point = input("--- Entering skipped mode. Type OK to continue. Despair at the lack of a save progress feature --- \n")
+		break_point = input("--- Entering skipped mode. Type OK to continue or EXIT to save and quit --- \n")
+		if break_point == "EXIT":
+			save_relinked_transactions(params)
+			sys.exit()
 
 	# Fix Skipped
 	while len(skipped) > 0:
@@ -194,7 +198,10 @@ def reconcile_null(params, es_connection):
 	# Prompt a mode change
 	break_point = ""
 	while break_point != "OK":
-		break_point = input("--- Entering NULL mode. Type OK to continue. Despair at the lack of a save progress feature --- \n")
+		break_point = input("--- Entering NULL mode. Type OK to continue or EXIT to save and quit --- \n")
+		if break_point == "EXIT":
+			save_relinked_transactions(params)
+			sys.exit()
 
 	# Fix Null
 	while len(null) > 0:

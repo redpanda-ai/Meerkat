@@ -61,7 +61,8 @@ def write_pulses(pulses):
 
 	for i in range(len(pulses)):
 		pulse = pulses[i]
-		pulse_prefix = "pulses/card_sample_"
+		#TODO support both card and bank automatically
+		pulse_prefix = "/mnt/ephemeral/training_data/pulses/bank/bank_sample_"
 		file_name = pulse_prefix + str(i) + ".txt"
 		write_dict_list(pulse, file_name)
 

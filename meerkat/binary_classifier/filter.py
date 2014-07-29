@@ -37,6 +37,8 @@ def filter_transactions(transactions):
 	classifier = joblib.load(sys.argv[1])
 	desired_category = sys.argv[2]
 
+	print("Classifying, please wait \n")
+
 	for i, transaction in enumerate(transactions):
 
 		# Progress
@@ -97,6 +99,7 @@ def run_from_command_line(command_line_arguments):
 	file_suffix = "_non_physical.txt" if category == "0" else "_physical.txt"
 	output_folder = "/mnt/ephemeral/training_data/"
 	output_file = output_folder + basepath + file_suffix
+	print("Saving file, please wait \n")
 	write_dict_list(filtered_transactions, output_file)
 		
 if __name__ == "__main__":
