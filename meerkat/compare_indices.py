@@ -55,10 +55,10 @@ def relink_transactions(params, es_connection):
 	identify_changes(params, es_connection)
 
 	# Fix Changes
+	reconcile_changed_details(params, es_connection)
 	reconcile_changed_ids(params, es_connection)
 	reconcile_null(params, es_connection)
-	reconcile_changed_details(params, es_connection)
-
+	
 	# Save Changes
 	save_relinked_transactions(params)
 
@@ -153,6 +153,8 @@ def has_mapping_changed(params, old_mapping, new_mapping):
 def reconcile_changed_ids(params, es_connection):
 	"""Attempt to find a matching factual_id using address"""
 
+	prompt_mode_change("changed id")
+
 	while len(params["compare_indices"]["id_changed"]) > 0:
 		br()
 		changed_ids = params["compare_indices"]["id_changed"]
@@ -161,27 +163,65 @@ def reconcile_changed_ids(params, es_connection):
 		results = find_merchant_by_address(params, transaction, es_connection)
 		decision_boundary(params, transaction, results)
 
+	reconcile_skipped(params, es_connection)
+
 def reconcile_changed_details(params, es_connection):
 	"""Decide whether new details are erroneous"""
 
-def reconcile_null(params, es_connection):
-	"""Attempt to find a factual_id for a NULL entry"""
+	prompt_mode_change("changed details")
+	total = len(params["compare_indices"]["details_changed"])
 
-	null = params["compare_indices"]["NULL"]
-	null_len = len(null)
-	skipped = params["compare_indices"]["skipped"]
-	skipped_len = len(skipped)
-	params["compare_indices"]["NULL"] = []
-	params["compare_indices"]["skipped"] = []
-	random.shuffle(null)
+	while len(params["compare_indices"]["details_changed"]) > 0:
+		br()
+		details_changed = params["compare_indices"]["details_changed"]
+		transaction = details_changed.pop()
+		old_mapping = enrich_transaction(params, transaction, es_connection, index=sys.argv[3])
+		new_mapping = enrich_transaction(params, transaction, es_connection, index=sys.argv[4])
 
-	# Prompt a mode change
+		percent_done = (1 - (len(details_changed) / total)) * 100
+		print(str(round(percent_done, 1)) + "% " + "done with details changed mode \n")
+
+		print("DESCRIPTION_UNMASKED: ", transaction["DESCRIPTION_UNMASKED"])
+
+		old_details = [old_mapping["PHYSICAL_MERCHANT"], old_mapping["STREET"], old_mapping["CITY"], string_cleanse(old_mapping["STATE"]), old_mapping["ZIP_CODE"]]
+		old_details_formatted = ", ".join(old_details)
+		print("Old index details: ", old_details_formatted.encode("utf-8", "replace"), " ")
+
+		new_details = [new_mapping["PHYSICAL_MERCHANT"], new_mapping["STREET"], new_mapping["CITY"], string_cleanse(new_mapping["STATE"]), new_mapping["ZIP_CODE"]]
+		new_details_formatted = ", ".join(new_details)
+		print("New index details: ", new_details_formatted.encode("utf-8", "replace"), " ")
+		sys.stdout.write('\n')
+
+		print("Is this the same merchant?")
+		print("[enter] Yes")
+		print("[n] No")
+		choice = input()
+
+		if choice == "n":
+			params["compare_indices"]["id_changed"].append(transaction)
+		else:
+			params["compare_indices"]["relinked"].append(transaction)
+
+def prompt_mode_change(mode):
+	"""Prompt a user that the mode has changed"""
+
 	break_point = ""
 	while break_point != "OK":
-		break_point = input("--- Entering skipped mode. Type OK to continue or EXIT to save and quit --- \n")
+		break_point = input("--- Entering " + mode + " mode. Type OK to continue or EXIT to save and quit --- \n")
 		if break_point == "EXIT":
 			save_relinked_transactions(params)
 			sys.exit()
+
+def reconcile_skipped(params, es_connection):
+	"""Attempt to reconcile transactions skipped
+	during changed id mode"""
+
+	skipped = params["compare_indices"]["skipped"]
+	params["compare_indices"]["skipped"] = []
+	skipped_len = len(skipped)
+
+	# Prompt a mode change
+	prompt_mode_change("skipped")
 
 	# Fix Skipped
 	while len(skipped) > 0:
@@ -195,13 +235,16 @@ def reconcile_null(params, es_connection):
 			continue
 		null_decision_boundary(params, transaction, results)
 
+def reconcile_null(params, es_connection):
+	"""Attempt to find a factual_id for a NULL entry"""
+
+	null = params["compare_indices"]["NULL"]
+	params["compare_indices"]["NULL"] = []
+	null_len = len(null)
+	random.shuffle(null)
+
 	# Prompt a mode change
-	break_point = ""
-	while break_point != "OK":
-		break_point = input("--- Entering NULL mode. Type OK to continue or EXIT to save and quit --- \n")
-		if break_point == "EXIT":
-			save_relinked_transactions(params)
-			sys.exit()
+	prompt_mode_change("NULL")
 
 	# Fix Null
 	while len(null) > 0:
@@ -238,7 +281,7 @@ def skipped_details_prompt(params, transaction, es_connection):
 	old_details = [store["PHYSICAL_MERCHANT"], store["STREET"], store["CITY"], string_cleanse(store["STATE"]), store["ZIP_CODE"],]
 	old_details_formatted = ", ".join(old_details)
 	print("Old index details: ", old_details_formatted.encode("utf-8"), " ")
-	address = input("What is the address of this location?")
+	address = input("What is the address of this location? \n")
 
 	return address
 
@@ -417,7 +460,7 @@ def user_prompt(params, old_details, results, store):
 	print("Percent Relinked: ", percentage_formatted, "\n")
 
 	print("DESCRIPTION_UNMASKED: ", store["DESCRIPTION_UNMASKED"].encode("utf-8"))
-	print("Query Sent: ", old_details_formatted.encode("utf-8"), " ")
+	print("Query Sent: ", old_details_formatted.encode("utf-8"), "\n")
 	
 	for i in range(5):
 		print_formatted_result(results, i)
@@ -434,6 +477,13 @@ def print_formatted_result(results, index):
 
 	fields_to_print = ["name", "address", "locality", "region", "postcode", "internal_store_number"]
 	score, hit = get_hit(results, index)
+
+	# No Result
+	if not hit:
+		print("No hits found")
+		return
+
+	# Print Details
 	details_formatted = [hit.get(field, "") for field in fields_to_print]
 	details_formatted = ", ".join(details_formatted)
 	print("[" + str(index) + "]", details_formatted.encode("utf-8"))
