@@ -128,16 +128,19 @@ def identify_changes(params, es_connection):
 
 	for i, transaction in enumerate(transactions):
 
-		# Add a field for tracking
-		if transaction.get("relinked_id", "") == "":
-			transaction["relinked_id"] = ""
-
 		# Progress
 		progress = (i / len(transactions)) * 100
 		progress = str(round(progress, 0)) + "%"
 		sys.stdout.write('\r')
 		sys.stdout.write(progress)
 		sys.stdout.flush()
+
+		# Add a field for tracking
+		if transaction.get("relinked_id", "") == "":
+			transaction["relinked_id"] = ""
+		else:
+			params["compare_indices"]["relinked"].append(transaction)
+			continue
 
 		# Null
 		if transaction["factual_id"] == "NULL":
@@ -168,9 +171,9 @@ def print_diff_stats(params, transactions):
 
 	sys.stdout.write('\n\n')
 	print("Number of transactions: ", len(transactions))
+	print("No action necessary: ", len(params["compare_indices"]["relinked"]))
 	print("Number Changed ID: ", len(params["compare_indices"]["id_changed"]))
 	print("Number Changed Details: ", len(params["compare_indices"]["details_changed"]))
-	print("Number Unchanged: ", len(params["compare_indices"]["relinked"]))
 	print("Number Null: ", len(params["compare_indices"]["NULL"]), "\n")
 
 def has_mapping_changed(params, old_mapping, new_mapping):
