@@ -221,11 +221,11 @@ def reconcile_changed_details(params, es_connection):
 
 		print("DESCRIPTION_UNMASKED: ", transaction["DESCRIPTION_UNMASKED"])
 
-		old_details = [old_mapping["PHYSICAL_MERCHANT"], old_mapping["STREET"], old_mapping["CITY"], string_cleanse(old_mapping["STATE"]), old_mapping["ZIP_CODE"]]
+		old_details = [old_mapping["PHYSICAL_MERCHANT"], old_mapping["STREET"], old_mapping["CITY"], string_cleanse(old_mapping["STATE"]), old_mapping["ZIP_CODE"], old_mapping["STORE_NUMBER"]]
 		old_details_formatted = ", ".join(old_details)
 		print("Old index details: ", old_details_formatted.encode("utf-8", "replace"), " ")
 
-		new_details = [new_mapping["PHYSICAL_MERCHANT"], new_mapping["STREET"], new_mapping["CITY"], string_cleanse(new_mapping["STATE"]), new_mapping["ZIP_CODE"]]
+		new_details = [new_mapping["PHYSICAL_MERCHANT"], new_mapping["STREET"], new_mapping["CITY"], string_cleanse(new_mapping["STATE"]), new_mapping["ZIP_CODE"], new_mapping["STORE_NUMBER"]]
 		new_details_formatted = ", ".join(new_details)
 		print("New index details: ", new_details_formatted.encode("utf-8", "replace"), " ")
 		sys.stdout.write('\n')
@@ -458,7 +458,7 @@ def find_merchant_by_address(params, store, es_connection, additional_data=""):
 	"""Match document with address to factual document"""
 
 	fields = ["name^2", "address", "locality", "region", "postcode"]
-	old_details = [store["PHYSICAL_MERCHANT"], store["STREET"], store["CITY"], string_cleanse(store["STATE"]), store["ZIP_CODE"]]
+	old_details = [store.get("PHYSICAL_MERCHANT", ""), store.get("STREET",""), store.get("CITY", ""), string_cleanse(store.get("STATE", "")), store.get("ZIP_CODE", "")]
 	index = sys.argv[4]
 	results = ""
 
