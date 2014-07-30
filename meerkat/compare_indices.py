@@ -54,13 +54,43 @@ def relink_transactions(params, es_connection):
 	# Locate Changes
 	identify_changes(params, es_connection)
 
-	# Fix Changes
-	reconcile_changed_details(params, es_connection)
-	reconcile_changed_ids(params, es_connection)
-	reconcile_null(params, es_connection)
+	# Select Mode and Fix Changes
+	mode_change(params, es_connection)
 	
 	# Save Changes
 	save_relinked_transactions(params)
+
+def mode_change(params, es_connection):
+	"""Define what mode to work in"""
+
+	mode = ""
+	accepted_inputs = [str(x) for x in list(range(4))]
+
+	print("Which task would you like to complete? \n")
+	print("[0] Run all tasks")
+	print("[1] Relink transactions where factual_id no longer exists")
+	print("[2] Verify changes to merchant")
+	print("[3] Link transactions with NULL factual_id \n")
+
+	while mode not in accepted_inputs: 
+		mode = input()
+	
+	if mode == "0":
+		run_all_modes(params, es_connection)
+	elif mode == "1": 
+		reconcile_changed_ids(params, es_connection)
+	elif mode == "2":
+		reconcile_changed_details(params, es_connection)
+		reconcile_changed_ids(params, es_connection)
+	elif mode == "3":
+		reconcile_null(params, es_connection)
+
+def run_all_modes(params, es_connection):
+	"""Run the entire relinking program"""
+
+	reconcile_changed_details(params, es_connection)
+	reconcile_changed_ids(params, es_connection)
+	reconcile_null(params, es_connection)
 
 def generate_user_context(params, es_connection):
 	"""Generate a list of cities common to a user"""
@@ -98,6 +128,10 @@ def identify_changes(params, es_connection):
 
 	for i, transaction in enumerate(transactions):
 
+		# Add a field for tracking
+		if transaction.get("relinked_id", "") == "":
+			transaction["relinked_id"] = ""
+
 		# Progress
 		progress = (i / len(transactions)) * 100
 		progress = str(round(progress, 0)) + "%"
@@ -124,7 +158,8 @@ def identify_changes(params, es_connection):
 			params["compare_indices"]["details_changed"].append(transaction)
 			continue
 
-		params["compare_indices"]["no_change"].append(transaction)
+		transaction["relinked_id"] = transaction["factual_id"]
+		params["compare_indices"]["relinked"].append(transaction)
 
 	print_diff_stats(params, transactions)
 
@@ -135,7 +170,7 @@ def print_diff_stats(params, transactions):
 	print("Number of transactions: ", len(transactions))
 	print("Number Changed ID: ", len(params["compare_indices"]["id_changed"]))
 	print("Number Changed Details: ", len(params["compare_indices"]["details_changed"]))
-	print("Number Unchanged: ", len(params["compare_indices"]["no_change"]))
+	print("Number Unchanged: ", len(params["compare_indices"]["relinked"]))
 	print("Number Null: ", len(params["compare_indices"]["NULL"]), "\n")
 
 def has_mapping_changed(params, old_mapping, new_mapping):
@@ -207,7 +242,7 @@ def prompt_mode_change(mode):
 
 	break_point = ""
 	while break_point != "OK":
-		break_point = input("--- Entering " + mode + " mode. Type OK to continue or EXIT to save and quit --- \n")
+		break_point = input("--- Entering " + mode + " mode. Type OK to continue --- \n")
 		if break_point == "EXIT":
 			save_relinked_transactions(params)
 			sys.exit()
@@ -260,12 +295,16 @@ def reconcile_null(params, es_connection):
 def save_relinked_transactions(params):
 	""""Save the completed file set"""
 
-	file_name = input("What should the output file be named? \n")
+	print("What should the output file be named? \n")
+	file_name = ""
+
+	while file_name == "":
+		file_name = input()
+
 	changed_details = params["compare_indices"]["details_changed"]
 	null = params["compare_indices"]["NULL"]
-	no_change = params["compare_indices"]["no_change"]
 	relinked = params["compare_indices"]["relinked"]
-	transactions = changed_details + null + no_change + relinked
+	transactions = changed_details + null + relinked
 
 	write_dict_list(transactions, file_name)
 
@@ -340,7 +379,7 @@ def null_decision_boundary(params, store, results):
 	# Change factual_id, move to relinked
 	if user_input in accepted_inputs:
 		score, hit = get_hit(results, int(user_input))
-		store["new_id"] = hit["factual_id"]
+		store["relinked_id"] = hit["factual_id"]
 		params["compare_indices"]["relinked"].append(store)
 	else:
 		# Add transaction to another queue for later analysis
@@ -369,7 +408,7 @@ def decision_boundary(params, store, results):
 		print("Record autolinked", "\n")
 		user_input = "0"
 	else:
-		user_input = user_prompt(params, old_details, results, store)
+		user_input = changed_id_user_prompt(params, old_details, results, store)
 
 	# Remove is transaction isn't physical
 	if user_input == "rm":
@@ -378,7 +417,7 @@ def decision_boundary(params, store, results):
 	# Change factual_id, move to relinked
 	if user_input in accepted_inputs:
 		score, hit = get_hit(results, int(user_input))
-		store["new_id"] = hit["factual_id"]
+		store["relinked_id"] = hit["factual_id"]
 		params["compare_indices"]["relinked"].append(store)
 	else:
 		# Add transaction to another queue for later analysis
@@ -442,7 +481,7 @@ def find_merchant_by_address(params, store, es_connection, additional_data=""):
 
 	return results
 
-def user_prompt(params, old_details, results, store):
+def changed_id_user_prompt(params, old_details, results, store):
 	"""Prompt a user for input to continue"""
 
 	num_changed = len(params["compare_indices"]["id_changed"])
@@ -456,8 +495,7 @@ def user_prompt(params, old_details, results, store):
 
 	print("Number id_changed remaining: ", num_changed)
 	print("Number relinked: ", num_relinked)
-	print("Number skipped: ", num_skipped)
-	print("Percent Relinked: ", percentage_formatted, "\n")
+	print("Number skipped: ", num_skipped, "\n")
 
 	print("DESCRIPTION_UNMASKED: ", store["DESCRIPTION_UNMASKED"].encode("utf-8"))
 	print("Query Sent: ", old_details_formatted.encode("utf-8"), "\n")
@@ -487,9 +525,6 @@ def print_formatted_result(results, index):
 	details_formatted = [hit.get(field, "") for field in fields_to_print]
 	details_formatted = ", ".join(details_formatted)
 	print("[" + str(index) + "]", details_formatted.encode("utf-8"))
-
-def validate_hit():
-	"""Rely on user input to validate a potential match"""
 
 def get_hit(search_results, index):
 
@@ -543,7 +578,6 @@ def add_local_params(params):
 	params["compare_indices"]["id_changed"] = []
 	params["compare_indices"]["details_changed"] = []
 	params["compare_indices"]["skipped"] = []
-	params["compare_indices"]["no_change"] = []
 	params["compare_indices"]["relinked"] = []
 	params["compare_indices"]["user_context"] = collections.defaultdict(list)
 
