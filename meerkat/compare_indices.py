@@ -173,11 +173,11 @@ def print_diff_stats(params, transactions):
 	"""Display a set of diff stats"""
 
 	sys.stdout.write('\n\n')
-	print("Number of transactions: ", len(transactions))
-	print("No action necessary: ", len(params["compare_indices"]["relinked"]))
-	print("Number Changed ID: ", len(params["compare_indices"]["id_changed"]))
-	print("Number Changed Details: ", len(params["compare_indices"]["details_changed"]))
-	print("Number Null: ", len(params["compare_indices"]["NULL"]), "\n")
+	print("{:25}{}".format("Number of transactions: ", len(transactions)))
+	print("{:25}{}".format("No action necessary: ", len(params["compare_indices"]["relinked"])))
+	print("{:25}{}".format("Number Changed ID: ", len(params["compare_indices"]["id_changed"])))
+	print("{:25}{}".format("Number Changed Details: ", len(params["compare_indices"]["details_changed"])))
+	print("{:25}{}\n".format("Number NULL: ", len(params["compare_indices"]["NULL"])))
 
 def has_mapping_changed(params, old_mapping, new_mapping):
 	"""Compares two transactions for similarity"""
@@ -230,20 +230,21 @@ def reconcile_changed_details(params, es_connection):
 		print("DESCRIPTION_UNMASKED: ", transaction["DESCRIPTION_UNMASKED"])
 
 		old_details = [old_mapping["PHYSICAL_MERCHANT"], old_mapping["STREET"], old_mapping["CITY"], string_cleanse(old_mapping["STATE"]), old_mapping["ZIP_CODE"], old_mapping["STORE_NUMBER"]]
-		old_details = [detail if detail != "" else "NULL" for detail in old_details]
-		old_details_formatted = ", ".join(old_details)
-		print("Old index details: {0}".format(old_details_formatted))
+		old_details = [detail if detail != "" else "_____" for detail in old_details]
+		old_details_formatted = ", ".join(old_details).encode("utf-8", "replace")
+		print("Old index details: " + str(old_details_formatted))
 
 		new_details = [new_mapping["PHYSICAL_MERCHANT"], new_mapping["STREET"], new_mapping["CITY"], string_cleanse(new_mapping["STATE"]), new_mapping["ZIP_CODE"], new_mapping["STORE_NUMBER"]]
-		new_details = [detail if detail != "" else "NULL" for detail in new_details]
-		new_details_formatted = ", ".join(new_details)
-		print("New index details: {0}".format(new_details_formatted))
+		new_details = [detail if detail != "" else "_____" for detail in new_details]
+		new_details_formatted = ", ".join(new_details).encode("utf-8", "replace")
+		print("New index details: " + str(new_details_formatted))
 		sys.stdout.write('\n')
 
 		# Prompt User
-		print("Is this the same merchant?")
+		print("Is the new merchant correct?")
 		print("[enter] Yes")
-		print("[n] Not Sure")
+		print("{:7s} Not Sure".format("[n]"))
+
 		choice = input()
 
 		# Take Action
@@ -279,8 +280,9 @@ def reconcile_skipped(params, es_connection):
 		progress = 100 - ((len(skipped) / skipped_len) * 100)
 		print(round(progress, 2), "% ", "done with Skipped")
 		transaction = skipped.pop()
-		user_input = skipped_details_prompt(params, transaction, es_connection)
-		results = find_merchant_by_address(params, transaction, es_connection, additional_data=user_input)
+		name, address = skipped_details_prompt(params, transaction, es_connection)
+		extra_queries = [(["address", "locality", "region", "postcode"], address, 3), (["name"], name, 4)]
+		results = find_merchant_by_address(params, transaction, es_connection, additional_data=extra_queries)
 		if results == False:
 			continue
 		null_decision_boundary(params, transaction, results)
@@ -334,10 +336,11 @@ def skipped_details_prompt(params, transaction, es_connection):
 	store = enrich_transaction(params, transaction, es_connection, index=sys.argv[3])
 	old_details = [store["PHYSICAL_MERCHANT"], store["STREET"], store["CITY"], string_cleanse(store["STATE"]), store["ZIP_CODE"],]
 	old_details_formatted = ", ".join(old_details)
-	print("Old index details: {0}".format(old_details_formatted))
-	address = input("What is the address of this location? \n")
+	print("Old index details: {0}".format(old_details_formatted.encode("utf-8", "replace")))
+	name = input("What is the name of this merchant? \n")
+	address = input("At what address is this merchant located? \n")
 
-	return address
+	return name, address
 
 def search_with_user_input(params, es_connection, transaction):
 	"""Search for a location by providing additional data"""
@@ -383,7 +386,7 @@ def null_decision_boundary(params, store, results):
 		print_formatted_result(results, i)
 
 	print("[enter] NULL")
-	print("[rm] transaction is not physical, remove it from data", "\n")
+	print("{:7} Transaction did not occur at a specific location. Remove it from training data\n".format("[rm]"))
 
 	user_input = input("Please select a choice above: \n")
 
@@ -404,7 +407,7 @@ def decision_boundary(params, store, results):
 	"""Decide if there is a match"""
 
 	fields = ["name", "address", "locality", "region", "postcode"]
-	old_details = [store["PHYSICAL_MERCHANT"], store["STREET"], store["CITY"], string_cleanse(store["STATE"]), store["ZIP_CODE"]]
+	old_details = [store["PHYSICAL_MERCHANT"], store["STREET"], store["CITY"], string_cleanse(store["STATE"]), store.get("ZIP_CODE", "")]
 	accepted_inputs = [str(x) for x in list(range(5))]
 	score, top_hit = get_hit(results, 0)
 
@@ -466,7 +469,7 @@ def enrich_transaction(params, transaction, es_connection, index="", factual_id=
 
 	return transaction
 
-def find_merchant_by_address(params, store, es_connection, additional_data=""):
+def find_merchant_by_address(params, store, es_connection, additional_data=[]):
 	"""Match document with address to factual document"""
 
 	fields = ["name^2", "address", "locality", "region", "postcode"]
@@ -479,9 +482,11 @@ def find_merchant_by_address(params, store, es_connection, additional_data=""):
 	should_clauses = bool_search["query"]["bool"]["should"]
 
 	# Additional Details
-	if additional_data != "":
-		additional_query = get_qs_query(additional_data, ["address"])
-		should_clauses.append(additional_query)
+	if len(additional_data) > 0:
+		for query in additional_data:
+			if len(query) == 3:
+				additional_query = get_qs_query(query[1], field_list=query[0], boost=query[2])
+				should_clauses.append(additional_query)
 
 	# Multi Field
 	for i in range(len(fields)):
@@ -513,13 +518,13 @@ def changed_id_user_prompt(params, old_details, results, store):
 	print("Number skipped: ", num_skipped, "\n")
 
 	print("DESCRIPTION_UNMASKED: {0}".format(store["DESCRIPTION_UNMASKED"]))
-	print("Query Sent: {0} \n".format(old_details_formatted))
+	print("Query Sent: {0} \n".format(old_details_formatted.encode("utf-8", "replace")))
 	
 	for i in range(5):
 		print_formatted_result(results, i)
 
 	print("[enter] None of the above")
-	print("[rm] transaction is not physical, remove it from data", "\n")
+	print("[rm] Transaction did not occur at a specific location. Remove it from training data", "\n")
 	user_input = ""
 	user_input = input("Please select a location, or press enter to skip: \n")
 
@@ -539,7 +544,7 @@ def print_formatted_result(results, index):
 	# Print Details
 	details_formatted = [hit.get(field, "") for field in fields_to_print]
 	details_formatted = ", ".join(details_formatted)
-	print("[{0}] {1}".format(index, details_formatted))
+	print("{:8}".format("[" + str(index) + "] ") + " " + str(details_formatted.encode("utf-8", "replace")))
 
 def get_hit(search_results, index):
 
