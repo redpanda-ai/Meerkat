@@ -1,8 +1,10 @@
 #!/usr/local/bin/python3.3
 
-"""This script takes a list of transactions
-and their matched addresses and returns a
-document with associated factual_id's. 
+"""This module takes a file containing
+transactions and their associated
+uuid relative to a specific index, 
+and helps to reconcile changes as the 
+index evolves over time.
 
 Created on July 21, 2014
 @author: Matthew Sevrens
@@ -18,6 +20,7 @@ Created on July 21, 2014
 # DESCRIPTION_UNMASKED
 # UNIQUE_MEM_ID
 # factual_id
+# GOOD_DESCRIPTION
 
 #####################################################
 
@@ -69,7 +72,7 @@ def mode_change(params, es_connection):
 	print("Which task would you like to complete? \n")
 	print("[0] Run all tasks")
 	print("[1] Relink transactions where factual_id no longer exists")
-	print("[2] Verify changes to merchant")
+	print("[2] Verify changes to merchants")
 	print("[3] Link transactions with NULL factual_id \n")
 
 	while mode not in accepted_inputs: 
@@ -210,31 +213,40 @@ def reconcile_changed_details(params, es_connection):
 	total = len(params["compare_indices"]["details_changed"])
 
 	while len(params["compare_indices"]["details_changed"]) > 0:
+
+		# Prepare Data
 		br()
 		details_changed = params["compare_indices"]["details_changed"]
+		random.shuffle(details_changed)
 		transaction = details_changed.pop()
 		old_mapping = enrich_transaction(params, transaction, es_connection, index=sys.argv[3])
 		new_mapping = enrich_transaction(params, transaction, es_connection, index=sys.argv[4])
 
+		# Track Task Completion
 		percent_done = (1 - (len(details_changed) / total)) * 100
 		print(str(round(percent_done, 1)) + "% " + "done with details changed mode \n")
 
+		# Inform User
 		print("DESCRIPTION_UNMASKED: ", transaction["DESCRIPTION_UNMASKED"])
 
 		old_details = [old_mapping["PHYSICAL_MERCHANT"], old_mapping["STREET"], old_mapping["CITY"], string_cleanse(old_mapping["STATE"]), old_mapping["ZIP_CODE"], old_mapping["STORE_NUMBER"]]
+		old_details = [detail if detail != "" else "NULL" for detail in old_details]
 		old_details_formatted = ", ".join(old_details)
-		print("Old index details: ", old_details_formatted.encode("utf-8", "replace"), " ")
+		print("Old index details: {0}".format(old_details_formatted))
 
 		new_details = [new_mapping["PHYSICAL_MERCHANT"], new_mapping["STREET"], new_mapping["CITY"], string_cleanse(new_mapping["STATE"]), new_mapping["ZIP_CODE"], new_mapping["STORE_NUMBER"]]
+		new_details = [detail if detail != "" else "NULL" for detail in new_details]
 		new_details_formatted = ", ".join(new_details)
-		print("New index details: ", new_details_formatted.encode("utf-8", "replace"), " ")
+		print("New index details: {0}".format(new_details_formatted))
 		sys.stdout.write('\n')
 
+		# Prompt User
 		print("Is this the same merchant?")
 		print("[enter] Yes")
-		print("[n] No")
+		print("[n] Not Sure")
 		choice = input()
 
+		# Take Action
 		if choice == "n":
 			params["compare_indices"]["id_changed"].append(transaction)
 		else:
@@ -322,7 +334,7 @@ def skipped_details_prompt(params, transaction, es_connection):
 	store = enrich_transaction(params, transaction, es_connection, index=sys.argv[3])
 	old_details = [store["PHYSICAL_MERCHANT"], store["STREET"], store["CITY"], string_cleanse(store["STATE"]), store["ZIP_CODE"],]
 	old_details_formatted = ", ".join(old_details)
-	print("Old index details: ", old_details_formatted.encode("utf-8"), " ")
+	print("Old index details: {0}".format(old_details_formatted))
 	address = input("What is the address of this location? \n")
 
 	return address
@@ -500,8 +512,8 @@ def changed_id_user_prompt(params, old_details, results, store):
 	print("Number relinked: ", num_relinked)
 	print("Number skipped: ", num_skipped, "\n")
 
-	print("DESCRIPTION_UNMASKED: ", store["DESCRIPTION_UNMASKED"].encode("utf-8"))
-	print("Query Sent: ", old_details_formatted.encode("utf-8"), "\n")
+	print("DESCRIPTION_UNMASKED: {0}".format(store["DESCRIPTION_UNMASKED"]))
+	print("Query Sent: {0} \n".format(old_details_formatted))
 	
 	for i in range(5):
 		print_formatted_result(results, i)
@@ -527,7 +539,7 @@ def print_formatted_result(results, index):
 	# Print Details
 	details_formatted = [hit.get(field, "") for field in fields_to_print]
 	details_formatted = ", ".join(details_formatted)
-	print("[" + str(index) + "]", details_formatted.encode("utf-8"))
+	print("[{0}] {1}".format(index, details_formatted))
 
 def get_hit(search_results, index):
 
