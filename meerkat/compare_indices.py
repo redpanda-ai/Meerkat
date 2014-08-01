@@ -69,11 +69,11 @@ def mode_change(params, es_connection):
 	mode = ""
 	accepted_inputs = [str(x) for x in list(range(4))]
 
-	print("Which task would you like to complete? \n")
-	print("[0] Run all tasks")
-	print("[1] Relink transactions where factual_id no longer exists")
-	print("[2] Verify changes to merchants")
-	print("[3] Link transactions with NULL factual_id \n")
+	safe_print("Which task would you like to complete? \n")
+	safe_print("[0] Run all tasks")
+	safe_print("[1] Relink transactions where factual_id no longer exists")
+	safe_print("[2] Verify changes to merchants")
+	safe_print("[3] Link transactions with NULL factual_id \n")
 
 	while mode not in accepted_inputs: 
 		mode = safe_input()
@@ -133,7 +133,7 @@ def identify_changes(params, es_connection):
 
 	transactions = load_dict_list(sys.argv[2])
 
-	print("Locating changes in training set:")
+	safe_print("Locating changes in training set:")
 
 	for i, transaction in enumerate(transactions):
 
@@ -179,20 +179,20 @@ def print_diff_stats(params, transactions):
 	"""Display a set of diff stats"""
 
 	sys.stdout.write('\n\n')
-	print("{:25}{}".format("Number of transactions: ", len(transactions)))
-	print("{:25}{}".format("No action necessary: ", len(params["compare_indices"]["relinked"])))
-	print("{:25}{}".format("Number Changed ID: ", len(params["compare_indices"]["id_changed"])))
-	print("{:25}{}".format("Number Changed Details: ", len(params["compare_indices"]["details_changed"])))
-	print("{:25}{}\n".format("Number NULL: ", len(params["compare_indices"]["NULL"])))
+	safe_print("{:25}{}".format("Number of transactions: ", len(transactions)))
+	safe_print("{:25}{}".format("No action necessary: ", len(params["compare_indices"]["relinked"])))
+	safe_print("{:25}{}".format("Number Changed ID: ", len(params["compare_indices"]["id_changed"])))
+	safe_print("{:25}{}".format("Number Changed Details: ", len(params["compare_indices"]["details_changed"])))
+	safe_print("{:25}{}\n".format("Number NULL: ", len(params["compare_indices"]["NULL"])))
 
 def print_current_stats(params):
 	"""Print Current Stats"""
 
 	sys.stdout.write('\n')
-	print("{:25}{}".format("No action necessary: ", len(params["compare_indices"]["relinked"])))
-	print("{:25}{}".format("Number Changed ID: ", len(params["compare_indices"]["id_changed"])))
-	print("{:25}{}".format("Number Changed Details: ", len(params["compare_indices"]["details_changed"])))
-	print("{:25}{}\n".format("Number NULL: ", len(params["compare_indices"]["NULL"])))
+	safe_print("{:25}{}".format("No action necessary: ", len(params["compare_indices"]["relinked"])))
+	safe_print("{:25}{}".format("Number Changed ID: ", len(params["compare_indices"]["id_changed"])))
+	safe_print("{:25}{}".format("Number Changed Details: ", len(params["compare_indices"]["details_changed"])))
+	safe_print("{:25}{}\n".format("Number NULL: ", len(params["compare_indices"]["NULL"])))
 
 def has_mapping_changed(params, old_mapping, new_mapping):
 	"""Compares two transactions for similarity"""
@@ -241,26 +241,26 @@ def reconcile_changed_details(params, es_connection):
 
 		# Track Task Completion
 		percent_done = (1 - (len(details_changed) / total)) * 100
-		print(str(round(percent_done, 1)) + "% " + "done with details changed mode \n")
+		safe_print(str(round(percent_done, 1)) + "% " + "done with details changed mode \n")
 
 		# Inform User
-		print("DESCRIPTION_UNMASKED: ", transaction["DESCRIPTION_UNMASKED"])
+		safe_print("DESCRIPTION_UNMASKED: ", transaction["DESCRIPTION_UNMASKED"])
 
 		old_details = [old_mapping["PHYSICAL_MERCHANT"], old_mapping["STREET"], old_mapping["CITY"], string_cleanse(old_mapping["STATE"]), old_mapping["ZIP_CODE"], old_mapping["STORE_NUMBER"]]
 		old_details = [detail if detail != "" else "_____" for detail in old_details]
 		old_details_formatted = ", ".join(old_details).encode("utf-8", "replace")
-		print("Old index details: " + str(old_details_formatted))
+		safe_print("Old index details: " + str(old_details_formatted))
 
 		new_details = [new_mapping["PHYSICAL_MERCHANT"], new_mapping["STREET"], new_mapping["CITY"], string_cleanse(new_mapping["STATE"]), new_mapping["ZIP_CODE"], new_mapping["STORE_NUMBER"]]
 		new_details = [detail if detail != "" else "_____" for detail in new_details]
 		new_details_formatted = ", ".join(new_details).encode("utf-8", "replace")
-		print("New index details: " + str(new_details_formatted))
+		safe_print("New index details: " + str(new_details_formatted))
 		sys.stdout.write('\n')
 
 		# Prompt User
-		print("Is the new merchant correct?")
-		print("[enter] Yes")
-		print("{:7s} Not Sure".format("[n]"))
+		safe_print("Is the new merchant correct?")
+		safe_print("[enter] Yes")
+		safe_print("{:7s} Not Sure".format("[n]"))
 
 		choice = safe_input()
 
@@ -296,7 +296,7 @@ def reconcile_skipped(params, es_connection):
 	while len(skipped) > 0:
 		br()
 		progress = 100 - ((len(skipped) / skipped_len) * 100)
-		print(round(progress, 2), "% ", "done with Skipped")
+		safe_print(round(progress, 2), "% ", "done with Skipped")
 		transaction = skipped.pop()
 		name, address = skipped_details_prompt(params, transaction, es_connection)
 		extra_queries = [(["address", "locality", "region", "postcode"], address, 3), (["name"], name, 4)]
@@ -322,7 +322,7 @@ def reconcile_null(params, es_connection):
 	while len(null) > 0:
 		br()
 		progress = 100 - ((len(null) / null_len) * 100)
-		print(round(progress, 2), "% ", "done with NULL")
+		safe_print(round(progress, 2), "% ", "done with NULL")
 		transaction = null.pop()
 		results = search_with_user_safe_input(params, es_connection, transaction)
 		if results == False:
@@ -334,7 +334,7 @@ def reconcile_null(params, es_connection):
 def save_relinked_transactions(params):
 	""""Save the completed file set"""
 
-	print("What should the output file be named? \n")
+	safe_print("What should the output file be named? \n")
 	file_name = ""
 
 	while file_name == "":
@@ -349,16 +349,16 @@ def save_relinked_transactions(params):
 
 def br():
 	"""Prints a break line to show current record has changed"""
-	print("------------------", "\n")
+	safe_print("------------------", "\n")
 
 def skipped_details_prompt(params, transaction, es_connection):
 	"""Prompt the users to provide additional data"""
 
-	print("Base query: " + transaction["DESCRIPTION_UNMASKED"])
+	safe_print("Base query: " + transaction["DESCRIPTION_UNMASKED"])
 	store = enrich_transaction(params, transaction, es_connection, index=sys.argv[3])
 	old_details = [store["PHYSICAL_MERCHANT"], store["STREET"], store["CITY"], string_cleanse(store["STATE"]), store["ZIP_CODE"],]
 	old_details_formatted = ", ".join(old_details)
-	print("Old index details: {0}".format(old_details_formatted.encode("utf-8", "replace")))
+	safe_print("Old index details: {0}".format(old_details_formatted.encode("utf-8", "replace")))
 	name = safe_input("What is the name of this merchant? \n")
 	address = safe_input("At what address is this merchant located? \n")
 
@@ -370,11 +370,11 @@ def search_with_user_safe_input(params, es_connection, transaction):
 	index = sys.argv[4]
 	prompt = "Base query: " + transaction["DESCRIPTION_UNMASKED"]
 	prompt = prompt + " is insufficient to uniquely identify, please provide additional data \n"
-	print(prompt)
+	safe_print(prompt)
 
 	# Give context to user
-	print("User " + str(transaction["UNIQUE_MEM_ID"]) + " Context: ")
-	print(params["compare_indices"]["user_context"][transaction["UNIQUE_MEM_ID"]], "\n")
+	safe_print("User " + str(transaction["UNIQUE_MEM_ID"]) + " Context: ")
+	safe_print(params["compare_indices"]["user_context"][transaction["UNIQUE_MEM_ID"]], "\n")
 
 	# Collect Additional Data
 	store_name = safe_input("What is the name of the business? \n")
@@ -407,8 +407,8 @@ def null_decision_boundary(params, store, results):
 	for i in range(5):
 		print_formatted_result(results, i)
 
-	print("[enter] NULL")
-	print("{:7} Transaction did not occur at a specific location. Remove it from training data\n".format("[rm]"))
+	safe_print("[enter] NULL")
+	safe_print("{:7} Transaction did not occur at a specific location. Remove it from training data\n".format("[rm]"))
 
 	user_input = safe_input("Please select a choice above: \n")
 
@@ -434,6 +434,14 @@ def safe_input(prompt=""):
 	except:
 		return ""
 
+def safe_print(string):
+	"""Safely print a string"""
+
+	try:
+		print(string)
+	except:
+		print("Encoding Error. Continuing")
+
 def decision_boundary(params, store, results):
 	"""Decide if there is a match"""
 
@@ -444,7 +452,7 @@ def decision_boundary(params, store, results):
 
 	# Add transaction back to the queue for later analysis if nothing found
 	if score == False:
-		print("No matches found", "\n")
+		safe_print("No matches found", "\n")
 		params["compare_indices"]["skipped"].append(store)
 		return
 
@@ -454,7 +462,7 @@ def decision_boundary(params, store, results):
 
 	# Don't require input on matching details
 	if new_details == old_details:
-		print("Record autolinked", "\n")
+		safe_print("Record autolinked", "\n")
 		user_input = "0"
 	else:
 		user_input = changed_id_user_prompt(params, old_details, results, store)
@@ -544,18 +552,18 @@ def changed_id_user_prompt(params, old_details, results, store):
 	old_details_formatted = [detail.decode("utf-8") for detail in old_details]
 	old_details_formatted =  ", ".join(old_details_formatted)
 
-	print("Number id_changed remaining: ", num_changed)
-	print("Number relinked: ", num_relinked)
-	print("Number skipped: ", num_skipped, "\n")
+	safe_print("Number id_changed remaining: ", num_changed)
+	safe_print("Number relinked: ", num_relinked)
+	safe_print("Number skipped: ", num_skipped, "\n")
 
-	print("DESCRIPTION_UNMASKED: {0}".format(store["DESCRIPTION_UNMASKED"]))
-	print("Query Sent: {0} \n".format(old_details_formatted.encode("utf-8", "replace")))
+	safe_print("DESCRIPTION_UNMASKED: {0}".format(store["DESCRIPTION_UNMASKED"]))
+	safe_print("Query Sent: {0} \n".format(old_details_formatted.encode("utf-8", "replace")))
 	
 	for i in range(5):
 		print_formatted_result(results, i)
 
-	print("[enter] None of the above")
-	print("[rm] Transaction did not occur at a specific location. Remove it from training data", "\n")
+	safe_print("[enter] None of the above")
+	safe_print("[rm] Transaction did not occur at a specific location. Remove it from training data", "\n")
 	user_input = ""
 	user_input = safe_input("Please select a location, or press enter to skip: \n")
 
@@ -569,13 +577,13 @@ def print_formatted_result(results, index):
 
 	# No Result
 	if not hit:
-		print("No hits found")
+		safe_print("No hits found")
 		return
 
 	# Print Details
 	details_formatted = [hit.get(field, "") for field in fields_to_print]
 	details_formatted = ", ".join(details_formatted)
-	print("{:8}".format("[" + str(index) + "] ") + " " + str(details_formatted.encode("utf-8", "replace")))
+	safe_print("{:8}".format("[" + str(index) + "] ") + " " + str(details_formatted.encode("utf-8", "replace")))
 
 def get_hit(search_results, index):
 
@@ -589,6 +597,8 @@ def get_hit(search_results, index):
 	hit = hits[index]
 
 	return z_score, hit["_source"]
+
+
 
 def z_score_delta(scores):
 	"""Find the Z-Score Delta"""
@@ -608,7 +618,7 @@ def verify_arguments():
 	sufficient_arguments = (len(sys.argv) == 5)
 
 	if not sufficient_arguments:
-		print("Insufficient arguments. Please see usage")
+		safe_print("Insufficient arguments. Please see usage")
 		sys.exit()
 
 	config = sys.argv[1]
@@ -618,7 +628,7 @@ def verify_arguments():
 	factual_list_included = factual_list.endswith('.txt')
 
 	if not config_included  or not factual_list_included:
-		print("Erroneous arguments. Please see usage")
+		safe_print("Erroneous arguments. Please see usage")
 		sys.exit()
 
 def add_local_params(params):
