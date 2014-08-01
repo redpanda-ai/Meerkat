@@ -63,6 +63,29 @@ def relink_transactions(params, es_connection):
 	# Save Changes
 	save_relinked_transactions(params)
 
+def generate_user_context(params, es_connection):
+	"""Generate a list of cities common to a user"""
+
+	transactions = load_dict_list(sys.argv[2])
+
+	sys.stdout.write('\n')
+	safe_print("Generating User Context:")
+
+	for i, transaction in enumerate(transactions):
+
+		# Progress
+		progress(i, transactions)
+
+		# Save Context
+		enriched = enrich_transaction(params, transaction, es_connection, index=sys.argv[3])
+		unique_mem_id = enriched["UNIQUE_MEM_ID"]
+		location = enriched["CITY"] + ", " + enriched["STATE"]
+
+		if location not in params["compare_indices"]["user_context"][unique_mem_id] and location != ", ":
+			params["compare_indices"]["user_context"][unique_mem_id].append(location)
+
+	sys.stdout.write('\n\n')
+
 def mode_change(params, es_connection):
 	"""Define what mode to work in"""
 
@@ -95,38 +118,9 @@ def run_all_modes(params, es_connection):
 	reconcile_changed_ids(params, es_connection)
 	reconcile_null(params, es_connection)
 
-	# Save Null
-	null = params["compare_indices"]["NULL"]
-
-	for n in null:
+	# Save as NULL
+	for n in params["compare_indices"]["NULL"]:
 		n["relinked_id"] = "NULL"
-
-def generate_user_context(params, es_connection):
-	"""Generate a list of cities common to a user"""
-
-	transactions = load_dict_list(sys.argv[2])
-
-	sys.stdout.write('\n')
-	print("Generating User Context:")
-
-	for i, transaction in enumerate(transactions):
-
-		# Progress
-		progress = (i / len(transactions)) * 100
-		progress = str(round(progress, 0)) + "%"
-		sys.stdout.write('\r')
-		sys.stdout.write(progress)
-		sys.stdout.flush()
-
-		# Save Context
-		enriched = enrich_transaction(params, transaction, es_connection, index=sys.argv[3])
-		unique_mem_id = enriched["UNIQUE_MEM_ID"]
-		location = enriched["CITY"] + ", " + enriched["STATE"]
-
-		if location not in params["compare_indices"]["user_context"][unique_mem_id] and location != ", ":
-			params["compare_indices"]["user_context"][unique_mem_id].append(location)
-
-	sys.stdout.write('\n\n')
 
 def identify_changes(params, es_connection):
 	"""Locate changes in training data between indices"""
@@ -138,11 +132,7 @@ def identify_changes(params, es_connection):
 	for i, transaction in enumerate(transactions):
 
 		# Progress
-		progress = (i / len(transactions)) * 100
-		progress = str(round(progress, 0)) + "%"
-		sys.stdout.write('\r')
-		sys.stdout.write(progress)
-		sys.stdout.flush()
+		progress(i, transactions)
 
 		# Add a field for tracking
 		if transaction.get("relinked_id", "") == "":
@@ -175,6 +165,15 @@ def identify_changes(params, es_connection):
 
 	print_diff_stats(params, transactions)
 
+def progress(i, list):
+	"""Display progress percent in a loop"""
+
+	progress = (i / len(list)) * 100
+	progress = str(round(progress, 0)) + "%"
+	sys.stdout.write('\r')
+	sys.stdout.write(progress)
+	sys.stdout.flush()
+
 def print_diff_stats(params, transactions):
 	"""Display a set of diff stats"""
 
@@ -192,7 +191,9 @@ def print_current_stats(params):
 	safe_print("{:25}{}".format("No action necessary: ", len(params["compare_indices"]["relinked"])))
 	safe_print("{:25}{}".format("Number Changed ID: ", len(params["compare_indices"]["id_changed"])))
 	safe_print("{:25}{}".format("Number Changed Details: ", len(params["compare_indices"]["details_changed"])))
+	safe_print("{:25}{}\n".format("Number Skipped: ", len(params["compare_indices"]["skipped"])))
 	safe_print("{:25}{}\n".format("Number NULL: ", len(params["compare_indices"]["NULL"])))
+	sys.stdout.write('\n')
 
 def has_mapping_changed(params, old_mapping, new_mapping):
 	"""Compares two transactions for similarity"""
@@ -245,16 +246,15 @@ def reconcile_changed_details(params, es_connection):
 
 		# Inform User
 		safe_print("DESCRIPTION_UNMASKED: ", transaction["DESCRIPTION_UNMASKED"])
+		mappings = [("Old", old_mapping), ("New", new_mapping)]
 
-		old_details = [old_mapping["PHYSICAL_MERCHANT"], old_mapping["STREET"], old_mapping["CITY"], string_cleanse(old_mapping["STATE"]), old_mapping["ZIP_CODE"], old_mapping["STORE_NUMBER"]]
-		old_details = [detail if detail != "" else "_____" for detail in old_details]
-		old_details_formatted = ", ".join(old_details).encode("utf-8", "replace")
-		safe_print("Old index details: " + str(old_details_formatted))
+		for mapping in mappings:
+			index, mapping = mapping
+			details = [mapping["PHYSICAL_MERCHANT"], mapping["STREET"], mapping["CITY"], string_cleanse(mapping["STATE"]), mapping["ZIP_CODE"], mapping["STORE_NUMBER"]]
+			details = [detail if detail != "" else "_____" for detail in details]
+			details_formatted = ", ".join(details)
+			safe_print("{} index details: {}".format(index, details_formatted))
 
-		new_details = [new_mapping["PHYSICAL_MERCHANT"], new_mapping["STREET"], new_mapping["CITY"], string_cleanse(new_mapping["STATE"]), new_mapping["ZIP_CODE"], new_mapping["STORE_NUMBER"]]
-		new_details = [detail if detail != "" else "_____" for detail in new_details]
-		new_details_formatted = ", ".join(new_details).encode("utf-8", "replace")
-		safe_print("New index details: " + str(new_details_formatted))
 		sys.stdout.write('\n')
 
 		# Prompt User
@@ -277,9 +277,6 @@ def prompt_mode_change(mode):
 	break_point = ""
 	while break_point != "OK":
 		break_point = safe_input("--- Entering " + mode + " mode. Type OK to continue --- \n")
-		if break_point == "EXIT":
-			save_relinked_transactions(params)
-			sys.exit()
 
 def reconcile_skipped(params, es_connection):
 	"""Attempt to reconcile transactions skipped
@@ -334,6 +331,9 @@ def reconcile_null(params, es_connection):
 def save_relinked_transactions(params):
 	""""Save the completed file set"""
 
+	print("Preparing to save. Current State:")
+	print_current_stats(stats)
+
 	safe_print("What should the output file be named? \n")
 	file_name = ""
 
@@ -343,8 +343,11 @@ def save_relinked_transactions(params):
 	changed_details = params["compare_indices"]["details_changed"]
 	null = params["compare_indices"]["NULL"]
 	relinked = params["compare_indices"]["relinked"]
-
 	transactions = changed_details + null + relinked
+
+	for transaction in transactions:
+		transaction = clean_transaction(transaction)
+
 	write_dict_list(transactions, file_name)
 
 def br():
@@ -358,7 +361,7 @@ def skipped_details_prompt(params, transaction, es_connection):
 	store = enrich_transaction(params, transaction, es_connection, index=sys.argv[3])
 	old_details = [store["PHYSICAL_MERCHANT"], store["STREET"], store["CITY"], string_cleanse(store["STATE"]), store["ZIP_CODE"],]
 	old_details_formatted = ", ".join(old_details)
-	safe_print("Old index details: {0}".format(old_details_formatted.encode("utf-8", "replace")))
+	safe_print("Old index details: {}".format(old_details_formatted))
 	name = safe_input("What is the name of this merchant? \n")
 	address = safe_input("At what address is this merchant located? \n")
 
@@ -374,7 +377,8 @@ def search_with_user_safe_input(params, es_connection, transaction):
 
 	# Give context to user
 	safe_print("User " + str(transaction["UNIQUE_MEM_ID"]) + " Context: ")
-	safe_print(params["compare_indices"]["user_context"][transaction["UNIQUE_MEM_ID"]], "\n")
+	safe_print(params["compare_indices"]["user_context"][transaction["UNIQUE_MEM_ID"]])
+	sys.stdout.write('\n')
 
 	# Collect Additional Data
 	store_name = safe_input("What is the name of the business? \n")
@@ -431,16 +435,22 @@ def safe_input(prompt=""):
 	try:
 		result = input(prompt)
 		return result
+	except KeyboardInterrupt:
+		sys.exit()
 	except:
 		return ""
 
-def safe_print(string):
-	"""Safely print a string"""
+def to_stdout(string, errors="replace"):
+	"""Converts a string to stdout compatible encoding"""
 
-	try:
-		print(string)
-	except:
-		print("Encoding Error. Continuing")
+	encoded = string.encode(sys.stdout.encoding, errors)
+	decoded = encoded.decode(sys.stdout.encoding)
+	return decoded
+
+def safe_print(*objs, errors="replace"):
+	"""Print without unicode errors"""
+	
+	print(*(to_stdout(str(o), errors) for o in objs))
 
 def decision_boundary(params, store, results):
 	"""Decide if there is a match"""
@@ -457,8 +467,8 @@ def decision_boundary(params, store, results):
 		return
 
 	# Compare Results
-	old_details = [part.encode("utf-8") for part in old_details]
-	new_details = [top_hit.get(field, "").encode("utf-8") for field in fields[0:5]]
+	old_details = [part for part in old_details]
+	new_details = [top_hit.get(field, "") for field in fields[0:5]]
 
 	# Don't require input on matching details
 	if new_details == old_details:
@@ -480,6 +490,16 @@ def decision_boundary(params, store, results):
 		# Add transaction to another queue for later analysis
 		params["compare_indices"]["skipped"].append(store)
 
+def clean_transaction(transaction):
+	"""Strips any enriched data"""
+
+	fields_to_clear = ["PHYSICAL_MERCHANT", "STORE_NUMBER", "STREET", "CITY", "STATE", "ZIP_CODE"]
+
+	for field in fields_to_clear:
+		transaction[field] = ""
+
+	return transaction
+
 def enrich_transaction(params, transaction, es_connection, index="", factual_id=""):
 	"""Return a copy of a transaction, enriched with data from a 
 	provided factual_id"""
@@ -487,6 +507,7 @@ def enrich_transaction(params, transaction, es_connection, index="", factual_id=
 	transaction = deepcopy(transaction)
 	transaction["merchant_found"] = True
 	fields_to_get = ["name", "region", "locality", "internal_store_number", "postcode", "address"]
+	fields_to_fill = ["PHYSICAL_MERCHANT", "STATE", "CITY", "STORE_NUMBER", "ZIP_CODE", "STREET"]
 	
 	# Get merchant and suppress errors
 	if factual_id == "":
@@ -498,13 +519,10 @@ def enrich_transaction(params, transaction, es_connection, index="", factual_id=
 	if merchant == None:
 		merchant = {}
 		transaction["merchant_found"] = False
- 
-	transaction["PHYSICAL_MERCHANT"] = merchant.get("name", "")
-	transaction["STORE_NUMBER"] = merchant.get("internal_store_number", "")
-	transaction["STREET"] = merchant.get("address", "")
-	transaction["CITY"] = merchant.get("locality", "")
-	transaction["STATE"] = merchant.get("region", "")
-	transaction["ZIP_CODE"] = merchant.get("postcode", "")
+
+	# Enrich the transaction
+	for i in range(len(fields_to_get)):
+		transaction[fields_to_fill[i]] = merchant.get(fields_to_get[i], "")
 
 	return transaction
 
@@ -549,21 +567,19 @@ def changed_id_user_prompt(params, old_details, results, store):
 	total = num_changed + num_relinked + num_skipped
 	percentage_relinked = num_relinked / total
 	percentage_formatted = str(round(percentage_relinked * 100, 2)) + "%"
-	old_details_formatted = [detail.decode("utf-8") for detail in old_details]
+	old_details_formatted = [detail for detail in old_details]
 	old_details_formatted =  ", ".join(old_details_formatted)
 
-	safe_print("Number id_changed remaining: ", num_changed)
-	safe_print("Number relinked: ", num_relinked)
-	safe_print("Number skipped: ", num_skipped, "\n")
-
-	safe_print("DESCRIPTION_UNMASKED: {0}".format(store["DESCRIPTION_UNMASKED"]))
-	safe_print("Query Sent: {0} \n".format(old_details_formatted.encode("utf-8", "replace")))
+	print_current_stats(params)
+	
+	safe_print("DESCRIPTION_UNMASKED: {}".format(store["DESCRIPTION_UNMASKED"]))
+	safe_print("Query Sent: {} \n".format(old_details_formatted))
 	
 	for i in range(5):
 		print_formatted_result(results, i)
 
 	safe_print("[enter] None of the above")
-	safe_print("[rm] Transaction did not occur at a specific location. Remove it from training data", "\n")
+	safe_print("{:7}".format("[rm]"), "Transaction did not occur at a specific location. Remove it from training data", "\n")
 	user_input = ""
 	user_input = safe_input("Please select a location, or press enter to skip: \n")
 
@@ -583,12 +599,12 @@ def print_formatted_result(results, index):
 	# Print Details
 	details_formatted = [hit.get(field, "") for field in fields_to_print]
 	details_formatted = ", ".join(details_formatted)
-	safe_print("{:8}".format("[" + str(index) + "] ") + " " + str(details_formatted.encode("utf-8", "replace")))
+	safe_print("{:7}".format("[" + str(index) + "] ") + " " + str(details_formatted))
 
 def get_hit(search_results, index):
 
 	# Must have results
-	if search_results['hits']['total'] == 0:
+	if search_results['hits']['total'] < (index + 1):
 		return False, False
 
 	hits = search_results['hits']['hits']
@@ -597,8 +613,6 @@ def get_hit(search_results, index):
 	hit = hits[index]
 
 	return z_score, hit["_source"]
-
-
 
 def z_score_delta(scores):
 	"""Find the Z-Score Delta"""
