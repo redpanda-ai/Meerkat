@@ -118,10 +118,6 @@ def run_all_modes(params, es_connection):
 	reconcile_changed_ids(params, es_connection)
 	reconcile_null(params, es_connection)
 
-	# Save as NULL
-	for n in params["compare_indices"]["NULL"]:
-		n["relinked_id"] = "NULL"
-
 def identify_changes(params, es_connection):
 	"""Locate changes in training data between indices"""
 
@@ -187,13 +183,11 @@ def print_diff_stats(params, transactions):
 def print_current_stats(params):
 	"""Print Current Stats"""
 
-	sys.stdout.write('\n')
-	safe_print("{:25}{}".format("No action necessary: ", len(params["compare_indices"]["relinked"])))
+	safe_print("{:25}{}".format("Number Relinked: ", len(params["compare_indices"]["relinked"])))
 	safe_print("{:25}{}".format("Number Changed ID: ", len(params["compare_indices"]["id_changed"])))
 	safe_print("{:25}{}".format("Number Changed Details: ", len(params["compare_indices"]["details_changed"])))
-	safe_print("{:25}{}\n".format("Number Skipped: ", len(params["compare_indices"]["skipped"])))
-	safe_print("{:25}{}\n".format("Number NULL: ", len(params["compare_indices"]["NULL"])))
-	sys.stdout.write('\n')
+	safe_print("{:25}{}".format("Number Skipped: ", len(params["compare_indices"]["skipped"])))
+	safe_print("{:25}{}\n".format("Number NULL (unreviewed): ", len(params["compare_indices"]["NULL"])))
 
 def has_mapping_changed(params, old_mapping, new_mapping):
 	"""Compares two transactions for similarity"""
@@ -259,17 +253,17 @@ def reconcile_changed_details(params, es_connection):
 
 		# Prompt User
 		safe_print("Is the new merchant correct?")
-		safe_print("[enter] Yes")
-		safe_print("{:7s} Not Sure".format("[n]"))
+		safe_print("[enter] Skip")
+		safe_print("{:7s} Yes".format("[y]"))
 
 		choice = safe_input()
 
 		# Take Action
-		if choice == "n":
-			params["compare_indices"]["id_changed"].append(transaction)
-		else:
+		if choice == "y":
 			transaction["relinked_id"] = transaction["factual_id"]
 			params["compare_indices"]["relinked"].append(transaction)
+		else:
+			params["compare_indices"]["id_changed"].append(transaction)
 
 def prompt_mode_change(mode):
 	"""Prompt a user that the mode has changed"""
@@ -332,7 +326,7 @@ def save_relinked_transactions(params):
 	""""Save the completed file set"""
 
 	print("Preparing to save. Current State:")
-	print_current_stats(stats)
+	print_current_stats(params)
 
 	safe_print("What should the output file be named? \n")
 	file_name = ""
@@ -343,7 +337,10 @@ def save_relinked_transactions(params):
 	changed_details = params["compare_indices"]["details_changed"]
 	null = params["compare_indices"]["NULL"]
 	relinked = params["compare_indices"]["relinked"]
-	transactions = changed_details + null + relinked
+	id_changed = params["compare_indices"]["id_changed"]
+	skipped = params["compare_indices"]["skipped"]
+
+	transactions = changed_details + null + relinked + skipped + id_changed
 
 	for transaction in transactions:
 		transaction = clean_transaction(transaction)
@@ -411,13 +408,20 @@ def null_decision_boundary(params, store, results):
 	for i in range(5):
 		print_formatted_result(results, i)
 
-	safe_print("[enter] NULL")
+	safe_print("{:7}".format("[null]"), "Transaction has been reviewed before and has no matching merchant in new index. Set to NULL")	
+	safe_print("[enter] Skip")
 	safe_print("{:7} Transaction did not occur at a specific location. Remove it from training data\n".format("[rm]"))
 
 	user_input = safe_input("Please select a choice above: \n")
 
 	# Remove from Set
 	if user_input == "rm":
+		return
+
+	# Set to NULL
+	if user_input == "null":
+		store["relinked_id"] = "NULL"
+		params["compare_indices"]["relinked"].append(store)
 		return
 
 	# Change factual_id, move to relinked
@@ -477,6 +481,12 @@ def decision_boundary(params, store, results):
 	else:
 		user_input = changed_id_user_prompt(params, old_details, results, store)
 
+	# Transaction is NULL
+	if user_input == "null":
+		store["relinked_id"] = "NULL"
+		params["compare_indices"]["relinked"].append(store)
+		return
+
 	# Remove is transaction isn't physical
 	if user_input == "rm":
 		return
@@ -493,7 +503,7 @@ def decision_boundary(params, store, results):
 def clean_transaction(transaction):
 	"""Strips any enriched data"""
 
-	fields_to_clear = ["PHYSICAL_MERCHANT", "STORE_NUMBER", "STREET", "CITY", "STATE", "ZIP_CODE"]
+	fields_to_clear = ["PHYSICAL_MERCHANT", "STORE_NUMBER", "STREET", "CITY", "STATE", "ZIP_CODE", "LATITUDE", "LONGITUDE"]
 
 	for field in fields_to_clear:
 		transaction[field] = ""
@@ -571,14 +581,15 @@ def changed_id_user_prompt(params, old_details, results, store):
 	old_details_formatted =  ", ".join(old_details_formatted)
 
 	print_current_stats(params)
-	
+
 	safe_print("DESCRIPTION_UNMASKED: {}".format(store["DESCRIPTION_UNMASKED"]))
 	safe_print("Query Sent: {} \n".format(old_details_formatted))
 	
 	for i in range(5):
 		print_formatted_result(results, i)
 
-	safe_print("[enter] None of the above")
+	safe_print("{:7}".format("[null]"), "Transaction has been reviewed before and has no matching merchant in new index. Set to NULL")	
+	safe_print("[enter] Skip")
 	safe_print("{:7}".format("[rm]"), "Transaction did not occur at a specific location. Remove it from training data", "\n")
 	user_input = ""
 	user_input = safe_input("Please select a location, or press enter to skip: \n")
