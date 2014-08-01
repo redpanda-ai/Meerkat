@@ -76,7 +76,7 @@ def mode_change(params, es_connection):
 	print("[3] Link transactions with NULL factual_id \n")
 
 	while mode not in accepted_inputs: 
-		mode = input()
+		mode = safe_input()
 	
 	if mode == "0":
 		run_all_modes(params, es_connection)
@@ -94,6 +94,12 @@ def run_all_modes(params, es_connection):
 	reconcile_changed_details(params, es_connection)
 	reconcile_changed_ids(params, es_connection)
 	reconcile_null(params, es_connection)
+
+	# Save Null
+	null = params["compare_indices"]["NULL"]
+
+	for n in null:
+		n["relinked_id"] = "NULL"
 
 def generate_user_context(params, es_connection):
 	"""Generate a list of cities common to a user"""
@@ -179,6 +185,15 @@ def print_diff_stats(params, transactions):
 	print("{:25}{}".format("Number Changed Details: ", len(params["compare_indices"]["details_changed"])))
 	print("{:25}{}\n".format("Number NULL: ", len(params["compare_indices"]["NULL"])))
 
+def print_current_stats(params):
+	"""Print Current Stats"""
+
+	sys.stdout.write('\n')
+	print("{:25}{}".format("No action necessary: ", len(params["compare_indices"]["relinked"])))
+	print("{:25}{}".format("Number Changed ID: ", len(params["compare_indices"]["id_changed"])))
+	print("{:25}{}".format("Number Changed Details: ", len(params["compare_indices"]["details_changed"])))
+	print("{:25}{}\n".format("Number NULL: ", len(params["compare_indices"]["NULL"])))
+
 def has_mapping_changed(params, old_mapping, new_mapping):
 	"""Compares two transactions for similarity"""
 
@@ -203,6 +218,8 @@ def reconcile_changed_ids(params, es_connection):
 		transaction = changed_ids.pop()
 		results = find_merchant_by_address(params, transaction, es_connection)
 		decision_boundary(params, transaction, results)
+
+	print_current_stats(params)
 
 	reconcile_skipped(params, es_connection)
 
@@ -245,12 +262,13 @@ def reconcile_changed_details(params, es_connection):
 		print("[enter] Yes")
 		print("{:7s} Not Sure".format("[n]"))
 
-		choice = input()
+		choice = safe_input()
 
 		# Take Action
 		if choice == "n":
 			params["compare_indices"]["id_changed"].append(transaction)
 		else:
+			transaction["relinked_id"] = transaction["factual_id"]
 			params["compare_indices"]["relinked"].append(transaction)
 
 def prompt_mode_change(mode):
@@ -258,7 +276,7 @@ def prompt_mode_change(mode):
 
 	break_point = ""
 	while break_point != "OK":
-		break_point = input("--- Entering " + mode + " mode. Type OK to continue --- \n")
+		break_point = safe_input("--- Entering " + mode + " mode. Type OK to continue --- \n")
 		if break_point == "EXIT":
 			save_relinked_transactions(params)
 			sys.exit()
@@ -287,6 +305,8 @@ def reconcile_skipped(params, es_connection):
 			continue
 		null_decision_boundary(params, transaction, results)
 
+	print_current_stats(params)
+
 def reconcile_null(params, es_connection):
 	"""Attempt to find a factual_id for a NULL entry"""
 
@@ -304,10 +324,12 @@ def reconcile_null(params, es_connection):
 		progress = 100 - ((len(null) / null_len) * 100)
 		print(round(progress, 2), "% ", "done with NULL")
 		transaction = null.pop()
-		results = search_with_user_input(params, es_connection, transaction)
+		results = search_with_user_safe_input(params, es_connection, transaction)
 		if results == False:
 			continue
 		null_decision_boundary(params, transaction, results)
+
+	print_current_stats(params)
 
 def save_relinked_transactions(params):
 	""""Save the completed file set"""
@@ -316,13 +338,13 @@ def save_relinked_transactions(params):
 	file_name = ""
 
 	while file_name == "":
-		file_name = input()
+		file_name = safe_input()
 
 	changed_details = params["compare_indices"]["details_changed"]
 	null = params["compare_indices"]["NULL"]
 	relinked = params["compare_indices"]["relinked"]
-	transactions = changed_details + null + relinked
 
+	transactions = changed_details + null + relinked
 	write_dict_list(transactions, file_name)
 
 def br():
@@ -337,12 +359,12 @@ def skipped_details_prompt(params, transaction, es_connection):
 	old_details = [store["PHYSICAL_MERCHANT"], store["STREET"], store["CITY"], string_cleanse(store["STATE"]), store["ZIP_CODE"],]
 	old_details_formatted = ", ".join(old_details)
 	print("Old index details: {0}".format(old_details_formatted.encode("utf-8", "replace")))
-	name = input("What is the name of this merchant? \n")
-	address = input("At what address is this merchant located? \n")
+	name = safe_input("What is the name of this merchant? \n")
+	address = safe_input("At what address is this merchant located? \n")
 
 	return name, address
 
-def search_with_user_input(params, es_connection, transaction):
+def search_with_user_safe_input(params, es_connection, transaction):
 	"""Search for a location by providing additional data"""
 
 	index = sys.argv[4]
@@ -355,8 +377,8 @@ def search_with_user_input(params, es_connection, transaction):
 	print(params["compare_indices"]["user_context"][transaction["UNIQUE_MEM_ID"]], "\n")
 
 	# Collect Additional Data
-	store_name = input("What is the name of the business? \n")
-	store_address = input("What is the store address with state, city and zip? \n")
+	store_name = safe_input("What is the name of the business? \n")
+	store_address = safe_input("What is the store address with state, city and zip? \n")
 
 	# Generate new query
 	bool_search = get_bool_query(size=45)
@@ -388,7 +410,7 @@ def null_decision_boundary(params, store, results):
 	print("[enter] NULL")
 	print("{:7} Transaction did not occur at a specific location. Remove it from training data\n".format("[rm]"))
 
-	user_input = input("Please select a choice above: \n")
+	user_input = safe_input("Please select a choice above: \n")
 
 	# Remove from Set
 	if user_input == "rm":
@@ -402,6 +424,15 @@ def null_decision_boundary(params, store, results):
 	else:
 		# Add transaction to another queue for later analysis
 		params["compare_indices"]["NULL"].append(store)
+
+def safe_input(prompt=""):
+	"""Safely input a string"""
+
+	try:
+		result = input(prompt)
+		return result
+	except:
+		return ""
 
 def decision_boundary(params, store, results):
 	"""Decide if there is a match"""
@@ -526,7 +557,7 @@ def changed_id_user_prompt(params, old_details, results, store):
 	print("[enter] None of the above")
 	print("[rm] Transaction did not occur at a specific location. Remove it from training data", "\n")
 	user_input = ""
-	user_input = input("Please select a location, or press enter to skip: \n")
+	user_input = safe_input("Please select a location, or press enter to skip: \n")
 
 	return user_input
 
