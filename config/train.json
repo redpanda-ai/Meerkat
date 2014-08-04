@@ -4,7 +4,7 @@
 	"mode" : "train",
 	"input" : {
 		"hyperparameters" : "config/hyperparameters/default.json",
-		"filename" : "/mnt/ephemeral/training_data/processed/bank/bank_sample_4.txt",
+		"filename" : "/mnt/ephemeral/training_data/processed/bank/bank_sample_10.txt",
 		"delimiter" : "|",
 		"encoding" : "utf-8",
 		"split" : {
@@ -31,7 +31,7 @@
 		},
 		"file" : {
 			"format" : "csv",
-			"processing_location" : "/mnt/ephemeral/training_data/processed/bank/first_batch/",
+			"processing_location" : "/mnt/ephemeral/training_data/processed/bank/second_batch/",
 			"delimiter" : "|"
 		}
 	},
