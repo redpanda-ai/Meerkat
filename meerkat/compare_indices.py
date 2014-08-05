@@ -360,7 +360,8 @@ def br():
 def skipped_details_prompt(params, transaction, es_connection):
 	"""Prompt the users to provide additional data"""
 
-	safe_print("Base query: " + transaction["DESCRIPTION_UNMASKED"])
+	safe_print("Base query: " + transaction["DESCRIPTION_UNMASKED"] + "\n")
+	display_user_context(params, transaction)
 	store = enrich_transaction(params, transaction, es_connection, index=sys.argv[3])
 	old_details = [store["PHYSICAL_MERCHANT"], store["STREET"], store["CITY"], string_cleanse(store["STATE"]), store["ZIP_CODE"],]
 	old_details_formatted = ", ".join(old_details)
@@ -369,6 +370,13 @@ def skipped_details_prompt(params, transaction, es_connection):
 	address = safe_input("At what address is this merchant located? \n")
 
 	return name, address
+
+def display_user_context(params, transaction):
+	"""Display known information about user location"""
+
+	safe_print("User " + str(transaction["UNIQUE_MEM_ID"]) + " Context: ")
+	safe_print(params["compare_indices"]["user_context"][transaction["UNIQUE_MEM_ID"]])
+	sys.stdout.write('\n')
 
 def search_with_user_safe_input(params, es_connection, transaction):
 	"""Search for a location by providing additional data"""
@@ -379,9 +387,7 @@ def search_with_user_safe_input(params, es_connection, transaction):
 	safe_print(prompt)
 
 	# Give context to user
-	safe_print("User " + str(transaction["UNIQUE_MEM_ID"]) + " Context: ")
-	safe_print(params["compare_indices"]["user_context"][transaction["UNIQUE_MEM_ID"]])
-	sys.stdout.write('\n')
+	display_user_context(params, transaction)
 
 	# Collect Additional Data
 	store_name = safe_input("What is the name of the business? \n")
