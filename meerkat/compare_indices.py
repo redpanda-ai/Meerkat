@@ -36,7 +36,7 @@ from scipy.stats.mstats import zscore
 
 from meerkat.description_consumer import get_qs_query, get_bool_query
 from meerkat.various_tools import load_params, get_es_connection, string_cleanse
-from meerkat.various_tools import get_merchant_by_id, load_dict_list, write_dict_list
+from meerkat.various_tools import get_merchant_by_id, load_dict_ordered, write_dict_list
 
 class DummyFile(object):
     def write(self, x): pass
@@ -66,7 +66,7 @@ def relink_transactions(params, es_connection):
 def generate_user_context(params, es_connection):
 	"""Generate a list of cities common to a user"""
 
-	transactions = load_dict_list(sys.argv[2])
+	transactions, _ = load_dict_ordered(sys.argv[2])
 
 	sys.stdout.write('\n')
 	safe_print("Generating User Context:")
@@ -121,7 +121,8 @@ def run_all_modes(params, es_connection):
 def identify_changes(params, es_connection):
 	"""Locate changes in training data between indices"""
 
-	transactions = load_dict_list(sys.argv[2])
+	transactions, field_order = load_dict_ordered(sys.argv[2])
+	params["compare_indices"]["field_order"] = field_order
 
 	safe_print("Locating changes in training set:")
 
@@ -334,6 +335,11 @@ def save_relinked_transactions(params):
 	while file_name == "":
 		file_name = safe_input()
 
+	field_order = params["compare_indices"]["field_order"]
+	field_order = [field for field in field_order if field]
+	if "relinked" not in field_order:
+		field_order.append("relinked_id")
+
 	changed_details = params["compare_indices"]["details_changed"]
 	null = params["compare_indices"]["NULL"]
 	relinked = params["compare_indices"]["relinked"]
@@ -345,7 +351,7 @@ def save_relinked_transactions(params):
 	for transaction in transactions:
 		transaction = clean_transaction(transaction)
 
-	write_dict_list(transactions, file_name)
+	write_dict_list(transactions, file_name, column_order=field_order)
 
 def br():
 	"""Prints a break line to show current record has changed"""
@@ -660,6 +666,7 @@ def add_local_params(params):
 	"""Adds additional local params"""
 
 	params["compare_indices"] = {}
+	params["compare_indices"]["field_order"] = []
 	params["compare_indices"]["NULL"] = []
 	params["compare_indices"]["id_changed"] = []
 	params["compare_indices"]["details_changed"] = []

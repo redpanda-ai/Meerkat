@@ -22,11 +22,24 @@ def load_dict_list(file_name, encoding='utf-8', delimiter="|"):
 	input_file.close()
 	return dict_list
 
-def write_dict_list(dict_list, file_name, encoding="utf-8", delimiter="|"):
+def load_dict_ordered(file_name, encoding='utf-8', delimiter="|"):
+	"""Loads a dictionary of input, anf returns a list and ordered
+	fieldnames"""
+
+	input_file = open(file_name, encoding=encoding, errors='replace')
+	reader = csv.DictReader(input_file, delimiter=delimiter, quoting=csv.QUOTE_NONE)
+	dict_list = list(reader)
+	input_file.close()
+	return dict_list, reader.fieldnames
+
+def write_dict_list(dict_list, file_name, encoding="utf-8", delimiter="|", column_order=""):
 	""" Saves a lists of dicts with uniform keys to file """
 
+	if column_order == "":
+		column_order = dict_list[0].keys()
+
 	with open(file_name, 'w', encoding=encoding, errors='replace') as output_file:
-		dict_w = csv.DictWriter(output_file, delimiter=delimiter, fieldnames=dict_list[0].keys(), extrasaction='ignore')
+		dict_w = csv.DictWriter(output_file, delimiter=delimiter, fieldnames=column_order, extrasaction='ignore')
 		dict_w.writeheader()
 		dict_w.writerows(dict_list)
 
