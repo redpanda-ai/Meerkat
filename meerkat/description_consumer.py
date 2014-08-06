@@ -27,7 +27,7 @@ from sklearn.preprocessing import StandardScaler
 from scipy.stats.mstats import zscore
 from pprint import pprint
 
-from .various_tools import string_cleanse, synonyms
+from .various_tools import string_cleanse, synonyms, safe_print
 from .clustering import cluster, collect_clusters
 from .location import separate_geo, scale_polygon
 
@@ -108,6 +108,7 @@ class DescriptionConsumer(threading.Thread):
 		"""Displays search results."""
 
 		logger = logging.getLogger("thread " + str(self.thread_id))
+
 		# Must have results
 		if search_results['hits']['total'] == 0:
 			return True
@@ -115,6 +116,10 @@ class DescriptionConsumer(threading.Thread):
 		hits = search_results['hits']['hits']
 		scores, results, fields_found = [], [], []
 		params = self.params
+
+		# Disable in training mode
+		if params["mode"] == "train":
+			return
 
 		for hit in hits:
 			# Add Latitude and Longitude
@@ -141,14 +146,32 @@ class DescriptionConsumer(threading.Thread):
 			results.append(\
 			"[" + str(round(score, 3)) + "] " + " ".join(ordered_hit_fields))
 
-		self.__generate_z_score_delta(scores)
+		score = scores[0]
+		z_score = self.__generate_z_score_delta(scores)
+		decision = self.__decision_boundary(z_score)
+		description =  ' '.join(transaction["DESCRIPTION_UNMASKED"].split())
+		first_hit = hits[0]["fields"]
+		fields_to_get = ["name", "region", "locality", "internal_store_number", "postcode", "address"]
+		field_content = [first_hit.get(field, ["_____"])[0] for field in fields_to_get]
+		
+		if decision:
+			decision = "Yes"
+		else: 
+			decision = "No"
 
-		try:
-			logger.debug("%s: %s", str(self.thread_id), results[0].encode("utf-8"))
-			print(str(self.thread_id), ": ", results[0].encode("utf-8"))
-		except IndexError:
-			logger.warning("INDEX ERROR: %s", transaction["DESCRIPTION"])
-			#print("INDEX ERROR: ", transaction["DESCRIPTION"])
+		labels = ["Transaction", "Score", "Z-Score", "Decision"] + [field.title() for field in fields_to_get]
+		data = [description, score, z_score, decision] + field_content
+		prompt = [label + ": {}" for label in labels]
+		prompt = "\n".join(prompt)
+
+		user = input(prompt.format(*data) + "\n")
+
+		#try:
+		#	logger.debug("%s: %s", str(self.thread_id), results[0].encode("utf-8"))
+			#safe_print(str(self.thread_id), ": ", results[0])
+		#except IndexError:
+		#	logger.warning("INDEX ERROR: %s", transaction["DESCRIPTION"])
+		#	#print("INDEX ERROR: ", transaction["DESCRIPTION"])
 
 		return True
 
@@ -160,8 +183,6 @@ class DescriptionConsumer(threading.Thread):
 		if len(scores) < 2:
 			logger.info("Unable to generate Z-Score")
 			return 0
-
-		# !!!!! Explore using score / z_score
 
 		z_scores = zscore(scores)
 		first_score, second_score = z_scores[0:2]
@@ -179,7 +200,6 @@ class DescriptionConsumer(threading.Thread):
 		logger.info("Top Score Quality: %s", quality)
 
 		return z_score_delta
-
 
 	def __decision_boundary(self, z_score_delta):
 		"""Decides whether or not we will label transaction

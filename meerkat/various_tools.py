@@ -9,6 +9,7 @@ Created on Dec 20, 2013
 """
 
 import csv
+import sys
 import re
 import os
 import gzip
@@ -42,6 +43,27 @@ def write_dict_list(dict_list, file_name, encoding="utf-8", delimiter="|", colum
 		dict_w = csv.DictWriter(output_file, delimiter=delimiter, fieldnames=column_order, extrasaction='ignore')
 		dict_w.writeheader()
 		dict_w.writerows(dict_list)
+
+def to_stdout(string, errors="replace"):
+	"""Converts a string to stdout compatible encoding"""
+
+	encoded = string.encode(sys.stdout.encoding, errors)
+	decoded = encoded.decode(sys.stdout.encoding)
+	return decoded
+
+def safe_print(*objs, errors="replace"):
+	"""Print without unicode errors"""
+	
+	print(*(to_stdout(str(o), errors) for o in objs))
+
+def progress(i, list, message=""):
+	"""Display progress percent in a loop"""
+
+	progress = (i / len(list)) * 100
+	progress = str(round(progress, 1)) + "% " + message 
+	sys.stdout.write('\r')
+	sys.stdout.write(progress)
+	sys.stdout.flush()
 
 def queue_to_list(result_queue):
 	"""Converts queue to list"""

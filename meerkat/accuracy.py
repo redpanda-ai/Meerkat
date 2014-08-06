@@ -209,7 +209,7 @@ def print_results(results):
 		results['num_verified']))
 	print("{0:35} = {1:10.2f}%".format("Precision",
 		results['precision']))
-	print("", "MISLABELED:", '\n'.join(results['mislabeled']), sep="\n")
+	print("", "MISLABELED:", '\n'.join(sorted(results['mislabeled'])), sep="\n")
 	print("", "MISLABELED BINARY:", '\n'.join(results['non_physical']),
 		sep="\n")
 

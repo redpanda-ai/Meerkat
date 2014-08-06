@@ -23,11 +23,11 @@
 			"fields" : [
 				"name", "chain_id", "category_labels", "address", "locality",
 				"region", "postcode", "website", "tel", "chain_name",
-				"latitude", "longitude", "neighborhood", "factual_id"],
+				"latitude", "longitude", "neighborhood", "factual_id", "internal_store_number"],
 			"labels" : [
 				"PHYSICAL_MERCHANT", "STORE_ID", "FACTUAL_CATEGORY", "STREET", "CITY",
 				"STATE", "ZIP_CODE", "WEBSITE", "PHONE_NUMBER", "CHAIN_NAME",
-				"LATITUDE", "LONGITUDE", "NEIGHBORHOOD", "FACTUAL_ID"]
+				"LATITUDE", "LONGITUDE", "NEIGHBORHOOD", "FACTUAL_ID", "STORE_NUMBER"]
 		},
 		"file" : {
 			"format" : "csv",

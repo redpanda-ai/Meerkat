@@ -35,7 +35,7 @@ from copy import deepcopy
 from scipy.stats.mstats import zscore
 
 from meerkat.description_consumer import get_qs_query, get_bool_query
-from meerkat.various_tools import load_params, get_es_connection, string_cleanse
+from meerkat.various_tools import load_params, get_es_connection, string_cleanse, safe_print
 from meerkat.various_tools import get_merchant_by_id, load_dict_ordered, write_dict_list
 
 class DummyFile(object):
@@ -455,18 +455,6 @@ def safe_input(prompt=""):
 		sys.exit()
 	except:
 		return ""
-
-def to_stdout(string, errors="replace"):
-	"""Converts a string to stdout compatible encoding"""
-
-	encoded = string.encode(sys.stdout.encoding, errors)
-	decoded = encoded.decode(sys.stdout.encoding)
-	return decoded
-
-def safe_print(*objs, errors="replace"):
-	"""Print without unicode errors"""
-	
-	print(*(to_stdout(str(o), errors) for o in objs))
 
 def decision_boundary(params, store, results):
 	"""Decide if there is a match"""

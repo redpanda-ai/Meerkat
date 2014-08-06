@@ -44,6 +44,7 @@ import os
 import queue
 import csv
 import collections
+import contextlib
 from copy import deepcopy
 from random import randint, uniform, random, shuffle
 
@@ -53,7 +54,21 @@ from numpy import array, array_split
 from meerkat.description_consumer import DescriptionConsumer
 from meerkat.binary_classifier.load import select_model
 from meerkat.accuracy import print_results, test_accuracy
-from meerkat.various_tools import load_dict_list, queue_to_list, load_params, load_hyperparameters
+from meerkat.various_tools import load_dict_list, queue_to_list
+from meerkat.various_tools import load_params, load_hyperparameters, progress
+
+class DummyFile(object):
+    def write(self, x): pass
+
+@contextlib.contextmanager
+def nostdout():
+    save_stdout = sys.stdout
+    save_stderr = sys.stderr
+    sys.stdout = DummyFile()
+    sys.stderr = DummyFile()
+    yield
+    sys.stderr = save_stderr
+    sys.stdout = save_stdout
 
 def test_train_split(dataset):
 	"""Load the verification source, and split the
@@ -130,11 +145,22 @@ def run_meerkat(params, desc_queue, hyperparameters):
 	consumer_threads = params.get("concurrency", 8)
 	result_queue = queue.Queue()
 
+	# Suppress Output and Classify
 	for i in range(consumer_threads):
-		new_consumer = DescriptionConsumer(i, params, desc_queue,\
-			result_queue, hyperparameters)
+		new_consumer = DescriptionConsumer(i, params, desc_queue, result_queue, hyperparameters)
 		new_consumer.setDaemon(True)
 		new_consumer.start()
+
+	# Progress 
+	qsize = desc_queue.qsize()
+	total = range(qsize)
+
+	while qsize > 0:
+		if qsize == desc_queue.qsize():
+			continue
+		else:
+			qsize = desc_queue.qsize()
+			progress((len(total) - qsize), total, message="complete with current iteration")
 
 	desc_queue.join()
 
@@ -180,7 +206,7 @@ def randomized_optimization(hyperparameters, known, params, dataset):
 
 	# Save All Scores
 	with open(base_name + "_all_scores.txt", "w") as fout:
-		pprint(params["scores"], fout)
+		pprint(params["optimization"]["scores"], fout)
 
 	print("Precision = " + str(top_score['precision']) + "%")
 	print("Best Recall = " + str(top_score['total_recall_physical']) + "%")
@@ -198,8 +224,8 @@ def randomized_optimization(hyperparameters, known, params, dataset):
 def get_initial_values(hyperparameters, params, known, dataset):
 	"""Do a simple search to find starter values"""
 
-	settings = params["settings"]
-	top_score = {"precision" : 0, "total_recall_physical" : 0, "f1" : 0}
+	settings = params["optimization"]["settings"]
+	top_score = {"precision" : 0, "total_recall_physical" : 0}
 	iterations = settings["initial_search_space"]
 	learning_rate = settings["initial_learning_rate"]
 
@@ -207,7 +233,11 @@ def get_initial_values(hyperparameters, params, known, dataset):
 
 	for i in range(iterations):
 
-		randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=learning_rate)
+		if i > 0:
+			randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=learning_rate)
+		else:
+			randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=0)
+
 		print("\n", "ITERATION NUMBER: " + str(i))
 		print("\n", randomized_hyperparameters,"\n")
 
@@ -215,18 +245,15 @@ def get_initial_values(hyperparameters, params, known, dataset):
 		accuracy = run_classifier(randomized_hyperparameters, params, dataset)
 		precision = accuracy["precision"]
 		recall = accuracy["total_recall_physical"]
-		f1 = 2 * (((precision / 100) * 1.3 * recall) / (((precision / 100) * 1.3) + recall))
-		higher_f1 = f1 >= top_score["f1"]
 		higher_precision = precision >= top_score["precision"]
 		higher_recall = recall >= top_score["total_recall_physical"]
 		not_too_high = precision <= settings["max_precision"]
 
-		if higher_recall:
+		if higher_precision and not_too_high:
 			top_score = accuracy
-			top_score["f1"] = f1
 			top_score['hyperparameters'] = randomized_hyperparameters
-			print("\n", "SCORE PRECISION: " + str(round(accuracy["precision"], 2)))
-			print("\n", "SCORE RECALL: " + str(round(accuracy["total_recall_physical"], 2)))
+			print("SCORE PRECISION: " + str(round(accuracy["precision"], 2)))
+			print("SCORE RECALL: " + str(round(accuracy["total_recall_physical"], 2)))
 
 		# Keep Track of All Scores
 		score = {
@@ -235,7 +262,7 @@ def get_initial_values(hyperparameters, params, known, dataset):
 			"recall" : round(accuracy["total_recall_physical"], 2)
 		}
 
-		params["scores"].append(score)
+		params["optimization"]["scores"].append(score)
 		
 		print("\n", randomized_hyperparameters,"\n")
 
@@ -244,7 +271,7 @@ def get_initial_values(hyperparameters, params, known, dataset):
 
 def gradient_descent(initial_values, params, known, dataset):
 
-	settings = params["settings"]
+	settings = params["optimization"]["settings"]
 	top_score = initial_values
 	learning_rate = settings["iteration_learning_rate"]
 	save_top_score(initial_values)
@@ -260,7 +287,7 @@ def gradient_descent(initial_values, params, known, dataset):
 
 def run_iteration(top_score, params, known, dataset):
 
-	settings = params["settings"]
+	settings = params["optimization"]["settings"]
 	hyperparameters = top_score['hyperparameters']
 	new_top_score = top_score
 	learning_rate = settings["iteration_learning_rate"]
@@ -289,7 +316,7 @@ def run_iteration(top_score, params, known, dataset):
 			"recall" : round(accuracy["total_recall_physical"], 2)
 		}
 
-		params["scores"].append(score)
+		params["optimization"]["scores"].append(score)
 
 	return new_top_score
 
@@ -362,11 +389,29 @@ def run_classifier(hyperparameters, params, dataset):
 	params["elasticsearch"]["boost_labels"] = boost_labels
 	params["elasticsearch"]["boost_vectors"] = boost_vectors
 
-	# Run Classifier with new Hyperparameters
+	# Run Classifier with new Hyperparameters. Suppress Output
 	desc_queue = get_desc_queue(dataset)
 	accuracy = run_meerkat(params, desc_queue, hyperparameters)
 
 	return accuracy
+
+def add_local_params(params):
+	"""Adds additional local params"""
+
+	params["optimization"] = {}
+	params["optimization"]["scores"] = []
+	params["optimization"]["settings"] = {
+		"folds": 1,
+		"initial_search_space": 50,
+		"initial_learning_rate": 0.5,
+		"iteration_search_space": 5,
+		"iteration_learning_rate": 0.3,
+		"gradient_descent_iterations": 10,
+		"max_precision": 95
+	}
+
+
+	return params
 
 def verify_arguments():
 	"""Verify Usage"""
@@ -379,51 +424,43 @@ def verify_arguments():
 	# Clear Contents from Previous Runs
 	open(os.path.splitext(os.path.basename(sys.argv[1]))[0] + '_top_scores.txt', 'w').close()
 
-if __name__ == "__main__":
+def run_from_command_line(command_line_arguments):
+	"""Runs these commands if the module is invoked from the command line"""
 
 	# Meta Information
 	start_time = datetime.datetime.now()
 	verify_arguments()
 	params = load_params(sys.argv[1])
 
-	params["settings"] = {
-		"folds": 1,
-		"initial_search_space": 100,
-		"initial_learning_rate": 3,
-		"iteration_search_space": 5,
-		"iteration_learning_rate": 0.5,
-		"gradient_descent_iterations": 10,
-		"max_precision": 95
-	}
-
-	params["scores"] = []
+	# Add Local Params
+	add_local_params(params)
 
 	known = {"es_result_size" : "45"}
 
 	hyperparameters = {
-		"internal_store_number" : "2",  
-	    "name" : "3",
+		"internal_store_number" : "1.9",  
+	    "name" : "2.781",
 	    "good_description" : "2",             
 	    "address" : "0.5",          
-	    "address_extended" : "1.25", 
-	    "po_box" : "1.25",           
-	    "locality" : "1.5",         
-	    "region" : "1.5",           
-	    "post_town" : "0.5",        
-	    "admin_region" : "1",     
-	    "postcode" : "1",                
-	    "tel" : "0.5",                            
-	    "neighborhood" : "1",     
+	    "address_extended" : "1.282", 
+	    "po_box" : "1.292",           
+	    "locality" : "1.367",         
+	    "region" : "1.685",           
+	    "post_town" : "0.577",        
+	    "admin_region" : "0.69",     
+	    "postcode" : "0.9",                
+	    "tel" : "0.6",                            
+	    "neighborhood" : "0.801",     
 	    "email" : "0.5",               
-	    "category_labels" : "1.25",           
+	    "category_labels" : "1.319",           
 	    "chain_name" : "1",
-		"z_score_threshold" : "3"
+		"z_score_threshold" : "2.7"
 	}
 
 	dataset = load_dataset(params)
 
 	# Use all data or Cross Validate
-	if params["settings"]["folds"] == 1:
+	if params["optimization"]["settings"]["folds"] == 1:
 		randomized_optimization(hyperparameters, known, params, dataset)
 	else:
 		d0, d1 = test_train_split(dataset)
@@ -432,3 +469,6 @@ if __name__ == "__main__":
 	# Run Speed Tests
 	time_delta = datetime.datetime.now() - start_time
 	print("TOTAL TIME TAKEN FOR OPTIMIZATION: ", time_delta)
+
+if __name__ == "__main__":
+	run_from_command_line(sys.argv)
