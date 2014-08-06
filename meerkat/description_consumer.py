@@ -161,14 +161,14 @@ class DescriptionConsumer(threading.Thread):
 		description =  ' '.join(transaction["DESCRIPTION_UNMASKED"].split())
 		first_hit = hits[0]["fields"]
 		fields_to_get = ["name", "region", "locality", "internal_store_number", "postcode", "address"]
-		labels = ["Transaction", "Score", "Z-Score", "Combined", "Decision"]
-		data = [description, score, z_score, (score + z_score), decision]
+		labels = ["Transaction", "Score", "Z-Score", "Decision"]
+		data = [description, score, z_score, decision]
 		field_content = [first_hit.get(field, ["_____"])[0] for field in fields_to_get]
 		city_fallback, state_fallback, name_fallback = "", "", ""
 
 		# Populate Decisions
 		if not decision:
-			data[4] == "No"
+			data[3] == "No"
 			fields = self.params["output"]["results"]["fields"]
 			city_names = city_names[0:2]
 			state_names = state_names[0:2]
@@ -187,16 +187,17 @@ class DescriptionConsumer(threading.Thread):
 			labels = labels + ["Name Fallback", "State Fallback", "City Fallback"]
 			data = data + [name_fallback, state_fallback, city_fallback]
 		else:
-			data[4] = "Yes"
+			data[3] = "Yes"
 
 		# Print to User
 		stats = ["{:22}: ".format(label) + "{}" for label in labels]
 		stats = "\n".join(stats)
 		stats = stats.format(*data)
 
-		attr_labels = [field.title() for field in fields_to_get]
+		attr_labels = ["GOOD_DESCRIPTION"] + [field.title() for field in fields_to_get]
 		attributes = ["{:22}: ".format(label) + "{}" for label in attr_labels]
 		attributes = "\n".join(attributes) + "\n\n----------------------------\n"
+		field_content = [transaction['GOOD_DESCRIPTION']] + field_content
 		attributes = attributes.format(*field_content)
 		
 		prompt = stats + "\n\n" + attributes

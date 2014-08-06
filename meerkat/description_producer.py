@@ -34,7 +34,7 @@ from .custom_exceptions import InvalidArguments, Misconfiguration
 from .description_consumer import DescriptionConsumer
 from .binary_classifier.load import select_model
 from .various_tools import load_dict_list, safely_remove_file, load_hyperparameters
-from .various_tools import split_csv, merge_split_files, queue_to_list
+from .various_tools import split_csv, merge_split_files, queue_to_list, string_cleanse
 from .accuracy import test_accuracy, print_results, speed_tests
 from meerkat.optimization import run_meerkat as test_meerkat
 from meerkat.optimization import get_desc_queue as get_simple_queue
@@ -77,6 +77,10 @@ def get_desc_queue(filename, params, classifier):
 			atm.append(transaction)
 
 	# Hold on to GOOD_DESCRIPTION, clear fields
+	for row in physical:
+		gd = string_cleanse(row["GOOD_DESCRIPTION"])
+		row["GOOD_DESCRIPTION"] = string.capwords(gd, " ")
+
 	if params.get("mode", "") == "train":
 		for row in physical:
 			for field in training_fields:
