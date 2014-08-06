@@ -21,6 +21,7 @@ import queue
 import re
 import sys
 import threading
+import string
 
 from elasticsearch import Elasticsearch
 from sklearn.preprocessing import StandardScaler
@@ -178,21 +179,28 @@ class DescriptionConsumer(threading.Thread):
 			top_name = business_names[0].lower()
 			all_equal = business_names.count(business_names[0]) == len(business_names)
 			not_a_city = top_name not in self.cities
-			name_fallback = ("", business_names[0].title())[((all_equal and not_a_city) or transaction['GOOD_DESCRIPTION'] != "") == True]
+			name_fallback = ("", business_names[0].title())[((all_equal and not_a_city)) == True]
+			name_fallback = (name_fallback, transaction['GOOD_DESCRIPTION'])[(transaction['GOOD_DESCRIPTION'] != "") == True]
+			name_fallback = string.capwords(name_fallback, " ")
 			city_fallback = ("", city_names[0].title())[city_in_transaction == True]
-			state_fallback = ("", state_names[0].title())[(states_equal and state_in_transaction) == True]
+			state_fallback = ("", state_names[0].upper())[(states_equal and state_in_transaction) == True]
 			labels = labels + ["Name Fallback", "State Fallback", "City Fallback"]
 			data = data + [name_fallback, state_fallback, city_fallback]
 		else:
 			data[4] = "Yes"
 
 		# Print to User
-		labels = labels + [""] + [field.title() for field in fields_to_get]
-		data = data + [""] + field_content
-		prompt = ["{:22}: ".format(label) + "{}" for label in labels]
-		prompt = "----------------------------\n\n" + "\n".join(prompt)
+		stats = ["{:22}: ".format(label) + "{}" for label in labels]
+		stats = "\n".join(stats)
+		stats = stats.format(*data)
 
-		user = input(prompt.format(*data) + "\n")
+		attr_labels = [field.title() for field in fields_to_get]
+		attributes = ["{:22}: ".format(label) + "{}" for label in attr_labels]
+		attributes = "\n".join(attributes) + "\n\n----------------------------\n"
+		attributes = attributes.format(*field_content)
+		
+		prompt = stats + "\n\n" + attributes
+		user = input(prompt)
 
 	def __generate_z_score_delta(self, scores):
 		"""Generate the Z-score delta between the first and second scores."""
@@ -505,7 +513,7 @@ class DescriptionConsumer(threading.Thread):
 
 		# Ensure Proper Casing
 		if enriched_transaction['name'] == enriched_transaction['name'].upper():
-			enriched_transaction['name'] = enriched_transaction['name'].title()
+			enriched_transaction['name'] = string.capwords(enriched_transaction['name'], " ")
 
 		return enriched_transaction
 
