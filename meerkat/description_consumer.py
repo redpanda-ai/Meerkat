@@ -107,6 +107,8 @@ class DescriptionConsumer(threading.Thread):
 	def __display_search_results(self, search_results, transaction):
 		"""Displays search results."""
 
+		return
+
 		logger = logging.getLogger("thread " + str(self.thread_id))
 
 		# Must have results
@@ -118,7 +120,7 @@ class DescriptionConsumer(threading.Thread):
 		params = self.params
 
 		# Disable in training mode
-		if params["mode"] == "train":
+		if params["mode"] != "test":
 			return
 
 		for hit in hits:
@@ -146,34 +148,51 @@ class DescriptionConsumer(threading.Thread):
 			results.append(\
 			"[" + str(round(score, 3)) + "] " + " ".join(ordered_hit_fields))
 
+		# Monitor Results as they Arrive
+		self.__interactive_mode(scores, transaction, hits)
+
+	def __interactive_mode(self, params, scores, transaction, hits, business_names, city_names, state_names):
+		"""Interact with the results as they come"""
+
 		score = scores[0]
 		z_score = self.__generate_z_score_delta(scores)
 		decision = self.__decision_boundary(z_score)
 		description =  ' '.join(transaction["DESCRIPTION_UNMASKED"].split())
 		first_hit = hits[0]["fields"]
 		fields_to_get = ["name", "region", "locality", "internal_store_number", "postcode", "address"]
+		labels = ["Transaction", "Score", "Z-Score", "Combined", "Decision"]
+		data = [description, score, z_score, (score + z_score), decision]
 		field_content = [first_hit.get(field, ["_____"])[0] for field in fields_to_get]
-		
-		if decision:
-			decision = "Yes"
-		else: 
-			decision = "No"
+		city_fallback, state_fallback, name_fallback = "", "", ""
 
-		labels = ["Transaction", "Score", "Z-Score", "Decision"] + [field.title() for field in fields_to_get]
-		data = [description, score, z_score, decision] + field_content
-		prompt = [label + ": {}" for label in labels]
-		prompt = "\n".join(prompt)
+		# Populate Decisions
+		if not decision:
+			data[4] == "No"
+			fields = self.params["output"]["results"]["fields"]
+			city_names = city_names[0:2]
+			state_names = state_names[0:2]
+			states_equal = state_names.count(state_names[0]) == len(state_names)
+			city_in_transaction = (city_names[0].lower() in transaction["DESCRIPTION_UNMASKED"].lower())
+			state_in_transaction = (state_names[0].lower() in transaction["DESCRIPTION_UNMASKED"].lower())
+			business_names = business_names[0:2]
+			top_name = business_names[0].lower()
+			all_equal = business_names.count(business_names[0]) == len(business_names)
+			not_a_city = top_name not in self.cities
+			name_fallback = ("", business_names[0].title())[((all_equal and not_a_city) or transaction['GOOD_DESCRIPTION'] != "") == True]
+			city_fallback = ("", city_names[0].title())[city_in_transaction == True]
+			state_fallback = ("", state_names[0].title())[(states_equal and state_in_transaction) == True]
+			labels = labels + ["Name Fallback", "State Fallback", "City Fallback"]
+			data = data + [name_fallback, state_fallback, city_fallback]
+		else:
+			data[4] = "Yes"
+
+		# Print to User
+		labels = labels + [""] + [field.title() for field in fields_to_get]
+		data = data + [""] + field_content
+		prompt = ["{:22}: ".format(label) + "{}" for label in labels]
+		prompt = "----------------------------\n\n" + "\n".join(prompt)
 
 		user = input(prompt.format(*data) + "\n")
-
-		#try:
-		#	logger.debug("%s: %s", str(self.thread_id), results[0].encode("utf-8"))
-			#safe_print(str(self.thread_id), ": ", results[0])
-		#except IndexError:
-		#	logger.warning("INDEX ERROR: %s", transaction["DESCRIPTION"])
-		#	#print("INDEX ERROR: ", transaction["DESCRIPTION"])
-
-		return True
 
 	def __generate_z_score_delta(self, scores):
 		"""Generate the Z-score delta between the first and second scores."""
@@ -202,7 +221,7 @@ class DescriptionConsumer(threading.Thread):
 		return z_score_delta
 
 	def __decision_boundary(self, z_score_delta):
-		"""Decides whether or not we will label transaction
+		"""Decide whether or not we will label transaction
 		by factual_id"""
 
 		threshold = self.hyperparameters.get("z_score_threshold", "2")
@@ -390,8 +409,10 @@ class DescriptionConsumer(threading.Thread):
 
 	def __process_results(self, search_results, transaction):
 		"""Prepare results for decision boundary"""
+
 		field_names = self.params["output"]["results"]["fields"]
 		hyperparameters = self.hyperparameters
+		params = self.params
 
 		# Must be at least one result
 		if search_results["hits"]["total"] == 0:
@@ -440,6 +461,11 @@ class DescriptionConsumer(threading.Thread):
 
 		z_score_delta = self.__generate_z_score_delta(scores)
 		decision = self.__decision_boundary(z_score_delta)
+
+		# Interactive Mode
+		if params["mode"] == "test":
+			args = [params, scores, transaction, hits, business_names, city_names, state_names]
+			self.__interactive_mode(*args)
 
 		# Enrich Data if Passes Boundary
 		enriched_transaction = self.__enrich_transaction(decision, transaction, hit_fields, z_score_delta, business_names, city_names, state_names)

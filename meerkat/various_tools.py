@@ -170,8 +170,8 @@ def synonyms(transaction):
 		"wal-mart" : "Walmart",
 		"samsclub" : "Sam's Club",
 		"usps" : "US Post Office",
-		"qps" : "",
-		"q03" : "",
+		"qps" : " ",
+		"q03" : " ",
 		"lowes" : "Lowe's",
 		"wholefds" : "Whole Foods",
 		"Shell Oil" : "Shell Gas",
@@ -181,7 +181,8 @@ def synonyms(transaction):
 		"costco whse" : "costco",
 		"franciscoca" : "francisco ca",
 		"QT" : "Quicktrip",
-		"Macy's East" : "Macy's"
+		"Macy's East" : "Macy's",
+		"SQ" : " "
  	}
 
 	transaction = transaction.lower()

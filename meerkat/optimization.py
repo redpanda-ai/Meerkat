@@ -398,6 +398,7 @@ def run_classifier(hyperparameters, params, dataset):
 def add_local_params(params):
 	"""Adds additional local params"""
 
+	params["mode"] = "train"
 	params["optimization"] = {}
 	params["optimization"]["scores"] = []
 	params["optimization"]["settings"] = {
