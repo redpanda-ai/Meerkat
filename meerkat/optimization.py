@@ -228,7 +228,7 @@ def display_hyperparameters(hyperparameters):
 	safe_print("Iteration Hyperparameters:\n")
 
 	for key, value in hyperparameters.items():
-		safe_print("{:22} : {}".format(key, value))
+		safe_print("{:29} : {}".format(key, value))
 
 	sys.stdout.write("\n")
 
@@ -249,7 +249,8 @@ def get_initial_values(hyperparameters, params, known, dataset):
 		else:
 			randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=0)
 
-		print("\nITERATION NUMBER: " + str(i) + "\n")
+		safe_print("\n--------------------\n")
+		safe_print("ITERATION NUMBER: " + str(i) + "\n")
 		display_hyperparameters(randomized_hyperparameters)
 
 		# Run Classifier
@@ -257,14 +258,14 @@ def get_initial_values(hyperparameters, params, known, dataset):
 		precision = accuracy["precision"]
 		recall = accuracy["total_recall_physical"]
 		same_or_higher_precision = precision >= top_score["precision"]
-		higher_recall = recall >= top_score["total_recall_physical"]
+		same_or_higher_recall = recall >= top_score["total_recall_physical"]
 		not_too_high = precision <= settings["max_precision"]
 
-		if higher_recall and not_too_high and same_or_higher_precision:
+		if same_or_higher_recall and not_too_high and same_or_higher_precision:
 			top_score = accuracy
 			top_score['hyperparameters'] = randomized_hyperparameters
-			print("\nSCORE PRECISION: " + str(round(accuracy["precision"], 2)))
-			print("SCORE RECALL: " + str(round(accuracy["total_recall_physical"], 2)))
+			safe_print("\nSCORE PRECISION: " + str(round(accuracy["precision"], 2)))
+			safe_print("SCORE RECALL: " + str(round(accuracy["total_recall_physical"], 2)) + "\n")
 
 		# Keep Track of All Scores
 		score = {
@@ -313,7 +314,8 @@ def run_iteration(top_score, params, known, dataset):
 		randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=learning_rate)
 
 		# Iteration Stats
-		print("\nITERATION NUMBER: " + str(i) + "\n")
+		safe_print("\n--------------------\n")
+		safe_print("ITERATION NUMBER: " + str(i) + "\n")
 		display_hyperparameters(randomized_hyperparameters)
 
 		# Run Classifier
@@ -325,8 +327,8 @@ def run_iteration(top_score, params, known, dataset):
 		if same_or_higher_recall and same_or_higher_precision and not_too_high_precision:
 			new_top_score = accuracy
 			new_top_score['hyperparameters'] = randomized_hyperparameters
-			print("\n", "SCORE PRECISION: " + str(round(accuracy["precision"], 2)))
-			print("\n", "SCORE RECALL: " + str(round(accuracy["total_recall_physical"], 2)))
+			safe_print("\n", "SCORE PRECISION: " + str(round(accuracy["precision"], 2)))
+			safe_print("\n", "SCORE RECALL: " + str(round(accuracy["total_recall_physical"], 2)))
 
 		score = {
 			"hyperparameters" : randomized_hyperparameters,
@@ -427,12 +429,12 @@ def add_local_params(params):
 
 	params["optimization"]["settings"] = {
 		"folds": 1,
-		"initial_search_space": 1,
-		"initial_learning_rate": 0,
-		"iteration_search_space": 5,
-		"iteration_learning_rate": 0.2,
-		"gradient_descent_iterations": 10,
-		"max_precision": 95.05
+		"initial_search_space": 50,
+		"initial_learning_rate": 1,
+		"iteration_search_space": 25,
+		"iteration_learning_rate": 0.25,
+		"gradient_descent_iterations": 5,
+		"max_precision": 95.1
 	}
 
 	return params
@@ -461,8 +463,8 @@ def run_from_command_line(command_line_arguments):
 
 	known = {
 		"es_result_size" : "45",
-		"address" : "0.5",          
-	    "address_extended" : "1.282",          
+		#"address" : "0.5",          
+	    #"address_extended" : "1.282",          
 	    "locality" : "1.367",         
 	    "region" : "1.685",           
 	    "post_town" : "0.577",        
@@ -480,7 +482,9 @@ def run_from_command_line(command_line_arguments):
 	    "name" : "2.782",
 	    "good_description" : "1.986",
 		"z_score_threshold" : "2.841",
-		"po_box" : "1.292"
+		"po_box" : "1.292",
+		"dispersed.address.street_part" : "1",
+		"dispersed.address.number_part" : "1"
 	}
 
 	dataset = load_dataset(params)
