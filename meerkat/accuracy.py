@@ -34,13 +34,19 @@ import sys
 
 from pprint import pprint
 
-from meerkat.various_tools import load_dict_list, get_es_connection, get_merchant_by_id
+from meerkat.various_tools import load_dict_list, get_es_connection, get_merchant_by_id, progress
 
 def test_pinpoint_classifier(machine_labeled, human_labeled, my_lists, params):
 	"""Tests both the recall and precision of the pinpoint classifier against
 	human-labeled training data."""
 
-	for machine_labeled_row in machine_labeled:
+	sys.stdout.write('\n')
+
+	for m, machine_labeled_row in enumerate(machine_labeled):
+
+		# Display progress
+		progress(m, machine_labeled, message="complete with accuracy tests")
+
 		# Our confidence was not high enough to label
 		if machine_labeled_row["factual_id"] == "":
 			my_lists["unlabeled"].append(machine_labeled_row['DESCRIPTION_UNMASKED'])
@@ -189,7 +195,9 @@ def print_results(results):
 	if results is None:
 		return
 
-	print("\nSTATS:")
+	sys.stdout.write('\n\n')
+
+	print("STATS:")
 	print("{0:35} = {1:11}".format("Total Transactions Processed",
 		results['total_processed']))
 	print("{0:35} = {1:10.2f}%".format("Total Labeled Physical",
@@ -198,7 +206,9 @@ def print_results(results):
 		results['total_non_physical']))
 	print("{0:35} = {1:10.2f}%".format("Binary Classifier Accuracy",
 		results['binary_accuracy']))
-	print("\n")
+
+	sys.stdout.write('\n')
+
 	print("{0:35} = {1:10.2f}%".format("Recall all transactions",
 		results['total_recall']))
 	print("{0:35} = {1:10.2f}%".format("Recall physical",
@@ -209,9 +219,10 @@ def print_results(results):
 		results['num_verified']))
 	print("{0:35} = {1:10.2f}%".format("Precision",
 		results['precision']))
-	print("", "MISLABELED:", '\n'.join(sorted(results['mislabeled'])), sep="\n")
-	print("", "MISLABELED BINARY:", '\n'.join(results['non_physical']),
-		sep="\n")
+
+	#print("", "MISLABELED:", '\n'.join(sorted(results['mislabeled'])), sep="\n")
+	#print("", "MISLABELED BINARY:", '\n'.join(results['non_physical']),
+	#	sep="\n")
 
 def run_from_command_line(command_line_arguments):
 	"""Runs these commands if the module is invoked from the command line"""

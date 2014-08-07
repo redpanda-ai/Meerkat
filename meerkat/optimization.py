@@ -54,7 +54,7 @@ from numpy import array, array_split
 from meerkat.description_consumer import DescriptionConsumer
 from meerkat.binary_classifier.load import select_model
 from meerkat.accuracy import print_results, test_accuracy
-from meerkat.various_tools import load_dict_list, queue_to_list
+from meerkat.various_tools import load_dict_list, queue_to_list, safe_print
 from meerkat.various_tools import load_params, load_hyperparameters, progress
 
 class DummyFile(object):
@@ -206,7 +206,7 @@ def randomized_optimization(hyperparameters, known, params, dataset):
 	top_score = gradient_descent(initial_values, params, known, dataset)
 
 	# Save All Scores
-	with open(base_name + "_all_scores.txt", "w") as fout:
+	with open("optimization_results/" + base_name + "_all_scores.txt", "w") as fout:
 		pprint(params["optimization"]["scores"], fout)
 
 	print("Precision = " + str(top_score['precision']) + "%")
@@ -216,11 +216,21 @@ def randomized_optimization(hyperparameters, known, params, dataset):
 	print("ALL RESULTS:")
 	
 	# Save Final Parameters
-	file_name = base_name + "_" + str(round(top_score['precision'], 2)) + "Precision" + str(round(top_score['total_recall_physical'], 2)) + "Recall.json" 
+	file_name = "optimization_results/" + base_name + "_" + str(round(top_score['precision'], 2)) + "Precision" + str(round(top_score['total_recall_physical'], 2)) + "Recall.json" 
 	new_parameters = open(file_name, 'w')
 	pprint(top_score["hyperparameters"], new_parameters)
 
 	return top_score
+
+def display_hyperparameters(hyperparameters):
+	"""Display a human readable output of hyperparameters"""
+
+	safe_print("Iteration Hyperparameters:\n")
+
+	for key, value in hyperparameters.items():
+		safe_print("{:22} : {}".format(key, value))
+
+	sys.stdout.write("\n")
 
 def get_initial_values(hyperparameters, params, known, dataset):
 	"""Do a simple search to find starter values"""
@@ -239,21 +249,21 @@ def get_initial_values(hyperparameters, params, known, dataset):
 		else:
 			randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=0)
 
-		print("\n", "ITERATION NUMBER: " + str(i))
-		print("\n", randomized_hyperparameters,"\n")
+		print("\nITERATION NUMBER: " + str(i) + "\n")
+		display_hyperparameters(randomized_hyperparameters)
 
 		# Run Classifier
 		accuracy = run_classifier(randomized_hyperparameters, params, dataset)
 		precision = accuracy["precision"]
 		recall = accuracy["total_recall_physical"]
-		higher_precision = precision >= top_score["precision"]
+		same_or_higher_precision = precision >= top_score["precision"]
 		higher_recall = recall >= top_score["total_recall_physical"]
 		not_too_high = precision <= settings["max_precision"]
 
-		if higher_precision and not_too_high:
+		if higher_recall and not_too_high and same_or_higher_precision:
 			top_score = accuracy
 			top_score['hyperparameters'] = randomized_hyperparameters
-			print("SCORE PRECISION: " + str(round(accuracy["precision"], 2)))
+			print("\nSCORE PRECISION: " + str(round(accuracy["precision"], 2)))
 			print("SCORE RECALL: " + str(round(accuracy["total_recall_physical"], 2)))
 
 		# Keep Track of All Scores
@@ -265,7 +275,7 @@ def get_initial_values(hyperparameters, params, known, dataset):
 
 		params["optimization"]["scores"].append(score)
 		
-		print("\n", randomized_hyperparameters,"\n")
+		display_hyperparameters(randomized_hyperparameters)
 
 	print("TOP SCORE:" + str(top_score["precision"]))
 	return top_score
@@ -278,10 +288,14 @@ def gradient_descent(initial_values, params, known, dataset):
 	save_top_score(initial_values)
 	iterations = settings["gradient_descent_iterations"]
 
+	print("\n----------- Stochastic Gradient Descent ------------")
+
 	for i in range(iterations):
 		top_score = run_iteration(top_score, params, known, dataset)
 		
 		# Save Iterations Top Hyperparameters
+		print("\n", "Top Precision: " + str(round(top_score["precision"], 2)))
+		print("\n", "Top Recall: " + str(round(top_score["total_recall_physical"], 2)))
 		save_top_score(top_score)
 
 	return top_score
@@ -295,9 +309,12 @@ def run_iteration(top_score, params, known, dataset):
 	iterations = settings["iteration_search_space"]
 
 	for i in range(iterations):
+
 		randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=learning_rate)
-		print("\n", "ITERATION NUMBER: " + str(i))
-		print("\n", randomized_hyperparameters,"\n")
+
+		# Iteration Stats
+		print("\nITERATION NUMBER: " + str(i) + "\n")
+		display_hyperparameters(randomized_hyperparameters)
 
 		# Run Classifier
 		accuracy = run_classifier(randomized_hyperparameters, params, dataset)
@@ -333,13 +350,18 @@ def randomize(hyperparameters, known={}, learning_rate=0.3):
 		upper = float(value) + learning_rate
 		upper = upper if upper <=3 else 3
 		new_value = uniform(lower, upper)
+
+		# HACK
+		if key == "z_score_threshold":
+			new_value = uniform(lower, float(value))
+
 		randomized[key] = str(round(new_value, 3))
 
 	return dict(list(randomized.items()) + list(known.items()))
 
 def save_top_score(top_score):
 
-	record = open(os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_top_scores.txt", "a")
+	record = open("optimization_results/" + os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_top_scores.txt", "a")
 	pprint("Precision = " + str(top_score['precision']) + "%", record)
 	pprint("Best Recall = " + str(top_score['total_recall_physical']) + "%", record)
 	boost_vectors, boost_labels, other = split_hyperparameters(top_score["hyperparameters"])
@@ -402,16 +424,16 @@ def add_local_params(params):
 	params["mode"] = "train"
 	params["optimization"] = {}
 	params["optimization"]["scores"] = []
+
 	params["optimization"]["settings"] = {
 		"folds": 1,
-		"initial_search_space": 50,
-		"initial_learning_rate": 0.5,
+		"initial_search_space": 1,
+		"initial_learning_rate": 0,
 		"iteration_search_space": 5,
-		"iteration_learning_rate": 0.3,
+		"iteration_learning_rate": 0.2,
 		"gradient_descent_iterations": 10,
-		"max_precision": 95
+		"max_precision": 95.05
 	}
-
 
 	return params
 
@@ -424,7 +446,7 @@ def verify_arguments():
 		sys.exit()
 
 	# Clear Contents from Previous Runs
-	open(os.path.splitext(os.path.basename(sys.argv[1]))[0] + '_top_scores.txt', 'w').close()
+	open("optimization_results/" + os.path.splitext(os.path.basename(sys.argv[1]))[0] + '_top_scores.txt', 'w').close()
 
 def run_from_command_line(command_line_arguments):
 	"""Runs these commands if the module is invoked from the command line"""
@@ -437,15 +459,10 @@ def run_from_command_line(command_line_arguments):
 	# Add Local Params
 	add_local_params(params)
 
-	known = {"es_result_size" : "45"}
-
-	hyperparameters = {
-		"internal_store_number" : "1.9",  
-	    "name" : "2.781",
-	    "good_description" : "2",             
-	    "address" : "0.5",          
-	    "address_extended" : "1.282", 
-	    "po_box" : "1.292",           
+	known = {
+		"es_result_size" : "45",
+		"address" : "0.5",          
+	    "address_extended" : "1.282",          
 	    "locality" : "1.367",         
 	    "region" : "1.685",           
 	    "post_town" : "0.577",        
@@ -455,8 +472,15 @@ def run_from_command_line(command_line_arguments):
 	    "neighborhood" : "0.801",     
 	    "email" : "0.5",               
 	    "category_labels" : "1.319",           
-	    "chain_name" : "1",
-		"z_score_threshold" : "2.7"
+	    "chain_name" : "1"
+	}
+
+	hyperparameters = {
+		"internal_store_number" : "2.147",  
+	    "name" : "2.782",
+	    "good_description" : "1.986",
+		"z_score_threshold" : "2.841",
+		"po_box" : "1.292"
 	}
 
 	dataset = load_dataset(params)
