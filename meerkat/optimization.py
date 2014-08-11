@@ -31,11 +31,6 @@ Created on Feb 26, 2014
 # python3.3 -m meerkat.optimization config/train.json
 # Note: Experts only! Do not touch!
 
-#FEATURE_IDEA: Memory of each round of configuration
-#FEATURE: limit size of user data. One thread taking way longer. 
-#FEATURE: Run initial values the first time for a benchmark
-#FEATURE: Save every top score found from "get initial values"
-
 #####################################################
 
 import sys 
@@ -260,8 +255,9 @@ def get_initial_values(hyperparameters, params, known, dataset):
 		same_or_higher_precision = precision >= top_score["precision"]
 		same_or_higher_recall = recall >= top_score["total_recall_physical"]
 		not_too_high = precision <= settings["max_precision"]
+		has_min_recall = recall >= settings["min_recall"]
 
-		if same_or_higher_recall and not_too_high and same_or_higher_precision:
+		if has_min_recall and not_too_high and same_or_higher_precision:
 			top_score = accuracy
 			top_score['hyperparameters'] = randomized_hyperparameters
 			safe_print("\nSCORE PRECISION: " + str(round(accuracy["precision"], 2)))
@@ -355,7 +351,8 @@ def randomize(hyperparameters, known={}, learning_rate=0.3):
 
 		# HACK
 		if key == "z_score_threshold":
-			new_value = uniform(lower, float(value))
+			lower_upper_bound = float(value) + (learning_rate / 2)
+			new_value = uniform(lower, lower_upper_bound)
 
 		randomized[key] = str(round(new_value, 3))
 
@@ -429,12 +426,13 @@ def add_local_params(params):
 
 	params["optimization"]["settings"] = {
 		"folds": 1,
-		"initial_search_space": 50,
-		"initial_learning_rate": 1,
+		"initial_search_space": 100,
+		"initial_learning_rate": 0.3,
 		"iteration_search_space": 25,
-		"iteration_learning_rate": 0.25,
+		"iteration_learning_rate": 0.15,
 		"gradient_descent_iterations": 5,
-		"max_precision": 95.1
+		"max_precision": 95.1,
+		"min_recall": 40
 	}
 
 	return params
@@ -478,13 +476,13 @@ def run_from_command_line(command_line_arguments):
 	}
 
 	hyperparameters = {
-		"internal_store_number" : "2.147",  
-	    "name" : "2.782",
-	    "good_description" : "1.986",
-		"z_score_threshold" : "2.841",
-		"po_box" : "1.292",
-		"dispersed.address.street_part" : "1",
-		"dispersed.address.number_part" : "1"
+		"internal_store_number" : "2.13",  
+	    "name" : "2.746",
+	    "good_description" : "2.007",
+		"z_score_threshold" : "2.775",
+		"po_box" : "1.159",
+		"dispersed.address.street_part" : "0.911",
+		"dispersed.address.number_part" : "0.95"
 	}
 
 	dataset = load_dataset(params)

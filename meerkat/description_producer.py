@@ -26,6 +26,7 @@ import os
 import re
 import queue
 import sys
+import string
 
 import boto
 from boto.s3.connection import Location, S3Connection

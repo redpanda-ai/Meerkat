@@ -4,7 +4,7 @@
 	"mode" : "train",
 	"input" : {
 		"hyperparameters" : "config/hyperparameters/default.json",
-		"filename" : "data/misc/ground_truth_card.txt",
+		"filename" : "/mnt/ephemeral/training_data/processed/bank/bank_sample_20.txt",
 		"delimiter" : "|",
 		"encoding" : "utf-8",
 		"split" : {
@@ -31,7 +31,7 @@
 		},
 		"file" : {
 			"format" : "csv",
-			"processing_location" : "/mnt/ephemeral/output",
+			"processing_location" : "/mnt/ephemeral/training_data/processed/bank/third_batch/",
 			"delimiter" : "|"
 		}
 	},
