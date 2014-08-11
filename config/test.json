@@ -1,10 +1,10 @@
 {
 	"concurrency" : 36,
-	"verification_source" : "data/misc/ground_truth_card.txt",
+	"verification_source" : "data/misc/ground_truth_bank.txt",
 	"mode" : "test",
 	"input" : {
 		"hyperparameters" : "config/hyperparameters/default.json",
-		"filename" : "data/misc/ground_truth_card.txt",
+		"filename" : "data/misc/ground_truth_bank.txt",
 		"delimiter" : "|",
 		"encoding" : "utf-8",
 		"split" : {
