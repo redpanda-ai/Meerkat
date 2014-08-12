@@ -153,7 +153,6 @@ def purge(dir, pattern):
 def string_cleanse(original_string):
 	"""Strips out characters that might confuse ElasticSearch."""
 	original_string = original_string.replace("OR", "or")
-	original_string = original_string.replace("AND", "and")
 	bad_characters = [r"\[", r"\]", r"\{", r"\}", r'"', r"/", r"\\", r"\:",
 		r"\(", r"\)", r"-", r"\+", r">", r"!", r"\*", r"\|\|", r"&&", r"~"]
 	bad_character_regex = "|".join(bad_characters)
@@ -167,22 +166,32 @@ def synonyms(transaction):
 	should be expanded to manage a file of synonyms"""
 
 	rep = {
-		"wal-mart" : "Walmart",
-		"samsclub" : "Sam's Club",
-		"usps" : "US Post Office",
+		"wal-mart" : " Walmart ",
+		"samsclub" : " Sam's Club ",
+		"usps" : " US Post Office ",
 		"qps" : " ",
 		"q03" : " ",
-		"lowes" : "Lowe's",
-		"wholefds" : "Whole Foods",
-		"Shell Oil" : "Shell Gas",
-		"wm supercenter" : "Walmart",
-		"exxonmobil" : "exxonmobil exxon mobil",
-		"mcdonalds" : "mcdonald's",
-		"costco whse" : "costco",
-		"franciscoca" : "francisco ca",
-		"QT" : "Quicktrip",
-		"Macy's East" : "Macy's",
-		"SQ" : " "
+		"lowes" : " Lowe's ",
+		"wholefds" : " Whole Foods ",
+		"shell oil" : " Shell Gas ",
+		"wm supercenter" : " Walmart ",
+		"exxonmobil" : " exxonmobil exxon mobil ",
+		"mcdonalds" : " mcdonald's ",
+		"costco whse" : " costco ",
+		"franciscoca" : " francisco ca ",
+		"qt" : " Quicktrip ",
+		"macy's east" : " Macy's ",
+		"sq" : " ",
+		#"pos" : " ",
+		#"ach" : " ",
+		#"electronic debit" : " ",
+		#"checkcard" : " ",
+		#"debit" : " ",
+		#"purchase" : " ",
+		#"card" : " ",
+		#" pin " : " ",
+		#"recurring" : " ",
+		#"check" : " "
  	}
 
 	transaction = transaction.lower()
@@ -190,7 +199,7 @@ def synonyms(transaction):
 	pattern = re.compile("|".join(rep.keys()))
 	text = pattern.sub(lambda m: rep[re.escape(m.group(0))], transaction)
 
-	return text
+	return text.upper()
 
 def split_csv(filehandler, delimiter=',', row_limit=10000, 
 	output_name_template='output_%s.csv', output_path='.', keep_headers=True):

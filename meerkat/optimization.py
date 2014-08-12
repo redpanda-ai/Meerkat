@@ -426,13 +426,13 @@ def add_local_params(params):
 
 	params["optimization"]["settings"] = {
 		"folds": 1,
-		"initial_search_space": 100,
-		"initial_learning_rate": 0.3,
-		"iteration_search_space": 25,
-		"iteration_learning_rate": 0.15,
-		"gradient_descent_iterations": 5,
-		"max_precision": 95.1,
-		"min_recall": 40
+		"initial_search_space": 20,
+		"initial_learning_rate": 0.5,
+		"iteration_search_space": 10,
+		"iteration_learning_rate": 0.3,
+		"gradient_descent_iterations": 10,
+		"max_precision": 97.5,
+		"min_recall": 31
 	}
 
 	return params
@@ -460,9 +460,14 @@ def run_from_command_line(command_line_arguments):
 	add_local_params(params)
 
 	known = {
-		"es_result_size" : "45",
-		#"address" : "0.5",          
-	    #"address_extended" : "1.282",          
+		"es_result_size" : "45"
+	}
+
+	hyperparameters = {
+		"dispersed.address.street_part" : "0.911",
+		"dispersed.address.number_part" : "0.95",
+		"address" : "0.541",          
+	    "address_extended" : "1.282",          
 	    "locality" : "1.367",         
 	    "region" : "1.685",           
 	    "post_town" : "0.577",        
@@ -472,17 +477,12 @@ def run_from_command_line(command_line_arguments):
 	    "neighborhood" : "0.801",     
 	    "email" : "0.5",               
 	    "category_labels" : "1.319",           
-	    "chain_name" : "1"
-	}
-
-	hyperparameters = {
-		"internal_store_number" : "2.13",  
-	    "name" : "2.746",
-	    "good_description" : "2.007",
-		"z_score_threshold" : "2.775",
+	    "chain_name" : "1",
+	    "internal_store_number" : "1.9",  
+	    "name" : "2.781",
+	    "good_description" : "2",
+		"z_score_threshold" : "2.857",
 		"po_box" : "1.159",
-		"dispersed.address.street_part" : "0.911",
-		"dispersed.address.number_part" : "0.95"
 	}
 
 	dataset = load_dataset(params)

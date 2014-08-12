@@ -44,7 +44,6 @@
 		    "s05:9200",
 		    "s06:9200",
 		    "s07:9200",
-		    "s08:9200",
 		    "s09:9200",
 		    "s10:9200",
 		    "s11:9200",
@@ -56,8 +55,7 @@
 		    "s17:9200",
 		    "s18:9200"
     	],
-		"cache_results" : false,
-		"index" : "factual_index",
+		"index" : "factual_index_2",
 		"type" : "factual_type",
 		"boost_labels" : ["standard_fields"],
 		"boost_vectors" :  {

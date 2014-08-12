@@ -129,8 +129,7 @@ def identify_changes(params, es_connection):
 	for i, transaction in enumerate(transactions):
 
 		# Progress
-		#progress(i, transactions)
-		print(transaction["factual_id"])
+		progress(i, transactions)
 
 		# Add a field for tracking
 		if transaction.get("relinked_id", "") == "":

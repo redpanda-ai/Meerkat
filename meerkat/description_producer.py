@@ -34,7 +34,7 @@ from boto.s3.connection import Location, S3Connection
 from .custom_exceptions import InvalidArguments, Misconfiguration
 from .description_consumer import DescriptionConsumer
 from .binary_classifier.load import select_model
-from .various_tools import load_dict_list, safely_remove_file, load_hyperparameters
+from .various_tools import load_dict_list, safely_remove_file, load_hyperparameters, safe_print
 from .various_tools import split_csv, merge_split_files, queue_to_list, string_cleanse
 from .accuracy import test_accuracy, print_results, speed_tests
 from meerkat.optimization import run_meerkat as test_meerkat
@@ -65,17 +65,22 @@ def get_desc_queue(filename, params, classifier):
 	for transaction in transactions:
 		transaction['factual_id'] = ""
 		description = transaction["DESCRIPTION_UNMASKED"]
-		prediction = classifier(description)
+		
+		# HACK
+		#prediction = classifier(description)
+		prediction = "1"
+
 		transaction["IS_PHYSICAL_TRANSACTION"] = prediction
-		print(str(description.encode("utf-8")) + ": " + str(prediction.encode("utf-8")))
+		#safe_print(str(description) + ": " + str(prediction))
+
 		if prediction == "1":
 			physical.append(transaction)
-		elif prediction == "0":
-			non_physical.append(transaction)
-			logging.info("NON-PHYSICAL: %s", description)
-		elif prediction == "2":
-			physical.append(transaction)
-			atm.append(transaction)
+		#elif prediction == "0":
+		#	non_physical.append(transaction)
+		#	logging.info("NON-PHYSICAL: %s", description)
+		#elif prediction == "2":
+		#	physical.append(transaction)
+		#	atm.append(transaction)
 
 	# Hold on to GOOD_DESCRIPTION, clear fields
 	for row in physical:

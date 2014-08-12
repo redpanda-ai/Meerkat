@@ -161,14 +161,17 @@ class DescriptionConsumer(threading.Thread):
 		description =  ' '.join(transaction["DESCRIPTION_UNMASKED"].split())
 		first_hit = hits[0]["fields"]
 		fields_to_get = ["name", "region", "locality", "internal_store_number", "postcode", "address"]
-		labels = ["Transaction", "Score", "Z-Score", "Decision"]
-		data = [description, score, z_score, decision]
 		field_content = [first_hit.get(field, ["_____"])[0] for field in fields_to_get]
 		city_fallback, state_fallback, name_fallback = "", "", ""
 
+		labels = ["Transaction", "Query", "Score", "Z-Score", "Decision"]
+		query = synonyms(description)
+		query = string_cleanse(query)
+		data = [description, query, score, z_score, decision]
+
 		# Populate Decisions
 		if not decision:
-			data[3] == "No"
+			data[4] == "No"
 			fields = self.params["output"]["results"]["fields"]
 			city_names = city_names[0:2]
 			state_names = state_names[0:2]
@@ -187,7 +190,7 @@ class DescriptionConsumer(threading.Thread):
 			labels = labels + ["Name Fallback", "State Fallback", "City Fallback"]
 			data = data + [name_fallback, state_fallback, city_fallback]
 		else:
-			data[3] = "Yes"
+			data[4] = "Yes"
 
 		# Print to User
 		stats = ["{:22}: ".format(label) + "{}" for label in labels]
@@ -398,6 +401,7 @@ class DescriptionConsumer(threading.Thread):
 
 		# Replace synonyms
 		transaction = synonyms(transaction)
+		transaction = string_cleanse(transaction)
 
 		# Construct Main Query
 		logger.info("BUILDING FINAL BOOLEAN SEARCH")
