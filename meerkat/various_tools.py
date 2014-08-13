@@ -111,7 +111,7 @@ def get_es_connection(params):
 
 	return es_connection
 
-def get_merchant_by_id(params, factual_id, es_connection, index="", fields=["name", "region", "locality", "internal_store_number", "postcode"]):
+def get_merchant_by_id(params, factual_id, es_connection, index=""):
 	"""Fetch the details for a single factual_id"""
 
 	if index == "":
@@ -160,10 +160,22 @@ def string_cleanse(original_string):
 	with_spaces = re.sub(cleanse_pattern, " ", original_string)
 	return ' '.join(with_spaces.split())
 
-def synonyms(transaction):
+def synonyms(transaction, stopwords=False):
 	"""Replaces transactions tokens with manually
 	mapped factual representations. This method
 	should be expanded to manage a file of synonyms"""
+
+	stop_words = [
+		"pos", 
+		"ach", 
+		"electronic", 
+		"debit", 
+		"purchase", 
+		"card", 
+		" pin ", 
+		"recurring", 
+		"check"
+	]
 
 	rep = {
 		"wal-mart" : " Walmart ",
@@ -182,17 +194,11 @@ def synonyms(transaction):
 		"qt" : " Quicktrip ",
 		"macy's east" : " Macy's ",
 		"sq" : " ",
-		#"pos" : " ",
-		#"ach" : " ",
-		#"electronic debit" : " ",
-		#"checkcard" : " ",
-		#"debit" : " ",
-		#"purchase" : " ",
-		#"card" : " ",
-		#" pin " : " ",
-		#"recurring" : " ",
-		#"check" : " "
  	}
+
+	if stopwords:
+ 		for word in stop_words:
+ 			rep[word] = " "
 
 	transaction = transaction.lower()
 	rep = dict((re.escape(k), v) for k, v in rep.items())

@@ -36,7 +36,7 @@ from scipy.stats.mstats import zscore
 
 from meerkat.description_consumer import get_qs_query, get_bool_query
 from meerkat.various_tools import load_params, get_es_connection, string_cleanse, safe_print
-from meerkat.various_tools import get_merchant_by_id, load_dict_ordered, write_dict_list
+from meerkat.various_tools import get_merchant_by_id, load_dict_ordered, write_dict_list, synonyms
 
 class DummyFile(object):
     def write(self, x): pass
@@ -77,12 +77,16 @@ def generate_user_context(params, es_connection):
 		progress(i, transactions)
 
 		# Save Context
-		enriched = enrich_transaction(params, transaction, es_connection, index=sys.argv[3])
+		enriched = enrich_transaction(params, transaction, es_connection, index=sys.argv[4])
 		unique_mem_id = enriched["UNIQUE_MEM_ID"]
-		location = enriched["CITY"] + ", " + enriched["STATE"]
+		location = enriched["LATITUDE"] + ", " + enriched["LONGITUDE"]
+		city = enriched["CITY"] + ", " + enriched["STATE"]
 
 		if location not in params["compare_indices"]["user_context"][unique_mem_id] and location != ", ":
 			params["compare_indices"]["user_context"][unique_mem_id].append(location)
+
+		if city not in params["compare_indices"]["user_cities"][unique_mem_id] and city != ", ":
+			params["compare_indices"]["user_cities"][unique_mem_id].append(city)
 
 	sys.stdout.write('\n\n')
 
@@ -374,15 +378,31 @@ def skipped_details_prompt(params, transaction, es_connection):
 def display_user_context(params, transaction):
 	"""Display known information about user location"""
 
-	safe_print("User " + str(transaction["UNIQUE_MEM_ID"]) + " Context: ")
-	safe_print(params["compare_indices"]["user_context"][transaction["UNIQUE_MEM_ID"]])
+	points = params["compare_indices"]["user_context"][transaction["UNIQUE_MEM_ID"]]
+	cities = params["compare_indices"]["user_cities"][transaction["UNIQUE_MEM_ID"]]
+
+	if len(points) == 0 and len(cities) == 0:
+		safe_print("No context found for user " + transaction["UNIQUE_MEM_ID"])
+
+	safe_print("User " + str(transaction["UNIQUE_MEM_ID"]) + " Context: \n")
+
+	if len(points) > 0:
+		safe_print("Latitude, Longitude")
+		for point in points:
+			safe_print(point)
+
+	if len(cities) > 0:
+		safe_print("\nCities:")
+		for city in cities:
+			safe_print(city)
+
 	sys.stdout.write('\n')
 
 def search_with_user_safe_input(params, es_connection, transaction):
 	"""Search for a location by providing additional data"""
 
 	index = sys.argv[4]
-	prompt = "Base query: " + transaction["DESCRIPTION_UNMASKED"]
+	prompt = "Base query: " + synonyms(' '.join(transaction["DESCRIPTION_UNMASKED"].split()), stopwords=True)
 	prompt = prompt + " is insufficient to uniquely identify, please provide additional data \n"
 	safe_print(prompt)
 
@@ -524,7 +544,7 @@ def enrich_transaction(params, transaction, es_connection, index="", factual_id=
 		factual_id = transaction["factual_id"]
 
 	with nostderr():
-		merchant = get_merchant_by_id(params, factual_id, es_connection, index=index, fields=fields_to_get)
+		merchant = get_merchant_by_id(params, factual_id, es_connection, index=index)
 
 	if merchant == None:
 		merchant = {}
@@ -533,6 +553,12 @@ def enrich_transaction(params, transaction, es_connection, index="", factual_id=
 	# Enrich the transaction
 	for i in range(len(fields_to_get)):
 		transaction[fields_to_fill[i]] = merchant.get(fields_to_get[i], "")
+
+	# Add Geo
+	if merchant.get("pin", "") != "":
+		coordinates = merchant["pin"]["location"]["coordinates"]
+		transaction["LONGITUDE"] = coordinates[0]
+		transaction["LATITUDE"] = coordinates[1]
 
 	return transaction
 
@@ -667,6 +693,7 @@ def add_local_params(params):
 	params["compare_indices"]["skipped"] = []
 	params["compare_indices"]["relinked"] = []
 	params["compare_indices"]["user_context"] = collections.defaultdict(list)
+	params["compare_indices"]["user_cities"] = collections.defaultdict(list)
 
 	return params
 
