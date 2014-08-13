@@ -66,21 +66,18 @@ def get_desc_queue(filename, params, classifier):
 		transaction['factual_id'] = ""
 		description = transaction["DESCRIPTION_UNMASKED"]
 		
-		# HACK
-		#prediction = classifier(description)
-		prediction = "1"
-
+		prediction = classifier(description)
 		transaction["IS_PHYSICAL_TRANSACTION"] = prediction
-		#safe_print(str(description) + ": " + str(prediction))
+		safe_print(str(description) + ": " + str(prediction))
 
 		if prediction == "1":
 			physical.append(transaction)
-		#elif prediction == "0":
-		#	non_physical.append(transaction)
-		#	logging.info("NON-PHYSICAL: %s", description)
-		#elif prediction == "2":
-		#	physical.append(transaction)
-		#	atm.append(transaction)
+		elif prediction == "0":
+			non_physical.append(transaction)
+			logging.info("NON-PHYSICAL: %s", description)
+		elif prediction == "2":
+			physical.append(transaction)
+			atm.append(transaction)
 
 	# Hold on to GOOD_DESCRIPTION, clear fields
 	for row in physical:

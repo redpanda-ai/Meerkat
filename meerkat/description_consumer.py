@@ -453,7 +453,7 @@ class DescriptionConsumer(threading.Thread):
 		city_names = [name[0] for name in city_names if type(name) == list]
 		state_names = [result.get("fields", {"region" : ""}).get("region", "") for result in hits]
 		state_names = [name[0] for name in state_names if type(name) == list]
-		
+
 		# Need Names
 		if len(business_names) < 2:
 			return transaction
@@ -466,8 +466,8 @@ class DescriptionConsumer(threading.Thread):
 		# Elasticsearch v1.0 bug workaround
 		if top_hit["_source"].get("pin", "") != "":
 			coordinates = top_hit["_source"]["pin"]["location"]["coordinates"]
-			top_hit["longitude"] = coordinates[0]
-			top_hit["latitude"] = coordinates[1]
+			hit_fields["longitude"] = coordinates[0]
+			hit_fields["latitude"] = coordinates[1]
 
 		# Collect Relevancy Scores
 		for hit in hits:
@@ -482,7 +482,8 @@ class DescriptionConsumer(threading.Thread):
 			self.__interactive_mode(*args)
 
 		# Enrich Data if Passes Boundary
-		enriched_transaction = self.__enrich_transaction(decision, transaction, hit_fields, z_score_delta, business_names, city_names, state_names)
+		args = [decision, transaction, hit_fields, z_score_delta, business_names, city_names, state_names]
+		enriched_transaction = self.__enrich_transaction(*args)
 
 		return enriched_transaction
 

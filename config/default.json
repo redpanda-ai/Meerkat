@@ -1,14 +1,15 @@
 {
     "concurrency" : 36,
-    "verification_source" : "data/misc/matt_8000_card.csv",
+    "verification_source" : "data/misc/ground_truth_bank.txt",
+    "mode" : "production",
     "input" : {
         "hyperparameters" : "config/hyperparameters/default.json",
-        "bucket_key" : "meerkat/input/gpanel/card/",
+        "filename" : "data/misc/ground_truth_bank.txt",
         "delimiter" : "|",
         "encoding" : "utf-8",
         "split" : {
             "processing_location" : "/mnt/ephemeral/input/",
-            "row_limit" : 1000
+            "row_limit" : 10000
         }
     },
     "logging" : {
@@ -22,15 +23,15 @@
             "fields" : [
                 "name", "chain_id", "category_labels", "address", "locality",
                 "region", "postcode", "website", "tel", "chain_name",
-                "latitude", "longitude", "neighborhood", "factual_id"],
+                "latitude", "longitude", "neighborhood", "factual_id", "internal_store_number"],
             "labels" : [
                 "PHYSICAL_MERCHANT", "STORE_ID", "FACTUAL_CATEGORY", "STREET", "CITY",
                 "STATE", "ZIP_CODE", "WEBSITE", "PHONE_NUMBER", "CHAIN_NAME",
-                "LATITUDE", "LONGITUDE", "NEIGHBORHOOD", "FACTUAL_ID"]
+                "LATITUDE", "LONGITUDE", "NEIGHBORHOOD", "FACTUAL_ID", "STORE_NUMBER"]
         },
         "file" : {
             "format" : "csv",
-            "processing_location" : "/mnt/ephemeral/output/",
+            "processing_location" : "data/output/",
             "delimiter" : "|"
         }
     },
@@ -43,7 +44,6 @@
             "s05:9200",
             "s06:9200",
             "s07:9200",
-            "s08:9200",
             "s09:9200",
             "s10:9200",
             "s11:9200",
@@ -55,7 +55,7 @@
             "s17:9200",
             "s18:9200"
         ],
-        "index" : "factual_index",
+        "index" : "factual_index_2",
         "type" : "factual_type",
         "boost_labels" : ["standard_fields"],
         "boost_vectors" :  {

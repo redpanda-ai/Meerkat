@@ -464,8 +464,8 @@ def run_from_command_line(command_line_arguments):
 	}
 
 	hyperparameters = {
-		"dispersed.address.street_part" : "0.911",
-		"dispersed.address.number_part" : "0.95",
+		"dispersed.address.street_part" : "0",
+		"dispersed.address.number_part" : "0",
 		"address" : "0.541",          
 	    "address_extended" : "1.282",          
 	    "locality" : "1.367",         
