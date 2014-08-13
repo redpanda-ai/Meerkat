@@ -25,6 +25,7 @@ Created on July 21, 2014
 #####################################################
 
 import os
+import re
 import sys
 import random
 import contextlib
@@ -37,7 +38,7 @@ from scipy.stats.mstats import zscore
 from meerkat.description_consumer import get_qs_query, get_bool_query
 from meerkat.various_tools import load_params, get_es_connection, string_cleanse
 from meerkat.various_tools import get_merchant_by_id, load_dict_ordered, write_dict_list
-from meerkat.various_tools import safe_print, synonyms, get_magic_query
+from meerkat.various_tools import safe_print, synonyms, get_magic_query, stopwords
 
 class DummyFile(object):
     def write(self, x): pass
@@ -106,7 +107,7 @@ def mode_change(params, es_connection):
 	safe_print("[1] Relink transactions where factual_id no longer exists")
 	safe_print("[2] Verify changes to merchants")
 	safe_print("[3] Link transactions with NULL factual_id")
-	safe_print("[4] Label new file \n")
+	safe_print("[4] Label new dataset \n")
 
 	while mode not in accepted_inputs: 
 		mode = safe_input()
@@ -121,7 +122,7 @@ def mode_change(params, es_connection):
 	elif mode == "3":
 		reconcile_null(params, es_connection)
 	elif mode == "4":
-		find_and_verify(params, es_connection)
+		autolink_and_verify(params, es_connection)
 		reconcile_null(params, es_connection)
 
 def run_all_modes(params, es_connection):
@@ -234,7 +235,7 @@ def reconcile_changed_ids(params, es_connection):
 
 	reconcile_skipped(params, es_connection)
 
-def find_and_verify(params, es_connection):
+def autolink_and_verify(params, es_connection):
 	"""Label transactions using magic queries 
 	and do quick validation"""
 
@@ -242,10 +243,11 @@ def find_and_verify(params, es_connection):
 
 	while len(params["compare_indices"]["NULL"]) > 0:
 		br()
+		random.shuffle(params["compare_indices"]["NULL"])
 		relinked = params["compare_indices"]["NULL"]
 		transaction = relinked.pop()
 		results = search_with_magic_query(params, transaction, es_connection)
-		find_and_verify_boundary(params, transaction, results)
+		reconcile_autolinked(params, transaction, results)
 
 	print_current_stats(params)
 
@@ -262,13 +264,38 @@ def search_with_magic_query(params, transaction, es_connection):
 
 	return results
 
-def find_and_verify_boundary(params, transaction, results):
+def reconcile_autolinked(params, transaction, results):
 	"""Verify autolinked transaction is correct"""
 
-	top_hit = results['hits']['hits'][0]
-	source = top_hit["_source"]
+	description =  ' '.join(transaction["DESCRIPTION_UNMASKED"].split())
+	query = stopwords(description)
+	query = synonyms(query)
+	query = string_cleanse(query)
+	safe_print("DESCRIPTION_UNMASKED: " + description)
+	safe_print("QUERY: " + query.upper() + "\n")
 
-	input(source)
+	accepted_inputs = [str(x) for x in list(range(5))]
+	user_input = print_multiselect_prompt(results)
+
+	# Remove from Set
+	if user_input == "rm":
+		return
+
+	# Set to NULL
+	if user_input == "null":
+		transaction["relinked_id"] = "NULL"
+		params["compare_indices"]["relinked"].append(transaction)
+		return
+
+	# Change factual_id, move to relinked
+	if user_input in accepted_inputs:
+		score, hit = get_hit(results, int(user_input))
+		transaction["relinked_id"] = hit["factual_id"]
+		update_user_context(params, transaction, hit)
+		params["compare_indices"]["relinked"].append(transaction)
+	else:
+		# Add transaction to another queue for later analysis
+		params["compare_indices"]["NULL"].append(transaction)
 
 def reconcile_changed_details(params, es_connection):
 	"""Decide whether new details are erroneous"""
@@ -467,7 +494,7 @@ def search_with_user_safe_input(params, es_connection, transaction):
 	"""Search for a location by providing additional data"""
 
 	index = sys.argv[4]
-	prompt = "Base query: " + synonyms(' '.join(transaction["DESCRIPTION_UNMASKED"].split()), stopwords=True)
+	prompt = "Base query: " + stopwords(synonyms(' '.join(transaction["DESCRIPTION_UNMASKED"].split())))
 	prompt = prompt + " is insufficient to uniquely identify, please provide additional data \n"
 	safe_print(prompt)
 
@@ -497,10 +524,8 @@ def search_with_user_safe_input(params, es_connection, transaction):
 
 	return results
 
-def null_decision_boundary(params, transaction, results):
-	"""Decide if there is a match when evaluating NULL"""
-
-	accepted_inputs = [str(x) for x in list(range(5))]
+def print_multiselect_prompt(results):
+	"""Prints out a multiselect prompt requesting user input"""
 
 	for i in range(5):
 		print_formatted_result(results, i)
@@ -510,6 +535,14 @@ def null_decision_boundary(params, transaction, results):
 	safe_print("{:7} Transaction did not occur at a specific location. Remove it from training data\n".format("[rm]"))
 
 	user_input = safe_input("Please select a choice above: \n")
+
+	return user_input
+
+def null_decision_boundary(params, transaction, results):
+	"""Decide if there is a match when evaluating NULL"""
+
+	accepted_inputs = [str(x) for x in list(range(5))]
+	user_input = print_multiselect_prompt(results)
 
 	# Remove from Set
 	if user_input == "rm":
@@ -677,14 +710,7 @@ def changed_id_user_prompt(params, old_details, results, store):
 	safe_print("DESCRIPTION_UNMASKED: {}".format(store["DESCRIPTION_UNMASKED"]))
 	safe_print("Query Sent: {} \n".format(old_details_formatted))
 	
-	for i in range(5):
-		print_formatted_result(results, i)
-
-	safe_print("{:7}".format("[null]"), "Transaction has been reviewed before and has no matching merchant in new index. Set to NULL")	
-	safe_print("[enter] Skip")
-	safe_print("{:7}".format("[rm]"), "Transaction did not occur at a specific location. Remove it from training data", "\n")
-	user_input = ""
-	user_input = safe_input("Please select a location, or press enter to skip: \n")
+	user_input = print_multiselect_prompt(results)
 
 	return user_input
 

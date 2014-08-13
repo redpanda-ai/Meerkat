@@ -155,6 +155,7 @@ def purge(dir, pattern):
 def string_cleanse(original_string):
 	"""Strips out characters that might confuse ElasticSearch."""
 	original_string = original_string.replace("OR", "or")
+	original_string = original_string.replace("AND", "and")
 	bad_characters = [r"\[", r"\]", r"\{", r"\}", r'"', r"/", r"\\", r"\:",
 		r"\(", r"\)", r"-", r"\+", r">", r"!", r"\*", r"\|\|", r"&&", r"~"]
 	bad_character_regex = "|".join(bad_characters)
@@ -253,10 +254,17 @@ def get_us_cities():
 	cities = [city.lower().rstrip('\n') for city in cities]
 	return cities
 
-def synonyms(transaction, stopwords=False):
-	"""Replaces transactions tokens with manually
-	mapped factual representations. This method
-	should be expanded to manage a file of synonyms"""
+def stopwords(transaction):
+	"""Remove stopwords"""
+
+	patterns = [
+		r"^ACH", 
+		r"\d{2}\/\d{2}", 
+		r"X{4}\d{4}", 
+		r"~{2}\d{5}~{2}\d{16}~{2}\d{5}~{2}\d~{4}\d{4}", 
+		r"CHECKCARD \d{4}", 
+		r"\d{15}"
+	]
 
 	stop_words = [
 		" pos ", 
@@ -268,8 +276,20 @@ def synonyms(transaction, stopwords=False):
 		" pin ", 
 		"recurring", 
 		" check ",
-		"checkcard"
+		"checkcard",
 	]
+
+	patterns = patterns + stop_words
+	transaction = transaction.lower()
+	regex = "|".join(patterns)
+	cleanse_pattern = re.compile(regex)
+	with_spaces = re.sub(cleanse_pattern, " ", transaction)
+	return ' '.join(with_spaces.split()).upper()
+
+def synonyms(transaction):
+	"""Replaces transactions tokens with manually
+	mapped factual representations. This method
+	should be expanded to manage a file of synonyms"""
 
 	rep = {
 		"wal-mart" : " Walmart ",
@@ -287,12 +307,8 @@ def synonyms(transaction, stopwords=False):
 		"franciscoca" : " francisco ca ",
 		"qt" : " Quicktrip ",
 		"macy's east" : " Macy's ",
-		"sq" : " ",
+		"sq" : " "
  	}
-
-	if stopwords:
- 		for word in stop_words:
- 			rep[word] = " "
 
 	transaction = transaction.lower()
 	rep = dict((re.escape(k), v) for k, v in rep.items())
