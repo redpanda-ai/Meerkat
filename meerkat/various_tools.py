@@ -15,6 +15,8 @@ import os
 import gzip
 import json
 
+import numpy as np
+
 def load_dict_list(file_name, encoding='utf-8', delimiter="|"):
 	"""Loads a dictionary of input from a file into a list."""
 	input_file = open(file_name, encoding=encoding, errors='replace')
@@ -160,21 +162,113 @@ def string_cleanse(original_string):
 	with_spaces = re.sub(cleanse_pattern, " ", original_string)
 	return ' '.join(with_spaces.split())
 
+def build_boost_vectors(params):
+	"""Turns field boosts into dictionary of numpy arrays"""
+
+	boost_column_labels = params["elasticsearch"]["boost_labels"]
+	boost_row_vectors = params["elasticsearch"]["boost_vectors"]
+	boost_row_labels, boost_column_vectors = sorted(boost_row_vectors.keys()), {}
+
+	for i in range(len(boost_column_labels)):
+
+		my_list = []
+
+		for field in boost_row_labels:
+			my_list.append(boost_row_vectors[field][i])
+
+		boost_column_vectors[boost_column_labels[i]] = np.array(my_list)
+
+	return boost_row_labels, boost_column_vectors
+
+def get_boosted_fields(params, vector_name):
+	"""Returns a list of boosted fields built from a boost vector"""
+
+	boost_row_labels, boost_column_vectors = build_boost_vectors(params)
+	boost_vector = boost_column_vectors[vector_name]
+	return [x + "^" + str(y) for x, y in zip(boost_row_labels, boost_vector) if y != 0.0]
+
+def get_magic_query(params, transaction, boost=1.0):
+	"""Build a magic query from pretrained boost vectors"""
+
+	hyperparameters = load_hyperparameters(params)
+	result_size = hyperparameters.get("es_result_size", "10")
+	fields = params["output"]["results"]["fields"]
+	good_description = transaction["GOOD_DESCRIPTION"]
+	transaction = string_cleanse(transaction["DESCRIPTION_UNMASKED"]).rstrip()
+
+	# Input transaction must not be empty
+	if len(transaction) <= 2 and re.match('^[a-zA-Z0-9_]+$', transaction):
+		return
+
+	# Replace synonyms
+	transaction = synonyms(transaction)
+	transaction = string_cleanse(transaction)
+
+	# Construct Main Query
+	magic_query = get_bool_query(size=result_size)
+	magic_query["fields"] = fields
+	magic_query["_source"] = "*"
+	should_clauses = magic_query["query"]["bool"]["should"]
+	field_boosts = get_boosted_fields(params, "standard_fields")
+	simple_query = get_qs_query(transaction, field_boosts, boost)
+	should_clauses.append(simple_query)
+
+	# Use Good Description in Query
+	if good_description != "" and hyperparameters.get("good_description", "") != "":
+		good_description_boost = hyperparameters["good_description"]
+		name_query = get_qs_query(string_cleanse(good_description), ['name'], good_description_boost)
+		should_clauses.append(name_query)
+
+	return magic_query
+
+def get_bool_query(starting_from=0, size=0):
+	"""Returns a bool style ElasticSearch query object"""
+
+	return {
+		"from" : starting_from, 
+		"size" : size, 
+		"query" : {
+			"bool": {
+				"minimum_number_should_match": 1, 
+				"should": []
+			}
+		}
+	}
+
+def get_qs_query(term, field_list=[], boost=1.0):
+	"""Returns a "query_string" style ElasticSearch query object"""
+
+	return {
+		"query_string": {
+			"query": term, 
+			"fields": field_list, 
+			"boost" : boost
+		}
+	}
+
+def get_us_cities():
+	"""Load an array of US cities"""
+	with open("data/misc/US_Cities.txt") as city_file:
+		cities = city_file.readlines()
+	cities = [city.lower().rstrip('\n') for city in cities]
+	return cities
+
 def synonyms(transaction, stopwords=False):
 	"""Replaces transactions tokens with manually
 	mapped factual representations. This method
 	should be expanded to manage a file of synonyms"""
 
 	stop_words = [
-		"pos", 
-		"ach", 
+		" pos ", 
+		" ach ", 
 		"electronic", 
 		"debit", 
 		"purchase", 
-		"card", 
+		" card ", 
 		" pin ", 
 		"recurring", 
-		"check"
+		" check ",
+		"checkcard"
 	]
 
 	rep = {

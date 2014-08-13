@@ -105,53 +105,6 @@ class DescriptionConsumer(threading.Thread):
 			boost_column_vectors[boost_column_labels[i]] = np.array(my_list)
 		return boost_row_labels, boost_column_vectors
 
-	def __display_search_results(self, search_results, transaction):
-		"""Displays search results."""
-
-		return
-
-		logger = logging.getLogger("thread " + str(self.thread_id))
-
-		# Must have results
-		if search_results['hits']['total'] == 0:
-			return True
-
-		hits = search_results['hits']['hits']
-		scores, results, fields_found = [], [], []
-		params = self.params
-
-		# Disable in training mode
-		if params["mode"] != "test":
-			return
-
-		for hit in hits:
-			# Add Latitude and Longitude
-			if hit.get("_source", {}).get("pin", "") != "":
-				coordinates = hit["_source"]["pin"]["location"]["coordinates"]
-				if "fields" in hit:
-					hit["fields"]["longitude"] = [coordinates[0]]
-					hit["fields"]["latitude"] = [coordinates[1]]
-			hit_fields, score = hit.get("fields", {}), hit['_score']
-			scores.append(score)
-			field_order = params["output"]["results"]["fields"]
-			fields_in_hit = [field for field in hit_fields]
-			ordered_hit_fields = []
-			for ordinal in field_order:
-				if ordinal in fields_in_hit:
-					my_field = (hit_fields[ordinal][0]\
-						if isinstance(hit_fields[ordinal], (list))\
-						else str(hit_fields[ordinal]))
-					fields_found.append(ordinal)
-					ordered_hit_fields.append(my_field)
-				else:
-					fields_found.append(ordinal)
-					ordered_hit_fields.append("")
-			results.append(\
-			"[" + str(round(score, 3)) + "] " + " ".join(ordered_hit_fields))
-
-		# Monitor Results as they Arrive
-		self.__interactive_mode(scores, transaction, hits)
-
 	def __interactive_mode(self, params, scores, transaction, hits, business_names, city_names, state_names):
 		"""Interact with the results as they come"""
 
@@ -220,16 +173,6 @@ class DescriptionConsumer(threading.Thread):
 		first_score, second_score = z_scores[0:2]
 		z_score_delta = round(first_score - second_score, 3)
 		logger.info("Z-Score delta: [%.2f]", z_score_delta)
-		quality = ""
-
-		if z_score_delta <= 1:
-			quality = "Low-grade"
-		elif z_score_delta <= 2:
-			quality = "Mid-grade"
-		else:
-			quality = "High-grade"
-
-		logger.info("Top Score Quality: %s", quality)
 
 		return z_score_delta
 
@@ -278,7 +221,6 @@ class DescriptionConsumer(threading.Thread):
 			transaction = self.user.pop()
 			base_query = self.__generate_base_query(transaction)
 			search_results = self.__run_classifier(base_query)
-			self.__display_search_results(search_results, transaction)
 			enriched_transaction = self.__process_results(search_results, transaction)
 			enriched_transactions.append(enriched_transaction)
 
@@ -328,7 +270,6 @@ class DescriptionConsumer(threading.Thread):
 					key, value = field_boosts[i].split("^")
 					field_boosts[i] = key + "^" + str(float(value) * 0.5)
 			search_results = self.__run_classifier(json.dumps(base_query))
-			self.__display_search_results(search_results, transaction)
 			enriched_transaction = self.__process_results(search_results, transaction)
 			enriched_transactions.append(enriched_transaction)
 

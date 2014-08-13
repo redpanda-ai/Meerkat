@@ -33,6 +33,20 @@ def separate_geo(result_list):
 
 	return hits, non_hits
 
+def get_geo_query(scaled_shapes):
+	"""Generate multipolygon query for use with user context"""
+	
+	return {
+		"geo_shape" : {
+			"pin.location" : {
+				"shape" : {
+					"type" : "multipolygon",
+					"coordinates": [[scaled_shape] for scaled_shape in scaled_shapes]
+				}
+			}
+		}
+	}
+
 def scale_polygon(list_of_points, scale=2.0):
 	"""This function accepts a list of points representing a polygon and scales
 	them about its centroid."""

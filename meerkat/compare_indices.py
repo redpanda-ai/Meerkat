@@ -35,8 +35,9 @@ from copy import deepcopy
 from scipy.stats.mstats import zscore
 
 from meerkat.description_consumer import get_qs_query, get_bool_query
-from meerkat.various_tools import load_params, get_es_connection, string_cleanse, safe_print
-from meerkat.various_tools import get_merchant_by_id, load_dict_ordered, write_dict_list, synonyms
+from meerkat.various_tools import load_params, get_es_connection, string_cleanse
+from meerkat.various_tools import get_merchant_by_id, load_dict_ordered, write_dict_list
+from meerkat.various_tools import safe_print, synonyms, get_magic_query
 
 class DummyFile(object):
     def write(self, x): pass
@@ -73,6 +74,10 @@ def generate_user_context(params, es_connection):
 
 	for i, transaction in enumerate(transactions):
 
+		# No Null
+		if transaction.get("factual_id", "NULL") == "NULL":
+			continue
+
 		# Progress
 		progress(i, transactions)
 
@@ -94,13 +99,14 @@ def mode_change(params, es_connection):
 	"""Define what mode to work in"""
 
 	mode = ""
-	accepted_inputs = [str(x) for x in list(range(4))]
+	accepted_inputs = [str(x) for x in list(range(5))]
 
 	safe_print("Which task would you like to complete? \n")
-	safe_print("[0] Run all tasks")
+	safe_print("[0] Run all relinking tasks")
 	safe_print("[1] Relink transactions where factual_id no longer exists")
 	safe_print("[2] Verify changes to merchants")
-	safe_print("[3] Link transactions with NULL factual_id \n")
+	safe_print("[3] Link transactions with NULL factual_id")
+	safe_print("[4] Label new file \n")
 
 	while mode not in accepted_inputs: 
 		mode = safe_input()
@@ -113,6 +119,9 @@ def mode_change(params, es_connection):
 		reconcile_changed_details(params, es_connection)
 		reconcile_changed_ids(params, es_connection)
 	elif mode == "3":
+		reconcile_null(params, es_connection)
+	elif mode == "4":
+		find_and_verify(params, es_connection)
 		reconcile_null(params, es_connection)
 
 def run_all_modes(params, es_connection):
@@ -143,7 +152,8 @@ def identify_changes(params, es_connection):
 			continue
 
 		# Null
-		if transaction["factual_id"] == "NULL":
+		if transaction.get("factual_id", "") == "NULL" or transaction.get("factual_id", "") == "":
+			transaction["factual_id"] = "NULL"
 			params["compare_indices"]["NULL"].append(transaction)
 			continue
 
@@ -161,6 +171,7 @@ def identify_changes(params, es_connection):
 			params["compare_indices"]["details_changed"].append(transaction)
 			continue
 
+		# No Changes Found
 		transaction["relinked_id"] = transaction["factual_id"]
 		params["compare_indices"]["relinked"].append(transaction)
 
@@ -222,6 +233,42 @@ def reconcile_changed_ids(params, es_connection):
 	print_current_stats(params)
 
 	reconcile_skipped(params, es_connection)
+
+def find_and_verify(params, es_connection):
+	"""Label transactions using magic queries 
+	and do quick validation"""
+
+	prompt_mode_change("find and verify")
+
+	while len(params["compare_indices"]["NULL"]) > 0:
+		br()
+		relinked = params["compare_indices"]["NULL"]
+		transaction = relinked.pop()
+		results = search_with_magic_query(params, transaction, es_connection)
+		find_and_verify_boundary(params, transaction, results)
+
+	print_current_stats(params)
+
+def search_with_magic_query(params, transaction, es_connection):
+	"""Search using a pretrained query"""
+
+	index = sys.argv[4]
+	magic_query = get_magic_query(params, transaction)
+	
+	try:
+		results = es_connection.search(index=index, body=magic_query)
+	except Exception:
+		results = {"hits":{"total":0}}
+
+	return results
+
+def find_and_verify_boundary(params, transaction, results):
+	"""Verify autolinked transaction is correct"""
+
+	top_hit = results['hits']['hits'][0]
+	source = top_hit["_source"]
+
+	input(source)
 
 def reconcile_changed_details(params, es_connection):
 	"""Decide whether new details are erroneous"""
@@ -398,6 +445,24 @@ def display_user_context(params, transaction):
 
 	sys.stdout.write('\n')
 
+def update_user_context(params, transaction, hit):
+	"""Updates user context when a new location is found"""
+
+	if hit.get("pin", "") != "":
+		coordinates = hit["pin"]["location"]["coordinates"]
+		transaction["LONGITUDE"] = coordinates[0]
+		transaction["LATITUDE"] = coordinates[1]
+
+	point = transaction["LATITUDE"] + ", " + transaction["LONGITUDE"]
+	city = hit["locality"] + ", " + hit["region"]
+	UNIQUE_MEM_ID = transaction["UNIQUE_MEM_ID"]
+
+	if point not in params["compare_indices"]["user_context"][UNIQUE_MEM_ID] and point != ", ":
+		params["compare_indices"]["user_context"][UNIQUE_MEM_ID].append(point)
+
+	if city not in params["compare_indices"]["user_cities"][UNIQUE_MEM_ID] and city != ", ":
+		params["compare_indices"]["user_cities"][UNIQUE_MEM_ID].append(city)
+
 def search_with_user_safe_input(params, es_connection, transaction):
 	"""Search for a location by providing additional data"""
 
@@ -432,7 +497,7 @@ def search_with_user_safe_input(params, es_connection, transaction):
 
 	return results
 
-def null_decision_boundary(params, store, results):
+def null_decision_boundary(params, transaction, results):
 	"""Decide if there is a match when evaluating NULL"""
 
 	accepted_inputs = [str(x) for x in list(range(5))]
@@ -452,18 +517,19 @@ def null_decision_boundary(params, store, results):
 
 	# Set to NULL
 	if user_input == "null":
-		store["relinked_id"] = "NULL"
-		params["compare_indices"]["relinked"].append(store)
+		transaction["relinked_id"] = "NULL"
+		params["compare_indices"]["relinked"].append(transaction)
 		return
 
 	# Change factual_id, move to relinked
 	if user_input in accepted_inputs:
 		score, hit = get_hit(results, int(user_input))
-		store["relinked_id"] = hit["factual_id"]
-		params["compare_indices"]["relinked"].append(store)
+		transaction["relinked_id"] = hit["factual_id"]
+		update_user_context(params, transaction, hit)
+		params["compare_indices"]["relinked"].append(transaction)
 	else:
 		# Add transaction to another queue for later analysis
-		params["compare_indices"]["NULL"].append(store)
+		params["compare_indices"]["NULL"].append(transaction)
 
 def safe_input(prompt=""):
 	"""Safely input a string"""
@@ -541,7 +607,7 @@ def enrich_transaction(params, transaction, es_connection, index="", factual_id=
 	
 	# Get merchant and suppress errors
 	if factual_id == "":
-		factual_id = transaction["factual_id"]
+		factual_id = transaction.get("factual_id", "NULL")
 
 	with nostderr():
 		merchant = get_merchant_by_id(params, factual_id, es_connection, index=index)
