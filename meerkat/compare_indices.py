@@ -107,7 +107,7 @@ def mode_change(params, es_connection):
 	safe_print("[1] Relink transactions where factual_id no longer exists")
 	safe_print("[2] Verify changes to merchants")
 	safe_print("[3] Link transactions with NULL factual_id")
-	safe_print("[4] Label new dataset \n")
+	safe_print("[4] Label unlinked transactions \n")
 
 	while mode not in accepted_inputs: 
 		mode = safe_input()
