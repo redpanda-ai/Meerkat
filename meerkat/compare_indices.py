@@ -152,9 +152,13 @@ def identify_changes(params, es_connection):
 			params["compare_indices"]["relinked"].append(transaction)
 			continue
 
+		# Unlinked 
+		if transaction.get("factual_id", "") == "":
+			params["compare_indices"]["unlinked"].append(transaction)
+			continue
+
 		# Null
-		if transaction.get("factual_id", "") == "NULL" or transaction.get("factual_id", "") == "":
-			transaction["factual_id"] = "NULL"
+		if transaction.get("factual_id", "") == "NULL":
 			params["compare_indices"]["NULL"].append(transaction)
 			continue
 
@@ -195,6 +199,7 @@ def print_diff_stats(params, transactions):
 	safe_print("{:25}{}".format("No action necessary: ", len(params["compare_indices"]["relinked"])))
 	safe_print("{:25}{}".format("Number Changed ID: ", len(params["compare_indices"]["id_changed"])))
 	safe_print("{:25}{}".format("Number Changed Details: ", len(params["compare_indices"]["details_changed"])))
+	safe_print("{:25}{}".format("Number Unlinked: ", len(params["compare_indices"]["unlinked"])))
 	safe_print("{:25}{}\n".format("Number NULL: ", len(params["compare_indices"]["NULL"])))
 
 def print_current_stats(params):
@@ -240,12 +245,15 @@ def autolink_and_verify(params, es_connection):
 	and do quick validation"""
 
 	prompt_mode_change("find and verify")
+	unlinked = params["compare_indices"]["unlinked"]
+	total = len(unlinked)
+	params["compare_indices"]["unlinked"] = []
 
-	while len(params["compare_indices"]["NULL"]) > 0:
+	while len(unlinked) > 0:
 		br()
-		random.shuffle(params["compare_indices"]["NULL"])
-		relinked = params["compare_indices"]["NULL"]
-		transaction = relinked.pop()
+		safe_print(str(len(unlinked)) + " unlinked remaining")
+		random.shuffle(unlinked)
+		transaction = unlinked.pop()
 		results = search_with_magic_query(params, transaction, es_connection)
 		reconcile_autolinked(params, transaction, results)
 
@@ -295,6 +303,7 @@ def reconcile_autolinked(params, transaction, results):
 		params["compare_indices"]["relinked"].append(transaction)
 	else:
 		# Add transaction to another queue for later analysis
+		transaction["factual_id"] = "NULL"
 		params["compare_indices"]["NULL"].append(transaction)
 
 def reconcile_changed_details(params, es_connection):
@@ -479,6 +488,8 @@ def update_user_context(params, transaction, hit):
 		coordinates = hit["pin"]["location"]["coordinates"]
 		transaction["LONGITUDE"] = coordinates[0]
 		transaction["LATITUDE"] = coordinates[1]
+	else:
+		transaction["LONGITUDE"], transaction["LATITUDE"] = "", ""
 
 	point = transaction["LATITUDE"] + ", " + transaction["LONGITUDE"]
 	city = hit["locality"] + ", " + hit["region"]
@@ -784,6 +795,7 @@ def add_local_params(params):
 	params["compare_indices"]["details_changed"] = []
 	params["compare_indices"]["skipped"] = []
 	params["compare_indices"]["relinked"] = []
+	params["compare_indices"]["unlinked"] = []
 	params["compare_indices"]["user_context"] = collections.defaultdict(list)
 	params["compare_indices"]["user_cities"] = collections.defaultdict(list)
 

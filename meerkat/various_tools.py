@@ -202,6 +202,7 @@ def get_magic_query(params, transaction, boost=1.0):
 		return
 
 	# Replace synonyms
+	transaction = stopwords(transaction)
 	transaction = synonyms(transaction)
 	transaction = string_cleanse(transaction)
 
@@ -258,16 +259,18 @@ def stopwords(transaction):
 	"""Remove stopwords"""
 
 	patterns = [
-		r"^ACH", 
+		r"^ach", 
 		r"\d{2}\/\d{2}", 
-		r"X{4}\d{4}", 
+		r"X{4}\d{4}",
+		r"X{5}\d{4}", 
 		r"~{2}\d{5}~{2}\d{16}~{2}\d{5}~{2}\d~{4}\d{4}", 
-		r"CHECKCARD \d{4}", 
+		r"checkcard \d{4}", 
 		r"\d{15}"
 	]
 
 	stop_words = [
-		" pos ", 
+		" pos ",
+		r"^pos ",  
 		" ach ", 
 		"electronic", 
 		"debit", 
@@ -277,6 +280,10 @@ def stopwords(transaction):
 		"recurring", 
 		" check ",
 		"checkcard",
+		"qps",
+		"q35",
+		"q03",
+		" sq "
 	]
 
 	patterns = patterns + stop_words
@@ -295,8 +302,6 @@ def synonyms(transaction):
 		"wal-mart" : " Walmart ",
 		"samsclub" : " Sam's Club ",
 		"usps" : " US Post Office ",
-		"qps" : " ",
-		"q03" : " ",
 		"lowes" : " Lowe's ",
 		"wholefds" : " Whole Foods ",
 		"shell oil" : " Shell Gas ",
@@ -307,7 +312,6 @@ def synonyms(transaction):
 		"franciscoca" : " francisco ca ",
 		"qt" : " Quicktrip ",
 		"macy's east" : " Macy's ",
-		"sq" : " "
  	}
 
 	transaction = transaction.lower()
