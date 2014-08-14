@@ -26,17 +26,18 @@ def begin_processing_loop(some_container, filter_expression):
 	conn = boto.connect_s3()
 
 	#Set destination details
-	dst_bucket_name = "s3yodlee"
-	dst_s3_path_regex = re.compile("meerkat/nullcat/" + some_container +\
-	"/(" + filter_expression + "[^/]+)")
+	dst_bucket_name = "yodleeproducts"
+	dst_folders = "panels/6m/" + some_container + "/"
+	print("DST folder is: s3://{0}/{1}({2}[^/]+)".format(dst_bucket_name, dst_folders, filter_expression))
+	dst_s3_path_regex = re.compile(dst_folders + "(" + filter_expression + "[^/]+)")
 	dst_local_path = "/mnt/ephemeral/output/"
 	dst_bucket = conn.get_bucket(dst_bucket_name, Location.USWest2)
 
 	#Set error destination details
-	error_bucket_name = "s3yodlee"
+	error_bucket_name = "yodleeproducts"
 	error_local_path = "/mnt/ephemeral/output/"
 	error_bucket = conn.get_bucket(error_bucket_name, Location.USWest2)
-	error_s3_path = "meerkat/nullcat/error/"
+	error_s3_path = "panels/6m/error/"
 
 	#Get the list of completed files (already proceseed)
 	completed = {}
@@ -45,10 +46,10 @@ def begin_processing_loop(some_container, filter_expression):
 			completed[dst_s3_path_regex.search(j.key).group(1)] = j.size
 	#Set source details
 	src_bucket_name = "s3yodlee"
-	src_s3_path_regex = re.compile("ctprocessed/gpanel/" + some_container +\
-	"/(" + filter_expression + "[^/]+)")
-	#src_local_path = "data/input/src/"
+	src_folders = "ctprocessed/gpanel/" + some_container + "/"
+	src_s3_path_regex = re.compile(src_folders + "(" + filter_expression + "[^/]+)")
 	src_local_path = "/mnt/ephemeral/input/"
+	print("SRC folder is: s3://{0}/{1}({2}[^/]+)".format(src_bucket_name, src_folders, filter_expression))
 	src_bucket = conn.get_bucket(src_bucket_name, Location.USWest2)
 
 	#Get list of pending files (yet to be processed)
@@ -69,6 +70,8 @@ def begin_processing_loop(some_container, filter_expression):
 	#Reverse the pending list so that they are processed in reverse
 	#chronological order
 	pending_list.reverse()
+	if not pending_list:
+		print("Everything is up-to-date.")
 	#Loop through each file in the list of files to process
 	dst_s3_path = "meerkat/nullcat/" + some_container + "/"
 	for item in pending_list:
@@ -202,7 +205,6 @@ header_pos_name, map_of_column_positions, container):
 							name = header_pos_name[count]
 						except:
 							#Verify that each line has the correct number of delimiters
-							#gzipped_output.close()
 							had_error = True
 							line_error = True
 							line_error_count +=1
@@ -223,7 +225,6 @@ header_pos_name, map_of_column_positions, container):
 					output_line = "|".join(result)
 					if output_line[0] == "|":
 						#Verify the each line begins with a non-pipe
-						#gzipped_output.close()
 						had_error = True
 						line_error = True
 						line_error_count +=1
@@ -244,4 +245,6 @@ header_pos_name, map_of_column_positions, container):
 #	python3.3 -m meerkat.nullcat <bank_or_card> <regex_filter>
 #`
 #		Example: python3.3 -m meercat.nullcat bank 201306.*[02468]
+print("Begin")
 begin_processing_loop(sys.argv[1], sys.argv[2])
+print("End")
