@@ -75,6 +75,10 @@ def generate_user_context(params, es_connection):
 
 	for i, transaction in enumerate(transactions):
 
+		# Ensure previously found context is added
+		if transaction.get("relinked_id", "") != "":
+			transaction["factual_id"] = transaction["relinked_id"]
+
 		# No Null
 		if transaction.get("factual_id", "NULL") == "NULL":
 			continue
@@ -669,6 +673,8 @@ def enrich_transaction(params, transaction, es_connection, index="", factual_id=
 		coordinates = merchant["pin"]["location"]["coordinates"]
 		transaction["LONGITUDE"] = coordinates[0]
 		transaction["LATITUDE"] = coordinates[1]
+	else:
+		transaction["LONGITUDE"], transaction["LATITUDE"] = "", ""
 
 	return transaction
 
