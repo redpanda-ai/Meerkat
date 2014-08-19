@@ -426,6 +426,8 @@ def save_relinked_transactions(params):
 	while file_name == "":
 		file_name = safe_input()
 
+	# TODO auto append "_in_progress" to file name if relinked_id is not full populated
+
 	field_order = params["compare_indices"]["field_order"]
 	field_order = [field for field in field_order if field]
 	if "relinked" not in field_order:

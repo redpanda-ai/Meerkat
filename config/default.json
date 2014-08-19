@@ -4,7 +4,7 @@
     "mode" : "production",
     "input" : {
         "hyperparameters" : "config/hyperparameters/default.json",
-        "filename" : "data/misc/ground_truth_bank.txt",
+        "filename" : "/mnt/ephemeral/training_data/bank_sample/bank_sample_20140501_to_20140630.txt",
         "delimiter" : "|",
         "encoding" : "utf-8",
         "split" : {
@@ -31,7 +31,7 @@
         },
         "file" : {
             "format" : "csv",
-            "processing_location" : "data/output/",
+            "processing_location" : "/mnt/ephemeral/output",
             "delimiter" : "|"
         }
     },

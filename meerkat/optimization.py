@@ -426,10 +426,10 @@ def add_local_params(params):
 
 	params["optimization"]["settings"] = {
 		"folds": 1,
-		"initial_search_space": 20,
-		"initial_learning_rate": 0.5,
-		"iteration_search_space": 10,
-		"iteration_learning_rate": 0.3,
+		"initial_search_space": 25,
+		"initial_learning_rate": 0.25,
+		"iteration_search_space": 15,
+		"iteration_learning_rate": 0.1,
 		"gradient_descent_iterations": 10,
 		"max_precision": 97.5,
 		"min_recall": 31
@@ -464,10 +464,10 @@ def run_from_command_line(command_line_arguments):
 	}
 
 	hyperparameters = {
-		"dispersed.address.street_part" : "0",
-		"dispersed.address.number_part" : "0",
-		"address" : "0.541",          
-	    "address_extended" : "1.282",          
+		"dispersed.address.street_part" : "1.012",
+		"dispersed.address.number_part" : "0.812",
+		"address" : "0",          
+	    "address_extended" : "0",          
 	    "locality" : "1.367",         
 	    "region" : "1.685",           
 	    "post_town" : "0.577",        
