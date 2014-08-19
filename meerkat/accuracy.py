@@ -24,6 +24,13 @@ Created on Jan 8, 2014
 
 # Note: Needs refining. Experts only!
 
+# Suggested Future Work:
+#
+# 	Instead of matching being binary, produce a 
+# 	loss function that penalizes less for matching
+# 	the wrong location if the majority of the 
+#	informaiton is correct
+
 #####################################################
 
 import csv

@@ -8,7 +8,6 @@ import sys
 from random import shuffle
 from .various_tools import safely_remove_file, split_csv
 
-
 #Usage
 # python3.3 -m meerkat.gzip_slicer <path_to_some_directory_of_gzipped_csv_files>
 

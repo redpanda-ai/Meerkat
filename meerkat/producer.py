@@ -31,12 +31,12 @@ import string
 import boto
 from boto.s3.connection import Location, S3Connection
 
-from .custom_exceptions import InvalidArguments, Misconfiguration
-from .description_consumer import DescriptionConsumer
-from .binary_classifier.load import select_model
-from .various_tools import load_dict_list, safely_remove_file, load_hyperparameters, safe_print
-from .various_tools import split_csv, merge_split_files, queue_to_list, string_cleanse
-from .accuracy import test_accuracy, print_results, speed_tests
+from meerkat.custom_exceptions import InvalidArguments, Misconfiguration
+from meerkat.consumer import Consumer
+from meerkat.binary_classifier.load import select_model
+from meerkat.various_tools import load_dict_list, safely_remove_file, load_hyperparameters, safe_print
+from meerkat.various_tools import split_csv, merge_split_files, queue_to_list, string_cleanse
+from meerkat.accuracy import test_accuracy, print_results, speed_tests
 from meerkat.optimization import run_meerkat as test_meerkat
 from meerkat.optimization import get_desc_queue as get_simple_queue
 from meerkat.optimization import load_dataset
@@ -137,7 +137,7 @@ def run_meerkat(params, desc_queue, hyperparameters, non_physical, split):
 	result_queue = queue.Queue()
 
 	for i in range(consumer_threads):
-		new_consumer = DescriptionConsumer(i, params, desc_queue,\
+		new_consumer = Consumer(i, params, desc_queue,\
 			result_queue, hyperparameters)
 		new_consumer.setDaemon(True)
 		new_consumer.start()

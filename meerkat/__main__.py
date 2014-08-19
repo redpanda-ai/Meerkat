@@ -5,7 +5,7 @@ Meerkat is executed as a package"""
 
 import os, re
 
-from meerkat.description_producer import mode_switch, initialize, validate_params
+from meerkat.producer import mode_switch, initialize, validate_params
 from meerkat.various_tools import purge
 
 # Run the Meerkat Classifier
