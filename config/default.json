@@ -5,7 +5,7 @@
     "mode" : "production",
     "input" : {
         "S3" : {
-            "filter" : ".*",
+            "filter" : "2014010.*",
             "src_bucket_name" : "s3yodlee",
             "src_folders" : "ctprocessed/gpanel/",
             "src_local_path" : "/mnt/ephemeral/input/",

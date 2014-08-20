@@ -347,7 +347,7 @@ def production_run(params):
 
 	# Start Processing Files
 	for item in pending:
-
+		
 		src_file_name = src_s3_path_regex.search(item.key).group(1)
 		dst_file_name = src_file_name
 
