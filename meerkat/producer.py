@@ -286,10 +286,10 @@ def get_S3_buckets(S3_params, conn):
 
 	return src_bucket, dst_bucket, error_bucket
 
-def get_S3_regex(S3_params, folders):
+def get_S3_regex(S3_params, container, folders):
 	"""Get a regex for dealing with S3 buckets"""
 
-	return re.compile(folders + "(" + S3_params["filter"] + "[^/]+)")
+	return re.compile(folders + container + "/(" + S3_params["filter"] + "[^/]+)")
 
 def get_completed_files(bucket, path_regex):
 	"""Get a list of files that have been processed"""
@@ -310,12 +310,12 @@ def get_pending_files(bucket, path_regex, completed):
 	for k in bucket.list():
 		if path_regex.search(k.key):
 			file_name = path_regex.search(k.key).group(1)
-			ratio = float(k.size) / completed[file_name]
-			# Exclude files that have been completed
-			if file_name in completed and ratio >= 1.8:
-				print("Completed Size, Source Size, Ratio: {0}, {1}, {2:.2f}".format(completed[file_name], k.size, ratio))
-				print("Re-running {0}".format(file_name))
-				pending.append(k)
+			if file_name in completed:
+				ratio = float(k.size) / completed[file_name]
+				if ratio >= 1.8:
+					print("Completed Size, Source Size, Ratio: {0}, {1}, {2:.2f}".format(completed[file_name], k.size, ratio))
+					print("Re-running {0}".format(file_name))
+					pending.append(k)
 			elif k.size > 0:
 				pending.append(k)
 
@@ -330,8 +330,8 @@ def production_run(params):
 
 	# Get Buckets
 	src_bucket, dst_bucket, error_bucket = get_S3_buckets(S3_params, conn)
-	src_s3_path_regex = get_S3_regex(S3_params, S3_params["src_folders"])
-	dst_s3_path_regex = get_S3_regex(S3_params, S3_params["dst_folders"])
+	src_s3_path_regex = get_S3_regex(S3_params, container, S3_params["src_folders"])
+	dst_s3_path_regex = get_S3_regex(S3_params, container, S3_params["dst_folders"])
 
 	# Sort By Completion Status
 	completed = get_completed_files(dst_bucket, dst_s3_path_regex)
@@ -350,7 +350,6 @@ def production_run(params):
 
 		src_file_name = src_s3_path_regex.search(item.key).group(1)
 		dst_file_name = src_file_name
-		print(src_file_name)
 
 		# Copy from S3
 

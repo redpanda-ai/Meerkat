@@ -5,12 +5,12 @@
     "mode" : "production",
     "input" : {
         "S3" : {
-            "filter" : "201306.*[02468]",
+            "filter" : ".*",
             "src_bucket_name" : "s3yodlee",
             "src_folders" : "ctprocessed/gpanel/",
             "src_local_path" : "/mnt/ephemeral/input/",
             "dst_bucket_name" : "yodleeproducts",
-            "dst_folders" : "panels/6m/",
+            "dst_folders" : "panels/nullcat_integration/",
             "dst_local_path" : "/mnt/ephemeral/output/",
             "error_bucket_name" : "yodleeproducts",
             "error_local_path" : "/mnt/ephemeral/output/",
