@@ -273,50 +273,6 @@ def	hms_to_seconds(t):
 	print ("H: {0}, M: {1}, S: {2}".format(h, m, s))
 	return 3600 * float(h) + 60 * float(m) + float(s)
 
-def process_bucket(params):
-	"""Process an entire s3 bucket"""
-
-	# Init
-	conn = boto.connect_s3()
-	s3_location = params["input"]["bucket_key"]
-	bucket_name = "s3yodlee"
-	regex = "([^/]+)"
-	path_regex = re.compile(s3_location + regex)
-	bucket = conn.get_bucket(bucket_name, Location.USWest2)
-	keep_going = True
-
-	# Loop through Panels in Bucket
-	for k in bucket.list():
-		if path_regex.search(k.key):
-
-			matches = path_regex.match(k.key)
-			input_split_path = params["input"]["split"]["processing_location"]
-			new_filename = input_split_path + matches.group(1)
-
-			if keep_going:
-
-				# Download from S3
-				keep_going = False
-				logging.warning("Fetching %s from S3.", k.key)
-				local_input_path = params["input"]["split"]["processing_location"]
-				k.get_contents_to_filename(new_filename)
-				params["output"]["file"]["name"] = matches.group(1)[:-3]
-				logging.warning("Fetch of %s complete.", new_filename)
-
-				# Gunzip
-				with gzip.open(new_filename, 'rb') as gzipped_input:
-					unzipped_name = new_filename[:-3]
-					with open(unzipped_name, 'wb') as unzipped_input:
-						for line in gzipped_input:
-							unzipped_input.write(line)
-						logging.warning("%s unzipped.", new_filename)
-
-				safely_remove_file(new_filename)
-
-				# Run Panel
-				logging.warning("Beginning with %s", unzipped_name)
-				process_panel(params, unzipped_name, conn)
-
 def get_S3_buckets(S3_params, conn):
 	"""Gets src, dst, and error S3 buckets"""
 
@@ -367,7 +323,7 @@ def get_pending_files(bucket, path_regex, completed):
 def production_run(params):
 	"""Runs Meerkat in production mode"""
 
-	conn = boto.connect_s3()
+	conn = connect_to_S3()
 	container = params["container"]
 	S3_params =  params["input"]["S3"]
 
@@ -390,21 +346,18 @@ def production_run(params):
 
 	# Start Processing Files
 	for item in pending_list:
+
 		src_file_name = src_s3_path_regex.search(item.key).group(1)
 		dst_file_name = src_file_name
 		print(src_file_name)
 
-	# STEPS TO PRODUCTION RUN
-	# 1) Get Bucket Details DONE
-	# 2) Loop through pending files
-	# 	a) Clean File
-	#	b) Process with Meerkat
-	# 3) Push processed file to S3
+		# Copy from S3
 
-	# Set source details
+		# Clean File
 
-	#######
+		# Process With Meerkat
 
+		# Push to S3
 
 def process_panel(params, filename, S3):
 	"""Process a single panel"""
@@ -517,19 +470,6 @@ def connect_to_S3():
 		sys.exit()
 
 	return conn
-
-def move_to_S3(params, filepath, S3):
-	"""Pushes a file back to S3"""
-
-	# Get Connection
-	s3_location = "meerkat/output/gpanel/" + params["container"] + "/"
-	key = s3_location + os.path.basename(filepath)
-	bucket_name = "s3yodlee"
-	bucket = conn.get_bucket(bucket_name, Location.USWest2)
-
-	# Move to S3
-	key = bucket.new_key(key)
-	key.set_contents_from_filename(filepath)
 
 def run_from_command_line(command_line_arguments):
 	"""Runs these commands if the module is invoked from the command line"""
