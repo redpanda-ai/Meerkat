@@ -321,6 +321,21 @@ def get_pending_files(bucket, path_regex, completed):
 
 	return pending, completed
 
+def identify_container(filename):
+	"""Determines whether transactions are bank or card"""
+
+	container = params["container"]
+
+	if container == "bank" or container == "card":
+		return container
+	elif "bank" in filename.lower():
+		return "bank"
+	elif "card" in filename.lower():
+		return "card"
+	else:
+		print('Please designate whether this is bank or card in params["container"]')
+		sys.exit()
+
 def production_run(params):
 	"""Runs Meerkat in production mode"""
 
@@ -347,39 +362,34 @@ def production_run(params):
 
 	# Start Processing Files
 	for item in pending:
-		
+
 		src_file_name = src_s3_path_regex.search(item.key).group(1)
 		dst_file_name = src_file_name
 
 		# Copy from S3
+		item.get_contents_to_filename(S3_params["src_local_path"] + src_file_name)
+
+		# Process With Meerkat
+		params["input"]["filename"] = S3_params["src_local_path"] + src_file_name
+		run_panel(params)
 
 		# Clean File
 
-		# Process With Meerkat
-
 		# Push to S3
 
-def process_panel(params, filename, S3):
+def run_panel(params):
+	"""Process a single panel"""
+
+def process_panel(params, filename):
 	"""Process a single panel"""
 
 	row_limit = None
 	key = load_hyperparameters(params)
 	params["add_header"] = True
 	split_count = 0
-	container = params["container"]
-
-	# Determine Mode
-	if container == "bank" or container == "card":
-		classifier = select_model(container)
-	elif "bank" in filename.lower():
-		params["container"] = "bank"
-		classifier = select_model("bank")
-	elif "card" in filename.lower():
-		params["container"] = "card"
-		classifier = select_model("card")
-	else: 
-		print('Please designate whether this is bank or card in params["container"]')
-		sys.exit()
+	container = identify_container(filename)
+	params["container"] = container
+	classifier = select_model(container)
 
 	# Load and Split Files
 	try:
@@ -406,8 +416,10 @@ def process_panel(params, filename, S3):
 		split_count += 1
 		logging.warning("Working with the following split: %s", split)
 		split_start_time = datetime.datetime.now()
+
 		desc_queue, non_physical = get_desc_queue(split, params, classifier)
 		run_meerkat(params, desc_queue, key, non_physical, split)
+
 		end_time = datetime.datetime.now()
 		total_time = end_time - start_time
 		split_time = end_time - split_start_time
@@ -422,11 +434,11 @@ def process_panel(params, filename, S3):
 		safely_remove_file(split)
 
 	# Merge Files, GZIP and Push to S3
-	output_location = merge_split_files(params, split_list)
-	if params["input"].get("bucket_key", "") != "":
-		move_to_S3(params, output_location, S3)
+	#output_location = merge_split_files(params, split_list)
+	#if params["input"].get("bucket_key", "") != "":
+	#	move_to_S3(params, output_location, S3)
 
-	logging.warning("Complete.")
+	#logging.warning("Complete.")
 
 	# Only do one
 	print("Exiting after one panel file. Modify code to enable bucket processing.")
