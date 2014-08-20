@@ -29,64 +29,9 @@ from scipy.stats.mstats import zscore
 from pprint import pprint
 
 from .various_tools import string_cleanse, synonyms, safe_print
+from .various_tools import get_bool_query, get_qs_query, get_us_cities
 from .clustering import cluster, collect_clusters
-from .location import separate_geo, scale_polygon
-
-#Helper functions
-def get_bool_query(starting_from=0, size=0):
-	"""Returns a "bool" style ElasticSearch query object"""
-
-	return {
-		"from" : starting_from, 
-		"size" : size, 
-		"query" : {
-			"bool": {
-				"minimum_number_should_match": 1, 
-				"should": []
-			}
-		}
-	}
-
-def get_basic_query(starting_from=0, size=0):
-	"""Returns an ElasticSearch query object"""
-
-	return {
-		"from" : starting_from, 
-		"size" : size, 
-		"query" : {}
-	}
-
-def get_geo_query(scaled_shapes):
-	"""Generate multipolygon query for use with user context"""
-	
-	return {
-		"geo_shape" : {
-			"pin.location" : {
-				"shape" : {
-					"type" : "multipolygon",
-					"coordinates": [[scaled_shape] for scaled_shape in scaled_shapes]
-				}
-			}
-		}
-	}
-
-def get_qs_query(term, field_list=[], boost=1.0):
-	"""Returns a "query_string" style ElasticSearch query object"""
-
-	return {
-		"query_string": {
-			"query": term, 
-			"fields": field_list, 
-			"boost" : boost
-		}
-	}
-
-def get_us_cities():
-	"""Load an array of US cities"""
-	with open("data/misc/US_Cities.txt") as city_file:
-		cities = city_file.readlines()
-	cities = [city.lower().rstrip('\n') for city in cities]
-	return cities
+from .location import separate_geo, scale_polygon, get_geo_query
 
 class DescriptionConsumer(threading.Thread):
 	''' Acts as a client to an ElasticSearch cluster, tokenizing description
@@ -95,8 +40,8 @@ class DescriptionConsumer(threading.Thread):
 	def __build_boost_vectors(self):
 		"""Turns configuration entries into a dictionary of numpy arrays."""
 		#logger = logging.getLogger("thread " + str(self.thread_id))
-		boost_column_labels = self.params["elasticsearch"]["boost_labels"]
-		boost_row_vectors = self.params["elasticsearch"]["boost_vectors"]
+		boost_column_labels = self.hyperparameters["boost_labels"]
+		boost_row_vectors = self.hyperparameters["boost_vectors"]
 		boost_row_labels, boost_column_vectors = sorted(boost_row_vectors.keys()), {}
 		for i in range(len(boost_column_labels)):
 			my_list = []

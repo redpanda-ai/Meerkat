@@ -408,8 +408,8 @@ def run_classifier(hyperparameters, params, dataset):
 	boost_vectors, boost_labels, hyperparameters = split_hyperparameters(hyperparameters)
 
 	# Override Params
-	params["elasticsearch"]["boost_labels"] = boost_labels
-	params["elasticsearch"]["boost_vectors"] = boost_vectors
+	hyperparameters["boost_labels"] = boost_labels
+	hyperparameters["boost_vectors"] = boost_vectors
 
 	# Run Classifier with new Hyperparameters. Suppress Output
 	desc_queue = get_desc_queue(dataset)

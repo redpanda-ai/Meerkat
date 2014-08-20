@@ -317,6 +317,13 @@ def process_bucket(params):
 				logging.warning("Beginning with %s", unzipped_name)
 				process_panel(params, unzipped_name, conn)
 
+def production_run(params):
+	"""Runs Meerkat in production mode"""
+
+	conn = boto.connect_s3()
+	pending_list = []
+	completed = {}
+
 def process_panel(params, filename, S3):
 	"""Process a single panel"""
 
@@ -324,16 +331,20 @@ def process_panel(params, filename, S3):
 	key = load_hyperparameters(params)
 	params["add_header"] = True
 	split_count = 0
+	container = params["container"]
 
 	# Determine Mode
-	if "bank" in filename.lower():
-		params["transaction_type"] = "bank"
+	if container == "bank" or container == "card":
+		classifier = select_model(container)
+	elif "bank" in filename.lower():
+		params["container"] = "bank"
 		classifier = select_model("bank")
 	elif "card" in filename.lower():
-		params["transaction_type"] = "card"
+		params["container"] = "card"
 		classifier = select_model("card")
 	else: 
-		print("Panel name must include type (bank or card).")
+		print('Please designate whether this is bank or card in params["container"]')
+		sys.exit()
 
 	# Load and Split Files
 	try:
@@ -394,14 +405,13 @@ def mode_switch(params):
 
 	if params.get("mode", "") == "test":
 		test_training_data(params)
+	elif params.get("mode", "") == "production":
+		production_run(params)
 	elif os.path.isfile(input_file):
 		print("Processing Single Local File: ", input_file)
 		params["output"]["file"]["name"] = os.path.basename(input_file)
 		conn = connect_to_S3()
 		process_panel(params, input_file, conn)
-	elif input_bucket != "":
-		print("Processing S3 Bucket: ", input_bucket)
-		process_bucket(params)
 	else:
 		logging.critical("Please provide a local file or s3 bucket for procesing. Terminating")
 		sys.exit()
@@ -430,7 +440,7 @@ def move_to_S3(params, filepath, S3):
 	"""Pushes a file back to S3"""
 
 	# Get Connection
-	s3_location = "meerkat/output/gpanel/" + params["transaction_type"] + "/"
+	s3_location = "meerkat/output/gpanel/" + params["container"] + "/"
 	key = s3_location + os.path.basename(filepath)
 	bucket_name = "s3yodlee"
 	bucket = conn.get_bucket(bucket_name, Location.USWest2)

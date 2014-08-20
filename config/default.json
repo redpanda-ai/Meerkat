@@ -1,6 +1,7 @@
 {
     "concurrency" : 36,
     "verification_source" : "data/misc/ground_truth_bank.txt",
+    "container" : "bank",
     "mode" : "production",
     "input" : {
         "hyperparameters" : "config/hyperparameters/default.json",
