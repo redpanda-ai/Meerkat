@@ -33,7 +33,7 @@ from .various_tools import get_bool_query, get_qs_query, get_us_cities
 from .clustering import cluster, collect_clusters
 from .location import separate_geo, scale_polygon, get_geo_query
 
-class DescriptionConsumer(threading.Thread):
+class Consumer(threading.Thread):
 	''' Acts as a client to an ElasticSearch cluster, tokenizing description
 	strings that it pulls from a synchronized queue. '''
 
