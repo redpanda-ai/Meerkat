@@ -4,14 +4,21 @@
     "container" : "bank",
     "mode" : "production",
     "input" : {
+        "S3" : {
+            "filter" : "201306.*[02468]",
+            "src_bucket_name" : "s3yodlee",
+            "src_folders" : "ctprocessed/gpanel/",
+            "src_local_path" : "/mnt/ephemeral/input/",
+            "dst_bucket_name" : "yodleeproducts",
+            "dst_folders" : "panels/6m/",
+            "dst_local_path" : "/mnt/ephemeral/output/",
+            "error_bucket_name" : "yodleeproducts",
+            "error_local_path" : "/mnt/ephemeral/output/",
+            "error_s3_path" : "panels/6m/error/",
+        },
         "hyperparameters" : "config/hyperparameters/default.json",
-        "filename" : "/mnt/ephemeral/training_data/bank_sample/bank_sample_20140501_to_20140630.txt",
         "delimiter" : "|",
-        "encoding" : "utf-8",
-        "split" : {
-            "processing_location" : "/mnt/ephemeral/input/",
-            "row_limit" : 10000
-        }
+        "encoding" : "utf-8"
     },
     "logging" : {
         "level" : "warning",
@@ -57,24 +64,6 @@
             "s18:9200"
         ],
         "index" : "factual_index_2",
-        "type" : "factual_type",
-        "boost_labels" : ["standard_fields"],
-        "boost_vectors" :  {
-            "address": [0.541],
-            "address_extended": [1.282],
-            "admin_region": [0.69],
-            "category_labels": [1.319],
-            "chain_name": [0.999],
-            "email": [0.516],
-            "internal_store_number": [1.9],
-            "locality": [1.367],
-            "name": [2.781],
-            "neighborhood": [0.801],
-            "po_box": [1.292],
-            "post_town": [0.577],
-            "postcode": [0.914],
-            "region": [1.685],
-            "tel": [0.597]
-        }
+        "type" : "factual_type"
     }
 }

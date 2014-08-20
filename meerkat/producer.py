@@ -317,12 +317,94 @@ def process_bucket(params):
 				logging.warning("Beginning with %s", unzipped_name)
 				process_panel(params, unzipped_name, conn)
 
+def get_S3_buckets(S3_params, conn):
+	"""Gets src, dst, and error S3 buckets"""
+
+	bucket_filter = S3_params["filter"]
+
+	src_bucket_name = S3_params["src_bucket_name"]
+	src_bucket = conn.get_bucket(src_bucket_name, Location.USWest2)
+	dst_bucket_name = S3_params["dst_bucket_name"]
+	dst_bucket = conn.get_bucket(dst_bucket_name, Location.USWest2)
+	error_bucket_name = S3_params["error_bucket_name"]
+	error_bucket = conn.get_bucket(error_bucket_name, Location.USWest2)
+
+def get_S3_regex(S3_params, folders):
+	"""Get a regex for dealing with S3 buckets"""
+
+	return re.compile(folders + "(" + S3_params["filter"] + "[^/]+)")
+
+def get_completed_files(bucket, path_regex):
+	"""Get a list of files that have been processed"""
+
+	completed = {}
+
+	for j in bucket.list():
+		if path_regex.search(j.key):
+			completed[path_regex.search(j.key).group(1)] = j.size
+
+	return completed
+
+def get_pending_files(bucket, path_regex, completed):
+	"""Get a list of files that need to be processed"""
+
+	pending_list = []
+
+	for k in bucket.list():
+		if path_regex.search(k.key):
+			file_name = path_regex.search(k.key).group(1)
+			ratio = float(k.size) / completed[file_name]
+			# Exclude files that have been completed
+			if file_name in completed and ratio >= 1.8
+				print("Completed Size, Source Size, Ratio: {0}, {1}, {2:.2f}".format(completed[file_name], k.size, ratio))
+				print("Re-running {0}".format(file_name))
+				pending_list.append(k)
+			elif k.size > 0:
+				pending_list.append(k)
+
+	return pending, completed
+
 def production_run(params):
 	"""Runs Meerkat in production mode"""
 
 	conn = boto.connect_s3()
-	pending_list = []
-	completed = {}
+	container = params["container"]
+	S3_params =  params["input"]["S3"]
+
+	# Get Buckets
+	src_bucket, dst_bucket, error_bucket = get_S3_buckets(S3_params, conn)
+	src_s3_path_regex = get_S3_regex(S3_params, S3_params["src_folders"])
+	dst_s3_path_regex = get_S3_regex(S3_params, S3_params["dst_folders"])
+
+	# Sort By Completion Status
+	completed = get_completed_files(dst_bucket, dst_s3_path_regex)
+	pending, completed = get_pending_files(src_bucket, src_s3_path_regex, completed)
+
+	# Exit if Nothing to Process
+	if not pending_list:
+		print("Everything is up-to-date.")
+		sys.exit()
+
+	# Process in Reverse Chronological Order
+	pending_list.reverse()
+
+	# Start Processing Files
+	for item in pending_list:
+		src_file_name = src_s3_path_regex.search(item.key).group(1)
+		dst_file_name = src_file_name
+		print(src_file_name)
+
+	# STEPS TO PRODUCTION RUN
+	# 1) Get Bucket Details DONE
+	# 2) Loop through pending files
+	# 	a) Clean File
+	#	b) Process with Meerkat
+	# 3) Push processed file to S3
+
+	# Set source details
+
+	#######
+
 
 def process_panel(params, filename, S3):
 	"""Process a single panel"""
