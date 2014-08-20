@@ -277,13 +277,14 @@ def get_S3_buckets(S3_params, conn):
 	"""Gets src, dst, and error S3 buckets"""
 
 	bucket_filter = S3_params["filter"]
-
 	src_bucket_name = S3_params["src_bucket_name"]
 	src_bucket = conn.get_bucket(src_bucket_name, Location.USWest2)
 	dst_bucket_name = S3_params["dst_bucket_name"]
 	dst_bucket = conn.get_bucket(dst_bucket_name, Location.USWest2)
 	error_bucket_name = S3_params["error_bucket_name"]
 	error_bucket = conn.get_bucket(error_bucket_name, Location.USWest2)
+
+	return src_bucket, dst_bucket, error_bucket
 
 def get_S3_regex(S3_params, folders):
 	"""Get a regex for dealing with S3 buckets"""
