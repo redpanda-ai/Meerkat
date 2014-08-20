@@ -199,8 +199,8 @@ def validate_params(params):
 		raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.cluster_nodes'", expr=None)
 	if "path" not in params["logging"]:
 		raise Misconfiguration(msg="Misconfiguration: missing key, 'logging.path'", expr=None)
-	if "filename" not in params["input"] and "bucket_key" not in params["input"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'input.filename' or 'input.bucket_key'", expr=None)
+	if "filename" not in params["input"] and "S3" not in params["input"]:
+		raise Misconfiguration(msg="Misconfiguration: missing key, 'input.filename' or 'input.S3'", expr=None)
 	if "encoding" not in params["input"]:
 		raise Misconfiguration(msg="Misconfiguration: missing key, 'input.encoding'", expr=None)
 
@@ -305,19 +305,19 @@ def get_completed_files(bucket, path_regex):
 def get_pending_files(bucket, path_regex, completed):
 	"""Get a list of files that need to be processed"""
 
-	pending_list = []
+	pending = []
 
 	for k in bucket.list():
 		if path_regex.search(k.key):
 			file_name = path_regex.search(k.key).group(1)
 			ratio = float(k.size) / completed[file_name]
 			# Exclude files that have been completed
-			if file_name in completed and ratio >= 1.8
+			if file_name in completed and ratio >= 1.8:
 				print("Completed Size, Source Size, Ratio: {0}, {1}, {2:.2f}".format(completed[file_name], k.size, ratio))
 				print("Re-running {0}".format(file_name))
-				pending_list.append(k)
+				pending.append(k)
 			elif k.size > 0:
-				pending_list.append(k)
+				pending.append(k)
 
 	return pending, completed
 
@@ -338,15 +338,15 @@ def production_run(params):
 	pending, completed = get_pending_files(src_bucket, src_s3_path_regex, completed)
 
 	# Exit if Nothing to Process
-	if not pending_list:
+	if not pending:
 		print("Everything is up-to-date.")
 		sys.exit()
 
 	# Process in Reverse Chronological Order
-	pending_list.reverse()
+	pending.reverse()
 
 	# Start Processing Files
-	for item in pending_list:
+	for item in pending:
 
 		src_file_name = src_s3_path_regex.search(item.key).group(1)
 		dst_file_name = src_file_name
@@ -437,7 +437,6 @@ def mode_switch(params):
 	"""Switches mode between, single file / s3 bucket mode"""
 
 	input_file = params["input"].get("filename", "")
-	input_bucket = params["input"].get("bucket_key", "")
 
 	if params.get("mode", "") == "test":
 		test_training_data(params)

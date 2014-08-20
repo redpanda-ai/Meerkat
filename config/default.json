@@ -14,7 +14,7 @@
             "dst_local_path" : "/mnt/ephemeral/output/",
             "error_bucket_name" : "yodleeproducts",
             "error_local_path" : "/mnt/ephemeral/output/",
-            "error_s3_path" : "panels/6m/error/",
+            "error_s3_path" : "panels/6m/error/"
         },
         "hyperparameters" : "config/hyperparameters/default.json",
         "delimiter" : "|",

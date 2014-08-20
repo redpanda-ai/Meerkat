@@ -18,7 +18,8 @@ try:
 
 except (KeyboardInterrupt, SystemExit) as e:
 
-	input_dir = params["input"]["split"]["processing_location"]
-	output_dir = params["output"]["file"]["processing_location"]
-	purge(input_dir, "output*")
-	purge(output_dir, "output*")
+	if params["input"]["S3"]:
+		input_dir = params["input"]["S3"]["src_local_path"]
+		output_dir = params["input"]["S3"]["dst_local_path"]
+		purge(input_dir, "output*")
+		purge(output_dir, "output*")
