@@ -29,6 +29,7 @@ import sys
 import string
 
 import boto
+import pandas as pd
 from boto.s3.connection import Location, S3Connection
 
 from meerkat.custom_exceptions import InvalidArguments, Misconfiguration
@@ -36,6 +37,7 @@ from meerkat.consumer import Consumer
 from meerkat.binary_classifier.load import select_model
 from meerkat.various_tools import load_dict_list, safely_remove_file, load_hyperparameters, safe_print
 from meerkat.various_tools import split_csv, merge_split_files, queue_to_list, string_cleanse
+from meerkat.various_tools import get_panel_header, get_column_map, get_new_columns
 from meerkat.accuracy import test_accuracy, print_results, speed_tests
 from meerkat.optimization import run_meerkat as test_meerkat
 from meerkat.optimization import get_desc_queue as get_simple_queue
@@ -321,17 +323,18 @@ def get_pending_files(bucket, path_regex, completed):
 
 	return pending, completed
 
-def identify_container(filename):
+def identify_container(params):
 	"""Determines whether transactions are bank or card"""
 
 	container = params["container"]
+	filename = params["input"]["filename"]
 
-	if container == "bank" or container == "card":
-		return container
-	elif "bank" in filename.lower():
+	if "bank" in filename.lower():
 		return "bank"
 	elif "card" in filename.lower():
 		return "card"
+	elif container == "bank" or container == "card":
+		return container
 	else:
 		print('Please designate whether this is bank or card in params["container"]')
 		sys.exit()
@@ -360,7 +363,7 @@ def production_run(params):
 	# Process in Reverse Chronological Order
 	pending.reverse()
 
-	# Start Processing Files
+	# Process Files
 	for item in pending:
 
 		src_file_name = src_s3_path_regex.search(item.key).group(1)
@@ -368,26 +371,52 @@ def production_run(params):
 
 		# Copy from S3
 		item.get_contents_to_filename(S3_params["src_local_path"] + src_file_name)
-
-		# Process With Meerkat
 		params["input"]["filename"] = S3_params["src_local_path"] + src_file_name
-		run_panel(params)
 
 		# Clean File
+		container = identify_container(params)
+		params["container"] = container
+		clean_panel(params)
+
+		# Process With Meerkat
+		process_panel(params)
 
 		# Push to S3
 
-def run_panel(params):
+def process_panel(params):
 	"""Process a single panel"""
 
-def process_panel(params, filename):
+def clean_panel(params):
+	"""Cleans up any issues with the input panel"""
+
+	params["input"]["filename"] = "/mnt/ephemeral/input/20140524_GPANEL_CARD.txt.gz"
+	container = params["container"]
+	column_remap = get_column_map(container)
+	header = get_panel_header(container)
+	new_columns = get_new_columns()
+
+	# Read file into dataframe
+	df = pd.read_csv(params["input"]["filename"], encoding="utf-8", sep='|', compression="gzip", error_bad_lines=False)
+	
+	# Rename and add columns
+	df = df.rename(columns=column_remap)
+	for column in new_columns:
+		df[column] = ""
+
+	# Reorder header
+	df = df[header]
+	input(df.axes)
+	
+	#df.sort(column="UNIQUE_MEM_ID")
+
+def run_panel(params, filename):
 	"""Process a single panel"""
 
 	row_limit = None
 	key = load_hyperparameters(params)
 	params["add_header"] = True
 	split_count = 0
-	container = identify_container(filename)
+	container = identify_container(params)
 	params["container"] = container
 	classifier = select_model(container)
 

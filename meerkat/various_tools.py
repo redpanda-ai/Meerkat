@@ -46,6 +46,56 @@ def write_dict_list(dict_list, file_name, encoding="utf-8", delimiter="|", colum
 		dict_w.writeheader()
 		dict_w.writerows(dict_list)
 
+def get_panel_header(container):
+	"""Return an ordered consistent header for panels"""
+
+	header = [\
+		"UNIQUE_MEM_ID", "UNIQUE___BLANK_ACCOUNT_ID", "UNIQUE___BLANK_TRANSACTION_ID",\
+		"MEM_ID", "__BLANK_ACCOUNT_ID", "__BLANK_TRANSACTION_ID", "COBRAND_ID",\
+		"SUM_INFO_ID", "AMOUNT", "CURRENCY_ID", "DESCRIPTION", "TRANSACTION_DATE",\
+		"POST_DATE", "TRANSACTION_BASE_TYPE", "TRANSACTION_CATEGORY_ID",\
+		"TRANSACTION_CATEGORY_NAME", "MERCHANT_NAME", "STORE_ID", "FACTUAL_CATEGORY",\
+		"STREET", "CITY", "STATE", "ZIP_CODE", "WEBSITE", "PHONE_NUMBER", "FAX_NUMBER",\
+		"CHAIN_NAME", "LATITUDE", "LONGITUDE", "NEIGHBOURHOOD", "TRANSACTION_ORIGIN",\
+		"CONFIDENCE_SCORE", "FACTUAL_ID", "FILE_CREATED_DATE"
+	]
+
+	container = container.upper()
+	header = [x.replace("__BLANK", container) for x in header]
+	return header
+
+def get_column_map(container):
+	"""Fix old or erroneous column names"""
+
+	return {
+		"UNIQUE_ACCOUNT_ID" : "UNIQUE_" + container.upper() + "_ACCOUNT_ID",
+		"UNIQUE_TRANSACTION_ID" : "UNIQUE_" + container.upper() + "_TRANSACTION_ID",
+		"TYPE" : "TRANSACTION_BASE_TYPE",
+		"GOOD_DESCRIPTION" : "MERCHANT_NAME"
+	}
+
+def get_new_columns():
+	"""Return a list of new columns to add to a panel"""
+
+	return [
+		'STORE_ID', 
+		'FACTUAL_CATEGORY', 
+		'STREET', 
+		'CITY', 
+		'STATE', 
+		'ZIP_CODE', 
+		'WEBSITE', 
+		'PHONE_NUMBER', 
+		'FAX_NUMBER', 
+		'CHAIN_NAME', 
+		'LATITUDE', 
+		'LONGITUDE', 
+		'NEIGHBOURHOOD', 
+		'TRANSACTION_ORIGIN', 
+		'CONFIDENCE_SCORE', 
+		'FACTUAL_ID'
+	]
+
 def to_stdout(string, errors="replace"):
 	"""Converts a string to stdout compatible encoding"""
 
