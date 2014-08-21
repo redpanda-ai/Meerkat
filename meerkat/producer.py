@@ -27,6 +27,7 @@ import re
 import queue
 import sys
 import string
+import io
 
 import boto
 import pandas as pd
@@ -389,15 +390,15 @@ def process_panel(params):
 def clean_panel(params):
 	"""Cleans up any issues with the input panel"""
 
-	params["input"]["filename"] = "/mnt/ephemeral/input/20140524_GPANEL_CARD.txt.gz"
+	params["input"]["filename"] = "/mnt/ephemeral/input/20140109_GPANEL_BANK.txt.gz"
 	container = params["container"]
 	column_remap = get_column_map(container)
 	header = get_panel_header(container)
 	new_columns = get_new_columns()
 
 	# Read file into dataframe
-	df = pd.read_csv(params["input"]["filename"], encoding="utf-8", sep='|', compression="gzip", error_bad_lines=False)
-	
+	df = pd.read_csv(params["input"]["filename"], compression="gzip", encoding="utf-8", sep='|', error_bad_lines=False)
+
 	# Rename and add columns
 	df = df.rename(columns=column_remap)
 	for column in new_columns:
@@ -405,8 +406,10 @@ def clean_panel(params):
 
 	# Reorder header
 	df = df[header]
-	input(df.axes)
-	
+	print(df.axes)
+	print(df.shape)
+	sys.exit()
+
 	#df.sort(column="UNIQUE_MEM_ID")
 
 def run_panel(params, filename):
