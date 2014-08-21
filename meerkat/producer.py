@@ -408,8 +408,10 @@ def df_to_queue(params, df):
 	df['IS_PHYSICAL_TRANSACTION'] = df.apply(f, axis=1)
 	gb = df.groupby('IS_PHYSICAL_TRANSACTION')
 
-	print(gb.groups)
-	print(df.head())
+	for name, group in gb:
+		print(name)
+		print(len(group))
+
 	sys.exit()
 
 def clean_dataframe(params, df):
