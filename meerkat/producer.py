@@ -377,42 +377,49 @@ def production_run(params):
 		# Clean File
 		container = identify_container(params)
 		params["container"] = container
-		clean_panel(params)
+		reader = load_dataframe(params)
 
 		# Process With Meerkat
-		process_panel(params)
+		run_panel(params, reader)
 
 		# Push to S3
 
-def process_panel(params):
+def run_panel(params, reader):
 	"""Process a single panel"""
 
-def clean_panel(params):
-	"""Cleans up any issues with the input panel"""
-
-	params["input"]["filename"] = "/mnt/ephemeral/input/20140109_GPANEL_BANK.txt.gz"
 	container = params["container"]
 	column_remap = get_column_map(container)
 	header = get_panel_header(container)
 	new_columns = get_new_columns()
 
-	# Read file into dataframe
-	df = pd.read_csv(params["input"]["filename"], compression="gzip", encoding="utf-8", sep='|', error_bad_lines=False)
+	for df in reader:
 
-	# Rename and add columns
-	df = df.rename(columns=column_remap)
-	for column in new_columns:
-		df[column] = ""
+		# Rename and add columns
+		df = df.rename(columns=column_remap)
+		for column in new_columns:
+			df[column] = ""
 
-	# Reorder header
-	df = df[header]
-	print(df.axes)
-	print(df.shape)
+		# Reorder header
+		df = df[header]
+
+		# Sort by user
+		df = df.sort("UNIQUE_MEM_ID")
+
+		print(df.shape)
+
 	sys.exit()
 
-	#df.sort(column="UNIQUE_MEM_ID")
+def load_dataframe(params):
+	"""Loads file into a pandas dataframe"""
 
-def run_panel(params, filename):
+	params["input"]["filename"] = "/mnt/ephemeral/input/20140109_GPANEL_BANK.txt.gz"
+
+	# Read file into dataframe
+	reader = pd.read_csv(params["input"]["filename"], chunksize=100000, compression="gzip", encoding="utf-8", sep='|', error_bad_lines=False)
+	
+	return reader
+
+def process_panel(params, filename):
 	"""Process a single panel"""
 
 	row_limit = None
