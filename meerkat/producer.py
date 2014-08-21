@@ -371,10 +371,10 @@ def production_run(params):
 		dst_file_name = src_file_name
 
 		# Copy from S3
-		item.get_contents_to_filename(S3_params["src_local_path"] + src_file_name)
+		#item.get_contents_to_filename(S3_params["src_local_path"] + src_file_name)
 		params["input"]["filename"] = S3_params["src_local_path"] + src_file_name
 
-		# Clean File
+		# Load into Dataframe
 		container = identify_container(params)
 		params["container"] = container
 		reader = load_dataframe(params)
@@ -405,6 +405,8 @@ def run_panel(params, reader):
 		# Sort by user
 		df = df.sort("UNIQUE_MEM_ID")
 
+		reader.chunksize = reader.chunksize + 100000
+
 		print(df.shape)
 
 	sys.exit()
@@ -416,7 +418,7 @@ def load_dataframe(params):
 
 	# Read file into dataframe
 	reader = pd.read_csv(params["input"]["filename"], chunksize=100000, compression="gzip", encoding="utf-8", sep='|', error_bad_lines=False)
-	
+
 	return reader
 
 def process_panel(params, filename):
