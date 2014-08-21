@@ -408,9 +408,10 @@ def df_to_queue(params, df):
 	df['IS_PHYSICAL_TRANSACTION'] = df.apply(f, axis=1)
 	gb = df.groupby('IS_PHYSICAL_TRANSACTION')
 
-	for name, group in gb:
-		print(name)
-		print(len(group))
+	physical = pd.concat([gb.get_group('1'), gb.get_group('2')])
+	non_physical = gb.get_group('0')
+
+	# TODO load physical to queue
 
 	sys.exit()
 
