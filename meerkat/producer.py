@@ -164,7 +164,6 @@ def run_meerkat(params, desc_queue, hyperparameters, non_physical, split):
 	if params.get("mode", "") == "test":
 		accuracy_results = test_accuracy(params, result_list=result_list, non_physical_trans=non_physical)
 		print_results(accuracy_results)
-		return accuracy_results
 
 def usage():
 	"""Shows the user which parameters to send into the program."""
@@ -387,29 +386,49 @@ def production_run(params):
 def run_panel(params, reader):
 	"""Process a single panel"""
 
+	hyperparameters = load_hyperparameters(params)
+
+	for df in reader:
+
+		# Clean Data
+		df = clean_dataframe(params, df)
+
+		# Load into Queue for Processing
+		desc_queue, non_physical = df_to_queue(params, df)
+
+	sys.exit()
+
+def df_to_queue(params, df):
+	"""Converts a dataframe to a queue for processing"""
+
+	container = params["container"]
+	classifier = select_model(container)
+	f = lambda x: classifier(x["DESCRIPTION_UNMASKED"])
+
+	df['IS_PHYSICAL_TRANSACTION'] = df.apply(f, axis=1)
+	gb = df.groupby('IS_PHYSICAL_TRANSACTION')
+
+	print(gb.groups)
+	print(df.head())
+	sys.exit()
+
+def clean_dataframe(params, df):
+	"""Fix issues with current dataframe"""
+
 	container = params["container"]
 	column_remap = get_column_map(container)
 	header = get_panel_header(container)
 	new_columns = get_new_columns()
 
-	for df in reader:
+	# Rename and add columns
+	df = df.rename(columns=column_remap)
+	for column in new_columns:
+		df[column] = ""
 
-		# Rename and add columns
-		df = df.rename(columns=column_remap)
-		for column in new_columns:
-			df[column] = ""
+	# Reorder header
+	df = df[header]
 
-		# Reorder header
-		df = df[header]
-
-		# Sort by user
-		df = df.sort("UNIQUE_MEM_ID")
-
-		reader.chunksize = reader.chunksize + 100000
-
-		print(df.shape)
-
-	sys.exit()
+	return df
 
 def load_dataframe(params):
 	"""Loads file into a pandas dataframe"""
@@ -417,7 +436,7 @@ def load_dataframe(params):
 	params["input"]["filename"] = "/mnt/ephemeral/input/20140109_GPANEL_BANK.txt.gz"
 
 	# Read file into dataframe
-	reader = pd.read_csv(params["input"]["filename"], chunksize=100000, compression="gzip", encoding="utf-8", sep='|', error_bad_lines=False)
+	reader = pd.read_csv(params["input"]["filename"], chunksize=1000, compression="gzip", encoding="utf-8", sep='|', error_bad_lines=False)
 
 	return reader
 
