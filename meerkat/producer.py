@@ -401,6 +401,9 @@ def run_panel(params, reader):
 		# Classify Transaction Chunk
 		physical = run_meerkat_chunk(params, desc_queue, hyperparameters)
 
+		# Combine Split Dataframes
+		chunk = pd.concat(physical, non_physical)
+
 		input("Finished Chunk")
 
 	sys.exit()
