@@ -65,6 +65,28 @@ def get_panel_header(container):
 	header = [x.replace("__BLANK", container) for x in header]
 	return header
 
+def get_yodlee_factual_map():
+	"""Return a map of factual attribute names to
+	yodlee attribute names"""
+
+	return {
+		"factual_id" : "FACTUAL_ID",
+		"address" : "STREET",
+		"tel" : "PHONE_NUMBER",
+		"latitude" : "LATITUDE",
+		"longitude" : "LONGITUDE",
+		"postcode" : "ZIP_CODE",
+		"region" : "STATE",
+		"website" : "WEBSITE",
+		"locality" : "CITY",
+		"z_score_delta" : "CONFIDENCE_SCORE",
+		"category_labels" : "FACTUAL_CATEGORY",
+		"chain_name" : "CHAIN_NAME",
+		"neighborhood" : "NEIGHBOURHOOD",
+		"internal_store_number" : "STORE_ID",
+		"name" : "MERCHANT_NAME"
+	}
+
 def get_column_map(container):
 	"""Fix old or erroneous column names"""
 

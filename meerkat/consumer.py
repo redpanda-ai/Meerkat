@@ -28,7 +28,7 @@ from sklearn.preprocessing import StandardScaler
 from scipy.stats.mstats import zscore
 from pprint import pprint
 
-from .various_tools import string_cleanse, synonyms, safe_print
+from .various_tools import string_cleanse, synonyms, safe_print, get_yodlee_factual_map
 from .various_tools import get_bool_query, get_qs_query, get_us_cities
 from .clustering import cluster, collect_clusters
 from .location import separate_geo, scale_polygon, get_geo_query
@@ -379,34 +379,35 @@ class Consumer(threading.Thread):
 		enriched_transaction = transaction
 		field_names = self.params["output"]["results"]["fields"]
 		fields_in_hit = [field for field in hit_fields]
+		yfm = get_yodlee_factual_map()
 
 		# Enrich with the fields we've found. Attach the z_score_delta
 		if decision == True:
 			for field in field_names:
 				if field in fields_in_hit:
 					field_content = hit_fields[field][0] if isinstance(hit_fields[field], (list)) else str(hit_fields[field])
-					enriched_transaction[field] = field_content
+					enriched_transaction[yfm.get(field, field)] = field_content
 				else:
-					enriched_transaction[field] = ""
-			enriched_transaction["z_score_delta"] = z_score_delta
+					enriched_transaction[yfm.get(field, field)] = ""
+			enriched_transaction[yfm["z_score_delta"]] = z_score_delta
 
 		# Add Business Name, City and State as a fallback
 		if decision == False:
 			for field in field_names:
-				enriched_transaction[field] = ""
+				enriched_transaction[yfm.get(field, field)] = ""
 			enriched_transaction = self.__business_name_fallback(business_names, transaction)
 			enriched_transaction = self.__geo_fallback(city_names, state_names, transaction)
-			enriched_transaction["z_score_delta"] = 0
+			enriched_transaction[yfm["z_score_delta"]] = 0
 
 		# Remove Good Description
 		if enriched_transaction['GOOD_DESCRIPTION'] != "":
-			enriched_transaction['name'] = enriched_transaction['GOOD_DESCRIPTION']
+			enriched_transaction[yfm['name']] = enriched_transaction['GOOD_DESCRIPTION']
 			
 		enriched_transaction["GOOD_DESCRIPTION"] = ""
 
 		# Ensure Proper Casing
-		if enriched_transaction['name'] == enriched_transaction['name'].upper():
-			enriched_transaction['name'] = string.capwords(enriched_transaction['name'], " ")
+		if enriched_transaction[yfm['name']] == enriched_transaction[yfm['name']].upper():
+			enriched_transaction[yfm['name']] = string.capwords(enriched_transaction[yfm['name']], " ")
 
 		return enriched_transaction
 
@@ -421,6 +422,7 @@ class Consumer(threading.Thread):
 		when no factual_id is found"""
 
 		fields = self.params["output"]["results"]["fields"]
+		yfm = get_yodlee_factual_map()
 		enriched_transaction = transaction
 		city_names = city_names[0:2]
 		state_names = state_names[0:2]
@@ -429,10 +431,10 @@ class Consumer(threading.Thread):
 		state_in_transaction = (state_names[0].lower() in enriched_transaction["DESCRIPTION_UNMASKED"].lower())
 
 		if (city_in_transaction):
-			enriched_transaction['locality'] = city_names[0]
+			enriched_transaction[yfm['locality']] = city_names[0]
 
 		if (states_equal and state_in_transaction):
-			enriched_transaction['region'] = state_names[0]
+			enriched_transaction[yfm['region']] = state_names[0]
 
 		return enriched_transaction
 
@@ -441,6 +443,7 @@ class Consumer(threading.Thread):
 		when no factual_id is found"""
 
 		fields = self.params["output"]["results"]["fields"]
+		yfm = get_yodlee_factual_map()
 		enriched_transaction = transaction
 		business_names = business_names[0:2]
 		top_name = business_names[0].lower()
@@ -448,10 +451,10 @@ class Consumer(threading.Thread):
 		not_a_city = top_name not in self.cities
 
 		if (all_equal and not_a_city):
-			enriched_transaction['name'] = business_names[0]
+			enriched_transaction[yfm['name']] = business_names[0]
 
 		if enriched_transaction['GOOD_DESCRIPTION'] != "":
-			enriched_transaction['name'] = enriched_transaction['GOOD_DESCRIPTION']
+			enriched_transaction[yfm['name']] = enriched_transaction['GOOD_DESCRIPTION']
 
 		return enriched_transaction
 

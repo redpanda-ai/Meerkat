@@ -399,7 +399,7 @@ def run_panel(params, reader):
 		desc_queue, non_physical = df_to_queue(params, chunk)
 
 		# Classify Transaction Chunk
-		result_queue = run_meerkat_chunk(params, desc_queue, hyperparameters)
+		physical = run_meerkat_chunk(params, desc_queue, hyperparameters)
 
 		input("Finished Chunk")
 
@@ -411,6 +411,8 @@ def run_meerkat_chunk(params, desc_queue, hyperparameters):
 	# Run the Classifier
 	consumer_threads = params.get("concurrency", 8)
 	result_queue = queue.Queue()
+	header = get_panel_header(params["container"])
+	df = pd.DataFrame()
 
 	for i in range(consumer_threads):
 		new_consumer = Consumer(i, params, desc_queue,\
@@ -420,7 +422,17 @@ def run_meerkat_chunk(params, desc_queue, hyperparameters):
 
 	desc_queue.join()
 
-	return result_queue
+	# Dequeue results into dataframe
+	while result_queue.qsize() > 0:
+		row = result_queue.get()
+		df = pd.concat([pd.DataFrame([row]), df])
+		result_queue.task_done()
+
+	result_queue.join()
+
+	print(df.shape)
+
+	return df
 
 def df_to_queue(params, df):
 	"""Converts a dataframe to a queue for processing"""
@@ -430,12 +442,15 @@ def df_to_queue(params, df):
 	f = lambda x: classifier(x["DESCRIPTION_UNMASKED"])
 	desc_queue = queue.Queue()
 
+	# Classify transactions
 	df['IS_PHYSICAL_TRANSACTION'] = df.apply(f, axis=1)
 	gb = df.groupby('IS_PHYSICAL_TRANSACTION')
 
+	# Group into separate dataframes
 	physical = pd.concat([gb.get_group('1'), gb.get_group('2')])
 	non_physical = gb.get_group('0')
 
+	# Group by user
 	users = physical.groupby('UNIQUE_MEM_ID')
 
 	for user in users:
