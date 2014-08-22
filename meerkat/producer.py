@@ -165,6 +165,8 @@ def run_meerkat(params, desc_queue, hyperparameters, non_physical, split):
 		accuracy_results = test_accuracy(params, result_list=result_list, non_physical_trans=non_physical)
 		print_results(accuracy_results)
 
+	return result_list
+
 def usage():
 	"""Shows the user which parameters to send into the program."""
 	result = "Usage:\n\t<path_to_json_format_config_file>"
@@ -388,15 +390,37 @@ def run_panel(params, reader):
 
 	hyperparameters = load_hyperparameters(params)
 
-	for df in reader:
+	for chunk in reader:
 
 		# Clean Data
-		df = clean_dataframe(params, df)
+		chunk = clean_dataframe(params, chunk)
 
 		# Load into Queue for Processing
-		desc_queue, non_physical = df_to_queue(params, df)
+		desc_queue, non_physical = df_to_queue(params, chunk)
+
+		# Classify Transaction Chunk
+		result_queue = run_meerkat_chunk(params, desc_queue, hyperparameters)
+
+		input("Finished Chunk")
 
 	sys.exit()
+
+def run_meerkat_chunk(params, desc_queue, hyperparameters):
+	"""Run meerkat on a chunk of data"""
+
+	# Run the Classifier
+	consumer_threads = params.get("concurrency", 8)
+	result_queue = queue.Queue()
+
+	for i in range(consumer_threads):
+		new_consumer = Consumer(i, params, desc_queue,\
+			result_queue, hyperparameters)
+		new_consumer.setDaemon(True)
+		new_consumer.start()
+
+	desc_queue.join()
+
+	return result_queue
 
 def df_to_queue(params, df):
 	"""Converts a dataframe to a queue for processing"""
@@ -404,6 +428,7 @@ def df_to_queue(params, df):
 	container = params["container"]
 	classifier = select_model(container)
 	f = lambda x: classifier(x["DESCRIPTION_UNMASKED"])
+	desc_queue = queue.Queue()
 
 	df['IS_PHYSICAL_TRANSACTION'] = df.apply(f, axis=1)
 	gb = df.groupby('IS_PHYSICAL_TRANSACTION')
@@ -411,9 +436,15 @@ def df_to_queue(params, df):
 	physical = pd.concat([gb.get_group('1'), gb.get_group('2')])
 	non_physical = gb.get_group('0')
 
-	# TODO load physical to queue
+	users = physical.groupby('UNIQUE_MEM_ID')
 
-	sys.exit()
+	for user in users:
+		user_trans = []
+		for i, row in user[1].iterrows():
+			user_trans.append(row.to_dict())
+		desc_queue.put(user_trans)
+
+	return desc_queue, non_physical
 
 def clean_dataframe(params, df):
 	"""Fix issues with current dataframe"""
@@ -439,7 +470,7 @@ def load_dataframe(params):
 	params["input"]["filename"] = "/mnt/ephemeral/input/20140109_GPANEL_BANK.txt.gz"
 
 	# Read file into dataframe
-	reader = pd.read_csv(params["input"]["filename"], chunksize=1000, compression="gzip", encoding="utf-8", sep='|', error_bad_lines=False)
+	reader = pd.read_csv(params["input"]["filename"], na_filter=False, chunksize=1000, compression="gzip", encoding="utf-8", sep='|', error_bad_lines=False)
 
 	return reader
 

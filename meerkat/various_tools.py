@@ -58,7 +58,7 @@ def get_panel_header(container):
 		"STREET", "CITY", "STATE", "ZIP_CODE", "WEBSITE", "PHONE_NUMBER", "FAX_NUMBER",\
 		"CHAIN_NAME", "LATITUDE", "LONGITUDE", "NEIGHBOURHOOD", "TRANSACTION_ORIGIN",\
 		"CONFIDENCE_SCORE", "FACTUAL_ID", "FILE_CREATED_DATE", "DESCRIPTION_UNMASKED",\
-		"IS_PHYSICAL_TRANSACTION"
+		"IS_PHYSICAL_TRANSACTION", "GOOD_DESCRIPTION"
 	]
 
 	container = container.upper()
@@ -71,8 +71,7 @@ def get_column_map(container):
 	return {
 		"UNIQUE_ACCOUNT_ID" : "UNIQUE_" + container.upper() + "_ACCOUNT_ID",
 		"UNIQUE_TRANSACTION_ID" : "UNIQUE_" + container.upper() + "_TRANSACTION_ID",
-		"TYPE" : "TRANSACTION_BASE_TYPE",
-		"GOOD_DESCRIPTION" : "MERCHANT_NAME"
+		"TYPE" : "TRANSACTION_BASE_TYPE"
 	}
 
 def get_new_columns():
@@ -90,7 +89,8 @@ def get_new_columns():
 		'FAX_NUMBER', 
 		'CHAIN_NAME', 
 		'LATITUDE', 
-		'LONGITUDE', 
+		'LONGITUDE',
+		'MERCHANT_NAME',
 		'NEIGHBOURHOOD', 
 		'TRANSACTION_ORIGIN', 
 		'CONFIDENCE_SCORE', 
