@@ -93,7 +93,8 @@ def get_column_map(container):
 	return {
 		"UNIQUE_ACCOUNT_ID" : "UNIQUE_" + container.upper() + "_ACCOUNT_ID",
 		"UNIQUE_TRANSACTION_ID" : "UNIQUE_" + container.upper() + "_TRANSACTION_ID",
-		"TYPE" : "TRANSACTION_BASE_TYPE"
+		"TYPE" : "TRANSACTION_BASE_TYPE",
+		"MERCHANT_NAME" : "GOOD_DESCRIPTION"
 	}
 
 def get_new_columns():

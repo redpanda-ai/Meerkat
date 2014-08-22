@@ -381,14 +381,16 @@ def production_run(params):
 		reader = load_dataframe(params)
 
 		# Process With Meerkat
-		run_panel(params, reader)
+		run_panel(params, reader, dst_file_name)
 
 		# Push to S3
 
-def run_panel(params, reader):
+def run_panel(params, reader, dst_file_name):
 	"""Process a single panel"""
 
 	hyperparameters = load_hyperparameters(params)
+	dst_local_path = params["input"]["S3"]["dst_local_path"]
+	header = get_panel_header(params["container"])[0:3]
 
 	for chunk in reader:
 
@@ -402,9 +404,10 @@ def run_panel(params, reader):
 		physical = run_meerkat_chunk(params, desc_queue, hyperparameters)
 
 		# Combine Split Dataframes
-		chunk = pd.concat(physical, non_physical)
+		chunk = pd.concat([physical, non_physical])
 
-		input("Finished Chunk")
+		# Write
+		chunk.to_csv(dst_local_path + dst_file_name, columns=header, sep="|", mode="a", encoding="utf-8")
 
 	sys.exit()
 
@@ -433,8 +436,6 @@ def run_meerkat_chunk(params, desc_queue, hyperparameters):
 
 	result_queue.join()
 
-	print(df.shape)
-
 	return df
 
 def df_to_queue(params, df):
@@ -450,8 +451,12 @@ def df_to_queue(params, df):
 	gb = df.groupby('IS_PHYSICAL_TRANSACTION')
 
 	# Group into separate dataframes
-	physical = pd.concat([gb.get_group('1'), gb.get_group('2')])
-	non_physical = gb.get_group('0')
+	groups = list(gb.groups.keys())
+	one = gb.get_group('1') if '1' in groups else pd.DataFrame()
+	two = gb.get_group('2') if '2' in groups else pd.DataFrame()
+
+	physical = pd.concat([one, two])
+	non_physical = gb.get_group('0') if '0' in groups else pd.DataFrame()
 
 	# Group by user
 	users = physical.groupby('UNIQUE_MEM_ID')
@@ -485,7 +490,8 @@ def clean_dataframe(params, df):
 def load_dataframe(params):
 	"""Loads file into a pandas dataframe"""
 
-	params["input"]["filename"] = "/mnt/ephemeral/input/20140109_GPANEL_BANK.txt.gz"
+	# TEMPORARY
+	params["input"]["filename"] = "/mnt/ephemeral/input/100000_CARD.txt.gz"
 
 	# Read file into dataframe
 	reader = pd.read_csv(params["input"]["filename"], na_filter=False, chunksize=1000, compression="gzip", encoding="utf-8", sep='|', error_bad_lines=False)
