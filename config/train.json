@@ -5,7 +5,7 @@
 	"mode" : "train",
 	"input" : {
 		"hyperparameters" : "config/hyperparameters/default.json",
-		"filename" : "/mnt/ephemeral/input/100000_CARD.txt",
+		"filename" : "/mnt/ephemeral/input/10000_CARD.txt",
 		"delimiter" : "|",
 		"encoding" : "utf-8",
 		"split" : {

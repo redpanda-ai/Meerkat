@@ -135,7 +135,7 @@ class Consumer(threading.Thread):
 			return False
 
 	def __init__(self, thread_id, params, desc_queue, result_queue,\
-		hyperparameters):
+		hyperparameters, cities):
 		''' Constructor '''
 		threading.Thread.__init__(self)
 		self.thread_id = thread_id
@@ -144,7 +144,7 @@ class Consumer(threading.Thread):
 		self.user = None
 		self.params = params
 		self.hyperparameters = hyperparameters
-		self.cities = get_us_cities()
+		self.cities = cities
 
 		cluster_nodes = self.params["elasticsearch"]["cluster_nodes"]
 		self.es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True,

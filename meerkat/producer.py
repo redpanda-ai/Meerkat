@@ -38,7 +38,7 @@ from meerkat.consumer import Consumer
 from meerkat.binary_classifier.load import select_model
 from meerkat.various_tools import load_dict_list, safely_remove_file, load_hyperparameters, safe_print
 from meerkat.various_tools import split_csv, merge_split_files, queue_to_list, string_cleanse
-from meerkat.various_tools import get_panel_header, get_column_map, get_new_columns
+from meerkat.various_tools import get_panel_header, get_column_map, get_new_columns, get_us_cities
 from meerkat.accuracy import test_accuracy, print_results, speed_tests
 from meerkat.optimization import run_meerkat as test_meerkat
 from meerkat.optimization import get_desc_queue as get_simple_queue
@@ -392,6 +392,7 @@ def run_panel(params, reader, dst_file_name):
 	hyperparameters = load_hyperparameters(params)
 	dst_local_path = params["input"]["S3"]["dst_local_path"]
 	header = get_panel_header(params["container"])[0:3]
+	cities = get_us_cities()
 
 	for chunk in reader:
 
@@ -402,7 +403,7 @@ def run_panel(params, reader, dst_file_name):
 		desc_queue, non_physical = df_to_queue(params, chunk)
 
 		# Classify Transaction Chunk
-		physical = run_meerkat_chunk(params, desc_queue, hyperparameters)
+		physical = run_meerkat_chunk(params, desc_queue, hyperparameters, cities)
 
 		# Combine Split Dataframes
 		chunk = pd.concat([physical, non_physical])
@@ -412,18 +413,18 @@ def run_panel(params, reader, dst_file_name):
 
 	sys.exit()
 
-def run_meerkat_chunk(params, desc_queue, hyperparameters):
+def run_meerkat_chunk(params, desc_queue, hyperparameters, cities):
 	"""Run meerkat on a chunk of data"""
 
 	# Run the Classifier
 	consumer_threads = params.get("concurrency", 8)
 	result_queue = queue.Queue()
 	header = get_panel_header(params["container"])
-	df = pd.DataFrame()
+	output = []
 
 	for i in range(consumer_threads):
 		new_consumer = Consumer(i, params, desc_queue,\
-			result_queue, hyperparameters)
+			result_queue, hyperparameters, cities)
 		new_consumer.setDaemon(True)
 		new_consumer.start()
 
@@ -432,12 +433,12 @@ def run_meerkat_chunk(params, desc_queue, hyperparameters):
 	# Dequeue results into dataframe
 	while result_queue.qsize() > 0:
 		row = result_queue.get()
-		df = pd.concat([pd.DataFrame([row]), df])
+		output.append(row)
 		result_queue.task_done()
 
 	result_queue.join()
 
-	return df
+	return pd.DataFrame([output])
 
 def df_to_queue(params, df):
 	"""Converts a dataframe to a queue for processing"""
@@ -452,12 +453,12 @@ def df_to_queue(params, df):
 	gb = df.groupby('IS_PHYSICAL_TRANSACTION')
 
 	# Group into separate dataframes
-	groups = list(gb.groups.keys())
-	one = gb.get_group('1') if '1' in groups else pd.DataFrame()
-	two = gb.get_group('2') if '2' in groups else pd.DataFrame()
+	if container == "bank":
+		physical = pd.concat([gb.get_group('1'), gb.get_group('2')])
+	elif container == "card":
+		physical = gb.get_group('1')
 
-	physical = pd.concat([one, two])
-	non_physical = gb.get_group('0') if '0' in groups else pd.DataFrame()
+	non_physical = gb.get_group('0')
 
 	# Group by user
 	users = physical.groupby('UNIQUE_MEM_ID')
@@ -492,10 +493,10 @@ def load_dataframe(params):
 	"""Loads file into a pandas dataframe"""
 
 	# TEMPORARY
-	params["input"]["filename"] = "/mnt/ephemeral/input/100000_CARD.txt.gz"
+	params["input"]["filename"] = "/mnt/ephemeral/input/100000_CARD.txt"
 
 	# Read file into dataframe
-	reader = pd.read_csv(params["input"]["filename"], na_filter=False, chunksize=1000, compression="gzip", encoding="utf-8", sep='|', error_bad_lines=False)
+	reader = pd.read_csv(params["input"]["filename"], na_filter=False, chunksize=1000, encoding="utf-8", sep='|', error_bad_lines=False)
 
 	return reader
 
