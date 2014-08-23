@@ -1,15 +1,16 @@
 {
 	"concurrency" : 36,
-	"verification_source" : "data/misc/ground_truth_bank.txt",
+	"verification_source" : "data/misc/ground_truth_card.txt",
+	"container" : "card",
 	"mode" : "test",
 	"input" : {
 		"hyperparameters" : "config/hyperparameters/default.json",
-		"filename" : "data/misc/ground_truth_bank.txt",
+		"filename" : "/mnt/ephemeral/input/100000_CARD.txt",
 		"delimiter" : "|",
 		"encoding" : "utf-8",
 		"split" : {
 			"processing_location" : "/mnt/ephemeral/input/",
-			"row_limit" : 10000
+			"row_limit" : 1000
 		}
 	},
 	"logging" : {
@@ -31,7 +32,7 @@
 		},
 		"file" : {
 			"format" : "csv",
-			"processing_location" : "/data/output/",
+			"processing_location" : "/mnt/ephemeral/output/",
 			"delimiter" : "|"
 		}
 	},

@@ -142,7 +142,7 @@ def run_meerkat(params, desc_queue, hyperparameters):
 
 	# Suppress Output and Classify
 	for i in range(consumer_threads):
-		new_consumer = DescriptionConsumer(i, params, desc_queue, result_queue, hyperparameters)
+		new_consumer = Consumer(i, params, desc_queue, result_queue, hyperparameters)
 		new_consumer.setDaemon(True)
 		new_consumer.start()
 

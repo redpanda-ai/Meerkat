@@ -363,9 +363,9 @@ class Consumer(threading.Thread):
 		decision = self.__decision_boundary(z_score_delta)
 
 		# Interactive Mode
-		if params["mode"] == "test":
-			args = [params, scores, transaction, hits, business_names, city_names, state_names]
-			self.__interactive_mode(*args)
+		#if params["mode"] == "test":
+			#args = [params, scores, transaction, hits, business_names, city_names, state_names]
+			#self.__interactive_mode(*args)
 
 		# Enrich Data if Passes Boundary
 		args = [decision, transaction, hit_fields, z_score_delta, business_names, city_names, state_names]

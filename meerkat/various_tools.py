@@ -229,14 +229,12 @@ def purge(dir, pattern):
 
 def string_cleanse(original_string):
 	"""Strips out characters that might confuse ElasticSearch."""
-	original_string = original_string.replace("OR", "or")
-	original_string = original_string.replace("AND", "and")
 	bad_characters = [r"\[", r"\]", r"\{", r"\}", r'"', r"/", r"\\", r"\:",
 		r"\(", r"\)", r"-", r"\+", r">", r"!", r"\*", r"\|\|", r"&&", r"~"]
 	bad_character_regex = "|".join(bad_characters)
 	cleanse_pattern = re.compile(bad_character_regex)
 	with_spaces = re.sub(cleanse_pattern, " ", original_string)
-	return ' '.join(with_spaces.split())
+	return ' '.join(with_spaces.split()).lower()
 
 def build_boost_vectors(params):
 	"""Turns field boosts into dictionary of numpy arrays"""

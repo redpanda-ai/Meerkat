@@ -84,6 +84,7 @@ def get_desc_queue(filename, params, classifier):
 
 	# Hold on to GOOD_DESCRIPTION, clear fields
 	for row in physical:
+		row["GOOD_DESCRIPTION"] = row["MERCHANT_NAME"]
 		gd = string_cleanse(row["GOOD_DESCRIPTION"])
 		row["GOOD_DESCRIPTION"] = string.capwords(gd, " ")
 
@@ -537,6 +538,7 @@ def process_panel(params, filename):
 
 		desc_queue, non_physical = get_desc_queue(split, params, classifier)
 		run_meerkat(params, desc_queue, key, non_physical, split)
+		print("Marker")
 
 		end_time = datetime.datetime.now()
 		total_time = end_time - start_time
@@ -575,7 +577,7 @@ def mode_switch(params):
 		print("Processing Single Local File: ", input_file)
 		params["output"]["file"]["name"] = os.path.basename(input_file)
 		conn = connect_to_S3()
-		process_panel(params, input_file, conn)
+		process_panel(params, input_file)
 	else:
 		logging.critical("Please provide a local file or s3 bucket for procesing. Terminating")
 		sys.exit()

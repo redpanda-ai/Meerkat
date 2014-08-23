@@ -18,7 +18,7 @@ try:
 
 except (KeyboardInterrupt, SystemExit) as e:
 
-	if params["input"]["S3"]:
+	if params["input"].get("S3", "") != "":
 		input_dir = params["input"]["S3"]["src_local_path"]
 		output_dir = params["input"]["S3"]["dst_local_path"]
 		purge(input_dir, "output*")
