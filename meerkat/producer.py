@@ -406,7 +406,16 @@ def run_panel(params, reader, dst_file_name):
 	cities = get_us_cities()
 	first_chunk = True
 
+	# Capture Errors
+	errors = []
+	old_stderr = sys.stderr
+	sys.stderr = mystderr = StringIO()
+
 	for chunk in reader:
+
+		# Save Errors
+		errors += mystderr.getvalue().split('\\n')
+		sys.stderr = old_stderr
 
 		# Clean Data
 		chunk = clean_dataframe(params, chunk)
@@ -421,7 +430,7 @@ def run_panel(params, reader, dst_file_name):
 		chunk = pd.concat([physical, non_physical])
 
 		# Write 
-		dst_file_name = "20140720_GPANEL_BANK.txt.gz"
+		dst_file_name = "10000_BANK.txt.gz"
 
 		dst_file_name = os.path.splitext(dst_file_name)[0]
 	
@@ -431,6 +440,12 @@ def run_panel(params, reader, dst_file_name):
 			first_chunk = False
 		else:
 			chunk.to_csv(dst_local_path + dst_file_name, header=False, columns=header, sep="|", mode="a", encoding="utf-8")
+
+		# Handle Errors
+		sys.stderr = mystderr = StringIO()
+
+	print("Errors: ", len(errors))
+	sys.stderr = old_stderr
 
 	return dst_local_path + dst_file_name
 
@@ -515,7 +530,7 @@ def load_dataframe(params):
 	"""Loads file into a pandas dataframe"""
 
 	# TEMPORARY
-	params["input"]["filename"] = "/mnt/ephemeral/input/20140720_GPANEL_BANK.txt.gz"
+	params["input"]["filename"] = "/mnt/ephemeral/input/10000_BANK.txt.gz"
 
 	# Read file into dataframe
 	reader = pd.read_csv(params["input"]["filename"], compression="gzip", na_filter=False, chunksize=3000, encoding="utf-8", sep='|', error_bad_lines=False)
