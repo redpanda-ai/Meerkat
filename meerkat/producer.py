@@ -404,6 +404,7 @@ def run_panel(params, reader, dst_file_name):
 	dst_local_path = params["input"]["S3"]["dst_local_path"]
 	header = get_panel_header(params["container"])[0:-3]
 	cities = get_us_cities()
+	line_count = 0
 	first_chunk = True
 
 	# Capture Errors
@@ -414,6 +415,7 @@ def run_panel(params, reader, dst_file_name):
 	for chunk in reader:
 
 		# Save Errors
+		line_count += chunk.shape[0]
 		errors += mystderr.getvalue().split('\\n')
 		sys.stderr = old_stderr
 
@@ -444,10 +446,23 @@ def run_panel(params, reader, dst_file_name):
 		# Handle Errors
 		sys.stderr = mystderr = StringIO()
 
-	print("Errors: ", len(errors))
 	sys.stderr = old_stderr
 
+	# Write Errors
+	error_count = len(errors)
+	if error_count > 0:
+		for error in errors:
+			write_error_file(dst_local_path, dst_file_name, error_msg)
+		error_summary = [str(line_count), str(error_count), str(1.0 * (error_count / line_count))] 
+		error_msg = "Total line count: {}\nTotal error count: {}\n Success Ratio: {}"
+		error_msg = error_msg.format(*error_summary)
+		write_error_file(dst_local_path, dst_file_name, "", error_msg)
+
 	return dst_local_path + dst_file_name
+
+def write_error_file(path, file_name, line, error_msg):
+	with gzip.open(path + file_name[:-3] + ".error.gz", "ab") as gzipped_output:
+		gzipped_output.write(bytes(total_line + "\n", 'UTF-8'))
 
 def run_meerkat_chunk(params, desc_queue, hyperparameters, cities):
 	"""Run meerkat on a chunk of data"""
