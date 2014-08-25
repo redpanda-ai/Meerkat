@@ -391,8 +391,9 @@ def run_panel(params, reader, dst_file_name):
 
 	hyperparameters = load_hyperparameters(params)
 	dst_local_path = params["input"]["S3"]["dst_local_path"]
-	header = get_panel_header(params["container"])[0:3]
+	header = get_panel_header(params["container"])[0:-3]
 	cities = get_us_cities()
+	first_chunk = True
 
 	for chunk in reader:
 
@@ -408,8 +409,15 @@ def run_panel(params, reader, dst_file_name):
 		# Combine Split Dataframes
 		chunk = pd.concat([physical, non_physical])
 
-		# Write
-		chunk.to_csv(dst_local_path + dst_file_name, columns=header, sep="|", mode="a", encoding="utf-8")
+		# Write 
+		dst_file_name = "1000_BANK.txt.gz"
+	
+		if first_chunk:
+			safe_print("Output Path: " + dst_local_path + dst_file_name)
+			chunk.to_csv(dst_local_path + dst_file_name, columns=header, sep="|", mode="a", encoding="utf-8")
+			first_chunk = False
+		else:
+			chunk.to_csv(dst_local_path + dst_file_name, header=False, columns=header, sep="|", mode="a", encoding="utf-8")
 
 	sys.exit()
 
@@ -438,7 +446,7 @@ def run_meerkat_chunk(params, desc_queue, hyperparameters, cities):
 
 	result_queue.join()
 
-	return pd.DataFrame([output])
+	return pd.DataFrame(output)
 
 def df_to_queue(params, df):
 	"""Converts a dataframe to a queue for processing"""
@@ -458,7 +466,7 @@ def df_to_queue(params, df):
 	elif container == "card":
 		physical = gb.get_group('1')
 
-	non_physical = gb.get_group('0')
+	non_physical = gb.get_group('0').rename(columns = {"GOOD_DESCRIPTION" : "MERCHANT_NAME", "MERCHANT_NAME" : "GOOD_DESCRIPTION"})
 
 	# Group by user
 	users = physical.groupby('UNIQUE_MEM_ID')
@@ -493,10 +501,10 @@ def load_dataframe(params):
 	"""Loads file into a pandas dataframe"""
 
 	# TEMPORARY
-	params["input"]["filename"] = "/mnt/ephemeral/input/100000_CARD.txt"
+	params["input"]["filename"] = "/mnt/ephemeral/input/1000_BANK.txt.gz"
 
 	# Read file into dataframe
-	reader = pd.read_csv(params["input"]["filename"], na_filter=False, chunksize=1000, encoding="utf-8", sep='|', error_bad_lines=False)
+	reader = pd.read_csv(params["input"]["filename"], compression="gzip", na_filter=False, chunksize=300, encoding="utf-8", sep='|', error_bad_lines=False)
 
 	return reader
 

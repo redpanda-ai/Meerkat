@@ -1,7 +1,7 @@
 {
     "concurrency" : 36,
-    "verification_source" : "data/misc/ground_truth_card.txt",
-    "container" : "card",
+    "verification_source" : "data/misc/ground_truth_bank.txt",
+    "container" : "bank",
     "mode" : "production",
     "input" : {
         "S3" : {
