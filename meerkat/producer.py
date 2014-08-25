@@ -466,6 +466,7 @@ def df_to_queue(params, df):
 	elif container == "card":
 		physical = gb.get_group('1')
 
+	# Swap column names to save good description
 	non_physical = gb.get_group('0').rename(columns = {"GOOD_DESCRIPTION" : "MERCHANT_NAME", "MERCHANT_NAME" : "GOOD_DESCRIPTION"})
 
 	# Group by user
@@ -504,7 +505,7 @@ def load_dataframe(params):
 	params["input"]["filename"] = "/mnt/ephemeral/input/1000_BANK.txt.gz"
 
 	# Read file into dataframe
-	reader = pd.read_csv(params["input"]["filename"], compression="gzip", na_filter=False, chunksize=300, encoding="utf-8", sep='|', error_bad_lines=False)
+	reader = pd.read_csv(params["input"]["filename"], compression="gzip", na_filter=False, chunksize=3000, encoding="utf-8", sep='|', error_bad_lines=False)
 
 	return reader
 
