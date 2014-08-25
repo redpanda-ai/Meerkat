@@ -31,7 +31,7 @@ import io
 
 import boto
 import pandas as pd
-from boto.s3.connection import Location, S3Connection
+from boto.s3.connection import Location, S3Connection, Key
 
 from meerkat.custom_exceptions import InvalidArguments, Misconfiguration
 from meerkat.consumer import Consumer
@@ -382,9 +382,20 @@ def production_run(params):
 		reader = load_dataframe(params)
 
 		# Process With Meerkat
-		run_panel(params, reader, dst_file_name)
+		local_dst_file = run_panel(params, reader, dst_file_name)
+
+		# Gzip and Remove
+		with open(local_dst_file, 'rb') as f_in:
+			with gzip.open(local_dst_file + ".gz", 'wb') as f_out:
+				f_out.writelines(f_in)
+
+		safely_remove_file(local_dst_file)
+		safely_remove_file(S3_params["src_local_path"] + src_file_name)
 
 		# Push to S3
+		move_to_S3(params, dst_file_name)
+
+		sys.exit()
 
 def run_panel(params, reader, dst_file_name):
 	"""Process a single panel"""
@@ -410,7 +421,9 @@ def run_panel(params, reader, dst_file_name):
 		chunk = pd.concat([physical, non_physical])
 
 		# Write 
-		dst_file_name = "1000_BANK.txt.gz"
+		dst_file_name = "20140720_GPANEL_BANK.txt.gz"
+
+		dst_file_name = os.path.splitext(dst_file_name)[0]
 	
 		if first_chunk:
 			safe_print("Output Path: " + dst_local_path + dst_file_name)
@@ -419,7 +432,7 @@ def run_panel(params, reader, dst_file_name):
 		else:
 			chunk.to_csv(dst_local_path + dst_file_name, header=False, columns=header, sep="|", mode="a", encoding="utf-8")
 
-	sys.exit()
+	return dst_local_path + dst_file_name
 
 def run_meerkat_chunk(params, desc_queue, hyperparameters, cities):
 	"""Run meerkat on a chunk of data"""
@@ -502,7 +515,7 @@ def load_dataframe(params):
 	"""Loads file into a pandas dataframe"""
 
 	# TEMPORARY
-	params["input"]["filename"] = "/mnt/ephemeral/input/1000_BANK.txt.gz"
+	params["input"]["filename"] = "/mnt/ephemeral/input/20140720_GPANEL_BANK.txt.gz"
 
 	# Read file into dataframe
 	reader = pd.read_csv(params["input"]["filename"], compression="gzip", na_filter=False, chunksize=3000, encoding="utf-8", sep='|', error_bad_lines=False)
@@ -611,6 +624,20 @@ def connect_to_S3():
 		sys.exit()
 
 	return conn
+
+def move_to_S3(params, filename):
+	"""Moves a file to S3"""
+
+	S3_params = params["input"]["S3"]
+	dst_bucket = S3_params["dst_bucket"]
+	dst_local_path = S3_params["dst_local_path"]
+	dst_s3_path = S3_params["dst_s3_path"] + params["container"] + "/"
+
+	dst_key = Key(dst_bucket)
+	dst_key.key = dst_s3_path + filename
+	bytes_written = dst_key.set_contents_from_filename(dst_local_path + dst_file_name, encrypt_key=True, replace=True)
+	safe_print("{0} bytes written".format(bytes_written))
+	safely_remove_file(dst_local_path + filename)
 
 def run_from_command_line(command_line_arguments):
 	"""Runs these commands if the module is invoked from the command line"""

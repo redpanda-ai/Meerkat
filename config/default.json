@@ -12,6 +12,7 @@
             "dst_bucket_name" : "yodleeproducts",
             "dst_folders" : "panels/nullcat_integration/",
             "dst_local_path" : "/mnt/ephemeral/output/",
+            "dst_s3_path" : "/meerkat/nullcat_integration/",
             "error_bucket_name" : "yodleeproducts",
             "error_local_path" : "/mnt/ephemeral/output/",
             "error_s3_path" : "panels/6m/error/"
