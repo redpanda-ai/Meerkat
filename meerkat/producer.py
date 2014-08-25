@@ -460,9 +460,9 @@ def run_panel(params, reader, dst_file_name):
 
 	return dst_local_path + dst_file_name
 
-def write_error_file(path, file_name, line, error_msg):
+def write_error_file(path, file_name, error_msg):
 	with gzip.open(path + file_name[:-3] + ".error.gz", "ab") as gzipped_output:
-		gzipped_output.write(bytes(total_line + "\n", 'UTF-8'))
+		gzipped_output.write(bytes(error_msg + "\n", 'UTF-8'))
 
 def run_meerkat_chunk(params, desc_queue, hyperparameters, cities):
 	"""Run meerkat on a chunk of data"""
