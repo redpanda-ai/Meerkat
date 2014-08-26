@@ -455,12 +455,12 @@ def run_panel(params, reader, dst_file_name):
 		error_summary = [str(line_count), str(error_count), str(1.0 * (error_count / line_count))] 
 		error_msg = "Total line count: {}\nTotal error count: {}\n Success Ratio: {}"
 		error_msg = error_msg.format(*error_summary)
-		write_error_file(dst_local_path, dst_file_name, "", error_msg)
+		write_error_file(dst_local_path, dst_file_name, error_msg)
 
 	return dst_local_path + dst_file_name
 
-def write_error_file(path, file_name, error_msg):
-	with gzip.open(path + file_name[:-3] + ".error.gz", "ab") as gzipped_output:
+def write_error_file(path, filename, error_msg):
+	with gzip.open(path + filename[:-3] + ".error.gz", "ab") as gzipped_output:
 		gzipped_output.write(bytes(error_msg + "\n", 'UTF-8'))
 
 def run_meerkat_chunk(params, desc_queue, hyperparameters, cities):
