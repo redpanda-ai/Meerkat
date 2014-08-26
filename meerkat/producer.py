@@ -432,7 +432,7 @@ def run_panel(params, reader, dst_file_name):
 		chunk = pd.concat([physical, non_physical])
 
 		# Write 
-		dst_file_name = "30000_BANK.txt.gz"
+		dst_file_name = "bank_sample_20140501_to_20140630.txt.gz"
 		dst_file_name = os.path.splitext(dst_file_name)[0]
 	
 		if first_chunk:
@@ -548,7 +548,7 @@ def load_dataframe(params):
 	"""Loads file into a pandas dataframe"""
 
 	# TEMPORARY
-	params["input"]["filename"] = "/mnt/ephemeral/input/30000_BANK.txt.gz"
+	params["input"]["filename"] = "/mnt/ephemeral/input/bank_sample_20140501_to_20140630.txt.gz"
 
 	# Read file into dataframe
 	reader = pd.read_csv(params["input"]["filename"], compression="gzip", na_filter=False, chunksize=3000, encoding="utf-8", sep='|', error_bad_lines=False)
@@ -668,6 +668,7 @@ def move_to_S3(params, bucket, s3_path, filepath):
 	key = Key(bucket)
 	key.key = s3_path + filename
 	bytes_written = key.set_contents_from_filename(filepath, encrypt_key=True, replace=True)
+	safe_print("File written to: " + key.key)
 	safe_print("{0} bytes written".format(bytes_written))
 	safely_remove_file(filepath)
 
