@@ -432,7 +432,7 @@ def run_panel(params, reader, dst_file_name):
 		chunk = pd.concat([physical, non_physical])
 
 		# Write 
-		dst_file_name = "200000_BANK.txt.gz"
+		dst_file_name = "30000_BANK.txt.gz"
 		dst_file_name = os.path.splitext(dst_file_name)[0]
 	
 		if first_chunk:
@@ -451,7 +451,7 @@ def run_panel(params, reader, dst_file_name):
 	error_count = len(errors)
 	if error_count > 0:
 		for error in errors:
-			write_error_file(dst_local_path, dst_file_name, error_msg)
+			write_error_file(dst_local_path, dst_file_name, error)
 		error_summary = [str(line_count), str(error_count), str(1.0 * (error_count / line_count))] 
 		error_msg = "Total line count: {}\nTotal error count: {}\n Success Ratio: {}"
 		error_msg = error_msg.format(*error_summary)
@@ -548,7 +548,7 @@ def load_dataframe(params):
 	"""Loads file into a pandas dataframe"""
 
 	# TEMPORARY
-	params["input"]["filename"] = "/mnt/ephemeral/input/200000_BANK.txt.gz"
+	params["input"]["filename"] = "/mnt/ephemeral/input/30000_BANK.txt.gz"
 
 	# Read file into dataframe
 	reader = pd.read_csv(params["input"]["filename"], compression="gzip", na_filter=False, chunksize=3000, encoding="utf-8", sep='|', error_bad_lines=False)
