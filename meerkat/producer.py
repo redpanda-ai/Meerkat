@@ -443,7 +443,7 @@ def run_panel(params, reader, dst_file_name):
 			chunk.to_csv(dst_local_path + dst_file_name, header=False, columns=header, sep="|", mode="a", encoding="utf-8")
 
 		# Handle Errors
-		sys.stderr = mystderr = StringIO()
+		sys.stderr = mystderr = io.StringIO()
 
 	sys.stderr = old_stderr
 
