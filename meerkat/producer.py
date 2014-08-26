@@ -393,7 +393,7 @@ def production_run(params):
 		safely_remove_file(S3_params["src_local_path"] + src_file_name)
 
 		# Push to S3
-		move_to_S3(params, dst_file_name)
+		move_to_S3(params, dst_bucket, S3_params["dst_s3_path"], local_dst_file + ".gz")
 
 		sys.exit()
 
@@ -541,6 +541,10 @@ def clean_dataframe(params, df):
 
 	return df
 
+def clean_line(line):
+	"""Strips out the part of a binary line that is not usable"""
+	return CLEAN_PATTERN.sub(" ", str(line)[2:-3])
+
 def load_dataframe(params):
 	"""Loads file into a pandas dataframe"""
 
@@ -655,19 +659,18 @@ def connect_to_S3():
 
 	return conn
 
-def move_to_S3(params, filename):
+def move_to_S3(params, bucket, s3_path, filepath):
 	"""Moves a file to S3"""
 
+	filename = os.path.basename(filepath)
 	S3_params = params["input"]["S3"]
-	dst_bucket = S3_params["dst_bucket"]
-	dst_local_path = S3_params["dst_local_path"]
-	dst_s3_path = S3_params["dst_s3_path"] + params["container"] + "/"
+	s3_path = s3_path + params["container"] + "/"
 
-	dst_key = Key(dst_bucket)
-	dst_key.key = dst_s3_path + filename
-	bytes_written = dst_key.set_contents_from_filename(dst_local_path + dst_file_name, encrypt_key=True, replace=True)
+	key = Key(bucket)
+	key.key = s3_path + filename
+	bytes_written = key.set_contents_from_filename(filepath, encrypt_key=True, replace=True)
 	safe_print("{0} bytes written".format(bytes_written))
-	safely_remove_file(dst_local_path + filename)
+	safely_remove_file(filepath)
 
 def run_from_command_line(command_line_arguments):
 	"""Runs these commands if the module is invoked from the command line"""
