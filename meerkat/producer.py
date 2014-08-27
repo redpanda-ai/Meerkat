@@ -372,7 +372,7 @@ def production_run(params):
 		src_file_name = src_s3_path_regex.search(item.key).group(1)
 
 		# TEMP
-		src_file_name = "4000_BANK.txt.gz"
+		src_file_name = "100000_BANK.txt.gz"
 
 		# Copy from S3
 		#item.get_contents_to_filename(S3_params["src_local_path"] + src_file_name)
@@ -408,8 +408,6 @@ def production_run(params):
 def run_panel(params, reader, dst_file_name):
 	"""Process a single panel"""
 
-	safe_print("FILE NAME ENTERING RUN PANEL: ", dst_file_name)
-
 	hyperparameters = load_hyperparameters(params)
 	dst_local_path = params["input"]["S3"]["dst_local_path"]
 	header = get_panel_header(params["container"])[0:-2]
@@ -426,7 +424,7 @@ def run_panel(params, reader, dst_file_name):
 
 		# Save Errors
 		line_count += chunk.shape[0]
-		errors += mystderr.getvalue().split('\\n')
+		errors += mystderr.getvalue().split('\n')
 		sys.stderr = old_stderr
 
 		# Clean Data
@@ -463,8 +461,6 @@ def run_panel(params, reader, dst_file_name):
 		error_msg = "Total line count: {}\nTotal error count: {}\n Success Ratio: {}"
 		error_msg = error_msg.format(*error_summary)
 		write_error_file(dst_local_path, dst_file_name, error_msg)
-
-	safe_print("FILE NAME EXITING RUN PANEL: ", dst_file_name)
 
 	return dst_local_path + dst_file_name
 
