@@ -370,15 +370,17 @@ def production_run(params):
 	for item in pending:
 
 		src_file_name = src_s3_path_regex.search(item.key).group(1)
-		dst_file_name = src_file_name
+
+		# TEMP
+		src_file_name = "3000_BANK.txt.gz"
 
 		# Copy from S3
 		#item.get_contents_to_filename(S3_params["src_local_path"] + src_file_name)
 		params["input"]["filename"] = S3_params["src_local_path"] + src_file_name
 
-
-		# Remove Troublesome Escapes
-		clean_bad_escapes(params["input"]["filename"])
+		# Remove Troublesome Escapes and decompress
+		dst_file_name = src_file_name = clean_bad_escapes(params["input"]["filename"])
+		params["input"]["filename"] = S3_params["src_local_path"] + src_file_name
 
 		# Load into Dataframe
 		container = identify_container(params)
@@ -387,6 +389,8 @@ def production_run(params):
 
 		# Process With Meerkat
 		local_dst_file = run_panel(params, reader, dst_file_name)
+
+		safe_print("LOCAL DST FILE: " + local_dst_file)
 
 		# Gzip and Remove
 		with open(local_dst_file, 'rb') as f_in:
@@ -436,7 +440,6 @@ def run_panel(params, reader, dst_file_name):
 		chunk = pd.concat([physical, non_physical])
 
 		# Write 
-		dst_file_name = "3000_BANK.txt.gz"
 		dst_file_name = os.path.splitext(dst_file_name)[0]
 	
 		if first_chunk:
@@ -500,7 +503,7 @@ def df_to_queue(params, df):
 	container = params["container"]
 	classifier = select_model(container)
 	classes = ["Non-Physical", "Physical", "ATM"]
-	f = lambda x: classes[classifier(x["DESCRIPTION_UNMASKED"]])
+	f = lambda x: classes[int(classifier(x["DESCRIPTION_UNMASKED"]))]
 	desc_queue = queue.Queue()
 
 	# Classify transactions
@@ -548,11 +551,8 @@ def clean_dataframe(params, df):
 def load_dataframe(params):
 	"""Loads file into a pandas dataframe"""
 
-	# TEMPORARY
-	params["input"]["filename"] = "/mnt/ephemeral/input/3000_BANK.txt.gz"
-
 	# Read file into dataframe
-	reader = pd.read_csv(params["input"]["filename"], compression="gzip", na_filter=False, chunksize=3000, encoding="utf-8", sep='|', error_bad_lines=False)
+	reader = pd.read_csv(params["input"]["filename"], na_filter=False, chunksize=300, encoding="utf-8", sep='|', error_bad_lines=False)
 
 	return reader
 

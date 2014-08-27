@@ -332,9 +332,12 @@ def get_us_cities():
 def clean_bad_escapes(filepath):
 	"""Clean a panel file of poorly escaped characters"""
 
+	path, filename = os.path.split(filepath)
+	filename = os.path.splitext(filename)[0]
+
 	# Clean File
 	with gzip.open(filepath, "rb") as f:
-		with open(filepath + ".temp", "wb") as g:
+		with open(path + "/" + filename, "wb") as g:
 		    for l in f:
 		        line = clean_line(l)
 		        line = bytes(line + "\n", 'UTF-8')
@@ -342,7 +345,8 @@ def clean_bad_escapes(filepath):
 
 	# Rename and Remove
 	safely_remove_file(filepath)
-	os.rename(filepath + ".temp", filepath)
+
+	return filename
 
 def clean_line(line):
 	"""Strips out the part of a binary line that is not usable"""
