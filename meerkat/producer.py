@@ -372,7 +372,7 @@ def production_run(params):
 		src_file_name = src_s3_path_regex.search(item.key).group(1)
 
 		# TEMP
-		src_file_name = "100000_BANK.txt.gz"
+		src_file_name = "25000_BANK.txt.gz"
 
 		# Copy from S3
 		#item.get_contents_to_filename(S3_params["src_local_path"] + src_file_name)
@@ -399,7 +399,7 @@ def production_run(params):
 		safely_remove_file(S3_params["src_local_path"] + src_file_name)
 
 		# Push to S3
-		error_filepath = S3_params["error_local_path"] + dst_file_name + ".error.gz")
+		error_filepath = S3_params["error_local_path"] + dst_file_name + ".error.gz"
 		move_to_S3(params, dst_bucket, S3_params["dst_s3_path"], local_dst_filepath + ".gz")
 		move_to_S3(params, error_bucket, S3_params["error_s3_path"], error_filepath)
 		safely_remove_file(error_filepath)
@@ -443,10 +443,10 @@ def run_panel(params, reader, dst_file_name):
 		# Write 	
 		if first_chunk:
 			safe_print("Output Path: " + dst_local_path + dst_file_name)
-			chunk.to_csv(dst_local_path + dst_file_name, columns=header, sep="|", mode="a", encoding="utf-8")
+			chunk.to_csv(dst_local_path + dst_file_name, columns=header, sep="|", mode="a", encoding="utf-8", index_label=False)
 			first_chunk = False
 		else:
-			chunk.to_csv(dst_local_path + dst_file_name, header=False, columns=header, sep="|", mode="a", encoding="utf-8")
+			chunk.to_csv(dst_local_path + dst_file_name, header=False, columns=header, sep="|", mode="a", encoding="utf-8", index_label=False)
 
 		# Handle Errors
 		sys.stderr = mystderr = io.StringIO()
