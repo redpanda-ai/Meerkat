@@ -388,20 +388,21 @@ def production_run(params):
 		reader = load_dataframe(params)
 
 		# Process With Meerkat
-		local_dst_file = run_panel(params, reader, dst_file_name)
-
-		safe_print("LOCAL DST FILE: " + local_dst_file)
+		local_dst_filepath = run_panel(params, reader, dst_file_name)
 
 		# Gzip and Remove
-		with open(local_dst_file, 'rb') as f_in:
-			with gzip.open(local_dst_file + ".gz", 'wb') as f_out:
+		with open(local_dst_filepath, 'rb') as f_in:
+			with gzip.open(local_dst_filepath + ".gz", 'wb') as f_out:
 				f_out.writelines(f_in)
 
 		safely_remove_file(local_dst_file)
 		safely_remove_file(S3_params["src_local_path"] + src_file_name)
 
 		# Push to S3
-		move_to_S3(params, dst_bucket, S3_params["dst_s3_path"], local_dst_file + ".gz")
+		error_filepath = S3_params["error_local_path"] + dst_file_name + ".error.gz")
+		move_to_S3(params, dst_bucket, S3_params["dst_s3_path"], local_dst_filepath + ".gz")
+		move_to_S3(params, error_bucket, S3_params["error_s3_path"], error_filepath)
+		safely_remove_file(error_filepath)
 
 		sys.exit()
 
