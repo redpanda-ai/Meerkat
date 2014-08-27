@@ -37,7 +37,7 @@ from meerkat.custom_exceptions import InvalidArguments, Misconfiguration
 from meerkat.consumer import Consumer
 from meerkat.binary_classifier.load import select_model
 from meerkat.various_tools import load_dict_list, safely_remove_file, load_hyperparameters, safe_print
-from meerkat.various_tools import split_csv, merge_split_files, queue_to_list, string_cleanse
+from meerkat.various_tools import split_csv, merge_split_files, queue_to_list, string_cleanse, clean_bad_escapes
 from meerkat.various_tools import get_panel_header, get_column_map, get_new_columns, get_us_cities
 from meerkat.accuracy import test_accuracy, print_results, speed_tests
 from meerkat.optimization import run_meerkat as test_meerkat
@@ -376,6 +376,10 @@ def production_run(params):
 		#item.get_contents_to_filename(S3_params["src_local_path"] + src_file_name)
 		params["input"]["filename"] = S3_params["src_local_path"] + src_file_name
 
+
+		# Remove Troublesome Escapes
+		clean_bad_escapes(params["input"]["filename"])
+
 		# Load into Dataframe
 		container = identify_container(params)
 		params["container"] = container
@@ -402,7 +406,7 @@ def run_panel(params, reader, dst_file_name):
 
 	hyperparameters = load_hyperparameters(params)
 	dst_local_path = params["input"]["S3"]["dst_local_path"]
-	header = get_panel_header(params["container"])[0:-3]
+	header = get_panel_header(params["container"])[0:-2]
 	cities = get_us_cities()
 	line_count = 0
 	first_chunk = True
@@ -432,7 +436,7 @@ def run_panel(params, reader, dst_file_name):
 		chunk = pd.concat([physical, non_physical])
 
 		# Write 
-		dst_file_name = "bank_sample_20140501_to_20140630.txt.gz"
+		dst_file_name = "3000_BANK.txt.gz"
 		dst_file_name = os.path.splitext(dst_file_name)[0]
 	
 		if first_chunk:
@@ -460,7 +464,7 @@ def run_panel(params, reader, dst_file_name):
 	return dst_local_path + dst_file_name
 
 def write_error_file(path, filename, error_msg):
-	with gzip.open(path + filename[:-3] + ".error.gz", "ab") as gzipped_output:
+	with gzip.open(path + filename[:-3] + "error.gz", "ab") as gzipped_output:
 		gzipped_output.write(bytes(error_msg + "\n", 'UTF-8'))
 
 def run_meerkat_chunk(params, desc_queue, hyperparameters, cities):
@@ -495,21 +499,22 @@ def df_to_queue(params, df):
 
 	container = params["container"]
 	classifier = select_model(container)
-	f = lambda x: classifier(x["DESCRIPTION_UNMASKED"])
+	classes = ["Non-Physical", "Physical", "ATM"]
+	f = lambda x: classes[classifier(x["DESCRIPTION_UNMASKED"]])
 	desc_queue = queue.Queue()
 
 	# Classify transactions
-	df['IS_PHYSICAL_TRANSACTION'] = df.apply(f, axis=1)
-	gb = df.groupby('IS_PHYSICAL_TRANSACTION')
+	df['TRANSACTION_ORIGIN'] = df.apply(f, axis=1)
+	gb = df.groupby('TRANSACTION_ORIGIN')
 
 	# Group into separate dataframes
 	if container == "bank":
-		physical = pd.concat([gb.get_group('1'), gb.get_group('2')])
+		physical = pd.concat([gb.get_group("Physical"), gb.get_group('ATM')])
 	elif container == "card":
-		physical = gb.get_group('1')
+		physical = gb.get_group('Physical')
 
 	# Swap column names to save good description
-	non_physical = gb.get_group('0').rename(columns = {"GOOD_DESCRIPTION" : "MERCHANT_NAME", "MERCHANT_NAME" : "GOOD_DESCRIPTION"})
+	non_physical = gb.get_group('Non-Physical').rename(columns = {"GOOD_DESCRIPTION" : "MERCHANT_NAME", "MERCHANT_NAME" : "GOOD_DESCRIPTION"})
 
 	# Group by user
 	users = physical.groupby('UNIQUE_MEM_ID')
@@ -540,15 +545,11 @@ def clean_dataframe(params, df):
 
 	return df
 
-def clean_line(line):
-	"""Strips out the part of a binary line that is not usable"""
-	return CLEAN_PATTERN.sub(" ", str(line)[2:-3])
-
 def load_dataframe(params):
 	"""Loads file into a pandas dataframe"""
 
 	# TEMPORARY
-	params["input"]["filename"] = "/mnt/ephemeral/input/bank_sample_20140501_to_20140630.txt.gz"
+	params["input"]["filename"] = "/mnt/ephemeral/input/3000_BANK.txt.gz"
 
 	# Read file into dataframe
 	reader = pd.read_csv(params["input"]["filename"], compression="gzip", na_filter=False, chunksize=3000, encoding="utf-8", sep='|', error_bad_lines=False)
@@ -610,7 +611,8 @@ def process_panel(params, filename):
 		safely_remove_file(split)
 
 	# Merge Files, GZIP and Push to S3
-	#output_location = merge_split_files(params, split_list)
+	output_location = merge_split_files(params, split_list)
+
 	#if params["input"].get("bucket_key", "") != "":
 	#	move_to_S3(params, output_location, S3)
 

@@ -17,6 +17,8 @@ import json
 
 import numpy as np
 
+CLEAN_PATTERN = re.compile(r"\\+\|")
+
 def load_dict_list(file_name, encoding='utf-8', delimiter="|"):
 	"""Loads a dictionary of input from a file into a list."""
 	input_file = open(file_name, encoding=encoding, errors='replace')
@@ -58,7 +60,7 @@ def get_panel_header(container):
 		"STREET", "CITY", "STATE", "ZIP_CODE", "WEBSITE", "PHONE_NUMBER", "FAX_NUMBER",\
 		"CHAIN_NAME", "LATITUDE", "LONGITUDE", "NEIGHBOURHOOD", "TRANSACTION_ORIGIN",\
 		"CONFIDENCE_SCORE", "FACTUAL_ID", "FILE_CREATED_DATE", "DESCRIPTION_UNMASKED",\
-		"IS_PHYSICAL_TRANSACTION", "GOOD_DESCRIPTION"
+		"GOOD_DESCRIPTION"
 	]
 
 	container = container.upper()
@@ -117,8 +119,7 @@ def get_new_columns():
 		'NEIGHBOURHOOD', 
 		'TRANSACTION_ORIGIN', 
 		'CONFIDENCE_SCORE', 
-		'FACTUAL_ID',
-		"IS_PHYSICAL_TRANSACTION"
+		'FACTUAL_ID'
 	]
 
 def to_stdout(string, errors="replace"):
@@ -327,6 +328,25 @@ def get_us_cities():
 		cities = city_file.readlines()
 	cities = [city.lower().rstrip('\n') for city in cities]
 	return cities
+
+def clean_bad_escapes(filepath):
+	"""Clean a panel file of poorly escaped characters"""
+
+	# Clean File
+	with gzip.open(filepath, "rb") as f:
+		with open(filepath + ".temp", "wb") as g:
+		    for l in f:
+		        line = clean_line(l)
+		        line = bytes(line + "\n", 'UTF-8')
+		        g.write(line)
+
+	# Rename and Remove
+	safely_remove_file(filepath)
+	os.rename(filepath + ".temp", filepath)
+
+def clean_line(line):
+	"""Strips out the part of a binary line that is not usable"""
+	return CLEAN_PATTERN.sub(" ", str(line)[2:-3])
 
 def stopwords(transaction):
 	"""Remove stopwords"""
