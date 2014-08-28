@@ -372,14 +372,26 @@ def production_run(params):
 		src_file_name = src_s3_path_regex.search(item.key).group(1)
 
 		# TEMP
-		src_file_name = "25000_BANK.txt.gz"
+		src_file_name = "noheader_BANK.txt.gz"
 
 		# Copy from S3
 		#item.get_contents_to_filename(S3_params["src_local_path"] + src_file_name)
 		params["input"]["filename"] = S3_params["src_local_path"] + src_file_name
 
 		# Remove Troublesome Escapes and decompress
-		dst_file_name = src_file_name = clean_bad_escapes(params["input"]["filename"])
+		result = clean_bad_escapes(params["input"]["filename"])
+
+		# File must have header
+		if not result:
+			filename = os.path.splitext(src_file_name)[0]
+			error_filepath = S3_params["error_local_path"] + filename + ".error.gz"
+			write_error_file(S3_params["error_local_path"], filename, "No header found in source file")
+			move_to_S3(params, error_bucket, S3_params["error_s3_path"], error_filepath)
+			safely_remove_file(error_filepath)
+			continue
+
+		# Save Details and Continue
+		dst_file_name = src_file_name = result
 		params["input"]["filename"] = S3_params["src_local_path"] + src_file_name
 
 		# Load into Dataframe
@@ -395,7 +407,7 @@ def production_run(params):
 			with gzip.open(local_dst_filepath + ".gz", 'wb') as f_out:
 				f_out.writelines(f_in)
 
-		safely_remove_file(local_dst_file)
+		safely_remove_file(local_dst_filepath)
 		safely_remove_file(S3_params["src_local_path"] + src_file_name)
 
 		# Push to S3
@@ -551,7 +563,7 @@ def load_dataframe(params):
 	"""Loads file into a pandas dataframe"""
 
 	# Read file into dataframe
-	reader = pd.read_csv(params["input"]["filename"], na_filter=False, chunksize=300, encoding="utf-8", sep='|', error_bad_lines=False)
+	reader = pd.read_csv(params["input"]["filename"], na_filter=False, chunksize=5000, encoding="utf-8", sep='|', error_bad_lines=False)
 
 	return reader
 

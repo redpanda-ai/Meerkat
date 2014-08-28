@@ -330,18 +330,27 @@ def get_us_cities():
 	return cities
 
 def clean_bad_escapes(filepath):
-	"""Clean a panel file of poorly escaped characters"""
+	"""Clean a panel file of poorly escaped characters.
+	Return false if required fields not present"""
 
 	path, filename = os.path.split(filepath)
 	filename = os.path.splitext(filename)[0]
+	first_line = True
+	required_fields = ["DESCRIPTION_UNMASKED", "UNIQUE_MEM_ID", "GOOD_DESCRIPTION"]
 
 	# Clean File
 	with gzip.open(filepath, "rb") as f:
 		with open(path + "/" + filename, "wb") as g:
-		    for l in f:
-		        line = clean_line(l)
-		        line = bytes(line + "\n", 'UTF-8')
-		        g.write(line)
+			for l in f:
+				if first_line:
+					for field in required_fields:
+						if field not in str(l):
+							safely_remove_file(filepath)
+							safely_remove_file(path + "/" + filename)
+							return False
+				line = clean_line(l)
+				line = bytes(line + "\n", 'UTF-8')
+				g.write(line)
 
 	# Rename and Remove
 	safely_remove_file(filepath)
