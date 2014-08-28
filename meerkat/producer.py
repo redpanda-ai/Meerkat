@@ -38,7 +38,7 @@ from meerkat.consumer import Consumer
 from meerkat.binary_classifier.load import select_model
 from meerkat.various_tools import load_dict_list, safely_remove_file, load_hyperparameters, safe_print
 from meerkat.various_tools import split_csv, merge_split_files, queue_to_list, string_cleanse, clean_bad_escapes
-from meerkat.various_tools import get_panel_header, get_column_map, get_new_columns, get_us_cities
+from meerkat.various_tools import get_panel_header, get_column_map, get_new_columns, get_us_cities, post_SNS
 from meerkat.accuracy import test_accuracy, print_results, speed_tests
 from meerkat.optimization import run_meerkat as test_meerkat
 from meerkat.optimization import get_desc_queue as get_simple_queue
@@ -371,11 +371,8 @@ def production_run(params):
 
 		src_file_name = src_s3_path_regex.search(item.key).group(1)
 
-		# TEMP
-		src_file_name = "noheader_BANK.txt.gz"
-
 		# Copy from S3
-		#item.get_contents_to_filename(S3_params["src_local_path"] + src_file_name)
+		item.get_contents_to_filename(S3_params["src_local_path"] + src_file_name)
 		params["input"]["filename"] = S3_params["src_local_path"] + src_file_name
 
 		# Remove Troublesome Escapes and decompress
@@ -413,10 +410,9 @@ def production_run(params):
 		# Push to S3
 		error_filepath = S3_params["error_local_path"] + dst_file_name + ".error.gz"
 		move_to_S3(params, dst_bucket, S3_params["dst_s3_path"], local_dst_filepath + ".gz")
+		post_SNS(dst_file_name + " successfully processed")
 		move_to_S3(params, error_bucket, S3_params["error_s3_path"], error_filepath)
 		safely_remove_file(error_filepath)
-
-		sys.exit()
 
 def run_panel(params, reader, dst_file_name):
 	"""Process a single panel"""

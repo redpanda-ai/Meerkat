@@ -15,6 +15,7 @@ import os
 import gzip
 import json
 
+import boto.sns
 import numpy as np
 
 CLEAN_PATTERN = re.compile(r"\\+\|")
@@ -188,6 +189,14 @@ def get_es_connection(params):
 	sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
 
 	return es_connection
+
+def post_SNS(message):
+	"""Post an SNS message"""
+
+	region = 'us-west-2'
+	topic = 'arn:aws:sns:us-west-2:003144629351:panel_6m'
+	conn = boto.sns.connect_to_region(region)
+	pub = conn.publish(topic = topic, message = message)
 
 def get_merchant_by_id(params, factual_id, es_connection, index=""):
 	"""Fetch the details for a single factual_id"""
