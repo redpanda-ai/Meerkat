@@ -1,10 +1,8 @@
 #!/usr/local/bin/python3.3
 
-"""This module generates and trains
-a binary classification model for transactions
-using SciKit Learn. Specifically it uses
-a Stochastic Gradient Descent classifier
-that is optimized using Grid Search
+"""This module generates and trains a binary classification model for
+transactions using SciKit Learn. Specifically it uses a Stochastic 
+Gradient Descent classifier that is optimized using Grid Search
 
 Created on Feb 25, 2014
 @author: Matthew Sevrens

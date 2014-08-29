@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3.3
 
-"""This is where we keeping custom exception classes 
-for use within multiple scripts.
+"""This is where we keeping custom exception classes for use within
+multiple scripts.
 
 Created on Dec 21, 2013
 @author: J. Andrew Key

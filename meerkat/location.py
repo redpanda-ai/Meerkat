@@ -1,8 +1,8 @@
 #!/usr/local/bin/python3.3
 # pylint: disable=all
 
-"""This module aims to collect the functionality 
-related to geolocation used throughout Meerkat.
+"""This module aims to collect the functionality related to geolocation
+used throughout Meerkat.
 
 Created on Jan 27, 2014
 @author: Matthew Sevrens

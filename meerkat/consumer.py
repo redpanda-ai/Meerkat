@@ -1,11 +1,10 @@
 #!/usr/local/bin/python3.3
 
-"""This module constructs ElasticSearch queries to match 
-a transaction to merchant data indexed with ElasticSearch.
-More generally it is used to match an unstructured 
-record to a well structured index. In our multithreaded 
-system, this is what processes the queue of data provided 
-by description_producer.
+"""This module constructs ElasticSearch queries to match a transaction to
+merchant data indexed with ElasticSearch. More generally it is used to
+match an unstructured record to a well structured index. In our
+multithreaded system, this is what processes the queue of data provided by
+description_producer.
 
 Created on Jan 16, 2014
 @author: J. Andrew Key

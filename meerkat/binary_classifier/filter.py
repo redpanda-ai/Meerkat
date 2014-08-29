@@ -1,13 +1,11 @@
 #!/usr/local/bin/python3
 # pylint: disable=all
 
-"""This module is a utility tool. It takes a file of 
-transactions with a column header of DESCRIPTION_UNMASKED 
-and outputs a file containing either only physical 
-transactions or only non physical transactions
-depending on a provided argument. This is useful in
-terms of evaluating how well we deal with both
-classes of transactions
+"""This module is a utility tool. It takes a file of transactions with a
+column header of DESCRIPTION_UNMASKED and outputs a file containing either
+only physical transactions or only non physical transactions depending on
+a provided argument. This is useful in terms of evaluating how well we 
+deal with both classes of transactions
 
 Created on May 27, 2014
 @author: Matthew Sevrens

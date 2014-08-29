@@ -1,8 +1,10 @@
 #!/usr/local/bin/python3.3
 
-"""This module transforms panels built by 
-the Clustering Tool into a format also used 
-by Meerkat.  It does not use Meerkat."""
+"""This module transforms panels built by the Clustering Tool into a
+format also used by Meerkat. It does not use Meerkat.
+
+@author: J. Andrew Key
+"""
 
 #################### USAGE ##########################
 

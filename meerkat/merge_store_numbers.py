@@ -1,13 +1,11 @@
 #!/usr/local/bin/python3.3
 # pylint: disable=all
 
-"""This module takes a set of merchants with
-their associated manually formatted store numbers.
-The records are matched against Factual and if
-a matching merchant is found the store numbers are
-merged into the index. Merchants not found are saved
-for further processing. This is a form of feature
-engineering used to improve Meerkat's ability to label
+"""This module takes a set of merchants with their associated manually
+formatted store numbers. The records are matched against Factual and if a
+matching merchant is found the store numbers are merged into the index.
+Merchants not found are saved for further processing. This is a form of
+feature engineering used to improve Meerkat's ability to label
 transactions by location.
 
 Created on March 25, 2014

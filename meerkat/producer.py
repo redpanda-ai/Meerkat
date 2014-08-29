@@ -1,8 +1,7 @@
 #!/usr/local/bin/python3.3
 
-"""This module loads and processes transactions
-in preparation for analysis and search though
-our structured ElasticSearch merchant index. 
+"""This module loads and processes transactions in preparation for
+analysis and search though our structured ElasticSearch merchant index. 
 
 Created on Dec 9, 2013
 @author: J. Andrew Key

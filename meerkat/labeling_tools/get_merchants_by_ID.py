@@ -1,9 +1,7 @@
 #!/usr/local/bin/python3.3
 
-"""This script takes a list of transactions
-and their matched factual_id's and 
-populates the input file with additional
-fields from the factual index
+"""This script takes a list of transactions and their matched factual_id's
+and populates the input file with additional fields from the factual index
 
 Created on July 15, 2014
 @author: Matthew Sevrens

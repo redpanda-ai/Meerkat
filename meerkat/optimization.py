@@ -1,26 +1,21 @@
 #!/usr/local/bin/python3.3
 # pylint: disable=all
 
-"""This module is the core of the Meerkat
-engine. It allows us to rapidly evaluate many
-possible configurations if provided a well
-labeled dataset. Iteratively it runs Meerkat
-with randomized levels of configurations and
+"""This module is the core of the Meerkat engine. It allows us to rapidly
+evaluate many possible configurations if provided a well labeled dataset.
+Iteratively it runs Meerkat with randomized levels of configurations and
 then converges on the best possible values. 
 
-In context of Machine Leaning, this module 
-performs hyperparameter optimization. This 
-involves tuning the numeric values located at  
-Meerkat/config/hyperparameters. These key 
-value pairs map to hyperparameters used through 
-out the Meerkat Classifier in aid of tuning or
-refining the queries used with ElasticSearch.
+In context of Machine Leaning, this module  performs hyperparameter
+optimization. This involves tuning the numeric values located at  
+Meerkat/config/hyperparameters. These key value pairs map to
+hyperparameters used through out the Meerkat Classifier in aid of tuning
+or refining the queries used with ElasticSearch.
 
-This module utilizes a common method known as 
-grid search. In particular we are using a custom
-implementation of randomized optimization as it 
-works better where it is resource intensive to 
-exaustively perform a standard grid_search.
+This module utilizes a common method known as grid search. In particular
+we are using a custom implementation of randomized optimization as it 
+works better where it is resource intensive to exaustively perform a
+standard grid_search.
 
 Created on Feb 26, 2014
 @author: Matthew Sevrens

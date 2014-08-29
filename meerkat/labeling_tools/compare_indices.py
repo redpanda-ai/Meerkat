@@ -1,10 +1,9 @@
 #!/usr/local/bin/python3.3
 
-"""This module takes a file containing
-transactions and their associated
-uuid relative to a specific index, 
-and helps to reconcile changes as the 
-index evolves over time.
+"""This module takes a file containing transactions and their associated
+uuid relative to a specific index, and helps to reconcile changes as the 
+index evolves over time. It also can be used to label files from scratch
+if both the old_index and new_index are the same
 
 Created on July 21, 2014
 @author: Matthew Sevrens
@@ -796,16 +795,17 @@ def verify_arguments():
 def add_local_params(params):
 	"""Adds additional local params"""
 
-	params["compare_indices"] = {}
-	params["compare_indices"]["field_order"] = []
-	params["compare_indices"]["NULL"] = []
-	params["compare_indices"]["id_changed"] = []
-	params["compare_indices"]["details_changed"] = []
-	params["compare_indices"]["skipped"] = []
-	params["compare_indices"]["relinked"] = []
-	params["compare_indices"]["unlinked"] = []
-	params["compare_indices"]["user_context"] = collections.defaultdict(list)
-	params["compare_indices"]["user_cities"] = collections.defaultdict(list)
+	params["compare_indices"] = {
+		"field_order" : [],
+		"NULL" : [],
+		"id_changed" : [],
+		"details_changed" : [],
+		"skipped" : [],
+		"relinked" : []
+		"unlinked" : [],
+		"user_context" : collections.defaultdict(list),
+		"user_cities" : collections.defaultdict(list)
+	}
 
 	return params
 

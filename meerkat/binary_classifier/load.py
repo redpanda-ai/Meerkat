@@ -1,11 +1,9 @@
 #!/usr/local/bin/python3.3
 
-"""This module loads our general classifier
-and produces a helper function that will
-classify a single transaction. Depending
-on the mode provided (Bank or Card) this
-module will load a different previously
-generated and pickled SciKit model.
+"""This module loads our general classifier and produces a helper function
+that will classify a single transaction. Depending on the mode provided
+(Bank or Card) this module will load a different previously generated and
+pickled SciKit model.
 
 Created on Feb 25, 2014
 @author: Matthew Sevrens

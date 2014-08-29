@@ -1,19 +1,15 @@
 #!/usr/local/bin/python3.3
 
-"""This script is aimed at testing the accuracy of the
-Meerkat Classifier. We iteratively use this accuracy
-as a feedback score to tune and optimize Meerkat as a
-whole. The use of this script requires a csv containing
-human labeled data that has been verified as accurate.
-The input file to this script should be randomized over
-the selection of data being modeled. 
+"""This script is aimed at testing the accuracy of the Meerkat Classifier.
+We iteratively use this accuracy as a feedback score to tune and optimize
+Meerkat as a whole. The use of this script requires a csv containing human
+labeled data that has been verified as accurate. The input file to this
+script should be randomized over the selection of data being modeled. 
 
-To configure accuracy, this module should be
-provided a verification source that can be 
-referenced in the config file under the key
-params["verification_source"]. This should be 
-a reference to a file containing manually labeled 
-transactions.
+To configure accuracy, this module should be provided a verification
+source that can be referenced in the config file under the key
+params["verification_source"]. This should be a reference to a file
+containing manually labeled transactions.
 
 Created on Jan 8, 2014
 @author: Matthew Sevrens
