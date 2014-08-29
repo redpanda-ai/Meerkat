@@ -33,8 +33,8 @@ from .clustering import cluster, collect_clusters
 from .location import separate_geo, scale_polygon, get_geo_query
 
 class Consumer(threading.Thread):
-	''' Acts as a client to an ElasticSearch cluster, tokenizing description
-	strings that it pulls from a synchronized queue. '''
+	"""Acts as a client to an ElasticSearch cluster, tokenizing description
+	strings that it pulls from a synchronized queue."""
 
 	def __build_boost_vectors(self):
 		"""Turns configuration entries into a dictionary of numpy arrays."""

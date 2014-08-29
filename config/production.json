@@ -1,11 +1,11 @@
 {
     "concurrency" : 36,
     "verification_source" : "data/misc/ground_truth_bank.txt",
-    "container" : "bank",
+    "container" : "card",
     "mode" : "production",
     "input" : {
         "S3" : {
-            "filter" : "20140109.*",
+            "filter" : "2014072.*",
             "src_bucket_name" : "s3yodlee",
             "src_folders" : "ctprocessed/gpanel/",
             "src_local_path" : "/mnt/ephemeral/input/",

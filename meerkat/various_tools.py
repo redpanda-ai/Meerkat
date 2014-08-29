@@ -357,6 +357,7 @@ def clean_bad_escapes(filepath):
 							safely_remove_file(filepath)
 							safely_remove_file(path + "/" + filename)
 							return False
+					first_line = False
 				line = clean_line(l)
 				line = bytes(line + "\n", 'UTF-8')
 				g.write(line)
