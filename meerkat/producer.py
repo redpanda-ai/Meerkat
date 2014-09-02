@@ -384,6 +384,7 @@ def production_run(params):
 			write_error_file(S3_params["error_local_path"], filename, "No header found in source file")
 			move_to_S3(params, error_bucket, S3_params["error_s3_path"], error_filepath)
 			safely_remove_file(error_filepath)
+			safely_remove_file(params["input"]["filename"])
 			continue
 
 		# Save Details and Continue
@@ -474,7 +475,8 @@ def run_panel(params, reader, dst_file_name):
 
 def write_error_file(path, filename, error_msg):
 	with gzip.open(path + filename + ".error.gz", "ab") as gzipped_output:
-		gzipped_output.write(bytes(error_msg + "\n", 'UTF-8'))
+		if error_msg != "":
+			gzipped_output.write(bytes(error_msg + "\n", 'UTF-8'))
 
 def run_meerkat_chunk(params, desc_queue, hyperparameters, cities):
 	"""Run meerkat on a chunk of data"""
