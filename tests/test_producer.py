@@ -1,8 +1,8 @@
-"""Unit tests for meerkat.description_producer"""
+"""Unit tests for meerkat.producer"""
 
 import unittest, queue, sys, socket, os, json
 
-from meerkat import description_producer
+from meerkat import producer
 from meerkat.custom_exceptions import InvalidArguments, Misconfiguration
 from meerkat.binary_classifier.load import select_model
 
@@ -43,7 +43,6 @@ class TokenizeDescriptionTests(unittest.TestCase):
 			    "s05:9200",
 			    "s06:9200",
 			    "s07:9200",
-			    "s08:9200",
 			    "s09:9200",
 			    "s10:9200",
 			    "s11:9200",
@@ -150,35 +149,35 @@ class TokenizeDescriptionTests(unittest.TestCase):
 
 	def test_usage(self):
 		"""The point of this function is to print usage information to the user"""
-		result = description_producer.usage()
+		result = producer.usage()
 		self.assertEqual("Usage:\n\t<path_to_json_format_config_file>", result)
 
 	def test_get_desc_queue_returns_queue(self):
 		"""Ensure returns an instance of Queue"""
 		classifier = select_model('bank')
-		my_queue, non_physical = description_producer.get_desc_queue(self.params["input"]["filename"], self.params, classifier)
+		my_queue, non_physical = producer.get_desc_queue(self.params["input"]["filename"], self.params, classifier)
 		self.assertTrue(isinstance(my_queue, queue.Queue))
 
 	def test_get_desc_queue_is_not_empty(self):
 		"""Ensure queue is not empty"""
 		classifier = select_model('bank')
-		my_queue, non_physical = description_producer.get_desc_queue(self.params["input"]["filename"], self.params, classifier)
+		my_queue, non_physical = producer.get_desc_queue(self.params["input"]["filename"], self.params, classifier)
 		self.assertFalse(my_queue.empty())
 
 	def test_initialize_no_file_name(self):
 		"""Config file not provided"""
-		self.assertRaises(InvalidArguments, description_producer.initialize)
+		self.assertRaises(InvalidArguments, producer.initialize)
 
 	def test_initialize_file_does_not_exist(self):
 		"""Config file doesn't exist"""
 		sys.argv.append("data/somethingThatWontExist.csv")
-		self.assertRaises(SystemExit, description_producer.initialize)
+		self.assertRaises(SystemExit, producer.initialize)
 
 	def test_initialize_too_many_arguments(self):
 		"""Too Many Options"""
 		sys.argv.append("data/somethingThatWontExist.csv")
 		sys.argv.append("argument")
-		self.assertRaises(InvalidArguments, description_producer.initialize)
+		self.assertRaises(InvalidArguments, producer.initialize)
 
 	def test_tokenize(self):
 		"""The point of this function is to start a number of
@@ -188,67 +187,67 @@ class TokenizeDescriptionTests(unittest.TestCase):
 	def test_validate_logging(self):
 		"""Ensure 'logging' key is in configuration"""
 		del self.params["logging"]
-		self.assertRaises(Misconfiguration, description_producer.validate_params, self.params)
+		self.assertRaises(Misconfiguration, producer.validate_params, self.params)
 
 	def test_validate_logging_path(self):
 		"""Ensure 'logging.path' key is in configuration"""
 		del self.params["logging"]["path"]
-		self.assertRaises(Misconfiguration, description_producer.validate_params, self.params)
+		self.assertRaises(Misconfiguration, producer.validate_params, self.params)
 
 	def test_validate_elasticsearch_index(self):
 		"""Ensure 'elasticsearch.index' key is in configuration"""
 		del self.params["elasticsearch"]['index']
-		self.assertRaises(Misconfiguration, description_producer.validate_params, self.params)
+		self.assertRaises(Misconfiguration, producer.validate_params, self.params)
 
 	def test_validate_elasticsearch_type(self):
 		"""Ensure 'elasticsearch.type' key is in configuration"""
 		del self.params["elasticsearch"]['type']
-		self.assertRaises(Misconfiguration, description_producer.validate_params, self.params)
+		self.assertRaises(Misconfiguration, producer.validate_params, self.params)
 
 	def test_validate_elasticsearch(self):
 		"""Ensure 'elasticsearch' key is in configuration"""
 		del self.params["elasticsearch"]
-		self.assertRaises(Misconfiguration, description_producer.validate_params, self.params)
+		self.assertRaises(Misconfiguration, producer.validate_params, self.params)
 
 	def test_validate_empty_config(self):
 		"""Ensure configuration is not empty"""
 		self.params = {}
-		self.assertRaises(Misconfiguration, description_producer.validate_params, self.params)
+		self.assertRaises(Misconfiguration, producer.validate_params, self.params)
 
 	def test_validate_missing_concurrency(self):
 		"""Ensure 'concurrency' key is in configuration"""
 		del self.params["concurrency"]
-		self.assertRaises(Misconfiguration, description_producer.validate_params, self.params)
+		self.assertRaises(Misconfiguration, producer.validate_params, self.params)
 
 	def test_validate_positive_concurrency(self):
 		"""Ensure 'concurrency' value is a positive integer"""
 		self.params["concurrency"] = 0
-		self.assertRaises(Misconfiguration, description_producer.validate_params, self.params)
+		self.assertRaises(Misconfiguration, producer.validate_params, self.params)
 
 	def test_validate_input_key(self):
 		"""Ensure 'input' key is in configuration"""
 		del self.params["input"]
-		self.assertRaises(Misconfiguration, description_producer.validate_params, self.params)
+		self.assertRaises(Misconfiguration, producer.validate_params, self.params)
 
 	def test_validate_input_file(self):
 		"""Ensure input file is provided"""
 		del self.params["input"]["filename"]
-		self.assertRaises(Misconfiguration, description_producer.validate_params, self.params)
+		self.assertRaises(Misconfiguration, producer.validate_params, self.params)
 
 	def test_validate_encoding(self):
 		"""Ensure encoding key is in configuration"""
 		del self.params["input"]["encoding"]
-		self.assertRaises(Misconfiguration, description_producer.validate_params, self.params)
+		self.assertRaises(Misconfiguration, producer.validate_params, self.params)
 
 	def test_hyperparameters_default(self):
 		"""Ensure parameter key defaults to default.json"""
 		del self.params["input"]["hyperparameters"]
-		description_producer.validate_params(self.params)
+		producer.validate_params(self.params)
 		self.assertEqual(self.params["input"]["hyperparameters"], "config/hyperparameters/default.json")
 
 	def test_false_key_throws_error(self):
 		"""Ensure not existent key throws error"""
-		self.assertRaises(SystemExit, description_producer.load_hyperparameters, self.params)				
+		self.assertRaises(SystemExit, producer.load_hyperparameters, self.params)				
 
 if __name__ == '__main__':
 	unittest.main(argv=[sys.argv[0]])
