@@ -369,6 +369,7 @@ def production_run(params):
 	for item in pending:
 
 		src_file_name = src_s3_path_regex.search(item.key).group(1)
+		safe_print("Processing file: " + src_file_name)
 
 		# Copy from S3
 		item.get_contents_to_filename(S3_params["src_local_path"] + src_file_name)
@@ -502,6 +503,9 @@ def run_meerkat_chunk(params, desc_queue, hyperparameters, cities):
 		result_queue.task_done()
 
 	result_queue.join()
+
+	# Shutdown Loggers
+	logging.shutdown()
 
 	return pd.DataFrame(output)
 
