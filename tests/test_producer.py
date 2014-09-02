@@ -11,6 +11,7 @@ class TokenizeDescriptionTests(unittest.TestCase):
 	"""Our UnitTest class."""
 
 	config = """{
+		"mode": "skip",
 		"concurrency" : 1,
 		"input" : {
 			"hyperparameters" : "config/hyperparameters/made_up_key_name.json",

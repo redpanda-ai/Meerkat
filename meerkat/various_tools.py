@@ -9,11 +9,12 @@ Created on Dec 20, 2013
 """
 
 import csv
-import sys
-import re
-import os
 import gzip
 import json
+import logging
+import os
+import re
+import sys
 
 import boto.sns
 import numpy as np
