@@ -4,7 +4,7 @@
 merchant data indexed with ElasticSearch. More generally it is used to
 match an unstructured record to a well structured index. In our
 multithreaded system, this is what processes the queue of data provided by
-description_producer.
+producer.py
 
 Created on Jan 16, 2014
 @author: J. Andrew Key
@@ -31,6 +31,8 @@ from .various_tools import string_cleanse, synonyms, safe_print, get_yodlee_fact
 from .various_tools import get_bool_query, get_qs_query, get_us_cities
 from .clustering import cluster, collect_clusters
 from .location import separate_geo, scale_polygon, get_geo_query
+
+PIPE_PATTERN = re.compile(r"\|")
 
 class Consumer(threading.Thread):
 	"""Acts as a client to an ElasticSearch cluster, tokenizing description
@@ -361,7 +363,7 @@ class Consumer(threading.Thread):
 		z_score_delta = self.__generate_z_score_delta(scores)
 		decision = self.__decision_boundary(z_score_delta)
 
-		# Interactive Mode
+		# Interactive Mode (temporarily disabled)
 		#if params["mode"] == "test":
 			#args = [params, scores, transaction, hits, business_names, city_names, state_names]
 			#self.__interactive_mode(*args)
@@ -407,6 +409,9 @@ class Consumer(threading.Thread):
 		# Ensure Proper Casing
 		if enriched_transaction[yfm['name']] == enriched_transaction[yfm['name']].upper():
 			enriched_transaction[yfm['name']] = string.capwords(enriched_transaction[yfm['name']], " ")
+
+		# Ensure No Pipes
+		enriched_transaction[yfm['name']] = PIPE_PATTERN.sub(" ", enriched_transaction[yfm['name']])
 
 		return enriched_transaction
 
