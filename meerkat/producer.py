@@ -83,7 +83,7 @@ def get_desc_queue(filename, params, classifier):
 
 	# Hold on to GOOD_DESCRIPTION, clear fields
 	for row in physical:
-		row["GOOD_DESCRIPTION"] = row["MERCHANT_NAME"]
+		#row["GOOD_DESCRIPTION"] = row["MERCHANT_NAME"]
 		gd = string_cleanse(row["GOOD_DESCRIPTION"])
 		row["GOOD_DESCRIPTION"] = string.capwords(gd, " ")
 

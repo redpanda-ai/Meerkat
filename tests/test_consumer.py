@@ -1,4 +1,4 @@
-"""Unit tests for meerkat.description_consumer"""
+"""Unit tests for meerkat.consumer"""
 
 import collections
 import json

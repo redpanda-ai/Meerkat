@@ -15,7 +15,7 @@ class TokenizeDescriptionTests(unittest.TestCase):
 		"concurrency" : 1,
 		"input" : {
 			"hyperparameters" : "config/hyperparameters/made_up_key_name.json",
-			"filename" : "data/input/100_bank_transaction_descriptions.txt",
+			"filename" : "data/input/100_Bank_Transactions.txt",
 			"delimiter" : "|",
 			"encoding" : "utf-8"
 		},
