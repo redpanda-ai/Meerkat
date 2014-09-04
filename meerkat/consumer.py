@@ -1,11 +1,10 @@
 #!/usr/local/bin/python3.3
 
-"""This module constructs ElasticSearch queries to match 
-a transaction to merchant data indexed with ElasticSearch.
-More generally it is used to match an unstructured 
-record to a well structured index. In our multithreaded 
-system, this is what processes the queue of data provided 
-by description_producer.
+"""This module constructs ElasticSearch queries to match a transaction to
+merchant data indexed with ElasticSearch. More generally it is used to
+match an unstructured record to a well structured index. In our
+multithreaded system, this is what processes the queue of data provided by
+producer.py
 
 Created on Jan 16, 2014
 @author: J. Andrew Key
@@ -21,61 +20,29 @@ import queue
 import re
 import sys
 import threading
+import string
 
 from elasticsearch import Elasticsearch
 from sklearn.preprocessing import StandardScaler
 from scipy.stats.mstats import zscore
 from pprint import pprint
 
-from .various_tools import string_cleanse, synonyms
+from .various_tools import string_cleanse, synonyms, safe_print, get_yodlee_factual_map
+from .various_tools import get_bool_query, get_qs_query, get_us_cities
 from .clustering import cluster, collect_clusters
-from .location import separate_geo, scale_polygon
+from .location import separate_geo, scale_polygon, get_geo_query
 
-#Helper functions
-def get_bool_query(starting_from=0, size=0):
-	"""Returns a "bool" style ElasticSearch query object"""
-	return {"from" : starting_from, "size" : size, "query" : {
-		"bool": {"minimum_number_should_match": 1, "should": []}}}
+PIPE_PATTERN = re.compile(r"\|")
 
-def get_basic_query(starting_from=0, size=0):
-	"""Returns an ElasticSearch query object"""
-	return {"from" : starting_from, "size" : size, "query" : {}}
-
-def get_geo_query(scaled_shapes):
-	"""Generate multipolygon query for use with"""
-	
-	return {
-		"geo_shape" : {
-			"pin.location" : {
-				"shape" : {
-					"type" : "multipolygon",
-					"coordinates": [[scaled_shape] for scaled_shape in scaled_shapes]
-				}
-			}
-		}
-	}
-
-def get_qs_query(term, field_list=[], boost=1.0):
-	"""Returns a "query_string" style ElasticSearch query object"""
-	return {"query_string": {
-		"query": term, "fields": field_list, "boost" : boost}}
-
-def get_us_cities():
-	"""Load an array of US cities"""
-	with open("data/misc/US_Cities.txt") as city_file:
-		cities = city_file.readlines()
-	cities = [city.lower().rstrip('\n') for city in cities]
-	return cities
-
-class DescriptionConsumer(threading.Thread):
-	''' Acts as a client to an ElasticSearch cluster, tokenizing description
-	strings that it pulls from a synchronized queue. '''
+class Consumer(threading.Thread):
+	"""Acts as a client to an ElasticSearch cluster, tokenizing description
+	strings that it pulls from a synchronized queue."""
 
 	def __build_boost_vectors(self):
 		"""Turns configuration entries into a dictionary of numpy arrays."""
 		#logger = logging.getLogger("thread " + str(self.thread_id))
-		boost_column_labels = self.params["elasticsearch"]["boost_labels"]
-		boost_row_vectors = self.params["elasticsearch"]["boost_vectors"]
+		boost_column_labels = self.hyperparameters["boost_labels"]
+		boost_row_vectors = self.hyperparameters["boost_vectors"]
 		boost_row_labels, boost_column_vectors = sorted(boost_row_vectors.keys()), {}
 		for i in range(len(boost_column_labels)):
 			my_list = []
@@ -84,52 +51,60 @@ class DescriptionConsumer(threading.Thread):
 			boost_column_vectors[boost_column_labels[i]] = np.array(my_list)
 		return boost_row_labels, boost_column_vectors
 
-	def __display_search_results(self, search_results, transaction):
-		"""Displays search results."""
-		logger = logging.getLogger("thread " + str(self.thread_id))
-		# Must have results
-		if search_results['hits']['total'] == 0:
-			return True
+	def __interactive_mode(self, params, scores, transaction, hits, business_names, city_names, state_names):
+		"""Interact with the results as they come"""
 
-		hits = search_results['hits']['hits']
-		scores, results, fields_found = [], [], []
-		params = self.params
+		score = scores[0]
+		z_score = self.__generate_z_score_delta(scores)
+		decision = self.__decision_boundary(z_score)
+		description =  ' '.join(transaction["DESCRIPTION_UNMASKED"].split())
+		first_hit = hits[0]["fields"]
+		fields_to_get = ["name", "region", "locality", "internal_store_number", "postcode", "address"]
+		field_content = [first_hit.get(field, ["_____"])[0] for field in fields_to_get]
+		city_fallback, state_fallback, name_fallback = "", "", ""
 
-		for hit in hits:
-			# Add Latitude and Longitude
-			if hit.get("_source", {}).get("pin", "") != "":
-				coordinates = hit["_source"]["pin"]["location"]["coordinates"]
-				if "fields" in hit:
-					hit["fields"]["longitude"] = [coordinates[0]]
-					hit["fields"]["latitude"] = [coordinates[1]]
-			hit_fields, score = hit.get("fields", {}), hit['_score']
-			scores.append(score)
-			field_order = params["output"]["results"]["fields"]
-			fields_in_hit = [field for field in hit_fields]
-			ordered_hit_fields = []
-			for ordinal in field_order:
-				if ordinal in fields_in_hit:
-					my_field = (hit_fields[ordinal][0]\
-						if isinstance(hit_fields[ordinal], (list))\
-						else str(hit_fields[ordinal]))
-					fields_found.append(ordinal)
-					ordered_hit_fields.append(my_field)
-				else:
-					fields_found.append(ordinal)
-					ordered_hit_fields.append("")
-			results.append(\
-			"[" + str(round(score, 3)) + "] " + " ".join(ordered_hit_fields))
+		labels = ["Transaction", "Query", "Score", "Z-Score", "Decision"]
+		query = synonyms(description)
+		query = string_cleanse(query)
+		data = [description, query, score, z_score, decision]
 
-		self.__generate_z_score_delta(scores)
+		# Populate Decisions
+		if not decision:
+			data[4] == "No"
+			fields = self.params["output"]["results"]["fields"]
+			city_names = city_names[0:2]
+			state_names = state_names[0:2]
+			states_equal = state_names.count(state_names[0]) == len(state_names)
+			city_in_transaction = (city_names[0].lower() in transaction["DESCRIPTION_UNMASKED"].lower())
+			state_in_transaction = (state_names[0].lower() in transaction["DESCRIPTION_UNMASKED"].lower())
+			business_names = business_names[0:2]
+			top_name = business_names[0].lower()
+			all_equal = business_names.count(business_names[0]) == len(business_names)
+			not_a_city = top_name not in self.cities
+			name_fallback = ("", business_names[0].title())[((all_equal and not_a_city)) == True]
+			name_fallback = (name_fallback, transaction['GOOD_DESCRIPTION'])[(transaction['GOOD_DESCRIPTION'] != "") == True]
+			name_fallback = string.capwords(name_fallback, " ")
+			city_fallback = ("", city_names[0].title())[city_in_transaction == True]
+			state_fallback = ("", state_names[0].upper())[(states_equal and state_in_transaction) == True]
+			labels = labels + ["Name Fallback", "State Fallback", "City Fallback"]
+			data = data + [name_fallback, state_fallback, city_fallback]
+		else:
+			data[4] = "Yes"
 
-		try:
-			logger.debug("%s: %s", str(self.thread_id), results[0].encode("utf-8"))
-			print(str(self.thread_id), ": ", results[0].encode("utf-8"))
-		except IndexError:
-			logger.warning("INDEX ERROR: %s", transaction["DESCRIPTION"])
-			#print("INDEX ERROR: ", transaction["DESCRIPTION"])
+		# Print to User
+		stats = ["{:22}: ".format(label) + "{}" for label in labels]
+		stats = "\n".join(stats)
+		stats = stats.format(*data)
 
-		return True
+		attr_labels = ["GOOD_DESCRIPTION"] + [field.title() for field in fields_to_get]
+		attributes = ["{:22}: ".format(label) + "{}" for label in attr_labels]
+		attributes = "\n".join(attributes) + "\n\n----------------------------\n"
+		field_content = [transaction['GOOD_DESCRIPTION']] + field_content
+		attributes = attributes.format(*field_content)
+		
+		prompt = stats + "\n\n" + attributes
+		#print(prompt)
+		user = input(prompt)
 
 	def __generate_z_score_delta(self, scores):
 		"""Generate the Z-score delta between the first and second scores."""
@@ -144,22 +119,11 @@ class DescriptionConsumer(threading.Thread):
 		first_score, second_score = z_scores[0:2]
 		z_score_delta = round(first_score - second_score, 3)
 		logger.info("Z-Score delta: [%.2f]", z_score_delta)
-		quality = ""
-
-		if z_score_delta <= 1:
-			quality = "Low-grade"
-		elif z_score_delta <= 2:
-			quality = "Mid-grade"
-		else:
-			quality = "High-grade"
-
-		logger.info("Top Score Quality: %s", quality)
 
 		return z_score_delta
 
-
 	def __decision_boundary(self, z_score_delta):
-		"""Decides whether or not we will label transaction
+		"""Decide whether or not we will label transaction
 		by factual_id"""
 
 		threshold = self.hyperparameters.get("z_score_threshold", "2")
@@ -172,7 +136,7 @@ class DescriptionConsumer(threading.Thread):
 			return False
 
 	def __init__(self, thread_id, params, desc_queue, result_queue,\
-		hyperparameters):
+		hyperparameters, cities):
 		''' Constructor '''
 		threading.Thread.__init__(self)
 		self.thread_id = thread_id
@@ -181,7 +145,7 @@ class DescriptionConsumer(threading.Thread):
 		self.user = None
 		self.params = params
 		self.hyperparameters = hyperparameters
-		self.cities = get_us_cities()
+		self.cities = cities
 
 		cluster_nodes = self.params["elasticsearch"]["cluster_nodes"]
 		self.es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True,
@@ -203,7 +167,6 @@ class DescriptionConsumer(threading.Thread):
 			transaction = self.user.pop()
 			base_query = self.__generate_base_query(transaction)
 			search_results = self.__run_classifier(base_query)
-			self.__display_search_results(search_results, transaction)
 			enriched_transaction = self.__process_results(search_results, transaction)
 			enriched_transactions.append(enriched_transaction)
 
@@ -212,7 +175,7 @@ class DescriptionConsumer(threading.Thread):
 	def __text_and_geo_features(self, text_features_results):
 		"""Classify transactions using geo and text features"""
 
-		user_id = text_features_results[0]['MEM_ID']
+		user_id = text_features_results[0]['UNIQUE_MEM_ID']
 		qs_boost = self.hyperparameters.get("qs_boost", "1")
 		name_boost = self.hyperparameters.get("name_boost", "1")
 		hits, non_hits = separate_geo(text_features_results)
@@ -253,7 +216,6 @@ class DescriptionConsumer(threading.Thread):
 					key, value = field_boosts[i].split("^")
 					field_boosts[i] = key + "^" + str(float(value) * 0.5)
 			search_results = self.__run_classifier(json.dumps(base_query))
-			self.__display_search_results(search_results, transaction)
 			enriched_transaction = self.__process_results(search_results, transaction)
 			enriched_transactions.append(enriched_transaction)
 
@@ -326,6 +288,7 @@ class DescriptionConsumer(threading.Thread):
 
 		# Replace synonyms
 		transaction = synonyms(transaction)
+		transaction = string_cleanse(transaction)
 
 		# Construct Main Query
 		logger.info("BUILDING FINAL BOOLEAN SEARCH")
@@ -337,18 +300,20 @@ class DescriptionConsumer(threading.Thread):
 		simple_query = get_qs_query(transaction, field_boosts, boost)
 		should_clauses.append(simple_query)
 
-		# Hack Names
-		if good_description != "":
-
-			name_query = get_qs_query(string_cleanse(good_description), ['name'], 2)
+		# Use Good Description in Query
+		if good_description != "" and self.hyperparameters.get("good_description", "") != "":
+			good_description_boost = self.hyperparameters["good_description"]
+			name_query = get_qs_query(string_cleanse(good_description), ['name'], good_description_boost)
 			should_clauses.append(name_query)
 
 		return bool_search
 
 	def __process_results(self, search_results, transaction):
 		"""Prepare results for decision boundary"""
+
 		field_names = self.params["output"]["results"]["fields"]
 		hyperparameters = self.hyperparameters
+		params = self.params
 
 		# Must be at least one result
 		if search_results["hits"]["total"] == 0:
@@ -375,7 +340,7 @@ class DescriptionConsumer(threading.Thread):
 		city_names = [name[0] for name in city_names if type(name) == list]
 		state_names = [result.get("fields", {"region" : ""}).get("region", "") for result in hits]
 		state_names = [name[0] for name in state_names if type(name) == list]
-		
+
 		# Need Names
 		if len(business_names) < 2:
 			return transaction
@@ -388,8 +353,8 @@ class DescriptionConsumer(threading.Thread):
 		# Elasticsearch v1.0 bug workaround
 		if top_hit["_source"].get("pin", "") != "":
 			coordinates = top_hit["_source"]["pin"]["location"]["coordinates"]
-			top_hit["longitude"] = coordinates[0]
-			top_hit["latitude"] = coordinates[1]
+			hit_fields["longitude"] = coordinates[0]
+			hit_fields["latitude"] = coordinates[1]
 
 		# Collect Relevancy Scores
 		for hit in hits:
@@ -398,8 +363,14 @@ class DescriptionConsumer(threading.Thread):
 		z_score_delta = self.__generate_z_score_delta(scores)
 		decision = self.__decision_boundary(z_score_delta)
 
+		# Interactive Mode (temporarily disabled)
+		#if params["mode"] == "test":
+			#args = [params, scores, transaction, hits, business_names, city_names, state_names]
+			#self.__interactive_mode(*args)
+
 		# Enrich Data if Passes Boundary
-		enriched_transaction = self.__enrich_transaction(decision, transaction, hit_fields, z_score_delta, business_names, city_names, state_names)
+		args = [decision, transaction, hit_fields, z_score_delta, business_names, city_names, state_names]
+		enriched_transaction = self.__enrich_transaction(*args)
 
 		return enriched_transaction
 
@@ -409,34 +380,38 @@ class DescriptionConsumer(threading.Thread):
 		enriched_transaction = transaction
 		field_names = self.params["output"]["results"]["fields"]
 		fields_in_hit = [field for field in hit_fields]
+		yfm = get_yodlee_factual_map()
 
 		# Enrich with the fields we've found. Attach the z_score_delta
 		if decision == True:
 			for field in field_names:
 				if field in fields_in_hit:
 					field_content = hit_fields[field][0] if isinstance(hit_fields[field], (list)) else str(hit_fields[field])
-					enriched_transaction[field] = field_content
+					enriched_transaction[yfm.get(field, field)] = field_content
 				else:
-					enriched_transaction[field] = ""
-			enriched_transaction["z_score_delta"] = z_score_delta
+					enriched_transaction[yfm.get(field, field)] = ""
+			enriched_transaction[yfm["z_score_delta"]] = z_score_delta
 
 		# Add Business Name, City and State as a fallback
 		if decision == False:
 			for field in field_names:
-				enriched_transaction[field] = ""
+				enriched_transaction[yfm.get(field, field)] = ""
 			enriched_transaction = self.__business_name_fallback(business_names, transaction)
 			enriched_transaction = self.__geo_fallback(city_names, state_names, transaction)
-			enriched_transaction["z_score_delta"] = 0
+			enriched_transaction[yfm["z_score_delta"]] = 0
 
 		# Remove Good Description
 		if enriched_transaction['GOOD_DESCRIPTION'] != "":
-			enriched_transaction['name'] = enriched_transaction['GOOD_DESCRIPTION']
+			enriched_transaction[yfm['name']] = enriched_transaction['GOOD_DESCRIPTION']
 			
 		enriched_transaction["GOOD_DESCRIPTION"] = ""
 
 		# Ensure Proper Casing
-		if enriched_transaction['name'] == enriched_transaction['name'].upper():
-			enriched_transaction['name'] = enriched_transaction['name'].title()
+		if enriched_transaction[yfm['name']] == enriched_transaction[yfm['name']].upper():
+			enriched_transaction[yfm['name']] = string.capwords(enriched_transaction[yfm['name']], " ")
+
+		# Ensure No Pipes
+		enriched_transaction[yfm['name']] = PIPE_PATTERN.sub(" ", enriched_transaction[yfm['name']])
 
 		return enriched_transaction
 
@@ -451,6 +426,7 @@ class DescriptionConsumer(threading.Thread):
 		when no factual_id is found"""
 
 		fields = self.params["output"]["results"]["fields"]
+		yfm = get_yodlee_factual_map()
 		enriched_transaction = transaction
 		city_names = city_names[0:2]
 		state_names = state_names[0:2]
@@ -459,10 +435,10 @@ class DescriptionConsumer(threading.Thread):
 		state_in_transaction = (state_names[0].lower() in enriched_transaction["DESCRIPTION_UNMASKED"].lower())
 
 		if (city_in_transaction):
-			enriched_transaction['locality'] = city_names[0]
+			enriched_transaction[yfm['locality']] = city_names[0]
 
 		if (states_equal and state_in_transaction):
-			enriched_transaction['region'] = state_names[0]
+			enriched_transaction[yfm['region']] = state_names[0]
 
 		return enriched_transaction
 
@@ -471,6 +447,7 @@ class DescriptionConsumer(threading.Thread):
 		when no factual_id is found"""
 
 		fields = self.params["output"]["results"]["fields"]
+		yfm = get_yodlee_factual_map()
 		enriched_transaction = transaction
 		business_names = business_names[0:2]
 		top_name = business_names[0].lower()
@@ -478,10 +455,10 @@ class DescriptionConsumer(threading.Thread):
 		not_a_city = top_name not in self.cities
 
 		if (all_equal and not_a_city):
-			enriched_transaction['name'] = business_names[0]
+			enriched_transaction[yfm['name']] = business_names[0]
 
 		if enriched_transaction['GOOD_DESCRIPTION'] != "":
-			enriched_transaction['name'] = enriched_transaction['GOOD_DESCRIPTION']
+			enriched_transaction[yfm['name']] = enriched_transaction['GOOD_DESCRIPTION']
 
 		return enriched_transaction
 

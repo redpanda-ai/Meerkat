@@ -1,19 +1,15 @@
 #!/usr/local/bin/python3.3
 
-"""This script is aimed at testing the accuracy of the
-Meerkat Classifier. We iteratively use this accuracy
-as a feedback score to tune and optimize Meerkat as a
-whole. The use of this script requires a csv containing
-human labeled data that has been verified as accurate.
-The input file to this script should be randomized over
-the selection of data being modeled. 
+"""This script is aimed at testing the accuracy of the Meerkat Classifier.
+We iteratively use this accuracy as a feedback score to tune and optimize
+Meerkat as a whole. The use of this script requires a csv containing human
+labeled data that has been verified as accurate. The input file to this
+script should be randomized over the selection of data being modeled. 
 
-To configure accuracy, this module should be
-provided a verification source that can be 
-referenced in the config file under the key
-params["verification_source"]. This should be 
-a reference to a file containing manually labeled 
-transactions.
+To configure accuracy, this module should be provided a verification
+source that can be referenced in the config file under the key
+params["verification_source"]. This should be a reference to a file
+containing manually labeled transactions.
 
 Created on Jan 8, 2014
 @author: Matthew Sevrens
@@ -23,6 +19,13 @@ Created on Jan 8, 2014
 #################### USAGE ##########################
 
 # Note: Needs refining. Experts only!
+
+# Suggested Future Work:
+#
+# 	Instead of matching being binary, produce a 
+# 	loss function that penalizes less for matching
+# 	the wrong location if the majority of the 
+#	informaiton is correct
 
 #####################################################
 
@@ -34,13 +37,19 @@ import sys
 
 from pprint import pprint
 
-from meerkat.various_tools import load_dict_list
+from meerkat.various_tools import load_dict_list, get_es_connection, get_merchant_by_id, progress
 
-def test_pinpoint_classifier(machine_labeled, human_labeled, my_lists):
+def test_pinpoint_classifier(machine_labeled, human_labeled, my_lists, params):
 	"""Tests both the recall and precision of the pinpoint classifier against
 	human-labeled training data."""
 
-	for machine_labeled_row in machine_labeled:
+	sys.stdout.write('\n')
+
+	for m, machine_labeled_row in enumerate(machine_labeled):
+
+		# Display progress
+		progress(m, machine_labeled, message="complete with accuracy tests")
+
 		# Our confidence was not high enough to label
 		if machine_labeled_row["factual_id"] == "":
 			my_lists["unlabeled"].append(machine_labeled_row['DESCRIPTION_UNMASKED'])
@@ -48,11 +57,7 @@ def test_pinpoint_classifier(machine_labeled, human_labeled, my_lists):
 		# Verify against human labeled
 		for index, human_labeled_row in enumerate(human_labeled):
 			if machine_labeled_row['DESCRIPTION_UNMASKED'] == human_labeled_row['DESCRIPTION_UNMASKED']:
-				if human_labeled_row['IS_PHYSICAL_TRANSACTION'] == '0':
-					# Transaction is non physical
-					my_lists["non_physical"].append(machine_labeled_row['DESCRIPTION_UNMASKED'])
-					break
-				elif human_labeled_row["factual_id"] == "":
+				if human_labeled_row["factual_id"] == "":
 					# Transaction is not yet labeled
 					my_lists["needs_hand_labeling"].append(machine_labeled_row['DESCRIPTION_UNMASKED'])
 					break
@@ -64,8 +69,8 @@ def test_pinpoint_classifier(machine_labeled, human_labeled, my_lists):
 				else:
 					# Transaction is mislabeled
 					my_lists["mislabeled"].append(human_labeled_row['DESCRIPTION_UNMASKED']\
-						+ " (ACTUAL:" + human_labeled_row["factual_id"] + ")"\
-						+ " (FOUND:" + machine_labeled_row["factual_id"] + ")")
+						+ " (ACTUAL: " + human_labeled_row["factual_id"] + ")"\
+						+ " (FOUND: " + machine_labeled_row["factual_id"] + ")")
 					break
 			elif index + 1 == len(human_labeled):
 				my_lists["needs_hand_labeling"].append(machine_labeled_row['DESCRIPTION_UNMASKED'])
@@ -91,6 +96,8 @@ def test_accuracy(params, file_path=None, non_physical_trans=None,
 	"""Takes file by default but can accept result
 	queue/ non_physical list. Attempts to provide various
 	accuracy tests"""
+
+	#params["es_connection"] = get_es_connection(params)
 
 	if non_physical_trans is None:
 		non_physical_trans = []
@@ -128,10 +135,10 @@ def test_accuracy(params, file_path=None, non_physical_trans=None,
 	}
 
 	# Test Pinpoint Classifier for recall and precision
-	test_pinpoint_classifier(machine_labeled, human_labeled, my_lists)
+	test_pinpoint_classifier(machine_labeled, human_labeled, my_lists, params)
 
 	# Test Bulk (binary) Classifier for accuracy
-	test_bulk_classifier(human_labeled, non_physical_trans, my_lists)
+	#test_bulk_classifier(human_labeled, non_physical_trans, my_lists)
 
 	# Collect results into dict for easier access
 	my_counters["num_labeled"] = my_counters["total"] - len(my_lists["unlabeled"])
@@ -191,7 +198,9 @@ def print_results(results):
 	if results is None:
 		return
 
-	print("\nSTATS:")
+	sys.stdout.write('\n\n')
+
+	print("STATS:")
 	print("{0:35} = {1:11}".format("Total Transactions Processed",
 		results['total_processed']))
 	print("{0:35} = {1:10.2f}%".format("Total Labeled Physical",
@@ -200,7 +209,9 @@ def print_results(results):
 		results['total_non_physical']))
 	print("{0:35} = {1:10.2f}%".format("Binary Classifier Accuracy",
 		results['binary_accuracy']))
-	print("\n")
+
+	sys.stdout.write('\n')
+
 	print("{0:35} = {1:10.2f}%".format("Recall all transactions",
 		results['total_recall']))
 	print("{0:35} = {1:10.2f}%".format("Recall physical",
@@ -211,9 +222,10 @@ def print_results(results):
 		results['num_verified']))
 	print("{0:35} = {1:10.2f}%".format("Precision",
 		results['precision']))
-	print("", "MISLABELED:", '\n'.join(results['mislabeled']), sep="\n")
-	print("", "MISLABELED BINARY:", '\n'.join(results['non_physical']),
-		sep="\n")
+
+	#print("", "MISLABELED:", '\n'.join(sorted(results['mislabeled'])), sep="\n")
+	#print("", "MISLABELED BINARY:", '\n'.join(results['non_physical']),
+	#	sep="\n")
 
 def run_from_command_line(command_line_arguments):
 	"""Runs these commands if the module is invoked from the command line"""

@@ -1,15 +1,25 @@
 {
     "concurrency" : 36,
-    "verification_source" : "data/misc/matt_8000_card.csv",
+    "verification_source" : "data/misc/ground_truth_bank.txt",
+    "container" : "card",
+    "mode" : "production",
     "input" : {
+        "S3" : {
+            "filter" : "2014070.*",
+            "src_bucket_name" : "s3yodlee",
+            "src_folders" : "ctprocessed/gpanel/",
+            "src_local_path" : "/mnt/ephemeral/input/",
+            "dst_bucket_name" : "yodleeproducts",
+            "dst_folders" : "panels/nullcat_integration/",
+            "dst_local_path" : "/mnt/ephemeral/output/",
+            "dst_s3_path" : "/meerkat/nullcat_integration/",
+            "error_bucket_name" : "yodleeproducts",
+            "error_local_path" : "/mnt/ephemeral/output/",
+            "error_s3_path" : "panels/6m/error/"
+        },
         "hyperparameters" : "config/hyperparameters/default.json",
-        "bucket_key" : "meerkat/input/gpanel/card/",
         "delimiter" : "|",
-        "encoding" : "utf-8",
-        "split" : {
-            "processing_location" : "/mnt/ephemeral/input/",
-            "row_limit" : 1000
-        }
+        "encoding" : "utf-8"
     },
     "logging" : {
         "level" : "warning",
@@ -22,15 +32,15 @@
             "fields" : [
                 "name", "chain_id", "category_labels", "address", "locality",
                 "region", "postcode", "website", "tel", "chain_name",
-                "latitude", "longitude", "neighborhood", "factual_id"],
+                "latitude", "longitude", "neighborhood", "factual_id", "internal_store_number"],
             "labels" : [
                 "PHYSICAL_MERCHANT", "STORE_ID", "FACTUAL_CATEGORY", "STREET", "CITY",
                 "STATE", "ZIP_CODE", "WEBSITE", "PHONE_NUMBER", "CHAIN_NAME",
-                "LATITUDE", "LONGITUDE", "NEIGHBORHOOD", "FACTUAL_ID"]
+                "LATITUDE", "LONGITUDE", "NEIGHBORHOOD", "FACTUAL_ID", "STORE_NUMBER"]
         },
         "file" : {
             "format" : "csv",
-            "processing_location" : "/mnt/ephemeral/output/",
+            "processing_location" : "/mnt/ephemeral/output",
             "delimiter" : "|"
         }
     },
@@ -43,7 +53,6 @@
             "s05:9200",
             "s06:9200",
             "s07:9200",
-            "s08:9200",
             "s09:9200",
             "s10:9200",
             "s11:9200",
@@ -55,25 +64,7 @@
             "s17:9200",
             "s18:9200"
         ],
-        "index" : "factual_index",
-        "type" : "factual_type",
-        "boost_labels" : ["standard_fields"],
-        "boost_vectors" :  {
-            "address": [0.541],
-            "address_extended": [1.282],
-            "admin_region": [0.69],
-            "category_labels": [1.319],
-            "chain_name": [0.999],
-            "email": [0.516],
-            "internal_store_number": [1.9],
-            "locality": [1.367],
-            "name": [2.781],
-            "neighborhood": [0.801],
-            "po_box": [1.292],
-            "post_town": [0.577],
-            "postcode": [0.914],
-            "region": [1.685],
-            "tel": [0.597]
-        }
+        "index" : "factual_index_2",
+        "type" : "factual_type"
     }
 }

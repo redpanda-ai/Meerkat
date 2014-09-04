@@ -1,10 +1,8 @@
 #!/usr/local/bin/python3.3
 
-"""The bulk loader is a tool that takes as an
-input a text based multifield merchant dataset and
-indexes it into Elasticsearch for further processing
-and analysis against transactions or other merchant
-datasets
+"""The bulk loader is a tool that takes as an input a text based
+multifield merchant dataset and indexes it into Elasticsearch for further
+processing and analysis against transactions or other merchant datasets
 
 Created on Feb 18, 2014
 @author: J. Andrew Key

@@ -1,0 +1,80 @@
+{
+	"concurrency" : 36,
+	"verification_source" : "data/misc/ground_truth_card.txt",
+	"container" : "card",
+	"mode" : "train",
+	"input" : {
+		"hyperparameters" : "config/hyperparameters/default.json",
+		"filename" : "/mnt/ephemeral/input/10000_CARD.txt",
+		"delimiter" : "|",
+		"encoding" : "utf-8",
+		"split" : {
+			"processing_location" : "/mnt/ephemeral/input/",
+			"row_limit" : 1000
+		}
+	},
+	"logging" : {
+		"level" : "warning",
+		"path" : "logs/foo.log",
+		"formatter" : "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+		"console" : true
+	},
+	"output" : {
+		"results" : {
+			"fields" : [
+				"name", "chain_id", "category_labels", "address", "locality",
+				"region", "postcode", "website", "tel", "chain_name",
+				"latitude", "longitude", "neighborhood", "factual_id", "internal_store_number"],
+			"labels" : [
+				"PHYSICAL_MERCHANT", "STORE_ID", "FACTUAL_CATEGORY", "STREET", "CITY",
+				"STATE", "ZIP_CODE", "WEBSITE", "PHONE_NUMBER", "CHAIN_NAME",
+				"LATITUDE", "LONGITUDE", "NEIGHBORHOOD", "FACTUAL_ID", "STORE_NUMBER"]
+		},
+		"file" : {
+			"format" : "csv",
+			"processing_location" : "/mnt/ephemeral/output/",
+			"delimiter" : "|"
+		}
+	},
+	"elasticsearch" : {
+		"cluster_nodes" : [
+		    "s01:9200",
+		    "s02:9200",
+		    "s03:9200",
+		    "s04:9200",
+		    "s05:9200",
+		    "s06:9200",
+		    "s07:9200",
+		    "s09:9200",
+		    "s10:9200",
+		    "s11:9200",
+		    "s12:9200",
+		    "s13:9200",
+		    "s14:9200",
+		    "s15:9200",
+		    "s16:9200",
+		    "s17:9200",
+		    "s18:9200"
+    	],
+		"index" : "factual_index_2",
+		"type" : "factual_type",
+		"boost_labels" : ["standard_fields"],
+		"boost_vectors" :  {
+			"address": [0.541],
+			"address_extended": [1.282],
+			"admin_region": [0.69],
+			"category_labels": [1.319],
+			"chain_name": [0.999],
+			"email": [0.516],
+			"internal_store_number": [1.9],
+			"locality": [1.367],
+			"name": [2.781],
+			"neighborhood": [0.801],
+			"po_box": [1.292],
+			"post_town": [0.577],
+			"postcode": [0.914],
+			"region": [1.685],
+			"tel": [0.597]
+		}
+	}
+}

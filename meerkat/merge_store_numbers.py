@@ -1,13 +1,11 @@
 #!/usr/local/bin/python3.3
 # pylint: disable=all
 
-"""This module takes a set of merchants with
-their associated manually formatted store numbers.
-The records are matched against Factual and if
-a matching merchant is found the store numbers are
-merged into the index. Merchants not found are saved
-for further processing. This is a form of feature
-engineering used to improve Meerkat's ability to label
+"""This module takes a set of merchants with their associated manually
+formatted store numbers. The records are matched against Factual and if a
+matching merchant is found the store numbers are merged into the index.
+Merchants not found are saved for further processing. This is a form of
+feature engineering used to improve Meerkat's ability to label
 transactions by location.
 
 Created on March 25, 2014
@@ -41,7 +39,8 @@ from scipy.stats.mstats import zscore
 from pprint import pprint
 from elasticsearch import Elasticsearch, helpers
 
-from meerkat.description_consumer import get_qs_query, get_bool_query
+from meerkat.consumer import get_qs_query, get_bool_query
+from meerkat.various_tools import string_cleanse
 
 def load_store_numbers(file_name):
 	"""Load Store Numbers from provided file"""
@@ -73,8 +72,8 @@ def z_score_delta(scores):
 def find_merchant(store):
 	"""Match document with store number to factual document"""
 
-	fields = ["address", "postcode", "name^1.5", "locality", "region"]
-	search_parts = [store["address"], store["zip_code"][0:5], store["keywords"], store["city"], store["state"]]
+	fields = ["address", "postcode", "name", "locality", "region"]
+	search_parts = [store["address"], store["zip_code"][0:5], store["keywords"], store["city"], string_cleanse(store["state"])]
 	factual_id = ""
 	top_result = ""
 
@@ -131,7 +130,8 @@ def update_merchant(factual_id, store):
 	body = {"doc" : {"internal_store_number" : store_number}}
 
 	try:
-		output_data = es_connection.update(index="factual_index", doc_type="factual_type", id=factual_id, body=body)
+		#TODO NO HARDCODED INDEX!!!
+		output_data = es_connection.update(index="factual_index_2", doc_type="factual_type", id=factual_id, body=body)
 	except Exception:
 		print("Failed to Update Merchant")
 
@@ -142,12 +142,11 @@ def update_merchant(factual_id, store):
 def search_index(query):
 	"""Searches the merchants index and the merchant mapping"""
 
-	input_data = json.dumps(query, sort_keys=True, indent=4\
-	, separators=(',', ': ')).encode('UTF-8')
 	output_data = ""
 
 	try:
-		output_data = es_connection.search(index="factual_index", body=query)
+		#TODO NO HARDCODED INDEX!!!
+		output_data = es_connection.search(index="factual_index_2", body=query)
 	except Exception:
 		output_data = {"hits":{"total":0}}
 
@@ -292,7 +291,6 @@ if __name__ == "__main__":
         "s05:9200",
         "s06:9200",
         "s07:9200",
-        "s08:9200",
         "s09:9200",
         "s10:9200",
         "s11:9200",

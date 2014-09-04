@@ -1,9 +1,10 @@
 {
 	"concurrency" : 36,
-	"verification_source" : "data/misc/matt_8000_card.csv",
+	"verification_source" : "data/misc/ground_truth_card.csv",
+	"mode" : "training",
 	"input" : {
 		"hyperparameters" : "config/hyperparameters/default.json",
-		"filename" : "/mnt/ephemeral/input/1000_bank.txt",
+		"filename" : "/mnt/ephemeral/training_data/card_sample/card_sample_physical.txt",
 		"delimiter" : "|",
 		"encoding" : "utf-8",
 		"split" : {
@@ -43,7 +44,6 @@
 		    "s05:9200",
 		    "s06:9200",
 		    "s07:9200",
-		    "s08:9200",
 		    "s09:9200",
 		    "s10:9200",
 		    "s11:9200",
@@ -55,8 +55,7 @@
 		    "s17:9200",
 		    "s18:9200"
     	],
-		"cache_results" : false,
-		"index" : "factual_index",
+		"index" : "factual_index_2",
 		"type" : "factual_type",
 		"boost_labels" : ["standard_fields"],
 		"boost_vectors" :  {

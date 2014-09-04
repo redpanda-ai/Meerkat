@@ -1,8 +1,8 @@
 #!/usr/local/bin/python3.3
 # pylint: disable=all
 
-"""This module aims to collect the functionality 
-related to geolocation used throughout Meerkat.
+"""This module aims to collect the functionality related to geolocation
+used throughout Meerkat.
 
 Created on Jan 27, 2014
 @author: Matthew Sevrens
@@ -32,6 +32,20 @@ def separate_geo(result_list):
 			hits.append(result)
 
 	return hits, non_hits
+
+def get_geo_query(scaled_shapes):
+	"""Generate multipolygon query for use with user context"""
+	
+	return {
+		"geo_shape" : {
+			"pin.location" : {
+				"shape" : {
+					"type" : "multipolygon",
+					"coordinates": [[scaled_shape] for scaled_shape in scaled_shapes]
+				}
+			}
+		}
+	}
 
 def scale_polygon(list_of_points, scale=2.0):
 	"""This function accepts a list of points representing a polygon and scales

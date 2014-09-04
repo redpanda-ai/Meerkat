@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3.3
 
-"""A script that tests the accuracy of a previously generated
-model using a provided human labeled file
+"""A script that tests the accuracy of a previously generated model using
+a provided human labeled file
 
 Created on Mar 11, 2014
 @author: Matthew Sevrens

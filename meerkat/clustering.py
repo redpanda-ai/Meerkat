@@ -1,15 +1,14 @@
 #!/usr/local/bin/python3.3
 # pylint: disable=C0301
 
-"""This module clusters a list of a users previously found
-transaction locations. Provided at least 25 latitude / longitude
-pairs, this module can group these points into separate categories
-such as Work or Home by analyzing how close the points are to 
-each other. After clustering, we find the outermost points that 
-bound a users typical shopping area represented as geopolygons, 
-scale these polygons inward or outward, and then generate a 
-geopolygon query for ElasticSearch. This added context allows 
-Meerkat to resolve ambiguous transactions that may not include a 
+"""This module clusters a list of a users previously found transaction
+locations. Provided at least 25 latitude / longitude pairs, this module
+can group these points into separate categories such as Work or Home by
+analyzing how close the points are to each other. After clustering, we
+find the outermost points that bound a users typical shopping area
+represented as geopolygons, scale these polygons inward or outward, and
+then generate a geopolygon query for ElasticSearch. This added context
+allows Meerkat to resolve ambiguous transactions that may not include a
 City or State to aid in indentification. 
 
 Created on March 16, 2014
@@ -131,6 +130,7 @@ def convex_hull(clusters, locations):
 def convert_geoshapes_coordinates_to_strings(geoshape_list):
 	"""Returns a copy of geoshape_list where each coordinate is formatted as a comma
 	separated pair of string values. """
+	
 	new_geoshape_list = []
 	for geoshape in geoshape_list:
 		new_geoshape = []
