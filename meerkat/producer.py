@@ -517,19 +517,20 @@ def df_to_queue(params, df):
 	classes = ["Non-Physical", "Physical", "ATM"]
 	f = lambda x: classes[int(classifier(x["DESCRIPTION_UNMASKED"]))]
 	desc_queue = queue.Queue()
+	name_map = {"GOOD_DESCRIPTION" : "MERCHANT_NAME", "MERCHANT_NAME" : "GOOD_DESCRIPTION"}
 
 	# Classify transactions
 	df['TRANSACTION_ORIGIN'] = df.apply(f, axis=1)
 	gb = df.groupby('TRANSACTION_ORIGIN')
+	groups = list(gb.groups)
 
 	# Group into separate dataframes
-	if container == "bank":
-		physical = pd.concat([gb.get_group("Physical"), gb.get_group('ATM')])
-	elif container == "card":
-		physical = gb.get_group('Physical')
+	physical = gb.get_group("Physical") if "Physical" in groups else pd.DataFrame()
+	atm = gb.get_group("ATM") if "ATM" in groups else pd.DataFrame()
+	non_physical = gb.get_group("Non-Physical").rename(columns=name_map) if "Non-Physical" in groups else pd.DataFrame()
 
-	# Swap column names to save good description
-	non_physical = gb.get_group('Non-Physical').rename(columns = {"GOOD_DESCRIPTION" : "MERCHANT_NAME", "MERCHANT_NAME" : "GOOD_DESCRIPTION"})
+	# Roll ATM into physical
+	physical = pd.concat([physical, atm])
 
 	# Group by user
 	users = physical.groupby('UNIQUE_MEM_ID')
