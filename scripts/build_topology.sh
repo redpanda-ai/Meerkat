@@ -42,7 +42,7 @@ done
 echo -e "Naming Nodes"
 for m in "${nodes[@]}"
 do
-	echo -e "Renaming ${prefix}${m}"
+	echo -e "Renaming ${m}"
 	ssh -i ${KEY} ${m} "sed -i 's/solo/${m}/' /etc/elasticsearch/elasticsearch.yml"
 done
 echo -e "Setting Masters"
