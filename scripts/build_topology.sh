@@ -1,10 +1,13 @@
 prefix="n"
-node_start=21
-node_end=100
-slave_start=21
-slave_end=100
-master_start=1
-master_end=0
+master_start=10001
+master_end=10002
+
+slave_start=10003
+slave_end=10020
+
+node_start=10001
+node_end=10020
+
 echo -e "Nodes are:"
 nodes=()
 for ((a=${node_start}; a <= ${node_end} ; a++))
@@ -39,26 +42,36 @@ done
 echo -e "Naming Nodes"
 for m in "${nodes[@]}"
 do
-	./rename.sh ${m}
+	echo -e "Renaming ${prefix}${m}"
+	ssh -i ${KEY} ${1} "sed -i 's/solo/${prefix}${m}/' /etc/elasticsearch/elasticsearch.yml"
 done
 echo -e "Setting Masters"
 for i in "${masters[@]}"
 do
-	./y_slave.sh ${i}
+	echo -e "master ${prefix}${i}"
+	ssh -i ${KEY} ${i} "sed -i '64 s/#//' /etc/elasticsearch/elasticsearch.yml"
+	ssh -i ${KEY} ${i} "sed -i '65 s/#//' /etc/elasticsearch/elasticsearch.yml"
 done
 echo -e "Setting Slaves"
 for j in "${slaves[@]}"
 do
-	./y_slave.sh ${j}
+	echo -e "slave ${prefix}${j}"
+	ssh -i ${KEY} ${j} "sed -i '58 s/#//' /etc/elasticsearch/elasticsearch.yml"
+	ssh -i ${KEY} ${j} "sed -i '59 s/#//' /etc/elasticsearch/elasticsearch.yml"
 done
 echo -e "Mounting EBS to /data"
 for k in "${nodes[@]}"
 do
-	./prep_data.sh ${k}
+	echo -e "Mounting EBS for ${prefix}${k}"
+	ssh -i ${KEY} ${k} "mkfs -t ext4 /dev/xvdb"
+	ssh -i ${KEY} ${k} "mount /dev/xvdb /data"
+	ssh -i ${KEY} ${k} "df | grep 'data'"
+	ssh -i ${KEY} ${k} "chown -R elasticsearch /data"
 done
-echo -e "Mounting EBS to /data"
+echo -e "Starting Elasticsearch"
 for p in "${nodes[@]}"
 do
+	echo -e "Activating ${prefix}${p}"
 	ssh -i ${KEY} ${p} "service elasticsearch start"
 done
 
