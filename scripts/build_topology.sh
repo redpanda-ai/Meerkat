@@ -43,26 +43,26 @@ echo -e "Naming Nodes"
 for m in "${nodes[@]}"
 do
 	echo -e "Renaming ${prefix}${m}"
-	ssh -i ${KEY} ${m} "sed -i 's/solo/${prefix}${m}/' /etc/elasticsearch/elasticsearch.yml"
+	ssh -i ${KEY} ${m} "sed -i 's/solo/${m}/' /etc/elasticsearch/elasticsearch.yml"
 done
 echo -e "Setting Masters"
 for i in "${masters[@]}"
 do
-	echo -e "master ${prefix}${i}"
+	echo -e "master ${i}"
 	ssh -i ${KEY} ${i} "sed -i '64 s/#//' /etc/elasticsearch/elasticsearch.yml"
 	ssh -i ${KEY} ${i} "sed -i '65 s/#//' /etc/elasticsearch/elasticsearch.yml"
 done
 echo -e "Setting Slaves"
 for j in "${slaves[@]}"
 do
-	echo -e "slave ${prefix}${j}"
+	echo -e "slave ${j}"
 	ssh -i ${KEY} ${j} "sed -i '58 s/#//' /etc/elasticsearch/elasticsearch.yml"
 	ssh -i ${KEY} ${j} "sed -i '59 s/#//' /etc/elasticsearch/elasticsearch.yml"
 done
 echo -e "Mounting EBS to /data"
 for k in "${nodes[@]}"
 do
-	echo -e "Mounting EBS for ${prefix}${k}"
+	echo -e "Mounting EBS for ${k}"
 	ssh -i ${KEY} ${k} "mkfs -t ext4 /dev/xvdb"
 	ssh -i ${KEY} ${k} "mount /dev/xvdb /data"
 	ssh -i ${KEY} ${k} "df | grep 'data'"
@@ -71,7 +71,7 @@ done
 echo -e "Starting Elasticsearch"
 for p in "${nodes[@]}"
 do
-	echo -e "Activating ${prefix}${p}"
+	echo -e "Activating ${p}"
 	ssh -i ${KEY} ${p} "service elasticsearch start"
 done
 
