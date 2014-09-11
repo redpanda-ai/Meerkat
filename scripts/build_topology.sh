@@ -59,20 +59,15 @@ do
 	ssh -i ${KEY} ${j} "sed -i '58 s/#//' /etc/elasticsearch/elasticsearch.yml"
 	ssh -i ${KEY} ${j} "sed -i '59 s/#//' /etc/elasticsearch/elasticsearch.yml"
 done
-echo -e "Mounting EBS to /data"
+echo -e "Mounting EBS to /data and starting Elasticsearch"
 for k in "${nodes[@]}"
 do
-	echo -e "Mounting EBS for ${k}"
+	echo -e "Activating ${k}"
 	ssh -i ${KEY} ${k} "mkfs -t ext4 /dev/xvdb"
 	ssh -i ${KEY} ${k} "mount /dev/xvdb /data"
 	ssh -i ${KEY} ${k} "df | grep 'data'"
 	ssh -i ${KEY} ${k} "chown -R elasticsearch /data"
-done
-echo -e "Starting Elasticsearch"
-for p in "${nodes[@]}"
-do
-	echo -e "Activating ${p}"
-	ssh -i ${KEY} ${p} "service elasticsearch start"
+	ssh -i ${KEY} ${k} "service elasticsearch start"
 done
 
 echo -e "Complete."
