@@ -434,7 +434,9 @@ def run_panel(params, reader, dst_file_name):
 
 		# Save Errors
 		line_count += chunk.shape[0]
-		errors += mystderr.getvalue().split('\n')
+		error_chunk = str.strip(mystderr.getvalue())
+		if len(error_chunk) > 0:
+			errors += error_chunk.split('\n')
 		sys.stderr = old_stderr
 
 		# Clean Data
