@@ -412,8 +412,10 @@ def production_run(params):
 		error_filepath = S3_params["error_local_path"] + dst_file_name + ".error.gz"
 		move_to_S3(params, dst_bucket, S3_params["dst_s3_path"], local_dst_filepath + ".gz")
 		post_SNS(dst_file_name + " successfully processed")
-		move_to_S3(params, error_bucket, S3_params["error_s3_path"], error_filepath)
-		safely_remove_file(error_filepath)
+		#Ensure that error file exists before pushing to S3
+		if os.path.isfilename(error_filepath):
+			move_to_S3(params, error_bucket, S3_params["error_s3_path"], error_filepath)
+			safely_remove_file(error_filepath)
 
 def run_panel(params, reader, dst_file_name):
 	"""Process a single panel"""
