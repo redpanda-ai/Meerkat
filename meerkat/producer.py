@@ -413,7 +413,7 @@ def production_run(params):
 		move_to_S3(params, dst_bucket, S3_params["dst_s3_path"], local_dst_filepath + ".gz")
 		post_SNS(dst_file_name + " successfully processed")
 		#Ensure that error file exists before pushing to S3
-		if os.path.isfilename(error_filepath):
+		if os.path.isfile(error_filepath):
 			move_to_S3(params, error_bucket, S3_params["error_s3_path"], error_filepath)
 			safely_remove_file(error_filepath)
 
