@@ -1,21 +1,23 @@
 {
-    "concurrency" : 36,
+    "concurrency" : 20,
     "verification_source" : "data/misc/ground_truth_bank.txt",
     "container" : "card",
     "mode" : "production",
     "input" : {
         "S3" : {
-            "filter" : "2014070.*",
-            "src_bucket_name" : "s3yodlee",
-            "src_folders" : "ctprocessed/gpanel/",
-            "src_local_path" : "/mnt/ephemeral/input/",
-            "dst_bucket_name" : "yodleeproducts",
-            "dst_folders" : "panels/nullcat_integration/",
-            "dst_local_path" : "/mnt/ephemeral/output/",
-            "dst_s3_path" : "/meerkat/nullcat_integration/",
-            "error_bucket_name" : "yodleeproducts",
-            "error_local_path" : "/mnt/ephemeral/output/",
-            "error_s3_path" : "panels/6m/error/"
+            "filter" : "201311.*_.*",
+            "src_bucket_name"   : "s3yodlee",
+            "dst_bucket_name"   : "yodleeprivate",
+            "error_bucket_name" : "yodleeprivate",
+            "src_folders"       : "ctprocessed/gpanel/",
+
+            "dst_folders"       : "panels/meerkat/",
+            "dst_s3_path"       : "/panels/meerkat/",
+            "error_s3_path"     : "/panels/meerkat/error/",
+
+            "src_local_path"    : "/mnt/ephemeral/input/",
+            "dst_local_path"    : "/mnt/ephemeral/output/",
+            "error_local_path"  : "/mnt/ephemeral/error/"
         },
         "hyperparameters" : "config/hyperparameters/default.json",
         "delimiter" : "|",
@@ -46,25 +48,11 @@
     },
     "elasticsearch" : {
         "cluster_nodes" : [
-            "s01:9200",
-            "s02:9200",
-            "s03:9200",
-            "s04:9200",
-            "s05:9200",
-            "s06:9200",
-            "s07:9200",
-            "s09:9200",
-            "s10:9200",
-            "s11:9200",
-            "s12:9200",
-            "s13:9200",
-            "s14:9200",
-            "s15:9200",
-            "s16:9200",
-            "s17:9200",
-            "s18:9200"
+            "n10001:9200",
+            "n10002:9200",
+            "n10003:9200"
         ],
-        "index" : "factual_index_2",
+        "index" : "factual_index",
         "type" : "factual_type"
     }
 }
