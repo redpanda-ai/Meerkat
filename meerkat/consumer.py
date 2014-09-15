@@ -334,7 +334,7 @@ class Consumer(threading.Thread):
 			return transaction
 
 		# Collect Business Names, City Names, and State Names
-		business_names = [result.get("fields", {"name" : ""})["name"] for result in hits]
+		business_names = [result.get("fields", {"name" : ""}).get("name", "") for result in hits]
 		business_names = [name[0] for name in business_names if type(name) == list]
 		city_names = [result.get("fields", {"locality" : ""}).get("locality", "") for result in hits]
 		city_names = [name[0] for name in city_names if type(name) == list]
