@@ -456,10 +456,10 @@ def run_panel(params, reader, dst_file_name):
 		# Write 	
 		if first_chunk:
 			safe_print("Output Path: " + dst_local_path + dst_file_name)
-			chunk.to_csv(dst_local_path + dst_file_name, columns=header, sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
+			chunk.to_csv(dst_local_path + dst_file_name, columns=header, quoting=csv.QUOTE_NONE, sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
 			first_chunk = False
 		else:
-			chunk.to_csv(dst_local_path + dst_file_name, header=False, columns=header, sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
+			chunk.to_csv(dst_local_path + dst_file_name, header=False, columns=header, quoting=csv.QUOTE_NONE, sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
 
 		# Handle Errors
 		sys.stderr = mystderr = io.StringIO()
@@ -511,7 +511,7 @@ def run_meerkat_chunk(params, desc_queue, hyperparameters, cities):
 	# Shutdown Loggers
 	logging.shutdown()
 
-	return pd.DataFrame(output)
+	return pd.DataFrame(data=output, columns=header)
 
 def df_to_queue(params, df):
 	"""Converts a dataframe to a queue for processing"""
@@ -569,7 +569,7 @@ def load_dataframe(params):
 	"""Loads file into a pandas dataframe"""
 
 	# Read file into dataframe
-	reader = pd.read_csv(params["input"]["filename"], na_filter=False, chunksize=5000, encoding="utf-8", sep='|', error_bad_lines=False)
+	reader = pd.read_csv(params["input"]["filename"], na_filter=False, chunksize=5000, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
 
 	return reader
 
