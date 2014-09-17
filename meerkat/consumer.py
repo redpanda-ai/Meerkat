@@ -387,7 +387,7 @@ class Consumer(threading.Thread):
 			for field in field_names:
 				if field in fields_in_hit:
 					field_content = hit_fields[field][0] if isinstance(hit_fields[field], (list)) else str(hit_fields[field])
-					enriched_transaction[yfm.get(field, field)] = field_content
+					enriched_transaction[yfm.get(field, field)] = PIPE_PATTERN.sub(" ", field_content)
 				else:
 					enriched_transaction[yfm.get(field, field)] = ""
 			enriched_transaction[yfm["z_score_delta"]] = z_score_delta
@@ -409,9 +409,6 @@ class Consumer(threading.Thread):
 		# Ensure Proper Casing
 		if enriched_transaction[yfm['name']] == enriched_transaction[yfm['name']].upper():
 			enriched_transaction[yfm['name']] = string.capwords(enriched_transaction[yfm['name']], " ")
-
-		# Ensure No Pipes
-		enriched_transaction[yfm['name']] = PIPE_PATTERN.sub(" ", enriched_transaction[yfm['name']])
 
 		return enriched_transaction
 
