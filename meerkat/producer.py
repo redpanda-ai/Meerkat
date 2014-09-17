@@ -455,6 +455,7 @@ def run_panel(params, reader, dst_file_name):
 
 		# Write 	
 		if first_chunk:
+			safely_remove_file(dst_local_path + dst_file_name)
 			safe_print("Output Path: " + dst_local_path + dst_file_name)
 			chunk.to_csv(dst_local_path + dst_file_name, columns=header, quoting=csv.QUOTE_NONE, sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
 			first_chunk = False
