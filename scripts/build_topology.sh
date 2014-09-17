@@ -1,12 +1,12 @@
-prefix="n"
-master_start=10001
-master_end=10002
+prefix="spot"
+master_start=1
+master_end=0
 
-slave_start=10003
-slave_end=10020
+slave_start=10001
+slave_end=10699
 
 node_start=10001
-node_end=10020
+node_end=10699
 
 echo -e "Nodes are:"
 nodes=()
