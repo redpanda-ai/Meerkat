@@ -64,6 +64,8 @@ for k in "${nodes[@]}"
 do
 	echo -e "Activating ${k}"
 	#ssh -i ${KEY} ${k} "mkfs -t ext4 /dev/xvdb"
+	ssh -i ${KEY} ${k} "mkdir -p /data/0"
+	ssh -i ${KEY} ${k} "mkdir -p /data/1"
 	ssh -i ${KEY} ${k} "mount /dev/xvdb /data/0"
 	ssh -i ${KEY} ${k} "mount /dev/xvdc /data/1"
 	ssh -i ${KEY} ${k} "df | grep 'data'"
@@ -73,6 +75,8 @@ do
 	ssh -i ${KEY} ${k} "mkdir -p /data/1/input"
 	ssh -i ${KEY} ${k} "mkdir -p /data/1/output"
 	ssh -i ${KEY} ${k} "mkdir -p /data/1/error"
+	ssh -i ${KEY} ${k} "mkdir -p /data/1/log/elasticsearch"
+
 	ssh -i ${KEY} ${k} "chown -R elasticsearch /data"
 	ssh -i ${KEY} ${k} "service elasticsearch start"
 done
