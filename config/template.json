@@ -15,9 +15,9 @@
             "dst_s3_path"       : "/panels/meerkat/",
             "error_s3_path"     : "/panels/meerkat/error/",
 
-            "src_local_path"    : "/data/input/",
-            "dst_local_path"    : "/data/output/",
-            "error_local_path"  : "/data/error/"
+            "src_local_path"    : "/data/0/input/",
+            "dst_local_path"    : "/data/1/output/",
+            "error_local_path"  : "/data/1/error/"
         },
         "hyperparameters" : "config/hyperparameters/default.json",
         "delimiter" : "|",
