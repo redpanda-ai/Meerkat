@@ -20,6 +20,7 @@ import boto.sns
 import numpy as np
 
 CLEAN_PATTERN = re.compile(r"\\+\|")
+QUOTE_CLEAN = re.compile(r'\"')
 
 def load_dict_list(file_name, encoding='utf-8', delimiter="|"):
 	"""Loads a dictionary of input from a file into a list."""
@@ -370,7 +371,11 @@ def clean_bad_escapes(filepath):
 
 def clean_line(line):
 	"""Strips out the part of a binary line that is not usable"""
-	return CLEAN_PATTERN.sub(" ", str(line)[2:-3])
+
+	line = CLEAN_PATTERN.sub(" ", str(line)[2:-3])
+	line = QUOTE_CLEAN.sub("", line)
+
+	return line
 
 def stopwords(transaction):
 	"""Remove stopwords"""
