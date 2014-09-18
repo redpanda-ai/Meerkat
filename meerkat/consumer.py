@@ -445,7 +445,7 @@ class Consumer(threading.Thread):
 
 		# Default to CT Names if Available
 		if transaction['GOOD_DESCRIPTION'] != "":
-			transaction[yfm['name']] = enriched_transaction['GOOD_DESCRIPTION']
+			transaction[yfm['name']] = transaction['GOOD_DESCRIPTION']
 			return transaction
 
 		fields = self.params["output"]["results"]["fields"]
