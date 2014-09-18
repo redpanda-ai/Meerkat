@@ -1,21 +1,23 @@
 {
-    "concurrency" : 36,
-    "verification_source" : "data/misc/ground_truth_card.txt",
+    "concurrency" : 20,
+    "verification_source" : "data/misc/ground_truth_bank.txt",
     "container" : "card",
     "mode" : "production",
     "input" : {
         "S3" : {
-            "filter" : "20140914.*",
-            "src_bucket_name" : "s3yodlee",
-            "src_folders" : "ctprocessed/gpanel/",
-            "src_local_path" : "/mnt/ephemeral/input/",
-            "dst_bucket_name" : "yodleeproducts",
-            "dst_folders" : "panels/nullcat_integration/",
-            "dst_local_path" : "/mnt/ephemeral/output/",
-            "dst_s3_path" : "/meerkat/nullcat_integration/",
-            "error_bucket_name" : "yodleeproducts",
-            "error_local_path" : "/mnt/ephemeral/output/",
-            "error_s3_path" : "panels/6m/error/"
+            "filter" : "201311.*_.*",
+            "src_bucket_name"   : "s3yodlee",
+            "dst_bucket_name"   : "yodleeprivate",
+            "error_bucket_name" : "yodleeprivate",
+            "src_folders"       : "ctprocessed/gpanel/",
+
+            "dst_folders"       : "panels/meerkat/",
+            "dst_s3_path"       : "/panels/meerkat/",
+            "error_s3_path"     : "/panels/meerkat/error/",
+
+            "src_local_path"    : "/data/input/",
+            "dst_local_path"    : "/data/output/",
+            "error_local_path"  : "/data/error/"
         },
         "hyperparameters" : "config/hyperparameters/default.json",
         "delimiter" : "|",
@@ -54,6 +56,7 @@
             "172.31.1.196:9200",
             "172.31.1.197:9200",
             "172.31.1.198:9200",
+            "172.31.1.199:9200",
             "172.31.1.200:9200"
         ],
         "index" : "factual_index",

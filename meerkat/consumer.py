@@ -442,6 +442,9 @@ class Consumer(threading.Thread):
 	def __business_name_fallback(self, business_names, transaction):
 		"""Basic logic to obtain a fallback for business name
 		when no factual_id is found"""
+		
+		fields = self.params["output"]["results"]["fields"]
+		yfm = get_yodlee_factual_map()
 
 		fields = self.params["output"]["results"]["fields"]
 		yfm = get_yodlee_factual_map()
