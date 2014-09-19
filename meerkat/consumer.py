@@ -446,9 +446,6 @@ class Consumer(threading.Thread):
 		fields = self.params["output"]["results"]["fields"]
 		yfm = get_yodlee_factual_map()
 
-		fields = self.params["output"]["results"]["fields"]
-		yfm = get_yodlee_factual_map()
-
 		# Default to CT Names if Available
 		if transaction['GOOD_DESCRIPTION'] != "":
 			transaction[yfm['name']] = transaction['GOOD_DESCRIPTION']
