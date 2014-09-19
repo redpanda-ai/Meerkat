@@ -442,9 +442,15 @@ class Consumer(threading.Thread):
 	def __business_name_fallback(self, business_names, transaction):
 		"""Basic logic to obtain a fallback for business name
 		when no factual_id is found"""
-
+		
 		fields = self.params["output"]["results"]["fields"]
 		yfm = get_yodlee_factual_map()
+
+		# Default to CT Names if Available
+		if transaction['GOOD_DESCRIPTION'] != "":
+			transaction[yfm['name']] = transaction['GOOD_DESCRIPTION']
+			return transaction
+
 		enriched_transaction = transaction
 		business_names = business_names[0:2]
 		top_name = business_names[0].lower()
@@ -452,10 +458,7 @@ class Consumer(threading.Thread):
 		not_a_city = top_name not in self.cities
 
 		if (all_equal and not_a_city):
-			enriched_transaction[yfm['name']] = business_names[0]
-
-		if enriched_transaction['GOOD_DESCRIPTION'] != "":
-			enriched_transaction[yfm['name']] = enriched_transaction['GOOD_DESCRIPTION']
+			enriched_transaction[yfm['name']] = PIPE_PATTERN.sub(" ", business_names[0])
 
 		return enriched_transaction
 
