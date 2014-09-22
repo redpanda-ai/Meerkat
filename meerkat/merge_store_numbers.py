@@ -131,7 +131,7 @@ def update_merchant(factual_id, store):
 
 	try:
 		#TODO NO HARDCODED INDEX!!!
-		output_data = es_connection.update(index="factual_index_2", doc_type="factual_type", id=factual_id, body=body)
+		output_data = es_connection.update(index="factual_index", doc_type="factual_type", id=factual_id, body=body)
 	except Exception:
 		print("Failed to Update Merchant")
 
@@ -146,7 +146,7 @@ def search_index(query):
 
 	try:
 		#TODO NO HARDCODED INDEX!!!
-		output_data = es_connection.search(index="factual_index_2", body=query)
+		output_data = es_connection.search(index="factual_index", body=query)
 	except Exception:
 		output_data = {"hits":{"total":0}}
 
@@ -283,25 +283,7 @@ if __name__ == "__main__":
 
 	verify_arguments()
 
-	cluster_nodes = [
-        "s01:9200",
-        "s02:9200",
-        "s03:9200",
-        "s04:9200",
-        "s05:9200",
-        "s06:9200",
-        "s07:9200",
-        "s09:9200",
-        "s10:9200",
-        "s11:9200",
-        "s12:9200",
-        "s13:9200",
-        "s14:9200",
-        "s15:9200",
-        "s16:9200",
-        "s17:9200",
-        "s18:9200"
-    ]
+	cluster_nodes = [ "172.31.19.118:9200", "172.31.19.119:9200", "172.31.19.120:9200", "172.31.19.121:9200", "172.31.19.122:9200", "172.31.19.123:9200", "172.31.19.124:9200", "172.31.19.125:9200", "172.31.19.126:9200", "172.31.19.127:9200", "172.31.44.44:9200", "172.31.44.45:9200", "172.31.44.46:9200", "172.31.44.47:9200", "172.31.44.48:9200", "172.31.44.49:9200", "172.31.44.50:9200", "172.31.44.51:9200", "172.31.44.52:9200", "172.31.44.53:9200", "172.31.14.79:9200", "172.31.14.80:9200", "172.31.14.81:9200", "172.31.14.82:9200", "172.31.14.83:9200", "172.31.14.84:9200", "172.31.14.85:9200", "172.31.14.86:9200", "172.31.14.87:9200", "172.31.14.88:9200" ]
 
 	es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True, sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
 	run_from_command_line(sys.argv)
