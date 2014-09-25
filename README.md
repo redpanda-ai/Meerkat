@@ -35,11 +35,13 @@ Manually for now
 
 Dependencies
 ------------
-* Python 3
+* Python 3.3
+* Pandas
 * Numpy
 * SciPy
 * Scikit-Learn
 * Elasticsearch
+* Boto
 
 License information
 -------------------
