@@ -6,7 +6,7 @@
     "input" : {
         "S3" : {
             "filter" : "__FILTER",
-            "src_bucket_name"   : "s3yodlee",
+            "src_bucket_name"   : "yodleeprivate",
             "dst_bucket_name"   : "yodleeprivate",
             "error_bucket_name" : "yodleeprivate",
             "src_folders"       : "ctprocessed/gpanel/",
