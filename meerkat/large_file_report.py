@@ -30,7 +30,7 @@ def begin_processing_loop(some_container, day_of_month):
 	#print(completed_sizes)
 	#sys.exit()
 	#Set source details
-	src_bucket_name = "s3yodlee"
+	src_bucket_name = "yodleeprivate"
 	src_s3_path_regex = re.compile("ctprocessed/gpanel/" + some_container +\
 	"/(.*" + day_of_month + "_[^/]+)")
 	#src_local_path = "data/input/src/"
@@ -41,6 +41,8 @@ def begin_processing_loop(some_container, day_of_month):
 	pending_list = []
 	for k in src_bucket.list():
 		if src_s3_path_regex.search(k.key):
+			#DEBUG
+			print(k.key)
 			file_name = src_s3_path_regex.search(k.key).group(1)
 			if file_name in completed:
 				#Exclude files that have already been completed
