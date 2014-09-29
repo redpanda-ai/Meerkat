@@ -9,4 +9,6 @@ do
 	mv -f tmp_file $file
 	mv -f $file $file.$denom
 	gzip $file.$denom
+	aws s3 cp --sse $file.$denom s3://yodleeprivate/ctprocessed/gpanel/bank/
+	rm $file.$denom
 done
