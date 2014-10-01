@@ -99,10 +99,25 @@ def acquire_instances(ec2_conn, params):
 		for i in instances:
 			private_ip_address = i.private_ip_address
 			id = i.id
-			state = i.update()
-			print("IP: {0}, ID: {1}, State: {2}".format(private_ip_address, id, state))
-			if state == "running":
-				count_runners += 1
+			max_attempts = 6
+			#Try multiple times to get instance update if necessary
+			for j in range(0, max_attempts):
+				try:
+					if j > 0:
+						print("Making attempt {0} of {1} for instance update.".format(j, max_attempts))
+					state = i.update()
+					break
+					if j >= max_attempts:
+						print("Error updating instance state, aborting abnormally.")
+						sys.exit()
+				except:
+					j += 1
+					print("Attempt #{0} in 3 seconds.".format(j))
+					time.sleep(3)
+
+		print("IP: {0}, ID: {1}, State: {2}".format(private_ip_address, id, state))
+		if state == "running":
+			count_runners += 1
 		if count_runners < params["instance_count"]:
 			print("Still waiting on {0} instances...".format(params["instance_count"] - count_runners))
 			time.sleep(10)
@@ -117,6 +132,24 @@ def map_block_devices(ec2_conn, params):
 	bdm['/dev/sdc'] = eph1
 	print("Map is {0}".format(bdm))
 	params["bdm"] = bdm
+
+def prep_servers_2(params):
+	#Try multiple times to get instance update if necessary
+	max_attempts = 6
+	for j in range(0, max_attempts):
+		try:
+			if j >= 0:
+				print("Making attempt {0} of {1} for ssh access.".format(j, max_attempts))
+			for instance in params["instances"]:
+				run_ssh_commands(instance.private_ip_address, params)
+			break
+			if j >= max_attempts:
+				print("Error using ssh to access instance, aborting abnormally.")
+				sys.exit()
+		except:
+			j += 1
+			print("Attempt #{0} in 10 seconds.".format(j))
+			time.sleep(10)
 
 def prep_servers(params):
 	print("Waiting 60 seconds for ssh daemon.")
@@ -202,7 +235,7 @@ def start():
 	confirm_security_groups(ec2_conn, params)
 	map_block_devices(ec2_conn, params)
 	acquire_instances(ec2_conn, params)
-	prep_servers(params)
+	prep_servers_2(params)
 	configure_servers(params)
 
 start()
