@@ -1,5 +1,6 @@
 import boto
 import json
+import paramiko
 import sys
 import time
 
