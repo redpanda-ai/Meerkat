@@ -1,6 +1,10 @@
 import boto
+import fileinput
 import json
+import os
 import paramiko
+import select
+import shutil
 import sys
 import time
 
@@ -103,16 +107,7 @@ def acquire_instances(ec2_conn, params):
 			print("Still waiting on {0} instances...".format(params["instance_count"] - count_runners))
 			time.sleep(10)
 	print("All instances running.")
-
-#	instance = reservations.instances[0]
-#	status = instance.update()
-#	while status == 'pending':
-#		time.sleep(10)
-#		status = instance.update()
-#	if status == 'running':
-#		print("New instance {0} accessible.".format(instance.id))
-#	else:
-#		print("Instance status: {0}".format(status))
+	params["instances"] = instances
 
 def map_block_devices(ec2_conn, params):
 	bdm = BlockDeviceMapping()
@@ -123,13 +118,81 @@ def map_block_devices(ec2_conn, params):
 	print("Map is {0}".format(bdm))
 	params["bdm"] = bdm
 
+def prep_servers(params):
+	print("Waiting 60 seconds for ssh daemon.")
+	time.sleep(60)
+	params["instances"]
+	for instance in params["instances"]:
+		run_ssh_commands(instance.private_ip_address, params)
+
+def configure_servers(params):
+	# __UNICAST HOSTS -> "172.31.1.191", "172.31.1.192"
+	# __MINIMUM_MASTER_NODES -> params["minimum_master_nodes"]
+	# __NODE_NAME -> params["name"] + a number
+	srcfile = params["elasticsearch_yaml_template"]
+	dstfile = srcfile + "." + params["name"]
+	try:
+		shutil.copy(srcfile, dstfile)
+	except shutil.Error as e:
+		print("Error copying template.")
+	except IOError:
+		print("IO Error copying template.")
+
+	unicast_hosts = get_unicast_hosts(params)
+	with fileinput.input(files=(dstfile), inplace=True) as yaml_template:
+		for line in yaml_template:
+			line = line.strip().replace("__UNICAST_HOSTS", unicast_hosts)
+			line = line.replace("__MINIMUM_MASTER_NODES", str(params["minimum_master_nodes"]))
+			print(line)
+
+	copy_configuration_to_hosts(params)
+
+def get_unicast_hosts(params):
+	result = ''
+	hosts = params["instances"][0:params["minimum_master_nodes"]]
+	for host in hosts:
+		result += '"' + host.private_ip_address + '", '
+	return result[:-2]
+
+def copy_configuration_to_hosts(params):
+	srcfile = params["elasticsearch_yaml_template"]
+	dstfile = srcfile + "." + params["name"]
+	rsa_private_key_file = params["key_file"]
+	ssh = paramiko.SSHClient()
+	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+	for instance in params["instances"]:
+		instance_ip_address = instance.private_ip_address
+		print("Pushing config file to {0}".format(instance_ip_address))
+		ssh.connect(instance_ip_address, username="root", key_filename=rsa_private_key_file)
+		sftp = ssh.open_sftp()
+		sftp.put(dstfile, "/etc/elasticsearch/elasticsearch.yml")
+		ssh.close()
+
+def run_ssh_commands(instance_ip_address, params):
+	rsa_private_key_file = params["key_file"]
+	shell_commands = params["shell_commands"]
+	ssh = paramiko.SSHClient()
+	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+	ssh.connect(instance_ip_address, username="root", key_filename=rsa_private_key_file)
+	for item in shell_commands:
+		print(item)
+		stdin, stdout, stderr = ssh.exec_command(item)
+		x = stdout.readlines()
+		y = stderr.readlines()
+		if x != "":
+			print(x)
+		if y != "":
+			print(y)
+	ssh.close()
+
 def start():
 	params = initialize()
 	my_region = boto.ec2.get_region(params["region"])
 	ec2_conn = EC2Connection(region=my_region)
 	confirm_security_groups(ec2_conn, params)
 	map_block_devices(ec2_conn, params)
-	#print(params["mapping"])
 	acquire_instances(ec2_conn, params)
+	prep_servers(params)
+	configure_servers(params)
 
 start()

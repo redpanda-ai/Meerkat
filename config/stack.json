@@ -1,0 +1,35 @@
+{
+	"name" : "meerkat-stack-01",
+	"region" : "us-west-2",
+	"security_groups" : [
+		"github",
+		"meerkat_private",
+		"s3cmd"
+	],
+	"ami-id" : "ami-178cce27",
+	"key_name" : "meerkat",
+	"key_file" : "/root/.ssh/meerkat.pem",
+	"instance_type" : "m3.2xlarge",
+	"instance_count" : 3,
+	"placement" : "us-west-2b",
+	"block_device_mapping" : [
+		{ "name" : "ephemeral0", "mount": "/dev/sdb" },
+		{ "name" : "ephemeral1", "mount": "/dev/sdc" }
+	],
+	"shell_commands" : [
+		"mkdir -p /data/0",
+		"mkdir -p /data/1",
+		"mount /dev/xvdb /data/0",
+		"mount /dev/xvdc /data/1",
+		"mkdir -p /data/0/input",
+		"mkdir -p /data/0/output",
+		"mkdir -p /data/1/input",
+		"mkdir -p /data/1/output",
+		"mkdir -p /data/1/error",
+		"mkdir -p /data/1/log/elasticsearch",
+		"chown -R elasticsearch /data",
+		"df | grep 'data'"
+	],
+	"elasticsearch_yaml_template" : "/root/git/Meerkat/config/elasticsearch.yml.template",
+	"minimum_master_nodes" : 2
+}
