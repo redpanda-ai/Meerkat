@@ -1,4 +1,5 @@
 import boto
+import elasticsearch
 import fileinput
 import json
 import os
@@ -8,6 +9,7 @@ import shutil
 import sys
 import time
 
+from elasticsearch import Elasticsearch
 from boto.ec2.connection import EC2Connection
 from boto.regioninfo import RegionInfo
 from boto.ec2.blockdevicemapping import BlockDeviceType, BlockDeviceMapping
@@ -254,8 +256,80 @@ def get_instance_lists(params):
 	print("Hybrids {0}".format(params["hybrids"]))
 	print("Slaves {0}".format(params["slaves"]))
 
+def poll_for_cluster_status(params):
+	cluster_nodes = [ params["instances"][0].private_ip_address ]
+	print("Polling for cluster status green")
+	max_attempts, sleep_between_attempts = 30, 10
+	#Try multiple times to get cluster health of green
+	target_nodes = len(params["instances"])
+	for j in range(0, max_attempts):
+		try:
+			if j > 0:
+				print("Making attempt {0} of {1} for cluster status.".format(j, max_attempts))
+				es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True,
+					sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
+				print("Cluster is online.")
+				print("Attempting to poll for health.")
+				status, number_of_nodes = "unknown", 0
+				while status != "green":
+					result = es_connection.cluster.health()
+					if result:
+						status = result["status"]
+						number_of_nodes = result["number_of_nodes"]
+						print("Status: {0}, Number of Nodes: {1}, Target Nodes: {2}".format(status, number_of_nodes, target_nodes))
+					else:
+						time.sleep(sleep_between_attempts)
+				break
+			if j >= max_attempts:
+				print("Error getting cluster status, aborting abnormally.")
+				sys.exit()
+		except Exception as err:
+			j += 1
+			print("Unexpected error:", sys.exc_info()[0])
+			print("Attempt #{0} in {1} seconds.".format(j, sleep_between_attempts))
+			time.sleep(sleep_between_attempts)
+	print("Congratulations your cluster is fully operational.")
+
+def poll_for_cluster_status_2(params):
+	cluster_nodes = [ "172.31.13.195" ]
+	print("Polling for cluster status green")
+	max_attempts, sleep_between_attempts = 6, 10
+	#Try multiple times to get cluster health of green
+	target_nodes = 1
+	for j in range(0, max_attempts):
+		try:
+			if j > 0:
+				print("Making attempt {0} of {1} for cluster status.".format(j, max_attempts))
+				es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True,
+					sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
+				print("Cluster is online.")
+				print("Attempting to poll for health.")
+				status, number_of_nodes = "unknown", 0
+				while status != "green":
+					result = es_connection.cluster.health()
+					if result:
+						status = result["status"]
+						number_of_nodes = result["number_of_nodes"]
+						print("Status: {0}, Number of Nodes: {1}, Target Nodes: {2}".format(status, number_of_nodes, target_nodes))
+					else:
+						time.sleep(sleep_between_attempts)
+				break
+			if j >= max_attempts:
+				print("Error getting cluster status, aborting abnormally.")
+				sys.exit()
+		except Exception as err:
+			j += 1
+			print("Unexpected error:", sys.exc_info()[0])
+			print("Attempt #{0} in {1} seconds.".format(j, sleep_between_attempts))
+			time.sleep(sleep_between_attempts)
+	print("Congratulations your cluster is fully operational.")
+
+
+
 def start():
 	params = initialize()
+	#poll_for_cluster_status_2(params)
+	#sys.exit()
 	my_region = boto.ec2.get_region(params["region"])
 	ec2_conn = EC2Connection(region=my_region)
 	confirm_security_groups(ec2_conn, params)
@@ -267,5 +341,6 @@ def start():
 	send_shell_commands(params, "configure_master_commands", "masters")
 	send_shell_commands(params, "configure_hybrid_commands", "hybrids")
 	send_shell_commands(params, "configure_slave_commands", "slaves")
+	poll_for_cluster_status(params)
 
 start()

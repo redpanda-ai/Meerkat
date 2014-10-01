@@ -12,8 +12,8 @@
 	"minimum_master_nodes" : 1,
 	"instance_layout" : {
 		"masters" : 1,
-		"hybrids" : 2,
-		"slaves" : 3
+		"hybrids" : 0,
+		"slaves" : 2
 	},
 	"placement" : "us-west-2c",
 	"block_device_mapping" : [
