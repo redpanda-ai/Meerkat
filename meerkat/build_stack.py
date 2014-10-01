@@ -1,9 +1,11 @@
 import boto
 import json
 import sys
+import time
 
 from boto.ec2.connection import EC2Connection
 from boto.regioninfo import RegionInfo
+from boto.ec2.blockdevicemapping import BlockDeviceType, BlockDeviceMapping
 
 #AWS_SECRET_ACCESS_KEY="0432+/xrV6cpnc2N7F5VpJbhKhXBuxIJpYwM3bQl"
 #AWS_ACCESS_KEY_ID="AKIAIHJQDVN46QEUHU6A"
@@ -68,16 +70,65 @@ def initialize():
 
 def acquire_instances(ec2_conn, params):
 	print("Acquiring instances")
-	ec2_conn.run_instances(params["ami-id"], key_name=params["key_name"],
-		instance_type=params["instance_type"],
+	#set up block device mapping
+	bdm = BlockDeviceMapping()
+	eph0 = BlockDeviceType()
+	eph1 = BlockDeviceType()
+	eph0.ephemeral_name = 'ephemeral0'
+	eph1.ephemeral_name = 'ephemeral1'
+	bdm['/dev/sdb'] = eph0
+	bdm['/dev/sdc'] = eph1
+	reservations = ec2_conn.run_instances(params["ami-id"],
+		key_name=params["key_name"], instance_type=params["instance_type"],
+		placement=params["placement"], block_device_map=bdm,
+		min_count=params["instance_count"], max_count=params["instance_count"],
 		security_groups=params["all_security_groups"])
 
+	print("Reservations {0}".format(reservations))
+
+	print("Waiting for instances to start...")
+	count_runners = 0
+	while count_runners < params["instance_count"]:
+		instances = reservations.instances
+		count_runners = 0
+		for i in instances:
+			private_ip_address = i.private_ip_address
+			id = i.id
+			state = i.update()
+			print("IP: {0}, ID: {1}, State: {2}".format(private_ip_address, id, state))
+			if state == "running":
+				count_runners += 1
+		if count_runners < params["instance_count"]:
+			print("Still waiting on {0} instances...".format(params["instance_count"] - count_runners))
+			time.sleep(10)
+	print("All instances running.")
+
+#	instance = reservations.instances[0]
+#	status = instance.update()
+#	while status == 'pending':
+#		time.sleep(10)
+#		status = instance.update()
+#	if status == 'running':
+#		print("New instance {0} accessible.".format(instance.id))
+#	else:
+#		print("Instance status: {0}".format(status))
+
+def map_block_devices(ec2_conn, params):
+	bdm = BlockDeviceMapping()
+	eph0 = BlockDeviceType(ephemeral_name = 'ephemeral0')
+	eph1 = BlockDeviceType(ephemeral_name = 'ephemeral1')
+	bdm['/dev/sdb'] = eph0
+	bdm['/dev/sdc'] = eph1
+	print("Map is {0}".format(bdm))
+	params["bdm"] = bdm
 
 def start():
 	params = initialize()
 	my_region = boto.ec2.get_region(params["region"])
 	ec2_conn = EC2Connection(region=my_region)
 	confirm_security_groups(ec2_conn, params)
+	map_block_devices(ec2_conn, params)
+	#print(params["mapping"])
 	acquire_instances(ec2_conn, params)
 
 start()
