@@ -86,17 +86,20 @@ def acquire_instances(ec2_conn, params):
 	eph1.ephemeral_name = 'ephemeral1'
 	bdm['/dev/sdb'] = eph0
 	bdm['/dev/sdc'] = eph1
+	layout = params["instance_layout"]
+	instance_count = layout["masters"] + layout["hybrids"] + layout["slaves"]
 	reservations = ec2_conn.run_instances(params["ami-id"],
 		key_name=params["key_name"], instance_type=params["instance_type"],
 		placement=params["placement"], block_device_map=bdm,
-		min_count=params["instance_count"], max_count=params["instance_count"],
+		min_count=instance_count, max_count=instance_count,
 		security_groups=params["all_security_groups"])
 
+	#params["instance_count"] = instance_count
 	print("Reservations {0}".format(reservations))
 
 	print("Waiting for instances to start...")
 	count_runners = 0
-	while count_runners < params["instance_count"]:
+	while count_runners < instance_count:
 		instances = reservations.instances
 		count_runners = 0
 		for i in instances:
@@ -123,8 +126,8 @@ def acquire_instances(ec2_conn, params):
 			if state == "running":
 				count_runners += 1
 
-		if count_runners < params["instance_count"]:
-			print("Still waiting on {0} instances...".format(params["instance_count"] - count_runners))
+		if count_runners < instance_count:
+			print("Still waiting on {0} instances...".format(instance_count - count_runners))
 			time.sleep(10)
 	print("All instances running.")
 	params["instances"] = instances
@@ -139,7 +142,7 @@ def map_block_devices(ec2_conn, params):
 	print("Map is {0}".format(bdm))
 	params["bdm"] = bdm
 
-def send_shell_commands(params, command_set):
+def send_shell_commands(params, command_set, instance_list):
 	"""Sends a list of shell commands, to each instance, displaying the result."""
 	#Try multiple times to get instance update if necessary
 	max_attempts = 6
@@ -147,7 +150,7 @@ def send_shell_commands(params, command_set):
 		try:
 			if j >= 0:
 				print("Making attempt {0} of {1} for ssh access.".format(j, max_attempts))
-			for instance in params["instances"]:
+			for instance in params[instance_list]:
 				run_ssh_commands(instance.private_ip_address, params, command_set)
 			break
 			if j >= max_attempts:
@@ -232,6 +235,25 @@ def run_ssh_commands(instance_ip_address, params, command_list):
 			print(y)
 	ssh.close()
 
+def get_instance_lists(params):
+	layout = params["instance_layout"]
+	master_count = layout["masters"]
+	hybrid_count = layout["hybrids"]
+	slave_count = layout["slaves"]
+	print("Masters: {0}, Hybrids: {1}, Slaves: {2}".format(master_count, hybrid_count, slave_count))
+	instance_count = master_count + hybrid_count + slave_count
+	#Split the instances into separate lists
+	step = 0
+	params["masters"] = params["instances"][step:step + master_count]
+	step += master_count
+	params["hybrids"] = params["instances"][step:step + hybrid_count]
+	step += hybrid_count
+	params["slaves"] = params["instances"][step:step + slave_count]
+
+	print("Masters {0}".format(params["masters"]))
+	print("Hybrids {0}".format(params["hybrids"]))
+	print("Slaves {0}".format(params["slaves"]))
+
 def start():
 	params = initialize()
 	my_region = boto.ec2.get_region(params["region"])
@@ -239,10 +261,11 @@ def start():
 	confirm_security_groups(ec2_conn, params)
 	map_block_devices(ec2_conn, params)
 	acquire_instances(ec2_conn, params)
-	send_shell_commands(params, "mount_data_commands")
+	get_instance_lists(params)
+	send_shell_commands(params, "mount_data_commands", "instances")
 	configure_servers(params)
-	send_shell_commands(params, "configure_hybrid_commands")
-	#set_masters(params)
-	#set_slaves(params)
+	send_shell_commands(params, "configure_master_commands", "masters")
+	send_shell_commands(params, "configure_hybrid_commands", "hybrids")
+	send_shell_commands(params, "configure_slave_commands", "slaves")
 
 start()
