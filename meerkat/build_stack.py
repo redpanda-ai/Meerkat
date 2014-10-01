@@ -125,38 +125,47 @@ def prep_servers(params):
 	for instance in params["instances"]:
 		run_ssh_commands(instance.private_ip_address, params)
 
-def configure_servers(params):
-	# __UNICAST HOSTS -> "172.31.1.191", "172.31.1.192"
-	# __MINIMUM_MASTER_NODES -> params["minimum_master_nodes"]
-	# __NODE_NAME -> params["name"] + a number
-	srcfile = params["elasticsearch_yaml_template"]
-	dstfile = srcfile + "." + params["name"]
+def customize_config_file(params, src_file):
+	templates = params["template_files"]
+	src_file = templates["path"] + templates[src_file]
+	dst_file = src_file + "." + params["name"]
 	try:
-		shutil.copy(srcfile, dstfile)
+		shutil.copy(src_file, dst_file)
 	except shutil.Error as e:
 		print("Error copying template.")
 	except IOError:
 		print("IO Error copying template.")
 
-	unicast_hosts = get_unicast_hosts(params)
-	with fileinput.input(files=(dstfile), inplace=True) as yaml_template:
-		for line in yaml_template:
-			line = line.strip().replace("__UNICAST_HOSTS", unicast_hosts)
+	with fileinput.input(files=(dst_file), inplace=True) as altered_file:
+		for line in altered_file:
+			line = line.strip().replace("__UNICAST_HOSTS", params["unicast_hosts"])
 			line = line.replace("__MINIMUM_MASTER_NODES", str(params["minimum_master_nodes"]))
 			print(line)
 
-	copy_configuration_to_hosts(params)
+	return dst_file
+
+def configure_servers(params):
+	# __UNICAST HOSTS -> "172.31.1.191", "172.31.1.192"
+	# __MINIMUM_MASTER_NODES -> params["minimum_master_nodes"]
+	# __NODE_NAME -> params["name"] + a number
+	print("Creating config files from templates.")
+	get_unicast_hosts(params)
+	yml_file = customize_config_file(params, "elasticsearch_yml" )
+	search_file = customize_config_file(params, "search")
+	load_file = customize_config_file(params, "load")
+	merge_file = customize_config_file(params, "merge")
+
+	print("Copying configuration to hosts.")
+	copy_configuration_to_hosts(params, yml_file)
 
 def get_unicast_hosts(params):
 	result = ''
 	hosts = params["instances"][0:params["minimum_master_nodes"]]
 	for host in hosts:
 		result += '"' + host.private_ip_address + '", '
-	return result[:-2]
+	params["unicast_hosts"] = result[:-2]
 
-def copy_configuration_to_hosts(params):
-	srcfile = params["elasticsearch_yaml_template"]
-	dstfile = srcfile + "." + params["name"]
+def copy_configuration_to_hosts(params, dst_file):
 	rsa_private_key_file = params["key_file"]
 	ssh = paramiko.SSHClient()
 	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -165,7 +174,8 @@ def copy_configuration_to_hosts(params):
 		print("Pushing config file to {0}".format(instance_ip_address))
 		ssh.connect(instance_ip_address, username="root", key_filename=rsa_private_key_file)
 		sftp = ssh.open_sftp()
-		sftp.put(dstfile, "/etc/elasticsearch/elasticsearch.yml")
+		#ALERT hard-coded string
+		sftp.put(dst_file, "/etc/elasticsearch/elasticsearch.yml")
 		ssh.close()
 
 def run_ssh_commands(instance_ip_address, params):
