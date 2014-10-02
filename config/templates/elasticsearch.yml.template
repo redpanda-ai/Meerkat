@@ -37,7 +37,7 @@
 # Node names are generated dynamically on startup, so you're relieved
 # from configuring them manually. You can tie this node to a specific name:
 #
-node.name: "__NODE_NAME"
+#node.name: "__NODE_NAME"
 node.master: __NODE_MASTER
 node.data: __NODE_DATA
 
@@ -123,7 +123,8 @@ node.data: __NODE_DATA
 # space on creation. For example:
 #
 #path.data: /path/to/data1,/path/to/data2
-path.data: /data/0,/data/1
+#path.data: /data/0,/data/1
+path.data: __ES_DATA_PATH
 # Path to temporary files:
 #
 #path.work: /path/to/work

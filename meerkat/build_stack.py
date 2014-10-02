@@ -271,12 +271,13 @@ def poll_for_cluster_status(params):
 				print("Cluster is online.")
 				print("Attempting to poll for health.")
 				status, number_of_nodes = "unknown", 0
-				while status != "green":
+				while (( status != "green") or (number_of_nodes < target_nodes) ):
 					result = es_connection.cluster.health()
 					if result:
 						status = result["status"]
 						number_of_nodes = result["number_of_nodes"]
 						print("Status: {0}, Number of Nodes: {1}, Target Nodes: {2}".format(status, number_of_nodes, target_nodes))
+						time.sleep(sleep_between_attempts)
 					else:
 						time.sleep(sleep_between_attempts)
 				break
@@ -285,56 +286,113 @@ def poll_for_cluster_status(params):
 				sys.exit()
 		except Exception as err:
 			j += 1
-			print("Unexpected error:", sys.exc_info()[0])
+			print("Exception {0}".format(err))
 			print("Attempt #{0} in {1} seconds.".format(j, sleep_between_attempts))
 			time.sleep(sleep_between_attempts)
 	print("Congratulations your cluster is fully operational.")
 
-def poll_for_cluster_status_2(params):
-	cluster_nodes = [ "172.31.13.195" ]
-	print("Polling for cluster status green")
-	max_attempts, sleep_between_attempts = 6, 10
-	#Try multiple times to get cluster health of green
-	target_nodes = 1
+def assign_ebs_volumes(ec2_conn, params):
+	get_snapshot(ec2_conn, params)
+	snapshot = params["snapshot"]
+	print("Snapshot: {0}".format(params["snapshot"]))
+	my_placement = params["placement"]
+	my_ebs_mount = params["ebs_mount"]
+	instances = params["instances"]
+	for i in instances:
+		id = i.id
+		max_attempts = 60
+		#Try multiple times to attach a volume
+		for j in range(0, max_attempts):
+			try:
+				if j > 0:
+					print("Making attempt {0} of {1} to attach volume.".format(j, max_attempts))
+					print("Placement {0}, Snapshot {1}".format(my_placement, snapshot))
+					new_volume = snapshot.create_volume(my_placement)
+					print("New volume created {0}, {1}".format(new_volume.id, new_volume.status))
+					attach_volume_to_instance(ec2_conn, new_volume, i, params)
+					break
+			except Exception as err:
+				j += 1
+				print("Unexpected error:", sys.exc_info()[0])
+				print("Attempt #{0} in 3 seconds.".format(j))
+				time.sleep(3)
+	print("All volumes created from snapshots and mounted.")
+
+def attach_volume_to_instance(ec2_conn, volume, instance, params):
+	print("In attach_volume_to_instance")
+	status, tries, max_tries = volume.status, 0, 60
+	while ( (status != "available") and (tries < max_tries) ):
+		print("Volume status {0}".format(status))
+		time.sleep(5)
+		tries +=1
+		print("Updating")
+		volume.update()
+		status = volume.volume_state()
+	print("Volume available")
+	my_ebs_mount = params["ebs_mount"]
+	max_attempts = 60
+	print("Volume.id {0}, Instance.id {1}, my_ebs_mount {2}".format(volume.id, instance.id, my_ebs_mount))
 	for j in range(0, max_attempts):
 		try:
-			if j > 0:
-				print("Making attempt {0} of {1} for cluster status.".format(j, max_attempts))
-				es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True,
-					sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
-				print("Cluster is online.")
-				print("Attempting to poll for health.")
-				status, number_of_nodes = "unknown", 0
-				while status != "green":
-					result = es_connection.cluster.health()
-					if result:
-						status = result["status"]
-						number_of_nodes = result["number_of_nodes"]
-						print("Status: {0}, Number of Nodes: {1}, Target Nodes: {2}".format(status, number_of_nodes, target_nodes))
-					else:
-						time.sleep(sleep_between_attempts)
-				break
-			if j >= max_attempts:
-				print("Error getting cluster status, aborting abnormally.")
-				sys.exit()
+			print("Trying to attach volume")
+			result = ec2_conn.attach_volume(volume.id, instance.id, my_ebs_mount)
+			print("Trying to update volume stats")
+			volume.update()
+			print("Trying to read volume state")
+			status = volume.attachment_state()
+			print("Volume attachment state {0}".format(status))
+			if status == 'attaching':
+				print("volume.id {0}, instance.id {1}, device_name {2}, attachment_state {3}".format(volume.id, instance.id, my_ebs_mount, status))
+				j = max_attempts
+				return
+			time.sleep(3)
+			continue
+		except boto.exception.EC2ResponseError:
+			print("volume.id {0}, instance.id {1}, device_name {2}, attachment_state attached".format(volume.id, instance.id, my_ebs_mount))
+			j = max_attempts
+			return
 		except Exception as err:
 			j += 1
+			print("Exception {0}".format(err))
 			print("Unexpected error:", sys.exc_info()[0])
-			print("Attempt #{0} in {1} seconds.".format(j, sleep_between_attempts))
-			time.sleep(sleep_between_attempts)
-	print("Congratulations your cluster is fully operational.")
+			print("Attempt #{0} in 3 seconds.".format(j))
+			time.sleep(3)
 
-
+def get_snapshot(ec2_conn, params):
+	"""Gets the EBS snapshot from Amazon"""
+	print("Assigning EBS volumes")
+	my_region = params["region"]
+	#new_vol = snapshot.create_volume(my_region)
+	ebs_mapping = params["ebs_mapping"]
+	max_attempts, sleep_between_attempts = 6, 10
+	snapshots = None
+	for j in range(0, max_attempts):
+		for item in ebs_mapping:
+			try:
+				snapshot_id = item["snapshot-id"]
+				params["ebs_mount"] = item["mount"]
+				snapshot_ids = [ snapshot_id ]
+				snapshots = ec2_conn.get_all_snapshots(snapshot_ids=snapshot_ids)
+				snapshot = snapshots[0]
+				
+			except Exception as err:
+				j += 1
+				print("Unexpected error:", sys.exc_info()[0])
+				print("Attempt #{0} in {1} seconds.".format(j, sleep_between_attempts))
+				time.sleep(sleep_between_attempts)
+		break
+	params["snapshot"] = snapshot
 
 def start():
 	params = initialize()
-	#poll_for_cluster_status_2(params)
-	#sys.exit()
 	my_region = boto.ec2.get_region(params["region"])
 	ec2_conn = EC2Connection(region=my_region)
+	#assign_ebs_volumes(ec2_conn, params)
+	#sys.exit()
 	confirm_security_groups(ec2_conn, params)
 	map_block_devices(ec2_conn, params)
 	acquire_instances(ec2_conn, params)
+	assign_ebs_volumes(ec2_conn, params)
 	get_instance_lists(params)
 	send_shell_commands(params, "mount_data_commands", "instances")
 	configure_servers(params)
