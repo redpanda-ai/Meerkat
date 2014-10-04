@@ -1,12 +1,12 @@
 prefix=${1}
-master_start=1
-master_end=0
+master_start=10001
+master_end=10010
 
 slave_start=10011
-slave_end=10300
+slave_end=10234
 
-node_start=10011
-node_end=10300
+node_start=10001
+node_end=10234
 
 echo -e "Nodes are:"
 nodes=()
@@ -78,7 +78,7 @@ do
 	ssh ${SSH_OPTIONS} ${k} "mkdir -p /data/1/error"
 	ssh ${SSH_OPTIONS} ${k} "mkdir -p /data/1/log/elasticsearch"
 	ssh ${SSH_OPTIONS} ${k} "chown -R elasticsearch /data"
-	ssh ${SSH_OPTIONS} ${k} "service elasticsearch start"
+#	ssh ${SSH_OPTIONS} ${k} "service elasticsearch start"
 done
 
 echo -e "Complete."

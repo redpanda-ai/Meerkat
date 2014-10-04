@@ -14,7 +14,8 @@ def begin_processing_loop(some_container, day_of_month):
 	#dst_s3_path_regex = re.compile("panels/meerkat/" + some_container +\
 	#"/([^/]+)")
 	dst_s3_path_regex = re.compile("panels/meerkat/" + some_container +\
-	"/(.*" + day_of_month + "_[^/]+)")
+#	"/(.*" + day_of_month + "_[^/]+)")
+	"/([^\.]*" + day_of_month + "\..*_[^/]+)")
 	#dst_local_path = "data/input/dst/"
 	dst_local_path = "/mnt/ephemeral/output/"
 	dst_bucket = conn.get_bucket(dst_bucket_name, Location.USWest2)
@@ -26,13 +27,15 @@ def begin_processing_loop(some_container, day_of_month):
 		if dst_s3_path_regex.search(j.key):
 			completed[dst_s3_path_regex.search(j.key).group(1)] = j.size
 
+	for item in sorted(completed):
+		print("C - {0}".format(item))
 	#print(completed)
 	#print(completed_sizes)
 	#sys.exit()
 	#Set source details
 	src_bucket_name = "yodleeprivate"
-	src_s3_path_regex = re.compile("ctprocessed/gpanel/" + some_container +\
-	"/(.*" + day_of_month + "_[^/]+)")
+	src_s3_path_regex = re.compile("panels/meerkat_split/" + some_container +\
+	"/([^\.]*" + day_of_month + "\..*_[^/]+)")
 	#src_local_path = "data/input/src/"
 	src_local_path = "/mnt/ephemeral/input/"
 	src_bucket = conn.get_bucket(src_bucket_name, Location.USWest2)
@@ -42,7 +45,7 @@ def begin_processing_loop(some_container, day_of_month):
 	for k in src_bucket.list():
 		if src_s3_path_regex.search(k.key):
 			#DEBUG
-			print(k.key)
+			#print(k.key)
 			file_name = src_s3_path_regex.search(k.key).group(1)
 			if file_name in completed:
 				#Exclude files that have already been completed
@@ -56,6 +59,8 @@ def begin_processing_loop(some_container, day_of_month):
 				pending_list.append((k, k.size))
 	#Reverse the pending list so that they are processed in reverse
 	#chronological order
+	for thing, item in pending_list:
+		print("P - {0}".format(thing.key))
 	pending_list.reverse()
 	dst_s3_path = "panels/meerkat/" + some_container + "/"
 	#pattern = re.compile("^201[34].*$")
@@ -82,6 +87,12 @@ def split_files(sizes):
 	for key in sorted(sizes.keys(), reverse=True):
 		print(sizes[key])
 
+def split_files_2(files):
+	for key in sorted(files.keys(), reverse=False):
+		print(files[key])
+
+
 my_files, my_sizes = begin_processing_loop(sys.argv[1], sys.argv[2])
 split_files(my_sizes)
+split_files_2(my_sizes)
 

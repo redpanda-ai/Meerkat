@@ -11,9 +11,9 @@
 	"instance_type" : "m3.2xlarge",
 	"minimum_master_nodes" : 1,
 	"instance_layout" : {
-		"masters" : 0,
-		"hybrids" : 1,
-		"slaves" : 0
+		"masters" : 4,
+		"hybrids" : 0,
+		"slaves" : 96
 	},
 	"placement" : "us-west-2c",
 	"block_device_mapping" : [
@@ -21,7 +21,7 @@
 		{ "name" : "ephemeral1", "mount": "/dev/sdc" }
 	],
 	"ebs_mapping" : [
-		{ "snapshot-id": "snap-060009cf", "mount" : "/dev/sdf" }
+		{ "snapshot-id": "snap-747466bd", "mount" : "/dev/sdf" }
 	],
 	"mount_data_commands" : [
 		"mkdir -p /data/0",

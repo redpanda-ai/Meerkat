@@ -225,7 +225,13 @@ def run_ssh_commands(instance_ip_address, params, command_list):
 	shell_commands = params[command_list]
 	ssh = paramiko.SSHClient()
 	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-	ssh.connect(instance_ip_address, username="root", key_filename=rsa_private_key_file)
+	sleep_between_attempts = 10
+	try:
+		ssh.connect(instance_ip_address, username="root", key_filename=rsa_private_key_file)
+	except Exception as err:
+		print("Exception trying to ssh into host {0}".format(err))
+		raise Exception("Error trying to ssh into host.")
+
 	for item in shell_commands:
 		print(item)
 		stdin, stdout, stderr = ssh.exec_command(item)
@@ -266,8 +272,12 @@ def poll_for_cluster_status(params):
 		try:
 			if j > 0:
 				print("Making attempt {0} of {1} for cluster status.".format(j, max_attempts))
-				es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True,
-					sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
+				try:
+					es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True,
+						sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
+				except Exception as err:
+					print("Exception while trying to make Elasticsearch connection.")
+					raise("Error trying to connect to ES node.")
 				print("Cluster is online.")
 				print("Attempting to poll for health.")
 				status, number_of_nodes = "unknown", 0
@@ -295,7 +305,7 @@ def assign_ebs_volumes(ec2_conn, params):
 	get_snapshot(ec2_conn, params)
 	snapshot = params["snapshot"]
 	print("Snapshot: {0}".format(params["snapshot"]))
-	my_placement = params["placement"]
+	placement = params["placement"]
 	my_ebs_mount = params["ebs_mount"]
 	instances = params["instances"]
 	for i in instances:
@@ -306,8 +316,9 @@ def assign_ebs_volumes(ec2_conn, params):
 			try:
 				if j > 0:
 					print("Making attempt {0} of {1} to attach volume.".format(j, max_attempts))
-					print("Placement {0}, Snapshot {1}".format(my_placement, snapshot))
-					new_volume = snapshot.create_volume(my_placement)
+					print("Placement {0}, Snapshot {1}".format(placement, snapshot))
+					new_volume = ec2_conn.create_volume(100, placement, snapshot=snapshot, volume_type="gp2")
+					#new_volume = snapshot.create_volume(placement)
 					print("New volume created {0}, {1}".format(new_volume.id, new_volume.status))
 					attach_volume_to_instance(ec2_conn, new_volume, i, params)
 					break
@@ -392,7 +403,8 @@ def start():
 	confirm_security_groups(ec2_conn, params)
 	map_block_devices(ec2_conn, params)
 	acquire_instances(ec2_conn, params)
-	assign_ebs_volumes(ec2_conn, params)
+	if "ebs_mapping" in params:
+		assign_ebs_volumes(ec2_conn, params)
 	get_instance_lists(params)
 	send_shell_commands(params, "mount_data_commands", "instances")
 	configure_servers(params)
