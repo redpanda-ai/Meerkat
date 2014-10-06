@@ -179,6 +179,7 @@ def customize_config_file(params, src_file):
 		for line in altered_file:
 			line = line.strip().replace("__UNICAST_HOSTS", params["unicast_hosts"])
 			line = line.replace("__MINIMUM_MASTER_NODES", str(params["minimum_master_nodes"]))
+			line = line.strip().replace("__MASTER_IP_LIST", params["master_ip_list"])
 			print(line)
 
 	return dst_file
@@ -191,6 +192,7 @@ def configure_servers(params):
 	# __NODE_NAME -> params["name"] + a number
 	print("Creating config files from templates.")
 	get_unicast_hosts(params)
+	get_master_ip_list(params)
 	yml_file = customize_config_file(params, "elasticsearch_yml" )
 	search_file = customize_config_file(params, "search")
 	load_file = customize_config_file(params, "load")
@@ -206,6 +208,15 @@ def get_unicast_hosts(params):
 	for host in hosts:
 		result += '"' + host.private_ip_address + '", '
 	params["unicast_hosts"] = result[:-2]
+
+def get_master_ip_list(params):
+	"""Creates a comma separated list of masters for use in configuration files."""
+	masters = params["masters"]
+	master_private_ips = []
+	for master in masters:
+		master_private_ips.append('"' + master.private_ip_address + '"')
+	params["master_ip_list"] = ', '.join(master_private_ips)
+	print("master_ip_list {0}".format(params["master_ip_list"]))
 
 def copy_configuration_to_hosts(params, dst_file):
 	rsa_private_key_file = params["key_file"]

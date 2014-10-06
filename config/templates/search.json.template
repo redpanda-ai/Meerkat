@@ -47,7 +47,9 @@
         }
     },
     "elasticsearch" : {
-        "cluster_nodes" : [ __UNICAST_HOSTS ],
+        "cluster_nodes" : [
+			__MASTER_IP_LIST
+        ],
         "index" : "factual_index",
         "type" : "factual_type"
     }

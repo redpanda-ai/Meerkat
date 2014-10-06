@@ -15,7 +15,7 @@
 		"hybrids" : 0,
 		"slaves" : 96
 	},
-	"placement" : "us-west-2c",
+	"placement" : "us-west-2b",
 	"block_device_mapping" : [
 		{ "name" : "ephemeral0", "mount": "/dev/sdb" },
 		{ "name" : "ephemeral1", "mount": "/dev/sdc" }
