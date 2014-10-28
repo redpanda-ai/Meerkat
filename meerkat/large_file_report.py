@@ -14,8 +14,8 @@ def begin_processing_loop(some_container, day_of_month):
 	#dst_s3_path_regex = re.compile("panels/meerkat/" + some_container +\
 	#"/([^/]+)")
 	dst_s3_path_regex = re.compile("panels/meerkat/" + some_container +\
-#	"/(.*" + day_of_month + "_[^/]+)")
-	"/([^\.]*" + day_of_month + "\..*_[^/]+)")
+	"/(.*" + day_of_month + "_[^/]+)")
+#	"/([^\.]*" + day_of_month + "\..*_[^/]+)")
 	#dst_local_path = "data/input/dst/"
 	dst_local_path = "/mnt/ephemeral/output/"
 	dst_bucket = conn.get_bucket(dst_bucket_name, Location.USWest2)
@@ -27,15 +27,16 @@ def begin_processing_loop(some_container, day_of_month):
 		if dst_s3_path_regex.search(j.key):
 			completed[dst_s3_path_regex.search(j.key).group(1)] = j.size
 
-	for item in sorted(completed):
-		print("C - {0}".format(item))
+	#for item in sorted(completed):
+	#	print("C - {0}".format(item))
 	#print(completed)
 	#print(completed_sizes)
 	#sys.exit()
 	#Set source details
 	src_bucket_name = "yodleeprivate"
 	src_s3_path_regex = re.compile("panels/meerkat_split/" + some_container +\
-	"/([^\.]*" + day_of_month + "\..*_[^/]+)")
+	"/(.*" + day_of_month + "_[^/]+)")
+#	"/([^\.]*" + day_of_month + "\..*_[^/]+)")
 	#src_local_path = "data/input/src/"
 	src_local_path = "/mnt/ephemeral/input/"
 	src_bucket = conn.get_bucket(src_bucket_name, Location.USWest2)
@@ -59,8 +60,13 @@ def begin_processing_loop(some_container, day_of_month):
 				pending_list.append((k, k.size))
 	#Reverse the pending list so that they are processed in reverse
 	#chronological order
-	for thing, item in pending_list:
-		print("P - {0}".format(thing.key))
+	last_date = None
+	for thing, item in reversed(pending_list):
+		#print("P - {0}".format(thing.key))
+		new_date = thing.key[26:38]
+		if last_date != new_date:
+			print("cd /root/git/Meerkat && ./day_bank_launcher.sh {0}".format(new_date))
+			last_date = new_date
 	pending_list.reverse()
 	dst_s3_path = "panels/meerkat/" + some_container + "/"
 	#pattern = re.compile("^201[34].*$")
@@ -75,12 +81,12 @@ def begin_processing_loop(some_container, day_of_month):
 	for item, item_size in pending_list:
 		src_file_name = src_s3_path_regex.search(item.key).group(1)
 		dst_file_name = src_file_name
-		if pattern1.search(src_file_name) or pattern2.search(src_file_name) or pattern3.search(src_file_name) or pattern4.search(src_file_name) or pattern5.search(src_file_name) or pattern6.search(src_file_name):
+		#if pattern1.search(src_file_name) or pattern2.search(src_file_name) or pattern3.search(src_file_name) or pattern4.search(src_file_name) or pattern5.search(src_file_name) or pattern6.search(src_file_name):
 			#print("{0} {1} {2}".format(some_container, src_file_name[0:8], int(item_size / 100000000) ))
-			large_files[item.key] = int(item_size / 100000000)
-			if item_size not in large_sizes:
-				large_sizes[item_size] = []
-			large_sizes[item_size].append((item.key))
+		large_files[item.key] = int(item_size / 100000000)
+		if item_size not in large_sizes:
+			large_sizes[item_size] = []
+		large_sizes[item_size].append((item.key))
 	return large_files, large_sizes
 
 def split_files(sizes):
@@ -93,6 +99,6 @@ def split_files_2(files):
 
 
 my_files, my_sizes = begin_processing_loop(sys.argv[1], sys.argv[2])
-split_files(my_sizes)
-split_files_2(my_sizes)
+#split_files(my_sizes)
+#split_files_2(my_sizes)
 
