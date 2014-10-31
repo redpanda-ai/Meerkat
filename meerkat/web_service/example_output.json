@@ -1,0 +1,30 @@
+{
+	"cobrand_id" : 1234,
+	"user_id" : 2345,
+	"transaction_list" : [
+		{
+			"transaction_id" : 1,
+			"is_physical_merchant" : true,
+			"merchant_name" : "Safeway",
+			"store_id" : "#12",
+			"category_label" : "Grocery",
+			"source" : "FACTUAL",
+			"source_merchant_id" : "3ec075f0-33c2-11e4-8c21-0800200c9a66",
+			"street" : "742 El Camino Real",
+			"city" : "Sunnyvale",
+			"state" : "CA",
+			"country" : "US",
+			"postal_code" : "94087"
+		},
+		{
+			"transaction_id" : 2,
+			"is_physical_merchant" : false,
+			"category" : "bank_transfer"
+		},
+		{
+			"transaction_id" : 3,
+			"is_physical_merchant" : false,
+			"merchant_name" : "Amazon"
+		}
+	]
+}

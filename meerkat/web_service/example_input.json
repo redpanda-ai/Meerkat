@@ -1,0 +1,24 @@
+{
+	"cobrand_id" : 1234,
+	"user_id" : 2345,
+	"transaction_list" : [
+		{
+			"transaction_id": 1,
+			"description": "Safeway #12, 742 El Camino Real, Sunnyvale CA 94087",
+			"amount": 151.23,
+			"date": "2014-04-01"
+		},
+		{
+			"transaction_id": 2,
+			"description": "Bank Transfer",
+			"amount": 100.00,
+			"date": "2014-04-03"
+		},
+		{
+			"transaction_id": 3,
+			"description": "Amazon.com",
+			"amount": 47.99,
+			"date": "2014-04-03"
+		}
+	]
+}

@@ -1,0 +1,68 @@
+{
+	"$schema" : "http://json-schema.org/draft-04/schema#",
+	"title" : "meerkat_categorize output",
+	"definitions" : {
+		"physical_merchant_response" : {
+			"type" : "object",
+			"properties" : {
+				"transaction_id" : { "type" : "number" },
+				"is_physical_merchant" : { "enum" : [ true ] },
+				"merchant_name" : { "type" : "string" },
+				"store_id" : { "type" : "string" },
+				"category_label" : { "type" : "string" },
+				"source" : { "enum": [ "FACTUAL", "OTHER" ] },
+				"source_merchant_id" : { "type" : "string" },
+				"street" : { "type" : "string" },
+				"city" : { "type" : "string" },
+				"state" : { "type" : "string" },
+				"country" : { "type" : "string", "maxLength" : 2, "minLength" : 2 },
+				"postal_code" : { "type" : "string" }
+			},
+			"required": [ "transaction_id", "is_physical_merchant", "merchant_name", "source_merchant_id", "country" ]
+		},
+		"non_physical_merchant_response" : {
+			"type" : "object",
+			"properties" : {
+				"transaction_id" : { "type" : "number" },
+				"is_physical_merchant" : { "enum" : [ false ] },
+				"merchant_name" : { "type" : "string" }
+			},
+			"required": [ "transaction_id", "is_physical_merchant", "merchant_name" ]
+		},
+		"non_merchant_category_response" : {
+			"type" : "object",
+			"properties" : {
+				"transaction_id" : { "type" : "number" },
+				"is_physical_merchant" : { "enum" : [ false ] },
+				"category" : { "type" : "string" }
+			},
+			"required": [ "transaction_id", "is_physical_merchant", "category" ]
+		}
+	},
+	"description": "A schema for defining output from 'meerkat_categorize'",
+	"type" : "object",
+	"properties" : {
+		"cobrand_id" : {
+			"description" : "Yodlee's number to uniquely identify the cobrand",
+			"type" : "number"
+		},
+		"user_id" : {
+			"description" : "Yodlee's number to uniquely identify a user within a cobrand",
+			"type" : "number"
+		},
+		"transaction_list" : {
+			"description" : "An array containing at least one of the following response types.",
+			"type" : "array",
+			"items" : {
+				"oneOf": [
+					{"$ref": "#/definitions/physical_merchant_response"},
+					{"$ref": "#/definitions/non_physical_merchant_response"},
+					{"$ref": "#/definitions/non_merchant_category_response"}
+				]
+			},
+			"minItems": 1,
+			"uniqueItems": true
+		}
+	},
+	"required": ["cobrand_id", "user_id", "transaction_list"]
+}
