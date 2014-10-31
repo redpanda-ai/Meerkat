@@ -1,5 +1,7 @@
 import json
 
+from pprint import pprint
+
 from tornado_json.requesthandlers import APIHandler
 from tornado_json import schema
 
@@ -20,12 +22,18 @@ class Meerkat(APIHandler):
 	@schema.validate(
 		input_schema = schema_input,
 		input_example = example_input,
-		output_schema = schema_output,
-		output_example = example_output
+		output_schema = {},
+		output_example = {}
+		#output_schema = schema_output,
+		#output_example = example_output
 	)
 
 	def post(self):
 		"""Handle post requests"""
+
+		data = json.loads(self.request.body.decode())
+
+		pprint(data)
 
 		return {
 
