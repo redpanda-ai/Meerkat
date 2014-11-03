@@ -2,25 +2,24 @@
 
 import json
 
+from pprint import pprint
 import tornado.ioloop
 from tornado_json.routes import get_routes
 from tornado_json.application import Application
 
-import meerkat.web_service as api
+from meerkat.web_service.api import Meerkat
 
 #################### USAGE ######################
 
 # python3.3 -m meerkat.web_service
 
+# curl -X POST -d @example_input.json http://localhost:8888/web_service/api/meerkat/ --header "Content-Type:application/json"
+
 #################################################
 
 def main():
 
-	routes = get_routes(api)
-
-	print(
-		json.dumps([(url, repr(route)) for url, route in routes], indent=2)
-	)
+	routes = [("/meerkat/?", Meerkat)]
 
 	# Create the application
 	application = Application(routes=routes, settings={})
