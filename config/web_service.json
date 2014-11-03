@@ -1,0 +1,24 @@
+{
+    "output" : {
+        "results" : {
+            "fields" : [
+                "name", "chain_id", "category_labels", "address", "locality",
+                "region", "postcode", "website", "tel", "chain_name",
+                "latitude", "longitude", "neighborhood", "factual_id", "internal_store_number"],
+            "labels" : [
+                "PHYSICAL_MERCHANT", "STORE_ID", "FACTUAL_CATEGORY", "STREET", "CITY",
+                "STATE", "ZIP_CODE", "WEBSITE", "PHONE_NUMBER", "CHAIN_NAME",
+                "LATITUDE", "LONGITUDE", "NEIGHBORHOOD", "FACTUAL_ID", "STORE_NUMBER"]
+        }
+    },
+    "elasticsearch" : {
+        "cluster_nodes" : [
+            "172.31.26.85", 
+            "172.31.26.84", 
+            "172.31.26.87", 
+            "172.31.26.86"
+        ],
+        "index" : "factual_index",
+        "type" : "factual_type"
+    }
+}

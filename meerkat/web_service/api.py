@@ -1,11 +1,13 @@
 import json
 
 from pprint import pprint
-
 from tornado_json.requesthandlers import APIHandler
 from tornado_json import schema
 
-class Meerkat(APIHandler):
+from meerkat.web_service.web_consumer import Web_Consumer
+from meerkat.various_tools import load_params, get_us_cities
+
+class Meerkat_API(APIHandler):
 
 	with open("meerkat/web_service/schema_input.json") as data_file:    
 		schema_input = json.load(data_file)
@@ -32,6 +34,10 @@ class Meerkat(APIHandler):
 		"""Handle post requests"""
 
 		data = json.loads(self.request.body.decode())
+		cities = get_us_cities()
+		params = load_params("config/web_service.json")
+		hyperparams = load_hyperparameters(params)
+		classifier = Web_Consumer(params, data["transaction_list"], hyperparams, cities)
 
 		pprint(data)
 

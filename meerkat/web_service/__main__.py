@@ -7,7 +7,7 @@ import tornado.ioloop
 from tornado_json.routes import get_routes
 from tornado_json.application import Application
 
-from meerkat.web_service.api import Meerkat
+from meerkat.web_service.api import Meerkat_API
 
 #################### USAGE ######################
 
@@ -19,7 +19,7 @@ from meerkat.web_service.api import Meerkat
 
 def main():
 
-	routes = [("/meerkat/?", Meerkat)]
+	routes = [("/meerkat/?", Meerkat_API)]
 
 	# Create the application
 	application = Application(routes=routes, settings={})
