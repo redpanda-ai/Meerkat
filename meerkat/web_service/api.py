@@ -37,7 +37,8 @@ class Meerkat_API(APIHandler):
 		cities = get_us_cities()
 		params = load_params("config/web_service.json")
 		hyperparams = load_hyperparameters(params)
-		classifier = Web_Consumer(params, data["transaction_list"], hyperparams, cities)
+		classifier = Web_Consumer(params, hyperparams, cities)
+		enriched = classifier.classify(data["transaction_list"])
 
 		pprint(data)
 

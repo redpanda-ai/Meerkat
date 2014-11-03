@@ -9,7 +9,7 @@ Created on Nov 3, 2014
 
 class Web_Consumer():
 	"""Acts as a web service client to process and enrich
-	transactions in real time """
+	transactions in real time"""
 
 	def __init__(self, params, transactions, hyperparameters, cities):
 		"""Constructor"""
@@ -17,6 +17,11 @@ class Web_Consumer():
 		self.params = params
 		self.hyperparameters = hyperparameters
 		self.cities = cities
+
+	def classify(self, transactions):
+		"""Classify a set of transactions"""
+
+		return {}
 
 if __name__ == "__main__":
 	"""Print a warning to not execute this file as a module"""
