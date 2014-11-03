@@ -1,4 +1,8 @@
 {
+    "input" : {
+        "hyperparameters" : "config/hyperparameters/default.json",
+        "encoding" : "utf-8"
+    },
     "output" : {
         "results" : {
             "fields" : [

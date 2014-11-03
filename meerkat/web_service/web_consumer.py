@@ -11,7 +11,7 @@ class Web_Consumer():
 	"""Acts as a web service client to process and enrich
 	transactions in real time"""
 
-	def __init__(self, params, transactions, hyperparameters, cities):
+	def __init__(self, params, hyperparameters, cities):
 		"""Constructor"""
 
 		self.params = params
