@@ -266,10 +266,10 @@ def build_boost_vectors(hyperparams):
 
 	return boost_row_labels, boost_column_vectors
 
-def get_boosted_fields(params, vector_name):
+def get_boosted_fields(hyperparams, vector_name):
 	"""Returns a list of boosted fields built from a boost vector"""
 
-	boost_row_labels, boost_column_vectors = build_boost_vectors(params)
+	boost_row_labels, boost_column_vectors = build_boost_vectors(hyperparams)
 	boost_vector = boost_column_vectors[vector_name]
 	return [x + "^" + str(y) for x, y in zip(boost_row_labels, boost_vector) if y != 0.0]
 
@@ -296,7 +296,7 @@ def get_magic_query(params, transaction, boost=1.0):
 	magic_query["fields"] = fields
 	magic_query["_source"] = "*"
 	should_clauses = magic_query["query"]["bool"]["should"]
-	field_boosts = get_boosted_fields(params, "standard_fields")
+	field_boosts = get_boosted_fields(hyperparameters, "standard_fields")
 	simple_query = get_qs_query(transaction, field_boosts, boost)
 	should_clauses.append(simple_query)
 
