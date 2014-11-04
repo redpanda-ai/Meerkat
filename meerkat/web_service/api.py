@@ -6,8 +6,17 @@ from tornado_json import schema
 
 from meerkat.web_service.web_consumer import Web_Consumer
 from meerkat.various_tools import load_params, get_us_cities, load_hyperparameters
+from meerkat.binary_classifier.load import select_model
+
+BANK_CLASSIFIER = select_model("bank")
+CARD_CLASSIFIER = select_model("card")
 
 class Meerkat_API(APIHandler):
+
+	cities = get_us_cities()
+	params = load_params("config/web_service.json")
+	hyperparams = load_hyperparameters(params)
+	meerkat = Web_Consumer(params, hyperparams, cities)
 
 	with open("meerkat/web_service/schema_input.json") as data_file:    
 		schema_input = json.load(data_file)
@@ -34,14 +43,25 @@ class Meerkat_API(APIHandler):
 		"""Handle post requests"""
 
 		data = json.loads(self.request.body.decode())
-		cities = get_us_cities()
-		params = load_params("config/web_service.json")
-		hyperparams = load_hyperparameters(params)
-		classifier = Web_Consumer(params, hyperparams, cities)
-		enriched = classifier.classify(data["transaction_list"])
+		physical, non_physical = [], []
 
-		pprint(data)
+		# Determine Whether to Search
+		for trans in data["transaction_list"]:
+
+			label = BANK_CLASSIFIER(trans["description"])
+
+			if label == "1":
+				physical.append(trans)
+			else:
+				non_physical.append(trans)
+
+		# Classify Physical Merchants
+		enriched = self.meerkat.classify(physical)
 
 		return {
 
 		}
+
+if __name__ == "__main__":
+	"""Print a warning to not execute this file as a module"""
+	print("This module is a Class; it should not be run from the console.")

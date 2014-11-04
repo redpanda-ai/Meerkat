@@ -21,6 +21,9 @@ class Web_Consumer():
 	def classify(self, transactions):
 		"""Classify a set of transactions"""
 
+		for trans in transactions:
+			print(trans["description"])
+
 		return {}
 
 if __name__ == "__main__":
