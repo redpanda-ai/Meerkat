@@ -56,6 +56,18 @@ class Web_Consumer():
 
 		return o_query
 
+	def __search_index(self, query):
+		"""Search against a structured index"""
+
+		index = self.params["elasticsearch"]["index"]
+
+		try:
+			results = self.es.search(index=index, body=query)
+		except Exception:
+			results = {"hits":{"total":0}}
+
+		return results
+
 	def __enrich_physical(self, transactions):
 		"""Enrich physical transactions with Meerkat"""
 
@@ -63,8 +75,8 @@ class Web_Consumer():
 
 		for trans in transactions:
 			query =  self.__get_query(trans)
-			pprint(query)
-			# Generate Query
+			results = self.__search_index(query)
+			pprint(results)
 			# Search Index
 			# Add Results
 
