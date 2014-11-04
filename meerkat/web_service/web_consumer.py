@@ -7,6 +7,8 @@ Created on Nov 3, 2014
 @author: Matthew Sevrens
 """
 
+import json
+
 from meerkat.binary_classifier.load import select_model
 
 BANK_CLASSIFIER = select_model("bank")
@@ -23,7 +25,18 @@ class Web_Consumer():
 		self.hyperparameters = hyperparameters
 		self.cities = cities
 
-	def sws(self, transactions):
+	def __enrich_physical(self, transactions):
+		"""Enrich physical transactions with Meerkat"""
+
+		# Generate Query
+		# Search Index
+		# Add Results
+
+		enriched = transactions
+
+		return enriched
+
+	def __sws(self, transactions):
 		"""Split transactions into physical and non physical"""
 
 		physical, non_physical = [], []
@@ -36,14 +49,15 @@ class Web_Consumer():
 
 		return physical, non_physical
 
-
 	def classify(self, data):
 		"""Classify a set of transactions"""
 
-		physical, non_physical = self.sws(data["transaction_list"])
+		physical, non_physical = self.__sws(data["transaction_list"])
+		physical = self.__enrich_physical(physical)
+		transactions = physical + non_physical
+		data["transaction_list"] = transactions
 
-		for trans in (physical + non_physical):
-			print(trans["description"], trans["is_physical_merchant"])
+		print(json.dumps(data))
 
 		return {}
 
