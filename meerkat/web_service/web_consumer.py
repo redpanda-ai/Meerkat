@@ -23,23 +23,27 @@ class Web_Consumer():
 		self.hyperparameters = hyperparameters
 		self.cities = cities
 
-	def classify(self, data):
-		"""Classify a set of transactions"""
+	def sws(self, transactions):
+		"""Split transactions into physical and non physical"""
 
 		physical, non_physical = [], []
 
 		# Determine Whether to Search
-		for trans in data["transaction_list"]:
-
+		for trans in transactions:
 			label = BANK_CLASSIFIER(trans["description"])
+			trans["is_physical_merchant"] = True if (label == "1") else False
+			physical.append(trans) if (label == "1") else non_physical.append(trans)
 
-			if label == "1":
-				physical.append(trans)
-			else:
-				non_physical.append(trans)
+		return physical, non_physical
 
-		for trans in physical:
-			print(trans["description"])
+
+	def classify(self, data):
+		"""Classify a set of transactions"""
+
+		physical, non_physical = self.sws(data["transaction_list"])
+
+		for trans in (physical + non_physical):
+			print(trans["description"], trans["is_physical_merchant"])
 
 		return {}
 
