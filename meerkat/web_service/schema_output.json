@@ -50,6 +50,7 @@
 			"description" : "Yodlee's number to uniquely identify a user within a cobrand",
 			"type" : "number"
 		},
+		"container" : { "enum" : [ "bank", "card" ] },
 		"transaction_list" : {
 			"description" : "An array containing at least one of the following response types.",
 			"type" : "array",
@@ -64,5 +65,5 @@
 			"uniqueItems": true
 		}
 	},
-	"required": ["cobrand_id", "user_id", "transaction_list"]
+	"required": ["cobrand_id", "user_id", "container", "transaction_list"]
 }
