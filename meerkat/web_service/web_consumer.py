@@ -32,7 +32,7 @@ class Web_Consumer():
 		for trans in transactions:
 			label = BANK_CLASSIFIER(trans["description"])
 			trans["is_physical_merchant"] = True if (label == "1") else False
-			physical.append(trans) if (label == "1") else non_physical.append(trans)
+			(non_physical, physical)[label == "1"].append(trans)
 
 		return physical, non_physical
 
