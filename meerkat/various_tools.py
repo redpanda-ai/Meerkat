@@ -248,11 +248,11 @@ def string_cleanse(original_string):
 	with_spaces = re.sub(cleanse_pattern, " ", original_string)
 	return ' '.join(with_spaces.split()).lower()
 
-def build_boost_vectors(params):
+def build_boost_vectors(hyperparams):
 	"""Turns field boosts into dictionary of numpy arrays"""
 
-	boost_column_labels = params["elasticsearch"]["boost_labels"]
-	boost_row_vectors = params["elasticsearch"]["boost_vectors"]
+	boost_column_labels = hyperparams["boost_labels"]
+	boost_row_vectors = hyperparams["boost_vectors"]
 	boost_row_labels, boost_column_vectors = sorted(boost_row_vectors.keys()), {}
 
 	for i in range(len(boost_column_labels)):
