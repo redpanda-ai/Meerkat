@@ -6,10 +6,6 @@ from tornado_json import schema
 
 from meerkat.web_service.web_consumer import Web_Consumer
 from meerkat.various_tools import load_params, get_us_cities, load_hyperparameters
-from meerkat.binary_classifier.load import select_model
-
-BANK_CLASSIFIER = select_model("bank")
-CARD_CLASSIFIER = select_model("card")
 
 class Meerkat_API(APIHandler):
 
@@ -43,20 +39,9 @@ class Meerkat_API(APIHandler):
 		"""Handle post requests"""
 
 		data = json.loads(self.request.body.decode())
-		physical, non_physical = [], []
-
-		# Determine Whether to Search
-		for trans in data["transaction_list"]:
-
-			label = BANK_CLASSIFIER(trans["description"])
-
-			if label == "1":
-				physical.append(trans)
-			else:
-				non_physical.append(trans)
-
-		# Classify Physical Merchants
-		enriched = self.meerkat.classify(physical)
+		
+		# Enrich Transaction Data with Meerkat
+		enriched = self.meerkat.classify(data)
 
 		return {
 
