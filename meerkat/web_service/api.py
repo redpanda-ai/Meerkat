@@ -29,10 +29,10 @@ class Meerkat_API(APIHandler):
 	@schema.validate(
 		input_schema = schema_input,
 		input_example = example_input,
-		output_schema = {},
-		output_example = {}
-		#output_schema = schema_output,
-		#output_example = example_output
+		#output_schema = {},
+		#output_example = {}
+		output_schema = schema_output,
+		output_example = example_output
 	)
 
 	def post(self):
@@ -43,9 +43,7 @@ class Meerkat_API(APIHandler):
 		# Identify Metadata with Meerkat
 		results = self.meerkat.classify(data)
 
-		pprint(results)
-
-		return {}
+		return results
 
 if __name__ == "__main__":
 	"""Print a warning to not execute this file as a module"""

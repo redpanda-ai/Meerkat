@@ -165,7 +165,8 @@ class Web_Consumer():
 			transaction[attr_map['name']] = string.capwords(transaction[attr_map['name']], " ")
 
 		# Add Source
-		transaction["source"] = params["elasticsearch"]["index"]
+		index = params["elasticsearch"]["index"]
+		transaction["source"] = "FACTUAL" if ("factual" in index) else "OTHER"
 
 		return transaction
 
@@ -206,9 +207,12 @@ class Web_Consumer():
 	def ensure_output_schema(self, physical, non_physical):
 		"""Clean output to proper schema"""
 
-		# Add Fields
+		# Add or Modify Fields
 		for trans in non_physical:
-			trans["category_label"] = ""
+			trans["category"] = ""
+
+		for trans in physical:
+			trans["category_label"] = json.loads(trans["category_label"])[0]
 
 		# Combine Transactions
 		transactions = physical + non_physical
