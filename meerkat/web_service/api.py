@@ -40,12 +40,12 @@ class Meerkat_API(APIHandler):
 
 		data = json.loads(self.request.body.decode())
 		
-		# Enrich Transaction Data with Meerkat
-		enriched = self.meerkat.classify(data)
+		# Identify Metadata with Meerkat
+		results = self.meerkat.classify(data)
 
-		return {
+		pprint(results)
 
-		}
+		return {}
 
 if __name__ == "__main__":
 	"""Print a warning to not execute this file as a module"""
