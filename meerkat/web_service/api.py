@@ -29,8 +29,6 @@ class Meerkat_API(APIHandler):
 	@schema.validate(
 		input_schema = schema_input,
 		input_example = example_input,
-		#output_schema = {},
-		#output_example = {}
 		output_schema = schema_output,
 		output_example = example_output
 	)
