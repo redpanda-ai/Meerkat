@@ -2,9 +2,9 @@ import json
 
 from pprint import pprint
 from tornado_json.requesthandlers import APIHandler
-from tornado_json import schema
 
 from meerkat.web_service.web_consumer import Web_Consumer
+from meerkat.web_service import schema
 from meerkat.various_tools import load_params, get_us_cities, load_hyperparameters
 
 class Meerkat_API(APIHandler):
