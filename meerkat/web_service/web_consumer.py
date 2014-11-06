@@ -8,6 +8,7 @@ Created on Nov 3, 2014
 """
 
 import json
+import string
 
 from pprint import pprint
 from scipy.stats.mstats import zscore
@@ -212,7 +213,9 @@ class Web_Consumer():
 			trans["category"] = ""
 
 		for trans in physical:
-			trans["category_label"] = json.loads(trans["category_label"])[0]
+			categories = trans["category_label"]
+			category = json.loads(categories)[0] if (categories != "") else categories
+			trans["category_label"] = category
 
 		# Combine Transactions
 		transactions = physical + non_physical
