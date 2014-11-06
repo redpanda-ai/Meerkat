@@ -13,7 +13,7 @@ from meerkat.web_service.api import Meerkat_API
 
 # python3.3 -m meerkat.web_service
 
-# curl -X POST -d @example_input.json http://localhost:8888/web_service/api/meerkat/ --header "Content-Type:application/json"
+# curl -X POST -d @meerkat/web_service/example_input.json http://localhost:8888/web_service/api/meerkat/ --header "Content-Type:application/json"
 
 #################################################
 
