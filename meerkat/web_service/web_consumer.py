@@ -139,7 +139,8 @@ class Web_Consumer():
 		params = self.params
 		field_names = params["output"]["results"]["fields"]
 		fields_in_hit = [field for field in hit_fields]
-		
+		transaction["match_found"] = False
+
 		# Collect Mapping Details
 		fields = params["output"]["results"]["fields"]
 		labels = params["output"]["results"]["labels"]
@@ -147,6 +148,7 @@ class Web_Consumer():
 
 		# Enrich with found data
 		if decision == True:
+			transaction["match_found"] = True
 			for field in field_names:
 				if field in fields_in_hit:
 					field_content = hit_fields[field][0] if isinstance(hit_fields[field], (list)) else str(hit_fields[field])

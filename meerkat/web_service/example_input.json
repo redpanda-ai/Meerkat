@@ -20,6 +20,12 @@
 			"description": "Amazon.com",
 			"amount": 47.99,
 			"date": "2014-04-03"
+		},
+		{
+			"transaction_id": 4,
+			"description": "SAFEWAY STORE 2341 SO WINCHESTER BLVCAMPBELL CAUS",
+			"amount": 151.23,
+			"date": "2014-04-01"
 		}
 	]
 }
