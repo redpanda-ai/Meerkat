@@ -238,14 +238,16 @@ class Web_Consumer():
 
 		return enriched
 
-	def __sws(self, transactions):
+	def __sws(self, data):
 		"""Split transactions into physical and non-physical"""
 
+		transactions = data["transaction_list"]
 		physical, non_physical = [], []
 
 		# Determine Whether to Search
 		for trans in transactions:
-			label = BANK_CLASSIFIER(trans["description"])
+			classifier = BANK_CLASSIFIER if (data["container"] == "bank") else CARD_CLASSIFIER
+			label = classifier(trans["description"])
 			trans["is_physical_merchant"] = True if (label == "1") else False
 			(non_physical, physical)[label == "1"].append(trans)
 
@@ -254,7 +256,7 @@ class Web_Consumer():
 	def classify(self, data):
 		"""Classify a set of transactions"""
 
-		physical, non_physical = self.__sws(data["transaction_list"])
+		physical, non_physical = self.__sws(data)
 		physical = self.__enrich_physical(physical)
 		transactions = self.ensure_output_schema(physical, non_physical)
 		data["transaction_list"] = transactions
