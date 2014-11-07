@@ -5,7 +5,7 @@ import re
 import sys
 import time
 
-from datetime import datetime, date, time
+from datetime import datetime, date
 
 from boto.s3.connection import Key, Location
 
@@ -61,7 +61,7 @@ def begin_processing_loop(some_container, date_pattern, s3_input_path):
 	dst_s3_path = "panels/meerkat/" + some_container + "/"
 	return commands
 
-def poll_clients(my_stack):
+def poll_clients(my_stack, running_processes):
 	clients = [ "172.31.16.210", "172.31.16.208", "172.31.16.209" ]
 	rsa_private_key_file = "/root/.ssh/jkey.pem"
 	big_command = "ps -ef|grep python3.3|grep -v grep|awk ' { print $12 }'"
@@ -84,7 +84,12 @@ def poll_clients(my_stack):
 			if my_stack:
 				command = my_stack.pop()
 				print(command)
-				stdin, stdout, stderr = ssh.exec_command(command)
+				if command not in running_processes:
+					print("Adding to running processes.")
+					stdin, stdout, stderr = ssh.exec_command(command)
+					running_processes[command] = datetime.now()
+				else:
+					print("Command already issued {0}".format(command))
 			else:
 				print("Stack is empty, finished for now.")
 				ssh.close()
@@ -100,16 +105,17 @@ def poll_clients(my_stack):
 
 date_pattern = sys.argv[1]
 new_stack = []
+running_processes = {}
 print("Begin Program")
 command_stack = begin_processing_loop("bank", date_pattern, "panels/meerkat_split/")
 command_stack.extend(begin_processing_loop("card", date_pattern, "ctprocessed/gpanel/"))
 start_time = datetime.now()
 print("{0}".format(start_time))
-goal_seconds = 100
+goal_seconds = 3 * 24 * 60 * 60
 new_time = datetime.now()
 while True:
 	print("Beginning loop")
-	poll_clients(command_stack)
+	poll_clients(command_stack, running_processes)
 	if not command_stack:
 		print("Command stack empty, refilling")
 		command_stack = begin_processing_loop("bank", date_pattern, "panels/meerkat_split/")

@@ -65,17 +65,17 @@ def begin_processing_loop(some_container, day_of_month):
 		#print("P - {0}".format(thing.key))
 		new_date = thing.key[26:38]
 		if last_date != new_date:
-			print("cd /root/git/Meerkat && ./day_bank_launcher.sh {0}".format(new_date))
+			print("cd /root/git/Meerkat && ./calendar_launcher.sh {0} {1}".format(some_container, new_date))
 			last_date = new_date
 	pending_list.reverse()
 	dst_s3_path = "panels/meerkat/" + some_container + "/"
 	#pattern = re.compile("^201[34].*$")
-	pattern1 = re.compile("^201308.*$")
-	pattern2 = re.compile("^201309.*$")
-	pattern3 = re.compile("^201310.*$")
-	pattern4 = re.compile("^201311.*$")
-	pattern5 = re.compile("^201312.*$")
-	pattern6 = re.compile("^2014.*$")
+	#pattern1 = re.compile("^201308.*$")
+	#pattern2 = re.compile("^201309.*$")
+	#pattern3 = re.compile("^201310.*$")
+	#pattern4 = re.compile("^201311.*$")
+	#pattern5 = re.compile("^201312.*$")
+	#pattern6 = re.compile("^2014.*$")
 
 	large_files, large_sizes = {}, {}
 	for item, item_size in pending_list:

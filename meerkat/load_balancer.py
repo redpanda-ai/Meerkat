@@ -16,10 +16,8 @@ def load_stack_from_file(filename):
 	return new_stack
 
 def poll_clients(my_stack):
-	clients = [ "172.31.11.39", "172.31.8.64", "172.31.1.103", "172.31.6.213", "172.31.6.214", "172.31.6.215",
-		"172.31.42.132", "172.31.42.131", "172.31.42.140", "172.31.42.137", "172.31.42.139", "172.31.42.134",
-		"172.31.42.136", "172.31.42.135", "172.31.42.138", "172.31.25.114", "172.31.25.115", "172.31.25.116"]
-	rsa_private_key_file = "/root/.ssh/meerkat.pem"
+	clients = [ "172.31.16.210", "172.31.16.208", "172.31.16.209" ]
+	rsa_private_key_file = "/root/.ssh/jkey.pem"
 	shell_command = "ps -ef|grep python3.3|grep -v grep|wc -l"
 	ssh = paramiko.SSHClient()
 	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())

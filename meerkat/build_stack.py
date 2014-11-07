@@ -13,6 +13,7 @@ from elasticsearch import Elasticsearch
 from boto.ec2.connection import EC2Connection
 from boto.regioninfo import RegionInfo
 from boto.ec2.blockdevicemapping import BlockDeviceType, BlockDeviceMapping
+from boto.exception import EC2ResponseError
 
 def connect_to_ec2(region):
 	"""Returns a connection to EC2"""
@@ -90,11 +91,17 @@ def acquire_instances(ec2_conn, params):
 	bdm['/dev/sdc'] = eph1
 	layout = params["instance_layout"]
 	instance_count = layout["masters"] + layout["hybrids"] + layout["slaves"]
-	reservations = ec2_conn.run_instances(params["ami-id"],
-		key_name=params["key_name"], instance_type=params["instance_type"],
-		placement=params["placement"], block_device_map=bdm,
-		min_count=instance_count, max_count=instance_count,
-		security_groups=params["all_security_groups"])
+	try:
+		reservations = ec2_conn.run_instances(params["ami-id"],
+			key_name=params["key_name"], instance_type=params["instance_type"],
+			placement=params["placement"], block_device_map=bdm,
+			min_count=instance_count, max_count=instance_count,
+			security_groups=params["all_security_groups"])
+	except EC2ResponseError as err:
+		print("Error getting instances, aborting")
+		print("Exception {0}".format(err))
+		print("Unexpected error:", sys.exc_info()[0])
+		sys.exit()
 
 	#params["instance_count"] = instance_count
 	print("Reservations {0}".format(reservations))

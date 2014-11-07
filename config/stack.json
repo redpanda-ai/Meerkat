@@ -5,15 +5,15 @@
 		"meerkat_private",
 		"s3cmd"
 	],
-	"ami-id" : "ami-178cce27",
-	"key_name" : "meerkat",
-	"key_file" : "/root/.ssh/meerkat.pem",
+	"ami-id" : "ami-9dbdf3ad",
+	"key_name" : "jkey",
+	"key_file" : "/root/.ssh/jkey.pem",
 	"instance_type" : "m3.2xlarge",
 	"minimum_master_nodes" : 1,
 	"instance_layout" : {
-		"masters" : 4,
-		"hybrids" : 0,
-		"slaves" : 96
+		"masters" : 0,
+		"hybrids" : 1,
+		"slaves" : 0
 	},
 	"placement" : "us-west-2b",
 	"block_device_mapping" : [
