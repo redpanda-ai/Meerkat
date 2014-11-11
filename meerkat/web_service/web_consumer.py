@@ -19,6 +19,7 @@ from meerkat.binary_classifier.load import select_model
 
 BANK_CLASSIFIER = select_model("bank")
 CARD_CLASSIFIER = select_model("card")
+BANK_NPMN = select_model("bank_NPMN")
 
 class Web_Consumer():
 	"""Acts as a web service client to process and enrich
@@ -211,8 +212,8 @@ class Web_Consumer():
 		"""Clean output to proper schema"""
 
 		# Add or Modify Fields
-		for trans in non_physical:
-			trans["category"] = ""
+		#for trans in non_physical:
+		#	trans["category"] = ""
 
 		for trans in physical:
 			categories = trans["category_label"]
@@ -243,6 +244,15 @@ class Web_Consumer():
 
 		return enriched
 
+	def __enrich_non_physical(self, transactions):
+		"""Enrich non-physical transactions with Meerkat"""
+
+		for trans in transactions:
+			name = BANK_NPMN(trans["description"])
+			trans["merchant_name"] = name.title()
+
+		return transactions
+
 	def __sws(self, data):
 		"""Split transactions into physical and non-physical"""
 
@@ -263,6 +273,7 @@ class Web_Consumer():
 
 		physical, non_physical = self.__sws(data)
 		physical = self.__enrich_physical(physical)
+		non_physical = self.__enrich_non_physical(non_physical)
 		transactions = self.ensure_output_schema(physical, non_physical)
 		data["transaction_list"] = transactions
 
