@@ -422,6 +422,7 @@ def synonyms(transaction):
 
 	rep = {
 		"wal-mart" : " Walmart ",
+		"wal mart" : " Walmart ",
 		"samsclub" : " Sam's Club ",
 		"usps" : " US Post Office ",
 		"lowes" : " Lowe's ",

@@ -56,6 +56,8 @@ class Web_Consumer():
 		simple_query = get_qs_query(transaction, field_boosts)
 		should_clauses.append(simple_query)
 
+		pprint(transaction)
+
 		return o_query
 
 	def __search_index(self, query):
