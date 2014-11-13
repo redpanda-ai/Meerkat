@@ -111,7 +111,7 @@ command_stack = begin_processing_loop("bank", date_pattern, "panels/meerkat_spli
 command_stack.extend(begin_processing_loop("card", date_pattern, "ctprocessed/gpanel/"))
 start_time = datetime.now()
 print("{0}".format(start_time))
-goal_seconds = 3 * 24 * 60 * 60
+goal_seconds = 7 * 24 * 60 * 60
 new_time = datetime.now()
 while True:
 	print("Beginning loop")
