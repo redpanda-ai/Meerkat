@@ -56,8 +56,6 @@ class Web_Consumer():
 		simple_query = get_qs_query(transaction, field_boosts)
 		should_clauses.append(simple_query)
 
-		pprint(transaction)
-
 		return o_query
 
 	def __search_index(self, query):
@@ -94,9 +92,7 @@ class Web_Consumer():
 
 		# Must be at least one result
 		if results["hits"]["total"] == 0:
-			for field in field_names:
-				transaction[field] = ""
-
+			transaction = self.__no_result(transaction)
 			return transaction
 
 		# Collect Necessary Information
@@ -106,6 +102,7 @@ class Web_Consumer():
 		
 		# If no results return
 		if hit_fields == "":
+			transaction = self.__no_result(transaction)
 			return transaction
 
 		# Collect Fallback Data
@@ -118,10 +115,12 @@ class Web_Consumer():
 
 		# Need Names
 		if len(business_names) < 2:
+			transaction = self.__no_result(transaction)
 			return transaction
 
 		# City Names Cause issues
 		if business_names[0] in self.cities:
+			transaction = self.__no_result(transaction)
 			return transaction
 
 		# Collect Relevancy Scores
@@ -135,6 +134,21 @@ class Web_Consumer():
 		enriched_transaction = self.__enrich_transaction(*args)
 
 		return enriched_transaction
+
+	def __no_result(self, transaction):
+		"""Make sure transactions have proper attribute names"""
+
+		params = self.params
+		fields = params["output"]["results"]["fields"]
+		labels = params["output"]["results"]["labels"]
+		attr_map = dict(zip(fields, labels))
+
+		for field in fields:
+			transaction[attr_map.get(field, field)] = ""
+
+		transaction["match_found"] = False
+
+		return transaction
 
 	def __enrich_transaction(self, decision, transaction, hit_fields, z_score_delta, business_names, city_names, state_names):
 		"""Enriches the transaction with additional data"""
@@ -218,7 +232,7 @@ class Web_Consumer():
 		#	trans["category"] = ""
 
 		for trans in physical:
-			categories = trans["category_label"]
+			categories = trans.get("category_label", "")
 			category = json.loads(categories)[0] if (categories != "") else categories
 			trans["category_label"] = category
 
