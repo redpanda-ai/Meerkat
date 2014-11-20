@@ -19,7 +19,12 @@
 				"match_found" : { "enum" : [ true ] },
 				"merchant_name" : { "type" : "string" },
 				"store_id" : { "type" : "string" },
-				"category_label" : { "type" : "string" },
+				"category_labels" : {
+					"type" : "array",
+					"items" : {
+						"type": "string"
+					}
+				},
 				"source" : { "enum": [ "FACTUAL", "OTHER" ] },
 				"source_merchant_id" : { "type" : "string" },
 				"street" : { "type" : "string" },
@@ -44,9 +49,14 @@
 			"properties" : {
 				"transaction_id" : { "type" : "number" },
 				"is_physical_merchant" : { "enum" : [ false ] },
-				"category" : { "type" : "string" }
+				"category_labels" : {
+					"type" : "array",
+					"items" : {
+						"type": "string"
+					}
+				}
 			},
-			"required": [ "transaction_id", "is_physical_merchant", "category" ]
+			"required": [ "transaction_id", "is_physical_merchant", "category_labels" ]
 		}
 	},
 	"description": "A schema for defining output from 'meerkat_categorize'",

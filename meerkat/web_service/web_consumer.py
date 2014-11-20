@@ -232,9 +232,9 @@ class Web_Consumer():
 		#	trans["category"] = ""
 
 		for trans in physical:
-			categories = trans.get("category_label", "")
-			category = json.loads(categories)[0] if (categories != "") else categories
-			trans["category_label"] = category
+			categories = trans.get("category_labels", "")
+			categories = json.loads(categories) if (categories != "") else []
+			trans["category_labels"] = categories
 
 		# Combine Transactions
 		transactions = physical + non_physical

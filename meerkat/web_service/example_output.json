@@ -6,10 +6,10 @@
 		{
 			"transaction_id" : 1,
 			"is_physical_merchant" : true,
-			"match_found": true,
+			"match_found" : true,
 			"merchant_name" : "Safeway",
 			"store_id" : "#12",
-			"category_label" : "Grocery",
+			"category_labels" : ["Grocery", "Pharmacy"],
 			"source" : "FACTUAL",
 			"source_merchant_id" : "3ec075f0-33c2-11e4-8c21-0800200c9a66",
 			"street" : "742 El Camino Real",
@@ -21,7 +21,7 @@
 		{
 			"transaction_id" : 2,
 			"is_physical_merchant" : false,
-			"category" : "bank_transfer"
+			"category_labels" : ["bank_transfer"]
 		},
 		{
 			"transaction_id" : 3,
@@ -29,19 +29,14 @@
 			"merchant_name" : "Amazon"
 		},
 		{
-			"category_label": "",
-     		"city": "Campbell",
-     		"country": "",
-     		"is_physical_merchant": true,
-     		"match_found": false,
-     		"merchant_name": "Safeway",
-     		"postal_code": "",
-     		"source": "FACTUAL",
-     		"source_merchant_id": "",
-     		"state": "",
-     		"store_id": "",
-     		"street": "",
-     		"transaction_id" : 4 
-     	}
+			"transaction_id" : 4,
+			"is_physical_merchant" : true,
+			"match_found" : false
+		},
+		{
+			"transaction_id" : 5,
+			"is_physical_merchant" : false,
+			"match_found" : false
+		}
 	]
 }
