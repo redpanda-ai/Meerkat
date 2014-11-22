@@ -58,15 +58,16 @@ class Web_Consumer():
 
 		return o_query
 
-	def __search_index(self, query):
+	def __search_index(self, queries):
 		"""Search against a structured index"""
 
 		index = self.params["elasticsearch"]["index"]
+		results = self.es.msearch(queries, index=index)
 
-		try:
-			results = self.es.search(index=index, body=query)
-		except Exception:
-			results = {"hits":{"total":0}}
+		#try:
+		#	results = self.es.msearch(index=index, body=query)
+		#except Exception:
+		#	results = {"hits":{"total":0}}
 
 		return results
 
@@ -250,12 +251,18 @@ class Web_Consumer():
 	def __enrich_physical(self, transactions):
 		"""Enrich physical transactions with Meerkat"""
 
-		enriched = []
+		enriched, queries = [], []
 
 		for trans in transactions:
-			query =  self.__get_query(trans)
-			results = self.__search_index(query)
-			trans_plus = self.__process_results(results, trans)
+			query = self.__get_query(trans)
+			queries.append({"index" : "factual_index"})
+			queries.append(query)
+
+		queries = '\n'.join(map(json.dumps, queries))
+		results = self.__search_index(queries)['responses']
+
+		for r, t in zip(results, transactions):
+			trans_plus = self.__process_results(r, t)
 			enriched.append(trans_plus)
 
 		return enriched
