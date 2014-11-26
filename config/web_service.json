@@ -1,0 +1,23 @@
+{
+    "input" : {
+        "hyperparameters" : "config/hyperparameters/default.json",
+        "encoding" : "utf-8"
+    },
+    "output" : {
+        "results" : {
+            "fields" : [
+                "name", "category_labels", "address", "locality", "country",
+                "region", "postcode", "factual_id", "internal_store_number"],
+            "labels" : [
+                "merchant_name", "category_labels", "street", "city", "country",
+                "state", "postal_code", "source_merchant_id", "store_id"]
+        }
+    },
+    "elasticsearch" : {
+        "cluster_nodes" : [
+            "172.31.22.21"
+        ],
+        "index" : "factual_index",
+        "type" : "factual_type"
+    }
+}

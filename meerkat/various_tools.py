@@ -248,11 +248,11 @@ def string_cleanse(original_string):
 	with_spaces = re.sub(cleanse_pattern, " ", original_string)
 	return ' '.join(with_spaces.split()).lower()
 
-def build_boost_vectors(params):
+def build_boost_vectors(hyperparams):
 	"""Turns field boosts into dictionary of numpy arrays"""
 
-	boost_column_labels = params["elasticsearch"]["boost_labels"]
-	boost_row_vectors = params["elasticsearch"]["boost_vectors"]
+	boost_column_labels = hyperparams["boost_labels"]
+	boost_row_vectors = hyperparams["boost_vectors"]
 	boost_row_labels, boost_column_vectors = sorted(boost_row_vectors.keys()), {}
 
 	for i in range(len(boost_column_labels)):
@@ -266,10 +266,10 @@ def build_boost_vectors(params):
 
 	return boost_row_labels, boost_column_vectors
 
-def get_boosted_fields(params, vector_name):
+def get_boosted_fields(hyperparams, vector_name):
 	"""Returns a list of boosted fields built from a boost vector"""
 
-	boost_row_labels, boost_column_vectors = build_boost_vectors(params)
+	boost_row_labels, boost_column_vectors = build_boost_vectors(hyperparams)
 	boost_vector = boost_column_vectors[vector_name]
 	return [x + "^" + str(y) for x, y in zip(boost_row_labels, boost_vector) if y != 0.0]
 
@@ -296,7 +296,7 @@ def get_magic_query(params, transaction, boost=1.0):
 	magic_query["fields"] = fields
 	magic_query["_source"] = "*"
 	should_clauses = magic_query["query"]["bool"]["should"]
-	field_boosts = get_boosted_fields(params, "standard_fields")
+	field_boosts = get_boosted_fields(hyperparameters, "standard_fields")
 	simple_query = get_qs_query(transaction, field_boosts, boost)
 	should_clauses.append(simple_query)
 
@@ -422,6 +422,7 @@ def synonyms(transaction):
 
 	rep = {
 		"wal-mart" : " Walmart ",
+		"wal mart" : " Walmart ",
 		"samsclub" : " Sam's Club ",
 		"usps" : " US Post Office ",
 		"lowes" : " Lowe's ",
