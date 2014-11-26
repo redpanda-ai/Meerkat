@@ -28,7 +28,7 @@ def main():
 	tornado.options.parse_command_line()
 	routes = [("/meerkat/?", Meerkat_API)]
 
-	data_dir = "/root/git/Meerkat/"
+	data_dir = "./"
 	ssl_options = {
 		"certfile" : os.path.join(data_dir, "server.crt"),
 		"keyfile" : os.path.join(data_dir, "server.key"),
