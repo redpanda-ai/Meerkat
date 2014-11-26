@@ -25,6 +25,12 @@ def select_model(mode):
 	elif mode == "bank_NPMN":
 		print("--- Classifying Merchant Name in Non-Physical Bank Mode ---")
 		model_path = "meerkat/binary_classifier/models/bank_NPMN_2.pkl"
+	elif mode == "sub_transaction_type":
+		print("--- Classifying sub transaction type on non spend transactions ---")
+		model_path = "meerkat/binary_classifier/models/sub_transaction_type_93.pkl"
+	elif mode == "transaction_type":
+		print("--- Classifying transaction type on non spend transactions ---")
+		model_path = "meerkat/binary_classifier/models/transation_type_94.pkl"
 	else:
 		print("--- Binary Classifier requested not found. Terminating ---")
 		sys.exit()
