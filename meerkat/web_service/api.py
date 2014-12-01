@@ -14,16 +14,16 @@ class Meerkat_API(APIHandler):
 	hyperparams = load_hyperparameters(params)
 	meerkat = Web_Consumer(params, hyperparams, cities)
 
-	with open("meerkat/web_service/schema_input.json") as data_file:    
+	with open("meerkat/web_service/schema_input.json") as data_file:
 		schema_input = json.load(data_file)
 
-	with open("meerkat/web_service/example_input.json") as data_file:    
+	with open("meerkat/web_service/example_input.json") as data_file:
 		example_input = json.load(data_file)
 
-	with open("meerkat/web_service/schema_output.json") as data_file:    
+	with open("meerkat/web_service/schema_output.json") as data_file:
 		schema_output = json.load(data_file)
 
-	with open("meerkat/web_service/example_output.json") as data_file:    
+	with open("meerkat/web_service/example_output.json") as data_file:
 		example_output = json.load(data_file)
 
 	@schema.validate(
@@ -42,6 +42,10 @@ class Meerkat_API(APIHandler):
 		results = self.meerkat.classify(data)
 
 		return results
+
+	def get(self):
+		"""Handle get requests"""
+		return None
 
 if __name__ == "__main__":
 	"""Print a warning to not execute this file as a module"""

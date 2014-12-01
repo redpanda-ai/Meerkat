@@ -26,7 +26,10 @@ define("port", default=443, help="run on the given port", type=int)
 def main():
 	#Log some useful stuff
 	tornado.options.parse_command_line()
-	routes = [("/meerkat/?", Meerkat_API)]
+	routes = [
+		("/meerkat/?", Meerkat_API),
+		("/status/index.html", Meerkat_API)
+	]
 
 	data_dir = "./"
 	ssl_options = {
