@@ -62,12 +62,11 @@ class Web_Consumer():
 		"""Search against a structured index"""
 
 		index = self.params["elasticsearch"]["index"]
-		results = self.es.msearch(queries, index=index)
 
-		#try:
-		#	results = self.es.msearch(index=index, body=query)
-		#except Exception:
-		#	results = {"hits":{"total":0}}
+		try:
+			results = self.es.msearch(queries, index=index)
+		except Exception:
+			return None
 
 		return results
 
@@ -251,15 +250,25 @@ class Web_Consumer():
 	def __enrich_physical(self, transactions):
 		"""Enrich physical transactions with Meerkat"""
 
+		if len(transactions) == 0:
+			return transactions
+
 		enriched, queries = [], []
+		index = self.params["elasticsearch"]["index"]
 
 		for trans in transactions:
 			query = self.__get_query(trans)
-			queries.append({"index" : "factual_index"})
+			queries.append({"index" : index})
 			queries.append(query)
 
 		queries = '\n'.join(map(json.dumps, queries))
-		results = self.__search_index(queries)['responses']
+		results = self.__search_index(queries)
+
+		# Error Handling
+		if results == None:
+			return transactions
+
+		results = results['responses']
 
 		for r, t in zip(results, transactions):
 			trans_plus = self.__process_results(r, t)
@@ -269,6 +278,9 @@ class Web_Consumer():
 
 	def __enrich_non_physical(self, transactions):
 		"""Enrich non-physical transactions with Meerkat"""
+
+		if len(transactions) == 0:
+			return transactions
 
 		for trans in transactions:
 			name = BANK_NPMN(trans["description"])
