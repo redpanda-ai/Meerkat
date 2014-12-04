@@ -539,6 +539,7 @@ def df_to_queue(params, df):
 	#Return if there are no physical transactions
 	if physical.empty:
 		return desc_queue, non_physical
+		
 	# Roll ATM into physical
 	physical = pd.concat([physical, atm])
 
