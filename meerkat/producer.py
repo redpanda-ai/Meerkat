@@ -447,8 +447,10 @@ def run_panel(params, reader, dst_file_name):
 		# Load into Queue for Processing
 		desc_queue, non_physical = df_to_queue(params, chunk)
 
-		# Classify Transaction Chunk
-		physical = run_meerkat_chunk(params, desc_queue, hyperparameters, cities)
+		physical = None
+		if not desc_queue.empty():
+			# Classify Transaction Chunk
+			physical = run_meerkat_chunk(params, desc_queue, hyperparameters, cities)
 
 		# Combine Split Dataframes
 		chunk = pd.concat([physical, non_physical])
@@ -534,6 +536,9 @@ def df_to_queue(params, df):
 	atm = gb.get_group("ATM") if "ATM" in groups else pd.DataFrame()
 	non_physical = gb.get_group("Non-Physical").rename(columns=name_map) if "Non-Physical" in groups else pd.DataFrame()
 
+	#Return if there are no physical transactions
+	if physical.empty:
+		return desc_queue, non_physical
 	# Roll ATM into physical
 	physical = pd.concat([physical, atm])
 
