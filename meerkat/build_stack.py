@@ -347,7 +347,6 @@ def assign_ebs_volumes(ec2_conn, params):
 					print("Making attempt {0} of {1} to attach volume.".format(j, max_attempts))
 					print("Placement {0}, Snapshot {1}".format(placement, snapshot))
 					new_volume = ec2_conn.create_volume(100, placement, snapshot=snapshot, volume_type="gp2")
-					#new_volume = snapshot.create_volume(placement)
 					print("New volume created {0}, {1}".format(new_volume.id, new_volume.status))
 					attach_volume_to_instance(ec2_conn, new_volume, i, params)
 					break
@@ -402,7 +401,6 @@ def get_snapshot(ec2_conn, params):
 	"""Gets the EBS snapshot from Amazon"""
 	print("Assigning EBS volumes")
 	my_region = params["region"]
-	#new_vol = snapshot.create_volume(my_region)
 	ebs_mapping = params["ebs_mapping"]
 	max_attempts, sleep_between_attempts = 6, 10
 	snapshots = None
@@ -429,10 +427,7 @@ def start():
 	my_region = boto.ec2.get_region(params["region"])
 	ec2_conn = EC2Connection(region=my_region)
 	print("Connection established.")
-	#assign_ebs_volumes(ec2_conn, params)
-	#sys.exit()
 	confirm_security_groups(ec2_conn, params)
-	#sys.exit()
 	map_block_devices(ec2_conn, params)
 	acquire_instances(ec2_conn, params)
 	if "ebs_mapping" in params:
