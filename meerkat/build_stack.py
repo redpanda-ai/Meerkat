@@ -109,13 +109,7 @@ def acquire_instances(ec2_conn, params):
 			security_group_ids=sec_group_ids)
 	except EC2ResponseError as err:
 		print("Error getting instances, aborting")
-		print(err)
 		print("Exception {0}".format(err))
-		print("{0}".format(err.status))
-		print("{0}".format(err.reason))
-		print("{0}".format(err.body))
-		print("{0}".format(err.startElement))
-		print("{0}".format(err.endElement))
 		print("Unexpected error:", sys.exc_info()[0])
 		print(reservations)
 		sys.exit()
