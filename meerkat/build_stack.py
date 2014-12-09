@@ -8,6 +8,7 @@ import select
 import shutil
 import sys
 import time
+import logging
 
 from elasticsearch import Elasticsearch
 from boto.ec2.connection import EC2Connection
@@ -19,7 +20,7 @@ def connect_to_ec2(region):
 	"""Returns a connection to EC2"""
 	try:
 		conn = boto.ec2.connect_to_region(region, aws_access_key_id=AWS_ACCESS_KEY_ID,
-			aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
+			aws_secret_access_key=AWS_SECRET_ACCESS_KEY, debug=2)
 	except:
 		print("Error connecting to EC2, check your credentials")
 		sys.exit()
@@ -46,15 +47,16 @@ def confirm_security_groups(conn, params):
 		print("All pre-existing groups found, continuing".format(group))
 	if not new_group_found:
 		print("Adding group {0}".format(params["name"]))
-		all_groups.append(create_security_group(conn, params["name"]))
+		#Need to add vpc_id as named parameters
+		all_groups.append(create_security_group(conn, params["name"], params["vpc-id"]))
 	for group in all_groups:
 		print(group)
 	params["all_security_groups"] = all_groups
 
-def create_security_group(conn, name):
+def create_security_group(conn, name, vpc):
 	"""Creates a new security group for our stack."""
 	try:
-		my_security_group = conn.create_security_group(name, name)
+		my_security_group = conn.create_security_group(name, name, vpc)
 		print("Added {0}".format(my_security_group))
 		return my_security_group
 	except boto.exception.EC2ResponseError:
@@ -81,6 +83,11 @@ def acquire_instances(ec2_conn, params):
 	"""Requests EC2 instances from Amazon and monitors the request until
 	it is fulfilled.."""
 	print("Acquiring instances")
+	sec_groups = params["all_security_groups"]
+	sec_group_ids = []
+	for group in sec_groups:
+		sec_group_ids.append(group.id)
+	print("Security group ids {0}".format(sec_group_ids))
 	#set up block device mapping
 	bdm = BlockDeviceMapping()
 	eph0 = BlockDeviceType()
@@ -91,16 +98,26 @@ def acquire_instances(ec2_conn, params):
 	bdm['/dev/sdc'] = eph1
 	layout = params["instance_layout"]
 	instance_count = layout["masters"] + layout["hybrids"] + layout["slaves"]
+	reservations = None
+	#logging.getLogger('boto').setLevel(logging.INFO)
 	try:
 		reservations = ec2_conn.run_instances(params["ami-id"],
 			key_name=params["key_name"], instance_type=params["instance_type"],
 			placement=params["placement"], block_device_map=bdm,
 			min_count=instance_count, max_count=instance_count,
-			security_groups=params["all_security_groups"])
+			subnet_id=params["subnet-id"],
+			security_group_ids=sec_group_ids)
 	except EC2ResponseError as err:
 		print("Error getting instances, aborting")
+		print(err)
 		print("Exception {0}".format(err))
+		print("{0}".format(err.status))
+		print("{0}".format(err.reason))
+		print("{0}".format(err.body))
+		print("{0}".format(err.startElement))
+		print("{0}".format(err.endElement))
 		print("Unexpected error:", sys.exc_info()[0])
+		print(reservations)
 		sys.exit()
 
 	#params["instance_count"] = instance_count
@@ -413,12 +430,15 @@ def get_snapshot(ec2_conn, params):
 	params["snapshot"] = snapshot
 
 def start():
+	logging.basicConfig(filename='boto.log', level=logging.DEBUG)
 	params = initialize()
 	my_region = boto.ec2.get_region(params["region"])
 	ec2_conn = EC2Connection(region=my_region)
+	print("Connection established.")
 	#assign_ebs_volumes(ec2_conn, params)
 	#sys.exit()
 	confirm_security_groups(ec2_conn, params)
+	#sys.exit()
 	map_block_devices(ec2_conn, params)
 	acquire_instances(ec2_conn, params)
 	if "ebs_mapping" in params:
