@@ -4,7 +4,7 @@
 We iteratively use this accuracy as a feedback score to tune and optimize
 Meerkat as a whole. The use of this script requires a csv containing human
 labeled data that has been verified as accurate. The input file to this
-script should be randomized over the selection of data being modeled. 
+script should be randomized over the selection of data being modeled.
 
 To configure accuracy, this module should be provided a verification
 source that can be referenced in the config file under the key
@@ -22,9 +22,9 @@ Created on Jan 8, 2014
 
 # Suggested Future Work:
 #
-# 	Instead of matching being binary, produce a 
+# 	Instead of matching being binary, produce a
 # 	loss function that penalizes less for matching
-# 	the wrong location if the majority of the 
+# 	the wrong location if the majority of the
 #	informaiton is correct
 
 #####################################################
@@ -37,18 +37,18 @@ import sys
 
 from pprint import pprint
 
-from meerkat.various_tools import load_dict_list, get_es_connection, get_merchant_by_id, progress
+from meerkat.various_tools import (load_dict_list, progress)
 
-def test_pinpoint_classifier(machine_labeled, human_labeled, my_lists, params):
+def test_pinpoint_classifier(machine_labeled, human_labeled, my_lists):
 	"""Tests both the recall and precision of the pinpoint classifier against
 	human-labeled training data."""
 
 	sys.stdout.write('\n')
 
-	for m, machine_labeled_row in enumerate(machine_labeled):
+	for row_index, machine_labeled_row in enumerate(machine_labeled):
 
 		# Display progress
-		progress(m, machine_labeled, message="complete with accuracy tests")
+		progress(row_index, machine_labeled, message="complete with accuracy tests")
 
 		# Our confidence was not high enough to label
 		if machine_labeled_row["factual_id"] == "":
@@ -56,10 +56,12 @@ def test_pinpoint_classifier(machine_labeled, human_labeled, my_lists, params):
 			continue
 		# Verify against human labeled
 		for index, human_labeled_row in enumerate(human_labeled):
-			if machine_labeled_row['DESCRIPTION_UNMASKED'] == human_labeled_row['DESCRIPTION_UNMASKED']:
+			if machine_labeled_row['DESCRIPTION_UNMASKED'] == \
+				human_labeled_row['DESCRIPTION_UNMASKED']:
 				if human_labeled_row["factual_id"] == "":
 					# Transaction is not yet labeled
-					my_lists["needs_hand_labeling"].append(machine_labeled_row['DESCRIPTION_UNMASKED'])
+					my_lists["needs_hand_labeling"].append(\
+						machine_labeled_row['DESCRIPTION_UNMASKED'])
 					break
 				elif machine_labeled_row["factual_id"] == human_labeled_row["factual_id"]:
 					# Transaction was correctly labeled
@@ -73,7 +75,8 @@ def test_pinpoint_classifier(machine_labeled, human_labeled, my_lists, params):
 						+ " (FOUND: " + machine_labeled_row["factual_id"] + ")")
 					break
 			elif index + 1 == len(human_labeled):
-				my_lists["needs_hand_labeling"].append(machine_labeled_row['DESCRIPTION_UNMASKED'])
+				my_lists["needs_hand_labeling"].append(\
+					machine_labeled_row['DESCRIPTION_UNMASKED'])
 
 def test_bulk_classifier(human_labeled, non_physical_trans, my_lists):
 	"""Tests for accuracy of the bulk (binary) classifier"""
@@ -91,7 +94,7 @@ def test_bulk_classifier(human_labeled, non_physical_trans, my_lists):
 				if human_labeled_row['IS_PHYSICAL_TRANSACTION'] == '1':
 					my_lists["incorrect_non_physical"].append(item)
 
-def test_accuracy(params, file_path=None, non_physical_trans=None,
+def test_accuracy(params, file_path=None, non_physical_trans=None,\
 	result_list=None):
 	"""Takes file by default but can accept result
 	queue/ non_physical list. Attempts to provide various
@@ -115,7 +118,7 @@ def test_accuracy(params, file_path=None, non_physical_trans=None,
 		return
 
 	# Load Verification Source
-	verification_source = params.get("verification_source",
+	verification_source = params.get("verification_source",\
 		"data/misc/verifiedLabeledTrans.txt")
 	human_labeled = load_dict_list(verification_source)
 
@@ -135,7 +138,7 @@ def test_accuracy(params, file_path=None, non_physical_trans=None,
 	}
 
 	# Test Pinpoint Classifier for recall and precision
-	test_pinpoint_classifier(machine_labeled, human_labeled, my_lists, params)
+	test_pinpoint_classifier(machine_labeled, human_labeled, my_lists)
 
 	# Test Bulk (binary) Classifier for accuracy
 	#test_bulk_classifier(human_labeled, non_physical_trans, my_lists)
