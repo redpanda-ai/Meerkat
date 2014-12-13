@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3.3
 
 """This module generates and trains a binary classification model for
-transactions using SciKit Learn. Specifically it uses a Stochastic 
+transactions using SciKit Learn. Specifically it uses a Stochastic
 Gradient Descent classifier that is optimized using Grid Search
 
 Created on Feb 25, 2014
@@ -10,7 +10,7 @@ Created on Feb 25, 2014
 
 #################### USAGE ##########################
 
-# Experts only! Do not touch! 
+# Experts only! Do not touch!
 
 #####################################################
 
@@ -72,7 +72,8 @@ def load_data(transactions, labels, file_name, test_size=1):
 def build_model(trans_train, trans_test, labels_train, labels_test):
 	"""Creates a classifier using the training set and then scores the
 	result."""
-
+	# pylint: disable=bad-continuation
+	# pylint: disable=no-value-for-parameter
 	pipeline = Pipeline([
 		('vect', CountVectorizer()),
 		('tfidf', TfidfTransformer()),
@@ -82,7 +83,7 @@ def build_model(trans_train, trans_test, labels_train, labels_test):
 	parameters = {
 		'vect__max_df': (0.05, 0.10, 0.25, 0.5),
 		'vect__max_features': (1000, 2000, 3000, 4000, 5000, 6000),
-		'vect__ngram_range': ((1, 1), (1,2)),  # unigrams or bigrams
+ 		'vect__ngram_range': ((1, 1), (1, 2)), # unigrams or bigrams
 		'tfidf__use_idf': (True, False),
 		'tfidf__norm': ('l1', 'l2'),
 		'clf__alpha': (0.00001, 0.0000055, 0.000001),
@@ -90,6 +91,7 @@ def build_model(trans_train, trans_test, labels_train, labels_test):
 		'clf__n_iter': (10, 50, 80)
 	}
 
+	# pylint: disable=unexpected-keyword-arg
 	grid_search = GridSearchCV(pipeline, parameters, n_jobs=-1, verbose=1, cv=4)
 	grid_search.fit(trans_train, labels_train)
 	score = grid_search.score(trans_test, labels_test)
@@ -103,7 +105,8 @@ def build_model(trans_train, trans_test, labels_train, labels_test):
 	print("Actual Score: " + str(score))
 
 	# Save Model
-	joblib.dump(grid_search, 'meerkat/binary_classifier/models/final_bank.pkl', compress=3)
+	joblib.dump(grid_search,\
+		'meerkat/binary_classifier/models/final_bank.pkl', compress=3)
 
 	test_model("data/misc/10K_Bank.txt", grid_search)
 
