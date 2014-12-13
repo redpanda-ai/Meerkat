@@ -55,8 +55,6 @@ def ensure_output_schema(physical, non_physical):
 def __geo_fallback(city_names, state_names, transaction, attr_map):
 	"""Basic logic to obtain a fallback for city and state
 	when no factual_id is found"""
-
-	#fields = self.params["output"]["results"]["fields"]
 	city_names = city_names[0:2]
 	state_names = state_names[0:2]
 	states_equal = state_names.count(state_names[0]) == len(state_names)
@@ -268,7 +266,6 @@ class Web_Consumer():
 	def __business_name_fallback(self, business_names, transaction, attr_map):
 		"""Basic logic to obtain a fallback for business name
 		when no factual_id is found"""
-		#fields = self.params["output"]["results"]["fields"]
 		business_names = business_names[0:2]
 		top_name = business_names[0].lower()
 		all_equal = business_names.count(business_names[0]) == len(business_names)
@@ -280,7 +277,6 @@ class Web_Consumer():
 
 	def __enrich_physical(self, transactions):
 		"""Enrich physical transactions with Meerkat"""
-
 		if len(transactions) == 0:
 			return transactions
 
@@ -300,22 +296,18 @@ class Web_Consumer():
 			return transactions
 
 		results = results['responses']
-
 		for result, transaction in zip(results, transactions):
 			trans_plus = self.__process_results(result, transaction)
 			enriched.append(trans_plus)
-
 		return enriched
 
 	def classify(self, data):
 		"""Classify a set of transactions"""
-
 		physical, non_physical = __split_into_physical_and_nonphysical(data)
 		physical = self.__enrich_physical(physical)
 		non_physical = __enrich_non_physical(non_physical)
 		transactions = ensure_output_schema(physical, non_physical)
 		data["transaction_list"] = transactions
-
 		return data
 
 #Print a warning to not execute this file as a module
