@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3.3
 
 """This module loads and processes transactions in preparation for
-analysis and search though our structured ElasticSearch merchant index. 
+analysis and search though our structured ElasticSearch merchant index.
 
 Created on Dec 9, 2013
 @author: J. Andrew Key
@@ -35,9 +35,12 @@ from boto.s3.connection import Location, S3Connection, Key
 from meerkat.custom_exceptions import InvalidArguments, Misconfiguration
 from meerkat.consumer import Consumer
 from meerkat.binary_classifier.load import select_model
-from meerkat.various_tools import load_dict_list, safely_remove_file, load_hyperparameters, safe_print
-from meerkat.various_tools import split_csv, merge_split_files, queue_to_list, string_cleanse, clean_bad_escapes
-from meerkat.various_tools import get_panel_header, get_column_map, get_new_columns, get_us_cities, post_SNS
+from meerkat.various_tools import (load_dict_list, safely_remove_file,\
+	load_hyperparameters, safe_print)
+from meerkat.various_tools import (split_csv, merge_split_files,\
+	queue_to_list, string_cleanse, clean_bad_escapes)
+from meerkat.various_tools import (get_panel_header, get_column_map,\
+	get_new_columns, get_us_cities, post_SNS)
 from meerkat.accuracy import test_accuracy, print_results, speed_tests
 from meerkat.optimization import run_meerkat as test_meerkat
 from meerkat.optimization import get_desc_queue as get_simple_queue
@@ -46,10 +49,10 @@ from meerkat.optimization import load_dataset
 def get_desc_queue(filename, params, classifier):
 	"""Opens a file of descriptions, one per line, and load a description
 	queue."""
-
 	encoding = None
 	physical, non_physical, atm = [], [], []
-	training_fields = ["PHYSICAL_MERCHANT",	"STORE_NUMBER", "CITY",	"STATE", "LATITUDE", "LONGITUDE", "FACTUAL_ID", "STREET"]
+	training_fields = ["PHYSICAL_MERCHANT", "STORE_NUMBER", "CITY", "STATE",\
+		"LATITUDE", "LONGITUDE", "FACTUAL_ID", "STREET"]
 	users = collections.defaultdict(list)
 	desc_queue = queue.Queue()
 
@@ -67,7 +70,7 @@ def get_desc_queue(filename, params, classifier):
 	for transaction in transactions:
 		transaction['factual_id'] = ""
 		description = transaction["DESCRIPTION_UNMASKED"]
-		
+
 		prediction = classifier(description)
 		transaction["IS_PHYSICAL_TRANSACTION"] = prediction
 		safe_print(str(description) + ": " + str(prediction))
@@ -134,7 +137,6 @@ def initialize():
 
 def run_meerkat(params, desc_queue, hyperparameters, non_physical, split):
 	"""Opens a number of threads to process the descriptions queue."""
-
 	# Run the Classifier
 	consumer_threads = params.get("concurrency", 8)
 	result_queue = queue.Queue()
@@ -162,9 +164,9 @@ def run_meerkat(params, desc_queue, hyperparameters, non_physical, split):
 
 	# Test Accuracy
 	if params.get("mode", "") == "test":
-		accuracy_results = test_accuracy(params, result_list=result_list, non_physical_trans=non_physical)
+		accuracy_results = test_accuracy(params, result_list=result_list,\
+			non_physical_trans=non_physical)
 		print_results(accuracy_results)
-
 	return result_list
 
 def usage():
@@ -539,7 +541,7 @@ def df_to_queue(params, df):
 	#Return if there are no physical transactions
 	if physical.empty:
 		return desc_queue, non_physical
-		
+
 	# Roll ATM into physical
 	physical = pd.concat([physical, atm])
 
@@ -661,7 +663,8 @@ def mode_switch(params):
 		conn = connect_to_S3()
 		process_panel(params, input_file)
 	else:
-		logging.critical("Please provide a local file or s3 bucket for procesing. Terminating")
+		logging.critical("Please provide a local file or s3 bucket for "\
+			"procesing. Terminating")
 		sys.exit()
 
 def test_training_data(params):
@@ -700,7 +703,7 @@ def move_to_S3(params, bucket, s3_path, filepath):
 
 def run_from_command_line(command_line_arguments):
 	"""Runs these commands if the module is invoked from the command line"""
-	
+
 	params = initialize()
 	validate_params(params)
 	mode_switch(params)
