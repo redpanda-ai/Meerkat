@@ -9,11 +9,13 @@ Created on Nov 3, 2014
 
 import json
 import string
+import re
 
-from pprint import pprint
+#from pprint import pprint
 from scipy.stats.mstats import zscore
 
-from meerkat.various_tools import get_es_connection, string_cleanse, get_boosted_fields
+from meerkat.various_tools import (get_es_connection, string_cleanse,\
+	get_boosted_fields)
 from meerkat.various_tools import synonyms, get_bool_query, get_qs_query
 from meerkat.binary_classifier.load import select_model
 
@@ -21,13 +23,86 @@ BANK_CLASSIFIER = select_model("bank")
 CARD_CLASSIFIER = select_model("card")
 BANK_NPMN = select_model("bank_NPMN")
 
+#Helper functions
+def __enrich_non_physical(transactions):
+	"""Enrich non-physical transactions with Meerkat"""
+	if len(transactions) == 0:
+		return transactions
+	for trans in transactions:
+		name = BANK_NPMN(trans["description"])
+		trans["merchant_name"] = name.title()
+	return transactions
+
+def ensure_output_schema(physical, non_physical):
+	"""Clean output to proper schema"""
+	# Add or Modify Fields
+	#for trans in non_physical:
+	#	trans["category"] = ""
+	for trans in physical:
+		categories = trans.get("category_labels", "")
+		categories = json.loads(categories) if (categories != "") else []
+		trans["category_labels"] = categories
+
+	# Combine Transactions
+	transactions = physical + non_physical
+	# Strip Fields
+	for trans in transactions:
+		del trans["description"]
+		del trans["amount"]
+		del trans["date"]
+	return transactions
+
+def __geo_fallback(city_names, state_names, transaction, attr_map):
+	"""Basic logic to obtain a fallback for city and state
+	when no factual_id is found"""
+
+	#fields = self.params["output"]["results"]["fields"]
+	city_names = city_names[0:2]
+	state_names = state_names[0:2]
+	states_equal = state_names.count(state_names[0]) == len(state_names)
+	city_in_transaction = (city_names[0].lower()\
+		in transaction["description"].lower())
+	state_in_transaction = (state_names[0].lower()\
+		in transaction["description"].lower())
+
+	if city_in_transaction:
+		transaction[attr_map['locality']] = city_names[0]
+	if states_equal and state_in_transaction:
+		transaction[attr_map['region']] = state_names[0]
+	return transaction
+
+def __sws(data):
+	"""Split transactions into physical and non-physical"""
+	transactions = data["transaction_list"]
+	physical, non_physical = [], []
+	# Determine Whether to Search
+	for trans in transactions:
+		classifier = None
+		if data["container"] == "bank":
+			classifier = BANK_CLASSIFIER
+		else:
+			classifier = CARD_CLASSIFIER
+		#TODO: Check that data["container"] is valid
+		label = classifier(trans["description"])
+		trans["is_physical_merchant"] = True if (label == "1") else False
+		(non_physical, physical)[label == "1"].append(trans)
+	return physical, non_physical
+
+def __z_score_delta(scores):
+	"""Find the Z-Score Delta"""
+	if len(scores) < 2:
+		return None
+	z_scores = zscore(scores)
+	first_score, second_score = z_scores[0:2]
+	z_score_delta = round(first_score - second_score, 3)
+	return z_score_delta
+
 class Web_Consumer():
 	"""Acts as a web service client to process and enrich
 	transactions in real time"""
 
 	def __init__(self, params, hyperparams, cities):
 		"""Constructor"""
-
 		self.params = params
 		self.hyperparams = hyperparams
 		self.cities = cities
@@ -35,7 +110,6 @@ class Web_Consumer():
 
 	def __get_query(self, transaction):
 		"""Create an optimized query"""
-
 		result_size = self.hyperparams.get("es_result_size", "10")
 		fields = self.params["output"]["results"]["fields"]
 		transaction = string_cleanse(transaction["description"]).rstrip()
@@ -60,7 +134,6 @@ class Web_Consumer():
 
 	def __search_index(self, queries):
 		"""Search against a structured index"""
-
 		index = self.params["elasticsearch"]["index"]
 
 		try:
@@ -70,25 +143,13 @@ class Web_Consumer():
 
 		return results
 
-	def __z_score_delta(self, scores):
-		"""Find the Z-Score Delta"""
-
-		if len(scores) < 2:
-			return None
-
-		z_scores = zscore(scores)
-		first_score, second_score = z_scores[0:2]
-		z_score_delta = round(first_score - second_score, 3)
-
-		return z_score_delta
-
 	def __process_results(self, results, transaction):
 		"""Process search results and enrich transaction
 		with found data"""
 
-		params = self.params
+		#params = self.params
 		hyperparams = self.hyperparams
-		field_names = params["output"]["results"]["fields"]
+		#field_names = params["output"]["results"]["fields"]
 
 		# Must be at least one result
 		if results["hits"]["total"] == 0:
@@ -99,18 +160,23 @@ class Web_Consumer():
 		hits = results['hits']['hits']
 		top_hit = hits[0]
 		hit_fields = top_hit.get("fields", "")
-		
+
 		# If no results return
 		if hit_fields == "":
 			transaction = self.__no_result(transaction)
 			return transaction
 
 		# Collect Fallback Data
-		business_names = [result.get("fields", {"name" : ""}).get("name", "") for result in hits]
-		business_names = [name[0] for name in business_names if type(name) == list]
-		city_names = [result.get("fields", {"locality" : ""}).get("locality", "") for result in hits]
+		business_names = [result.get("fields", {"name" : ""}).get("name", "")\
+			for result in hits]
+		business_names = [name[0]\
+			for name in business_names if type(name) == list]
+		city_names = [result.get(\
+			"fields", {"locality" : ""}).get("locality", "")\
+			for result in hits]
 		city_names = [name[0] for name in city_names if type(name) == list]
-		state_names = [result.get("fields", {"region" : ""}).get("region", "") for result in hits]
+		state_names = [result.get("fields", {"region" : ""}).get("region", "")\
+			for result in hits]
 		state_names = [name[0] for name in state_names if type(name) == list]
 
 		# Need Names
@@ -125,12 +191,13 @@ class Web_Consumer():
 
 		# Collect Relevancy Scores
 		scores = [hit["_score"] for hit in hits]
-		z_score_delta = self.__z_score_delta(scores)
+		z_score_delta = __z_score_delta(scores)
 		threshold = float(hyperparams.get("z_score_threshold", "2"))
 		decision = True if (z_score_delta > threshold) else False
 
 		# Enrich Data if Passes Boundary
-		args = [decision, transaction, hit_fields, z_score_delta, business_names, city_names, state_names]
+		args = [decision, transaction, hit_fields, business_names,\
+			city_names, state_names]
 		enriched_transaction = self.__enrich_transaction(*args)
 
 		return enriched_transaction
@@ -150,7 +217,8 @@ class Web_Consumer():
 
 		return transaction
 
-	def __enrich_transaction(self, decision, transaction, hit_fields, z_score_delta, business_names, city_names, state_names):
+	def __enrich_transaction(self, decision, transaction, hit_fields,\
+		business_names, city_names, state_names):
 		"""Enriches the transaction with additional data"""
 
 		params = self.params
@@ -168,7 +236,11 @@ class Web_Consumer():
 			transaction["match_found"] = True
 			for field in field_names:
 				if field in fields_in_hit:
-					field_content = hit_fields[field][0] if isinstance(hit_fields[field], (list)) else str(hit_fields[field])
+					field_content = None
+					if isinstance(hit_fields[field]):
+						field_content = hit_fields[field][0]
+					else:
+						field_content = str(hit_fields[field])
 					transaction[attr_map.get(field, field)] = field_content
 				else:
 					transaction[attr_map.get(field, field)] = ""
@@ -177,12 +249,15 @@ class Web_Consumer():
 		if decision == False:
 			for field in field_names:
 				transaction[attr_map.get(field, field)] = ""
-			transaction = self.__business_name_fallback(business_names, transaction, attr_map)
-			transaction = self.__geo_fallback(city_names, state_names, transaction, attr_map)
+			transaction = self.__business_name_fallback(business_names,\
+				transaction, attr_map)
+			transaction = __geo_fallback(city_names, state_names,\
+				transaction, attr_map)
 
 		# Ensure Proper Casing
 		if transaction[attr_map['name']] == transaction[attr_map['name']].upper():
-			transaction[attr_map['name']] = string.capwords(transaction[attr_map['name']], " ")
+			transaction[attr_map['name']] = \
+				string.capwords(transaction[attr_map['name']], " ")
 
 		# Add Source
 		index = params["elasticsearch"]["index"]
@@ -190,62 +265,18 @@ class Web_Consumer():
 
 		return transaction
 
-	def __geo_fallback(self, city_names, state_names, transaction, attr_map):
-		"""Basic logic to obtain a fallback for city and state
-		when no factual_id is found"""
-
-		fields = self.params["output"]["results"]["fields"]
-		city_names = city_names[0:2]
-		state_names = state_names[0:2]
-		states_equal = state_names.count(state_names[0]) == len(state_names)
-		city_in_transaction = (city_names[0].lower() in transaction["description"].lower())
-		state_in_transaction = (state_names[0].lower() in transaction["description"].lower())
-
-		if (city_in_transaction):
-			transaction[attr_map['locality']] = city_names[0]
-
-		if (states_equal and state_in_transaction):
-			transaction[attr_map['region']] = state_names[0]
-
-		return transaction
-
 	def __business_name_fallback(self, business_names, transaction, attr_map):
 		"""Basic logic to obtain a fallback for business name
 		when no factual_id is found"""
-		
-		fields = self.params["output"]["results"]["fields"]
+		#fields = self.params["output"]["results"]["fields"]
 		business_names = business_names[0:2]
 		top_name = business_names[0].lower()
 		all_equal = business_names.count(business_names[0]) == len(business_names)
 		not_a_city = top_name not in self.cities
 
-		if (all_equal and not_a_city):
+		if all_equal and not_a_city:
 			transaction[attr_map['name']] = business_names[0]
-
 		return transaction
-
-	def ensure_output_schema(self, physical, non_physical):
-		"""Clean output to proper schema"""
-
-		# Add or Modify Fields
-		#for trans in non_physical:
-		#	trans["category"] = ""
-
-		for trans in physical:
-			categories = trans.get("category_labels", "")
-			categories = json.loads(categories) if (categories != "") else []
-			trans["category_labels"] = categories
-
-		# Combine Transactions
-		transactions = physical + non_physical
-
-		# Strip Fields
-		for trans in transactions:
-			del trans["description"]
-			del trans["amount"]
-			del trans["date"]
-
-		return transactions
 
 	def __enrich_physical(self, transactions):
 		"""Enrich physical transactions with Meerkat"""
@@ -270,50 +301,23 @@ class Web_Consumer():
 
 		results = results['responses']
 
-		for r, t in zip(results, transactions):
-			trans_plus = self.__process_results(r, t)
+		for result, transaction in zip(results, transactions):
+			trans_plus = self.__process_results(result, transaction)
 			enriched.append(trans_plus)
 
 		return enriched
 
-	def __enrich_non_physical(self, transactions):
-		"""Enrich non-physical transactions with Meerkat"""
-
-		if len(transactions) == 0:
-			return transactions
-
-		for trans in transactions:
-			name = BANK_NPMN(trans["description"])
-			trans["merchant_name"] = name.title()
-
-		return transactions
-
-	def __sws(self, data):
-		"""Split transactions into physical and non-physical"""
-
-		transactions = data["transaction_list"]
-		physical, non_physical = [], []
-
-		# Determine Whether to Search
-		for trans in transactions:
-			classifier = BANK_CLASSIFIER if (data["container"] == "bank") else CARD_CLASSIFIER
-			label = classifier(trans["description"])
-			trans["is_physical_merchant"] = True if (label == "1") else False
-			(non_physical, physical)[label == "1"].append(trans)
-
-		return physical, non_physical
-
 	def classify(self, data):
 		"""Classify a set of transactions"""
 
-		physical, non_physical = self.__sws(data)
+		physical, non_physical = __sws(data)
 		physical = self.__enrich_physical(physical)
-		non_physical = self.__enrich_non_physical(non_physical)
-		transactions = self.ensure_output_schema(physical, non_physical)
+		non_physical = __enrich_non_physical(non_physical)
+		transactions = ensure_output_schema(physical, non_physical)
 		data["transaction_list"] = transactions
 
 		return data
 
+#Print a warning to not execute this file as a module
 if __name__ == "__main__":
-	"""Print a warning to not execute this file as a module"""
 	print("This module is a Class; it should not be run from the console.")
