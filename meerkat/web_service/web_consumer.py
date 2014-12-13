@@ -71,7 +71,7 @@ def __geo_fallback(city_names, state_names, transaction, attr_map):
 		transaction[attr_map['region']] = state_names[0]
 	return transaction
 
-def __sws(data):
+def __split_into_physical_and_nonphysical(data):
 	"""Split transactions into physical and non-physical"""
 	transactions = data["transaction_list"]
 	physical, non_physical = [], []
@@ -310,7 +310,7 @@ class Web_Consumer():
 	def classify(self, data):
 		"""Classify a set of transactions"""
 
-		physical, non_physical = __sws(data)
+		physical, non_physical = __split_into_physical_and_nonphysical(data)
 		physical = self.__enrich_physical(physical)
 		non_physical = __enrich_non_physical(non_physical)
 		transactions = ensure_output_schema(physical, non_physical)
