@@ -66,7 +66,8 @@ def plot_clustering(model, normalized_points):
 		for index in class_members:
 			x = normalized_points[index]
 			markersize = 5
-			pl.plot(x[1], x[0], 'o', markerfacecolor=col, markeredgecolor='k', markersize=markersize)
+			pl.plot(x[1], x[0], 'o', markerfacecolor=col,\
+				markeredgecolor='k', markersize=markersize)
 
 	pl.show()
 
