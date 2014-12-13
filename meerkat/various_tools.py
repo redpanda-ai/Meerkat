@@ -25,7 +25,7 @@ QUOTE_CLEAN = re.compile(r'\"')
 def load_dict_list(file_name, encoding='utf-8', delimiter="|"):
 	"""Loads a dictionary of input from a file into a list."""
 	input_file = open(file_name, encoding=encoding, errors='replace')
-	dict_list = list(csv.DictReader(input_file, delimiter=delimiter,
+	dict_list = list(csv.DictReader(input_file, delimiter=delimiter,\
 		quoting=csv.QUOTE_NONE))
 	input_file.close()
 	return dict_list
@@ -33,39 +33,38 @@ def load_dict_list(file_name, encoding='utf-8', delimiter="|"):
 def load_dict_ordered(file_name, encoding='utf-8', delimiter="|"):
 	"""Loads a dictionary of input, anf returns a list and ordered
 	fieldnames"""
-
 	input_file = open(file_name, encoding=encoding, errors='replace')
-	reader = csv.DictReader(input_file, delimiter=delimiter, quoting=csv.QUOTE_NONE)
+	reader = csv.DictReader(input_file, delimiter=delimiter,\
+		quoting=csv.QUOTE_NONE)
 	dict_list = list(reader)
 	input_file.close()
 	return dict_list, reader.fieldnames
 
-def write_dict_list(dict_list, file_name, encoding="utf-8", delimiter="|", column_order=""):
+def write_dict_list(dict_list, file_name, encoding="utf-8", delimiter="|",\
+		column_order=""):
 	""" Saves a lists of dicts with uniform keys to file """
-
 	if column_order == "":
 		column_order = dict_list[0].keys()
 
 	with open(file_name, 'w', encoding=encoding, errors='replace') as output_file:
-		dict_w = csv.DictWriter(output_file, delimiter=delimiter, fieldnames=column_order, extrasaction='ignore')
+		dict_w = csv.DictWriter(output_file, delimiter=delimiter,\
+			fieldnames=column_order, extrasaction='ignore')
 		dict_w.writeheader()
 		dict_w.writerows(dict_list)
 
 def get_panel_header(container):
 	"""Return an ordered consistent header for panels"""
-
-	header = [\
-		"UNIQUE_MEM_ID", "UNIQUE___BLANK_ACCOUNT_ID", "UNIQUE___BLANK_TRANSACTION_ID",\
-		"MEM_ID", "__BLANK_ACCOUNT_ID", "__BLANK_TRANSACTION_ID", "COBRAND_ID",\
-		"SUM_INFO_ID", "AMOUNT", "CURRENCY_ID", "DESCRIPTION", "TRANSACTION_DATE",\
-		"POST_DATE", "TRANSACTION_BASE_TYPE", "TRANSACTION_CATEGORY_ID",\
-		"TRANSACTION_CATEGORY_NAME", "MERCHANT_NAME", "STORE_ID", "FACTUAL_CATEGORY",\
-		"STREET", "CITY", "STATE", "ZIP_CODE", "WEBSITE", "PHONE_NUMBER", "FAX_NUMBER",\
-		"CHAIN_NAME", "LATITUDE", "LONGITUDE", "NEIGHBOURHOOD", "TRANSACTION_ORIGIN",\
-		"CONFIDENCE_SCORE", "FACTUAL_ID", "FILE_CREATED_DATE", "DESCRIPTION_UNMASKED",\
-		"GOOD_DESCRIPTION"
-	]
-
+	# pylint: disable=bad-continuation
+	header = ["UNIQUE_MEM_ID", "UNIQUE___BLANK_ACCOUNT_ID",
+		"UNIQUE___BLANK_TRANSACTION_ID", "MEM_ID", "__BLANK_ACCOUNT_ID",
+		"__BLANK_TRANSACTION_ID", "COBRAND_ID", "SUM_INFO_ID", "AMOUNT",
+		"CURRENCY_ID", "DESCRIPTION", "TRANSACTION_DATE", "POST_DATE",
+		"TRANSACTION_BASE_TYPE", "TRANSACTION_CATEGORY_ID",
+		"TRANSACTION_CATEGORY_NAME", "MERCHANT_NAME", "STORE_ID", "FACTUAL_CATEGORY",
+		"STREET", "CITY", "STATE", "ZIP_CODE", "WEBSITE", "PHONE_NUMBER",
+		"FAX_NUMBER", "CHAIN_NAME", "LATITUDE", "LONGITUDE", "NEIGHBOURHOOD",
+		"TRANSACTION_ORIGIN", "CONFIDENCE_SCORE", "FACTUAL_ID",
+		"FILE_CREATED_DATE", "DESCRIPTION_UNMASKED", "GOOD_DESCRIPTION"]
 	container = container.upper()
 	header = [x.replace("__BLANK", container) for x in header]
 	return header
@@ -73,7 +72,7 @@ def get_panel_header(container):
 def get_yodlee_factual_map():
 	"""Return a map of factual attribute names to
 	yodlee attribute names"""
-
+	# pylint: disable=bad-continuation
 	return {
 		"factual_id" : "FACTUAL_ID",
 		"address" : "STREET",
@@ -89,41 +88,24 @@ def get_yodlee_factual_map():
 		"chain_name" : "CHAIN_NAME",
 		"neighborhood" : "NEIGHBOURHOOD",
 		"internal_store_number" : "STORE_ID",
-		"name" : "MERCHANT_NAME"
-	}
+		"name" : "MERCHANT_NAME"}
 
 def get_column_map(container):
 	"""Fix old or erroneous column names"""
-
+	# pylint: disable=bad-continuation
 	return {
 		"UNIQUE_ACCOUNT_ID" : "UNIQUE_" + container.upper() + "_ACCOUNT_ID",
 		"UNIQUE_TRANSACTION_ID" : "UNIQUE_" + container.upper() + "_TRANSACTION_ID",
 		"TYPE" : "TRANSACTION_BASE_TYPE",
-		"MERCHANT_NAME" : "GOOD_DESCRIPTION"
-	}
+		"MERCHANT_NAME" : "GOOD_DESCRIPTION"}
 
 def get_new_columns():
 	"""Return a list of new columns to add to a panel"""
-
-	return [
-		'STORE_ID', 
-		'FACTUAL_CATEGORY', 
-		'STREET', 
-		'CITY', 
-		'STATE', 
-		'ZIP_CODE', 
-		'WEBSITE', 
-		'PHONE_NUMBER', 
-		'FAX_NUMBER', 
-		'CHAIN_NAME', 
-		'LATITUDE', 
-		'LONGITUDE',
-		'MERCHANT_NAME',
-		'NEIGHBOURHOOD', 
-		'TRANSACTION_ORIGIN', 
-		'CONFIDENCE_SCORE', 
-		'FACTUAL_ID'
-	]
+	# pylint: disable=bad-continuation
+	return ['STORE_ID', 'FACTUAL_CATEGORY', 'STREET', 'CITY', 'STATE',
+		'ZIP_CODE', 'WEBSITE', 'PHONE_NUMBER', 'FAX_NUMBER', 'CHAIN_NAME',
+		'LATITUDE', 'LONGITUDE', 'MERCHANT_NAME', 'NEIGHBOURHOOD',
+		'TRANSACTION_ORIGIN', 'CONFIDENCE_SCORE', 'FACTUAL_ID']
 
 def to_stdout(string, errors="replace"):
 	"""Converts a string to stdout compatible encoding"""
@@ -134,16 +116,14 @@ def to_stdout(string, errors="replace"):
 
 def safe_print(*objs, errors="replace"):
 	"""Print without unicode errors"""
-	
 	print(*(to_stdout(str(o), errors) for o in objs))
 
-def progress(i, list, message=""):
+def progress(i, my_list, message=""):
 	"""Display progress percent in a loop"""
-
-	progress = (i / len(list)) * 100
-	progress = str(round(progress, 1)) + "% " + message 
+	my_progress = (i / len(my_list)) * 100
+	my_progress = str(round(my_progress, 1)) + "% " + message
 	sys.stdout.write('\r')
-	sys.stdout.write(progress)
+	sys.stdout.write(my_progress)
 	sys.stdout.flush()
 
 def queue_to_list(result_queue):
@@ -187,30 +167,31 @@ def get_es_connection(params):
 
 	cluster_nodes = params["elasticsearch"]["cluster_nodes"]
 	index = params["elasticsearch"]["index"]
-	es_connection = Elasticsearch(cluster_nodes, index=index, sniff_on_start=True,
-	sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
+	es_connection = Elasticsearch(cluster_nodes, index=index,\
+		sniff_on_start=True, sniff_on_connection_fail=True,\
+		sniffer_timeout=15, sniff_timeout=15)
 
 	return es_connection
 
 def post_SNS(message):
 	"""Post an SNS message"""
-
 	region = 'us-west-2'
 	topic = 'arn:aws:sns:us-west-2:003144629351:panel_6m'
 	conn = boto.sns.connect_to_region(region)
-	pub = conn.publish(topic = topic, message = message)
+	_ = conn.publish(topic=topic, message=message)
 
 def get_merchant_by_id(params, factual_id, es_connection, index=""):
 	"""Fetch the details for a single factual_id"""
 
 	if index == "":
 		index = params.get("elasticsearch", {}).get("index", "")
-	
+
 	if factual_id == "NULL":
 		return None
 
 	try:
-		result = es_connection.get(index=index, doc_type='factual_type', id=factual_id)
+		result = es_connection.get(index=index,\
+			doc_type='factual_type', id=factual_id)
 		hit = result["_source"]
 		return hit
 	except:
@@ -233,15 +214,15 @@ def safely_remove_file(filename):
 		print("Unable to remove {0}".format(filename))
 	print("File removed.")
 
-def purge(dir, pattern):
+def purge(my_dir, pattern):
 	"""Cleans up processing location on System Exit"""
-	for f in os.listdir(dir):
-		if re.search(pattern, f):
-			os.remove(os.path.join(dir, f))
+	for my_file in os.listdir(my_dir):
+		if re.search(pattern, my_file):
+			os.remove(os.path.join(my_dir, my_file))
 
 def string_cleanse(original_string):
 	"""Strips out characters that might confuse ElasticSearch."""
-	bad_characters = [r"\[", r"\]", r"\{", r"\}", r'"', r"/", r"\\", r"\:",
+	bad_characters = [r"\[", r"\]", r"\{", r"\}", r'"', r"/", r"\\", r"\:",\
 		r"\(", r"\)", r"-", r"\+", r">", r"!", r"\*", r"\|\|", r"&&", r"~"]
 	bad_character_regex = "|".join(bad_characters)
 	cleanse_pattern = re.compile(bad_character_regex)
@@ -268,10 +249,11 @@ def build_boost_vectors(hyperparams):
 
 def get_boosted_fields(hyperparams, vector_name):
 	"""Returns a list of boosted fields built from a boost vector"""
-
 	boost_row_labels, boost_column_vectors = build_boost_vectors(hyperparams)
 	boost_vector = boost_column_vectors[vector_name]
-	return [x + "^" + str(y) for x, y in zip(boost_row_labels, boost_vector) if y != 0.0]
+	return [x + "^" + str(y)\
+		for x, y in zip(boost_row_labels, boost_vector)\
+		if y != 0.0]
 
 def get_magic_query(params, transaction, boost=1.0):
 	"""Build a magic query from pretrained boost vectors"""
@@ -301,34 +283,38 @@ def get_magic_query(params, transaction, boost=1.0):
 	should_clauses.append(simple_query)
 
 	# Use Good Description in Query
-	if good_description != "" and hyperparameters.get("good_description", "") != "":
+	if good_description != ""\
+		and hyperparameters.get("good_description", "") != "":
 		good_description_boost = hyperparameters["good_description"]
-		name_query = get_qs_query(string_cleanse(good_description), ['name'], good_description_boost)
+		name_query = get_qs_query(string_cleanse(good_description),\
+			['name'], good_description_boost)
 		should_clauses.append(name_query)
 
 	return magic_query
 
 def get_bool_query(starting_from=0, size=0):
 	"""Returns a bool style ElasticSearch query object"""
-
+	# pylint: disable=bad-continuation
 	return {
-		"from" : starting_from, 
-		"size" : size, 
+		"from" : starting_from,
+		"size" : size,
 		"query" : {
 			"bool": {
-				"minimum_number_should_match": 1, 
+				"minimum_number_should_match": 1,
 				"should": []
 			}
 		}
 	}
 
-def get_qs_query(term, field_list=[], boost=1.0):
+def get_qs_query(term, field_list=None, boost=1.0):
 	"""Returns a "query_string" style ElasticSearch query object"""
-
+	if field_list is None:
+		field_list = []
+	# pylint: disable=bad-continuation
 	return {
 		"query_string": {
-			"query": term, 
-			"fields": field_list, 
+			"query": term,
+			"fields": field_list,
 			"boost" : boost
 		}
 	}
@@ -350,20 +336,19 @@ def clean_bad_escapes(filepath):
 	required_fields = ["DESCRIPTION_UNMASKED", "UNIQUE_MEM_ID", "GOOD_DESCRIPTION"]
 
 	# Clean File
-	with gzip.open(filepath, "rb") as f:
-		with open(path + "/" + filename, "wb") as g:
-			for l in f:
+	with gzip.open(filepath, "rb") as input_file:
+		with open(path + "/" + filename, "wb") as output_file:
+			for line in input_file:
 				if first_line:
 					for field in required_fields:
-						if field not in str(l):
+						if field not in str(line):
 							safely_remove_file(filepath)
 							safely_remove_file(path + "/" + filename)
 							return False
 					first_line = False
-				line = clean_line(l)
+				line = clean_line(line)
 				line = bytes(line + "\n", 'UTF-8')
-				g.write(line)
-
+				output_file.write(line)
 	# Rename and Remove
 	safely_remove_file(filepath)
 
@@ -379,34 +364,19 @@ def clean_line(line):
 
 def stopwords(transaction):
 	"""Remove stopwords"""
-
+	# pylint: disable=bad-continuation
 	patterns = [
-		r"^ach", 
-		r"\d{2}\/\d{2}", 
-		r"X{4}\d{4}",
-		r"X{5}\d{4}", 
-		r"~{2}\d{5}~{2}\d{16}~{2}\d{5}~{2}\d~{4}\d{4}", 
-		r"checkcard \d{4}", 
+		r"^ach",
+		r"\d{2}\/\d{2}",
+		r"X{4}\d{4}"
+		r"X{5}\d{4}",
+		r"~{2}\d{5}~{2}\d{16}~{2}\d{5}~{2}\d~{4}\d{4}",
+		r"checkcard \d{4}",
 		r"\d{15}"
 	]
-
-	stop_words = [
-		" pos ",
-		r"^pos ",  
-		" ach ", 
-		"electronic", 
-		"debit", 
-		"purchase", 
-		" card ", 
-		" pin ", 
-		"recurring", 
-		" check ",
-		"checkcard",
-		"qps",
-		"q35",
-		"q03",
-		" sq "
-	]
+	stop_words = [" pos ", r"^pos ", " ach ", "electronic", "debit",
+		"purchase", " card ", " pin ", "recurring", " check ", "checkcard",
+		"qps", "q35", "q03", " sq "]
 
 	patterns = patterns + stop_words
 	transaction = transaction.lower()
@@ -419,7 +389,7 @@ def synonyms(transaction):
 	"""Replaces transactions tokens with manually
 	mapped factual representations. This method
 	should be expanded to manage a file of synonyms"""
-
+	# pylint: disable=bad-continuation
 	rep = {
 		"wal-mart" : " Walmart ",
 		"wal mart" : " Walmart ",
@@ -444,36 +414,33 @@ def synonyms(transaction):
 
 	return text.upper()
 
-def split_csv(filehandler, delimiter=',', row_limit=10000, 
+def split_csv(filehandler, delimiter=',', row_limit=10000,\
 	output_name_template='output_%s.csv', output_path='.', keep_headers=True):
-	"""
-	Adapted from Jordi Rivero:
+	""" Adapted from Jordi Rivero:
 	https://gist.github.com/jrivero
 	Splits a CSV file into multiple pieces.
-	
+
 	A quick bastardization of the Python CSV library.
 
 	Arguments:
-		`row_limit`: The number of rows you want in each output file. 10,000 by default.
-		`output_name_template`: A %s-style template for the numbered output files.
-		`output_path`: Where to stick the output files.
-		`keep_headers`: Whether or not to print the headers in each output file.
+	`row_limit`: The number of rows you want in each output file.
+		10,000 by default.
+	`output_name_template`: A %s-style template for the numbered output files.
+	`output_path`: Where to stick the output files.
+	`keep_headers`: Whether or not to print the headers in each output file.
 
 	Example usage:
 		>> from various_tools import split_csv;
-		>> split_csv(open('/home/ben/input.csv', 'r'));
-	
-	"""
+		>> split_csv(open('/home/ben/input.csv', 'r')); """
 	reader = csv.reader(filehandler, delimiter=delimiter)
 	#Start at piece one
 	current_piece = 1
-	current_out_path = os.path.join(
-		 output_path,
-		 output_name_template  % current_piece
-	)
+	current_out_path = os.path.join(output_path,\
+		output_name_template % current_piece)
 	#Create a list of file pieces
 	file_list = [current_out_path]
-	current_out_writer = csv.writer(open(current_out_path, 'w', encoding="utf-8"), delimiter=delimiter)
+	current_out_writer = csv.writer(open(current_out_path, 'w',\
+		encoding="utf-8"), delimiter=delimiter)
 	current_limit = row_limit
 	if keep_headers:
 		headers = reader.__next__()
@@ -483,9 +450,11 @@ def split_csv(filehandler, delimiter=',', row_limit=10000,
 		if i + 1 > current_limit:
 			current_piece += 1
 			current_limit = row_limit * current_piece
-			current_out_path = os.path.join( output_path, output_name_template  % current_piece)
+			current_out_path = os.path.join(output_path,\
+				output_name_template % current_piece)
 			file_list.append(current_out_path)
-			current_out_writer = csv.writer(open(current_out_path, 'w', encoding="utf-8"), delimiter=delimiter)
+			current_out_writer = csv.writer(open(current_out_path, 'w',\
+				encoding="utf-8"), delimiter=delimiter)
 			if keep_headers:
 				current_out_writer.writerow(headers)
 		current_out_writer.writerow(row)
@@ -518,7 +487,7 @@ def merge_split_files(params, split_list):
 
 	output.close()
 
-	# GZIP 
+	# GZIP
 	unzipped = open(full_path, "rb")
 	zipped = gzip.open(full_path + ".gz", "wb")
 	zipped.writelines(unzipped)
@@ -531,6 +500,7 @@ def merge_split_files(params, split_list):
 
 	return full_path + ".gz"
 
+#Print a warning to not execute this file as a module
 if __name__ == "__main__":
-	"""Print a warning to not execute this file as a module"""
-	print("This module is a library that contains useful functions; it should not be run from the console.")
+	print("This module is a library that contains useful functions;" \
+		" it should not be run from the console.")
