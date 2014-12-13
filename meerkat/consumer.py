@@ -11,14 +11,14 @@ Created on Jan 16, 2014
 @author: Matthew Sevrens
 """
 
-import hashlib
+#import hashlib
 import json
 import logging
 import numpy as np
 import pprint
 import queue
 import re
-import sys
+#import sys
 import threading
 import string
 
@@ -27,8 +27,8 @@ from sklearn.preprocessing import StandardScaler
 from scipy.stats.mstats import zscore
 from pprint import pprint
 
-from .various_tools import string_cleanse, synonyms, safe_print, get_yodlee_factual_map
-from .various_tools import get_bool_query, get_qs_query, get_us_cities
+from .various_tools import string_cleanse, synonyms, get_yodlee_factual_map
+from .various_tools import get_bool_query, get_qs_query
 from .clustering import cluster, collect_clusters
 from .location import separate_geo, scale_polygon, get_geo_query
 
@@ -51,16 +51,18 @@ class Consumer(threading.Thread):
 			boost_column_vectors[boost_column_labels[i]] = np.array(my_list)
 		return boost_row_labels, boost_column_vectors
 
-	def __interactive_mode(self, params, scores, transaction, hits, business_names, city_names, state_names):
+	def __interactive_mode(self, scores, transaction, hits,\
+		business_names, city_names, state_names):
 		"""Interact with the results as they come"""
-
 		score = scores[0]
 		z_score = self.__generate_z_score_delta(scores)
 		decision = self.__decision_boundary(z_score)
-		description =  ' '.join(transaction["DESCRIPTION_UNMASKED"].split())
+		description = ' '.join(transaction["DESCRIPTION_UNMASKED"].split())
 		first_hit = hits[0]["fields"]
-		fields_to_get = ["name", "region", "locality", "internal_store_number", "postcode", "address"]
-		field_content = [first_hit.get(field, ["_____"])[0] for field in fields_to_get]
+		fields_to_get = ["name", "region", "locality",\
+			"internal_store_number", "postcode", "address"]
+		field_content = [first_hit.get(field, ["_____"])[0]\
+			for field in fields_to_get]
 		city_fallback, state_fallback, name_fallback = "", "", ""
 
 		labels = ["Transaction", "Query", "Score", "Z-Score", "Decision"]
@@ -70,22 +72,30 @@ class Consumer(threading.Thread):
 
 		# Populate Decisions
 		if not decision:
-			data[4] == "No"
-			fields = self.params["output"]["results"]["fields"]
+			data[4] = "No"
+			#fields = self.params["output"]["results"]["fields"]
 			city_names = city_names[0:2]
 			state_names = state_names[0:2]
 			states_equal = state_names.count(state_names[0]) == len(state_names)
-			city_in_transaction = (city_names[0].lower() in transaction["DESCRIPTION_UNMASKED"].lower())
-			state_in_transaction = (state_names[0].lower() in transaction["DESCRIPTION_UNMASKED"].lower())
+			city_in_transaction = (city_names[0].lower()\
+				in transaction["DESCRIPTION_UNMASKED"].lower())
+			state_in_transaction = (state_names[0].lower()\
+				in transaction["DESCRIPTION_UNMASKED"].lower())
 			business_names = business_names[0:2]
 			top_name = business_names[0].lower()
 			all_equal = business_names.count(business_names[0]) == len(business_names)
 			not_a_city = top_name not in self.cities
-			name_fallback = ("", business_names[0].title())[((all_equal and not_a_city)) == True]
-			name_fallback = (name_fallback, transaction['GOOD_DESCRIPTION'])[(transaction['GOOD_DESCRIPTION'] != "") == True]
+			name_fallback = ("", business_names[0].title())[((\
+				all_equal and not_a_city)) == True]
+			name_fallback = (name_fallback,\
+				transaction['GOOD_DESCRIPTION'])\
+				[(transaction['GOOD_DESCRIPTION'] != "") == True]
 			name_fallback = string.capwords(name_fallback, " ")
-			city_fallback = ("", city_names[0].title())[city_in_transaction == True]
-			state_fallback = ("", state_names[0].upper())[(states_equal and state_in_transaction) == True]
+			city_fallback = ("",\
+				city_names[0].title())[city_in_transaction == True]
+			state_fallback = ("",\
+				state_names[0].upper())\
+				[(states_equal and state_in_transaction) == True]
 			labels = labels + ["Name Fallback", "State Fallback", "City Fallback"]
 			data = data + [name_fallback, state_fallback, city_fallback]
 		else:
@@ -96,15 +106,17 @@ class Consumer(threading.Thread):
 		stats = "\n".join(stats)
 		stats = stats.format(*data)
 
-		attr_labels = ["GOOD_DESCRIPTION"] + [field.title() for field in fields_to_get]
+		attr_labels = ["GOOD_DESCRIPTION"] + [field.title()\
+			for field in fields_to_get]
 		attributes = ["{:22}: ".format(label) + "{}" for label in attr_labels]
-		attributes = "\n".join(attributes) + "\n\n----------------------------\n"
+		attributes = "\n".join(attributes)\
+			+ "\n\n----------------------------\n"
 		field_content = [transaction['GOOD_DESCRIPTION']] + field_content
 		attributes = attributes.format(*field_content)
-		
-		prompt = stats + "\n\n" + attributes
+
+		#prompt = stats + "\n\n" + attributes
 		#print(prompt)
-		user = input(prompt)
+		#user = input(prompt)
 
 	def __generate_z_score_delta(self, scores):
 		"""Generate the Z-score delta between the first and second scores."""
@@ -148,8 +160,9 @@ class Consumer(threading.Thread):
 		self.cities = cities
 
 		cluster_nodes = self.params["elasticsearch"]["cluster_nodes"]
-		self.es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True,
-			sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
+		self.es_connection = Elasticsearch(cluster_nodes,\
+			sniff_on_start=True, sniff_on_connection_fail=True,\
+			sniffer_timeout=15, sniff_timeout=15)
 
 		self.my_meta = None
 		self.__reset_my_meta()
@@ -180,15 +193,16 @@ class Consumer(threading.Thread):
 		name_boost = self.hyperparameters.get("name_boost", "1")
 		hits, non_hits = separate_geo(text_features_results)
 
-		locations_found = [
-		str(json.loads(hit["pin.location"].replace("'", '"'))["coordinates"])
-		for hit in hits]
+		locations_found = [\
+			str(json.loads(\
+			hit["pin.location"].replace("'", '"'))["coordinates"])\
+			for hit in hits]
 
 		unique_locations = set(locations_found)
 
-		unique_locations = [
-		json.loads(location.replace("'", '"'))
-		for location in unique_locations]
+		unique_locations = [\
+			json.loads(location.replace("'", '"'))\
+			for location in unique_locations]
 
 		enriched_transactions = []
 
@@ -219,8 +233,8 @@ class Consumer(threading.Thread):
 			enriched_transaction = self.__process_results(search_results, transaction)
 			enriched_transactions.append(enriched_transaction)
 
-		added_text_and_geo_features = [trans for trans in enriched_transactions
-		if trans["factual_id"] != ""]
+		added_text_and_geo_features = [trans\
+			for trans in enriched_transactions if trans["factual_id"] != ""]
 
 		text_and_geo_features_results = hits + enriched_transactions
 
@@ -251,24 +265,28 @@ class Consumer(threading.Thread):
 					labels, unique_locations)
 
 			# Scale generated geo shapes
-			scaled_geoshapes = [scale_polygon(geoshape, scale=scaling_factor)[1]
-			for geoshape in original_geoshapes]
+			scaled_geoshapes = [\
+				scale_polygon(geoshape, scale=scaling_factor)[1]\
+				for geoshape in original_geoshapes]
 
 			# Save interesting outputs needs to run in it's own process
+			# Note: you will need to pass in the user!
 			#if len(unique_locations) >= 3:
 			#	pool = multiprocessing.Pool()
-			#	arguments = [(unique_locations, original_geoshapes, scaled_geoshapes, user_id)]
+			#	arguments = [(unique_locations, original_geoshapes,\
+			#	scaled_geoshapes, user_id)]
 			#	pool.starmap(visualize, arguments)
-			
+
 		return scaled_geoshapes
 
 	def __run_classifier(self, query):
 		"""Runs the classifier"""
 		# Show Final Query
 		logger = logging.getLogger("thread " + str(self.thread_id))
-		logger.info(json.dumps(query, sort_keys=True, indent=4, separators=(',', ': ')))
+		logger.info(json.dumps(query, sort_keys=True, indent=4,\
+			separators=(',', ': ')))
 		my_results = self.__search_index(query)
-		metrics = self.my_meta["metrics"]
+		#metrics = self.my_meta["metrics"]
 		return my_results
 
 	def __generate_base_query(self, transaction, boost=1.0):
@@ -301,9 +319,11 @@ class Consumer(threading.Thread):
 		should_clauses.append(simple_query)
 
 		# Use Good Description in Query
-		if good_description != "" and self.hyperparameters.get("good_description", "") != "":
+		if good_description != ""\
+			and self.hyperparameters.get("good_description", "") != "":
 			good_description_boost = self.hyperparameters["good_description"]
-			name_query = get_qs_query(string_cleanse(good_description), ['name'], good_description_boost)
+			name_query = get_qs_query(string_cleanse(good_description),\
+				['name'], good_description_boost)
 			should_clauses.append(name_query)
 
 		return bool_search
@@ -312,8 +332,8 @@ class Consumer(threading.Thread):
 		"""Prepare results for decision boundary"""
 
 		field_names = self.params["output"]["results"]["fields"]
-		hyperparameters = self.hyperparameters
-		params = self.params
+		#hyperparameters = self.hyperparameters
+		#params = self.params
 
 		# Must be at least one result
 		if search_results["hits"]["total"] == 0:
@@ -328,18 +348,24 @@ class Consumer(threading.Thread):
 		scores = []
 		top_hit = hits[0]
 		hit_fields = top_hit.get("fields", "")
-		
+
 		# If no results return
 		if hit_fields == "":
 			return transaction
 
 		# Collect Business Names, City Names, and State Names
-		business_names = [result.get("fields", {"name" : ""}).get("name", "") for result in hits]
-		business_names = [name[0] for name in business_names if type(name) == list]
-		city_names = [result.get("fields", {"locality" : ""}).get("locality", "") for result in hits]
+		business_names = [result.get("fields", {"name" : ""}).get("name", "")\
+			for result in hits]
+		business_names = [name[0]\
+			for name in business_names if type(name) == list]
+		city_names = [result.get("fields",\
+			{"locality" : ""}).get("locality", "")\
+			for result in hits]
 		city_names = [name[0] for name in city_names if type(name) == list]
-		state_names = [result.get("fields", {"region" : ""}).get("region", "") for result in hits]
-		state_names = [name[0] for name in state_names if type(name) == list]
+		state_names = [result.get("fields", {"region" : ""}).get("region", "")\
+			for result in hits]
+		state_names = [name[0]\
+			for name in state_names if type(name) == list]
 
 		# Need Names
 		if len(business_names) < 2:
@@ -365,16 +391,18 @@ class Consumer(threading.Thread):
 
 		# Interactive Mode (temporarily disabled)
 		#if params["mode"] == "test":
-			#args = [params, scores, transaction, hits, business_names, city_names, state_names]
+			#args = [scores, transaction, hits, business_names, city_names, state_names]
 			#self.__interactive_mode(*args)
 
 		# Enrich Data if Passes Boundary
-		args = [decision, transaction, hit_fields, z_score_delta, business_names, city_names, state_names]
+		args = [decision, transaction, hit_fields, z_score_delta,\
+			business_names, city_names, state_names]
 		enriched_transaction = self.__enrich_transaction(*args)
 
 		return enriched_transaction
 
-	def __enrich_transaction(self, decision, transaction, hit_fields, z_score_delta, business_names, city_names, state_names):
+	def __enrich_transaction(self, decision, transaction, hit_fields,\
+		z_score_delta, business_names, city_names, state_names):
 		"""Enriches the transaction if it passes the boundary"""
 
 		enriched_transaction = transaction
@@ -386,8 +414,13 @@ class Consumer(threading.Thread):
 		if decision == True:
 			for field in field_names:
 				if field in fields_in_hit:
-					field_content = hit_fields[field][0] if isinstance(hit_fields[field], (list)) else str(hit_fields[field])
-					enriched_transaction[yfm.get(field, field)] = PIPE_PATTERN.sub(" ", field_content)
+					field_content = None
+					if isinstance(hit_fields[field], (list)):
+						field_content = hit_fields[field][0]
+					else:
+						field_content = str(hit_fields[field])
+					enriched_transaction[yfm.get(field, field)] =\
+						PIPE_PATTERN.sub(" ", field_content)
 				else:
 					enriched_transaction[yfm.get(field, field)] = ""
 			enriched_transaction[yfm["z_score_delta"]] = z_score_delta
@@ -396,19 +429,23 @@ class Consumer(threading.Thread):
 		if decision == False:
 			for field in field_names:
 				enriched_transaction[yfm.get(field, field)] = ""
-			enriched_transaction = self.__business_name_fallback(business_names, transaction)
-			enriched_transaction = self.__geo_fallback(city_names, state_names, transaction)
+			enriched_transaction = self.__business_name_fallback(\
+				business_names, transaction)
+			enriched_transaction = self.__geo_fallback(city_names,\
+				state_names, transaction)
 			enriched_transaction[yfm["z_score_delta"]] = 0
 
 		# Remove Good Description
 		if enriched_transaction['GOOD_DESCRIPTION'] != "":
 			enriched_transaction[yfm['name']] = enriched_transaction['GOOD_DESCRIPTION']
-			
+
 		enriched_transaction["GOOD_DESCRIPTION"] = ""
 
 		# Ensure Proper Casing
-		if enriched_transaction[yfm['name']] == enriched_transaction[yfm['name']].upper():
-			enriched_transaction[yfm['name']] = string.capwords(enriched_transaction[yfm['name']], " ")
+		if enriched_transaction[yfm['name']] ==\
+			enriched_transaction[yfm['name']].upper():
+			enriched_transaction[yfm['name']] =\
+				string.capwords(enriched_transaction[yfm['name']], " ")
 
 		return enriched_transaction
 
@@ -421,20 +458,21 @@ class Consumer(threading.Thread):
 	def __geo_fallback(self, city_names, state_names, transaction):
 		"""Basic logic to obtain a fallback for city and state
 		when no factual_id is found"""
-
-		fields = self.params["output"]["results"]["fields"]
+		#fields = self.params["output"]["results"]["fields"]
 		yfm = get_yodlee_factual_map()
 		enriched_transaction = transaction
 		city_names = city_names[0:2]
 		state_names = state_names[0:2]
 		states_equal = state_names.count(state_names[0]) == len(state_names)
-		city_in_transaction = (city_names[0].lower() in enriched_transaction["DESCRIPTION_UNMASKED"].lower())
-		state_in_transaction = (state_names[0].lower() in enriched_transaction["DESCRIPTION_UNMASKED"].lower())
+		city_in_transaction = (city_names[0].lower()\
+			in enriched_transaction["DESCRIPTION_UNMASKED"].lower())
+		state_in_transaction = (state_names[0].lower()\
+			in enriched_transaction["DESCRIPTION_UNMASKED"].lower())
 
-		if (city_in_transaction):
+		if city_in_transaction:
 			enriched_transaction[yfm['locality']] = city_names[0]
 
-		if (states_equal and state_in_transaction):
+		if states_equal and state_in_transaction:
 			enriched_transaction[yfm['region']] = state_names[0]
 
 		return enriched_transaction
@@ -442,8 +480,7 @@ class Consumer(threading.Thread):
 	def __business_name_fallback(self, business_names, transaction):
 		"""Basic logic to obtain a fallback for business name
 		when no factual_id is found"""
-		
-		fields = self.params["output"]["results"]["fields"]
+		#fields = self.params["output"]["results"]["fields"]
 		yfm = get_yodlee_factual_map()
 
 		# Default to CT Names if Available
@@ -457,8 +494,9 @@ class Consumer(threading.Thread):
 		all_equal = business_names.count(business_names[0]) == len(business_names)
 		not_a_city = top_name not in self.cities
 
-		if (all_equal and not_a_city):
-			enriched_transaction[yfm['name']] = PIPE_PATTERN.sub(" ", business_names[0])
+		if all_equal and not_a_city:
+			enriched_transaction[yfm['name']] =\
+				PIPE_PATTERN.sub(" ", business_names[0])
 
 		return enriched_transaction
 
@@ -469,14 +507,15 @@ class Consumer(threading.Thread):
 	def __search_index(self, input_as_object):
 		"""Searches the merchants index and the merchant mapping"""
 		logger = logging.getLogger("thread " + str(self.thread_id))
-		input_data = json.dumps(input_as_object, sort_keys=True, indent=4\
-		, separators=(',', ': ')).encode('UTF-8')
+		#input_data = json.dumps(input_as_object, sort_keys=True, indent=4\
+		#, separators=(',', ': ')).encode('UTF-8')
 
 		output_data = ""
 
 		try:
-			output_data = self.es_connection.search(
-				index=self.params["elasticsearch"]["index"], body=input_as_object)
+			output_data = self.es_connection.search(\
+				index=self.params["elasticsearch"]["index"],\
+				body=input_as_object)
 		except Exception:
 			logging.critical("Unable to process the following: %s",\
 				str(input_as_object))
@@ -501,6 +540,7 @@ class Consumer(threading.Thread):
 		transaction_id = transaction["UNIQUE_TRANSACTION_ID"]
 		date = transaction["TRANSACTION_DATE"].replace(".", "-")
 		date = date.replace("/", "-")
+		# pylint: disable=bad-continuation
 		update_body = {
 			"date": date,
 			"_parent": transaction["UNIQUE_MEM_ID"],
@@ -533,12 +573,13 @@ class Consumer(threading.Thread):
 	def __get_boosted_fields(self, vector_name):
 		"""Returns a list of boosted fields built from a boost vector"""
 		boost_vector = self.boost_column_vectors[vector_name]
-		return [x + "^" + str(y)
-		for x, y in zip(self.boost_row_labels, boost_vector)
-		if y != 0.0]
+		return [x + "^" + str(y)\
+			for x, y in zip(self.boost_row_labels, boost_vector)\
+			if y != 0.0]
 
 	def __set_logger(self):
 		"""Creates a logger, based upon the supplied config object."""
+		# pylint: disable=bad-continuation
 		levels = {
 			'debug': logging.DEBUG, 'info': logging.INFO,
 			'warning': logging.WARNING, 'error': logging.ERROR,
@@ -597,6 +638,6 @@ class Consumer(threading.Thread):
 
 		return True
 
+#Print a warning to not execute this file as a module
 if __name__ == "__main__":
-	"""Print a warning to not execute this file as a module"""
 	print("This module is a Class; it should not be run from the console.")
