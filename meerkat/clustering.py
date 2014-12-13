@@ -9,25 +9,25 @@ find the outermost points that bound a users typical shopping area
 represented as geopolygons, scale these polygons inward or outward, and
 then generate a geopolygon query for ElasticSearch. This added context
 allows Meerkat to resolve ambiguous transactions that may not include a
-City or State to aid in indentification. 
+City or State to aid in indentification.
 
 Created on March 16, 2014
 @author: Matthew Sevrens
 """
 
-import sys
+#import sys
 
 import pylab as pl
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 from sklearn.cluster import DBSCAN
-from sklearn import metrics
-from sklearn.datasets.samples_generator import make_blobs
+#from sklearn import metrics
+#from sklearn.datasets.samples_generator import make_blobs
 from sklearn.preprocessing import StandardScaler
 from scipy.spatial import ConvexHull
 
-from pprint import pprint
+#from pprint import pprint
 
 def cluster(location_list):
 	"""Cluster Points"""
@@ -52,7 +52,7 @@ def plot_clustering(model, normalized_points):
 
 	core_samples = model.core_sample_indices_
 	labels = model.labels_
-	n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
+	#n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
 	unique_labels = set(labels)
 	colors = pl.cm.Spectral(np.linspace(0, 1, len(unique_labels)))
 
@@ -61,7 +61,8 @@ def plot_clustering(model, normalized_points):
 			# Noise throws off visualization
 			continue
 		class_members = [index[0] for index in np.argwhere(labels == k)]
-		cluster_core_samples = [index for index in core_samples if labels[index] == k]
+		#cluster_core_samples = [index for index in core_samples if labels[index] == k]
+		_ = [index for index in core_samples if labels[index] == k]
 		for index in class_members:
 			x = normalized_points[index]
 			markersize = 5
@@ -79,12 +80,12 @@ def collect_clusters(scaled_points, labels, location_list):
 	for label in unique_labels:
 		if label == -1:
 			continue
-		cluster, location = [], []
+		my_cluster, location = [], []
 		for index, item in enumerate(labels):
 			if item == label:
-				cluster.append(scaled_points[index])
+				my_cluster.append(scaled_points[index])
 				location.append(location_list[index])
-		clusters.append(cluster)
+		clusters.append(my_cluster)
 		locations.append(location)
 
 	geoshape_list = convex_hull(clusters, locations)
@@ -102,12 +103,13 @@ def convex_hull(clusters, locations):
 	that bound those clusters"""
 
 	locations = np.array(locations)
-	geoshapes, scaled_geoshapes = [], []
+	#geoshapes, scaled_geoshapes = [], []
+	geoshapes = []
 
-	for index, cluster in enumerate(clusters):
+	for index, my_cluster in enumerate(clusters):
 
 		lat_lon_points = np.array(locations[index])
-		points = np.array(cluster)
+		points = np.array(my_cluster)
 		hull = ConvexHull(points)
 		geoshape = []
 
@@ -130,7 +132,6 @@ def convex_hull(clusters, locations):
 def convert_geoshapes_coordinates_to_strings(geoshape_list):
 	"""Returns a copy of geoshape_list where each coordinate is formatted as a comma
 	separated pair of string values. """
-	
 	new_geoshape_list = []
 	for geoshape in geoshape_list:
 		new_geoshape = []
@@ -143,6 +144,6 @@ def convert_geoshapes_coordinates_to_strings(geoshape_list):
 
 	return new_geoshape_list
 
+#Print a warning to not execute this file as a module"""
 if __name__ == "__main__":
-	"""Print a warning to not execute this file as a module"""
 	print("This module is a library that contains useful functions; it should not be run from the console.")
