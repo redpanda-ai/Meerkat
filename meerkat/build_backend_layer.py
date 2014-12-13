@@ -1,4 +1,4 @@
-"""This module creates an Elasticsearch stack on Amazon EC2."""
+"""This module creates an Elasticsearch cluster on Amazon EC2."""
 import boto
 import fileinput
 import json
@@ -134,7 +134,7 @@ def configure_servers(params):
 
 
 def confirm_security_groups(conn, params):
-	"""Confirms that the security groups we need for accessng our stack
+	"""Confirms that the security groups we need for accessng our cluster
 	are correctly in place"""
 	existing_groups = params["security_groups"]
 	existing_group_count = len(existing_groups)
@@ -188,7 +188,7 @@ def copy_configuration_to_hosts(params, dst_file):
 		ssh.close()
 
 def create_security_group(conn, name, vpc):
-	"""Creates a new security group for our stack."""
+	"""Creates a new security group for our cluster."""
 	try:
 		my_security_group = conn.create_security_group(name, name, vpc)
 		print("Added {0}".format(my_security_group))
@@ -285,7 +285,7 @@ def initialize():
 	"""Validates the command line arguments."""
 	input_file, params = None, None
 	if len(sys.argv) != 3:
-		print("Supply the following arguments: config_file, stack-name")
+		print("Supply the following arguments: config_file, cluster-name")
 		raise InvalidArguments(msg="Incorrect number of arguments", expr=None)
 	try:
 		input_file = open(sys.argv[1], encoding='utf-8')
@@ -432,7 +432,7 @@ def send_shell_commands(params, command_set, instance_list):
 			time.sleep(10)
 
 def start():
-	"""This function runs the entire sequence needed to build a stack."""
+	"""This function runs the entire sequence needed to build a cluster."""
 	logging.basicConfig(filename='boto.log', level=logging.DEBUG)
 	params = initialize()
 	my_region = boto.ec2.get_region(params["region"])
