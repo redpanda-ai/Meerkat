@@ -1,6 +1,7 @@
 {
 	"region" : "us-west-2",
 	"vpc-id" : "vpc-a930dacc",
+	"subnet-id" : "subnet-ad253cd9",
 	"security_groups" : [
 		"github",
 		"meerkat_private",
