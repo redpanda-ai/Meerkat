@@ -36,6 +36,8 @@ def create_bloom_filter(src_filename, dst_filename):
 	return sbf
 
 def get_bloom_filter():
+	"""Attempts to fetch a bloom filter from a file, making a new bloom filter
+	if that is not possible."""
 	sbf = None
 	try:
 		sbf = ScalableBloomFilter.fromfile(open("stats/location_bloom", "br"))
@@ -46,6 +48,8 @@ def get_bloom_filter():
 	return sbf
 
 def test_bloom_filter(sbf):
+	"""Does a basic run through US and Canadian locations, looking for probable
+	membership."""
 	canadian_locations = [
 		("TORONTO", "ON"),
 		("MONTREAL", "QB"),
@@ -68,5 +72,6 @@ def test_bloom_filter(sbf):
 	for location in us_locations:
 		print(line.format(location, location in sbf))
 
+# MAIN PROGRAM
 my_bloom_filter = get_bloom_filter()
 test_bloom_filter(my_bloom_filter)
