@@ -62,7 +62,11 @@ def test_bloom_filter(sbf):
 		("HIGHGATE FALLS", "VT"),
 		("SAN JOSE", "CA"),
 		("WEST MONROE", "LA"),
-		("DILLARD", "GA")
+		("DILLARD", "GA"),
+		("FAKE CITY", "CA"),
+		("CARSON CITY", "NV"),
+		("SAINT LOUIS", "MO"),
+		("SUNNYVALE", "CA")
 	]
 	print("Touring Canada")
 	line = "{0} in bloom filter: {1}"
@@ -73,5 +77,6 @@ def test_bloom_filter(sbf):
 		print(line.format(location, location in sbf))
 
 # MAIN PROGRAM
-my_bloom_filter = get_bloom_filter()
-test_bloom_filter(my_bloom_filter)
+if __name__ == "__main__":
+	my_bloom_filter = get_bloom_filter()
+	test_bloom_filter(my_bloom_filter)

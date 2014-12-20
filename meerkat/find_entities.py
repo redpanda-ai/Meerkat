@@ -53,6 +53,7 @@ def start():
 	pd.set_option('max_rows', 5000)
 	#pd.set_option('display.max_colwidth', 60)
 	print(combined)
+	print(bloom_results.describe())
 if __name__ == "__main__":
 	my_bloom = get_bloom_filter()
 	start()
