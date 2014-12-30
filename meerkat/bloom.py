@@ -16,7 +16,7 @@ def get_json_from_file(input_filename):
 		sys.exit()
 	return None
 
-def create_bloom_filter(src_filename, dst_filename):
+def create_location_bloom(src_filename, dst_filename):
 	"""Creates a bloom filter from the provided input file."""
 	sbf = ScalableBloomFilter(initial_capacity=100000, error_rate=0.001,\
 		mode=ScalableBloomFilter.SMALL_SET_GROWTH)
@@ -35,16 +35,65 @@ def create_bloom_filter(src_filename, dst_filename):
 
 	return sbf
 
-def get_bloom_filter():
+def create_merchant_bloom(src_filename, dst_filename, partial_filename):
+	"""Creates a bloom filter from the provided input file."""
+	m_bloom = ScalableBloomFilter(initial_capacity=5000, error_rate=0.001,\
+		mode=ScalableBloomFilter.SMALL_SET_GROWTH)
+	p_bloom = ScalableBloomFilter(initial_capacity=5000, error_rate=0.001,\
+		mode=ScalableBloomFilter.SMALL_SET_GROWTH)
+	merchants = get_json_from_file(src_filename)
+
+	count, limit = 0, 500
+	buckets = merchants["aggregations"]["merchants"]["buckets"]
+	#Iterate through merchant names
+	for bucket in buckets:
+		if count >= limit:
+			break
+		count += 1
+		merchant_name = bucket["key"].upper()
+		#Add full merchant names to merchant bloom
+		print("Adding '{0}'".format(merchant_name))
+		m_bloom.add(merchant_name)
+		#Handle partial merchant names to partial bloom
+		splits = merchant_name.split()
+		if len(splits) > 1:
+			for i in range(1,len(splits)):
+				partial = " ".join(splits[:i])
+				print("\tAdding '{0}'".format(partial))
+				p_bloom.add(partial)
+
+	with open(dst_filename, "bw+") as merchant_bloom:
+		m_bloom.tofile(merchant_bloom)
+	with open(partial_filename, "bw+") as partial_bloom:
+		p_bloom.tofile(partial_bloom)
+
+	return m_bloom, p_bloom
+
+
+def get_merchant_bloom():
+	"""Attempts to fetch a bloom filter from a file, making a new bloom filter
+	if that is not possible."""
+	sbf, partial = None, None
+	try:
+		sbf = ScalableBloomFilter.fromfile(open("stats/merchant_bloom", "br"))
+		partial = ScalableBloomFilter.fromfile(open("stats/partial_merchant_bloom", "br"))
+		print("Full merchant bloom filter loaded from file.")
+		print("Partial merchant bloom filter loaded from file.")
+	except:
+		print("Creating merchant bloom filters")
+		sbf, partial = create_merchant_bloom("stats/merchant_names.json", "stats/merchant_bloom", "stats/partial_merchant_bloom")
+	return sbf, partial
+
+def get_location_bloom():
 	"""Attempts to fetch a bloom filter from a file, making a new bloom filter
 	if that is not possible."""
 	sbf = None
 	try:
 		sbf = ScalableBloomFilter.fromfile(open("stats/location_bloom", "br"))
-		print("Bloom filter loaded from file.")
+		print("Location bloom filter loaded from file.")
 	except:
 		print("Creating new bloom filter")
-		sbf = create_bloom_filter("stats/locations.json", "stats/location_bloom")
+		sbf = create_location_bloom("stats/locations.json", "stats/location_bloom")
 	return sbf
 
 def test_bloom_filter(sbf):
@@ -78,5 +127,7 @@ def test_bloom_filter(sbf):
 
 # MAIN PROGRAM
 if __name__ == "__main__":
-	my_bloom_filter = get_bloom_filter()
-	test_bloom_filter(my_bloom_filter)
+	my_location_bloom = get_location_bloom()
+	#test_bloom_filter(my_location_bloom)
+	my_merchant_bloom, my_partial_merchant_bloom = get_merchant_bloom()
+
