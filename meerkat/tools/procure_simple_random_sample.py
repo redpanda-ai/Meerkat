@@ -17,9 +17,7 @@ def get_header(input_file):
 	with gzip.open(input_file, "rb") as gzipped_input:
 		#is_first_line = True
 		for line in gzipped_input:
-			line = clean_line(line)
-			header = "SHUFFLE_ID|" + line
-			return header
+			return clean_line(line)
 
 def count_me(input_file):
 	logging.critical("Counting %s", input_file)
