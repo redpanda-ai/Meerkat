@@ -62,8 +62,16 @@ def run_from_command_line(command_line_arguments):
 	"""Runs these commands if the module is invoked from the command line"""
 
 	verify_arguments()
-	params = load_params(sys.argv[1])
+	params = {}
 	params = add_local_params(params)
+	df = pd.read_csv(sys.argv[1], na_filter=False, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+
+	# Step 1: Load merchant sample with pandas
+	# Step 2: Select Transactions and Merchant Name
+	# Step 3: Verify Merchant Name and Prompt for rename if necessary 
+	# Step 4: Prompt User for Username
+	# Step 5: Loop through each row (until completion or save out) and prompt for 1: Is this Merchant, 0: Is not this merchant, 2: Skip - Not Sure 
+	# Step 6: On key to save to file, map decision column with username as header back to dataframe and save out file
 	
 if __name__ == "__main__":
 	run_from_command_line(sys.argv)

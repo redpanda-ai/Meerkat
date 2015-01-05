@@ -177,8 +177,8 @@ def load_dataset(params):
 	# Filter Verification File
 	for i in range(len(verified_transactions)):
 		curr = verified_transactions[i]
-		if curr["factual_id"] != "":
-			dataset.append(curr)
+		curr["factual_id"] = ""
+		dataset.append(curr)
 
 	return dataset
 

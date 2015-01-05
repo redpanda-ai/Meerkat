@@ -51,28 +51,28 @@ def test_pinpoint_classifier(machine_labeled, human_labeled, my_lists):
 		progress(row_index, machine_labeled, message="complete with accuracy tests")
 
 		# Our confidence was not high enough to label
-		if machine_labeled_row["factual_id"] == "":
+		if machine_labeled_row["FACTUAL_ID"] == "":
 			my_lists["unlabeled"].append(machine_labeled_row['DESCRIPTION_UNMASKED'])
 			continue
 		# Verify against human labeled
 		for index, human_labeled_row in enumerate(human_labeled):
 			if machine_labeled_row['DESCRIPTION_UNMASKED'] == \
 				human_labeled_row['DESCRIPTION_UNMASKED']:
-				if human_labeled_row["factual_id"] == "":
+				if human_labeled_row["FACTUAL_ID"] == "":
 					# Transaction is not yet labeled
 					my_lists["needs_hand_labeling"].append(\
 						machine_labeled_row['DESCRIPTION_UNMASKED'])
 					break
-				elif machine_labeled_row["factual_id"] == human_labeled_row["factual_id"]:
+				elif machine_labeled_row["FACTUAL_ID"] == human_labeled_row["FACTUAL_ID"]:
 					# Transaction was correctly labeled
 					my_lists["correct"].append(human_labeled_row['DESCRIPTION_UNMASKED']\
-						+ " (ACTUAL:" + human_labeled_row["factual_id"] + ")")
+						+ " (ACTUAL:" + human_labeled_row["FACTUAL_ID"] + ")")
 					break
 				else:
 					# Transaction is mislabeled
 					my_lists["mislabeled"].append(human_labeled_row['DESCRIPTION_UNMASKED']\
-						+ " (ACTUAL: " + human_labeled_row["factual_id"] + ")"\
-						+ " (FOUND: " + machine_labeled_row["factual_id"] + ")")
+						+ " (ACTUAL: " + human_labeled_row["FACTUAL_ID"] + ")"\
+						+ " (FOUND: " + machine_labeled_row["FACTUAL_ID"] + ")")
 					break
 			elif index + 1 == len(human_labeled):
 				my_lists["needs_hand_labeling"].append(\
