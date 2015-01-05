@@ -36,21 +36,19 @@ def nostderr():
 def verify_arguments():
 	"""Verify Usage"""
 
-	sufficient_arguments = (len(sys.argv) == 5)
+	sufficient_arguments = (len(sys.argv) == 2)
 
 	if not sufficient_arguments:
 		safe_print("Insufficient arguments. Please see usage")
 		sys.exit()
 
-	config = sys.argv[1]
-	factual_list = sys.argv[2]
+	sample = sys.argv[1]
 
-	config_included = config.endswith('.json')
-	factual_list_included = factual_list.endswith('.txt')
+	sample_included = sample.endswith('.txt')
 
-	if not config_included  or not factual_list_included:
+	if not sample_included:
 		safe_print("Erroneous arguments. Please see usage")
-		sys.exit()
+		sys.exit()							
 
 def add_local_params(params):
 	"""Adds additional local params"""
