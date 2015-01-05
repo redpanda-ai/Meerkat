@@ -1,4 +1,5 @@
 import csv
+import gzip
 import sys
 import logging
 
@@ -10,7 +11,7 @@ def sort_the_file(my_file):
 	my_map = defaultdict(list)
 	count = 0
 	tock = 20000
-	with open(my_file, 'r') as file_one:
+	with gzip.open(my_file, 'rt') as file_one:
 		csv_reader = csv.reader(file_one, delimiter='|')
 		first_line = True
 		for row in csv_reader:
@@ -48,7 +49,7 @@ def merge_the_files(expected_lines):
 	match_count, all_count, tick = 0, 0, 10000
 	tick = int(expected_lines / 20)
 	entry_a, entry_b = None, None
-	with open(merged_file, 'w') as f_out:
+	with gzip.open(merged_file, 'wt') as f_out:
 		header_line = "|".join(header_1) + "|".join(remainder) + "\n"
 		f_out.write(header_line)
 		while map_1 and map_2 and all_count < expected_lines:
