@@ -5,6 +5,12 @@ import logging
 
 from collections import defaultdict, OrderedDict
 
+#Usage
+# python3.3 -m meerkat.tools.merge_ct_and_meerkat_panel <gzipped_ct_file> <gzipped_meerkat_file> <gzipped_merged_file>
+
+#Example
+# python3.3 -m meerkat.tools.merge_ct_and_meerkat_panel ct_file.txt.gz meerkat_file.txt.gz merged_file.txt.gz
+
 def sort_the_file(my_file):
 	logging.warning("Reading {0}".format(my_file))
 	my_header = defaultdict(list)
