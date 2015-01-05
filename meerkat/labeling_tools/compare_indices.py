@@ -12,8 +12,8 @@ Created on July 21, 2014
 #################### USAGE ##########################
 
 # Note: In Progress
-# python3.3 -m meerkat.compare_indices [config_file] [labeled_transactions] [old_index] [new_index]
-# python3.3 -m meerkat.compare_indices config/test.json data/misc/ground_truth_card.txt factual_index factual_index_2
+# python3.3 -m meerkat.labeling_tools.compare_indices [config_file] [labeled_transactions] [old_index] [new_index]
+# python3.3 -m meerkat.labeling_tools.compare_indices config/test.json data/misc/ground_truth_card.txt factual_index factual_index_2
 
 # Required Columns: 
 # DESCRIPTION_UNMASKED
@@ -34,7 +34,7 @@ from pprint import pprint
 from copy import deepcopy
 from scipy.stats.mstats import zscore
 
-from meerkat.description_consumer import get_qs_query, get_bool_query
+from meerkat.consumer import get_qs_query, get_bool_query
 from meerkat.various_tools import load_params, get_es_connection, string_cleanse
 from meerkat.various_tools import get_merchant_by_id, load_dict_ordered, write_dict_list
 from meerkat.various_tools import safe_print, synonyms, get_magic_query, stopwords
@@ -801,7 +801,7 @@ def add_local_params(params):
 		"id_changed" : [],
 		"details_changed" : [],
 		"skipped" : [],
-		"relinked" : []
+		"relinked" : [],
 		"unlinked" : [],
 		"user_context" : collections.defaultdict(list),
 		"user_cities" : collections.defaultdict(list)
