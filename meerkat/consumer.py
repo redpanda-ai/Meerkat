@@ -28,7 +28,7 @@ from scipy.stats.mstats import zscore
 from pprint import pprint
 
 from .various_tools import string_cleanse, synonyms, get_yodlee_factual_map
-from .various_tools import get_bool_query, get_qs_query
+from .various_tools import get_bool_query, get_qs_query, safe_print
 from .clustering import cluster, collect_clusters
 from .location import separate_geo, scale_polygon, get_geo_query
 
@@ -132,9 +132,9 @@ class Consumer(threading.Thread):
 		z_score_delta = round(first_score - second_score, 3)
 		logger.info("Z-Score delta: [%.2f]", z_score_delta)
 
-		return z_score_delta
+		return z_score_delta, z_scores[0]
 
-	def __decision_boundary(self, z_score_delta):
+	def __decision_boundary(self, z_score_delta, raw_score):
 		"""Decide whether or not we will label transaction
 		by factual_id"""
 
@@ -386,8 +386,8 @@ class Consumer(threading.Thread):
 		for hit in hits:
 			scores.append(hit['_score'])
 
-		z_score_delta = self.__generate_z_score_delta(scores)
-		decision = self.__decision_boundary(z_score_delta)
+		z_score_delta, raw_score = self.__generate_z_score_delta(scores)
+		decision = self.__decision_boundary(z_score_delta, raw_score)
 
 		# Interactive Mode (temporarily disabled)
 		#if params["mode"] == "test":
