@@ -88,7 +88,8 @@ def generic_test(machine, human, lists, column):
 
 	# Create Quicker Lookup
 	for index, row in enumerate(human):
-		index_lookup[row[doc_label]] = index
+		key = str(row["UNIQUE_MEM_ID"]) + row[doc_label]
+		index_lookup[key] = index
 
 	# Test Each Machine Labeled Row
 	for index, mRow in enumerate(machine):
@@ -102,7 +103,8 @@ def generic_test(machine, human, lists, column):
 			continue
 
 		# Verify Accuracy
-		h_index = index_lookup.get(mRow[doc_label], "")
+		key = str(mRow["UNIQUE_MEM_ID"]) + mRow[doc_label]
+		h_index = index_lookup.get(key, "")
 
 		# Sort Into Lists
 		if h_index == "":
