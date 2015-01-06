@@ -54,9 +54,10 @@ class Consumer(threading.Thread):
 	def __interactive_mode(self, scores, transaction, hits,\
 		business_names, city_names, state_names):
 		"""Interact with the results as they come"""
+
 		score = scores[0]
-		z_score = self.__generate_z_score_delta(scores)
-		decision = self.__decision_boundary(z_score)
+		z_score, raw_score = self.__generate_z_score_delta(scores)
+		decision = self.__decision_boundary(z_score, raw_score)
 		description = ' '.join(transaction["DESCRIPTION_UNMASKED"].split())
 		first_hit = hits[0]["fields"]
 		fields_to_get = ["name", "region", "locality",\
@@ -114,9 +115,9 @@ class Consumer(threading.Thread):
 		field_content = [transaction['GOOD_DESCRIPTION']] + field_content
 		attributes = attributes.format(*field_content)
 
-		#prompt = stats + "\n\n" + attributes
-		#print(prompt)
-		#user = input(prompt)
+		prompt = stats + "\n\n" + attributes
+		print(prompt)
+		user = input(prompt)
 
 	def __generate_z_score_delta(self, scores):
 		"""Generate the Z-score delta between the first and second scores."""
@@ -389,10 +390,10 @@ class Consumer(threading.Thread):
 		z_score_delta, raw_score = self.__generate_z_score_delta(scores)
 		decision = self.__decision_boundary(z_score_delta, raw_score)
 
-		# Interactive Mode (temporarily disabled)
-		#if params["mode"] == "test":
-			#args = [scores, transaction, hits, business_names, city_names, state_names]
-			#self.__interactive_mode(*args)
+		# Interactive Mode 
+		if self.params["mode"] == "test":
+			args = [scores, transaction, hits, business_names, city_names, state_names]
+			self.__interactive_mode(*args)
 
 		# Enrich Data if Passes Boundary
 		args = [decision, transaction, hit_fields, z_score_delta,\
