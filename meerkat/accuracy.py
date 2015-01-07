@@ -39,7 +39,7 @@ from pprint import pprint
 
 from meerkat.various_tools import (load_dict_list, progress)
 
-def test_pinpoint_classifier(machine_labeled, human_labeled, my_lists):
+def test_pinpoint_classifier(machine_labeled, human_labeled, my_lists, column):
 	"""Tests both the recall and precision of the pinpoint classifier against
 	human-labeled training data."""
 
@@ -51,32 +51,76 @@ def test_pinpoint_classifier(machine_labeled, human_labeled, my_lists):
 		progress(row_index, machine_labeled, message="complete with accuracy tests")
 
 		# Our confidence was not high enough to label
-		if machine_labeled_row["factual_id"] == "":
+		if machine_labeled_row[column] == "":
 			my_lists["unlabeled"].append(machine_labeled_row['DESCRIPTION_UNMASKED'])
 			continue
 		# Verify against human labeled
 		for index, human_labeled_row in enumerate(human_labeled):
 			if machine_labeled_row['DESCRIPTION_UNMASKED'] == \
 				human_labeled_row['DESCRIPTION_UNMASKED']:
-				if human_labeled_row["factual_id"] == "":
+				if human_labeled_row[column] == "":
 					# Transaction is not yet labeled
 					my_lists["needs_hand_labeling"].append(\
 						machine_labeled_row['DESCRIPTION_UNMASKED'])
 					break
-				elif machine_labeled_row["factual_id"] == human_labeled_row["factual_id"]:
+				elif machine_labeled_row[column] == human_labeled_row[column]:
 					# Transaction was correctly labeled
 					my_lists["correct"].append(human_labeled_row['DESCRIPTION_UNMASKED']\
-						+ " (ACTUAL:" + human_labeled_row["factual_id"] + ")")
+						+ " (ACTUAL:" + human_labeled_row[column] + ")")
 					break
 				else:
 					# Transaction is mislabeled
 					my_lists["mislabeled"].append(human_labeled_row['DESCRIPTION_UNMASKED']\
-						+ " (ACTUAL: " + human_labeled_row["factual_id"] + ")"\
-						+ " (FOUND: " + machine_labeled_row["factual_id"] + ")")
+						+ " (ACTUAL: " + human_labeled_row[column] + ")"\
+						+ " (FOUND: " + machine_labeled_row[column] + ")")
 					break
 			elif index + 1 == len(human_labeled):
 				my_lists["needs_hand_labeling"].append(\
 					machine_labeled_row['DESCRIPTION_UNMASKED'])
+
+def generic_test(machine, human, lists, column):
+	"""Tests both the recall and precision of the pinpoint classifier against
+	human-labeled training data."""
+
+	sys.stdout.write('\n')
+	doc_label = 'DESCRIPTION_UNMASKED'
+	index_lookup = {}
+
+	# Create Quicker Lookup
+	for index, row in enumerate(human):
+		key = str(row["UNIQUE_MEM_ID"]) + row[doc_label]
+		index_lookup[key] = index
+
+	# Test Each Machine Labeled Row
+	for index, mRow in enumerate(machine):
+
+		# Display progress
+		progress(index, machine, message="complete with accuracy tests")
+
+		# Continue if Unlabeled
+		if mRow[column] == "":
+			lists["unlabeled"].append(row[doc_label])
+			continue
+
+		# Verify Accuracy
+		key = str(mRow["UNIQUE_MEM_ID"]) + mRow[doc_label]
+		h_index = index_lookup.get(key, "")
+
+		# Sort Into Lists
+		if h_index == "":
+			lists["needs_hand_labeling"].append(mRow[doc_label])
+			continue
+		else: 
+			hRow = human[h_index]
+			if hRow[column] == "":
+				lists["needs_hand_labeling"].append(mRow[doc_label])
+				continue
+			elif mRow[column] == hRow[column]:
+				lists["correct"].append(hRow[doc_label] + " (ACTUAL:" + hRow[column] + ")")
+				continue
+			else:
+				lists["mislabeled"].append(hRow[doc_label] + " (ACTUAL: " + hRow[column] + ")" + " (FOUND: " + mRow[column] + ")")
+				continue
 
 def test_bulk_classifier(human_labeled, non_physical_trans, my_lists):
 	"""Tests for accuracy of the bulk (binary) classifier"""
@@ -138,7 +182,8 @@ def test_accuracy(params, file_path=None, non_physical_trans=None,\
 	}
 
 	# Test Pinpoint Classifier for recall and precision
-	test_pinpoint_classifier(machine_labeled, human_labeled, my_lists)
+	generic_test(machine_labeled, human_labeled, my_lists, "FACTUAL_ID")
+	#test_pinpoint_classifier(machine_labeled, human_labeled, my_lists, "MERCHANT_NAME")
 
 	# Test Bulk (binary) Classifier for accuracy
 	#test_bulk_classifier(human_labeled, non_physical_trans, my_lists)

@@ -44,7 +44,7 @@ from numpy import array, array_split
 from meerkat.consumer import Consumer
 from meerkat.binary_classifier.load import select_model
 from meerkat.accuracy import print_results, test_accuracy
-from meerkat.various_tools import load_dict_list, queue_to_list, safe_print
+from meerkat.various_tools import load_dict_list, queue_to_list, safe_print, get_us_cities
 from meerkat.various_tools import load_params, load_hyperparameters, progress
 
 class DummyFile(object):
@@ -134,10 +134,11 @@ def run_meerkat(params, desc_queue, hyperparameters):
 
 	consumer_threads = params.get("concurrency", 8)
 	result_queue = queue.Queue()
+	cities = get_us_cities()
 
 	# Suppress Output and Classify
 	for i in range(consumer_threads):
-		new_consumer = Consumer(i, params, desc_queue, result_queue, hyperparameters)
+		new_consumer = Consumer(i, params, desc_queue, result_queue, hyperparameters, cities)
 		new_consumer.setDaemon(True)
 		new_consumer.start()
 
@@ -176,8 +177,8 @@ def load_dataset(params):
 	# Filter Verification File
 	for i in range(len(verified_transactions)):
 		curr = verified_transactions[i]
-		if curr["factual_id"] != "":
-			dataset.append(curr)
+		curr["factual_id"] = ""
+		dataset.append(curr)
 
 	return dataset
 
@@ -459,8 +460,6 @@ def run_from_command_line(command_line_arguments):
 	}
 
 	hyperparameters = {
-		"dispersed.address.street_part" : "1.012",
-		"dispersed.address.number_part" : "0.812",
 		"address" : "0",          
 	    "address_extended" : "0",          
 	    "locality" : "1.367",         
