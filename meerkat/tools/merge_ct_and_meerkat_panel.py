@@ -6,77 +6,20 @@ import logging
 import os
 import re
 import sys
-import threading
 
 from collections import defaultdict, OrderedDict
 from boto.s3.connection import Location, Key
 from meerkat.various_tools import safely_remove_file
 
 #Usage
-# python3.3 -m meerkat.tools.merge_ct_and_meerkat_panel <gzipped_ct_file> <gzipped_meerkat_file> <gzipped_merged_file>
+# python3.3 -m meerkat.tools.merge_ct_and_meerkat_panel <path_to_configuration_file>
 
 #Example
-# python3.3 -m meerkat.tools.merge_ct_and_meerkat_panel ct_file.txt.gz meerkat_file.txt.gz merged_file.txt.gz
+# python3.3 -m meerkat.tools.merge_ct_and_meerkat_panel config/card_merge.json
 
 def diff(a, b):
 	b = set(b)
 	return [aa for aa in a if aa not in b]
-
-def inter(a, b):
-	b = set(b)
-	return [aa for aa in a if aa in b]
-
-def get_s3_contents(bucket_name, sub_dir):
-	bucket = CONN.get_bucket(bucket_name, Location.USWest2)
-	my_filter = re.compile(PARAMS["filter"])
-	#my_key = re.compile(".*/([^/]+)")
-	#list = []
-	#items = [j for j in bucket.list(prefix=sub_dir) if my_filter.search(j.key)]
-	#list = [j.key for j in bucket.list(prefix=sub_dir) if my_filter.search(j.key)]
-	#keys = [my_key.search(k).group(1) for k in list if my_key.search(k)]
-	#print("Keys are")
-	#for k in keys:
-	#	print(k)
-	return [j for j in bucket.list(prefix=sub_dir) if my_filter.search(j.key)]
-	#return items, keys
-
-def get_pending_list():
-	lists = []
-	my_key = re.compile(".*/([^/]+)")
-	#logging.critical("-> {0}".format((PARAMS["S3"])))
-	for s3_dir in PARAMS["S3"]:
-		list = [j.key for j in s3_dir["s3_objects"] ]
-		keys = [my_key.search(k).group(1) for k in list if my_key.search(k)]
-		lists.append(keys)
-	my_inter = inter(lists[0], lists[1])
-	return diff(my_inter, lists[2])
-
-def set_s3():
-	my_re = re.compile("S3://([^/]+)/(.*/)")
-	for s3_dir in PARAMS["S3"]:
-		path = s3_dir["path"]
-		if my_re.match(path):
-			matches = my_re.search(path)
-			bucket, sub_dir = matches.group(1), matches.group(2)
-			s3_dir["bucket"] = bucket
-			s3_dir["sub_dir"] = sub_dir
-			#contents = get_s3_contents(bucket, sub_dir)
-			s3_dir["s3_objects"] = get_s3_contents(bucket, sub_dir)
-			#s3_dir["s3_objects"] = get_s3_contents(bucket, sub_dir)
-			logging.warning("{0} contains {1} items.".format(sub_dir, len(s3_dir["s3_objects"])))
-			#logging.warning("Bucket, Subdir -> {0}, {1}".format(bucket, sub_dir))
-		else:
-			logging.warning("Path is invalid")
-
-def set_directories():
-	for dir in PARAMS["local"]:
-		path = dir["path"]
-		if not os.path.exists(path):
-			logging.warning("{0} does not exist.".format(path))
-			os.makedirs(path)
-			logging.warning("{0} created.".format(path))
-		else:
-			logging.debug("{0} found, continuing.".format(path))
 
 def initialize():
 	"""Validates the command line arguments."""
@@ -93,6 +36,50 @@ def initialize():
 		logging.error("%s not found, aborting.", sys.argv[1])
 		sys.exit()
 	return params
+
+def inter(a, b):
+	b = set(b)
+	return [aa for aa in a if aa in b]
+
+def get_pending_list():
+	lists = []
+	my_key = re.compile(".*/([^/]+)")
+	#logging.critical("-> {0}".format((PARAMS["S3"])))
+	for s3_dir in PARAMS["S3"]:
+		list = [j.key for j in s3_dir["s3_objects"] ]
+		keys = [my_key.search(k).group(1) for k in list if my_key.search(k)]
+		lists.append(keys)
+	my_inter = inter(lists[0], lists[1])
+	return diff(my_inter, lists[2])
+
+def get_s3_contents(bucket_name, sub_dir):
+	bucket = CONN.get_bucket(bucket_name, Location.USWest2)
+	my_filter = re.compile(PARAMS["filter"])
+	return [j for j in bucket.list(prefix=sub_dir) if my_filter.search(j.key)]
+
+def set_s3():
+	my_re = re.compile("S3://([^/]+)/(.*/)")
+	for s3_dir in PARAMS["S3"]:
+		path = s3_dir["path"]
+		if my_re.match(path):
+			matches = my_re.search(path)
+			bucket, sub_dir = matches.group(1), matches.group(2)
+			s3_dir["bucket"] = bucket
+			s3_dir["sub_dir"] = sub_dir
+			s3_dir["s3_objects"] = get_s3_contents(bucket, sub_dir)
+			logging.warning("{0} contains {1} items.".format(sub_dir, len(s3_dir["s3_objects"])))
+		else:
+			logging.warning("Path is invalid, double-check your configuration file.")
+
+def set_directories():
+	for dir in PARAMS["local"]:
+		path = dir["path"]
+		if not os.path.exists(path):
+			logging.warning("{0} does not exist.".format(path))
+			os.makedirs(path)
+			logging.warning("{0} created.".format(path))
+		else:
+			logging.debug("{0} found, continuing.".format(path))
 
 def sort_the_file(my_file):
 	logging.warning("Reading {0}".format(my_file))
@@ -164,6 +151,7 @@ def merge_the_files(args, expected_lines, remainder):
 			if a == b:
 				match_count += 1
 				part_a = get_columns(entry_a, "filter_a")
+				#TODO: Apply this filter before you store it in the sorted dictionary
 				part_b = get_columns(entry_b, "filter_b")
 				line = "|".join(part_a) + "|".join(part_b) + "\n"
 				f_out.write(line)
@@ -186,6 +174,7 @@ def merge_the_files(args, expected_lines, remainder):
 	logging.warning("{0} bytes written.".format(bytes_written))
 
 def merge(file_name):
+	#Abort early if the file was already completed.
 	my_key = re.compile(".*/([^/]+)")
 	finished_objects = PARAMS["S3"][2]["s3_objects"]
 	finished_files = [my_key.search(x.key).group(1) for x in finished_objects]
@@ -196,11 +185,13 @@ def merge(file_name):
 	logging.warning("Merging {0}".format(file_name))
 	MAX_LINES = sys.maxsize
 
+	#Make a sorted dictionary of the first file
 	file_1 = PARAMS["local"][0]["path"] + "/" + file_name
 	header_1, map_1, count_1 = sort_the_file(file_1)
 	safely_remove_file(file_1)
 	logging.warning("There were {0} records in the file.".format(count_1))
 
+	#Make a sorted dictionary of the second file
 	file_2 = PARAMS["local"][1]["path"] + "/" + file_name
 	header_2, map_2, count_2 = sort_the_file(file_2)
 	safely_remove_file(file_2)
@@ -211,22 +202,12 @@ def merge(file_name):
 		logging.critical("ERROR! Mismatched number of lines, aborting.")
 		sys.exit()
 
+	#Merge the two files
 	merged_file = PARAMS["local"][2]["path"] + "/" + file_name
 	logging.warning("Files have the same number of records, proceeding")
 	remainder = diff(header_2, header_1)
 	args = [ file_name, merged_file, header_1, header_2, map_1, map_2 ]
 	merge_the_files(args, count_1, remainder)
-
-
-def pull_file_from_s3(i, x):
-	my_key = re.compile(".*/([^/]+)")
-	local = PARAMS["local"][i]["path"]
-	bucket = PARAMS["S3"][i]
-	s3_object = bucket["s3_objects"][x]
-	filename = my_key.search(s3_object.key).group(1)
-	s3_object.get_contents_to_filename(local + "/" + filename)
-	logging.warning("{0} pulled from {1}".format(filename, PARAMS["S3"][i]["path"]))
-	return filename
 
 def process_pending_list():
 	logging.warning("Processing pending list")
@@ -240,11 +221,15 @@ def process_pending_list():
 		filename = pull_file_from_s3(1, x)
 		merge(filename)
 
-#	for s3_dir in PARAMS["S3"]:
-#		bucket = s3_dir["bucket"]
-#		sub_dir = s3_dir["sub_dir"]
-#		list = [j.key for j in s3_dir["s3_objects"] ]
-		#pull key from bucket
+def pull_file_from_s3(i, x):
+	my_key = re.compile(".*/([^/]+)")
+	local = PARAMS["local"][i]["path"]
+	bucket = PARAMS["S3"][i]
+	s3_object = bucket["s3_objects"][x]
+	filename = my_key.search(s3_object.key).group(1)
+	s3_object.get_contents_to_filename(local + "/" + filename)
+	logging.warning("{0} pulled from {1}".format(filename, PARAMS["S3"][i]["path"]))
+	return filename
 
 
 #Main program
