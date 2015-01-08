@@ -88,6 +88,8 @@ def sort_the_file(my_file):
 	count = 0
 	tock = 20000
 	sort_keys = PARAMS["sort_keys"]
+	csv.field_size_limit(sys.maxsize)
+
 	with gzip.open(my_file, 'rt') as file_one:
 		csv_reader = csv.reader(file_one, delimiter='|')
 		first_line = True
@@ -199,8 +201,8 @@ def merge(file_name):
 
 	#Abort if files have a different number of records
 	if count_1 != count_2:
-		logging.critical("ERROR! Mismatched number of lines, aborting.")
-		sys.exit()
+		logging.critical("ERROR! Mismatched number of lines, skipping.")
+		return
 
 	#Merge the two files
 	merged_file = PARAMS["local"][2]["path"] + "/" + file_name
@@ -212,10 +214,16 @@ def merge(file_name):
 def process_pending_list():
 	logging.warning("Processing pending list")
 	my_key = re.compile(".*/([^/]+)")
+	#Remove all but the pending files in each list
+	index = 0
 	for s3_dir in PARAMS["S3"]:
-		list = [j.key for j in s3_dir["s3_objects"] ]
-		keys = [my_key.search(k).group(1) for k in list if my_key.search(k)]
+		list = [(j, my_key.search(j.key).group(1)) for j in s3_dir["s3_objects"] if my_key.search(j.key) ]
+		list = [z for (z, y) in list if y in PENDING ]
+		PARAMS["S3"][index]["s3_objects"] = list
+		logging.warning("{0} items in list {1}".format(len(PARAMS["S3"][index]["s3_objects"]), index))
+		index += 1
 
+	#Process the pending files
 	for x in range(0, len(PENDING)):
 		_ = pull_file_from_s3(0, x)
 		filename = pull_file_from_s3(1, x)
@@ -241,6 +249,7 @@ CONN = boto.connect_s3()
 set_s3()
 PENDING = get_pending_list()
 #print(len(PENDING))
+#print("PENDING LIST IS {0}".format((PENDING)))
 process_pending_list()
 
 
