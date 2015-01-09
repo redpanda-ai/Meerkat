@@ -141,7 +141,7 @@ def merge_the_files(args, expected_lines, remainder):
 	PARAMS["filter_a"] = get_new_filter(header_1, header_1)
 	PARAMS["filter_b"] = get_new_filter(header_2, remainder)
 	with gzip.open(merged_file, 'wt') as f_out:
-		header_line = "|".join(header_1) + "|".join(remainder) + "\n"
+		header_line = "|".join(header_1) + "|" + "|".join(remainder) + "\n"
 		f_out.write(header_line)
 		while map_1 and map_2 and all_count < expected_lines:
 			if entry_a is None:
@@ -155,7 +155,7 @@ def merge_the_files(args, expected_lines, remainder):
 				part_a = get_columns(entry_a, "filter_a")
 				#TODO: Apply this filter before you store it in the sorted dictionary
 				part_b = get_columns(entry_b, "filter_b")
-				line = "|".join(part_a) + "|".join(part_b) + "\n"
+				line = "|".join(part_a) + "|" + "|".join(part_b) + "\n"
 				f_out.write(line)
 				entry_a = None
 				entry_b = None
