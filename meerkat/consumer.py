@@ -391,7 +391,7 @@ class Consumer(threading.Thread):
 		decision = self.__decision_boundary(z_score_delta, raw_score)
 
 		# Interactive Mode 
-		if self.params["mode"] == "test":
+		if self.params["mode"] == "interactive":
 			args = [scores, transaction, hits, business_names, city_names, state_names]
 			self.__interactive_mode(*args)
 
