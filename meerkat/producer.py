@@ -46,77 +46,6 @@ from meerkat.optimization import run_meerkat as test_meerkat
 from meerkat.optimization import get_desc_queue as get_simple_queue
 from meerkat.optimization import load_dataset
 
-def get_desc_queue(filename, params, classifier):
-	"""Opens a file of descriptions, one per line, and load a description
-	queue."""
-	encoding = None
-	physical, non_physical, atm = [], [], []
-	training_fields = ["PHYSICAL_MERCHANT", "STORE_NUMBER", "CITY", "STATE",\
-		"LATITUDE", "LONGITUDE", "FACTUAL_ID", "STREET"]
-	users = collections.defaultdict(list)
-	desc_queue = queue.Queue()
-
-	try:
-		encoding = params["input"]["encoding"]
-		delimiter = params["input"].get("delimiter", "|")
-		transactions = load_dict_list(filename, encoding=encoding,\
-			delimiter=delimiter)
-	except IOError:
-		logging.critical("Input file: %s"
-			" cannot be found. Terminating", filename)
-		sys.exit()
-
-	# Run Binary Classifier
-	for transaction in transactions:
-		transaction['factual_id'] = ""
-		description = transaction["DESCRIPTION_UNMASKED"]
-
-		prediction = classifier(description)
-		transaction["IS_PHYSICAL_TRANSACTION"] = prediction
-		safe_print(str(description) + ": " + str(prediction))
-
-		if prediction == "1":
-			physical.append(transaction)
-		elif prediction == "0":
-			non_physical.append(transaction)
-			logging.info("NON-PHYSICAL: %s", description)
-		elif prediction == "2":
-			physical.append(transaction)
-			atm.append(transaction)
-
-	# Hold on to GOOD_DESCRIPTION, clear fields
-	for row in physical:
-		#row["GOOD_DESCRIPTION"] = row["MERCHANT_NAME"]
-		gd = string_cleanse(row["GOOD_DESCRIPTION"])
-		row["GOOD_DESCRIPTION"] = string.capwords(gd, " ")
-
-	if params.get("mode", "") == "train":
-		for row in physical:
-			for field in training_fields:
-				row[field] = ""
-			row["MERCHANT_NAME"] = row["GOOD_DESCRIPTION"]
-
-	# Split into user buckets
-	for row in physical:
-		user = row.get("UNIQUE_MEM_ID", "")
-		users[user].append(row)
-
-	# Add Users to Queue
-	for key, _ in users.items():
-		desc_queue.put(users[key])
-
-	atm_percent = (len(atm) / len(transactions)) * 100
-	non_physical_percent = (len(non_physical) / len(transactions)) * 100
-	physical_percent = (len(physical) / len(transactions)) * 100
-
-	print("")
-	print("PHYSICAL: ", round(physical_percent, 2), "%")
-	print("NON-PHYSICAL: ", round(non_physical_percent, 2), "%")
-	print("ATM: ", round(atm_percent, 2), "%")
-	print("")
-
-	return desc_queue, non_physical
-
 def initialize():
 	"""Validates the command line arguments."""
 	input_file, params = None, None
@@ -134,40 +63,6 @@ def initialize():
 		sys.exit()
 
 	return params
-
-def run_meerkat(params, desc_queue, hyperparameters, non_physical, split):
-	"""Opens a number of threads to process the descriptions queue."""
-	# Run the Classifier
-	consumer_threads = params.get("concurrency", 8)
-	result_queue = queue.Queue()
-
-	for i in range(consumer_threads):
-		new_consumer = Consumer(i, params, desc_queue,\
-			result_queue, hyperparameters)
-		new_consumer.setDaemon(True)
-		new_consumer.start()
-
-	desc_queue.join()
-
-	# Convert queue to list
-	result_list = queue_to_list(result_queue)
-
-	# Writing to an output file, if necessary.
-	if "file" in params["output"] and "format" in params["output"]["file"]\
-	and params["output"]["file"]["format"] in ["csv", "json"]:
-		write_output_to_file(params, result_list, non_physical, split)
-	else:
-		logging.critical("Not configured for file output.")
-
-	# Shutdown Loggers
-	logging.shutdown()
-
-	# Test Accuracy
-	if params.get("mode", "") == "test":
-		accuracy_results = test_accuracy(params, result_list=result_list,\
-			non_physical_trans=non_physical)
-		print_results(accuracy_results)
-	return result_list
 
 def usage():
 	"""Shows the user which parameters to send into the program."""
@@ -211,68 +106,6 @@ def validate_params(params):
 		raise Misconfiguration(msg="Misconfiguration: missing key, 'input.encoding'", expr=None)
 
 	return True
-
-def write_output_to_file(params, output_list, non_physical, split):
-	"""Outputs results to a file"""
-
-	if type(output_list) is queue.Queue:
-		output_list = queue_to_list(output_list)
-
-	if len(output_list) < 1:
-		logging.warning("No results available to write")
-		#return
-
-	# Merge Physical and Non-Physical
-	output_list = output_list + non_physical
-
-	# Get File Save Info
-	file_path = os.path.basename(split)
-	file_name = params["output"]["file"]["processing_location"] + file_path
-	file_format = params["output"]["file"].get("format", 'csv')
-
-	# What is the output_list[0]
-	#print("Output_list[0]:\n{0}".format(output_list[0]))
-
-	# Get Headers
-	header = None
-	with open(split, 'r', encoding="utf-8") as infile:
-		header = infile.readline()
-
-	# Split on delimiter into a list
-	split_header = header.split(params["input"]["delimiter"])
-	header_list = [token.strip() for token in split_header]
-	header_list.append("IS_PHYSICAL_TRANSACTION")
-	header_list.append("z_score_delta")
-	header_list.append("MERCHANT_NAME")
-
- 	# Get additional fields for display from config file
-	additional_fields = params["output"]["results"]["fields"]
-	all_fields = header_list + additional_fields
-	#print("ALL_FIELDS: {0}".format(all_fields))
-
-	# Output as CSV
-	if file_format == "csv":
-		delimiter = params["output"]["file"].get("delimiter", ',')
-		new_header_list = header_list + params["output"]["results"]["labels"]
-		new_header = delimiter.join(new_header_list)
-		new_header = new_header.replace("GOOD_DESCRIPTION", "NON_PHYSICAL_TRANSACTION")
-
-		#We only write the header for the first file
-		if params["add_header"] is True:
-			with open(file_name, 'w', encoding="utf-8") as output_file:
-				output_file.write(new_header + "\n")
-				params["add_header"] = False
-
-		#We append for every split
-		with open(file_name, 'a', encoding="utf-8") as output_file:
-			dict_w = csv.DictWriter(output_file, delimiter=delimiter,\
-				fieldnames=all_fields, extrasaction='ignore')
-			dict_w.writerows(output_list)
-
-	# Output as JSON
-	if file_format == "json":
-		with open(file_name, 'w') as outfile:
-			json.dump(output_list, outfile)
 
 def	hms_to_seconds(t):
 	h, m, s = [i.lstrip("0") if len(i.lstrip("0")) != 0 else 0 for i in t.split(':')]
@@ -582,88 +415,18 @@ def load_dataframe(params):
 
 	return reader
 
-def process_panel(params, filename):
-	"""Process a single panel"""
-
-	row_limit = None
-	key = load_hyperparameters(params)
-	params["add_header"] = True
-	split_count = 0
-	container = identify_container(params)
-	params["container"] = container
-	classifier = select_model(container)
-
-	# Load and Split Files
-	try:
-		split_path = params["input"]["split"]["processing_location"]
-		row_limit = params["input"]["split"]["row_limit"]
-		delimiter = params["input"].get("delimiter", "|")
-		encoding = params["input"].get("encoding", "utf-8")
-		#Break the input file into segments
-		split_list = split_csv(open(filename, 'r', encoding=encoding, errors='replace'), delimiter=delimiter,
-			row_limit=row_limit, output_path=split_path)
-	except IOError:
-		logging.critical("Invalid ['input']['filename'] key; Input file: %s"
-			" cannot be found. Correct your config file.", filename)
-		sys.exit()
-
-	# Start a timer
-	start_time = datetime.datetime.now()
-	split_total = len(split_list)
-
-	logging.warning("There are %i splits to process", split_total)
-
-	# Loop through input segements
-	for split in split_list:
-		split_count += 1
-		logging.warning("Working with the following split: %s", split)
-		split_start_time = datetime.datetime.now()
-
-		desc_queue, non_physical = get_desc_queue(split, params, classifier)
-		run_meerkat(params, desc_queue, key, non_physical, split)
-		print("Marker")
-
-		end_time = datetime.datetime.now()
-		total_time = end_time - start_time
-		split_time = end_time - split_start_time
-		remaining_splits = split_total - split_count
-		completion_percentage = split_count / split_total * 100.0
-		my_rate = row_limit / hms_to_seconds(str(split_time))
-		logging.warning("Elapsed time: %s, ETA: %s",\
-			str(total_time)[:7], str(split_time * remaining_splits)[:7])
-		logging.warning("Rate: %10.2f, Completion: %2.2f%%",\
-			my_rate, completion_percentage)
-		logging.warning("Deleting {0}".format(split))
-		safely_remove_file(split)
-
-	# Merge Files, GZIP and Push to S3
-	output_location = merge_split_files(params, split_list)
-
-	#if params["input"].get("bucket_key", "") != "":
-	#	move_to_S3(params, output_location, S3)
-
-	#logging.warning("Complete.")
-
-	# Only do one
-	print("Exiting after one panel file. Modify code to enable bucket processing.")
-	sys.exit()
-
 def mode_switch(params):
 	"""Switches mode between, single file / s3 bucket mode"""
 
-	input_file = params["input"].get("filename", "")
+	mode = params.get("mode", "")
 
-	if params.get("mode", "") == "test":
+	if mode == "test" or mode == "interactive":
 		test_training_data(params)
-	elif params.get("mode", "") == "production":
+		per_merchant_tests(params)
+	elif mode == "production":
 		production_run(params)
-	elif os.path.isfile(input_file):
-		print("Processing Single Local File: ", input_file)
-		params["output"]["file"]["name"] = os.path.basename(input_file)
-		conn = connect_to_S3()
-		process_panel(params, input_file)
 	else:
-		logging.critical("Please provide a local file or s3 bucket for "\
+		logging.critical("Please provide a verification_source for testing or a s3 bucket for "\
 			"procesing. Terminating")
 		sys.exit()
 
@@ -675,6 +438,17 @@ def test_training_data(params):
 	dataset = load_dataset(params)
 	desc_queue = get_simple_queue(dataset)
 	test_meerkat(params, desc_queue, hyperparameters)
+
+def per_merchant_tests(params):
+	"""Run tests on a directory of Merchant Samples"""
+
+	dir_name = "data/misc/Merchant Samples/"
+	params["label_key"] = "MERCHANT_NAME"
+	merchant_files = [os.path.join(dir_name, f) for f in os.listdir(dir_name) if f.endswith(".txt")]
+
+	for sample in merchant_files:
+		params["verification_source"] = sample
+		test_training_data(params)
 
 def connect_to_S3():
 	"""Returns a connection to S3"""

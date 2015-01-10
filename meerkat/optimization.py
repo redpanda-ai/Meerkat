@@ -177,7 +177,10 @@ def load_dataset(params):
 	# Filter Verification File
 	for i in range(len(verified_transactions)):
 		curr = verified_transactions[i]
-		curr["factual_id"] = ""
+
+		for field in params["output"]["results"]["labels"]:
+			curr[field] = ""
+
 		dataset.append(curr)
 
 	return dataset
