@@ -421,6 +421,11 @@ def mode_switch(params):
 	mode = params.get("mode", "")
 
 	if mode == "test" or mode == "interactive":
+		params["verification_source"] = "data/misc/ground_truth_card.txt"
+		params["mode"] = "card"
+		test_training_data(params)
+		params["verification_source"] = "data/misc/ground_truth_bank.txt"
+		params["mode"] = "card"
 		test_training_data(params)
 		per_merchant_tests(params)
 	elif mode == "production":
