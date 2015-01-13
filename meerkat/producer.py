@@ -439,6 +439,7 @@ def test_training_data(params):
 	"""An easy way to test the accuracy of a small set
 	provided a set of hyperparameters"""
 
+	safe_print("Testing sample: " + params["verification_source"])
 	hyperparameters = load_hyperparameters(params)
 	dataset = load_dataset(params)
 	desc_queue = get_simple_queue(dataset)
@@ -452,7 +453,6 @@ def per_merchant_tests(params):
 	merchant_files = [os.path.join(dir_name, f) for f in os.listdir(dir_name) if f.endswith(".txt")]
 
 	for sample in merchant_files:
-		safe_print("Testing sample: " + sample)
 		params["verification_source"] = sample
 		test_training_data(params)
 
