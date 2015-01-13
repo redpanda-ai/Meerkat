@@ -26,7 +26,7 @@
 				"region", "postcode", "website", "tel", "chain_name",
 				"latitude", "longitude", "neighborhood", "factual_id", "internal_store_number"],
 			"labels" : [
-				"PHYSICAL_MERCHANT", "STORE_ID", "FACTUAL_CATEGORY", "STREET", "CITY",
+				"MERCHANT_NAME", "STORE_ID", "FACTUAL_CATEGORY", "STREET", "CITY",
 				"STATE", "ZIP_CODE", "WEBSITE", "PHONE_NUMBER", "CHAIN_NAME",
 				"LATITUDE", "LONGITUDE", "NEIGHBORHOOD", "FACTUAL_ID", "STORE_NUMBER"]
 		},
@@ -38,25 +38,9 @@
 	},
 	"elasticsearch" : {
 		"cluster_nodes" : [
-		    "s01:9200",
-		    "s02:9200",
-		    "s03:9200",
-		    "s04:9200",
-		    "s05:9200",
-		    "s06:9200",
-		    "s07:9200",
-		    "s09:9200",
-		    "s10:9200",
-		    "s11:9200",
-		    "s12:9200",
-		    "s13:9200",
-		    "s14:9200",
-		    "s15:9200",
-		    "s16:9200",
-		    "s17:9200",
-		    "s18:9200"
+			"172.31.26.85", "172.31.26.84", "172.31.26.87", "172.31.26.86"
     	],
-		"index" : "factual_index_2",
+		"index" : "factual_index",
 		"type" : "factual_type",
 		"boost_labels" : ["standard_fields"],
 		"boost_vectors" :  {

@@ -151,7 +151,7 @@ def run_meerkat(params, desc_queue, hyperparameters):
 			continue
 		else:
 			qsize = desc_queue.qsize()
-			if params["mode"] == "train":
+			if params["mode"] == "train" or params["mode"] == "test":
 				progress((len(total) - qsize), total, message="complete with current iteration")
 
 	desc_queue.join()

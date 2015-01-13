@@ -6,7 +6,7 @@ evaluate many possible configurations if provided a well labeled dataset.
 Iteratively it runs Meerkat with randomized levels of configurations and
 then converges on the best possible values. 
 
-In context of Machine Leaning, this module  performs hyperparameter
+In context of Machine Learning, this module performs hyperparameter
 optimization. This involves tuning the numeric values located at  
 Meerkat/config/hyperparameters. These key value pairs map to
 hyperparameters used through out the Meerkat Classifier in aid of tuning
@@ -269,29 +269,53 @@ def run_from_command_line(command_line_arguments):
 		"po_box" : "1.159",
 	}
 
+	hyperparams = {
+		"address" : "1",          
+	    "address_extended" : "1",
+	    "admin_region" : "1",
+	    "category_labels" : "1",          
+	    "locality" : "1",         
+	    "region" : "1",           
+	    "post_town" : "1",             
+	    "postcode" : "1",                
+	    "tel" : "1",                            
+	    "neighborhood" : "1",     
+	    "email" : "1",                      
+	    "chain_name" : "1",
+	    "internal_store_number" : "1",  
+	    "name" : "1",
+	    "good_description" : "1",
+		"z_score_threshold" : "2.9",
+		"po_box" : "1",
+	}
+
 	param_names = list(hyperparams.keys())
 	initial_guess = [float(x) for x in list(hyperparams.values())]
 	x0 = np.array(initial_guess)
-	bounds = [((45, 45) if x == "es_result_size" else (0,3 )) for x in param_names]
+	bounds = [((45, 45) if x == "es_result_size" else (0, 3)) for x in param_names]
 	xmin = np.array([x[0] for x in bounds])
 	xmax = np.array([x[1] for x in bounds])
 	dataset = load_dataset(params)
+
+	safe_print(param_names)
 
 	def loss(x):
 		"""A loss function to optimize against"""
 
 		x = take_step(x)
-		safe_print(x)
 		x = [str(n) for n in x]
 		hyperparam = dict(zip(param_names, list(x)))
 		hyperparam['es_result_size'] = "45"
 		accuracy = run_classifier(hyperparam, params, dataset)
+		error = (100 - accuracy['precision']) / 100
 
-		return (100 - accuracy['precision']) / 100
+		safe_print(error)
 
-	take_step = RandomDisplacementBounds(xmin, xmax, 0.05)
-	minimizer_kwargs = dict(method="L-BFGS-B", bounds=bounds)
-	res = basinhopping(loss, x0, niter=100, minimizer_kwargs=minimizer_kwargs, take_step=take_step)
+		return error
+
+	take_step = RandomDisplacementBounds(xmin, xmax, 0.3)
+	minimizer_kwargs = dict(method="L-BFGS-B", bounds=bounds, options={"maxiter": 10, "disp": True})
+	res = basinhopping(loss, x0, niter=50, minimizer_kwargs=minimizer_kwargs, take_step=take_step, niter_success=5)
 	safe_print(res)
 
 if __name__ == "__main__":

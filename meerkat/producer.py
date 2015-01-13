@@ -447,6 +447,7 @@ def per_merchant_tests(params):
 	merchant_files = [os.path.join(dir_name, f) for f in os.listdir(dir_name) if f.endswith(".txt")]
 
 	for sample in merchant_files:
+		safe_print("Testing sample: " + sample)
 		params["verification_source"] = sample
 		test_training_data(params)
 
