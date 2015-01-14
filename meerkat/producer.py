@@ -371,12 +371,12 @@ def df_to_queue(params, df):
 	atm = gb.get_group("ATM") if "ATM" in groups else pd.DataFrame()
 	non_physical = gb.get_group("Non-Physical").rename(columns=name_map) if "Non-Physical" in groups else pd.DataFrame()
 
+	# Roll ATM into non_physical
+	non_physical = pd.concat([non_physical, atm])
+
 	#Return if there are no physical transactions
 	if physical.empty:
 		return desc_queue, non_physical
-
-	# Roll ATM into physical
-	physical = pd.concat([physical, atm])
 
 	# Group by user
 	users = physical.groupby('UNIQUE_MEM_ID')
