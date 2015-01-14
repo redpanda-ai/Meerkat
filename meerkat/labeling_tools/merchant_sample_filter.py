@@ -26,7 +26,7 @@ import csv
 import pandas as pd
 import sys
 
-from meerkat.various_tools import safe_print
+from ..various_tools import safe_print
 
 class DummyFile(object):
     def write(self, x): pass
