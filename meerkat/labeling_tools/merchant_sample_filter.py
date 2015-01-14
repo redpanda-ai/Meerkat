@@ -79,4 +79,7 @@ def run_from_command_line(command_line_arguments):
 	# Step 6: On key to save to file, map decision column with username as header back to dataframe and save out file
 	
 if __name__ == "__main__":
+	#FIXME: This module is a work-in-progress
+	print("This module is just a stub, terminating now.")
+	sys.exit()
 	run_from_command_line(sys.argv)
