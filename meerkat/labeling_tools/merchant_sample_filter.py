@@ -22,6 +22,8 @@ Created on Jan5, 2015
 #####################################################
 
 import contextlib
+import csv
+import pandas as pd
 import sys
 
 from meerkat.various_tools import safe_print
@@ -51,12 +53,12 @@ def verify_arguments():
 
 	if not sample_included:
 		safe_print("Erroneous arguments. Please see usage")
-		sys.exit()							
+		sys.exit()
 
 def add_local_params(params):
 	"""Adds additional local params"""
 
-	params["merchant_sample_filter"] = {		
+	params["merchant_sample_filter"] = {
 	}
 
 	return params
