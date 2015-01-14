@@ -22,6 +22,9 @@ Created on Jan5, 2015
 #####################################################
 
 import contextlib
+import sys
+
+from meerkat.various_tools import safe_print
 
 class DummyFile(object):
     def write(self, x): pass
