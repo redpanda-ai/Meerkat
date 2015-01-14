@@ -245,13 +245,14 @@ def run_from_command_line(command_line_arguments):
 	# Meta Information
 	verify_arguments()
 	params = load_params(sys.argv[1])
+	params["label_key"] = "FACTUAL_ID"
 
 	# Add Local Params
 	add_local_params(params)
 
 	hyperparams = {
-		"address" : "0",          
-	    "address_extended" : "0",
+		"address" : "0.541",          
+	    "address_extended" : "1.282",
 	    "admin_region" : "0.69",
 	    "category_labels" : "1.319",          
 	    "locality" : "1.367",         
@@ -266,38 +267,42 @@ def run_from_command_line(command_line_arguments):
 	    "name" : "2.781",
 	    "good_description" : "2",
 		"z_score_threshold" : "2.897",
+		"raw_score_threshold" : "1",
 		"po_box" : "1.159",
 	}
 
 	hyperparams = {
-		"address" : "1",          
-	    "address_extended" : "1",
-	    "admin_region" : "1",
-	    "category_labels" : "1",          
-	    "locality" : "1",         
-	    "region" : "1",           
-	    "post_town" : "1",             
-	    "postcode" : "1",                
-	    "tel" : "1",                            
-	    "neighborhood" : "1",     
-	    "email" : "1",                      
-	    "chain_name" : "1",
-	    "internal_store_number" : "1",  
-	    "name" : "1",
-	    "good_description" : "1",
-		"z_score_threshold" : "2.9",
-		"po_box" : "1",
+		'internal_store_number': '1.99790717245', 
+		'postcode': '0.889522513227', 
+		'admin_region': '0.773378327833', 
+		'name': '2.82490404605',
+		'neighborhood': '0.846703886202', 
+		'address': '0.477002703853', 
+		'region': '1.68611061327', 
+		'email': '0.43777658703', 
+		'good_description': '1.91336330233', 
+		'category_labels': '1.37356391086', 
+		'tel': '0.629506400436',
+		'locality': '1.46468955334', 
+		'chain_name': '1.01024837929', 
+		'z_score_threshold': '2.95304044158', 
+		'address_extended': '1.29045648636',
+		'post_town': '0.482537334349',
+		'po_box': '1.15032269428',
+		"raw_score_threshold" : "1"
+	}
+
+	alt_bounds = {
+		"es_result_size": (45, 45), 
 	}
 
 	param_names = list(hyperparams.keys())
 	initial_guess = [float(x) for x in list(hyperparams.values())]
 	x0 = np.array(initial_guess)
-	bounds = [((45, 45) if x == "es_result_size" else (0, 3)) for x in param_names]
+	bounds = [(alt_bounds[x] if x in alt_bounds else (float(hyperparams[x]) - 0.5, float(hyperparams[x]) + 0.5)) for x in param_names]
 	xmin = np.array([x[0] for x in bounds])
 	xmax = np.array([x[1] for x in bounds])
 	dataset = load_dataset(params)
-
-	safe_print(param_names)
 
 	def loss(x):
 		"""A loss function to optimize against"""
@@ -309,13 +314,14 @@ def run_from_command_line(command_line_arguments):
 		accuracy = run_classifier(hyperparam, params, dataset)
 		error = (100 - accuracy['precision']) / 100
 
+		safe_print(hyperparam)
 		safe_print(error)
 
 		return error
 
-	take_step = RandomDisplacementBounds(xmin, xmax, 0.3)
+	take_step = RandomDisplacementBounds(xmin, xmax, 0.1)
 	minimizer_kwargs = dict(method="L-BFGS-B", bounds=bounds, options={"maxiter": 10, "disp": True})
-	res = basinhopping(loss, x0, niter=50, minimizer_kwargs=minimizer_kwargs, take_step=take_step, niter_success=5)
+	res = basinhopping(loss, x0, niter=10, T=0.3, minimizer_kwargs=minimizer_kwargs, take_step=take_step, niter_success=5)
 	safe_print(res)
 
 if __name__ == "__main__":
