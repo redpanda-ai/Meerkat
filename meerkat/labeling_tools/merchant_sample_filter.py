@@ -22,6 +22,11 @@ Created on Jan5, 2015
 #####################################################
 
 import contextlib
+import csv
+import pandas as pd
+import sys
+
+from ..various_tools import safe_print
 
 class DummyFile(object):
     def write(self, x): pass
@@ -48,12 +53,12 @@ def verify_arguments():
 
 	if not sample_included:
 		safe_print("Erroneous arguments. Please see usage")
-		sys.exit()							
+		sys.exit()
 
 def add_local_params(params):
 	"""Adds additional local params"""
 
-	params["merchant_sample_filter"] = {		
+	params["merchant_sample_filter"] = {
 	}
 
 	return params
@@ -74,4 +79,7 @@ def run_from_command_line(command_line_arguments):
 	# Step 6: On key to save to file, map decision column with username as header back to dataframe and save out file
 	
 if __name__ == "__main__":
+	#FIXME: This module is a work-in-progress
+	print("This module is just a stub, terminating now.")
+	sys.exit()
 	run_from_command_line(sys.argv)

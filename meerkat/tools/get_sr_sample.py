@@ -7,24 +7,23 @@ import os
 import sys
 from random import shuffle
 
-def clean_line(line):
-	"""Strips garbarge from both ends of a line, rendering it clean."""
-	return str(line)[2:-3]
 
 def get_header(input_file):
 	"""Gets the header from an input file."""
 	logging.critical("Getting header from %s", input_file)
-	with gzip.open(input_file, "rb") as gzipped_input:
+	with gzip.open(input_file, "rt") as gzipped_input:
 		#is_first_line = True
 		for line in gzipped_input:
-			return clean_line(line)
+			return line
 
 def count_me(input_file):
+	"""Counts the number of lines in a file, updates the running total"""
 	logging.critical("Counting %s", input_file)
-	with gzip.open(input_file, "rb") as gzipped_input:
+	with gzip.open(input_file, "rt") as gzipped_input:
 		count = -1 #ignore the header
 		for line in gzipped_input:
 			count += 1
+	logging.warning("Count: {0}".format(count))
 	return input_file, count
 
 def produce_sample(sample_indices, file_index, sorted_filenames):
@@ -47,12 +46,12 @@ def produce_sample(sample_indices, file_index, sorted_filenames):
 				sample_indices.append(my_index)
 	return result_dict
 
-def start(input_path):
+def start(input_path, sample_size):
 	"""Runs the main program."""
 	os.chdir(input_path)
 	input_files = sorted(glob.glob('*.gz'))
 	#ignore old sample
-	input_files = [ x for x in input_files if x != "sample.txt.gz" ]
+	input_files = [ x for x in input_files if x != "rsample.txt.gz" ]
 	#get the header
 	header = get_header(input_files[0])
 	#get a count for each input file
@@ -76,41 +75,52 @@ def start(input_path):
 	logging.critical("Shuffling")
 	shuffle(x)
 	#Pick the top 50000, without replacement
-	sample_size_in_members = 50000
+	sample_size = int(sample_size)
 	#obtain a sorted list of indices
-	sample_indices = sorted(x[:sample_size_in_members])
+	sample_indices = sorted(x[:sample_size])
 
 	result_dict = produce_sample(sample_indices, ind, sorted_filenames)
 
 	sorted_keys = sorted(result_dict, key=result_dict.get)
 	miss_count = 0
 	count = 0
-	with gzip.open("sample.txt.gz", "wb") as f_out:
-		f_out.write(bytes(header + "\n", "UTF-8"))
-		for k in sorted_keys:
-			with gzip.open(k, "rb") as gzipped_input:
-				logging.critical("Fetching transactions from {0}".format(k))
-				is_first_line = True
-				count = ind[k][0]
-				result_dict[k].reverse()
-				my_element = None
-				for line in gzipped_input:
-					if is_first_line:
-						is_first_line = False
-						continue
-					elif my_element is None:
-						if not result_dict[k]:
-							break
-						my_element = result_dict[k].pop()
-					if count == my_element:
-						line = clean_line(line)
-						logging.debug("Writing sample to file.")
-						f_out.write(bytes(line + "\n", "UTF-8"))
-						my_element = None
-					else:
-						miss_count += 1
-					count += 1
+	lines = []
+
+	#Build a list of lines to shuffle
+	for k in sorted_keys:
+		with gzip.open(k, "rt") as gzipped_input:
+			logging.critical("Fetching transactions from {0}".format(k))
+			is_first_line = True
+			count = ind[k][0]
+			result_dict[k].reverse()
+			my_element = None
+			for line in gzipped_input:
+				if is_first_line:
+					is_first_line = False
+					continue
+				elif my_element is None:
+					if not result_dict[k]:
+						break
+					my_element = result_dict[k].pop()
+				if count == my_element:
+					lines.append(line)
+					my_element = None
+				else:
+					miss_count += 1
+				count += 1
+
+	#Shuffle random sample to eliminate order bias from how we collected the list of lines
+	shuffle(lines)
+
+	#Write out the result
+	with gzip.open("rsample.txt.gz", "wt") as f_out:
+		f_out.write(header)
+		for line in lines:
+			f_out.write(line)
 
 #MAIN PROGRAM
-INPUT_PATH = sys.argv[1]
-start(INPUT_PATH)
+INPUT_PATH, SAMPLE_SIZE = sys.argv[1:3]
+if len(sys.argv) != 3:
+	logging.critical("Use it correctly!")
+	sys.exit()
+start(INPUT_PATH, SAMPLE_SIZE)
