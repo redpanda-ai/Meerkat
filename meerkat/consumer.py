@@ -140,10 +140,11 @@ class Consumer(threading.Thread):
 		by factual_id"""
 
 		threshold = self.hyperparameters.get("z_score_threshold", "2")
+		raw_score_threshold = self.hyperparameters.get("raw_score_threshold", "1")
 
 		if z_score_delta is None:
 			return False
-		if z_score_delta > float(threshold):
+		if z_score_delta > float(threshold) and raw_score > float(raw_score_threshold):
 			return True
 		else:
 			return False
