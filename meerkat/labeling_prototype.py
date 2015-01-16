@@ -61,7 +61,7 @@ def start():
 			selection = custom_menu(row)
 			if selection != 1:
 				PARAMS["row_count"] += 1
-			if selection == 13:
+			if selection == 2:
 				curses.endwin()
 				logging.critical("Saving file, have a nice day!")
 				#TODO: Ship file to S3?
@@ -92,17 +92,19 @@ def custom_menu(row):
 	m = curses.color_pair(3)
 	p = curses.color_pair(4)
 	n = curses.A_NORMAL
-	choices = ["Zero"]
+	choices = ["Zero", "Skip", "Quit"]
 	my_labels = PARAMS["labels"]
-	choices.extend(PARAMS["labels"])
-	row_base, col_base = 7, 4
+	for i in range(len(my_labels)):
+		choices.append( my_labels[i]["name"])
+	#choices.extend(PARAMS["labels"])
+	row_base, col_base, menu_level = 7, 4, 1
 	while x != ord('\n'):
 		screen.clear()
 		screen.border(0)
 		screen.addstr(0, 2, "ROW_ID:   ", m)
 		screen.addstr(0, 12, PARAMS["row_id"], l)
 		screen.addstr(1, 2, "You have completed " + str(PARAMS["row_count"]) + " rows.", l)
-		screen.addstr(2, 2, "LABELING TOOL PROTOTYPE", curses.A_STANDOUT)
+		screen.addstr(2, 2, "Menu level: " + str(menu_level), curses.A_BOLD)
 		screen.addstr(4, 2, "TRANSACTION TYPE", curses.A_BOLD)
 		screen.addstr(5, 2, choices[pos], p)
 		my_col = 7
@@ -128,8 +130,18 @@ def custom_menu(row):
 				break
 
 		if not direct:
-			if x == curses.KEY_DOWN:
-				if pos < len(my_labels):
+			if x == curses.KEY_RIGHT:
+				if menu_level == 1:
+					menu_level += 1
+				else:
+					curses.flash()
+			elif x == curses.KEY_LEFT:
+				if menu_level == 2:
+					menu_level -= 1
+				else:
+					curses.flash()
+			elif x == curses.KEY_DOWN:
+				if pos < len(choices) - 1:
 					pos += 1
 				else:
 					curses.flash()
