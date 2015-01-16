@@ -1,3 +1,20 @@
+#!/usr/local/bin/python3.3
+
+"""This module takes a sample of a particular merchant
+and enables a human labeler to sort out erroneous 
+transactions
+
+Created on Jan 15, 2015
+@author: J. Andrew Key
+"""
+
+#################### USAGE ##########################
+
+# python3.3 -m meerkat.labeling_tools.labeling_prototype [config_file]
+# python3.3 -m meerkat.labeling_tools.labeling_prototype config/labeling_prototype.json
+
+#####################################################
+
 import csv
 import curses
 import gzip
@@ -6,7 +23,7 @@ import logging
 import os
 import sys
 
-from .custom_exceptions import InvalidArguments
+from meerkat.custom_exceptions import InvalidArguments
 
 def usage():
 	logging.error("Usage:\n"
