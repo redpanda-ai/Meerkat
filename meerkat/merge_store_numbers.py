@@ -8,7 +8,7 @@ Merchants not found are saved for further processing. This is a form of
 feature engineering used to improve Meerkat's ability to label
 transactions by location.
 
-Created on March 25, 2014
+Created on Mar 25, 2014
 @author: Matthew Sevrens
 """
 
