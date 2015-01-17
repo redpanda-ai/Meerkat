@@ -118,6 +118,17 @@ def safe_print(*objs, errors="replace"):
 	"""Print without unicode errors"""
 	print(*(to_stdout(str(o), errors) for o in objs))
 
+def safe_input(prompt=""):
+	"""Safely input a string"""
+
+	try:
+		result = input(prompt)
+		return result
+	except KeyboardInterrupt:
+		sys.exit()
+	except:
+		return ""
+
 def progress(i, my_list, message=""):
 	"""Display progress percent in a loop"""
 	my_progress = (i / len(my_list)) * 100

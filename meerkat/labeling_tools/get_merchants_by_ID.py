@@ -30,7 +30,7 @@ def enrich_transactions(params, es_connection):
 
 	for transaction in transactions:
 
-		merchant = get_merchant_by_id(params, transaction["factual_id"], es_connection)
+		merchant = get_merchant_by_id(params, transaction["FACTUAL_ID"], es_connection)
 
 		# No merchant found for factual_id
 		if merchant == None:
