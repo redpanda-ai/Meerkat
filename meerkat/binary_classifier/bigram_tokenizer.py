@@ -69,7 +69,7 @@ def run_from_command_line(cla):
 	params = add_local_params(params)
 	first_chunk = True
 
-	reader = pd.read_csv(cla[1], chunksize=5000, na_filter=False, quoting=csv.QUOTE_NONE, encoding="utf-8", sep=',', error_bad_lines=False)
+	reader = pd.read_csv(cla[1], chunksize=5000, na_filter=False, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
 
 	# Process Transactions
 	for chunk in reader:
