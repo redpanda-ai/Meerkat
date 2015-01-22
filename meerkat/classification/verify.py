@@ -11,10 +11,8 @@ Created on Mar 11, 2014
 
 # Note: Transactions file must be pipe delimited.
 
-# python3.3 -m meerkat.binary_classifier.verify \
-# [pickled_classifier] [labeled_transactions_file]
-# python3.3 -m meerkat.binary_classifier.verify \
-# meerkat/binary_classifier/models/final_card.pkl data/input/users.txt
+# python3.3 -m meerkat.classification.verify [pickled_classifier] [labeled_transactions_file]
+# python3.3 -m meerkat.classification.verify meerkat/classification/models/final_card.pkl data/input/users.txt
 
 #####################################################
 
@@ -23,7 +21,7 @@ import sys
 
 from sklearn.externals import joblib
 
-from meerkat.binary_classifier.train import load_data
+from meerkat.classification.train import load_data
 
 def test_model(file_to_test):
 	"""Tests a classifier model using the provided file."""

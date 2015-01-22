@@ -34,7 +34,7 @@ from boto.s3.connection import Location, S3Connection, Key
 
 from meerkat.custom_exceptions import InvalidArguments, Misconfiguration
 from meerkat.consumer import Consumer
-from meerkat.binary_classifier.load import select_model
+from meerkat.classification.load import select_model
 from meerkat.various_tools import (load_dict_list, safely_remove_file,\
 	load_hyperparameters, safe_print)
 from meerkat.various_tools import (split_csv, merge_split_files,\

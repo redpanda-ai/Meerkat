@@ -15,7 +15,7 @@ from scipy.stats.mstats import zscore
 
 from meerkat.various_tools import get_es_connection, string_cleanse, get_boosted_fields
 from meerkat.various_tools import synonyms, get_bool_query, get_qs_query
-from meerkat.binary_classifier.load import select_model
+from meerkat.classification.load import select_model
 
 BANK_CLASSIFIER = select_model("bank")
 CARD_CLASSIFIER = select_model("card")

@@ -9,8 +9,8 @@ Created on Jan 21, 2015
 
 #################### USAGE ##########################
 
-# python3.3 -m meerkat.binary_classifier.generate_common_bigrams [transaction_sample] 
-# python3.3 -m meerkat.binary_classifier.generate_common_bigrams data/card_sample.txt
+# python3.3 -m meerkat.classification.generate_common_bigrams [transaction_sample] 
+# python3.3 -m meerkat.classification.generate_common_bigrams data/card_sample.txt
 
 # Required Columns: 
 # DESCRIPTION_UNMASKED

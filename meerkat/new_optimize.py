@@ -44,7 +44,7 @@ from numpy import array, array_split
 from scipy.optimize import minimize, brute, basinhopping
 
 from meerkat.consumer import Consumer
-from meerkat.binary_classifier.load import select_model
+from meerkat.classification.load import select_model
 from meerkat.accuracy import print_results, test_accuracy
 from meerkat.various_tools import load_dict_list, queue_to_list, safe_print, get_us_cities
 from meerkat.various_tools import load_params, load_hyperparameters, progress
@@ -272,24 +272,24 @@ def run_from_command_line(command_line_arguments):
 	}
 
 	hyperparams = {
-		'internal_store_number': '1.99790717245', 
-		'postcode': '0.889522513227', 
-		'admin_region': '0.773378327833', 
-		'name': '2.82490404605',
-		'neighborhood': '0.846703886202', 
-		'address': '0.477002703853', 
-		'region': '1.68611061327', 
-		'email': '0.43777658703', 
-		'good_description': '1.91336330233', 
-		'category_labels': '1.37356391086', 
-		'tel': '0.629506400436',
-		'locality': '1.46468955334', 
-		'chain_name': '1.01024837929', 
-		'z_score_threshold': '2.95304044158', 
-		'address_extended': '1.29045648636',
-		'post_town': '0.482537334349',
-		'po_box': '1.15032269428',
-		"raw_score_threshold" : "1"
+		'address_extended': '1.24092497169',
+		'address': '0.435257197422',
+		'region': '1.65965387615',
+		'po_box': '1.20505912172',
+		'raw_score_threshold': '1.5',
+		'chain_name': '1.07215840333',
+		'post_town': '0.469337481112',
+		'neighborhood': '0.916776449001',
+		'postcode': '0.898428790832',
+		'tel': '0.643553234078',
+		'internal_store_number': '1.90064206613',
+		'name': '2.8302028516',
+		'email': '0.388050410775',
+		'admin_region': '0.768857866621',
+		'category_labels': '1.29327003712',
+		'good_description': '1.87959401211',
+		'z_score_threshold': '2.99449986282',
+		'locality': '1.45424498872'
 	}
 
 	alt_bounds = {

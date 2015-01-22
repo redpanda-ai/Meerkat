@@ -11,7 +11,7 @@ Created on Feb 25, 2014
 #################### USAGE ##########################
 
 # Experts only! Do not touch!
-# python3.3 -m meerkat.binary_classifier.model_train [file_name] [label_column_name]
+# python3.3 -m meerkat.classification.model_train [file_name] [label_column_name]
 
 #####################################################
 

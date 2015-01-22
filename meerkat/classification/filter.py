@@ -15,8 +15,8 @@ Created on May 27, 2014
 
 # Note: Transactions file must be pipe delimited.
 
-# python3.3 -m meerkat.binary_classifier.filter [pickled_classifier] [category_to_return] [transactions_file]
-# python3.3 -m meerkat.binary_classifier.filter meerkat/binary_classifier/models/final_card.pkl 1 data/input/users.txt
+# python3.3 -m meerkat.classification.filter [pickled_classifier] [category_to_return] [transactions_file]
+# python3.3 -m meerkat.classification.filter meerkat/classification/models/final_card.pkl 1 data/input/users.txt
 
 #####################################################
 
