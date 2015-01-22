@@ -4,7 +4,7 @@ import unittest, queue, sys, socket, os, json
 
 from meerkat import producer
 from meerkat.custom_exceptions import InvalidArguments, Misconfiguration
-from meerkat.binary_classifier.load import select_model
+from meerkat.classification.load import select_model
 
 class TokenizeDescriptionTests(unittest.TestCase):
 
