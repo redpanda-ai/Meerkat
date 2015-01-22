@@ -9,8 +9,8 @@ Created on Jan 21, 2015
 
 #################### USAGE ##########################
 
-# python3.3 generate_common_bigrams.py [transaction_sample] 
-# python3.3 generate_common_bigrams.py data/card_sample.txt
+# python3.3 -m meerkat.binary_classifier.generate_common_bigrams [transaction_sample] 
+# python3.3 -m meerkat.binary_classifier.generate_common_bigrams data/card_sample.txt
 
 # Required Columns: 
 # DESCRIPTION_UNMASKED
@@ -24,7 +24,7 @@ import sys
 
 from gensim.models import Phrases
 
-from various_tools import safe_print, safe_input
+from meerkat.various_tools import safe_print, safe_input
 
 class DummyFile(object):
     def write(self, x): pass
@@ -47,7 +47,7 @@ def verify_arguments():
 
 	sample = sys.argv[1]
 
-	sample_included = sample.endswith('.txt')
+	sample_included = (sample.endswith('.txt') or sample.endswith('.csv'))
 
 	if not sample_included:
 		safe_print("Erroneous arguments. Please see usage")
@@ -69,12 +69,12 @@ def run_from_command_line(cla):
 	params = add_local_params(params)
 	first_chunk = True
 
-	reader = pd.read_csv(cla[1], chunksize=5000, na_filter=False, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+	reader = pd.read_csv(cla[1], chunksize=5000, na_filter=False, quoting=csv.QUOTE_NONE, encoding="utf-8", sep=',', error_bad_lines=False)
 
 	# Process Transactions
 	for chunk in reader:
 
-		transactions = [row["DESCRIPTION_UNMASKED"].split(" ") for i, row in chunk.iterrows()]
+		transactions = [row["DESCRIPTION_UNMASKED"].lower().split(" ") for i, row in chunk.iterrows()]
 
 		if first_chunk:
 			bigrams = Phrases(transactions, max_vocab_size=5000)
@@ -82,9 +82,6 @@ def run_from_command_line(cla):
 			bigrams.add_vocab(transactions)
 
 	bigrams.save("models/bigram_model")
-
-	#for index, value in df['DESCRIPTION_UNMASKED'].iteritems():
-	#	safe_print(value)
 
 if __name__ == "__main__":
 	run_from_command_line(sys.argv)
