@@ -71,10 +71,16 @@ def run_from_command_line(cla):
 	params = add_local_params(params)
 	df = pd.read_csv(cla[1], na_filter=False, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
 	sub_df = df[["DESCRIPTION_UNMASKED", "MERCHANT_NAME"]]
-	labeler = safe_input("What is the Yodlee email of the current labeler?")
+	sLen = len(sub_df['DESCRIPTION_UNMASKED'])
+	labeler = safe_input("What is the Yodlee email of the current labeler?\n")
 
+	# Add a new column if first time labeling this data set
+	if labeler not in df.columns:
+		sub_df[labeler] = pd.Series(np.random.randn(sLen), index=df.index)
+	else:
+		sub_df[labeler] = sf[labeler]
+		
 	# Step 3: Verify Merchant Name and Prompt for rename if necessary 
-	# Step 4: Prompt User for Username
 	# Step 5: Loop through each row (until completion or save out) and prompt for 1: Is this Merchant, 0: Is not this merchant, 2: Skip - Not Sure 
 	# Step 6: On key to save to file, map decision column with username as header back to dataframe and save out file
 	
