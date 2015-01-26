@@ -24,7 +24,7 @@ from gensim.models import Word2Vec
 from gensim.utils import tokenize
 from sklearn.feature_extraction.text import CountVectorizer
 
-from various_tools import clean_bad_escapes
+from meerkat.various_tools import clean_bad_escapes
 
 class documentGenerator(object):
 	"""A memory efficient document loader"""
