@@ -119,9 +119,6 @@ def run_from_command_line(cla):
 		if save_and_exit:
 			df.to_csv(sys.argv[1], sep="|", mode="w", encoding="utf-8", index=False, index_label=False)
 			break
-
-	# Step 5: Loop through each row (until completion or save out) and prompt for 1: Is this Merchant, 0: Is not this merchant, 2: Skip - Not Sure 
-	# Step 6: On key to save to file, map decision column with username as header back to dataframe and save out file
 	
 if __name__ == "__main__":
 	run_from_command_line(sys.argv)
