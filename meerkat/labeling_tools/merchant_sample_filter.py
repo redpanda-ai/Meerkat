@@ -117,7 +117,7 @@ def run_from_command_line(cla):
 
 		# Break if User exits
 		if save_and_exit:
-			df.to_csv("data/output/test_merchant_filter.txt", sep="|", mode="w", encoding="utf-8", index=False, index_label=False)
+			df.to_csv(sys.argv[1], sep="|", mode="w", encoding="utf-8", index=False, index_label=False)
 			break
 
 	# Step 5: Loop through each row (until completion or save out) and prompt for 1: Is this Merchant, 0: Is not this merchant, 2: Skip - Not Sure 
