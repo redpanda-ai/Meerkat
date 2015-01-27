@@ -78,16 +78,21 @@ def run_from_command_line(cla):
 
 	# Add a new column if first time labeling this data set
 	if labeler not in df.columns:
-		df[labeler] = pd.Series(([None] * sLen))
+		df[labeler] = pd.Series(([""] * sLen))
 
 	# Capture Decisions
 	save_and_exit = False
 	choices = ["n", "y", "", "s"]
 
-	while df[labeler].count() != sLen:
+	while "" in df[labeler].tolist():
 
 		for i, row in df.iterrows():
 
+			# Skip rows that already have decisions
+			if row[labeler] in ["y","n"]:
+				continue
+
+			# Collect labeler choice
 			choice = None
 
 			safe_print("_" * 75)
@@ -107,14 +112,13 @@ def run_from_command_line(cla):
 				save_and_exit = True
 				break
 
+			# Enter choice into decision matrix
 			df.loc[i, labeler] = choice
 
 		# Break if User exits
 		if save_and_exit:
-			df.to_csv("data/output/test_merchant_filter.csv", sep="|", mode="w", encoding="utf-8", index=False, index_label=False)
+			df.to_csv("data/output/test_merchant_filter.txt", sep="|", mode="w", encoding="utf-8", index=False, index_label=False)
 			break
-
-	safe_print(df[labeler].count())
 
 	# Step 5: Loop through each row (until completion or save out) and prompt for 1: Is this Merchant, 0: Is not this merchant, 2: Skip - Not Sure 
 	# Step 6: On key to save to file, map decision column with username as header back to dataframe and save out file
