@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3.3
 
-"""This module takes a sample of a possible transactions for a single
-merchant and allows a reviewer to filter out non matching transactions
+"""This module takes a sample of a transactions and allows multiple
+labelers to assign a type and subtype to each transaction
 
 Created on Jan 5, 2015
 @author: Matthew Sevrens
