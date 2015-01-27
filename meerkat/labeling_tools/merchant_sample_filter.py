@@ -73,17 +73,48 @@ def run_from_command_line(cla):
 	params = {}
 	params = add_local_params(params)
 	df = pd.read_csv(cla[1], na_filter=False, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
-	sub_df = df[["DESCRIPTION_UNMASKED", "MERCHANT_NAME"]]
-	sLen = len(sub_df['DESCRIPTION_UNMASKED'])
+	sLen = len(df['DESCRIPTION_UNMASKED'])
 	labeler = safe_input("What is the Yodlee email of the current labeler?\n")
 
 	# Add a new column if first time labeling this data set
 	if labeler not in df.columns:
-		sub_df[labeler] = pd.Series(([""] * sLen))
-	else:
-		sub_df[labeler] = df[labeler]
+		df[labeler] = pd.Series(([None] * sLen))
 
-	safe_print(sub_df)
+	# Capture Decisions
+	save_and_exit = False
+	choices = ["n", "y", "", "s"]
+
+	while df[labeler].count() != sLen:
+
+		for i, row in df.iterrows():
+
+			choice = None
+
+			safe_print("_" * 75)
+			safe_print("\nDESCRIPTION_UNMASKED: {}".format(row["DESCRIPTION_UNMASKED"]))
+			safe_print("Is the merchant associated with the preceding transaction best described as {}?".format(row["MERCHANT_NAME"]))
+			safe_print("\n[enter] Skip")
+			safe_print("{:7s} Yes".format("[y]"))
+			safe_print("{:7s} No".format("[n]"))
+			safe_print("{:7s} Save and Exit".format("[s]"))
+
+			while choice not in choices:
+				choice = safe_input()
+				if choice not in choices: 
+					safe_print("Please select one of the options listed above")
+
+			if choice == "s":
+				save_and_exit = True
+				break
+
+			df.loc[i, labeler] = choice
+
+		# Break if User exits
+		if save_and_exit:
+			df.to_csv("data/output/test_merchant_filter.csv", sep="|", mode="w", encoding="utf-8", index=False, index_label=False)
+			break
+
+	safe_print(df[labeler].count())
 
 	# Step 5: Loop through each row (until completion or save out) and prompt for 1: Is this Merchant, 0: Is not this merchant, 2: Skip - Not Sure 
 	# Step 6: On key to save to file, map decision column with username as header back to dataframe and save out file
