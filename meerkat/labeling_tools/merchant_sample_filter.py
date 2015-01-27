@@ -11,6 +11,7 @@ Created on Jan5, 2015
 
 # Note: In Progress
 # python3.3 -m meerkat.labeling_tools.merchant_sample_filter [merchant_sample] 
+# python3.3 -m meerkat.labeling_tools.merchant_sample_filter data/misc/Merchant\ Samples/16K_Target_Card.txt
 
 # Required Columns: 
 # DESCRIPTION_UNMASKED
@@ -23,8 +24,10 @@ Created on Jan5, 2015
 
 import contextlib
 import csv
-import pandas as pd
 import sys
+
+import pandas as pd
+import numpy as np
 
 from meerkat.various_tools import safe_print, safe_input
 
@@ -76,11 +79,12 @@ def run_from_command_line(cla):
 
 	# Add a new column if first time labeling this data set
 	if labeler not in df.columns:
-		sub_df[labeler] = pd.Series(np.random.randn(sLen), index=df.index)
+		sub_df[labeler] = pd.Series(([""] * sLen))
 	else:
-		sub_df[labeler] = sf[labeler]
-		
-	# Step 3: Verify Merchant Name and Prompt for rename if necessary 
+		sub_df[labeler] = df[labeler]
+
+	safe_print(sub_df)
+
 	# Step 5: Loop through each row (until completion or save out) and prompt for 1: Is this Merchant, 0: Is not this merchant, 2: Skip - Not Sure 
 	# Step 6: On key to save to file, map decision column with username as header back to dataframe and save out file
 	
