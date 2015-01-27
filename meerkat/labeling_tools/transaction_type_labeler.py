@@ -11,7 +11,7 @@ Created on Jan 5, 2015
 
 # Note: In Progress
 # python3.3 -m meerkat.labeling_tools.transaction_type_labeler [merchant_sample] 
-# python3.3 -m meerkat.labeling_tools.transaction_type_labeler data/misc/Merchant\ Samples/16K_Target_Card.txt
+# python3.3 -m meerkat.labeling_tools.transaction_type_labeler data/misc/transaction_type_GT_Card.txt
 
 # Required Columns: 
 # DESCRIPTION_UNMASKED
@@ -27,7 +27,6 @@ import csv
 import sys
 
 import pandas as pd
-import numpy as np
 
 from meerkat.various_tools import safe_print, safe_input, load_params
 
@@ -89,8 +88,13 @@ def run_from_command_line(cla):
 	save_and_exit = False
 	choices = [c["name"] for c in params["labels"]]
 	sub_choices = [s for s in params["labels"] if "sub_labels" in s]
+	sub_dict = {}
 	skip_save = ["", "s"]
 	options = skip_save + [str(o) for o in list(range(0, len(choices)))]
+
+	# Create Loopup for Sub types
+	for sub in sub_choices:
+		sub_dict[sub["name"]] = sub["sub_labels"]
 
 	while "" in df[tt_col].tolist():
 
@@ -98,7 +102,12 @@ def run_from_command_line(cla):
 
 			# Skip rows that already have decisions
 			if row[tt_col] in choices:
-				continue
+				if row[tt_col] in sub_dict:
+					if row[st_col] in sub_dict[row[tt_col]]:
+						continue
+				else: 
+					continue
+			
 
 			# Collect labeler choice
 			choice = None
@@ -110,7 +119,7 @@ def run_from_command_line(cla):
 				safe_print("{}: {}".format(c, row[c]))
 
 			# Prompt with top level question
-			safe_print("\nWhich of the following best describes the transaction type of the precending transaction?\n")
+			safe_print("\nWhich of the following transaction types best describes the preceding transaction?\n")
 			
 			# Prompt with choices
 			for i, item in enumerate(choices):
@@ -124,12 +133,35 @@ def run_from_command_line(cla):
 				if choice not in options:
 					safe_print("Please select one of the options listed above")
 
-			if choice == "s":
+			# Prompt for subtype if neccesary
+			choice_name = choices[int(choice)] if choice not in ["", "s"] else choice
+
+			if choice_name in sub_dict:
+
+				sub_options = skip_save + [str(o) for o in list(range(0, len(sub_dict[choice_name])))]
+
+				safe_print("\nWhich of the following subtypes best describes the preceding transaction?\n")
+
+				for i, item in enumerate(sub_dict[choice_name]):
+					safe_print("{:7s} {}".format("[" + str(i) + "]", item))
+
+				safe_print("\n[enter] Skip")
+				safe_print("{:7s} Save and Exit".format("[s]"))
+
+				while sub_choice not in sub_options:
+					sub_choice = safe_input()
+					if sub_choice not in sub_options:
+						safe_print("Please select one of the options listed above")
+
+			if choice == "s" or sub_choice == "s":
 				save_and_exit = True
 				break
 
-			# Enter choice into decision matrix
+			# Enter choices into decision matrix
 			df.loc[i, tt_col] = "" if choice == "" else choices[int(choice)]
+
+			if sub_choice != None:
+				df.loc[i, st_col] = "" if sub_choice == "" else sub_dict[choice_name][int(sub_choice)]
 
 		# Break if User exits
 		if save_and_exit:
