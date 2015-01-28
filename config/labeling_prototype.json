@@ -23,5 +23,10 @@
 		{ "name" : "Authorization",
 			"sub_labels": [ "Auth Hold", "Auth Request" ] }
 	],
-	"display_columns" : [ "TRANSACTION_BASE_TYPE", "AMOUNT", "DESCRIPTION_UNMASKED" ]
+	"display_columns" : [ "TRANSACTION_BASE_TYPE", "AMOUNT", "DESCRIPTION_UNMASKED" ],
+	"S3" : {
+		"bucket_name" : "s3yodlee",
+		"s3_path" : "development/labeling/",
+		"filename" : "transaction_type_GT_Card"
+	}
 }

@@ -25,12 +25,13 @@ Created on Jan 5, 2015
 import contextlib
 import csv
 import sys
+import os
 
 import pandas as pd
-import boto
+from boto.s3.connection import Key, Location
 
 from meerkat.various_tools import safe_print, safe_input, load_params
-from meerkat.producer import connect_to_S3, move_to_S3
+from meerkat.producer import connect_to_S3
 
 class DummyFile(object):
     def write(self, x): pass
@@ -70,6 +71,20 @@ def identify_container(filename):
 		print('Please designate whether this is bank or card in params["container"]')
 		sys.exit()
 
+
+def move_to_S3(params, bucket, s3_path, filepath, labeler):
+	"""Moves a file to S3"""
+
+	filename = os.path.basename(filepath)
+	s3_path = s3_path + params["container"] + "/"
+
+	key = Key(bucket)
+	key.key = s3_path + labeler + "_" + filename
+	bytes_written = key.set_contents_from_filename(filepath, encrypt_key=True, replace=True)
+	safe_print("File written to: " + key.key)
+	safe_print("{0} bytes written".format(bytes_written))
+	#safely_remove_file(filepath)
+
 def add_local_params(params):
 	"""Adds additional local params"""
 
@@ -84,6 +99,8 @@ def run_from_command_line(cla):
 	verify_arguments()
 	params = load_params("config/labeling_prototype.json")
 	params = add_local_params(params)
+	conn = connect_to_S3()
+	bucket = conn.get_bucket(params["S3"]["bucket_name"], Location.USWest2)
 	df = pd.read_csv(cla[1], na_filter=False, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
 	sLen = df.shape[0]
 	labeler = safe_input("What is the Yodlee email of the current labeler?\n")
@@ -179,6 +196,7 @@ def run_from_command_line(cla):
 		# Break if User exits
 		if save_and_exit:
 			df.to_csv(sys.argv[1], sep="|", mode="w", encoding="utf-8", index=False, index_label=False)
+			move_to_S3(params, bucket, "development/labeled/", sys.argv[1], labeler)
 			break
 	
 if __name__ == "__main__":
