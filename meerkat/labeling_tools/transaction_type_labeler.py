@@ -27,8 +27,10 @@ import csv
 import sys
 
 import pandas as pd
+import boto
 
 from meerkat.various_tools import safe_print, safe_input, load_params
+from meerkat.producer import connect_to_S3, move_to_S3
 
 class DummyFile(object):
     def write(self, x): pass
@@ -57,11 +59,22 @@ def verify_arguments():
 		safe_print("Erroneous arguments. Please see usage")
 		sys.exit()
 
+def identify_container(filename):
+	"""Determines whether transactions are bank or card"""
+
+	if "bank" in filename.lower():
+		return "bank"
+	elif "card" in filename.lower():
+		return "card"
+	else:
+		print('Please designate whether this is bank or card in params["container"]')
+		sys.exit()
+
 def add_local_params(params):
 	"""Adds additional local params"""
 
-	params["merchant_sample_filter"] = {
-	}
+	params["merchant_sample_filter"] = {}
+	params["container"] = identify_container(sys.argv[1].lower())
 
 	return params
 

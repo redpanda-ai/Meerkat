@@ -23,7 +23,5 @@
 		{ "name" : "Authorization",
 			"sub_labels": [ "Auth Hold", "Auth Request" ] }
 	],
-	"sample_file" : "/mnt/ephemeral/card/raw_panel/rsample.txt.gz",
-	"display_columns" : [ "TRANSACTION_BASE_TYPE", "AMOUNT", "DESCRIPTION_UNMASKED" ],
-	"sort_columns" : [ "MEM_ID", "CARD_ACCOUNT_ID", "CARD_TRANSACTION_ID" ]
+	"display_columns" : [ "TRANSACTION_BASE_TYPE", "AMOUNT", "DESCRIPTION_UNMASKED" ]
 }

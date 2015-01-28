@@ -163,7 +163,7 @@ def get_pending_files(bucket, path_regex, completed):
 def identify_container(params):
 	"""Determines whether transactions are bank or card"""
 
-	container = params["container"]
+	container = params.get("container", "")
 	filename = params["input"]["filename"]
 
 	if "bank" in filename.lower():
@@ -471,7 +471,6 @@ def move_to_S3(params, bucket, s3_path, filepath):
 	"""Moves a file to S3"""
 
 	filename = os.path.basename(filepath)
-	S3_params = params["input"]["S3"]
 	s3_path = s3_path + params["container"] + "/"
 
 	key = Key(bucket)
