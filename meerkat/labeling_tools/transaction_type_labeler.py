@@ -98,7 +98,7 @@ def run_from_command_line(cla):
 
 	while "" in df[tt_col].tolist():
 
-		for i, row in df.iterrows():
+		for index, row in df.iterrows():
 
 			# Skip rows that already have decisions
 			if row[tt_col] in choices:
@@ -153,15 +153,15 @@ def run_from_command_line(cla):
 					if sub_choice not in sub_options:
 						safe_print("Please select one of the options listed above")
 
-			if choice == "s" or sub_choice == "s":
+			if choice_name == "s" or sub_choice == "s":
 				save_and_exit = True
 				break
 
 			# Enter choices into decision matrix
-			df.loc[i, tt_col] = "" if choice == "" else choices[int(choice)]
+			df.loc[index, tt_col] = "" if choice_name == "" else choice_name
 
 			if sub_choice != None:
-				df.loc[i, st_col] = "" if sub_choice == "" else sub_dict[choice_name][int(sub_choice)]
+				df.loc[index, st_col] = "" if sub_choice == "" else sub_dict[choice_name][int(sub_choice)]
 
 		# Break if User exits
 		if save_and_exit:
