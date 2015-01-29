@@ -27,6 +27,6 @@
 	"S3" : {
 		"bucket_name" : "s3yodlee",
 		"s3_path" : "development/labeling/",
-		"filename" : "transaction_type_GT_Card.txt"
+		"filename" : "transaction_type_GT_Bank.txt"
 	}
 }
