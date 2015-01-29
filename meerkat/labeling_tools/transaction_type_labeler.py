@@ -27,6 +27,7 @@ import csv
 import sys
 import os
 
+import numpy as np
 import pandas as pd
 from boto.s3.connection import Key, Location
 
@@ -116,6 +117,9 @@ def run_from_command_line(cla):
 
 	if (st_col) not in df.columns:
 		df[st_col] = pd.Series(([""] * sLen))
+
+	# Shuffle Rows
+	df = df.reindex(np.random.permutation(df.index))
 
 	# Capture Decisions
 	save_and_exit = False
