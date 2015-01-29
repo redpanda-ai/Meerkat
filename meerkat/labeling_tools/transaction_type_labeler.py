@@ -10,8 +10,8 @@ Created on Jan 5, 2015
 #################### USAGE ##########################
 
 # Note: In Progress
-# python3.3 -m meerkat.labeling_tools.transaction_type_labeler [merchant_sample] 
-# python3.3 -m meerkat.labeling_tools.transaction_type_labeler data/misc/transaction_type_GT_Card.txt
+# python3.3 -m meerkat.labeling_tools.transaction_type_labeler
+# python3.3 -m meerkat.labeling_tools.transaction_type_labeler
 
 # Required Columns: 
 # DESCRIPTION_UNMASKED
@@ -46,18 +46,10 @@ def nostderr():
 def verify_arguments():
 	"""Verify Usage"""
 
-	sufficient_arguments = (len(sys.argv) == 2)
+	sufficient_arguments = (len(sys.argv) == 1)
 
 	if not sufficient_arguments:
 		safe_print("Insufficient arguments. Please see usage")
-		sys.exit()
-
-	sample = sys.argv[1]
-
-	sample_included = sample.endswith('.txt')
-
-	if not sample_included:
-		safe_print("Erroneous arguments. Please see usage")
 		sys.exit()
 
 def identify_container(filename):
@@ -71,25 +63,20 @@ def identify_container(filename):
 		print('Please designate whether this is bank or card in params["container"]')
 		sys.exit()
 
-
-def move_to_S3(params, bucket, s3_path, filepath, labeler):
+def move_to_S3(bucket, key_name, filepath):
 	"""Moves a file to S3"""
 
-	filename = os.path.basename(filepath)
-	s3_path = s3_path + params["container"] + "/"
-
 	key = Key(bucket)
-	key.key = s3_path + labeler + "_" + filename
+	key.key = key_name
 	bytes_written = key.set_contents_from_filename(filepath, encrypt_key=True, replace=True)
 	safe_print("File written to: " + key.key)
-	safe_print("{0} bytes written".format(bytes_written))
 	#safely_remove_file(filepath)
 
-def add_local_params(params):
+def add_local_params(params,):
 	"""Adds additional local params"""
 
 	params["merchant_sample_filter"] = {}
-	params["container"] = identify_container(sys.argv[1].lower())
+	params["container"] = identify_container(params["S3"]["filename"])
 
 	return params
 
@@ -101,11 +88,27 @@ def run_from_command_line(cla):
 	params = add_local_params(params)
 	conn = connect_to_S3()
 	bucket = conn.get_bucket(params["S3"]["bucket_name"], Location.USWest2)
-	df = pd.read_csv(cla[1], na_filter=False, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
-	sLen = df.shape[0]
 	labeler = safe_input("What is the Yodlee email of the current labeler?\n")
+	labeler_filename = labeler + "_" + params["S3"]["filename"]
+	s3_loc = "development/labeled/" + params["container"] + "/"
+	labeler_key = s3_loc + labeler_filename
+	local_filename = "data/input/" + labeler_filename
 	tt_col = labeler + "_TT"
 	st_col = labeler + "_ST"
+
+	# See if partially labeled dataset exists
+	k = Key(bucket)
+	k.key = labeler_key
+
+	# Load Dataset
+	if k.exists():
+		pass
+	else:
+		k.key = s3_loc + params["S3"]["filename"]
+
+	k.get_contents_to_filename(local_filename)
+	df = pd.read_csv(local_filename, na_filter=False, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+	sLen = df.shape[0]
 
 	# Add new columns if first time labeling this data set
 	if (tt_col) not in df.columns:
@@ -199,8 +202,8 @@ def run_from_command_line(cla):
 
 		# Break if User exits
 		if save_and_exit:
-			df.to_csv(sys.argv[1], sep="|", mode="w", encoding="utf-8", index=False, index_label=False)
-			move_to_S3(params, bucket, "development/labeled/", sys.argv[1], labeler)
+			df.to_csv(local_filename, sep="|", mode="w", encoding="utf-8", index=False, index_label=False)
+			move_to_S3(bucket, labeler_key, local_filename)
 			break
 	
 if __name__ == "__main__":
