@@ -144,6 +144,10 @@ def run_from_command_line(cla):
 			sub_choice = None
 			safe_print(("_" * 75) + "\n")
 
+			# Show Progress
+			percent_complete = ((sLen - df[tt_col].str.contains(r'^$').sum()) / sLen) * 100
+			safe_print("{0:.2f}%".format(percent_complete) + " complete with labeling\n")
+
 			# Show transaction details
 			for c in params["display_columns"]:
 				safe_print("{}: {}".format(c, row[c]))
