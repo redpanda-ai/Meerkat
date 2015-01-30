@@ -10,8 +10,8 @@ Created on Jan 5, 2015
 #################### USAGE ##########################
 
 # Note: In Progress
-# python3.3 -m meerkat.labeling_tools.transaction_type_labeler [config_file]
-# python3.3 -m meerkat.labeling_tools.transaction_type_labeler config/transaction_type_labeling.json
+# python3.3 -m meerkat.labeling_tools.transaction_labeler [config_file]
+# python3.3 -m meerkat.labeling_tools.transaction_labeler config/transaction_type_labeling.json
 
 # Required Columns: 
 # DESCRIPTION_UNMASKED
