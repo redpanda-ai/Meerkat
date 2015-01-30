@@ -130,8 +130,9 @@ def run_from_command_line(cla):
 	options = skip_save + [str(o) for o in list(range(0, len(choices)))]
 
 	# Create Loopup for Sub types
-	for sub in sub_choices:
-		sub_dict[sub["name"]] = sub["sub_labels"]
+	if len(sub_choices) > 0:
+		for sub in sub_choices:
+			sub_dict[sub["name"]] = sub["sub_labels"]
 
 	while "" in df[tt_col].tolist():
 
@@ -160,7 +161,7 @@ def run_from_command_line(cla):
 				safe_print("{}: {}".format(c, row[c]))
 
 			# Prompt with top level question
-			safe_print("\nWhich of the following transaction types best describes the preceding transaction?\n")
+			safe_print("\n{}\n".format(params["questions"][0]))
 			
 			# Prompt with choices
 			for i, item in enumerate(choices):
@@ -181,7 +182,7 @@ def run_from_command_line(cla):
 
 				sub_options = skip_save + [str(o) for o in list(range(0, len(sub_dict[choice_name])))]
 
-				safe_print("\nWhich of the following subtypes best describes the preceding transaction?\n")
+				safe_print("\n{}\n".format(params["questions"][1]))
 
 				for i, item in enumerate(sub_dict[choice_name]):
 					safe_print("{:7s} {}".format("[" + str(i) + "]", item))

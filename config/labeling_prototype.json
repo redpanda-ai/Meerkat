@@ -23,6 +23,10 @@
 		{ "name" : "Authorization",
 			"sub_labels": [ "Auth Hold", "Auth Request" ] }
 	],
+	"questions" : [
+		"Which of the following transaction types best describes the preceding transaction?",
+		"Which of the following subtypes best describes the preceding transaction?"
+	],
 	"display_columns" : ["TRANSACTION_BASE_TYPE", "AMOUNT", "DESCRIPTION_UNMASKED"],
 	"S3" : {
 		"bucket_name" : "s3yodlee",
