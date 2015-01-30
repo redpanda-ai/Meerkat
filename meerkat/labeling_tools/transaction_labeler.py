@@ -166,6 +166,7 @@ def run_from_command_line(cla):
 
 			# Show Progress
 			percent_complete = ((sLen - df[tc_col].str.contains(r'^$').sum()) / sLen) * 100
+			os.system("clear")
 			safe_print("{0:.2f}%".format(percent_complete) + " complete with labeling\n")
 
 			# Show transaction details
