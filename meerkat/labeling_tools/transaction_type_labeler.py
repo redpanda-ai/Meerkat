@@ -85,7 +85,7 @@ def run_from_command_line(cla):
 	"""Runs these commands if the module is invoked from the command line"""
 
 	verify_arguments()
-	params = load_params("config/labeling_prototype.json")
+	params = load_params("config/transaction_type_labeling.json")
 	params = add_local_params(params)
 	conn = connect_to_S3()
 	bucket = conn.get_bucket(params["S3"]["bucket_name"], Location.USWest2)

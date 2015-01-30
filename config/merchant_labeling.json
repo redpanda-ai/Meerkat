@@ -1,11 +1,11 @@
 {
 	"labels" : [
-		{ "name" : "Target" },
-		{ "name" : "Not Target" },
+		{"name" : "Target"},
+		{"name" : "Not Target"}
 	],
 	"display_columns" : ["DESCRIPTION_UNMASKED"],
 	"questions" : [
-		"Is the merchant associated with the preceding transaction best described as Target?",
+		"Is the merchant associated with the preceding transaction best described as Target?"
 	],
 	"S3" : {
 		"bucket_name" : "s3yodlee",
