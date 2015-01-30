@@ -94,8 +94,8 @@ def run_from_command_line(cla):
 	s3_loc = "development/labeled/" + params["container"] + "/"
 	labeler_key = s3_loc + labeler_filename
 	local_filename = "data/input/" + labeler_filename
-	tt_col = labeler + "_TT"
-	st_col = labeler + "_ST"
+	tc_col = labeler + "_top_choice"
+	sc_col = labeler + "_sub_choice"
 
 	# See if partially labeled dataset exists
 	k = Key(bucket)
@@ -112,11 +112,11 @@ def run_from_command_line(cla):
 	sLen = df.shape[0]
 
 	# Add new columns if first time labeling this data set
-	if (tt_col) not in df.columns:
-		df[tt_col] = pd.Series(([""] * sLen))
+	if (tc_col) not in df.columns:
+		df[tc_col] = pd.Series(([""] * sLen))
 
-	if (st_col) not in df.columns:
-		df[st_col] = pd.Series(([""] * sLen))
+	if (sc_col) not in df.columns:
+		df[sc_col] = pd.Series(([""] * sLen))
 
 	# Shuffle Rows
 	df = df.reindex(np.random.permutation(df.index))
@@ -134,14 +134,14 @@ def run_from_command_line(cla):
 		for sub in sub_choices:
 			sub_dict[sub["name"]] = sub["sub_labels"]
 
-	while "" in df[tt_col].tolist():
+	while "" in df[tc_col].tolist():
 
 		for index, row in df.iterrows():
 
 			# Skip rows that already have decisions
-			if row[tt_col] in choices:
-				if row[tt_col] in sub_dict:
-					if row[st_col] in sub_dict[row[tt_col]]:
+			if row[tc_col] in choices:
+				if row[tc_col] in sub_dict:
+					if row[sc_col] in sub_dict[row[tc_col]]:
 						continue
 				else: 
 					continue
@@ -153,7 +153,7 @@ def run_from_command_line(cla):
 			safe_print(("_" * 75) + "\n")
 
 			# Show Progress
-			percent_complete = ((sLen - df[tt_col].str.contains(r'^$').sum()) / sLen) * 100
+			percent_complete = ((sLen - df[tc_col].str.contains(r'^$').sum()) / sLen) * 100
 			safe_print("{0:.2f}%".format(percent_complete) + " complete with labeling\n")
 
 			# Show transaction details
@@ -200,10 +200,10 @@ def run_from_command_line(cla):
 				break
 
 			# Enter choices into decision matrix
-			df.loc[index, tt_col] = "" if choice_name == "" else choice_name
+			df.loc[index, tc_col] = "" if choice_name == "" else choice_name
 
 			if sub_choice != None:
-				df.loc[index, st_col] = "" if sub_choice == "" else sub_dict[choice_name][int(sub_choice)]
+				df.loc[index, sc_col] = "" if sub_choice == "" else sub_dict[choice_name][int(sub_choice)]
 
 		# Break if User exits
 		if save_and_exit:
