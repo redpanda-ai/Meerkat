@@ -1,5 +1,11 @@
-#!/bin/python3.3
-"""Bloom filter stuff."""
+#!/usr/local/bin/python3.3
+
+"""Bloom filter stuff.
+
+Created on Dec 19, 2014
+@author: J. Andrew Key
+"""
+
 import json
 import sys
 from pybloom import ScalableBloomFilter

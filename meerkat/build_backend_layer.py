@@ -1,4 +1,11 @@
-"""This module creates an Elasticsearch cluster on Amazon EC2."""
+#!/usr/local/bin/python3.3
+
+"""This module creates an Elasticsearch cluster on Amazon EC2.
+
+Created on Sep 30, 2014
+@author: J. Andrew Key
+"""
+
 import boto
 import fileinput
 import json

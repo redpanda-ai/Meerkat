@@ -1,3 +1,11 @@
+#!/usr/local/bin/python3.3
+
+"""Finds entities
+
+Created on Dec 20, 2014
+@author: J. Andrew Key
+"""
+
 import nltk
 import gzip
 import pandas as pd

@@ -1,6 +1,13 @@
+#!/usr/local/bin/python3.3
+
 """This module monitors S3 and our file processing farm of EC2 instances.
 If it notices new input files to process, it does so.  So long as there
-are available 'slots'.  The remaining input files are kept in a stack."""
+are available 'slots'.  The remaining input files are kept in a stack.
+
+Created on Oct 29, 2014
+@author: J. Andrew Key
+"""
+
 import boto
 import paramiko
 import re
