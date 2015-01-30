@@ -10,8 +10,8 @@ Created on Jan 5, 2015
 #################### USAGE ##########################
 
 # Note: In Progress
-# python3.3 -m meerkat.labeling_tools.transaction_type_labeler
-# python3.3 -m meerkat.labeling_tools.transaction_type_labeler
+# python3.3 -m meerkat.labeling_tools.transaction_type_labeler [config_file]
+# python3.3 -m meerkat.labeling_tools.transaction_type_labeler config/transaction_type_labeling.json
 
 # Required Columns: 
 # DESCRIPTION_UNMASKED
@@ -38,19 +38,22 @@ class DummyFile(object):
     def write(self, x): pass
 
 @contextlib.contextmanager
-def nostderr():
+def nostdout():
+    save_stdout = sys.stdout
     save_stderr = sys.stderr
+    sys.stdout = DummyFile()
     sys.stderr = DummyFile()
     yield
     sys.stderr = save_stderr
+    sys.stdout = save_stdout
 
 def verify_arguments():
 	"""Verify Usage"""
 
-	sufficient_arguments = (len(sys.argv) == 1)
+	sufficient_arguments = (len(sys.argv) == 2)
 
 	if not sufficient_arguments:
-		safe_print("Insufficient arguments. Please see usage")
+		safe_print("Insufficient arguments. Please provide a config file")
 		sys.exit()
 
 def identify_container(filename):
@@ -67,9 +70,11 @@ def identify_container(filename):
 def move_to_S3(bucket, key_name, filepath):
 	"""Moves a file to S3"""
 
-	key = Key(bucket)
-	key.key = key_name
-	bytes_written = key.set_contents_from_filename(filepath, encrypt_key=True, replace=True)
+	with nostdout():
+		key = Key(bucket)
+		key.key = key_name
+		bytes_written = key.set_contents_from_filename(filepath, encrypt_key=True, replace=True)
+	
 	safe_print("File written to: " + key.key)
 	#safely_remove_file(filepath)
 
@@ -85,10 +90,15 @@ def run_from_command_line(cla):
 	"""Runs these commands if the module is invoked from the command line"""
 
 	verify_arguments()
-	params = load_params("config/transaction_type_labeling.json")
+	params = load_params(cla[1])
 	params = add_local_params(params)
-	conn = connect_to_S3()
-	bucket = conn.get_bucket(params["S3"]["bucket_name"], Location.USWest2)
+
+	# Connect to S3
+	with nostdout():
+		conn = connect_to_S3()
+		bucket = conn.get_bucket(params["S3"]["bucket_name"], Location.USWest2)
+
+	# Collect Labeler Details
 	labeler = safe_input("What is the Yodlee email of the current labeler?\n")
 	labeler_filename = labeler + "_" + params["S3"]["filename"]
 	s3_loc = "development/labeled/" + params["container"] + "/"
@@ -102,12 +112,14 @@ def run_from_command_line(cla):
 	k.key = labeler_key
 
 	# Load Dataset
-	if k.exists():
-		pass
-	else:
-		k.key = s3_loc + params["S3"]["filename"]
+	with nostdout():
+		if k.exists():
+			pass
+		else:
+			k.key = s3_loc + params["S3"]["filename"]
 
-	k.get_contents_to_filename(local_filename)
+		k.get_contents_to_filename(local_filename)
+	
 	df = pd.read_csv(local_filename, na_filter=False, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
 	sLen = df.shape[0]
 

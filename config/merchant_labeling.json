@@ -1,7 +1,7 @@
 {
 	"labels" : [
-		{"name" : "Target"},
-		{"name" : "Not Target"}
+		{"name" : "No"},
+		{"name" : "Yes"}
 	],
 	"display_columns" : ["DESCRIPTION_UNMASKED"],
 	"questions" : [
