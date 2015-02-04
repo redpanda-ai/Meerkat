@@ -11,21 +11,6 @@
 	],
 	"labels": [
 		{
-			"name": "Authorization",
-			"sub_labels": [
-				"Auth Hold",
-				"Auth Request",
-				"Auth Processing",
-				"Auth Release",
-				"Pre-Auth",
-				"Auth Complete",
-				"Auth Void",
-				"Balance Enquriy",
-				"Account Verification",
-				"Pre-Auth Completion"
-			]
-		},
-		{
 			"name": "Bank Adjustment",
 			"sub_labels": [
 				"Overdraft charge",
@@ -46,33 +31,12 @@
 			]
 		},
 		{
-			"name": "Credit",
+			"name": "Loan",
 			"sub_labels": [
 				"Personal Loan Credit",
-				"Credit Card Credit",
 				"Automobile Loan",
-				"Mortgage or Home Loan",
-				"Short Term Credit"
+				"Mortgage or Home Loan"
 			]
-		},
-		{
-			"name": "Debit",
-			"sub_labels": [
-				"Signature Debit",
-				"Contact-less Debit"
-			]
-		},
-		{
-			"name": "Deferred",
-			"sub_labels": [
-				"Deferred Bill Pay",
-				"Installment Payment",
-				"Recurring Payment",
-				"Hold Check Payment"
-			]
-		},
-		{
-			"name": "POS Debit"
 		},
 		{
 			"name": "Deposit",
@@ -81,8 +45,7 @@
 				"ATM Deposit",
 				"Dividend Deposit",
 				"Capital Gains Distribution",
-				"CG Long-term Deposit",
-				"Open Sale Deposit"
+				"CG Long-term Deposit"
 			]
 		},
 		{
@@ -94,16 +57,6 @@
 			]
 		},
 		{
-			"name": "Purchase",
-			"sub_labels": [
-				"Purchased Online",
-				"Purchased with Check",
-				"Purchase Void",
-				"Purchase with Credit Card",
-				"Purchase with Debit Card"
-			]
-		},
-		{
 			"name": "Payment",
 			"sub_labels": [
 				"BillPay",
@@ -111,9 +64,19 @@
 				"Tax Payment",
 				"Payment by Check",
 				"Electronic Payment",
-				"Charge a Repeat Customer",
-				"Down Payment or Annuity Payment or Direct Payment",
-				"Fee Payment"
+				"Charge a Repeat Customer"
+			]
+		},
+		{
+			"name": "POS Debit"
+		},
+		{
+			"name": "Purchase",
+			"sub_labels": [
+				"Purchased Online",
+				"Purchased with Check",
+				"Purchase with Credit Card",
+				"Purchase with Debit Card"
 			]
 		},
 		{
@@ -133,22 +96,12 @@
 			]
 		},
 		{
-			"name": "Void",
-			"sub_labels": [
-				"Transaction Void",
-				"Fee Void"
-			]
-		},
-		{
 			"name": "Withdrawal",
 			"sub_labels": [
 				"Cash Withdrawal at FI",
 				"ATM Withdrawal",
 				"Debit Card Withdrawal at Store"
 			]
-		},
-		{
-			"name": "Investment"
 		},
 		{
 			"name": "Other"
