@@ -1,0 +1,158 @@
+{
+	"S3": {
+		"bucket_name": "s3yodlee",
+		"filename": "transaction_type_GT_Bank.txt",
+		"s3_path": "development/labeling/"
+	},
+	"display_columns": [
+		"TRANSACTION_BASE_TYPE",
+		"AMOUNT",
+		"DESCRIPTION_UNMASKED"
+	],
+	"labels": [
+		{
+			"name": "Authorization",
+			"sub_labels": [
+				"Auth Hold",
+				"Auth Request",
+				"Auth Processing",
+				"Auth Release",
+				"Pre-Auth",
+				"Auth Complete",
+				"Auth Void",
+				"Balance Enquriy",
+				"Account Verification",
+				"Pre-Auth Completion"
+			]
+		},
+		{
+			"name": "Bank Adjustment",
+			"sub_labels": [
+				"Overdraft charge",
+				"Credit Adjustment",
+				"Service Charge",
+				"Service Charge Refund",
+				"Returned Check Charge",
+				"Returned Check Reimbursement",
+				"Cash Advance",
+				"BillPay Charge",
+				"Check Image Service Charge",
+				"Overdraft Protection Charge",
+				"Stop Payment Charge",
+				"Checks Ordering Charge",
+				"Monthly Maintenance Charge",
+				"Debit Card Fee",
+				"Convenience Fee"
+			]
+		},
+		{
+			"name": "Credit",
+			"sub_labels": [
+				"Personal Loan Credit",
+				"Credit Card Credit",
+				"Automobile Loan",
+				"Mortgage or Home Loan",
+				"Short Term Credit"
+			]
+		},
+		{
+			"name": "Debit",
+			"sub_labels": [
+				"Signature Debit",
+				"Contact-less Debit"
+			]
+		},
+		{
+			"name": "Deferred",
+			"sub_labels": [
+				"Deferred Bill Pay",
+				"Installment Payment",
+				"Recurring Payment",
+				"Hold Check Payment"
+			]
+		},
+		{
+			"name": "POS Debit"
+		},
+		{
+			"name": "Deposit",
+			"sub_labels": [
+				"Bank Direct Deposit",
+				"ATM Deposit",
+				"Dividend Deposit",
+				"Capital Gains Distribution",
+				"CG Long-term Deposit",
+				"Open Sale Deposit"
+			]
+		},
+		{
+			"name": "Interest",
+			"sub_labels": [
+				"Interest - Savings",
+				"Interest Adjustment",
+				"Interest - Check"
+			]
+		},
+		{
+			"name": "Purchase",
+			"sub_labels": [
+				"Purchased Online",
+				"Purchased with Check",
+				"Purchase Void",
+				"Purchase with Credit Card",
+				"Purchase with Debit Card"
+			]
+		},
+		{
+			"name": "Payment",
+			"sub_labels": [
+				"BillPay",
+				"ACH Debit",
+				"Tax Payment",
+				"Payment by Check",
+				"Electronic Payment",
+				"Charge a Repeat Customer",
+				"Down Payment or Annuity Payment or Direct Payment",
+				"Fee Payment"
+			]
+		},
+		{
+			"name": "Refund",
+			"sub_labels": [
+				"Fee Refund",
+				"Finance Charge Refund"
+			]
+		},
+		{
+			"name": "Transfer",
+			"sub_labels": [
+				"Wire Transfer charge",
+				"Account to Account Transfer",
+				"Bank to Bank Transaction",
+				"Bank to Non-bank Account transfer"
+			]
+		},
+		{
+			"name": "Void",
+			"sub_labels": [
+				"Transaction Void",
+				"Fee Void"
+			]
+		},
+		{
+			"name": "Withdrawal",
+			"sub_labels": [
+				"Cash Withdrawal at FI",
+				"ATM Withdrawal",
+				"Debit Card Withdrawal at Store"
+			]
+		},
+		{
+			"name": "Other"
+		}
+	],
+	"questions": [
+		"Which of the following transaction types best describes the preceding transaction?",
+		"Which of the following subtypes best describes the preceding transaction?"
+	]
+}

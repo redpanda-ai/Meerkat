@@ -11,7 +11,7 @@ Created on Jan 5, 2015
 
 # Note: In Progress
 # python3.3 -m meerkat.labeling_tools.transaction_labeler [config_file]
-# python3.3 -m meerkat.labeling_tools.transaction_labeler config/transaction_type_labeling.json
+# python3.3 -m meerkat.labeling_tools.transaction_labeler config/transaction_origin_labeling.json
 
 # Required Columns: 
 # DESCRIPTION_UNMASKED
@@ -166,6 +166,7 @@ def run_from_command_line(cla):
 
 			# Show Progress
 			percent_complete = ((sLen - df[tc_col].str.contains(r'^$').sum()) / sLen) * 100
+			os.system("clear")
 			safe_print("{0:.2f}%".format(percent_complete) + " complete with labeling\n")
 
 			# Show transaction details
@@ -197,13 +198,13 @@ def run_from_command_line(cla):
 				safe_print("\n{}\n".format(params["questions"][1]))
 
 				for i, item in enumerate(sub_dict[choice_name]):
-					safe_print("{:7s} {}".format("[" + str(i) + "]", item))
+					safe_print("{:7s} {}".format("[" + str(chr(65 + i)) + "]", item))
 
 				safe_print("\n[enter] Skip")
 				safe_print("{:7s} Save and Exit".format("[s]"))
 
 				while sub_choice not in sub_options:
-					sub_choice = safe_input()
+					sub_choice = str(ord(safe_input()) - 65)
 					if sub_choice not in sub_options:
 						safe_print("Please select one of the options listed above")
 
