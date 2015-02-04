@@ -75,7 +75,7 @@ def move_to_S3(bucket, key_name, filepath):
 		key.key = key_name
 		bytes_written = key.set_contents_from_filename(filepath, encrypt_key=True, replace=True)
 	
-	safe_print("File written to: " + key.key)
+	safe_print("File written to: S3://" + key.key)
 	#safely_remove_file(filepath)
 
 def add_local_params(params,):
@@ -204,7 +204,12 @@ def run_from_command_line(cla):
 				safe_print("{:7s} Save and Exit".format("[s]"))
 
 				while sub_choice not in sub_options:
-					sub_choice = str(ord(safe_input()) - 65)
+					raw_choice = safe_input()
+					if raw_choice not in ["", "s"]:
+						#sub_choice = str(ord(safe_input()) - 65)
+						sub_choice = str(ord(raw_choice) - 65)
+					else:
+						sub_choice = raw_choice
 					if sub_choice not in sub_options:
 						safe_print("Please select one of the options listed above")
 
