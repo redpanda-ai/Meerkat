@@ -165,8 +165,10 @@ def run_from_command_line(cla):
 			safe_print(("_" * 75) + "\n")
 
 			# Show Progress
-			percent_complete = ((sLen - df[tc_col].str.contains(r'^$').sum()) / sLen) * 100
+			incomplete = df[tc_col].str.contains(r'^$').sum()
+			percent_complete = (( sLen - incomplete ) / sLen) * 100
 			os.system("clear")
+			safe_print("{} ".format(sLen - incomplete) + "completed.")
 			safe_print("{0:.2f}%".format(percent_complete) + " complete with labeling\n")
 
 			# Show transaction details
@@ -205,9 +207,10 @@ def run_from_command_line(cla):
 
 				while sub_choice not in sub_options:
 					raw_choice = safe_input()
+					#Convert alphabetic sub-choices to positive whole numbers
 					if raw_choice not in ["", "s"]:
-						#sub_choice = str(ord(safe_input()) - 65)
 						sub_choice = str(ord(raw_choice) - 65)
+					#Handle 'Skip' and 'Save and Exit' differently
 					else:
 						sub_choice = raw_choice
 					if sub_choice not in sub_options:
@@ -216,6 +219,10 @@ def run_from_command_line(cla):
 			if choice_name == "s" or sub_choice == "s":
 				save_and_exit = True
 				break
+
+			#Skipping goes to the next transaction
+			if choice_name == "" or sub_choice == "":
+				continue
 
 			# Enter choices into decision matrix
 			df.loc[index, tc_col] = "" if choice_name == "" else choice_name
