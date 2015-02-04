@@ -165,11 +165,11 @@ def run_from_command_line(cla):
 			safe_print(("_" * 75) + "\n")
 
 			# Show Progress
-			incomplete = df[tc_col].str.contains(r'^$').sum()
-			percent_complete = (( sLen - incomplete ) / sLen) * 100
+			complete = sLen - df[tc_col].str.contains(r'^$').sum()
+			percent_complete = complete / sLen * 100
 			os.system("clear")
-			safe_print("{} ".format(sLen - incomplete) + "completed.")
-			safe_print("{0:.2f}%".format(percent_complete) + " complete with labeling\n")
+			safe_print("{} ".format(complete) + "completed.")
+			safe_print("{0:.2f}%".format(percent_complete) + " complete with labeling.\n")
 
 			# Show transaction details
 			for c in params["display_columns"]:
