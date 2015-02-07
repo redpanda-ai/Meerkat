@@ -1,7 +1,7 @@
 {
 	"S3": {
 		"bucket_name": "s3yodlee",
-		"filename": "transaction_type_GT_Bank.txt",
+		"filename": "1000_transaction_origin_bank.txt",
 		"s3_path": "development/labeling/"
 	},
 	"display_columns": [
