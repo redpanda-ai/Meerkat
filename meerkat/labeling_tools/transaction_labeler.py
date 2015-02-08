@@ -230,6 +230,10 @@ def run_from_command_line(cla):
 			if sub_choice != None:
 				df.loc[index, sc_col] = "" if sub_choice == "" else sub_dict[choice_name][int(sub_choice)]
 
+		# Strip Excess Quotes
+		f = lambda x: x.replace('"', '')
+		df["FACTUAL_CATEGORY"] = df["FACTUAL_CATEGORY"].apply(f)
+		
 		# Break if User exits
 		if save_and_exit:
 			df.to_csv(local_filename, sep="|", mode="w", encoding="utf-8", index=False, index_label=False)
