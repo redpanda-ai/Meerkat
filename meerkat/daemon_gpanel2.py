@@ -62,7 +62,7 @@ def begin_processing_loop(some_container, date_pattern, s3_input_path):
 	for thing, item in reversed(pending_list):
 		new_date = date_finder_regex.search(thing.key).group(1)
 		if last_date != new_date:
-			item = "cd /root/git/Meerkat && ./calendar_launcher_alt.sh "\
+			item = "cd /root/git/Meerkat && ./calendar_launcher_gpanel2.sh "\
 				+ some_container + " " + new_date
 			commands.append(item)
 			last_date = new_date
@@ -157,7 +157,7 @@ def start(date_pattern, goal_in_days):
 			logging.warning("Ending.")
 			sys.exit()
 #MAIN PROGRAM
-#Usage: python3.3 -m meerkat.daemon_alt <date_pattern>
+#Usage: python3.3 -m meerkat.daemon_gpanel2 <date_pattern>
 #params = initialize()
 #print(params)
 #sys.exit()
