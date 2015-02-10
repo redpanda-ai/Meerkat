@@ -229,16 +229,10 @@ def run_from_command_line(cla):
 
 			if sub_choice != None:
 				df.loc[index, sc_col] = "" if sub_choice == "" else sub_dict[choice_name][int(sub_choice)]
-
-		# Strip Excess Quotes
-		f = lambda x: x.replace('"', '')
-		df["FACTUAL_CATEGORY"] = df["FACTUAL_CATEGORY"].apply(f)
-		df["NEIGHBOURHOOD"] = df["NEIGHBOURHOOD"].apply(f)
-		df["GOOD_DESCRIPTION"] = df["GOOD_DESCRIPTION"].apply(f)
 		
 		# Break if User exits
 		if save_and_exit:
-			df.to_csv(local_filename, sep="|", mode="w", doublequote=False, quoting=csv.QUOTE_NONE, encoding="utf-8", index=False, index_label=False)
+			df.to_csv(local_filename, sep="|", mode="w", quotechar=None, doublequote=False, quoting=csv.QUOTE_NONE, encoding="utf-8", index=False, index_label=False)
 			move_to_S3(bucket, labeler_key, local_filename)
 			break
 	
