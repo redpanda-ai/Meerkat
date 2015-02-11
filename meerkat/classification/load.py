@@ -27,10 +27,10 @@ def select_model(mode):
 		model_path = "meerkat/classification/models/bank_NPMN_2.pkl"
 	elif mode == "sub_transaction_type":
 		print("--- Classifying sub transaction type ---")
-		model_path = "meerkat/classification/models/STO_bank_model_99.pkl"
+		model_path = "meerkat/classification/models/STO_bank_model.pkl"
 	elif mode == "transaction_type":
-		print("--- Classifying transaction type on non spend transactions ---")
-		model_path = "meerkat/classification/models/TO_bank_model_99.pkl"
+		print("--- Classifying transaction type ---")
+		model_path = "meerkat/classification/models/TO_bank_model.pkl"
 	else:
 		print("--- Classifier requested not found. Terminating ---")
 		sys.exit()
