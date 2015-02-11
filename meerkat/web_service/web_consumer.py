@@ -9,6 +9,7 @@ Created on Nov 3, 2014
 
 import json
 import string
+import sys
 
 from pprint import pprint
 from scipy.stats.mstats import zscore
@@ -20,6 +21,8 @@ from meerkat.classification.load import select_model
 BANK_CLASSIFIER = select_model("bank")
 CARD_CLASSIFIER = select_model("card")
 BANK_NPMN = select_model("bank_NPMN")
+TRANSACTION_ORIGIN = select_model("transaction_type")
+SUB_TRANSACTION_ORIGIN = select_model("sub_transaction_type")
 
 class Web_Consumer():
 	"""Acts as a web service client to process and enrich
@@ -288,10 +291,25 @@ class Web_Consumer():
 
 		return transactions
 
-	def __sws(self, data):
-		"""Split transactions into physical and non-physical"""
+	def __add_transaction_origin(self, data):
+		"""Add transaction origin and sub origin to transaction"""
 
 		transactions = data["transaction_list"]
+
+		if len(transactions) == 0:
+			return transactions
+
+		for trans in transactions:
+			txn_type = TRANSACTION_ORIGIN(trans["description"])
+			txn_sub_type = SUB_TRANSACTION_ORIGIN(trans["description"])
+			trans["txn_type"] = txn_type.title()
+			trans["txn_sub_type"] = txn_sub_type.title()
+
+		return transactions
+
+	def __sws(self, data, transactions):
+		"""Split transactions into physical and non-physical"""
+
 		physical, non_physical = [], []
 
 		# Determine Whether to Search
@@ -306,7 +324,8 @@ class Web_Consumer():
 	def classify(self, data):
 		"""Classify a set of transactions"""
 
-		physical, non_physical = self.__sws(data)
+		transactions = self.__add_transaction_origin(data)
+		physical, non_physical = self.__sws(data, transactions)
 		physical = self.__enrich_physical(physical)
 		non_physical = self.__enrich_non_physical(non_physical)
 		transactions = self.ensure_output_schema(physical, non_physical)
