@@ -18,21 +18,21 @@ def select_model(mode):
 	# Switch on Models
 	if mode == "card":
 		print("--- Classifying Transactions in Card Mode ---")
-		model_path = "meerkat/binary_classifier/models/final_card.pkl"
+		model_path = "meerkat/classification/models/final_card.pkl"
 	elif mode == "bank":
 		print("--- Classifying Transactions in Bank Mode ---")
-		model_path = "meerkat/binary_classifier/models/final_bank.pkl"
+		model_path = "meerkat/classification/models/final_bank.pkl"
 	elif mode == "bank_NPMN":
 		print("--- Classifying Merchant Name in Non-Physical Bank Mode ---")
-		model_path = "meerkat/binary_classifier/models/bank_NPMN_2.pkl"
+		model_path = "meerkat/classification/models/bank_NPMN_2.pkl"
 	elif mode == "sub_transaction_type":
 		print("--- Classifying sub transaction type ---")
-		model_path = "meerkat/binary_classifier/models/STO_bank_model_99.pkl"
+		model_path = "meerkat/classification/models/STO_bank_model_99.pkl"
 	elif mode == "transaction_type":
 		print("--- Classifying transaction type on non spend transactions ---")
-		model_path = "meerkat/binary_classifier/models/TO_bank_model_99.pkl"
+		model_path = "meerkat/classification/models/TO_bank_model_99.pkl"
 	else:
-		print("--- Binary Classifier requested not found. Terminating ---")
+		print("--- Classifier requested not found. Terminating ---")
 		sys.exit()
 
 	# Load Model
