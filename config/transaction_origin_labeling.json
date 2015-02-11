@@ -13,6 +13,7 @@
 		{
 			"name": "Bank Adjustment",
 			"sub_labels": [
+				"I don't know",
 				"Overdraft charge",
 				"Credit Adjustment",
 				"Service Charge",
@@ -33,6 +34,7 @@
 		{
 			"name": "Loan",
 			"sub_labels": [
+				"I don't know",
 				"Personal Loan Credit",
 				"Automobile Loan",
 				"Mortgage or Home Loan"
@@ -41,6 +43,7 @@
 		{
 			"name": "Deposit",
 			"sub_labels": [
+				"I don't know",
 				"Bank Direct Deposit",
 				"ATM Deposit",
 				"Dividend Deposit",
@@ -51,6 +54,7 @@
 		{
 			"name": "Interest",
 			"sub_labels": [
+				"I don't know",
 				"Interest - Savings",
 				"Interest Adjustment",
 				"Interest - Check"
@@ -59,6 +63,7 @@
 		{
 			"name": "Payment",
 			"sub_labels": [
+				"I don't know",
 				"BillPay",
 				"ACH Debit",
 				"Tax Payment",
@@ -73,6 +78,7 @@
 		{
 			"name": "Purchase",
 			"sub_labels": [
+				"I don't know",
 				"Purchased Online",
 				"Purchased with Check",
 				"Purchase with Credit Card",
@@ -82,6 +88,7 @@
 		{
 			"name": "Refund",
 			"sub_labels": [
+				"I don't know",
 				"Fee Refund",
 				"Finance Charge Refund"
 			]
@@ -89,6 +96,7 @@
 		{
 			"name": "Transfer",
 			"sub_labels": [
+				"I don't know",
 				"Wire Transfer charge",
 				"Account to Account Transfer",
 				"Bank to Bank Transaction",
@@ -98,6 +106,7 @@
 		{
 			"name": "Withdrawal",
 			"sub_labels": [
+				"I don't know",
 				"Cash Withdrawal at FI",
 				"ATM Withdrawal",
 				"Debit Card Withdrawal at Store"
