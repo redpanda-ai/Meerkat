@@ -1,7 +1,7 @@
 {
 	"S3": {
 		"bucket_name": "s3yodlee",
-		"filename": "Unresolved_bank_transaction_origin.txt",
+		"filename": "unresolved_bank_transaction_origin.txt",
 		"s3_path": "development/labeling/"
 	},
 	"display_columns": [
