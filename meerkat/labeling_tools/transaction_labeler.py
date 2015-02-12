@@ -229,6 +229,12 @@ def run_from_command_line(cla):
 
 			if sub_choice != None:
 				df.loc[index, sc_col] = "" if sub_choice == "" else sub_dict[choice_name][int(sub_choice)]
+
+			# Save at every 50th transaction
+			if complete > 0 and complete % 25 == 0:
+				safe_print("Autosaving...")
+				df.to_csv(local_filename, sep="|", mode="w", quotechar=None, doublequote=False, quoting=csv.QUOTE_NONE, encoding="utf-8", index=False, index_label=False)
+				move_to_S3(bucket, labeler_key, local_filename)
 		
 		# Break if User exits
 		if save_and_exit:
