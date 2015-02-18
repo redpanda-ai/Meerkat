@@ -9,7 +9,7 @@ Created on Sep 30, 2014
 #################### USAGE ##########################
 
 # python3.3 -m meerkat.build_backend_layer [config_file] [cluster_name]
-# python3.3 -m meerkat config/stack.json Meerkat-ES
+# python3.3 -m meerkat.build_backend_layer config/stack.json Meerkat-ES
 
 #####################################################
 
