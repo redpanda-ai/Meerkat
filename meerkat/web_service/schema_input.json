@@ -8,6 +8,7 @@
 				"transaction_id" : { "type": "number" },
 				"description" : { "type": "string" },
 				"amount" : { "type": "number" },
+				"ledger_entry" : { "enum" : [ "debit", "credit" ] },
 				"date" : { "type": "string" }
 			},
 			"required": ["transaction_id", "description", "amount", "date"]
