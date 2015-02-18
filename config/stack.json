@@ -7,7 +7,7 @@
 		"meerkat_private",
 		"s3cmd"
 	],
-	"ami-id" : "ami-03144233",
+	"ami-id" : "ami-5d75536d",
 	"key_name" : "jkey",
 	"key_file" : "/root/.ssh/jkey.pem",
 	"instance_type" : "m3.2xlarge",
