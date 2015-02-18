@@ -6,6 +6,13 @@ Created on Sep 30, 2014
 @author: J. Andrew Key
 """
 
+#################### USAGE ##########################
+
+# python3.3 -m meerkat.build_backend_layer [config_file] [cluster_name]
+# python3.3 -m meerkat.build_backend_layer config/stack.json Meerkat-ES
+
+#####################################################
+
 import boto
 import fileinput
 import json

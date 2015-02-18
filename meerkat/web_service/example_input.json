@@ -7,25 +7,22 @@
 			"transaction_id": 1,
 			"description": "Safeway #12, 742 El Camino Real, Sunnyvale CA 94087",
 			"amount": 151.23,
+			"ledger_entry": "credit",
 			"date": "2014-04-01"
 		},
 		{
 			"transaction_id": 2,
 			"description": "Bank Transfer",
 			"amount": 100.00,
+			"ledger_entry": "debit",
 			"date": "2014-04-03"
 		},
 		{
 			"transaction_id": 3,
 			"description": "Amazon.com",
 			"amount": 47.99,
+			"ledger_entry": "credit",
 			"date": "2014-04-03"
-		},
-		{
-			"transaction_id": 4,
-			"description": "SAFEWAY STORE 2341 SO WINCHESTER BLVCAMPBELL CAUS",
-			"amount": 151.23,
-			"date": "2014-04-01"
 		}
 	]
 }
