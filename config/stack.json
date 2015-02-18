@@ -7,7 +7,7 @@
 		"meerkat_private",
 		"s3cmd"
 	],
-	"ami-id" : "ami-f3d4f3c3",
+	"ami-id" : "ami-03144233",
 	"key_name" : "jkey",
 	"key_file" : "/root/.ssh/jkey.pem",
 	"instance_type" : "m3.2xlarge",
@@ -17,7 +17,7 @@
 		"hybrids" : 0,
 		"slaves" : 1
 	},
-	"placement" : "us-west-2b",
+	"placement" : "us-west-2a",
 	"block_device_mapping" : [
 		{ "name" : "ephemeral0", "mount": "/dev/sdb" },
 		{ "name" : "ephemeral1", "mount": "/dev/sdc" }
