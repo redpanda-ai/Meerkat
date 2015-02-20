@@ -230,7 +230,7 @@ def scale_down(params):
 		print("Error scaling down, aborting: Exception {0}".format(err))
 		print("Unexpected error:", sys.exc_info()[0])
 		sys.exit()
-	status, _, _ = poll_for_cluster_status()
+	status, _, _ = poll_for_cluster_status(params)
 	logging.info(status)
 	time.sleep(10)
 	logging.info(status)
