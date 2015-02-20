@@ -224,7 +224,19 @@ def scale_down(params):
 	running = params["running"]
 	candidate = running[0]
 	logging.warning("Stopping {0}".format(candidate.id))
-	time.sleep(60)
+	try:
+		candidate.stop()
+	except EC2ResponseError as err:
+		print("Error scaling down, aborting: Exception {0}".format(err))
+		print("Unexpected error:", sys.exc_info()[0])
+		sys.exit()
+	status, _, _ = poll_for_cluster_status()
+	logging.info(status)
+	time.sleep(10)
+	logging.info(status)
+	time.sleep(10)
+	logging.info(status)
+	time.sleep(10)
 
 def scale_up(params):
 	print("This is where we scale up, but instead we wait 60 seconds.")
@@ -238,9 +250,9 @@ def start():
 	"""This function starts the monitor."""
 	logging.basicConfig(format='%(asctime)s %(message)s', filename='logs/prototype.log', \
 		level=logging.WARNING)
-	console = logging.StreamHandler()
-	console.setLevel(logging.WARNING)
-	logging.getLogger('').addHandler(console)
+#	console = logging.StreamHandler()
+#	console.setLevel(logging.WARNING)
+#	logging.getLogger('').addHandler(console)
 
 	logging.debug("Advanced Infrastructure Monitor.")
 	params = initialize()
@@ -255,7 +267,9 @@ def start():
 	judgment = "foo"
 	while count < 2000:
 		judgment = judge(params, ec2_conn)
-		if last_judgment == judgment:
+		if judgment == "neutral":
+			consistent_judgments = 0
+		elif last_judgment == judgment:
 			consistent_judgments += 1
 		else:
 			consistent_judgments = 0
