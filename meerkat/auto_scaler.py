@@ -156,8 +156,6 @@ def poll_for_cluster_status(params):
 						#TODO: Return with vital information
 						return status, number_of_nodes, target_nodes
 
-						#logging.warning(status_line.format(status, number_of_nodes,\
-						#	target_nodes))
 						if (status != "green") or (number_of_nodes < target_nodes):
 							time.sleep(sleep_between_attempts)
 					else:
@@ -174,7 +172,7 @@ def poll_for_cluster_status(params):
 	logging.warning("Congratulations your cluster is fully operational.")
 
 def recommend(params, summary):
-	"""This function recommends scaling up or down."""
+	"""This function uses rules to recommend scaling up or down."""
 	p = lambda x: json.dumps(x, sort_keys=False, indent=4, separators=(',', ': '))
 	judgment = None
 	scaling_rules = params["scaling_rules"]
@@ -183,8 +181,6 @@ def recommend(params, summary):
 	node_min, node_max = params["nodes"]["minimum"], params["nodes"]["maximum"]
 	running, not_running = len(params["running"]), len(params["not_running"])
 	cpu, queue = summary["high_cpu"], summary["high_search_queue"]
-
-	#logging.warning("IN-USE: {0}, STANDING-BY: {1}".format(running, not_running))
 
 	if (cpu <= down_cpu) and (queue <= down_queue):
 		if running >= node_min:
@@ -203,6 +199,7 @@ def recommend(params, summary):
 	return judgment
 
 def judge(params, ec2_conn):
+	"""This function uses gathers data for the recommend function."""
 	reservations = ec2_conn.get_all_instances()
 	instances = []
 	filtered_instances = []
@@ -218,12 +215,24 @@ def judge(params, ec2_conn):
 	params["not_running"] = [i for i in instances if i.state != 'running' ]
 	params["instances"] = params["running"]
 	status, active_nodes, data_nodes = poll_for_cluster_status(params)
-	#status_line = "Status: {0}, Active Nodes: {1}, Data Nodes: {2}"
-	#logging.warning(status_line.format(status, active_nodes, data_nodes))
 	summary, trim_result, result = poll_for_cluster_statistics(params)
 	cpu, queue = summary["high_cpu"], summary["high_search_queue"]
-	judgment = recommend(params, summary)
-	#logging.warning("CPU: {0}, QUEUE: {1}, RECOMMENDATION {2}".format(cpu, queue, judgment))
+	return recommend(params, summary)
+
+def scale_down(params):
+	print("This is where we scale down, but instead we wait 60 seconds.")
+	running = params["running"]
+	candidate = running[0]
+	logging.warning("Stopping {0}".format(candidate.id))
+	time.sleep(60)
+
+def scale_up(params):
+	print("This is where we scale up, but instead we wait 60 seconds.")
+	time.sleep(60)
+
+def something_else(params):
+	print("This is where we do something else, but for now we abort")
+	sys.exit()
 
 def start():
 	"""This function starts the monitor."""
@@ -241,14 +250,29 @@ def start():
 	confirm_security_groups(ec2_conn, params)
 	interval = params["scaling_rules"]["interval"]
 	count = 0
-	while count < 20:
-		judge(params, ec2_conn)
+	consistent_judgments = 0
+	last_judgment = None
+	judgment = "foo"
+	while count < 2000:
+		judgment = judge(params, ec2_conn)
+		if last_judgment == judgment:
+			consistent_judgments += 1
+		else:
+			consistent_judgments = 0
+		if consistent_judgments >= params["scaling_rules"]["limit_break"]:
+			logging.warning("Time to {0}".format(judgment))
+			if judgment == "scale down":
+				scale_down(params)
+				consistent_judgments = 0
+			elif judgment == "scale up":
+				scale_up(params)
+				consistent_judgments = 0
+			else:
+				something_else(params)
+				consistent_judgments = 0
+		last_judgment = judgment
 		time.sleep(interval)
 		count += 1
-
-#	for instance in instances:
-#		logging.debug("ID {0}, state {1}, private_ip {2}".format(\
-#			instance.id, instance.state, instance.private_ip_address))
 
 #MAIN PROGRAM
 start()
