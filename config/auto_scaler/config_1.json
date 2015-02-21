@@ -15,14 +15,14 @@
 	],
 	"scaling_rules": {
 		"interval" : 10,
-		"limit_break" : 3,
+		"consensus_limit" : 3,
 		"down" : {
-			"cpu" : 40,
-			"search_queue" : 50
+			"cpu" : 0,
+			"search_queue" : 0
 		},
 		"up" : {
-			"cpu" : 80,
-			"search_queue" : 200
+			"cpu" : 1,
+			"search_queue" : 0
 		}
 	}
 }

@@ -280,7 +280,7 @@ def start():
 			consistency += 1
 		else:
 			consistency = 0
-		if consistency >= params["scaling_rules"]["limit_break"]:
+		if consistency >= params["scaling_rules"]["consensus_limit"]:
 			logging.warning("Time to {0}".format(judgment))
 			if judgment in ["contract", "expand"]:
 				scale(params, judgment)
