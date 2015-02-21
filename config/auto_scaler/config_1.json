@@ -14,8 +14,8 @@
 		"i-3790643b"
 	],
 	"scaling_rules": {
-		"interval" : 15,
-		"limit_break" : 10,
+		"interval" : 10,
+		"limit_break" : 3,
 		"down" : {
 			"cpu" : 40,
 			"search_queue" : 50

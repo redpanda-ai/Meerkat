@@ -14,18 +14,15 @@ Created on 2014-02-19
 import boto
 import fileinput
 import json
-import paramiko
+import logging
 import re
-import shutil
 import sys
 import time
-import logging
 
 from elasticsearch import Elasticsearch
 from boto.ec2.connection import EC2Connection
-from boto.ec2.instance import Instance
-from boto.ec2.blockdevicemapping import BlockDeviceType, BlockDeviceMapping
 from boto.exception import EC2ResponseError
+
 from .custom_exceptions import InvalidArguments
 
 def confirm_security_groups(conn, params):
@@ -55,9 +52,88 @@ def confirm_security_groups(conn, params):
 		logging.debug(group)
 	params["all_security_groups"] = all_groups
 
-def pretty(my_json):
-	"""A pretty print function"""
-	return json.dumps(my_json, sort_keys=False, indent=4, separators=(',', ': '))
+def get_cluster_health(params):
+	"""Poll for cluster status until all nodes are 'green'"""
+	permanent_es_nodes = [params["permanent_instances"][0].private_ip_address]
+	logging.debug("Polling for cluster status green")
+	max_attempts, sleep_between_attempts = 30, 10
+	#Try multiple times to get cluster health of green
+	#We want to make sure to target all ec2_on_slave slave nodes plus the permanent master nodes
+	target_nodes = len(params["ec2_on_slave"]) + len(params["permanent_instances"])
+	status = "unknown"
+	for j in range(0, max_attempts):
+		try:
+			if j > 0:
+				logging.debug("Making attempt {0} of {1} for cluster status.".format(j,\
+					max_attempts))
+				try:
+					es_connection = Elasticsearch(permanent_es_nodes, sniff_on_start=True,\
+						sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
+				except Exception as err:
+					logging.warning("Exception while trying to make Elasticsearch connection.")
+					raise("Error trying to connect to ES node.")
+				logging.debug("Cluster found.")
+				logging.debug("Attempting to poll for health.")
+				status, number_of_nodes = "unknown", 0
+				while status != "green":
+					result = es_connection.cluster.health()
+					if result:
+						status = result["status"]
+						number_of_nodes = result["number_of_nodes"]
+						#TODO: Return with vital information
+						return status, number_of_nodes, target_nodes
+
+						if status != "green":
+							time.sleep(sleep_between_attempts)
+					else:
+						time.sleep(sleep_between_attempts)
+				break
+			if j >= max_attempts:
+				logging.warning("Error getting cluster status, aborting abnormally.")
+				sys.exit()
+		except Exception as err:
+			j += 1
+			logging.warning("Exception {0}".format(err))
+			logging.warning("Attempt #{0} in {1} seconds.".format(j, sleep_between_attempts))
+			time.sleep(sleep_between_attempts)
+	return status, number_of_nodes, target_node
+
+def get_es_health(es_conn):
+	"""Returns either a valid ElasticSearch health status or a warning."""
+	es_health = None
+	try:
+		es_health = es_conn.cluster.health()
+	except Exception as err:
+		logging.warning("Exception while trying to pull Elasticsearch stats.")
+	return es_health
+
+def get_cluster_health_2(params):
+	"""Collect highest CPU and highest search queue metrics from an ES cluster"""
+	max_attempts, sleep_between_attempts = 30, 10
+	#This pattern allows us to pull out the proper ip4 address
+	#TODO: Remove 'target_nodes', this function doesn't do anything with that param!
+	status, number_of_nodes, target_nodes = None, None, None
+	for j in range(max_attempts):
+		get_es_connection(params)
+		#0. Terminate after too many attempts
+		if j >= max_attempts:
+			logging.critical("Error getting cluster statistics, aborting abnormally.")
+			sys.exit()
+		#1. Attempt to connect to ES cluster
+		es_connection = get_es_connection(params)
+		if not es_connection:
+			j += 1
+			continue
+		#2. Attempt to connect to ES cluster
+		es_health = get_es_health(es_connection)
+		if not es_health:
+			j += 1
+			continue
+		#3. Process the es_health
+		status = es_health["status"]
+		number_of_nodes = es_health["number_of_nodes"]
+		target_nodes = len(params["ec2_on_slave"]) + len(params["permanent_instances"])
+		return status, number_of_nodes, target_nodes
 
 def get_cluster_metrics(params):
 	"""Collect highest CPU and highest search queue metrics from an ES cluster"""
@@ -77,7 +153,6 @@ def get_cluster_metrics(params):
 			continue
 		#2. Attempt to connect to ES cluster
 		es_stats = get_es_stats(es_connection)
-		#es_stats = es_connection.nodes.stats(metric="name,os,thread_pool")
 		if not es_stats:
 			j += 1
 			continue
@@ -133,74 +208,29 @@ def get_parameters():
 		sys.exit()
 	return params
 
-
-def poll_for_cluster_status(params):
-	"""Poll for cluster status until all nodes are 'green'"""
-	permanent_es_nodes = [params["permanent_instances"][0].private_ip_address]
-	logging.debug("Polling for cluster status green")
-	max_attempts, sleep_between_attempts = 30, 10
-	#Try multiple times to get cluster health of green
-	#We want to make sure to target all ec2_on_slave slave nodes plus the permanent master nodes
-	target_nodes = len(params["ec2_on_slave"]) + len(params["permanent_instances"])
-	status = "unknown"
-	status_line = "Status: {0}, Number of Nodes: {1}, Target Nodes: {2}"
-	for j in range(0, max_attempts):
-		try:
-			if j > 0:
-				logging.debug("Making attempt {0} of {1} for cluster status.".format(j,\
-					max_attempts))
-				try:
-					es_connection = Elasticsearch(permanent_es_nodes, sniff_on_start=True,\
-						sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
-				except Exception as err:
-					logging.warning("Exception while trying to make Elasticsearch connection.")
-					raise("Error trying to connect to ES node.")
-				logging.debug("Cluster found.")
-				logging.debug("Attempting to poll for health.")
-				status, number_of_nodes = "unknown", 0
-				while status != "green":
-					result = es_connection.cluster.health()
-					if result:
-						status = result["status"]
-						number_of_nodes = result["number_of_nodes"]
-						#TODO: Return with vital information
-						return status, number_of_nodes, target_nodes
-
-						if status != "green":
-							time.sleep(sleep_between_attempts)
-					else:
-						time.sleep(sleep_between_attempts)
-				break
-			if j >= max_attempts:
-				logging.warning("Error getting cluster status, aborting abnormally.")
-				sys.exit()
-		except Exception as err:
-			j += 1
-			logging.warning("Exception {0}".format(err))
-			logging.warning("Attempt #{0} in {1} seconds.".format(j, sleep_between_attempts))
-			time.sleep(sleep_between_attempts)
-	return status, number_of_nodes, target_node
-
 def get_judgment(params, metrics):
 	"""This function uses rules to get a judgment scaling up or down."""
-	judgment, rules = None, params["scaling_rules"]
-	node_min, node_max = params["nodes"]["minimum"], params["nodes"]["maximum"]
+	#Rules
+	rules = params["scaling_rules"]
+	#EC2 metrics
 	ec2_on_slave, ec2_off_slave = len(params["ec2_on_slave"]), len(params["ec2_off_slave"])
-	highest_cpu, highest_queue = metrics["highest_cpu"], metrics["highest_queue"]
+	#ES metrics
+	cpu, q = metrics["highest_cpu"], metrics["highest_queue"]
 
-	#Lambda functions for clarity
-	underloaded = lambda c, q: c <= rules["down"]["cpu"] and q <= rules["down"]["search_queue"]
-	overloaded = lambda c, q: c >= rules["up"]["cpu"] and q >= rules["up"]["search_queue"]
+	#Lambda functions to create words for decision logic
+	underloaded = lambda: cpu <= rules["down"]["cpu"] and q <= rules["down"]["search_queue"]
+	overloaded = lambda: cpu >= rules["up"]["cpu"] and q >= rules["up"]["search_queue"]
 	room_to_shrink = lambda: len(params["ec2_on_slave"]) >= params["nodes"]["minimum"]
 	room_to_grow = lambda: len(params["ec2_off_slave"]) > 0
 
 	#Make a judgment about whether to scale up, scale down, or do nothing
-	if underloaded(highest_cpu, highest_queue):
+	judgment = None
+	if underloaded:
 		if room_to_shrink:
 			judgment = "scale down"
 		else:
 			judgment = "neutral: scale down limit reached"
-	elif overloaded(highest_cpu, highest_queue):
+	elif overloaded:
 		if room_to_grow:
 			judgment = "scale up"
 		else:
@@ -208,33 +238,12 @@ def get_judgment(params, metrics):
 	else:
 		judgment = "neutral"
 	logging.warning("IN-USE: {0}, STANDING-BY: {1}, CPU: {2}, QUEUE: {3}, RECOMMENDATION {4}".format(\
-		ec2_on_slave, ec2_off_slave, highest_cpu, highest_queue, judgment))
+		ec2_on_slave, ec2_off_slave, cpu, q, judgment))
 	return judgment
 
-def judge(params, ec2_conn):
-	"""This function uses gathers data for the get_judgment function."""
-	reservations = ec2_conn.get_all_instances()
-	instances = []
-	filtered_instances = []
-	for reservation in reservations:
-		instances.extend(reservation.instances)
-	for instance in instances:
-		for group in instance.groups:
-			if group.name == params["name"]:
-				filtered_instances.append(instance)
-				break
-	#Filtered instances not in master_instances
-	instances = [ i for i in filtered_instances if i.id not in params["master_instances"] ]
-	perm = [ i for i in filtered_instances if i.id in params["master_instances"] ]
-	params["permanent_instances"] = perm
-	#Number of ec2 nodes that are running
-	params["ec2_on_slave"] = [i for i in instances if i.state == 'running' ]
-	params["ec2_off_slave"] = [i for i in instances if i.state != 'running' ]
-	params["instances"] = params["ec2_on_slave"]
-	status, active_nodes, data_nodes = poll_for_cluster_status(params)
-	metrics = get_cluster_metrics(params)
-	cpu, queue = metrics["highest_cpu"], metrics["highest_queue"]
-	return get_judgment(params, metrics)
+def pretty(my_json):
+	"""A pretty print function"""
+	return json.dumps(my_json, sort_keys=False, indent=4, separators=(',', ': '))
 
 def refresh_ec2_metrics(params, ec2_conn):
 	"""This function uses gathers ec2_metrics"""
@@ -258,6 +267,7 @@ def refresh_ec2_metrics(params, ec2_conn):
 	params["instances"] = params["ec2_on_slave"]
 
 def scale_down(params):
+	"""Scales our elasticsearch cluster down."""
 	logging.info("Scaling down.")
 	ec2_on_slave = params["ec2_on_slave"]
 	#TODO: switch to a random ec2_slave
@@ -272,42 +282,38 @@ def scale_down(params):
 	status, current_nodes = None, None
 	#We need to achieve the number of ec2_on_slave instances plus the permanent instances
 	target_nodes = len(params["ec2_on_slave"]) + len(params["permanent_instances"])
-	#Since we are trying to reduce, adjust our target by two nodes
-	target_nodes += -2
+	#Since we are trying to reduce, reduce our target by one
+	target_nodes += -1
 	#Wait until the ES cluster is healthy (green) and has the correct number of nodes
 	while (status != "green") or (current_nodes != target_nodes):
-		status, current_nodes, _ = poll_for_cluster_status(params)
+		status, current_nodes, _ = get_cluster_health_2(params)
 		logging.warning("STATUS: {0}, CURRENT_NODES {1}, TARGET_NODES: {2}".format(status, current_nodes, target_nodes))
 		time.sleep(5)
 
 def scale_up(params):
-	logging.critical("This is where we scale up, but instead we wait 60 seconds.")
-	time.sleep(60)
+	"""Scales our elasticsearch cluster up."""
+	#TODO: Implement
+	pass
 
 def something_else(params):
-	logging.critical("This is where we do something else, but for now we abort")
-	sys.exit()
+	"""Sends an alert or something, I don't know yet."""
+	#TODO" Implement
+	pass
 
 def start():
 	"""This function starts the monitor."""
-	logging.basicConfig(format='%(asctime)s %(message)s', filename='logs/auto_scaler.log', \
-		level=logging.INFO)
-
-#	console = logging.StreamHandler()
-#	console.setLevel(logging.WARNING)
-#	logging.getLogger('').addHandler(console)
-
-	logging.info("Auto_scale module activated.")
 	params = get_parameters()
 	my_region = boto.ec2.get_region(params["region"])
 	ec2_conn = EC2Connection(region=my_region)
 	confirm_security_groups(ec2_conn, params)
 	interval = params["scaling_rules"]["interval"]
-	count = 0
 	consistency = 0
-	previous_judgment = None
-	judgment = None
-	while count < 2000:
+	previous_judgment, judgment = None, None
+
+	#Continuously judge the status of the EC2 against available resources
+	#and decide whether to scale up or down.  If there are a consistent
+	#string of judgements to scale, then perform a scaling action.
+	while True:
 		refresh_ec2_metrics(params, ec2_conn)
 		metrics = get_cluster_metrics(params)
 		judgment = get_judgment(params, metrics)
@@ -331,7 +337,10 @@ def start():
 				consistency = 0
 		previous_judgment = judgment
 		time.sleep(interval)
-		count += 1
 
-#MAIN PROGRAM
-start()
+if __name__ == "__main__":
+	#MAIN PROGRAM
+	logging.basicConfig(format='%(asctime)s %(message)s', filename='logs/auto_scaler.log', \
+		level=logging.INFO)
+	logging.info("Auto_scale module activated.")
+	start()
