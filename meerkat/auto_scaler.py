@@ -52,52 +52,6 @@ def confirm_security_groups(conn, params):
 		logging.debug(group)
 	params["all_security_groups"] = all_groups
 
-def get_cluster_health(params):
-	"""Poll for cluster status until all nodes are 'green'"""
-	permanent_es_nodes = [params["permanent_instances"][0].private_ip_address]
-	logging.debug("Polling for cluster status green")
-	max_attempts, sleep_between_attempts = 30, 10
-	#Try multiple times to get cluster health of green
-	#We want to make sure to target all ec2_on_slave slave nodes plus the permanent master nodes
-	target_nodes = len(params["ec2_on_slave"]) + len(params["permanent_instances"])
-	status = "unknown"
-	for j in range(0, max_attempts):
-		try:
-			if j > 0:
-				logging.debug("Making attempt {0} of {1} for cluster status.".format(j,\
-					max_attempts))
-				try:
-					es_connection = Elasticsearch(permanent_es_nodes, sniff_on_start=True,\
-						sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
-				except Exception as err:
-					logging.warning("Exception while trying to make Elasticsearch connection.")
-					raise("Error trying to connect to ES node.")
-				logging.debug("Cluster found.")
-				logging.debug("Attempting to poll for health.")
-				status, number_of_nodes = "unknown", 0
-				while status != "green":
-					result = es_connection.cluster.health()
-					if result:
-						status = result["status"]
-						number_of_nodes = result["number_of_nodes"]
-						#TODO: Return with vital information
-						return status, number_of_nodes, target_nodes
-
-						if status != "green":
-							time.sleep(sleep_between_attempts)
-					else:
-						time.sleep(sleep_between_attempts)
-				break
-			if j >= max_attempts:
-				logging.warning("Error getting cluster status, aborting abnormally.")
-				sys.exit()
-		except Exception as err:
-			j += 1
-			logging.warning("Exception {0}".format(err))
-			logging.warning("Attempt #{0} in {1} seconds.".format(j, sleep_between_attempts))
-			time.sleep(sleep_between_attempts)
-	return status, number_of_nodes, target_node
-
 def get_es_health(es_conn):
 	"""Returns either a valid ElasticSearch health status or a warning."""
 	es_health = None
@@ -107,7 +61,7 @@ def get_es_health(es_conn):
 		logging.warning("Exception while trying to pull Elasticsearch stats.")
 	return es_health
 
-def get_cluster_health_2(params):
+def get_cluster_health(params):
 	"""Collect highest CPU and highest search queue metrics from an ES cluster"""
 	max_attempts, sleep_between_attempts = 30, 10
 	#This pattern allows us to pull out the proper ip4 address
@@ -286,7 +240,7 @@ def scale_down(params):
 	target_nodes += -1
 	#Wait until the ES cluster is healthy (green) and has the correct number of nodes
 	while (status != "green") or (current_nodes != target_nodes):
-		status, current_nodes, _ = get_cluster_health_2(params)
+		status, current_nodes, _ = get_cluster_health(params)
 		logging.warning("STATUS: {0}, CURRENT_NODES {1}, TARGET_NODES: {2}".format(status, current_nodes, target_nodes))
 		time.sleep(5)
 
