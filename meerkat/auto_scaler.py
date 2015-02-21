@@ -226,20 +226,21 @@ def wait_for_healthy_cluster(params, target_nodes):
 
 def scale(params, judgment):
 	"""Scales our elasticsearch cluster up or down."""
-	logging.info("Scaling {0}.".format(judgment))
-	ec2_on_slave = params["ec2_on_slave"]
-	#TODO: switch to a random ec2_slave
-	candidate, target_offset = ec2_on_slave[0], 0
-	logging.info("Stopping {0}".format(candidate.id))
+	logging.info("Scale action is: {0}.".format(judgment))
+	#TODO: switch to a random ec2_slave candidate
+	candidate, target_offset = None, None
 	try:
 		if judgment == "contract":
+			candidate = params["ec2_on_slave"][0]
 			candidate.stop()
 			target_offset = -1
 		elif judgment == "expand":
+			candidate = params["ec2_off_slave"][0]
 			candidate.start()
 			target_offset = 1
 		else:
 			raise UnknownJudgment(msg="No handling for that judgment, aborting.", expr=None)
+		logging.info("Candidate is {0}".format(candidate.id))
 	except EC2ResponseError as err:
 		logging.critical("Error scaling down, aborting: Exception {0}".format(err))
 		logging.critical("Unexpected error:", sys.exc_info()[0])
