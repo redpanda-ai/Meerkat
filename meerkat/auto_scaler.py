@@ -78,7 +78,7 @@ def get_cluster_health(params):
 		if not es_connection:
 			j += 1
 			continue
-		#2. Attempt to connect to ES cluster
+		#2. Attempt to pull cluster health
 		es_health = get_es_health(es_connection)
 		if not es_health:
 			j += 1
@@ -105,7 +105,7 @@ def get_cluster_metrics(params):
 		if not es_connection:
 			j += 1
 			continue
-		#2. Attempt to connect to ES cluster
+		#2. Attempt to pull cluster stats
 		es_stats = get_es_stats(es_connection)
 		if not es_stats:
 			j += 1
