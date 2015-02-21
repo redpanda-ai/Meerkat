@@ -12,7 +12,6 @@ Created on 2014-02-19
 ###############################################################################
 
 import boto
-import fileinput
 import json
 import logging
 import re
@@ -23,11 +22,12 @@ from elasticsearch import Elasticsearch
 from boto.ec2.connection import EC2Connection
 from boto.exception import EC2ResponseError
 
-from .custom_exceptions import InvalidArguments
+from .custom_exceptions import FileProblem, InvalidArguments, UnknownJudgment, SecurityGroupNotFound
 
 def confirm_security_groups(conn, params):
 	"""Confirms that the security groups we need for accessng our cluster
-	are correctly in place.  If they aren't found it aborts the program."""
+	are correctly in place.  If those groups are not found the program
+	aborts."""
 	existing_groups = params["security_groups"]
 	security_groups = conn.get_all_security_groups()
 	logging.debug(security_groups)
@@ -45,28 +45,17 @@ def confirm_security_groups(conn, params):
 	if groups_found == len(existing_groups):
 		logging.debug("All pre-existing groups found, continuing".format(group))
 	if not new_group_found:
-		logging.critical("Group {0} not found, aborting".format(params["name"]))
-		#TODO: Throw group not found Exception
-		sys.exit()
+		logging.critical("Supply the following arguments: config_file, cluster-name")
+		raise SecurityGroupNotFound(msg="Cannot proceed without a valid Security Group", expr=None)
 	for group in all_groups:
 		logging.debug(group)
 	params["all_security_groups"] = all_groups
-
-def get_es_health(es_conn):
-	"""Returns either a valid ElasticSearch health status or a warning."""
-	es_health = None
-	try:
-		es_health = es_conn.cluster.health()
-	except Exception as err:
-		logging.warning("Exception while trying to pull Elasticsearch stats.")
-	return es_health
 
 def get_cluster_health(params):
 	"""Collect highest CPU and highest search queue metrics from an ES cluster"""
 	max_attempts, sleep_between_attempts = 30, 10
 	#This pattern allows us to pull out the proper ip4 address
-	#TODO: Remove 'target_nodes', this function doesn't do anything with that param!
-	status, number_of_nodes, target_nodes = None, None, None
+	status, number_of_nodes = None, None
 	for j in range(max_attempts):
 		get_es_connection(params)
 		#0. Terminate after too many attempts
@@ -87,7 +76,7 @@ def get_cluster_health(params):
 		status = es_health["status"]
 		number_of_nodes = es_health["number_of_nodes"]
 		target_nodes = len(params["ec2_on_slave"]) + len(params["permanent_instances"])
-		return status, number_of_nodes, target_nodes
+		return status, number_of_nodes
 
 def get_cluster_metrics(params):
 	"""Collect highest CPU and highest search queue metrics from an ES cluster"""
@@ -137,6 +126,15 @@ def get_es_connection(params):
 		logging.warning("Exception while trying to make Elasticsearch connection.")
 	return es_connection
 
+def get_es_health(es_conn):
+	"""Returns either a valid ElasticSearch health status or a warning."""
+	es_health = None
+	try:
+		es_health = es_conn.cluster.health()
+	except Exception as err:
+		logging.warning("Exception while trying to pull Elasticsearch stats.")
+	return es_health
+
 def get_es_stats(es_conn):
 	"""Returns either a valid ElasticSearch statistics or a warning."""
 	es_stats = None
@@ -158,8 +156,8 @@ def get_parameters():
 		input_file.close()
 		params["name"] = sys.argv[2]
 	except IOError:
-		logging.error("%s not found, aborting.", sys.argv[1])
-		sys.exit()
+		logging.critical("%s not found, aborting.", sys.argv[1])
+		raise FileProblem(msg="Cannot find a valid configuration file.", expr=None)
 	return params
 
 def get_judgment(params, metrics):
@@ -172,21 +170,22 @@ def get_judgment(params, metrics):
 	cpu, q = metrics["highest_cpu"], metrics["highest_queue"]
 
 	#Lambda functions to create words for decision logic
-	underloaded = lambda: cpu <= rules["down"]["cpu"] and q <= rules["down"]["search_queue"]
-	overloaded = lambda: cpu >= rules["up"]["cpu"] and q >= rules["up"]["search_queue"]
+	underloaded = lambda: (cpu <= rules["down"]["cpu"]) and (q <= rules["down"]["search_queue"])
+	overloaded = lambda: (cpu >= rules["up"]["cpu"]) and (q >= rules["up"]["search_queue"])
 	room_to_shrink = lambda: len(params["ec2_on_slave"]) >= params["nodes"]["minimum"]
 	room_to_grow = lambda: len(params["ec2_off_slave"]) > 0
 
 	#Make a judgment about whether to scale up, scale down, or do nothing
 	judgment = None
-	if underloaded:
-		if room_to_shrink:
-			judgment = "scale down"
+	
+	if underloaded():
+		if room_to_shrink():
+			judgment = "contract"
 		else:
 			judgment = "neutral: scale down limit reached"
-	elif overloaded:
-		if room_to_grow:
-			judgment = "scale up"
+	elif overloaded():
+		if room_to_grow():
+			judgment = "expand"
 		else:
 			judgment = "neutral: scale up limit reached"
 	else:
@@ -194,10 +193,6 @@ def get_judgment(params, metrics):
 	logging.warning("IN-USE: {0}, STANDING-BY: {1}, CPU: {2}, QUEUE: {3}, RECOMMENDATION {4}".format(\
 		ec2_on_slave, ec2_off_slave, cpu, q, judgment))
 	return judgment
-
-def pretty(my_json):
-	"""A pretty print function"""
-	return json.dumps(my_json, sort_keys=False, indent=4, separators=(',', ': '))
 
 def refresh_ec2_metrics(params, ec2_conn):
 	"""This function uses gathers ec2_metrics"""
@@ -220,39 +215,46 @@ def refresh_ec2_metrics(params, ec2_conn):
 	params["ec2_off_slave"] = [i for i in instances if i.state != 'running' ]
 	params["instances"] = params["ec2_on_slave"]
 
-def scale_down(params):
-	"""Scales our elasticsearch cluster down."""
-	logging.info("Scaling down.")
+def wait_for_healthy_cluster(params, target_nodes):
+	"""This module polls the cluster for its health and returns once the cluster
+	is found to be in good health."""
+	status, current_nodes = None, None
+	while (status != "green") or (current_nodes != target_nodes):
+		status, current_nodes = get_cluster_health(params)
+		logging.warning("STATUS: {0}, CURRENT_NODES {1}, TARGET_NODES: {2}".format(status, current_nodes, target_nodes))
+		time.sleep(5)
+
+def scale(params, judgment):
+	"""Scales our elasticsearch cluster up or down."""
+	logging.info("Scaling {0}.".format(judgment))
 	ec2_on_slave = params["ec2_on_slave"]
 	#TODO: switch to a random ec2_slave
-	candidate = ec2_on_slave[0]
+	candidate, target_offset = ec2_on_slave[0], 0
 	logging.info("Stopping {0}".format(candidate.id))
 	try:
-		candidate.stop()
+		if judgment == "contract":
+			candidate.stop()
+			target_offset = -1
+		elif judgment == "expand":
+			candidate.start()
+			target_offset = 1
+		else:
+			raise UnknownJudgment(msg="No handling for that judgment, aborting.", expr=None)
 	except EC2ResponseError as err:
 		logging.critical("Error scaling down, aborting: Exception {0}".format(err))
 		logging.critical("Unexpected error:", sys.exc_info()[0])
 		sys.exit()
-	status, current_nodes = None, None
 	#We need to achieve the number of ec2_on_slave instances plus the permanent instances
 	target_nodes = len(params["ec2_on_slave"]) + len(params["permanent_instances"])
 	#Since we are trying to reduce, reduce our target by one
-	target_nodes += -1
+	target_nodes += target_offset
 	#Wait until the ES cluster is healthy (green) and has the correct number of nodes
-	while (status != "green") or (current_nodes != target_nodes):
-		status, current_nodes, _ = get_cluster_health(params)
-		logging.warning("STATUS: {0}, CURRENT_NODES {1}, TARGET_NODES: {2}".format(status, current_nodes, target_nodes))
-		time.sleep(5)
-
-def scale_up(params):
-	"""Scales our elasticsearch cluster up."""
-	#TODO: Implement
-	pass
+	wait_for_healthy_cluster(params, target_nodes)
 
 def something_else(params):
 	"""Sends an alert or something, I don't know yet."""
-	#TODO" Implement
-	pass
+	#TODO: Implement
+	logging.critical("Unimplemented, 'something_else' function.")
 
 def start():
 	"""This function starts the monitor."""
@@ -280,11 +282,8 @@ def start():
 			consistency = 0
 		if consistency >= params["scaling_rules"]["limit_break"]:
 			logging.warning("Time to {0}".format(judgment))
-			if judgment == "scale down":
-				scale_down(params)
-				consistency = 0
-			elif judgment == "scale up":
-				scale_up(params)
+			if judgment in ["contract", "expand"]:
+				scale(params, judgment)
 				consistency = 0
 			else:
 				something_else(params)

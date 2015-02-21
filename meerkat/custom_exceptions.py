@@ -14,8 +14,22 @@ class FileProblem(Exception):
 		self.expr = expr
 		self.msg = msg
 
+class SecurityGroupNotFound(Exception):
+	"""Exception raised for invalid EC2 Security Groups."""
+	def __init__(self, expr, msg):
+		super(InvalidArguments, self).__init__(msg)
+		self.expr = expr
+		self.msg = msg
+
 class InvalidArguments(Exception):
 	"""Exception raised for invalid command line arguments."""
+	def __init__(self, expr, msg):
+		super(InvalidArguments, self).__init__(msg)
+		self.expr = expr
+		self.msg = msg
+
+class UnknownJudgment(Exception):
+	"""Exception raised for invalid auto_scale judgments."""
 	def __init__(self, expr, msg):
 		super(InvalidArguments, self).__init__(msg)
 		self.expr = expr
