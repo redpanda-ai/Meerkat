@@ -1,0 +1,28 @@
+{
+	"region" : "us-west-2",
+	"vpc-id" : "vpc-a930dacc",
+	"nodes" : {
+		"minimum" : 45,
+		"maximum" : 90
+	},
+	"security_groups" : [ ],
+	"master_instances" : [
+		"i-f89064f4",
+		"i-34906438",
+		"i-35906439",
+		"i-3690643a",
+		"i-3790643b"
+	],
+	"scaling_rules": {
+		"interval" : 10,
+		"consensus_limit" : 3000,
+		"down" : {
+			"cpu" : 0,
+			"search_queue" : 0
+		},
+		"up" : {
+			"cpu" : 1,
+			"search_queue" : 0
+		}
+	}
+}
