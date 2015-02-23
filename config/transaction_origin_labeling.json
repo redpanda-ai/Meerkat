@@ -1,7 +1,7 @@
 {
 	"S3": {
 		"bucket_name": "s3yodlee",
-		"filename": "TO_GT_BANK_1.txt",
+		"filename": "TO_GT_BANK_2.txt",
 		"s3_path": "development/labeling/"
 	},
 	"display_columns": [
