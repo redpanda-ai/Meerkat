@@ -31,6 +31,7 @@ def main():
 	# Define valid routes
 	# pylint: disable=bad-continuation
 	routes = [
+		("/meerkat/v1.0.0/?", Meerkat_API),
 		("/meerkat/?", Meerkat_API),
 		("/status/index.html", Meerkat_API)
 	]
