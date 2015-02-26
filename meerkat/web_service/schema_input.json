@@ -11,7 +11,7 @@
 				"ledger_entry" : { "enum" : [ "debit", "credit" ] },
 				"date" : { "type": "string" }
 			},
-			"required": ["transaction_id", "description", "amount", "date"]
+			"required": ["transaction_id", "description", "amount", "date", "ledger_entry"]
 		}
 	},
 	"description": "A schema for defining input into 'meerkat_categorize'",
