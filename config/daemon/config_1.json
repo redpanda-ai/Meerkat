@@ -49,6 +49,6 @@
 			"name" : "gpanel_enhancedCT_card",
 			"src_location" : "yodleeprivate/ctprocessed/gpanel_enhancedCT/card/",
 			"dst_location" : "yodleeprivate/panels/meerkat_output/gpanel_enhancedCT/card/"
-		},
+		}
 	]
 }
