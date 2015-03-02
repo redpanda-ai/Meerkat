@@ -34,25 +34,7 @@ class ConsumerTests(unittest.TestCase):
 			}
 		},
 		"elasticsearch" : {
-			"cluster_nodes" : [
-			    "s01:9200",
-			    "s02:9200",
-			    "s03:9200",
-			    "s04:9200",
-			    "s05:9200",
-			    "s06:9200",
-			    "s07:9200",
-			    "s09:9200",
-			    "s10:9200",
-			    "s11:9200",
-			    "s12:9200",
-			    "s13:9200",
-			    "s14:9200",
-			    "s15:9200",
-			    "s16:9200",
-			    "s17:9200",
-			    "s18:9200"
-	    	],
+			"cluster_nodes" : ["172.31.26.85"],
 			"index" : "factual_index", "type" : "factual_type",
 			"boost_labels" : [ "standard_fields", "composite.address" ],
 			"boost_vectors" : {
@@ -130,7 +112,7 @@ class ConsumerTests(unittest.TestCase):
 		"""Ensure that list containing [3, 2, 1], returns 1.225 for z_score"""
 		scores = [3, 2, 1]
 		result = self.my_consumer._Consumer__generate_z_score_delta(scores)
-		self.assertEqual(result, 1.225)
+		self.assertEqual(result[0], 1.225)
 
 
 	"""FIXME: No longer a method in consumer, should we remove? 
