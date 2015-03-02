@@ -17,7 +17,7 @@
 			* - [ ] provide alerting when problems occur
 			* - [ ] full deployment
 	* 3/3
-		* - [ ] Reduce EC2 infrastructure cost and report results to Neil and Katie		
+		* - [x] Reduce EC2 infrastructure cost and report results to Neil and Katie		
 2.  **Meerkat Team**, Matt
 	* 3/3
 		* - [ ] Conduct analysis on first 5000 labeled transactions, report results
