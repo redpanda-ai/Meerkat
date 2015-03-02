@@ -18,13 +18,15 @@
 			* - [ ] full deployment
 	* 3/3
 		* - [ ] Reduce EC2 infrastructure cost and report results to Neil and Katie		
-	* 3/7
-		* - [ ] Think of a way to process set of ***deep clean*** regular expressions.
-			* Each bundle of regex expressions will serve as a per-merchant classifier
-			* Nikhil is heading up a team of interns and data analysts to build it in Q1 and Q2.
-1.  **Meerkat Team**, Matt
+
+2.  **Meerkat Team**, Matt
 	* - [ ] 3/3 Conduct analysis on first 5000 labeled transactions, report results
 	* - [ ] 3/3 Review Ram's contribution to our labeling effort, report findings
+3.  **Meerkat Team**, Andy and Matt
+	* 3/7
+		* - [ ] Think of a way to integrate a series of per-merchant classifiers that take the form of a series of regex expressions.
+			* Each bundle of regex expressions will serve as a per-merchant classifier
+			* Nikhil is heading up a team of interns and data analysts to build and maintain at least dozens but possibly a hundered of them in Q1 and Q2.
 
 ### DEPENDENCIES
 #### v1.1.0
