@@ -47,7 +47,7 @@
 
 #### Andy
 * 3/2
-	* - [x] Merge fix_unittests pull request
+	* - [x] Merge fix_unittests pull request 
 * 2/28
 	* - [x] Phone screen for Sivan, a new summer intern
 	* - [x] Update the Meerkat daemon to give CT testing data
