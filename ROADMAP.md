@@ -10,26 +10,27 @@
 	* 3/2 
 		* - [x] Review pull request for revised unit tests from Matt
 		* - [ ] Give Rahul a complete list of development and 3rd party libraries, with versions.
-		* - [ ] Reduce EC2 infrastructure from 
+
 		* - [ ] Update the Meerkat daemon to provide
 			* - [ ] column re-ordering
 			* - [ ] handle multiple input paths
 			* - [ ] handle newer version of the input files
 			* - [ ] provide alerting when problems occur
 			* - [ ] full deployment
-	* Due 3/31 - Think of a way to process set of ***deep clean*** regular expressions.
-		* Each bundle of regex expressions will serve as a merchant classifier
-		* Nikhil is heading up a team of interns and data analysts to build it in Q1 and Q2.
+	* 3/3
+		* - [ ] Reduce EC2 infrastructure cost and report results to Neil and Katie		
+	* 3/7
+		* - [ ] Think of a way to process set of ***deep clean*** regular expressions.
+			* Each bundle of regex expressions will serve as a per-merchant classifier
+			* Nikhil is heading up a team of interns and data analysts to build it in Q1 and Q2.
 1.  **Meerkat Team**, Matt
 	* - [ ] 3/3 Conduct analysis on first 5000 labeled transactions, report results
 	* - [ ] 3/3 Review Ram's contribution to our labeling effort, report findings
 
 ### DEPENDENCIES
+#### v1.1.0
 1. **Data Warehouse Team**, Sanjay
 	* - [ ] Confirm the complete list of Meerkat S3 input and output locations
-	
-#### v1.1.0
-* To be determined
 
 ### AGREEMENTS / DEADLINES
 #### v1.1.0
@@ -47,7 +48,7 @@
 	* - [ ] Meet with Richa from Program Management to discuss architecture of Meerkat
 * 3/7
 	* - [ ] Speak with Sanjay and team about prototype for building a web service panel for Meerkat
-	* - [ ] Create plan to deal integrate Nikhil's per-merchant classifier program (uses regex)
+	* - [ ] Create plan to deal integrate Nikhil's per-merchant classifier program (uses bundles of regular expressions)
 * 3/31
 	* - [ ] Relesae shadow CT with end-to-end functionality, Meerkat v1.1.0
 
