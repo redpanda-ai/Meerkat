@@ -49,4 +49,8 @@ All rights reserved.
 
 Contributors
 ------------
-* J. Andrew Key, Matt Sevrens, and M. Phani Ram
+* J. Andrew Key
+* Matt Sevrens
+* M. Phani Ram
+* As Shaja
+* Ashish Kulkarni

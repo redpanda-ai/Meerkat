@@ -133,7 +133,7 @@ class Consumer(threading.Thread):
 		z_score_delta = round(first_score - second_score, 3)
 		logger.info("Z-Score delta: [%.2f]", z_score_delta)
 
-		return z_score_delta, z_scores[0]
+		return z_score_delta, scores[0]
 
 	def __decision_boundary(self, z_score_delta, raw_score):
 		"""Decide whether or not we will label transaction
