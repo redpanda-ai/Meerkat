@@ -18,7 +18,6 @@
 			* - [ ] full deployment
 	* 3/3
 		* - [ ] Reduce EC2 infrastructure cost and report results to Neil and Katie		
-
 2.  **Meerkat Team**, Matt
 	* - [ ] 3/3 Conduct analysis on first 5000 labeled transactions, report results
 	* - [ ] 3/3 Review Ram's contribution to our labeling effort, report findings
