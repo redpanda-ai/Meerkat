@@ -1,4 +1,15 @@
 {
+    "concurrency": 20,
+	"elasticsearch": {
+		"cluster_nodes": [
+			"172.31.26.85",
+			"172.31.26.84",
+			"172.31.26.87",
+			"172.31.26.86"
+		],
+		"index": "factual_index",
+		"type": "factual_type"
+	},
 	"location_pairs" : [
 		{
 			"name" : "ct_version2_bank",

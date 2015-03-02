@@ -5,7 +5,7 @@ import re
 import sys
 
 from boto.s3.connection import Location
-from .custom_exceptions import FileProblem
+from .custom_exceptions import FileProblem, InvalidArguments
 
 def get_parameters():
 	"""Validates the command line arguments and loads a dict of params."""
@@ -23,7 +23,7 @@ def get_parameters():
 	return params
 
 def start():
-	"""This function starts the toy."""
+	"""This function starts the new_daemon."""
 	params = get_parameters()
 	location_pairs = params["location_pairs"]
 	params["s3_conn"] = boto.connect_s3()
@@ -70,7 +70,7 @@ def update_pending_files(params, src_dict, dst_dict):
 
 if __name__ == "__main__":
 	#MAIN PROGRAM
-	logging.basicConfig(format='%(asctime)s %(message)s', filename='logs/toy.log', \
+	logging.basicConfig(format='%(asctime)s %(message)s', filename='logs/new_daemon.log', \
 		level=logging.INFO)
 	logging.info("Toy module activated.")
 	start()
