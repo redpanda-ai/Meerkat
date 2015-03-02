@@ -11,7 +11,8 @@
 		* Each bundle of regex expressions will serve as a merchant classifier
 		* Nikhil is heading up a team of interns and data analysts to build it in Q1 and Q2.
 1.  **Meerkat Team**, Matt
-	* - [ ] Review Ram's contribution to our labeling effort
+	* - [ ] 3/3 Review Ram's contribution to our labeling effort, report findings
+	* - [ ] 3/3 Conduct analysis on first 5000 labeled transactions, report results
 
 ### DEPENDENCIES
 #### v1.1.0
