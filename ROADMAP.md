@@ -19,8 +19,9 @@
 	* 3/3
 		* - [ ] Reduce EC2 infrastructure cost and report results to Neil and Katie		
 2.  **Meerkat Team**, Matt
-	* - [ ] 3/3 Conduct analysis on first 5000 labeled transactions, report results
-	* - [ ] 3/3 Review Ram's contribution to our labeling effort, report findings
+	* 3/3
+		* - [ ] Conduct analysis on first 5000 labeled transactions, report results
+		* - [ ] Review Ram's contribution to our labeling effort, report findings
 3.  **Meerkat Team**, Andy and Matt
 	* 3/7
 		* - [ ] Think of a way to integrate a series of per-merchant classifiers that take the form of a series of regex expressions.
