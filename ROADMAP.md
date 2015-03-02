@@ -60,6 +60,7 @@
 	* - [x] Compare the lists of ***txn_type*** and ***txn_sub_type*** labels between Platform and Meerkat
 	* - [x] Add semantic versioning for the v1.0.0 version of Meerkat
 	* - [x] Provide thoughtful response to how to find and predict transaction types.
+
 #### Andy
 * 3/2
 	* - [x] Merge fix_unittests pull request 
