@@ -55,7 +55,7 @@
 	* - [ ] Speak with Sanjay and team about prototype for building a web service panel for Meerkat
 	* - [ ] Create plan to deal integrate Nikhil's per-merchant classifier program (uses bundles of regular expressions)
 * 3/31
-	* - [ ] Relesae shadow CT with end-to-end functionality, Meerkat v1.1.0
+	* - [ ] Release shadow CT with end-to-end functionality, Meerkat v1.1.0
 
 ### RECENTLY COMPLETED
 #### Matt
