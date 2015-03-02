@@ -40,12 +40,14 @@
 ### RECENTLY COMPLETED
 #### Matt
 * 3/2
-	* - [x] Submit corrections for unit tests in meerkat.producer
+	* - [x] Submit pull request for unit tests in meerkat.producer
 * 2/28
 	* - [x] Compare the lists of ***txn_type*** and ***txn_sub_type*** labels between Platform and Meerkat
 	* - [x] Add semantic versioning for the v1.0.0 version of Meerkat
 
 #### Andy
+* 3/2
+	* - [x] Merge fix_unittests pull request
 * 2/28
 	* - [x] Phone screen for Sivan, a new summer intern
 	* - [x] Update the Meerkat daemon to give CT testing data
