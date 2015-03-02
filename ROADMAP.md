@@ -23,6 +23,9 @@
 				* ***Meerkat Panel Processing***, 52 instances
 				* Meerkat Production Web Service, 9 instances
 				* Meerkat Unknown, 4 instances
+		* - [ ] Meet with Richa from Program Management to discuss architecture of Meerkat
+	* 3/7
+		* - [ ] Speak with Sanjay and team about prototype for building a web service panel for Meerkat
 2.  **Meerkat Team**, Matt
 	* 3/3
 		* - [ ] Conduct analysis on first 5000 labeled transactions, report results
@@ -37,25 +40,6 @@
 #### v1.1.0
 1. **Data Warehouse Team**, Sanjay
 	* - [ ] Confirm the complete list of Meerkat S3 input and output locations
-
-### AGREEMENTS / DEADLINES
-#### v1.1.0
-* 3/2 
-	* - [ ] Give Rahul a complete list of development and 3rd party libraries, with versions.
-	* - [ ] Update the Meerkat daemon to provide
-		* - [ ] column re-ordering
-		* - [ ] handle multiple input paths
-		* - [ ] handle newer version of the input files
-		* - [ ] provide alerting when problems occur
-		* - [ ] full deployment
-* 3/3
-
-	* - [ ] Meet with Richa from Program Management to discuss architecture of Meerkat
-* 3/7
-	* - [ ] Speak with Sanjay and team about prototype for building a web service panel for Meerkat
-	* - [ ] Create plan to deal integrate Nikhil's per-merchant classifier program (uses bundles of regular expressions)
-* 3/31
-	* - [ ] Release shadow CT with end-to-end functionality, Meerkat v1.1.0
 
 ### RECENTLY COMPLETED
 #### Matt
