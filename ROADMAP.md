@@ -11,25 +11,31 @@
 		* Each bundle of regex expressions will serve as a merchant classifier
 		* Nikhil is heading up a team of interns and data analysts to build it in Q1 and Q2.
 1.  **Meerkat Team**, Matt
-	* - [ ]
+	* - [ ] Review Ram's contribution to our labeling effort
 
 ### DEPENDENCIES
 #### v1.1.0
+* To be determined
 
 ### AGREEMENTS / DEADLINES
 #### v1.1.0
-* 3/2 - [ ] Review pull request for revised unit tests from Matt
-* 3/2 - [ ] Give Rahul, specifically a sharepoint address, a complete list of development and 3rd party libraries, with versions.
-* 3/2 - [ ] Update the Meerkat daemon to provide
-	* - [ ] column re-ordering
-	* - [ ] handle multiple input paths
-	* - [ ] handle newer version of the input files
-	* - [ ] provide alerting when problems occur
-	* - [ ] full deployment
-* 3/3 - [ ] Provide an update to Neil and Katie about progress on reducing EC2 cost
-* 3/3 - [ ] Meet with Richa from Program Management to discuss architecture of Meerkat
-* 3/7 - [ ] Speak with Sanjay and team about prototype for building a web service panel for Meerkat
-* 3/31 - Relesae shadow CT with end-to-end functionality, Meerkat v1.1.0
+* 3/2 
+	* - [ ] Review pull request for revised unit tests from Matt
+	* - [ ] Give Rahul, specifically a sharepoint address, a complete list of development and 3rd party libraries, with versions.
+	* - [ ] Update the Meerkat daemon to provide
+		* - [ ] column re-ordering
+		* - [ ] handle multiple input paths
+		* - [ ] handle newer version of the input files
+		* - [ ] provide alerting when problems occur
+		* - [ ] full deployment
+* 3/3
+	* - [ ] Provide an update to Neil and Katie about progress on reducing EC2 cost
+	* - [ ] Meet with Richa from Program Management to discuss architecture of Meerkat
+* 3/7
+	* - [ ] Speak with Sanjay and team about prototype for building a web service panel for Meerkat
+	* - [ ] Create plan to deal integrate Nikhil's per-merchant classifier program (uses regex)
+* 3/31
+	* - [ ] Relesae shadow CT with end-to-end functionality, Meerkat v1.1.0
 
 ### RECENTLY COMPLETED
 #### Matt
