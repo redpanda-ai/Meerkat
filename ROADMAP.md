@@ -17,7 +17,12 @@
 			* - [ ] provide alerting when problems occur
 			* - [ ] full deployment
 	* 3/3
-		* - [x] Reduce EC2 infrastructure cost and report results to Neil and Katie		
+		* - [x] Reduce EC2 infrastructure cost and report results to Neil and Katie
+			* Total instance count 69
+				* Meerkat Development, 4 instances
+				* ***Meerkat Panel Processing***, 52 instances
+				* Meerkat Production Web Service, 9 instances
+				* Meerkat Unknown, 4 instances
 2.  **Meerkat Team**, Matt
 	* 3/3
 		* - [ ] Conduct analysis on first 5000 labeled transactions, report results
