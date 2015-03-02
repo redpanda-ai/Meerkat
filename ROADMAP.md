@@ -10,7 +10,6 @@
 	* 3/2 
 		* - [x] Review pull request for revised unit tests from Matt
 		* - [ ] Give Rahul a complete list of development and 3rd party libraries, with versions.
-
 		* - [ ] Update the Meerkat daemon to provide
 			* - [ ] column re-ordering
 			* - [ ] handle multiple input paths
