@@ -41,7 +41,6 @@
 ### AGREEMENTS / DEADLINES
 #### v1.1.0
 * 3/2 
-	* - [ ] Review pull request for revised unit tests from Matt
 	* - [ ] Give Rahul a complete list of development and 3rd party libraries, with versions.
 	* - [ ] Update the Meerkat daemon to provide
 		* - [ ] column re-ordering
@@ -50,7 +49,7 @@
 		* - [ ] provide alerting when problems occur
 		* - [ ] full deployment
 * 3/3
-	* - [ ] Provide an update to Neil and Katie about progress on reducing EC2 cost
+
 	* - [ ] Meet with Richa from Program Management to discuss architecture of Meerkat
 * 3/7
 	* - [ ] Speak with Sanjay and team about prototype for building a web service panel for Meerkat
@@ -68,8 +67,10 @@
 	* - [x] Provide thoughtful response to how to find and predict transaction types.
 
 #### Andy
+* 3/3
+	* - [x] Provide an update to Neil and Katie about progress on reducing EC2 cost
 * 3/2
-	* - [x] Merge fix_unittests pull request 
+	* - [x] Review pull request for revised unit tests from Matt
 * 2/28
 	* - [x] Phone screen for Sivan, a new summer intern
 	* - [x] Update the Meerkat daemon to give CT testing data
