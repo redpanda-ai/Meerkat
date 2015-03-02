@@ -15,7 +15,7 @@
 			* - [ ] handle multiple input paths
 			* - [ ] handle newer version of the input files
 			* - [ ] provide alerting when problems occur
-			* - [ ] full deployment :clock4:
+			* - [ ] :clock4: full deployment
 	* 3/3
 		* - [x] Reduce EC2 infrastructure cost and report results to Neil and Katie
 			* Total instance count 69
@@ -28,8 +28,8 @@
 		* - [ ] Speak with Sanjay and team about prototype for building a web service panel for Meerkat
 2.  **Meerkat Team**, Matt
 	* 3/3
-		* - [ ] Conduct analysis on first 5000 labeled transactions, report results :clock4:
-		* - [ ] Review Ram's contribution to our labeling effort, report findings :clock4:
+		* - [ ] :clock4: Conduct analysis on first 5000 labeled transactions, report results 
+		* - [ ] :clock4: Review Ram's contribution to our labeling effort, report findings
 3.  **Meerkat Team**, Andy and Matt
 	* 3/7
 		* - [ ] Think of a way to integrate a series of per-merchant classifiers that take the form of a series of regex expressions.
