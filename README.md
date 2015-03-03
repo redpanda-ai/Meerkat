@@ -36,8 +36,8 @@ Manually for now
 Dependencies
 ------------
 <pre>
-[root@ip-172-31-25-23 Meerkat]# uname -a
-Linux ip-172-31-25-232.6.32-431.29.2.el6.x86_64#1 SMP Tue Sep 9 21:36:05 UTC 2014 x86_64 x86_64 x86_64 GNU/Linux
+[root@ip-172-31-25-23 ~]# uname -r
+2.6.32-431.29.2.el6.x86_64
 [root@ip-172-31-25-23 Meerkat]# cat /etc/centos-release
 CentOS release 6.5 (Final)
 [root@ip-172-31-25-23 Meerkat]# pip3.3 freeze
