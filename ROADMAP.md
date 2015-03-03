@@ -55,8 +55,8 @@
 	* - [x] Provide an update to Neil and Katie about progress on reducing EC2 cost
 * 3/2
 	* - [x] Review pull request for revised unit tests from Matt
-* 2/28
 	* - [x] Phone screen for Sivan, a new summer intern
+* 2/28
 	* - [x] Update the Meerkat daemon to give CT testing data
 	* - [x] :+1: Deploy Meerkat v1.0.0 to production VPC 
 	* - [x] Set up a [distribution list] (https://github.com/joeandrewkey/meerkat_webservice_schema/issues/21) or equivalent for labels
