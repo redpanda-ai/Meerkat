@@ -15,6 +15,7 @@
 			* - [ ] handle multiple input paths
 			* - [ ] handle newer version of the input files
 			* - [ ] provide alerting when problems occur
+			* - [ ] produce a daily report for all input paths, sent to a distribution list
 			* - [ ] :clock4: full deployment
 	* 3/3
 		* - [x] Reduce EC2 infrastructure cost and report results to Neil and Katie
@@ -40,6 +41,8 @@
 #### v1.1.0
 1. **Data Warehouse Team**, Sanjay
 	* - [ ] Confirm the complete list of Meerkat S3 input and output locations
+	* - [ ] Provide a distribution list for everyone who needs Meerkat panel alerts
+	* - [ ] Provide a distribution list for everyone who wants the daily panel report
 
 ### RECENTLY COMPLETED
 #### Matt
