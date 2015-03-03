@@ -9,13 +9,6 @@
 			* - [x] timeline with milestones
 	* 3/2 
 		* - [x] Review pull request for revised unit tests from Matt
-		* - [ ] Update the Meerkat daemon to provide
-			* - [ ] column re-ordering
-			* - [ ] handle multiple input paths
-			* - [ ] handle newer version of the input files
-			* - [ ] provide alerting when problems occur
-			* - [ ] produce a daily report for all input paths, sent to a distribution list
-			* - [ ] :clock4: full deployment
 	* 3/3
 		* - [x] Reduce EC2 infrastructure cost and report results to Neil and Katie
 			* Total instance count 69
@@ -23,6 +16,14 @@
 				* ***Meerkat Panel Processing***, 52 instances
 				* Meerkat Production Web Service, 9 instances
 				* Meerkat Unknown, 4 instances
+	* 3/4
+		* - [ ] Update the Meerkat daemon to provide
+			* - [ ] column re-ordering
+			* - [ ] handle multiple input paths
+			* - [ ] handle newer version of the input files
+			* - [ ] provide alerting when problems occur
+			* - [ ] produce a daily report for all input paths, sent to a distribution list
+			* - [ ] :clock4: full deployment
 		* - [ ] Meet with Richa from Program Management to discuss architecture of Meerkat
 	* 3/6
 		* - [ ] Speak with Sanjay and team about prototype for building a web service panel for Meerkat
