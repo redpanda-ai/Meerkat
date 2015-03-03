@@ -35,13 +35,64 @@ Manually for now
 
 Dependencies
 ------------
-* Python 3.3
-* Pandas
-* Numpy
-* SciPy
-* Scikit-Learn
-* Elasticsearch
-* Boto
+<pre>
+[root@ip-172-31-25-23 Meerkat]# uname -a
+Linux ip-172-31-25-232.6.32-431.29.2.el6.x86_64#1 SMP Tue Sep 9 21:36:05 UTC 2014 x86_64 x86_64 x86_64 GNU/Linux
+[root@ip-172-31-25-23 Meerkat]# cat /etc/centos-release
+CentOS release 6.5 (Final)
+[root@ip-172-31-25-23 Meerkat]# pip3.3 freeze
+Menu==1.4
+Tornado-JSON==0.41
+astroid==1.1.1
+awscli==1.5.3
+bcdoc==0.12.2
+bitarray==0.8.1
+boto==2.9.9
+botocore==0.67.0
+colorama==0.2.5
+docutils==0.12
+ecdsa==0.11
+elasticsearch==1.0.0
+jmespath==0.4.1
+jsonschema==2.4.0
+logilab-common==0.61.0
+matplotlib==1.3.1
+nltk==3.0.0
+nose==1.3.3
+numpy==1.8.1
+pandas==0.14.1
+paramiko==1.15.1
+progressbar==2.2
+pyasn1==0.1.7
+pybloom==2.0.0
+pycrypto==2.6.1
+pylint==1.2.1
+pyparsing==2.0.2
+python-dateutil==2.2
+pytz==2014.7
+rsa==3.1.2
+scikit-learn==0.15.2
+scipy==0.14.0
+six==1.6.1
+tornado==3.2.1
+urllib3==1.8.2
+virtualenv==1.11.6
+[root@ip-172-31-25-23 ~]# python3.3 --version
+Python 3.3.5
+[root@ip-172-31-25-23 Meerkat]# curl -s 172.31.26.85:9200
+{
+  "status" : 200,
+  "name" : "Frigga",
+  "version" : {
+    "number" : "1.3.1",
+    "build_hash" : "2de6dc5268c32fb49b205233c138d93aaf772015",
+    "build_timestamp" : "2014-07-28T14:45:15Z",
+    "build_snapshot" : false,
+    "lucene_version" : "4.9"
+  },
+  "tagline" : "You Know, for Search"
+}
+</pre>
 
 License information
 -------------------
