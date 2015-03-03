@@ -28,8 +28,8 @@
 		* - [ ] Speak with Sanjay and team about prototype for building a web service panel for Meerkat
 2.  **Meerkat Team**, Matt
 	* 3/3
-		* - [ ] :clock4: Conduct analysis on first 5000 labeled transactions, report results 
-		* - [ ] :clock4: Review Ram's contribution to our labeling effort, report findings
+		* - [x] :clock4: Conduct analysis on first 5000 labeled transactions, report results 
+		* - [x] :clock4: Review Ram's contribution to our labeling effort, report findings
 3.  **Meerkat Team**, Andy and Matt
 	* 3/7
 		* - [ ] Think of a way to integrate a series of per-merchant classifiers that take the form of a series of regex expressions.
