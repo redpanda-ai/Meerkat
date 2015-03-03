@@ -35,11 +35,23 @@ Manually for now
 
 Dependencies
 ------------
+#### Linux Version
 <pre>
 [root@ip-172-31-25-23 ~]# uname -r
 2.6.32-431.29.2.el6.x86_64
+</pre>
+#### Linux Distribution
+<pre>
 [root@ip-172-31-25-23 Meerkat]# cat /etc/centos-release
 CentOS release 6.5 (Final)
+</pre>
+#### Python version
+<pre>
+[root@ip-172-31-25-23 ~]# python3.3 --version
+Python 3.3.5
+</pre>
+#### Python Libraries
+<pre>
 [root@ip-172-31-25-23 Meerkat]# pip3.3 freeze
 Menu==1.4
 Tornado-JSON==0.41
@@ -77,8 +89,9 @@ six==1.6.1
 tornado==3.2.1
 urllib3==1.8.2
 virtualenv==1.11.6
-[root@ip-172-31-25-23 ~]# python3.3 --version
-Python 3.3.5
+</pre>
+#### Elasticsearch and Lucene versions
+<pre>
 [root@ip-172-31-25-23 Meerkat]# curl -s 172.31.26.85:9200
 {
   "status" : 200,
