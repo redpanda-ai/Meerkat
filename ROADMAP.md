@@ -9,7 +9,6 @@
 			* - [x] timeline with milestones
 	* 3/2 
 		* - [x] Review pull request for revised unit tests from Matt
-		* - [ ] Give Rahul a complete list of development and 3rd party libraries, with versions.
 		* - [ ] Update the Meerkat daemon to provide
 			* - [ ] column re-ordering
 			* - [ ] handle multiple input paths
@@ -25,7 +24,8 @@
 				* Meerkat Production Web Service, 9 instances
 				* Meerkat Unknown, 4 instances
 		* - [ ] Meet with Richa from Program Management to discuss architecture of Meerkat
-	* 3/7
+	* 3/6
+		* - [ ] Give Rahul and Mandira a complete list of development and 3rd party libraries, with versions.
 		* - [ ] Speak with Sanjay and team about prototype for building a web service panel for Meerkat
 2.  **Meerkat Team**, Matt
 	* 3/3
