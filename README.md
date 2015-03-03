@@ -92,7 +92,7 @@ virtualenv==1.11.6
 </pre>
 #### Elasticsearch and Lucene versions
 <pre>
-[root@ip-172-31-25-23 Meerkat]# curl -s 172.31.26.85:9200
+[root@ip-172-31-25-23 Meerkat]# curl -s some_host:9200
 {
   "status" : 200,
   "name" : "Frigga",
