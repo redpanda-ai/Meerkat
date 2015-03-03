@@ -25,7 +25,6 @@
 				* Meerkat Unknown, 4 instances
 		* - [ ] Meet with Richa from Program Management to discuss architecture of Meerkat
 	* 3/6
-		* - [ ] Give Rahul and Mandira a complete list of development and 3rd party libraries, with versions.
 		* - [ ] Speak with Sanjay and team about prototype for building a web service panel for Meerkat
 2.  **Meerkat Team**, Matt
 	* 3/3
@@ -55,6 +54,7 @@
 
 #### Andy
 * 3/3
+	* - [x] Give Rahul and Mandira a complete list of development and 3rd party libraries, with versions.
 	* - [x] Provide an update to Neil and Katie about progress on reducing EC2 cost
 * 3/2
 	* - [x] Review pull request for revised unit tests from Matt
