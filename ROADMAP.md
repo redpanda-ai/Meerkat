@@ -40,9 +40,9 @@
 ### DEPENDENCIES
 #### v1.1.0
 1. **Data Warehouse Team**, Sanjay
-	* - [ ] Confirm the complete list of Meerkat S3 input and output locations
-	* - [ ] Provide a distribution list for everyone who needs Meerkat panel alerts
-	* - [ ] Provide a distribution list for everyone who wants the daily panel report
+	* - [x] Confirm the complete list of Meerkat S3 input and output locations
+	* - [x] Provide a distribution list for everyone who needs Meerkat panel alerts
+	* - [x] Provide a distribution list for everyone who wants the daily panel report
 
 ### RECENTLY COMPLETED
 #### Matt
