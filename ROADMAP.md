@@ -25,6 +25,8 @@
 			* - [ ] produce a daily report for all input paths, sent to a distribution list
 			* - [ ] :clock4: full deployment
 		* - [ ] Meet with Richa from Program Management to discuss architecture of Meerkat
+	* 3/5
+		* - [ ] Speak with Ram and ask him to get back to work on the label resolution.
 	* 3/6
 		* - [ ] Speak with Sanjay and team about prototype for building a web service panel for Meerkat
 2.  **Meerkat Team**, Matt
@@ -34,6 +36,8 @@
 			* works quickly over large data sets
 
 3.  **Meerkat Team**, Andy and Matt
+	* 3/5
+		* - [ ] Set up a call with Deepu to get the label choices and the samples to be labeled in a sensible place so that we can move forward.
 	* 3/7
 		* - [ ] Think of a way to integrate a series of per-merchant classifiers that take the form of a series of regex expressions.
 			* Each bundle of regex expressions will serve as a per-merchant classifier
@@ -71,3 +75,10 @@
 	* - [x] Set up a [distribution list] (https://github.com/joeandrewkey/meerkat_webservice_schema/issues/21) or equivalent for labels
 	* - [x] Obtain agreement on requiring ***ledger_entry*** in meerkat web service v1.0.0
 
+#### Notes
+	* Type x, Sub-type y, 5-> (81%) 4-> (9%) 3-> (12%)
+	* Complete Consensus (all 5)
+		Type x1, sub-type y1 -> 79%
+		Type x1, sub-type y2 -> 88%
+                     .....
+        * 4 out of 5 
