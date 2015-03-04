@@ -7,15 +7,7 @@
 			* - [x] list tasks
 			* - [x] list dependencies
 			* - [x] timeline with milestones
-	* 3/2 
-		* - [x] Review pull request for revised unit tests from Matt
-	* 3/3
-		* - [x] Reduce EC2 infrastructure cost and report results to Neil and Katie
-			* Total instance count 69
-				* Meerkat Development, 4 instances
-				* ***Meerkat Panel Processing***, 52 instances
-				* Meerkat Production Web Service, 9 instances
-				* Meerkat Unknown, 4 instances
+
 	* 3/4
 		* - [ ] Update the Meerkat daemon to provide
 			* - [ ] column re-ordering
@@ -72,7 +64,12 @@
 #### Andy
 * 3/3
 	* - [x] Give Rahul and Mandira a complete list of development and 3rd party libraries, with versions.
-	* - [x] Provide an update to Neil and Katie about progress on reducing EC2 cost
+	* - [x] Reduce EC2 infrastructure cost and report results to Neil and Katie
+		* Total instance count 69
+			* Meerkat Development, 4 instances
+			* ***Meerkat Panel Processing***, 52 instances
+			* Meerkat Production Web Service, 9 instances
+			* Meerkat Unknown, 4 instances
 * 3/2
 	* - [x] Review pull request for revised unit tests from Matt
 	* - [x] Phone screen for Sivan, a new summer intern
