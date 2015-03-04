@@ -80,10 +80,21 @@
 	* - [x] Set up a [distribution list] (https://github.com/joeandrewkey/meerkat_webservice_schema/issues/21) or equivalent for labels
 	* - [x] Obtain agreement on requiring ***ledger_entry*** in meerkat web service v1.0.0
 
-#### Notes
-	* Type x, Sub-type y, 5-> (81%) 4-> (9%) 3-> (12%)
-	* Complete Consensus (all 5)
-		Type x1, sub-type y1 -> 79%
-		Type x1, sub-type y2 -> 88%
-                     .....
-        * 4 out of 5 
+#### Possible ways of describing consensus on labels
+1. **One histogram per (type,subtype) pair** each with exactly 5 buckets
+	* Type x1, Sub-type y1, ***5 out of 5*** -> 79%, ***4 out of 5*** -> 7%, ***3 out of 5*** -> 12%
+	* Type x1, Sub-type y2, ***5 out of 5*** -> 88%, ***4 out of 5*** -> 5%, ***3 out of 5*** ->  7%
+	* .... more (type, subtype) histgrams
+2. **5 histograms** each with multiple (type, subtype) buckets
+	* ***5 out of 5***
+		* Type x1, sub-type y1 -> 79%
+		* Type x1, sub-type y2 -> 88%
+		* ..... more (type, subtype) buckets
+	* ***4 out of 5*** 
+		* Type x1, sub-type y1 -> 7%
+		* Type x1, sub-type y2 -> 5%
+		* ..... more
+	* ***3 out of 5***
+		* Type x1, sub-type y1 -> 12%
+		* Type x1, sub-type y2 -> 5%
+		* ..... more
