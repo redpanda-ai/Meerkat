@@ -80,7 +80,7 @@
 	* - [x] Set up a [distribution list] (https://github.com/joeandrewkey/meerkat_webservice_schema/issues/21) or equivalent for labels
 	* - [x] Obtain agreement on requiring ***ledger_entry*** in meerkat web service v1.0.0
 
-#### Possible ways of describing consensus on labels, 3 x b or b x 3
+#### Possible ways of describing consensus on labels, m x 3 or 3 x m
 1. **One histogram per (type,subtype) pair** each with exactly 3 buckets
 <pre>
 [ (Type,Subtype) "5/5" "4/5" "3/5" ]
