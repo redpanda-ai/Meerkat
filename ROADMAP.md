@@ -26,7 +26,8 @@
 			* - [ ] :clock4: full deployment
 		* - [ ] Meet with Richa from Program Management to discuss architecture of Meerkat
 	* 3/5
-		* - [ ] Speak with Ram and ask him to get back to work on the label resolution.
+		* - [x] Speak with Ram and ask him to get back to work on the label resolution.
+		* - [ ] Meet with Kirti on the architecture and design of our transaction data enrichment service
 	* 3/6
 		* - [ ] Speak with Sanjay and team about prototype for building a web service panel for Meerkat
 2.  **Meerkat Team**, Matt
