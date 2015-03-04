@@ -31,6 +31,7 @@
 		* - [ ] Speak with Sanjay and team about prototype for building a web service panel for Meerkat
 2.  **Meerkat Team**, Matt
 	* 3/7
+		* - [ ] Check and see if there are any types/subtypes with abnormally low rates of agreement between the labelers, provide useful metrics.
 		* - [ ] Set up an EC2 environment for the nolearn deep learning libraries that
 			* uses the graphics processing unit
 			* works quickly over large data sets
@@ -38,6 +39,9 @@
 3.  **Meerkat Team**, Andy and Matt
 	* 3/5
 		* - [ ] Set up a call with Deepu to get the label choices and the samples to be labeled in a sensible place so that we can move forward.
+		* - [ ] Determine why our labelers had trouble distinguishing subtypes of transfers, perhaps retry those
+		* - [ ] Reclassify the ***other*** transactions and see if providing ***charges and fees*** gives us labels
+		* - [ ] Add some E-trade data, or other cash management accounts to make sure we see some dividens and capital gains
 	* 3/7
 		* - [ ] Think of a way to integrate a series of per-merchant classifiers that take the form of a series of regex expressions.
 			* Each bundle of regex expressions will serve as a per-merchant classifier
