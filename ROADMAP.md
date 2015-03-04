@@ -83,10 +83,10 @@
 #### Possible ways of describing consensus on labels, 3 x b or b x 3
 1. **One histogram per (type,subtype) pair** each with exactly 3 buckets
 <pre>
-[ "Type" Subtype" "5/5" "4/5" "3/5" ]
-[   "T1"     "S1" 0.79   0.07  0.12 ]
-[   "T1"     "S2" 0.88   0.05  0.07 ]
-[   ....     .... ....   ....  .... ]
+[ "Type,Subtype" "5/5" "4/5" "3/5" ]
+[        "T1,S1" 0.79   0.07  0.12 ]
+[        "T1.S2" 0.88   0.05  0.07 ]
+[        ....... ....   ....  .... ]
 </pre>
 2. **5 histograms** each with multiple (type, subtype) buckets, just transpose the original matrix
 <pre>
