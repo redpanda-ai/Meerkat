@@ -25,7 +25,7 @@
 	* 3/7
 		* - [ ] Check and see if there are any types/subtypes with abnormally low rates of agreement between the labelers, provide useful metrics.
 			* Report findings as a Fleiss' Kappa matrix
-		* - [ ] Set up an EC2 environment for the nolearn deep learning libraries that
+		* - [x] Set up an EC2 environment for the nolearn deep learning libraries that
 			* uses the graphics processing unit
 			* works quickly over large data sets
 
