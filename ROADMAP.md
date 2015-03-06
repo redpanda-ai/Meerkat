@@ -48,7 +48,7 @@
 	* - [x] Provide a distribution list for everyone who needs Meerkat panel alerts
 	* - [x] Provide a distribution list for everyone who wants the daily panel report
 2. **Database Administrators**, Subha S., Arun
-	* - [x] Provide the *sum_info_id* for e*trade
+	* - [x] Provide the *sum_info_id* for e*trade (https://github.com/joeandrewkey/Meerkat/issues/120)
 
 ### RECENTLY COMPLETED
 #### Matt
