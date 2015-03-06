@@ -23,7 +23,7 @@
 		* - [ ] Speak with Sanjay and team about prototype for building a web service panel for Meerkat
 2.  **Meerkat Team**, Matt
 	* 3/7
-		* - [ ] Check and see if there are any types/subtypes with abnormally low rates of agreement between the labelers, provide useful metrics.
+		* - [x] Check and see if there are any types/subtypes with abnormally low rates of agreement between the labelers, provide useful metrics.
 			* Report findings as a Fleiss' Kappa matrix
 		* - [x] Set up an EC2 environment for the nolearn deep learning libraries that
 			* uses the graphics processing unit
