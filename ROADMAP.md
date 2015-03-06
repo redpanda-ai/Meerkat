@@ -27,6 +27,7 @@
 		* - [ ] Set up an EC2 environment for the nolearn deep learning libraries that
 			* uses the graphics processing unit
 			* works quickly over large data sets
+		* - [ ] Fleiss' Kappa rating for labeling agreement
 
 3.  **Meerkat Team**, Andy and Matt
 	* 3/5
@@ -79,20 +80,4 @@
 	* - [x] :+1: Deploy Meerkat v1.0.0 to production VPC 
 	* - [x] Set up a [distribution list] (https://github.com/joeandrewkey/meerkat_webservice_schema/issues/21) or equivalent for labels
 	* - [x] Obtain agreement on requiring ***ledger_entry*** in meerkat web service v1.0.0
-
-#### Possible ways of describing consensus on labels, m x 3 or 3 x m
-1. **One histogram per (type,subtype) pair** each with exactly 3 buckets
-<pre>
-[ (Type,Subtype) "5/5" "4/5" "3/5" ]
-[        (T1,S1) 0.79   0.07  0.12 ]
-[        (T1,S2) 0.88   0.05  0.07 ]
-[        ....... ....   ....  .... ]
-</pre>
-2. **5 histograms** each with multiple (type, subtype) buckets, just transpose the original matrix
-<pre>
-[ "Consensus" (T1,S1) (T1,S2) ... ]
-[       "5/5"    0.79    0.88 ... ]
-[       "4/5"    0.07    0.05 ... ]
-[       "3/5"    0.12    0.07 ... ]
-</pre>
 
