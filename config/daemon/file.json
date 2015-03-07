@@ -9,7 +9,7 @@
 		"key_filename" : "/root/.ssh/jkey.pem",
 		"username": "root",
 		"producer": "/root/git/Meerkat/meerkat/producer.py",
-		"producer_hash": "bd46e52a62a9a391eb2fbc7105208a7e9fb4865c",
+		"producer_hash": "bd46e52a62a9a391eb2fbc7105208a7e9fb4865c"
 	},
 	"location_pairs": [
 		{
@@ -24,7 +24,7 @@
 		}
 	],
 	"producer_options" : {
-		"base" : {
+		"default" : {
 			"input": {
 				"delimiter": "|",
 				"encoding": "utf-8"
@@ -37,7 +37,7 @@
 				"src_path": "/data/0/input/",
 				"dst_path": "/data/1/output/",
 				"err_path": "/data/1/error/"
-			}
+			},
 			"columns" : [
 				["name", "PHYSICAL_MERCHANT"],
 				["chain_id", "STORE_ID"],
@@ -55,7 +55,7 @@
 				["factual_id", "FACTUAL_ID"],
 				["internal_store_number", "STORE_NUMBER"]
 			],
-			"hyperparameters": "config/hyperparameters/default.json"
+			"hyperparameters": "config/hyperparameters/default.json",
 			"concurrency": 20,
 			"elasticsearch": {
 				"cluster_nodes": [

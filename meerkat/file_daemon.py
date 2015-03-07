@@ -25,6 +25,9 @@ def get_parameters():
 	return params
 
 def start():
+	#This producer needs updating to deal with oddities:
+		#Strangely ordered columns
+		#Strangely named columns
 	count, max_count = 0, 1
 	sleep_time_sec = 5
 	params = get_parameters()
@@ -79,17 +82,13 @@ def scan_locations(params):
 	"""This function starts the new_daemon."""
 	location_pairs = params["location_pairs"]
 	params["s3_conn"] = boto.connect_s3()
-	#Distribute the meerkat.producer if necessary
-	#This producer needs updating to deal with oddities:
-		#Strangely ordered columns
-		#Strangely named columns
-
 	for pair in location_pairs:
-		logging.info("Compariing {0}".format(pair["name"]))
+		name = pair["name"]
+		logging.info("Compariing {0}".format(name))
 		logging.info("Scanning\n\t{0}\n\t{1}".format(pair["src_location"], pair["dst_location"]))
 		src_dict = scan_s3_location(params, pair["src_location"])
 		dst_dict = scan_s3_location(params, pair["dst_location"])
-		update_pending_files(params, src_dict, dst_dict)
+		update_pending_files(params, name, src_dict, dst_dict)
 
 	logging.info("There are {0} pending files".format(len(params["pending_files"])))
 
@@ -108,11 +107,11 @@ def scan_s3_location(params, location):
 		result[file_name] = (bucket_name, directory, k.name, k.last_modified)
 	return result
 
-def update_pending_files(params, src_dict, dst_dict):
+def update_pending_files(params, name, src_dict, dst_dict):
 	"""Update the dictionary of files that need to be processed."""
 	dst_keys = dst_dict.keys()
-	not_in_dst = [ k for k in src_dict.keys() if k not in dst_keys ]
-	newer_src = [ k for k in src_dict.keys() if k in dst_keys and src_dict[k][3] > dst_dict[k][3] ]
+	not_in_dst = [ (name, k) for k in src_dict.keys() if k not in dst_keys ]
+	newer_src = [ (name, k) for k in src_dict.keys() if k in dst_keys and src_dict[k][3] > dst_dict[k][3] ]
 	if "pending_files" not in params:
 		params["pending_files"] = []
 	params["pending_files"].extend(not_in_dst)
@@ -121,14 +120,14 @@ def update_pending_files(params, src_dict, dst_dict):
 	logging.info("Not in dst {0}, Newer src {1}".format(len(not_in_dst), len(newer_src)))
 	logging.debug("List of unprocessed files:")
 	for item in not_in_dst:
-		logging.debug(item)
+		logging.info(item)
 	logging.debug("List of files that are newer at the source:")
 	for item in newer_src:
-		logging.debug(item)
+		logging.info(item)
 
 if __name__ == "__main__":
 	#MAIN PROGRAM
-	logging.basicConfig(format='%(asctime)s %(message)s', filename='logs/new_daemon.log', \
+	logging.basicConfig(format='%(asctime)s %(message)s', filename='logs/file_daemon.log', \
 		level=logging.INFO)
 	logging.info("Scanning module activated.")
 	start()
