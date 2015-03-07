@@ -1,0 +1,72 @@
+{
+	"launchpad" : {
+		"instance_ips": [
+			"172.31.16.208",
+			"172.31.16.209",
+			"172.31.16.210"
+		],
+		"per_instance_clients" : 12,
+		"key_filename" : "/root/.ssh/jkey.pem",
+		"username": "root",
+		"producer": "/root/git/Meerkat/meerkat/producer.py",
+		"producer_hash": "bd46e52a62a9a391eb2fbc7105208a7e9fb4865c",
+	},
+	"location_pairs": [
+		{
+			"name": "gpanel2_bank",
+			"src_location": "yodleeprivate/panels/meerkat_input/gpanel2/bank/",
+			"dst_location": "yodleeprivate/panels/meerkat_output/gpanel2/bank/"
+		},
+		{
+			"name": "gpanel2_card",
+			"src_location": "yodleeprivate/panels/meerkat_input/gpanel2/card/",
+			"dst_location": "yodleeprivate/panels/meerkat_output/gpanel2/card/"
+		}
+	],
+	"producer_options" : {
+		"base" : {
+			"input": {
+				"delimiter": "|",
+				"encoding": "utf-8"
+			},
+			"output": {
+				"delimiter": "|",
+				"encoding": "utf-8"
+			},
+			"local_files" : {
+				"src_path": "/data/0/input/",
+				"dst_path": "/data/1/output/",
+				"err_path": "/data/1/error/"
+			}
+			"columns" : [
+				["name", "PHYSICAL_MERCHANT"],
+				["chain_id", "STORE_ID"],
+				["category_labels", "FACTUAL_CATEGORY"],
+				["address", "STREET"],
+				["locality", "CITY"],
+				["region", "STATE"],
+				["postcode", "ZIP_CODE"],
+				["website", "WEBSITE"],
+				["tel", "PHONE_NUMBER"],
+				["chain_name", "CHAIN_NAME"],
+				["latitude", "LATITUDE"],
+				["longitude", "LONGITUDE"],
+				["neighborhood", "NEIGHBORHOOD"],
+				["factual_id", "FACTUAL_ID"],
+				["internal_store_number", "STORE_NUMBER"]
+			],
+			"hyperparameters": "config/hyperparameters/default.json"
+			"concurrency": 20,
+			"elasticsearch": {
+				"cluster_nodes": [
+					"172.31.26.84",
+					"172.31.26.85",
+					"172.31.26.86",
+					"172.31.26.87"
+				],
+			"index": "factual_index",
+			"type": "factual_type"
+			}
+		}
+	}
+}
