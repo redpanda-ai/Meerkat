@@ -79,6 +79,7 @@ def usage():
 	return result
 
 def validate_configuration():
+	"""Ensures that the correct parameters are supplied."""
 	schema_file = open("config/daemon/schema.json")
 	config_file = open("config/daemon/file.json")
 
@@ -88,44 +89,7 @@ def validate_configuration():
 	result = validate(config, schema)
 	logging.info("Configuration schema is valid.")
 
-def validate_params(params):
-	"""Ensures that the correct parameters are supplied."""
-
-	mandatory_keys = ["elasticsearch", "concurrency", "input", "logging", "mode"]
-
-	# Ensure Mandatory Keys are in Config
-	for key in mandatory_keys:
-		if key not in params:
-			raise Misconfiguration(msg="Misconfiguration: missing key, '" + key + "'", expr=None)
-
-	if params["concurrency"] <= 0:
-		raise Misconfiguration(msg="Misconfiguration: 'concurrency' must be a positive integer", expr=None)
-
-	if "hyperparameters" not in params["input"]:
-		params["input"]["hyperparameters"] = "config/hyperparameters/default.json"
-
-	# Ensure Test Mode Requirements
-	if params["mode"] == "test":
-		if params.get("verification_source", "") == "":
-			raise Misconfiguration(msg="Please provide verification_source to run in test mode", expr=None)
-
-	# Ensure Other Various Parameters Available
-	if "index" not in params["elasticsearch"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.index'", expr=None)
-	if "type" not in params["elasticsearch"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.type'", expr=None)
-	if "cluster_nodes" not in params["elasticsearch"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.cluster_nodes'", expr=None)
-	if "path" not in params["logging"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'logging.path'", expr=None)
-	if "filename" not in params["input"] and "S3" not in params["input"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'input.filename' or 'input.S3'", expr=None)
-	if "encoding" not in params["input"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'input.encoding'", expr=None)
-
-	return True
-
-def	hms_to_seconds(t):
+def hms_to_seconds(t):
 	h, m, s = [i.lstrip("0") if len(i.lstrip("0")) != 0 else 0 for i in t.split(':')]
 	print ("H: {0}, M: {1}, S: {2}".format(h, m, s))
 	return 3600 * float(h) + 60 * float(m) + float(s)
@@ -435,33 +399,15 @@ def load_dataframe(params):
 
 def mode_switch(params):
 	"""Switches mode between, single file / s3 bucket mode"""
+	#TODO: Discuss with the team whether to support modes beyond 'production'.
+	#It may make sense to make a dedicated test harness for interactive testing.
+	mode = params.get("mode", "production")
+	if mode != "production":
+		logging.error("Only production mode is supported in this version, aborting.")
 
-	mode = params.get("mode", "")
-
-	if mode == "test" or mode == "interactive":
-		params["verification_source"] = "data/misc/ground_truth_card.txt"
-		params["container"] = "card"
-		test_training_data(params)
-		params["verification_source"] = "data/misc/ground_truth_bank.txt"
-		params["container"] = "card"
-		test_training_data(params)
-		per_merchant_tests(params)
-	elif mode == "production":
-		production_run(params)
-	else:
-		logging.critical("Please provide a verification_source for testing or a s3 bucket for "\
-			"procesing. Terminating")
-		sys.exit()
-
-def test_training_data(params):
-	"""An easy way to test the accuracy of a small set
-	provided a set of hyperparameters"""
-
-	safe_print("Testing sample: " + params["verification_source"])
-	hyperparameters = load_hyperparameters(params)
-	dataset = load_dataset(params)
-	desc_queue = get_simple_queue(dataset)
-	test_meerkat(params, desc_queue, hyperparameters)
+	logging.info("Proceeding with production mode run.")
+	sys.exit()
+	production_run(params)
 
 def per_merchant_tests(params):
 	"""Run tests on a directory of Merchant Samples"""
@@ -506,8 +452,6 @@ def run_from_command_line(command_line_arguments):
 	#sys.exit()
 
 	validate_configuration()
-	sys.exit()
-	validate_params(params)
 	mode_switch(params)
 
 if __name__ == "__main__":
