@@ -24,7 +24,7 @@
 		}
 	],
 	"producer_options" : {
-		"default" : {
+		"producer_default" : {
 			"input": {
 				"delimiter": "|",
 				"encoding": "utf-8"
@@ -38,7 +38,7 @@
 				"dst_path": "/data/1/output/",
 				"err_path": "/data/1/error/"
 			},
-			"columns" : [
+			"field_mappings" : [
 				["name", "PHYSICAL_MERCHANT"],
 				["chain_id", "STORE_ID"],
 				["category_labels", "FACTUAL_CATEGORY"],
@@ -64,8 +64,8 @@
 					"172.31.26.86",
 					"172.31.26.87"
 				],
-			"index": "factual_index",
-			"type": "factual_type"
+				"es_index": "factual_index",
+				"es_type": "factual_type"
 			}
 		}
 	}

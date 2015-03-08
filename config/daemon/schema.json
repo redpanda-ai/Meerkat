@@ -1,0 +1,102 @@
+{
+	"schema": "http://json-schema.org/draft-04/schema#",
+	"title": "meerkat.file_producer schema",
+	"definitions": {
+		"location_pair": {
+			"type": "object",
+			"properties": {
+				"name": { "type": "string" },
+				"src_location": { "type": "string" },
+				"dst_location": { "type": "string" }
+			}
+		},
+		"field_mapping" : {
+			"description": "An array of length 2 that maps the internal name for a field to the name that will given to the output file.",
+			"type": "array",
+			"items": {
+				"allOf": [ { "type": "string" } ],
+				"minItems": 2
+			}
+		},
+		"field_mappings": {
+			"description": "An ordered list of field_mapping arrays used to determine the structure of the output file.",
+			"type": "array",
+			"items": {
+				"allOf": [ { "$ref": "#/definitions/field_mapping" } ],
+				"minItems": 1
+			}
+		},
+		"instance_ips": {
+			"description": "List of internal IP addresses used by our EC2 instances.",
+			"type": "array",
+			"items": {
+				"allOf": [ { "type": "string" } ],
+				"minItems": 1
+			}
+		},
+		"elasticsearch": {
+			"description": "An object containing relevant information about the back-end Elasticsearch cluster.",
+			"type": "object",
+			"properties": {
+				"cluster_nodes" : { "$ref": "#/definitions/instance_ips" },
+				"es_index": { "type" : "string" },
+				"es_type" : { "type" : "string" }
+			}
+		},
+		"producer_default": {
+			"description": "Object containing default producer configuration options",
+			"type": "object",
+			"properties": {
+				"concurrency" : { "type" : "number" },
+				"elasticsearch" : { "$ref": "#/definitions/elasticsearch" },
+				"hyperparameters" : { "type" : "string" },
+				"input" : { "type": "object" },
+				"local_files" : {
+					"type": "object",
+					"properties": {
+						"src_path": { "type": "string" },
+						"dst_path": { "type": "string" },
+						"err_path": { "type": "string" }
+					}
+				},
+				"output" : { "type": "object" }
+			},
+			"required": ["concurrency", "elasticsearch", "hyperparameters", "input", "local_files", "output"]
+		}
+	},
+	"description": "A schema for defining configuration parameters for our meerkat.file_producer module",
+	"type": "object",
+	"properties": {
+		"launchpad": {
+			"description": "Object containing everything needed to connect to a remote client.",
+			"type": "object",
+			"items" : {
+				"instance_ips" : { "$ref": "#/defintions/instance_ips" },
+				"key_filename": { "type": "string" },
+				"per_instance_clients": { "type": "number" },
+				"producer" : { "type": "string" },
+				"producer_hash" : { "type": "string" },
+				"username" : { "type": "string" }
+			},
+			"required" : ["instance_ips", "key_filename", "per_instance_clients", "producer", "producer_hash", "username"]
+		},
+		"location_pairs": {
+			"description": "List of named objects corresponding to pairs of S3 locations.",
+			"type": "array",
+			"items" : {
+				"allOf": [
+					{"$ref": "#/definitions/location_pair"}
+				]
+			}
+		},
+		"producer_options" : {
+			"description": "A set of options for use with different meerkat.producer instances",
+			"type": "object",
+			"properties" : {
+				"producer_default" : { "$ref": "#definitions/producer_default" }
+			},
+			"required": ["producer_default"]
+		}
+	},
+	"required": ["launchpad", "location_pairs", "producer_options"]
+}
