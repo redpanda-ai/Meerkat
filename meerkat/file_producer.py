@@ -181,9 +181,10 @@ def gunzip_and_validate_file(filepath):
 def set_custom_producer_options(params):
 	po = params["producer_options"]
 	params["my_producer_options"] = po["producer_default"]
-	overrides = po[sys.argv[1]]
-	for key in overrides:
-		params["my_producer_options"][key] = overrides[key]
+	if sys.argv[1] in po:
+		overrides = po[sys.argv[1]]
+		for key in overrides:
+			params["my_producer_options"][key] = overrides[key]
 	del params["producer_options"]
 
 def initialize():
