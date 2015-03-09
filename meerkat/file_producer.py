@@ -10,15 +10,13 @@ Created on Dec 9, 2013
 
 #################### USAGE ##########################
 
-# python3.3 -m meerkat [config_file]
-# python3.3 -m meerkat config/users.json
+# python3.3 -m meerkat.file_producer <location_pair_name> <file_name>
+# python3.3 -m meerkat.file_producer jkey_test_bank 20150205.007.012_GPANEL2_BANK.txt.gz
 
 #####################################################
 
 import boto
-import collections
 import csv
-import datetime
 import gzip
 import io
 import json
@@ -27,32 +25,36 @@ import os
 import pandas as pd
 import queue
 import re
-import string
 import sys
 
-from boto.s3.connection import Location, S3Connection, Key
+from boto.s3.connection import Key, Location, S3Connection
 from jsonschema import validate
 
-from meerkat.custom_exceptions import InvalidArguments, Misconfiguration
+from meerkat.custom_exceptions import InvalidArguments
 from meerkat.file_consumer import FileConsumer
 from meerkat.classification.load import select_model
-from meerkat.various_tools import (load_dict_list, safely_remove_file,\
-	load_hyperparameters, safe_print)
-from meerkat.various_tools import (split_csv, merge_split_files,\
-	queue_to_list, string_cleanse, clean_bad_escapes)
-from meerkat.various_tools import (get_panel_header, get_column_map,\
-	get_new_columns, get_us_cities, post_SNS)
-from meerkat.accuracy import test_accuracy, print_results, speed_tests
-from meerkat.optimization import run_meerkat as test_meerkat
-from meerkat.optimization import get_desc_queue as get_simple_queue
-from meerkat.optimization import load_dataset
+from meerkat.various_tools import (safely_remove_file)
+from meerkat.various_tools import (get_us_cities, post_SNS)
+
+def get_new_columns(params):
+	"""Return a list of new columns to add to a panel"""
+	return params["my_producer_options"]["meerkat_fields"]
+
+def get_column_map(params):
+	"""Fix old or erroneous column names"""
+	container = params["container"].upper()
+	cm = params["my_producer_options"]["column_map"]
+	column_map = {}
+	for item in cm:
+		column_map[item[0]] = item[1].replace("__BLANK", container)
+	return column_map
 
 def clean_dataframe(params, df):
 	"""Fix issues with current dataframe, like remapping, etc."""
 	container = params["container"]
-	column_remap = get_column_map(container)
-	header = get_panel_header(container)
-	new_columns = get_new_columns()
+	column_remap = get_column_map(params)
+	header = get_panel_header(params)
+	new_columns = get_new_columns(params)
 	# Rename and add columns
 	df = df.rename(columns=column_remap)
 	for column in new_columns:
@@ -72,7 +74,6 @@ def connect_to_S3():
 
 def df_to_queue(params, df):
 	"""Converts a dataframe to a queue for processing"""
-
 	container = params["container"]
 	classifier = select_model(container)
 	classes = ["Non-Physical", "Physical", "ATM"]
@@ -80,33 +81,26 @@ def df_to_queue(params, df):
 	desc_queue = queue.Queue()
 	name_map = {"GOOD_DESCRIPTION" : "MERCHANT_NAME",\
 		"MERCHANT_NAME" : "GOOD_DESCRIPTION"}
-
 	# Classify transactions
 	df['TRANSACTION_ORIGIN'] = df.apply(f, axis=1)
 	gb = df.groupby('TRANSACTION_ORIGIN')
 	groups = list(gb.groups)
-
 	# Group into separate dataframes
 	physical = gb.get_group("Physical") if "Physical" in groups else pd.DataFrame()
 	atm = gb.get_group("ATM") if "ATM" in groups else pd.DataFrame()
 	non_physical = gb.get_group("Non-Physical").rename(columns=name_map) if "Non-Physical" in groups else pd.DataFrame()
-
 	#Return if there are no physical transactions
 	if physical.empty:
 		return desc_queue, non_physical
-
 	# Roll ATM into physical
 	physical = pd.concat([physical, atm])
-
 	# Group by user
 	users = physical.groupby('UNIQUE_MEM_ID')
-
 	for user in users:
 		user_trans = []
 		for i, row in user[1].iterrows():
 			user_trans.append(row.to_dict())
 		desc_queue.put(user_trans)
-
 	return desc_queue, non_physical
 
 def get_container(filename):
@@ -125,6 +119,14 @@ def get_container(filename):
 def get_dataframe_reader(input_filename):
 	"""Returns pandas dataframe reader for the input file."""
 	return pd.read_csv(input_filename, na_filter=False, chunksize=5000, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+
+def get_panel_header(params):
+	"""Return an ordered consistent header for panels"""
+	# pylint: disable=bad-continuation
+	header = params["my_producer_options"]["header_template"]
+	container = params["container"].upper()
+	header = [x.replace("__BLANK", container) for x in header]
+	return header
 
 def gunzip_and_validate_file(filepath):
 	"""Decompress a file, check for required fields on the first line."""
@@ -151,6 +153,13 @@ def gunzip_and_validate_file(filepath):
 	logging.info("{0} unzipped; header contains mandatory fields.".format(filename))
 	return filename
 
+def set_custom_producer_options(params):
+	po = params["producer_options"]
+	params["my_producer_options"] = po["producer_default"]
+	overrides = po[sys.argv[1]]
+	for key in overrides:
+		params["my_producer_options"][key] = overrides[key]
+	del params["producer_options"]
 
 def initialize():
 	"""Validates the command line arguments."""
@@ -176,18 +185,16 @@ def initialize():
 		raise InvalidArguments(msg="Invalid 'location_pair' argument, aborting.", expr=None)
 	logging.info("location_pair found in configuration file.")
 	params["src_file"] = sys.argv[2]
+	set_custom_producer_options(params)
+	#Adding other fields for compatiblity with various tools library
+	my_options = params["my_producer_options"]
+	params["output"] = my_options["output"]
+	params["output"]["results"] = {}
+	params["output"]["results"]["fields"] = []
+	for field, label in my_options["field_mappings"]:
+		params["output"]["results"]["fields"].append(field)
+	params["mode"] = "production"
 	return params
-
-def move_to_S3(params, bucket, s3_path, filepath):
-	"""Moves a file to S3"""
-	filename = os.path.basename(filepath)
-	s3_path = s3_path + params["container"] + "/"
-	key = Key(bucket)
-	key.key = s3_path + filename
-	bytes_written = key.set_contents_from_filename(filepath, encrypt_key=True, replace=True)
-	safe_print("File written to: " + key.key)
-	safe_print("{0} bytes written".format(bytes_written))
-	safely_remove_file(filepath)
 
 def pull_src_file_from_s3(params):
 	#Grab relevant configuraiton parameters
@@ -206,14 +213,13 @@ def pull_src_file_from_s3(params):
 	s3_key = None
 	for item in listing:
 		s3_key = item
-	params["local_src_path"] = params["producer_options"]["producer_default"]["local_files"]["src_path"]
+	params["local_src_path"] = params["my_producer_options"]["local_files"]["src_path"]
 	local_src_file = params["local_src_path"] + src_file
 	s3_key.get_contents_to_filename(local_src_file)
 	logging.info("Src file pulled from S3")
 	return local_src_file
 
 def push_dst_file_to_s3(params):
-#def move_to_S3(params, bucket, s3_path, filepath):
 	"""Moves a file to S3"""
 	dst_s3_location = params["location_pair"]["dst_location"]
 	location_pattern = re.compile("^([^/]+)/(.*)$")
@@ -279,7 +285,7 @@ def run_meerkat_chunk(params, desc_queue, hyperparameters, cities):
 	# Run the Classifier
 	consumer_threads = params.get("concurrency", 8)
 	result_queue = queue.Queue()
-	header = get_panel_header(params["container"])
+	header = get_panel_header(params)
 	output = []
 
 	for i in range(consumer_threads):
@@ -303,27 +309,25 @@ def run_meerkat_chunk(params, desc_queue, hyperparameters, cities):
 
 	return pd.DataFrame(data=output, columns=header)
 
+def load_hyperparameters(filepath):
+	"""Attempts to load parameter key"""
+	hyperparameters = None
+	try:
+		input_file = open(filepath, encoding='utf-8')
+		hyperparameters = json.loads(input_file.read())
+		input_file.close()
+	except IOError:
+		logging.error("%s not found, aborting.", filepath)
+		sys.exit()
+	return hyperparameters
+
 def run_panel(params, reader, dst_file_name):
 	"""Process a single panel"""
-	my_options = params["producer_options"]["producer_default"]
-	#Lots of adapting to existing code, sheesh
-	params["input"] = {}
-	params["input"]["hyperparameters"] = my_options["hyperparameters"]
-	params["elasticsearch"] = my_options["elasticsearch"]
-	params["logging"] = my_options["logging"]
-	params["output"] = my_options["output"]
-	params["output"]["results"] = {}
-	params["output"]["results"]["fields"] = []
-	params["output"]["results"]["labels"] = []
-	for field, label in my_options["field_mappings"]:
-		params["output"]["results"]["fields"].append(field)
-		params["output"]["results"]["labels"].append(label)
-	params["mode"] = "production"
-	#Getting on with it
-	hyperparameters = load_hyperparameters(params)
-	#dst_local_path = params["input"]["S3"]["dst_local_path"]
+	my_options = params["my_producer_options"]
+	hyperparameters = load_hyperparameters(my_options["hyperparameters"])
 	dst_local_path = my_options["local_files"]["dst_path"]
-	header = get_panel_header(params["container"])[0:-2]
+	remove_list = ["DESCRIPTION_UNMASKED", "GOOD_DESCRIPTION"]
+	header = [ x for x in get_panel_header(params) if x not in remove_list ]
 	cities = get_us_cities()
 	line_count = 0
 	first_chunk = True
@@ -334,17 +338,14 @@ def run_panel(params, reader, dst_file_name):
 	sys.stderr = mystderr = io.StringIO()
 
 	for chunk in reader:
-
 		# Save Errors
 		line_count += chunk.shape[0]
 		error_chunk = str.strip(mystderr.getvalue())
 		if len(error_chunk) > 0:
 			errors += error_chunk.split('\n')
 		sys.stderr = old_stderr
-
 		# Clean Data
 		chunk = clean_dataframe(params, chunk)
-
 		# Load into Queue for Processing
 		desc_queue, non_physical = df_to_queue(params, chunk)
 
@@ -360,8 +361,9 @@ def run_panel(params, reader, dst_file_name):
 
 		# Write
 		if first_chunk:
-			safely_remove_file(dst_local_path + dst_file_name)
-			safe_print("Output Path: " + dst_local_path + dst_file_name)
+			file_to_remove = dst_local_path + dst_file_name
+			safely_remove_file(file_to_remove)
+			logging.info("Output Path: {0}".format(file_to_remove))
 			chunk.to_csv(dst_local_path + dst_file_name, columns=header, sep="|",\
 				mode="a", encoding="utf-8", index=False, index_label=False)
 			first_chunk = False
@@ -389,21 +391,15 @@ def run_panel(params, reader, dst_file_name):
 def usage():
 	"""Shows the user which parameters to send into the program."""
 	result = "Usage:\n\t<location_pair_name> <file_name>"
-	#gpanel2_bank 20150205.007.012_GPANEL2_BANK.txt.gz
 	logging.error(result)
 	return result
 
 def validate_configuration():
 	"""Ensures that the correct parameters are supplied."""
-	schema_file = open("config/daemon/schema.json")
-	config_file = open("config/daemon/file.json")
-
-	schema = json.load(schema_file)
-	config = json.load(config_file)
-
+	schema = json.load(open("config/daemon/schema.json"))
+	config = json.load(open("config/daemon/file.json"))
 	result = validate(config, schema)
 	logging.info("Configuration schema is valid.")
-
 
 def write_error_file(path, filename, error_msg):
 	with gzip.open(path + filename + ".error.gz", "ab") as gzipped_output:

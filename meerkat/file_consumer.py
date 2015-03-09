@@ -11,14 +11,12 @@ Created on Jan 16, 2014
 @author: Matthew Sevrens
 """
 
-#import hashlib
 import json
 import logging
 import numpy as np
 import pprint
 import queue
 import re
-#import sys
 import threading
 import string
 
@@ -27,12 +25,23 @@ from sklearn.preprocessing import StandardScaler
 from scipy.stats.mstats import zscore
 from pprint import pprint
 
-from .various_tools import string_cleanse, synonyms, get_yodlee_factual_map
+from .various_tools import string_cleanse, synonyms
 from .various_tools import get_bool_query, get_qs_query, safe_print
 from .clustering import cluster, collect_clusters
 from .location import separate_geo, scale_polygon, get_geo_query
 
 PIPE_PATTERN = re.compile(r"\|")
+
+def get_yodlee_factual_map(params):
+	"""Return a map of factual attribute names to
+	yodlee attribute names"""
+	# pylint: disable=bad-continuation
+	my_field_mappings = params["my_producer_options"]["field_mappings"]
+	mappings = {}
+	for item in my_field_mappings:
+		mappings[item[0]] = item[1]
+	return mappings
+	# { "factual_id" : "FACTUAL_ID", "address" : "STREET", "tel" : "PHONE_NUMBER", "latitude" : "LATITUDE", "longitude" : "LONGITUDE", "postcode" : "ZIP_CODE", "region" : "STATE", "website" : "WEBSITE", "locality" : "CITY", "z_score_delta" : "CONFIDENCE_SCORE", "category_labels" : "FACTUAL_CATEGORY", "chain_name" : "CHAIN_NAME", "neighborhood" : "NEIGHBOURHOOD", "internal_store_number" : "STORE_ID", "name" : "MERCHANT_NAME"}
 
 class FileConsumer(threading.Thread):
 	"""Acts as a client to an ElasticSearch cluster, tokenizing description
@@ -161,7 +170,7 @@ class FileConsumer(threading.Thread):
 		self.hyperparameters = hyperparameters
 		self.cities = cities
 
-		cluster_nodes = self.params["elasticsearch"]["cluster_nodes"]
+		cluster_nodes = self.params["my_producer_options"]["elasticsearch"]["cluster_nodes"]
 		self.es_connection = Elasticsearch(cluster_nodes,\
 			sniff_on_start=True, sniff_on_connection_fail=True,\
 			sniffer_timeout=15, sniff_timeout=15)
@@ -410,7 +419,7 @@ class FileConsumer(threading.Thread):
 		enriched_transaction = transaction
 		field_names = self.params["output"]["results"]["fields"]
 		fields_in_hit = [field for field in hit_fields]
-		yfm = get_yodlee_factual_map()
+		yfm = get_yodlee_factual_map(self.params)
 
 		# Enrich with the fields we've found. Attach the z_score_delta
 		if decision == True:
@@ -461,7 +470,7 @@ class FileConsumer(threading.Thread):
 		"""Basic logic to obtain a fallback for city and state
 		when no factual_id is found"""
 		#fields = self.params["output"]["results"]["fields"]
-		yfm = get_yodlee_factual_map()
+		yfm = get_yodlee_factual_map(self.params)
 		enriched_transaction = transaction
 		city_names = city_names[0:2]
 		state_names = state_names[0:2]
@@ -483,7 +492,7 @@ class FileConsumer(threading.Thread):
 		"""Basic logic to obtain a fallback for business name
 		when no factual_id is found"""
 		#fields = self.params["output"]["results"]["fields"]
-		yfm = get_yodlee_factual_map()
+		yfm = get_yodlee_factual_map(self.params)
 
 		# Default to CT Names if Available
 		if transaction['GOOD_DESCRIPTION'] != "":
@@ -516,7 +525,7 @@ class FileConsumer(threading.Thread):
 
 		try:
 			output_data = self.es_connection.search(\
-				index=self.params["elasticsearch"]["index"],\
+				index=self.params["my_producer_options"]["elasticsearch"]["index"],\
 				body=input_as_object)
 		except Exception:
 			logging.critical("Unable to process the following: %s",\
@@ -588,11 +597,12 @@ class FileConsumer(threading.Thread):
 			'critical': logging.CRITICAL
 		}
 		params = self.params
-		my_level = params["logging"]["level"]
+		my_logging = params["my_producer_options"]["logging"]
+		my_level = my_logging["level"]
 		if my_level in levels:
 			my_level = levels[my_level]
-		my_path = params["logging"]["path"]
-		my_formatter = logging.Formatter(params['logging']['formatter'])
+		my_path = my_logging["path"]
+		my_formatter = logging.Formatter(my_logging["formatter"])
 		#You'll want to add something to identify the thread
 		my_logger = logging.getLogger("thread " + str(self.thread_id))
 		my_logger.setLevel(my_level)
@@ -602,7 +612,7 @@ class FileConsumer(threading.Thread):
 		my_logger.addHandler(file_handler)
 
 		#Add console logging, if configured
-		my_console = params["logging"]["console"]
+		my_console = my_logging["console"]
 		if my_console is True:
 			console_handler = logging.StreamHandler()
 			console_handler.setLevel(my_level)

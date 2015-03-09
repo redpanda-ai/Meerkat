@@ -26,6 +26,14 @@
 				"minItems": 1
 			}
 		},
+		"header_template" : {
+			"description": "An array of column labels for our Meerkat output file.",
+			"type": "array",
+			"items": {
+				"allOf": [ { "type": "string" } ],
+				"minItems": 1
+			}
+		},
 		"instance_ips": {
 			"description": "List of internal IP addresses used by our EC2 instances.",
 			"type": "array",
@@ -61,7 +69,9 @@
 				},
 				"output" : { "type": "object" }
 			},
-			"required": ["concurrency", "elasticsearch", "hyperparameters", "input", "local_files", "output"]
+			"required": [ "concurrency", "elasticsearch", "field_mappings", "header_template",
+				"hyperparameters", "input", "local_files", "output"
+			]
 		}
 	},
 	"description": "A schema for defining configuration parameters for our meerkat.file_producer module",

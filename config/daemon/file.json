@@ -38,22 +38,45 @@
 				"dst_path": "/data/1/output/",
 				"err_path": "/data/1/error/"
 			},
+			"header_template" : [
+				"UNIQUE_MEM_ID", "UNIQUE___BLANK_ACCOUNT_ID", "UNIQUE___BLANK_TRANSACTION_ID",
+				"MEM_ID", "__BLANK_ACCOUNT_ID", "__BLANK_TRANSACTION_ID", "COBRAND_ID",
+				"SUM_INFO_ID", "AMOUNT", "CURRENCY_ID", "DESCRIPTION", "TRANSACTION_DATE",
+				"POST_DATE", "TRANSACTION_BASE_TYPE", "TRANSACTION_CATEGORY_ID",
+				"TRANSACTION_CATEGORY_NAME", "MERCHANT_NAME", "STORE_ID", "FACTUAL_CATEGORY",
+				"STREET", "CITY", "STATE", "ZIP_CODE","WEBSITE", "PHONE_NUMBER",
+				"FAX_NUMBER", "CHAIN_NAME", "LATITUDE", "LONGITUDE", "NEIGHBOURHOOD",
+				"TRANSACTION_ORIGIN", "CONFIDENCE_SCORE", "FACTUAL_ID",
+				"FILE_CREATED_DATE", "DESCRIPTION_UNMASKED", "GOOD_DESCRIPTION"
+			],
 			"field_mappings" : [
-				["name", "PHYSICAL_MERCHANT"],
-				["chain_id", "STORE_ID"],
-				["category_labels", "FACTUAL_CATEGORY"],
+				["factual_id", "FACTUAL_ID"],
 				["address", "STREET"],
-				["locality", "CITY"],
-				["region", "STATE"],
-				["postcode", "ZIP_CODE"],
-				["website", "WEBSITE"],
 				["tel", "PHONE_NUMBER"],
-				["chain_name", "CHAIN_NAME"],
 				["latitude", "LATITUDE"],
 				["longitude", "LONGITUDE"],
+				["postcode", "ZIP_CODE"],
+				["region", "STATE"],
+				["website", "WEBSITE"],
+				["locality", "CITY"],
+				["z_score_delta", "CONFIDENCE_SCORE"],
+				["category_labels", "FACTUAL_CATEGORY"],
+				["chain_name", "CHAIN_NAME"],
 				["neighborhood", "NEIGHBORHOOD"],
-				["factual_id", "FACTUAL_ID"],
-				["internal_store_number", "STORE_NUMBER"]
+				["internal_store_number", "STORE_ID"],
+				["name", "MERCHANT_NAME"]
+			],
+			"column_map": [
+				["UNIQUE_ACCOUNT_ID", "UNIQUE___BLANK_ACCOUNT_ID"],
+				["UNIQUE_TRANSACTION_ID", "UNIQUE___BLANK_TRANSACTION_ID"],
+				["TYPE", "TRANSACTION_BASE_TYPE"],
+				["MERCHANT_NAME", "GOOD_DESCRIPTION"]
+			],
+			"meerkat_fields": [
+				"STORE_ID", "FACTUAL_CATEGORY", "STREET", "CITY", "STATE",
+				"ZIP_CODE", "WEBSITE", "PHONE_NUMBER", "FAX_NUMBER", "CHAIN_NAME",
+				"LATITUDE", "LONGITUDE", "MERCHANT_NAME", "NEIGHBOURHOOD",
+				"TRANSACTION_ORIGIN", "CONFIDENCE_SCORE", "FACTUAL_ID"
 			],
 			"hyperparameters": "config/hyperparameters/default.json",
 			"concurrency": 20,
@@ -73,6 +96,32 @@
 				"level": "warning",
 				"path": "logs/foo.log"
 			}
+		},
+		"jkey_test_bank" : {
+			"concurrency" : 19,
+			"logging": {
+				"console": true,
+				"formatter": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+				"level": "warning",
+				"path": "logs/jkey_test_bank.log"
+			},
+			"field_mappings" : [
+				["factual_id", "FACTUAL_ID"],
+				["address", "STREET"],
+				["tel", "PHONE_NUMBER"],
+				["latitude", "LATITUDE"],
+				["longitude", "LONGITUDE"],
+				["postcode", "ZIP_CODE"],
+				["region", "STATE"],
+				["website", "WEBSITE"],
+				["locality", "CITY"],
+				["z_score_delta", "CONFIDENCE_SCORE"],
+				["category_labels", "FACTUAL_CATEGORY"],
+				["chain_name", "CHAIN_NAME"],
+				["neighborhood", "NEIGHBORHOOD"],
+				["internal_store_number", "STORE_ID"],
+				["name", "MERCHANT_NAME"]
+			]
 		}
 	}
 }
