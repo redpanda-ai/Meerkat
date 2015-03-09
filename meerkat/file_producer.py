@@ -36,29 +36,54 @@ from meerkat.classification.load import select_model
 from meerkat.various_tools import (safely_remove_file)
 from meerkat.various_tools import (get_us_cities, post_SNS)
 
-def get_new_columns(params):
-	"""Return a list of new columns to add to a panel"""
-	return params["my_producer_options"]["meerkat_fields"]
+#CONSTANTS
+USED_IN_HEADER, ORIGIN, NAME_IN_MEERKAT, NAME_IN_ORIGIN = 0, 1, 2, 3
+
+def get_field_mappings(params):
+	return [ [x[NAME_IN_ORIGIN], x[NAME_IN_MEERKAT]]
+		for x in get_unified_header(params)
+		if ((x[ORIGIN] == "search") and (x[NAME_IN_MEERKAT] != x[NAME_IN_ORIGIN])) ]
+
+def get_meerkat_fields(params):
+	"""Return a list of meerkat fields to add to the panel output."""
+	# pylint: disable=bad-continuation
+	return [ x[NAME_IN_MEERKAT]
+		for x in get_unified_header(params)
+		if (x[USED_IN_HEADER] == True) and (x[ORIGIN] == "search") ]
 
 def get_column_map(params):
 	"""Fix old or erroneous column names"""
 	container = params["container"].upper()
-	cm = params["my_producer_options"]["column_map"]
+	# pylint: disable=bad-continuation
+	cm = [
+		(x[NAME_IN_ORIGIN], x[NAME_IN_MEERKAT].replace("__BLANK", container))
+		for x in get_unified_header(params)
+		if (x[ORIGIN] == "input") and (x[NAME_IN_MEERKAT] != x[NAME_IN_ORIGIN]) ]
 	column_map = {}
-	for item in cm:
-		column_map[item[0]] = item[1].replace("__BLANK", container)
+	for a, b in cm:
+		column_map[a] = b
 	return column_map
+
+def get_panel_header(params):
+	"""Return an ordered consistent header for panels"""
+	# pylint: disable=bad-continuation
+	return [ x[NAME_IN_MEERKAT].replace("__BLANK", params["container"].upper())
+		for x in get_unified_header(params) ]
+
+def get_unified_header(params):
+	"""Return the unified_header object, minus the first row."""
+	return params["my_producer_options"]["unified_header"][1:]
 
 def clean_dataframe(params, df):
 	"""Fix issues with current dataframe, like remapping, etc."""
 	container = params["container"]
 	column_remap = get_column_map(params)
 	header = get_panel_header(params)
-	new_columns = get_new_columns(params)
+	meerkat_fields = get_meerkat_fields(params)
 	# Rename and add columns
 	df = df.rename(columns=column_remap)
-	for column in new_columns:
-		df[column] = ""
+	for meerkat_field in meerkat_fields:
+		df[meerkat_field] = ""
 	# Reorder header
 	df = df[header]
 	return df
@@ -120,7 +145,7 @@ def get_dataframe_reader(input_filename):
 	"""Returns pandas dataframe reader for the input file."""
 	return pd.read_csv(input_filename, na_filter=False, chunksize=5000, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
 
-def get_panel_header(params):
+def get_panel_header_old(params):
 	"""Return an ordered consistent header for panels"""
 	# pylint: disable=bad-continuation
 	header = params["my_producer_options"]["header_template"]
@@ -191,6 +216,7 @@ def initialize():
 	params["output"] = my_options["output"]
 	params["output"]["results"] = {}
 	params["output"]["results"]["fields"] = []
+	params["my_producer_options"]["field_mappings"] = get_field_mappings(params)
 	for field, label in my_options["field_mappings"]:
 		params["output"]["results"]["fields"].append(field)
 	params["mode"] = "production"

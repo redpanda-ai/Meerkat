@@ -38,47 +38,6 @@
 				"dst_path": "/data/1/output/",
 				"err_path": "/data/1/error/"
 			},
-			"header_template" : [
-				"UNIQUE_MEM_ID", "UNIQUE___BLANK_ACCOUNT_ID", "UNIQUE___BLANK_TRANSACTION_ID",
-				"MEM_ID", "__BLANK_ACCOUNT_ID", "__BLANK_TRANSACTION_ID", "COBRAND_ID",
-				"SUM_INFO_ID", "AMOUNT", "CURRENCY_ID", "DESCRIPTION", "TRANSACTION_DATE",
-				"POST_DATE", "TRANSACTION_BASE_TYPE", "TRANSACTION_CATEGORY_ID",
-				"TRANSACTION_CATEGORY_NAME", "MERCHANT_NAME", "STORE_ID", "FACTUAL_CATEGORY",
-				"STREET", "CITY", "STATE", "ZIP_CODE","WEBSITE", "PHONE_NUMBER",
-				"FAX_NUMBER", "CHAIN_NAME", "LATITUDE", "LONGITUDE", "NEIGHBOURHOOD",
-				"TRANSACTION_ORIGIN", "CONFIDENCE_SCORE", "FACTUAL_ID",
-				"FILE_CREATED_DATE", "DESCRIPTION_UNMASKED", "GOOD_DESCRIPTION"
-			],
-			"field_mappings" : [
-				["factual_id", "FACTUAL_ID"],
-				["address", "STREET"],
-				["tel", "PHONE_NUMBER"],
-				["fax", "FAX_NUMBER"],
-				["latitude", "LATITUDE"],
-				["longitude", "LONGITUDE"],
-				["postcode", "ZIP_CODE"],
-				["region", "STATE"],
-				["website", "WEBSITE"],
-				["locality", "CITY"],
-				["z_score_delta", "CONFIDENCE_SCORE"],
-				["category_labels", "FACTUAL_CATEGORY"],
-				["chain_name", "CHAIN_NAME"],
-				["neighborhood", "NEIGHBOURHOOD"],
-				["internal_store_number", "STORE_ID"],
-				["name", "MERCHANT_NAME"]
-			],
-			"column_map": [
-				["UNIQUE_ACCOUNT_ID", "UNIQUE___BLANK_ACCOUNT_ID"],
-				["UNIQUE_TRANSACTION_ID", "UNIQUE___BLANK_TRANSACTION_ID"],
-				["TYPE", "TRANSACTION_BASE_TYPE"],
-				["MERCHANT_NAME", "GOOD_DESCRIPTION"]
-			],
-			"meerkat_fields": [
-				"STORE_ID", "FACTUAL_CATEGORY", "STREET", "CITY", "STATE",
-				"ZIP_CODE", "WEBSITE", "PHONE_NUMBER", "FAX_NUMBER", "CHAIN_NAME",
-				"LATITUDE", "LONGITUDE", "MERCHANT_NAME", "NEIGHBOURHOOD",
-				"TRANSACTION_ORIGIN", "CONFIDENCE_SCORE", "FACTUAL_ID"
-			],
 			"unified_header" : [
 				["used_in_header", "origin",    "name_in_meerkat",               "name_in_origin"],
 				[true,             "input",     "UNIQUE_MEM_ID",                 "UNIQUE_MEM_ID"],
@@ -90,7 +49,7 @@
 				[true,             "input",     "COBRAND_ID",                    "COBRAND_ID"],
 				[true,             "input",     "SUM_INFO_ID",                   "SUM_INFO_ID"],
 				[true,             "input",     "AMOUNT",                        "AMOUNT"],
-				[true,             "input",     "CURRENCY_ID",                   "CURRENCY"],
+				[true,             "input",     "CURRENCY_ID",                   "CURRENCY_ID"],
 				[true,             "input",     "DESCRIPTION",                   "DESCRIPTION"],
 				[true,             "input",     "TRANSACTION_DATE",              "TRANSACTION_DATE"],
 				[true,             "input",     "POST_DATE",                     "POST_DATE"],
@@ -116,7 +75,7 @@
 				[true,             "search",    "FACTUAL_ID",                    "factual_id"],
 				[true,             "input",     "FILE_CREATED_DATE",             "FILE_CREATED_DATE"],
 				[false,            "input",     "DESCRIPTION_UNMASKED",          "DESCRIPTION_UNMASKED"],
-				[false,            "input",     "MERCHANT_NAME",                 "GOOD_DESCRIPTION"]
+				[false,            "input",     "GOOD_DESCRIPTION",              "MERCHANT_NAME"]
 			],
 			"hyperparameters": "config/hyperparameters/default.json",
 			"concurrency": 20,
@@ -144,24 +103,7 @@
 				"formatter": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 				"level": "warning",
 				"path": "logs/jkey_test_bank.log"
-			},
-			"field_mappings" : [
-				["factual_id", "FACTUAL_ID"],
-				["address", "STREET"],
-				["tel", "PHONE_NUMBER"],
-				["latitude", "LATITUDE"],
-				["longitude", "LONGITUDE"],
-				["postcode", "ZIP_CODE"],
-				["region", "STATE"],
-				["website", "WEBSITE"],
-				["locality", "CITY"],
-				["z_score_delta", "CONFIDENCE_SCORE"],
-				["category_labels", "FACTUAL_CATEGORY"],
-				["chain_name", "CHAIN_NAME"],
-				["neighborhood", "NEIGHBORHOOD"],
-				["internal_store_number", "STORE_ID"],
-				["name", "MERCHANT_NAME"]
-			]
+			}
 		}
 	}
 }

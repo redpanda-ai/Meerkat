@@ -11,26 +11,17 @@
 			}
 		},
 		"field_mapping" : {
-			"description": "An array of length 2 that maps the internal name for a field to the name that will given to the output file.",
+			"description": "An array of length 4 that shows the source and purpose of name and how it is mapped.",
 			"type": "array",
 			"items": {
-				"allOf": [ { "type": "string" } ],
-				"minItems": 2
+				"minItems": 4
 			}
 		},
-		"field_mappings": {
+		"unified_header": {
 			"description": "An ordered list of field_mapping arrays used to determine the structure of the output file.",
 			"type": "array",
 			"items": {
 				"allOf": [ { "$ref": "#/definitions/field_mapping" } ],
-				"minItems": 1
-			}
-		},
-		"header_template" : {
-			"description": "An array of column labels for our Meerkat output file.",
-			"type": "array",
-			"items": {
-				"allOf": [ { "type": "string" } ],
 				"minItems": 1
 			}
 		},
@@ -69,7 +60,7 @@
 				},
 				"output" : { "type": "object" }
 			},
-			"required": [ "concurrency", "elasticsearch", "field_mappings", "header_template",
+			"required": [ "concurrency", "elasticsearch", "unified_header",
 				"hyperparameters", "input", "local_files", "output"
 			]
 		}
