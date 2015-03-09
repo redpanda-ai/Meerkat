@@ -41,7 +41,6 @@ def get_yodlee_factual_map(params):
 	for item in my_field_mappings:
 		mappings[item[0]] = item[1]
 	return mappings
-	# { "factual_id" : "FACTUAL_ID", "address" : "STREET", "tel" : "PHONE_NUMBER", "latitude" : "LATITUDE", "longitude" : "LONGITUDE", "postcode" : "ZIP_CODE", "region" : "STATE", "website" : "WEBSITE", "locality" : "CITY", "z_score_delta" : "CONFIDENCE_SCORE", "category_labels" : "FACTUAL_CATEGORY", "chain_name" : "CHAIN_NAME", "neighborhood" : "NEIGHBOURHOOD", "internal_store_number" : "STORE_ID", "name" : "MERCHANT_NAME"}
 
 class FileConsumer(threading.Thread):
 	"""Acts as a client to an ElasticSearch cluster, tokenizing description
