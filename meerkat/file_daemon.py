@@ -9,25 +9,25 @@ import time
 from boto.s3.connection import Location
 from .custom_exceptions import FileProblem, InvalidArguments
 
+#Usage python3.3 -m meerkat.file_daemon
+
 def get_parameters():
 	"""Validates the command line arguments and loads a dict of params."""
 	input_file, params = None, None
-	if len(sys.argv) != 2:
+	if len(sys.argv) != 1:
 		logging.debug("Supply the following arguments: config_file")
 		raise InvalidArguments(msg="Incorrect number of arguments", expr=None)
 	try:
-		input_file = open(sys.argv[1], encoding='utf-8')
+		input_file = open("config/daemon/file.json", encoding='utf-8')
 		params = json.loads(input_file.read())
 		input_file.close()
 	except IOError:
-		logging.critical("%s not found, aborting.", sys.argv[1])
+		logging.error("Configuration file not found, aborting.")
 		raise FileProblem(msg="Cannot find a valid configuration file.", expr=None)
 	return params
 
 def start():
 	#This producer needs updating to deal with oddities:
-		#Strangely ordered columns
-		#Strangely named columns
 	count, max_count = 0, 1
 	sleep_time_sec = 5
 	params = get_parameters()
@@ -43,6 +43,7 @@ def start():
 		count_running_clients(params)
 		logging.info("Resting for {0} seconds.".format(sleep_time_sec))
 		time.sleep(sleep_time_sec)
+	logging.info("Done.")
 
 def distribute_clients(params):
 	lp = params["launchpad"]
@@ -63,7 +64,7 @@ def distribute_clients(params):
 			sys.exit()
 
 def count_running_clients(params):
-	polling_command = "ps -ef|grep python3.3|grep -v grep|awk ' { print $12 }'"
+	polling_command = "ps -ef|grep python3.3|grep -v grep|awk ' { print $11,$12 }'"
 	lp = params["launchpad"]
 	ssh, instance_ips, username = lp["ssh"], lp["instance_ips"], lp["username"]
 	key_filename = lp["key_filename"]
@@ -74,7 +75,7 @@ def count_running_clients(params):
 		process_count = 0
 		for line in stdout.readlines():
 			process_count += 1
-			logging.info(line.strip())
+			logging.info(line)
 		logging.info("{0} processes found.".format(process_count))
 
 
@@ -127,7 +128,16 @@ def update_pending_files(params, name, src_dict, dst_dict):
 
 if __name__ == "__main__":
 	#MAIN PROGRAM
+	logger = logging.getLogger('file_daemon')
+	logger.setLevel(logging.DEBUG)
+	ch = logging.StreamHandler()
+	ch.setLevel(logging.DEBUG)
+	formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+	ch.setFormatter(formatter)
+	logger.addHandler(ch)
+	logger.debug("File daemon")
 	logging.basicConfig(format='%(asctime)s %(message)s', filename='logs/file_daemon.log', \
 		level=logging.INFO)
+
 	logging.info("Scanning module activated.")
 	start()
