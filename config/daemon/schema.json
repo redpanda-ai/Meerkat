@@ -39,8 +39,8 @@
 			"type": "object",
 			"properties": {
 				"cluster_nodes" : { "$ref": "#/definitions/instance_ips" },
-				"es_index": { "type" : "string" },
-				"es_type" : { "type" : "string" }
+				"index": { "type" : "string" },
+				"type" : { "type" : "string" }
 			}
 		},
 		"producer_default": {

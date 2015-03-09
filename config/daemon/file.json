@@ -13,14 +13,14 @@
 	},
 	"location_pairs": [
 		{
-			"name": "gpanel2_bank",
-			"src_location": "yodleeprivate/panels/meerkat_input/gpanel2/bank/",
-			"dst_location": "yodleeprivate/panels/meerkat_output/gpanel2/bank/"
+			"name": "jkey_test_bank",
+			"src_location": "yodleeprivate/panels/meerkat_input/jkey_test/bank/",
+			"dst_location": "yodleeprivate/panels/meerkat_output/jkey_test/bank/"
 		},
 		{
-			"name": "gpanel2_card",
-			"src_location": "yodleeprivate/panels/meerkat_input/gpanel2/card/",
-			"dst_location": "yodleeprivate/panels/meerkat_output/gpanel2/card/"
+			"name": "jkey_test_card",
+			"src_location": "yodleeprivate/panels/meerkat_input/jkey_test/card/",
+			"dst_location": "yodleeprivate/panels/meerkat_output/jkey_test/card/"
 		}
 	],
 	"producer_options" : {
@@ -64,8 +64,14 @@
 					"172.31.26.86",
 					"172.31.26.87"
 				],
-				"es_index": "factual_index",
-				"es_type": "factual_type"
+				"index": "factual_index",
+				"type": "factual_type"
+			},
+			"logging": {
+				"console": true,
+				"formatter": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+				"level": "warning",
+				"path": "logs/foo.log"
 			}
 		}
 	}
