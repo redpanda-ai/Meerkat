@@ -9,7 +9,7 @@
 		"key_filename" : "/root/.ssh/jkey.pem",
 		"username": "root",
 		"producer": "/root/git/Meerkat/meerkat/file_producer.py",
-		"producer_hash": "338408de9e9e64ef8f39b877509a8125336da8ba"
+		"producer_hash": "80bd9b0233ef92e000daf3f97a219aa20482a870"
 	},
 	"location_pairs": [
 		{
