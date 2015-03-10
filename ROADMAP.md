@@ -9,10 +9,10 @@
 			* - [x] timeline with milestones
 
 	* 3/4
-		* - [ ] Update the Meerkat daemon to provide
-			* - [ ] column re-ordering
-			* - [ ] handle multiple input paths
-			* - [ ] handle newer version of the input files
+		* - [x] Update the Meerkat daemon to provide
+			* - [x] column re-ordering
+			* - [x] handle multiple input paths
+			* - [x] handle newer version of the input files
 			* - [ ] provide alerting when problems occur
 			* - [ ] produce a daily report for all input paths, sent to a distribution list
 			* - [ ] :clock4: full deployment
