@@ -12,11 +12,13 @@ from plumbum import SshMachine, BG
 
 #Usage python3.3 -m meerkat.file_daemon
 
-def launch_remote_producer(instance_ip, user, keyfile, item):
+def launch_remote_producer(params, instance_ip, user, keyfile, item):
 	logging.info("Launching: {0}".format(item))
-	remote = SshMachine(instance_ip, user=user, keyfile=keyfile)
 	panel_name, file_name = item[0:2]
 	log_name = "logs/" + panel_name + "." + file_name + ".log"
+	if instance_ip not in params:
+		params[instance_ip] = SshMachine(instance_ip, user=user, keyfile=keyfile)
+	remote = params[instance_ip]
 	command = remote["carriage"][panel_name][file_name][log_name]
 	with remote.cwd("/root/git/Meerkat"):
 		pass
@@ -44,9 +46,9 @@ def start():
 	count, max_count = 1, 100000000
 	sleep_time_sec = 60
 	params = get_parameters()
-	ssh = paramiko.SSHClient()
-	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-	params["launchpad"]["ssh"] = ssh
+	#ssh = paramiko.SSHClient()
+	#ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+	#params["launchpad"]["ssh"] = ssh
 	distribute_clients(params)
 	while count < max_count:
 		params["not_finished"] = []
@@ -61,48 +63,33 @@ def start():
 
 def distribute_clients(params):
 	lp = params["launchpad"]
-	ssh, instance_ips, username = lp["ssh"], lp["instance_ips"], lp["username"]
+	instance_ips, username = lp["instance_ips"], lp["username"]
 	key_filename, producer = lp["key_filename"], lp["producer"]
 	producer_hash = lp["producer_hash"]
 	command = "sha1sum " + producer
 	hash = None
+	ssh = paramiko.SSHClient()
+	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 	for instance_ip in instance_ips:
 		logging.info("Checking producer client on {0}".format(instance_ip))
 		ssh.connect(instance_ip, username=username, key_filename=key_filename)
 		_, stdout, _ = ssh.exec_command(command)
+
 		for line in stdout.readlines():
 			hash = line[:40]
 		logging.info("SHA1 is {0}".format(hash))
 		if hash != producer_hash:
 			logging.critical("Sorry, producer is the wrong version.")
 			sys.exit()
-
-def interExecute(host,port,username,password,cmd):
-	"""Execute the given commands in an interactive shell."""
-	transport = paramiko.Transport((host, port))
-	transport.connect(username = username, password = password)
-	chan = paramiko.transport.open_session()
-	chan.setblocking(0)
-	chan.invoke_shell()
-
-	out = ''
-	chan.send(cmd+'\n')
-	tCheck = 0
-	# Wait for it.....
-	while not chan.recv_ready():
-		time.sleep(10)
-		tCheck+=1
-		if tCheck >= 6:
-			logging.info('time out')#TODO: add exeption here
-			return False
-	out = chan.recv(1024)
-	return out
+	ssh.close()
 
 def dispatch_clients(params):
 	lp = params["launchpad"]
-	ssh, instance_ips, username = lp["ssh"], lp["instance_ips"], lp["username"]
+	instance_ips, username = lp["instance_ips"], lp["username"]
 	key_filename = lp["key_filename"]
 	running_pattern = re.compile("^(.*) (.*)$")
+	ssh = paramiko.SSHClient()
+	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
 	polling_command = "ps -ef|grep python3.3|grep -v grep|awk ' { print $11,$12 }'"
 	#command_base = "cd /root/git/Meerkat/ && nohup python3.3 -m meerkat.file_producer "
@@ -127,18 +114,21 @@ def dispatch_clients(params):
 				#command = command_base + item[0] + " " + item[1] + " " + item[0] + "." + item[1] + ".log)"
 				#logging.info("Command: {0}".format(command))
 				#print(command)
-				launch_remote_producer(instance_ip, username, key_filename, item)
+				launch_remote_producer(params, instance_ip, username, key_filename, item)
 				#_, _, _ = ssh.exec_command(command)
 				#logging.info(stdout)
 				#logging.info("Command: {0}".format(command))
+	ssh.close()
 
 def count_running_clients(params):
 	polling_command = "ps -ef|grep python3.3|grep -v grep|awk ' { print $12,$13 }'"
 	lp = params["launchpad"]
-	ssh, instance_ips, username = lp["ssh"], lp["instance_ips"], lp["username"]
+	instance_ips, username = lp["instance_ips"], lp["username"]
 	key_filename = lp["key_filename"]
 	running_pattern = re.compile("^(.*) (.*)$")
 	params["in_progress"] = []
+	ssh = paramiko.SSHClient()
+	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 	for instance_ip in instance_ips:
 		logging.info("Counting running clients on {0}".format(instance_ip))
 		ssh.connect(instance_ip, username=username, key_filename=key_filename)
@@ -163,6 +153,7 @@ def count_running_clients(params):
 	logging.info("Number of files not yet finished: {0}".format(len(not_finished)))
 	logging.info("Number of files in progress: {0}".format(len(in_progress)))
 	logging.info("Number of files not yet started: {0}".format(len(not_started)))
+	ssh.close()
 
 def scan_locations(params):
 	"""This function starts the new_daemon."""
