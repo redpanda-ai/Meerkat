@@ -17,6 +17,7 @@
 			* - [ ] produce a daily report for all input paths, sent to a distribution list
 			* - [ ] :clock4: full deployment
 	* 3/10
+		* - [ ] Advertise the Jobvite for our new position in LinkedIn.
 		* - [ ] Work with Richa on end-to-end integration strategy
 		* - [ ] Speak with Sanjay and Nikhil about getting the gpanel_v2 up and running
 	* 3/11
