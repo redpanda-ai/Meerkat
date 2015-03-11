@@ -22,6 +22,9 @@
 		* - [ ] Speak with Sanjay and Nikhil about getting the gpanel_v2 up and running
 	* 3/11
 		* - [ ] Meet with Kirti on the architecture and design of our transaction data enrichment service
+		* - [ ] Look at traffic on early adopter program
+			* - review logs for possible bugs
+			* - try to get a sense of the traffic, report rates, etc.
 	* 3/15
 		* - [ ] Speak with Sanjay and team about prototype for building a web service panel for Meerkat
 	* 3/18
