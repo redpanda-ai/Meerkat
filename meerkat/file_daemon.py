@@ -8,8 +8,20 @@ import time
 
 from boto.s3.connection import Location
 from .custom_exceptions import FileProblem, InvalidArguments
+from plumbum import SshMachine, BG
 
 #Usage python3.3 -m meerkat.file_daemon
+
+def launch_remote_producer(instance_ip, user, keyfile, item):
+	logging.info("Launching: {0}".format(item))
+	remote = SshMachine(instance_ip, user=user, keyfile=keyfile)
+	panel_name, file_name = item[0:2]
+	log_name = "logs/" + panel_name + "." + file_name + ".log"
+	command = remote["carriage"][panel_name][file_name][log_name]
+	with remote.cwd("/root/git/Meerkat"):
+		pass
+		f = (command) & BG
+	logging.info(("Launched"))
 
 def get_parameters():
 	"""Validates the command line arguments and loads a dict of params."""
@@ -18,6 +30,7 @@ def get_parameters():
 		logging.debug("Supply the following arguments: config_file")
 		raise InvalidArguments(msg="Incorrect number of arguments", expr=None)
 	try:
+		#TODO: Set to file.json
 		input_file = open("config/daemon/file.json", encoding='utf-8')
 		params = json.loads(input_file.read())
 		input_file.close()
@@ -64,6 +77,27 @@ def distribute_clients(params):
 			logging.critical("Sorry, producer is the wrong version.")
 			sys.exit()
 
+def interExecute(host,port,username,password,cmd):
+	"""Execute the given commands in an interactive shell."""
+	transport = paramiko.Transport((host, port))
+	transport.connect(username = username, password = password)
+	chan = paramiko.transport.open_session()
+	chan.setblocking(0)
+	chan.invoke_shell()
+
+	out = ''
+	chan.send(cmd+'\n')
+	tCheck = 0
+	# Wait for it.....
+	while not chan.recv_ready():
+		time.sleep(10)
+		tCheck+=1
+		if tCheck >= 6:
+			logging.info('time out')#TODO: add exeption here
+			return False
+	out = chan.recv(1024)
+	return out
+
 def dispatch_clients(params):
 	lp = params["launchpad"]
 	ssh, instance_ips, username = lp["ssh"], lp["instance_ips"], lp["username"]
@@ -72,7 +106,7 @@ def dispatch_clients(params):
 
 	polling_command = "ps -ef|grep python3.3|grep -v grep|awk ' { print $11,$12 }'"
 	#command_base = "cd /root/git/Meerkat/ && nohup python3.3 -m meerkat.file_producer "
-	command_base = "carriage "
+	command_base = "(cd /root/git/Meerkat ; source /root/.bash_profile ; ./test.sh "
 	total_slots = params["launchpad"]["per_instance_clients"]
 	for instance_ip in instance_ips:
 		logging.info("Counting running clients on {0}".format(instance_ip))
@@ -90,10 +124,11 @@ def dispatch_clients(params):
 				item = params["not_started"].pop()
 				#logging.info("Launching {0}, which is {1}".format(i, item))
 				panel_name, panel_file = item[0:2]
-				command = command_base + item[0] + " " + item[1] + " " + item[0] + "." + item[1] + ".log"
-				logging.info("Command: {0}".format(command))
+				#command = command_base + item[0] + " " + item[1] + " " + item[0] + "." + item[1] + ".log)"
+				#logging.info("Command: {0}".format(command))
 				#print(command)
-				#_, stdout, _ = ssh.exec_command(command)
+				launch_remote_producer(instance_ip, username, key_filename, item)
+				#_, _, _ = ssh.exec_command(command)
 				#logging.info(stdout)
 				#logging.info("Command: {0}".format(command))
 
