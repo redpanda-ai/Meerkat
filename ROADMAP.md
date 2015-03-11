@@ -18,6 +18,7 @@
 			* - [ ] :clock4: full deployment
 	* 3/10
 		* - [ ] Work with Richa on end-to-end integration strategy
+		* - [ ] Speak with Sanjay and Nikhil about getting the gpanel_v2 up and running
 	* 3/11
 		* - [ ] Meet with Kirti on the architecture and design of our transaction data enrichment service
 	* 3/15
