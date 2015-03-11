@@ -16,13 +16,14 @@
 			* - [ ] provide alerting when problems occur
 			* - [ ] produce a daily report for all input paths, sent to a distribution list
 			* - [ ] :clock4: full deployment
-		* - [ ] Meet with Richa from Program Management to discuss architecture of Meerkat
 	* 3/10
 		* - [ ] Work with Richa on end-to-end integration strategy
 	* 3/11
 		* - [ ] Meet with Kirti on the architecture and design of our transaction data enrichment service
 	* 3/15
 		* - [ ] Speak with Sanjay and team about prototype for building a web service panel for Meerkat
+	* 3/18
+		* - [ ] Meet with Richa from Program Management to discuss architecture of Meerkat
 2.  **Meerkat Team**, Matt
 	* 3/7
 		* - [x] Check and see if there are any types/subtypes with abnormally low rates of agreement between the labelers, provide useful metrics.
