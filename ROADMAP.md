@@ -25,6 +25,8 @@
 		* - [ ] Look at traffic on early adopter program
 			* - review logs for possible bugs
 			* - try to get a sense of the traffic, report rates, etc.
+			* - 10.16.3.99 and 10.16.2.226
+			* - start using a daily rolling log file, and add some dates to the timestamps
 	* 3/15
 		* - [ ] Speak with Sanjay and team about prototype for building a web service panel for Meerkat
 	* 3/18
