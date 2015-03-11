@@ -26,6 +26,9 @@
 	* 3/18
 		* - [ ] Meet with Richa from Program Management to discuss architecture of Meerkat
 2.  **Meerkat Team**, Matt
+	* 3/11
+		* - [ ] Produce a comprehensive set of transactions from our labeling sample where the “choice_pair” was “Payment – Loan”
+			* Place the results in S3
 	* 3/7
 		* - [x] Check and see if there are any types/subtypes with abnormally low rates of agreement between the labelers, provide useful metrics.
 			* Report findings as a Fleiss' Kappa matrix
