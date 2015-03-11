@@ -41,8 +41,8 @@ def get_parameters():
 
 def start():
 	#This producer needs updating to deal with oddities:
-	count, max_count = 0, 1
-	sleep_time_sec = 5
+	count, max_count = 1, 100000000
+	sleep_time_sec = 60
 	params = get_parameters()
 	ssh = paramiko.SSHClient()
 	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
