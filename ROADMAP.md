@@ -24,7 +24,8 @@
 	* 3/18
 		* - [ ] Meet with Richa from Program Management to discuss architecture of Meerkat
 2.  **Meerkat Team**, Matt
-
+	* 3/12
+		* - [ ] Review [pull request] (https://github.com/joeandrewkey/Meerkat/pull/121)
 
 
 3.  **Meerkat Team**, Andy and Matt
