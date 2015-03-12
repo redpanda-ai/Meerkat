@@ -34,6 +34,8 @@
 		* - [x] Recommend strategies for better labeling
 	* 3/12
 		* - [ ] Review [pull request] (https://github.com/joeandrewkey/Meerkat/pull/121) for ***new_daemon*** branch
+		* - [ ] Get the labelers ready to make another pass at our transactions that were labeled, "Other"
+			* Use the labels proposed by Deepu to see if we can get a clearer resolution
 	* 3/20
 		* - [ ] Cut a first draft of the Transaction Origin Classifier
 			
