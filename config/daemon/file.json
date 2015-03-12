@@ -23,6 +23,16 @@
 			"dst_location": "yodleeprivate/panels/meerkat_output/ct_version2/card/"
 		},
 		{
+			"name": "gpanel_bank",
+			"src_location": "yodleeprivate/panels/meerkat_split/bank/",
+			"dst_location": "yodleeprivate/panels/meerkat/bank/"
+		},
+		{
+			"name": "gpanel_card",
+			"src_location": "yodleeprivate/ctprocessed/gpanel/card/",
+			"dst_location": "yodleeprivate/panels/meerkat/card/"
+		},
+		{
 			"name": "gpanel2_bank",
 			"src_location": "yodleeprivate/panels/meerkat_input/gpanel2/bank/",
 			"dst_location": "yodleeprivate/panels/meerkat_output/gpanel2/bank/"
@@ -41,6 +51,36 @@
 			"name": "jkey_test_card",
 			"src_location": "yodleeprivate/panels/meerkat_input/jkey_test/card/",
 			"dst_location": "yodleeprivate/panels/meerkat_output/jkey_test/card/"
+		},
+		{
+			"name": "yic2_bank",
+			"src_location": "yodleeprivate/panels/meerkat_input/yic2/bank/",
+			"dst_location": "yodleeprivate/panels/meerkat_output/yic2/bank/"
+		},
+		{
+			"name": "yic2_card",
+			"src_location": "yodleeprivate/panels/meerkat_input/yic2/card/",
+			"dst_location": "yodleeprivate/panels/meerkat_output/yic2/card/"
+		},
+		{
+			"name": "Cpanel_bank",
+			"src_location": "yodleeprivate/panels/meerkat_input/Cpanel/bank/",
+			"dst_location": "yodleeprivate/panels/meerkat_output/Cpanel/bank/"
+		},
+		{
+			"name": "Cpanel_card",
+			"src_location": "yodleeprivate/panels/meerkat_input/Cpanel/card/",
+			"dst_location": "yodleeprivate/panels/meerkat_output/Cpanel/card/"
+		},
+		{
+			"name": "gpanel_enhancedCT_bank",
+			"src_location": "yodleeprivate/ctprocessed/gpanel_enhancedCT/bank/",
+			"dst_location": "yodleeprivate/panels/meerkat_output/gpanel_enhancedCT/bank/"
+		},
+		{
+			"name": "gpanel_enhancedCT_card",
+			"src_location": "yodleeprivate/ctprocessed/gpanel_enhancedCT/card/",
+			"dst_location": "yodleeprivate/panels/meerkat_output/gpanel_enhancedCT/card/"
 		}
 	],
 	"producer_options" : {
