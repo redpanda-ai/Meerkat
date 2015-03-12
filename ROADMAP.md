@@ -23,9 +23,23 @@
 		* - [ ] Speak with Sanjay and team about prototype for building a web service panel for Meerkat
 	* 3/18
 		* - [ ] Meet with Richa from Program Management to discuss architecture of Meerkat
+	* 3/20
+		* - [ ] Provide a versioning mechanism for the file daemon interface to Meerkat
+			* support version 1.0.0
+			* support version 1.1.0
 2.  **Meerkat Team**, Matt
+	* Begins 3/1 - Drive the Labeling Effort
+		* - [x] Periodically communicate with Smita R. and Ram about new requirements
+		* - [x] Produce metrics regarding labeling agreeance
+		* - [x] Recommend strategies for better labeling
 	* 3/12
 		* - [ ] Review [pull request] (https://github.com/joeandrewkey/Meerkat/pull/121)
+	* 3/20
+		* - [ ] Cut a first draft of the Transaction Origin Classifier
+			
+	* 3/24
+		* - [ ] Provide integration with the v1.1.0 web service
+		* - [ ] Provide integration with the v1.1.0 version of the file daemon
 
 
 3.  **Meerkat Team**, Andy and Matt
