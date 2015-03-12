@@ -33,7 +33,7 @@
 		* - [x] Produce metrics regarding labeling agreeance
 		* - [x] Recommend strategies for better labeling
 	* 3/12
-		* - [ ] Review [pull request] (https://github.com/joeandrewkey/Meerkat/pull/121)
+		* - [ ] Review [pull request] (https://github.com/joeandrewkey/Meerkat/pull/121) for ***new_daemon*** branch
 	* 3/20
 		* - [ ] Cut a first draft of the Transaction Origin Classifier
 			
