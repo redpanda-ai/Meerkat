@@ -8,7 +8,7 @@
 			* - [x] list dependencies
 			* - [x] timeline with milestones
 	* 3/12
-		* - [ ] Advertise the Jobvite for our new position through LinkedIn.
+		* - [x] Advertise the Jobvite for our new position through LinkedIn.
 		* - [x] Meet with Kirti on the architecture and design of our transaction data enrichment service
 		* - [ ] Look at traffic on early adopter program
 			* - review logs for possible bugs
