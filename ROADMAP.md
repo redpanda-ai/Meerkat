@@ -52,7 +52,7 @@
 * 3/11
 	* - [x] Produce a comprehensive set of transactions from our labeling sample where the “choice_pair” was “Payment – Loan”
 	* - [x] Check and see if there are any types/subtypes with abnormally low rates of agreement between the labelers, provide useful metrics.
-	* Report findings in a useful spreadsheet
+		* Report findings in a useful spreadsheet
 * 3/9
 	* - [x] Set up an EC2 environment for the nolearn deep learning libraries that
 		* uses the graphics processing unit
