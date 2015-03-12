@@ -34,7 +34,7 @@
 		* - [x] Recommend strategies for better labeling
 	* 3/12
 		* - [ ] Review [pull request] (https://github.com/joeandrewkey/Meerkat/pull/121) for ***new_daemon*** branch
-		* - [ ] Get the labelers ready to make another pass at our transactions that were labeled as ***Other***
+		* - [ ] Get the labelers ready to make another pass at our transactions that were previously labeled as ***Other***
 			* Use the [labels] (https://github.com/joeandrewkey/Meerkat/blob/develop/data/misc/TransactionTypeRules20150303.xlsx) proposed by Deepu
 	* 3/15
 		* - [ ] :clock4: Use the SRS module and associated e*trade sum_info_id [filters] (https://github.com/joeandrewkey/Meerkat/issues/120) to produce a sample of transactions from investment type accounts
