@@ -85,7 +85,8 @@
 	* - [x] Reduce EC2 infrastructure cost and report results to Neil and Katie
 		* Total instance count 69
 			* Meerkat Development, 4 instances
-			* ***Meerkat Panel Processing***, 52 instances
+			* ***Meerkat Panel Processing***, 52 instances + 20 extra slave nodes = 72 instances
+				* 20 extra nodes temporarily up and running to deal with gpanel_v2
 			* Meerkat Production Web Service, 9 instances
 			* Meerkat Unknown, 4 instances
 * 3/2
