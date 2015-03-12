@@ -8,14 +8,7 @@
 			* - [x] list dependencies
 			* - [x] timeline with milestones
 
-	* 3/4
-		* - [x] Update the Meerkat daemon to provide
-			* - [x] column re-ordering
-			* - [x] handle multiple input paths
-			* - [x] handle newer version of the input files
-			* - [ ] provide alerting when problems occur
-			* - [ ] produce a daily report for all input paths, sent to a distribution list
-			* - [ ] :clock4: full deployment
+
 	* 3/10
 		* - [ ] Advertise the Jobvite for our new position in LinkedIn.
 		* - [ ] Work with Richa on end-to-end integration strategy
@@ -32,15 +25,7 @@
 	* 3/18
 		* - [ ] Meet with Richa from Program Management to discuss architecture of Meerkat
 2.  **Meerkat Team**, Matt
-	* 3/11
-		* - [x] Produce a comprehensive set of transactions from our labeling sample where the “choice_pair” was “Payment – Loan”
-			* Place the results in S3
-	* 3/7
-		* - [x] Check and see if there are any types/subtypes with abnormally low rates of agreement between the labelers, provide useful metrics.
-			* Report findings as a Fleiss' Kappa matrix
-		* - [x] Set up an EC2 environment for the nolearn deep learning libraries that
-			* uses the graphics processing unit
-			* works quickly over large data sets
+
 
 
 3.  **Meerkat Team**, Andy and Matt
@@ -65,6 +50,14 @@
 
 ### RECENTLY COMPLETED
 #### Matt
+* 3/11
+	* - [x] Produce a comprehensive set of transactions from our labeling sample where the “choice_pair” was “Payment – Loan”
+	* - [x] Check and see if there are any types/subtypes with abnormally low rates of agreement between the labelers, provide useful metrics.
+	* Report findings in a useful spreadsheet
+* 3/9
+	* - [x] Set up an EC2 environment for the nolearn deep learning libraries that
+		* uses the graphics processing unit
+		* works quickly over large data sets
 * 3/3
 	* - [x] :clock4: Conduct analysis on first 5000 labeled transactions, report results 
 	* - [x] :clock4: Review Ram's contribution to our labeling effort, report findings
@@ -76,6 +69,14 @@
 	* - [x] Provide thoughtful response to how to find and predict transaction types.
 
 #### Andy
+* 3/11
+	* - [x] Update the Meerkat daemon to provide
+		* - [x] column re-ordering
+		* - [x] handle multiple input paths
+		* - [x] handle newer version of the input files
+		* - [x] provide alerting when problems occur
+		* - [x] produce a daily report for all input paths, sent to a distribution list
+		* - [x] :clock4: full deployment
 * 3/4
 	* - [x] Speak with Ram and ask him to get back to work on the label resolution.
 * 3/3
