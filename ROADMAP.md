@@ -10,10 +10,9 @@
 
 
 	* 3/10
-		* - [ ] Advertise the Jobvite for our new position in LinkedIn.
+		* - [ ] Advertise the Jobvite for our new position through LinkedIn.
 		* - [ ] Work with Richa on end-to-end integration strategy
-		* - [ ] Speak with Sanjay and Nikhil about getting the gpanel_v2 up and running
-	* 3/11
+	* 3/12
 		* - [ ] Meet with Kirti on the architecture and design of our transaction data enrichment service
 		* - [ ] Look at traffic on early adopter program
 			* - review logs for possible bugs
@@ -77,6 +76,7 @@
 		* - [x] provide alerting when problems occur
 		* - [x] produce a daily report for all input paths, sent to a distribution list
 		* - [x] :clock4: full deployment
+		* - [x] Speak with Sanjay and Nikhil about getting the gpanel_v2 up and running
 * 3/4
 	* - [x] Speak with Ram and ask him to get back to work on the label resolution.
 * 3/3
