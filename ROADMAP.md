@@ -45,6 +45,7 @@
 		* - [ ] Provide integration with the v1.1.0 web service
 		* - [ ] Provide integration with the v1.1.0 version of the file daemon
 3.  **Meerkat Team**, Andy and Matt
+	* Backlog
 		* - [ ] Determine why our labelers had trouble distinguishing subtypes of transfers, perhaps retry those
 		* - [ ] Reclassify the ***other*** transactions and see if providing ***charges and fees*** gives us labels
 		* - [ ] Add some E-trade data, or other cash management accounts to make sure we see some dividends and capital gains
