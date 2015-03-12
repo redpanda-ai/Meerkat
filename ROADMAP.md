@@ -7,13 +7,9 @@
 			* - [x] list tasks
 			* - [x] list dependencies
 			* - [x] timeline with milestones
-
-
-	* 3/10
-		* - [ ] Advertise the Jobvite for our new position through LinkedIn.
-		* - [ ] Work with Richa on end-to-end integration strategy
 	* 3/12
-		* - [ ] Meet with Kirti on the architecture and design of our transaction data enrichment service
+		* - [ ] Advertise the Jobvite for our new position through LinkedIn.
+		* - [x] Meet with Kirti on the architecture and design of our transaction data enrichment service
 		* - [ ] Look at traffic on early adopter program
 			* - review logs for possible bugs
 			* - try to get a sense of the traffic, report rates, etc.
@@ -21,6 +17,10 @@
 			* - start using a daily rolling log file, and add some dates to the timestamps
 	* 3/15
 		* - [ ] Speak with Sanjay and team about prototype for building a web service panel for Meerkat
+		* - [ ] Address the outstanding issues with the [pull request] (https://github.com/joeandrewkey/Meerkat/pull/121) for ***new_daemon*** branch
+	* 3/17 
+		* - [ ] Work with Richa on end-to-end integration strategy for the production web service
+			* specifically regarding the use of Yodlee Labs to produce testing data
 	* 3/18
 		* - [ ] Meet with Richa from Program Management to discuss architecture of Meerkat
 	* 3/20
@@ -33,7 +33,7 @@
 		* - [x] Produce metrics regarding labeling agreeance
 		* - [x] Recommend strategies for better labeling
 	* 3/12
-		* - [ ] Review [pull request] (https://github.com/joeandrewkey/Meerkat/pull/121) for ***new_daemon*** branch
+		* - [x] Review [pull request] (https://github.com/joeandrewkey/Meerkat/pull/121) for ***new_daemon*** branch
 		* - [ ] Get the labelers ready to make another pass at our transactions that were previously labeled as ***Other***
 			* Use the [labels] (https://github.com/joeandrewkey/Meerkat/blob/develop/data/misc/TransactionTypeRules20150303.xlsx) proposed by Deepu
 	* 3/15
@@ -44,11 +44,7 @@
 	* 3/24
 		* - [ ] Provide integration with the v1.1.0 web service
 		* - [ ] Provide integration with the v1.1.0 version of the file daemon
-
-
 3.  **Meerkat Team**, Andy and Matt
-	* 3/5
-		* - [ ] Set up a call with Deepu to get the label choices and the samples to be labeled in a sensible place so that we can move forward.
 		* - [ ] Determine why our labelers had trouble distinguishing subtypes of transfers, perhaps retry those
 		* - [ ] Reclassify the ***other*** transactions and see if providing ***charges and fees*** gives us labels
 		* - [ ] Add some E-trade data, or other cash management accounts to make sure we see some dividends and capital gains
