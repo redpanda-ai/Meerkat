@@ -126,10 +126,16 @@ def run_from_command_line(cla):
 
 	# Add new columns if first time labeling this data set
 	if (tc_col) not in df.columns:
-		df[tc_col] = pd.Series(([""] * sLen))
+		if "TXN_TYPE" in df.columns:
+			df.rename(columns={"TXN_TYPE": tc_col}, inplace=True)
+		else:
+			df[tc_col] = pd.Series(([""] * sLen))
 
 	if (sc_col) not in df.columns:
-		df[sc_col] = pd.Series(([""] * sLen))
+		if "SUB_TXN_TYPE" in df.columns:
+			df.rename(columns={"SUB_TXN_TYPE": sc_col}, inplace=True)
+		else:
+			df[sc_col] = pd.Series(([""] * sLen))
 
 	# Shuffle Rows
 	df = df.reindex(np.random.permutation(df.index))
