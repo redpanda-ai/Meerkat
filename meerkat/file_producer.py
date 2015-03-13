@@ -434,7 +434,7 @@ def write_error_file(path, filename, error_msg):
 			gzipped_output.write(bytes(error_msg + "\n", 'UTF-8'))
 
 if __name__ == "__main__":
-	logging.basicConfig(format='%(asctime)s %(message)s', filename='logs/file_producer.log', \
+	logging.basicConfig(format='%(asctime)s %(message)s', filename='/data/1/log/file_producer.log', \
 		level=logging.INFO)
 	logging.info("file_producer module activated.")
 	run_from_command_line(sys.argv)
