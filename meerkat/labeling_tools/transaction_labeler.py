@@ -26,6 +26,7 @@ import contextlib
 import csv
 import sys
 import os
+import re
 
 import numpy as np
 import pandas as pd
@@ -137,6 +138,7 @@ def run_from_command_line(cla):
 	save_and_exit = False
 	choices = [c["name"] for c in params["labels"]]
 	sub_choices = [s for s in params["labels"] if "sub_labels" in s]
+	choice_regex = re.compile('|'.join(choices))
 	sub_dict = {}
 	skip_save = ["", "s"]
 	options = skip_save + [str(o) for o in list(range(0, len(choices)))]
@@ -158,14 +160,13 @@ def run_from_command_line(cla):
 				else: 
 					continue
 			
-
 			# Collect labeler choice
 			choice = None
 			sub_choice = None
 			safe_print(("_" * 75) + "\n")
 
 			# Show Progress
-			complete = sLen - df[tc_col].str.contains(r'^$').sum()
+			complete = df[tc_col].str.contains(choice_regex).sum()
 			percent_complete = complete / sLen * 100
 			os.system("clear")
 			safe_print("{} ".format(complete) + "completed.")
