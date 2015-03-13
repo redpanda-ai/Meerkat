@@ -41,14 +41,16 @@
 	* 3/20
 		* - [ ] Cut a first draft of the Transaction Origin Classifier
 			
-	* 3/24
-		* - [ ] Provide integration with the v1.1.0 web service
-		* - [ ] Provide integration with the v1.1.0 version of the file daemon
+	* 3/23 - 3/30
+		* - [ ] Scheduled vacation
+
 3.  **Meerkat Team**, Andy and Matt
 	* Backlog
 		* - [ ] Determine why our labelers had trouble distinguishing subtypes of transfers, perhaps retry those
 		* - [ ] Reclassify the ***other*** transactions and see if providing ***charges and fees*** gives us labels
 		* - [ ] Add some E-trade data, or other cash management accounts to make sure we see some dividends and capital gains
+		* - [ ] Provide integration with the v1.1.0 web service
+		* - [ ] Provide integration with the v1.1.0 version of the file daemon
 	* 3/7
 		* - [ ] Think of a way to integrate a series of per-merchant classifiers that take the form of a series of regex expressions.
 			* Each bundle of regex expressions will serve as a per-merchant classifier
