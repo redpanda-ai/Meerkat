@@ -8,7 +8,10 @@ import time
 
 from boto.s3.connection import Location
 from .custom_exceptions import FileProblem, InvalidArguments
+from datetime import date, timedelta
 from plumbum import SshMachine, BG
+
+from operator import itemgetter
 
 #Usage python3.3 -m meerkat.file_daemon
 
@@ -46,9 +49,6 @@ def start():
 	count, max_count = 1, 100000000
 	sleep_time_sec = 60
 	params = get_parameters()
-	#ssh = paramiko.SSHClient()
-	#ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-	#params["launchpad"]["ssh"] = ssh
 	distribute_clients(params)
 	while count < max_count:
 		params["not_finished"] = []
@@ -141,31 +141,54 @@ def count_running_clients(params):
 				process_count += 1
 				panel_name = matches.group(1)
 				panel_file = matches.group(2)
-				in_progress.append((panel_name, panel_file))
+				in_progress.append((panel_name, panel_file, params[panel_name]))
 				logging.info("Panel name: {0}, Panel file: {1}".format(panel_name, panel_file))
 		logging.info("{0} processes found.".format(process_count))
 		params["in_progress"].extend(in_progress)
+	ssh.close()
 	#Valuable metrics
 	not_finished = params["not_finished"]
 	in_progress = params["in_progress"]
 	not_started = list(set(not_finished) - set(in_progress))
-	params["not_started"] = not_started
+
+	#Now for new scheduling
+	#Get todays date minus 14 days
+	two_weeks_ago = str(date.today() - timedelta(days=14)).replace("-","")
+	#Get the set of recent files
+	recent_files = [ x for x in not_started if x[1][:8] >= two_weeks_ago ]
+	#Get the set of older files
+	older_files = [ x for x in not_started if x[1][:8] < two_weeks_ago ]
+	#Sort the recent files by date(reversed)
+	recent_files = sorted(recent_files, key=itemgetter(1), reverse=True)
+	#Sort the older files, by priority
+	older_files = sorted(older_files, key=itemgetter(2), reverse=True)
+	sorted_not_started = []
+	sorted_not_started.extend(older_files)
+	sorted_not_started.extend(recent_files)
+
+	params["not_started"] = sorted_not_started
 	logging.info("Number of files not yet finished: {0}".format(len(not_finished)))
 	logging.info("Number of files in progress: {0}".format(len(in_progress)))
 	logging.info("Number of files not yet started: {0}".format(len(not_started)))
-	ssh.close()
+	logging.info("Number of recent files not yet started {0}".format(len(recent_files)))
+	logging.info("Number of older files not yet started {0}".format(len(older_files)))
+	logging.info("Recent files:\n{0}".format(recent_files))
+	#logging.info("Not started:\n {0}".format(not_started))
 
 def scan_locations(params):
 	"""This function starts the new_daemon."""
 	location_pairs = params["location_pairs"]
 	params["s3_conn"] = boto.connect_s3()
+	pair_priority = 0
 	for pair in location_pairs:
 		name = pair["name"]
+		params[name] = pair_priority
 		logging.info("Compariing {0}".format(name))
 		logging.info("Scanning\n\t{0}\n\t{1}".format(pair["src_location"], pair["dst_location"]))
 		src_dict = scan_s3_location(params, pair["src_location"])
 		dst_dict = scan_s3_location(params, pair["dst_location"])
-		update_pending_files(params, name, src_dict, dst_dict)
+		update_pending_files(params, name, src_dict, dst_dict, pair_priority)
+		pair_priority += 1
 
 	logging.info("There are {0} pending files".format(len(params["not_finished"])))
 
@@ -178,21 +201,28 @@ def scan_s3_location(params, location):
 	logging.debug("Bucket: {0}, Directory {1}".format(bucket_name, directory))
 	bucket = params["s3_conn"].get_bucket(bucket_name, Location.USWest2)
 	result = {}
-	filename_pattern = re.compile("^(.*)/(.+)$")
+	filename_pattern = re.compile("^(.*)/(.+.txt.gz)$")
 	for k in bucket.list(prefix=directory):
-		file_name = filename_pattern.search(k.name).group(2)
-		result[file_name] = (bucket_name, directory, k.name, k.last_modified)
+		if filename_pattern.search(k.name):
+			file_name = filename_pattern.search(k.name).group(2)
+			result[file_name] = (bucket_name, directory, k.name, k.last_modified)
 	return result
 
-def update_pending_files(params, name, src_dict, dst_dict):
+def update_pending_files(params, name, src_dict, dst_dict, pair_priority):
 	"""Update the dictionary of files that need to be processed."""
 	dst_keys = dst_dict.keys()
-	not_in_dst = [ (name, k) for k in src_dict.keys() if k not in dst_keys ]
-	newer_src = [ (name, k) for k in src_dict.keys() if k in dst_keys and src_dict[k][3] > dst_dict[k][3] ]
+	not_in_dst = [ (name, k, pair_priority) for k in src_dict.keys() if k not in dst_keys ]
+	newer_src = [ (name, k, pair_priority) for k in src_dict.keys() if k in dst_keys and src_dict[k][3] > dst_dict[k][3] ]
 	if "not_finished" not in params:
 		params["not_finished"] = []
-	params["not_finished"].extend(not_in_dst)
-	params["not_finished"].extend(newer_src)
+	#TODO: Verify that reverse works
+	total_list = []
+	total_list.extend(not_in_dst)
+	total_list.extend(newer_src)
+
+	params["not_finished"].extend(total_list)
+	#params["not_finished"].extend(my_not_in_dst)
+	#params["not_finished"].extend(newer_src)
 	logging.info("Src count {0}, dst count {1}".format(len(src_dict), len(dst_dict)))
 	logging.info("Not in dst {0}, Newer src {1}".format(len(not_in_dst), len(newer_src)))
 	logging.debug("List of unprocessed files:")
@@ -212,7 +242,7 @@ if __name__ == "__main__":
 	ch.setFormatter(formatter)
 	logger.addHandler(ch)
 	logger.debug("File daemon")
-	logging.basicConfig(format='%(asctime)s %(message)s', filename='logs/file_daemon.log', \
+	logging.basicConfig(format='%(asctime)s %(message)s', filename='/data/1/log/file_daemon.log', \
 		level=logging.INFO)
 
 	logging.info("Scanning module activated.")

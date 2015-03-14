@@ -9,9 +9,19 @@
 		"key_filename" : "/root/.ssh/jkey.pem",
 		"username": "root",
 		"producer": "/root/git/Meerkat/meerkat/file_producer.py",
-		"producer_hash": "80bd9b0233ef92e000daf3f97a219aa20482a870"
+		"producer_hash": "4c2d53fe790c9cfb0bb3b17823c92fd2589d4c69"
 	},
 	"location_pairs": [
+		{
+			"name": "gpanel2_bank",
+			"src_location": "yodleeprivate/panels/meerkat_input/gpanel2/bank/",
+			"dst_location": "yodleeprivate/panels/meerkat_output/gpanel2/bank/"
+		},
+		{
+			"name": "gpanel2_card",
+			"src_location": "yodleeprivate/panels/meerkat_input/gpanel2/card/",
+			"dst_location": "yodleeprivate/panels/meerkat_output/gpanel2/card/"
+		},
 		{
 			"name": "ct_version2_bank",
 			"src_location": "yodleeprivate/panels/meerkat_input/ct_version2/bank/",
@@ -31,26 +41,6 @@
 			"name": "gpanel_card",
 			"src_location": "yodleeprivate/ctprocessed/gpanel/card/",
 			"dst_location": "yodleeprivate/panels/meerkat/card/"
-		},
-		{
-			"name": "gpanel2_bank",
-			"src_location": "yodleeprivate/panels/meerkat_input/gpanel2/bank/",
-			"dst_location": "yodleeprivate/panels/meerkat_output/gpanel2/bank/"
-		},
-		{
-			"name": "gpanel2_card",
-			"src_location": "yodleeprivate/panels/meerkat_input/gpanel2/card/",
-			"dst_location": "yodleeprivate/panels/meerkat_output/gpanel2/card/"
-		},
-		{
-			"name": "jkey_test_bank",
-			"src_location": "yodleeprivate/panels/meerkat_input/jkey_test/bank/",
-			"dst_location": "yodleeprivate/panels/meerkat_output/jkey_test/bank/"
-		},
-		{
-			"name": "jkey_test_card",
-			"src_location": "yodleeprivate/panels/meerkat_input/jkey_test/card/",
-			"dst_location": "yodleeprivate/panels/meerkat_output/jkey_test/card/"
 		},
 		{
 			"name": "yic2_bank",
