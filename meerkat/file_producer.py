@@ -11,7 +11,7 @@ Created on Dec 9, 2013
 #################### USAGE ##########################
 
 # python3.3 -m meerkat.file_producer <location_pair_name> <file_name>
-# python3.3 -m meerkat.file_producer jkey_test_bank 20150205.007.012_GPANEL2_BANK.txt.gz
+# python3.3 -m meerkat.file_producer p1 20150205.007.012_P1_BANK.txt.gz
 
 #####################################################
 
@@ -27,8 +27,9 @@ import queue
 import re
 import sys
 
-from boto.s3.connection import Key, Location, S3Connection
+from boto.s3.connection import Key, Location
 from jsonschema import validate
+from jsonschema.exceptions import ValidationError, SchemaError
 
 from meerkat.custom_exceptions import InvalidArguments
 from meerkat.file_consumer import FileConsumer
@@ -39,14 +40,17 @@ from meerkat.various_tools import (get_us_cities, post_SNS)
 #CONSTANTS
 USED_IN_HEADER, ORIGIN, NAME_IN_MEERKAT, NAME_IN_ORIGIN = 0, 1, 2, 3
 
+#Allowed pylint exception
+# pylint: disable=bad-continuation
+
 def get_field_mappings(params):
-	return [ [x[NAME_IN_ORIGIN], x[NAME_IN_MEERKAT]]
+	"""Returns a list of field_mappings."""
+	return [[x[NAME_IN_ORIGIN], x[NAME_IN_MEERKAT]]
 		for x in get_unified_header(params)
-		if ((x[ORIGIN] == "search") and (x[NAME_IN_MEERKAT] != x[NAME_IN_ORIGIN])) ]
+		if (x[ORIGIN] == "search") and (x[NAME_IN_MEERKAT] != x[NAME_IN_ORIGIN])]
 
 def get_meerkat_fields(params):
 	"""Return a list of meerkat fields to add to the panel output."""
-	# pylint: disable=bad-continuation
 	return [ x[NAME_IN_MEERKAT]
 		for x in get_unified_header(params)
 		if (x[USED_IN_HEADER] == True) and (x[ORIGIN] == "search") ]
@@ -54,19 +58,17 @@ def get_meerkat_fields(params):
 def get_column_map(params):
 	"""Fix old or erroneous column names"""
 	container = params["container"].upper()
-	# pylint: disable=bad-continuation
-	cm = [
+	column_mapping_list = [
 		(x[NAME_IN_ORIGIN], x[NAME_IN_MEERKAT].replace("__BLANK", container))
 		for x in get_unified_header(params)
 		if (x[ORIGIN] == "input") and (x[NAME_IN_MEERKAT] != x[NAME_IN_ORIGIN]) ]
 	column_map = {}
-	for a, b in cm:
-		column_map[a] = b
+	for name_in_origin, name_in_meerkat in column_mapping_list:
+		column_map[name_in_origin] = name_in_meerkat
 	return column_map
 
 def get_panel_header(params):
 	"""Return an ordered consistent header for panels"""
-	# pylint: disable=bad-continuation
 	return [ x[NAME_IN_MEERKAT].replace("__BLANK", params["container"].upper())
 		for x in get_unified_header(params) ]
 
@@ -74,19 +76,19 @@ def get_unified_header(params):
 	"""Return the unified_header object, minus the first row."""
 	return params["my_producer_options"]["unified_header"][1:]
 
-def clean_dataframe(params, df):
+def clean_dataframe(params, dataframe):
 	"""Fix issues with current dataframe, like remapping, etc."""
 	container = params["container"]
 	column_remap = get_column_map(params)
 	header = get_panel_header(params)
 	meerkat_fields = get_meerkat_fields(params)
 	# Rename and add columns
-	df = df.rename(columns=column_remap)
+	dataframe = dataframe.rename(columns=column_remap)
 	for meerkat_field in meerkat_fields:
-		df[meerkat_field] = ""
+		dataframe[meerkat_field] = ""
 	# Reorder header
-	df = df[header]
-	return df
+	dataframe = dataframe[header]
+	return dataframe
 
 def connect_to_S3():
 	"""Returns a connection to S3"""
@@ -97,23 +99,28 @@ def connect_to_S3():
 		sys.exit()
 	return conn
 
-def df_to_queue(params, df):
+def df_to_queue(params, dataframe):
 	"""Converts a dataframe to a queue for processing"""
 	container = params["container"]
 	classifier = select_model(container)
 	classes = ["Non-Physical", "Physical", "ATM"]
-	f = lambda x: classes[int(classifier(x["DESCRIPTION_UNMASKED"]))]
 	desc_queue = queue.Queue()
 	name_map = {"GOOD_DESCRIPTION" : "MERCHANT_NAME",\
 		"MERCHANT_NAME" : "GOOD_DESCRIPTION"}
 	# Classify transactions
-	df['TRANSACTION_ORIGIN'] = df.apply(f, axis=1)
-	gb = df.groupby('TRANSACTION_ORIGIN')
+	apply_classifier = lambda x: classes[int(classifier(x["DESCRIPTION_UNMASKED"]))]
+	dataframe['TRANSACTION_ORIGIN'] = dataframe.apply(apply_classifier, axis=1)
+	gb = dataframe.groupby('TRANSACTION_ORIGIN')
 	groups = list(gb.groups)
 	# Group into separate dataframes
 	physical = gb.get_group("Physical") if "Physical" in groups else pd.DataFrame()
 	atm = gb.get_group("ATM") if "ATM" in groups else pd.DataFrame()
-	non_physical = gb.get_group("Non-Physical").rename(columns=name_map) if "Non-Physical" in groups else pd.DataFrame()
+	if "Non-Physical" in groups:
+		non_physical = gb.get_group("Non-Physical").rename(columns=name_map)
+	else:
+		non_physical = pd.DataFrame()
+	#non_physical = gb.get_group("Non-Physical").rename(columns=name_map)\
+	#if "Non-Physical" in groups else pd.DataFrame()
 	#Return if there are no physical transactions
 	if physical.empty:
 		return desc_queue, non_physical
@@ -123,12 +130,14 @@ def df_to_queue(params, df):
 	users = physical.groupby('UNIQUE_MEM_ID')
 	for user in users:
 		user_trans = []
-		for i, row in user[1].iterrows():
+		for _, row in user[1].iterrows():
 			user_trans.append(row.to_dict())
 		desc_queue.put(user_trans)
 	return desc_queue, non_physical
 
 def get_container(filename):
+	"""Parses the filename to determine if the file is either
+		for 'bank' or 'card' transactions."""
 	container = None
 	if "bank" in filename.lower():
 		container = "bank"
@@ -147,7 +156,6 @@ def get_dataframe_reader(input_filename):
 
 def get_panel_header_old(params):
 	"""Return an ordered consistent header for panels"""
-	# pylint: disable=bad-continuation
 	header = params["my_producer_options"]["header_template"]
 	container = params["container"].upper()
 	header = [x.replace("__BLANK", container) for x in header]
@@ -179,10 +187,11 @@ def gunzip_and_validate_file(filepath):
 	return filename
 
 def set_custom_producer_options(params):
-	po = params["producer_options"]
-	params["my_producer_options"] = po["producer_default"]
-	if sys.argv[1] in po:
-		overrides = po[sys.argv[1]]
+	"""Applies overrides specific to a particular panel to the default."""
+	my_producer_options = params["producer_options"]
+	params["my_producer_options"] = my_producer_options["producer_default"]
+	if sys.argv[1] in my_producer_options:
+		overrides = my_producer_options[sys.argv[1]]
 		for key in overrides:
 			params["my_producer_options"][key] = overrides[key]
 	del params["producer_options"]
@@ -218,12 +227,13 @@ def initialize():
 	params["output"]["results"] = {}
 	params["output"]["results"]["fields"] = []
 	params["my_producer_options"]["field_mappings"] = get_field_mappings(params)
-	for field, label in my_options["field_mappings"]:
+	for field, _ in my_options["field_mappings"]:
 		params["output"]["results"]["fields"].append(field)
 	params["mode"] = "production"
 	return params
 
 def pull_src_file_from_s3(params):
+	"""Pulls a source file from S3 and delivers it to the local host."""
 	#Grab relevant configuraiton parameters
 	src_s3_location = params["location_pair"]["src_location"]
 	location_pattern = re.compile("^([^/]+)/(.*)$")
@@ -301,10 +311,10 @@ def run(params):
 	push_err_file_to_s3(params)
 	sys.exit()
 
-def run_from_command_line(command_line_arguments):
+def run_from_command_line():
 	"""Runs these commands if the module is invoked from the command line"""
+	validate_configuration("config/daemon/schema.json","config/daemon/file.json")
 	params = initialize()
-	validate_configuration()
 	run(params)
 
 def run_meerkat_chunk(params, desc_queue, hyperparameters, cities):
@@ -354,7 +364,7 @@ def run_panel(params, reader, dst_file_name):
 	hyperparameters = load_hyperparameters(my_options["hyperparameters"])
 	dst_local_path = my_options["local_files"]["dst_path"]
 	remove_list = ["DESCRIPTION_UNMASKED", "GOOD_DESCRIPTION"]
-	header = [ x for x in get_panel_header(params) if x not in remove_list ]
+	header = [x for x in get_panel_header(params) if x not in remove_list]
 	cities = get_us_cities()
 	line_count = 0
 	first_chunk = True
@@ -408,7 +418,8 @@ def run_panel(params, reader, dst_file_name):
 	if error_count > 0:
 		for error in errors:
 			write_error_file(dst_local_path, dst_file_name, error)
-		error_summary = [str(line_count), str(error_count), str(1.0 * (error_count / line_count))]
+		error_summary = [str(line_count), str(error_count),
+			str(1.0 * (error_count / line_count))]
 		error_msg = "Total line count: {}\nTotal error count: {}\n Success Ratio: {}"
 		error_msg = error_msg.format(*error_summary)
 		write_error_file(dst_local_path, dst_file_name, error_msg)
@@ -421,14 +432,24 @@ def usage():
 	logging.error(result)
 	return result
 
-def validate_configuration():
+def validate_configuration(schema, config):
 	"""Ensures that the correct parameters are supplied."""
-	schema = json.load(open("config/daemon/schema.json"))
-	config = json.load(open("config/daemon/file.json"))
-	result = validate(config, schema)
+	schema = json.load(open(schema))
+	config = json.load(open(config))
+	try:
+		validate(config, schema)
+	except ValidationError as validation_error:
+		logging.error("Configuration file was invalid, aborting.")
+		logging.error(validation_error.message)
+		sys.exit()
+	except SchemaError as schema_error:
+		logging.error("Schema definition is invalid, aborting")
+		logging.error(schema_error.message)
+		sys.exit()
 	logging.info("Configuration schema is valid.")
 
 def write_error_file(path, filename, error_msg):
+	"""Writes a gzipped file of errors to the local host."""
 	with gzip.open(path + filename + ".error.gz", "ab") as gzipped_output:
 		if error_msg != "":
 			gzipped_output.write(bytes(error_msg + "\n", 'UTF-8'))
@@ -437,4 +458,4 @@ if __name__ == "__main__":
 	logging.basicConfig(format='%(asctime)s %(message)s', filename='/data/1/log/file_producer.log', \
 		level=logging.INFO)
 	logging.info("file_producer module activated.")
-	run_from_command_line(sys.argv)
+	run_from_command_line()
