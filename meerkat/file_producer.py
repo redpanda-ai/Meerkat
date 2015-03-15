@@ -332,26 +332,26 @@ def run_meerkat_chunk(params, desc_queue, hyperparameters, cities):
 	result_queue = queue.Queue()
 	header = get_panel_header(params)
 	output = []
-
+	# Launch consumer threads
 	for i in range(consumer_threads):
 		new_consumer = FileConsumer(i, params, desc_queue,\
 			result_queue, hyperparameters, cities)
 		new_consumer.setDaemon(True)
 		new_consumer.start()
-
+	# Block thread execution on the consumer until all
+	# items in the desc_queue have been processed
 	desc_queue.join()
-
 	# Dequeue results into dataframe
 	while result_queue.qsize() > 0:
 		row = result_queue.get()
 		output.append(row)
 		result_queue.task_done()
-
+	# Block thread execution on the consumer until all
+	# items in the result_queue have been processed
 	result_queue.join()
-
 	# Shutdown Loggers
 	logging.shutdown()
-
+	# Return a dataframe containing the results
 	return pd.DataFrame(data=output, columns=header)
 
 def load_hyperparameters(filepath):
@@ -437,6 +437,7 @@ def run_panel(params, dataframe_reader, dst_file_name):
 	first_chunk = True
 	# Capture Errors
 	errors = []
+	# Save stderr context
 	old_stderr = sys.stderr
 	sys.stderr = my_stderr = io.StringIO()
 	# Iterate through each chunk in the dataframe_reader
@@ -445,10 +446,7 @@ def run_panel(params, dataframe_reader, dst_file_name):
 			hyperparameters, cities, header, dst_file_name, first_chunk,
 			errors)
 		line_count, errors = run_chunk(params, *args)
-		#run_chunk(params, chunk, line_count, my_stderr, old_stderr,
-#			hyperparameters, cities, header, dst_file_name,
-#			first_chunk, errors)
-
+	#Restore stderr context
 	sys.stderr = old_stderr
 	# Flush errors to a file
 	flush_errors(params, errors, dst_file_name, line_count)
