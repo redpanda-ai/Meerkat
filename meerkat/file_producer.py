@@ -51,9 +51,9 @@ def get_field_mappings(params):
 
 def get_meerkat_fields(params):
 	"""Return a list of meerkat fields to add to the panel output."""
-	return [ x[NAME_IN_MEERKAT]
+	return [x[NAME_IN_MEERKAT]
 		for x in get_unified_header(params)
-		if (x[USED_IN_HEADER] == True) and (x[ORIGIN] == "search") ]
+		if (x[USED_IN_HEADER] == True) and (x[ORIGIN] == "search")]
 
 def get_column_map(params):
 	"""Fix old or erroneous column names"""
@@ -61,7 +61,7 @@ def get_column_map(params):
 	column_mapping_list = [
 		(x[NAME_IN_ORIGIN], x[NAME_IN_MEERKAT].replace("__BLANK", container))
 		for x in get_unified_header(params)
-		if (x[ORIGIN] == "input") and (x[NAME_IN_MEERKAT] != x[NAME_IN_ORIGIN]) ]
+		if (x[ORIGIN] == "input") and (x[NAME_IN_MEERKAT] != x[NAME_IN_ORIGIN])]
 	column_map = {}
 	for name_in_origin, name_in_meerkat in column_mapping_list:
 		column_map[name_in_origin] = name_in_meerkat
@@ -69,8 +69,9 @@ def get_column_map(params):
 
 def get_panel_header(params):
 	"""Return an ordered consistent header for panels"""
-	return [ x[NAME_IN_MEERKAT].replace("__BLANK", params["container"].upper())
-		for x in get_unified_header(params) ]
+	return [
+		x[NAME_IN_MEERKAT].replace("__BLANK", params["container"].upper())
+		for x in get_unified_header(params)]
 
 def get_unified_header(params):
 	"""Return the unified_header object, minus the first row."""
@@ -78,7 +79,6 @@ def get_unified_header(params):
 
 def clean_dataframe(params, dataframe):
 	"""Fix issues with current dataframe, like remapping, etc."""
-	container = params["container"]
 	column_remap = get_column_map(params)
 	header = get_panel_header(params)
 	meerkat_fields = get_meerkat_fields(params)
@@ -90,7 +90,7 @@ def clean_dataframe(params, dataframe):
 	dataframe = dataframe[header]
 	return dataframe
 
-def connect_to_S3():
+def get_s3_connection():
 	"""Returns a connection to S3"""
 	try:
 		conn = boto.connect_s3()
@@ -99,36 +99,38 @@ def connect_to_S3():
 		sys.exit()
 	return conn
 
-def df_to_queue(params, dataframe):
+def convert_dataframe_to_queue(params, dataframe):
 	"""Converts a dataframe to a queue for processing"""
 	container = params["container"]
+	#Pull the correct model
 	classifier = select_model(container)
-	classes = ["Non-Physical", "Physical", "ATM"]
 	desc_queue = queue.Queue()
 	name_map = {"GOOD_DESCRIPTION" : "MERCHANT_NAME",\
 		"MERCHANT_NAME" : "GOOD_DESCRIPTION"}
 	# Classify transactions
-	apply_classifier = lambda x: classes[int(classifier(x["DESCRIPTION_UNMASKED"]))]
-	dataframe['TRANSACTION_ORIGIN'] = dataframe.apply(apply_classifier, axis=1)
-	gb = dataframe.groupby('TRANSACTION_ORIGIN')
-	groups = list(gb.groups)
+	classes = ["Non-Physical", "Physical", "ATM"]
+	get_classes = lambda x: classes[int(classifier(x["DESCRIPTION_UNMASKED"]))]
+	dataframe['TRANSACTION_ORIGIN'] = dataframe.apply(get_classes, axis=1)
+	my_groupby = dataframe.groupby('TRANSACTION_ORIGIN')
+	groups = list(my_groupby.groups)
 	# Group into separate dataframes
-	physical = gb.get_group("Physical") if "Physical" in groups else pd.DataFrame()
-	atm = gb.get_group("ATM") if "ATM" in groups else pd.DataFrame()
+	physical = pd.DataFrame()
+	if "Physical" in groups:
+		physical = my_groupby.get_group("Physical")
+	atm = pd.DataFrame()
+	if "ATM" in groups:
+		atm = my_groupby.get_group("ATM")
+	non_physical = pd.DataFrame()
 	if "Non-Physical" in groups:
-		non_physical = gb.get_group("Non-Physical").rename(columns=name_map)
-	else:
-		non_physical = pd.DataFrame()
-	#non_physical = gb.get_group("Non-Physical").rename(columns=name_map)\
-	#if "Non-Physical" in groups else pd.DataFrame()
-	#Return if there are no physical transactions
+		non_physical = my_groupby.get_group("Non-Physical").rename(columns=name_map)
+	#.Return if there are no physical transactions
 	if physical.empty:
 		return desc_queue, non_physical
-	# Roll ATM into physical
+	# Concatenate ATM onto physical
 	physical = pd.concat([physical, atm])
 	# Group by user
-	users = physical.groupby('UNIQUE_MEM_ID')
-	for user in users:
+	user_groupby = physical.groupby('UNIQUE_MEM_ID')
+	for user in user_groupby:
 		user_trans = []
 		for _, row in user[1].iterrows():
 			user_trans.append(row.to_dict())
@@ -150,10 +152,6 @@ def get_container(filename):
 	#TODO Add a proper exception
 	sys.exit()
 
-def get_dataframe_reader(input_filename):
-	"""Returns pandas dataframe reader for the input file."""
-	return pd.read_csv(input_filename, na_filter=False, chunksize=5000, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
-
 def get_panel_header_old(params):
 	"""Return an ordered consistent header for panels"""
 	header = params["my_producer_options"]["header_template"]
@@ -170,6 +168,7 @@ def gunzip_and_validate_file(filepath):
 	required_fields = ["DESCRIPTION_UNMASKED", "UNIQUE_MEM_ID", "GOOD_DESCRIPTION"]
 	# Clean File
 	with gzip.open(filepath, "rt") as input_file:
+		#pylint: disable=bad-open-mode
 		with open(path + "/" + filename, "wt") as output_file:
 			for line in input_file:
 				if first_line:
@@ -183,7 +182,8 @@ def gunzip_and_validate_file(filepath):
 				output_file.write(line)
 	# Remove original file
 	safely_remove_file(filepath)
-	logging.info("{0} unzipped; header contains mandatory fields.".format(filename))
+	logging.info("{0} unzipped; header contains mandatory fields."
+		.format(filename))
 	return filename
 
 def set_custom_producer_options(params):
@@ -217,7 +217,8 @@ def initialize():
 			found = True
 			break
 	if not found:
-		raise InvalidArguments(msg="Invalid 'location_pair' argument, aborting.", expr=None)
+		raise InvalidArguments(
+			msg="Invalid 'location_pair' argument, aborting.", expr=None)
 	logging.info("location_pair found in configuration file.")
 	params["src_file"] = sys.argv[2]
 	set_custom_producer_options(params)
@@ -241,16 +242,18 @@ def pull_src_file_from_s3(params):
 	bucket_name = matches.group(1)
 	directory = matches.group(2)
 	src_file = params["src_file"]
-	logging.info("S3 Bucket: {0}, S3 directory: {1}, Src file: {2}".format(bucket_name, directory, src_file))
+	logging.info("S3 Bucket: {0}, S3 directory: {1}, Src file: {2}".
+		format(bucket_name, directory, src_file))
 
 	#Pull the src file from S3
-	conn = connect_to_S3()
+	conn = get_s3_connection()
 	bucket = conn.get_bucket(bucket_name, Location.USWest2)
 	listing = bucket.list(prefix=directory+src_file)
 	s3_key = None
 	for item in listing:
 		s3_key = item
-	params["local_src_path"] = params["my_producer_options"]["local_files"]["src_path"]
+	params["local_src_path"] = \
+		params["my_producer_options"]["local_files"]["src_path"]
 	local_src_file = params["local_src_path"] + src_file
 	s3_key.get_contents_to_filename(local_src_file)
 	logging.info("Src file pulled from S3")
@@ -265,12 +268,14 @@ def push_dst_file_to_s3(params):
 	directory = matches.group(2)
 	dst_file = params["src_file"]
 	#Push the dst file to S3
-	conn = connect_to_S3()
+	conn = get_s3_connection()
 	bucket = conn.get_bucket(bucket_name, Location.USWest2)
 	key = Key(bucket)
 	key.key = directory + dst_file
-	bytes_written = key.set_contents_from_filename(params["local_gzipped_dst_file"], encrypt_key=True, replace=True)
-	logging.info("{0} pushed to S3, {1} bytes written.".format(dst_file, bytes_written))
+	bytes_written = key.set_contents_from_filename(
+		params["local_gzipped_dst_file"], encrypt_key=True, replace=True)
+	logging.info("{0} pushed to S3, {1} bytes written.".format(
+		dst_file, bytes_written))
 
 def push_err_file_to_s3(params):
 	"""Unimplemented."""
@@ -289,7 +294,9 @@ def run(params):
 	dst_file_name = src_file_name
 	local_src_file = params["local_src_path"] + src_file_name
 	# Get a pandas dataframe ready
-	reader = get_dataframe_reader(local_src_file)
+	reader = pd.read_csv(local_src_file, na_filter=False, chunksize=5000,
+		quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|',
+		error_bad_lines=False)
 	logging.info("Dataframe reader loaded.")
 	# Process a single file with Meerkat
 	local_dst_file = run_panel(params, reader, dst_file_name)
@@ -313,7 +320,8 @@ def run(params):
 
 def run_from_command_line():
 	"""Runs these commands if the module is invoked from the command line"""
-	validate_configuration("config/daemon/schema.json","config/daemon/file.json")
+	validate_configuration("config/daemon/schema.json",
+		"config/daemon/file.json")
 	params = initialize()
 	run(params)
 
@@ -358,7 +366,66 @@ def load_hyperparameters(filepath):
 		sys.exit()
 	return hyperparameters
 
-def run_panel(params, reader, dst_file_name):
+def flush_errors(params, errors, dst_file_name, line_count):
+	"""Takes all of the errors encountered and does the following:
+		1.  Flushes individual error lines to a file.
+		2.  Flushes a summary line with metrics about the error rate.
+		3.  Writes the completed file out to the local host."""
+	my_options = params["my_producer_options"]
+	dst_local_path = my_options["local_files"]["dst_path"]
+	error_count = len(errors)
+	if error_count > 0:
+		for error in errors:
+			write_error_file(dst_local_path, dst_file_name, error)
+	error_summary = [str(line_count), str(error_count),
+		str(1.0 * (error_count / line_count))]
+	error_msg = "Total line count: {}\nTotal error count: {}\n Success Ratio: {}"
+	error_msg = error_msg.format(*error_summary)
+	write_error_file(dst_local_path, dst_file_name, error_msg)
+
+def run_chunk(params, *argv):
+	"""Run a single chunk from a dataframe_reader"""
+	chunk, line_count, my_stderr, old_stderr = argv[:4]
+	hyperparameters, cities, header, dst_file_name = argv[4:8]
+	first_chunk, errors = argv[8:10]
+	my_options = params["my_producer_options"]
+	dst_local_path = my_options["local_files"]["dst_path"]
+	# Save Errors
+	line_count += chunk.shape[0]
+	error_chunk = str.strip(my_stderr.getvalue())
+	if len(error_chunk) > 0:
+		errors += error_chunk.split('\n')
+	sys.stderr = old_stderr
+	# Clean Data
+	chunk = clean_dataframe(params, chunk)
+	# Load into Queue for Processing
+	desc_queue, non_physical = convert_dataframe_to_queue(params, chunk)
+
+	physical = None
+	if not desc_queue.empty():
+		# Classify Transaction Chunk
+		logging.info("Chunk contained physical transactions, using Meerkat")
+		physical = run_meerkat_chunk(params, desc_queue, hyperparameters, cities)
+	else:
+		logging.info("Chunk did not contain physical transactions, skipping Meerkat")
+	# Combine Split Dataframes
+	chunk = pd.concat([physical, non_physical])
+	# Write
+	if first_chunk:
+		file_to_remove = dst_local_path + dst_file_name
+		safely_remove_file(file_to_remove)
+		logging.info("Output Path: {0}".format(file_to_remove))
+		chunk.to_csv(dst_local_path + dst_file_name, columns=header, sep="|",\
+			mode="a", encoding="utf-8", index=False, index_label=False)
+		first_chunk = False
+	else:
+		chunk.to_csv(dst_local_path + dst_file_name, header=False, columns=header,\
+			sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
+	# Handle Errors
+	sys.stderr = my_stderr = io.StringIO()
+	return line_count, errors
+
+def run_panel(params, dataframe_reader, dst_file_name):
 	"""Process a single panel"""
 	my_options = params["my_producer_options"]
 	hyperparameters = load_hyperparameters(my_options["hyperparameters"])
@@ -368,62 +435,23 @@ def run_panel(params, reader, dst_file_name):
 	cities = get_us_cities()
 	line_count = 0
 	first_chunk = True
-
 	# Capture Errors
 	errors = []
 	old_stderr = sys.stderr
-	sys.stderr = mystderr = io.StringIO()
-
-	for chunk in reader:
-		# Save Errors
-		line_count += chunk.shape[0]
-		error_chunk = str.strip(mystderr.getvalue())
-		if len(error_chunk) > 0:
-			errors += error_chunk.split('\n')
-		sys.stderr = old_stderr
-		# Clean Data
-		chunk = clean_dataframe(params, chunk)
-		# Load into Queue for Processing
-		desc_queue, non_physical = df_to_queue(params, chunk)
-
-		physical = None
-		if not desc_queue.empty():
-			# Classify Transaction Chunk
-			logging.info("Chunk contained physical transactions, using Meerkat")
-			physical = run_meerkat_chunk(params, desc_queue, hyperparameters, cities)
-		else:
-			logging.info("Chunk did not contain physical transactions, skipping Meerkat")
-		# Combine Split Dataframes
-		chunk = pd.concat([physical, non_physical])
-
-		# Write
-		if first_chunk:
-			file_to_remove = dst_local_path + dst_file_name
-			safely_remove_file(file_to_remove)
-			logging.info("Output Path: {0}".format(file_to_remove))
-			chunk.to_csv(dst_local_path + dst_file_name, columns=header, sep="|",\
-				mode="a", encoding="utf-8", index=False, index_label=False)
-			first_chunk = False
-		else:
-			chunk.to_csv(dst_local_path + dst_file_name, header=False, columns=header,\
-				sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
-
-		# Handle Errors
-		sys.stderr = mystderr = io.StringIO()
+	sys.stderr = my_stderr = io.StringIO()
+	# Iterate through each chunk in the dataframe_reader
+	for chunk in dataframe_reader:
+		args = (chunk, line_count, my_stderr, old_stderr,
+			hyperparameters, cities, header, dst_file_name, first_chunk,
+			errors)
+		line_count, errors = run_chunk(params, *args)
+		#run_chunk(params, chunk, line_count, my_stderr, old_stderr,
+#			hyperparameters, cities, header, dst_file_name,
+#			first_chunk, errors)
 
 	sys.stderr = old_stderr
-
-	# Write Errors
-	error_count = len(errors)
-	if error_count > 0:
-		for error in errors:
-			write_error_file(dst_local_path, dst_file_name, error)
-		error_summary = [str(line_count), str(error_count),
-			str(1.0 * (error_count / line_count))]
-		error_msg = "Total line count: {}\nTotal error count: {}\n Success Ratio: {}"
-		error_msg = error_msg.format(*error_summary)
-		write_error_file(dst_local_path, dst_file_name, error_msg)
-
+	# Flush errors to a file
+	flush_errors(params, errors, dst_file_name, line_count)
 	return dst_local_path + dst_file_name
 
 def usage():
@@ -455,7 +483,7 @@ def write_error_file(path, filename, error_msg):
 			gzipped_output.write(bytes(error_msg + "\n", 'UTF-8'))
 
 if __name__ == "__main__":
-	logging.basicConfig(format='%(asctime)s %(message)s', filename='/data/1/log/file_producer.log', \
-		level=logging.INFO)
+	logging.basicConfig(format='%(asctime)s %(message)s',
+		filename='/data/1/log/file_producer.log', level=logging.INFO)
 	logging.info("file_producer module activated.")
 	run_from_command_line()
