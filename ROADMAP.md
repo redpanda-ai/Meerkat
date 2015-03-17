@@ -17,7 +17,7 @@
 			* - start using a daily rolling log file, and add some dates to the timestamps
 	* 3/15
 		* - [ ] Speak with Sanjay and team about prototype for building a web service panel for Meerkat
-		* - [ ] Address the outstanding issues with the [pull request] (https://github.com/joeandrewkey/Meerkat/pull/121) for ***new_daemon*** branch
+
 	* 3/17 
 		* - [ ] Work with Richa on end-to-end integration strategy for the production web service
 			* specifically regarding the use of Yodlee Labs to produce testing data
@@ -26,6 +26,7 @@
 			* In any event think of getting the SCT and the TOC up and running end-to-end by 3/31.  Once that is in place, we'll need some sort of predicatable pace to upgrading our models, and our search queries.
 	* 3/18
 		* - [ ] Meet with Richa from Program Management to discuss architecture of Meerkat
+		* - [ ] Address the outstanding issues with the [pull request]  (https://github.com/joeandrewkey/Meerkat/pull/121) for ***new_daemon*** branch
 	* 3/20
 		* - [ ] Provide a versioning mechanism for the file daemon interface to Meerkat
 			* support version 1.0.0
