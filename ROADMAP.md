@@ -39,7 +39,7 @@
 	* 3/15
 		* - [ ] :clock4: Use the SRS module and associated e*trade sum_info_id [filters] (https://github.com/joeandrewkey/Meerkat/issues/120) to produce a sample of transactions from investment type accounts
 	* 3/20
-		* - [ ] Cut a first draft of the Transaction Origin Classifier
+		* - [ ] Cut a first draft of the Shadow CT version 2.0
 			
 	* 3/23 - 3/30
 		* - [ ] Scheduled vacation
