@@ -21,6 +21,9 @@
 	* 3/17 
 		* - [ ] Work with Richa on end-to-end integration strategy for the production web service
 			* specifically regarding the use of Yodlee Labs to produce testing data
+		* - [ ] Build a basic plan around the concept of a "cadence" for the development testing and release of Meerkat improvements
+			* Tom suggests that a weekly rhythm is possible, explore the idea and propose reasons why it might or might not work
+			* In any event think of getting the SCT and the TOC up and running end-to-end by 3/31.  Once that is in place, we'll need some sort of predicatable pace to upgrading our models, and our search queries.
 	* 3/18
 		* - [ ] Meet with Richa from Program Management to discuss architecture of Meerkat
 	* 3/20
