@@ -30,6 +30,7 @@ from .custom_exceptions import FileProblem, InvalidArguments
 
 
 def launch_remote_producer(params, instance_ip, user, keyfile, item):
+	"""Launches a file_producer client on one of the launchpad instances."""
 	logging.info("Launching: {0}".format(item))
 	panel_name, file_name = item[0:2]
 	log_name = "logs/" + panel_name + "." + file_name + ".log"
@@ -56,7 +57,8 @@ def get_parameters():
 		raise FileProblem(msg="Cannot find a valid configuration file.", expr=None)
 	return params
 
-def start():
+def begin_scanning_loop():
+	"""Begins scanning each panel in S3 at regular intervals"""
 	count, max_count = 1, 100000000
 	sleep_time_sec = 60
 	params = get_parameters()
@@ -67,12 +69,16 @@ def start():
 		scan_locations(params)
 		count += 1
 		count_running_clients(params)
-		dispatch_clients(params)
+		launch_remote_clients_into_available_slots(params)
 		logging.info("Resting for {0} seconds.".format(sleep_time_sec))
 		time.sleep(sleep_time_sec)
 	logging.info("Done.")
 
 def distribute_clients(params):
+	"""Ensures that the correct version of the file_producer client is running
+	on the 'launchpad' instances """
+	#TODO: auto-detect the sha1sum locally, distribute matching client to the launchpad
+	#instances
 	lp = params["launchpad"]
 	instance_ips, username = lp["instance_ips"], lp["username"]
 	key_filename, producer = lp["key_filename"], lp["producer"]
@@ -94,7 +100,9 @@ def distribute_clients(params):
 			sys.exit()
 	ssh.close()
 
-def dispatch_clients(params):
+def launch_remote_clients_into_available_slots(params):
+	"""Scans for available 'slots' on the remote clients.  Should it find any, it
+	then launches an instance of the file_producer into those empty slots"""
 	lp = params["launchpad"]
 	instance_ips, username = lp["instance_ips"], lp["username"]
 	key_filename = lp["key_filename"]
@@ -102,9 +110,8 @@ def dispatch_clients(params):
 	ssh = paramiko.SSHClient()
 	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-	#TODO: Convert to plumbum if possible
+	#TODO: Convert to plumbum
 	polling_command = "ps -ef|grep python3.3|grep -v grep|awk ' { print $11,$12 }'"
-	command_base = "(cd /root/git/Meerkat ; source /root/.bash_profile ; ./test.sh "
 	total_slots = params["launchpad"]["per_instance_clients"]
 	for instance_ip in instance_ips:
 		logging.info("Counting running clients on {0}".format(instance_ip))
@@ -126,6 +133,7 @@ def dispatch_clients(params):
 
 def count_running_clients(params):
 	"""Count the running clients."""
+	#TODO: Convert to plumbum
 	polling_command = "ps -ef|grep python3.3|grep -v grep|awk ' { print $12,$13 }'"
 	lp = params["launchpad"]
 	instance_ips, username = lp["instance_ips"], lp["username"]
@@ -277,4 +285,4 @@ if __name__ == "__main__":
 		level=logging.INFO)
 
 	logging.info("Scanning module activated.")
-	start()
+	begin_scanning_loop()
