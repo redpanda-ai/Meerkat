@@ -48,7 +48,6 @@ class FileConsumer(threading.Thread):
 
 	def __build_boost_vectors(self):
 		"""Turns configuration entries into a dictionary of numpy arrays."""
-		#logger = logging.getLogger("thread " + str(self.thread_id))
 		boost_column_labels = self.hyperparameters["boost_labels"]
 		boost_row_vectors = self.hyperparameters["boost_vectors"]
 		boost_row_labels, boost_column_vectors = sorted(boost_row_vectors.keys()), {}
@@ -82,7 +81,6 @@ class FileConsumer(threading.Thread):
 		# Populate Decisions
 		if not decision:
 			data[4] = "No"
-			#fields = self.params["output"]["results"]["fields"]
 			city_names = city_names[0:2]
 			state_names = state_names[0:2]
 			states_equal = state_names.count(state_names[0]) == len(state_names)
@@ -602,7 +600,7 @@ class FileConsumer(threading.Thread):
 			my_level = levels[my_level]
 		my_path = my_logging["path"]
 		my_formatter = logging.Formatter(my_logging["formatter"])
-		#You'll want to add something to identify the thread
+		# Add a thread identifier
 		my_logger = logging.getLogger("thread " + str(self.thread_id))
 		my_logger.setLevel(my_level)
 		file_handler = logging.FileHandler(my_path)
@@ -610,7 +608,7 @@ class FileConsumer(threading.Thread):
 		file_handler.setFormatter(my_formatter)
 		my_logger.addHandler(file_handler)
 
-		#Add console logging, if configured
+		# Add console logging, if configured
 		my_console = my_logging["console"]
 		if my_console is True:
 			console_handler = logging.StreamHandler()
