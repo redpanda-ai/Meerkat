@@ -168,7 +168,6 @@ def gunzip_and_validate_file(filepath):
 	required_fields = ["DESCRIPTION_UNMASKED", "UNIQUE_MEM_ID", "GOOD_DESCRIPTION"]
 	# Clean File
 	with gzip.open(filepath, "rt") as input_file:
-		#pylint: disable=bad-open-mode
 		with open(path + "/" + filename, "wt") as output_file:
 			for line in input_file:
 				if first_line:
@@ -177,6 +176,7 @@ def gunzip_and_validate_file(filepath):
 							safely_remove_file(filepath)
 							safely_remove_file(path + "/" + filename)
 							logging.error("Required fields not found in header, aborting")
+							#Write to the error file first
 							sys.exit()
 					first_line = False
 				output_file.write(line)
@@ -260,6 +260,7 @@ def pull_src_file_from_s3(params):
 	return local_src_file
 
 def push_dst_file_to_s3(params):
+	#TODO: Refactor me
 	"""Moves a file to S3"""
 	dst_s3_location = params["location_pair"]["dst_location"]
 	location_pattern = re.compile("^([^/]+)/(.*)$")
@@ -277,12 +278,27 @@ def push_dst_file_to_s3(params):
 	logging.info("{0} pushed to S3, {1} bytes written.".format(
 		dst_file, bytes_written))
 
-def push_err_file_to_s3(params):
-	"""Unimplemented."""
-	#TODO: Implement
-	pass
+def push_file_to_s3(params, type):
+	"""Moves a file to S3"""
+	type_location = type + "_location"
+	gzipped_type_file = "local_gzipped_" + type + "_file"
+	s3_type_location = params["location_pair"][type_location]
+	location_pattern = re.compile("^([^/]+)/(.*)$")
+	matches = location_pattern.search(s3_type_location)
+	bucket_name = matches.group(1)
+	directory = matches.group(2)
+	type_file = params["src_file"]
+	#Push the dst file to S3
+	conn = get_s3_connection()
+	bucket = conn.get_bucket(bucket_name, Location.USWest2)
+	key = Key(bucket)
+	key.key = directory + type_file
+	bytes_written = key.set_contents_from_filename(
+		params[gzipped_type_file], encrypt_key=True, replace=True)
+	logging.info("{0} pushed to S3, {1} bytes written.".format(
+		type_file, bytes_written))
 
-def run(params):
+def process_single_input_file(params):
 	"""Runs Meerkat in production mode on a single file"""
 	#Pull the file from S3
 	local_gzipped_src_file = pull_src_file_from_s3(params)
@@ -309,7 +325,7 @@ def run(params):
 	safely_remove_file(local_dst_file)
 	safely_remove_file(local_src_file)
 	#Push local gzipped dst_file to S3
-	push_dst_file_to_s3(params)
+	push_file_to_s3(params, "dst")
 	#Remove local gzipped dst file
 	safely_remove_file(params["local_gzipped_dst_file"])
 	#Publish to the SNS topic
@@ -323,7 +339,7 @@ def run_from_command_line():
 	validate_configuration("config/daemon/schema.json",
 		"config/daemon/file.json")
 	params = initialize()
-	run(params)
+	process_single_input_file(params)
 
 def run_meerkat_chunk(params, desc_queue, hyperparameters, cities):
 	"""Run meerkat on a chunk of data"""

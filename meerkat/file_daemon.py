@@ -45,10 +45,9 @@ def get_parameters():
 	"""Validates the command line arguments and loads a dict of params."""
 	input_file, params = None, None
 	if len(sys.argv) != 1:
-		logging.debug("Supply the following arguments: config_file")
+		logging.debug("Do not supply command line arguments.")
 		raise InvalidArguments(msg="Incorrect number of arguments", expr=None)
 	try:
-		#TODO: Set to file.json
 		input_file = open("config/daemon/file.json", encoding='utf-8')
 		params = json.loads(input_file.read())
 		input_file.close()
@@ -58,7 +57,6 @@ def get_parameters():
 	return params
 
 def start():
-	#This producer needs updating to deal with oddities:
 	count, max_count = 1, 100000000
 	sleep_time_sec = 60
 	params = get_parameters()
@@ -104,8 +102,8 @@ def dispatch_clients(params):
 	ssh = paramiko.SSHClient()
 	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
+	#TODO: Convert to plumbum if possible
 	polling_command = "ps -ef|grep python3.3|grep -v grep|awk ' { print $11,$12 }'"
-	#command_base = "cd /root/git/Meerkat/ && nohup python3.3 -m meerkat.file_producer "
 	command_base = "(cd /root/git/Meerkat ; source /root/.bash_profile ; ./test.sh "
 	total_slots = params["launchpad"]["per_instance_clients"]
 	for instance_ip in instance_ips:
@@ -191,7 +189,6 @@ def write_local_report(params):
 		report_file.write(report_timestamp + "\n")
 		for key in overall_report.keys():
 			logging.info("{0}: {1}".format(key, overall_report[key]))
-			#report_file.write(item + "\n")
 		report_file.write(json.dumps(overall_report, sort_keys=True, indent=4,
 				separators=(",", ": ")) + "\n")
 		for report in params["report"]:
@@ -253,13 +250,9 @@ def update_pending_files(params, name, src_dict, dst_dict, pair_priority):
 	# Extend the list of "not_finished" files to include what we just discovered
 	params["not_finished"].extend(total_list)
 	# Log a quick report of what was found
-#	if "report" not in params:
-#		params["report"] = []
 	my_report = { "name": name, "src" : len(src_dict), "dst" : len(dst_dict),
 		"newer_src": len(newer_src), "not_in_dst": len(not_in_dst) }
 	params["report"].append(my_report)
-#	logging.info("Report: {0}".format(params["report"]))
-
 	logging.info("Src count {0}, dst count {1}".format(len(src_dict), len(dst_dict)))
 	logging.info("Not in dst {0}, Newer src {1}".format(len(not_in_dst), len(newer_src)))
 	logging.debug("List of unprocessed files:")
