@@ -3,7 +3,7 @@
 """This module scans S3 directories looking for files to process.
 One can configure its behavior within config/daemon/file.json
 
-Created on Mar 18, 2014
+Created on Mar 18, 2015
 @author: J. Andrew Key
 """
 #################### USAGE ##########################
@@ -127,6 +127,7 @@ def dispatch_clients(params):
 	ssh.close()
 
 def count_running_clients(params):
+	"""Count the running clients."""
 	polling_command = "ps -ef|grep python3.3|grep -v grep|awk ' { print $12,$13 }'"
 	lp = params["launchpad"]
 	instance_ips, username = lp["instance_ips"], lp["username"]
@@ -152,12 +153,16 @@ def count_running_clients(params):
 		logging.info("{0} processes found.".format(process_count))
 		params["in_progress"].extend(in_progress)
 	ssh.close()
+	write_local_report(params)
+
+def write_local_report(params):
+	"""Write a report of the current status to the local file system"""
 	#Valuable metrics
 	not_finished = params["not_finished"]
 	in_progress = params["in_progress"]
 	not_started = list(set(not_finished) - set(in_progress))
-
-	#Now for new scheduling
+	#This scheduler prefers daily update files to all others, regardless
+	#of priority.
 	#Get todays date minus 14 days
 	two_weeks_ago = str(date.today() - timedelta(days=14)).replace("-","")
 	#Get the set of recent files
@@ -173,37 +178,32 @@ def count_running_clients(params):
 	sorted_not_started.extend(recent_files)
 
 	params["not_started"] = sorted_not_started
-	logging.info("Number of files not yet finished: {0}".format(len(not_finished)))
-	logging.info("Number of files in progress: {0}".format(len(in_progress)))
-	logging.info("Number of files not yet started: {0}".format(len(not_started)))
-	logging.info("Number of recent files not yet started {0}".format(len(recent_files)))
-	logging.info("Number of older files not yet started {0}".format(len(older_files)))
-	#logging.info("Recent files:\n{0}".format(recent_files))
+#	report = [
+#		"Total Files not yet finished: {0}".format(len(not_finished)),
+#		"    in progress:              {0}".format(len(in_progress)),
+#		"    not yet started:          {0}".format(len(not_started)),
+#		"       daily update:          {0}".format(len(recent_files)),
+#		"       backlog files:         {0}".format(len(older_files)) ]
 
-	report = [
-		"Total Files not yet finished: {0}".format(len(not_finished)),
-		"    in progress:              {0}".format(len(in_progress)),
-		"    not yet started:          {0}".format(len(not_started)),
-		"       daily update:          {0}".format(len(recent_files)),
-		"       backlog files:         {0}".format(len(older_files)) ]
-
+	overall_report = {
+		"files_not_yet_finished" : len(not_finished),
+		"files_in_progress" : len(in_progress),
+		"files_not_yet_started" : len(not_started),
+		"files_daily_update": len(recent_files),
+		"files_backlog": len(older_files)
+	}
 	report_timestamp = time.strftime("%c")
-	with open("/var/www/html/meerkat/file_daemon.txt", 'w') as report_file:
+	local_report_file = params.get("local_report_file", "/dev/null")
+	with open(local_report_file, 'w') as report_file:
 		report_file.write(report_timestamp + "\n")
-		for item in report:
-			logging.info(item)
-			report_file.write(item + "\n")
-		#report_file.write(json.dumps(params["report"], sort_keys=True))
+		for key in overall_report.keys():
+			logging.info("{0}: {1}".format(key, overall_report[key]))
+			#report_file.write(item + "\n")
+		report_file.write(json.dumps(overall_report, sort_keys=True, indent=4,
+				separators=(",", ": ")) + "\n")
 		for report in params["report"]:
-			report_file.write(json.dumps(report, sort_keys=True, indent=4, separators=(",", ": ")) + "\n")
-
-#		for report in params["report"]:
-#			for item in report:
-#				for key in item:
-#					report_file.write("            {0}: {1}\n".format((key, item[key])))
-#		del params["report"]
-
-	#logging.info("Not started:\n {0}".format(not_started))
+			report_file.write(json.dumps(report, sort_keys=True, indent=4,
+				separators=(",", ": ")) + "\n")
 
 def scan_locations(params):
 	"""This function starts the new_daemon."""
