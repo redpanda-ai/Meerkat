@@ -178,13 +178,6 @@ def write_local_report(params):
 	sorted_not_started.extend(recent_files)
 
 	params["not_started"] = sorted_not_started
-#	report = [
-#		"Total Files not yet finished: {0}".format(len(not_finished)),
-#		"    in progress:              {0}".format(len(in_progress)),
-#		"    not yet started:          {0}".format(len(not_started)),
-#		"       daily update:          {0}".format(len(recent_files)),
-#		"       backlog files:         {0}".format(len(older_files)) ]
-
 	overall_report = {
 		"files_not_yet_finished" : len(not_finished),
 		"files_in_progress" : len(in_progress),
