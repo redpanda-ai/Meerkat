@@ -212,6 +212,7 @@ def initialize():
 	found = False
 	for item in params["location_pairs"]:
 		if item["name"] == sys.argv[1]:
+			item["err_location"] = params["err_location"]
 			params["location_pair"] = item
 			del params["location_pairs"]
 			found = True
@@ -331,7 +332,7 @@ def process_single_input_file(params):
 	#Publish to the SNS topic
 	post_SNS(dst_file_name + " successfully processed")
 	# Remove
-	push_err_file_to_s3(params)
+	push_file_to_s3(params, "err")
 	sys.exit()
 
 def run_from_command_line():
@@ -387,17 +388,25 @@ def flush_errors(params, errors, dst_file_name, line_count):
 		1.  Flushes individual error lines to a file.
 		2.  Flushes a summary line with metrics about the error rate.
 		3.  Writes the completed file out to the local host."""
+	print("Flushing errors")
 	my_options = params["my_producer_options"]
 	dst_local_path = my_options["local_files"]["dst_path"]
 	error_count = len(errors)
+	# Set the name of the error file
+	params["local_gzipped_err_file"] =\
+		params["my_producer_options"]["local_files"]["err_path"]\
+		+ dst_file_name + "." + params["location_pair"]["name"] + ".error.gz"
+	# Make sure to clobber any existing error file first
+	if "new_error_file" not in params:
+		safely_remove_file(params["local_gzipped_err_file"])
+		params["new_error_file"] = True
+	# Write out a simple overall report as a summary
+	error_msg = "Errors/Total Transactions {0}/{1}".format(error_count, line_count)
+	write_error_file(params, error_msg)
+	# Write all line errors out to a local gziped error file
 	if error_count > 0:
 		for error in errors:
-			write_error_file(dst_local_path, dst_file_name, error)
-	error_summary = [str(line_count), str(error_count),
-		str(1.0 * (error_count / line_count))]
-	error_msg = "Total line count: {}\nTotal error count: {}\n Success Ratio: {}"
-	error_msg = error_msg.format(*error_summary)
-	write_error_file(dst_local_path, dst_file_name, error_msg)
+			write_error_file(params, error)
 
 def run_chunk(params, *argv):
 	"""Run a single chunk from a dataframe_reader"""
@@ -490,14 +499,16 @@ def validate_configuration(schema, config):
 		sys.exit()
 	logging.info("Configuration schema is valid.")
 
-def write_error_file(path, filename, error_msg):
+def write_error_file(params, error_msg):
 	"""Writes a gzipped file of errors to the local host."""
-	with gzip.open(path + filename + ".error.gz", "ab") as gzipped_output:
-		if error_msg != "":
-			gzipped_output.write(bytes(error_msg + "\n", 'UTF-8'))
+	logging.info("Writing to error file: {0}".format(params["local_gzipped_err_file"]))
+	if error_msg == "":
+		return
+	with gzip.open(params["local_gzipped_err_file"], "ab") as gzipped_output:
+		gzipped_output.write(bytes(error_msg + "\n", 'UTF-8'))
 
 if __name__ == "__main__":
 	logging.basicConfig(format='%(asctime)s %(message)s',
-		filename='/data/1/log/file_producer.log', level=logging.INFO)
+		filename='/data/1/log/file_producer2.log', level=logging.INFO)
 	logging.info("file_producer module activated.")
 	run_from_command_line()
