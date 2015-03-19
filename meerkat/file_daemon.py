@@ -1,3 +1,18 @@
+#!/usr/local/bin/python3.3
+
+"""This module scans S3 directories looking for files to process.
+One can configure its behavior within config/daemon/file.json
+
+Created on Mar 18, 2014
+@author: J. Andrew Key
+"""
+#################### USAGE ##########################
+
+# python3.3 -m meerkat.file_daemon
+
+#####################################################
+
+
 import boto
 import json
 import logging
@@ -7,13 +22,12 @@ import sys
 import time
 
 from boto.s3.connection import Location
-from .custom_exceptions import FileProblem, InvalidArguments
 from datetime import date, timedelta
+from operator import itemgetter
 from plumbum import SshMachine, BG
 
-from operator import itemgetter
+from .custom_exceptions import FileProblem, InvalidArguments
 
-#Usage python3.3 -m meerkat.file_daemon
 
 def launch_remote_producer(params, instance_ip, user, keyfile, item):
 	logging.info("Launching: {0}".format(item))
@@ -24,7 +38,6 @@ def launch_remote_producer(params, instance_ip, user, keyfile, item):
 	remote = params[instance_ip]
 	command = remote["carriage"][panel_name][file_name][log_name]
 	with remote.cwd("/root/git/Meerkat"):
-		pass
 		f = (command) & BG
 	logging.info(("Launched"))
 
@@ -109,15 +122,8 @@ def dispatch_clients(params):
 		for i in range(remaining_slots):
 			if params["not_started"]:
 				item = params["not_started"].pop()
-				#logging.info("Launching {0}, which is {1}".format(i, item))
 				panel_name, panel_file = item[0:2]
-				#command = command_base + item[0] + " " + item[1] + " " + item[0] + "." + item[1] + ".log)"
-				#logging.info("Command: {0}".format(command))
-				#print(command)
 				launch_remote_producer(params, instance_ip, username, key_filename, item)
-				#_, _, _ = ssh.exec_command(command)
-				#logging.info(stdout)
-				#logging.info("Command: {0}".format(command))
 	ssh.close()
 
 def count_running_clients(params):
@@ -172,7 +178,31 @@ def count_running_clients(params):
 	logging.info("Number of files not yet started: {0}".format(len(not_started)))
 	logging.info("Number of recent files not yet started {0}".format(len(recent_files)))
 	logging.info("Number of older files not yet started {0}".format(len(older_files)))
-	logging.info("Recent files:\n{0}".format(recent_files))
+	#logging.info("Recent files:\n{0}".format(recent_files))
+
+	report = [
+		"Total Files not yet finished: {0}".format(len(not_finished)),
+		"    in progress:              {0}".format(len(in_progress)),
+		"    not yet started:          {0}".format(len(not_started)),
+		"       daily update:          {0}".format(len(recent_files)),
+		"       backlog files:         {0}".format(len(older_files)) ]
+
+	report_timestamp = time.strftime("%c")
+	with open("/var/www/html/meerkat/file_daemon.txt", 'w') as report_file:
+		report_file.write(report_timestamp + "\n")
+		for item in report:
+			logging.info(item)
+			report_file.write(item + "\n")
+		#report_file.write(json.dumps(params["report"], sort_keys=True))
+		for report in params["report"]:
+			report_file.write(json.dumps(report, sort_keys=True, indent=4, separators=(",", ": ")) + "\n")
+
+#		for report in params["report"]:
+#			for item in report:
+#				for key in item:
+#					report_file.write("            {0}: {1}\n".format((key, item[key])))
+#		del params["report"]
+
 	#logging.info("Not started:\n {0}".format(not_started))
 
 def scan_locations(params):
@@ -180,6 +210,7 @@ def scan_locations(params):
 	location_pairs = params["location_pairs"]
 	params["s3_conn"] = boto.connect_s3()
 	pair_priority = 0
+	params["report"] = []
 	for pair in location_pairs:
 		name = pair["name"]
 		params[name] = pair_priority
@@ -210,37 +241,51 @@ def scan_s3_location(params, location):
 
 def update_pending_files(params, name, src_dict, dst_dict, pair_priority):
 	"""Update the dictionary of files that need to be processed."""
+	# Look at the files at the S3 destination directory
 	dst_keys = dst_dict.keys()
-	not_in_dst = [ (name, k, pair_priority) for k in src_dict.keys() if k not in dst_keys ]
-	newer_src = [ (name, k, pair_priority) for k in src_dict.keys() if k in dst_keys and src_dict[k][3] > dst_dict[k][3] ]
+	# Find files not in destination S3 directory
+	not_in_dst = [(name, k, pair_priority)
+		for k in src_dict.keys()
+		if k not in dst_keys]
+	# Find files that are new in the destination S3 directory
+	newer_src = [(name, k, pair_priority)
+		for k in src_dict.keys()
+		if k in dst_keys and src_dict[k][3] > dst_dict[k][3]]
+	# Combine both lists
+	total_list = not_in_dst
+	total_list.extend(newer_src)
+	# Ensure that params contains a 'not_finished' key
 	if "not_finished" not in params:
 		params["not_finished"] = []
-	#TODO: Verify that reverse works
-	total_list = []
-	total_list.extend(not_in_dst)
-	total_list.extend(newer_src)
-
+	# Extend the list of "not_finished" files to include what we just discovered
 	params["not_finished"].extend(total_list)
-	#params["not_finished"].extend(my_not_in_dst)
-	#params["not_finished"].extend(newer_src)
+	# Log a quick report of what was found
+#	if "report" not in params:
+#		params["report"] = []
+	my_report = { "name": name, "src" : len(src_dict), "dst" : len(dst_dict),
+		"newer_src": len(newer_src), "not_in_dst": len(not_in_dst) }
+	params["report"].append(my_report)
+#	logging.info("Report: {0}".format(params["report"]))
+
 	logging.info("Src count {0}, dst count {1}".format(len(src_dict), len(dst_dict)))
 	logging.info("Not in dst {0}, Newer src {1}".format(len(not_in_dst), len(newer_src)))
 	logging.debug("List of unprocessed files:")
+	# Log a more involved report if the log level is debug
 	for item in not_in_dst:
-		logging.info(item)
+		logging.debug(item)
 	logging.debug("List of files that are newer at the source:")
 	for item in newer_src:
-		logging.info(item)
+		logging.debug(item)
 
 if __name__ == "__main__":
 	#MAIN PROGRAM
 	logger = logging.getLogger('file_daemon')
 	logger.setLevel(logging.DEBUG)
-	ch = logging.StreamHandler()
-	ch.setLevel(logging.DEBUG)
+	handler = logging.StreamHandler()
+	handler.setLevel(logging.DEBUG)
 	formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-	ch.setFormatter(formatter)
-	logger.addHandler(ch)
+	handler.setFormatter(formatter)
+	logger.addHandler(handler)
 	logger.debug("File daemon")
 	logging.basicConfig(format='%(asctime)s %(message)s', filename='/data/1/log/file_daemon.log', \
 		level=logging.INFO)
