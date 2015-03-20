@@ -24,7 +24,8 @@ import time
 from boto.s3.connection import Location
 from datetime import date, timedelta
 from operator import itemgetter
-from plumbum import SshMachine, BG
+from plumbum import local, SshMachine, BG
+from plumbum.path.utils import copy as copy_to_remote_machine
 
 from .custom_exceptions import FileProblem, InvalidArguments
 
@@ -77,28 +78,43 @@ def begin_scanning_loop():
 def distribute_clients(params):
 	"""Ensures that the correct version of the file_producer client is running
 	on the 'launchpad' instances """
-	#TODO: auto-detect the sha1sum locally, distribute matching client to the launchpad
-	#instances
-	lp = params["launchpad"]
-	instance_ips, username = lp["instance_ips"], lp["username"]
-	key_filename, producer = lp["key_filename"], lp["producer"]
-	producer_hash = lp["producer_hash"]
-	command = "sha1sum " + producer
-	hash = None
-	ssh = paramiko.SSHClient()
-	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+	# Set local variables
+	launchpad = params["launchpad"]
+	instance_ips, user = launchpad["instance_ips"], launchpad["username"]
+	keyfile, producer = launchpad["key_filename"], launchpad["producer"]
+
+	producer_pattern = re.compile("^(.*/)(.*\.py)$")
+	matches = producer_pattern.search(producer)
+	if matches == None:
+		logging.error("Invalid paramater 'producer'.")
+		sys.exit()
+	producer_path = matches.group(1)
+	producer_filename = matches.group(2)
+	# Get the producer hash
+	producer_hash = None
+	command = local["sha1sum"][producer_filename]
+	with local.cwd(producer_path):
+		producer_hash = command().split(" ")[0]
+	producer_hash = launchpad["producer_hash"]
+	if not producer_hash:
+		logging.error("Unable to find a local file_producer, aborting")
+		sys.exit()
+	logging.info("Producer hash is: {0}".format(producer_hash))
+	# Check the remote producers, distribute as necessary
 	for instance_ip in instance_ips:
 		logging.info("Checking producer client on {0}".format(instance_ip))
-		ssh.connect(instance_ip, username=username, key_filename=key_filename)
-		_, stdout, _ = ssh.exec_command(command)
-
-		for line in stdout.readlines():
-			hash = line[:40]
-		logging.info("SHA1 is {0}".format(hash))
+		# Get the remote hash
+		hash = None
+		with SshMachine(instance_ip, user=user, keyfile=keyfile) as remote:
+			command = remote["sha1sum"][producer_filename]
+			with remote.cwd(producer_path):
+				hash = command().split(" ")[0]
+		logging.info("Remote hash for {0} is {1}".format(instance_ip, hash))
+		# Upload the producer, if the hash is incorrect
 		if hash != producer_hash:
-			logging.critical("Sorry, producer is the wrong version.")
-			sys.exit()
-	ssh.close()
+			with SshMachine(instance_ip, user=user, keyfile=keyfile) as remote:
+				remote.upload(producer, producer_path)
+				logging.info("Copied file producer to {0}.".format(instance_ip))
 
 def launch_remote_clients_into_available_slots(params):
 	"""Scans for available 'slots' on the remote clients.  Should it find any, it
@@ -212,7 +228,7 @@ def scan_locations(params):
 	for pair in location_pairs:
 		name = pair["name"]
 		params[name] = pair_priority
-		logging.info("Compariing {0}".format(name))
+		logging.info("Comparing {0}".format(name))
 		logging.info("Scanning\n\t{0}\n\t{1}".format(pair["src_location"], pair["dst_location"]))
 		src_dict = scan_s3_location(params, pair["src_location"])
 		dst_dict = scan_s3_location(params, pair["dst_location"])
@@ -272,7 +288,7 @@ def update_pending_files(params, name, src_dict, dst_dict, pair_priority):
 		logging.debug(item)
 
 if __name__ == "__main__":
-	#MAIN PROGRAM
+	# MAIN PROGRAM
 	logger = logging.getLogger('file_daemon')
 	logger.setLevel(logging.DEBUG)
 	handler = logging.StreamHandler()
@@ -281,7 +297,7 @@ if __name__ == "__main__":
 	handler.setFormatter(formatter)
 	logger.addHandler(handler)
 	logger.debug("File daemon")
-	logging.basicConfig(format='%(asctime)s %(message)s', filename='/data/1/log/file_daemon.log', \
+	logging.basicConfig(format='%(asctime)s %(message)s', filename='/data/1/log/file_daemon2.log', \
 		level=logging.INFO)
 
 	logging.info("Scanning module activated.")
