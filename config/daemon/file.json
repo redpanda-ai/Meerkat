@@ -4,7 +4,8 @@
 		"instance_ips": [
 			"172.31.16.208",
 			"172.31.16.209",
-			"172.31.16.210"
+			"172.31.16.210",
+			"172.31.25.112"
 		],
 		"per_instance_clients" : 12,
 		"key_filename" : "/root/.ssh/jkey.pem",
