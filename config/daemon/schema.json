@@ -76,10 +76,9 @@
 				"key_filename": { "type": "string" },
 				"per_instance_clients": { "type": "number" },
 				"producer" : { "type": "string" },
-				"producer_hash" : { "type": "string" },
 				"username" : { "type": "string" }
 			},
-			"required" : ["instance_ips", "key_filename", "per_instance_clients", "producer", "producer_hash", "username"]
+			"required" : ["instance_ips", "key_filename", "per_instance_clients", "producer", "username"]
 		},
 		"location_pairs": {
 			"description": "List of named objects corresponding to pairs of S3 locations.",

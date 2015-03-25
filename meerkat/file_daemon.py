@@ -25,7 +25,6 @@ from boto.s3.connection import Location
 from datetime import date, timedelta
 from operator import itemgetter
 from plumbum import local, SshMachine, BG
-from plumbum.path.utils import copy as copy_to_remote_machine
 
 from .custom_exceptions import FileProblem, InvalidArguments
 
@@ -95,7 +94,7 @@ def distribute_clients(params):
 	command = local["sha1sum"][producer_filename]
 	with local.cwd(producer_path):
 		producer_hash = command().split(" ")[0]
-	producer_hash = launchpad["producer_hash"]
+	#producer_hash = launchpad["producer_hash"]
 	if not producer_hash:
 		logging.error("Unable to find a local file_producer, aborting")
 		sys.exit()
@@ -297,7 +296,7 @@ if __name__ == "__main__":
 	handler.setFormatter(formatter)
 	logger.addHandler(handler)
 	logger.debug("File daemon")
-	logging.basicConfig(format='%(asctime)s %(message)s', filename='/data/1/log/file_daemon2.log', \
+	logging.basicConfig(format='%(asctime)s %(message)s', filename='/var/log/file_daemon_info.log', \
 		level=logging.INFO)
 
 	logging.info("Scanning module activated.")
