@@ -19,8 +19,8 @@
 		* - [ ] Build a basic plan around the concept of a "cadence" for the development testing and release of Meerkat improvements
 			* Tom suggests that a weekly rhythm is possible, explore the idea and propose reasons why it might or might not work
 			* In any event think of getting the SCT and the TOC up and running end-to-end by 3/31.  Once that is in place, we'll need some sort of predicatable pace to upgrading our models, and our search queries.
-	* 3/18
-		* - [ ] Address the outstanding issues with the [pull request]  (https://github.com/joeandrewkey/Meerkat/pull/121) for ***new_daemon*** branch
+	* 3/30
+		* - [ ] Create a pull request for the ***new_daemon*** branch
 	* 4/1
 		* - [ ] Write up a job description for a DevOps build/release/testing/automation position to
 			* fill our regression test suite with tests
@@ -29,20 +29,21 @@
 			* work with Operations to build run books to operationalize Meerkat so that we can stop supporting it.
 	* 4/1 (ongoing)
 		* - [ ] Recruiting effort for both the Data Science / Machine Learning and the DevOps build/release/testing position
-
+	* Not estimated but important
+		* - [ ] :clock4: Cut a first draft of the Shadow CT version 2.0
 2.  **Meerkat Team**, Matt
 	* Begins 3/1 - Drive the Labeling Effort
 		* - [x] Periodically communicate with Smita R. and Ram about new requirements
 		* - [x] Produce metrics regarding labeling agreeance
 		* - [x] Recommend strategies for better labeling
  (https://github.com/joeandrewkey/Meerkat/issues/120) to produce a sample of transactions from investment type accounts
-	* Not estimated but important
-		* - [ ] :clock4: Cut a first draft of the Shadow CT version 2.0
+
 3.  **Meerkat Team**, Andy and Matt
-	* Backlog
+	* Backlog, Level "S"
 		* - [ ] Provide a versioning mechanism for the file daemon interface to Meerkat
 			* support version 1.0.0
-			* support version 1.1.0		* - [] Work with Richa on end-to-end integration strategy for the production web service
+			* support version 1.1.0		
+		* - [ ] Work with Richa on end-to-end integration strategy for the production web service
 			* specifically regarding the use of Yodlee Labs to produce testing data
 		* - [ ] Speak with Sanjay and team about prototype for building a web service panel for Meerkat
 		* - [ ] Determine why our labelers had trouble distinguishing subtypes of transfers, perhaps retry those
