@@ -15,47 +15,42 @@
 			* - try to get a sense of the traffic, report rates, etc.
 			* - 10.16.3.99 and 10.16.2.226
 			* - start using a daily rolling log file, and add some dates to the timestamps
-	* 3/15
-		* - [ ] Speak with Sanjay and team about prototype for building a web service panel for Meerkat
 
-	* 3/17 
-		* - [ ] Work with Richa on end-to-end integration strategy for the production web service
-			* specifically regarding the use of Yodlee Labs to produce testing data
 		* - [ ] Build a basic plan around the concept of a "cadence" for the development testing and release of Meerkat improvements
 			* Tom suggests that a weekly rhythm is possible, explore the idea and propose reasons why it might or might not work
 			* In any event think of getting the SCT and the TOC up and running end-to-end by 3/31.  Once that is in place, we'll need some sort of predicatable pace to upgrading our models, and our search queries.
-	* 3/18
-		* - [ ] Meet with Richa from Program Management to discuss architecture of Meerkat
-		* - [ ] Address the outstanding issues with the [pull request]  (https://github.com/joeandrewkey/Meerkat/pull/121) for ***new_daemon*** branch
-	* 3/20
-		* - [ ] Provide a versioning mechanism for the file daemon interface to Meerkat
-			* support version 1.0.0
-			* support version 1.1.0
+	* 3/30
+		* - [ ] Create a pull request for the ***new_daemon*** branch
+	* 4/1
+		* - [ ] Write up a job description for a DevOps build/release/testing/automation position to
+			* fill our regression test suite with tests
+			* set up our continuous integration server
+			* escort our tagged releases into production
+			* work with Operations to build run books to operationalize Meerkat so that we can stop supporting it.
+	* 4/1 (ongoing)
+		* - [ ] Recruiting effort for both the Data Science / Machine Learning and the DevOps build/release/testing position
+	* Not estimated but important
+		* - [ ] :clock4: Cut a first draft of the Shadow CT version 2.0
 2.  **Meerkat Team**, Matt
 	* Begins 3/1 - Drive the Labeling Effort
 		* - [x] Periodically communicate with Smita R. and Ram about new requirements
 		* - [x] Produce metrics regarding labeling agreeance
 		* - [x] Recommend strategies for better labeling
-	* 3/12
-		* - [x] Review [pull request] (https://github.com/joeandrewkey/Meerkat/pull/121) for ***new_daemon*** branch
-		* - [x] Get the labelers ready to make another pass at our transactions that were previously labeled as ***Other***
-			* Use the [labels] (https://github.com/joeandrewkey/Meerkat/blob/develop/data/misc/TransactionTypeRules20150303.xlsx) proposed by Deepu
-	* 3/15
-		* - [ ] :clock4: Use the SRS module and associated e*trade sum_info_id [filters] (https://github.com/joeandrewkey/Meerkat/issues/120) to produce a sample of transactions from investment type accounts
-	* 3/20
-		* - [ ] Cut a first draft of the Shadow CT version 2.0
-			
-	* 3/23 - 3/30
-		* - [ ] Scheduled vacation
+ (https://github.com/joeandrewkey/Meerkat/issues/120) to produce a sample of transactions from investment type accounts
 
 3.  **Meerkat Team**, Andy and Matt
-	* Backlog
+	* Backlog, Level "S"
+		* - [ ] Provide a versioning mechanism for the file daemon interface to Meerkat
+			* support version 1.0.0
+			* support version 1.1.0		
+		* - [ ] Work with Richa on end-to-end integration strategy for the production web service
+			* specifically regarding the use of Yodlee Labs to produce testing data
+		* - [ ] Speak with Sanjay and team about prototype for building a web service panel for Meerkat
 		* - [ ] Determine why our labelers had trouble distinguishing subtypes of transfers, perhaps retry those
 		* - [ ] Reclassify the ***other*** transactions and see if providing ***charges and fees*** gives us labels
 		* - [ ] Add some E-trade data, or other cash management accounts to make sure we see some dividends and capital gains
 		* - [ ] Provide integration with the v1.1.0 web service
 		* - [ ] Provide integration with the v1.1.0 version of the file daemon
-	* 3/7
 		* - [ ] Think of a way to integrate a series of per-merchant classifiers that take the form of a series of regex expressions.
 			* Each bundle of regex expressions will serve as a per-merchant classifier
 			* Nikhil is heading up a team of interns and data analysts to build and maintain at least dozens but possibly a hundered of them in Q1 and Q2.
@@ -71,6 +66,12 @@
 
 ### RECENTLY COMPLETED
 #### Matt
+* 3/23 - 3/30
+	* - [x] Scheduled vacation
+* 3/12
+	* - [x] Review [pull request] (https://github.com/joeandrewkey/Meerkat/pull/121) for ***new_daemon*** branch
+	* - [x] Get the labelers ready to make another pass at our transactions that were previously labeled as ***Other***
+		* Use the [labels]
 * 3/11
 	* - [x] Produce a comprehensive set of transactions from our labeling sample where the “choice_pair” was “Payment – Loan”
 	* - [x] Check and see if there are any types/subtypes with abnormally low rates of agreement between the labelers, provide useful metrics.
