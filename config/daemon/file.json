@@ -10,7 +10,8 @@
 		"per_instance_clients" : 12,
 		"key_filename" : "/root/.ssh/jkey.pem",
 		"username": "root",
-		"producer": "/root/git/Meerkat/meerkat/file_producer.py"
+		"producer": "/root/git/Meerkat/meerkat/file_producer.py",
+		"producer_hash": "DELETE_ME"
 	},
 	"err_location": "yodleeprivate/panels/meerkat_error/",
 	"location_pairs": [
@@ -146,7 +147,15 @@
 					"172.31.26.84",
 					"172.31.26.85",
 					"172.31.26.86",
-					"172.31.26.87"
+					"172.31.26.87",
+					"172.31.19.230",
+					"172.31.23.160",
+					"172.31.23.3",
+					"172.31.30.59",
+					"172.31.26.224",
+					"172.31.20.33",
+					"172.31.18.182",
+					"172.31.20.49"
 				],
 				"index": "factual_index",
 				"type": "factual_type"
