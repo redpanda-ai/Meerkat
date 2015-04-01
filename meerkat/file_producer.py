@@ -448,7 +448,7 @@ def run_chunk(params, *argv):
 			sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
 	# Handle Errors
 	sys.stderr = my_stderr = io.StringIO()
-	return line_count, errors
+	return line_count, errors, first_chunk
 
 def run_panel(params, dataframe_reader, dst_file_name):
 	"""Process a single panel"""
@@ -470,7 +470,7 @@ def run_panel(params, dataframe_reader, dst_file_name):
 		args = (chunk, line_count, my_stderr, old_stderr,
 			hyperparameters, cities, header, dst_file_name, first_chunk,
 			errors)
-		line_count, errors = run_chunk(params, *args)
+		line_count, errors, first_chunk = run_chunk(params, *args)
 	#Restore stderr context
 	sys.stderr = old_stderr
 	# Flush errors to a file
