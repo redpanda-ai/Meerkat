@@ -65,11 +65,11 @@ deep = NeuralNet(
 
 def character_encode(str, l):
     """Transform a transaction to a properly encoded representation"""
-    s = str.lower()
+    s = str.lower()[0:l]
     t = np.zeros((len(ALPHABET), l), dtype=np.int)
-    for i, c in enumerate(s[::-1]):
+    for i, c in reversed(list(enumerate(s))):
         if c in ALPHABET:
-            t[ALPHA_DICT[c]][i]
+            t[ALPHA_DICT[c]][l - i - 1] = 1
     return t
 
 # TEMPORARY EXAMPLE CODE
