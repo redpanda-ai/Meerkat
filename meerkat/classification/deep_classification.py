@@ -49,10 +49,10 @@ deep_conv = NeuralNet(
         ('hidden5', layers.DenseLayer),
         ('output', layers.DenseLayer),
     ],
-    input_shape=(128, len(ALPHABET), 128),
-    conv1_num_filters=32, conv1_filter_length=3, pool1_ds=2,
-    conv2_num_filters=64, conv2_filter_length=2, pool2_ds=2,
-    conv3_num_filters=128, conv3_filter_length=2, pool3_ds=2,
+    input_shape=(None, len(ALPHABET), 128),
+    conv1_num_filters=32, conv1_filter_length=3, pool1_ds=1,
+    conv2_num_filters=64, conv2_filter_length=2, pool2_ds=1,
+    conv3_num_filters=128, conv3_filter_length=2, pool3_ds=1,
     hidden4_num_units=512,
     hidden5_num_units=512,
     output_num_units=11,
@@ -89,6 +89,4 @@ def load_data(filename):
     return X, y
 
 X, y = load_data("data/misc/transaction_type_GT_Bank.txt")
-deep_conv.fit(X, y)
-
-#TODO Load labels into numpy array
+#deep_conv.fit(X, y)
