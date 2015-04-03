@@ -45,17 +45,16 @@ deep_conv = NeuralNet(
         ('conv3', layers.Conv1DLayer),
         ('pool3', layers.MaxPool1DLayer),
         ('conv3', layers.Conv1DLayer),
-        ('pool4', layers.MaxPool1DLayer),
-        ('conv5', layers.Conv1DLayer),
-        ('pool5', layers.MaxPool1DLayer),
-        ('conv6', layers.Conv1DLayer),
-        ('pool6', layers.MaxPool1DLayer),
-        ('hidden7', layers.DenseLayer),
-        ('hidden8', layers.DenseLayer),
-        ('hidden9', layers.DenseLayer),
+        ('hidden4', layers.DenseLayer),
+        ('hidden5', layers.DenseLayer),
         ('output', layers.DenseLayer),
     ],
     input_shape=(128, len(ALPHABET), 128),
+    conv1_num_filters=32, conv1_filter_length=3, pool1_ds=2,
+    conv2_num_filters=64, conv2_filter_length=2, pool2_ds=2,
+    conv3_num_filters=128, conv3_filter_length=2, pool3_ds=2,
+    hidden4_num_units=512,
+    hidden5_num_units=512,
     output_num_units=11,
     update_learning_rate=0.01,
     update=nesterov_momentum,
@@ -67,7 +66,7 @@ deep_conv = NeuralNet(
 def character_encode(str, l):
     """Transform a transaction to a properly encoded representation"""
     s = str.lower()[0:l]
-    t = np.zeros((len(ALPHABET), l), dtype=np.float)
+    t = np.zeros((len(ALPHABET), l), dtype=np.float32)
     for i, c in reversed(list(enumerate(s))):
         if c in ALPHABET:
             t[ALPHA_DICT[c]][len(s) - i - 1] = 1
@@ -81,17 +80,15 @@ def load_data(filename):
     labels = df["TRANSACTION_ORIGIN"].unique()
     label_map = dict(zip(labels, range(len(labels))))
     X = np.empty((len(df.index), len(ALPHABET), l))
-    y = np.zeros((len(df.index), len(labels)), dtype=np.int)
+    y = np.zeros(len(df.index), dtype=np.int32)
 
     for index, row in df.iterrows():
         X[index] = character_encode(row["DESCRIPTION_UNMASKED"], l)
-        n = np.zeros(len(labels), dtype=np.float)
-        n[label_map[row["TRANSACTION_ORIGIN"]]] = 1
-        y[index] = n
+        y[index] = label_map[row["TRANSACTION_ORIGIN"]]
 
     return X, y
 
 X, y = load_data("data/misc/transaction_type_GT_Bank.txt")
-#deep_conv.fit(X, y)
+deep_conv.fit(X, y)
 
 #TODO Load labels into numpy array
