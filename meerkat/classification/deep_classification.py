@@ -91,5 +91,4 @@ def load_data(filename):
 X, y = load_data("data/misc/transaction_type_GT_Bank.txt")
 #deep_conv.fit(X, y)
 
-#TODO Character Quantization
-#TODO Data Loading
+#TODO Load labels into numpy array
