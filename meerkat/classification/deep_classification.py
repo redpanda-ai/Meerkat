@@ -26,8 +26,6 @@ from lasagne import layers
 from lasagne.updates import nesterov_momentum
 from nolearn.lasagne import NeuralNet
 
-FTRAIN = 'data/input/training.csv'
-FTEST = 'data/input/test.csv'
 ALPHABET = list("abcdefghijklmnopqrstuvwxyz0123456789-,;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}")
 ALPHA_DICT = {}
 
@@ -50,16 +48,16 @@ deep_conv = NeuralNet(
         ('output', layers.DenseLayer),
     ],
     input_shape=(None, len(ALPHABET), 128),
-    conv1_num_filters=32, conv1_filter_length=3, pool1_ds=1,
-    conv2_num_filters=64, conv2_filter_length=2, pool2_ds=1,
-    conv3_num_filters=128, conv3_filter_length=2, pool3_ds=1,
+    conv1_num_filters=7, conv1_filter_length=3, pool1_ds=1,
+    conv2_num_filters=3, conv2_filter_length=2, pool2_ds=1,
+    conv3_num_filters=3, conv3_filter_length=2, pool3_ds=1,
     hidden4_num_units=512,
     hidden5_num_units=512,
     output_num_units=11,
     update_learning_rate=0.01,
     update=nesterov_momentum,
     update_momentum=0.9,
-    max_epochs=500,
+    max_epochs=10,
     verbose=1
 )
 
