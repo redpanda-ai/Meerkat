@@ -56,7 +56,7 @@ deep_conv = NeuralNet(
         ('output', layers.DenseLayer),
     ],
     input_shape=(128, len(ALPHABET), 128),
-    output_num_units=500,
+    output_num_units=11,
     update_learning_rate=0.01,
     update=nesterov_momentum,
     update_momentum=0.9,
@@ -78,13 +78,16 @@ def load_data(filename):
     
     l = 128
     df = pd.read_csv(filename, na_filter=False, encoding="utf-8", sep='|', error_bad_lines=False)
+    labels = df["TRANSACTION_ORIGIN"].unique()
+    label_map = dict(zip(labels, range(len(labels))))
     X = np.empty((len(df.index), len(ALPHABET), l))
-    y = np.zeros((len(df.index)), dtype=np.int)
+    y = np.zeros((len(df.index), len(labels)), dtype=np.int)
 
     for index, row in df.iterrows():
         X[index] = character_encode(row["DESCRIPTION_UNMASKED"], l)
-
-    print(X.shape)
+        n = np.zeros(len(labels), dtype=np.float)
+        n[label_map[row["TRANSACTION_ORIGIN"]]] = 1
+        y[index] = n
 
     return X, y
 
