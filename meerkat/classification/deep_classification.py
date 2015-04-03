@@ -69,7 +69,7 @@ def character_encode(str, l):
     t = np.zeros((len(ALPHABET), l), dtype=np.int)
     for i, c in reversed(list(enumerate(s))):
         if c in ALPHABET:
-            t[ALPHA_DICT[c]][l - i - 1] = 1
+            t[ALPHA_DICT[c]][len(s) - i + 1] = 1
     return t
 
 # TEMPORARY EXAMPLE CODE
