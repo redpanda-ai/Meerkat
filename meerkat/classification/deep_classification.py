@@ -55,7 +55,7 @@ deep_conv = NeuralNet(
         ('hidden9', layers.DenseLayer),
         ('output', layers.DenseLayer),
     ],
-    input_shape=(None, 128),
+    input_shape=(128, len(ALPHABET), 128),
     output_num_units=500,
     update_learning_rate=0.01,
     update=nesterov_momentum,
