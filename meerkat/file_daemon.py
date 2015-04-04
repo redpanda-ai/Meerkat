@@ -261,9 +261,11 @@ def update_pending_files(params, name, src_dict, dst_dict, pair_priority):
 		for k in src_dict.keys()
 		if k not in dst_keys]
 	# Find files that are new in the destination S3 directory
-	newer_src = [(name, k, pair_priority)
-		for k in src_dict.keys()
-		if k in dst_keys and src_dict[k][3] > dst_dict[k][3]]
+	# TODO: Temporary halt on newer src files, please revert after we finish gpanel v2 2011
+	#newer_src = [(name, k, pair_priority)
+	#	for k in src_dict.keys()
+	#	if k in dst_keys and src_dict[k][3] > dst_dict[k][3]]
+	newer_src = []
 	# Combine both lists
 	total_list = not_in_dst
 	total_list.extend(newer_src)
