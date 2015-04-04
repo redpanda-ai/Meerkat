@@ -22,6 +22,7 @@ import pandas as pd
 import numpy as np
 from sklearn.utils import shuffle
 
+import lasagne
 from lasagne import layers
 from lasagne.updates import nesterov_momentum
 from nolearn.lasagne import NeuralNet
@@ -54,6 +55,7 @@ deep_conv = NeuralNet(
     hidden4_num_units=512,
     hidden5_num_units=512,
     output_num_units=11,
+    output_nonlinearity=lasagne.nonlinearities.softmax,
     update_learning_rate=0.01,
     update=nesterov_momentum,
     update_momentum=0.9,
@@ -87,4 +89,4 @@ def load_data(filename):
     return X, y
 
 X, y = load_data("data/misc/transaction_type_GT_Bank.txt")
-#deep_conv.fit(X, y)
+deep_conv.fit(X, y)
