@@ -42,24 +42,31 @@ deep_conv = NeuralNet(
         ('conv2', layers.Conv1DLayer),
         ('pool2', layers.MaxPool1DLayer),
         ('conv3', layers.Conv1DLayer),
+        ('conv4', layers.Conv1DLayer),
+        ('conv5', layers.Conv1DLayer),
+        ('conv6', layers.Conv1DLayer),
         ('pool3', layers.MaxPool1DLayer),
-        ('conv3', layers.Conv1DLayer),
-        ('hidden4', layers.DenseLayer),
-        ('hidden5', layers.DenseLayer),
+        ('hidden1', layers.DenseLayer),
+        ('dropout1', layers.DropoutLayer),
+        ('hidden2', layers.DenseLayer),
         ('output', layers.DenseLayer),
     ],
     input_shape=(None, len(ALPHABET), 128),
-    conv1_num_filters=7, conv1_filter_length=3, pool1_ds=1,
-    conv2_num_filters=3, conv2_filter_length=2, pool2_ds=1,
-    conv3_num_filters=3, conv3_filter_length=2, pool3_ds=1,
-    hidden4_num_units=512,
-    hidden5_num_units=512,
+    conv1_num_filters=7, conv1_filter_length=7, pool1_ds=3,
+    conv2_num_filters=7, conv2_filter_length=7, pool2_ds=3,
+    conv3_num_filters=3, conv3_filter_length=2, pool3_ds=3,
+    conv4_num_filters=3, conv4_filter_length=2,
+    conv5_num_filters=3, conv5_filter_length=2, 
+    conv6_num_filters=3, conv6_filter_length=2,
+    hidden1_num_units=512,
+    hidden2_num_units=512,
     output_num_units=11,
     output_nonlinearity=lasagne.nonlinearities.softmax,
     update_learning_rate=0.01,
+    dropout1_p=0.5,
     update=nesterov_momentum,
     update_momentum=0.9,
-    max_epochs=10,
+    max_epochs=100,
     verbose=1
 )
 
@@ -90,3 +97,4 @@ def load_data(filename):
 
 X, y = load_data("data/misc/transaction_type_GT_Bank.txt")
 deep_conv.fit(X, y)
+print(deep_conv.predict(X))
