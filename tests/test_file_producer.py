@@ -10,7 +10,6 @@ class TokenizeDescriptionTests(unittest.TestCase):
 
 	"""Our UnitTest class."""
 
-
 	def setUp(self):
 		try:
 			input_file = open("config/daemon/file.json", encoding='utf-8')
@@ -26,7 +25,7 @@ class TokenizeDescriptionTests(unittest.TestCase):
 	def test_usage(self):
 		"""The point of this function is to print usage information to the user"""
 		result = file_producer.usage()
-		self.assertEqual("Usage:\n\t<location_pair_name> <file_name>", result)
+		self.assertEqual("Usage: <location_pair_name> <file_name>", result)
 
 if __name__ == '__main__':
 	unittest.main(argv=[sys.argv[0]])

@@ -479,7 +479,7 @@ def run_panel(params, dataframe_reader, dst_file_name):
 
 def usage():
 	"""Shows the user which parameters to send into the program."""
-	result = "Usage:\n\t<location_pair_name> <file_name>"
+	result = "Usage: <location_pair_name> <file_name>"
 	logging.error(result)
 	return result
 
