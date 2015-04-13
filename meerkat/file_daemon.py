@@ -16,7 +16,6 @@ Created on Mar 18, 2015
 import boto
 import json
 import logging
-import paramiko
 import re
 import sys
 import time
@@ -25,22 +24,31 @@ from boto.s3.connection import Location
 from datetime import date, timedelta
 from operator import itemgetter
 from plumbum import local, SshMachine, BG
+from plumbum.cmd import grep
 
 from .custom_exceptions import FileProblem, InvalidArguments
 
 
-def launch_remote_producer(params, instance_ip, user, keyfile, item):
+def launch_remote_producer(params, instance_ip, item):
 	"""Launches a file_producer client on one of the launchpad instances."""
 	logging.info("Launching: {0}".format(item))
 	panel_name, file_name = item[0:2]
 	log_name = "logs/" + panel_name + "." + file_name + ".log"
-	if instance_ip not in params:
-		params[instance_ip] = SshMachine(instance_ip, user=user, keyfile=keyfile)
+	#Verify that we have a 'remote' connection tothe host
+	verify_remote_instance(params, instance_ip)
+	user = params["launchpad"]["username"]
+	keyfile = params["launchpad"]["key_filename"]
 	remote = params[instance_ip]
 	command = remote["carriage"][panel_name][file_name][log_name]
 	with remote.cwd("/root/git/Meerkat"):
 		f = (command) & BG
-	logging.info(("Launched"))
+
+def verify_remote_instance(params, instance_ip):
+	"""Ensures that our params dict maintains an open remote connection."""
+	if instance_ip not in params:
+		user = params["launchpad"]["username"]
+		keyfile = params["launchpad"]["key_filename"]
+		params[instance_ip] = SshMachine(instance_ip, user=user, keyfile=keyfile)
 
 def get_parameters():
 	"""Validates the command line arguments and loads a dict of params."""
@@ -68,7 +76,6 @@ def begin_scanning_loop():
 		logging.info("Scan #{0} of #{1}".format(count, max_count))
 		scan_locations(params)
 		count += 1
-		count_running_clients(params)
 		launch_remote_clients_into_available_slots(params)
 		logging.info("Resting for {0} seconds.".format(sleep_time_sec))
 		time.sleep(sleep_time_sec)
@@ -119,61 +126,41 @@ def launch_remote_clients_into_available_slots(params):
 	"""Scans for available 'slots' on the remote clients.  Should it find any, it
 	then launches an instance of the file_producer into those empty slots"""
 	lp = params["launchpad"]
-	instance_ips, username = lp["instance_ips"], lp["username"]
-	key_filename = lp["key_filename"]
-	running_pattern = re.compile("^(.*) (.*)$")
-	ssh = paramiko.SSHClient()
-	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
-	#TODO: Convert to plumbum
-	polling_command = "ps -ef|grep python3.3|grep -v grep|awk ' { print $11,$12 }'"
-	total_slots = params["launchpad"]["per_instance_clients"]
+	instance_ips = lp["instance_ips"]
+	total_slots = lp["per_instance_clients"]
+	params["in_progress"] = []
+	#Loop through each launchpad host
+	write_local_report(params)
 	for instance_ip in instance_ips:
 		logging.info("Counting running clients on {0}".format(instance_ip))
-		ssh.connect(instance_ip, username=username, key_filename=key_filename)
-		_, stdout, _ = ssh.exec_command(polling_command)
 		process_count = 0
+		#Ensure that we have a remote producer
+		verify_remote_instance(params, instance_ip)
+		#Count remote file producers
+		remote = params[instance_ip]
+		cmd = remote["ps"]["-ef"] | grep["python3.3"]
+		cmd_result = cmd(retcode=None)
+		cmd_split = cmd_result.split("\n")
 		in_progress = []
-		for line in stdout.readlines():
-			if running_pattern.search(line):
-				process_count += 1
+		for line in cmd_split:
+			splits = re.split('\s+', line)
+			if len(splits) > 12:
+				if splits[10] == "meerkat.file_producer":
+					process_count += 1
+					panel_name, panel_file = splits[11:13]
+					in_progress.append((panel_name, panel_file, params[panel_name]))
+					logging.info("Panel name: {0}, Panel file: {1}".format(panel_name, panel_file))
+		#Calculate available slots
 		remaining_slots = total_slots - process_count
 		logging.info("{0} has {1} remaining slots".format(instance_ip, remaining_slots))
+		#Fill slots from list of files that are 'not_started'
 		for i in range(remaining_slots):
 			if params["not_started"]:
 				item = params["not_started"].pop()
 				panel_name, panel_file = item[0:2]
-				launch_remote_producer(params, instance_ip, username, key_filename, item)
-	ssh.close()
-
-def count_running_clients(params):
-	"""Count the running clients."""
-	#TODO: Convert to plumbum
-	polling_command = "ps -ef|grep python3.3|grep -v grep|awk ' { print $12,$13 }'"
-	lp = params["launchpad"]
-	instance_ips, username = lp["instance_ips"], lp["username"]
-	key_filename = lp["key_filename"]
-	running_pattern = re.compile("^(.*) (.*)$")
-	params["in_progress"] = []
-	ssh = paramiko.SSHClient()
-	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-	for instance_ip in instance_ips:
-		logging.info("Counting running clients on {0}".format(instance_ip))
-		ssh.connect(instance_ip, username=username, key_filename=key_filename)
-		_, stdout, _ = ssh.exec_command(polling_command)
-		process_count = 0
-		in_progress = []
-		for line in stdout.readlines():
-			if running_pattern.search(line):
-				matches = running_pattern.search(line)
-				process_count += 1
-				panel_name = matches.group(1)
-				panel_file = matches.group(2)
+				launch_remote_producer(params, instance_ip, item)
 				in_progress.append((panel_name, panel_file, params[panel_name]))
-				logging.info("Panel name: {0}, Panel file: {1}".format(panel_name, panel_file))
-		logging.info("{0} processes found.".format(process_count))
 		params["in_progress"].extend(in_progress)
-	ssh.close()
 	write_local_report(params)
 
 def write_local_report(params):
@@ -200,23 +187,26 @@ def write_local_report(params):
 
 	params["not_started"] = sorted_not_started
 	overall_report = {
-		"files_not_yet_finished" : len(not_finished),
-		"files_in_progress" : len(in_progress),
-		"files_not_yet_started" : len(not_started),
-		"files_daily_update": len(recent_files),
-		"files_backlog": len(older_files)
+		"meta": 
+		[
+			{"timestamp": time.strftime("%c")},
+			{"total_unfinished" : len(not_finished)},
+			{"_in_progress" : len(in_progress)},
+			{"_backlog" : len(not_started)},
+			{"__daily": len(recent_files)},
+			{"__older": len(older_files)}
+		],
+		"panels": []
 	}
+	for report in params["report"]:
+		overall_report["panels"].append(report)
 	report_timestamp = time.strftime("%c")
 	local_report_file = params.get("local_report_file", "/dev/null")
+	full_report = json.dumps(overall_report, sort_keys=True, indent=4,
+		separators=(",", ": "))
+	logging.info(full_report)
 	with open(local_report_file, 'w') as report_file:
-		report_file.write(report_timestamp + "\n")
-		for key in overall_report.keys():
-			logging.info("{0}: {1}".format(key, overall_report[key]))
-		report_file.write(json.dumps(overall_report, sort_keys=True, indent=4,
-				separators=(",", ": ")) + "\n")
-		for report in params["report"]:
-			report_file.write(json.dumps(report, sort_keys=True, indent=4,
-				separators=(",", ": ")) + "\n")
+		report_file.write(full_report)
 
 def scan_locations(params):
 	"""This function starts the new_daemon."""
@@ -261,11 +251,9 @@ def update_pending_files(params, name, src_dict, dst_dict, pair_priority):
 		for k in src_dict.keys()
 		if k not in dst_keys]
 	# Find files that are new in the destination S3 directory
-	# TODO: Temporary halt on newer src files, please revert after we finish gpanel v2 2011
-	#newer_src = [(name, k, pair_priority)
-	#	for k in src_dict.keys()
-	#	if k in dst_keys and src_dict[k][3] > dst_dict[k][3]]
-	newer_src = []
+	newer_src = [(name, k, pair_priority)
+		for k in src_dict.keys()
+		if k in dst_keys and src_dict[k][3] > dst_dict[k][3]]
 	# Combine both lists
 	total_list = not_in_dst
 	total_list.extend(newer_src)

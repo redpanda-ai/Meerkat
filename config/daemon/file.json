@@ -3,16 +3,7 @@
 	"launchpad" : {
 		"instance_ips": [
 			"172.31.16.208",
-			"172.31.16.209",
-			"172.31.16.210",
-			"172.31.25.112",
-			"172.31.18.129",
-			"172.31.22.159",
-			"172.31.27.152",
-			"172.31.27.35",
-			"172.31.31.81",
-			"172.31.28.24",
-			"172.31.30.34"
+			"172.31.16.209"
 		],
 		"per_instance_clients" : 12,
 		"key_filename" : "/root/.ssh/jkey.pem",
@@ -22,6 +13,16 @@
 	},
 	"err_location": "yodleeprivate/panels/meerkat_error/",
 	"location_pairs": [
+		{
+			"name": "gpanel_1m_bank",
+			"src_location": "yodleeprivate/panels/meerkat_input/gpanel_1m/bank/",
+			"dst_location": "yodleeprivate/panels/meerkat_output/gpanel_1m/bank/"
+		},
+		{
+			"name": "gpanel_1m_card",
+			"src_location": "yodleeprivate/panels/meerkat_input/gpanel_1m/card/",
+			"dst_location": "yodleeprivate/panels/meerkat_output/gpanel_1m/card/"
+		},
 		{
 			"name": "gpanel3_bank",
 			"src_location": "yodleeprivate/panels/meerkat_input/gpanel3/bank/",
@@ -151,25 +152,7 @@
 			"concurrency": 20,
 			"elasticsearch": {
 				"cluster_nodes": [
-					"172.31.26.84",
-					"172.31.26.85",
-					"172.31.26.86",
-					"172.31.26.87",
-					"172.31.19.230",
-					"172.31.23.160",
-					"172.31.23.3",
-					"172.31.30.59",
-					"172.31.26.224",
-					"172.31.20.33",
-					"172.31.18.182",
-					"172.31.20.49",
-					"172.31.30.96",
-					"172.31.43.186",
-					"172.31.32.187",
-					"172.31.35.225",
-					"172.31.35.49",
-					"172.31.41.36",
-					"172.31.42.53"
+					"172.31.42.53", "172.31.30.96"
 				],
 				"index": "factual_index",
 				"type": "factual_type"
