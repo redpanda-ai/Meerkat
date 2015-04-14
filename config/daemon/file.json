@@ -9,7 +9,7 @@
 		"key_filename" : "/root/.ssh/jkey.pem",
 		"username": "root",
 		"producer": "/root/git/Meerkat/meerkat/file_producer.py",
-		"producer_hash": "DELETE_ME"
+		"producer_hash": "DELETE_ME_2"
 	},
 	"err_location": "yodleeprivate/panels/meerkat_error/",
 	"location_pairs": [

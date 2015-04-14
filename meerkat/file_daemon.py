@@ -70,7 +70,9 @@ def begin_scanning_loop():
 	count, max_count = 1, 100000000
 	sleep_time_sec = 60
 	params = get_parameters()
-	distribute_clients(params)
+	#distribute_clients(params)
+	distribute_file(params, "/root/git/Meerkat/meerkat/file_producer.py")
+	distribute_file(params, "/root/git/Meerkat/config/daemon/file.json")
 	while count < max_count:
 		params["not_finished"] = []
 		logging.info("Scan #{0} of #{1}".format(count, max_count))
@@ -81,46 +83,42 @@ def begin_scanning_loop():
 		time.sleep(sleep_time_sec)
 	logging.info("Done.")
 
-def distribute_clients(params):
-	"""Ensures that the correct version of the file_producer client is running
-	on the 'launchpad' instances """
-	# Set local variables
+def distribute_file(params, file_to_push):
+	logging.info("Synchronizing {0}".format(file_to_push))
 	launchpad = params["launchpad"]
 	instance_ips, user = launchpad["instance_ips"], launchpad["username"]
-	keyfile, producer = launchpad["key_filename"], launchpad["producer"]
-
-	producer_pattern = re.compile("^(.*/)(.*\.py)$")
-	matches = producer_pattern.search(producer)
+	keyfile = launchpad["key_filename"]
+	file_pattern = re.compile("^(.*/)([^/]+)$")
+	matches = file_pattern.search(file_to_push)
 	if matches == None:
-		logging.error("Invalid paramater 'producer'.")
+		logging.error("file_to_push fails to match regex, aborting.")
 		sys.exit()
-	producer_path = matches.group(1)
-	producer_filename = matches.group(2)
-	# Get the producer hash
-	producer_hash = None
-	command = local["sha1sum"][producer_filename]
-	with local.cwd(producer_path):
-		producer_hash = command().split(" ")[0]
-	#producer_hash = launchpad["producer_hash"]
-	if not producer_hash:
-		logging.error("Unable to find a local file_producer, aborting")
+	working_directory = matches.group(1)
+	working_filename = matches.group(2)
+	# Get the local hash
+	local_hash = None
+	command = local["sha1sum"][file_to_push]
+	with local.cwd(working_directory):
+		local_hash = command().split(" ")[0]
+	#local_hash = launchpad["local_hash"]
+	if not local_hash:
+		logging.error("Unable to find a local file to hash, aborting")
 		sys.exit()
-	logging.info("Producer hash is: {0}".format(producer_hash))
-	# Check the remote producers, distribute as necessary
+	logging.info("File hash is: {0}".format(local_hash))
+	# Check the remote file, distribute as necessary
 	for instance_ip in instance_ips:
-		logging.info("Checking producer client on {0}".format(instance_ip))
+		logging.info("Checking file hash on {0}".format(instance_ip))
 		# Get the remote hash
-		hash = None
+		remote_hash = None
 		with SshMachine(instance_ip, user=user, keyfile=keyfile) as remote:
-			command = remote["sha1sum"][producer_filename]
-			with remote.cwd(producer_path):
-				hash = command().split(" ")[0]
-		logging.info("Remote hash for {0} is {1}".format(instance_ip, hash))
-		# Upload the producer, if the hash is incorrect
-		if hash != producer_hash:
-			with SshMachine(instance_ip, user=user, keyfile=keyfile) as remote:
-				remote.upload(producer, producer_path)
-				logging.info("Copied file producer to {0}.".format(instance_ip))
+			command = remote["sha1sum"][file_to_push]
+			with remote.cwd(working_directory):
+				remote_hash = command().split(" ")[0]
+				logging.info("Remote hash for {0} is {1}".format(instance_ip, remote_hash))
+				# Upload the file, if the remote hash is incorrect
+				if remote_hash != local_hash:
+					remote.upload(file_to_push, working_directory)
+					logging.info("Copied {0} to {1}.".format(file_to_push, instance_ip))
 
 def launch_remote_clients_into_available_slots(params):
 	"""Scans for available 'slots' on the remote clients.  Should it find any, it
