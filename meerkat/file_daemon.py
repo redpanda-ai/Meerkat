@@ -78,6 +78,7 @@ def begin_scanning_loop():
 		logging.info("Scan #{0} of #{1}".format(count, max_count))
 		scan_locations(params)
 		count += 1
+		get_files_in_progress(params)
 		launch_remote_clients_into_available_slots(params)
 		logging.info("Resting for {0} seconds.".format(sleep_time_sec))
 		time.sleep(sleep_time_sec)
@@ -120,7 +121,7 @@ def distribute_file(params, file_to_push):
 					remote.upload(file_to_push, working_directory)
 					logging.info("Copied {0} to {1}.".format(file_to_push, instance_ip))
 
-def launch_remote_clients_into_available_slots(params):
+def get_files_in_progress(params):
 	"""Scans for available 'slots' on the remote clients.  Should it find any, it
 	then launches an instance of the file_producer into those empty slots"""
 	lp = params["launchpad"]
@@ -139,14 +140,50 @@ def launch_remote_clients_into_available_slots(params):
 		cmd = remote["ps"]["-ef"] | grep["python3.3"]
 		cmd_result = cmd(retcode=None)
 		cmd_split = cmd_result.split("\n")
-		in_progress = []
 		for line in cmd_split:
 			splits = re.split('\s+', line)
 			if len(splits) > 12:
 				if splits[10] == "meerkat.file_producer":
 					process_count += 1
 					panel_name, panel_file = splits[11:13]
-					in_progress.append((panel_name, panel_file, params[panel_name]))
+					params["in_progress"].append((panel_name, panel_file, params[panel_name]))
+					logging.info("Panel name: {0}, Panel file: {1}".format(panel_name, panel_file))
+		#Calculate available slots
+		remaining_slots = total_slots - process_count
+		logging.info("{0} has {1} remaining slots".format(instance_ip, remaining_slots))
+		#Fill slots from list of files that are 'not_started'
+		for i in range(remaining_slots):
+			if params["not_started"]:
+				item = params["not_started"].pop()
+				panel_name, panel_file = item[0:2]
+				params["in_progress"].append((panel_name, panel_file, params[panel_name]))
+
+	write_local_report(params)
+
+def launch_remote_clients_into_available_slots(params):
+	"""Scans for available 'slots' on the remote clients.  Should it find any, it
+	then launches an instance of the file_producer into those empty slots"""
+	lp = params["launchpad"]
+	instance_ips = lp["instance_ips"]
+	total_slots = lp["per_instance_clients"]
+	#Loop through each launchpad host
+	write_local_report(params)
+	for instance_ip in instance_ips:
+		logging.info("Counting running clients on {0}".format(instance_ip))
+		process_count = 0
+		#Ensure that we have a remote producer
+		verify_remote_instance(params, instance_ip)
+		#Count remote file producers
+		remote = params[instance_ip]
+		cmd = remote["ps"]["-ef"] | grep["python3.3"]
+		cmd_result = cmd(retcode=None)
+		cmd_split = cmd_result.split("\n")
+		for line in cmd_split:
+			splits = re.split('\s+', line)
+			if len(splits) > 12:
+				if splits[10] == "meerkat.file_producer":
+					process_count += 1
+					panel_name, panel_file = splits[11:13]
 					logging.info("Panel name: {0}, Panel file: {1}".format(panel_name, panel_file))
 		#Calculate available slots
 		remaining_slots = total_slots - process_count
@@ -157,8 +194,7 @@ def launch_remote_clients_into_available_slots(params):
 				item = params["not_started"].pop()
 				panel_name, panel_file = item[0:2]
 				launch_remote_producer(params, instance_ip, item)
-				in_progress.append((panel_name, panel_file, params[panel_name]))
-		params["in_progress"].extend(in_progress)
+
 	write_local_report(params)
 
 def write_local_report(params):
@@ -166,6 +202,7 @@ def write_local_report(params):
 	#Valuable metrics
 	not_finished = params["not_finished"]
 	in_progress = params["in_progress"]
+
 	not_started = list(set(not_finished) - set(in_progress))
 	#This scheduler prefers daily update files to all others, regardless
 	#of priority.
