@@ -509,6 +509,6 @@ def write_error_file(params, error_msg):
 
 if __name__ == "__main__":
 	logging.basicConfig(format='%(asctime)s %(message)s',
-		filename='/data/1/log/file_producer2.log', level=logging.INFO)
+		filename='/data/1/log/' + sys.argv[1] + '.' + sys.argv[2] + '.log', level=logging.INFO)
 	logging.info("file_producer module activated.")
 	run_from_command_line()
