@@ -129,9 +129,10 @@ def get_files_in_progress(params):
 	total_slots = lp["per_instance_clients"]
 	params["in_progress"] = []
 	#Loop through each launchpad host
-	write_local_report(params)
+	#write_local_report(params)
+	logging.info("Counting running clients")
 	for instance_ip in instance_ips:
-		logging.info("Counting running clients on {0}".format(instance_ip))
+		#logging.info("Counting running clients on {0}".format(instance_ip))
 		process_count = 0
 		#Ensure that we have a remote producer
 		verify_remote_instance(params, instance_ip)
@@ -147,18 +148,19 @@ def get_files_in_progress(params):
 					process_count += 1
 					panel_name, panel_file = splits[11:13]
 					params["in_progress"].append((panel_name, panel_file, params[panel_name]))
-					logging.info("Panel name: {0}, Panel file: {1}".format(panel_name, panel_file))
+					#logging.info("Panel name: {0}, Panel file: {1}".format(panel_name, panel_file))
 		#Calculate available slots
 		remaining_slots = total_slots - process_count
-		logging.info("{0} has {1} remaining slots".format(instance_ip, remaining_slots))
+		#logging.info("{0} has {1} remaining slots".format(instance_ip, remaining_slots))
 		#Fill slots from list of files that are 'not_started'
 		for i in range(remaining_slots):
-			if params["not_started"]:
+			if (("not_started" in params) and (params["not_started"])):
 				item = params["not_started"].pop()
 				panel_name, panel_file = item[0:2]
 				params["in_progress"].append((panel_name, panel_file, params[panel_name]))
+	logging.info("Running clients counted")
 
-	write_local_report(params)
+	#write_local_report(params)
 
 def launch_remote_clients_into_available_slots(params):
 	"""Scans for available 'slots' on the remote clients.  Should it find any, it
@@ -167,7 +169,7 @@ def launch_remote_clients_into_available_slots(params):
 	instance_ips = lp["instance_ips"]
 	total_slots = lp["per_instance_clients"]
 	#Loop through each launchpad host
-	write_local_report(params)
+	#write_local_report(params)
 	for instance_ip in instance_ips:
 		logging.info("Counting running clients on {0}".format(instance_ip))
 		process_count = 0
@@ -190,7 +192,7 @@ def launch_remote_clients_into_available_slots(params):
 		logging.info("{0} has {1} remaining slots".format(instance_ip, remaining_slots))
 		#Fill slots from list of files that are 'not_started'
 		for i in range(remaining_slots):
-			if params["not_started"]:
+			if (("not_started" in params) and (params["not_started"])):
 				item = params["not_started"].pop()
 				panel_name, panel_file = item[0:2]
 				launch_remote_producer(params, instance_ip, item)
@@ -253,7 +255,7 @@ def scan_locations(params):
 		name = pair["name"]
 		params[name] = pair_priority
 		logging.info("Comparing {0}".format(name))
-		logging.info("Scanning\n\t{0}\n\t{1}".format(pair["src_location"], pair["dst_location"]))
+		#logging.info("Scanning\n\t{0}\n\t{1}".format(pair["src_location"], pair["dst_location"]))
 		src_dict = scan_s3_location(params, pair["src_location"])
 		dst_dict = scan_s3_location(params, pair["dst_location"])
 		update_pending_files(params, name, src_dict, dst_dict, pair_priority)

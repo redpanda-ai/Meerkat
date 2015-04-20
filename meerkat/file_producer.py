@@ -146,7 +146,7 @@ def get_container(filename):
 	elif "card" in filename.lower():
 		container = "card"
 	if container:
-		logging.info("{0} discovered as container.".format(container))
+		logging.warning("{0} discovered as container.".format(container))
 		return container
 	logging.error("Neither 'bank' nor 'card' present in file name, aborting.")
 	#TODO Add a proper exception
@@ -161,7 +161,7 @@ def get_panel_header_old(params):
 
 def gunzip_and_validate_file(filepath):
 	"""Decompress a file, check for required fields on the first line."""
-	logging.info("Gunzipping and validating {0}".format(filepath))
+	logging.warning("Gunzipping and validating {0}".format(filepath))
 	path, filename = os.path.split(filepath)
 	filename = os.path.splitext(filename)[0]
 	first_line = True
@@ -182,7 +182,7 @@ def gunzip_and_validate_file(filepath):
 				output_file.write(line)
 	# Remove original file
 	safely_remove_file(filepath)
-	logging.info("{0} unzipped; header contains mandatory fields."
+	logging.warning("{0} unzipped; header contains mandatory fields."
 		.format(filename))
 	return filename
 
@@ -220,7 +220,7 @@ def initialize():
 	if not found:
 		raise InvalidArguments(
 			msg="Invalid 'location_pair' argument, aborting.", expr=None)
-	logging.info("location_pair found in configuration file.")
+	logging.warning("location_pair found in configuration file.")
 	params["src_file"] = sys.argv[2]
 	set_custom_producer_options(params)
 	#Adding other fields for compatiblity with various tools library
@@ -243,7 +243,7 @@ def pull_src_file_from_s3(params):
 	bucket_name = matches.group(1)
 	directory = matches.group(2)
 	src_file = params["src_file"]
-	logging.info("S3 Bucket: {0}, S3 directory: {1}, Src file: {2}".
+	logging.warning("S3 Bucket: {0}, S3 directory: {1}, Src file: {2}".
 		format(bucket_name, directory, src_file))
 
 	#Pull the src file from S3
@@ -257,7 +257,7 @@ def pull_src_file_from_s3(params):
 		params["my_producer_options"]["local_files"]["src_path"]
 	local_src_file = params["local_src_path"] + src_file
 	s3_key.get_contents_to_filename(local_src_file)
-	logging.info("Src file pulled from S3")
+	logging.warning("Src file pulled from S3")
 	return local_src_file
 
 def push_dst_file_to_s3(params):
@@ -276,7 +276,7 @@ def push_dst_file_to_s3(params):
 	key.key = directory + dst_file
 	bytes_written = key.set_contents_from_filename(
 		params["local_gzipped_dst_file"], encrypt_key=True, replace=True)
-	logging.info("{0} pushed to S3, {1} bytes written.".format(
+	logging.warning("{0} pushed to S3, {1} bytes written.".format(
 		dst_file, bytes_written))
 
 def push_file_to_s3(params, type):
@@ -296,7 +296,7 @@ def push_file_to_s3(params, type):
 	key.key = directory + type_file
 	bytes_written = key.set_contents_from_filename(
 		params[gzipped_type_file], encrypt_key=True, replace=True)
-	logging.info("{0} pushed to S3, {1} bytes written.".format(
+	logging.warning("{0} pushed to S3, {1} bytes written.".format(
 		type_file, bytes_written))
 
 def process_single_input_file(params):
@@ -314,7 +314,7 @@ def process_single_input_file(params):
 	reader = pd.read_csv(local_src_file, na_filter=False, chunksize=5000,
 		quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|',
 		error_bad_lines=False)
-	logging.info("Dataframe reader loaded.")
+	logging.warning("Dataframe reader loaded.")
 	# Process a single file with Meerkat
 	local_dst_file = run_panel(params, reader, dst_file_name)
 	# Write panel output as gzip file
@@ -429,17 +429,17 @@ def run_chunk(params, *argv):
 	physical = None
 	if not desc_queue.empty():
 		# Classify Transaction Chunk
-		logging.info("Chunk contained physical transactions, using Meerkat")
+		logging.warning("Chunk contained physical transactions, using Meerkat")
 		physical = run_meerkat_chunk(params, desc_queue, hyperparameters, cities)
 	else:
-		logging.info("Chunk did not contain physical transactions, skipping Meerkat")
+		logging.warning("Chunk did not contain physical transactions, skipping Meerkat")
 	# Combine Split Dataframes
 	chunk = pd.concat([physical, non_physical])
 	# Write
 	if first_chunk:
 		file_to_remove = dst_local_path + dst_file_name
 		safely_remove_file(file_to_remove)
-		logging.info("Output Path: {0}".format(file_to_remove))
+		logging.warning("Output Path: {0}".format(file_to_remove))
 		chunk.to_csv(dst_local_path + dst_file_name, columns=header, sep="|",\
 			mode="a", encoding="utf-8", index=False, index_label=False)
 		first_chunk = False
@@ -471,6 +471,7 @@ def run_panel(params, dataframe_reader, dst_file_name):
 			hyperparameters, cities, header, dst_file_name, first_chunk,
 			errors)
 		line_count, errors, first_chunk = run_chunk(params, *args)
+		logging.warning("{0} Lines processed.".format(line_count))
 	#Restore stderr context
 	sys.stderr = old_stderr
 	# Flush errors to a file
@@ -497,11 +498,11 @@ def validate_configuration(schema, config):
 		logging.error("Schema definition is invalid, aborting")
 		logging.error(schema_error.message)
 		sys.exit()
-	logging.info("Configuration schema is valid.")
+	logging.warning("Configuration schema is valid.")
 
 def write_error_file(params, error_msg):
 	"""Writes a gzipped file of errors to the local host."""
-	logging.info("Writing to error file: {0}".format(params["local_gzipped_err_file"]))
+	logging.warning("Writing to error file: {0}".format(params["local_gzipped_err_file"]))
 	if error_msg == "":
 		return
 	with gzip.open(params["local_gzipped_err_file"], "ab") as gzipped_output:
@@ -509,6 +510,6 @@ def write_error_file(params, error_msg):
 
 if __name__ == "__main__":
 	logging.basicConfig(format='%(asctime)s %(message)s',
-		filename='/data/1/log/' + sys.argv[1] + '.' + sys.argv[2] + '.log', level=logging.INFO)
-	logging.info("file_producer module activated.")
+		filename='/data/1/log/' + sys.argv[1] + '.' + sys.argv[2] + '.log', level=logging.WARNING)
+	logging.warning("file_producer module activated.")
 	run_from_command_line()
