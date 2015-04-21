@@ -17,6 +17,7 @@ Created on Dec 9, 2013
 
 import boto
 import csv
+import datetime
 import gzip
 import io
 import json
@@ -330,7 +331,11 @@ def process_single_input_file(params):
 	#Remove local gzipped dst file
 	safely_remove_file(params["local_gzipped_dst_file"])
 	#Publish to the SNS topic
-	post_SNS(dst_file_name + " successfully processed")
+	time_delta = datetime.datetime.now() - START_TIME
+	message = "{0} successfully processed {1} in {2}".format(dst_file_name,
+		params["line_count"], time_delta)
+	print(message)
+	post_SNS(message)
 	# Remove
 	push_file_to_s3(params, "err")
 	sys.exit()
@@ -448,6 +453,7 @@ def run_chunk(params, *argv):
 			sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
 	# Handle Errors
 	sys.stderr = my_stderr = io.StringIO()
+	params["line_count"] = line_count
 	return line_count, errors, first_chunk
 
 def run_panel(params, dataframe_reader, dst_file_name):
@@ -507,6 +513,8 @@ def write_error_file(params, error_msg):
 		return
 	with gzip.open(params["local_gzipped_err_file"], "ab") as gzipped_output:
 		gzipped_output.write(bytes(error_msg + "\n", 'UTF-8'))
+
+START_TIME = datetime.datetime.now()
 
 if __name__ == "__main__":
 	logging.basicConfig(format='%(asctime)s %(message)s',
