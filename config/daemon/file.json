@@ -1,5 +1,6 @@
 {
 	"local_report_file" : "/var/www/html/meerkat/file_daemon_status.txt",
+	"reprocess" : false,
 	"launchpad" : {
 		"instance_ips": [
 			"172.31.16.208",
@@ -15,6 +16,11 @@
 	},
 	"err_location": "yodleeprivate/panels/meerkat_error/",
 	"location_pairs": [
+		{
+			"name": "jkey_test_bank",
+			"src_location": "yodleeprivate/panels/meerkat_input/jkey_test/bank/",
+			"dst_location": "yodleeprivate/panels/meerkat_output/jkey_test/bank/"
+		},
 		{
 			"name": "gpanel_1m_bank",
 			"src_location": "yodleeprivate/panels/meerkat_input/gpanel_1m/bank/",

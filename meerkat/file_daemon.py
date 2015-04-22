@@ -216,8 +216,9 @@ def write_local_report(params):
 	older_files = [ x for x in not_started if x[1][:8] < two_weeks_ago ]
 	#Sort the recent files by date(reversed)
 	recent_files = sorted(recent_files, key=itemgetter(1), reverse=True)
-	#Sort the older files, by priority
-	older_files = sorted(older_files, key=itemgetter(2), reverse=True)
+	#Sort the older files, by priority and then date(reversed)
+	older_files = sorted(older_files, key=itemgetter(2,1), reverse=True)
+
 	sorted_not_started = []
 	sorted_not_started.extend(older_files)
 	sorted_not_started.extend(recent_files)
@@ -287,10 +288,13 @@ def update_pending_files(params, name, src_dict, dst_dict, pair_priority):
 	not_in_dst = [(name, k, pair_priority)
 		for k in src_dict.keys()
 		if k not in dst_keys]
-	# Find files that are new in the destination S3 directory
-	newer_src = [(name, k, pair_priority)
-		for k in src_dict.keys()
-		if k in dst_keys and src_dict[k][3] > dst_dict[k][3]]
+	# Reprocess newer files
+	if params["reprocess"]:
+		newer_src = [(name, k, pair_priority)
+			for k in src_dict.keys()
+			if k in dst_keys and src_dict[k][3] > dst_dict[k][3]]
+	else:
+		newer_src = []
 	# Combine both lists
 	total_list = not_in_dst
 	total_list.extend(newer_src)

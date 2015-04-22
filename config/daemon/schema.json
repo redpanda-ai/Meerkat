@@ -68,6 +68,7 @@
 	"description": "A schema for defining configuration parameters for our meerkat.file_producer module",
 	"type": "object",
 	"properties": {
+		"reprocess": { "enum": [ true, false ] },
 		"launchpad": {
 			"description": "Object containing everything needed to connect to a remote client.",
 			"type": "object",
@@ -98,5 +99,5 @@
 			"required": ["producer_default"]
 		}
 	},
-	"required": ["launchpad", "location_pairs", "producer_options"]
+	"required": ["reprocess", "launchpad", "location_pairs", "producer_options"]
 }
