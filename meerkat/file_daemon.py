@@ -153,12 +153,14 @@ def get_files_in_progress(params):
 		remaining_slots = total_slots - process_count
 		#logging.info("{0} has {1} remaining slots".format(instance_ip, remaining_slots))
 		#Fill slots from list of files that are 'not_started'
+
+		#Add the files in progress
 		for i in range(remaining_slots):
 			if (("not_started" in params) and (params["not_started"])):
-				item = params["not_started"].pop()
+				my_list = params["not_started"][:]
+				item = my_list.pop()
 				panel_name, panel_file = item[0:2]
 				params["in_progress"].append((panel_name, panel_file, params[panel_name]))
-	logging.info("Running clients counted")
 
 	#write_local_report(params)
 
@@ -209,11 +211,13 @@ def write_local_report(params):
 	#This scheduler prefers daily update files to all others, regardless
 	#of priority.
 	#Get todays date minus 14 days
-	two_weeks_ago = str(date.today() - timedelta(days=14)).replace("-","")
+	three_weeks_ago = str(date.today() - timedelta(days=14)).replace("-","")
 	#Get the set of recent files
-	recent_files = [ x for x in not_started if x[1][:8] >= two_weeks_ago ]
+	recent_files = [ x for x in not_started if x[1][:8] >= three_weeks_ago ]
+	logging.warning("RECENT_FILES")
+	logging.warning(recent_files)
 	#Get the set of older files
-	older_files = [ x for x in not_started if x[1][:8] < two_weeks_ago ]
+	older_files = [ x for x in not_started if x[1][:8] < three_weeks_ago ]
 	#Sort the recent files by date(reversed)
 	recent_files = sorted(recent_files, key=itemgetter(1), reverse=True)
 	#Sort the older files, by priority and then date(reversed)
