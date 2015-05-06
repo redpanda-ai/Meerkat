@@ -155,12 +155,13 @@ def get_files_in_progress(params):
 		#Fill slots from list of files that are 'not_started'
 
 		#Add the files in progress
-		for i in range(remaining_slots):
-			if (("not_started" in params) and (params["not_started"])):
-				my_list = params["not_started"][:]
-				item = my_list.pop()
-				panel_name, panel_file = item[0:2]
-				params["in_progress"].append((panel_name, panel_file, params[panel_name]))
+		#for i in range(remaining_slots):
+		#	if (("not_started" in params) and (params["not_started"])):
+				#my_list = params["not_started"][:]
+				#item = my_list.pop()
+		#		item = params["not_started"].pop()
+		#		panel_name, panel_file = item[0:2]
+		#		params["in_progress"].append((panel_name, panel_file, params[panel_name]))
 
 	#write_local_report(params)
 
