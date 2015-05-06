@@ -1,0 +1,362 @@
+{
+	"local_report_file" : "/var/www/html/meerkat/file_daemon_status.txt",
+	"reprocess" : false,
+	"launchpad" : {
+		"instance_ips": [
+			"172.31.16.208",
+			"172.31.16.209",
+			"172.31.16.210",
+			"172.31.25.112"
+		],
+		"per_instance_clients" : 12,
+		"key_filename" : "/root/.ssh/jkey.pem",
+		"username": "root",
+		"producer": "/root/git/Meerkat/meerkat/file_producer.py",
+		"producer_hash": "DELETE_ME_2"
+	},
+	"err_location": "yodleeprivate/panels/meerkat_error/",
+	"location_pairs": [
+		{
+			"name": "jkey_test_bank",
+			"src_location": "yodleeprivate/panels/meerkat_input/jkey_test/bank/",
+			"dst_location": "yodleeprivate/panels/meerkat_output/jkey_test/bank/"
+		},
+		{
+			"name": "gpanel_1m_bank",
+			"src_location": "yodleeprivate/panels/meerkat_input/gpanel_1m/bank/",
+			"dst_location": "yodleeprivate/panels/meerkat_output/gpanel_1m/bank/"
+		},
+		{
+			"name": "gpanel_1m_card",
+			"src_location": "yodleeprivate/panels/meerkat_input/gpanel_1m/card/",
+			"dst_location": "yodleeprivate/panels/meerkat_output/gpanel_1m/card/"
+		},
+		{
+			"name": "gpanel3_bank",
+			"src_location": "yodleeprivate/panels/meerkat_input/gpanel3/bank/",
+			"dst_location": "yodleeprivate/panels/meerkat_output/gpanel3/bank/"
+		},
+		{
+			"name": "gpanel3_card",
+			"src_location": "yodleeprivate/panels/meerkat_input/gpanel3/card/",
+			"dst_location": "yodleeprivate/panels/meerkat_output/gpanel3/card/"
+		},
+		{
+			"name": "ct_version2_bank",
+			"src_location": "yodleeprivate/panels/meerkat_input/ct_version2/bank/",
+			"dst_location": "yodleeprivate/panels/meerkat_output/ct_version2/bank/"
+		},
+		{
+			"name": "ct_version2_card",
+			"src_location": "yodleeprivate/panels/meerkat_input/ct_version2/card/",
+			"dst_location": "yodleeprivate/panels/meerkat_output/ct_version2/card/"
+		},
+		{
+			"name": "gpanel2_bank",
+			"src_location": "yodleeprivate/panels/meerkat_input/gpanel2/bank/",
+			"dst_location": "yodleeprivate/panels/meerkat_output/gpanel2/bank/"
+		},
+		{
+			"name": "gpanel2_card",
+			"src_location": "yodleeprivate/panels/meerkat_input/gpanel2/card/",
+			"dst_location": "yodleeprivate/panels/meerkat_output/gpanel2/card/"
+		},
+		{
+			"name": "yic2_bank",
+			"src_location": "yodleeprivate/panels/meerkat_input/yic2/bank/",
+			"dst_location": "yodleeprivate/panels/meerkat_output/yic2/bank/"
+		},
+		{
+			"name": "yic2_card",
+			"src_location": "yodleeprivate/panels/meerkat_input/yic2/card/",
+			"dst_location": "yodleeprivate/panels/meerkat_output/yic2/card/"
+		},
+		{
+			"name": "Cpanel_bank",
+			"src_location": "yodleeprivate/panels/meerkat_input/Cpanel/bank/",
+			"dst_location": "yodleeprivate/panels/meerkat_output/Cpanel/bank/"
+		},
+		{
+			"name": "Cpanel_card",
+			"src_location": "yodleeprivate/panels/meerkat_input/Cpanel/card/",
+			"dst_location": "yodleeprivate/panels/meerkat_output/Cpanel/card/"
+		},
+		{
+			"name": "gpanel_enhancedCT_bank",
+			"src_location": "yodleeprivate/ctprocessed/gpanel_enhancedCT/bank/",
+			"dst_location": "yodleeprivate/panels/meerkat_output/gpanel_enhancedCT/bank/"
+		},
+		{
+			"name": "gpanel_enhancedCT_card",
+			"src_location": "yodleeprivate/ctprocessed/gpanel_enhancedCT/card/",
+			"dst_location": "yodleeprivate/panels/meerkat_output/gpanel_enhancedCT/card/"
+		}
+	],
+	"producer_options" : {
+		"producer_default" : {
+			"input": {
+				"delimiter": "|",
+				"encoding": "utf-8"
+			},
+			"output": {
+				"delimiter": "|",
+				"encoding": "utf-8"
+			},
+			"local_files" : {
+				"src_path": "/data/0/input/",
+				"dst_path": "/data/1/output/",
+				"err_path": "/data/1/error/"
+			},
+			"unified_header" : [
+				["used_in_header", "origin",    "name_in_meerkat",               "name_in_origin"],
+				[true,             "input",     "UNIQUE_MEM_ID",                 "UNIQUE_MEM_ID"],
+				[true,             "input",     "UNIQUE___BLANK_ACCOUNT_ID",     "UNIQUE_ACCOUNT_ID"],
+				[true,             "input",     "UNIQUE___BLANK_TRANSACTION_ID", "UNIQUE_TRANSACTION_ID"],
+				[true,             "input",     "MEM_ID",                        "MEM_ID"],
+				[true,             "input",     "__BLANK_ACCOUNT_ID",            "__BLANK_ACCOUNT_ID"],
+				[true,             "input",     "__BLANK_TRANSACTION_ID",        "__BLANK_TRANSACTION_ID"],
+				[true,             "input",     "COBRAND_ID",                    "COBRAND_ID"],
+				[true,             "input",     "SUM_INFO_ID",                   "SUM_INFO_ID"],
+				[true,             "input",     "AMOUNT",                        "AMOUNT"],
+				[true,             "input",     "CURRENCY_ID",                   "CURRENCY_ID"],
+				[true,             "input",     "DESCRIPTION",                   "DESCRIPTION"],
+				[true,             "input",     "TRANSACTION_DATE",              "TRANSACTION_DATE"],
+				[true,             "input",     "POST_DATE",                     "POST_DATE"],
+				[true,             "input",     "TRANSACTION_BASE_TYPE",         "TYPE"],
+				[true,             "input",     "TRANSACTION_CATEGORY_ID",       "TRANSACTION_CATEGORY_ID"],
+				[true,             "input",     "TRANSACTION_CATEGORY_NAME",     "TRANSACTION_CATEGORY_NAME"],
+				[true,             "search",    "MERCHANT_NAME",                 "name"],
+				[true,             "search",    "STORE_ID",                      "internal_store_number"],
+				[true,             "search",    "FACTUAL_CATEGORY",              "category_labels"],
+				[true,             "search",    "STREET",                        "address"],
+				[true,             "search",    "CITY",                          "locality"],
+				[true,             "search",    "STATE",                         "region"],
+				[true,             "search",    "ZIP_CODE",                      "postcode"],
+				[true,             "search",    "WEBSITE",                       "website"],
+				[true,             "search",    "PHONE_NUMBER",                  "tel"],
+				[true,             "search",    "FAX_NUMBER",                    "fax"],
+				[true,             "search",    "CHAIN_NAME",                    "chain_name"],
+				[true,             "search",    "LATITUDE",                      "latitude"],
+				[true,             "search",    "LONGITUDE",                     "longitude"],
+				[true,             "search",    "NEIGHBOURHOOD",                 "neighborhood"],
+				[true,             "search",    "TRANSACTION_ORIGIN",            "TRANSACTION_ORIGIN"],
+				[true,             "search",    "CONFIDENCE_SCORE",              "z_score_delta"],
+				[true,             "search",    "FACTUAL_ID",                    "factual_id"],
+				[true,             "input",     "FILE_CREATED_DATE",             "FILE_CREATED_DATE"],
+				[false,            "input",     "DESCRIPTION_UNMASKED",          "DESCRIPTION_UNMASKED"],
+				[false,            "input",     "GOOD_DESCRIPTION",              "MERCHANT_NAME"]
+			],
+			"hyperparameters": "config/hyperparameters/default.json",
+			"concurrency": 20,
+			"elasticsearch": {
+				"cluster_nodes": [
+					"172.31.17.134", "172.31.33.226", "172.31.9.6", "172.31.37.99"
+				],
+				"index": "factual_index",
+				"type": "factual_type"
+			},
+			"logging": {
+				"console": true,
+				"formatter": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+				"level": "warning",
+				"path": "logs/foo.log"
+			}
+		},
+		"gpanel3_bank" : {
+			"concurrency" : 19,
+			"logging": {
+				"console": true,
+				"formatter": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+				"level": "warning",
+				"path": "logs/gpanel3_bank.log"
+			},
+			"unified_header" : [
+				["used_in_header", "origin",    "name_in_meerkat",               "name_in_origin"],
+				[true,             "input",     "UNIQUE_MEM_ID",                 "UNIQUE_MEM_ID"],
+				[true,             "input",     "UNIQUE___BLANK_ACCOUNT_ID",     "UNIQUE_ACCOUNT_ID"],
+				[true,             "input",     "UNIQUE___BLANK_TRANSACTION_ID", "UNIQUE_TRANSACTION_ID"],
+				[true,             "input",     "MEM_ID",                        "MEM_ID"],
+				[true,             "input",     "__BLANK_ACCOUNT_ID",            "__BLANK_ACCOUNT_ID"],
+				[true,             "input",     "__BLANK_TRANSACTION_ID",        "__BLANK_TRANSACTION_ID"],
+				[true,             "input",     "COBRAND_ID",                    "COBRAND_ID"],
+				[true,             "input",     "SUM_INFO_ID",                   "SUM_INFO_ID"],
+				[true,             "input",     "AMOUNT",                        "AMOUNT"],
+				[true,             "input",     "CURRENCY_ID",                   "CURRENCY_ID"],
+				[true,             "input",     "DESCRIPTION",                   "DESCRIPTION"],
+				[true,             "input",     "TRANSACTION_DATE",              "TRANSACTION_DATE"],
+				[true,             "input",     "POST_DATE",                     "POST_DATE"],
+				[true,             "input",     "TRANSACTION_BASE_TYPE",         "TYPE"],
+				[true,             "input",     "TRANSACTION_CATEGORY_ID",       "TRANSACTION_CATEGORY_ID"],
+				[true,             "input",     "TRANSACTION_CATEGORY_NAME",     "TRANSACTION_CATEGORY_NAME"],
+				[true,             "search",    "MERCHANT_NAME",                 "name"],
+				[true,             "search",    "STORE_ID",                      "internal_store_number"],
+				[true,             "search",    "FACTUAL_CATEGORY",              "category_labels"],
+				[true,             "search",    "STREET",                        "address"],
+				[true,             "search",    "CITY",                          "locality"],
+				[true,             "search",    "STATE",                         "region"],
+				[true,             "search",    "ZIP_CODE",                      "postcode"],
+				[true,             "search",    "WEBSITE",                       "website"],
+				[true,             "search",    "PHONE_NUMBER",                  "tel"],
+				[true,             "search",    "FAX_NUMBER",                    "fax"],
+				[true,             "search",    "CHAIN_NAME",                    "chain_name"],
+				[true,             "search",    "LATITUDE",                      "latitude"],
+				[true,             "search",    "LONGITUDE",                     "longitude"],
+				[true,             "search",    "NEIGHBOURHOOD",                 "neighborhood"],
+				[true,             "search",    "TRANSACTION_ORIGIN",            "TRANSACTION_ORIGIN"],
+				[true,             "search",    "CONFIDENCE_SCORE",              "z_score_delta"],
+				[true,             "search",    "FACTUAL_ID",                    "factual_id"],
+				[true,             "input",     "FILE_CREATED_DATE",             "FILE_CREATED_DATE"],
+				[false,            "input",     "DESCRIPTION_UNMASKED",          "DESCRIPTION_UNMASKED"],
+				[false,            "input",     "GOOD_DESCRIPTION",              "MERCHANT_NAME"],
+				[true,             "input",     "TRANSACTION_SRC_ELEMENT_ID",    "TRANSACTION_SRC_ELEMENT_ID"]
+			]
+		},
+		"gpanel3_card" : {
+			"concurrency" : 19,
+			"logging": {
+				"console": true,
+				"formatter": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+				"level": "warning",
+				"path": "logs/gpanel3_card.log"
+			},
+			"unified_header" : [
+				["used_in_header", "origin",    "name_in_meerkat",               "name_in_origin"],
+				[true,             "input",     "UNIQUE_MEM_ID",                 "UNIQUE_MEM_ID"],
+				[true,             "input",     "UNIQUE___BLANK_ACCOUNT_ID",     "UNIQUE_ACCOUNT_ID"],
+				[true,             "input",     "UNIQUE___BLANK_TRANSACTION_ID", "UNIQUE_TRANSACTION_ID"],
+				[true,             "input",     "MEM_ID",                        "MEM_ID"],
+				[true,             "input",     "__BLANK_ACCOUNT_ID",            "__BLANK_ACCOUNT_ID"],
+				[true,             "input",     "__BLANK_TRANSACTION_ID",        "__BLANK_TRANSACTION_ID"],
+				[true,             "input",     "COBRAND_ID",                    "COBRAND_ID"],
+				[true,             "input",     "SUM_INFO_ID",                   "SUM_INFO_ID"],
+				[true,             "input",     "AMOUNT",                        "AMOUNT"],
+				[true,             "input",     "CURRENCY_ID",                   "CURRENCY_ID"],
+				[true,             "input",     "DESCRIPTION",                   "DESCRIPTION"],
+				[true,             "input",     "TRANSACTION_DATE",              "TRANSACTION_DATE"],
+				[true,             "input",     "POST_DATE",                     "POST_DATE"],
+				[true,             "input",     "TRANSACTION_BASE_TYPE",         "TYPE"],
+				[true,             "input",     "TRANSACTION_CATEGORY_ID",       "TRANSACTION_CATEGORY_ID"],
+				[true,             "input",     "TRANSACTION_CATEGORY_NAME",     "TRANSACTION_CATEGORY_NAME"],
+				[true,             "search",    "MERCHANT_NAME",                 "name"],
+				[true,             "search",    "STORE_ID",                      "internal_store_number"],
+				[true,             "search",    "FACTUAL_CATEGORY",              "category_labels"],
+				[true,             "search",    "STREET",                        "address"],
+				[true,             "search",    "CITY",                          "locality"],
+				[true,             "search",    "STATE",                         "region"],
+				[true,             "search",    "ZIP_CODE",                      "postcode"],
+				[true,             "search",    "WEBSITE",                       "website"],
+				[true,             "search",    "PHONE_NUMBER",                  "tel"],
+				[true,             "search",    "FAX_NUMBER",                    "fax"],
+				[true,             "search",    "CHAIN_NAME",                    "chain_name"],
+				[true,             "search",    "LATITUDE",                      "latitude"],
+				[true,             "search",    "LONGITUDE",                     "longitude"],
+				[true,             "search",    "NEIGHBOURHOOD",                 "neighborhood"],
+				[true,             "search",    "TRANSACTION_ORIGIN",            "TRANSACTION_ORIGIN"],
+				[true,             "search",    "CONFIDENCE_SCORE",              "z_score_delta"],
+				[true,             "search",    "FACTUAL_ID",                    "factual_id"],
+				[true,             "input",     "FILE_CREATED_DATE",             "FILE_CREATED_DATE"],
+				[false,            "input",     "DESCRIPTION_UNMASKED",          "DESCRIPTION_UNMASKED"],
+				[false,            "input",     "GOOD_DESCRIPTION",              "MERCHANT_NAME"],
+				[true,             "input",     "TRANSACTION_SRC_ELEMENT_ID",    "TRANSACTION_SRC_ELEMENT_ID"]
+			]
+		},
+		"gpanel2_bank" : {
+			"concurrency" : 19,
+			"logging": {
+				"console": true,
+				"formatter": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+				"level": "warning",
+				"path": "logs/gpanel2_bank.log"
+			},
+			"unified_header" : [
+				["used_in_header", "origin",    "name_in_meerkat",               "name_in_origin"],
+				[true,             "input",     "UNIQUE_MEM_ID",                 "UNIQUE_MEM_ID"],
+				[true,             "input",     "UNIQUE___BLANK_ACCOUNT_ID",     "UNIQUE_ACCOUNT_ID"],
+				[true,             "input",     "UNIQUE___BLANK_TRANSACTION_ID", "UNIQUE_TRANSACTION_ID"],
+				[true,             "input",     "MEM_ID",                        "MEM_ID"],
+				[true,             "input",     "__BLANK_ACCOUNT_ID",            "__BLANK_ACCOUNT_ID"],
+				[true,             "input",     "__BLANK_TRANSACTION_ID",        "__BLANK_TRANSACTION_ID"],
+				[true,             "input",     "COBRAND_ID",                    "COBRAND_ID"],
+				[true,             "input",     "SUM_INFO_ID",                   "SUM_INFO_ID"],
+				[true,             "input",     "AMOUNT",                        "AMOUNT"],
+				[true,             "input",     "CURRENCY_ID",                   "CURRENCY_ID"],
+				[true,             "input",     "DESCRIPTION",                   "DESCRIPTION"],
+				[true,             "input",     "TRANSACTION_DATE",              "TRANSACTION_DATE"],
+				[true,             "input",     "POST_DATE",                     "POST_DATE"],
+				[true,             "input",     "TRANSACTION_BASE_TYPE",         "TYPE"],
+				[true,             "input",     "TRANSACTION_CATEGORY_ID",       "TRANSACTION_CATEGORY_ID"],
+				[true,             "input",     "TRANSACTION_CATEGORY_NAME",     "TRANSACTION_CATEGORY_NAME"],
+				[true,             "search",    "MERCHANT_NAME",                 "name"],
+				[true,             "search",    "STORE_ID",                      "internal_store_number"],
+				[true,             "search",    "FACTUAL_CATEGORY",              "category_labels"],
+				[true,             "search",    "STREET",                        "address"],
+				[true,             "search",    "CITY",                          "locality"],
+				[true,             "search",    "STATE",                         "region"],
+				[true,             "search",    "ZIP_CODE",                      "postcode"],
+				[true,             "search",    "WEBSITE",                       "website"],
+				[true,             "search",    "PHONE_NUMBER",                  "tel"],
+				[true,             "search",    "FAX_NUMBER",                    "fax"],
+				[true,             "search",    "CHAIN_NAME",                    "chain_name"],
+				[true,             "search",    "LATITUDE",                      "latitude"],
+				[true,             "search",    "LONGITUDE",                     "longitude"],
+				[true,             "search",    "NEIGHBOURHOOD",                 "neighborhood"],
+				[true,             "search",    "TRANSACTION_ORIGIN",            "TRANSACTION_ORIGIN"],
+				[true,             "search",    "CONFIDENCE_SCORE",              "z_score_delta"],
+				[true,             "search",    "FACTUAL_ID",                    "factual_id"],
+				[true,             "input",     "FILE_CREATED_DATE",             "FILE_CREATED_DATE"],
+				[false,            "input",     "DESCRIPTION_UNMASKED",          "DESCRIPTION_UNMASKED"],
+				[false,            "input",     "GOOD_DESCRIPTION",              "MERCHANT_NAME"],
+				[true,             "input",     "TRANSACTION_SRC_ELEMENT_ID",    "TRANSACTION_SRC_ELEMENT_ID"]
+			]
+		},
+		"gpanel2_card" : {
+			"concurrency" : 19,
+			"logging": {
+				"console": true,
+				"formatter": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+				"level": "warning",
+				"path": "logs/gpanel2_card.log"
+			},
+			"unified_header" : [
+				["used_in_header", "origin",    "name_in_meerkat",               "name_in_origin"],
+				[true,             "input",     "UNIQUE_MEM_ID",                 "UNIQUE_MEM_ID"],
+				[true,             "input",     "UNIQUE___BLANK_ACCOUNT_ID",     "UNIQUE_ACCOUNT_ID"],
+				[true,             "input",     "UNIQUE___BLANK_TRANSACTION_ID", "UNIQUE_TRANSACTION_ID"],
+				[true,             "input",     "MEM_ID",                        "MEM_ID"],
+				[true,             "input",     "__BLANK_ACCOUNT_ID",            "__BLANK_ACCOUNT_ID"],
+				[true,             "input",     "__BLANK_TRANSACTION_ID",        "__BLANK_TRANSACTION_ID"],
+				[true,             "input",     "COBRAND_ID",                    "COBRAND_ID"],
+				[true,             "input",     "SUM_INFO_ID",                   "SUM_INFO_ID"],
+				[true,             "input",     "AMOUNT",                        "AMOUNT"],
+				[true,             "input",     "CURRENCY_ID",                   "CURRENCY_ID"],
+				[true,             "input",     "DESCRIPTION",                   "DESCRIPTION"],
+				[true,             "input",     "TRANSACTION_DATE",              "TRANSACTION_DATE"],
+				[true,             "input",     "POST_DATE",                     "POST_DATE"],
+				[true,             "input",     "TRANSACTION_BASE_TYPE",         "TYPE"],
+				[true,             "input",     "TRANSACTION_CATEGORY_ID",       "TRANSACTION_CATEGORY_ID"],
+				[true,             "input",     "TRANSACTION_CATEGORY_NAME",     "TRANSACTION_CATEGORY_NAME"],
+				[true,             "search",    "MERCHANT_NAME",                 "name"],
+				[true,             "search",    "STORE_ID",                      "internal_store_number"],
+				[true,             "search",    "FACTUAL_CATEGORY",              "category_labels"],
+				[true,             "search",    "STREET",                        "address"],
+				[true,             "search",    "CITY",                          "locality"],
+				[true,             "search",    "STATE",                         "region"],
+				[true,             "search",    "ZIP_CODE",                      "postcode"],
+				[true,             "search",    "WEBSITE",                       "website"],
+				[true,             "search",    "PHONE_NUMBER",                  "tel"],
+				[true,             "search",    "FAX_NUMBER",                    "fax"],
+				[true,             "search",    "CHAIN_NAME",                    "chain_name"],
+				[true,             "search",    "LATITUDE",                      "latitude"],
+				[true,             "search",    "LONGITUDE",                     "longitude"],
+				[true,             "search",    "NEIGHBOURHOOD",                 "neighborhood"],
+				[true,             "search",    "TRANSACTION_ORIGIN",            "TRANSACTION_ORIGIN"],
+				[true,             "search",    "CONFIDENCE_SCORE",              "z_score_delta"],
+				[true,             "search",    "FACTUAL_ID",                    "factual_id"],
+				[true,             "input",     "FILE_CREATED_DATE",             "FILE_CREATED_DATE"],
+				[false,            "input",     "DESCRIPTION_UNMASKED",          "DESCRIPTION_UNMASKED"],
+				[false,            "input",     "GOOD_DESCRIPTION",              "MERCHANT_NAME"],
+				[true,             "input",     "TRANSACTION_SRC_ELEMENT_ID",    "TRANSACTION_SRC_ELEMENT_ID"]
+			]
+		}
+	}
+}

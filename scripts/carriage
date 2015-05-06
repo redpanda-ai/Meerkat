@@ -1,0 +1,11 @@
+#!/bin/bash
+
+if [ "$#" -ne 3 ]; then
+	echo "You must provide 3 arguments: panel_name, panel_file, and log_location"
+	exit 1
+fi
+
+cd /root/git/Meerkat
+time python3.3 -u -m meerkat.file_producer ${1} ${2} > ${3} 2>&1 &
+#time nohup python3.3 -u -m meerkat config/${3}.json > ${3}.out 2>&1&
+
