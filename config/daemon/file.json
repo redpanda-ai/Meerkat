@@ -6,9 +6,10 @@
 			"172.31.16.208",
 			"172.31.16.209",
 			"172.31.16.210",
-			"172.31.25.112"
+			"172.31.25.112",
+			"172.31.17.134", "172.31.33.226", "172.31.9.6", "172.31.37.99"
 		],
-		"per_instance_clients" : 12,
+		"per_instance_clients" : 9,
 		"key_filename" : "/root/.ssh/jkey.pem",
 		"username": "root",
 		"producer": "/root/git/Meerkat/meerkat/file_producer.py",

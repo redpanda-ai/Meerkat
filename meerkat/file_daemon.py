@@ -282,16 +282,17 @@ def scan_s3_location(params, location):
 	for k in bucket.list(prefix=directory):
 		if filename_pattern.search(k.name):
 			file_name = filename_pattern.search(k.name).group(2)
-			result[file_name] = (bucket_name, directory, k.name, k.last_modified)
+			result[file_name] = (bucket_name, directory, k.name, k.last_modified, k.size)
 	return result
 
 def update_pending_files(params, name, src_dict, dst_dict, pair_priority):
 	"""Update the dictionary of files that need to be processed."""
 	# Look at the files at the S3 destination directory
 	dst_keys = dst_dict.keys()
+	src_keys = src_dict.keys()
 	# Find files not in destination S3 directory
 	not_in_dst = [(name, k, pair_priority)
-		for k in src_dict.keys()
+		for k in src_keys
 		if k not in dst_keys]
 	# Reprocess newer files
 	if params["reprocess"]:
@@ -300,9 +301,35 @@ def update_pending_files(params, name, src_dict, dst_dict, pair_priority):
 			if k in dst_keys and src_dict[k][3] > dst_dict[k][3]]
 	else:
 		newer_src = []
+	# Add files of the wrong size
+	threshold, min_size = 0.7, 5000000
+	too_big = [(name, k, pair_priority)
+		for k in src_keys
+		if k in dst_keys 
+			and float(src_dict[k][4]) > min_size
+			and float(src_dict[k][4]) / float(dst_dict[k][4]) < threshold ]
+	too_small = [(name, k, pair_priority)
+		for k in src_keys
+		if k in dst_keys
+			and float(src_dict[k][4]) > min_size
+			and float(dst_dict[k][4]) / float(src_dict[k][4]) < threshold ]
+	#log information
+	logging.info("Too big:")
+	for item in too_big:
+		logging.info("{0} size is {1}".format(item[0], src_dict[item[1]]))
+		logging.info(item)
+	logging.info("Too small:")
+	for item in too_small:
+		logging.info("{0} size is {1}".format(item[0], src_dict[item[1]]))
+		logging.info(item)
+
 	# Combine both lists
 	total_list = not_in_dst
 	total_list.extend(newer_src)
+	#FIXME Disabled re-process files of a weird size
+	total_list.extend(too_big)
+	total_list.extend(too_small)
+
 	# Ensure that params contains a 'not_finished' key
 	if "not_finished" not in params:
 		params["not_finished"] = []

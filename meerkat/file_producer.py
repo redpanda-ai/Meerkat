@@ -31,6 +31,8 @@ import sys
 from boto.s3.connection import Key, Location
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError, SchemaError
+from plumbum import local
+
 
 from meerkat.custom_exceptions import InvalidArguments
 from meerkat.file_consumer import FileConsumer
@@ -197,6 +199,12 @@ def set_custom_producer_options(params):
 			params["my_producer_options"][key] = overrides[key]
 	del params["producer_options"]
 
+def get_host_ip(params):
+	params["report"] = {}
+	command = local["hostname"]["-I"]
+	params["report"]["host_ip"] = command().split(" ")[0]
+	logging.warning("Host IP is {0}.".format(params["report"]["host_ip"]))
+
 def initialize():
 	"""Validates the command line arguments."""
 	input_file, params = None, None
@@ -233,6 +241,7 @@ def initialize():
 	for field, _ in my_options["field_mappings"]:
 		params["output"]["results"]["fields"].append(field)
 	params["mode"] = "production"
+	get_host_ip(params)
 	return params
 
 def pull_src_file_from_s3(params):
@@ -312,7 +321,8 @@ def process_single_input_file(params):
 	dst_file_name = src_file_name
 	local_src_file = params["local_src_path"] + src_file_name
 	# Get a pandas dataframe ready
-	reader = pd.read_csv(local_src_file, na_filter=False, chunksize=5000,
+	# FIXME trying to capture exception
+	reader = pd.read_csv(local_src_file, na_filter=False, chunksize=1000,
 		quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|',
 		error_bad_lines=False)
 	logging.warning("Dataframe reader loaded.")
@@ -331,14 +341,27 @@ def process_single_input_file(params):
 	#Remove local gzipped dst file
 	safely_remove_file(params["local_gzipped_dst_file"])
 	#Publish to the SNS topic
-	time_delta = datetime.datetime.now() - START_TIME
-	message = "{0} successfully processed {1} in {2}".format(dst_file_name,
-		params["line_count"], time_delta)
-	print(message)
-	post_SNS(message)
+	report = [
+		("host_ip", params["report"]["host_ip"]),
+		("transactions_processed", params["line_count"]),
+		("error_count", params["error_count"]),
+		("file_name", dst_file_name),
+		("time_taken", datetime.datetime.now() - START_TIME)
+	]
+	report_message = get_report_message(report, params["errors"])
+	logging.warning(report_message)
+	post_SNS(report_message)
 	# Remove
 	push_file_to_s3(params, "err")
 	sys.exit()
+
+def get_report_message(report, errors):
+	message = ""
+	for name, value in report:
+		message += "{0}: {1}\n".format(name, value)
+	for item in errors:
+		message += item + "\n"
+	return message
 
 def run_from_command_line():
 	"""Runs these commands if the module is invoked from the command line"""
@@ -415,18 +438,11 @@ def flush_errors(params, errors, dst_file_name, line_count):
 
 def run_chunk(params, *argv):
 	"""Run a single chunk from a dataframe_reader"""
-	chunk, line_count, my_stderr, old_stderr = argv[:4]
+	chunk, line_count, chunk_stderr, old_stderr = argv[:4]
 	hyperparameters, cities, header, dst_file_name = argv[4:8]
 	first_chunk, errors = argv[8:10]
-	my_options = params["my_producer_options"]
-	dst_local_path = my_options["local_files"]["dst_path"]
 	# Save Errors
 	line_count += chunk.shape[0]
-	error_chunk = str.strip(my_stderr.getvalue())
-	if len(error_chunk) > 0:
-		errors += error_chunk.split('\n')
-	sys.stderr = old_stderr
-	# Clean Data
 	chunk = clean_dataframe(params, chunk)
 	# Load into Queue for Processing
 	desc_queue, non_physical = convert_dataframe_to_queue(params, chunk)
@@ -441,6 +457,8 @@ def run_chunk(params, *argv):
 	# Combine Split Dataframes
 	chunk = pd.concat([physical, non_physical])
 	# Write
+	my_options = params["my_producer_options"]
+	dst_local_path = my_options["local_files"]["dst_path"]
 	if first_chunk:
 		file_to_remove = dst_local_path + dst_file_name
 		safely_remove_file(file_to_remove)
@@ -452,8 +470,8 @@ def run_chunk(params, *argv):
 		chunk.to_csv(dst_local_path + dst_file_name, header=False, columns=header,\
 			sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
 	# Handle Errors
-	sys.stderr = my_stderr = io.StringIO()
-	params["line_count"] = line_count
+	#sys.stderr = chunk_stderr = io.StringIO()
+	#params["line_count"] = line_count
 	return line_count, errors, first_chunk
 
 def run_panel(params, dataframe_reader, dst_file_name):
@@ -468,18 +486,27 @@ def run_panel(params, dataframe_reader, dst_file_name):
 	first_chunk = True
 	# Capture Errors
 	errors = []
+	params["error_count"] = 0
+	params["line_count"] = 0
 	# Save stderr context
 	old_stderr = sys.stderr
-	sys.stderr = my_stderr = io.StringIO()
+	# Set temporary context to capture error lines
+	sys.stderr = chunk_stderr = io.StringIO()
 	# Iterate through each chunk in the dataframe_reader
 	for chunk in dataframe_reader:
-		args = (chunk, line_count, my_stderr, old_stderr,
+		args = (chunk, line_count, chunk_stderr, old_stderr,
 			hyperparameters, cities, header, dst_file_name, first_chunk,
 			errors)
 		line_count, errors, first_chunk = run_chunk(params, *args)
+		#chunk_stderr = None
 		logging.warning("{0} Lines processed.".format(line_count))
+	errors = str.strip(chunk_stderr.getvalue()).split("Skipping")
+	params["errors"] = errors
+	params["error_count"] = len(errors)
+
 	#Restore stderr context
 	sys.stderr = old_stderr
+	params["line_count"] = line_count
 	# Flush errors to a file
 	flush_errors(params, errors, dst_file_name, line_count)
 	return dst_local_path + dst_file_name
