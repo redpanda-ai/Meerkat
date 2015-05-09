@@ -32,7 +32,7 @@ from boto.s3.connection import Key, Location
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError, SchemaError
 from plumbum import local
-
+from plumbum.cmd import grep
 
 from meerkat.custom_exceptions import InvalidArguments
 from meerkat.file_consumer import FileConsumer
@@ -341,12 +341,15 @@ def process_single_input_file(params):
 	#Remove local gzipped dst file
 	safely_remove_file(params["local_gzipped_dst_file"])
 	#Publish to the SNS topic
+	end_time = datetime.datetime.now()
 	report = [
 		("host_ip", params["report"]["host_ip"]),
 		("transactions_processed", params["line_count"]),
 		("error_count", params["error_count"]),
 		("file_name", dst_file_name),
-		("time_taken", datetime.datetime.now() - START_TIME)
+		("start_time", START_TIME),
+		("end_time", end_time),
+		("time_taken", end_time - START_TIME)
 	]
 	report_message = get_report_message(report, params["errors"])
 	logging.warning(report_message)
@@ -503,6 +506,8 @@ def run_panel(params, dataframe_reader, dst_file_name):
 	errors = str.strip(chunk_stderr.getvalue()).split("Skipping")
 	params["errors"] = errors
 	params["error_count"] = len(errors)
+	if params["error_count"] >= 2:
+		params["error_count"] -= 1
 
 	#Restore stderr context
 	sys.stderr = old_stderr
@@ -541,10 +546,28 @@ def write_error_file(params, error_msg):
 	with gzip.open(params["local_gzipped_err_file"], "ab") as gzipped_output:
 		gzipped_output.write(bytes(error_msg + "\n", 'UTF-8'))
 
+def abort_if_already_running():
+	pid = str(os.getpid())
+	cmd = local["ps"]["-ef"] | grep["python3.3"] | grep[sys.argv[1]] | grep[sys.argv[2]]
+	cmd_result = cmd(retcode=None)
+	cmd_split = cmd_result.split("\n")
+	print("pid: {0}".format(pid))
+	#print("cmd_result:\n{0}".format(cmd_result))
+	for line in cmd_split:
+		splits = line.split()
+		print(splits)
+		if len(splits) > 1:
+			if splits[1] == pid:
+				print("Found my own process.")
+			else:
+				print("Found an earlier process, aborting.")
+				sys.exit()
+
 START_TIME = datetime.datetime.now()
 
 if __name__ == "__main__":
 	logging.basicConfig(format='%(asctime)s %(message)s',
 		filename='/data/1/log/' + sys.argv[1] + '.' + sys.argv[2] + '.log', level=logging.WARNING)
 	logging.warning("file_producer module activated.")
+	abort_if_already_running()
 	run_from_command_line()
