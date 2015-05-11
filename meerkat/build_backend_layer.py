@@ -370,10 +370,12 @@ def poll_pending_instances(reservations, instance_count, params):
 	print("Reservations {0}".format(reservations))
 	print("Waiting for instances to start...")
 	count_runners = 0
+	running = {}
 	while count_runners < instance_count:
 		instances = reservations.instances
 		count_runners = 0
 		max_attempts = 6
+		instance_count = 0
 		for i in instances:
 			private_ip_address = i.private_ip_address
 			instance_id = i.id
@@ -396,7 +398,11 @@ def poll_pending_instances(reservations, instance_count, params):
 				instance_id, state))
 			#Increment count if running
 			if state == "running":
+				if instance_count not in running:
+					i.add_tag('Name', params["name"] + " " + str(instance_count))
+					running[instance_count] = "yes"
 				count_runners += 1
+			instance_count += 1
 
 		pending_instances = instance_count - count_runners
 		if count_runners < instance_count:
