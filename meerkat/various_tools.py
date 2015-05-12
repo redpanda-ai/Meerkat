@@ -52,61 +52,6 @@ def write_dict_list(dict_list, file_name, encoding="utf-8", delimiter="|",\
 		dict_w.writeheader()
 		dict_w.writerows(dict_list)
 
-def get_panel_header(container):
-	"""Return an ordered consistent header for panels"""
-	# pylint: disable=bad-continuation
-	header = ["UNIQUE_MEM_ID", "UNIQUE___BLANK_ACCOUNT_ID",
-		"UNIQUE___BLANK_TRANSACTION_ID", "MEM_ID", "__BLANK_ACCOUNT_ID",
-		"__BLANK_TRANSACTION_ID", "COBRAND_ID", "SUM_INFO_ID", "AMOUNT",
-		"CURRENCY_ID", "DESCRIPTION", "TRANSACTION_DATE", "POST_DATE",
-		"TRANSACTION_BASE_TYPE", "TRANSACTION_CATEGORY_ID",
-		"TRANSACTION_CATEGORY_NAME", "MERCHANT_NAME", "STORE_ID", "FACTUAL_CATEGORY",
-		"STREET", "CITY", "STATE", "ZIP_CODE", "WEBSITE", "PHONE_NUMBER",
-		"FAX_NUMBER", "CHAIN_NAME", "LATITUDE", "LONGITUDE", "NEIGHBOURHOOD",
-		"TRANSACTION_ORIGIN", "CONFIDENCE_SCORE", "FACTUAL_ID",
-		"FILE_CREATED_DATE", "DESCRIPTION_UNMASKED", "GOOD_DESCRIPTION"]
-	container = container.upper()
-	header = [x.replace("__BLANK", container) for x in header]
-	return header
-
-def get_yodlee_factual_map():
-	"""Return a map of factual attribute names to
-	yodlee attribute names"""
-	# pylint: disable=bad-continuation
-	return {
-		"factual_id" : "FACTUAL_ID",
-		"address" : "STREET",
-		"tel" : "PHONE_NUMBER",
-		"latitude" : "LATITUDE",
-		"longitude" : "LONGITUDE",
-		"postcode" : "ZIP_CODE",
-		"region" : "STATE",
-		"website" : "WEBSITE",
-		"locality" : "CITY",
-		"z_score_delta" : "CONFIDENCE_SCORE",
-		"category_labels" : "FACTUAL_CATEGORY",
-		"chain_name" : "CHAIN_NAME",
-		"neighborhood" : "NEIGHBOURHOOD",
-		"internal_store_number" : "STORE_ID",
-		"name" : "MERCHANT_NAME"}
-
-def get_column_map(container):
-	"""Fix old or erroneous column names"""
-	# pylint: disable=bad-continuation
-	return {
-		"UNIQUE_ACCOUNT_ID" : "UNIQUE_" + container.upper() + "_ACCOUNT_ID",
-		"UNIQUE_TRANSACTION_ID" : "UNIQUE_" + container.upper() + "_TRANSACTION_ID",
-		"TYPE" : "TRANSACTION_BASE_TYPE",
-		"MERCHANT_NAME" : "GOOD_DESCRIPTION"}
-
-def get_new_columns():
-	"""Return a list of new columns to add to a panel"""
-	# pylint: disable=bad-continuation
-	return ['STORE_ID', 'FACTUAL_CATEGORY', 'STREET', 'CITY', 'STATE',
-		'ZIP_CODE', 'WEBSITE', 'PHONE_NUMBER', 'FAX_NUMBER', 'CHAIN_NAME',
-		'LATITUDE', 'LONGITUDE', 'MERCHANT_NAME', 'NEIGHBOURHOOD',
-		'TRANSACTION_ORIGIN', 'CONFIDENCE_SCORE', 'FACTUAL_ID']
-
 def to_stdout(string, errors="replace"):
 	"""Converts a string to stdout compatible encoding"""
 
@@ -424,53 +369,6 @@ def synonyms(transaction):
 	text = pattern.sub(lambda m: rep[re.escape(m.group(0))], transaction)
 
 	return text.upper()
-
-def split_csv(filehandler, delimiter=',', row_limit=10000,\
-	output_name_template='output_%s.csv', output_path='.', keep_headers=True):
-	""" Adapted from Jordi Rivero:
-	https://gist.github.com/jrivero
-	Splits a CSV file into multiple pieces.
-
-	A quick bastardization of the Python CSV library.
-
-	Arguments:
-	`row_limit`: The number of rows you want in each output file.
-		10,000 by default.
-	`output_name_template`: A %s-style template for the numbered output files.
-	`output_path`: Where to stick the output files.
-	`keep_headers`: Whether or not to print the headers in each output file.
-
-	Example usage:
-		>> from various_tools import split_csv;
-		>> split_csv(open('/home/ben/input.csv', 'r')); """
-	reader = csv.reader(filehandler, delimiter=delimiter)
-	#Start at piece one
-	current_piece = 1
-	current_out_path = os.path.join(output_path,\
-		output_name_template % current_piece)
-	#Create a list of file pieces
-	file_list = [current_out_path]
-	current_out_writer = csv.writer(open(current_out_path, 'w',\
-		encoding="utf-8"), delimiter=delimiter)
-	current_limit = row_limit
-	if keep_headers:
-		headers = reader.__next__()
-		current_out_writer.writerow(headers)
-	#Split the file into pieces
-	for i, row in enumerate(reader):
-		if i + 1 > current_limit:
-			current_piece += 1
-			current_limit = row_limit * current_piece
-			current_out_path = os.path.join(output_path,\
-				output_name_template % current_piece)
-			file_list.append(current_out_path)
-			current_out_writer = csv.writer(open(current_out_path, 'w',\
-				encoding="utf-8"), delimiter=delimiter)
-			if keep_headers:
-				current_out_writer.writerow(headers)
-		current_out_writer.writerow(row)
-	#Return complete list of chunks
-	return file_list
 
 def merge_split_files(params, split_list):
 	"""Takes a split list and merges the files back together
