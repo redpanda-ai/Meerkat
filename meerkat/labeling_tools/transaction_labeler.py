@@ -33,7 +33,7 @@ import pandas as pd
 from boto.s3.connection import Key, Location
 
 from meerkat.various_tools import safe_print, safe_input, load_params
-from meerkat.producer import connect_to_S3
+from meerkat.file_producer import get_s3_connection
 
 class DummyFile(object):
     def write(self, x): pass
@@ -118,7 +118,7 @@ def run_from_command_line(cla):
 
 	# Connect to S3
 	with nostdout():
-		conn = connect_to_S3()
+		conn = get_s3_connection()
 		bucket = conn.get_bucket(params["S3"]["bucket_name"], Location.USWest2)
 
 	# Collect Labeler Details

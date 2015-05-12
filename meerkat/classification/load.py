@@ -25,13 +25,13 @@ def select_model(mode):
 		model_path = "meerkat/classification/models/final_bank.pkl"
 	elif mode == "bank_NPMN":
 		logging.warning("--- Classifying Merchant Name in Non-Physical Bank Mode ---")
-		model_path = "meerkat/classification/models/bank_NPMN_2.pkl"
+		model_path = "meerkat/classification/models/bank_NPMN.pkl"
 	elif mode == "sub_transaction_type":
 		logging.warning("--- Classifying sub transaction type ---")
 		model_path = "meerkat/classification/models/STO_bank_model.pkl"
 	elif mode == "transaction_type":
 		logging.warning("--- Classifying transaction type ---")
-		model_path = "meerkat/classification/models/TO_bank_model_97_percent.pkl"
+		model_path = "meerkat/classification/models/TO_bank_model.pkl"
 	else:
 		logging.warning("--- Classifier requested not found. Terminating ---")
 		sys.exit()

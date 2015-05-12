@@ -43,7 +43,7 @@ import numpy as np
 from numpy import array, array_split
 from scipy.optimize import minimize, brute, basinhopping
 
-from meerkat.consumer import Consumer
+from meerkat.file_consumer import FileConsumer
 from meerkat.classification.load import select_model
 from meerkat.accuracy import print_results, test_accuracy
 from meerkat.various_tools import load_dict_list, queue_to_list, safe_print, get_us_cities
@@ -102,7 +102,7 @@ def run_meerkat(params, desc_queue, hyperparameters):
 
 	# Suppress Output and Classify
 	for i in range(consumer_threads):
-		new_consumer = Consumer(i, params, desc_queue, result_queue, hyperparameters, CITIES)
+		new_consumer = FileConsumer(i, params, desc_queue, result_queue, hyperparameters, CITIES)
 		new_consumer.setDaemon(True)
 		new_consumer.start()
 
