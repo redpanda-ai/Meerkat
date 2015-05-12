@@ -5,9 +5,21 @@ import json
 import numpy as np
 import queue
 import unittest
-from meerkat.consumer import FileConsumer
+from meerkat.file_consumer import FileConsumer
 from meerkat.custom_exceptions import Misconfiguration
 from meerkat.various_tools import get_us_cities
+
+def get_parameters():
+	"""Validates the command line arguments and loads a dict of params."""
+	input_file, params = None, None
+	try:
+		input_file = open("config/daemon/file.json", encoding='utf-8')
+		params = json.loads(input_file.read())
+		input_file.close()
+	except IOError:
+		logging.error("Configuration file not found, aborting.")
+		raise FileProblem(msg="Cannot find a valid configuration file.", expr=None)
+	return params
 
 class ConsumerTests(unittest.TestCase):
 	"""Our UnitTest class."""
@@ -97,7 +109,8 @@ class ConsumerTests(unittest.TestCase):
 	def setUp(self):
 		"""Basic Fixture for all tests."""
 		self.hyperparameters = json.loads(self.hyperparameters)
-		self.params = json.loads(self.config)
+		self.params = get_parameters()
+		self.params["my_producer_options"] = self.params["producer_options"]["producer_default"]
 		self.desc_queue, self.result_queue = queue.Queue(), queue.Queue()
 		self.my_consumer = FileConsumer(0, self.params, self.desc_queue
 			, self.result_queue, self.hyperparameters, get_us_cities())
@@ -105,13 +118,13 @@ class ConsumerTests(unittest.TestCase):
 	def test_display_z_score_single_score(self):
 		"""Ensure that list containing one score, returns None for z_score"""
 		scores = [0]
-		result = self.my_consumer._Consumer__generate_z_score_delta(scores)
+		result = self.my_consumer._FileConsumer__generate_z_score_delta(scores)
 		self.assertEqual(result, 0)
 
 	def test_generate_z_score_delta(self):
 		"""Ensure that list containing [3, 2, 1], returns 1.225 for z_score"""
 		scores = [3, 2, 1]
-		result = self.my_consumer._Consumer__generate_z_score_delta(scores)
+		result = self.my_consumer._FileConsumer__generate_z_score_delta(scores)
 		self.assertEqual(result[0], 1.225)
 
 
@@ -120,38 +133,38 @@ class ConsumerTests(unittest.TestCase):
 	def test_display_search_results_normal_use(self):
 		search_results = json.loads(self.search_results)
 		transaction = {"DESCRIPTION" : "Ham Sandwich"}
-		result = self.my_consumer._Consumer__display_search_results(search_results, transaction)
+		result = self.my_consumer._FileConsumer__display_search_results(search_results, transaction)
 		self.assertEqual(result,True)
 	"""
 	def test_output_to_result_queue(self):
 		"""Ensure that we can output to the result queue"""
 		search_results = json.loads(self.search_results)
-		self.my_consumer._Consumer__output_to_result_queue(search_results)
+		self.my_consumer._FileConsumer__output_to_result_queue(search_results)
 		self.assertEqual(False,self.my_consumer.result_queue.empty())
 
 	def test_reset_my_meta_reset_my_meta(self):
 		"""Ensure that the 'my_meta' member is reset"""
 		self.my_consumer.my_meta = {"dirty" : "my_meta"}
-		self.my_consumer._Consumer__reset_my_meta()
+		self.my_consumer._FileConsumer__reset_my_meta()
 		self.assertEqual(self.my_consumer.my_meta, json.loads(self.clean_my_meta))
 
 	def test_search_index_normal_use(self):
 		"""Ensure that __search_index finds a common result."""
 		input_as_object = json.loads(self.input_json)
-		result = self.my_consumer._Consumer__search_index(input_as_object)
+		result = self.my_consumer._FileConsumer__search_index(input_as_object)
 		self.assertGreater(result["hits"]["total"], -1)
 
 	def test_build_boost_vectors_boost_row_labels(self):
 		"""Ensure that __build_boost_vectors correctly builds a sorted list of
 		boost_row_labels."""
-		result, _ = self.my_consumer._Consumer__build_boost_vectors()
+		result, _ = self.my_consumer._FileConsumer__build_boost_vectors()
 		expect = ["address", "factual_id", "name"]
 		self.assertEqual(self.list_compare(result,expect), True)
 
 	def test_build_boost_vectors_boost_column_vectors(self):
 		"""Ensure that __build_boost_vectors correctly builds a dictionary of
 		boost_column_vectors."""
-		_, result = self.my_consumer._Consumer__build_boost_vectors()
+		_, result = self.my_consumer._FileConsumer__build_boost_vectors()
 		expect = {
 			"composite.address": np.array([1, 1, 0]),
 			"standard_fields": np.array([0, 0, 1]),
@@ -165,7 +178,7 @@ class ConsumerTests(unittest.TestCase):
 		self.my_consumer.boost_column_vectors = { "vector_1" : [0.0, 2.0, 1.0] }
 		self.my_consumer.boost_row_labels = ["A", "B", "C"]
 		expect = ["B^2.0", "C^1.0"]
-		result = self.my_consumer._Consumer__get_boosted_fields("vector_1")
+		result = self.my_consumer._FileConsumer__get_boosted_fields("vector_1")
 		self.assertEqual(self.list_compare(result,expect), True)
 
 if __name__ == '__main__':
