@@ -5,7 +5,7 @@ import json
 import numpy as np
 import queue
 import unittest
-from meerkat.consumer import Consumer
+from meerkat.consumer import FileConsumer
 from meerkat.custom_exceptions import Misconfiguration
 from meerkat.various_tools import get_us_cities
 
@@ -99,7 +99,7 @@ class ConsumerTests(unittest.TestCase):
 		self.hyperparameters = json.loads(self.hyperparameters)
 		self.params = json.loads(self.config)
 		self.desc_queue, self.result_queue = queue.Queue(), queue.Queue()
-		self.my_consumer = Consumer(0, self.params, self.desc_queue
+		self.my_consumer = FileConsumer(0, self.params, self.desc_queue
 			, self.result_queue, self.hyperparameters, get_us_cities())
 
 	def test_display_z_score_single_score(self):

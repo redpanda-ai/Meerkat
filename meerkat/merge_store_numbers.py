@@ -39,8 +39,7 @@ from scipy.stats.mstats import zscore
 from pprint import pprint
 from elasticsearch import Elasticsearch, helpers
 
-from meerkat.consumer import get_qs_query, get_bool_query
-from meerkat.various_tools import string_cleanse
+from meerkat.various_tools import get_bool_query, get_qs_query, string_cleanse
 
 def load_store_numbers(file_name):
 	"""Load Store Numbers from provided file"""

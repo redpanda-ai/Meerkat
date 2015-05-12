@@ -43,7 +43,7 @@ import numpy as np
 from numpy import array, array_split
 from scipy.optimize import minimize, brute, basinhopping
 
-from meerkat.consumer import FileConsumer
+from meerkat.file_consumer import FileConsumer
 from meerkat.classification.load import select_model
 from meerkat.accuracy import print_results, test_accuracy
 from meerkat.various_tools import load_dict_list, queue_to_list, safe_print, get_us_cities

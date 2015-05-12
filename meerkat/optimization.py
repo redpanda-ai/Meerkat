@@ -41,7 +41,7 @@ from random import randint, uniform, random, shuffle
 from pprint import pprint
 from numpy import array, array_split
 
-from meerkat.consumer import FileConsumer
+from meerkat.file_consumer import FileConsumer
 from meerkat.classification.load import select_model
 from meerkat.accuracy import print_results, test_accuracy
 from meerkat.various_tools import load_dict_list, queue_to_list, safe_print, get_us_cities
