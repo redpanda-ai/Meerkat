@@ -12,10 +12,11 @@ class TokenizeDescriptionTests(unittest.TestCase):
 
 	config = """{
 		"mode": "skip",
+		"container" : "bank",
 		"concurrency" : 1,
 		"input" : {
 			"hyperparameters" : "config/hyperparameters/made_up_key_name.json",
-			"filename" : "data/input/100_Bank_Transactions.txt",
+			"filename" : "data/misc/ground_truth_bank.txt",
 			"delimiter" : "|",
 			"encoding" : "utf-8"
 		},
@@ -36,25 +37,7 @@ class TokenizeDescriptionTests(unittest.TestCase):
 			}
 		},
 		"elasticsearch" : {
-			"cluster_nodes" : [
-			    "s01:9200",
-			    "s02:9200",
-			    "s03:9200",
-			    "s04:9200",
-			    "s05:9200",
-			    "s06:9200",
-			    "s07:9200",
-			    "s09:9200",
-			    "s10:9200",
-			    "s11:9200",
-			    "s12:9200",
-			    "s13:9200",
-			    "s14:9200",
-			    "s15:9200",
-			    "s16:9200",
-			    "s17:9200",
-			    "s18:9200"
-	    	],
+			"cluster_nodes" : ["172.31.26.85"],
 			"index" : "new_index",
 			"type" : "new_type",
 			"subqueries" : {
@@ -153,16 +136,18 @@ class TokenizeDescriptionTests(unittest.TestCase):
 		result = producer.usage()
 		self.assertEqual("Usage:\n\t<path_to_json_format_config_file>", result)
 
-	def test_get_desc_queue_returns_queue(self):
+	def test_df_to_queue_returns_queue(self):
 		"""Ensure returns an instance of Queue"""
 		classifier = select_model('bank')
-		my_queue, non_physical = producer.get_desc_queue(self.params["input"]["filename"], self.params, classifier)
+		df = producer.load_dataframe(self.params)
+		my_queue, non_physical = producer.df_to_queue(self.params, df.get_chunk())
 		self.assertTrue(isinstance(my_queue, queue.Queue))
 
-	def test_get_desc_queue_is_not_empty(self):
+	def test_df_to_queue_is_not_empty(self):
 		"""Ensure queue is not empty"""
 		classifier = select_model('bank')
-		my_queue, non_physical = producer.get_desc_queue(self.params["input"]["filename"], self.params, classifier)
+		df = producer.load_dataframe(self.params)
+		my_queue, non_physical = producer.df_to_queue(self.params, df.get_chunk())
 		self.assertFalse(my_queue.empty())
 
 	def test_initialize_no_file_name(self):
