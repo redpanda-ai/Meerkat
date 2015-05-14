@@ -107,11 +107,11 @@ def get_CNN(model_name):
 	# Generate Helper Function
 	def apply_CNN(trans):
 		"""Apply CNN to transactions in batches of 128"""
-
+		
 		trans_list = [' '.join(x["description"].split()) for x in trans]
 		table_trans = list_to_table(trans_list)
 		batch = make_batch(table_trans)
-		labels = list(process_batch(batch).values())
+		labels = process_batch(batch)
 		decisions = list(labels.values())
 		
 		for i, t in enumerate(trans):

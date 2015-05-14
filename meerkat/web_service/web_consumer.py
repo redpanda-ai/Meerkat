@@ -11,6 +11,7 @@ import json
 import string
 import sys
 
+from itertools import zip_longest
 from pprint import pprint
 from scipy.stats.mstats import zscore
 
@@ -25,6 +26,9 @@ BANK_NPMN = select_model("bank_NPMN")
 TRANSACTION_ORIGIN = select_model("transaction_type")
 SUB_TRANSACTION_ORIGIN = select_model("sub_transaction_type")
 APPLY_CNN = get_CNN("Card_Merchant_Name_500")
+
+def grouper(iterable):
+    return zip_longest(*[iter(iterable)]*128, fillvalue={"description":""})
 
 class Web_Consumer():
 	"""Acts as a web service client to process and enrich
@@ -323,10 +327,22 @@ class Web_Consumer():
 
 		return physical, non_physical
 
+	def __apply_CNN(self, data, transactions):
+		"""Apply the CNN to transactions"""
+
+		batches = grouper(transactions)
+		processed = []
+
+		for batch in batches:
+			processed += APPLY_CNN(batch)
+
+		return processed
+
 	def classify(self, data):
 		"""Classify a set of transactions"""
 
 		transactions = self.__add_transaction_origin(data)
+		#transactions = self.__apply_CNN(data, transactions)
 		physical, non_physical = self.__sws(data, transactions)
 		physical = self.__enrich_physical(physical)
 		non_physical = self.__enrich_non_physical(non_physical)
