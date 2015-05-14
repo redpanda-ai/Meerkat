@@ -10,6 +10,8 @@ Created on Nov 3, 2014
 import json
 import string
 import sys
+import re
+import math
 
 from itertools import zip_longest
 from pprint import pprint
@@ -331,18 +333,20 @@ class Web_Consumer():
 		"""Apply the CNN to transactions"""
 
 		batches = grouper(transactions)
+		last_batch = math.ceil(len(list(transactions)) / 128)
+		last_batch_length = len(transactions) % 128
 		processed = []
 
-		for batch in batches:
+		for i, batch in enumerate(batches):
 			processed += APPLY_CNN(batch)
 
-		return processed
+		return processed[0:len(transactions)]
 
 	def classify(self, data):
 		"""Classify a set of transactions"""
 
 		transactions = self.__add_transaction_origin(data)
-		#transactions = self.__apply_CNN(data, transactions)
+		transactions = self.__apply_CNN(data, transactions)
 		physical, non_physical = self.__sws(data, transactions)
 		physical = self.__enrich_physical(physical)
 		non_physical = self.__enrich_non_physical(non_physical)
