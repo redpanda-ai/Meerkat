@@ -17,12 +17,14 @@ from scipy.stats.mstats import zscore
 from meerkat.various_tools import get_es_connection, string_cleanse, get_boosted_fields
 from meerkat.various_tools import synonyms, get_bool_query, get_qs_query
 from meerkat.classification.load import select_model
+from meerkat.classification.lua_bridge import get_CNN
 
 BANK_CLASSIFIER = select_model("bank")
 CARD_CLASSIFIER = select_model("card")
 BANK_NPMN = select_model("bank_NPMN")
 TRANSACTION_ORIGIN = select_model("transaction_type")
 SUB_TRANSACTION_ORIGIN = select_model("sub_transaction_type")
+APPLY_CNN = get_CNN("Card_Merchant_Name_500")
 
 class Web_Consumer():
 	"""Acts as a web service client to process and enrich
