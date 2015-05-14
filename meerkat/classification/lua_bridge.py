@@ -31,9 +31,8 @@ def get_CNN(model_name):
 
 	# Load Runtime and Lua Modules
 	lua = LuaRuntime(unpack_returned_tuples=True)
-	data = lua.require('data')
 	nn = lua.require('nn')
-	model = lua.require('model')
+	model = lua.require('meerkat/classification/lua/model.lua')
 	torch = lua.require('torch')
 	cutorch = lua.require('cutorch')
 	cunn = lua.require('cunn')
@@ -43,7 +42,7 @@ def get_CNN(model_name):
 
 	# Load CNN
 	lua.execute('''
-		dofile("config.lua")
+		dofile("meerkat/classification/lua/config.lua")
 		model = Model:makeCleanSequential(torch.load("meerkat/classification/models/deepConv_Card_500.t7b"))
 		model = model:type("torch.CudaTensor")
 		cutorch.synchronize()
@@ -107,7 +106,7 @@ def get_CNN(model_name):
 
 	# Generate Helper Function
 	def apply_CNN(trans):
-	"""Apply CNN to transactions in batches of 128"""
+		"""Apply CNN to transactions in batches of 128"""
 
 		trans_list = [' '.join(x["description"].split()) for x in trans]
 		table_trans = list_to_table(trans_list)
