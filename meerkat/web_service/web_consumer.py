@@ -250,11 +250,21 @@ class Web_Consumer():
 		# Combine Transactions
 		transactions = physical + non_physical
 
+		# Collect Mapping Details
+		fields = self.params["output"]["results"]["fields"]
+		labels = self.params["output"]["results"]["labels"]
+		attr_map = dict(zip(fields, labels))
+
 		# Strip Fields
 		for trans in transactions:
-			del trans["description"]
+
+			if trans["CNN"] != "":
+				trans[attr_map["name"]] = trans["CNN"]
+
+			#del trans["description"]
 			del trans["amount"]
 			del trans["date"]
+			del trans["CNN"]
 
 		return transactions
 
@@ -333,8 +343,6 @@ class Web_Consumer():
 		"""Apply the CNN to transactions"""
 
 		batches = grouper(transactions)
-		last_batch = math.ceil(len(list(transactions)) / 128)
-		last_batch_length = len(transactions) % 128
 		processed = []
 
 		for i, batch in enumerate(batches):
