@@ -235,7 +235,7 @@ class Web_Consumer():
 
 		return transaction
 
-	def ensure_output_schema(self, physical, non_physical):
+	def ensure_output_schema(self, data, physical, non_physical):
 		"""Clean output to proper schema"""
 
 		# Add or Modify Fields
@@ -258,7 +258,7 @@ class Web_Consumer():
 		# Strip Fields
 		for trans in transactions:
 
-			if trans["CNN"] != "":
+			if trans["CNN"] != "" and data["container"] == "card":
 				trans[attr_map["name"]] = trans["CNN"]
 
 			#del trans["description"]
@@ -321,7 +321,7 @@ class Web_Consumer():
 			txn_type = TRANSACTION_ORIGIN(trans["description"])
 			txn_sub_type = SUB_TRANSACTION_ORIGIN(trans["description"])
 			trans["txn_type"] = txn_type.title()
-			trans["txn_sub_type"] = txn_sub_type.title()
+			trans["txn_sub_type"] = txn_sub_type.title() if txn_sub_type.lower() != "i don't know" else ""
 
 		return transactions
 
@@ -358,7 +358,7 @@ class Web_Consumer():
 		physical, non_physical = self.__sws(data, transactions)
 		physical = self.__enrich_physical(physical)
 		non_physical = self.__enrich_non_physical(non_physical)
-		transactions = self.ensure_output_schema(physical, non_physical)
+		transactions = self.ensure_output_schema(data, physical, non_physical)
 		data["transaction_list"] = transactions
 
 		return data
