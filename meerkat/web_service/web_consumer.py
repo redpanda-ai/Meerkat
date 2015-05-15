@@ -297,10 +297,10 @@ class Web_Consumer():
 
 		return enriched
 
-	def __enrich_non_physical(self, transactions):
-		"""Enrich non-physical transactions with Meerkat"""
+	def __enrich_non_physical(self, data, transactions):
+		"""Enrich non-physical bank transactions with Meerkat"""
 
-		if len(transactions) == 0:
+		if len(transactions) == 0 or data["container"] == "card":
 			return transactions
 
 		for trans in transactions:
@@ -357,7 +357,7 @@ class Web_Consumer():
 		transactions = self.__apply_CNN(data, transactions)
 		physical, non_physical = self.__sws(data, transactions)
 		physical = self.__enrich_physical(physical)
-		non_physical = self.__enrich_non_physical(non_physical)
+		non_physical = self.__enrich_non_physical(data, non_physical)
 		transactions = self.ensure_output_schema(data, physical, non_physical)
 		data["transaction_list"] = transactions
 
