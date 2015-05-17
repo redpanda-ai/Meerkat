@@ -10,6 +10,7 @@ Created on Feb 25, 2014
 """
 
 from sklearn.externals import joblib
+import logging
 
 def select_model(mode):
 	"""Load either Card or Bank classifier depending on
@@ -17,22 +18,22 @@ def select_model(mode):
 
 	# Switch on Models
 	if mode == "card":
-		print("--- Classifying Transactions in Card Mode ---")
+		logging.warning("--- Classifying Transactions in Card Mode ---")
 		model_path = "meerkat/classification/models/final_card.pkl"
 	elif mode == "bank":
-		print("--- Classifying Transactions in Bank Mode ---")
+		logging.warning("--- Classifying Transactions in Bank Mode ---")
 		model_path = "meerkat/classification/models/final_bank.pkl"
 	elif mode == "bank_NPMN":
-		print("--- Classifying Merchant Name in Non-Physical Bank Mode ---")
-		model_path = "meerkat/classification/models/bank_NPMN_2.pkl"
+		logging.warning("--- Classifying Merchant Name in Non-Physical Bank Mode ---")
+		model_path = "meerkat/classification/models/bank_NPMN.pkl"
 	elif mode == "sub_transaction_type":
-		print("--- Classifying sub transaction type ---")
+		logging.warning("--- Classifying sub transaction type ---")
 		model_path = "meerkat/classification/models/STO_bank_model.pkl"
 	elif mode == "transaction_type":
-		print("--- Classifying transaction type ---")
+		logging.warning("--- Classifying transaction type ---")
 		model_path = "meerkat/classification/models/TO_bank_model.pkl"
 	else:
-		print("--- Classifier requested not found. Terminating ---")
+		logging.warning("--- Classifier requested not found. Terminating ---")
 		sys.exit()
 
 	# Load Model
@@ -47,4 +48,4 @@ def select_model(mode):
 
 if __name__ == "__main__":
 	"""Print a warning to not execute this file as a module"""
-	print("This module is a library that contains useful functions; it should not be run from the console.")
+	logging.warning("This module is a library that contains useful functions; it should not be run from the console.")

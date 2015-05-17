@@ -26,13 +26,14 @@ import contextlib
 import csv
 import sys
 import os
+import re
 
 import numpy as np
 import pandas as pd
 from boto.s3.connection import Key, Location
 
 from meerkat.various_tools import safe_print, safe_input, load_params
-from meerkat.producer import connect_to_S3
+from meerkat.file_producer import get_s3_connection
 
 class DummyFile(object):
     def write(self, x): pass
@@ -78,13 +79,35 @@ def move_to_S3(bucket, key_name, filepath):
 	safe_print("File written to: S3://" + key.key)
 	#safely_remove_file(filepath)
 
-def add_local_params(params,):
+def add_local_params(params):
 	"""Adds additional local params"""
 
 	params["merchant_sample_filter"] = {}
 	params["container"] = identify_container(params["S3"]["filename"])
 
 	return params
+
+def collect_top_choice(params, row, options, choices):
+	"""Collects the top choice"""
+
+	choice = None
+
+	# Prompt with top level question
+	safe_print("\n{}\n".format(params["questions"][0]))
+	
+	# Prompt with choices
+	for i, item in enumerate(choices):
+		safe_print("{:7s} {}".format("[" + str(i) + "]", item))
+	
+	safe_print("\n[enter] Skip")
+	safe_print("{:7s} Save and Exit".format("[s]"))
+	
+	while choice not in options:
+		choice = safe_input()
+		if choice not in options:
+			safe_print("Please select one of the options listed above")
+
+	return choice
 
 def run_from_command_line(cla):
 	"""Runs these commands if the module is invoked from the command line"""
@@ -95,7 +118,7 @@ def run_from_command_line(cla):
 
 	# Connect to S3
 	with nostdout():
-		conn = connect_to_S3()
+		conn = get_s3_connection()
 		bucket = conn.get_bucket(params["S3"]["bucket_name"], Location.USWest2)
 
 	# Collect Labeler Details
@@ -125,10 +148,16 @@ def run_from_command_line(cla):
 
 	# Add new columns if first time labeling this data set
 	if (tc_col) not in df.columns:
-		df[tc_col] = pd.Series(([""] * sLen))
+		if "TXN_TYPE" in df.columns:
+			df.rename(columns={"TXN_TYPE": tc_col}, inplace=True)
+		else:
+			df[tc_col] = pd.Series(([""] * sLen))
 
 	if (sc_col) not in df.columns:
-		df[sc_col] = pd.Series(([""] * sLen))
+		if "SUB_TXN_TYPE" in df.columns:
+			df.rename(columns={"SUB_TXN_TYPE": sc_col}, inplace=True)
+		else:
+			df[sc_col] = pd.Series(([""] * sLen))
 
 	# Shuffle Rows
 	df = df.reindex(np.random.permutation(df.index))
@@ -140,6 +169,15 @@ def run_from_command_line(cla):
 	sub_dict = {}
 	skip_save = ["", "s"]
 	options = skip_save + [str(o) for o in list(range(0, len(choices)))]
+
+	# Build Regex
+	sb_set = set([])
+	for s_ch in sub_choices:
+		for i in s_ch["sub_labels"]:
+			sb_set.add(i)
+
+	choice_regex = re.compile('|'.join(choices))
+	sub_choice_regex = re.compile('|'.join(sb_set))
 
 	# Create Loopup for Sub types
 	if len(sub_choices) > 0:
@@ -158,42 +196,34 @@ def run_from_command_line(cla):
 				else: 
 					continue
 			
-
 			# Collect labeler choice
-			choice = None
 			sub_choice = None
 			safe_print(("_" * 75) + "\n")
 
 			# Show Progress
-			complete = sLen - df[tc_col].str.contains(r'^$').sum()
+			complete = df[tc_col].str.contains(choice_regex).sum()
+			sub_complete = df[sc_col].str.contains(sub_choice_regex).sum()
 			percent_complete = complete / sLen * 100
+			sub_percent_complete = sub_complete / sLen * 100
 			os.system("clear")
-			safe_print("{} ".format(complete) + "completed.")
-			safe_print("{0:.2f}%".format(percent_complete) + " complete with labeling.\n")
+			safe_print("{} ".format(complete) + "top choices completed.")
+			safe_print("{0:.2f}%".format(percent_complete) + " complete with top choices.")
+			safe_print("{} ".format(sub_complete) + "sub choices completed.")
+			safe_print("{0:.2f}%".format(sub_percent_complete) + " complete with sub choices.\n")
 
-			# Show transaction details
+			# Show Transaction Details
 			for c in params["display_columns"]:
 				safe_print("{}: {}".format(c, row[c]))
 
-			# Prompt with top level question
-			safe_print("\n{}\n".format(params["questions"][0]))
-			
-			# Prompt with choices
-			for i, item in enumerate(choices):
-				safe_print("{:7s} {}".format("[" + str(i) + "]", item))
-			
-			safe_print("\n[enter] Skip")
-			safe_print("{:7s} Save and Exit".format("[s]"))
-			
-			while choice not in options:
-				choice = safe_input()
-				if choice not in options:
-					safe_print("Please select one of the options listed above")
+			# Colect Top Choice
+			if row[tc_col] not in choices:
+				choice = collect_top_choice(params, row, options, choices)
+				choice_name = choices[int(choice)] if choice not in ["", "s"] else choice
+			else:
+				choice_name = row[tc_col]
 
 			# Prompt for subtype if neccesary
-			choice_name = choices[int(choice)] if choice not in ["", "s"] else choice
-
-			if choice_name in sub_dict:
+			if choice_name in sub_dict and row[sc_col] not in sb_set:
 
 				sub_options = skip_save + [str(o) for o in list(range(0, len(sub_dict[choice_name])))]
 
@@ -226,6 +256,7 @@ def run_from_command_line(cla):
 
 			# Enter choices into decision matrix
 			df.loc[index, tc_col] = "" if choice_name == "" else choice_name
+			print(df[tc_col].str.contains(choice_regex).sum())
 
 			if sub_choice != None:
 				df.loc[index, sc_col] = "" if sub_choice == "" else sub_dict[choice_name][int(sub_choice)]
