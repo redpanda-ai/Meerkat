@@ -258,6 +258,7 @@ class Web_Consumer():
 		# Strip Fields
 		for trans in transactions:
 
+			# Override output with CNN v1
 			if trans["CNN"] != "" and data["container"] == "card":
 				trans[attr_map["name"]] = trans["CNN"]
 
