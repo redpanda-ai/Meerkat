@@ -91,6 +91,10 @@ def clean_dataframe(params, dataframe):
 		dataframe[meerkat_field] = ""
 	# Reorder header
 	dataframe = dataframe[header]
+	# Issue #135 Cast COBRAND_ID as an int
+	if "COBRAND_ID" in list(dataframe.columns.values):
+		logging.warning("Converting COBRAND_ID to int")
+		dataframe['COBRAND_ID'] = dataframe['COBRAND_ID'].apply(lambda x: int(x))
 	return dataframe
 
 def get_s3_connection():
