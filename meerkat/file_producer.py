@@ -92,7 +92,9 @@ def clean_dataframe(params, dataframe):
 	# Reorder header
 	dataframe = dataframe[header]
 	# Issue #135 Cast COBRAND_ID as an int
-	dataframe['COBRAND_ID'] = dataframe['COBRAND_ID'].apply(lambda x: int(x))
+	if "COBRAND_ID" in list(dataframe.columns.values):
+		logging.warning("Converting COBRAND_ID to int")
+		dataframe['COBRAND_ID'] = dataframe['COBRAND_ID'].apply(lambda x: int(x))
 	return dataframe
 
 def get_s3_connection():
