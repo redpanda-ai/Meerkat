@@ -91,7 +91,7 @@ class Web_Consumer():
 		first_score, second_score = z_scores[0:2]
 		z_score_delta = round(first_score - second_score, 3)
 
-		return z_score_delta
+		return z_score_delta, scores[0]
 
 	def __process_results(self, results, transaction):
 		"""Process search results and enrich transaction
@@ -136,9 +136,10 @@ class Web_Consumer():
 
 		# Collect Relevancy Scores
 		scores = [hit["_score"] for hit in hits]
-		z_score_delta = self.__z_score_delta(scores)
+		z_score_delta, raw_score = self.__z_score_delta(scores)
 		threshold = float(hyperparams.get("z_score_threshold", "2"))
-		decision = True if (z_score_delta > threshold) else False
+		raw_threshold = float(hyperparams.get("raw_score_threshold", "1"))
+		decision = True if (z_score_delta > threshold) and (raw_score > raw_threshold) else False
 
 		# Enrich Data if Passes Boundary
 		args = [decision, transaction, hit_fields, z_score_delta, business_names, city_names, state_names]
