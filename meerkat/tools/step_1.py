@@ -4,6 +4,9 @@ import logging
 import pandas as pd
 import sys
 
+#USAGE:
+#python3 -m meerkat.tools.step_1 3_year_bank_sample.txt 
+
 def get_lookup_dicts(input_dataframe):
 	# Normalize GOOD_DESCRIPTION to lowercase before making a histogram
 	input_dataframe["GOOD_DESCRIPTION"] = input_dataframe.GOOD_DESCRIPTION.apply(
@@ -48,10 +51,8 @@ def get_lookup_dicts(input_dataframe):
 def get_transformed_training_data(lookup, input_dataframe):
 	#Pull out two columns
 	sub_frame = input_dataframe.ix[:, ['GOOD_DESCRIPTION', 'DESCRIPTION_UNMASKED'] ]
-	#Trim to 123 characters
-	trim_length = 123
-	sub_frame["DESCRIPTION_UNMASKED"] = sub_frame.DESCRIPTION_UNMASKED.apply(
-		lambda x: str(x)[:trim_length].strip())
+	#sub_frame["DESCRIPTION_UNMASKED"] = sub_frame.DESCRIPTION_UNMASKED.apply(
+	#	lambda x: str(x)[:])
 	#Convert the good description to a class
 	sub_frame["GOOD_DESCRIPTION"] = sub_frame.GOOD_DESCRIPTION.apply(
 		lambda x: str(x).lower() if str(x).lower() != "nan" else "" )
@@ -66,12 +67,13 @@ def write_training_and_testing_csv(df):
 		index=False)
 
 #Main function
-logging.warning("Building histogram")
-local_src_file = sys.argv[1]
-logging.warning("Analyzing {0}".format(local_src_file))
-initial_dataframe = pd.read_csv(local_src_file, sep='|', encoding="utf-8", error_bad_lines=False)
+if __name__ == "__main__":
+	logging.warning("Building histogram")
+	local_src_file = sys.argv[1]
+	logging.warning("Analyzing {0}".format(local_src_file))
+	initial_dataframe = pd.read_csv(local_src_file, sep='|', encoding="utf-8", error_bad_lines=False)
 
-lookup, reverse_lookup = get_lookup_dicts(initial_dataframe)
-df = get_transformed_training_data(lookup, initial_dataframe)
-write_training_and_testing_csv(df)
+	lookup, reverse_lookup = get_lookup_dicts(initial_dataframe)
+	df = get_transformed_training_data(lookup, initial_dataframe)
+	write_training_and_testing_csv(df)
 
