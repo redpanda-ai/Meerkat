@@ -5,7 +5,7 @@ import pandas as pd
 import sys
 
 #USAGE:
-#python3 -m meerkat.tools.step_1 3_year_bank_sample.txt 
+#python3 -m meerkat.tools.preprocess_cnn_training_data 3_year_bank_sample.txt 
 
 def get_lookup_dicts(input_dataframe):
 	# Normalize GOOD_DESCRIPTION to lowercase before making a histogram
