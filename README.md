@@ -118,4 +118,4 @@ Contributors
 * M. Phani Ram
 * As Shaja
 * Ashish Kulkarni
-* Sivan Mehta
+* Sivan K. Mehta
