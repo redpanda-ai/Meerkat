@@ -12,7 +12,6 @@ The file is then saved into
 """
 
 from splinter.browser import Browser
-from splinter.exceptions import ElementDoesNotExist
 from pprint import pprint
 # import os.path
 
@@ -34,10 +33,11 @@ def run():
 
 		browser.visit(base_url + str(current_walmart))
 
-		try:
+		# Find Address on Page
+		elements = browser.find_by_css(".StoreAddress")
 
-			# Find Address on Page
-			elements = browser.find_by_css(".StoreAddress")
+		# only go in if you have found any elements
+		if len(elements) != 0:
 			div = elements[0]
 
 			# Parse
@@ -63,7 +63,7 @@ def run():
 			print(str(current_walmart), ":")
 			print(div.value, "\n")
 
-		except ElementDoesNotExist:
+		else:
 			print("no walmart # ", current_walmart, "\n")
 			current_walmart +=1 
 			continue
