@@ -34,21 +34,21 @@ def get_basic_query(starting_from=0, size=0):
 
 def get_bool_query(starting_from=0, size=0):
 	"""Returns a "bool" style ElasticSearch query object"""
-	return {"from" : starting_from, "size" : size, "query" : {
+	return {"from" : starting_from, "size" : size, "query" : { \
 		"bool": {"minimum_number_should_match": 1, "should": []}}}
 
 def get_geo_query(scaled_shapes):
 	"""Generate multipolygon query for use with"""
-	return {"geo_shape" : {"pin.location" : {"shape" : {
-		"type" : "multipolygon",
-		"coordinates": [[scaled_shape] for scaled_shape in scaled_shapes]
+	return {"geo_shape" : {"pin.location" : {"shape" : { \
+		"type" : "multipolygon", \
+		"coordinates": [[scaled_shape] for scaled_shape in scaled_shapes] \
 		}}}}
 
 def get_qs_query(term, field_list=None, boost=1.0):
 	"""Returns a "query_string" style ElasticSearch query object"""
 	if field_list is None:
 		field_list = []
-	return {"query_string": {"query": term, "fields": field_list,
+	return {"query_string": {"query": term, "fields": field_list, \
 		"boost" : boost}}
 
 def get_us_cities():
@@ -259,12 +259,12 @@ class DescriptionConsumer(threading.Thread):
 	def __init__(self, **kwargs):
 		''' Constructor '''
 		threading.Thread.__init__(self)
-		self.init_args = {
-			"thread_id" : kwargs["thread_id"],
-			"params" : kwargs["params"],
-			"desc_queue" : kwargs["desc_queue"],
-			"result_queue" : kwargs["result_queue"],
-			"hyperparameters" : kwargs["hyperparamaters"]
+		self.init_args = { \
+			"thread_id" : kwargs["thread_id"], \
+			"params" : kwargs["params"], \
+			"desc_queue" : kwargs["desc_queue"], \
+			"result_queue" : kwargs["result_queue"], \
+			"hyperparameters" : kwargs["hyperparamaters"] \
 		}
 
 		self.user = None
@@ -277,7 +277,7 @@ class DescriptionConsumer(threading.Thread):
 		self.my_meta = None
 		self.__reset_my_meta()
 		self.__set_logger()
-		self.boost_row_labels, self.boost_column_vectors =\
+		self.boost_row_labels, self.boost_column_vectors = \
 			self.__build_boost_vectors()
 
 	def __load_past_transactions(self):
@@ -288,7 +288,7 @@ class DescriptionConsumer(threading.Thread):
 		_ = self.es_connection.index(index="user_index",\
 			doc_type="user", id=unique_member_id, body=index_body)
 
-	def __locate_user(self, unique_locations, user_id):
+	def __locate_user(self, unique_locations):
 		"""Uses first pass results, to find an approximation
 		of a users spending area. Returns estimation as
 		a bounded polygon"""
@@ -343,7 +343,7 @@ class DescriptionConsumer(threading.Thread):
 		business_names = [result.get("fields", {"name" : ""})["name"] \
 			for result in hits]
 		business_names = [name[0] for name in business_names \
-			if type(name) == list]
+		if isinstance(name, list)]
 
 		# If no results return
 		if hit_fields == "":
@@ -418,14 +418,14 @@ class DescriptionConsumer(threading.Thread):
 		transaction_id = transaction["UNIQUE_TRANSACTION_ID"]
 		date = transaction["TRANSACTION_DATE"].replace(".", "-")
 		date = date.replace("/", "-")
-		update_body = {
-			"date": date, "_parent": transaction["UNIQUE_MEM_ID"],
-			"z_score_delta": str(transaction["z_score_delta"]),
-			"description": transaction["DESCRIPTION"],
-			"factual_id": transaction["factual_id"],
-			"pin.location": {
-				"lon" : transaction["longitude"],
-				"lat" : transaction["latitude"]
+		update_body = { \
+			"date": date, "_parent": transaction["UNIQUE_MEM_ID"], \
+			"z_score_delta": str(transaction["z_score_delta"]), \
+			"description": transaction["DESCRIPTION"], \
+			"factual_id": transaction["factual_id"], \
+			"pin.location": { \
+				"lon" : transaction["longitude"], \
+				"lat" : transaction["latitude"] \
 			}
 		}
 
@@ -433,7 +433,7 @@ class DescriptionConsumer(threading.Thread):
 			_ = self.es_connection.index(index="user_index",\
 				doc_type="transaction", id=transaction_id, body=update_body,\
 				routing=transaction["UNIQUE_MEM_ID"])
-		except Exception:
+		except:
 			logging.critical("Unable to update the following: %s",\
 				str(transaction["DESCRIPTION"]))
 			pprint(update_body)
@@ -460,7 +460,7 @@ class DescriptionConsumer(threading.Thread):
 				#if use_cache == True:
 				#'input_hash' variable is undefined, this does not work!
 				#self.init_args["params"]["search_cache"][input_hash] = output_data
-			except Exception:
+			except:
 				logging.critical("Unable to process the following: %s",\
 					str(input_as_object))
 				output_data = {"hits":{"total":0}}
@@ -504,9 +504,7 @@ class DescriptionConsumer(threading.Thread):
 		"""Classify transactions using geo and text features"""
 		#Build 'text_features', dictionary of information about the
 		#text_features_results.
-		text_features = {
-			"user_id" : text_features_results[0]['MEM_ID']
-		}
+		text_features = {"user_id" : text_features_results[0]['MEM_ID']}
 		text_features["hits"], text_features["non_hits"] =\
 			separate_geo(text_features_results)
 		text_features["unique_locations"] = set([\
@@ -517,23 +515,22 @@ class DescriptionConsumer(threading.Thread):
 			for location in text_features["unique_locations"]]
 
 		# Use first pass results if no location found
-		scaled_geoshapes = self.__locate_user(text_features["unique_locations"],\
-			text_features["user_id"])
+		scaled_geoshapes = self.__locate_user(text_features["unique_locations"])
 		if not bool(scaled_geoshapes):
 			return text_features_results
 
 		#Build 'query_parts', dictionary of useful values when building
 		#ES queries
-		query_parts = {
-			"geo_query" : get_geo_query(scaled_geoshapes),
-			"qs_boost" : self.init_args["hyperparameters"].get("qs_boost", "1"),
-			"name_boost" : self.init_args["hyperparameters"].get("name_boost", "1")
+		query_parts = { \
+			"geo_query" : get_geo_query(scaled_geoshapes), \
+			"qs_boost" : self.init_args["hyperparameters"].get("qs_boost", "1"), \
+			"name_boost" : self.init_args["hyperparameters"].get("name_boost", "1") \
 		}
 		enriched_transactions = []
 
 		# Run transactions again with geo_query
 		for transaction in text_features["non_hits"]:
-			query_parts["base_query"] = self.__generate_base_query(transaction,
+			query_parts["base_query"] = self.__generate_base_query(transaction, \
 				boost=query_parts["qs_boost"])
 			query_parts["should_clauses"] =\
 				query_parts["base_query"]["query"]["bool"]["should"]
