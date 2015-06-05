@@ -26,10 +26,10 @@ def create_timed_rotating_log(path):
 	logger.addHandler(handler)
 	
 	# add dummy info to the logs, just for demonstration purposes
-	while True:
-		print(os.listdir("."), i)
-		logger.info(time.time())
-		time.sleep(3)
+	# while True:
+	# 	print(os.listdir("."), i)
+	# 	logger.info(time.time())
+	# 	time.sleep(3)
  
 #----------------------------------------------------------------------
 if __name__ == "__main__":
