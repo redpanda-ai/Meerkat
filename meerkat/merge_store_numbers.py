@@ -1,8 +1,8 @@
-import csv, sys, json
+import csv, json
 from meerkat.description_consumer import get_qs_query, get_bool_query
-from elasticsearch import Elasticsearch, helpers
+from elasticsearch import Elasticsearch
 from scipy.stats.mstats import zscore
-from pprint import pprint
+# from pprint import pprint
 
 def load_store_numbers(file_name):
 	"""Load Store Numbers from provided file"""
@@ -29,7 +29,11 @@ def find_merchant(store):
 	"""Match document with store number to factual document"""
 
 	fields = ["address", "postcode", "name", "locality", "region"]
-	search_parts = [store["address"], store["zip_code"][0:5], store["keywords"], store["city"], store["state"]]
+	search_parts = [store["address"], \
+	store["zip_code"][0:5], \
+	store["keywords"], \
+	store["city"], \
+	store["state"]]
 	factual_id = ""
 
 	# Generate Query
@@ -85,7 +89,7 @@ def update_merchant(factual_id, store):
 
 	try:
 		output_data = es_connection.update(index="factual_index", doc_type="factual_type", id=factual_id, body=body)
-	except Exception:
+	except:
 		print("Failed to Update Merchant")
 
 	return output_data["ok"]
@@ -93,16 +97,15 @@ def update_merchant(factual_id, store):
 def search_index(query):
 	"""Searches the merchants index and the merchant mapping"""
 
-	input_data = json.dumps(query, sort_keys=True, indent=4\
-	, separators=(',', ': ')).encode('UTF-8')
-	output_data = ""
+	# input_data = json.dumps(query, sort_keys=True, indent=4, separators=(',', ': ')).encode('UTF-8')
+	# output_data = ""
 
 	try:
-		output_data = es_connection.search(index="factual_index", body=query)
-	except Exception:
-		output_data = {"hits":{"total":0}}
+		return es_connection.search(index="factual_index", body=query)
+	except:
+		return {"hits":{"total":0}}
 
-	return output_data
+	# return output_data
 
 def run(stores):
 	"""Run the Program"""
@@ -121,16 +124,20 @@ def run(stores):
 		if len(factual_id) > 0:
 			status = update_merchant(factual_id, store)
 		else:
-			print("Did Not Merge Store Number ", store["store_number"], " To Index", "\n")
+			print("Did Not Merge Store Number ", \
+				store["store_number"], \
+				" To Index", "\n")
 			not_found.append(store)
 			continue
 
 		# Save Failed Attempts
 		if status == False:
-			print("Did Not Merge Store Number ", store["store_number"], " To Index")
+			print("Did Not Merge Store Number ", \
+				store["store_number"], " To Index")
 			not_found.append(store)
 		else:
-			print("Successfully Merged Store Number:", store["store_number"], "into Factual Merchant:", factual_id, "\n")
+			print("Successfully Merged Store Number:", \
+				store["store_number"], "into Factual Merchant:", factual_id, "\n")
 
 	# Show Success Rate
 	misses = len(not_found)
@@ -152,13 +159,14 @@ def save_not_found(not_found):
 	dict_w.writerows(not_found)
 	output_file.close()
 
-if __name__ == "__main__":
-
-	cluster_nodes = ["brainstorm0:9200", "brainstorm1:9200", "brainstorm2:9200"
-        , "brainstorm3:9200", "brainstorm4:9200", "brainstorm5:9200", "brainstorm6:9200"
-        , "brainstorm7:9200", "brainstorm8:9200", "brainstorm9:9200", "brainstorma:9200"
-        , "brainstormb:9200"]
+def execute():
+	"""Run the file"""
+	cluster_nodes = ["brainstorm%d:9200" % i for i in range(10)] + \
+		["brainstorma:9200", "brainstormb:9200"]
 	es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True, sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
 	file_name = "data/misc/Store Numbers/Clean/top_merchants.csv"
 	stores = load_store_numbers(file_name)
 	run(stores)
+
+if __name__ == "__main__":
+	execute()
