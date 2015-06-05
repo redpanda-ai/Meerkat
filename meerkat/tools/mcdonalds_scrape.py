@@ -1,7 +1,20 @@
+"""
+Scrapes data about at most 40,000 McDonalds stores. Gets the following pieces of
+information:
+store Number
+address
+city
+state
+zip code
+
+The file is then saved into
+/data/misc/Store\ Numbers/Clean/mcdonalds_store_numbers.txt"
+"""
+
+
 from splinter.browser import Browser
 from splinter.exceptions import ElementDoesNotExist
 from pprint import pprint
-import os.path
 
 def run():
 	browser = Browser()
@@ -25,11 +38,11 @@ def run():
 
 			# Parse
 			lines = div.value.split('\n')
-			
+
 			if len(lines) == 2:
 				address, extra = lines
 			elif len(lines) == 3:
-				address, trash, extra = lines
+				address, _, extra = lines
 
 
 			city, extra = extra.split(',')
@@ -55,7 +68,7 @@ def run():
 
 		except ElementDoesNotExist:
 			print("no mcdonalds # ", current_mcdonalds, "\n")
-			current_mcdonalds +=1 
+			current_mcdonalds += 1
 			continue
 
 		current_mcdonalds += 1
