@@ -10,7 +10,7 @@ ElasticSearch (structured data).
 """
 
 import csv
-import datetime
+# import datetime
 import collections
 import json
 import logging
@@ -23,7 +23,7 @@ from .custom_exceptions import InvalidArguments, Misconfiguration
 from .description_consumer import DescriptionConsumer
 from .binary_classifier.load import predict_if_physical_transaction
 from .various_tools import load_dict_list
-from .accuracy import test_accuracy, print_results, speed_tests
+# from .accuracy import test_accuracy, print_results, speed_tests
 
 def get_desc_queue(params):
 	"""Opens a file of descriptions, one per line, and load a description
@@ -41,7 +41,7 @@ def get_desc_queue(params):
 		transactions = load_dict_list(filename, encoding=encoding,\
 			delimiter=delimiter)
 	except IOError:
-		logging.critical("Invalid ['input']['filename'] key; Input file: %s"
+		logging.critical("Invalid ['input']['filename'] key; Input file: %s" \
 			" cannot be found. Correct your config file.", filename)
 		sys.exit()
 
@@ -173,7 +173,8 @@ def tokenize(params, desc_queue, hyperparameters, non_physical):
 		logging.critical("Not configured for file output.")
 
 	# Test Accuracy
-	#accuracy_results = test_accuracy(params, result_list=result_list, non_physical_trans=non_physical)
+	#accuracy_results = test_accuracy(params, \
+					#result_list=result_list, non_physical_trans=non_physical)
 	#print_results(accuracy_results)
 
 	# Do Speed Tests
@@ -204,7 +205,9 @@ def save_pickle_cache(params):
 	# Pickle the search_cache
 	logging.critical("Begin Pickling.")
 	with open('search_cache.pickle', 'wb') as client_cache_file:
-		pickle.dump(params["search_cache"], client_cache_file, pickle.HIGHEST_PROTOCOL)
+		pickle.dump(params["search_cache"], \
+			client_cache_file, \
+			pickle.HIGHEST_PROTOCOL)
 	logging.critical("Pickling complete.")
 
 def usage():
@@ -218,7 +221,8 @@ def validate_params(params):
 	mandatory_keys = ["elasticsearch", "concurrency", "input", "logging"]
 	for key in mandatory_keys:
 		if key not in params:
-			raise Misconfiguration(msg="Misconfiguration: missing key, '" + key + "'", expr=None)
+			raise Misconfiguration(msg="Misconfiguration: missing key, '" + \
+				key + "'", expr=None)
 
 	if params["concurrency"] <= 0:
 		raise Misconfiguration(msg="Misconfiguration: 'concurrency' must be a positive integer", expr=None)
@@ -227,17 +231,23 @@ def validate_params(params):
 		params["input"]["hyperparameters"] = "config/hyperparameters/default.json"
 
 	if "index" not in params["elasticsearch"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.index'", expr=None)
+		raise Misconfiguration(msg="Misconfiguration: missing key, \
+			'elasticsearch.index'", expr=None)
 	if "type" not in params["elasticsearch"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.type'", expr=None)
+		raise Misconfiguration(msg="Misconfiguration: missing key, \
+			'elasticsearch.type'", expr=None)
 	if "cluster_nodes" not in params["elasticsearch"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'elasticsearch.cluster_nodes'", expr=None)
+		raise Misconfiguration(msg="Misconfiguration: missing key, \
+			'elasticsearch.cluster_nodes'", expr=None)
 	if "path" not in params["logging"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'logging.path'", expr=None)
+		raise Misconfiguration(msg="Misconfiguration: missing key, \
+			'logging.path'", expr=None)
 	if "filename" not in params["input"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'input.filename'", expr=None)
+		raise Misconfiguration(msg="Misconfiguration: missing key, \
+			'input.filename'", expr=None)
 	if "encoding" not in params["input"]:
-		raise Misconfiguration(msg="Misconfiguration: missing key, 'input.encoding'",\
+		raise Misconfiguration(msg="Misconfiguration: missing key, \
+			'input.encoding'",\
 			expr=None)
 	return True
 
