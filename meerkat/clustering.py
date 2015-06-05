@@ -1,44 +1,43 @@
 #!/usr/local/bin/python3
-# pylint: disable=C0301
 
 """This script clusters a list of latitude/ longitude pairs"""
 
-import sys
+# import copy
 from sklearn.cluster import DBSCAN
-from sklearn import metrics
-from sklearn.datasets.samples_generator import make_blobs
+# from sklearn import metrics
+# from sklearn.datasets.samples_generator import make_blobs
 from sklearn.preprocessing import StandardScaler
 from scipy.spatial import ConvexHull
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import pylab as pl
 import numpy as np
-from meerkat.various_tools import scale_polygon
-from pprint import pprint
+# from meerkat.various_tools import scale_polygon
+# from pprint import pprint
 
 def cluster(location_list):
 	"""Cluster Points"""
 
 	# Parse to float
 	location_list[:] = [[float(x[1]), float(x[0])] for x in location_list]
-	X = location_list
+	locations = location_list
 
-	X = StandardScaler().fit_transform(X)
-	db = DBSCAN(eps=0.08, min_samples=3).fit(X)
+	locations = StandardScaler().fit_transform(locations)
+	data = dataSCAN(eps=0.08, min_samples=3).fit(locations)
 
 	# Find Shapes
-	geoshapes = collect_clusters(X, db.labels_, location_list)
+	geoshapes = collect_clusters(locations, data.labels_, location_list)
 
 	# Plot Results
-	plot_clustering(db, X)
+	plot_clustering(data, locations)
 
 	return geoshapes
 
 def plot_clustering(model, normalized_points):
 	"""Plot results of clustering"""
 
-	core_samples = model.core_sample_indices_
+	# core_samples = model.core_sample_indices_
 	labels = model.labels_
-	n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
+	# n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
 	unique_labels = set(labels)
 	colors = pl.cm.Spectral(np.linspace(0, 1, len(unique_labels)))
 
@@ -47,11 +46,13 @@ def plot_clustering(model, normalized_points):
 			# Noise throws off visualization
 			continue
 		class_members = [index[0] for index in np.argwhere(labels == k)]
-		cluster_core_samples = [index for index in core_samples if labels[index] == k]
+		# cluster_core_samples = [index for index in core_samples if labels[index] == k]
 		for index in class_members:
-			x = normalized_points[index]
+			points = normalized_points[index]
 			markersize = 5
-			pl.plot(x[1], x[0], 'o', markerfacecolor=col, markeredgecolor='k', markersize=markersize)
+			pl.plot(points[1], points[0], \
+				'o', markerfacecolor=col, \
+				markeredgecolor='k', markersize=markersize)
 
 	pl.show()
 
@@ -88,7 +89,7 @@ def convex_hull(clusters, locations):
 	that bound those clusters"""
 
 	locations = np.array(locations)
-	geoshapes, scaled_geoshapes = [], []
+	geoshapes = []
 
 	for index, cluster in enumerate(clusters):
 
@@ -116,6 +117,8 @@ def convex_hull(clusters, locations):
 def convert_geoshapes_coordinates_to_strings(geoshape_list):
 	"""Returns a copy of geoshape_list where each coordinate is formatted as a comma
 	separated pair of string values. """
+	# why can't this function be replaced with copy.deepcopy() ?
+
 	new_geoshape_list = []
 	for geoshape in geoshape_list:
 		new_geoshape = []
@@ -130,4 +133,5 @@ def convert_geoshapes_coordinates_to_strings(geoshape_list):
 
 if __name__ == "__main__":
 	""" Do some stuff."""
-	print("This module is a library that contains useful functions; it should not be run from the console.")
+	print("This module is a library that contains useful functions;\
+	 it should not be run from the console.")
