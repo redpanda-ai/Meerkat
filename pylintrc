@@ -34,7 +34,7 @@ load-plugins=
 # can either give multiple identifier separated by comma (,) or put this option
 # multiple time.
 #disable=
-disable=C0330
+#disable=C0330
 
 [REPORTS]
 
