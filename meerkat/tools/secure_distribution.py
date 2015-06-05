@@ -4,13 +4,14 @@ import inspect
 import sys
 import re
 import uuid
+import logging
 from meerkat import bulk_loader
 
 def start():
 	try:
-			input_file = open(sys.argv[1], encoding='utf-8')
-			#params = json.loads(input_file.read())
-			input_file.close()
+		input_file = open(sys.argv[1], encoding='utf-8')
+		#params = json.loads(input_file.read())
+		input_file.close()
 	except IOError:
 		logging.error(sys.argv[1] + " not found, aborting.")
 		sys.exit()
@@ -25,8 +26,8 @@ def get_file_lines(input_filename):
 
 def filter_symbols(symbols, imports):
 	#black_list = {}
-	black_list = { '__builtins__', '__cached__', '__doc__',
-		'__file__', '__initializing__', '__loader__', '__name__', '__package__' }
+	black_list = {'__builtins__', '__cached__', '__doc__',
+		'__file__', '__initializing__', '__loader__', '__name__', '__package__'}
 	clear, masked = [], []
 	for symbol in symbols:
 		if symbol in black_list:
@@ -43,8 +44,8 @@ def filter_symbols(symbols, imports):
 def inspect_methods():
 	members = inspect.getmembers(bulk_loader.ThreadConsumer, predicate=inspect.isfunction)
 	my_list = []
-	for x, y in members:
-		my_list.append(x)
+	for member in members:
+		my_list.append(member[0])
 	#print("Members:\n{0}".format(members))
 	private_method_re = re.compile("^_(.*)(__.*[^_])$")
 	public_method_re = re.compile("^([^_].*)$")
@@ -71,15 +72,15 @@ def get_imports(lines):
 		if from_import_re.search(line):
 			matches = from_import_re.match(line)
 			symbols = matches.group(2).split(",")
-			for s in symbols:
-				s = s.strip()
-				results[s] = ''
+			for symbol in symbols:
+				symbol = symbol.strip()
+				results[symbol] = ''
 		elif import_re.search(line):
 			matches = import_re.match(line)
 			symbols = matches.group(1).split(",")
-			for s in symbols:
-				s = s.strip()
-				results[s] = ''
+			for symbol in symbols:
+				symbol = symbol.strip()
+				results[symbol] = ''
 	return results
 
 def mask_symbols(lines, masked, private_methods):
@@ -105,7 +106,7 @@ def mask_symbols(lines, masked, private_methods):
 
 def process(lines, imports):
 	symbols = dir(bulk_loader)
-	clear, masked = filter_symbols(symbols, imports)
+	_, masked = filter_symbols(symbols, imports)
 	private_methods, _ = inspect_methods()
 	mask_symbols(lines, masked, private_methods)
 
