@@ -9,7 +9,7 @@ import sys
 import threading
 
 from datetime import datetime
-from pprint import pprint
+# from pprint import pprint
 from elasticsearch import Elasticsearch, helpers
 
 from meerkat.custom_exceptions import InvalidArguments, Misconfiguration
@@ -71,7 +71,7 @@ class ThreadConsumer(threading.Thread):
 		self.document_queue = params["document_queue"]
 		self.params["concurrency_queue"].put(self.thread_id)
 		cluster_nodes = self.params["elasticsearch"]["cluster_nodes"]
-		self.es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True,
+		self.es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True, \
 			sniff_on_connection_fail=True, sniffer_timeout=5, sniff_timeout=5)
 		self.__set_logger()
 		self.batch_list = []
@@ -115,7 +115,7 @@ class ThreadConsumer(threading.Thread):
 			if document_queue_populated and document_queue.empty():
 				concurrency_queue.get()
 				concurrency_queue.task_done()
-				my_logger.info("Consumer finished, concurrency queue size: %i",
+				my_logger.info("Consumer finished, concurrency queue size: %i", \
 					concurrency_queue.qsize())
 				return
 			for i in range(params["batch_size"]):
@@ -195,7 +195,7 @@ class ThreadConsumer(threading.Thread):
 				document = {x: y for (x, y) in list(zip(header, item_list)) if y != ""}
 				#merge latitude and longitude into a point
 				if "longitude" in document and "latitude" in document:
-					document["pin"] = {"location":{"type": "point", "coordinates" :[
+					document["pin"] = {"location":{"type": "point", "coordinates" :[ \
 						document["longitude"], document["latitude"]]}}
 					del document["longitude"]
 					del document["latitude"]
@@ -207,12 +207,12 @@ class ThreadConsumer(threading.Thread):
 				self.__create_dispersed_fields(document)
 
 				docs.append(document)
-				action = {
-					"_index": params["elasticsearch"]["index"],
-					"_type": params["elasticsearch"]["type"],
-					"_id": document["factual_id"],
-					"_source": document,
-					"timestamp": datetime.now()
+				action = { \
+					"_index": params["elasticsearch"]["index"], \
+					"_type": params["elasticsearch"]["type"], \
+					"_id": document["factual_id"], \
+					"_source": document, \
+					"timestamp": datetime.now() \
 				}
 				actions.append(action)
 		# Make Calls to Elastic Search
@@ -252,7 +252,7 @@ def validate_composite_fields(params, my_props):
 		keys = field.keys()
 		for key in keys:
 			my_dict = field[key]
-			ensure_keys_in_dictionary(my_dict, my_keys,
+			ensure_keys_in_dictionary(my_dict, my_keys, \
 				prefix="elasticsearch.composite_fields.")
 
 			components = my_dict["components"]
@@ -271,7 +271,7 @@ def validate_dispersed_fields(params):
 		keys = field.keys()
 		for key in keys:
 			my_dict = field[key]
-			ensure_keys_in_dictionary(my_dict, my_keys,
+			ensure_keys_in_dictionary(my_dict, my_keys, \
 				prefix="elasticsearch.dispersed_fields.")
 
 def validate_boost_vectors(params, my_type, boost_vectors):
@@ -303,9 +303,9 @@ def validate_params(params):
 	my_keys = ["elasticsearch", "concurrency", "input", "logging", "batch_size"]
 	ensure_keys_in_dictionary(params, my_keys)
 
-	my_keys = ["index", "type_mapping", "type", "cluster_nodes",
+	my_keys = ["index", "type_mapping", "type", "cluster_nodes", \
 		"boost_labels", "boost_vectors", "composite_fields", "dispersed_fields"]
-	ensure_keys_in_dictionary(params["elasticsearch"], my_keys,
+	ensure_keys_in_dictionary(params["elasticsearch"], my_keys, \
 		prefix="elasticsearch.")
 
 	my_keys = ["filename", "encoding"]
@@ -357,11 +357,11 @@ def add_composite_type_mappings(params):
 		for key in keys:
 			if "composite" not in my_properties:
 				my_properties["composite"] = {"properties" : {}}
-			my_properties["composite"]["properties"][key] = {
-				"index" : field[key]["index"],
-				"type" : field[key]["type"]
+			my_properties["composite"]["properties"][key] = { \
+				"index" : field[key]["index"], \
+				"type" : field[key]["type"] \
 			}
-	logging.critical(json.dumps(params, sort_keys=True, indent=4,
+	logging.critical(json.dumps(params, sort_keys=True, indent=4, \
 		separators=(',', ':')))
 
 def add_dispersed_type_mappings(params):
@@ -377,11 +377,11 @@ def add_dispersed_type_mappings(params):
 		for key in keys:
 			components = field[key]["components"]
 			for component in components:
-				my_properties["dispersed"]["properties"][component["name"]] = {
-					"index" : component["index"],
-					"type" : component["type"]
+				my_properties["dispersed"]["properties"][component["name"]] = { \
+					"index" : component["index"], \
+					"type" : component["type"] \
 				}
-	logging.critical(json.dumps(params, sort_keys=True,
+	logging.critical(json.dumps(params, sort_keys=True, \
 		indent=4, separators=(',', ':')))
 
 def guarantee_index_and_doc_type(params):
@@ -389,7 +389,7 @@ def guarantee_index_and_doc_type(params):
 	cluster_nodes = params["elasticsearch"]["cluster_nodes"]
 	es_index = params["elasticsearch"]["index"]
 	doc_type = params["elasticsearch"]["type"]
-	es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True,
+	es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True, \
 		sniff_on_connection_fail=True, sniffer_timeout=5, sniff_timeout=5)
 	if es_connection.indices.exists(index=es_index):
 		logging.critical("Index exists, continuing")
@@ -421,7 +421,7 @@ def build_user_index():
 	# Initialize
 	cluster_nodes = params["elasticsearch"]["cluster_nodes"]
 	index_name = "user_index"
-	es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True,
+	es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True, \
 		sniff_on_connection_fail=True, sniffer_timeout=5, sniff_timeout=5)
 
 	# Build the Index
@@ -443,7 +443,7 @@ if __name__ == "__main__":
 	#Runs the entire program.
 	build_user_index()
 	PARAMS = initialize()
-	logging.warning(json.dumps(PARAMS, sort_keys=True,
+	logging.warning(json.dumps(PARAMS, sort_keys=True, \
 		indent=4, separators=(',', ':')))
 	guarantee_index_and_doc_type(PARAMS)
 	PARAMS["document_queue_populated"] = False
