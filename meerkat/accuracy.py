@@ -60,7 +60,7 @@ def test_bulk_classifier(human_labeled, non_physical_trans, my_lists):
 				if human_labeled_row['IS_PHYSICAL_TRANSACTION'] == '1':
 					my_lists["incorrect_non_physical"].append(item)
 
-def test_accuracy(params, file_path=None, non_physical_trans=None,
+def test_accuracy(params, file_path=None, non_physical_trans=None, \
 	result_list=None):
 	"""Takes file by default but can accept result
 	queue/ non_physical list. Attempts to provide various
@@ -82,13 +82,13 @@ def test_accuracy(params, file_path=None, non_physical_trans=None,
 		return
 
 	# Load Verification Source
-	verification_source = params.get("verification_source",
+	verification_source = params.get("verification_source", \
 		"data/misc/verifiedLabeledTrans.csv")
 	human_labeled = load_dict_list(verification_source, delimiter=",")
 
-	my_counters = {
-		"total": len(machine_labeled),
-		"total_processed": len(machine_labeled) + len(non_physical_trans)
+	my_counters = { \
+		"total": len(machine_labeled), \
+		"total_processed": len(machine_labeled) + len(non_physical_trans) \
 	}
 
 	#Abort if there is nothing to process
@@ -96,9 +96,9 @@ def test_accuracy(params, file_path=None, non_physical_trans=None,
 		logging.warning("Nothing provided to perform accuracy tests on")
 		return
 
-	my_lists = {
-		"needs_hand_labeling": [], "non_physical": [], "mislabeled": [],
-		"unlabeled": [], "correct": [], "incorrect_non_physical" : []
+	my_lists = { \
+		"needs_hand_labeling": [], "non_physical": [], "mislabeled": [], \
+		"unlabeled": [], "correct": [], "incorrect_non_physical" : [] \
 	}
 
 	# Test Pinpoint Classifier for recall and precision
@@ -114,29 +114,29 @@ def test_accuracy(params, file_path=None, non_physical_trans=None,
 	if my_counters["num_verified"] <= 0:
 		my_counters["num_verified"] = 1
 	binary_accuracy = 100 - ((len(my_lists["non_physical"])\
-		+ len(my_lists["incorrect_non_physical"])) /
+		+ len(my_lists["incorrect_non_physical"])) / \
 		my_counters["total_processed"]) * 100
 
 	#rounded_percent = lambda x: math.ceil(x * 100)
 
-	return {
-		"total_processed": my_counters["total_processed"],
-		"total_physical": my_counters["total"] / my_counters["total_processed"] * 100,
-		"total_non_physical": len(non_physical_trans) /
-			my_counters["total_processed"] * 100,
-		"correct": my_lists["correct"],
-		"needs_hand_labeling": my_lists["needs_hand_labeling"],
-		"non_physical": my_lists["non_physical"],
-		"unlabeled": my_lists["unlabeled"],
-		"num_verified": my_counters["num_verified"],
-		"num_labeled": my_counters["num_labeled"],
-		"mislabeled": my_lists["mislabeled"],
-		"total_recall": my_counters["num_labeled"] /
-			my_counters["total_processed"] * 100,
-		"total_recall_physical": my_counters["num_labeled"] /
-			my_counters["total"] * 100,
-		"precision": len(my_lists["correct"]) / my_counters["num_verified"] * 100,
-		"binary_accuracy": binary_accuracy
+	return { \
+		"total_processed": my_counters["total_processed"], \
+		"total_physical": my_counters["total"] / my_counters["total_processed"] * 100,  \
+		"total_non_physical": len(non_physical_trans) / \
+			my_counters["total_processed"] * 100, \
+		"correct": my_lists["correct"], \
+		"needs_hand_labeling": my_lists["needs_hand_labeling"], \
+		"non_physical": my_lists["non_physical"], \
+		"unlabeled": my_lists["unlabeled"], \
+		"num_verified": my_counters["num_verified"], \
+		"num_labeled": my_counters["num_labeled"], \
+		"mislabeled": my_lists["mislabeled"], \
+		"total_recall": my_counters["num_labeled"] / \
+			my_counters["total_processed"] * 100, \
+		"total_recall_physical": my_counters["num_labeled"] / \
+			my_counters["total"] * 100, \
+		"precision": len(my_lists["correct"]) / my_counters["num_verified"] * 100, \
+		"binary_accuracy": binary_accuracy \
 	}
 
 def speed_tests(start_time, accuracy_results):
@@ -150,13 +150,13 @@ def speed_tests(start_time, accuracy_results):
 
 	print("\nSPEED TESTS:")
 	print("{0:35} = {1:11}".format("Total Time Taken", str(time_delta)[0:11]))
-	print("{0:35} = {1:11.2f}".format("Time per Transaction (in seconds)",
+	print("{0:35} = {1:11.2f}".format("Time per Transaction (in seconds)", \
 		time_per_transaction))
-	print("{0:35} = {1:11.2f}".format("Transactions Per Minute",
+	print("{0:35} = {1:11.2f}".format("Transactions Per Minute", \
 		transactions_per_minute))
 
-	return {'time_delta':time_delta,
-			'time_per_transaction': time_per_transaction,
+	return {'time_delta':time_delta, \
+			'time_per_transaction': time_per_transaction, \
 			'transactions_per_minute':transactions_per_minute}
 
 def print_results(results):
@@ -166,27 +166,27 @@ def print_results(results):
 		return
 
 	print("\nSTATS:")
-	print("{0:35} = {1:11}".format("Total Transactions Processed",
+	print("{0:35} = {1:11}".format("Total Transactions Processed", \
 		results['total_processed']))
-	print("{0:35} = {1:10.2f}%".format("Total Labeled Physical",
+	print("{0:35} = {1:10.2f}%".format("Total Labeled Physical", \
 		results['total_physical']))
-	print("{0:35} = {1:10.2f}%".format("Total Labeled Non Physical",
+	print("{0:35} = {1:10.2f}%".format("Total Labeled Non Physical", \
 		results['total_non_physical']))
-	print("{0:35} = {1:10.2f}%".format("Binary Classifier Accuracy",
+	print("{0:35} = {1:10.2f}%".format("Binary Classifier Accuracy", \
 		results['binary_accuracy']))
 	print("\n")
-	print("{0:35} = {1:10.2f}%".format("Recall all transactions",
+	print("{0:35} = {1:10.2f}%".format("Recall all transactions", \
 		results['total_recall']))
-	print("{0:35} = {1:10.2f}%".format("Recall physical",
+	print("{0:35} = {1:10.2f}%".format("Recall physical", \
 		results['total_recall_physical']))
-	print("{0:35} = {1:11}".format("Number of transactions labeled",
+	print("{0:35} = {1:11}".format("Number of transactions labeled", \
 		results['num_labeled']))
-	print("{0:35} = {1:11}".format("Number of transactions verified",
+	print("{0:35} = {1:11}".format("Number of transactions verified", \
 		results['num_verified']))
-	print("{0:35} = {1:10.2f}%".format("Precision",
+	print("{0:35} = {1:10.2f}%".format("Precision", \
 		results['precision']))
 	print("", "MISLABELED:", '\n'.join(results['mislabeled']), sep="\n")
-	print("", "MISLABELED BINARY:", '\n'.join(results['non_physical']),
+	print("", "MISLABELED BINARY:", '\n'.join(results['non_physical']), \
 		sep="\n")
 
 def run_from_command_line(command_line_arguments):
