@@ -20,13 +20,33 @@ from tornado.options import define, options
 
 from meerkat.web_service.api import Meerkat_API
 
+import logging
+from logging.handlers import TimedRotatingFileHandler
+
+def create_timed_rotating_log(path):
+	""""""
+	logger = logging.getLogger("Rotating Log")
+	logger.setLevel(logging.INFO)
+
+	# create a handler to rotate 7 logs every minute
+	handler = TimedRotatingFileHandler(path,
+									   when = "s",
+									   interval = 10,
+									   backupCount = 7)
+	logger.addHandler(handler)
+	logger.info("Created rotating logs")
+
 # Define Some Defaults
 define("port", default=443, help="run on the given port", type=int)
 
 def main():
 	"""Launches an HTTPS web service."""
+
 	# Log access to the web service
 	tornado.options.parse_command_line()
+
+	# Start the logs
+	create_timed_rotating_log("logs/web_service_log.log")
 
 	# Define valid routes
 	# pylint: disable=bad-continuation
@@ -47,6 +67,7 @@ def main():
 	# Create the http server
 	http_server = tornado.httpserver.HTTPServer(application,\
 		ssl_options=ssl_options)
+
 	# Start the http_server listening on default port
 	http_server.listen(options.port)
 	tornado.ioloop.IOLoop.instance().start()
