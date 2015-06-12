@@ -22,7 +22,7 @@
 			"transaction_id" : 2,
 			"is_physical_merchant" : false,
 			"txn_type" : "Payment",
-			"sub_txn_type": ""
+			"txn_sub_type": ""
 		},
 		{
 			"transaction_id" : 3,
