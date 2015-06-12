@@ -263,7 +263,7 @@ class Web_Consumer():
 			if trans["CNN"] != "":
 				trans[attr_map["name"]] = trans["CNN"]
 
-			del trans["description"]
+			#del trans["description"]
 			del trans["amount"]
 			del trans["date"]
 			del trans["CNN"]
