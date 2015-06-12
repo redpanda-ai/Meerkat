@@ -46,7 +46,7 @@ def main():
 	tornado.options.parse_command_line()
 
 	# Start the logs
-	create_timed_rotating_log("logs/web_service_log.log")
+	create_timed_rotating_log("logs/web_service.log")
 
 	# Define valid routes
 	# pylint: disable=bad-continuation
