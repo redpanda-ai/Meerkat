@@ -21,7 +21,8 @@
 		{
 			"transaction_id" : 2,
 			"is_physical_merchant" : false,
-			"category_labels" : ["bank_transfer"]
+			"txn_type" : "Payment",
+			"sub_txn_type": ""
 		},
 		{
 			"transaction_id" : 3,
