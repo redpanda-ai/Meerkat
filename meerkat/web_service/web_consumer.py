@@ -22,12 +22,12 @@ from meerkat.various_tools import synonyms, get_bool_query, get_qs_query
 from meerkat.classification.load import select_model
 from meerkat.classification.lua_bridge import get_CNN
 
-BANK_CLASSIFIER = select_model("bank")
-CARD_CLASSIFIER = select_model("card")
-BANK_NPMN = select_model("bank_NPMN")
+BANK_SWS = select_model("bank")
+CARD_SWS = select_model("card")
 TRANSACTION_ORIGIN = select_model("transaction_type")
 SUB_TRANSACTION_ORIGIN = select_model("sub_transaction_type")
-APPLY_CNN = get_CNN("Card_Merchant_Name_500")
+BANK_CNN = get_CNN("bank")
+CARD_CNN = get_CNN("card")
 
 def grouper(iterable):
     return zip_longest(*[iter(iterable)]*128, fillvalue={"description":""})
@@ -260,7 +260,7 @@ class Web_Consumer():
 		for trans in transactions:
 
 			# Override output with CNN v1
-			if trans["CNN"] != "" and data["container"] == "card":
+			if trans["CNN"] != "":
 				trans[attr_map["name"]] = trans["CNN"]
 
 			#del trans["description"]
@@ -299,18 +299,6 @@ class Web_Consumer():
 
 		return enriched
 
-	def __enrich_non_physical(self, data, transactions):
-		"""Enrich non-physical bank transactions with Meerkat"""
-
-		if len(transactions) == 0 or data["container"] == "card":
-			return transactions
-
-		for trans in transactions:
-			name = BANK_NPMN(trans["description"])
-			trans["merchant_name"] = name.title()
-
-		return transactions
-
 	def __add_transaction_origin(self, data):
 		"""Add transaction origin and sub origin to transaction"""
 
@@ -334,7 +322,7 @@ class Web_Consumer():
 
 		# Determine Whether to Search
 		for trans in transactions:
-			classifier = BANK_CLASSIFIER if (data["container"] == "bank") else CARD_CLASSIFIER
+			classifier = BANK_SWS if (data["container"] == "bank") else CARD_SWS
 			label = classifier(trans["description"])
 			trans["is_physical_merchant"] = True if (label == "1") else False
 			(non_physical, physical)[label == "1"].append(trans)
@@ -345,10 +333,11 @@ class Web_Consumer():
 		"""Apply the CNN to transactions"""
 
 		batches = grouper(transactions)
+		classifier = BANK_CNN if (data["container"] == "bank") else CARD_CNN
 		processed = []
 
 		for i, batch in enumerate(batches):
-			processed += APPLY_CNN(batch)
+			processed += classifier(batch)
 
 		return processed[0:len(transactions)]
 
@@ -359,7 +348,6 @@ class Web_Consumer():
 		transactions = self.__apply_CNN(data, transactions)
 		physical, non_physical = self.__sws(data, transactions)
 		physical = self.__enrich_physical(physical)
-		non_physical = self.__enrich_non_physical(data, non_physical)
 		transactions = self.ensure_output_schema(data, physical, non_physical)
 		data["transaction_list"] = transactions
 

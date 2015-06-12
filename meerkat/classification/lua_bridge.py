@@ -36,14 +36,28 @@ def get_CNN(model_name):
 	torch = lua.require('torch')
 	cutorch = lua.require('cutorch')
 	cunn = lua.require('cunn')
-
-	# Load Dataframe
-	reverse_label_map = load_label_map("meerkat/classification/label_maps/reverse_card_label_map.json")
-
-	# Load CNN
+	
+	# Load Config
 	lua.execute('''
 		dofile("meerkat/classification/lua/config.lua")
-		model = Model:makeCleanSequential(torch.load("meerkat/classification/models/deepConv_Card_500.t7b"))
+	''')
+
+	# Load CNN and Label map
+	if model_name == "bank":
+		reverse_label_map = load_label_map("meerkat/classification/label_maps/reverse_bank_label_map.json")
+		lua.execute('''
+			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/612_class_bank_CNN.t7b"))
+		''')
+	elif model_name == "card":
+		reverse_label_map = load_label_map("meerkat/classification/label_maps/reverse_card_label_map.json")
+		lua.execute('''
+			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/750_class_card_CNN.t7b"))
+		''')
+	else:
+		print("Requested CNN does not exist. Please reference an existing model")
+
+	# Prepare CNN
+	lua.execute('''
 		model = model:type("torch.CudaTensor")
 		cutorch.synchronize()
 
