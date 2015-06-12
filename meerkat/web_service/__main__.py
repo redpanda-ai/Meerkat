@@ -7,6 +7,9 @@ EXAMPLE CURL COMMAND TO TEST WEB SERVICE:
 # curl --insecure -s -X POST -d @big.json https://localhost:443/meerkat/ \
 --header "Content-Type:application/json" | python3.3 -m json.tool
 
+@author: J. Andrew Key
+@author: Sivan Mehta
+
 """
 #import json
 import os

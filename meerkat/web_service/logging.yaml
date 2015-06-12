@@ -1,5 +1,5 @@
-# taken from: https://gist.github.com/bootandy/5546891
-
+# adapted from: https://gist.github.com/bootandy/5546891
+# created by Sivan Mehta
 # use with: logging.config.dictConfig(yaml.load(open('logging.yaml', 'r')))
 
 # Formatters detailed here: http://docs.python.org/2/library/logging.html#logrecord-attributes
