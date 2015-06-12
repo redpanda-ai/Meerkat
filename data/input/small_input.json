@@ -8,6 +8,13 @@
     "date":"2014-12-22",
     "ledger_entry":"debit",
     "description":"DEBIT CARD PURCHASE   XXXXX0355     MCDONALDS F3441          CORBIN      KY",
-    "transaction_id":1
+    "transaction_id": 1
+  },
+  {
+    "amount":45.42,
+    "date":"2014-12-01",
+    "ledger_entry":"debit",
+    "description":"FRED MEYER               ANCHORAGE    AK~~08888~~5438058079334354~~94022~~0~~~~0066",
+    "transaction_id":2
   }]
 }
