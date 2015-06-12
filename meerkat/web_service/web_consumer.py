@@ -198,7 +198,7 @@ class Web_Consumer():
 
 		# Add Source
 		index = params["elasticsearch"]["index"]
-		transaction["source"] = "FACTUAL" if ("factual" in index) else "OTHER"
+		transaction["source"] = "FACTUAL" if ("factual" in index) and (transaction["match_found"] == True) else "YODLEE"
 
 		return transaction
 
