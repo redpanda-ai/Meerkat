@@ -1,0 +1,13 @@
+{
+  "cobrand_id" : 1234,
+  "user_id" : 2345,
+  "container" : "bank",
+  "transaction_list" : [
+  {
+    "amount":11.88,
+    "date":"2014-12-22",
+    "ledger_entry":"debit",
+    "description":"DEBIT CARD PURCHASE   XXXXX0355     MCDONALDS F3441          CORBIN      KY",
+    "transaction_id":1
+  }]
+}
