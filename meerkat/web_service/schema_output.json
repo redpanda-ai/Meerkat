@@ -71,7 +71,7 @@
 			"description" : "An array containing at least one of the following response types.",
 			"type" : "array",
 			"items" : {
-				"oneOf": [
+				"anyOf": [
 					{"$ref": "#/definitions/physical_merchant_response"},
 					{"$ref": "#/definitions/no_match_found"},
 					{"$ref": "#/definitions/non_physical_merchant_response"},
