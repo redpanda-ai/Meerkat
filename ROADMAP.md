@@ -38,15 +38,14 @@
 		* - [ ] Take the initiative and propose new ideas
 			* be prepared to back them up with code, since talk is cheap
 	* 06-12
-		* - [ ] Add a [daily rolling log file for our web service] (https://github.com/joeandrewkey/Meerkat/issues/131)
-			* [Pull Request Accepted] (https://github.com/joeandrewkey/Meerkat/issues/143)
-		
-
+		* - [x] Add a [daily rolling log file for our web service] (https://github.com/joeandrewkey/Meerkat/issues/131)
+	* 06-13
+		* - [ ] Submit a pull request for [pylint] (https://github.com/joeandrewkey/Meerkat/tree/pylint)
 
 ### DEPENDENCIES
 #### v1.1.0
 1. **Project Management**, Vinay
-	* - [x] Follow up with our DevOps recruiting
+	* - [ ] Follow up with our DevOps recruiting
 
 ### RECENTLY COMPLETED
 #### Matt
