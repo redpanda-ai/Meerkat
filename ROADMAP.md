@@ -12,11 +12,11 @@
 	* 06-15
 		* - [ ] Get an up-to-date version of the ROADMAP together
 		* - [ ] Get a job description for a DevOps engineer ready for Vinay
-		* - [x] Create a feature branch for [#143] (https://github.com/joeandrewkey/Meerkat/issues/143)
+		* - [x] Create a feature branch for [Locale Bloom Filter] (https://github.com/joeandrewkey/Meerkat/issues/143)
 		* - [x] Create a GitHub issue for Vinay's Questions and Answers
 		* - [x] Validate and potentially merge pull request [#144] (https://github.com/joeandrewkey/Meerkat/pull/144)
 	* 06-17
-		* - [x] Issue a pull request for [#143] (https://github.com/joeandrewkey/Meerkat/issues/143)
+		* - [x] Issue a pull request for [Locale Bloom Filter] (https://github.com/joeandrewkey/Meerkat/issues/143)
 		* - [ ] Validate and potentially merge pull request [#145] (https://github.com/joeandrewkey/Meerkat/pull/145)
 
 2.  **Matt Sevrens**
