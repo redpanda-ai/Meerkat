@@ -1,0 +1,13 @@
+All from root directory
+
+to start server:
+	./start_server.sh
+
+to check if server is running (3 processes will come up if server is running)
+	ps -ef | grep python3
+
+	the job id is the second column
+
+
+to kill server
+	kill <job id>
