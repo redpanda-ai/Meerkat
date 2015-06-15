@@ -1,36 +1,19 @@
 ### TASKS
-#### v1.1.0 *(scheduled for 3/31)*
+#### v1.1.0 *(scheduled for 2015-06-22)*
 1.  **Meerkat Team**, Andy
-	* Begins 3/1 - Work with Program Management
+	* Ongoing - At various states of completion
 		* - [x] Assist with complete schedule for v1.1.0 release
-			* - [x] thoughtful plan
-			* - [x] list tasks
-			* - [x] list dependencies
-			* - [x] timeline with milestones
-	* 3/12
-		* - [x] Advertise the Jobvite for our new position through LinkedIn.
-		* - [x] Meet with Kirti on the architecture and design of our transaction data enrichment service
-		* - [ ] Look at traffic on early adopter program
-			* - review logs for possible bugs
-			* - try to get a sense of the traffic, report rates, etc.
-			* - 10.16.3.99 and 10.16.2.226
-			* - start using a daily rolling log file, and add some dates to the timestamps
+			* - [x] Architecture Documents
+			* - [x] Development RoadMap
+	* 06-15
+		* - [ ] Get an up-to-date version of the ROADMAP together
+		* - [x] Create a feature branch for [#143] (https://github.com/joeandrewkey/Meerkat/issues/143)
+		* - [x] Create a GitHub issue for Vinay's Questions and Answers
+		* - [x] Validate and potentially merge pull request [#144] (https://github.com/joeandrewkey/Meerkat/pull/144)
+	* 06-17
+		* - [x] Issue a pull request for [#143] (https://github.com/joeandrewkey/Meerkat/issues/143)
+		* - [ ] Validate and potentially merge pull request [#145] (https://github.com/joeandrewkey/Meerkat/pull/145)
 
-		* - [ ] Build a basic plan around the concept of a "cadence" for the development testing and release of Meerkat improvements
-			* Tom suggests that a weekly rhythm is possible, explore the idea and propose reasons why it might or might not work
-			* In any event think of getting the SCT and the TOC up and running end-to-end by 3/31.  Once that is in place, we'll need some sort of predicatable pace to upgrading our models, and our search queries.
-	* 3/30
-		* - [ ] Create a pull request for the ***new_daemon*** branch
-	* 4/1
-		* - [ ] Write up a job description for a DevOps build/release/testing/automation position to
-			* fill our regression test suite with tests
-			* set up our continuous integration server
-			* escort our tagged releases into production
-			* work with Operations to build run books to operationalize Meerkat so that we can stop supporting it.
-	* 4/1 (ongoing)
-		* - [ ] Recruiting effort for both the Data Science / Machine Learning and the DevOps build/release/testing position
-	* Not estimated but important
-		* - [ ] :clock4: Cut a first draft of the Shadow CT version 2.0
 2.  **Meerkat Team**, Matt
 	* Begins 3/1 - Drive the Labeling Effort
 		* - [x] Periodically communicate with Smita R. and Ram about new requirements
