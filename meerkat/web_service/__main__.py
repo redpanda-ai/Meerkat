@@ -22,7 +22,6 @@ from tornado.options import define, options
 from meerkat.web_service.api import Meerkat_API
 
 import logging, yaml
-from logging.handlers import TimedRotatingFileHandler
 
 
 # Define Some Defaults
@@ -36,7 +35,8 @@ def main():
 
 	# Start the logs
 	# create_timed_rotating_log("logs/web_service.log")
-	logging.config.dictConfig(yaml.load(open('meerkat/web_service/logging.yaml', 'r')))
+	logging.config.dictConfig(yaml.load( \
+		open('meerkat/web_service/logging.yaml', 'r')))
 
 	# Define valid routes
 	# pylint: disable=bad-continuation
