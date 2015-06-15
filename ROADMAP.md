@@ -14,10 +14,10 @@
 		* - [ ] Get a job description for a DevOps engineer ready for Vinay
 		* - [x] Create a feature branch for [Locale Bloom Filter] (https://github.com/joeandrewkey/Meerkat/issues/143)
 		* - [x] Create a GitHub issue for Vinay's Questions and Answers
-		* - [x] Validate and potentially merge pull request [#144] (https://github.com/joeandrewkey/Meerkat/pull/144)
+		* - [x] Validate and potentially merge pull request [Rotating Log File] (https://github.com/joeandrewkey/Meerkat/pull/144)
 	* 06-17
-		* - [x] Issue a pull request for [Locale Bloom Filter] (https://github.com/joeandrewkey/Meerkat/issues/143)
-		* - [ ] Validate and potentially merge pull request [#145] (https://github.com/joeandrewkey/Meerkat/pull/145)
+		* - [ ] Issue a pull request for [Locale Bloom Filter] (https://github.com/joeandrewkey/Meerkat/issues/143)
+		* - [ ] Validate and potentially merge pull request [CNN Integration] (https://github.com/joeandrewkey/Meerkat/pull/145)
 
 2.  **Matt Sevrens**
 	* Ongoing - At various states of completion
@@ -26,7 +26,7 @@
 			* "Text Understanding From Scratch"
 			* "Convolutional Neural Networks"
 	* 06-12
-		* - [x] Submit pull request for CNN Integration [#145] (https://github.com/joeandrewkey/Meerkat/pull/145)				* - [x] Train a CNN for bank merchants
+		* - [x] Submit pull request for [CNN Integration] (https://github.com/joeandrewkey/Meerkat/pull/145)				* - [x] Train a CNN for bank merchants
 			* - [x] Train a CNN for card merchants
 			* - [x] Create a bridge to allow us to load our Lua modules from within the web service
 3.  **Sivan Mehta**
@@ -35,10 +35,11 @@
 			* Selection of tools, libraries, languages
 			* Level and correctness of documentation
 			* Organization
-		* - [ ] Take the initiative.
-			* Propose new ideas, but be prepared to back them up with code (since talk is cheap)
+		* - [ ] Take the initiative and propose new ideas
+			* be prepared to back them up with code, since talk is cheap
 	* 06-12
-		* - [ ] Add a daily rolling log file for our web service [#131] (https://github.com/joeandrewkey/Meerkat/issues/131)
+		* - [ ] Add a [daily rolling log file for our web service] (https://github.com/joeandrewkey/Meerkat/issues/131)
+			* [Pull Request Accepted] (https://github.com/joeandrewkey/Meerkat/issues/143)
 		
 
 
