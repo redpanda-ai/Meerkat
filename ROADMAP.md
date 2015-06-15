@@ -47,6 +47,7 @@
 1. **Project Management**, Vinay
 	* - [ ] Follow up with our DevOps recruiting
 	* - [ ] Get the labeled data from the Deep Cleaning initiative
+	* - [ ] Get our validation file from Shaja's group wrt Deep Cleaning
 
 ### RECENTLY COMPLETED
 #### Matt
