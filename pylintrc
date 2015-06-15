@@ -78,8 +78,8 @@ max-module-lines=1000
 indent-string="\t"
 ignore-bad-continuation=yes
 
-# disable trailign whitespace
-disable=C0303, bad-continuation
+# disable formatting errors
+disable=C0303, bad-continuation, W1202
 
 [VARIABLES]
 
