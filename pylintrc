@@ -79,7 +79,7 @@ indent-string="\t"
 ignore-bad-continuation=yes
 
 # disable formatting errors
-disable=C0303, bad-continuation, W1202
+disable=C0303, bad-continuation, W1202, bad-builtin
 
 [VARIABLES]
 
