@@ -76,7 +76,10 @@ max-module-lines=1000
 # String used as indentation unit. This is usually " " (4 spaces) or "\t" (1
 # tab).
 indent-string="\t"
+ignore-bad-continuation=yes
 
+# disable trailign whitespace
+disable=C0303, bad-continuation
 
 [VARIABLES]
 
