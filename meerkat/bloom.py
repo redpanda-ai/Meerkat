@@ -62,7 +62,7 @@ def create_merchant_bloom(src_filename, dst_filename, partial_filename):
 		#Handle partial merchant names to partial bloom
 		splits = merchant_name.split()
 		if len(splits) > 1:
-			for i in range(1,len(splits)):
+			for i in range(1, len(splits)):
 				partial = " ".join(splits[:i])
 				print("\tAdding '{0}'".format(partial))
 				p_bloom.add(partial)
