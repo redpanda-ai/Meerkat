@@ -10,7 +10,7 @@
 			* Linux
 			* Python
 	* 06-15
-		* - [ ] Get an up-to-date version of the ROADMAP together
+		* - [x] Get an up-to-date version of the ROADMAP together
 		* - [x] Get a job description for a DevOps engineer ready for Vinay
 		* - [x] Create a feature branch for [Locale Bloom Filter] (https://github.com/joeandrewkey/Meerkat/issues/143)
 		* - [x] Create a GitHub issue for Vinay's Questions and Answers
