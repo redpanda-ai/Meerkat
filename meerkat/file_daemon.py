@@ -36,12 +36,11 @@ def launch_remote_producer(params, instance_ip, item):
 	log_name = "logs/" + panel_name + "." + file_name + ".log"
 	#Verify that we have a 'remote' connection tothe host
 	verify_remote_instance(params, instance_ip)
-	user = params["launchpad"]["username"]
-	keyfile = params["launchpad"]["key_filename"]
+
 	remote = params[instance_ip]
 	command = remote["carriage"][panel_name][file_name][log_name]
 	with remote.cwd("/root/git/Meerkat"):
-		f = (command) & BG
+		_ = (command) & BG
 
 def verify_remote_instance(params, instance_ip):
 	"""Ensures that our params dict maintains an open remote connection."""
@@ -95,7 +94,6 @@ def distribute_file(params, file_to_push):
 		logging.error("file_to_push fails to match regex, aborting.")
 		sys.exit()
 	working_directory = matches.group(1)
-	working_filename = matches.group(2)
 	# Get the local hash
 	local_hash = None
 	command = local["sha1sum"][file_to_push]
@@ -124,16 +122,13 @@ def distribute_file(params, file_to_push):
 def get_files_in_progress(params):
 	"""Scans for available 'slots' on the remote clients.  Should it find any, it
 	then launches an instance of the file_producer into those empty slots"""
-	lp = params["launchpad"]
-	instance_ips = lp["instance_ips"]
-	total_slots = lp["per_instance_clients"]
+	launchpad = params["launchpad"]
+	instance_ips = launchpad["instance_ips"]
 	params["in_progress"] = []
 	#Loop through each launchpad host
 	#write_local_report(params)
 	logging.info("Counting running clients")
 	for instance_ip in instance_ips:
-		#logging.info("Counting running clients on {0}".format(instance_ip))
-		process_count = 0
 		#Ensure that we have a remote producer
 		verify_remote_instance(params, instance_ip)
 		#Count remote file producers
@@ -145,32 +140,15 @@ def get_files_in_progress(params):
 			splits = re.split('\s+', line)
 			if len(splits) > 12:
 				if splits[10] == "meerkat.file_producer":
-					process_count += 1
 					panel_name, panel_file = splits[11:13]
 					params["in_progress"].append((panel_name, panel_file, params[panel_name]))
-					#logging.info("Panel name: {0}, Panel file: {1}".format(panel_name, panel_file))
-		#Calculate available slots
-		remaining_slots = total_slots - process_count
-		#logging.info("{0} has {1} remaining slots".format(instance_ip, remaining_slots))
-		#Fill slots from list of files that are 'not_started'
-
-		#Add the files in progress
-		#for i in range(remaining_slots):
-		#	if (("not_started" in params) and (params["not_started"])):
-				#my_list = params["not_started"][:]
-				#item = my_list.pop()
-		#		item = params["not_started"].pop()
-		#		panel_name, panel_file = item[0:2]
-		#		params["in_progress"].append((panel_name, panel_file, params[panel_name]))
-
-	#write_local_report(params)
 
 def launch_remote_clients_into_available_slots(params):
 	"""Scans for available 'slots' on the remote clients.  Should it find any, it
 	then launches an instance of the file_producer into those empty slots"""
-	lp = params["launchpad"]
-	instance_ips = lp["instance_ips"]
-	total_slots = lp["per_instance_clients"]
+	launchpad = params["launchpad"]
+	instance_ips = launchpad["instance_ips"]
+	total_slots = launchpad["per_instance_clients"]
 	#Loop through each launchpad host
 	#write_local_report(params)
 	for instance_ip in instance_ips:
@@ -194,8 +172,8 @@ def launch_remote_clients_into_available_slots(params):
 		remaining_slots = total_slots - process_count
 		logging.info("{0} has {1} remaining slots".format(instance_ip, remaining_slots))
 		#Fill slots from list of files that are 'not_started'
-		for i in range(remaining_slots):
-			if (("not_started" in params) and (params["not_started"])):
+		for _ in range(remaining_slots):
+			if ("not_started" in params) and (params["not_started"]):
 				item = params["not_started"].pop()
 				panel_name, panel_file = item[0:2]
 				launch_remote_producer(params, instance_ip, item)
@@ -212,17 +190,17 @@ def write_local_report(params):
 	#This scheduler prefers daily update files to all others, regardless
 	#of priority.
 	#Get todays date minus 14 days
-	three_weeks_ago = str(date.today() - timedelta(days=14)).replace("-","")
+	three_weeks_ago = str(date.today() - timedelta(days=14)).replace("-", "")
 	#Get the set of recent files
-	recent_files = [ x for x in not_started if x[1][:8] >= three_weeks_ago ]
+	recent_files = [x for x in not_started if x[1][:8] >= three_weeks_ago]
 	logging.warning("RECENT_FILES")
 	logging.warning(recent_files)
 	#Get the set of older files
-	older_files = [ x for x in not_started if x[1][:8] < three_weeks_ago ]
+	older_files = [x for x in not_started if x[1][:8] < three_weeks_ago]
 	#Sort the recent files by date(reversed)
 	recent_files = sorted(recent_files, key=itemgetter(1), reverse=True)
 	#Sort the older files, by priority and then date(reversed)
-	older_files = sorted(older_files, key=itemgetter(2,1), reverse=True)
+	older_files = sorted(older_files, key=itemgetter(2, 1), reverse=True)
 
 	sorted_not_started = []
 	sorted_not_started.extend(older_files)
@@ -243,7 +221,6 @@ def write_local_report(params):
 	}
 	for report in params["report"]:
 		overall_report["panels"].append(report)
-	report_timestamp = time.strftime("%c")
 	local_report_file = params.get("local_report_file", "/dev/null")
 	full_report = json.dumps(overall_report, sort_keys=True, indent=4,
 		separators=(",", ": "))
@@ -261,7 +238,6 @@ def scan_locations(params):
 		name = pair["name"]
 		params[name] = pair_priority
 		logging.info("Comparing {0}".format(name))
-		#logging.info("Scanning\n\t{0}\n\t{1}".format(pair["src_location"], pair["dst_location"]))
 		src_dict = scan_s3_location(params, pair["src_location"])
 		dst_dict = scan_s3_location(params, pair["dst_location"])
 		update_pending_files(params, name, src_dict, dst_dict, pair_priority)
@@ -307,12 +283,12 @@ def update_pending_files(params, name, src_dict, dst_dict, pair_priority):
 		for k in src_keys
 		if k in dst_keys 
 			and float(src_dict[k][4]) > min_size
-			and float(src_dict[k][4]) / float(dst_dict[k][4]) < threshold ]
+			and float(src_dict[k][4]) / float(dst_dict[k][4]) < threshold]
 	too_small = [(name, k, pair_priority)
 		for k in src_keys
 		if k in dst_keys
 			and float(src_dict[k][4]) > min_size
-			and float(dst_dict[k][4]) / float(src_dict[k][4]) < threshold ]
+			and float(dst_dict[k][4]) / float(src_dict[k][4]) < threshold]
 	#log information
 	logging.info("Too big:")
 	for item in too_big:
@@ -336,8 +312,8 @@ def update_pending_files(params, name, src_dict, dst_dict, pair_priority):
 	# Extend the list of "not_finished" files to include what we just discovered
 	params["not_finished"].extend(total_list)
 	# Log a quick report of what was found
-	my_report = { "name": name, "src" : len(src_dict), "dst" : len(dst_dict),
-		"newer_src": len(newer_src), "not_in_dst": len(not_in_dst) }
+	my_report = {"name": name, "src" : len(src_dict), "dst" : len(dst_dict),
+		"newer_src": len(newer_src), "not_in_dst": len(not_in_dst)}
 	params["report"].append(my_report)
 	logging.info("Src count {0}, dst count {1}".format(len(src_dict), len(dst_dict)))
 	logging.info("Not in dst {0}, Newer src {1}".format(len(not_in_dst), len(newer_src)))
@@ -359,7 +335,8 @@ if __name__ == "__main__":
 	handler.setFormatter(formatter)
 	logger.addHandler(handler)
 	logger.debug("File daemon")
-	logging.basicConfig(format='%(asctime)s %(message)s', filename='/var/log/file_daemon_info.log', \
+	logging.basicConfig(format='%(asctime)s %(message)s', \
+		filename='/var/log/file_daemon_info.log', \
 		level=logging.INFO)
 
 	logging.info("Scanning module activated.")

@@ -7,30 +7,41 @@ EXAMPLE CURL COMMAND TO TEST WEB SERVICE:
 # curl --insecure -s -X POST -d @big.json https://localhost:443/meerkat/ \
 --header "Content-Type:application/json" | python3.3 -m json.tool
 
+@author: J. Andrew Key
+@author: Sivan Mehta
+
 """
 #import json
 import os
 
 import tornado.httpserver
 import tornado.ioloop
-#from tornado_json.routes import get_routes
 from tornado_json.application import Application
 from tornado.options import define, options
-#from pprint import pprint
 
 from meerkat.web_service.api import Meerkat_API
+
+import logging, yaml
+
 
 # Define Some Defaults
 define("port", default=443, help="run on the given port", type=int)
 
 def main():
 	"""Launches an HTTPS web service."""
+
 	# Log access to the web service
 	tornado.options.parse_command_line()
+
+	# Start the logs
+	# create_timed_rotating_log("logs/web_service.log")
+	logging.config.dictConfig(yaml.load( \
+		open('meerkat/web_service/logging.yaml', 'r')))
 
 	# Define valid routes
 	# pylint: disable=bad-continuation
 	routes = [
+		("/meerkat/v1.0.1/?", Meerkat_API),
 		("/meerkat/v1.0.0/?", Meerkat_API),
 		("/meerkat/?", Meerkat_API),
 		("/status/index.html", Meerkat_API)
@@ -46,6 +57,7 @@ def main():
 	# Create the http server
 	http_server = tornado.httpserver.HTTPServer(application,\
 		ssl_options=ssl_options)
+
 	# Start the http_server listening on default port
 	http_server.listen(options.port)
 	tornado.ioloop.IOLoop.instance().start()

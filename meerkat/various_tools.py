@@ -15,6 +15,7 @@ import logging
 import os
 import re
 import sys
+import queue
 
 import boto.sns
 import numpy as np
@@ -67,12 +68,12 @@ def safe_input(prompt=""):
 	"""Safely input a string"""
 
 	try:
-		result = input(prompt)
-		return result
+		return input(prompt)
 	except KeyboardInterrupt:
 		sys.exit()
-	except:
-		return ""
+
+	# there are no other exceptions that can occur in this scenario
+	return ""
 
 def progress(i, my_list, message=""):
 	"""Display progress percent in a loop"""
@@ -250,7 +251,6 @@ def get_magic_query(params, transaction, boost=1.0):
 
 def get_bool_query(starting_from=0, size=0):
 	"""Returns a bool style ElasticSearch query object"""
-	# pylint: disable=bad-continuation
 	return {
 		"from" : starting_from,
 		"size" : size,
@@ -266,7 +266,6 @@ def get_qs_query(term, field_list=None, boost=1.0):
 	"""Returns a "query_string" style ElasticSearch query object"""
 	if field_list is None:
 		field_list = []
-	# pylint: disable=bad-continuation
 	return {
 		"query_string": {
 			"query": term,
@@ -320,7 +319,6 @@ def clean_line(line):
 
 def stopwords(transaction):
 	"""Remove stopwords"""
-	# pylint: disable=bad-continuation
 	patterns = [
 		r"^ach",
 		r"\d{2}\/\d{2}",
@@ -345,7 +343,6 @@ def synonyms(transaction):
 	"""Replaces transactions tokens with manually
 	mapped factual representations. This method
 	should be expanded to manage a file of synonyms"""
-	# pylint: disable=bad-continuation
 	rep = {
 		"wal-mart" : " Walmart ",
 		"wal mart" : " Walmart ",
