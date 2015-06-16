@@ -7,6 +7,7 @@ import os
 import sys
 import random
 
+
 def get_header(input_file):
 	"""Gets the header from an input file."""
 	logging.critical("Getting header from %s", input_file)
@@ -97,13 +98,11 @@ def start(input_path, sample_size):
 				if count == my_element:
 					lines.append(line)
 					my_element = None
-				else:
-					miss_count += 1
 				count += 1
 
 	# Shuffle random sample to eliminate order bias 
 	# from how we collected the list of lines
-	shuffle(lines)
+	random.shuffle(lines)
 
 	#Write out the result
 	with gzip.open("rsample.txt.gz", "wt") as f_out:
