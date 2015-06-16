@@ -14,7 +14,6 @@ Created on 2014-02-19
 import boto
 import json
 import logging
-import re
 import sys
 import time
 
@@ -22,7 +21,8 @@ from elasticsearch import Elasticsearch
 from boto.ec2.connection import EC2Connection
 from boto.exception import EC2ResponseError
 
-from .custom_exceptions import FileProblem, InvalidArguments, UnknownJudgment, SecurityGroupNotFound
+from .custom_exceptions import (FileProblem, 
+	InvalidArguments, UnknownJudgment, SecurityGroupNotFound)
 
 def confirm_security_groups(conn, params):
 	"""Confirms that the security groups we need for accessng our cluster
@@ -82,7 +82,7 @@ def get_cluster_metrics(params):
 	"""Collect highest CPU and highest search queue metrics from an ES cluster"""
 	max_attempts = 30
 	#This pattern allows us to pull out the proper ip4 address
-	ip_address_pattern = re.compile("inet..(.*)......")
+	# ip_address_pattern = re.compile("inet..(.*)......")
 	for j in range(max_attempts):
 		get_es_connection(params)
 		#0. Terminate after too many attempts
