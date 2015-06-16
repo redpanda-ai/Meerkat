@@ -5,8 +5,7 @@ import gzip
 import logging
 import os
 import sys
-from random import shuffle
-
+import random
 
 def get_header(input_file):
 	"""Gets the header from an input file."""
@@ -21,7 +20,7 @@ def count_me(input_file):
 	logging.critical("Counting %s", input_file)
 	with gzip.open(input_file, "rt") as gzipped_input:
 		count = -1 #ignore the header
-		for line in gzipped_input:
+		for _ in gzipped_input:
 			count += 1
 	logging.warning("Count: {0}".format(count))
 	return input_file, count
@@ -51,7 +50,7 @@ def start(input_path, sample_size):
 	os.chdir(input_path)
 	input_files = sorted(glob.glob('*.gz'))
 	#ignore old sample
-	input_files = [ x for x in input_files if x != "rsample.txt.gz" ]
+	input_files = [x for x in input_files if x != "rsample.txt.gz"]
 	#get the header
 	header = get_header(input_files[0])
 	#get a count for each input file
@@ -70,19 +69,12 @@ def start(input_path, sample_size):
 
 	sorted_filenames = sorted(ind, key=ind.get)
 
-	#Shuffle all transactions
-	x = [i for i in range(total)]
-	logging.critical("Shuffling")
-	shuffle(x)
-	#Pick the top 50000, without replacement
-	sample_size = int(sample_size)
-	#obtain a sorted list of indices
-	sample_indices = sorted(x[:sample_size])
+	# get a random sample of indeces
+	sample_indices = sorted(random.sample(range(total), sample_size))
 
 	result_dict = produce_sample(sample_indices, ind, sorted_filenames)
 
 	sorted_keys = sorted(result_dict, key=result_dict.get)
-	miss_count = 0
 	count = 0
 	lines = []
 
@@ -109,7 +101,8 @@ def start(input_path, sample_size):
 					miss_count += 1
 				count += 1
 
-	#Shuffle random sample to eliminate order bias from how we collected the list of lines
+	# Shuffle random sample to eliminate order bias 
+	# from how we collected the list of lines
 	shuffle(lines)
 
 	#Write out the result
