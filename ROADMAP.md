@@ -26,7 +26,8 @@
 			* "Text Understanding From Scratch"
 			* "Convolutional Neural Networks"
 	* 06-12
-		* - [x] Submit pull request for [CNN Integration] (https://github.com/joeandrewkey/Meerkat/pull/145)				* - [x] Train a CNN for bank merchants
+		* - [x] Submit pull request for [CNN Integration] (https://github.com/joeandrewkey/Meerkat/pull/145).
+			* - [x] Train a CNN for bank merchants
 			* - [x] Train a CNN for card merchants
 			* - [x] Create a bridge to allow us to load our Lua modules from within the web service
 3.  **Sivan Mehta**
