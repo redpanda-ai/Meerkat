@@ -713,9 +713,6 @@ def find_merchant_by_address(store, es_connection, additional_data=[]):
 def changed_id_user_prompt(params, old_details, results, store):
 	"""Prompt a user for input to continue"""
 
-	num_changed = len(params["compare_indices"]["id_changed"])
-	num_relinked = len(params["compare_indices"]["relinked"])
-	num_skipped = len(params["compare_indices"]["skipped"])
 	old_details_formatted = [detail for detail in old_details]
 	old_details_formatted = ", ".join(old_details_formatted)
 
