@@ -13,7 +13,7 @@ import sys
 import re
 
 from pybloom import ScalableBloomFilter
-from .bloom import get_location_bloom, get_merchant_bloom
+from .bloom import get_location_bloom
 
 states = {
 	"AL": "", "AK": "", "AZ": "", "AR": "", "CA": "",
@@ -88,24 +88,25 @@ def merchant_split(my_text, **kwargs):
 
 def start():
 	print("find_entities")
-	input_file = "bank.txt.gz"
+	input_file = "meerkat/bloom_filter/input_file.txt.gz"
 	data_frame = pd.io.parsers.read_csv(input_file,sep="|",compression="gzip")
 	descriptions = data_frame['DESCRIPTION_UNMASKED']
 	location_bloom_results = descriptions.apply(location_split, axis=0)
 	#TODO: add merchant results
-	merchant_bloom_results = descriptions.apply(merchant_split, axis=0)
+	#merchant_bloom_results = descriptions.apply(merchant_split, axis=0)
 
-	#combined = pd.concat([location_bloom_results, descriptions], axis=1)
-	#combined.columns = ['NER - LOCATION', 'DESCRIPTION_UNMASKED']
-	combined = pd.concat([location_bloom_results, merchant_bloom_results, descriptions], axis=1)
-	combined.columns = ['LOCATION', 'MERCHANT_NAME', 'DESCRIPTION_UNMASKED']
+	combined = pd.concat([location_bloom_results, descriptions], axis=1)
+	combined.columns = ['LOCATION', 'DESCRIPTION_UNMASKED']
+	#combined = pd.concat([location_bloom_results, merchant_bloom_results, descriptions], axis=1)
+	#combined = location_bloom_results
+	combined.columns = ['LOCATION', 'DESCRIPTION_UNMASKED']
 	pd.set_option('max_rows', 10000)
 	#pd.set_option('display.max_colwidth', 60)
 	#chunk.to_csv(dst_local_path + dst_file_name, columns=header, sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
-	combined.to_csv("entities.csv", mode="w", sep="|", encoding="utf-8")
+	combined.to_csv("meerkat/bloom_filter/entities.csv", mode="w", sep="|", encoding="utf-8")
 	#print(combined)
 	#print(location_bloom_results.describe())
 if __name__ == "__main__":
 	my_bloom = get_location_bloom()
-	my_merchant_bloom, pm_bloom = get_merchant_bloom()
+	#my_merchant_bloom, pm_bloom = get_merchant_bloom()
 	start()

@@ -81,13 +81,13 @@ def get_merchant_bloom():
 	if that is not possible."""
 	sbf, partial = None, None
 	try:
-		sbf = ScalableBloomFilter.fromfile(open("stats/merchant_bloom", "br"))
-		partial = ScalableBloomFilter.fromfile(open("stats/partial_merchant_bloom", "br"))
+		sbf = ScalableBloomFilter.fromfile(open("meerkat/bloom_filter/assets/merchant_bloom", "br"))
+		partial = ScalableBloomFilter.fromfile(open("meerkat/bloom_filter/assets/partial_merchant_bloom", "br"))
 		print("Full merchant bloom filter loaded from file.")
 		print("Partial merchant bloom filter loaded from file.")
 	except:
 		print("Creating merchant bloom filters")
-		sbf, partial = create_merchant_bloom("stats/merchant_names.json", "stats/merchant_bloom", "stats/partial_merchant_bloom")
+		sbf, partial = create_merchant_bloom("meerkat/bloom_filter/assets/merchant_names.json", "meerkat/bloom_filter/assets/merchant_bloom", "meerkat/bloom_filter/assets/partial_merchant_bloom")
 	return sbf, partial
 
 def get_location_bloom():
@@ -95,11 +95,11 @@ def get_location_bloom():
 	if that is not possible."""
 	sbf = None
 	try:
-		sbf = ScalableBloomFilter.fromfile(open("stats/location_bloom", "br"))
+		sbf = ScalableBloomFilter.fromfile(open("meerkat/bloom_filter/assets/location_bloom", "br"))
 		print("Location bloom filter loaded from file.")
 	except:
 		print("Creating new bloom filter")
-		sbf = create_location_bloom("stats/locations.json", "stats/location_bloom")
+		sbf = create_location_bloom("meerkat/bloom_filter/assets/locations.json", "meerkat/bloom_filter/assets/location_bloom")
 	return sbf
 
 def test_bloom_filter(sbf):
