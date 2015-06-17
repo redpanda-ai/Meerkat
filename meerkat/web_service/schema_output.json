@@ -11,8 +11,7 @@
 				"txn_sub_type" : { "type" : "string" },
 				"txn_type" : { "type" : "string" }
 			},
-			"required": [ "transaction_id", "is_physical_merchant", "match_found" ],
-			"additionalProperties": false
+			"required": [ "transaction_id", "is_physical_merchant", "match_found" ]
 		},
 		"physical_merchant_response" : {
 			"type" : "object",
@@ -38,8 +37,7 @@
 				"txn_sub_type" : { "type" : "string" },
 				"txn_type" : { "type" : "string" }
 			},
-			"required": [ "transaction_id", "is_physical_merchant", "match_found", "merchant_name", "source_merchant_id", "country" ],
-			"additionalProperties": false
+			"required": [ "transaction_id", "is_physical_merchant", "match_found", "merchant_name", "source_merchant_id", "country" ]
 		},
 		"non_physical_merchant_response" : {
 			"type" : "object",
@@ -51,7 +49,7 @@
 				"txn_type" : { "type" : "string" }
 			},
 			"required": [ "transaction_id", "is_physical_merchant", "merchant_name" ],
-			"additionalProperties": false
+			"additionalProperties" : false
 		},
 		"non_merchant_category_response" : {
 			"type" : "object",
@@ -62,7 +60,7 @@
 				"txn_type" : { "type" : "string" }
 			},
 			"required": [ "transaction_id", "is_physical_merchant", "txn_type", "txn_sub_type"],
-			"additionalProperties": false
+			"additionalProperties" : false
 		}
 	},
 	"description": "A schema for defining output from 'meerkat_categorize'",
