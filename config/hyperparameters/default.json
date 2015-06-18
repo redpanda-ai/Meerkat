@@ -1,23 +1,24 @@
 {
 	"es_result_size": "45",
- 	"z_score_threshold": "2.857",
- 	"good_description" : "2",
+	"z_score_threshold": "2.857",
+	"raw_score_threshold": "1.000",
+	"good_description" : "2",
  	"boost_labels" : ["standard_fields"],
-    "boost_vectors" :  {
-        "address": [0.541],
-        "address_extended": [1.282],
-        "admin_region": [0.69],
-        "category_labels": [1.319],
-        "chain_name": [0.999],
-        "email": [0.516],
-        "internal_store_number": [1.9],
-        "locality": [1.367],
-        "name": [2.781],
-        "neighborhood": [0.801],
-        "po_box": [1.292],
-        "post_town": [0.577],
-        "postcode": [0.914],
-        "region": [1.685],
-        "tel": [0.597]
-    }
+	"boost_vectors" :  {
+		"address": [0.541],
+		"address_extended": [1.282],
+		"admin_region": [0.69],
+		"category_labels": [1.319],
+		"chain_name": [0.999],
+		"email": [0.516],
+		"internal_store_number": [1.9],
+		"locality": [1.367],
+		"name": [2.781],
+		"neighborhood": [0.801],
+		"po_box": [1.292],
+		"post_town": [0.577],
+		"postcode": [0.914],
+		"region": [1.685],
+		"tel": [0.597]
+	}
 }

@@ -49,14 +49,10 @@
 			"properties" : {
 				"transaction_id" : { "type" : "number" },
 				"is_physical_merchant" : { "enum" : [ false ] },
-				"category_labels" : {
-					"type" : "array",
-					"items" : {
-						"type": "string"
-					}
-				}
+				"txn_sub_type" : { "type" : "string" },
+				"txn_type" : { "type" : "string" }
 			},
-			"required": [ "transaction_id", "is_physical_merchant", "category_labels" ]
+			"required": [ "transaction_id", "is_physical_merchant", "txn_type", "txn_sub_type"]
 		}
 	},
 	"description": "A schema for defining output from 'meerkat_categorize'",
@@ -75,7 +71,7 @@
 			"description" : "An array containing at least one of the following response types.",
 			"type" : "array",
 			"items" : {
-				"oneOf": [
+				"anyOf": [
 					{"$ref": "#/definitions/physical_merchant_response"},
 					{"$ref": "#/definitions/no_match_found"},
 					{"$ref": "#/definitions/non_physical_merchant_response"},

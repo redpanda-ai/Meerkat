@@ -38,7 +38,7 @@ handlers:
     when: D
     interval: 1
     backupCount: 7
-    filename: logs/web_service.log
+    filename: meerkat/web_service/logs/web_service.log
   warn:
     class: logging.handlers.TimedRotatingFileHandler
     level: WARNING
@@ -46,7 +46,7 @@ handlers:
     when: D
     interval: 1
     backupCount: 7
-    filename: logs/web_service.log
+    filename: meerkat/web_service/logs/web_service.log
   ingenia:
     class: logging.handlers.TimedRotatingFileHandler
     level: DEBUG
@@ -54,7 +54,7 @@ handlers:
     when: D
     interval: 1
     backupCount: 7
-    filename: logs/web_service.log
+    filename: meerkat/web_service/logs/web_service.log
 
 root:
   level: INFO

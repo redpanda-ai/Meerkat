@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3.3
 """This module starts an HTTPS web service.
 USAGE:
-# python3.3 -m meerkat.web_service
+# sudo python3 -m meerkat.web_service
 
 EXAMPLE CURL COMMAND TO TEST WEB SERVICE:
 # curl --insecure -s -X POST -d @big.json https://localhost:443/meerkat/ \

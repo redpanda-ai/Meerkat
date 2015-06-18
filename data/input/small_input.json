@@ -1,0 +1,27 @@
+{
+  "cobrand_id" : 1234,
+  "user_id" : 2345,
+  "container" : "bank",
+  "transaction_list" : [
+  {
+    "amount":11.88,
+    "date":"2014-12-22",
+    "ledger_entry":"debit",
+    "description":"DEBIT CARD PURCHASE   XXXXX0355     MCDONALDS F3441          CORBIN      KY",
+    "transaction_id":1
+  },
+  {
+    "amount":45.42,
+    "date":"2014-12-01",
+    "ledger_entry":"debit",
+    "description":"FRED MEYER               ANCHORAGE    AK~~08888~~5438058079334354~~94022~~0~~~~0066",
+    "transaction_id":2
+  },
+  {
+    "amount":4.99,
+    "date":"2014-12-09",
+    "ledger_entry":"debit",
+    "description":"CHECKCARD  1208 APL* ITUNES.COM/BILL                        866-712-7753 CA 24692164342000869308530",
+    "transaction_id":3
+  }]
+}

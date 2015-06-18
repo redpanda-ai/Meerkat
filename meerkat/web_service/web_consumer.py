@@ -10,19 +10,27 @@ Created on Nov 3, 2014
 import json
 import string
 import sys
+import re
+import math
 
+from itertools import zip_longest
 from pprint import pprint
 from scipy.stats.mstats import zscore
 
 from meerkat.various_tools import get_es_connection, string_cleanse, get_boosted_fields
 from meerkat.various_tools import synonyms, get_bool_query, get_qs_query
 from meerkat.classification.load import select_model
+from meerkat.classification.lua_bridge import get_CNN
 
-BANK_CLASSIFIER = select_model("bank")
-CARD_CLASSIFIER = select_model("card")
-BANK_NPMN = select_model("bank_NPMN")
+BANK_SWS = select_model("bank")
+CARD_SWS = select_model("card")
 TRANSACTION_ORIGIN = select_model("transaction_type")
 SUB_TRANSACTION_ORIGIN = select_model("sub_transaction_type")
+BANK_CNN = get_CNN("bank")
+CARD_CNN = get_CNN("card")
+
+def grouper(iterable):
+    return zip_longest(*[iter(iterable)]*128, fillvalue={"description":""})
 
 class Web_Consumer():
 	"""Acts as a web service client to process and enrich
@@ -83,7 +91,7 @@ class Web_Consumer():
 		first_score, second_score = z_scores[0:2]
 		z_score_delta = round(first_score - second_score, 3)
 
-		return z_score_delta
+		return z_score_delta, scores[0]
 
 	def __process_results(self, results, transaction):
 		"""Process search results and enrich transaction
@@ -128,9 +136,10 @@ class Web_Consumer():
 
 		# Collect Relevancy Scores
 		scores = [hit["_score"] for hit in hits]
-		z_score_delta = self.__z_score_delta(scores)
+		z_score_delta, raw_score = self.__z_score_delta(scores)
 		threshold = float(hyperparams.get("z_score_threshold", "2"))
-		decision = True if (z_score_delta > threshold) else False
+		raw_threshold = float(hyperparams.get("raw_score_threshold", "1"))
+		decision = True if (z_score_delta > threshold) and (raw_score > raw_threshold) else False
 
 		# Enrich Data if Passes Boundary
 		args = [decision, transaction, hit_fields, z_score_delta, business_names, city_names, state_names]
@@ -189,7 +198,7 @@ class Web_Consumer():
 
 		# Add Source
 		index = params["elasticsearch"]["index"]
-		transaction["source"] = "FACTUAL" if ("factual" in index) else "OTHER"
+		transaction["source"] = "FACTUAL" if ("factual" in index) and (transaction["match_found"] == True) else "YODLEE"
 
 		return transaction
 
@@ -227,7 +236,7 @@ class Web_Consumer():
 
 		return transaction
 
-	def ensure_output_schema(self, physical, non_physical):
+	def ensure_output_schema(self, data, physical, non_physical):
 		"""Clean output to proper schema"""
 
 		# Add or Modify Fields
@@ -242,11 +251,22 @@ class Web_Consumer():
 		# Combine Transactions
 		transactions = physical + non_physical
 
+		# Collect Mapping Details
+		fields = self.params["output"]["results"]["fields"]
+		labels = self.params["output"]["results"]["labels"]
+		attr_map = dict(zip(fields, labels))
+
 		# Strip Fields
 		for trans in transactions:
-			del trans["description"]
+
+			# Override output with CNN v1
+			if trans["CNN"] != "":
+				trans[attr_map["name"]] = trans["CNN"]
+
+			#del trans["description"]
 			del trans["amount"]
 			del trans["date"]
+			del trans["CNN"]
 
 		return transactions
 
@@ -279,18 +299,6 @@ class Web_Consumer():
 
 		return enriched
 
-	def __enrich_non_physical(self, transactions):
-		"""Enrich non-physical transactions with Meerkat"""
-
-		if len(transactions) == 0:
-			return transactions
-
-		for trans in transactions:
-			name = BANK_NPMN(trans["description"])
-			trans["merchant_name"] = name.title()
-
-		return transactions
-
 	def __add_transaction_origin(self, data):
 		"""Add transaction origin and sub origin to transaction"""
 
@@ -303,7 +311,7 @@ class Web_Consumer():
 			txn_type = TRANSACTION_ORIGIN(trans["description"])
 			txn_sub_type = SUB_TRANSACTION_ORIGIN(trans["description"])
 			trans["txn_type"] = txn_type.title()
-			trans["txn_sub_type"] = txn_sub_type.title()
+			trans["txn_sub_type"] = txn_sub_type.title() if txn_sub_type.lower() != "i don't know" else ""
 
 		return transactions
 
@@ -314,21 +322,33 @@ class Web_Consumer():
 
 		# Determine Whether to Search
 		for trans in transactions:
-			classifier = BANK_CLASSIFIER if (data["container"] == "bank") else CARD_CLASSIFIER
+			classifier = BANK_SWS if (data["container"] == "bank") else CARD_SWS
 			label = classifier(trans["description"])
 			trans["is_physical_merchant"] = True if (label == "1") else False
 			(non_physical, physical)[label == "1"].append(trans)
 
 		return physical, non_physical
 
+	def __apply_CNN(self, data, transactions):
+		"""Apply the CNN to transactions"""
+
+		batches = grouper(transactions)
+		classifier = BANK_CNN if (data["container"] == "bank") else CARD_CNN
+		processed = []
+
+		for i, batch in enumerate(batches):
+			processed += classifier(batch)
+
+		return processed[0:len(transactions)]
+
 	def classify(self, data):
 		"""Classify a set of transactions"""
 
 		transactions = self.__add_transaction_origin(data)
+		transactions = self.__apply_CNN(data, transactions)
 		physical, non_physical = self.__sws(data, transactions)
 		physical = self.__enrich_physical(physical)
-		non_physical = self.__enrich_non_physical(non_physical)
-		transactions = self.ensure_output_schema(physical, non_physical)
+		transactions = self.ensure_output_schema(data, physical, non_physical)
 		data["transaction_list"] = transactions
 
 		return data
