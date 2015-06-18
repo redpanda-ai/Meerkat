@@ -11,6 +11,11 @@ import gzip
 import pandas as pd
 import sys
 import re
+import json
+import csv
+import pickle
+import os
+from pprint import pprint
 
 from pybloom import ScalableBloomFilter
 from .bloom import get_location_bloom
@@ -28,6 +33,33 @@ states = {
 	"VA": "", "WA": "", "WV": "", "WI": "", "WY": ""
 	}
 
+def generate_city_map():
+	print("generate location map")
+
+	csv_file = csv.reader(open("meerkat/bloom_filter/assets/us_cities_small.csv"), \
+		delimiter = "\t")
+	data = {}
+	for row in csv_file:
+		correct = True
+		try:
+			int(row[2]) # some of the rows don't acually record a state name
+		except ValueError:
+			data[(row[2].upper(), row[1])] = (row[0], row[3], row[4])
+
+	pickle.dump(data, open("meerkat/bloom_filter/assets/city_info", 'wb'))
+
+	return data
+
+city_info = {}
+
+if os.path.isfile("meerkat/bloom_filter/assets/city_info"):
+	with open("meerkat/bloom_filter/assets/city_info", 'rb') as fp:
+	    city_info = pickle.load(fp)
+else:
+	city_info = generate_city_map()
+
+# pprint(city_info)
+
 def in_merchant_bloom(splits):
 	if splits in my_merchant_bloom:
 		return splits
@@ -42,8 +74,15 @@ def in_location_bloom(splits):
 		for i in range(len(before)):
 			locality = " ".join(before[i:])
 			place = (locality, region)
-			if place in my_bloom:
-				return place
+			# pprint(place)
+			if (locality, region) in my_bloom:
+				try:
+					zipcode, lat, lng = city_info[(locality, region)]
+					return (locality, region, zipcode, lat, lng)
+				except KeyError:
+					# pprint((locality, region))
+					return (locality, region)
+
 	return None
 
 def location_split(my_text, **kwargs):
@@ -87,6 +126,7 @@ def merchant_split(my_text, **kwargs):
 #3. Note that you may wish to remove tokens that have already been found as locations (could be important)
 
 def start():
+
 	print("find_entities")
 	input_file = "meerkat/bloom_filter/input_file.txt.gz"
 	data_frame = pd.io.parsers.read_csv(input_file,sep="|",compression="gzip")
@@ -104,9 +144,10 @@ def start():
 	#pd.set_option('display.max_colwidth', 60)
 	#chunk.to_csv(dst_local_path + dst_file_name, columns=header, sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
 	combined.to_csv("meerkat/bloom_filter/entities.csv", mode="w", sep="|", encoding="utf-8")
-	#print(combined)
-	#print(location_bloom_results.describe())
+	print(combined)
+	print(location_bloom_results.describe())
+
 if __name__ == "__main__":
 	my_bloom = get_location_bloom()
-	#my_merchant_bloom, pm_bloom = get_merchant_bloom()
+	# #my_merchant_bloom, pm_bloom = get_merchant_bloom()
 	start()
