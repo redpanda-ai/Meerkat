@@ -6,38 +6,40 @@ Created on Dec 20, 2014
 @author: J. Andrew Key
 """
 
-import nltk
-import gzip
 import pandas as pd
-import sys
-import re
-import json
 import csv
 import pickle
 import os
-from pprint import pprint
 
-from pybloom import ScalableBloomFilter
 from .bloom import get_location_bloom
 
 states = {
-	"AL": "", "AK": "", "AZ": "", "AR": "", "CA": "",
-	"CO": "", "CT": "", "DE": "", "FL": "", "GA": "",
-	"HI": "", "ID": "", "IL": "", "IN": "", "IA": "",
-	"KS": "", "KY": "", "LA": "", "ME": "", "MD": "",
-	"MA": "", "MI": "", "MN": "", "MS": "", "MO": "",
-	"MT": "", "NE": "", "NV": "", "NH": "", "NJ": "",
-	"NM": "", "NY": "", "NC": "", "ND": "", "OH": "",
-	"OK": "", "OR": "", "PA": "", "RI": "", "SC": "",
-	"SD": "", "TN": "", "TX": "", "UT": "", "VT": "",
-	"VA": "", "WA": "", "WV": "", "WI": "", "WY": ""
+	"AL": "", "AK": "", "AZ": "", "AR": "", "CA": "", \
+	"CO": "", "CT": "", "DE": "", "FL": "", "GA": "", \
+	"HI": "", "ID": "", "IL": "", "IN": "", "IA": "", \
+	"KS": "", "KY": "", "LA": "", "ME": "", "MD": "", \
+	"MA": "", "MI": "", "MN": "", "MS": "", "MO": "", \
+	"MT": "", "NE": "", "NV": "", "NH": "", "NJ": "", \
+	"NM": "", "NY": "", "NC": "", "ND": "", "OH": "", \
+	"OK": "", "OR": "", "PA": "", "RI": "", "SC": "", \
+	"SD": "", "TN": "", "TX": "", "UT": "", "VT": "", \
+	"VA": "", "WA": "", "WV": "", "WI": "", "WY": "" \
 	}
 
 def generate_city_map():
+	"""
+		generates a dictionary with the following structure
+
+		(city, state) : (zip, latitude, longitude)
+
+		eg:
+		(Beverly Hills, CA) : (90210, 34.0731, 118.3994)
+
+	"""
 	print("generate location map")
 
 	csv_file = csv.reader(open("meerkat/bloom_filter/assets/us_cities_small.csv"), \
-		delimiter = "\t")
+		delimiter="\t")
 	data = {}
 	for row in csv_file:
 		correct = True
@@ -98,18 +100,18 @@ def merchant_split(my_text, **kwargs):
 	splits = [x.upper() for x in my_text.split()]
 	for i in range(len(splits)):
 		previous, name = splits[i], splits[i]
-		c = 1
+		count = 1
 		#print("START")
-		while name in pm_bloom and (i + c) < len(splits):
+		while name in pm_bloom and (i + count) < len(splits):
 			previous = name
 			#print("\tFound {0}".format(name))
-			name = " ".join(splits[i:i+c])
+			name = " ".join(splits[i:i+count])
 			#print("New name is {0}".format(name))
-			c += 1
+			count += 1
 		#print("Searching for '{0}'".format(previous))
-		if previous in my_merchant_bloom:
+		# if previous in my_merchant_bloom:
 			#print("\tFound {0}".format(previous))
-			return name
+			# return name
 	return None
 #	for i in range(len(splits)):
 #		merchant = in_merchant_bloom(splits[i])
@@ -149,5 +151,5 @@ def start():
 
 if __name__ == "__main__":
 	my_bloom = get_location_bloom()
-	# #my_merchant_bloom, pm_bloom = get_merchant_bloom()
+	# my_merchant_bloom, pm_bloom = get_merchant_bloom()
 	start()
