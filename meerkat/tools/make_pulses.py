@@ -19,8 +19,6 @@ Created on July 2, 2014
 
 import csv
 import sys
-import logging
-import os
 import collections
 import random
 
@@ -32,11 +30,14 @@ def load_dict_list(file_name, encoding='utf-8', delimiter="|"):
 	input_file.close()
 	return dict_list
 
-def write_dict_list(dict_list, file_name, encoding="utf-8", delimiter="|"):
+def write_dict_list(dict_list, file_name):
 	""" Saves a lists of dicts with uniform keys to file """
 
 	with open(file_name, 'w') as output_file:
-		dict_w = csv.DictWriter(output_file, delimiter=delimiter, fieldnames=dict_list[0].keys(), extrasaction='ignore')
+		dict_w = csv.DictWriter(output_file, \
+								delimiter="|", \
+								fieldnames=dict_list[0].keys(),\
+								extrasaction='ignore')
 		dict_w.writeheader()
 		dict_w.writerows(dict_list)
 
@@ -94,7 +95,7 @@ def split_sample(filepath):
 	pulses = []
 	while len(list_of_lists) > 0:
 		pulse = []
-		for i in range(15):
+		for _ in range(15):
 			if len(list_of_lists) > 0:
 				pulse = pulse + list_of_lists.pop()
 		pulses.append(pulse)
@@ -103,7 +104,7 @@ def split_sample(filepath):
 
 	return pulses
 
-def run_from_command_line(command_line_arguments):
+def run_from_command_line():
 	"""Runs the module when invoked from the command line."""
 	
 	verify_arguments()
@@ -111,4 +112,4 @@ def run_from_command_line(command_line_arguments):
 	write_pulses(pulses)
 
 if __name__ == "__main__":
-	run_from_command_line(sys.argv)
+	run_from_command_line()

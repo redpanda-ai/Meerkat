@@ -19,9 +19,8 @@ Created on July 15, 2014
 import os
 import sys
 
-from pprint import pprint
-
-from meerkat.various_tools import load_params, get_es_connection, get_merchant_by_id, load_dict_list, write_dict_list
+from meerkat.various_tools import (load_params, get_es_connection, \
+get_merchant_by_id, load_dict_list, write_dict_list)
 
 def enrich_transactions(params, es_connection):
 	"""Enrich a set of transactions using a provided factual_id"""
@@ -37,7 +36,7 @@ def enrich_transactions(params, es_connection):
 			continue
 
 		# Enrich 
-		location = merchant.get("pin", {}).get("location", {}).get("coordinates", ["",""])
+		location = merchant.get("pin", {}).get("location", {}).get("coordinates", ["", ""])
 		latitude = location[1]
 		longitude = location[0]
 		transaction["PHYSICAL_MERCHANT"] = merchant.get("name", "")
@@ -70,7 +69,7 @@ def verify_arguments():
 		print("Erroneous arguments. Please see usage")
 		sys.exit()
 
-def run_from_command_line(command_line_arguments):
+def run_from_command_line():
 	"""Runs these commands if the module is invoked from the command line"""
 
 	verify_arguments()
@@ -79,4 +78,4 @@ def run_from_command_line(command_line_arguments):
 	enrich_transactions(params, es_connection)
 	
 if __name__ == "__main__":
-	run_from_command_line(sys.argv)
+	run_from_command_line()

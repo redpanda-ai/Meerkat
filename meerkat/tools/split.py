@@ -35,13 +35,12 @@ def split_gzipped_file(input_filename, chunk_size, line_count):
 	}
 	with gzip.open(input_filename, "rt") as gzipped_input:
 		#Go through each line in the input
-		reset_me = False
 		for line in gzipped_input:
 			line = line.strip()
 			#Capture the header once
 			if first_line:
 				header = line
-				params["lines"] = [ header ]
+				params["lines"] = [header]
 				first_line = False
 				continue
 			else:
@@ -50,13 +49,16 @@ def split_gzipped_file(input_filename, chunk_size, line_count):
 				if len(params["lines"]) == params["chunk_size"] + 1:
 					write_lines_to_file(params)
 					params["chunk_number"] += 1
-					params["lines"] = [ header ]
+					params["lines"] = [header]
 	#Write any tail split to a file as well
 	if len(params["lines"]) > 1:
 		write_lines_to_file(params)
 
-#MAIN
-input_filename, chunk_size = sys.argv[1], int(sys.argv[2])
-line_count = get_line_count(input_filename)
-logging.warning("{0} contains {1} lines".format(input_filename, line_count))
-split_gzipped_file(input_filename, chunk_size, line_count)
+def main():
+	"""runs the file"""
+	input_filename, chunk_size = sys.argv[1], int(sys.argv[2])
+	line_count = get_line_count(input_filename)
+	logging.warning("{0} contains {1} lines".format(input_filename, line_count))
+	split_gzipped_file(input_filename, chunk_size, line_count)
+
+main()
