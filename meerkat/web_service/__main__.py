@@ -11,18 +11,15 @@ EXAMPLE CURL COMMAND TO TEST WEB SERVICE:
 @author: Sivan Mehta
 
 """
-#import json
+import logging
 import os
-
 import tornado.httpserver
 import tornado.ioloop
+import yaml
+
 from tornado_json.application import Application
 from tornado.options import define, options
-
 from meerkat.web_service.api import Meerkat_API
-
-import logging, yaml
-
 
 # Define Some Defaults
 define("port", default=443, help="run on the given port", type=int)
@@ -33,13 +30,11 @@ def main():
 	# Log access to the web service
 	tornado.options.parse_command_line()
 
-	# Start the logs
-	# create_timed_rotating_log("logs/web_service.log")
+	# Start the logs, configured by the following file
 	logging.config.dictConfig(yaml.load( \
 		open('meerkat/web_service/logging.yaml', 'r')))
 
 	# Define valid routes
-	# pylint: disable=bad-continuation
 	routes = [
 		("/meerkat/v1.0.1/?", Meerkat_API),
 		("/meerkat/v1.0.0/?", Meerkat_API),
