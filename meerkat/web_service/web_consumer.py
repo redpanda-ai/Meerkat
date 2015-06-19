@@ -40,7 +40,6 @@ class Web_Consumer():
 		"""Constructor"""
 
 		self.type_hierarchy = load_params("meerkat/classification/label_maps/type_subtype_hierarchy.json")
-		self.type_map = dict(zip(map(str.upper, self.type_hierarchy.keys()), self.type_hierarchy.keys()))
 		self.params = params
 		self.hyperparams = hyperparams
 		self.cities = cities
@@ -312,10 +311,9 @@ class Web_Consumer():
 		for trans in transactions:
 			txn_type = TRANSACTION_TYPE(trans["description"])
 			txn_sub_type = SUB_TRANSACTION_TYPE(trans["description"])
-			trans["txn_type"] = self.type_map[txn_type]
-			subtypes = self.type_subtype_hierarchy[trans["txn_type"]]
-			subtype_map = dict(zip(map(str.upper, subtypes), subtypes))
-			trans["txn_sub_type"] = subtype_map.get(txn_sub_type, "")
+			subtypes = self.type_subtype_hierarchy[txn_type]
+			trans["txn_type"] = txn_type
+			trans["txn_sub_type"] = txn_sub_type if txn_sub_type in subtypes else ""
 
 		return transactions
 
