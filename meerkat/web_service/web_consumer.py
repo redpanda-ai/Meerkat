@@ -311,7 +311,7 @@ class Web_Consumer():
 		for trans in transactions:
 			txn_type = TRANSACTION_TYPE(trans["description"])
 			txn_sub_type = SUB_TRANSACTION_TYPE(trans["description"])
-			subtypes = self.type_subtype_hierarchy[txn_type]
+			subtypes = self.type_subtype_hierarchy.get(txn_type, [])
 			trans["txn_type"] = txn_type
 			trans["txn_sub_type"] = txn_sub_type if txn_sub_type in subtypes else ""
 
