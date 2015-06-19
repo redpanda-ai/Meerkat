@@ -1,4 +1,5 @@
 #!/usr/local/bin/python3.3
+#pylint: disable=mixed-indentation, bad-continuation
 
 """Bloom filter stuff.
 
@@ -63,7 +64,7 @@ def create_merchant_bloom(src_filename, dst_filename, partial_filename):
 		#Handle partial merchant names to partial bloom
 		splits = merchant_name.split()
 		if len(splits) > 1:
-			for i in range(1,len(splits)):
+			for i in range(1, len(splits)):
 				partial = " ".join(splits[:i])
 				print("\tAdding '{0}'".format(partial))
 				p_bloom.add(partial)
@@ -136,4 +137,3 @@ if __name__ == "__main__":
 	my_location_bloom = get_location_bloom()
 	#test_bloom_filter(my_location_bloom)
 	# my_merchant_bloom, my_partial_merchant_bloom = get_merchant_bloom()
-	start()
