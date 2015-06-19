@@ -135,5 +135,5 @@ def test_bloom_filter(sbf):
 if __name__ == "__main__":
 	my_location_bloom = get_location_bloom()
 	#test_bloom_filter(my_location_bloom)
-	my_merchant_bloom, my_partial_merchant_bloom = get_merchant_bloom()
-
+	# my_merchant_bloom, my_partial_merchant_bloom = get_merchant_bloom()
+	start()

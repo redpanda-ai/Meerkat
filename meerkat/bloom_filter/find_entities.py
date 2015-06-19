@@ -4,6 +4,9 @@
 
 Created on Dec 20, 2014
 @author: J. Andrew Key
+
+Modified on June 18, 2015
+@author: Sivan Mehta
 """
 
 import pandas as pd
@@ -11,7 +14,7 @@ import csv
 import pickle
 import os
 
-from .bloom import get_location_bloom
+from .bloom import *
 
 STATES = {
 	"AL": "", "AK": "", "AZ": "", "AR": "", "CA": "", \
@@ -47,14 +50,14 @@ def generate_city_map():
 		except ValueError:
 			data[(row[2].upper(), row[1])] = (row[0], row[3], row[4])
 
-	pickle.dump(data, open("meerkat/bloom_filter/assets/CITY_INFO", 'wb'))
+	pickle.dump(data, open("meerkat/bloom_filter/assets/CITY_INFO.log", 'wb'))
 
 	return data
 
 CITY_INFO = {}
 
-if os.path.isfile("meerkat/bloom_filter/assets/CITY_INFO"):
-	with open("meerkat/bloom_filter/assets/CITY_INFO", 'rb') as fp:
+if os.path.isfile("meerkat/bloom_filter/assets/CITY_INFO.log"):
+	with open("meerkat/bloom_filter/assets/CITY_INFO.log", 'rb') as fp:
 	    CITY_INFO = pickle.load(fp)
 else:
 	CITY_INFO = generate_city_map()
@@ -138,5 +141,5 @@ def main():
 
 if __name__ == "__main__":
 	my_bloom = get_location_bloom()
-	my_merchant_bloom, pm_bloom = get_merchant_bloom()
+	# my_merchant_bloom, pm_bloom = get_merchant_bloom()
 	main()
