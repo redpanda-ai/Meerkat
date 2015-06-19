@@ -301,7 +301,7 @@ class Web_Consumer():
 		return enriched
 
 	def __add_transaction_type(self, data):
-		"""Add transaction origin and sub origin to transaction"""
+		"""Add transaction_type and transaction_sub_type to transaction"""
 
 		transactions = data["transaction_list"]
 
