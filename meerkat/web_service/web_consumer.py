@@ -18,14 +18,14 @@ from pprint import pprint
 from scipy.stats.mstats import zscore
 
 from meerkat.various_tools import get_es_connection, string_cleanse, get_boosted_fields
-from meerkat.various_tools import synonyms, get_bool_query, get_qs_query
+from meerkat.various_tools import synonyms, get_bool_query, get_qs_query, load_params
 from meerkat.classification.load import select_model
 from meerkat.classification.lua_bridge import get_CNN
 
 BANK_SWS = select_model("bank")
 CARD_SWS = select_model("card")
-TRANSACTION_ORIGIN = select_model("transaction_type")
-SUB_TRANSACTION_ORIGIN = select_model("sub_transaction_type")
+TRANSACTION_TYPE = select_model("transaction_type")
+SUB_TRANSACTION_TYPE = select_model("sub_transaction_type")
 BANK_CNN = get_CNN("bank")
 CARD_CNN = get_CNN("card")
 
@@ -39,6 +39,8 @@ class Web_Consumer():
 	def __init__(self, params, hyperparams, cities):
 		"""Constructor"""
 
+		self.type_hierarchy = load_params("meerkat/classification/label_maps/type_subtype_hierarchy.json")
+		self.type_map = dict(zip(map(str.upper, self.type_hierarchy.keys()), self.type_hierarchy.keys()))
 		self.params = params
 		self.hyperparams = hyperparams
 		self.cities = cities
@@ -299,7 +301,7 @@ class Web_Consumer():
 
 		return enriched
 
-	def __add_transaction_origin(self, data):
+	def __add_transaction_type(self, data):
 		"""Add transaction origin and sub origin to transaction"""
 
 		transactions = data["transaction_list"]
@@ -308,10 +310,12 @@ class Web_Consumer():
 			return transactions
 
 		for trans in transactions:
-			txn_type = TRANSACTION_ORIGIN(trans["description"])
-			txn_sub_type = SUB_TRANSACTION_ORIGIN(trans["description"])
-			trans["txn_type"] = txn_type.title()
-			trans["txn_sub_type"] = txn_sub_type.title() if txn_sub_type.lower() != "i don't know" else ""
+			txn_type = TRANSACTION_TYPE(trans["description"])
+			txn_sub_type = SUB_TRANSACTION_TYPE(trans["description"])
+			trans["txn_type"] = self.type_map[txn_type]
+			subtypes = self.type_subtype_hierarchy[trans["txn_type"]]
+			subtype_map = dict(zip(map(str.upper, subtypes), subtypes))
+			trans["txn_sub_type"] = subtype_map.get(txn_sub_type, "")
 
 		return transactions
 
@@ -344,7 +348,7 @@ class Web_Consumer():
 	def classify(self, data):
 		"""Classify a set of transactions"""
 
-		transactions = self.__add_transaction_origin(data)
+		transactions = self.__add_transaction_type(data)
 		transactions = self.__apply_CNN(data, transactions)
 		physical, non_physical = self.__sws(data, transactions)
 		physical = self.__enrich_physical(physical)
