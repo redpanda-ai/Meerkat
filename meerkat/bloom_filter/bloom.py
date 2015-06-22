@@ -7,8 +7,7 @@ Created on Dec 19, 2014
 @author: J. Andrew Key
 """
 
-import json
-import sys
+import json, sys, os
 from pybloom import ScalableBloomFilter
 
 def get_json_from_file(input_filename):
@@ -50,11 +49,11 @@ def create_merchant_bloom(src_filename, dst_filename, partial_filename):
 		mode=ScalableBloomFilter.SMALL_SET_GROWTH)
 	merchants = get_json_from_file(src_filename)
 
-	count, limit = 0, 500
+	count = 0
 	buckets = merchants["aggregations"]["merchants"]["buckets"]
 	#Iterate through merchant names
 	for bucket in buckets:
-		if count >= limit:
+		if count >= 500: # limit
 			break
 		count += 1
 		merchant_name = bucket["key"].upper()
@@ -81,14 +80,16 @@ def get_merchant_bloom():
 	"""Attempts to fetch a bloom filter from a file, making a new bloom filter
 	if that is not possible."""
 	sbf, partial = None, None
-	try:
-		sbf = ScalableBloomFilter.fromfile(open("meerkat/bloom_filter/assets/merchant_bloom", "br"))
-		partial = ScalableBloomFilter.fromfile(open("meerkat/bloom_filter/assets/partial_merchant_bloom", "br"))
+	# check if files exist
+	if os.path.isfile("stats/merchant_bloom") and \
+	   os.path.isfile("stats/partial_merchant_bloom"):
+		print("Creating merchant bloom filters")
+		sbf, partial = create_merchant_bloom("stats/merchant_names.json", "stats/merchant_bloom", "stats/partial_merchant_bloom")
+	else:
+		sbf = ScalableBloomFilter.fromfile(open("stats/merchant_bloom", "br"))
+		partial = ScalableBloomFilter.fromfile(open("stats/partial_merchant_bloom", "br"))
 		print("Full merchant bloom filter loaded from file.")
 		print("Partial merchant bloom filter loaded from file.")
-	except:
-		print("Creating merchant bloom filters")
-		sbf, partial = create_merchant_bloom("meerkat/bloom_filter/assets/merchant_names.json", "meerkat/bloom_filter/assets/merchant_bloom", "meerkat/bloom_filter/assets/partial_merchant_bloom")
 	return sbf, partial
 
 def get_location_bloom():

@@ -204,6 +204,7 @@ def set_custom_producer_options(params):
 	del params["producer_options"]
 
 def get_host_ip(params):
+	"""Gets the host's IP address"""
 	params["report"] = {}
 	command = local["hostname"]["-I"]
 	params["report"]["host_ip"] = command().split(" ")[0]
@@ -293,10 +294,10 @@ def push_dst_file_to_s3(params):
 	logging.warning("{0} pushed to S3, {1} bytes written.".format(
 		dst_file, bytes_written))
 
-def push_file_to_s3(params, type):
+def push_file_to_s3(params, filetype):
 	"""Moves a file to S3"""
-	type_location = type + "_location"
-	gzipped_type_file = "local_gzipped_" + type + "_file"
+	type_location = filetype + "_location"
+	gzipped_type_file = "local_gzipped_" + filetype + "_file"
 	s3_type_location = params["location_pair"][type_location]
 	location_pattern = re.compile("^([^/]+)/(.*)$")
 	matches = location_pattern.search(s3_type_location)
@@ -363,6 +364,7 @@ def process_single_input_file(params):
 	sys.exit()
 
 def get_report_message(report, errors):
+	"""gets report message"""
 	message = ""
 	for name, value in report:
 		message += "{0}: {1}\n".format(name, value)
@@ -445,7 +447,7 @@ def flush_errors(params, errors, dst_file_name, line_count):
 
 def run_chunk(params, *argv):
 	"""Run a single chunk from a dataframe_reader"""
-	chunk, line_count, chunk_stderr, old_stderr = argv[:4]
+	chunk, line_count, _, __ = argv[:4]
 	hyperparameters, cities, header, dst_file_name = argv[4:8]
 	first_chunk, errors = argv[8:10]
 	# Save Errors
@@ -460,7 +462,8 @@ def run_chunk(params, *argv):
 		logging.warning("Chunk contained physical transactions, using Meerkat")
 		physical = run_meerkat_chunk(params, desc_queue, hyperparameters, cities)
 	else:
-		logging.warning("Chunk did not contain physical transactions, skipping Meerkat")
+		logging.warning("Chunk did not contain physical transactions, \
+			skipping Meerkat")
 	# Combine Split Dataframes
 	chunk = pd.concat([physical, non_physical])
 	# Write
@@ -544,15 +547,20 @@ def validate_configuration(schema, config):
 
 def write_error_file(params, error_msg):
 	"""Writes a gzipped file of errors to the local host."""
-	logging.warning("Writing to error file: {0}".format(params["local_gzipped_err_file"]))
+	logging.warning("Writing to error file: {0}".format( \
+		params["local_gzipped_err_file"]))
 	if error_msg == "":
 		return
 	with gzip.open(params["local_gzipped_err_file"], "ab") as gzipped_output:
 		gzipped_output.write(bytes(error_msg + "\n", 'UTF-8'))
 
 def abort_if_already_running():
+	"""abort if already running"""
 	pid = str(os.getpid())
-	cmd = local["ps"]["-ef"] | grep["python3.3"] | grep[sys.argv[1]] | grep[sys.argv[2]]
+	cmd = local["ps"]["-ef"] | \
+	      grep["python3.3"] | \
+	      grep[sys.argv[1]] | \
+	      grep[sys.argv[2]]
 	cmd_result = cmd(retcode=None)
 	cmd_split = cmd_result.split("\n")
 	print("pid: {0}".format(pid))
@@ -570,8 +578,9 @@ def abort_if_already_running():
 START_TIME = datetime.datetime.now()
 
 if __name__ == "__main__":
-	logging.basicConfig(format='%(asctime)s %(message)s',
-		filename='/data/1/log/' + sys.argv[1] + '.' + sys.argv[2] + '.log', level=logging.WARNING)
+	logging.basicConfig(format='%(asctime)s %(message)s', \
+		filename='/data/1/log/' + sys.argv[1] + '.' + sys.argv[2] + '.log', \
+		level=logging.WARNING)
 	logging.warning("file_producer module activated.")
 	abort_if_already_running()
 	run_from_command_line()

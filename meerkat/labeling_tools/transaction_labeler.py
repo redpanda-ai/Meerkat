@@ -36,17 +36,21 @@ from meerkat.various_tools import safe_print, safe_input, load_params
 from meerkat.file_producer import get_s3_connection
 
 class DummyFile(object):
-    def write(self, x): pass
+	"""does nothing"""
+	def write(self, message):
+		"""I'm sorry but I'm going to lose connection because I'm about to drive\
+		into a tunnel in a canyon on an airplane while hanging up the phone."""
+		pass
 
 @contextlib.contextmanager
 def nostdout():
-    save_stdout = sys.stdout
-    save_stderr = sys.stderr
-    sys.stdout = DummyFile()
-    sys.stderr = DummyFile()
-    yield
-    sys.stderr = save_stderr
-    sys.stdout = save_stdout
+	save_stdout = sys.stdout
+	save_stderr = sys.stderr
+	sys.stdout = DummyFile()
+	sys.stderr = DummyFile()
+	yield
+	sys.stderr = save_stderr
+	sys.stdout = save_stdout
 
 def verify_arguments():
 	"""Verify Usage"""
@@ -74,10 +78,8 @@ def move_to_S3(bucket, key_name, filepath):
 	with nostdout():
 		key = Key(bucket)
 		key.key = key_name
-		bytes_written = key.set_contents_from_filename(filepath, encrypt_key=True, replace=True)
 	
 	safe_print("File written to: S3://" + key.key)
-	#safely_remove_file(filepath)
 
 def add_local_params(params):
 	"""Adds additional local params"""
@@ -87,7 +89,7 @@ def add_local_params(params):
 
 	return params
 
-def collect_top_choice(params, row, options, choices):
+def collect_top_choice(params, options, choices):
 	"""Collects the top choice"""
 
 	choice = None
@@ -109,11 +111,11 @@ def collect_top_choice(params, row, options, choices):
 
 	return choice
 
-def run_from_command_line(cla):
+def run_from_command_line():
 	"""Runs these commands if the module is invoked from the command line"""
 
 	verify_arguments()
-	params = load_params(cla[1])
+	params = load_params(sys.argv[1])
 	params = add_local_params(params)
 
 	# Connect to S3
@@ -143,24 +145,25 @@ def run_from_command_line(cla):
 
 		k.get_contents_to_filename(local_filename)
 	
-	df = pd.read_csv(local_filename, na_filter=False, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
-	sLen = df.shape[0]
+	dataframe = pd.read_csv(local_filename, na_filter=False, quoting=csv.QUOTE_NONE, \
+		encoding="utf-8", sep='|', error_bad_lines=False)
+	sLen = dataframe.shape[0]
 
 	# Add new columns if first time labeling this data set
-	if (tc_col) not in df.columns:
-		if "TXN_TYPE" in df.columns:
-			df.rename(columns={"TXN_TYPE": tc_col}, inplace=True)
+	if (tc_col) not in dataframe.columns:
+		if "TXN_TYPE" in dataframe.columns:
+			dataframe.rename(columns={"TXN_TYPE": tc_col}, inplace=True)
 		else:
-			df[tc_col] = pd.Series(([""] * sLen))
+			dataframe[tc_col] = pd.Series(([""] * sLen))
 
-	if (sc_col) not in df.columns:
-		if "SUB_TXN_TYPE" in df.columns:
-			df.rename(columns={"SUB_TXN_TYPE": sc_col}, inplace=True)
+	if (sc_col) not in dataframe.columns:
+		if "SUB_TXN_TYPE" in dataframe.columns:
+			dataframe.rename(columns={"SUB_TXN_TYPE": sc_col}, inplace=True)
 		else:
-			df[sc_col] = pd.Series(([""] * sLen))
+			dataframe[sc_col] = pd.Series(([""] * sLen))
 
 	# Shuffle Rows
-	df = df.reindex(np.random.permutation(df.index))
+	dataframe = dataframe.reindex(np.random.permutation(dataframe.index))
 
 	# Capture Decisions
 	save_and_exit = False
@@ -184,9 +187,9 @@ def run_from_command_line(cla):
 		for sub in sub_choices:
 			sub_dict[sub["name"]] = sub["sub_labels"]
 
-	while "" in df[tc_col].tolist():
+	while "" in dataframe[tc_col].tolist():
 
-		for index, row in df.iterrows():
+		for index, row in dataframe.iterrows():
 
 			# Skip rows that already have decisions
 			if row[tc_col] in choices:
@@ -201,8 +204,8 @@ def run_from_command_line(cla):
 			safe_print(("_" * 75) + "\n")
 
 			# Show Progress
-			complete = df[tc_col].str.contains(choice_regex).sum()
-			sub_complete = df[sc_col].str.contains(sub_choice_regex).sum()
+			complete = dataframe[tc_col].str.contains(choice_regex).sum()
+			sub_complete = dataframe[sc_col].str.contains(sub_choice_regex).sum()
 			percent_complete = complete / sLen * 100
 			sub_percent_complete = sub_complete / sLen * 100
 			os.system("clear")
@@ -212,12 +215,12 @@ def run_from_command_line(cla):
 			safe_print("{0:.2f}%".format(sub_percent_complete) + " complete with sub choices.\n")
 
 			# Show Transaction Details
-			for c in params["display_columns"]:
-				safe_print("{}: {}".format(c, row[c]))
+			for column in params["display_columns"]:
+				safe_print("{}: {}".format(column, row[column]))
 
 			# Colect Top Choice
 			if row[tc_col] not in choices:
-				choice = collect_top_choice(params, row, options, choices)
+				choice = collect_top_choice(params, options, choices)
 				choice_name = choices[int(choice)] if choice not in ["", "s"] else choice
 			else:
 				choice_name = row[tc_col]
@@ -255,23 +258,28 @@ def run_from_command_line(cla):
 				continue
 
 			# Enter choices into decision matrix
-			df.loc[index, tc_col] = "" if choice_name == "" else choice_name
-			print(df[tc_col].str.contains(choice_regex).sum())
+			dataframe.loc[index, tc_col] = "" if choice_name == "" else choice_name
+			print(dataframe[tc_col].str.contains(choice_regex).sum())
 
 			if sub_choice != None:
-				df.loc[index, sc_col] = "" if sub_choice == "" else sub_dict[choice_name][int(sub_choice)]
+				dataframe.loc[index, sc_col] = "" \
+				if sub_choice == "" else sub_dict[choice_name][int(sub_choice)]
 
 			# Save at every 50th transaction
 			if complete > 0 and complete % 25 == 0:
 				safe_print("Autosaving...")
-				df.to_csv(local_filename, sep="|", mode="w", quotechar=None, doublequote=False, quoting=csv.QUOTE_NONE, encoding="utf-8", index=False, index_label=False)
+				dataframe.to_csv(local_filename, sep="|", mode="w", quotechar=None, \
+						  doublequote=False, quoting=csv.QUOTE_NONE, \
+						  encoding="utf-8", index=False, index_label=False)
 				move_to_S3(bucket, labeler_key, local_filename)
 		
 		# Break if User exits
 		if save_and_exit:
-			df.to_csv(local_filename, sep="|", mode="w", quotechar=None, doublequote=False, quoting=csv.QUOTE_NONE, encoding="utf-8", index=False, index_label=False)
+			dataframe.to_csv(local_filename, sep="|", mode="w", quotechar=None, \
+					  doublequote=False, quoting=csv.QUOTE_NONE, \
+					  encoding="utf-8", index=False, index_label=False)
 			move_to_S3(bucket, labeler_key, local_filename)
 			break
 	
 if __name__ == "__main__":
-	run_from_command_line(sys.argv)
+	run_from_command_line()

@@ -37,7 +37,7 @@ import sys
 
 from pprint import pprint
 
-from meerkat.various_tools import (load_dict_list, progress, safe_print)
+from meerkat.various_tools import (load_dict_list, progress)
 
 def generic_test(machine, human, lists, column):
 	"""Tests both the recall and precision of the pinpoint classifier against
@@ -60,7 +60,7 @@ def generic_test(machine, human, lists, column):
 
 		# Continue if Unlabeled
 		if mRow[column] == "":
-			lists["unlabeled"].append(row[doc_label])
+			lists["unlabeled"].append(mRow[doc_label])
 			continue
 
 		# Verify Accuracy
