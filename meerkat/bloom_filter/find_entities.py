@@ -75,6 +75,17 @@ def in_location_bloom(splits):
 		checks whether or not the splits are in the location bloom filter,
 		and returns all the geographic information that we know about that
 		location
+
+		looks for a two letter state, then iterates backwards until it
+		finds a known string. for example:
+
+		el paso tx ==> FOUND STATE
+				^^
+		el paso tx ==> Not a known town
+		   ^^^^^^^
+
+		el paso tx ==> Known town, return all known information
+		^^^^^^^^^^
 	"""
 	len_splits = len(splits)
 	if len_splits == 1:
@@ -83,7 +94,7 @@ def in_location_bloom(splits):
 		region, before = splits[len_splits-1], splits[:len_splits-1]
 		for i in range(len(before)):
 			locality = " ".join(before[i:])
-			if (locality, region) in my_bloom:
+			if (locality, region) in LOCATION_BLOOM:
 				try:
 					zipcode, lat, lng = CITY_INFO[(locality, region)]
 					return (locality, region, zipcode, lat, lng)
@@ -93,7 +104,7 @@ def in_location_bloom(splits):
 	return None
 
 def location_split(my_text, **kwargs):
-	splits = [x.upper() for x in my_text.split()]
+	splits = [x.upper() for x in my_text.split()] 
 	for i in range(len(splits)):
 		if splits[i] in STATES:
 			place = in_location_bloom(splits[:i+1])
@@ -139,7 +150,7 @@ def main():
 	print(combined)
 	print(location_bloom_results.describe())
 
+LOCATION_BLOOM = get_location_bloom()
 if __name__ == "__main__":
-	my_bloom = get_location_bloom()
 	# my_merchant_bloom, pm_bloom = get_merchant_bloom()
 	main()
