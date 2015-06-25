@@ -15,7 +15,7 @@
     },
     "elasticsearch" : {
         "cluster_nodes" : [
-"172.31.42.53", "172.31.30.96"
+            "172.31.37.99", "172.31.17.134", "172.31.9.6", "172.31.33.226"
         ],
         "index" : "factual_index",
         "type" : "factual_type"

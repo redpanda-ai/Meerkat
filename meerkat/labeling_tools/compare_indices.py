@@ -1,5 +1,5 @@
 #!/usr/local/bin/python3.3
-
+# pylint: disable=line-too-long
 """This module takes a file containing transactions and their associated
 uuid relative to a specific index, and helps to reconcile changes as the 
 index evolves over time. It also can be used to label files from scratch
@@ -23,31 +23,33 @@ Created on July 21, 2014
 
 #####################################################
 
-import os
-import re
 import sys
 import random
 import contextlib
 import collections
 
-from pprint import pprint
 from copy import deepcopy
 from scipy.stats.mstats import zscore
 
 from meerkat.file_consumer import get_qs_query, get_bool_query
-from meerkat.various_tools import load_params, get_es_connection, string_cleanse
-from meerkat.various_tools import get_merchant_by_id, load_dict_ordered, write_dict_list
-from meerkat.various_tools import safe_print, synonyms, get_magic_query, stopwords, safe_input
+from meerkat.various_tools import (load_params, get_es_connection,
+	string_cleanse, get_merchant_by_id, load_dict_ordered, write_dict_list, \
+	safe_print, synonyms, get_magic_query, stopwords, safe_input)
 
 class DummyFile(object):
-    def write(self, x): pass
+	"""does nothing"""
+	def write(self, message):
+		"""I'm sorry but I'm going to lose connection because I'm about to drive\
+		into a tunnel in a canyon on an airplane while hanging up the phone."""
+		pass
 
 @contextlib.contextmanager
 def nostderr():
-    save_stderr = sys.stderr
-    sys.stderr = DummyFile()
-    yield
-    sys.stderr = save_stderr
+	"""temporarily remove stderr"""
+	save_stderr = sys.stderr
+	sys.stderr = DummyFile()
+	yield
+	sys.stderr = save_stderr
 
 def relink_transactions(params, es_connection):
 	"""Relink transactions to their new factual_ids"""
@@ -91,10 +93,12 @@ def generate_user_context(params, es_connection):
 		location = enriched["LATITUDE"] + ", " + enriched["LONGITUDE"]
 		city = enriched["CITY"] + ", " + enriched["STATE"]
 
-		if location not in params["compare_indices"]["user_context"][unique_mem_id] and location != ", ":
+		if location not in params["compare_indices"]["user_context"][unique_mem_id] \
+		and location != ", ":
 			params["compare_indices"]["user_context"][unique_mem_id].append(location)
 
-		if city not in params["compare_indices"]["user_cities"][unique_mem_id] and city != ", ":
+		if city not in params["compare_indices"]["user_cities"][unique_mem_id] \
+		and city != ", ":
 			params["compare_indices"]["user_cities"][unique_mem_id].append(city)
 
 	sys.stdout.write('\n\n')
@@ -166,14 +170,16 @@ def identify_changes(params, es_connection):
 			continue
 
 		# Compare Indices
-		old_mapping = enrich_transaction(params, transaction, es_connection, index=sys.argv[3])
-		new_mapping = enrich_transaction(params, transaction, es_connection, index=sys.argv[4])
+		old_mapping = enrich_transaction(params, transaction, \
+										 es_connection, index=sys.argv[3])
+		new_mapping = enrich_transaction(params, transaction, \
+										 es_connection, index=sys.argv[4])
 
 		if new_mapping["merchant_found"] == False:
 			params["compare_indices"]["id_changed"].append(old_mapping)
 			continue
 
-		mapping_changed = has_mapping_changed(params, old_mapping, new_mapping)
+		mapping_changed = has_mapping_changed(old_mapping, new_mapping)
 
 		if mapping_changed:
 			params["compare_indices"]["details_changed"].append(transaction)
@@ -183,38 +189,29 @@ def identify_changes(params, es_connection):
 		transaction["relinked_id"] = transaction["factual_id"]
 		params["compare_indices"]["relinked"].append(transaction)
 
-	print_diff_stats(params, transactions)
+	print_stats(params, transactions)
 
-def progress(i, list):
+def progress(i, data):
 	"""Display progress percent in a loop"""
 
-	progress = (i / len(list)) * 100
+	progress = (i / len(data)) * 100
 	progress = str(round(progress, 0)) + "%"
-	sys.stdout.write('\r')
-	sys.stdout.write(progress)
 	sys.stdout.flush()
+	sys.stdout.write('\r' + progress)
 
-def print_diff_stats(params, transactions):
+def print_stats(params, transactions=""):
 	"""Display a set of diff stats"""
 
 	sys.stdout.write('\n\n')
-	safe_print("{:25}{}".format("Number of transactions: ", len(transactions)))
+	if transactions != "":
+		safe_print("{:25}{}".format("Number of transactions: ", len(transactions)))
 	safe_print("{:25}{}".format("No action necessary: ", len(params["compare_indices"]["relinked"])))
 	safe_print("{:25}{}".format("Number Changed ID: ", len(params["compare_indices"]["id_changed"])))
 	safe_print("{:25}{}".format("Number Changed Details: ", len(params["compare_indices"]["details_changed"])))
 	safe_print("{:25}{}".format("Number Unlinked: ", len(params["compare_indices"]["unlinked"])))
 	safe_print("{:25}{}\n".format("Number NULL: ", len(params["compare_indices"]["NULL"])))
 
-def print_current_stats(params):
-	"""Print Current Stats"""
-
-	safe_print("{:25}{}".format("Number Relinked: ", len(params["compare_indices"]["relinked"])))
-	safe_print("{:25}{}".format("Number Changed ID: ", len(params["compare_indices"]["id_changed"])))
-	safe_print("{:25}{}".format("Number Changed Details: ", len(params["compare_indices"]["details_changed"])))
-	safe_print("{:25}{}".format("Number Skipped: ", len(params["compare_indices"]["skipped"])))
-	safe_print("{:25}{}\n".format("Number NULL (unreviewed): ", len(params["compare_indices"]["NULL"])))
-
-def has_mapping_changed(params, old_mapping, new_mapping):
+def has_mapping_changed(old_mapping, new_mapping):
 	"""Compares two transactions for similarity"""
 
 	fields_to_compare = ["PHYSICAL_MERCHANT", "STREET", "CITY", "STATE", "ZIP_CODE"]
@@ -232,14 +229,14 @@ def reconcile_changed_ids(params, es_connection):
 	prompt_mode_change("changed id")
 
 	while len(params["compare_indices"]["id_changed"]) > 0:
-		br()
+		line_break()
 		changed_ids = params["compare_indices"]["id_changed"]
 		random.shuffle(changed_ids)
 		transaction = changed_ids.pop()
-		results = find_merchant_by_address(params, transaction, es_connection)
+		results = find_merchant_by_address(transaction, es_connection)
 		decision_boundary(params, transaction, results)
 
-	print_current_stats(params)
+	print_stats(params)
 
 	reconcile_skipped(params, es_connection)
 
@@ -249,18 +246,17 @@ def autolink_and_verify(params, es_connection):
 
 	prompt_mode_change("find and verify")
 	unlinked = params["compare_indices"]["unlinked"]
-	total = len(unlinked)
 	params["compare_indices"]["unlinked"] = []
 
 	while len(unlinked) > 0:
-		br()
+		line_break()
 		safe_print(str(len(unlinked)) + " unlinked remaining")
 		random.shuffle(unlinked)
 		transaction = unlinked.pop()
 		results = search_with_magic_query(params, transaction, es_connection)
 		reconcile_autolinked(params, transaction, results)
 
-	print_current_stats(params)
+	print_stats(params)
 
 def search_with_magic_query(params, transaction, es_connection):
 	"""Search using a pretrained query"""
@@ -270,7 +266,7 @@ def search_with_magic_query(params, transaction, es_connection):
 	
 	try:
 		results = es_connection.search(index=index, body=magic_query)
-	except Exception:
+	except:
 		results = {"hits":{"total":0}}
 
 	return results
@@ -278,7 +274,7 @@ def search_with_magic_query(params, transaction, es_connection):
 def reconcile_autolinked(params, transaction, results):
 	"""Verify autolinked transaction is correct"""
 
-	description =  ' '.join(transaction["DESCRIPTION_UNMASKED"].split())
+	description = ' '.join(transaction["DESCRIPTION_UNMASKED"].split())
 	query = stopwords(description)
 	query = synonyms(query)
 	query = string_cleanse(query)
@@ -300,7 +296,7 @@ def reconcile_autolinked(params, transaction, results):
 
 	# Change factual_id, move to relinked
 	if user_input in accepted_inputs:
-		score, hit = get_hit(results, int(user_input))
+		_, hit = get_hit(results, int(user_input))
 		transaction["relinked_id"] = hit["factual_id"]
 		update_user_context(params, transaction, hit)
 		params["compare_indices"]["relinked"].append(transaction)
@@ -318,7 +314,7 @@ def reconcile_changed_details(params, es_connection):
 	while len(params["compare_indices"]["details_changed"]) > 0:
 
 		# Prepare Data
-		br()
+		line_break()
 		details_changed = params["compare_indices"]["details_changed"]
 		random.shuffle(details_changed)
 		transaction = details_changed.pop()
@@ -376,18 +372,18 @@ def reconcile_skipped(params, es_connection):
 
 	# Fix Skipped
 	while len(skipped) > 0:
-		br()
+		line_break()
 		progress = 100 - ((len(skipped) / skipped_len) * 100)
 		safe_print(round(progress, 2), "% ", "done with Skipped")
 		transaction = skipped.pop()
 		name, address = skipped_details_prompt(params, transaction, es_connection)
 		extra_queries = [(["address", "locality", "region", "postcode"], address, 3), (["name"], name, 4)]
-		results = find_merchant_by_address(params, transaction, es_connection, additional_data=extra_queries)
+		results = find_merchant_by_address(transaction, es_connection, additional_data=extra_queries)
 		if results == False:
 			continue
 		null_decision_boundary(params, transaction, results)
 
-	print_current_stats(params)
+	print_stats(params)
 
 def reconcile_null(params, es_connection):
 	"""Attempt to find a factual_id for a NULL entry"""
@@ -402,7 +398,7 @@ def reconcile_null(params, es_connection):
 
 	# Fix Null
 	while len(null) > 0:
-		br()
+		line_break()
 		progress = 100 - ((len(null) / null_len) * 100)
 		safe_print(round(progress, 2), "% ", "done with NULL")
 		transaction = null.pop()
@@ -411,13 +407,13 @@ def reconcile_null(params, es_connection):
 			continue
 		null_decision_boundary(params, transaction, results)
 
-	print_current_stats(params)
+	print_stats(params)
 
 def save_relinked_transactions(params):
 	""""Save the completed file set"""
 
 	print("Preparing to save. Current State:")
-	print_current_stats(params)
+	print_stats(params)
 
 	safe_print("What should the output file be named? \n")
 	file_name = ""
@@ -425,7 +421,8 @@ def save_relinked_transactions(params):
 	while file_name == "":
 		file_name = safe_input()
 
-	# TODO auto append "_in_progress" to file name if relinked_id is not full populated
+	# TODO auto append "_in_progress" to file name
+	# if relinked_id is not full populated
 
 	field_order = params["compare_indices"]["field_order"]
 	field_order = [field for field in field_order if field]
@@ -445,7 +442,7 @@ def save_relinked_transactions(params):
 
 	write_dict_list(transactions, file_name, column_order=field_order)
 
-def br():
+def line_break():
 	"""Prints a break line to show current record has changed"""
 	safe_print("------------------", "\n")
 
@@ -498,13 +495,13 @@ def update_user_context(params, transaction, hit):
 
 	point = transaction["LATITUDE"] + ", " + transaction["LONGITUDE"]
 	city = hit["locality"] + ", " + hit["region"]
-	UNIQUE_MEM_ID = transaction["UNIQUE_MEM_ID"]
+	unique_mem_id = transaction["UNIQUE_MEM_ID"]
 
-	if point not in params["compare_indices"]["user_context"][UNIQUE_MEM_ID] and point != ", ":
-		params["compare_indices"]["user_context"][UNIQUE_MEM_ID].append(point)
+	if point not in params["compare_indices"]["user_context"][unique_mem_id] and point != ", ":
+		params["compare_indices"]["user_context"][unique_mem_id].append(point)
 
-	if city not in params["compare_indices"]["user_cities"][UNIQUE_MEM_ID] and city != ", ":
-		params["compare_indices"]["user_cities"][UNIQUE_MEM_ID].append(city)
+	if city not in params["compare_indices"]["user_cities"][unique_mem_id] and city != ", ":
+		params["compare_indices"]["user_cities"][unique_mem_id].append(city)
 
 def search_with_user_safe_input(params, es_connection, transaction):
 	"""Search for a location by providing additional data"""
@@ -546,9 +543,11 @@ def print_multiselect_prompt(results):
 	for i in range(5):
 		print_formatted_result(results, i)
 
-	safe_print("{:7}".format("[null]"), "Transaction has been reviewed before and has no matching merchant in new index. Set to NULL")	
+	safe_print("{:7}".format("[null]"), "Transaction has been reviewed before \
+		and has no matching merchant in new index. Set to NULL")	
 	safe_print("[enter] Skip")
-	safe_print("{:7} Transaction did not occur at a specific location. Remove it from training data\n".format("[rm]"))
+	safe_print("{:7} Transaction did not occur at a specific location. \
+		Remove it from training data\n".format("[rm]"))
 
 	user_input = safe_input("Please select a choice above: \n")
 
@@ -572,7 +571,7 @@ def null_decision_boundary(params, transaction, results):
 
 	# Change factual_id, move to relinked
 	if user_input in accepted_inputs:
-		score, hit = get_hit(results, int(user_input))
+		_, hit = get_hit(results, int(user_input))
 		transaction["relinked_id"] = hit["factual_id"]
 		update_user_context(params, transaction, hit)
 		params["compare_indices"]["relinked"].append(transaction)
@@ -584,7 +583,11 @@ def decision_boundary(params, store, results):
 	"""Decide if there is a match"""
 
 	fields = ["name", "address", "locality", "region", "postcode"]
-	old_details = [store["PHYSICAL_MERCHANT"], store["STREET"], store["CITY"], string_cleanse(store["STATE"]), store.get("ZIP_CODE", "")]
+	old_details = [store["PHYSICAL_MERCHANT"], \
+				   store["STREET"], \
+				   store["CITY"], \
+				   string_cleanse(store["STATE"]), \
+				   store.get("ZIP_CODE", "")]
 	accepted_inputs = [str(x) for x in list(range(5))]
 	score, top_hit = get_hit(results, 0)
 
@@ -627,7 +630,8 @@ def decision_boundary(params, store, results):
 def clean_transaction(transaction):
 	"""Strips any enriched data"""
 
-	fields_to_clear = ["PHYSICAL_MERCHANT", "STORE_NUMBER", "STREET", "CITY", "STATE", "ZIP_CODE", "LATITUDE", "LONGITUDE"]
+	fields_to_clear = ["PHYSICAL_MERCHANT", "STORE_NUMBER", "STREET", "CITY", \
+					   "STATE", "ZIP_CODE", "LATITUDE", "LONGITUDE"]
 
 	for field in fields_to_clear:
 		transaction[field] = ""
@@ -640,8 +644,10 @@ def enrich_transaction(params, transaction, es_connection, index="", factual_id=
 
 	transaction = deepcopy(transaction)
 	transaction["merchant_found"] = True
-	fields_to_get = ["name", "region", "locality", "internal_store_number", "postcode", "address"]
-	fields_to_fill = ["PHYSICAL_MERCHANT", "STATE", "CITY", "STORE_NUMBER", "ZIP_CODE", "STREET"]
+	fields_to_get = ["name", "region", "locality", \
+					 "internal_store_number", "postcode", "address"]
+	fields_to_fill = ["PHYSICAL_MERCHANT", "STATE", "CITY", \
+					  "STORE_NUMBER", "ZIP_CODE", "STREET"]
 	
 	# Get merchant and suppress errors
 	if factual_id == "":
@@ -668,11 +674,15 @@ def enrich_transaction(params, transaction, es_connection, index="", factual_id=
 
 	return transaction
 
-def find_merchant_by_address(params, store, es_connection, additional_data=[]):
+def find_merchant_by_address(store, es_connection, additional_data=[]):
 	"""Match document with address to factual document"""
 
 	fields = ["name^2", "address", "locality", "region", "postcode"]
-	old_details = [store.get("PHYSICAL_MERCHANT", ""), store.get("STREET",""), store.get("CITY", ""), string_cleanse(store.get("STATE", "")), store.get("ZIP_CODE", "")]
+	old_details = [store.get("PHYSICAL_MERCHANT", ""), \
+				   store.get("STREET", ""), \
+				   store.get("CITY", ""), \
+				   string_cleanse(store.get("STATE", "")), \
+				   				  store.get("ZIP_CODE", "")]
 	index = sys.argv[4]
 	results = ""
 
@@ -703,16 +713,10 @@ def find_merchant_by_address(params, store, es_connection, additional_data=[]):
 def changed_id_user_prompt(params, old_details, results, store):
 	"""Prompt a user for input to continue"""
 
-	num_changed = len(params["compare_indices"]["id_changed"])
-	num_relinked = len(params["compare_indices"]["relinked"])
-	num_skipped = len(params["compare_indices"]["skipped"])
-	total = num_changed + num_relinked + num_skipped
-	percentage_relinked = num_relinked / total
-	percentage_formatted = str(round(percentage_relinked * 100, 2)) + "%"
 	old_details_formatted = [detail for detail in old_details]
-	old_details_formatted =  ", ".join(old_details_formatted)
+	old_details_formatted = ", ".join(old_details_formatted)
 
-	print_current_stats(params)
+	print_stats(params)
 
 	safe_print("DESCRIPTION_UNMASKED: {}".format(store["DESCRIPTION_UNMASKED"]))
 	safe_print("Query Sent: {} \n".format(old_details_formatted))
@@ -724,8 +728,9 @@ def changed_id_user_prompt(params, old_details, results, store):
 def print_formatted_result(results, index):
 	"""Display a potential result in readable format"""
 
-	fields_to_print = ["name", "address", "locality", "region", "postcode", "internal_store_number"]
-	score, hit = get_hit(results, index)
+	fields_to_print = ["name", "address", "locality", \
+					   "region", "postcode", "internal_store_number"]
+	_, hit = get_hit(results, index)
 
 	# No Result
 	if not hit:
@@ -798,7 +803,7 @@ def add_local_params(params):
 
 	return params
 
-def run_from_command_line(command_line_arguments):
+def run_from_command_line():
 	"""Runs these commands if the module is invoked from the command line"""
 
 	verify_arguments()
@@ -808,4 +813,4 @@ def run_from_command_line(command_line_arguments):
 	relink_transactions(params, es_connection)
 	
 if __name__ == "__main__":
-	run_from_command_line(sys.argv)
+	run_from_command_line()

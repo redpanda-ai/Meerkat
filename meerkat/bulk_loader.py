@@ -23,7 +23,6 @@ import sys
 import threading
 
 from datetime import datetime
-from pprint import pprint
 from elasticsearch import Elasticsearch, helpers
 
 from meerkat.custom_exceptions import InvalidArguments, Misconfiguration
@@ -453,25 +452,24 @@ def build_user_index():
 			logging.error("Failed to create user index, aborting.")
 			sys.exit()
 
-def run_from_command_line(command_line_arguments):
+def run_from_command_line():
 	"""Runs these commands if the module is invoked from the command line"""
 
-	global params
-	params = initialize()
-	logging.warning(json.dumps(params, sort_keys=True,
+	my_params = initialize()
+	logging.warning(json.dumps(my_params, sort_keys=True,
 		indent=4, separators=(',', ':')))
-	guarantee_index_and_doc_type(params)
-	params["document_queue_populated"] = False
-	params["concurrency_queue"] = queue.Queue()
-	params["header"], params["document_queue"],\
-	params["document_queue_populated"] = load_document_queue(params)
-	start_consumers(params)
-	params["concurrency_queue"].join()
+	guarantee_index_and_doc_type(my_params)
+	my_params["document_queue_populated"] = False
+	my_params["concurrency_queue"] = queue.Queue()
+	my_params["header"], my_params["document_queue"],\
+	my_params["document_queue_populated"] = load_document_queue(my_params)
+	start_consumers(my_params)
+	my_params["concurrency_queue"].join()
 	logging.info("Concurrency joined")
-	params["document_queue"].join()
+	my_params["document_queue"].join()
 	logging.info("Documents joined")
 
 	logging.critical("End of program.")
 
 if __name__ == "__main__":
-	run_from_command_line(sys.argv)
+	run_from_command_line()

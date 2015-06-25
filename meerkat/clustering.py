@@ -1,5 +1,4 @@
 #!/usr/local/bin/python3.3
-# pylint: disable=C0301
 
 """This module clusters a list of a users previously found transaction
 locations. Provided at least 25 latitude / longitude pairs, this module
@@ -34,16 +33,18 @@ def cluster(location_list):
 
 	# Parse to float
 	location_list[:] = [[float(x[1]), float(x[0])] for x in location_list]
-	X = location_list
+	distance_matrix = location_list
 
-	X = StandardScaler().fit_transform(X)
-	db = DBSCAN(eps=0.08, min_samples=3).fit(X)
+	distance_matrix = StandardScaler().fit_transform(distance_matrix)
+	clustering = DBSCAN(eps=0.08, min_samples=3).fit(distance_matrix)
 
 	# Find Shapes
-	geoshapes = collect_clusters(X, db.labels_, location_list)
+	geoshapes = collect_clusters(distance_matrix, \
+								 clustering.labels_, \
+								 location_list)
 
 	# Plot Results
-	plot_clustering(db, X)
+	plot_clustering(clustering, distance_matrix)
 
 	return geoshapes
 
@@ -61,12 +62,11 @@ def plot_clustering(model, normalized_points):
 			# Noise throws off visualization
 			continue
 		class_members = [index[0] for index in np.argwhere(labels == k)]
-		#cluster_core_samples = [index for index in core_samples if labels[index] == k]
 		_ = [index for index in core_samples if labels[index] == k]
 		for index in class_members:
-			x = normalized_points[index]
+			points = normalized_points[index]
 			markersize = 5
-			pl.plot(x[1], x[0], 'o', markerfacecolor=col,\
+			pl.plot(points[1], points[0], 'o', markerfacecolor=col,\
 				markeredgecolor='k', markersize=markersize)
 
 	pl.show()
@@ -91,9 +91,9 @@ def collect_clusters(scaled_points, labels, location_list):
 
 	geoshape_list = convex_hull(clusters, locations)
 
-	#The previous version of "convex_hull" converted coordinates from floating point pairs
-	#to strings pairs.  If you need that functionality, use the
-	#"convert_geoshapes_coordinates_to_strings" function provided below.
+	#The previous version of "convex_hull" converted coordinates from
+	# floating point pairs to strings pairs.  If you need that functionality, 
+	# use the "convert_geoshapes_coordinates_to_strings" function provided below
 
 	return geoshape_list
 
@@ -114,10 +114,6 @@ def convex_hull(clusters, locations):
 		hull = ConvexHull(points)
 		geoshape = []
 
-		# Draw lines
-		#for simplex in hull.simplices:
-			#plt.plot(points[simplex, 1], points[simplex, 0], 'k-')
-
 		# Get Lat Lon Vertices
 		for vertex in hull.vertices:
 			geoshape.append([lat_lon_points[vertex, 0], lat_lon_points[vertex, 1]])
@@ -131,8 +127,8 @@ def convex_hull(clusters, locations):
 	return geoshapes
 
 def convert_geoshapes_coordinates_to_strings(geoshape_list):
-	"""Returns a copy of geoshape_list where each coordinate is formatted as a comma
-	separated pair of string values. """
+	"""Returns a copy of geoshape_list where each coordinate is formatted 
+	as a comma separated pair of string values. """
 	new_geoshape_list = []
 	for geoshape in geoshape_list:
 		new_geoshape = []
@@ -147,4 +143,5 @@ def convert_geoshapes_coordinates_to_strings(geoshape_list):
 
 #Print a warning to not execute this file as a module"""
 if __name__ == "__main__":
-	print("This module is a library that contains useful functions; it should not be run from the console.")
+	print("This module is a library that contains useful functions; it should \
+		not be run from the console.")

@@ -26,7 +26,7 @@ from scipy.stats.mstats import zscore
 from pprint import pprint
 
 from .various_tools import string_cleanse, synonyms
-from .various_tools import get_bool_query, get_qs_query, safe_print
+from .various_tools import get_bool_query, get_qs_query
 from .clustering import cluster, collect_clusters
 from .location import separate_geo, scale_polygon, get_geo_query
 
@@ -35,7 +35,6 @@ PIPE_PATTERN = re.compile(r"\|")
 def get_yodlee_factual_map(params):
 	"""Return a map of factual attribute names to
 	yodlee attribute names"""
-	# pylint: disable=bad-continuation
 	my_field_mappings = params["my_producer_options"]["field_mappings"]
 	mappings = {}
 	for item in my_field_mappings:
@@ -196,7 +195,6 @@ class FileConsumer(threading.Thread):
 	def __text_and_geo_features(self, text_features_results):
 		"""Classify transactions using geo and text features"""
 
-		user_id = text_features_results[0]['UNIQUE_MEM_ID']
 		qs_boost = self.hyperparameters.get("qs_boost", "1")
 		name_boost = self.hyperparameters.get("name_boost", "1")
 		hits, non_hits = separate_geo(text_features_results)
@@ -215,7 +213,7 @@ class FileConsumer(threading.Thread):
 		enriched_transactions = []
 
 		# Locate user
-		scaled_geoshapes = self.__locate_user(unique_locations, user_id)
+		scaled_geoshapes = self.__locate_user(unique_locations)
 
 		# Use first pass results if no location found
 		if not bool(scaled_geoshapes):
@@ -249,7 +247,7 @@ class FileConsumer(threading.Thread):
 		print("ADDED SECOND PASS: " + str(len(added_text_and_geo_features)))
 		return text_and_geo_features_results
 
-	def __locate_user(self, unique_locations, user_id):
+	def __locate_user(self, unique_locations):
 		"""Uses previous results, to find an approximation
 		of a users spending area. Returns estimation as
 		a bounded polygon"""
@@ -365,15 +363,15 @@ class FileConsumer(threading.Thread):
 		business_names = [result.get("fields", {"name" : ""}).get("name", "")\
 			for result in hits]
 		business_names = [name[0]\
-			for name in business_names if type(name) == list]
+			for name in business_names if isinstance(name, list)]
 		city_names = [result.get("fields",\
 			{"locality" : ""}).get("locality", "")\
 			for result in hits]
-		city_names = [name[0] for name in city_names if type(name) == list]
+		city_names = [name[0] for name in city_names if isinstance(name, list)]
 		state_names = [result.get("fields", {"region" : ""}).get("region", "")\
 			for result in hits]
 		state_names = [name[0]\
-			for name in state_names if type(name) == list]
+			for name in state_names if isinstance(name, list)]
 
 		# Need Names
 		if len(business_names) < 2:
@@ -548,7 +546,6 @@ class FileConsumer(threading.Thread):
 		transaction_id = transaction["UNIQUE_TRANSACTION_ID"]
 		date = transaction["TRANSACTION_DATE"].replace(".", "-")
 		date = date.replace("/", "-")
-		# pylint: disable=bad-continuation
 		update_body = {
 			"date": date,
 			"_parent": transaction["UNIQUE_MEM_ID"],
@@ -587,7 +584,6 @@ class FileConsumer(threading.Thread):
 
 	def __set_logger(self):
 		"""Creates a logger, based upon the supplied config object."""
-		# pylint: disable=bad-continuation
 		levels = {
 			'debug': logging.DEBUG, 'info': logging.INFO,
 			'warning': logging.WARNING, 'error': logging.ERROR,

@@ -7,7 +7,9 @@
 			"properties" : {
 				"transaction_id" : { "type" : "number" },
 				"is_physical_merchant" : { "enum" : [ true, false ] },
-				"match_found" : { "enum" : [ false ] }
+				"match_found" : { "enum" : [ false ] },
+				"txn_sub_type" : { "type" : "string" },
+				"txn_type" : { "type" : "string" }
 			},
 			"required": [ "transaction_id", "is_physical_merchant", "match_found" ]
 		},
@@ -31,7 +33,9 @@
 				"city" : { "type" : "string" },
 				"state" : { "type" : "string" },
 				"country" : { "type" : "string", "maxLength" : 2, "minLength" : 2 },
-				"postal_code" : { "type" : "string" }
+				"postal_code" : { "type" : "string" },
+				"txn_sub_type" : { "type" : "string" },
+				"txn_type" : { "type" : "string" }
 			},
 			"required": [ "transaction_id", "is_physical_merchant", "match_found", "merchant_name", "source_merchant_id", "country" ]
 		},
@@ -40,23 +44,23 @@
 			"properties" : {
 				"transaction_id" : { "type" : "number" },
 				"is_physical_merchant" : { "enum" : [ false ] },
-				"merchant_name" : { "type" : "string" }
+				"merchant_name" : { "type" : "string" },
+				"txn_sub_type" : { "type" : "string" },
+				"txn_type" : { "type" : "string" }
 			},
-			"required": [ "transaction_id", "is_physical_merchant", "merchant_name" ]
+			"required": [ "transaction_id", "is_physical_merchant", "merchant_name" ],
+			"additionalProperties" : false
 		},
 		"non_merchant_category_response" : {
 			"type" : "object",
 			"properties" : {
 				"transaction_id" : { "type" : "number" },
 				"is_physical_merchant" : { "enum" : [ false ] },
-				"category_labels" : {
-					"type" : "array",
-					"items" : {
-						"type": "string"
-					}
-				}
+				"txn_sub_type" : { "type" : "string" },
+				"txn_type" : { "type" : "string" }
 			},
-			"required": [ "transaction_id", "is_physical_merchant", "category_labels" ]
+			"required": [ "transaction_id", "is_physical_merchant", "txn_type", "txn_sub_type"],
+			"additionalProperties" : false
 		}
 	},
 	"description": "A schema for defining output from 'meerkat_categorize'",

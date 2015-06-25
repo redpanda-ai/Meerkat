@@ -5,7 +5,7 @@ import gzip
 import logging
 import os
 import sys
-from random import shuffle
+import csv
 from .various_tools import safely_remove_file
 
 #Usage
@@ -73,9 +73,12 @@ def slice_me(working_directory, input_filename):
 	split_list = None
 	output_name_template = unzipped_filename + ".%s"
 	#Split big unzipped file
-	split_list = split_csv(open(unzipped_filename, 'r'), delimiter='|', row_limit=1000000,\
+	split_list = split_csv(open(unzipped_filename, 'r'), \
+		delimiter='|', \
+		row_limit=1000000,\
 		output_name_template=output_name_template,\
-		output_path=working_directory, keep_headers=True)
+		output_path=working_directory, \
+		keep_headers=True)
 	#Remove big unzipped file
 	safely_remove_file(working_directory + unzipped_filename)
 	for split in split_list:
@@ -87,10 +90,9 @@ def slice_me(working_directory, input_filename):
 					zipped_output.write(line)
 		safely_remove_file(split)
 
-working_directory = sys.argv[1]
-os.chdir(working_directory)
+os.chdir(sys.argv[1])
 
 #Gather all txt.gz files
 input_files = sorted(glob.glob('*.txt.gz'))
 for current_file in input_files:
-	slice_me(working_directory, current_file)
+	slice_me(sys.argv[1], current_file)
