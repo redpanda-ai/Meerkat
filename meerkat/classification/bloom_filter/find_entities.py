@@ -5,7 +5,7 @@
 Created on Dec 20, 2014
 @author: J. Andrew Key
 
-Modified on June 18, 2015
+Modified on June 25, 2015
 @author: Sivan Mehta
 """
 
@@ -29,6 +29,8 @@ STATES = {
 	"VA": "", "WA": "", "WV": "", "WI": "", "WY": "" \
 	}
 
+LOCATION_BLOOM = get_location_bloom()
+
 def generate_city_map():
 	"""
 		generates a dictionary with the following structure
@@ -41,7 +43,7 @@ def generate_city_map():
 	"""
 	print("generate location map")
 
-	csv_file = csv.reader(open("meerkat/bloom_filter/assets/us_cities_small.csv"), \
+	csv_file = csv.reader(open("meerkat/classification/bloom_filter/assets/us_cities_small.csv"), \
 		delimiter="\t")
 	data = {}
 	for row in csv_file:
@@ -50,19 +52,17 @@ def generate_city_map():
 		except ValueError:
 			data[(row[2].upper(), row[1])] = (row[0], row[3], row[4])
 
-	pickle.dump(data, open("meerkat/bloom_filter/assets/CITY_INFO.log", 'wb'))
+	pickle.dump(data, open("meerkat/classification/bloom_filter/assets/CITY_INFO.log", 'wb'))
 
 	return data
 
 CITY_INFO = {}
 
-if os.path.isfile("meerkat/bloom_filter/assets/CITY_INFO.log"):
-	with open("meerkat/bloom_filter/assets/CITY_INFO.log", 'rb') as fp:
+if os.path.isfile("meerkat/classification/bloom_filter/assets/CITY_INFO.log"):
+	with open("meerkat/classification/bloom_filter/assets/CITY_INFO.log", 'rb') as fp:
 	    CITY_INFO = pickle.load(fp)
 else:
 	CITY_INFO = generate_city_map()
-
-# pprint(CITY_INFO)
 
 def in_merchant_bloom(splits):
 	"""checks whether or not the splits are in the merchant bloom filter"""
@@ -135,7 +135,7 @@ def merchant_split(my_text, **kwargs):
 def main():
 	"""runs the file"""
 	print("find_entities")
-	input_file = "meerkat/bloom_filter/input_file.txt.gz"
+	input_file = "meerkat/classification/bloom_filter/input_file.txt.gz"
 	data_frame = pd.io.parsers.read_csv(input_file, sep="|", compression="gzip")
 	descriptions = data_frame['DESCRIPTION_UNMASKED']
 	location_bloom_results = descriptions.apply(location_split, axis=0)
@@ -145,12 +145,11 @@ def main():
 	combined = pd.concat([location_bloom_results, descriptions], axis=1)
 	combined.columns = ['LOCATION', 'DESCRIPTION_UNMASKED']
 	pd.set_option('max_rows', 10000)
-	combined.to_csv("meerkat/bloom_filter/entities.csv", \
+	combined.to_csv("meerkat/classification/bloom_filter/entities.csv", \
 		mode="w", sep="|", encoding="utf-8")
 	print(combined)
 	print(location_bloom_results.describe())
 
-LOCATION_BLOOM = get_location_bloom()
 if __name__ == "__main__":
 	# my_merchant_bloom, pm_bloom = get_merchant_bloom()
 	main()

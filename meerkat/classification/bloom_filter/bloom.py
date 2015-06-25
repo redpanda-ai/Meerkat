@@ -97,11 +97,11 @@ def get_location_bloom():
 	if that is not possible."""
 	sbf = None
 	try:
-		sbf = ScalableBloomFilter.fromfile(open("meerkat/bloom_filter/assets/location_bloom", "br"))
+		sbf = ScalableBloomFilter.fromfile(open("meerkat/classification/bloom_filter/assets/location_bloom", "br"))
 		print("Location bloom filter loaded from file.")
 	except:
 		print("Creating new bloom filter")
-		sbf = create_location_bloom("meerkat/bloom_filter/assets/locations.json", "meerkat/bloom_filter/assets/location_bloom")
+		sbf = create_location_bloom("meerkat/classification/bloom_filter/assets/locations.json", "meerkat/classification/bloom_filter/assets/location_bloom")
 	return sbf
 
 def test_bloom_filter(sbf):

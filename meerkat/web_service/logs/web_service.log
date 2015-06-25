@@ -71,3 +71,6 @@ NameError: name 'bloom_results' is not defined
 2015-06-25 19:04:35,520 - root - INFO - The bloom filter thinks it's here: 
 2015-06-25 19:04:35,520 - root - INFO - None
 2015-06-25 19:04:36,306 - tornado.access - INFO - 200 POST /meerkat/v1.0.1 (127.0.0.1) 791.71ms
+2015-06-25 21:19:38,072 - root - INFO - The bloom filter thinks it's here: 
+2015-06-25 21:19:38,072 - root - INFO - None
+2015-06-25 21:19:38,662 - tornado.access - INFO - 200 POST /meerkat/v1.0.1 (127.0.0.1) 592.71ms

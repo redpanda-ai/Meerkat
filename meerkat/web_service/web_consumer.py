@@ -23,7 +23,7 @@ from meerkat.various_tools import get_es_connection, string_cleanse, get_boosted
 from meerkat.various_tools import synonyms, get_bool_query, get_qs_query, load_params
 from meerkat.classification.load import select_model
 from meerkat.classification.lua_bridge import get_CNN
-from meerkat.bloom_filter.find_entities import get_location_bloom, location_split
+from meerkat.classification.bloom_filter.find_entities import get_location_bloom, location_split
 
 
 BANK_SWS = select_model("bank")
