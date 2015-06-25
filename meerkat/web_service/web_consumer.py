@@ -23,7 +23,7 @@ from meerkat.various_tools import get_es_connection, string_cleanse, get_boosted
 from meerkat.various_tools import synonyms, get_bool_query, get_qs_query, load_params
 from meerkat.classification.load import select_model
 from meerkat.classification.lua_bridge import get_CNN
-from meerkat.bloom_filter.find_entities import *
+from meerkat.bloom_filter.find_entities import get_location_bloom, location_split
 
 
 BANK_SWS = select_model("bank")
@@ -32,6 +32,7 @@ TRANSACTION_TYPE = select_model("transaction_type")
 SUB_TRANSACTION_TYPE = select_model("sub_transaction_type")
 BANK_CNN = get_CNN("bank")
 CARD_CNN = get_CNN("card")
+my_bloom = get_location_bloom()
 
 def grouper(iterable):
     return zip_longest(*[iter(iterable)]*128, fillvalue={"description":""})
@@ -348,10 +349,7 @@ class Web_Consumer():
 
 		return processed[0:len(transactions)]
 
-	def classify(self, data):
-		"""Classify a set of transactions"""
-		my_bloom = get_location_bloom()
-
+	def bloom_results(self, data):
 		transactions = data["transaction_list"]
 		for transaction in transactions:
 			try:
@@ -362,6 +360,9 @@ class Web_Consumer():
 				# no description identified
 				pass
 
+	def classify(self, data):
+		"""Classify a set of transactions"""
+		self.bloom_results(data)
 		transactions = self.__add_transaction_type(data)
 		transactions = self.__apply_CNN(data, transactions)
 		physical, non_physical = self.__sws(data, transactions)
