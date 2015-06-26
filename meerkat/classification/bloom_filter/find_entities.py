@@ -70,9 +70,9 @@ def in_merchant_bloom(splits):
 		return splits
 	return None
 
-def in_location_bloom(splits):
+def in_location_bloom(text):
 	"""
-		checks whether or not the splits are in the location bloom filter,
+		checks whether or not the text are in the location bloom filter,
 		and returns all the geographic information that we know about that
 		location
 
@@ -87,25 +87,32 @@ def in_location_bloom(splits):
 		el paso tx ==> Known town, return all known information
 		^^^^^^^^^^
 	"""
-	len_splits = len(splits)
-	if len_splits == 1:
-		return None
+	if len(text) == 1:
+		return False
 	else:
-		region, before = splits[len_splits-1], splits[:len_splits-1]
+		region, before = text[len(text)-1], text[:len(text)-1]
 		for i in range(len(before)):
 			locality = " ".join(before[i:])
 			if (locality, region) in LOCATION_BLOOM:
 				return locality, region
 
-	return None
+		region = text[-2:]
+		for i in range(len(text) - 1, -1, -1):
+			locality = text[i:-2]
+			# print(locality, region)
+			if (locality, region) in LOCATION_BLOOM:
+				return locality, region
+	# return splits
 
-def location_split(my_text, **kwargs):
-	splits = [x.upper() for x in my_text.split()]
-	for mark in string.punctuation:
-		splits = [x.replace(mark,"") for x in splits]
-	for i in range(len(splits)):
-		if splits[i] in STATES:
-			place = in_location_bloom(splits[:i+1])
+	return False
+
+def location_split(my_text):
+	# Capitalize
+	my_text = standardize(my_text)
+
+	for i in range(len(my_text) - 1):
+		if my_text[i:i+2] in STATES:
+			place = in_location_bloom(my_text[:i+2])
 			if place:
 				return place
 	return None
@@ -136,7 +143,7 @@ def main():
 	input_file = "meerkat/classification/bloom_filter/input_file.txt.gz"
 	data_frame = pd.io.parsers.read_csv(input_file, sep="|", compression="gzip")
 	descriptions = data_frame['DESCRIPTION_UNMASKED']
-	location_bloom_results = descriptions.apply(location_split, axis=0)
+	location_bloom_results = descriptions.apply(location_split)
 	#TODO: add merchant results
 	#merchant_bloom_results = descriptions.apply(merchant_split, axis=0)
 
