@@ -1,0 +1,11 @@
+{
+	"size" : 0,
+	"aggs" : {
+		"merchants" : {
+			"terms" : {
+				"script" : "_source.name",
+				"size" : 100000000
+			}
+		}
+	}
+}

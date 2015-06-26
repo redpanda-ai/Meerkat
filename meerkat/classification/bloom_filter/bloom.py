@@ -1,4 +1,5 @@
 #!/usr/local/bin/python3.3
+#pylint: disable=mixed-indentation, bad-continuation
 
 """Bloom filter stuff.
 
@@ -96,11 +97,11 @@ def get_location_bloom():
 	if that is not possible."""
 	sbf = None
 	try:
-		sbf = ScalableBloomFilter.fromfile(open("stats/location_bloom", "br"))
+		sbf = ScalableBloomFilter.fromfile(open("meerkat/classification/bloom_filter/assets/location_bloom", "br"))
 		print("Location bloom filter loaded from file.")
 	except:
 		print("Creating new bloom filter")
-		sbf = create_location_bloom("stats/locations.json", "stats/location_bloom")
+		sbf = create_location_bloom("meerkat/classification/bloom_filter/assets/locations.json", "meerkat/classification/bloom_filter/assets/location_bloom")
 	return sbf
 
 def test_bloom_filter(sbf):
@@ -136,5 +137,4 @@ def test_bloom_filter(sbf):
 if __name__ == "__main__":
 	my_location_bloom = get_location_bloom()
 	#test_bloom_filter(my_location_bloom)
-	my_merchant_bloom, my_partial_merchant_bloom = get_merchant_bloom()
-
+	# my_merchant_bloom, my_partial_merchant_bloom = get_merchant_bloom()

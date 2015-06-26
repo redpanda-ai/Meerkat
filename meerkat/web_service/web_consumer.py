@@ -12,6 +12,8 @@ import string
 import sys
 import re
 import math
+import logging
+from pprint import pprint
 
 from itertools import zip_longest
 from pprint import pprint
@@ -21,6 +23,8 @@ from meerkat.various_tools import get_es_connection, string_cleanse, get_boosted
 from meerkat.various_tools import synonyms, get_bool_query, get_qs_query, load_params
 from meerkat.classification.load import select_model
 from meerkat.classification.lua_bridge import get_CNN
+from meerkat.classification.bloom_filter.find_entities import get_location_bloom, location_split
+
 
 BANK_SWS = select_model("bank")
 CARD_SWS = select_model("card")
@@ -28,6 +32,7 @@ TRANSACTION_TYPE = select_model("transaction_type")
 SUB_TRANSACTION_TYPE = select_model("sub_transaction_type")
 BANK_CNN = get_CNN("bank")
 CARD_CNN = get_CNN("card")
+my_bloom = get_location_bloom()
 
 def grouper(iterable):
     return zip_longest(*[iter(iterable)]*128, fillvalue={"description":""})
@@ -344,9 +349,20 @@ class Web_Consumer():
 
 		return processed[0:len(transactions)]
 
+	def bloom_results(self, data):
+		transactions = data["transaction_list"]
+		for transaction in transactions:
+			try:
+				description = transaction["description"]
+				logging.info("The bloom filter thinks it's here: ")
+				logging.info(location_split(description))
+			except KeyError:
+				# no description identified
+				pass
+
 	def classify(self, data):
 		"""Classify a set of transactions"""
-
+		self.bloom_results(data)
 		transactions = self.__add_transaction_type(data)
 		transactions = self.__apply_CNN(data, transactions)
 		physical, non_physical = self.__sws(data, transactions)
