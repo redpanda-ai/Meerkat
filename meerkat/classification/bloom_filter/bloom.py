@@ -7,8 +7,17 @@ Created on Dec 19, 2014
 @author: J. Andrew Key
 """
 
-import json, sys, os
+import json, sys, os, string
 from pybloom import ScalableBloomFilter
+
+def standardize(text):
+	"""converts text to all caps, no punctuation, and no whitespace"""
+	text = text.upper()
+	for space in string.whitespace:
+		text = text.replace(space, "")
+	for mark in string.punctuation:
+		text = text.replace(mark, "")
+	return text
 
 def get_json_from_file(input_filename):
 	"""Opens a file of JSON and returns a json object"""
@@ -32,7 +41,7 @@ def create_location_bloom(src_filename, dst_filename):
 	for state in states:
 		state_name = state["key"].upper()
 		for city in state["localities"]["buckets"]:
-			city_name = city["key"].upper()
+			city_name = standardize(city["key"])
 			location = (city_name, state_name)
 			sbf.add(location)
 
