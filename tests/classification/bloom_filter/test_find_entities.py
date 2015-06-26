@@ -14,7 +14,7 @@ class VariousToolsTests(unittest.TestCase):
 		"""location_split test that it finds San Francisco, CA when there
 		are no commas"""
 		my_text = "CANDLESTICK PARK SAN FRANCISCO CA SHIRT"
-		expect = ('SAN FRANCISCO', 'CA')
+		expect = ('SANFRANCISCO', 'CA')
 		result = finder.location_split(my_text)
 		self.assertEqual(expect, result)
 
@@ -30,7 +30,7 @@ class VariousToolsTests(unittest.TestCase):
 		"""location_split test that merchant names containing city names
 		won't confuse the finder."""
 		my_text = "CHICAGO PIZZA SAN JOSE CA"
-		expect = ('SAN JOSE', 'CA')
+		expect = ('SANJOSE', 'CA')
 		result = finder.location_split(my_text)
 		self.assertEqual(expect, result)
 
@@ -38,14 +38,14 @@ class VariousToolsTests(unittest.TestCase):
 		"""location_split test that it finds San Francisco, CA when there
 		is a comma"""
 		my_text = "CANDLESTICK PARK SAN FRANCISCO, CA SHIRT"
-		expect = ('SAN FRANCISCO', 'CA')
+		expect = ('SANFRANCISCO', 'CA')
 		result = finder.location_split(my_text)
 		self.assertEqual(expect, result)
 
 	def test_location_split_with_punctuation(self):
 		"""location_split test that find SF, CA regardless of punctuation"""
 		my_text = "Chicago Illumination Company! Located in Davenport, IA?"
-		expect = ("DAVENPORT", "IA")
+		expect = ("CHICAGO", "IL")
 		result = finder.location_split(my_text)
 		self.assertEqual(expect, result)
 
