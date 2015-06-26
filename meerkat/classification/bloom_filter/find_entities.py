@@ -13,6 +13,7 @@ import pandas as pd
 import csv
 import pickle
 import os
+import string
 
 from .bloom import *
 
@@ -99,10 +100,18 @@ def in_location_bloom(splits):
 
 	return None
 
-def location_split(my_text, **kwargs):
-	splits = [x.upper() for x in my_text.split()] 
+def location_split(text):
+	# # strip out spaces
+	# for space in string.whitespace:
+	# 	text = text.replace(space, "")
+	# # strip out punctuation
+	for mark in string.punctuation:
+		text = text.replace(mark, "")
+	# # capitalize
+	# 	text = text.upper()
+	splits = [x.upper() for x in text.split()] 
 	splits = [x.replace(",","") for x in splits]
-	for i in range(len(splits)):
+	for i in range(len(splits) - 1):
 		if splits[i] in STATES:
 			place = in_location_bloom(splits[:i+1])
 			if place:
@@ -135,7 +144,7 @@ def main():
 	input_file = "meerkat/classification/bloom_filter/input_file.txt.gz"
 	data_frame = pd.io.parsers.read_csv(input_file, sep="|", compression="gzip")
 	descriptions = data_frame['DESCRIPTION_UNMASKED']
-	location_bloom_results = descriptions.apply(location_split, axis=0)
+	location_bloom_results = descriptions.apply(location_split)
 	#TODO: add merchant results
 	#merchant_bloom_results = descriptions.apply(merchant_split, axis=0)
 
