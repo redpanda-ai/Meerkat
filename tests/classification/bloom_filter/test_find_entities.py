@@ -42,6 +42,13 @@ class VariousToolsTests(unittest.TestCase):
 		result = finder.location_split(my_text)
 		self.assertEqual(expect, result)
 
+	def test_location_split_with_punctuation(self):
+		"""location_split test that find SF, CA regardless of punctuation"""
+		my_text = "Chicago Illumination Company! Located in Davenport, IA?"
+		expect = ("DAVENPORT", "IA")
+		result = finder.location_split(my_text)
+		self.assertEqual(expect, result)
+
 if __name__ == "__main__":
 	unittest.main()
 	sys.exit()
