@@ -95,11 +95,7 @@ def in_location_bloom(splits):
 		for i in range(len(before)):
 			locality = " ".join(before[i:])
 			if (locality, region) in LOCATION_BLOOM:
-				try:
-					zipcode, lat, lng = CITY_INFO[(locality, region)]
-					return (locality, region, zipcode, lat, lng)
-				except KeyError:
-					return (locality, region)
+				return locality, region
 
 	return None
 
