@@ -105,6 +105,7 @@ def in_location_bloom(splits):
 
 def location_split(my_text, **kwargs):
 	splits = [x.upper() for x in my_text.split()] 
+	splits = [x.replace(",","") for x in splits]
 	for i in range(len(splits)):
 		if splits[i] in STATES:
 			place = in_location_bloom(splits[:i+1])
