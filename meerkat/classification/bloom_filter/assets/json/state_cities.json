@@ -1,0 +1,19 @@
+{
+	"size" : 0,
+	"aggs" : {
+		"states" : {
+			"terms" : {
+				"field" : "region",
+				"size" : 100
+			},
+			"aggregations" : {
+				"localities": {
+					"terms": {
+						"script" : "_source.locality",
+						"size" : 1000000
+					}
+				}
+			}
+		}
+	}
+}
