@@ -53,6 +53,7 @@ class Web_Consumer():
 
 		result_size = self.hyperparams.get("es_result_size", "10")
 		fields = self.params["output"]["results"]["fields"]
+		locale_bloom = transaction["locale_bloom"]
 		transaction = string_cleanse(transaction["description"]).rstrip()
 
 		# Input transaction must not be empty
@@ -70,6 +71,13 @@ class Web_Consumer():
 		field_boosts = get_boosted_fields(self.hyperparams, "standard_fields")
 		simple_query = get_qs_query(transaction, field_boosts)
 		should_clauses.append(simple_query)
+
+		# Add Locale Sub Query
+		if locale_bloom != None:
+			city_query = get_qs_query(locale_bloom[0], ['locality'])
+			state_query = get_qs_query(locale_bloom[1], ['region'])
+			should_clauses.append(city_query)
+			should_clauses.append(state_query)
 
 		return o_query
 
@@ -244,9 +252,6 @@ class Web_Consumer():
 		"""Clean output to proper schema"""
 
 		# Add or Modify Fields
-		#for trans in non_physical:
-		#	trans["category"] = ""
-
 		for trans in physical:
 			categories = trans.get("category_labels", "")
 			categories = json.loads(categories) if (categories != "") else []
@@ -267,6 +272,7 @@ class Web_Consumer():
 			if trans["CNN"] != "":
 				trans[attr_map["name"]] = trans["CNN"]
 
+			del trans["locale_bloom"]
 			del trans["description"]
 			del trans["amount"]
 			del trans["date"]
@@ -347,24 +353,23 @@ class Web_Consumer():
 
 		return processed[0:len(transactions)]
 
-	def __apply_locale_bloom(self, data):
+	def __apply_locale_bloom(self, data, transactions):
 		""" Apply the locale bloom filter to transactions"""
 
-		transactions = data["transaction_list"]
-		for transaction in transactions:
+		for trans in transactions:
 			try:
-				description = transaction["description"]
-				logging.info("The bloom filter thinks it's here: ")
-				logging.info(location_split(description))
+				description = trans["description"]
+				trans["locale_bloom"] = location_split(description)
 			except KeyError:
-				# no description identified
 				pass
+
+		return transactions
 
 	def classify(self, data):
 		"""Classify a set of transactions"""
 
-		self.__apply_locale_bloom(data)
 		transactions = self.__add_transaction_type(data)
+		transactions = self.__apply_locale_bloom(data, transactions)
 		transactions = self.__apply_CNN(data, transactions)
 		physical, non_physical = self.__sws(data, transactions)
 		physical = self.__enrich_physical(physical)
