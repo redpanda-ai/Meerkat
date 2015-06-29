@@ -124,6 +124,7 @@ def in_location_bloom(text):
 		for i in range(len(text) -1, -1, -1):
 			locality = text[i:- 2]
 			if (locality, region) in LOCATION_BLOOM:
+				# print("matched (%s, %s)" % (locality, region))
 				biggest = (locality, region)
 
 		return biggest
@@ -137,7 +138,8 @@ def location_split(my_text):
 			place = in_location_bloom(my_text[:i+2])
 			if place:
 				key = place[0] + place[1]
-				return CITY_SUBS[key]
+				try: return CITY_SUBS[key]
+				except: pass
 				# return place
 	return None
 
@@ -181,5 +183,4 @@ def main():
 
 if __name__ == "__main__":
 	# my_merchant_bloom, pm_bloom = get_merchant_bloom()
-	# main()
-	pass
+	main()
