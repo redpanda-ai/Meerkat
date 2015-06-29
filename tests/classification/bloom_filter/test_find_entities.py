@@ -72,8 +72,6 @@ class VariousToolsTests(unittest.TestCase):
 		result = finder.location_split(my_text)
 		self.assertEqual(expected, result)
 
-	def test_appreviations
-
 if __name__ == "__main__":
 	unittest.main()
 	sys.exit()
