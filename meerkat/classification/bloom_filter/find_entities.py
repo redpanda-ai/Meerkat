@@ -90,21 +90,14 @@ def in_location_bloom(text):
 	if len(text) == 1:
 		return False
 	else:
-		region, before = text[len(text)-1], text[:len(text)-1]
-		for i in range(len(before)):
-			locality = " ".join(before[i:])
-			if (locality, region) in LOCATION_BLOOM:
-				return locality, region
-
 		region = text[-2:]
-		for i in range(len(text) - 1, -1, -1):
-			locality = text[i:-2]
-			# print(locality, region)
+		biggest = None
+		for i in range(len(text) -1, -1, -1):
+			locality = text[i:- 2]
 			if (locality, region) in LOCATION_BLOOM:
-				return locality, region
-	# return splits
+				biggest = (locality, region)
 
-	return False
+		return biggest
 
 def location_split(my_text):
 	# Capitalize
