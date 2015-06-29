@@ -5,7 +5,7 @@
 Created on Dec 20, 2014
 @author: J. Andrew Key
 
-Modified on June 25, 2015
+Modified on June 29, 2015
 @author: Sivan Mehta
 """
 
@@ -13,23 +13,49 @@ import pandas as pd
 import csv
 import pickle
 import os
+import string
+from pprint import pprint
 
 from .bloom import *
 
-STATES = {
-	"AL": "", "AK": "", "AZ": "", "AR": "", "CA": "", \
-	"CO": "", "CT": "", "DE": "", "FL": "", "GA": "", \
-	"HI": "", "ID": "", "IL": "", "IN": "", "IA": "", \
-	"KS": "", "KY": "", "LA": "", "ME": "", "MD": "", \
-	"MA": "", "MI": "", "MN": "", "MS": "", "MO": "", \
-	"MT": "", "NE": "", "NV": "", "NH": "", "NJ": "", \
-	"NM": "", "NY": "", "NC": "", "ND": "", "OH": "", \
-	"OK": "", "OR": "", "PA": "", "RI": "", "SC": "", \
-	"SD": "", "TN": "", "TX": "", "UT": "", "VT": "", \
-	"VA": "", "WA": "", "WV": "", "WI": "", "WY": "" \
-	}
+STATES = [
+	"AL", "AK", "AZ", "AR", "CA", \
+	"CO", "CT", "DE", "FL", "GA", \
+	"HI", "ID", "IL", "IN", "IA", \
+	"KS", "KY", "LA", "ME", "MD", \
+	"MA", "MI", "MN", "MS", "MO", \
+	"MT", "NE", "NV", "NH", "NJ", \
+	"NM", "NY", "NC", "ND", "OH", \
+	"OK", "OR", "PA", "RI", "SC", \
+	"SD", "TN", "TX", "UT", "VT", \
+	"VA", "WA", "WV", "WI", "WY" ]
 
 LOCATION_BLOOM = get_location_bloom()
+
+SUBS = {
+	# Directions
+	"EAST": "E",
+	"WEST": "W",
+	"NORTH": "N",
+	"SOUTH": "S",
+
+	# Abbreviations
+	"SAINT": "ST",
+	"CITY" : ""
+
+	# can get more in the future
+}
+
+def add_with_subs(data, city, state):
+	proper = "%s%s" % (city, state)
+	standard = standardize(proper)
+	proper = (city, state)
+	data[standard] = proper
+	for sub in SUBS.keys():
+		if sub in standard:
+			standard = standard.replace(sub, SUBS[sub])
+			# sys.stdout.write(("\tinserting %s" % standard) + "\n")
+			data[standard] = proper
 
 def generate_city_map():
 	"""
@@ -43,26 +69,29 @@ def generate_city_map():
 	"""
 	print("generate location map")
 
-	csv_file = csv.reader(open("meerkat/classification/bloom_filter/assets/us_cities_small.csv"), \
+	csv_file = csv.reader(open("meerkat/classification/bloom_filter/assets/us_cities_larger.csv"), \
 		delimiter="\t")
 	data = {}
 	for row in csv_file:
 		try:
 			int(row[2]) # some of the rows don't acually record a state name
 		except ValueError:
-			data[(row[2].upper(), row[1])] = (row[0], row[3], row[4])
+			city = row[2]
+			state = row[4] # for larger.csv
+			# state = row[1] # for small.csv
+			add_with_subs(data, city, state)
 
-	pickle.dump(data, open("meerkat/classification/bloom_filter/assets/CITY_INFO.log", 'wb'))
+	pickle.dump(data, open("meerkat/classification/bloom_filter/assets/CITY_SUBS.log", 'wb'))
 
 	return data
 
-CITY_INFO = {}
+CITY_SUBS = {}
 
-if os.path.isfile("meerkat/classification/bloom_filter/assets/CITY_INFO.log"):
-	with open("meerkat/classification/bloom_filter/assets/CITY_INFO.log", 'rb') as fp:
-	    CITY_INFO = pickle.load(fp)
+if os.path.isfile("meerkat/classification/bloom_filter/assets/CITY_SUBS.log"):
+	with open("meerkat/classification/bloom_filter/assets/CITY_SUBS.log", 'rb') as fp:
+	    CITY_SUBS = pickle.load(fp)
 else:
-	CITY_INFO = generate_city_map()
+	CITY_SUBS = generate_city_map()
 
 def in_merchant_bloom(splits):
 	"""checks whether or not the splits are in the merchant bloom filter"""
@@ -70,9 +99,9 @@ def in_merchant_bloom(splits):
 		return splits
 	return None
 
-def in_location_bloom(splits):
+def in_location_bloom(text):
 	"""
-		checks whether or not the splits are in the location bloom filter,
+		checks whether or not the text are in the location bloom filter,
 		and returns all the geographic information that we know about that
 		location
 
@@ -87,30 +116,31 @@ def in_location_bloom(splits):
 		el paso tx ==> Known town, return all known information
 		^^^^^^^^^^
 	"""
-	len_splits = len(splits)
-	if len_splits == 1:
-		return None
+	if len(text) == 1:
+		return False
 	else:
-		region, before = splits[len_splits-1], splits[:len_splits-1]
-		for i in range(len(before)):
-			locality = " ".join(before[i:])
+		region = text[-2:]
+		biggest = None
+		for i in range(len(text) -1, -1, -1):
+			locality = text[i:- 2]
 			if (locality, region) in LOCATION_BLOOM:
-				try:
-					zipcode, lat, lng = CITY_INFO[(locality, region)]
-					return (locality, region, zipcode, lat, lng)
-				except KeyError:
-					return (locality, region)
+				# print("matched (%s, %s)" % (locality, region))
+				biggest = (locality, region)
 
-	return None
+		return biggest
 
-def location_split(my_text, **kwargs):
-	splits = [x.upper() for x in my_text.split()] 
-	splits = [x.replace(",","") for x in splits]
-	for i in range(len(splits)):
-		if splits[i] in STATES:
-			place = in_location_bloom(splits[:i+1])
+def location_split(my_text):
+	# Capitalize and remove spaces
+	my_text = standardize(my_text)
+
+	for i in range(len(my_text) - 1):
+		if my_text[i:i+2] in STATES:
+			place = in_location_bloom(my_text[:i+2])
 			if place:
-				return place
+				key = place[0] + place[1]
+				try: return CITY_SUBS[key]
+				except: pass
+				# return place
 	return None
 
 def merchant_split(my_text, **kwargs):
@@ -139,7 +169,7 @@ def main():
 	input_file = "meerkat/classification/bloom_filter/input_file.txt.gz"
 	data_frame = pd.io.parsers.read_csv(input_file, sep="|", compression="gzip")
 	descriptions = data_frame['DESCRIPTION_UNMASKED']
-	location_bloom_results = descriptions.apply(location_split, axis=0)
+	location_bloom_results = descriptions.apply(location_split)
 	#TODO: add merchant results
 	#merchant_bloom_results = descriptions.apply(merchant_split, axis=0)
 
