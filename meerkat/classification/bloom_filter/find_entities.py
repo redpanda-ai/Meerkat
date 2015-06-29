@@ -31,6 +31,30 @@ STATES = [
 
 LOCATION_BLOOM = get_location_bloom()
 
+SUBS = {
+	# Directions
+	"EAST": "E",
+	"WEST": "W",
+	"NORTH": "N",
+	"SOUTH": "S",
+
+	# Abbreviations
+	"SAINT": "ST"
+
+	# can get more in the future
+}
+
+def add_with_subs(data, city, state):
+	proper = "%s%s" % (city, state)
+	standard = standardize(proper)
+	proper = (city, state)
+	data[standard] = proper
+	for sub in SUBS.keys():
+		if sub in standard:
+			standard = standard.replace(sub, SUBS[sub])
+			# sys.stdout.write(("\tinserting %s" % standard) + "\n")
+			data[standard] = proper
+
 def generate_city_map():
 	"""
 		generates a dictionary with the following structure
@@ -50,19 +74,22 @@ def generate_city_map():
 		try:
 			int(row[2]) # some of the rows don't acually record a state name
 		except ValueError:
-			data[(row[2].upper(), row[1])] = (row[0], row[3], row[4])
+			city = row[2]
+			# state = row[4] # for larger.csv
+			state = row[1] # for small.csv
+			add_with_subs(data, city, state)
 
-	pickle.dump(data, open("meerkat/classification/bloom_filter/assets/CITY_INFO.log", 'wb'))
+	pickle.dump(data, open("meerkat/classification/bloom_filter/assets/CITY_SUBS.log", 'wb'))
 
 	return data
 
-CITY_INFO = {}
+CITY_SUBS = {}
 
-if os.path.isfile("meerkat/classification/bloom_filter/assets/CITY_INFO.log"):
-	with open("meerkat/classification/bloom_filter/assets/CITY_INFO.log", 'rb') as fp:
-	    CITY_INFO = pickle.load(fp)
+if os.path.isfile("meerkat/classification/bloom_filter/assets/CITY_SUBS.log"):
+	with open("meerkat/classification/bloom_filter/assets/CITY_SUBS.log", 'rb') as fp:
+	    CITY_SUBS = pickle.load(fp)
 else:
-	CITY_INFO = generate_city_map()
+	CITY_SUBS = generate_city_map()
 
 def in_merchant_bloom(splits):
 	"""checks whether or not the splits are in the merchant bloom filter"""
@@ -100,13 +127,15 @@ def in_location_bloom(text):
 		return biggest
 
 def location_split(my_text):
-	# Capitalize
+	# Capitalize and remove spaces
 	my_text = standardize(my_text)
 
 	for i in range(len(my_text) - 1):
 		if my_text[i:i+2] in STATES:
 			place = in_location_bloom(my_text[:i+2])
 			if place:
+				key = standardize("%s%s" % (place[0], place[1]))
+				# return CITY_SUBS[key]
 				return place
 	return None
 
@@ -150,4 +179,5 @@ def main():
 
 if __name__ == "__main__":
 	# my_merchant_bloom, pm_bloom = get_merchant_bloom()
-	main()
+	# main()
+	pass

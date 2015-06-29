@@ -64,6 +64,12 @@ class VariousToolsTests(unittest.TestCase):
 		result = finder.location_split(my_text)
 		self.assertEqual(expected, result)
 
+	def test_location_split_smushed(self):
+		my_text = "NewYork,NYisthemostpopulouscityintheUS"
+		expected = ("NEWYORK", "NY")
+		result = finder.location_split(my_text)
+		self.assertEqual(expected, result)
+
 if __name__ == "__main__":
 	unittest.main()
 	sys.exit()
