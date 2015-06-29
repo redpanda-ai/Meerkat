@@ -23,8 +23,7 @@ from meerkat.various_tools import get_es_connection, string_cleanse, get_boosted
 from meerkat.various_tools import synonyms, get_bool_query, get_qs_query, load_params
 from meerkat.classification.load import select_model
 from meerkat.classification.lua_bridge import get_CNN
-from meerkat.classification.bloom_filter.find_entities import get_location_bloom, location_split
-
+from meerkat.classification.bloom_filter.find_entities import location_split
 
 BANK_SWS = select_model("bank")
 CARD_SWS = select_model("card")
@@ -32,7 +31,6 @@ TRANSACTION_TYPE = select_model("transaction_type")
 SUB_TRANSACTION_TYPE = select_model("sub_transaction_type")
 BANK_CNN = get_CNN("bank")
 CARD_CNN = get_CNN("card")
-my_bloom = get_location_bloom()
 
 def grouper(iterable):
     return zip_longest(*[iter(iterable)]*128, fillvalue={"description":""})
@@ -349,7 +347,9 @@ class Web_Consumer():
 
 		return processed[0:len(transactions)]
 
-	def bloom_results(self, data):
+	def __apply_locale_bloom(self, data):
+		""" Apply the locale bloom filter to transactions"""
+
 		transactions = data["transaction_list"]
 		for transaction in transactions:
 			try:
@@ -362,7 +362,8 @@ class Web_Consumer():
 
 	def classify(self, data):
 		"""Classify a set of transactions"""
-		self.bloom_results(data)
+
+		self.__apply_locale_bloom(data)
 		transactions = self.__add_transaction_type(data)
 		transactions = self.__apply_CNN(data, transactions)
 		physical, non_physical = self.__sws(data, transactions)
