@@ -14,7 +14,7 @@ class VariousToolsTests(unittest.TestCase):
 		"""location_split test that it finds San Francisco, CA when there
 		are no commas"""
 		my_text = "CANDLESTICK PARK SAN FRANCISCO CA SHIRT"
-		expect = ('SANFRANCISCO', 'CA')
+		expect = ('San Francisco', 'CA')
 		result = finder.location_split(my_text)
 		self.assertEqual(expect, result)
 
@@ -30,7 +30,7 @@ class VariousToolsTests(unittest.TestCase):
 		"""location_split test that merchant names containing city names
 		won't confuse the finder."""
 		my_text = "CHICAGO PIZZA SAN JOSE CA"
-		expected = ('SANJOSE', 'CA')
+		expected = ('San Jose', 'CA')
 		result = finder.location_split(my_text)
 		self.assertEqual(expected, result)
 
@@ -38,21 +38,21 @@ class VariousToolsTests(unittest.TestCase):
 		"""location_split test that it finds San Francisco, CA when there
 		is a comma"""
 		my_text = "CANDLESTICK PARK SAN FRANCISCO, CA SHIRT"
-		expected = ('SANFRANCISCO', 'CA')
+		expected = ('San Francisco', 'CA')
 		result = finder.location_split(my_text)
 		self.assertEqual(expected, result)
 
 	def test_location_split_with_punctuation(self):
 		"""location_split test that find SF, CA regardless of punctuation"""
 		my_text = "Chicago Illumination Company! Located in Davenport, IA?"
-		expected = ("CHICAGO", "IL")
+		expected = ("Chicago", "IL")
 		result = finder.location_split(my_text)
 		self.assertEqual(expected, result)
 
 	def test_location_split_without_spaces(self):
 		"""location_split test to find new york regardless of spaces"""
 		my_text = "New York, NY is the most populous city in the US"
-		expected = ("NEWYORK", "NY")
+		expected = ("New York City", "NY")
 		result = finder.location_split(my_text)
 		self.assertEqual(expected, result)
 
@@ -60,15 +60,19 @@ class VariousToolsTests(unittest.TestCase):
 		"""location_split test to find york, ny in a string that contains
 		new york elsewhere"""
 		my_text = "A New Yorker president was born in York, NY"
-		expected = ("YORK", "NY")
+		expected = ("York", "NY")
 		result = finder.location_split(my_text)
 		self.assertEqual(expected, result)
 
 	def test_location_split_smushed(self):
+		"""location_split test to find new york ny in string that is 
+		'smushed' to be without spaces"""
 		my_text = "NewYork,NYisthemostpopulouscityintheUS"
-		expected = ("NEWYORK", "NY")
+		expected = ("New York City", "NY")
 		result = finder.location_split(my_text)
 		self.assertEqual(expected, result)
+
+	def test_appreviations
 
 if __name__ == "__main__":
 	unittest.main()

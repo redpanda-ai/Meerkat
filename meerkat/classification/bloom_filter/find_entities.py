@@ -5,7 +5,7 @@
 Created on Dec 20, 2014
 @author: J. Andrew Key
 
-Modified on June 25, 2015
+Modified on June 29, 2015
 @author: Sivan Mehta
 """
 
@@ -14,6 +14,7 @@ import csv
 import pickle
 import os
 import string
+from pprint import pprint
 
 from .bloom import *
 
@@ -39,7 +40,8 @@ SUBS = {
 	"SOUTH": "S",
 
 	# Abbreviations
-	"SAINT": "ST"
+	"SAINT": "ST",
+	"CITY" : ""
 
 	# can get more in the future
 }
@@ -67,7 +69,7 @@ def generate_city_map():
 	"""
 	print("generate location map")
 
-	csv_file = csv.reader(open("meerkat/classification/bloom_filter/assets/us_cities_small.csv"), \
+	csv_file = csv.reader(open("meerkat/classification/bloom_filter/assets/us_cities_larger.csv"), \
 		delimiter="\t")
 	data = {}
 	for row in csv_file:
@@ -75,8 +77,8 @@ def generate_city_map():
 			int(row[2]) # some of the rows don't acually record a state name
 		except ValueError:
 			city = row[2]
-			# state = row[4] # for larger.csv
-			state = row[1] # for small.csv
+			state = row[4] # for larger.csv
+			# state = row[1] # for small.csv
 			add_with_subs(data, city, state)
 
 	pickle.dump(data, open("meerkat/classification/bloom_filter/assets/CITY_SUBS.log", 'wb'))
@@ -134,9 +136,9 @@ def location_split(my_text):
 		if my_text[i:i+2] in STATES:
 			place = in_location_bloom(my_text[:i+2])
 			if place:
-				key = standardize("%s%s" % (place[0], place[1]))
-				# return CITY_SUBS[key]
-				return place
+				key = place[0] + place[1]
+				return CITY_SUBS[key]
+				# return place
 	return None
 
 def merchant_split(my_text, **kwargs):
