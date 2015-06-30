@@ -25,7 +25,7 @@ def find_merchant(transaction):
 
 def main():
 	"""runs the file"""
-	# transactions = open("data/input/matt_8000_card.txt", "r")
+	# This file is located in S3 under s3yodlee/development/bank/3_year_card_sample.txt
 	transactions = open("data/input/3_year_card_sample.log")
 	reader = csv.reader(transactions, delimiter='|')
 	correct = 0
