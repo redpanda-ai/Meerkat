@@ -74,8 +74,8 @@ class Web_Consumer():
 
 		# Add Locale Sub Query
 		if locale_bloom != None:
-			city_query = get_qs_query(locale_bloom[0], ['locality'])
-			state_query = get_qs_query(locale_bloom[1], ['region'])
+			city_query = get_qs_query(locale_bloom[0].lower(), ['locality'])
+			state_query = get_qs_query(locale_bloom[1].lower(), ['region'])
 			should_clauses.append(city_query)
 			should_clauses.append(state_query)
 
@@ -265,12 +265,17 @@ class Web_Consumer():
 		labels = self.params["output"]["results"]["labels"]
 		attr_map = dict(zip(fields, labels))
 
-		# Strip Fields
+		# Override / Strip Fields
 		for trans in transactions:
 
 			# Override output with CNN v1
 			if trans["CNN"] != "":
 				trans[attr_map["name"]] = trans["CNN"]
+
+			# Override Locale with Bloom Results
+			if trans["locale_bloom"] != None:
+				trans["city"] = trans["locale_bloom"][0]
+				trans["state"] = trans["locale_bloom"][1]
 
 			del trans["locale_bloom"]
 			del trans["description"]
