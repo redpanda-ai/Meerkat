@@ -273,7 +273,7 @@ class Web_Consumer():
 				trans[attr_map["name"]] = trans["CNN"]
 
 			# Override Locale with Bloom Results
-			if trans["locale_bloom"] != None:
+			if trans["locale_bloom"] != None and trans["is_physical_merchant"] == True:
 				trans["city"] = trans["locale_bloom"][0]
 				trans["state"] = trans["locale_bloom"][1]
 
@@ -342,7 +342,6 @@ class Web_Consumer():
 			classifier = BANK_SWS if (data["container"] == "bank") else CARD_SWS
 			label = classifier(trans["description"])
 			trans["is_physical_merchant"] = True if (label == "1") else False
-			trans["is_physical_merchant"] = True if (trans["locale_bloom"] != None) else False
 			(non_physical, physical)[label == "1"].append(trans)
 
 		return physical, non_physical
