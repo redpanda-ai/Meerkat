@@ -47,8 +47,7 @@ def main():
 			guesses += 1
 		if standardize(merchant) == standardize(line[1]):
 			correct += 1
-		elif merchant != None:
-			print(column_print(merchant, standardize(line[1]), line[0]))
+		print(column_print(standardize(merchant), standardize(line[1]), line[0]))
 		count += 1
 		if count > 1000:
 			break
