@@ -179,8 +179,8 @@ def purge(my_dir, pattern):
 
 def string_cleanse(original_string):
 	"""Strips out characters that might confuse ElasticSearch."""
-	bad_characters = [r"\[", r"\]", r"\{", r"\}", r'"', r"'", r"/", r"\\", r"\:",\
-		r"\(", r"\)", r"-", r"\+", r"<", r">", r"!", r"\*", r"\|\|", r"&&", r"~"]
+	bad_characters = [r"\[", r"\]", r"\{", r"\}", r'"', r"/", r"\\", r"\:",\
+		r"\(", r"\)", r"-", r"\+", r"<", r">", r"'", r"!", r"\*", r"\|\|", r"&&", r"~"]
 	bad_character_regex = "|".join(bad_characters)
 	cleanse_pattern = re.compile(bad_character_regex)
 	with_spaces = re.sub(cleanse_pattern, " ", original_string)
