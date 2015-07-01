@@ -20,8 +20,7 @@ def find_merchant(transaction):
 			for end in range(start + 1, len(transaction)):
 				if transaction[start:end] in MERCHANT_TRIE and len(transaction[start:end]) > 3:
 					return transaction[start:end]
-		else:
-			return None
+	return None
 
 def main():
 	"""runs the file"""
