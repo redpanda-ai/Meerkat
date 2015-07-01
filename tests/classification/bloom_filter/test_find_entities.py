@@ -45,7 +45,7 @@ class VariousToolsTests(unittest.TestCase):
 	def test_location_split_with_punctuation(self):
 		"""location_split test that find SF, CA regardless of punctuation"""
 		my_text = "Chicago Illumination Company! Located in Davenport, IA?"
-		expected = ("Chicago", "IL")
+		expected = ("Davenport", "IA")
 		result = finder.location_split(my_text)
 		self.assertEqual(expected, result)
 
@@ -69,6 +69,14 @@ class VariousToolsTests(unittest.TestCase):
 		'smushed' to be without spaces"""
 		my_text = "NewYork,NYisthemostpopulouscityintheUS"
 		expected = ("New York City", "NY")
+		result = finder.location_split(my_text)
+		self.assertEqual(expected, result)
+
+	def test_location_chase_la(self):
+		"""location_split test to find irving texas where 
+		chase la is clearly in there"""
+		my_text = "Debit Card Purchase LA MICHOACANA # 26 IRVING TX"
+		expected = ("Irving", "TX")
 		result = finder.location_split(my_text)
 		self.assertEqual(expected, result)
 
