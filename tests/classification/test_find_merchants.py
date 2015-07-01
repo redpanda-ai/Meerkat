@@ -18,6 +18,7 @@ class VariousToolsTests(unittest.TestCase):
 		"""find_merchant test to find merchants in strings"""
 		transactions = [ \
 			"APL*APPLE ITUNES STORE   866-712-7753 CA", \
+			"APPLEBEE'S #32           COVINGTON    GA", \
 			"USAA FUNDS TRANSFER CR", \
 			"CANTEEN VENDING          8668995849   PA", \
 			"SAFEWAY  FUEL 10026409   PUYALLUP     WA", \
@@ -25,7 +26,8 @@ class VariousToolsTests(unittest.TestCase):
 			"someweirdo shenanigans that no one cares about",
 			"hahahhahahahahahahahahahahahahahhahahahWALMART" ]
 		expected = [ \
-			"APPLE",
+			"APPLE", \
+			"APPLEBEES", \
 			"USAA", \
 			"CANTEENVENDING", \
 			"SAFEWAY", \
