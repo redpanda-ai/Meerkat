@@ -15,7 +15,7 @@ class VariousToolsTests(unittest.TestCase):
 	"""Our UnitTest class."""
 
 	def test_find_merchant(self):
-		"""find_merchant test to find apple"""
+		"""find_merchant test to find merchants in strings"""
 		transactions = [ \
 			"APL*APPLE ITUNES STORE   866-712-7753 CA", \
 			"USAA FUNDS TRANSFER CR", \

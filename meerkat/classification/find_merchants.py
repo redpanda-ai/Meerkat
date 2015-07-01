@@ -27,8 +27,8 @@ def find_merchant(transaction):
 	return longest
 def column_print(merchant, expected, transaction):
 	out = ""
-	out += merchant[:12] + (" " * (12-len(merchant))) + " | "
-	out += expected[:12] + (" " * (12-len(expected))) + " | "
+	out += merchant[:15] + (" " * (15 - len(merchant))) + " | "
+	out += expected[:15] + (" " * (15 - len(expected))) + " | "
 	return out + transaction
 
 def main():
