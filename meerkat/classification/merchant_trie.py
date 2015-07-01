@@ -19,7 +19,7 @@ def standardize(text):
 	try:
 		text = text.upper()
 	except:
-		return None
+		return "None"
 	for space in string.whitespace:
 		text = text.replace(space, "")
 	for mark in string.punctuation:
