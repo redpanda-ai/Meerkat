@@ -2,6 +2,17 @@
 
 Created on June 30, 2015
 @author: Sivan Mehta
+
+USAGE
+note: must be run from root of Meerkat
+
+python3 -m meerkat.classification.find_merchants
+
+output should be a table in the following form:
+Detected        | Expected        | Input String
+VALERO          | VALERO          | VALERO 1657              TUCSON       AZ 
+VERIZON         | VERIZON         | VERIZON WRLS MYACCT VE   FOLSOM       CA 
+VICTORIASSECRET | VICTORIASSECRET | VICTORIA'S SECRET 0020   FAIRFAX      VA 
 """
 
 from .merchant_trie import *
