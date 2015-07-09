@@ -93,12 +93,6 @@ if os.path.isfile("meerkat/classification/bloom_filter/assets/CITY_SUBS.log"):
 else:
 	CITY_SUBS = generate_city_map()
 
-def in_merchant_bloom(splits):
-	"""checks whether or not the splits are in the merchant bloom filter"""
-	if splits in my_merchant_bloom:
-		return splits
-	return None
-
 def in_location_bloom(text):
 	"""
 		checks whether or not the text are in the location bloom filter,
@@ -133,7 +127,7 @@ def location_split(my_text):
 	# Capitalize and remove spaces
 	my_text = standardize(my_text)
 
-	for i in range(len(my_text) - 1):
+	for i in range(len(my_text) - 1, -1, -1):
 		if my_text[i:i+2] in STATES:
 			place = in_location_bloom(my_text[:i+2])
 			if place:
@@ -141,16 +135,6 @@ def location_split(my_text):
 				try: return CITY_SUBS[key]
 				except: pass
 				# return place
-	return None
-
-def merchant_split(my_text, **kwargs):
-	splits = [x.upper() for x in my_text.split()]
-	for i in range(len(splits)):
-		_, name = splits[i], splits[i]
-		count = 1
-		while name in pm_bloom and (i + count) < len(splits):
-			name = " ".join(splits[i:i+count])
-			count += 1
 	return None
 
 ##THINK!
@@ -182,5 +166,4 @@ def main():
 	print(location_bloom_results.describe())
 
 if __name__ == "__main__":
-	# my_merchant_bloom, pm_bloom = get_merchant_bloom()
 	main()
