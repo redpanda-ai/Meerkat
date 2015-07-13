@@ -3,7 +3,8 @@ from pprint import pprint
 import operator
 import pandas as pd
 import numpy as np
-import sys, time
+import sys
+import time
 
 """
 	This module generates a list of the top 1000 merchants in the factual data
@@ -18,12 +19,15 @@ def main():
 		$ s3cmd get s3://yodleefactual/us_places.factual.2014_05_01.1398986783000.tab.gz
 
 		$ gunzip us_places.factual.2014_05_01.1398986783000.tab.gz data/input/us_places_factual.log
+
+		The most recent runtime for this process is 2:37.17
 	"""
 
 	reader = pd.read_csv("data/input/us_places_factual.log", chunksize=10000, na_filter=False, encoding="utf-8", sep='\t', error_bad_lines=False)
 	counts = {}
 
 	count = 1
+	start = time.time()
 
 	for df in reader:
 		df['name'] = df['name'].astype('category')
@@ -37,7 +41,7 @@ def main():
 
 		if count <= 2059: # number of chunks in the input file
 			sys.stdout.flush()
-			sys.stdout.write("\r%d of 2058 chunks seen... " % count)
+			sys.stdout.write("\r%d of 2058 chunks seen after %2.2fs... " % (count, time.time() - start))
 			count += 1
 		else:
 			break
