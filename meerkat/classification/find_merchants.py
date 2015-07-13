@@ -48,24 +48,40 @@ def main():
 	# transactions = open("data/input/3_year_card_sample.log")
 	transactions = open("data/input/merchant_labels.csv",encoding = "ISO-8859-1")
 	reader = csv.reader(transactions, delimiter=',')
-	correct = 0
-	count = 0
-	guesses = 0
+
+	confusion_matrix = [[0,0,0],[0,0,0],[0,0,0]]
+
 	print(column_print("Guessed", "Actual", "Transaction"))
+	count = 0
 	for line in reader:
-		merchant = find_merchant(line[0])
-		if merchant != None:
-			guesses += 1
-		if standardize(merchant) == standardize(line[1]):
-			correct += 1
-		print(column_print(standardize(merchant), standardize(line[1]), line[0]))
+		merchant = standardize(find_merchant(line[0]))
+		actual = standardize(line[1])
+		transaction = line[0]
+		
+
 		count += 1
-		if count > 1000:
-			break
-	print("guesses: ", guesses)
-	print("correct: ", correct)
-	print("incorrect: ", guesses - correct)
-	print("total: ", count)
+		row, col = 0, 0
+
+		if actual == "":
+			col = 1
+
+		if merchant == "":
+			row = 2
+		elif merchant != actual:
+			row = 1
+
+
+		confusion_matrix[row][col] += 1
+
+		print(column_print(merchant, standardize(actual), transaction))
+
+	print("\n")
+	print("              found | null")
+	print("got correct %7d | %5d" % (confusion_matrix[0][0], confusion_matrix[0][1]))
+	print("got wrong %9d | %5d" %   (confusion_matrix[1][0], confusion_matrix[1][1]))
+	print("got null %10d | %5d" %   (confusion_matrix[2][0], confusion_matrix[2][1]))
+	print("total records:", count)
+
 
 if __name__ == "__main__":
 	main()
