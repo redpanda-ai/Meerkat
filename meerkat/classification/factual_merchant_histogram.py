@@ -53,7 +53,7 @@ def main():
 	counts = trimmed
 	print("done!")
 
-	f = open('out.log','w')
+	f = open('meerkat/classification/label_maps/top_1000_factual.txt','w')
 
 	sorted_counts = sorted(counts.items(), key=operator.itemgetter(1))
 	print(sorted_counts[-1000:], file = f)
