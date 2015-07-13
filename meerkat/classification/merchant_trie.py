@@ -7,6 +7,7 @@ Created on June 30, 2015
 """
 
 import json
+import csv
 import sys
 import string
 import os
@@ -19,7 +20,9 @@ def standardize(text):
 	try:
 		text = text.upper()
 	except:
-		return "None"
+		return ""
+	if len(text) == 0:
+		return ""
 	for space in string.whitespace:
 		text = text.replace(space, "")
 	for mark in string.punctuation:
@@ -49,6 +52,30 @@ def create_merchant_trie(input_filename, output_filename):
 
 	merchants.save('meerkat/classification/models/merchant_trie.marisa')
 
+def create_bigger_merchant_trie():
+	with open("data/input/us_places_factual.csv") as f:
+		reader  = csv.reader(f, delimiter = "\t")
+
+		merchants = set()
+
+		stop = 100000
+		seen = 0
+
+		for line in reader:
+			merchants.add(standardize(line[1]))
+			# print("added ", standardize(line[1]))
+			if seen > stop:
+				break
+			seen += 1
+			sys.stdout.flush()
+			sys.stdout.write("\rseen %d merchants of ~19 million" % seen)
+
+		merchants = mt.Trie(merchants)
+
+		merchants.save("meerkat/classification/models/us_factual_trie.marisa")
+
+	return merchants
+
 def generate_merchant_trie():
 	"""either loads the trie from a file or creates one if no file is found"""
 	trie = mt.Trie()
@@ -59,9 +86,20 @@ def generate_merchant_trie():
 			'meerkat/classification/models/merchant_trie.marisa')
 	return trie
 
+def generate_bigger_merchant_trie():
+	"""
+		either loads the trie from a file or creates one if no file is found
+	"""
+	trie = mt.Trie()
+	if os.path.isfile("meerkat/classification/models/us_factual_trie.marisa"):
+		trie.load("meerkat/classification/models/us_factual_trie.marisa")
+	else:
+		trie = create_bigger_merchant_trie()
+	return trie
 
 if __name__ == "__main__":
 	my_merchant_trie = generate_merchant_trie()
+	new_merchant_trie = create_bigger_merchant_trie()
 	# quick test to see if everything loaded
 	# for key in json.loads(open("meerkat/classification/label_maps/permanent_bank_label_map.json").read()):
 	# 	print(standardize(key) in my_merchant_trie)
