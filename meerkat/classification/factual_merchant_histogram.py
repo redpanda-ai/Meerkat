@@ -35,7 +35,7 @@ def main():
 			else:
 				counts[item] = value
 
-		if count <= 2059: # number of chunks in the input gile
+		if count <= 2059: # number of chunks in the input file
 			sys.stdout.flush()
 			sys.stdout.write("\r%d of 2058 chunks seen... " % count)
 			count += 1
