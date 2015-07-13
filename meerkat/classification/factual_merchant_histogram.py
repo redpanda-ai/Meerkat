@@ -1,3 +1,8 @@
+"""
+Created July 13, 2015
+@author: Sivan Mehta
+"""
+
 from __future__ import print_function
 from pprint import pprint
 import operator
@@ -31,7 +36,7 @@ def main():
 
 	for df in reader:
 		df['name'] = df['name'].astype('category')
-		value_counts = df['name'].value_counts().head(15000)
+		value_counts = df['name'].value_counts()
 		
 		for item, value in value_counts.iteritems():
 			if item in counts:
