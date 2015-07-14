@@ -7,6 +7,7 @@ Created on June 30, 2015
 """
 
 import json
+import csv
 import sys
 import string
 import os
@@ -19,7 +20,9 @@ def standardize(text):
 	try:
 		text = text.upper()
 	except:
-		return "None"
+		return ""
+	if len(text) == 0:
+		return ""
 	for space in string.whitespace:
 		text = text.replace(space, "")
 	for mark in string.punctuation:
@@ -47,7 +50,7 @@ def create_merchant_trie(input_filename, output_filename):
 
 	merchants = mt.Trie(merchants)
 
-	merchants.save('meerkat/classification/models/merchant_trie.marisa')
+	merchants.save(output_filename)
 
 def generate_merchant_trie():
 	"""either loads the trie from a file or creates one if no file is found"""
@@ -59,9 +62,9 @@ def generate_merchant_trie():
 			'meerkat/classification/models/merchant_trie.marisa')
 	return trie
 
-
 if __name__ == "__main__":
+	create_merchant_trie("meerkat/classification/label_maps/top_1000_factual.json", 'meerkat/classification/models/merchant_trie.marisa')
 	my_merchant_trie = generate_merchant_trie()
 	# quick test to see if everything loaded
-	# for key in json.loads(open("meerkat/classification/label_maps/permanent_bank_label_map.json").read()):
+	# for key in json.loads(open("meerkat/classification/label_maps/top_1000_factual.json").read()):
 	# 	print(standardize(key) in my_merchant_trie)

@@ -24,6 +24,7 @@ from meerkat.various_tools import synonyms, get_bool_query, get_qs_query, load_p
 from meerkat.classification.load import select_model
 from meerkat.classification.lua_bridge import get_CNN
 from meerkat.classification.bloom_filter.find_entities import location_split
+from meerkat.classification.find_merchants import find_merchant
 
 BANK_SWS = select_model("bank")
 CARD_SWS = select_model("card")
@@ -358,13 +359,25 @@ class Web_Consumer():
 
 		return processed[0:len(transactions)]
 
-	def __apply_locale_bloom(self, data, transactions):
+	def __apply_locale_bloom(self, transactions):
 		""" Apply the locale bloom filter to transactions"""
 
 		for trans in transactions:
 			try:
 				description = trans["description"]
+
 				trans["locale_bloom"] = location_split(description)
+			except KeyError:
+				pass
+
+		return transactions
+
+	def __apply_merchant_trie(self, transactions):
+		"""Apply the merchant trie to transactions"""
+		for trans in transactions:
+			try:
+				description = trans["description"]
+				trans["merchant_trie"] = find_merchant(description)
 			except KeyError:
 				pass
 
@@ -374,7 +387,8 @@ class Web_Consumer():
 		"""Classify a set of transactions"""
 
 		transactions = self.__add_transaction_type(data)
-		transactions = self.__apply_locale_bloom(data, transactions)
+		transactions = self.__apply_locale_bloom(transactions)
+		transactions = self.__apply_merchant_trie(transactions)
 		transactions = self.__apply_CNN(data, transactions)
 		physical, non_physical = self.__sws(data, transactions)
 		physical = self.__enrich_physical(physical)
