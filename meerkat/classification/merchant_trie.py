@@ -58,7 +58,7 @@ def generate_merchant_trie():
 	if os.path.isfile("meerkat/classification/models/merchant_trie.marisa"):
 		trie.load("meerkat/classification/models/merchant_trie.marisa")
 	else:
-		trie = create_merchant_trie("meerkat/classification/label_maps/top_1000_factual.json", \
+		trie = create_merchant_trie("meerkat/classification/label_maps/permanent_bank_label_map.json", \
 			'meerkat/classification/models/merchant_trie.marisa')
 	return trie
 
