@@ -99,7 +99,7 @@ def test_bulk_classifier(human_labeled, non_physical_trans, my_lists):
 				if human_labeled_row['IS_PHYSICAL_TRANSACTION'] == '1':
 					my_lists["incorrect_non_physical"].append(item)
 
-def test_accuracy(params, file_path=None, non_physical_trans=None,\
+def vest_accuracy(params, file_path=None, non_physical_trans=None,\
 	result_list=None):
 	"""Takes file by default but can accept result
 	queue/ non_physical list. Attempts to provide various
@@ -181,7 +181,7 @@ def test_accuracy(params, file_path=None, non_physical_trans=None,\
 		"binary_accuracy": binary_accuracy
 	}
 
-def speed_tests(start_time, accuracy_results):
+def speed_vests(start_time, accuracy_results):
 	"""Run a number of tests related to speed"""
 
 	time_delta = datetime.datetime.now() - start_time
@@ -241,7 +241,7 @@ def run_from_command_line(command_line_arguments):
 	output_path = "data/output/meerkatLabeled.csv"
 	if len(command_line_arguments) > 1:
 		output_path = command_line_arguments[1]
-	pprint(test_accuracy(params=None, file_path=output_path))
+	pprint(vest_accuracy(params=None, file_path=output_path))
 
 if __name__ == "__main__":
 	run_from_command_line(sys.argv)
