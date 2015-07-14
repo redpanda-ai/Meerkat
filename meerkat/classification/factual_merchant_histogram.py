@@ -11,6 +11,8 @@ import numpy as np
 import sys
 import time
 
+from meerkat.classification.merchant_trie import standardize
+
 """
 	This module generates a list of the top 1000 merchants in the factual data
 """
@@ -39,6 +41,7 @@ def main():
 		value_counts = df['name'].value_counts()
 		
 		for item, value in value_counts.iteritems():
+			item = standardize(item)
 			if item in counts:
 				counts[item] += value
 			else:
@@ -62,9 +65,14 @@ def main():
 	counts = trimmed
 	print("done!")
 
-	f = open('meerkat/classification/label_maps/top_1000_factual.txt','w')
 
-	sorted_counts = sorted(counts.items(), key=operator.itemgetter(1))
-	print(sorted_counts[-1000:], file = f)
+	sorted_counts = sorted(counts.items(), key=operator.itemgetter(1))[-1000:]
+	top_1000 = {}
+	for key, value in sorted_counts:
+		top_1000[key] = value
+
+	f = open('meerkat/classification/label_maps/top_1000_factual.txt','w')
+	pprint(top_1000, f)
+
 if __name__ == "__main__":
 	main()
