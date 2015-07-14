@@ -4,6 +4,10 @@ import unittest
 
 import numpy as np
 import pylab as pl
+import matplotlib
+
+matplotlib.use("Pdf")
+
 import matplotlib.pyplot as plt
 from matplotlib.path import Path
 from matplotlib.patches import Polygon
