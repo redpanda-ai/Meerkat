@@ -12,6 +12,8 @@ import string
 import sys
 import re
 import math
+import logging
+from pprint import pprint
 
 from itertools import zip_longest
 from pprint import pprint
@@ -21,6 +23,7 @@ from meerkat.various_tools import get_es_connection, string_cleanse, get_boosted
 from meerkat.various_tools import synonyms, get_bool_query, get_qs_query, load_params
 from meerkat.classification.load import select_model
 from meerkat.classification.lua_bridge import get_CNN
+from meerkat.classification.bloom_filter.find_entities import location_split
 
 BANK_SWS = select_model("bank")
 CARD_SWS = select_model("card")
@@ -50,6 +53,7 @@ class Web_Consumer():
 
 		result_size = self.hyperparams.get("es_result_size", "10")
 		fields = self.params["output"]["results"]["fields"]
+		locale_bloom = transaction["locale_bloom"]
 		transaction = string_cleanse(transaction["description"]).rstrip()
 
 		# Input transaction must not be empty
@@ -67,6 +71,13 @@ class Web_Consumer():
 		field_boosts = get_boosted_fields(self.hyperparams, "standard_fields")
 		simple_query = get_qs_query(transaction, field_boosts)
 		should_clauses.append(simple_query)
+
+		# Add Locale Sub Query
+		if locale_bloom != None:
+			city_query = get_qs_query(locale_bloom[0].lower(), ['locality'])
+			state_query = get_qs_query(locale_bloom[1].lower(), ['region'])
+			should_clauses.append(city_query)
+			should_clauses.append(state_query)
 
 		return o_query
 
@@ -241,9 +252,6 @@ class Web_Consumer():
 		"""Clean output to proper schema"""
 
 		# Add or Modify Fields
-		#for trans in non_physical:
-		#	trans["category"] = ""
-
 		for trans in physical:
 			categories = trans.get("category_labels", "")
 			categories = json.loads(categories) if (categories != "") else []
@@ -257,13 +265,19 @@ class Web_Consumer():
 		labels = self.params["output"]["results"]["labels"]
 		attr_map = dict(zip(fields, labels))
 
-		# Strip Fields
+		# Override / Strip Fields
 		for trans in transactions:
 
 			# Override output with CNN v1
 			if trans["CNN"] != "":
 				trans[attr_map["name"]] = trans["CNN"]
 
+			# Override Locale with Bloom Results
+			if trans["locale_bloom"] != None and trans["is_physical_merchant"] == True:
+				trans["city"] = trans["locale_bloom"][0]
+				trans["state"] = trans["locale_bloom"][1]
+
+			del trans["locale_bloom"]
 			del trans["description"]
 			del trans["amount"]
 			del trans["date"]
@@ -344,10 +358,23 @@ class Web_Consumer():
 
 		return processed[0:len(transactions)]
 
+	def __apply_locale_bloom(self, data, transactions):
+		""" Apply the locale bloom filter to transactions"""
+
+		for trans in transactions:
+			try:
+				description = trans["description"]
+				trans["locale_bloom"] = location_split(description)
+			except KeyError:
+				pass
+
+		return transactions
+
 	def classify(self, data):
 		"""Classify a set of transactions"""
 
 		transactions = self.__add_transaction_type(data)
+		transactions = self.__apply_locale_bloom(data, transactions)
 		transactions = self.__apply_CNN(data, transactions)
 		physical, non_physical = self.__sws(data, transactions)
 		physical = self.__enrich_physical(physical)

@@ -735,6 +735,14 @@
          "amount":59.0,
 	"ledger_entry":"debit",
          "transaction_id":5024957
+      },
+      {
+         "date":"2015-01-01T00:00:00",
+         "description":"CANDLESTICK PARK SAN FRANCISCO CA SHIRT",
+         "amount":59.0,
+   "ledger_entry":"debit",
+         "transaction_id":3514356
+
       }
    ],
    "cobrand_id":99,
