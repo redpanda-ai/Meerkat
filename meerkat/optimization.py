@@ -43,7 +43,7 @@ from numpy import array, array_split
 
 from meerkat.file_consumer import FileConsumer
 from meerkat.classification.load import select_model
-from meerkat.accuracy import print_results, test_accuracy
+from meerkat.accuracy import print_results, vest_accuracy
 from meerkat.various_tools import load_dict_list, queue_to_list, safe_print, get_us_cities
 from meerkat.various_tools import load_params, load_hyperparameters, progress
 
@@ -160,7 +160,7 @@ def run_meerkat(params, desc_queue, hyperparameters):
 	result_list = queue_to_list(result_queue)
 
 	# Test Accuracy
-	accuracy_results = test_accuracy(params, result_list=result_list)
+	accuracy_results = vest_accuracy(params, result_list=result_list)
 	print_results(accuracy_results)
 
 	return accuracy_results
