@@ -2,49 +2,18 @@
 	"concurrency" : 8,
 	"batch_size" : 500,
 	"input" : {
-		"filename" : "/data/input/us_places.factual.2014_07_01.1404216582000.tab",
+		"filename" : "/home/ubuntu/git/Meerkat/data/input/us_places.factual.2014_07_17.log",
 		"encoding" : "utf-8"
 	},
 	"logging" : {
 		"level" : "info",
-		"path" : "logs/logs.log",
+		"path" : "out.log",
 		"formatter" : "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 		"console" : false
 	},
 	"elasticsearch" : {
 		"cluster_nodes" : [
-			"172.31.19.118",
-			"172.31.19.119",
-			"172.31.19.120",
-			"172.31.19.121",
-			"172.31.19.122",
-			"172.31.19.123",
-			"172.31.19.124",
-			"172.31.19.125",
-			"172.31.19.126",
-			"172.31.19.127",
-
-			"172.31.44.44",
-			"172.31.44.51",
-			"172.31.44.52",
-			"172.31.44.53",
-			"172.31.44.54",
-			"172.31.44.55",
-			"172.31.44.56",
-			"172.31.44.58",
-			"172.31.44.60",
-			"172.31.44.61",
-
-			"172.31.14.81",
-			"172.31.14.85",
-			"172.31.14.89",
-			"172.31.14.90",
-			"172.31.14.91",
-			"172.31.14.92",
-			"172.31.14.100",
-			"172.31.14.101",
-			"172.31.14.102",
-			"172.31.14.103"
+			"127.0.0.1"
         ],
 		"index" : "factual_index",
 		"type" : "factual_type",
@@ -139,8 +108,8 @@
 				}
 			},
 			"settings" : {
-				"number_of_replicas" : 5,
-				"number_of_shards" : 870
+				"number_of_replicas" : 0,
+				"number_of_shards" : 10
 			}
 		}
 	}
