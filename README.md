@@ -119,4 +119,3 @@ Contributors
 * As Shaja
 * Ashish Kulkarni
 * Sivan K. Mehta
-* Rayaan A. Khatau
