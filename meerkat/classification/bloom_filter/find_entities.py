@@ -151,7 +151,8 @@ def main():
 	"""runs the file"""
 	print("find_entities")
 	# input_file = "meerkat/classification/bloom_filter/input_file.txt.gz"
-	input_file = "data/input/should_search_labels.csv.gz"
+	# input_file = "data/input/should_search_labels.csv.gz"
+	input_file = sys.argv[1]
 	data_frame = pd.io.parsers.read_csv(input_file, sep="|", compression="gzip")
 	descriptions = data_frame['DESCRIPTION_UNMASKED']
 	location_bloom_results = descriptions.apply(location_split)
