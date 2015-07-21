@@ -3,7 +3,7 @@
 	{
 		"match" :
 		{
-			"name" : "subway"
+			"postcode" : "10583"
 		}
 	}
 }

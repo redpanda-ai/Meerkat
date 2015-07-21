@@ -2,7 +2,7 @@
 	"concurrency" : 8,
 	"batch_size" : 500,
 	"input" : {
-		"filename" : "/home/ubuntu/git/Meerkat/data/input/us_places.factual.2014_07_17.log",
+		"filename" : "/home/ubuntu/git/Meerkat/data/input/factual_100000.log",
 		"encoding" : "utf-8"
 	},
 	"logging" : {
@@ -110,6 +110,12 @@
 			"settings" : {
 				"number_of_replicas" : 0,
 				"number_of_shards" : 10
+			}
+		},
+		"comment" : {
+			"_routing" : {
+				"required" : true,
+				"path" : "postcode"
 			}
 		}
 	}
