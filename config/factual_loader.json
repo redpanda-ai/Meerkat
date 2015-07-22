@@ -50,6 +50,12 @@
 					"format" : "{0} {1} {2}, {3} {4}, {5}",
 					"index" : "analyzed",
 					"type" : "string"
+				},
+				"city_state" : {
+					"components" : ["locality", "region"],
+					"format" : "{0}, {1}",
+					"index" : "analyzed",
+					"type" : "string"
 				}
 			}
 		],
@@ -115,7 +121,7 @@
 		"comment" : {
 			"_routing" : {
 				"required" : true,
-				"path" : "postcode"
+				"path" : "city_state"
 			}
 		}
 	}
