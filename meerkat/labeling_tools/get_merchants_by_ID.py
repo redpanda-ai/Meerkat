@@ -29,14 +29,16 @@ def enrich_transactions(params, es_connection):
 
 	for transaction in transactions:
 
-		merchant = get_merchant_by_id(params, transaction["FACTUAL_ID"], es_connection)
+		merchant = get_merchant_by_id(params,\
+		 transaction["FACTUAL_ID"], es_connection)
 
 		# No merchant found for factual_id
 		if merchant == None:
 			continue
 
 		# Enrich 
-		location = merchant.get("pin", {}).get("location", {}).get("coordinates", ["", ""])
+		location = merchant.get\
+		("pin", {}).get("location", {}).get("coordinates", ["", ""])
 		latitude = location[1]
 		longitude = location[0]
 		transaction["PHYSICAL_MERCHANT"] = merchant.get("name", "")
@@ -47,7 +49,8 @@ def enrich_transactions(params, es_connection):
 		transaction["LONGITUDE"] = longitude
 		transaction["STREET"] = merchant.get("address", "")
 
-	file_name = "data/misc/" + os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_enriched.txt"
+	file_name = "data/misc/" + \
+	os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_enriched.txt"
 	write_dict_list(transactions, file_name)
 
 def verify_arguments():

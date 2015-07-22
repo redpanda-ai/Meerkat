@@ -91,7 +91,8 @@ def main():
 
 	merchant_bloom_results = descriptions.apply(merchant_split)
 
-	combined = pd.concat([location_bloom_results, merchant_bloom_results, descriptions], axis=1)
+	combined = pd.concat([location_bloom_results, merchant_bloom_results,\
+	 descriptions], axis=1)
 	combined.columns = ['LOCATION', 'MERCHANT_NAME', 'DESCRIPTION_UNMASKED']
 	pd.set_option('max_rows', 10000)
 	combined.to_csv("entities.csv", mode="w", sep="|", encoding="utf-8")

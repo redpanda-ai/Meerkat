@@ -31,7 +31,7 @@ class InvalidArguments(Exception):
 class UnknownJudgment(Exception):
 	"""Exception raised for invalid auto_scale judgments."""
 	def __init__(self, expr, msg):
-		super(UnknownJudgement, self).__init__(msg)
+		super(UnknownJudgment, self).__init__(msg)
 		self.expr = expr
 		self.msg = msg
 

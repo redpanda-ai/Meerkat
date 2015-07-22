@@ -145,8 +145,8 @@ def run_from_command_line():
 
 		k.get_contents_to_filename(local_filename)
 	
-	dataframe = pd.read_csv(local_filename, na_filter=False, quoting=csv.QUOTE_NONE, \
-		encoding="utf-8", sep='|', error_bad_lines=False)
+	dataframe = pd.read_csv(local_filename, na_filter=False, \
+	quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
 	sLen = dataframe.shape[0]
 
 	# Add new columns if first time labeling this data set
@@ -210,9 +210,11 @@ def run_from_command_line():
 			sub_percent_complete = sub_complete / sLen * 100
 			os.system("clear")
 			safe_print("{} ".format(complete) + "top choices completed.")
-			safe_print("{0:.2f}%".format(percent_complete) + " complete with top choices.")
+			safe_print("{0:.2f}%".format(percent_complete) + \
+			" complete with top choices.")
 			safe_print("{} ".format(sub_complete) + "sub choices completed.")
-			safe_print("{0:.2f}%".format(sub_percent_complete) + " complete with sub choices.\n")
+			safe_print("{0:.2f}%".format(sub_percent_complete) + \
+			" complete with sub choices.\n")
 
 			# Show Transaction Details
 			for column in params["display_columns"]:
@@ -228,7 +230,8 @@ def run_from_command_line():
 			# Prompt for subtype if neccesary
 			if choice_name in sub_dict and row[sc_col] not in sb_set:
 
-				sub_options = skip_save + [str(o) for o in list(range(0, len(sub_dict[choice_name])))]
+				sub_options = skip_save + \
+				[str(o) for o in list(range(0, len(sub_dict[choice_name])))]
 
 				safe_print("\n{}\n".format(params["questions"][1]))
 

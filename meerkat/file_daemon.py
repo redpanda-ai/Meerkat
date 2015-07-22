@@ -146,9 +146,8 @@ def get_files_in_progress(params):
 def launch_remote_clients_into_available_slots(params):
 	"""Scans for available 'slots' on the remote clients.  Should it find any, it
 	then launches an instance of the file_producer into those empty slots"""
-	launchpad = params["launchpad"]
-	instance_ips = launchpad["instance_ips"]
-	total_slots = launchpad["per_instance_clients"]
+	instance_ips = params["launchpad"]["instance_ips"]
+	total_slots = params["launchpad"]["per_instance_clients"]
 	#Loop through each launchpad host
 	#write_local_report(params)
 	for instance_ip in instance_ips:
@@ -167,12 +166,13 @@ def launch_remote_clients_into_available_slots(params):
 				if splits[10] == "meerkat.file_producer":
 					process_count += 1
 					panel_name, panel_file = splits[11:13]
-					logging.info("Panel name: {0}, Panel file: {1}".format(panel_name, panel_file))
-		#Calculate available slots
-		remaining_slots = total_slots - process_count
-		logging.info("{0} has {1} remaining slots".format(instance_ip, remaining_slots))
+					logging.info(\
+					"Panel name: {0}, Panel file: {1}".format(panel_name, panel_file))
+
+		logging.info(\
+		"{0} has {1} remaining slots".format(instance_ip, (total_slots - process_count)))
 		#Fill slots from list of files that are 'not_started'
-		for _ in range(remaining_slots):
+		for _ in range(total_slots - process_count):
 			if ("not_started" in params) and (params["not_started"]):
 				item = params["not_started"].pop()
 				panel_name, panel_file = item[0:2]
@@ -315,8 +315,10 @@ def update_pending_files(params, name, src_dict, dst_dict, pair_priority):
 	my_report = {"name": name, "src" : len(src_dict), "dst" : len(dst_dict),
 		"newer_src": len(newer_src), "not_in_dst": len(not_in_dst)}
 	params["report"].append(my_report)
-	logging.info("Src count {0}, dst count {1}".format(len(src_dict), len(dst_dict)))
-	logging.info("Not in dst {0}, Newer src {1}".format(len(not_in_dst), len(newer_src)))
+	logging.info(\
+	"Src count {0}, dst count {1}".format(len(src_dict), len(dst_dict)))
+	logging.info(\
+	"Not in dst {0}, Newer src {1}".format(len(not_in_dst), len(newer_src)))
 	logging.debug("List of unprocessed files:")
 	# Log a more involved report if the log level is debug
 	for item in not_in_dst:
@@ -331,7 +333,8 @@ if __name__ == "__main__":
 	logger.setLevel(logging.DEBUG)
 	handler = logging.StreamHandler()
 	handler.setLevel(logging.DEBUG)
-	formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+	formatter = logging.Formatter(\
+	'%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 	handler.setFormatter(formatter)
 	logger.addHandler(handler)
 	logger.debug("File daemon")
