@@ -11,6 +11,7 @@ Created on Feb 25, 2014
 
 from sklearn.externals import joblib
 import logging
+import sys
 
 def select_model(mode):
 	"""Load either Card or Bank classifier depending on
