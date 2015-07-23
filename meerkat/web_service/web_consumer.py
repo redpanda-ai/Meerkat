@@ -9,11 +9,7 @@ Created on Nov 3, 2014
 
 import json
 import string
-import sys
 import re
-import math
-import logging
-from pprint import pprint
 
 from itertools import zip_longest
 from pprint import pprint

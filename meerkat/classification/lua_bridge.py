@@ -7,9 +7,8 @@ Created on May 14, 2015
 """
 
 import ctypes
-import sys
-import csv
 import json
+import logging
 
 def load_label_map(filename):
 	"""Load a permanent label map"""

@@ -15,8 +15,7 @@ VERIZON         | VERIZON         | VERIZON WRLS MYACCT VE   FOLSOM       CA
 VICTORIASSECRET | VICTORIASSECRET | VICTORIA'S SECRET 0020   FAIRFAX      VA 
 """
 
-from .merchant_trie import *
-import time
+from .merchant_trie import generate_merchant_trie, standardize
 import csv
 
 MERCHANT_TRIE = generate_merchant_trie()
