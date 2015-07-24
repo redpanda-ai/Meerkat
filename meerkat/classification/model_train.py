@@ -19,17 +19,21 @@ import csv
 import sys
 import logging
 import os
-import math
+#Import below is unused
+#import math
 from random import random
 
 import pandas as pd
-from sklearn.cross_validation import train_test_split
+#Import below is unused
+#from sklearn.cross_validation import train_test_split
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
-from sklearn.feature_extraction import DictVectorizer
+#Import below is unused
+#from sklearn.feature_extraction import DictVectorizer
 from sklearn.linear_model import SGDClassifier
 from sklearn.grid_search import GridSearchCV
-from sklearn.pipeline import Pipeline, FeatureUnion
+#FeatureUnion imported from sklearn.pipeline is unused
+from sklearn.pipeline import Pipeline #, FeatureUnion
 from sklearn.externals import joblib
 from sklearn.base import BaseEstimator, TransformerMixin
 
@@ -75,7 +79,8 @@ def split_data(filename):
 def load_data_df(file_name):
 	"""Loads human labeled data from a file."""
 
-	df = pd.read_csv(file_name, na_filter=False, parse_dates=["TRANSACTION_DATE"], quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+	df = pd.read_csv(file_name, na_filter=False, parse_dates=["TRANSACTION_DATE"],\
+	 quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
 	label_col_name = sys.argv[2]
 
 	transactions = df[['DESCRIPTION_UNMASKED', 'TRANSACTION_DATE', 'TYPE']]
@@ -151,7 +156,8 @@ def build_model(transactions, labels):
 	complex_parameters = {
 		'features__bag_of_words__vect__max_df': (0.25, 0.35),
 		'features__bag_of_words__vect__max_features': (8500, None),
-		'features__bag_of_words__vect__ngram_range': ((1, 1), (1, 2)),  # unigrams or bigrams
+		'features__bag_of_words__vect__ngram_range': ((1, 1), (1, 2)), 
+		# unigrams or bigrams
 		'features__bag_of_words__tfidf__use_idf': (True, False),
 		'features__bag_of_words__tfidf__norm': ('l1', 'l2'),
 		'clf__alpha': (0.0000055, 0.000008),
@@ -160,7 +166,8 @@ def build_model(transactions, labels):
 	}
 	"""
 
-	grid_search = GridSearchCV(simple_pipeline, simple_parameters, n_jobs=8, verbose=3, cv=3)
+	grid_search = GridSearchCV(simple_pipeline, simple_parameters, n_jobs=8,\
+	 verbose=3, cv=3)
 	grid_search.fit(transactions, labels)
 
 	print("Best score: %0.3f" % grid_search.best_score_)
@@ -174,7 +181,8 @@ def build_model(transactions, labels):
 	print("Actual Score: " + str(score))
 
 	# Save Model
-	joblib.dump(grid_search, 'meerkat/classification/models/STO_bank_model_' + str(score) + '.pkl', compress=3)
+	joblib.dump(grid_search, 'meerkat/classification/models/STO_bank_model_' +\
+	 str(score) + '.pkl', compress=3)
 
 	# Test Model
 	#test_model("100000_non_physical_bank.txt", grid_search)
