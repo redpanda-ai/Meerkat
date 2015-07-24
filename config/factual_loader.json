@@ -53,7 +53,7 @@
 				},
 				"city_state" : {
 					"components" : ["locality", "region"],
-					"format" : "{0}, {1}",
+					"format" : "{0}{1}",
 					"index" : "analyzed",
 					"type" : "string"
 				}
