@@ -11,8 +11,10 @@ import sys
 import string
 import os
 import marisa_trie as mt
-import pickle
-from pprint import pprint
+#Import below was unused
+#import pickle
+#Import below was unused
+#from pprint import pprint
 
 def standardize(text):
 	"""converts text to all caps, no punctuation, and no whitespace"""
@@ -55,7 +57,8 @@ def generate_merchant_trie():
 	if os.path.isfile("meerkat/classification/models/merchant_trie.marisa"):
 		trie.load("meerkat/classification/models/merchant_trie.marisa")
 	else:
-		trie = create_merchant_trie("meerkat/classification/label_maps/permanent_bank_label_map.json", \
+		trie = create_merchant_trie(\
+		"meerkat/classification/label_maps/permanent_bank_label_map.json", \
 			'meerkat/classification/models/merchant_trie.marisa')
 	return trie
 
@@ -63,5 +66,7 @@ def generate_merchant_trie():
 if __name__ == "__main__":
 	my_merchant_trie = generate_merchant_trie()
 	# quick test to see if everything loaded
-	# for key in json.loads(open("meerkat/classification/label_maps/permanent_bank_label_map.json").read()):
+	# for key in json.loads(open\
+	#("meerkat/classification/label_maps/permanent_bank_label_map.json").read()):
 	# 	print(standardize(key) in my_merchant_trie)
+
