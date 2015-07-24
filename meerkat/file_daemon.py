@@ -84,6 +84,7 @@ def begin_scanning_loop():
 	logging.info("Done.")
 
 def distribute_file(params, file_to_push):
+	"""Distributes files -- J.A.Key to be asked for more details """
 	logging.info("Synchronizing {0}".format(file_to_push))
 	launchpad = params["launchpad"]
 	instance_ips, user = launchpad["instance_ips"], launchpad["username"]
@@ -170,7 +171,8 @@ def launch_remote_clients_into_available_slots(params):
 					"Panel name: {0}, Panel file: {1}".format(panel_name, panel_file))
 
 		logging.info(\
-		"{0} has {1} remaining slots".format(instance_ip, (total_slots - process_count)))
+		"{0} has {1} remaining slots".format(instance_ip, \
+		(total_slots - process_count)))
 		#Fill slots from list of files that are 'not_started'
 		for _ in range(total_slots - process_count):
 			if ("not_started" in params) and (params["not_started"]):
