@@ -1,9 +1,6 @@
 {
 	"query":
 	{
-		"match" :
-		{
-			"postcode" : "10583"
-		}
+		"match_all": { }
 	}
 }
