@@ -69,7 +69,8 @@ def set_s3():
 			s3_dir["bucket"] = bucket
 			s3_dir["sub_dir"] = sub_dir
 			s3_dir["s3_objects"] = get_s3_contents(bucket, sub_dir)
-			logging.warning("{0} contains {1} items.".format(sub_dir, len(s3_dir["s3_objects"])))
+			logging.warning\
+			("{0} contains {1} items.".format(sub_dir, len(s3_dir["s3_objects"])))
 		else:
 			logging.warning("Path is invalid, double-check your configuration file.")
 
@@ -225,7 +226,8 @@ def process_pending_list():
 				for j in s3_dir["s3_objects"] if my_key.search(j.key)]
 		keys = [z for (z, y) in keys if y in PENDING]
 		PARAMS["S3"][index]["s3_objects"] = keys
-		logging.warning("{0} items in keys {1}".format(len(PARAMS["S3"][index]["s3_objects"]), index))
+		logging.warning(\
+		"{0} items in keys {1}".format(len(PARAMS["S3"][index]["s3_objects"]), index))
 		index += 1
 
 	#Process the pending files
@@ -241,7 +243,8 @@ def pull_file_from_s3(i, x):
 	s3_object = bucket["s3_objects"][x]
 	filename = my_key.search(s3_object.key).group(1)
 	s3_object.get_contents_to_filename(local + "/" + filename)
-	logging.warning("{0} pulled from {1}".format(filename, PARAMS["S3"][i]["path"]))
+	logging.warning\
+	("{0} pulled from {1}".format(filename, PARAMS["S3"][i]["path"]))
 	return filename
 
 

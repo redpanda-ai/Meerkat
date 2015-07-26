@@ -15,8 +15,7 @@ VERIZON         | VERIZON         | VERIZON WRLS MYACCT VE   FOLSOM       CA
 VICTORIASSECRET | VICTORIASSECRET | VICTORIA'S SECRET 0020   FAIRFAX      VA 
 """
 
-from .merchant_trie import *
-import time
+from .merchant_trie import generate_merchant_trie, standardize
 import csv
 
 MERCHANT_TRIE = generate_merchant_trie()
@@ -44,9 +43,10 @@ def column_print(merchant, expected, transaction):
 
 def main():
 	"""runs the file"""
-	# This file is located in S3 under s3yodlee/development/bank/3_year_card_sample.txt
+	# This file is located in S3 under
+	# s3yodlee/development/bank/3_year_card_sample.txt
 	# transactions = open("data/input/3_year_card_sample.log")
-	transactions = open("data/input/merchant_labels.csv",encoding = "ISO-8859-1")
+	transactions = open("data/input/merchant_labels.csv", encoding ="ISO-8859-1")
 	reader = csv.reader(transactions, delimiter=',')
 	correct = 0
 	count = 0

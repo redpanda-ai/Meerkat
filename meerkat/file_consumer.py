@@ -149,7 +149,8 @@ class FileConsumer(threading.Thread):
 
 		if z_score_delta is None:
 			return False
-		if z_score_delta > float(threshold) and raw_score > float(raw_score_threshold):
+		if z_score_delta > float(threshold) and\
+		 raw_score > float(raw_score_threshold):
 			return True
 		else:
 			return False
@@ -166,7 +167,8 @@ class FileConsumer(threading.Thread):
 		self.hyperparameters = hyperparameters
 		self.cities = cities
 
-		cluster_nodes = self.params["my_producer_options"]["elasticsearch"]["cluster_nodes"]
+		cluster_nodes = \
+		self.params["my_producer_options"]["elasticsearch"]["cluster_nodes"]
 		self.es_connection = Elasticsearch(cluster_nodes,\
 			sniff_on_start=True, sniff_on_connection_fail=True,\
 			sniffer_timeout=15, sniff_timeout=15)

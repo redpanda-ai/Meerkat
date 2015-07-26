@@ -1,5 +1,5 @@
 #!/usr/local/bin/python3.3
-# pylint: disable=all
+# pylint: skip-file
 
 """This module aims to collect the functionality related to geolocation
 used throughout Meerkat.
