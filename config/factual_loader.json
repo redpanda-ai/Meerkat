@@ -2,7 +2,7 @@
 	"concurrency" : 8,
 	"batch_size" : 500,
 	"input" : {
-		"filename" : "/home/ubuntu/git/Meerkat/data/input/factual_100000.log",
+		"filename" : "/data/2/smaller_100000.tab",
 		"encoding" : "utf-8"
 	},
 	"logging" : {
