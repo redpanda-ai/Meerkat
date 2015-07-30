@@ -27,14 +27,14 @@ from gensim.models import Phrases
 from meerkat.various_tools import safe_print, safe_input
 
 class DummyFile(object):
-    def write(self, x): pass
+	def write(self, x): pass
 
 @contextlib.contextmanager
 def nostderr():
-    save_stderr = sys.stderr
-    sys.stderr = DummyFile()
-    yield
-    sys.stderr = save_stderr
+	save_stderr = sys.stderr
+	sys.stderr = DummyFile()
+	yield
+	sys.stderr = save_stderr
 
 def verify_arguments():
 	"""Verify Usage"""
@@ -69,12 +69,14 @@ def run_from_command_line(cla):
 	params = add_local_params(params)
 	first_chunk = True
 
-	reader = pd.read_csv(cla[1], chunksize=5000, na_filter=False, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+	reader = pd.read_csv(cla[1], chunksize=5000, na_filter=False,\
+	quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
 
 	# Process Transactions
 	for chunk in reader:
 
-		transactions = [row["DESCRIPTION_UNMASKED"].lower().split(" ") for i, row in chunk.iterrows()]
+		transactions = [row["DESCRIPTION_UNMASKED"].lower().split(" ") \
+		for i, row in chunk.iterrows()]
 
 		if first_chunk:
 			bigrams = Phrases(transactions, max_vocab_size=5000)

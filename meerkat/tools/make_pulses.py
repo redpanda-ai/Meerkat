@@ -21,6 +21,7 @@ import csv
 import sys
 import collections
 import random
+from pprint import pprint
 
 def load_dict_list(file_name, encoding='utf-8', delimiter="|"):
 	"""Loads a dictionary of input from a file into a list."""
@@ -109,7 +110,8 @@ def run_from_command_line():
 	
 	verify_arguments()
 	pulses = split_sample(sys.argv[1])
-	write_pulses(pulses)
+	pprint(pulses);
+	#write_pulses(pulses)
 
 if __name__ == "__main__":
 	run_from_command_line()

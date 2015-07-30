@@ -9,18 +9,16 @@ Created on Nov 3, 2014
 
 import json
 import string
-import sys
 import re
-import math
-import logging
-from pprint import pprint
 
 from itertools import zip_longest
 from pprint import pprint
 from scipy.stats.mstats import zscore
 
-from meerkat.various_tools import get_es_connection, string_cleanse, get_boosted_fields
-from meerkat.various_tools import synonyms, get_bool_query, get_qs_query, load_params
+from meerkat.various_tools \
+import get_es_connection, string_cleanse, get_boosted_fields
+from meerkat.various_tools \
+import synonyms, get_bool_query, get_qs_query, load_params
 from meerkat.classification.load import select_model
 from meerkat.classification.lua_bridge import get_CNN
 from meerkat.classification.bloom_filter.find_entities import location_split
@@ -33,7 +31,7 @@ BANK_CNN = get_CNN("bank")
 CARD_CNN = get_CNN("card")
 
 def grouper(iterable):
-    return zip_longest(*[iter(iterable)]*128, fillvalue={"description":""})
+	return zip_longest(*[iter(iterable)]*128, fillvalue={"description":""})
 
 class Web_Consumer():
 	"""Acts as a web service client to process and enrich
@@ -42,7 +40,8 @@ class Web_Consumer():
 	def __init__(self, params, hyperparams, cities):
 		"""Constructor"""
 
-		self.type_hierarchy = load_params("meerkat/classification/label_maps/type_subtype_hierarchy.json")
+		self.type_hierarchy = load_params\
+		("meerkat/classification/label_maps/type_subtype_hierarchy.json")
 		self.params = params
 		self.hyperparams = hyperparams
 		self.cities = cities
@@ -129,12 +128,19 @@ class Web_Consumer():
 			return transaction
 
 		# Collect Fallback Data
-		business_names = [result.get("fields", {"name" : ""}).get("name", "") for result in hits]
-		business_names = [name[0] for name in business_names if type(name) == list]
-		city_names = [result.get("fields", {"locality" : ""}).get("locality", "") for result in hits]
-		city_names = [name[0] for name in city_names if type(name) == list]
-		state_names = [result.get("fields", {"region" : ""}).get("region", "") for result in hits]
-		state_names = [name[0] for name in state_names if type(name) == list]
+		business_names = \
+		[result.get("fields", {"name" : ""}).get("name", "") for result in hits]
+		business_names = \
+		[name[0] for name in business_names if type(name) == list]
+		city_names = \
+		[result.get("fields", {"locality" : ""}).get("locality", "") \
+		for result in hits]
+		city_names = \
+		[name[0] for name in city_names if type(name) == list]
+		state_names = \
+		[result.get("fields", {"region" : ""}).get("region", "") for result in hits]
+		state_names = \
+		[name[0] for name in state_names if type(name) == list]
 
 		# Need Names
 		if len(business_names) < 2:
@@ -151,10 +157,12 @@ class Web_Consumer():
 		z_score_delta, raw_score = self.__z_score_delta(scores)
 		threshold = float(hyperparams.get("z_score_threshold", "2"))
 		raw_threshold = float(hyperparams.get("raw_score_threshold", "1"))
-		decision = True if (z_score_delta > threshold) and (raw_score > raw_threshold) else False
+		decision = True \
+		if (z_score_delta > threshold) and (raw_score > raw_threshold) else False
 
 		# Enrich Data if Passes Boundary
-		args = [decision, transaction, hit_fields, z_score_delta, business_names, city_names, state_names]
+		args = [decision, transaction, hit_fields, z_score_delta, \
+		business_names, city_names, state_names]
 		enriched_transaction = self.__enrich_transaction(*args)
 
 		return enriched_transaction
@@ -174,7 +182,8 @@ class Web_Consumer():
 
 		return transaction
 
-	def __enrich_transaction(self, decision, transaction, hit_fields, z_score_delta, business_names, city_names, state_names):
+	def __enrich_transaction(self, decision, transaction, \
+	hit_fields, z_score_delta, business_names, city_names, state_names):
 		"""Enriches the transaction with additional data"""
 
 		params = self.params
@@ -192,7 +201,8 @@ class Web_Consumer():
 			transaction["match_found"] = True
 			for field in field_names:
 				if field in fields_in_hit:
-					field_content = hit_fields[field][0] if isinstance(hit_fields[field], (list)) else str(hit_fields[field])
+					field_content = hit_fields[field][0] if\
+ isinstance(hit_fields[field], (list)) else str(hit_fields[field])
 					transaction[attr_map.get(field, field)] = field_content
 				else:
 					transaction[attr_map.get(field, field)] = ""
@@ -201,16 +211,20 @@ class Web_Consumer():
 		if decision == False:
 			for field in field_names:
 				transaction[attr_map.get(field, field)] = ""
-			transaction = self.__business_name_fallback(business_names, transaction, attr_map)
-			transaction = self.__geo_fallback(city_names, state_names, transaction, attr_map)
+			transaction = \
+			self.__business_name_fallback(business_names, transaction, attr_map)
+			transaction = \
+			self.__geo_fallback(city_names, state_names, transaction, attr_map)
 
 		# Ensure Proper Casing
 		if transaction[attr_map['name']] == transaction[attr_map['name']].upper():
-			transaction[attr_map['name']] = string.capwords(transaction[attr_map['name']], " ")
+			transaction[attr_map['name']] = \
+			string.capwords(transaction[attr_map['name']], " ")
 
 		# Add Source
 		index = params["elasticsearch"]["index"]
-		transaction["source"] = "FACTUAL" if ("factual" in index) and (transaction["match_found"] == True) else "YODLEE"
+		transaction["source"] = "FACTUAL" if ("factual" in index) and\
+		 (transaction["match_found"] == True) else "YODLEE"
 
 		return transaction
 
@@ -221,11 +235,14 @@ class Web_Consumer():
 		fields = self.params["output"]["results"]["fields"]
 		city_names = city_names[0:2]
 		state_names = state_names[0:2]
-		states_equal = state_names.count(state_names[0]) == len(state_names)
-		city_in_transaction = (city_names[0].lower() in transaction["description"].lower())
-		state_in_transaction = (state_names[0].lower() in transaction["description"].lower())
+		states_equal = \
+		state_names.count(state_names[0]) == len(state_names)
+		city_in_transaction = \
+		(city_names[0].lower() in transaction["description"].lower())
+		state_in_transaction = \
+		(state_names[0].lower() in transaction["description"].lower())
 
-		if (city_in_transaction):
+		if city_in_transaction:
 			transaction[attr_map['locality']] = city_names[0]
 
 		if (states_equal and state_in_transaction):

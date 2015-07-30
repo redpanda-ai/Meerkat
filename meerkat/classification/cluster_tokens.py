@@ -46,7 +46,7 @@ def save_token_subset(word2vec, word_list):
 	for word in word_list:
 		vector_dict[word] = word2vec[word]
 
-	pickle.dump(vector_dict, open("data/misc/prophet_vectors.pkl", "wb" ))
+	pickle.dump(vector_dict, open("data/misc/prophet_vectors.pkl", "wb"))
 
 def t_SNE(X, word2vec):
 	"""Run stochastic neighbor embedding"""
@@ -76,7 +76,8 @@ def cluster_vectors(word2vec):
 	t_SNE(X, word2vec)
 	
 	# Clustering
-	clusters = kmeans(n_clusters=75, max_iter=100, batch_size=200, n_init=10, init_size=30)
+	clusters = kmeans(n_clusters=75, max_iter=100, \
+	batch_size=200, n_init=10, init_size=30)
 	clusters.fit(X)
 	word_clusters = {word:label for word, label in zip(tokens, clusters.labels_)}
 	sorted_clusters = sorted(word_clusters.items(), key=operator.itemgetter(1))
@@ -96,3 +97,4 @@ def run_from_command_line(command_line_arguments):
 
 if __name__ == "__main__":
 	run_from_command_line(sys.argv)
+

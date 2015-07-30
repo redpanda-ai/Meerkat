@@ -11,6 +11,7 @@ Created on Feb 25, 2014
 
 from sklearn.externals import joblib
 import logging
+import sys
 
 def select_model(mode):
 	"""Load either Card or Bank classifier depending on
@@ -48,4 +49,5 @@ def select_model(mode):
 
 if __name__ == "__main__":
 	"""Print a warning to not execute this file as a module"""
-	logging.warning("This module is a library that contains useful functions; it should not be run from the console.")
+	logging.warning("This module is a library that contains useful functions;" +\
+	 "it should not be run from the console.")
