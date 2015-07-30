@@ -110,7 +110,8 @@ def run_from_command_line():
 	
 	verify_arguments()
 	pulses = split_sample(sys.argv[1])
-	write_pulses(pulses)
+	pprint(pulses);
+	#write_pulses(pulses)
 
 if __name__ == "__main__":
 	run_from_command_line()
