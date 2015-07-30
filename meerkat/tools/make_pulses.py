@@ -21,6 +21,7 @@ import csv
 import sys
 import collections
 import random
+from pprint import pprint
 
 def load_dict_list(file_name, encoding='utf-8', delimiter="|"):
 	"""Loads a dictionary of input from a file into a list."""
