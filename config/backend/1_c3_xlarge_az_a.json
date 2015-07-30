@@ -48,7 +48,6 @@
 		"sed -i 's/__NODE_MASTER/true/' /etc/elasticsearch/elasticsearch.yml",
 		"sed -i 's/__NODE_DATA/false/' /etc/elasticsearch/elasticsearch.yml",
 		"sed -i 's:__ES_DATA_PATH:/data/2:' /etc/elasticsearch/elasticsearch.yml",
-		"echo 'path.repo: [\"/data/2/backups\", \"/data/2/longterm_backups\"] >> /etc/elasticsearch/elasticsearch.yml'",
 		"service elasticsearch start"
 	],
 	"configure_slave_commands" : [
