@@ -49,7 +49,7 @@ def generic_test(machine, human, lists, column):
 
 	# Create Quicker Lookup
 	for index, row in enumerate(human):
-		key = str(row["UNIQUE_MEM_ID"]) + row[doc_label]
+		key = str(row["UNIQUE_TRANSACTION_ID"])
 		index_lookup[key] = index
 
 	# Test Each Machine Labeled Row
