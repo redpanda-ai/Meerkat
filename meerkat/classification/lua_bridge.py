@@ -122,14 +122,14 @@ def get_CNN(model_name):
 	def apply_CNN(trans, doc_key="description", label_key="CNN"):
 		"""Apply CNN to transactions in batches of 128"""
 		
-		trans_list = [' '.join(x[name_in].split()) for x in trans]
+		trans_list = [' '.join(x[doc_key].split()) for x in trans]
 		table_trans = list_to_table(trans_list)
 		batch = make_batch(table_trans)
 		labels = process_batch(batch)
 		decisions = list(labels.values())
 		
 		for i, t in enumerate(trans):
-			t[name_out] = reverse_label_map.get(str(decisions[i]), "")
+			t[label_key] = reverse_label_map.get(str(decisions[i]), "")
 
 		return trans
 

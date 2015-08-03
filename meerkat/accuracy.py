@@ -36,11 +36,13 @@ import os
 import sys
 import re
 import contextlib
+import boto
 
 from boto.s3.connection import Key, Location
 
 from itertools import zip_longest
 from pprint import pprint
+import pandas as pd
 
 from meerkat.various_tools import load_dict_list, progress, safely_remove_file
 from meerkat.classification.lua_bridge import get_CNN, load_label_map
@@ -60,6 +62,15 @@ def nostdout():
 
 def grouper(iterable):
 	return zip_longest(*[iter(iterable)]*128, fillvalue={"DESCRIPTION":""})
+
+def get_s3_connection():
+	"""Returns a connection to S3"""
+	try:
+		conn = boto.connect_s3()
+	except boto.s3.connection.HostRequiredError:
+		print("Error connecting to S3, check your credentials")
+		sys.exit()
+	return conn
 
 def generic_test(machine, human, lists, column):
 	"""Tests both the recall and precision of the pinpoint classifier against
@@ -260,38 +271,28 @@ def CNN_accuracy():
 	with nostdout():
 		conn = get_s3_connection()
 
-	params = {}
-	params["label_key"] = "MERCHANT_NAME"
-	bank_files, card_files = [], []
 	bucket = conn.get_bucket("yodleemisc", Location.USWest2)
-	bank_regex = re.compile("vumashankar/CNN/bank/")
-	card_regex = re.compile("vumashankar/CNN/card/")
-
-	# Get a list of files
-	for panel in bucket:
-		if bank_regex.search(panel.key) and os.path.basename(panel.key) != "":
-			bank_files.append(panel)
-		if card_regex.search(panel.key) and os.path.basename(panel.key) != "":
-			card_files.append(panel)
 
 	# Test Card CNN
-	process_file_collection(card_files, CARD_CNN)
+	process_file_collection(bucket, "/vumashankar/CNN/card/", CARD_CNN)
 
 	# Test Bank CNN
 
-def process_file_collection(files, classifier):
+def process_file_collection(bucket, prefix, classifier):
 	"""Test a list of files"""
 
 	label_map = load_label_map("meerkat/classification/label_maps/deep_clean_map.json")
+	params = {}
+	params["label_key"] = "MERCHANT_NAME"
 
-	for i, sample in enumerate(files):
-		
+	for label_num in label_map.keys():
+
+		sample = bucket.get_key(prefix + label_num + ".txt.gz")
 		file_name = "data/misc/Merchant Samples/" + os.path.basename(sample.key)
-		label_num = os.path.splitext(file_name)[0]
 		sample.get_contents_to_filename(file_name)
- 		
- 		df = pd.read_csv(file_name, na_filter=False, compression="gzip", quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
-		df["MERCHANT_NAME"] = label_map.get("label_num", "NAME")
+
+		df = pd.read_csv(file_name, na_filter=False, compression="gzip", quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+		df["MERCHANT_NAME"] = label_map.get(label_num, "NAME")
 		unzipped_file_name = "data/misc/Merchant Samples/" + label_num + ".txt"
 		df.to_csv(unzipped_file_name, sep="|", mode="w", encoding="utf-8", index=False, index_label=False)
 		safely_remove_file(file_name)
