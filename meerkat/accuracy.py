@@ -34,12 +34,29 @@ import datetime
 import logging
 import os
 import sys
+import re
+import contextlib
+
+from boto.s3.connection import Key, Location
 
 from itertools import zip_longest
 from pprint import pprint
 
-from meerkat.various_tools import (load_dict_list, progress)
-from meerkat.classification.lua_bridge import get_CNN
+from meerkat.various_tools import load_dict_list, progress, safely_remove_file
+from meerkat.classification.lua_bridge import get_CNN, load_label_map
+
+class DummyFile(object):
+    def write(self, x): pass
+
+@contextlib.contextmanager
+def nostdout():
+    save_stdout = sys.stdout
+    save_stderr = sys.stderr
+    sys.stdout = DummyFile()
+    sys.stderr = DummyFile()
+    yield
+    sys.stderr = save_stderr
+    sys.stdout = save_stdout
 
 def grouper(iterable):
 	return zip_longest(*[iter(iterable)]*128, fillvalue={"DESCRIPTION":""})
@@ -206,6 +223,11 @@ def speed_vests(start_time, accuracy_results):
 			'time_per_transaction': time_per_transaction,
 			'transactions_per_minute':transactions_per_minute}
 
+def get_merchant_file_list():
+	"""Get a list of ground truth files for merchants from S3"""
+
+
+
 def apply_CNN(classifier, transactions):
 		"""Apply the CNN to transactions"""
 
@@ -230,17 +252,54 @@ def per_merchant_accuracy(params, classifier):
 def CNN_accuracy():
 	"""Run merchant CNN on a directory of Merchant Samples"""
 
+	# Load Classifiers
 	BANK_CNN = get_CNN("bank")
 	CARD_CNN = get_CNN("card")
 
+	# Connect to S3
+	with nostdout():
+		conn = get_s3_connection()
+
 	params = {}
 	params["label_key"] = "MERCHANT_NAME"
-	dir_name = "data/misc/Merchant Samples/"
-	merchant_files = [os.path.join(dir_name, f) for f in os.listdir(dir_name) if f.endswith(".txt")]
+	bank_files, card_files = [], []
+	bucket = conn.get_bucket("yodleemisc", Location.USWest2)
+	bank_regex = re.compile("vumashankar/CNN/bank/")
+	card_regex = re.compile("vumashankar/CNN/card/")
 
-	for sample in merchant_files:
-		params["verification_source"] = sample
-		per_merchant_accuracy(params, CARD_CNN)
+	# Get a list of files
+	for panel in bucket:
+		if bank_regex.search(panel.key) and os.path.basename(panel.key) != "":
+			bank_files.append(panel)
+		if card_regex.search(panel.key) and os.path.basename(panel.key) != "":
+			card_files.append(panel)
+
+	# Test Card CNN
+	process_file_collection(card_files, CARD_CNN)
+
+	# Test Bank CNN
+
+def process_file_collection(files, classifier):
+	"""Test a list of files"""
+
+	label_map = load_label_map("meerkat/classification/label_maps/deep_clean_map.json")
+
+	for i, sample in enumerate(files):
+		
+		file_name = "data/misc/Merchant Samples/" + os.path.basename(sample.key)
+		label_num = os.path.splitext(file_name)[0]
+		sample.get_contents_to_filename(file_name)
+ 		
+ 		df = pd.read_csv(file_name, na_filter=False, compression="gzip", quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+		df["MERCHANT_NAME"] = label_map.get("label_num", "NAME")
+		unzipped_file_name = "data/misc/Merchant Samples/" + label_num + ".txt"
+		df.to_csv(unzipped_file_name, sep="|", mode="w", encoding="utf-8", index=False, index_label=False)
+		safely_remove_file(file_name)
+		
+		params["verification_source"] = unzipped_file_name
+		per_merchant_accuracy(params, classifier)
+		safely_remove_file(unzipped_file_name)
+		del files[i]
 
 def print_results(results):
 	"""Provide useful readable output"""
