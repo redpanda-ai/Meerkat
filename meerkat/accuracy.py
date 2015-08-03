@@ -221,7 +221,8 @@ def per_merchant_accuracy(params, classifier):
 	"""An easy way to test the accuracy of a small set
 	provided a set of hyperparameters"""
 
-	safe_print("Testing sample: " + params["verification_source"])
+	print("Testing sample: " + params["verification_source"])
+	transactions = load_dict_list(params["verification_source"])
 	labeled_trans = apply_CNN(classifier, transactions)
 	accuracy_results = vest_accuracy(params, result_list=labeled_trans)
 	print_results(accuracy_results)
