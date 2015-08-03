@@ -213,7 +213,7 @@ def apply_CNN(classifier, transactions):
 		processed = []
 
 		for i, batch in enumerate(batches):
-			processed += classifier(batch, name_in="DESCRIPTION", name_out="MERCHANT_NAME")
+			processed += classifier(batch, doc_key="DESCRIPTION", label_key="MERCHANT_NAME")
 
 		return processed[0:len(transactions)]
 
@@ -273,6 +273,7 @@ def print_results(results):
 	print("{0:35} = {1:10.2f}%".format("Precision",
 		results['precision']))
 
+	#print("", "UNLABELED:", '\n'.join(sorted(results['unlabeled'])), sep="\n")
 	#print("", "MISLABELED:", '\n'.join(sorted(results['mislabeled'])), sep="\n")
 	#print("", "MISLABELED BINARY:", '\n'.join(results['non_physical']),
 	#	sep="\n")
