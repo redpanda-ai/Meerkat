@@ -35,9 +35,14 @@ import logging
 import os
 import sys
 
+from itertools import zip_longest
 from pprint import pprint
 
 from meerkat.various_tools import (load_dict_list, progress)
+from meerkat.classification.lua_bridge import get_CNN
+
+def grouper(iterable):
+	return zip_longest(*[iter(iterable)]*128, fillvalue={"DESCRIPTION":""})
 
 def generic_test(machine, human, lists, column):
 	"""Tests both the recall and precision of the pinpoint classifier against
@@ -106,8 +111,6 @@ def vest_accuracy(params, file_path=None, non_physical_trans=None,\
 	"""Takes file by default but can accept result
 	queue/ non_physical list. Attempts to provide various
 	accuracy tests"""
-
-	#params["es_connection"] = get_es_connection(params)
 
 	if non_physical_trans is None:
 		non_physical_trans = []
@@ -203,6 +206,41 @@ def speed_vests(start_time, accuracy_results):
 			'time_per_transaction': time_per_transaction,
 			'transactions_per_minute':transactions_per_minute}
 
+def apply_CNN(classifier, transactions):
+		"""Apply the CNN to transactions"""
+
+		batches = grouper(transactions)
+		processed = []
+
+		for i, batch in enumerate(batches):
+			processed += classifier(batch, name_in="DESCRIPTION", name_out="MERCHANT_NAME")
+
+		return processed[0:len(transactions)]
+
+def per_merchant_accuracy(params, classifier):
+	"""An easy way to test the accuracy of a small set
+	provided a set of hyperparameters"""
+
+	safe_print("Testing sample: " + params["verification_source"])
+	labeled_trans = apply_CNN(classifier, transactions)
+	accuracy_results = vest_accuracy(params, result_list=labeled_trans)
+	print_results(accuracy_results)
+
+def CNN_accuracy():
+	"""Run merchant CNN on a directory of Merchant Samples"""
+
+	BANK_CNN = get_CNN("bank")
+	CARD_CNN = get_CNN("card")
+
+	params = {}
+	params["label_key"] = "MERCHANT_NAME"
+	dir_name = "data/misc/Merchant Samples/"
+	merchant_files = [os.path.join(dir_name, f) for f in os.listdir(dir_name) if f.endswith(".txt")]
+
+	for sample in merchant_files:
+		params["verification_source"] = sample
+		per_merchant_accuracy(params, CARD_CNN)
+
 def print_results(results):
 	"""Provide useful readable output"""
 
@@ -240,10 +278,9 @@ def print_results(results):
 
 def run_from_command_line(command_line_arguments):
 	"""Runs these commands if the module is invoked from the command line"""
-	output_path = "data/output/meerkatLabeled.csv"
-	if len(command_line_arguments) > 1:
-		output_path = command_line_arguments[1]
-	pprint(vest_accuracy(params=None, file_path=output_path))
+	
+	#print_results(vest_accuracy(params=None))
+	CNN_accuracy()
 
 if __name__ == "__main__":
 	run_from_command_line(sys.argv)

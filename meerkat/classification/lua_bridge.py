@@ -121,17 +121,17 @@ def get_CNN(model_name):
 	''')
 
 	# Generate Helper Function
-	def apply_CNN(trans):
+	def apply_CNN(trans, name_in="description", name_out="CNN"):
 		"""Apply CNN to transactions in batches of 128"""
 		
-		trans_list = [' '.join(x["description"].split()) for x in trans]
+		trans_list = [' '.join(x[name_in].split()) for x in trans]
 		table_trans = list_to_table(trans_list)
 		batch = make_batch(table_trans)
 		labels = process_batch(batch)
 		decisions = list(labels.values())
 		
 		for i, t in enumerate(trans):
-			t["CNN"] = reverse_label_map.get(str(decisions[i]), "")
+			t[name_out] = reverse_label_map.get(str(decisions[i]), "")
 
 		return trans
 
