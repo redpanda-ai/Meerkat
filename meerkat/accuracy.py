@@ -69,7 +69,7 @@ def generic_test(machine, human, lists, column):
 			continue
 
 		# Verify Accuracy
-		key = str(machine_row["UNIQUE_MEM_ID"]) + machine_row[doc_label]
+		key = str(row["UNIQUE_TRANSACTION_ID"])
 		h_index = index_lookup.get(key, "")
 
 		# Sort Into Lists
