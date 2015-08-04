@@ -270,11 +270,11 @@ def CNN_accuracy():
 
 	bucket = conn.get_bucket("yodleemisc", Location.USWest2)
 
-	# Test Card CNN
-	process_file_collection(bucket, "/vumashankar/CNN/card/", CARD_CNN)
-
 	# Test Bank CNN
 	process_file_collection(bucket, "/vumashankar/CNN/bank/", BANK_CNN)
+
+	# Test Card CNN
+	process_file_collection(bucket, "/vumashankar/CNN/card/", CARD_CNN)
 
 def process_file_collection(bucket, prefix, classifier):
 	"""Test a list of files"""
@@ -303,7 +303,7 @@ def process_file_collection(bucket, prefix, classifier):
 		params["verification_source"] = unzipped_file_name
 		print("Testing Merchant: " + merchant_name)
 		accuracy_results = per_merchant_accuracy(params, classifier)
-		pure_accuracy = accuracy_results['total_recall'] * accuracy_results["precision"]
+		pure_accuracy = (accuracy_results['total_recall'] / 100) * (accuracy_results["precision"] / 100)
 		writer.writerow([merchant_name, pure_accuracy])
 		safely_remove_file(unzipped_file_name)
 
