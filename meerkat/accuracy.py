@@ -234,11 +234,6 @@ def speed_vests(start_time, accuracy_results):
 			'time_per_transaction': time_per_transaction,
 			'transactions_per_minute':transactions_per_minute}
 
-def get_merchant_file_list():
-	"""Get a list of ground truth files for merchants from S3"""
-
-
-
 def apply_CNN(classifier, transactions):
 		"""Apply the CNN to transactions"""
 
@@ -277,6 +272,7 @@ def CNN_accuracy():
 	process_file_collection(bucket, "/vumashankar/CNN/card/", CARD_CNN)
 
 	# Test Bank CNN
+	process_file_collection(bucket, "/vumashankar/CNN/bank/", BANK_CNN)
 
 def process_file_collection(bucket, prefix, classifier):
 	"""Test a list of files"""
@@ -288,6 +284,7 @@ def process_file_collection(bucket, prefix, classifier):
 	for label_num in label_map.keys():
 
 		sample = bucket.get_key(prefix + label_num + ".txt.gz")
+		if sample == None: continue
 		file_name = "data/misc/Merchant Samples/" + os.path.basename(sample.key)
 		sample.get_contents_to_filename(file_name)
 
@@ -298,9 +295,9 @@ def process_file_collection(bucket, prefix, classifier):
 		safely_remove_file(file_name)
 		
 		params["verification_source"] = unzipped_file_name
+		print("Testing Merchant: " + label_map.get(label_num, "NAME"))
 		per_merchant_accuracy(params, classifier)
 		safely_remove_file(unzipped_file_name)
-		del files[i]
 
 def print_results(results):
 	"""Provide useful readable output"""
