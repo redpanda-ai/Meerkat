@@ -255,6 +255,8 @@ def per_merchant_accuracy(params, classifier):
 	accuracy_results = vest_accuracy(params, result_list=labeled_trans)
 	print_results(accuracy_results)
 
+	return accuracy_results
+
 def CNN_accuracy():
 	"""Run merchant CNN on a directory of Merchant Samples"""
 
@@ -280,24 +282,32 @@ def process_file_collection(bucket, prefix, classifier):
 	label_map = load_label_map("meerkat/classification/label_maps/deep_clean_map.json")
 	params = {}
 	params["label_key"] = "MERCHANT_NAME"
+	results = open("data/output/per_merchant_tests_" + prefix.split('/')[-2] + ".csv", "a")
+	writer = csv.writer(results, delimiter = ',', quotechar = '"')
+	writer.writerow(["Merchant", "Accuracy"])
 
 	for label_num in label_map.keys():
 
+		merchant_name = label_map.get(label_num, "not_found")
 		sample = bucket.get_key(prefix + label_num + ".txt.gz")
 		if sample == None: continue
 		file_name = "data/misc/Merchant Samples/" + os.path.basename(sample.key)
 		sample.get_contents_to_filename(file_name)
 
 		df = pd.read_csv(file_name, na_filter=False, compression="gzip", quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
-		df["MERCHANT_NAME"] = label_map.get(label_num, "NAME")
+		df["MERCHANT_NAME"] = merchant_name
 		unzipped_file_name = "data/misc/Merchant Samples/" + label_num + ".txt"
 		df.to_csv(unzipped_file_name, sep="|", mode="w", encoding="utf-8", index=False, index_label=False)
 		safely_remove_file(file_name)
 		
 		params["verification_source"] = unzipped_file_name
-		print("Testing Merchant: " + label_map.get(label_num, "NAME"))
-		per_merchant_accuracy(params, classifier)
+		print("Testing Merchant: " + merchant_name)
+		accuracy_results = per_merchant_accuracy(params, classifier)
+		pure_accuracy = accuracy_results['total_recall'] * accuracy_results["precision"]
+		writer.writerow([merchant_name, pure_accuracy])
 		safely_remove_file(unzipped_file_name)
+
+	results.close()
 
 def print_results(results):
 	"""Provide useful readable output"""
