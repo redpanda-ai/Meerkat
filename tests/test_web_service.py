@@ -1,7 +1,8 @@
 from plumbum import ProcessExecutionError
 from plumbum import local, BG
-from plumbum.cmd import sudo, kill, grep, python3
+from plumbum.cmd import sudo, kill, grep, python3, sleep
 import requests
+import unittest
 
 def start_web_service():
 	start = sudo[python3["-m"]["meerkat.web_service"]]
@@ -33,9 +34,10 @@ class WebServiceTest(unittest.TestCase):
 		
 		#stop_web_service()
 		start_web_service()
+		sleep(3)
 		status = check_status()
 		self.assertTrue(status == 200)
-		self.stop_web_service()
+		stop_web_service()
 
 if __name__ == "__main__":
 	unittest.main()
