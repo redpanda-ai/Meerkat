@@ -295,6 +295,7 @@ def process_file_collection(bucket, prefix, classifier):
 		sample.get_contents_to_filename(file_name)
 
 		df = pd.read_csv(file_name, na_filter=False, compression="gzip", quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+		df = df.rename(columns = {'DESCRIPTION':'DESCRIPTION_UNMASKED'})
 		df["MERCHANT_NAME"] = merchant_name
 		unzipped_file_name = "data/misc/Merchant Samples/" + label_num + ".txt"
 		df.to_csv(unzipped_file_name, sep="|", mode="w", encoding="utf-8", index=False, index_label=False)
