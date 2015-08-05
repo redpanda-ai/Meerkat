@@ -32,7 +32,13 @@ class WebServiceTest(unittest.TestCase):
 	def test_web_service_status(self):
 		"""Test starts, checks status of, and stops meerkat web service"""
 		
+		#The line below is intended to stop web service in case it is running to prevent an AlreadyInUse error. 
+		#However, this causes a ConnectionResetError (connection reset by peer). 
+		#The line below needs to be included once this issue is resolved.
+		#A possible work around is to try and handle an AlreadyInUse error	
+		
 		#stop_web_service()
+		
 		start_web_service()
 		sleep(3)
 		status = check_status()
