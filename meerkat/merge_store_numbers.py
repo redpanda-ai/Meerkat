@@ -38,7 +38,9 @@ import os
 from scipy.stats.mstats import zscore
 from elasticsearch import Elasticsearch, helpers
 from pprint import pprint
+from queue import Queue
 from threading import Thread
+ 
 
 from meerkat.various_tools import get_bool_query, get_qs_query, string_cleanse
 
@@ -219,9 +221,12 @@ def save_not_found(not_found, percent_merged):
 	dict_w.writerows(not_found)
 	output_file.close()
 
-def start_thread(merchant):
-	stores = load_store_numbers(merchant)
-	run(stores)
+def start_thread(q):
+	while True:
+		merchant = q.get()
+		stores = load_store_numbers(merchant)
+		run(stores)
+		q.task_done()
 
 def process_multiple_merchants():
 	"""Merge in all files within a provided folder"""
@@ -229,23 +234,32 @@ def process_multiple_merchants():
 	dir_name = sys.argv[1]
 	merchant_files = [os.path.join(dir_name, f) for f in os.listdir(dir_name) if f.endswith(".csv")]
 
+	q = Queue(maxsize = 0)
+	num_threads = 12
+
+	for i in range(num_threads):
+		worker = Thread(target=start_thread, args=(q,))
+		worker.setDaemon(True)
+		worker.start()
+
 	# Process Merchants
 	for merchant in merchant_files:
 
 		try:
+			q.put(merchant)
 			# stores = load_store_numbers(merchant)
 			# run(stores)
-			Thread(target = start_thread, args=[merchant]).run()
 		except: 
 			continue
+
+	q.join()
 
 def process_single_merchant():
 	"""Merge in store numbers from a single files"""
 
 	file_name = sys.argv[1]
-	# stores = load_store_numbers(file_name)
-	# run(stores)
-	Thread(target = start_thread, args=[file_name]).run()
+	stores = load_store_numbers(file_name)
+	run(stores)
 
 def verify_arguments():
 	"""Verify Usage"""
