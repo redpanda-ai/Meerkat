@@ -34,6 +34,7 @@ import csv
 import sys
 import json
 import os
+import logging
 
 from scipy.stats.mstats import zscore
 from elasticsearch import Elasticsearch, helpers
@@ -47,7 +48,7 @@ from meerkat.various_tools import get_bool_query, get_qs_query, string_cleanse
 def load_store_numbers(file_name):
 	"""Load Store Numbers from provided file"""
 
-	print("LOADING: ", file_name)
+	logging.info("LOADING: {0}".format(file_name))
 
 	input_file = open(file_name, encoding="utf-8", errors='replace')
 	stores = list(csv.DictReader(input_file, delimiter=","))
@@ -98,9 +99,14 @@ def find_merchant(store):
 	# Allow User to Verify and Return 
 	formatted = [top_hit.get("name", ""), top_hit.get("address", ""), top_hit.get("postcode", ""), top_hit.get("locality", ""), top_hit.get("region", ""),]
 	formatted = ", ".join(formatted)
-	print("Z-Score: ", score)
-	print("Top Result: ", formatted.encode("utf-8"))
-	print("Query Sent: ", search_parts)
+
+	message = """
+		File: {0}
+		Z-Score: {1}
+		Top Result: {2}
+		Query Sent: {3}
+		""".format(store['keywords'], score, formatted.encode("utf-8"), search_parts)
+	# logging.warning(message)
 
 	# Must Match Keywords
 	if not (store["keywords"].lower() in top_hit["name"].lower()):
@@ -110,7 +116,7 @@ def find_merchant(store):
 	if score > 0.95:
 		return top_hit["factual_id"], ""
 
-	return factual_id, formatted
+	return factual_id, formatted, message
 
 def get_hit(search_results, index):
 
@@ -135,7 +141,7 @@ def update_merchant(factual_id, store):
 		#TODO NO HARDCODED INDEX!!!
 		output_data = es_connection.update(index="factual_index", doc_type="factual_type", id=factual_id, body=body)
 	except Exception:
-		print("Failed to Update Merchant")
+		logging.warning("Failed to Update Merchant")
 
 	status = True if output_data.get("_id", "") != "" else False
 
@@ -165,7 +171,7 @@ def run(stores):
 
 		# Find Most Likely Merchant
 		store = stores[i]
-		factual_id, top_result = find_merchant(store)
+		factual_id, top_result, message = find_merchant(store)
 		store['factual_id'] = factual_id
 		store['top_result'] = top_result
 
@@ -173,29 +179,28 @@ def run(stores):
 		if len(factual_id) > 0:
 			status = update_merchant(factual_id, store)
 		else:
-			print("Did Not Merge Store Number ", store["store_number"], " To Index", "\n")
+			logging.warning("{1}Did Not Merge Store Number {0} to Index\n".format(store["store_number"], message))
 			not_found.append(store)
 			continue
 
 		# Save Failed Attempts
 		if status == False:
-			print("Did Not Merge Store Number ", store["store_number"], " To Index")
+			logging.warning("{1}Did Not Merge Store Number {0} to Index".format(store["store_number"], message))
 			not_found.append(store)
 		else:
-			print("Successfully Merged Store Number:", store["store_number"], "into Factual Merchant:", factual_id, "\n")
+			logging.warning("{2}Successfully Merged Store Number: {0} into Factual Merchant: {1}\n".format(store["store_number"], factual_id, message))
 
 	# Show Success Rate
 	misses = len(not_found)
 	hits = total - misses
 	percent_merged = hits / total
 	percent_missed = round((misses / total), 3)
-	print("HITS: ", hits)
-	print("MISSES: ", misses)
-	print("PERCENT MERGED: ", percent_merged)
+	logging.warning("HITS: {0}".format(hits))
+	logging.warning("MISSES: {0}".format(misses))
+	logging.warning("PERCENT MERGED: {0}".format(percent_merged))
 
 	# Save Not Found
 	save_mapping(stores, percent_merged)
-	#save_not_found(not_found, percent_merged)
 
 def save_mapping(stores, percent_merged):
 	"""Saves all results as a mapping file"""
@@ -239,16 +244,15 @@ def process_multiple_merchants():
 
 	for i in range(num_threads):
 		worker = Thread(target=start_thread, args=(q,))
+		worker.name = "Thread %d" % i
 		worker.setDaemon(True)
 		worker.start()
 
 	# Process Merchants
 	for merchant in merchant_files:
-
+		logging.warning("Processing %s" % merchant)
 		try:
 			q.put(merchant)
-			# stores = load_store_numbers(merchant)
-			# run(stores)
 		except: 
 			continue
 
@@ -267,7 +271,7 @@ def verify_arguments():
 	sufficient_arguments = (len(sys.argv) == 2)
 
 	if not sufficient_arguments:
-		print("Insufficient arguments. Please see usage")
+		logging.warning("Insufficient arguments. Please see usage")
 		sys.exit()
 
 	# Single Merchant
@@ -279,7 +283,7 @@ def verify_arguments():
 
 	# Directory of Merchants
 	if not is_directory:
-		print("Improper usage. Please provide a directory of csv files or a single csv")
+		logging.warning("Improper usage. Please provide a directory of csv files or a single csv")
 		sys.exit()
 
 	for f in os.listdir(sys.argv[1]):
@@ -287,7 +291,7 @@ def verify_arguments():
 			return
 
 	# No CSV for Merchant Found
-	print("Improper usage. Please provide at least one csv containing store numbers")
+	logging.warning("Improper usage. Please provide at least one csv containing store numbers")
 	sys.exit()
 
 def run_from_command_line(command_line_arguments):
@@ -301,8 +305,14 @@ def run_from_command_line(command_line_arguments):
 
 if __name__ == "__main__":
 	verify_arguments()
-
 	cluster_nodes = [ "127.0.0.1" ]
-
 	es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True, sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
+	
+	logging.basicConfig(format='%(threadName)s %(asctime)s %(message)s', filename='merging.log', \
+		level = logging.WARNING)
+
+	logging.warning("Beginning log...")
+
 	run_from_command_line(sys.argv)
+
+	logging.shutdown()
