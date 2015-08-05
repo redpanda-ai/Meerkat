@@ -1,5 +1,5 @@
 #!/usr/local/bin/python3.3
-# pylint: disable=all
+# pylint: skip-file
 
 """This module takes a set of merchants with their associated manually
 formatted store numbers. The records are matched against Factual and if a
@@ -36,8 +36,9 @@ import json
 import os
 
 from scipy.stats.mstats import zscore
-from pprint import pprint
 from elasticsearch import Elasticsearch, helpers
+from pprint import pprint
+from threading import Thread
 
 from meerkat.various_tools import get_bool_query, get_qs_query, string_cleanse
 
@@ -218,6 +219,10 @@ def save_not_found(not_found, percent_merged):
 	dict_w.writerows(not_found)
 	output_file.close()
 
+def start_thread(merchant):
+	stores = load_store_numbers(merchant)
+	run(stores)
+
 def process_multiple_merchants():
 	"""Merge in all files within a provided folder"""
 
@@ -228,8 +233,9 @@ def process_multiple_merchants():
 	for merchant in merchant_files:
 
 		try:
-			stores = load_store_numbers(merchant)
-			run(stores)
+			# stores = load_store_numbers(merchant)
+			# run(stores)
+			Thread(target = start_thread, args=[merchant]).run()
 		except: 
 			continue
 
@@ -237,8 +243,9 @@ def process_single_merchant():
 	"""Merge in store numbers from a single files"""
 
 	file_name = sys.argv[1]
-	stores = load_store_numbers(file_name)
-	run(stores)
+	# stores = load_store_numbers(file_name)
+	# run(stores)
+	Thread(target = start_thread, args=[file_name]).run()
 
 def verify_arguments():
 	"""Verify Usage"""
@@ -279,10 +286,9 @@ def run_from_command_line(command_line_arguments):
 		process_multiple_merchants()
 
 if __name__ == "__main__":
-
 	verify_arguments()
 
-	cluster_nodes = [ "172.31.11.39" ]
+	cluster_nodes = [ "127.0.0.1" ]
 
 	es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True, sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
 	run_from_command_line(sys.argv)
