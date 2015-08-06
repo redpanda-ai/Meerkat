@@ -7,6 +7,7 @@ import requests
 import unittest
 
 def web_service_is_online():
+	"""Tests to see if the web service is already online."""
 	try:
 		no = sudo["ps"]["-ef"] | grep["python"] | \
 		grep["root"]| grep ["meerkat.web_service"]
@@ -16,12 +17,13 @@ def web_service_is_online():
 		return False, None
 
 def start_web_service():
+	"""Starts the web service as a background process."""
 	start = sudo[python3["-m"]["meerkat.web_service"]]
 	with local.cwd("/home/ubuntu/git/Meerkat"):
 		(start) & BG
 
 def stop_linux_process(my_pid):
-	"""Stops the meerkat.web_service bou"""
+	"""Stops any linux process with the provided process id (my_pid) """
 	try:
 		kill_process = sudo[kill[my_pid]]
 		kill_process()
