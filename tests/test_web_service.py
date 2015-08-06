@@ -1,52 +1,69 @@
 from plumbum import ProcessExecutionError
 from plumbum import local, BG
 from plumbum.cmd import sudo, kill, grep, python3, sleep
+from requests.exceptions import ConnectionError
+
 import requests
 import unittest
+
+def web_service_is_online():
+	try:
+		no = sudo["ps"]["-ef"] | grep["python"] | \
+		grep["root"]| grep ["meerkat.web_service"]
+		web_service_pid = no().split()[1]
+		return True, web_service_pid
+	except ProcessExecutionError:
+		return False, None
 
 def start_web_service():
 	start = sudo[python3["-m"]["meerkat.web_service"]]
 	with local.cwd("/home/ubuntu/git/Meerkat"):
 		(start) & BG
 
-
-def stop_web_service():
+def stop_linux_process(my_pid):
+	"""Stops the meerkat.web_service bou"""
 	try:
-		no = sudo["ps"]["-ef"] | grep["python"] | grep["root"]| grep ["meerkat.web_service"]
-		number = no().split()[1] 
-		print(number)
-		kill_process = sudo[kill[number]]
+		kill_process = sudo[kill[my_pid]]
 		kill_process()
-		print("web service stopped")
 	except ProcessExecutionError:
-		print("The service was not running, so it couldn't be stopped") 
-	
+		print("Unable to kill, aborting")
+		sys.exit()
+
 def check_status():
+	"""Get a status code (e.g. 200) from the web service"""
 	r = requests.get("https://localhost/status/index.html", verify=False)
 	status = r.status_code
+	r.connection.close()
 	return (status)
 
 class WebServiceTest(unittest.TestCase):
 	"""Our UnitTest class."""
 	
+	def setUp(self):
+		online, web_service_pid = web_service_is_online()
+		if online:
+			stop_linux_process(web_service_pid)
+
+	def tearDown(self):
+		online, web_service_pid = web_service_is_online()
+		if online:
+			stop_linux_process(web_service_pid)
+
 	def test_web_service_status(self):
 		"""Test starts, checks status of, and stops meerkat web service"""
-		
-		#The line below is intended to stop web service in case it is running to prevent an AlreadyInUse error. 
-		#However, this causes a ConnectionResetError (connection reset by peer). 
-		#The line below needs to be included once this issue is resolved.
-		#A possible work around is to try and handle an AlreadyInUse error	
-		
-		#stop_web_service()
-		
 		start_web_service()
-		sleep(3)
-		status = check_status()
-		self.assertTrue(status == 200)
-		stop_web_service()
+		count, sleep_interval, max_retries = 1, 2, 10
+		#Wait for sleep_interval seconds before trying up to
+		#max_retries times
+		while count <= max_retries:
+			try:
+				sleep(sleep_interval)
+				status = check_status()
+				self.assertTrue(status == 200)
+				return
+			except ConnectionError:
+				count += 1
+		return
 
 if __name__ == "__main__":
 	unittest.main()
-	sys.exit()
-
-	
