@@ -436,7 +436,8 @@ def build_user_index():
 		params = json.loads(input_file.read())
 		input_file.close()
 	except IOError:
-		logging.info("config file for user_index not found. Continuing on to factual index")
+		logging.info("config file for user_index not found." + \
+		" Continuing on to factual index")
 		return
 
 	# Initialize

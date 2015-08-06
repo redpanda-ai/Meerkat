@@ -53,34 +53,36 @@ def generic_test(machine, human, lists, column):
 		index_lookup[key] = index
 
 	# Test Each Machine Labeled Row
-	for index, mRow in enumerate(machine):
+	for index, machine_row in enumerate(machine):
 
 		# Display progress
 		progress(index, machine, message="complete with accuracy tests")
 
 		# Continue if Unlabeled
-		if mRow[column] == "":
-			lists["unlabeled"].append(mRow[doc_label])
+		if machine_row[column] == "":
+			lists["unlabeled"].append(machine_row[doc_label])
 			continue
 
 		# Verify Accuracy
-		key = str(mRow["UNIQUE_MEM_ID"]) + mRow[doc_label]
+		key = str(machine_row["UNIQUE_MEM_ID"]) + machine_row[doc_label]
 		h_index = index_lookup.get(key, "")
 
 		# Sort Into Lists
 		if h_index == "":
-			lists["needs_hand_labeling"].append(mRow[doc_label])
+			lists["needs_hand_labeling"].append(machine_row[doc_label])
 			continue
 		else: 
-			hRow = human[h_index]
-			if hRow[column] == "":
-				lists["needs_hand_labeling"].append(mRow[doc_label])
+			human_row = human[h_index]
+			if human_row[column] == "":
+				lists["needs_hand_labeling"].append(machine_row[doc_label])
 				continue
-			elif mRow[column] == hRow[column]:
-				lists["correct"].append(hRow[doc_label] + " (ACTUAL:" + hRow[column] + ")")
+			elif machine_row[column] == human_row[column]:
+				lists["correct"].append(human_row[doc_label] + \
+				" (ACTUAL:" + human_row[column] + ")")
 				continue
 			else:
-				lists["mislabeled"].append(hRow[doc_label] + " (ACTUAL: " + hRow[column] + ")" + " (FOUND: " + mRow[column] + ")")
+				lists["mislabeled"].append(human_row[doc_label] + " (ACTUAL: " \
+ 				+ human_row[column] + ")" + " (FOUND: " + machine_row[column] + ")")
 				continue
 
 def test_bulk_classifier(human_labeled, non_physical_trans, my_lists):

@@ -1,0 +1,4 @@
+transaction_id|description|amount|ledger_entry|date
+1|Safeway #12, 742 El Camino Real, Sunnyvale CA|151.23|credit|2014-04-01
+2|Bank Transfer|100.00|debit|2014-04-03
+3|Amazon.com|47.99|credit|2014-04-03

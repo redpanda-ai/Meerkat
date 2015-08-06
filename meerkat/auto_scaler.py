@@ -46,7 +46,8 @@ def confirm_security_groups(conn, params):
 		logging.debug("All pre-existing groups found, continuing")
 	if not new_group_found:
 		logging.critical("Supply the following arguments: config_file, cluster-name")
-		raise SecurityGroupNotFound(msg="Cannot proceed without a valid Security Group", expr=None)
+		raise SecurityGroupNotFound(msg=\
+		"Cannot proceed without a valid Security Group", expr=None)
 	for group in all_groups:
 		logging.debug(group)
 	params["all_security_groups"] = all_groups
@@ -75,7 +76,8 @@ def get_cluster_health(params):
 		#3. Process the es_health
 		status = es_health["status"]
 		number_of_nodes = es_health["number_of_nodes"]
-		# target_nodes = len(params["ec2_on_slave"]) + len(params["permanent_instances"])
+		# target_nodes = len(params["ec2_on_slave"]) +\
+		# len(params["permanent_instances"])
 		return status, number_of_nodes
 
 def get_cluster_metrics(params):
@@ -165,14 +167,18 @@ def get_judgment(params, metrics):
 	#Rules
 	rules = params["scaling_rules"]
 	#EC2 metrics
-	ec2_on_slave, ec2_off_slave = len(params["ec2_on_slave"]), len(params["ec2_off_slave"])
+	ec2_on_slave = len(params["ec2_on_slave"])
+	ec2_off_slave = len(params["ec2_off_slave"])
 	#ES metrics
 	cpu, queue = metrics["highest_cpu"], metrics["highest_queue"]
 
 	#Lambda functions to create words for decision logic
-	underloaded = lambda: (cpu <= rules["down"]["cpu"]) and (queue <= rules["down"]["search_queue"])
-	overloaded = lambda: (cpu >= rules["up"]["cpu"]) and (queue >= rules["up"]["search_queue"])
-	room_to_shrink = lambda: len(params["ec2_on_slave"]) >= params["nodes"]["minimum"]
+	underloaded = lambda: (cpu <= rules["down"]["cpu"]) and\
+	 (queue <= rules["down"]["search_queue"])
+	overloaded = lambda: (cpu >= rules["up"]["cpu"]) and\
+	 (queue >= rules["up"]["search_queue"])
+	room_to_shrink = \
+	lambda: len(params["ec2_on_slave"]) >= params["nodes"]["minimum"]
 	room_to_grow = lambda: len(params["ec2_off_slave"]) > 0
 
 	#Make a judgment about whether to scale up, scale down, or do nothing
@@ -211,8 +217,10 @@ def refresh_ec2_metrics(params, ec2_conn):
 				filtered_instances.append(instance)
 				break
 	#Filtered instances not in master_instances
-	instances = [i for i in filtered_instances if i.id not in params["master_instances"]]
-	perm = [i for i in filtered_instances if i.id in params["master_instances"]]
+	instances = \
+	[i for i in filtered_instances if i.id not in params["master_instances"]]
+	perm = [i for i in filtered_instances if i.id in params[\
+	"master_instances"]]
 	params["permanent_instances"] = perm
 	#Number of ec2 nodes that are running
 	params["ec2_on_slave"] = [i for i in instances if i.state == 'running']
