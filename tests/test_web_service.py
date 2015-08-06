@@ -25,8 +25,7 @@ def start_web_service():
 def stop_linux_process(my_pid):
 	"""Stops any linux process with the provided process id (my_pid) """
 	try:
-		kill_process = sudo[kill[my_pid]]
-		kill_process()
+		sudo[kill[my_pid]]()
 	except ProcessExecutionError:
 		print("Unable to kill, aborting")
 		sys.exit()
