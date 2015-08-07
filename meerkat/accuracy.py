@@ -97,7 +97,7 @@ def generic_test(machine, human, lists, column):
 			continue
 
 		# Verify Accuracy
-		key = str(row["UNIQUE_TRANSACTION_ID"])
+		key = str(machine_row["UNIQUE_TRANSACTION_ID"])
 		h_index = index_lookup.get(key, "")
 
 		# Sort Into Lists
@@ -284,7 +284,7 @@ def process_file_collection(bucket, prefix, classifier):
 	params["label_key"] = "MERCHANT_NAME"
 	results = open("data/output/per_merchant_tests_" + prefix.split('/')[-2] + ".csv", "a")
 	writer = csv.writer(results, delimiter = ',', quotechar = '"')
-	writer.writerow(["Merchant", "Accuracy"])
+	writer.writerow(["Merchant", "Recall", "Precision"])
 
 	for label_num in label_map.keys():
 
@@ -295,7 +295,6 @@ def process_file_collection(bucket, prefix, classifier):
 		sample.get_contents_to_filename(file_name)
 
 		df = pd.read_csv(file_name, na_filter=False, compression="gzip", quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
-		df = df.rename(columns = {'DESCRIPTION':'DESCRIPTION_UNMASKED'})
 		df["MERCHANT_NAME"] = merchant_name
 		unzipped_file_name = "data/misc/Merchant Samples/" + label_num + ".txt"
 		df.to_csv(unzipped_file_name, sep="|", mode="w", encoding="utf-8", index=False, index_label=False)
@@ -304,8 +303,7 @@ def process_file_collection(bucket, prefix, classifier):
 		params["verification_source"] = unzipped_file_name
 		print("Testing Merchant: " + merchant_name)
 		accuracy_results = per_merchant_accuracy(params, classifier)
-		pure_accuracy = (accuracy_results['total_recall'] / 100) * (accuracy_results["precision"] / 100)
-		writer.writerow([merchant_name, pure_accuracy])
+		writer.writerow([merchant_name, accuracy_results['total_recall'], accuracy_results["precision"]])
 		safely_remove_file(unzipped_file_name)
 
 	results.close()
