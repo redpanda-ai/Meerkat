@@ -166,11 +166,8 @@ def save_cross_fold_results(d0_top_score, d0_results, d1_top_score, d1_results):
 	pprint("d1 as Training Data - Score of d0 on this set of hyperparameters:", record)
 	pprint(d0_results, record)
 
-#def run_meerkat(params, desc_queue, hyperparameters):
 def run_meerkat(params, dataset)
 	"""Run meerkat on a set of transactions"""
-	# Convert queue to list
-	#result_list = queue_to_list(result_queue)
 	
 	result_list = []
 	n = (len(dataset))/1000
@@ -285,8 +282,6 @@ def get_initial_values(hyperparameters, params, known, dataset):
 
 		# Run Classifier
 		accuracy = run_classifier(randomized_hyperparameters, params, dataset)
-		#Ensure that dataset is reformatted after every call to classifier because classifiction modifies data
-		#dataset = update_format_web_consumer(dataset)
 		precision = accuracy["precision"]
 		recall = accuracy["total_recall_physical"]
 		same_or_higher_precision = precision >= top_score["precision"]
@@ -450,7 +445,7 @@ def run_classifier(hyperparameters, params, dataset):
 
 	consumer.update_hyperparams(hyperparameters)
 	#accuracy = run_meerkat(params, desc_queue, hyperparameters)
-	accuracy = run_meerkat(params,desc_queue)
+	accuracy = run_meerkat(params,dataset)
 	return accuracy
 
 def add_local_params(params):
@@ -462,11 +457,11 @@ def add_local_params(params):
 
 	params["optimization"]["settings"] = {
 		"folds": 1,
-		"initial_search_space": 25,
+		"initial_search_space": 2,
 		"initial_learning_rate": 0.25,
-		"iteration_search_space": 15,
+		"iteration_search_space": 2,
 		"iteration_learning_rate": 0.1,
-		"gradient_descent_iterations": 10,
+		"gradient_descent_iterations": 2,
 		"max_precision": 97.5,
 		"min_recall": 31
 	}
@@ -548,7 +543,7 @@ def run_from_command_line(command_line_arguments):
 	}
 
 	dataset = load_dataset(params)
-	dataset = format_web_consumer(dataset)
+	#dataset = format_web_consumer(dataset)
 	
 	# Use all data or Cross Validate
 	if params["optimization"]["settings"]["folds"] == 1:
