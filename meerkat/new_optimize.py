@@ -51,6 +51,43 @@ from meerkat.various_tools import load_params, load_hyperparameters, progress
 
 CITIES = get_us_cities()
 
+#CONSTANTS
+USED_IN_HEADER, ORIGIN, NAME_IN_MEERKAT, NAME_IN_ORIGIN = 0, 1, 2, 3
+
+def get_field_mappings(params):
+	"""Returns a list of field_mappings."""
+	return [[x[NAME_IN_ORIGIN], x[NAME_IN_MEERKAT]]
+		for x in get_unified_header(params)
+		if (x[ORIGIN] == "search") and (x[NAME_IN_MEERKAT] != x[NAME_IN_ORIGIN])]
+
+def get_meerkat_fields(params):
+	"""Return a list of meerkat fields to add to the panel output."""
+	return [x[NAME_IN_MEERKAT]
+		for x in get_unified_header(params)
+		if (x[USED_IN_HEADER] == True) and (x[ORIGIN] == "search")]
+
+def get_column_map(params):
+	"""Fix old or erroneous column names"""
+	container = params["container"].upper()
+	column_mapping_list = [
+		(x[NAME_IN_ORIGIN], x[NAME_IN_MEERKAT].replace("__BLANK", container))
+		for x in get_unified_header(params)
+		if (x[ORIGIN] == "input") and (x[NAME_IN_MEERKAT] != x[NAME_IN_ORIGIN])]
+	column_map = {}
+	for name_in_origin, name_in_meerkat in column_mapping_list:
+		column_map[name_in_origin] = name_in_meerkat
+	return column_map
+
+def get_panel_header(params):
+	"""Return an ordered consistent header for panels"""
+	return [
+		x[NAME_IN_MEERKAT].replace("__BLANK", params["container"].upper())
+		for x in get_unified_header(params)]
+
+def get_unified_header(params):
+	"""Return the unified_header object, minus the first row."""
+	return params["my_producer_options"]["unified_header"][1:]
+
 class RandomDisplacementBounds(object):
     """random displacement with bounds"""
     def __init__(self, xmin, xmax, stepsize=0.5):
