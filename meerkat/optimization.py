@@ -41,7 +41,6 @@ from random import randint, uniform, random, shuffle
 from pprint import pprint
 from numpy import array, array_split
 
-from meerkat.file_consumer import FileConsumer
 from meerkat.classification.load import select_model
 from meerkat.accuracy import print_results, vest_accuracy
 from meerkat.various_tools import load_dict_list, queue_to_list, safe_print, get_us_cities
@@ -145,8 +144,8 @@ def cross_validate(top_score, dataset):
 	# Run Classifier
 	print("\n", "CROSS VALIDATE", "\n")
 	desc_queue = get_desc_queue(dataset)
-	accuracy = run_meerkat(params, desc_queue, hyperparameters)
-
+	#accuracy = run_meerkat(params, desc_queue, hyperparameters)
+	accuracy = run_meerkat(params, desc_queue)
 	return accuracy
 
 def save_cross_fold_results(d0_top_score, d0_results, d1_top_score, d1_results):
@@ -167,32 +166,33 @@ def save_cross_fold_results(d0_top_score, d0_results, d1_top_score, d1_results):
 	pprint("d1 as Training Data - Score of d0 on this set of hyperparameters:", record)
 	pprint(d0_results, record)
 
-def run_meerkat(params, desc_queue, hyperparameters):
+#def run_meerkat(params, desc_queue, hyperparameters):
+def run_meerkat(params, desc_queue)
 	"""Run meerkat on a set of transactions"""
 
-	consumer_threads = params.get("concurrency", 8)
+	#consumer_threads = params.get("concurrency", 8)
 	result_queue = queue.Queue()
-	cities = get_us_cities()
+	#cities = get_us_cities()
 
 	# Suppress Output and Classify
-	for i in range(consumer_threads):
-		new_consumer = FileConsumer(i, params, desc_queue, result_queue, hyperparameters, cities)
-		new_consumer.setDaemon(True)
-		new_consumer.start()
+	#for i in range(consumer_threads):
+	#	new_consumer = FileConsumer(i, params, desc_queue, result_queue, hyperparameters, cities)
+	#	new_consumer.setDaemon(True)
+	#	new_consumer.start()
 
 	# Progress 
-	qsize = desc_queue.qsize()
-	total = range(qsize)
+	#qsize = desc_queue.qsize()
+	#total = range(qsize)
 
-	while qsize > 0:
-		if qsize == desc_queue.qsize():
-			continue
-		else:
-			qsize = desc_queue.qsize()
-			if params["mode"] == "train" or params["mode"] == "test":
-				progress((len(total) - qsize), total, message="complete with current iteration")
+	#while qsize > 0:
+	#	if qsize == desc_queue.qsize():
+	#		continue
+	#	else:
+	#		qsize = desc_queue.qsize()
+	#		if params["mode"] == "train" or params["mode"] == "test":
+	#			progress((len(total) - qsize), total, message="complete with current iteration")
 
-	desc_queue.join()
+	#desc_queue.join()
 
 	# Convert queue to list
 	result_list = queue_to_list(result_queue)
@@ -230,6 +230,11 @@ def randomized_optimization(hyperparameters, known, params, dataset):
 	Runs the classifier a fixed number of times and
 	provides the top score found"""
 
+	#Update values stored in params, hyperparams, cities fields of Web_Consumer object 'consumer'
+	consumer.update_params(params)
+	cities = get_us_cities()
+	consumer.update_cities(cities)
+	
 	# Init
 	base_name = os.path.splitext(os.path.basename(sys.argv[1]))[0]
 	initial_values = get_initial_values(hyperparameters, params, known, dataset)
@@ -448,10 +453,9 @@ def run_classifier(hyperparameters, params, dataset):
 	hyperparameters["boost_labels"] = boost_labels
 	hyperparameters["boost_vectors"] = boost_vectors
 
-	# Run Classifier with new Hyperparameters. Suppress Output
-	desc_queue = get_desc_queue(dataset)
-	accuracy = run_meerkat(params, desc_queue, hyperparameters)
-
+	consumer.update_hyperparams(hyperparameters)
+	#accuracy = run_meerkat(params, desc_queue, hyperparameters)
+	accuracy = run_meerkat(params,desc_queue)
 	return accuracy
 
 def add_local_params(params):
