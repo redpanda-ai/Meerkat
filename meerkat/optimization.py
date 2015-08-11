@@ -83,7 +83,7 @@ def get_panel_header(params):
 
 def get_unified_header(params):
 	"""Return the unified_header object, minus the first row."""
-	return params["my_producer_options"]["unified_header"][1:]
+	return params["unified_header"][1:]
 
 class DummyFile(object):
     def write(self, x): pass
@@ -526,7 +526,7 @@ def run_from_command_line(command_line_arguments):
 	params = load_params(sys.argv[1])
 	
 	#HACK to work with file_consumer
-	params["my_producer_options"]["field_mappings"] = get_field_mappings(params)
+	params["field_mappings"] = get_field_mappings(params)
 	
 	# Add Local Params
 	add_local_params(params)
