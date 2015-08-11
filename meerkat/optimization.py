@@ -46,9 +46,10 @@ from meerkat.classification.load import select_model
 from meerkat.accuracy import print_results, vest_accuracy
 from meerkat.various_tools import load_dict_list, queue_to_list, safe_print, get_us_cities
 from meerkat.various_tools import load_params, load_hyperparameters, progress
-
+from meerkat.web_service.web_consumer import Web_Consumer
 #CONSTANTS
 USED_IN_HEADER, ORIGIN, NAME_IN_MEERKAT, NAME_IN_ORIGIN = 0, 1, 2, 3
+consumer = Web_Consumer()
 
 def get_field_mappings(params):
 	"""Returns a list of field_mappings."""
