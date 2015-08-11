@@ -16,7 +16,7 @@ Created on March 16, 2014
 
 #import sys
 
-import pylab as pl
+#import pylab as pl
 import numpy as np
 #import matplotlib.pyplot as plt
 
