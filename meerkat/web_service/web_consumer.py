@@ -58,7 +58,17 @@ class Web_Consumer():
 
 		self.type_hierarchy = load_params\
 		("meerkat/classification/label_maps/type_subtype_hierarchy.json")
+	
+	def update_params(self, params):
+		self.params = params
+		self.es = get_es_connection(params)
 
+	def update_hyperparams(self, hyperparams):
+		self.hyperparams = hyperparams
+	
+	def update_cities(self, cities):
+		self.cities = cities
+	
 	def __get_query(self, transaction):
 		"""Create an optimized query"""
 
