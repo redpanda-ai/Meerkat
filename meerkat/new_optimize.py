@@ -283,7 +283,10 @@ def run_from_command_line(command_line_arguments):
 	verify_arguments()
 	params = load_params(sys.argv[1])
 	params["label_key"] = "FACTUAL_ID"
-
+	
+	#HACK to work with file_consumer
+	params["my_producer_options"]["field_mappings"] = get_field_mappings(params)
+	
 	# Add Local Params
 	add_local_params(params)
 
