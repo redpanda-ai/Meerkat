@@ -300,7 +300,7 @@ class Web_Consumer():
 		# Add or Modify Fields
 		for trans in physical:
 			categories = trans.get("category_labels", "")
-			categories = json.loads(categories) if (categories != "") else []
+			categories = json.loads(categories) if (categories != "" and categories != []) else []
 			trans["category_labels"] = categories
 
 		# Combine Transactions
