@@ -144,9 +144,8 @@ def cross_validate(top_score, dataset):
 
 	# Run Classifier
 	print("\n", "CROSS VALIDATE", "\n")
-	desc_queue = get_desc_queue(dataset)
 	#accuracy = run_meerkat(params, desc_queue, hyperparameters)
-	accuracy = run_meerkat(params, desc_queue)
+	accuracy = run_meerkat(params, dataset)
 	return accuracy
 
 def save_cross_fold_results(d0_top_score, d0_results, d1_top_score, d1_results):
@@ -168,11 +167,11 @@ def save_cross_fold_results(d0_top_score, d0_results, d1_top_score, d1_results):
 	pprint(d0_results, record)
 
 #def run_meerkat(params, desc_queue, hyperparameters):
-def run_meerkat(params, desc_queue)
+def run_meerkat(params, dataset)
 	"""Run meerkat on a set of transactions"""
 
 	#consumer_threads = params.get("concurrency", 8)
-	result_queue = queue.Queue()
+	#result_queue = queue.Queue()
 	#cities = get_us_cities()
 
 	# Suppress Output and Classify
@@ -196,8 +195,9 @@ def run_meerkat(params, desc_queue)
 	#desc_queue.join()
 
 	# Convert queue to list
-	result_list = queue_to_list(result_queue)
-
+	#result_list = queue_to_list(result_queue)
+	result = consumer.classify(dataset)
+	result_list - result["transaction_list"]
 	# Test Accuracy
 	accuracy_results = vest_accuracy(params, result_list=result_list)
 	print_results(accuracy_results)
