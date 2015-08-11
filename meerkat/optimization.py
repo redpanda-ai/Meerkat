@@ -286,7 +286,7 @@ def get_initial_values(hyperparameters, params, known, dataset):
 		# Run Classifier
 		accuracy = run_classifier(randomized_hyperparameters, params, dataset)
 		#Ensure that dataset is reformatted after every call to classifier because classifiction modifies data
-		dataset = update_format_web_consumer(dataset)
+		#dataset = update_format_web_consumer(dataset)
 		precision = accuracy["precision"]
 		recall = accuracy["total_recall_physical"]
 		same_or_higher_precision = precision >= top_score["precision"]
