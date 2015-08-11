@@ -35,6 +35,7 @@ import queue
 import csv
 import collections
 import contextlib
+import json
 from copy import deepcopy
 from random import randint, uniform, random, shuffle
 
@@ -292,6 +293,8 @@ def get_initial_values(hyperparameters, params, known, dataset):
 
 		# Run Classifier
 		accuracy = run_classifier(randomized_hyperparameters, params, dataset)
+		#Ensure that dataset is reformatted after every call to classifier because classifiction modifies data
+		dataset = update_format_web_consumer(dataset)
 		precision = accuracy["precision"]
 		recall = accuracy["total_recall_physical"]
 		same_or_higher_precision = precision >= top_score["precision"]
@@ -489,6 +492,31 @@ def verify_arguments():
 	# Clear Contents from Previous Runs
 	#open("optimization_results/" + os.path.splitext(os.path.basename(sys.argv[1]))[0] + '_top_scores.txt', 'w').close()
 
+def format_web_consumer(dataset):
+	
+	formatted = json.load(open("meerkat/web_service/example_input.json", "r"))
+	formatted["transaction_list"] = dataset
+	trans_id = 1
+	for trans in formatted["transaction_list"]:
+		trans["transaction_id"] = trans_id
+		trans_id = trans_is +1
+		trans["description"] = trans["DESCRIPTION_UNMASKED"]
+		trans["amount"] = TRANS["AMOUNT"]
+		trans["date"] = trans["DATE"]
+		trans["ledger_entry"] = "credit"
+	
+	return formatted
+
+def update_format_web_consumer(dataset):
+	
+	for trans in dataset["transaction_list"]:
+		trans["description"] = trans["DESCRIPTION_UNMASKED"]
+		trans["amount"] = trans["AMOUNT"]
+		trans["date"] = trans["TRANSACTION_DATE"]
+		trans["ledger_entry"] = "credit"
+
+	return dataset
+
 def run_from_command_line(command_line_arguments):
 	"""Runs these commands if the module is invoked from the command line"""
 
@@ -528,7 +556,8 @@ def run_from_command_line(command_line_arguments):
 	}
 
 	dataset = load_dataset(params)
-
+	dataset = format_web_consumer(dataset)
+	
 	# Use all data or Cross Validate
 	if params["optimization"]["settings"]["folds"] == 1:
 		randomized_optimization(hyperparameters, known, params, dataset)
