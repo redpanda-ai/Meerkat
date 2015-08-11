@@ -182,6 +182,7 @@ def run_meerkat(params, dataset):
 				print(i)
 				break
 
+		print("---Batch---")
 		batch_in = format_web_consumer(batch)
 		batch_result = consumer.classify(batch_in)
 		result_list.extend(batch_result["transaction_list"])

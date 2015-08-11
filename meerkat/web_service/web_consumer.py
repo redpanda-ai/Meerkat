@@ -111,12 +111,12 @@ class Web_Consumer():
 		index = self.params["elasticsearch"]["index"]
 		# pprint(queries)
 
-		try:
+#		try:
 			# pull routing out of queries and append to below msearch
 
-			results = self.es.msearch(queries, index=index)
-		except Exception:
-			return None
+		results = self.es.msearch(queries, index=index)
+#		except Exception:
+#			return None
 
 		return results
 
