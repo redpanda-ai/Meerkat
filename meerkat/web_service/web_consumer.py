@@ -37,15 +37,27 @@ class Web_Consumer():
 	"""Acts as a web service client to process and enrich
 	transactions in real time"""
 
-	def __init__(self, params, hyperparams, cities):
+	def __init__(self, params=None, hyperparams=None, cities=None):
 		"""Constructor"""
+		
+		if params is None:
+			self.params = dict()
+		else:
+			self.params = params
+			self.es = get_es_connection(params)
+
+		if hyperparams is None:
+			self.hyperparams = dict()
+		else:
+			self.hyperparams = hyperparams
+		
+		if cities is None:
+			self.cities = dict()
+		else:
+			self.cities = cities
 
 		self.type_hierarchy = load_params\
 		("meerkat/classification/label_maps/type_subtype_hierarchy.json")
-		self.params = params
-		self.hyperparams = hyperparams
-		self.cities = cities
-		self.es = get_es_connection(params)
 
 	def __get_query(self, transaction):
 		"""Create an optimized query"""
