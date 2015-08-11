@@ -291,7 +291,7 @@ def process_file_collection(bucket, prefix, classifier):
 		merchant_name = label_map.get(label_num, "not_found")
 		sample = bucket.get_key(prefix + label_num + ".txt.gz")
 		if sample == None: continue
-		file_name = "data/misc/Merchant Samples/" + os.path.basename(sample.key)
+		file_name = "data/input/" + os.path.basename(sample.key)
 		sample.get_contents_to_filename(file_name)
 
 		df = pd.read_csv(file_name, na_filter=False, compression="gzip", quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
