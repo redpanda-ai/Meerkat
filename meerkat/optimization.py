@@ -166,14 +166,14 @@ def save_cross_fold_results(d0_top_score, d0_results, d1_top_score, d1_results):
 	pprint("d1 as Training Data - Score of d0 on this set of hyperparameters:", record)
 	pprint(d0_results, record)
 
-def run_meerkat(params, dataset)
+def run_meerkat(params, dataset):
 	"""Run meerkat on a set of transactions"""
 	
 	result_list = []
 	n = (len(dataset))/1000
 	n = int(n - (n%1))
 	new_transaction_list = []
-	for x in range (0, n+1)
+	for x in range (0, n+1):
 		batch = []
 		for i in range(x*1000, (x*1000 + 1000)):
 			try:
@@ -486,10 +486,10 @@ def format_web_consumer(dataset):
 	trans_id = 1
 	for trans in formatted["transaction_list"]:
 		trans["transaction_id"] = trans_id
-		trans_id = trans_is +1
+		trans_id = trans_id +1
 		trans["description"] = trans["DESCRIPTION_UNMASKED"]
-		trans["amount"] = TRANS["AMOUNT"]
-		trans["date"] = trans["DATE"]
+		trans["amount"] = trans["AMOUNT"]
+		trans["date"] = trans["TRANSACTION_DATE"]
 		trans["ledger_entry"] = "credit"
 	
 	return formatted

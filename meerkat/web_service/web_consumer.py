@@ -140,7 +140,6 @@ class Web_Consumer():
 		hyperparams = self.hyperparams
 		field_names = params["output"]["results"]["fields"]
 
-		pprint(results)
 		# Must be at least one result
 		if results["hits"]["total"] == 0:
 			transaction = self.__no_result(transaction)
@@ -353,7 +352,6 @@ class Web_Consumer():
 				queries.append({"index" : index})
 			queries.append(query)
 
-		pprint(queries)
 		queries = '\n'.join(map(json.dumps, queries))
 		results = self.__search_index(queries)
 
