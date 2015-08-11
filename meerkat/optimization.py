@@ -169,35 +169,27 @@ def save_cross_fold_results(d0_top_score, d0_results, d1_top_score, d1_results):
 #def run_meerkat(params, desc_queue, hyperparameters):
 def run_meerkat(params, dataset)
 	"""Run meerkat on a set of transactions"""
-
-	#consumer_threads = params.get("concurrency", 8)
-	#result_queue = queue.Queue()
-	#cities = get_us_cities()
-
-	# Suppress Output and Classify
-	#for i in range(consumer_threads):
-	#	new_consumer = FileConsumer(i, params, desc_queue, result_queue, hyperparameters, cities)
-	#	new_consumer.setDaemon(True)
-	#	new_consumer.start()
-
-	# Progress 
-	#qsize = desc_queue.qsize()
-	#total = range(qsize)
-
-	#while qsize > 0:
-	#	if qsize == desc_queue.qsize():
-	#		continue
-	#	else:
-	#		qsize = desc_queue.qsize()
-	#		if params["mode"] == "train" or params["mode"] == "test":
-	#			progress((len(total) - qsize), total, message="complete with current iteration")
-
-	#desc_queue.join()
-
 	# Convert queue to list
 	#result_list = queue_to_list(result_queue)
-	result = consumer.classify(dataset)
-	result_list - result["transaction_list"]
+	
+	result_list = []
+	n = (len(dataset))/1000
+	n = int(n - (n%1))
+	new_transaction_list = []
+	for x in range (0, n+1)
+		batch = []
+		for i in range(x*1000, (x*1000 + 1000)):
+			try:
+				batch.append(dataset[i])
+			except IndexError:
+				print(i)
+				break
+
+		batch_in = format_web_consumer(batch)
+		batch_result = consumer.classify(batch_in)
+		result_list.extend(batch_result["transaction_list"])
+
+
 	# Test Accuracy
 	accuracy_results = vest_accuracy(params, result_list=result_list)
 	print_results(accuracy_results)
