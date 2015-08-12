@@ -189,6 +189,7 @@ def run_meerkat(params, dataset):
 
 
 	# Test Accuracy
+	print("RESULTS -___")
 	pprint(result_list)
 	accuracy_results = vest_accuracy(params, result_list=result_list)
 	print_results(accuracy_results)
