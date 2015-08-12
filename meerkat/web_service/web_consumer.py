@@ -351,9 +351,8 @@ class Web_Consumer():
 			except IndexError:
 				queries.append({"index" : index})
 			queries.append(query)
-			pprint(query)
-			print("-_-_-_-")
 
+		pprint(queries)
 		queries = '\n'.join(map(json.dumps, queries))
 		results = self.__search_index(queries)
 
