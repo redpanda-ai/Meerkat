@@ -147,6 +147,7 @@ def vest_accuracy(params, file_path=None, non_physical_trans=None,\
 	# Test Classifier for recall and precision
 	label_key = params.get("label_key", "FACTUAL_ID")
 	generic_test(machine_labeled, human_labeled, my_lists, label_key)
+	print("MY_LIST_ACCURACY")
 	pprint(my_lists)
 	# Test Bulk (binary) Classifier for accuracy
 	#test_bulk_classifier(human_labeled, non_physical_trans, my_lists)
