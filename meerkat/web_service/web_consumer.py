@@ -352,7 +352,6 @@ class Web_Consumer():
 				queries.append({"index" : index})
 			queries.append(query)
 
-		pprint(queries)
 		queries = '\n'.join(map(json.dumps, queries))
 		results = self.__search_index(queries)
 
