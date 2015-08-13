@@ -116,7 +116,8 @@ class Web_Consumer():
 		hyperparams = self.hyperparams
 		field_names = params["output"]["results"]["fields"]
 
-		pprint(results)
+		#pprint(results)
+
 		# Must be at least one result
 		if results["hits"]["total"] == 0:
 			transaction = self.__no_result(transaction)
@@ -329,7 +330,8 @@ class Web_Consumer():
 				queries.append({"index" : index})
 			queries.append(query)
 
-		pprint(queries)
+		#pprint(queries)
+
 		queries = '\n'.join(map(json.dumps, queries))
 		results = self.__search_index(queries)
 
@@ -385,13 +387,15 @@ class Web_Consumer():
 		for i, batch in enumerate(batches):
 			processed += SUBTYPE_CNN(batch, label_key="subtype_CNN")
 
+		processed = processed[0:len(transactions)]
+
 		for t in processed:
 			txn_type, txn_sub_type = t["subtype_CNN"].split(" - ")
-			trans["txn_type"] = txn_type
-			trans["txn_sub_type"] = txn_sub_type
+			t["txn_type"] = txn_type
+			t["txn_sub_type"] = txn_sub_type
 			del t["subtype_CNN"]
 
-		return processed[0:len(transactions)]
+		return processed
 
 	def __apply_locale_bloom(self, data, transactions):
 		""" Apply the locale bloom filter to transactions"""
