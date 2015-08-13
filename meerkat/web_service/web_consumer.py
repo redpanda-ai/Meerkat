@@ -40,7 +40,6 @@ class Web_Consumer():
 	def __init__(self, params, hyperparams, cities):
 		"""Constructor"""
 
-		self.subtype_map = load_params("meerkat/classification/label_maps/subtype_label_map.json")
 		self.params = params
 		self.hyperparams = hyperparams
 		self.cities = cities
@@ -387,7 +386,7 @@ class Web_Consumer():
 			processed += SUBTYPE_CNN(batch, label_key="subtype_CNN")
 
 		for t in processed:
-			txn_type, txn_sub_type = self.subtype_map[str(t["subtype_CNN"])].split(" - ")
+			txn_type, txn_sub_type = t["subtype_CNN"].split(" - ")
 			trans["txn_type"] = txn_type
 			trans["txn_sub_type"] = txn_sub_type
 			del t["subtype_CNN"]
