@@ -387,7 +387,7 @@ class Web_Consumer():
 			processed += SUBTYPE_CNN(batch, label_key="subtype_CNN")
 
 		for t in processed:
-			txn_type, txn_sub_type = t["subtype_CNN"].split(" - ")
+			txn_type, txn_sub_type = self.subtype_map[str(t["subtype_CNN"])].split(" - ")
 			trans["txn_type"] = txn_type
 			trans["txn_sub_type"] = txn_sub_type
 			del t["subtype_CNN"]
