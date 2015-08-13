@@ -28,7 +28,7 @@ BANK_SWS = select_model("bank")
 CARD_SWS = select_model("card")
 BANK_CNN = get_CNN("bank")
 CARD_CNN = get_CNN("card")
-SUBTYPE_CNN = get_CNN("card")
+SUBTYPE_CNN = get_CNN("subtype")
 
 def grouper(iterable):
 	return zip_longest(*[iter(iterable)]*128, fillvalue={"description":""})
