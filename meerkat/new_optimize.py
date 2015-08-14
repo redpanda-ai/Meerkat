@@ -34,6 +34,7 @@ import datetime
 import os
 import queue
 import csv
+import logging
 import collections
 import contextlib
 from copy import deepcopy
@@ -46,7 +47,7 @@ from scipy.optimize import minimize, brute, basinhopping
 
 from meerkat.web_service.web_consumer import Web_Consumer
 from meerkat.classification.load import select_model
-from meerkat.accuracy import print_results, vest_accuracy
+from meerkat.accuracy import log_results, vest_accuracy
 from meerkat.various_tools import load_dict_list, queue_to_list, safe_print, get_us_cities
 from meerkat.various_tools import load_params, load_hyperparameters, progress
 
@@ -163,26 +164,26 @@ def run_meerkat(params, dataset):
 	#result_list = queue_to_list(result_queue)
 
 	result_list = []
-	n = (len(dataset))/1000
+	n = (len(dataset))/50
 	n = int(n - (n%1))
 	new_transaction_list = []
 	for x in range (0, n+1):
 		batch = []
-		for i in range(x*1000, (x*1000 + 1000)):
+		for i in range(x*50, (x*50 + 50)):
 			try:
 				batch.append(dataset[i])
 			except IndexError:
-				print(i)
 				break
 
-		print("---Batch---")
+		logging.warning("---Batch---")
+		logging.warning("Batch number: {0}".format(x))
 		batch_in = format_web_consumer(batch)
 		batch_result = consumer.classify(batch_in)
 		result_list.extend(batch_result["transaction_list"])
 
 	# Test Accuracy
 	accuracy_results = vest_accuracy(params, result_list=result_list)
-	print_results(accuracy_results)
+	log_results(accuracy_results)
 
 	return accuracy_results
 
