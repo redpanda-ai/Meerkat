@@ -399,7 +399,7 @@ def run_from_command_line(command_line_arguments):
 
 	take_step = RandomDisplacementBounds(xmin, xmax, 0.1)
 	minimizer_kwargs = dict(method="L-BFGS-B", bounds=bounds, options={"maxiter": 10, "disp": True})
-	res = basinhopping(loss, x0, niter=3, T=0.3, minimizer_kwargs=minimizer_kwargs, take_step=take_step, niter_success=5)
+	res = basinhopping(loss, x0, niter=10, T=0.3, minimizer_kwargs=minimizer_kwargs, take_step=take_step, niter_success=5)
 	safe_print(res)
 
 if __name__ == "__main__":
