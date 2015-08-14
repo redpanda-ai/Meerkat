@@ -87,14 +87,14 @@ def get_panel_header(params):
 
 def get_unified_header(params):
 	"""Return the unified_header object, minus the first row."""
-	return params["my_producer_options"]["unified_header"][1:]
+	return params["unified_header"][1:]
 
 class RandomDisplacementBounds(object):
 	"""random displacement with bounds"""
 	def __init__(self, xmin, xmax, stepsize=0.5):
 		self.xmin = xmin
 		self.xmax = xmax
-	self.stepsize = stepsize
+		self.stepsize = stepsize
 
 	def __call__(self, x):
 		"""take a random step but ensure the new position is within the bounds"""
@@ -320,7 +320,7 @@ def run_from_command_line(command_line_arguments):
 	params["label_key"] = "FACTUAL_ID"
 	
 	#HACK to work with file_consumer
-	params["my_producer_options"]["field_mappings"] = get_field_mappings(params)
+	params["field_mappings"] = get_field_mappings(params)
 	
 	# Add Local Params
 	add_local_params(params)
