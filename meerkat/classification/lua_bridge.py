@@ -53,6 +53,11 @@ def get_CNN(model_name):
 		lua.execute('''
 			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/750_class_card_CNN.t7b"))
 		''')
+	elif model_name == "subtype":
+		reverse_label_map = load_label_map("meerkat/classification/label_maps/subtype_label_map.json")
+		lua.execute('''
+			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/subtype_CNN.t7b"))
+		''')
 	else:
 		print("Requested CNN does not exist. Please reference an existing model")
 
@@ -119,17 +124,17 @@ def get_CNN(model_name):
 	''')
 
 	# Generate Helper Function
-	def apply_CNN(trans):
+	def apply_CNN(trans, doc_key="description", label_key="CNN"):
 		"""Apply CNN to transactions in batches of 128"""
 		
-		trans_list = [' '.join(x["description"].split()) for x in trans]
+		trans_list = [' '.join(x[doc_key].split()) for x in trans]
 		table_trans = list_to_table(trans_list)
 		batch = make_batch(table_trans)
 		labels = process_batch(batch)
 		decisions = list(labels.values())
 		
 		for i, t in enumerate(trans):
-			t["CNN"] = reverse_label_map.get(str(decisions[i]), "")
+			t[label_key] = reverse_label_map.get(str(decisions[i]), "")
 
 		return trans
 
