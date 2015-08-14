@@ -73,8 +73,7 @@ def run_meerkat(params, dataset):
 
 
 	# Test Accuracy
-	print("RESULTS -___")
-	pprint(result_list)
+	#pprint(result_list)
 	accuracy_results = vest_accuracy(params, result_list=result_list)
 	print_results(accuracy_results)
 
@@ -364,15 +363,6 @@ def format_web_consumer(dataset):
 	
 	return formatted
 
-def update_format_web_consumer(dataset):
-	
-	for trans in dataset["transaction_list"]:
-		trans["description"] = trans["DESCRIPTION_UNMASKED"]
-		trans["amount"] = trans["AMOUNT"]
-		trans["date"] = trans["TRANSACTION_DATE"]
-		trans["ledger_entry"] = "credit"
-
-	return dataset
 
 def run_from_command_line(command_line_arguments):
 	"""Runs these commands if the module is invoked from the command line"""
