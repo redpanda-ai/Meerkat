@@ -43,7 +43,7 @@ import numpy as np
 from numpy import array, array_split
 from scipy.optimize import minimize, brute, basinhopping
 
-from meerkat.web_wervice.web_consumer import Web_Consumer
+from meerkat.web_service.web_consumer import Web_Consumer
 from meerkat.classification.load import select_model
 from meerkat.accuracy import print_results, vest_accuracy
 from meerkat.various_tools import load_dict_list, queue_to_list, safe_print, get_us_cities
@@ -295,7 +295,7 @@ def format_web_consumer(dataset):
 		trans["description"] = trans["DESCRIPTION_UNMASKED"]
 		trans["amount"] = trans["AMOUNT"]
 		trans["date"] = trans["TRANSACTION_DATE"]
-		"ledger_entry"] = "credit"
+		trans["ledger_entry"] = "credit"
 
 	return formatted
 
