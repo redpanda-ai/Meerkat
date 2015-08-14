@@ -132,7 +132,7 @@ def test_train_split(dataset):
 
 	return test, train
 
-def run_meerkat(params, desc_queue, hyperparameters):
+def run_meerkat(params, dataset):
 	"""Run meerkat on a set of transactions"""
 
 	#consumer_threads = params.get("concurrency", 8)
@@ -241,8 +241,8 @@ def run_classifier(hyperparameters, params, dataset):
 	hyperparameters["boost_vectors"] = boost_vectors
 
 	# Run Classifier with new Hyperparameters. Suppress Output
-	desc_queue = get_desc_queue(dataset)
-	accuracy = run_meerkat(params, desc_queue, hyperparameters)
+	consumer.update_hyperparms(hyperparameters)
+	accuracy = run_meerkat(params, dataset)
 
 	return accuracy
 
@@ -368,6 +368,8 @@ def run_from_command_line(command_line_arguments):
 		x = [str(n) for n in x]
 		hyperparam = dict(zip(param_names, list(x)))
 		hyperparam['es_result_size'] = "45"
+		consumer.update_params(params)
+		consumer.update_cities(CITIES)
 		accuracy = run_classifier(hyperparam, params, dataset)
 		error = (100 - accuracy['precision']) / 100
 
