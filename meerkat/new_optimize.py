@@ -274,11 +274,11 @@ def add_local_params(params):
 
 	params["optimization"]["settings"] = {
 		"folds": 1,
-		"initial_search_space": 25,
+		"initial_search_space": 2,
 		"initial_learning_rate": 0.25,
-		"iteration_search_space": 15,
+		"iteration_search_space": 2,
 		"iteration_learning_rate": 0.1,
-		"gradient_descent_iterations": 10,
+		"gradient_descent_iterations": 2,
 		"max_precision": 97.5,
 		"min_recall": 31
 	}
