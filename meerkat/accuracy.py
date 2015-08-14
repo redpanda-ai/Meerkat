@@ -204,6 +204,38 @@ def speed_vests(start_time, accuracy_results):
 			'time_per_transaction': time_per_transaction,
 			'transactions_per_minute':transactions_per_minute}
 
+def log_results(results):
+	 """Log useful readable output"""
+
+        if results is None:
+                return
+
+        sys.stdout.write('\n\n')
+
+        logging.warning("STATS:")
+        logging.warning("{0:35} = {1:11}".format("Total Transactions Processed",
+                results['total_processed']))
+        logging.warning("{0:35} = {1:10.2f}%".format("Total Labeled Physical",
+                results['total_physical']))
+        logging.warning("{0:35} = {1:10.2f}%".format("Total Labeled Non Physical",
+                results['total_non_physical']))
+        logging.warning("{0:35} = {1:10.2f}%".format("Binary Classifier Accuracy",
+                results['binary_accuracy']))
+
+        sys.stdout.write('\n')
+
+        logging.warning("{0:35} = {1:10.2f}%".format("Recall all transactions",
+                results['total_recall']))
+        logging.warning("{0:35} = {1:10.2f}%".format("Recall physical",
+                results['total_recall_physical']))
+        logging.warning("{0:35} = {1:11}".format("Number of transactions labeled",
+                results['num_labeled']))
+        logging.warning("{0:35} = {1:11}".format("Number of transactions verified",
+                results['num_verified']))
+        logging.warning("{0:35} = {1:10.2f}%".format("Precision",
+                results['precision']))
+
+
 def print_results(results):
 	"""Provide useful readable output"""
 
