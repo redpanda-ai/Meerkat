@@ -90,34 +90,34 @@ def get_unified_header(params):
 	return params["my_producer_options"]["unified_header"][1:]
 
 class RandomDisplacementBounds(object):
-    """random displacement with bounds"""
-    def __init__(self, xmin, xmax, stepsize=0.5):
-        self.xmin = xmin
-        self.xmax = xmax
-        self.stepsize = stepsize
+	"""random displacement with bounds"""
+	def __init__(self, xmin, xmax, stepsize=0.5):
+		self.xmin = xmin
+		self.xmax = xmax
+	self.stepsize = stepsize
 
-    def __call__(self, x):
-        """take a random step but ensure the new position is within the bounds"""
-        while True:
-            # this could be done in a much more clever way, but it will work for example purposes
-            xnew = x + np.random.uniform(-self.stepsize, self.stepsize, np.shape(x))
-            if np.all(xnew < self.xmax) and np.all(xnew > self.xmin):
-                break
+	def __call__(self, x):
+		"""take a random step but ensure the new position is within the bounds"""
+		while True:
+			# this could be done in a much more clever way, but it will work for example purposes
+			xnew = x + np.random.uniform(-self.stepsize, self.stepsize, np.shape(x))
+			if np.all(xnew < self.xmax) and np.all(xnew > self.xmin):
+				break
 
-        return xnew
+		return xnew
 
 class DummyFile(object):
-    def write(self, x): pass
+	def write(self, x): pass
 
 @contextlib.contextmanager
 def nostdout():
-    save_stdout = sys.stdout
-    save_stderr = sys.stderr
-    sys.stdout = DummyFile()
-    sys.stderr = DummyFile()
-    yield
-    sys.stderr = save_stderr
-    sys.stdout = save_stdout
+	save_stdout = sys.stdout
+	save_stderr = sys.stderr
+	sys.stdout = DummyFile()
+	sys.stderr = DummyFile()
+	yield
+	sys.stderr = save_stderr
+	sys.stdout = save_stdout
 
 def test_train_split(dataset):
 	"""Load the verification source, and split the
@@ -160,6 +160,24 @@ def run_meerkat(params, dataset):
 
 	# Convert queue to list
 	#result_list = queue_to_list(result_queue)
+
+	result_list = []
+	n = (len(dataset))/1000
+	n = int(n - (n%1))
+	new_transaction_list = []
+	for x in range (0, n+1):
+		batch = []
+		for i in range(x*1000, (x*1000 + 1000)):
+			try:
+				batch.append(dataset[i])
+			except IndexError:
+				print(i)
+				break
+
+		print("---Batch---")
+		batch_in = format_web_consumer(batch)
+		batch_result = consumer.classify(batch_in)
+		result_list.extend(batch_result["transaction_list"])
 
 	# Test Accuracy
 	accuracy_results = vest_accuracy(params, result_list=result_list)
@@ -267,19 +285,19 @@ def add_local_params(params):
 	return params
 
 def format_web_consumer(dataset):
-       
-       formatted = json.load(open("meerkat/web_service/example_input.json", "r"))
-       formatted["transaction_list"] = dataset
-       trans_id = 1
-       for trans in formatted["transaction_list"]:
-               trans["transaction_id"] = trans_id
-               trans_id = trans_id +1
-               trans["description"] = trans["DESCRIPTION_UNMASKED"]
-               trans["amount"] = trans["AMOUNT"]
-               trans["date"] = trans["TRANSACTION_DATE"]
-               trans["ledger_entry"] = "credit"
-       
-       return formatted
+ 
+	formatted = json.load(open("meerkat/web_service/example_input.json", "r"))
+	formatted["transaction_list"] = dataset
+	trans_id = 1
+	for trans in formatted["transaction_list"]:
+		trans["transaction_id"] = trans_id
+		trans_id = trans_id +1
+		trans["description"] = trans["DESCRIPTION_UNMASKED"]
+		trans["amount"] = trans["AMOUNT"]
+		trans["date"] = trans["TRANSACTION_DATE"]
+		"ledger_entry"] = "credit"
+
+	return formatted
 
 
 def verify_arguments():
