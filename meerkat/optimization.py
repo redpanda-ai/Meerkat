@@ -345,7 +345,9 @@ def verify_arguments():
 		sys.exit()
 
 	# Clear Contents from Previous Runs
-	#open("optimization_results/" + os.path.splitext(os.path.basename(sys.argv[1]))[0] + '_top_scores.txt', 'w').close()
+	previous_scores = "optimization_results/" + os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_top_scores.txt"
+	if os.path.isfile(fname):
+		open(previous_scores, 'w').close()
 
 def format_web_consumer(dataset):
 	
@@ -379,10 +381,7 @@ def run_from_command_line(command_line_arguments):
 	start_time = datetime.datetime.now()
 	verify_arguments()
 	params = load_params(sys.argv[1])
-	
-	#HACK to work with file_consumer
-	params["field_mappings"] = get_field_mappings(params)
-	
+		
 	# Add Local Params
 	add_local_params(params)
 
