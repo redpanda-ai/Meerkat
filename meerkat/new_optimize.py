@@ -43,7 +43,7 @@ import numpy as np
 from numpy import array, array_split
 from scipy.optimize import minimize, brute, basinhopping
 
-from meerkat.file_consumer import FileConsumer
+from meerkat.web_wervice.web_consumer import Web_Consumer
 from meerkat.classification.load import select_model
 from meerkat.accuracy import print_results, vest_accuracy
 from meerkat.various_tools import load_dict_list, queue_to_list, safe_print, get_us_cities
@@ -53,6 +53,7 @@ CITIES = get_us_cities()
 
 #CONSTANTS
 USED_IN_HEADER, ORIGIN, NAME_IN_MEERKAT, NAME_IN_ORIGIN = 0, 1, 2, 3
+consumer = Web_Consumer()
 
 def get_field_mappings(params):
 	"""Returns a list of field_mappings."""
@@ -134,31 +135,31 @@ def test_train_split(dataset):
 def run_meerkat(params, desc_queue, hyperparameters):
 	"""Run meerkat on a set of transactions"""
 
-	consumer_threads = params.get("concurrency", 8)
-	result_queue = queue.Queue()
+	#consumer_threads = params.get("concurrency", 8)
+	#result_queue = queue.Queue()
 
 	# Suppress Output and Classify
-	for i in range(consumer_threads):
-		new_consumer = FileConsumer(i, params, desc_queue, result_queue, hyperparameters, CITIES)
-		new_consumer.setDaemon(True)
-		new_consumer.start()
+	#for i in range(consumer_threads):
+	#	new_consumer = FileConsumer(i, params, desc_queue, result_queue, hyperparameters, CITIES)
+	#	new_consumer.setDaemon(True)
+	#	new_consumer.start()
 
 	# Progress 
-	qsize = desc_queue.qsize()
-	total = range(qsize)
+	#qsize = desc_queue.qsize()
+	#total = range(qsize)
 
-	while qsize > 0:
-		if qsize == desc_queue.qsize():
-			continue
-		else:
-			qsize = desc_queue.qsize()
-			if params["mode"] == "train":
-				progress((len(total) - qsize), total, message="complete with current iteration")
+	#while qsize > 0:
+	#	if qsize == desc_queue.qsize():
+	#		continue
+	#	else:
+	#		qsize = desc_queue.qsize()
+	#		if params["mode"] == "train":
+	#			progress((len(total) - qsize), total, message="complete with current iteration")
 
-	desc_queue.join()
+	#desc_queue.join()
 
 	# Convert queue to list
-	result_list = queue_to_list(result_queue)
+	#result_list = queue_to_list(result_queue)
 
 	# Test Accuracy
 	accuracy_results = vest_accuracy(params, result_list=result_list)
@@ -264,6 +265,22 @@ def add_local_params(params):
 	}
 
 	return params
+
+def format_web_consumer(dataset):
+       
+       formatted = json.load(open("meerkat/web_service/example_input.json", "r"))
+       formatted["transaction_list"] = dataset
+       trans_id = 1
+       for trans in formatted["transaction_list"]:
+               trans["transaction_id"] = trans_id
+               trans_id = trans_id +1
+               trans["description"] = trans["DESCRIPTION_UNMASKED"]
+               trans["amount"] = trans["AMOUNT"]
+               trans["date"] = trans["TRANSACTION_DATE"]
+               trans["ledger_entry"] = "credit"
+       
+       return formatted
+
 
 def verify_arguments():
 	"""Verify Usage"""
