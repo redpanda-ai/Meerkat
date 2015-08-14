@@ -28,6 +28,7 @@ Created on Feb 26, 2014
 
 #####################################################
 
+import json
 import sys 
 import datetime
 import os
@@ -259,7 +260,7 @@ def run_classifier(hyperparameters, params, dataset):
 	hyperparameters["boost_vectors"] = boost_vectors
 
 	# Run Classifier with new Hyperparameters. Suppress Output
-	consumer.update_hyperparms(hyperparameters)
+	consumer.update_hyperparams(hyperparameters)
 	accuracy = run_meerkat(params, dataset)
 
 	return accuracy
