@@ -345,7 +345,7 @@ def verify_arguments():
 
 	# Clear Contents from Previous Runs
 	previous_scores = "optimization_results/" + os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_top_scores.txt"
-	if os.path.isfile(fname):
+	if os.path.isfile(previous_scores):
 		open(previous_scores, 'w').close()
 
 def format_web_consumer(dataset):
