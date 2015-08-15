@@ -8,9 +8,10 @@ from meerkat.classification.lua_bridge import get_CNN, load_label_map
 
 BANK_CNN = get_CNN("bank")
 CARD_CNN = get_CNN("card")
-SUBTYPE_CNN = get_CNN("subtype")
+CARD_SUBTYPE_CNN = get_CNN("card_subtype")
+BANK_SUBTYPE_CNN = get_CNN("bank_subtype")
 
-def apply_to_df(reader, classifier, file_name):
+def apply_to_df(reader, classifier, file_name, subtype_classifier):
 
 	first_chunk = True
 
@@ -19,14 +20,16 @@ def apply_to_df(reader, classifier, file_name):
 		print("-- Batch --")
 
 		trans = list(df.T.to_dict().values())
-
 		t_len = len(trans)
+
+		for t in trans:
+			t["DESCRIPTION"] = t["LEDGER_ENTRY"] + " " + t["DESCRIPTION"]
 		
 		if t_len < 128:
 			trans = trans + [{"DESCRIPTION":""}] * (128 - t_len)
 
 		trans = classifier(trans, doc_key="DESCRIPTION", label_key="MERCHANT_CNN")
-		trans = SUBTYPE_CNN(trans, doc_key="DESCRIPTION", label_key="SUBTYPE_CNN")
+		trans = subtype_classifier(trans, doc_key="DESCRIPTION", label_key="SUBTYPE_CNN")
 		trans = trans[0:t_len]
 
 		# Save to file
@@ -52,8 +55,8 @@ bank_reader = pd.read_csv("data/input/bank_top_50_users.csv", na_filter=False, c
 card_reader = pd.read_csv("data/input/card_top_50_users.csv", na_filter=False, chunksize=128, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
 
 # Apply Classifiers
-apply_to_df(bank_reader, BANK_CNN, "data/output/bank_top_50_users_processed.txt")
-apply_to_df(card_reader, CARD_CNN, "data/output/card_top_50_users_processed.txt")
+apply_to_df(bank_reader, BANK_CNN, "data/output/bank_top_50_users_processed.txt", BANK_SUBTYPE_CNN)
+apply_to_df(card_reader, CARD_CNN, "data/output/card_top_50_users_processed.txt", CARD_SUBTYPE_CNN)
 
 
 			
