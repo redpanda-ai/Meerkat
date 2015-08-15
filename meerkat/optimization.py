@@ -28,6 +28,7 @@ Created on Feb 26, 2014
 
 #####################################################
 
+import logging
 import sys 
 import datetime
 import os
@@ -49,24 +50,24 @@ from meerkat.various_tools import load_params, load_hyperparameters, progress
 from meerkat.web_service.web_consumer import Web_Consumer
 
 consumer = Web_Consumer()
+BATCH_SIZE = 1000
 
 def run_meerkat(params, dataset):
 	"""Run meerkat on a set of transactions"""
 	
 	result_list = []
-	n = (len(dataset))/1000
+	n = (len(dataset))/BATCH_SIZE
 	n = int(n - (n%1))
 	new_transaction_list = []
 	for x in range (0, n+1):
 		batch = []
-		for i in range(x*1000, (x*1000 + 1000)):
+		for i in range(x*BATCH_SIZE, (x+1)*BATCH_SIZE):
 			try:
 				batch.append(dataset[i])
 			except IndexError:
-				print(i)
 				break
 
-		print("---Batch---")
+		logging.warning("Batch number: {0}".format(x))
 		batch_in = format_web_consumer(batch)
 		batch_result = consumer.classify(batch_in)
 		result_list.extend(batch_result["transaction_list"])
@@ -75,7 +76,7 @@ def run_meerkat(params, dataset):
 	# Test Accuracy
 	#pprint(result_list)
 	accuracy_results = vest_accuracy(params, result_list=result_list)
-	print_results(accuracy_results)
+	log_results(accuracy_results)
 
 	return accuracy_results
 
@@ -125,7 +126,6 @@ def randomized_optimization(hyperparameters, known, params, dataset):
 	print("Precision = " + str(top_score['precision']) + "%")
 	print("Best Recall = " + str(top_score['total_recall_physical']) + "%")
 	print("HYPERPARAMETERS:")
-	pprint(top_score["hyperparameters"])
 	print("ALL RESULTS:")
 	
 	# Save Final Parameters
@@ -139,9 +139,10 @@ def display_hyperparameters(hyperparameters):
 	"""Display a human readable output of hyperparameters"""
 
 	safe_print("Iteration Hyperparameters:\n")
-
+	logging.warning(("Iteration Hyperparameters:\n")
 	for key, value in hyperparameters.items():
 		safe_print("{:29} : {}".format(key, value))
+		logging.warning("{:29} : {}".format(key, value))
 
 	sys.stdout.write("\n")
 
@@ -163,7 +164,9 @@ def get_initial_values(hyperparameters, params, known, dataset):
 			randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=0)
 
 		safe_print("\n--------------------\n")
+		logging.warning("\n--------------------\n")
 		safe_print("ITERATION NUMBER: " + str(i) + "\n")
+		logging.warning("ITERATION NUMBER: " + str(i) + "\n")
 		display_hyperparameters(randomized_hyperparameters)
 
 		# Run Classifier
@@ -179,7 +182,9 @@ def get_initial_values(hyperparameters, params, known, dataset):
 			top_score = accuracy
 			top_score['hyperparameters'] = randomized_hyperparameters
 			safe_print("\nSCORE PRECISION: " + str(round(accuracy["precision"], 2)))
+			logging.warning("\nSCORE PRECISION: " + str(round(accuracy["precision"], 2)))
 			safe_print("SCORE RECALL: " + str(round(accuracy["total_recall_physical"], 2)) + "\n")
+			logging..warning("SCORE RECALL: " + str(round(accuracy["total_recall_physical"], 2)) + "\n")
 
 		# Keep Track of All Scores
 		score = {
@@ -193,6 +198,7 @@ def get_initial_values(hyperparameters, params, known, dataset):
 		display_hyperparameters(randomized_hyperparameters)
 
 	print("TOP SCORE:" + str(top_score["precision"]))
+	logging.warning("TOP SCORE:" + str(top_score["precision"]))
 	return top_score
 
 def gradient_descent(initial_values, params, known, dataset):
