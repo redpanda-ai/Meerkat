@@ -31,8 +31,10 @@ def apply_to_df(reader, classifier, file_name, subtype_classifier):
 			t["DESCRIPTION_alt"] = t["LEDGER_ENTRY"] + " " + t["DESCRIPTION"]
 
 		trans = subtype_classifier(trans, doc_key="DESCRIPTION_alt", label_key="SUBTYPE_CNN")
-		del trans["DESCRIPTION_alt"]
 		trans = trans[0:t_len]
+
+		for t in trans:
+			del trans["DESCRIPTION_alt"]
 
 		# Save to file
 		out_df = pd.DataFrame(trans)
