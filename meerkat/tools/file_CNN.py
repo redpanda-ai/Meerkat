@@ -22,14 +22,16 @@ def apply_to_df(reader, classifier, file_name, subtype_classifier):
 		trans = list(df.T.to_dict().values())
 		t_len = len(trans)
 
-		for t in trans:
-			t["DESCRIPTION"] = t["LEDGER_ENTRY"] + " " + t["DESCRIPTION"]
-		
 		if t_len < 128:
 			trans = trans + [{"DESCRIPTION":""}] * (128 - t_len)
 
 		trans = classifier(trans, doc_key="DESCRIPTION", label_key="MERCHANT_CNN")
-		trans = subtype_classifier(trans, doc_key="DESCRIPTION", label_key="SUBTYPE_CNN")
+
+		for t in trans:
+			t["DESCRIPTION_alt"] = t["LEDGER_ENTRY"] + " " + t["DESCRIPTION"]
+
+		trans = subtype_classifier(trans, doc_key="DESCRIPTION_alt", label_key="SUBTYPE_CNN")
+		del trans["DESCRIPTION_alt"]
 		trans = trans[0:t_len]
 
 		# Save to file
