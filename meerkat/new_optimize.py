@@ -55,6 +55,7 @@ CITIES = get_us_cities()
 
 #CONSTANTS
 USED_IN_HEADER, ORIGIN, NAME_IN_MEERKAT, NAME_IN_ORIGIN = 0, 1, 2, 3
+BATCH_SIZE = 50
 consumer = Web_Consumer()
 
 def get_field_mappings(params):
@@ -164,12 +165,12 @@ def run_meerkat(params, dataset):
 	#result_list = queue_to_list(result_queue)
 
 	result_list = []
-	n = (len(dataset))/50
+	n = (len(dataset))/BATCH_SIZE
 	n = int(n - (n%1))
 	new_transaction_list = []
 	for x in range (0, n+1):
 		batch = []
-		for i in range(x*50, (x*50 + 50)):
+		for i in range(x*BATCH_SIZE, (x+1)*BATCH_SIZE):
 			try:
 				batch.append(dataset[i])
 			except IndexError:
@@ -210,8 +211,8 @@ def load_dataset(params):
 def save_top_score(top_score):
 
 	record = open("optimization_results/" + os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_top_scores.txt", "a")
-	pprint("Precision = " + str(top_score['precision']) + "%", record)
-	pprint("Best Recall = " + str(top_score['total_recall_physical']) + "%", record)
+	pprint("Precision = {0}%".format(top_score['precision']), record)
+	pprint("Best Recall = {0}%".format(top_score['total_recall_physical']), record)
 	boost_vectors, boost_labels, other = split_hyperparameters(top_score["hyperparameters"])
 	pprint(boost_vectors, record)
 	pprint(other, record)
@@ -392,7 +393,8 @@ def run_from_command_line(command_line_arguments):
 		consumer.update_cities(CITIES)
 		accuracy = run_classifier(hyperparam, params, dataset)
 		error = (100 - accuracy['precision']) / 100
-
+		
+		logging.warning(str(hyperparam))
 		safe_print(hyperparam)
 		safe_print(error)
 
