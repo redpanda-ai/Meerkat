@@ -65,10 +65,6 @@ class AccuracyTests(unittest.TestCase):
 		"""You can place any per-test fixture deletion here."""
 		pass
 
-	def test_precision(self):
-		"""Assert that precision is above 85%"""
-		self.assertTrue(self._accuracy_results['precision'] > 85)
-
 	def test_total_processed(self):
 		"""Assert that 154 test transactions were processed."""
 		self.assertEqual(self._accuracy_results['total_processed'], 154)
