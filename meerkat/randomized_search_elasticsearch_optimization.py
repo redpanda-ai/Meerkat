@@ -67,7 +67,7 @@ def run_meerkat(params, dataset):
 			except IndexError:
 				break
 
-		logging.warning("Batch number: {0}".format(x))
+		print("Batch number: {0}".format(x))
 		batch_in = format_web_consumer(batch)
 		batch_result = consumer.classify(batch_in)
 		result_list.extend(batch_result["transaction_list"])
@@ -139,10 +139,8 @@ def display_hyperparameters(hyperparameters):
 	"""Display a human readable output of hyperparameters"""
 
 	safe_print("Iteration Hyperparameters:\n")
-	logging.warning(("Iteration Hyperparameters:\n")
 	for key, value in hyperparameters.items():
 		safe_print("{:29} : {}".format(key, value))
-		logging.warning("{:29} : {}".format(key, value))
 
 	sys.stdout.write("\n")
 
@@ -164,9 +162,7 @@ def get_initial_values(hyperparameters, params, known, dataset):
 			randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=0)
 
 		safe_print("\n--------------------\n")
-		logging.warning("\n--------------------\n")
 		safe_print("ITERATION NUMBER: " + str(i) + "\n")
-		logging.warning("ITERATION NUMBER: " + str(i) + "\n")
 		display_hyperparameters(randomized_hyperparameters)
 
 		# Run Classifier
@@ -182,9 +178,7 @@ def get_initial_values(hyperparameters, params, known, dataset):
 			top_score = accuracy
 			top_score['hyperparameters'] = randomized_hyperparameters
 			safe_print("\nSCORE PRECISION: " + str(round(accuracy["precision"], 2)))
-			logging.warning("\nSCORE PRECISION: " + str(round(accuracy["precision"], 2)))
 			safe_print("SCORE RECALL: " + str(round(accuracy["total_recall_physical"], 2)) + "\n")
-			logging..warning("SCORE RECALL: " + str(round(accuracy["total_recall_physical"], 2)) + "\n")
 
 		# Keep Track of All Scores
 		score = {
@@ -198,7 +192,6 @@ def get_initial_values(hyperparameters, params, known, dataset):
 		display_hyperparameters(randomized_hyperparameters)
 
 	print("TOP SCORE:" + str(top_score["precision"]))
-	logging.warning("TOP SCORE:" + str(top_score["precision"]))
 	return top_score
 
 def gradient_descent(initial_values, params, known, dataset):
