@@ -7,8 +7,9 @@ Created on May 14, 2015
 """
 
 import ctypes
+import sys
+import csv
 import json
-import logging
 
 def load_label_map(filename):
 	"""Load a permanent label map"""
@@ -22,8 +23,7 @@ def load_label_map(filename):
 def get_CNN(model_name):
 	"""Load a function to process transactions using a CNN"""
 
-	lualib = ctypes.CDLL\
-	("/home/ubuntu/torch/install/lib/libluajit.so", mode=ctypes.RTLD_GLOBAL)
+	lualib = ctypes.CDLL("/home/ubuntu/torch/install/lib/libluajit.so", mode=ctypes.RTLD_GLOBAL)
 
 	# Must Load Lupa After the Preceding Line
 	import lupa
@@ -36,7 +36,6 @@ def get_CNN(model_name):
 	torch = lua.require('torch')
 	cutorch = lua.require('cutorch')
 	cunn = lua.require('cunn')
-
 	# Load Config
 	lua.execute('''
 		dofile("meerkat/classification/lua/config.lua")
@@ -119,17 +118,17 @@ def get_CNN(model_name):
 	''')
 
 	# Generate Helper Function
-	def apply_CNN(trans):
+	def apply_CNN(trans, doc_key="description", label_key="CNN"):
 		"""Apply CNN to transactions in batches of 128"""
 		
-		trans_list = [' '.join(x["description"].split()) for x in trans]
+		trans_list = [' '.join(x[doc_key].split()) for x in trans]
 		table_trans = list_to_table(trans_list)
 		batch = make_batch(table_trans)
 		labels = process_batch(batch)
 		decisions = list(labels.values())
 		
 		for i, t in enumerate(trans):
-			t["CNN"] = reverse_label_map.get(str(decisions[i]), "")
+			t[label_key] = reverse_label_map.get(str(decisions[i]), "")
 
 		return trans
 
