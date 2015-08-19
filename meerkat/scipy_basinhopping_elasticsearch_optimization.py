@@ -23,7 +23,7 @@ Created on Feb 26, 2014
 
 #################### USAGE ##########################
 
-# python3.3 -m meerkat.new_optimize config/train.json
+# python3.3 -m meerkat.scipy_basinhopping_elasticsearch_optimization config/train.json
 # Note: Experts only! Do not touch!
 
 #####################################################
