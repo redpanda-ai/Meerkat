@@ -23,12 +23,13 @@ from meerkat.classification.load import select_model
 from meerkat.classification.lua_bridge import get_CNN
 from meerkat.classification.bloom_filter.find_entities import location_split
 
+# Enabled Models
 BANK_SWS = select_model("bank")
 CARD_SWS = select_model("card")
-TRANSACTION_TYPE = select_model("transaction_type")
-SUB_TRANSACTION_TYPE = select_model("sub_transaction_type")
 BANK_CNN = get_CNN("bank")
 CARD_CNN = get_CNN("card")
+BANK_SUBTYPE_CNN = get_CNN("card_subtype")
+CARD_SUBTYPE_CNN = get_CNN("bank_subtype")
 
 def grouper(iterable):
 	return zip_longest(*[iter(iterable)]*128, fillvalue={"description":""})
@@ -40,8 +41,6 @@ class Web_Consumer():
 	def __init__(self, params, hyperparams, cities):
 		"""Constructor"""
 
-		self.type_hierarchy = load_params\
-		("meerkat/classification/label_maps/type_subtype_hierarchy.json")
 		self.params = params
 		self.hyperparams = hyperparams
 		self.cities = cities
@@ -118,7 +117,8 @@ class Web_Consumer():
 		hyperparams = self.hyperparams
 		field_names = params["output"]["results"]["fields"]
 
-		pprint(results)
+		#pprint(results)
+
 		# Must be at least one result
 		if results["hits"]["total"] == 0:
 			transaction = self.__no_result(transaction)
@@ -331,7 +331,8 @@ class Web_Consumer():
 				queries.append({"index" : index})
 			queries.append(query)
 
-		pprint(queries)
+		#pprint(queries)
+
 		queries = '\n'.join(map(json.dumps, queries))
 		results = self.__search_index(queries)
 
@@ -347,23 +348,6 @@ class Web_Consumer():
 
 		return enriched
 
-	def __add_transaction_type(self, data):
-		"""Add transaction_type and transaction_sub_type to transaction"""
-
-		transactions = data["transaction_list"]
-
-		if len(transactions) == 0:
-			return transactions
-
-		for trans in transactions:
-			txn_type = TRANSACTION_TYPE(trans["description"])
-			txn_sub_type = SUB_TRANSACTION_TYPE(trans["description"])
-			subtypes = self.type_hierarchy.get(txn_type, [])
-			trans["txn_type"] = txn_type
-			trans["txn_sub_type"] = txn_sub_type if txn_sub_type in subtypes else ""
-
-		return transactions
-
 	def __sws(self, data, transactions):
 		"""Split transactions into physical and non-physical"""
 
@@ -378,8 +362,8 @@ class Web_Consumer():
 
 		return physical, non_physical
 
-	def __apply_CNN(self, data, transactions):
-		"""Apply the CNN to transactions"""
+	def __apply_merchant_CNN(self, data, transactions):
+		"""Apply the merchant CNN to transactions"""
 
 		batches = grouper(transactions)
 		classifier = BANK_CNN if (data["container"] == "bank") else CARD_CNN
@@ -389,6 +373,31 @@ class Web_Consumer():
 			processed += classifier(batch)
 
 		return processed[0:len(transactions)]
+
+	def __apply_subtype_CNN(self, data):
+		"""Apply the subtype CNN to transactions"""
+
+		transactions = data["transaction_list"]
+		classifier = BANK_SUBTYPE_CNN if (data["container"] == "bank") else CARD_SUBTYPE_CNN
+
+		if len(transactions) == 0:
+			return transactions
+
+		batches = grouper(transactions)
+		processed = []
+
+		for i, batch in enumerate(batches):
+			processed += classifier(batch, label_key="subtype_CNN")
+
+		processed = processed[0:len(transactions)]
+
+		for t in processed:
+			txn_type, txn_sub_type = t["subtype_CNN"].split(" - ")
+			t["txn_type"] = txn_type
+			t["txn_sub_type"] = txn_sub_type
+			del t["subtype_CNN"]
+
+		return processed
 
 	def __apply_locale_bloom(self, data, transactions):
 		""" Apply the locale bloom filter to transactions"""
@@ -405,9 +414,9 @@ class Web_Consumer():
 	def classify(self, data):
 		"""Classify a set of transactions"""
 
-		transactions = self.__add_transaction_type(data)
+		transactions = self.__apply_subtype_CNN(data)
 		transactions = self.__apply_locale_bloom(data, transactions)
-		transactions = self.__apply_CNN(data, transactions)
+		transactions = self.__apply_merchant_CNN(data, transactions)
 		physical, non_physical = self.__sws(data, transactions)
 		physical = self.__enrich_physical(physical)
 		transactions = self.ensure_output_schema(data, physical, non_physical)
