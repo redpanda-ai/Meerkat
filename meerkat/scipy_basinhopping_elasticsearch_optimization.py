@@ -47,7 +47,7 @@ from scipy.optimize import minimize, brute, basinhopping
 
 from meerkat.web_service.web_consumer import Web_Consumer
 from meerkat.classification.load import select_model
-from meerkat.accuracy import log_results, vest_accuracy
+from meerkat.accuracy import print_results, vest_accuracy
 from meerkat.various_tools import load_dict_list, queue_to_list, safe_print, get_us_cities
 from meerkat.various_tools import load_params, load_hyperparameters, progress
 
@@ -176,15 +176,14 @@ def run_meerkat(params, dataset):
 			except IndexError:
 				break
 
-		logging.warning("---Batch---")
-		logging.warning("Batch number: {0}".format(x))
+		print("Batch number: {0}".format(x))
 		batch_in = format_web_consumer(batch)
 		batch_result = consumer.classify(batch_in)
 		result_list.extend(batch_result["transaction_list"])
 
 	# Test Accuracy
 	accuracy_results = vest_accuracy(params, result_list=result_list)
-	log_results(accuracy_results)
+	print_results(accuracy_results)
 
 	return accuracy_results
 
@@ -394,7 +393,6 @@ def run_from_command_line(command_line_arguments):
 		accuracy = run_classifier(hyperparam, params, dataset)
 		error = (100 - accuracy['precision']) / 100
 		
-		logging.warning(str(hyperparam))
 		safe_print(hyperparam)
 		safe_print(error)
 
