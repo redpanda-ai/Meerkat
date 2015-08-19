@@ -55,7 +55,7 @@ CITIES = get_us_cities()
 
 #CONSTANTS
 USED_IN_HEADER, ORIGIN, NAME_IN_MEERKAT, NAME_IN_ORIGIN = 0, 1, 2, 3
-BATCH_SIZE = 50
+BATCH_SIZE = 1000
 consumer = Web_Consumer()
 
 def get_field_mappings(params):
