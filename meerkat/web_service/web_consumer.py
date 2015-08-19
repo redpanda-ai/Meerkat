@@ -78,14 +78,20 @@ class Web_Consumer():
 			should_clauses.append(city_query)
 			should_clauses.append(state_query)
 
+			# add routing term
+			# o_query["query"]["match"] = "%s, %s" % (locale_bloom[0], locale_bloom[1])
+
 		return o_query
 
 	def __search_index(self, queries):
 		"""Search against a structured index"""
 
 		index = self.params["elasticsearch"]["index"]
+		# pprint(queries)
 
 		try:
+			# pull routing out of queries and append to below msearch
+
 			results = self.es.msearch(queries, index=index)
 		except Exception:
 			return None
@@ -112,6 +118,7 @@ class Web_Consumer():
 		hyperparams = self.hyperparams
 		field_names = params["output"]["results"]["fields"]
 
+		pprint(results)
 		# Must be at least one result
 		if results["hits"]["total"] == 0:
 			transaction = self.__no_result(transaction)
@@ -314,9 +321,17 @@ class Web_Consumer():
 
 		for trans in transactions:
 			query = self.__get_query(trans)
-			queries.append({"index" : index})
+
+			# add routing to header
+			try:
+				locality = query['query']['bool']['should'][1]['query_string']['query']
+				region = query['query']['bool']['should'][2]['query_string']['query']
+				queries.append({"index" : index, "routing" : "%s%s" % (locality, region)})
+			except IndexError:
+				queries.append({"index" : index})
 			queries.append(query)
 
+		pprint(queries)
 		queries = '\n'.join(map(json.dumps, queries))
 		results = self.__search_index(queries)
 

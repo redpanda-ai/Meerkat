@@ -36,7 +36,6 @@ def get_CNN(model_name):
 	torch = lua.require('torch')
 	cutorch = lua.require('cutorch')
 	cunn = lua.require('cunn')
-	
 	# Load Config
 	lua.execute('''
 		dofile("meerkat/classification/lua/config.lua")
