@@ -58,40 +58,6 @@ USED_IN_HEADER, ORIGIN, NAME_IN_MEERKAT, NAME_IN_ORIGIN = 0, 1, 2, 3
 BATCH_SIZE = 1000
 consumer = Web_Consumer()
 
-def get_field_mappings(params):
-	"""Returns a list of field_mappings."""
-	return [[x[NAME_IN_ORIGIN], x[NAME_IN_MEERKAT]]
-		for x in get_unified_header(params)
-		if (x[ORIGIN] == "search") and (x[NAME_IN_MEERKAT] != x[NAME_IN_ORIGIN])]
-
-def get_meerkat_fields(params):
-	"""Return a list of meerkat fields to add to the panel output."""
-	return [x[NAME_IN_MEERKAT]
-		for x in get_unified_header(params)
-		if (x[USED_IN_HEADER] == True) and (x[ORIGIN] == "search")]
-
-def get_column_map(params):
-	"""Fix old or erroneous column names"""
-	container = params["container"].upper()
-	column_mapping_list = [
-		(x[NAME_IN_ORIGIN], x[NAME_IN_MEERKAT].replace("__BLANK", container))
-		for x in get_unified_header(params)
-		if (x[ORIGIN] == "input") and (x[NAME_IN_MEERKAT] != x[NAME_IN_ORIGIN])]
-	column_map = {}
-	for name_in_origin, name_in_meerkat in column_mapping_list:
-		column_map[name_in_origin] = name_in_meerkat
-	return column_map
-
-def get_panel_header(params):
-	"""Return an ordered consistent header for panels"""
-	return [
-		x[NAME_IN_MEERKAT].replace("__BLANK", params["container"].upper())
-		for x in get_unified_header(params)]
-
-def get_unified_header(params):
-	"""Return the unified_header object, minus the first row."""
-	return params["unified_header"][1:]
-
 class RandomDisplacementBounds(object):
 	"""random displacement with bounds"""
 	def __init__(self, xmin, xmax, stepsize=0.5):
@@ -109,18 +75,6 @@ class RandomDisplacementBounds(object):
 
 		return xnew
 
-class DummyFile(object):
-	def write(self, x): pass
-
-@contextlib.contextmanager
-def nostdout():
-	save_stdout = sys.stdout
-	save_stderr = sys.stderr
-	sys.stdout = DummyFile()
-	sys.stderr = DummyFile()
-	yield
-	sys.stderr = save_stderr
-	sys.stdout = save_stdout
 
 def test_train_split(dataset):
 	"""Load the verification source, and split the
@@ -137,32 +91,6 @@ def test_train_split(dataset):
 
 def run_meerkat(params, dataset):
 	"""Run meerkat on a set of transactions"""
-
-	#consumer_threads = params.get("concurrency", 8)
-	#result_queue = queue.Queue()
-
-	# Suppress Output and Classify
-	#for i in range(consumer_threads):
-	#	new_consumer = FileConsumer(i, params, desc_queue, result_queue, hyperparameters, CITIES)
-	#	new_consumer.setDaemon(True)
-	#	new_consumer.start()
-
-	# Progress 
-	#qsize = desc_queue.qsize()
-	#total = range(qsize)
-
-	#while qsize > 0:
-	#	if qsize == desc_queue.qsize():
-	#		continue
-	#	else:
-	#		qsize = desc_queue.qsize()
-	#		if params["mode"] == "train":
-	#			progress((len(total) - qsize), total, message="complete with current iteration")
-
-	#desc_queue.join()
-
-	# Convert queue to list
-	#result_list = queue_to_list(result_queue)
 
 	result_list = []
 	n = (len(dataset))/BATCH_SIZE
@@ -320,9 +248,6 @@ def run_from_command_line(command_line_arguments):
 	verify_arguments()
 	params = load_params(sys.argv[1])
 	params["label_key"] = "FACTUAL_ID"
-	
-	#HACK to work with file_consumer
-	params["field_mappings"] = get_field_mappings(params)
 	
 	# Add Local Params
 	add_local_params(params)
