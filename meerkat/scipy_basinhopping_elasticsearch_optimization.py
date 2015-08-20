@@ -23,16 +23,18 @@ Created on Feb 26, 2014
 
 #################### USAGE ##########################
 
-# python3.3 -m meerkat.new_optimize config/train.json
+# python3.3 -m meerkat.scipy_basinhopping_elasticsearch_optimization config/train.json
 # Note: Experts only! Do not touch!
 
 #####################################################
 
+import json
 import sys 
 import datetime
 import os
 import queue
 import csv
+import logging
 import collections
 import contextlib
 from copy import deepcopy
@@ -43,7 +45,7 @@ import numpy as np
 from numpy import array, array_split
 from scipy.optimize import minimize, brute, basinhopping
 
-from meerkat.file_consumer import FileConsumer
+from meerkat.web_service.web_consumer import Web_Consumer
 from meerkat.classification.load import select_model
 from meerkat.accuracy import print_results, vest_accuracy
 from meerkat.various_tools import load_dict_list, queue_to_list, safe_print, get_us_cities
@@ -51,35 +53,74 @@ from meerkat.various_tools import load_params, load_hyperparameters, progress
 
 CITIES = get_us_cities()
 
+#CONSTANTS
+USED_IN_HEADER, ORIGIN, NAME_IN_MEERKAT, NAME_IN_ORIGIN = 0, 1, 2, 3
+BATCH_SIZE = 1000
+consumer = Web_Consumer()
+
+def get_field_mappings(params):
+	"""Returns a list of field_mappings."""
+	return [[x[NAME_IN_ORIGIN], x[NAME_IN_MEERKAT]]
+		for x in get_unified_header(params)
+		if (x[ORIGIN] == "search") and (x[NAME_IN_MEERKAT] != x[NAME_IN_ORIGIN])]
+
+def get_meerkat_fields(params):
+	"""Return a list of meerkat fields to add to the panel output."""
+	return [x[NAME_IN_MEERKAT]
+		for x in get_unified_header(params)
+		if (x[USED_IN_HEADER] == True) and (x[ORIGIN] == "search")]
+
+def get_column_map(params):
+	"""Fix old or erroneous column names"""
+	container = params["container"].upper()
+	column_mapping_list = [
+		(x[NAME_IN_ORIGIN], x[NAME_IN_MEERKAT].replace("__BLANK", container))
+		for x in get_unified_header(params)
+		if (x[ORIGIN] == "input") and (x[NAME_IN_MEERKAT] != x[NAME_IN_ORIGIN])]
+	column_map = {}
+	for name_in_origin, name_in_meerkat in column_mapping_list:
+		column_map[name_in_origin] = name_in_meerkat
+	return column_map
+
+def get_panel_header(params):
+	"""Return an ordered consistent header for panels"""
+	return [
+		x[NAME_IN_MEERKAT].replace("__BLANK", params["container"].upper())
+		for x in get_unified_header(params)]
+
+def get_unified_header(params):
+	"""Return the unified_header object, minus the first row."""
+	return params["unified_header"][1:]
+
 class RandomDisplacementBounds(object):
-    """random displacement with bounds"""
-    def __init__(self, xmin, xmax, stepsize=0.5):
-        self.xmin = xmin
-        self.xmax = xmax
-        self.stepsize = stepsize
+	"""random displacement with bounds"""
+	def __init__(self, xmin, xmax, stepsize=0.5):
+		self.xmin = xmin
+		self.xmax = xmax
+		self.stepsize = stepsize
 
-    def __call__(self, x):
-        """take a random step but ensure the new position is within the bounds"""
-        while True:
-            # this could be done in a much more clever way, but it will work for example purposes
-            xnew = x + np.random.uniform(-self.stepsize, self.stepsize, np.shape(x))
-            if np.all(xnew < self.xmax) and np.all(xnew > self.xmin):
-                break
+	def __call__(self, x):
+		"""take a random step but ensure the new position is within the bounds"""
+		while True:
+			# this could be done in a much more clever way, but it will work for example purposes
+			xnew = x + np.random.uniform(-self.stepsize, self.stepsize, np.shape(x))
+			if np.all(xnew < self.xmax) and np.all(xnew > self.xmin):
+				break
 
-        return xnew
+		return xnew
 
 class DummyFile(object):
-    def write(self, x): pass
+	def write(self, x): pass
 
 @contextlib.contextmanager
 def nostdout():
-    save_stdout = sys.stdout
-    save_stderr = sys.stderr
-    sys.stdout = DummyFile()
-    sys.stderr = DummyFile()
-    yield
-    sys.stderr = save_stderr
-    sys.stdout = save_stdout
+	save_stdout = sys.stdout
+	save_stderr = sys.stderr
+	sys.stdout = DummyFile()
+	sys.stderr = DummyFile()
+	yield
+	sys.stderr = save_stderr
+	sys.stdout = save_stdout
 
 def test_train_split(dataset):
 	"""Load the verification source, and split the
@@ -94,34 +135,51 @@ def test_train_split(dataset):
 
 	return test, train
 
-def run_meerkat(params, desc_queue, hyperparameters):
+def run_meerkat(params, dataset):
 	"""Run meerkat on a set of transactions"""
 
-	consumer_threads = params.get("concurrency", 8)
-	result_queue = queue.Queue()
+	#consumer_threads = params.get("concurrency", 8)
+	#result_queue = queue.Queue()
 
 	# Suppress Output and Classify
-	for i in range(consumer_threads):
-		new_consumer = FileConsumer(i, params, desc_queue, result_queue, hyperparameters, CITIES)
-		new_consumer.setDaemon(True)
-		new_consumer.start()
+	#for i in range(consumer_threads):
+	#	new_consumer = FileConsumer(i, params, desc_queue, result_queue, hyperparameters, CITIES)
+	#	new_consumer.setDaemon(True)
+	#	new_consumer.start()
 
 	# Progress 
-	qsize = desc_queue.qsize()
-	total = range(qsize)
+	#qsize = desc_queue.qsize()
+	#total = range(qsize)
 
-	while qsize > 0:
-		if qsize == desc_queue.qsize():
-			continue
-		else:
-			qsize = desc_queue.qsize()
-			if params["mode"] == "train":
-				progress((len(total) - qsize), total, message="complete with current iteration")
+	#while qsize > 0:
+	#	if qsize == desc_queue.qsize():
+	#		continue
+	#	else:
+	#		qsize = desc_queue.qsize()
+	#		if params["mode"] == "train":
+	#			progress((len(total) - qsize), total, message="complete with current iteration")
 
-	desc_queue.join()
+	#desc_queue.join()
 
 	# Convert queue to list
-	result_list = queue_to_list(result_queue)
+	#result_list = queue_to_list(result_queue)
+
+	result_list = []
+	n = (len(dataset))/BATCH_SIZE
+	n = int(n - (n%1))
+	new_transaction_list = []
+	for x in range (0, n+1):
+		batch = []
+		for i in range(x*BATCH_SIZE, (x+1)*BATCH_SIZE):
+			try:
+				batch.append(dataset[i])
+			except IndexError:
+				break
+
+		print("Batch number: {0}".format(x))
+		batch_in = format_web_consumer(batch)
+		batch_result = consumer.classify(batch_in)
+		result_list.extend(batch_result["transaction_list"])
 
 	# Test Accuracy
 	accuracy_results = vest_accuracy(params, result_list=result_list)
@@ -152,8 +210,8 @@ def load_dataset(params):
 def save_top_score(top_score):
 
 	record = open("optimization_results/" + os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_top_scores.txt", "a")
-	pprint("Precision = " + str(top_score['precision']) + "%", record)
-	pprint("Best Recall = " + str(top_score['total_recall_physical']) + "%", record)
+	pprint("Precision = {0}%".format(top_score['precision']), record)
+	pprint("Best Recall = {0}%".format(top_score['total_recall_physical']), record)
 	boost_vectors, boost_labels, other = split_hyperparameters(top_score["hyperparameters"])
 	pprint(boost_vectors, record)
 	pprint(other, record)
@@ -203,8 +261,8 @@ def run_classifier(hyperparameters, params, dataset):
 	hyperparameters["boost_vectors"] = boost_vectors
 
 	# Run Classifier with new Hyperparameters. Suppress Output
-	desc_queue = get_desc_queue(dataset)
-	accuracy = run_meerkat(params, desc_queue, hyperparameters)
+	consumer.update_hyperparams(hyperparameters)
+	accuracy = run_meerkat(params, dataset)
 
 	return accuracy
 
@@ -228,6 +286,22 @@ def add_local_params(params):
 
 	return params
 
+def format_web_consumer(dataset):
+ 
+	formatted = json.load(open("meerkat/web_service/example_input.json", "r"))
+	formatted["transaction_list"] = dataset
+	trans_id = 1
+	for trans in formatted["transaction_list"]:
+		trans["transaction_id"] = trans_id
+		trans_id = trans_id +1
+		trans["description"] = trans["DESCRIPTION_UNMASKED"]
+		trans["amount"] = trans["AMOUNT"]
+		trans["date"] = trans["TRANSACTION_DATE"]
+		trans["ledger_entry"] = "credit"
+
+	return formatted
+
+
 def verify_arguments():
 	"""Verify Usage"""
 
@@ -237,7 +311,7 @@ def verify_arguments():
 		sys.exit()
 
 	# Clear Contents from Previous Runs
-	open("optimization_results/" + os.path.splitext(os.path.basename(sys.argv[1]))[0] + '_top_scores.txt', 'w').close()
+	#open("optimization_results/" + os.path.splitext(os.path.basename(sys.argv[1]))[0] + '_top_scores.txt', 'w').close()
 
 def run_from_command_line(command_line_arguments):
 	"""Runs these commands if the module is invoked from the command line"""
@@ -246,7 +320,10 @@ def run_from_command_line(command_line_arguments):
 	verify_arguments()
 	params = load_params(sys.argv[1])
 	params["label_key"] = "FACTUAL_ID"
-
+	
+	#HACK to work with file_consumer
+	params["field_mappings"] = get_field_mappings(params)
+	
 	# Add Local Params
 	add_local_params(params)
 
@@ -311,9 +388,11 @@ def run_from_command_line(command_line_arguments):
 		x = [str(n) for n in x]
 		hyperparam = dict(zip(param_names, list(x)))
 		hyperparam['es_result_size'] = "45"
+		consumer.update_params(params)
+		consumer.update_cities(CITIES)
 		accuracy = run_classifier(hyperparam, params, dataset)
 		error = (100 - accuracy['precision']) / 100
-
+		
 		safe_print(hyperparam)
 		safe_print(error)
 

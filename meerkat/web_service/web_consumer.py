@@ -38,14 +38,35 @@ class Web_Consumer():
 	"""Acts as a web service client to process and enrich
 	transactions in real time"""
 
-	def __init__(self, params, hyperparams, cities):
+	def __init__(self, params=None, hyperparams=None, cities=None):
 		"""Constructor"""
+		
+		if params is None:
+			self.params = dict()
+		else:
+			self.params = params
+			self.es = get_es_connection(params)
 
+		if hyperparams is None:
+			self.hyperparams = dict()
+		else:
+			self.hyperparams = hyperparams
+		
+		if cities is None:
+			self.cities = dict()
+		else:
+			self.cities = cities
+
+	def update_params(self, params):
 		self.params = params
-		self.hyperparams = hyperparams
-		self.cities = cities
 		self.es = get_es_connection(params)
 
+	def update_hyperparams(self, hyperparams):
+		self.hyperparams = hyperparams
+	
+	def update_cities(self, cities):
+		self.cities = cities
+	
 	def __get_query(self, transaction):
 		"""Create an optimized query"""
 
@@ -90,7 +111,6 @@ class Web_Consumer():
 
 		try:
 			# pull routing out of queries and append to below msearch
-
 			results = self.es.msearch(queries, index=index)
 		except Exception:
 			return None
@@ -116,8 +136,6 @@ class Web_Consumer():
 		params = self.params
 		hyperparams = self.hyperparams
 		field_names = params["output"]["results"]["fields"]
-
-		#pprint(results)
 
 		# Must be at least one result
 		if results["hits"]["total"] == 0:
@@ -278,7 +296,7 @@ class Web_Consumer():
 		# Add or Modify Fields
 		for trans in physical:
 			categories = trans.get("category_labels", "")
-			categories = json.loads(categories) if (categories != "") else []
+			categories = json.loads(categories) if (categories != "" and categories != []) else []
 			trans["category_labels"] = categories
 
 		# Combine Transactions
@@ -330,8 +348,6 @@ class Web_Consumer():
 			except IndexError:
 				queries.append({"index" : index})
 			queries.append(query)
-
-		#pprint(queries)
 
 		queries = '\n'.join(map(json.dumps, queries))
 		results = self.__search_index(queries)

@@ -1,5 +1,5 @@
 {
-	"concurrency" : 36,
+	"concurrency" : 8,
 	"verification_source" : "data/misc/ground_truth_card.txt",
 	"container" : "card",
 	"mode" : "train",
@@ -12,12 +12,6 @@
 			"processing_location" : "/mnt/ephemeral/input/",
 			"row_limit" : 1000
 		}
-	},
-	"logging" : {
-		"level" : "warning",
-		"path" : "logs/foo.log",
-		"formatter" : "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-		"console" : true
 	},
 	"output" : {
 		"results" : {
@@ -36,29 +30,74 @@
 			"delimiter" : "|"
 		}
 	},
+	"unified_header" : [
+			["used_in_header", "origin",    "name_in_meerkat",               "name_in_origin"],
+			[true,             "input",     "UNIQUE_MEM_ID",                 "UNIQUE_MEM_ID"],
+			[true,             "input",     "UNIQUE___BLANK_ACCOUNT_ID",     "UNIQUE_ACCOUNT_ID"],
+			[true,             "input",     "UNIQUE___BLANK_TRANSACTION_ID", "UNIQUE_TRANSACTION_ID"],
+			[true,             "input",     "MEM_ID",                        "MEM_ID"],
+			[true,             "input",     "__BLANK_ACCOUNT_ID",            "__BLANK_ACCOUNT_ID"],
+			[true,             "input",     "__BLANK_TRANSACTION_ID",        "__BLANK_TRANSACTION_ID"],
+			[true,             "input",     "COBRAND_ID",                    "COBRAND_ID"],
+			[true,             "input",     "SUM_INFO_ID",                   "SUM_INFO_ID"],
+			[true,             "input",     "AMOUNT",                        "AMOUNT"],
+			[true,             "input",     "CURRENCY_ID",                   "CURRENCY_ID"],
+			[true,             "input",     "DESCRIPTION",                   "DESCRIPTION"],
+			[true,             "input",     "TRANSACTION_DATE",              "TRANSACTION_DATE"],
+			[true,             "input",     "POST_DATE",                     "POST_DATE"],
+			[true,             "input",     "TRANSACTION_BASE_TYPE",         "TYPE"],
+			[true,             "input",     "TRANSACTION_CATEGORY_ID",       "TRANSACTION_CATEGORY_ID"],
+			[true,             "input",     "TRANSACTION_CATEGORY_NAME",     "TRANSACTION_CATEGORY_NAME"],
+			[true,             "search",    "MERCHANT_NAME",                 "name"],
+			[true,             "search",    "STORE_ID",                      "internal_store_number"],
+			[true,             "search",    "FACTUAL_CATEGORY",              "category_labels"],
+			[true,             "search",    "STREET",                        "address"],
+			[true,             "search",    "CITY",                          "locality"],
+			[true,             "search",    "STATE",                         "region"],
+			[true,             "search",    "ZIP_CODE",                      "postcode"],
+			[true,             "search",    "WEBSITE",                       "website"],
+			[true,             "search",    "PHONE_NUMBER",                  "tel"],
+			[true,             "search",    "FAX_NUMBER",                    "fax"],
+			[true,             "search",    "CHAIN_NAME",                    "chain_name"],
+			[true,             "search",    "LATITUDE",                      "latitude"],
+			[true,             "search",    "LONGITUDE",                     "longitude"],
+			[true,             "search",    "NEIGHBOURHOOD",                 "neighborhood"],
+			[true,             "search",    "TRANSACTION_ORIGIN",            "TRANSACTION_ORIGIN"],
+			[true,             "search",    "CONFIDENCE_SCORE",              "z_score_delta"],
+			[true,             "search",    "FACTUAL_ID",                    "factual_id"],
+			[true,             "input",     "FILE_CREATED_DATE",             "FILE_CREATED_DATE"],
+			[false,            "input",     "DESCRIPTION_UNMASKED",          "DESCRIPTION_UNMASKED"],
+			[false,            "input",     "GOOD_DESCRIPTION",              "MERCHANT_NAME"]
+		],
+	"logging": {
+			"console": true,
+			"formatter": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+			"level": "warning",
+			"path": "logs/foo.log"
+		},
 	"elasticsearch" : {
 		"cluster_nodes" : [
-			"172.31.26.85", "172.31.26.84", "172.31.26.87", "172.31.26.86"
-    	],
+			"internal-default-vpc-meerkat-lb-2028162053.us-west-2.elb.amazonaws.com"
+    		],
 		"index" : "factual_index",
-		"type" : "factual_type",
-		"boost_labels" : ["standard_fields"],
-		"boost_vectors" :  {
-			"address": [0.541],
-			"address_extended": [1.282],
-			"admin_region": [0.69],
-			"category_labels": [1.319],
-			"chain_name": [0.999],
-			"email": [0.516],
-			"internal_store_number": [1.9],
-			"locality": [1.367],
-			"name": [2.781],
-			"neighborhood": [0.801],
-			"po_box": [1.292],
-			"post_town": [0.577],
-			"postcode": [0.914],
-			"region": [1.685],
-			"tel": [0.597]
-		}
+		"type" : "factual_type"
+		},
+	"boost_labels" : ["standard_fields"],
+	"boost_vectors" :  {
+		"address": [0.541],
+		"address_extended": [1.282],
+		"admin_region": [0.69],
+		"category_labels": [1.319],
+		"chain_name": [0.999],
+		"email": [0.516],
+		"internal_store_number": [1.9],
+		"locality": [1.367],
+		"name": [2.781],
+		"neighborhood": [0.801],
+		"po_box": [1.292],
+		"post_town": [0.577],
+		"postcode": [0.914],
+		"region": [1.685],
+		"tel": [0.597]
 	}
 }
