@@ -114,7 +114,7 @@
 		},
 		"comment" : {
 			"_routing" : {
-				"required" : true,
+				"required" : false,
 				"path" : "region"
 			}
 		}
