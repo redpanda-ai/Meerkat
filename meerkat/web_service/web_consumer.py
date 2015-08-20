@@ -339,14 +339,14 @@ class Web_Consumer():
 
 		for trans in transactions:
 			query = self.__get_query(trans)
-			# Reverted for now, this does not seem to work well
+
 			# add routing to header
-			#try:
-			#	locality = query['query']['bool']['should'][1]['query_string']['query']
-			#	region = query['query']['bool']['should'][2]['query_string']['query']
-			#	queries.append({"index" : index, "routing" : "%s%s" % (locality, region)})
-			#except IndexError:
-			#	queries.append({"index" : index})
+			try:
+				locality = query['query']['bool']['should'][1]['query_string']['query']
+				region = query['query']['bool']['should'][2]['query_string']['query']
+				queries.append({"index" : index, "routing" : "%s%s" % (locality, region)})
+			except IndexError:
+				queries.append({"index" : index})
 			queries.append(query)
 
 		queries = '\n'.join(map(json.dumps, queries))
