@@ -339,7 +339,7 @@ class Web_Consumer():
 
 		for trans in transactions:
 			query = self.__get_query(trans)
-			# Reverted for now, this does not seem to work well
+
 			# add routing to header
 			#try:
 			#	locality = query['query']['bool']['should'][1]['query_string']['query']
