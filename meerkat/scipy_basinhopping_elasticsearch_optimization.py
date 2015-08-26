@@ -47,7 +47,8 @@ from scipy.optimize import minimize, brute, basinhopping
 from meerkat.web_service.web_consumer import Web_Consumer
 from meerkat.classification.load import select_model
 from meerkat.accuracy import print_results, vest_accuracy
-from meerkat.various_tools import load_dict_list, queue_to_list, safe_print, get_us_cities
+from meerkat.various_tools \
+import load_dict_list, queue_to_list, safe_print, get_us_cities
 from meerkat.various_tools import load_params, load_hyperparameters, progress
 
 CITIES = get_us_cities()
@@ -67,7 +68,8 @@ class RandomDisplacementBounds(object):
 	def __call__(self, x):
 		"""take a random step but ensure the new position is within the bounds"""
 		while True:
-			# this could be done in a much more clever way, but it will work for example purposes
+			# this could be done in a much more clever way,
+			# but it will work for example purposes
 			xnew = x + np.random.uniform(-self.stepsize, self.stepsize, np.shape(x))
 			if np.all(xnew < self.xmax) and np.all(xnew > self.xmin):
 				break
@@ -94,8 +96,7 @@ def run_meerkat(params, dataset):
 	result_list = []
 	n = (len(dataset))/BATCH_SIZE
 	n = int(n - (n%1))
-	new_transaction_list = []
-	for x in range (0, n+1):
+	for x in range(0, n+1):
 		batch = []
 		for i in range(x*BATCH_SIZE, (x+1)*BATCH_SIZE):
 			try:
@@ -117,7 +118,8 @@ def run_meerkat(params, dataset):
 def load_dataset(params):
 	"""Load a verified dataset"""
 
-	verification_source = params.get("verification_source", "data/misc/ground_truth_card.txt")
+	verification_source = \
+	params.get("verification_source", "data/misc/ground_truth_card.txt")
 	dataset = []
 
 	# Load Data
@@ -136,10 +138,12 @@ def load_dataset(params):
 
 def save_top_score(top_score):
 
-	record = open("optimization_results/" + os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_top_scores.txt", "a")
+	record = open("optimization_results/" + \
+	os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_top_scores.txt", "a")
 	pprint("Precision = {0}%".format(top_score['precision']), record)
 	pprint("Best Recall = {0}%".format(top_score['total_recall_physical']), record)
-	boost_vectors, boost_labels, other = split_hyperparameters(top_score["hyperparameters"])
+	boost_vectors, boost_labels, other = \
+	split_hyperparameters(top_score["hyperparameters"])
 	pprint(boost_vectors, record)
 	pprint(other, record)
 	record.close()
@@ -181,7 +185,8 @@ def run_classifier(hyperparameters, params, dataset):
 	""" Runs the classifier with a given set of hyperparameters"""
 
 	# Split boosts from other hyperparameters and format accordingly
-	boost_vectors, boost_labels, hyperparameters = split_hyperparameters(hyperparameters)
+	boost_vectors, boost_labels, hyperparameters =\
+	split_hyperparameters(hyperparameters)
 
 	# Override Params
 	hyperparameters["boost_labels"] = boost_labels
@@ -300,7 +305,8 @@ def run_from_command_line(command_line_arguments):
 	param_names = list(hyperparams.keys())
 	initial_guess = [float(x) for x in list(hyperparams.values())]
 	x0 = np.array(initial_guess)
-	bounds = [(alt_bounds[x] if x in alt_bounds else (float(hyperparams[x]) - 0.5, float(hyperparams[x]) + 0.5)) for x in param_names]
+	bounds = [(alt_bounds[x] if x in alt_bounds \
+	else (float(hyperparams[x]) - 0.5, float(hyperparams[x]) + 0.5)) for x in param_names]
 	xmin = np.array([x[0] for x in bounds])
 	xmax = np.array([x[1] for x in bounds])
 	dataset = load_dataset(params)
@@ -323,7 +329,8 @@ def run_from_command_line(command_line_arguments):
 		return error
 
 	take_step = RandomDisplacementBounds(xmin, xmax, 0.1)
-	minimizer_kwargs = dict(method="L-BFGS-B", bounds=bounds, options={"maxiter": 10, "disp": True})
+	minimizer_kwargs = \
+	dict(method="L-BFGS-B", bounds=bounds, options={"maxiter": 10, "disp": True})
 	res = basinhopping(loss, x0, niter=10, T=0.3, minimizer_kwargs=minimizer_kwargs, take_step=take_step, niter_success=5)
 	safe_print(res)
 
