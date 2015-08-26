@@ -1,5 +1,4 @@
 #!/usr/local/bin/python3.3
-# pylint: skip-file
 
 """This module takes a set of merchants with their associated manually
 formatted store numbers. The records are matched against Factual and if a

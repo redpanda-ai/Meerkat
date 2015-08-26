@@ -1,5 +1,4 @@
 #!/usr/local/bin/python3.3
-# pylint: skip-file
 
 """This module is the core of the Meerkat engine. It allows us to rapidly
 evaluate many possible configurations if provided a well labeled dataset.
