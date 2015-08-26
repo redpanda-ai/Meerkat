@@ -39,13 +39,14 @@ def check_status():
 
 class WebServiceTest(unittest.TestCase):
 	"""Our UnitTest class."""
-	
-	def setUp(self):
+
+	@classmethod
+	def setUpClass(cls):
 		online, web_service_pid = web_service_is_online()
 		if online:
 			stop_linux_process(web_service_pid)
-
-	def tearDown(self):
+	@classmethod
+	def tearDownClass(cls):
 		online, web_service_pid = web_service_is_online()
 		if online:
 			stop_linux_process(web_service_pid)
