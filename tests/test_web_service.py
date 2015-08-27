@@ -36,7 +36,17 @@ def check_status():
 	status = r.status_code
 	r.connection.close()
 	return (status)
-
+def post_sample():
+	"""Get a status code(e.g. 200) after posting small sample input to web service"""
+		
+	one_ledger = str(load_params("one_ledger.json")
+	header = {"Content-Type":"application/json"}
+	r = requests.get("https://localhost/status/index.html", verify=False, data=one_ledger,headers=header)
+	status = r.status_code
+	r.connection.close()
+	return (status)
+	
+	
 class WebServiceTest(unittest.TestCase):
 	"""Our UnitTest class."""
 	
@@ -71,7 +81,7 @@ class WebServiceTest(unittest.TestCase):
 	
 	def test_web_service_status(self):
 		"""Test executes meerkat with small sample input and checks for 200 status code"""
-		status = check_status()
+		status = post_sample()
 		self.assertTrue(status == 200)
 		return
 
