@@ -44,7 +44,7 @@ def post_sample():
 
 	#one_ledger = '{ "container":"bank", "transaction_list":[ { "date":"2014-08-10T00:00:00", "description":"taco bell scarsdale, ny", "amount":59.0, "transaction_id":5024853, "ledger_entry":"debit" } ], "cobrand_id":99, "user_id":12177727 }'
 	#big = load_params("one_ledger.json")
-	one_ledger = str(load_params(one_ledger.json))
+	one_ledger = str(load_params("one_ledger.json"))
 	header = {"Content-Type":"application/json"}
 	r = requests.post("https://localhost/meerkat/v1.3", verify=False,data=one_ledger,headers=header)
 	print(r.content)
