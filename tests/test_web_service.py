@@ -2,7 +2,8 @@ from plumbum import ProcessExecutionError
 from plumbum import local, BG
 from plumbum.cmd import sudo, kill, grep, python3, sleep
 from requests.exceptions import ConnectionError
-
+from meerkat.various_tools import load_params
+from pprint import pprint
 import requests
 import unittest
 
@@ -34,8 +35,21 @@ def check_status():
 	"""Get a status code (e.g. 200) from the web service"""
 	r = requests.get("https://localhost/status/index.html", verify=False)
 	status = r.status_code
+	print(r.content)
 	r.connection.close()
 	return (status)
+
+def post_sample():
+	"""Get a status code (e.g. 200) from web service after posting a sample input for classification by meerkat"""
+
+	one_ledger = '{ "container":"bank", "transaction_list":[ { "date":"2014-08-10T00:00:00", "description":"taco bell scarsdale, ny", "amount":59.0, "transaction_id":5024853, "ledger_entry":"debit" } ], "cobrand_id":99, "user_id":12177727 }'
+	#big = load_params("one_ledger.json")
+	header = {"Content-Type":"application/json"}
+	r = requests.post("https://localhost/meerkat/v1.3", verify=False,data=one_ledger,headers=header)
+	print(r.content)
+	status = r.status_code
+	r.connection.close()
+	return (status) 
 
 class WebServiceTest(unittest.TestCase):
 	"""Our UnitTest class."""
@@ -45,6 +59,9 @@ class WebServiceTest(unittest.TestCase):
 		online, web_service_pid = web_service_is_online()
 		if online:
 			stop_linux_process(web_service_pid)
+		
+		start_web_service()
+
 	@classmethod
 	def tearDownClass(cls):
 		online, web_service_pid = web_service_is_online()
@@ -53,7 +70,6 @@ class WebServiceTest(unittest.TestCase):
 
 	def test_web_service_status(self):
 		"""Test starts, checks status of, and stops meerkat web service"""
-		start_web_service()
 		count, sleep_interval, max_retries = 1, 2, 10
 		#Wait for sleep_interval seconds before trying up to
 		#max_retries times
@@ -66,6 +82,17 @@ class WebServiceTest(unittest.TestCase):
 			except ConnectionError:
 				count += 1
 		return
+	
+	def test_web_service_with_sample(self):
+		"""Test starts, checks status of, and stops meerkat web service"""
+		count, sleep_interval, max_retries = 1, 2, 10
+		#Wait for sleep_interval seconds before trying up to
+		#max_retries times
+		status = post_sample()
+		self.assertTrue(status == 200)
+		return
+	
+
 
 if __name__ == "__main__":
 	unittest.main()
