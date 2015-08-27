@@ -30,7 +30,8 @@ def apply_to_df(reader, classifier, file_name, subtype_classifier):
 		for t in trans:
 			t["DESCRIPTION_alt"] = t["LEDGER_ENTRY"] + " " + t["DESCRIPTION"]
 
-		trans = subtype_classifier(trans, doc_key="DESCRIPTION_alt", label_key="SUBTYPE_CNN")
+		trans = subtype_classifier(trans, doc_key="DESCRIPTION_alt", \
+		label_key="SUBTYPE_CNN")
 		trans = trans[0:t_len]
 
 		for t in trans:
@@ -40,27 +41,36 @@ def apply_to_df(reader, classifier, file_name, subtype_classifier):
 		out_df = pd.DataFrame(trans)
 
 		if first_chunk:
-			out_df.to_csv(file_name, sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
+			out_df.to_csv(file_name, sep="|", mode="a", \
+			encoding="utf-8", index=False, index_label=False)
 			first_chunk = False
 		else:
-			out_df.to_csv(file_name, header=False, sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
+			out_df.to_csv(file_name, header=False, sep="|", mode="a", \
+			encoding="utf-8", index=False, index_label=False)
 
 # Load Dataframe
-df = pd.read_csv("data/input/top_50_users.txt", na_filter=False, quoting=csv.QUOTE_NONE, encoding="utf-8", sep="|", error_bad_lines=False)
+df = pd.read_csv("data/input/top_50_users.txt", na_filter=False, \
+quoting=csv.QUOTE_NONE, encoding="utf-8", sep="|", error_bad_lines=False)
 
 # Group into bank and card
 grouped = df.groupby('CONTAINER', as_index=False)
 groups = dict(list(grouped))
 
 # Save groups to separate files and reload as readers
-groups["BANK"].to_csv("data/input/bank_top_50_users.csv", sep="|", mode="w", encoding="utf-8", index=False, index_label=False)
-groups["CARD"].to_csv("data/input/card_top_50_users.csv", sep="|", mode="w", encoding="utf-8", index=False, index_label=False)
-bank_reader = pd.read_csv("data/input/bank_top_50_users.csv", na_filter=False, chunksize=128, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
-card_reader = pd.read_csv("data/input/card_top_50_users.csv", na_filter=False, chunksize=128, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+groups["BANK"].to_csv("data/input/bank_top_50_users.csv", sep="|", mode="w", \
+encoding="utf-8", index=False, index_label=False)
+groups["CARD"].to_csv("data/input/card_top_50_users.csv", sep="|", mode="w", \
+encoding="utf-8", index=False, index_label=False)
+bank_reader = pd.read_csv("data/input/bank_top_50_users.csv", na_filter=False, \
+chunksize=128, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+card_reader = pd.read_csv("data/input/card_top_50_users.csv", na_filter=False, \
+chunksize=128, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
 
 # Apply Classifiers
-apply_to_df(bank_reader, BANK_CNN, "data/output/bank_top_50_users_processed.txt", BANK_SUBTYPE_CNN)
-apply_to_df(card_reader, CARD_CNN, "data/output/card_top_50_users_processed.txt", CARD_SUBTYPE_CNN)
+apply_to_df(bank_reader, BANK_CNN, "data/output/bank_top_50_users_processed.txt", \
+BANK_SUBTYPE_CNN)
+apply_to_df(card_reader, CARD_CNN, "data/output/card_top_50_users_processed.txt", \
+CARD_SUBTYPE_CNN)
 
 
 			
