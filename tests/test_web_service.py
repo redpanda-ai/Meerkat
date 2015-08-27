@@ -85,7 +85,6 @@ class WebServiceTest(unittest.TestCase):
 	
 	def test_web_service_with_sample(self):
 		"""Test starts, checks status of, and stops meerkat web service"""
-		count, sleep_interval, max_retries = 1, 2, 10
 		#Wait for sleep_interval seconds before trying up to
 		#max_retries times
 		status = post_sample()
