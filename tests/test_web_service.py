@@ -45,7 +45,8 @@ def post_sample():
 	one_ledger = '{ "container":"bank", "transaction_list":[ { "date":"2014-08-10T00:00:00", "description":"taco bell scarsdale, ny", "amount":59.0, "transaction_id":5024853, "ledger_entry":"debit" } ], "cobrand_id":99, "user_id":12177727 }'
 	header = {"Content-Type":"application/json"}
 	r = requests.post("https://localhost/meerkat/v1.3", verify=False,data=one_ledger,headers=header)
-	print(r.content)
+	output = open('sample_post_output.txt', 'w')
+	output.write(r.content)
 	status = r.status_code
 	r.connection.close()
 	return (status) 
