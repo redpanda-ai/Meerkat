@@ -38,10 +38,9 @@ import re
 import contextlib
 import boto
 
-from boto.s3.connection import Key, Location
+from boto.s3.connection import Location
 
 from itertools import zip_longest
-from pprint import pprint
 import pandas as pd
 
 from meerkat.various_tools import load_dict_list, progress, safely_remove_file
@@ -52,17 +51,17 @@ class DummyFile(object):
 
 @contextlib.contextmanager
 def nostdout():
-    save_stdout = sys.stdout
-    save_stderr = sys.stderr
-    sys.stdout = DummyFile()
-    sys.stderr = DummyFile()
-    yield
-    sys.stderr = save_stderr
-    sys.stdout = save_stdout
+	save_stdout = sys.stdout
+	save_stderr = sys.stderr
+	sys.stdout = DummyFile()
+	sys.stderr = DummyFile()
+	yield
+	sys.stderr = save_stderr
+	sys.stdout = save_stdout
 
 def grouper(iterable):
-	return zip_longest(*[iter(iterable)]*128, fillvalue={"DESCRIPTION_UNMASKED":""})
-
+	"""Returns batches of size 128 of iterable elements"""
+	return zip_longest(*[iter(iterable)]*128,fillvalue={"DESCRIPTION_UNMASKED":""})
 def get_s3_connection():
 	"""Returns a connection to S3"""
 	try:
@@ -237,15 +236,16 @@ def speed_vests(start_time, accuracy_results):
 
 
 def apply_CNN(classifier, transactions):
-		"""Apply the CNN to transactions"""
+	"""Apply the CNN to transactions"""
 
-		batches = grouper(transactions)
-		processed = []
+	batches = grouper(transactions)
+	processed = []
 
-		for i, batch in enumerate(batches):
-			processed += classifier(batch, doc_key="DESCRIPTION_UNMASKED", label_key="MERCHANT_NAME")
+	for batch in enumerate(batches):
+		processed += classifier(batch, doc_key="DESCRIPTION_UNMASKED", \
+label_key="MERCHANT_NAME")
 
-		return processed[0:len(transactions)]
+	return processed[0:len(transactions)]
 
 def per_merchant_accuracy(params, classifier):
 	"""An easy way to test the accuracy of a small set
@@ -281,11 +281,13 @@ def CNN_accuracy():
 def process_file_collection(bucket, prefix, classifier):
 	"""Test a list of files"""
 
-	label_map = load_label_map("meerkat/classification/label_maps/deep_clean_map.json")
+	label_map = load_label_map\
+	("meerkat/classification/label_maps/deep_clean_map.json")
 	params = {}
 	params["label_key"] = "MERCHANT_NAME"
-	results = open("data/output/per_merchant_tests_" + prefix.split('/')[-2] + ".csv", "a")
-	writer = csv.writer(results, delimiter = ',', quotechar = '"')
+	results = open\
+	("data/output/per_merchant_tests_" + prefix.split('/')[-2] + ".csv", "a")
+	writer = csv.writer(results, delimiter=',', quotechar='"')
 	writer.writerow(["Merchant", "Recall", "Precision"])
 
 	for label_num in label_map.keys():
@@ -296,17 +298,20 @@ def process_file_collection(bucket, prefix, classifier):
 		file_name = "data/input/" + os.path.basename(sample.key)
 		sample.get_contents_to_filename(file_name)
 
-		df = pd.read_csv(file_name, na_filter=False, compression="gzip", quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+		df = pd.read_csv(file_name, na_filter=False, compression="gzip",\
+		 quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
 		df.rename(columns={"DESCRIPTION": "DESCRIPTION_UNMASKED"}, inplace=True)
 		df["MERCHANT_NAME"] = merchant_name
 		unzipped_file_name = "data/misc/Merchant Samples/" + label_num + ".txt"
-		df.to_csv(unzipped_file_name, sep="|", mode="w", encoding="utf-8", index=False, index_label=False)
+		df.to_csv(unzipped_file_name, sep="|", mode="w", \
+		encoding="utf-8", index=False, index_label=False)
 		safely_remove_file(file_name)
 		
 		params["verification_source"] = unzipped_file_name
 		print("Testing Merchant: " + merchant_name)
 		accuracy_results = per_merchant_accuracy(params, classifier)
-		writer.writerow([merchant_name, accuracy_results['total_recall'], accuracy_results["precision"]])
+		writer.writerow([merchant_name, accuracy_results['total_recall'], \
+		accuracy_results["precision"]])
 		safely_remove_file(unzipped_file_name)
 
 	results.close()
