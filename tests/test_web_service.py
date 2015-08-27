@@ -40,19 +40,21 @@ def check_status():
 class WebServiceTest(unittest.TestCase):
 	"""Our UnitTest class."""
 	
-	def setUp(self):
+	@classmethod
+	def setUpClass(cls):
 		online, web_service_pid = web_service_is_online()
 		if online:
 			stop_linux_process(web_service_pid)
+		start_web_service()
 
-	def tearDown(self):
+	@classmethod
+	def tearDownClass(cls):
 		online, web_service_pid = web_service_is_online()
 		if online:
 			stop_linux_process(web_service_pid)
 
 	def test_web_service_status(self):
-		"""Test starts, checks status of, and stops meerkat web service"""
-		start_web_service()
+		"""Test checks status of meerkat web service"""
 		count, sleep_interval, max_retries = 1, 2, 10
 		#Wait for sleep_interval seconds before trying up to
 		#max_retries times
@@ -65,6 +67,15 @@ class WebServiceTest(unittest.TestCase):
 			except ConnectionError:
 				count += 1
 		return
+
+	
+	def test_web_service_status(self):
+		"""Test executes meerkat with small sample input and checks for 200 status code"""
+		status = check_status()
+		self.assertTrue(status == 200)
+		return
+
+
 
 if __name__ == "__main__":
 	unittest.main()
