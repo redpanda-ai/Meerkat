@@ -40,12 +40,12 @@ def post_sample():
 	"""Get a status code(e.g. 200) after posting small sample input to web service"""
 		
 	one_ledger = str(load_params("one_ledger.json")
-	header = {"Content-Type":"application/json"}
-	r = requests.get("https://localhost/status/index.html", verify=False, data=one_ledger,headers=header)
-	status = r.status_code
-	r.connection.close()
-	return (status)
-	
+        header = {"Content-Type":"application/json"}
+        r = requests.post("https://localhost/meerkat/v1.3", verify=False,data=one_ledger,headers=header)
+        print(r.content)
+        status = r.status_code
+        r.connection.close()
+        return (status)
 	
 class WebServiceTest(unittest.TestCase):
 	"""Our UnitTest class."""
