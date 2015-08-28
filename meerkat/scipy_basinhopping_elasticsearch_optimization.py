@@ -29,7 +29,6 @@ Created on Feb 26, 2014
 
 import json
 import sys 
-import datetime
 import os
 import queue
 import collections

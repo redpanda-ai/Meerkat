@@ -31,22 +31,16 @@ import logging
 import sys 
 import datetime
 import os
-import queue
-import csv
-import collections
-import contextlib
 import json
-from copy import deepcopy
-from random import randint, uniform, random, shuffle
+from random import uniform
 
 from pprint import pprint
-from numpy import array, array_split
 
 from meerkat.classification.load import select_model
 from meerkat.accuracy import print_results, vest_accuracy
 from meerkat.various_tools \
-import load_dict_list, queue_to_list, safe_print, get_us_cities
-from meerkat.various_tools import load_params, load_hyperparameters, progress
+import load_dict_list, safe_print, get_us_cities
+from meerkat.various_tools import load_params 
 from meerkat.web_service.web_consumer import Web_Consumer
 
 consumer = Web_Consumer()

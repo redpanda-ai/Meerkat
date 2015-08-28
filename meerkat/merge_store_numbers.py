@@ -31,13 +31,11 @@ Created on Mar 25, 2014
 
 import csv 
 import sys
-import json
 import os
 import logging
 
 from scipy.stats.mstats import zscore
-from elasticsearch import Elasticsearch, helpers
-from pprint import pprint
+from elasticsearch import Elasticsearch 
 from queue import Queue
 from threading import Thread
  

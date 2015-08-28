@@ -34,7 +34,6 @@ import datetime
 import logging
 import os
 import sys
-import re
 import contextlib
 import boto
 
