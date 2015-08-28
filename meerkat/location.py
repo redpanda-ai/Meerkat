@@ -13,7 +13,7 @@ import json
 import sys
 
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import matplotlib as mpl
 from matplotlib.patches import Polygon
 from pprint import pprint

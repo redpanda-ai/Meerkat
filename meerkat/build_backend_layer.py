@@ -4,6 +4,9 @@
 
 Created on Sep 30, 2014
 @author: J. Andrew Key
+
+Modified on July 31, 2015
+@author: Sivan Mehta
 """
 
 #################### USAGE ##########################
@@ -21,6 +24,7 @@ import shutil
 import sys
 import time
 import logging
+import os
 
 from elasticsearch import Elasticsearch
 from boto.ec2.connection import EC2Connection
@@ -363,7 +367,7 @@ def poll_for_cluster_status(params):
 			print("Exception {0}".format(err))
 			print("Attempt #{0} in {1} seconds.".format(j, sleep_between_attempts))
 			time.sleep(sleep_between_attempts)
-	print("Congratulations your cluster is fully operational.")
+	return cluster_nodes[0] # ip address of newly spun up cluster
 
 def poll_pending_instances(reservations, instance_count, params):
 	"""Poll pending instances until all are running."""
@@ -469,7 +473,12 @@ def start():
 	send_shell_commands(params, "configure_master_commands", "masters")
 	send_shell_commands(params, "configure_hybrid_commands", "hybrids")
 	send_shell_commands(params, "configure_slave_commands", "slaves")
-	poll_for_cluster_status(params)
-
+	ip = poll_for_cluster_status(params)
+	print("Creating Elasticsearch repository... ", end = "")
+	# create elasticsearch snapshot repository
+	command = "curl %s:9200/_snapshot/my_backup -d @web_service_tester/create_repository.json > out.log" % ip
+	os.system(command)
+	print("done!")
+	print("Congratulations! Your cluster is fully operational!")
 #Main program
 start()

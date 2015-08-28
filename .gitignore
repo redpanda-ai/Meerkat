@@ -4,3 +4,4 @@ __pycache__/
 *.log
 API_Documentation.md
 *.xml
+*.out

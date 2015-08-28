@@ -137,6 +137,7 @@ path.logs: /data/1/log/elasticsearch
 # Path to where plugins are installed:
 #
 #path.plugins: /path/to/plugins
+path.repo: ["/data/2/backups", "/data/2/longterm_backups"]
 
 
 #################################### Plugin ###################################

@@ -7,11 +7,18 @@ processing and analysis against transactions or other merchant datasets
 Created on Feb 18, 2014
 @author: J. Andrew Key
 @author: Matthew Sevrens
+
+Updated on July 17, 2015
+@author: Sivan Mehta
 """
 
 #################### USAGE ##########################
 
 # Note: Experts only! Do not touch!
+
+# python3 -m meerkat.bulk_loader config/factual_loader.json
+
+# Estimated runtime: ~40 mins / # number of cluster nodes
 
 #####################################################
 
@@ -412,12 +419,13 @@ def guarantee_index_and_doc_type(params):
 		logging.warning("Index does not exist, creating")
 		index_body = params["elasticsearch"]["type_mapping"]
 		result = es_connection.indices.create(index=es_index, body=index_body)
-		okay, acknowledged = result["ok"], result["acknowledged"]
-		if okay and acknowledged:
-			logging.critical("Index created successfully.")
-		else:
-			logging.error("Failed to create index, aborting.")
-			sys.exit()
+		# okay, acknowledged = result["ok"], result["acknowledged"]
+		# try:
+		# 	result["ok"] and result["acknowledged"]
+		# 	logging.critical("Index created successfully.")
+		# except KeyError:
+		# 	logging.error("Failed to create index, aborting.")
+		# 	sys.exit()
 
 def build_user_index():
 	"""Build out the user index"""

@@ -5,9 +5,10 @@
 	"security_groups" : [
 		"github",
 		"meerkat_private",
-		"s3cmd"
+		"s3cmd",
+		"es_develop"
 	],
-	"ami-id" : "ami-afe3d29f",
+	"ami-id" : "ami-cf707eff",
 	"key_name" : "jkey",
 	"key_file" : "/root/.ssh/jkey.pem",
 	"instance_type" : "c3.xlarge",
@@ -23,7 +24,7 @@
 		{ "name" : "ephemeral1", "mount": "/dev/sdc" }
 	],
 	"ebs_mapping" : [
-		{ "snapshot-id": "snap-151382de", "mount" : "/dev/sdf" }
+		{ "snapshot-id": "snap-00567253", "mount" : "/dev/sdg" }
 	],
 	"mount_data_commands" : [
 		"mkdir -p /data/0",
@@ -31,7 +32,7 @@
 		"mkdir -p /data/2",
 		"mount /dev/xvdb /data/0",
 		"mount /dev/xvdc /data/1",
-		"mount /dev/xvdf /data/2",
+		"mount /dev/xvdg /data/2",
 		"mkdir -p /data/0/input",
 		"mkdir -p /data/0/output",
 		"mkdir -p /data/1/input",

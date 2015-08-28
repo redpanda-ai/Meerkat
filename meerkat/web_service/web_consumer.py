@@ -23,12 +23,13 @@ from meerkat.classification.load import select_model
 from meerkat.classification.lua_bridge import get_CNN
 from meerkat.classification.bloom_filter.find_entities import location_split
 
+# Enabled Models
 BANK_SWS = select_model("bank")
 CARD_SWS = select_model("card")
-TRANSACTION_TYPE = select_model("transaction_type")
-SUB_TRANSACTION_TYPE = select_model("sub_transaction_type")
 BANK_CNN = get_CNN("bank")
 CARD_CNN = get_CNN("card")
+BANK_SUBTYPE_CNN = get_CNN("card_subtype")
+CARD_SUBTYPE_CNN = get_CNN("bank_subtype")
 
 def grouper(iterable):
 	return zip_longest(*[iter(iterable)]*128, fillvalue={"description":""})
@@ -37,16 +38,35 @@ class Web_Consumer():
 	"""Acts as a web service client to process and enrich
 	transactions in real time"""
 
-	def __init__(self, params, hyperparams, cities):
+	def __init__(self, params=None, hyperparams=None, cities=None):
 		"""Constructor"""
+		
+		if params is None:
+			self.params = dict()
+		else:
+			self.params = params
+			self.es = get_es_connection(params)
 
-		self.type_hierarchy = load_params\
-		("meerkat/classification/label_maps/type_subtype_hierarchy.json")
+		if hyperparams is None:
+			self.hyperparams = dict()
+		else:
+			self.hyperparams = hyperparams
+		
+		if cities is None:
+			self.cities = dict()
+		else:
+			self.cities = cities
+
+	def update_params(self, params):
 		self.params = params
-		self.hyperparams = hyperparams
-		self.cities = cities
 		self.es = get_es_connection(params)
 
+	def update_hyperparams(self, hyperparams):
+		self.hyperparams = hyperparams
+	
+	def update_cities(self, cities):
+		self.cities = cities
+	
 	def __get_query(self, transaction):
 		"""Create an optimized query"""
 
@@ -78,14 +98,19 @@ class Web_Consumer():
 			should_clauses.append(city_query)
 			should_clauses.append(state_query)
 
+			# add routing term
+			# o_query["query"]["match"] = "%s, %s" % (locale_bloom[0], locale_bloom[1])
+
 		return o_query
 
 	def __search_index(self, queries):
 		"""Search against a structured index"""
 
 		index = self.params["elasticsearch"]["index"]
+		# pprint(queries)
 
 		try:
+			# pull routing out of queries and append to below msearch
 			results = self.es.msearch(queries, index=index)
 		except Exception:
 			return None
@@ -271,7 +296,7 @@ class Web_Consumer():
 		# Add or Modify Fields
 		for trans in physical:
 			categories = trans.get("category_labels", "")
-			categories = json.loads(categories) if (categories != "") else []
+			categories = json.loads(categories) if (categories != "" and categories != []) else []
 			trans["category_labels"] = categories
 
 		# Combine Transactions
@@ -314,7 +339,14 @@ class Web_Consumer():
 
 		for trans in transactions:
 			query = self.__get_query(trans)
-			queries.append({"index" : index})
+
+			# add routing to header
+			#try:
+			#	locality = query['query']['bool']['should'][1]['query_string']['query']
+			#	region = query['query']['bool']['should'][2]['query_string']['query']
+			queries.append({"index" : index})#, "routing" : "%s%s" % (locality, region)})
+			#except IndexError:
+			#	queries.append({"index" : index})
 			queries.append(query)
 
 		queries = '\n'.join(map(json.dumps, queries))
@@ -332,23 +364,6 @@ class Web_Consumer():
 
 		return enriched
 
-	def __add_transaction_type(self, data):
-		"""Add transaction_type and transaction_sub_type to transaction"""
-
-		transactions = data["transaction_list"]
-
-		if len(transactions) == 0:
-			return transactions
-
-		for trans in transactions:
-			txn_type = TRANSACTION_TYPE(trans["description"])
-			txn_sub_type = SUB_TRANSACTION_TYPE(trans["description"])
-			subtypes = self.type_hierarchy.get(txn_type, [])
-			trans["txn_type"] = txn_type
-			trans["txn_sub_type"] = txn_sub_type if txn_sub_type in subtypes else ""
-
-		return transactions
-
 	def __sws(self, data, transactions):
 		"""Split transactions into physical and non-physical"""
 
@@ -363,8 +378,8 @@ class Web_Consumer():
 
 		return physical, non_physical
 
-	def __apply_CNN(self, data, transactions):
-		"""Apply the CNN to transactions"""
+	def __apply_merchant_CNN(self, data, transactions):
+		"""Apply the merchant CNN to transactions"""
 
 		batches = grouper(transactions)
 		classifier = BANK_CNN if (data["container"] == "bank") else CARD_CNN
@@ -374,6 +389,31 @@ class Web_Consumer():
 			processed += classifier(batch)
 
 		return processed[0:len(transactions)]
+
+	def __apply_subtype_CNN(self, data):
+		"""Apply the subtype CNN to transactions"""
+
+		transactions = data["transaction_list"]
+		classifier = BANK_SUBTYPE_CNN if (data["container"] == "bank") else CARD_SUBTYPE_CNN
+
+		if len(transactions) == 0:
+			return transactions
+
+		batches = grouper(transactions)
+		processed = []
+
+		for i, batch in enumerate(batches):
+			processed += classifier(batch, label_key="subtype_CNN")
+
+		processed = processed[0:len(transactions)]
+
+		for t in processed:
+			txn_type, txn_sub_type = t["subtype_CNN"].split(" - ")
+			t["txn_type"] = txn_type
+			t["txn_sub_type"] = txn_sub_type
+			del t["subtype_CNN"]
+
+		return processed
 
 	def __apply_locale_bloom(self, data, transactions):
 		""" Apply the locale bloom filter to transactions"""
@@ -390,9 +430,9 @@ class Web_Consumer():
 	def classify(self, data):
 		"""Classify a set of transactions"""
 
-		transactions = self.__add_transaction_type(data)
+		transactions = self.__apply_subtype_CNN(data)
 		transactions = self.__apply_locale_bloom(data, transactions)
-		transactions = self.__apply_CNN(data, transactions)
+		transactions = self.__apply_merchant_CNN(data, transactions)
 		physical, non_physical = self.__sws(data, transactions)
 		physical = self.__enrich_physical(physical)
 		transactions = self.ensure_output_schema(data, physical, non_physical)

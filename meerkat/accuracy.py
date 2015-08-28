@@ -34,10 +34,43 @@ import datetime
 import logging
 import os
 import sys
+import re
+import contextlib
+import boto
 
+from boto.s3.connection import Key, Location
+
+from itertools import zip_longest
 from pprint import pprint
+import pandas as pd
 
-from meerkat.various_tools import (load_dict_list, progress)
+from meerkat.various_tools import load_dict_list, progress, safely_remove_file
+from meerkat.classification.lua_bridge import get_CNN, load_label_map
+
+class DummyFile(object):
+    def write(self, x): pass
+
+@contextlib.contextmanager
+def nostdout():
+    save_stdout = sys.stdout
+    save_stderr = sys.stderr
+    sys.stdout = DummyFile()
+    sys.stderr = DummyFile()
+    yield
+    sys.stderr = save_stderr
+    sys.stdout = save_stdout
+
+def grouper(iterable):
+	return zip_longest(*[iter(iterable)]*128, fillvalue={"DESCRIPTION_UNMASKED":""})
+
+def get_s3_connection():
+	"""Returns a connection to S3"""
+	try:
+		conn = boto.connect_s3()
+	except boto.s3.connection.HostRequiredError:
+		print("Error connecting to S3, check your credentials")
+		sys.exit()
+	return conn
 
 def generic_test(machine, human, lists, column):
 	"""Tests both the recall and precision of the pinpoint classifier against
@@ -49,7 +82,7 @@ def generic_test(machine, human, lists, column):
 
 	# Create Quicker Lookup
 	for index, row in enumerate(human):
-		key = str(row["UNIQUE_MEM_ID"]) + row[doc_label]
+		key = str(row["UNIQUE_TRANSACTION_ID"])
 		index_lookup[key] = index
 
 	# Test Each Machine Labeled Row
@@ -64,7 +97,7 @@ def generic_test(machine, human, lists, column):
 			continue
 
 		# Verify Accuracy
-		key = str(machine_row["UNIQUE_MEM_ID"]) + machine_row[doc_label]
+		key = str(machine_row["UNIQUE_TRANSACTION_ID"])
 		h_index = index_lookup.get(key, "")
 
 		# Sort Into Lists
@@ -107,8 +140,6 @@ def vest_accuracy(params, file_path=None, non_physical_trans=None,\
 	queue/ non_physical list. Attempts to provide various
 	accuracy tests"""
 
-	#params["es_connection"] = get_es_connection(params)
-
 	if non_physical_trans is None:
 		non_physical_trans = []
 	if result_list is None:
@@ -147,6 +178,7 @@ def vest_accuracy(params, file_path=None, non_physical_trans=None,\
 	# Test Classifier for recall and precision
 	label_key = params.get("label_key", "FACTUAL_ID")
 	generic_test(machine_labeled, human_labeled, my_lists, label_key)
+
 
 	# Test Bulk (binary) Classifier for accuracy
 	#test_bulk_classifier(human_labeled, non_physical_trans, my_lists)
@@ -203,6 +235,82 @@ def speed_vests(start_time, accuracy_results):
 			'time_per_transaction': time_per_transaction,
 			'transactions_per_minute':transactions_per_minute}
 
+
+def apply_CNN(classifier, transactions):
+		"""Apply the CNN to transactions"""
+
+		batches = grouper(transactions)
+		processed = []
+
+		for i, batch in enumerate(batches):
+			processed += classifier(batch, doc_key="DESCRIPTION_UNMASKED", label_key="MERCHANT_NAME")
+
+		return processed[0:len(transactions)]
+
+def per_merchant_accuracy(params, classifier):
+	"""An easy way to test the accuracy of a small set
+	provided a set of hyperparameters"""
+
+	print("Testing sample: " + params["verification_source"])
+	transactions = load_dict_list(params["verification_source"])
+	labeled_trans = apply_CNN(classifier, transactions)
+	accuracy_results = vest_accuracy(params, result_list=labeled_trans)
+	print_results(accuracy_results)
+
+	return accuracy_results
+
+def CNN_accuracy():
+	"""Run merchant CNN on a directory of Merchant Samples"""
+
+	# Load Classifiers
+	BANK_CNN = get_CNN("bank")
+	CARD_CNN = get_CNN("card")
+
+	# Connect to S3
+	with nostdout():
+		conn = get_s3_connection()
+
+	bucket = conn.get_bucket("yodleemisc", Location.USWest2)
+
+	# Test Bank CNN
+	process_file_collection(bucket, "/vumashankar/CNN/bank/", BANK_CNN)
+
+	# Test Card CNN
+	process_file_collection(bucket, "/vumashankar/CNN/card/", CARD_CNN)
+
+def process_file_collection(bucket, prefix, classifier):
+	"""Test a list of files"""
+
+	label_map = load_label_map("meerkat/classification/label_maps/deep_clean_map.json")
+	params = {}
+	params["label_key"] = "MERCHANT_NAME"
+	results = open("data/output/per_merchant_tests_" + prefix.split('/')[-2] + ".csv", "a")
+	writer = csv.writer(results, delimiter = ',', quotechar = '"')
+	writer.writerow(["Merchant", "Recall", "Precision"])
+
+	for label_num in label_map.keys():
+
+		merchant_name = label_map.get(label_num, "not_found")
+		sample = bucket.get_key(prefix + label_num + ".txt.gz")
+		if sample == None: continue
+		file_name = "data/input/" + os.path.basename(sample.key)
+		sample.get_contents_to_filename(file_name)
+
+		df = pd.read_csv(file_name, na_filter=False, compression="gzip", quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+		df.rename(columns={"DESCRIPTION": "DESCRIPTION_UNMASKED"}, inplace=True)
+		df["MERCHANT_NAME"] = merchant_name
+		unzipped_file_name = "data/misc/Merchant Samples/" + label_num + ".txt"
+		df.to_csv(unzipped_file_name, sep="|", mode="w", encoding="utf-8", index=False, index_label=False)
+		safely_remove_file(file_name)
+		
+		params["verification_source"] = unzipped_file_name
+		print("Testing Merchant: " + merchant_name)
+		accuracy_results = per_merchant_accuracy(params, classifier)
+		writer.writerow([merchant_name, accuracy_results['total_recall'], accuracy_results["precision"]])
+		safely_remove_file(unzipped_file_name)
+
+	results.close()
+
 def print_results(results):
 	"""Provide useful readable output"""
 
@@ -234,16 +342,16 @@ def print_results(results):
 	print("{0:35} = {1:10.2f}%".format("Precision",
 		results['precision']))
 
+	#print("", "UNLABELED:", '\n'.join(sorted(results['unlabeled'])), sep="\n")
 	#print("", "MISLABELED:", '\n'.join(sorted(results['mislabeled'])), sep="\n")
 	#print("", "MISLABELED BINARY:", '\n'.join(results['non_physical']),
 	#	sep="\n")
 
 def run_from_command_line(command_line_arguments):
 	"""Runs these commands if the module is invoked from the command line"""
-	output_path = "data/output/meerkatLabeled.csv"
-	if len(command_line_arguments) > 1:
-		output_path = command_line_arguments[1]
-	pprint(vest_accuracy(params=None, file_path=output_path))
+	
+	#print_results(vest_accuracy(params=None))
+	CNN_accuracy()
 
 if __name__ == "__main__":
 	run_from_command_line(sys.argv)
