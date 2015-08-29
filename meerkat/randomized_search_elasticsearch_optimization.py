@@ -1,5 +1,4 @@
 #!/usr/local/bin/python3.3
-# pylint: skip-file
 
 """This module is the core of the Meerkat engine. It allows us to rapidly
 evaluate many possible configurations if provided a well labeled dataset.
@@ -32,21 +31,16 @@ import logging
 import sys 
 import datetime
 import os
-import queue
-import csv
-import collections
-import contextlib
 import json
-from copy import deepcopy
-from random import randint, uniform, random, shuffle
+from random import uniform
 
 from pprint import pprint
-from numpy import array, array_split
 
 from meerkat.classification.load import select_model
 from meerkat.accuracy import print_results, vest_accuracy
-from meerkat.various_tools import load_dict_list, queue_to_list, safe_print, get_us_cities
-from meerkat.various_tools import load_params, load_hyperparameters, progress
+from meerkat.various_tools \
+import load_dict_list, safe_print, get_us_cities
+from meerkat.various_tools import load_params 
 from meerkat.web_service.web_consumer import Web_Consumer
 
 consumer = Web_Consumer()
@@ -58,8 +52,7 @@ def run_meerkat(params, dataset):
 	result_list = []
 	n = (len(dataset))/BATCH_SIZE
 	n = int(n - (n%1))
-	new_transaction_list = []
-	for x in range (0, n+1):
+	for x in range(0, n+1):
 		batch = []
 		for i in range(x*BATCH_SIZE, (x+1)*BATCH_SIZE):
 			try:
@@ -83,7 +76,8 @@ def run_meerkat(params, dataset):
 def load_dataset(params):
 	"""Load a verified dataset"""
 
-	verification_source = params.get("verification_source", "data/misc/ground_truth_card.txt")
+	verification_source =\
+	params.get("verification_source", "data/misc/ground_truth_card.txt")
 	dataset = []
 
 	# Load Data
@@ -120,7 +114,7 @@ def randomized_optimization(hyperparameters, known, params, dataset):
 	top_score = gradient_descent(initial_values, params, known, dataset)
 
 	# Save All Scores
-	with open("optimization_results/" + base_name + "_all_scores.txt", "w") as fout:
+	with open("optimization_results/" +base_name + "_all_scores.txt", "w") as fout:
 		pprint(params["optimization"]["scores"], fout)
 
 	print("Precision = " + str(top_score['precision']) + "%")
@@ -129,7 +123,9 @@ def randomized_optimization(hyperparameters, known, params, dataset):
 	print("ALL RESULTS:")
 	
 	# Save Final Parameters
-	file_name = "optimization_results/" + base_name + "_" + str(round(top_score['precision'], 2)) + "Precision" + str(round(top_score['total_recall_physical'], 2)) + "Recall.json" 
+	file_name = \
+	"optimization_results/" + base_name + "_" + str(round(top_score['precision'], 2)) +\
+	"Precision" + str(round(top_score['total_recall_physical'], 2)) + "Recall.json" 
 	new_parameters = open(file_name, 'w')
 	pprint(top_score["hyperparameters"], new_parameters)
 
@@ -157,9 +153,11 @@ def get_initial_values(hyperparameters, params, known, dataset):
 	for i in range(iterations):
 
 		if i > 0:
-			randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=learning_rate)
+			randomized_hyperparameters = \
+			randomize(hyperparameters, known, learning_rate=learning_rate)
 		else:
-			randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=0)
+			randomized_hyperparameters = \
+			randomize(hyperparameters, known, learning_rate=0)
 
 		safe_print("\n--------------------\n")
 		safe_print("ITERATION NUMBER: " + str(i) + "\n")
@@ -178,7 +176,8 @@ def get_initial_values(hyperparameters, params, known, dataset):
 			top_score = accuracy
 			top_score['hyperparameters'] = randomized_hyperparameters
 			safe_print("\nSCORE PRECISION: " + str(round(accuracy["precision"], 2)))
-			safe_print("SCORE RECALL: " + str(round(accuracy["total_recall_physical"], 2)) + "\n")
+			safe_print("SCORE RECALL: " + \
+			str(round(accuracy["total_recall_physical"], 2)) + "\n")
 
 		# Keep Track of All Scores
 		score = {
@@ -209,7 +208,7 @@ def gradient_descent(initial_values, params, known, dataset):
 		
 		# Save Iterations Top Hyperparameters
 		print("\n", "Top Precision: " + str(round(top_score["precision"], 2)))
-		print("\n", "Top Recall: " + str(round(top_score["total_recall_physical"], 2)))
+		print("\n", "Top Recall: " + str(round(top_score["total_recall_physical"],2)))
 		save_top_score(top_score)
 
 	return top_score
@@ -224,7 +223,8 @@ def run_iteration(top_score, params, known, dataset):
 
 	for i in range(iterations):
 
-		randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=learning_rate)
+		randomized_hyperparameters = \
+		randomize(hyperparameters, known, learning_rate=learning_rate)
 
 		# Iteration Stats
 		safe_print("\n--------------------\n")
@@ -233,11 +233,14 @@ def run_iteration(top_score, params, known, dataset):
 
 		# Run Classifier
 		accuracy = run_classifier(randomized_hyperparameters, params, dataset)
-		same_or_higher_recall = accuracy["total_recall_physical"] >= new_top_score["total_recall_physical"]
+		same_or_higher_recall = \
+		accuracy["total_recall_physical"] >= new_top_score["total_recall_physical"]
 		same_or_higher_precision = accuracy["precision"] >= new_top_score["precision"]
 		not_too_high_precision = accuracy["precision"] <= settings["max_precision"]
 
-		if same_or_higher_recall and same_or_higher_precision and not_too_high_precision:
+		if same_or_higher_recall and same_or_higher_precision\
+		and not_too_high_precision:
+
 			new_top_score = accuracy
 			new_top_score['hyperparameters'] = randomized_hyperparameters
 			safe_print("\n", "SCORE PRECISION: " + str(round(accuracy["precision"], 2)))
@@ -277,10 +280,12 @@ def randomize(hyperparameters, known={}, learning_rate=0.3):
 
 def save_top_score(top_score):
 
-	record = open("optimization_results/" + os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_top_scores.txt", "a")
+	record = open("optimization_results/" + os.path.splitext(os.path.basename(sys.argv[1]))[0]\
+	 + "_top_scores.txt", "a")
 	pprint("Precision = " + str(top_score['precision']) + "%", record)
-	pprint("Best Recall = " + str(top_score['total_recall_physical']) + "%", record)
-	boost_vectors, boost_labels, other = split_hyperparameters(top_score["hyperparameters"])
+	pprint("Best Recall = " + str(top_score['total_recall_physical']) +"%", record)
+	boost_vectors, boost_labels, other = \
+	split_hyperparameters(top_score["hyperparameters"])
 	pprint(boost_vectors, record)
 	pprint(other, record)
 	record.close()
@@ -304,7 +309,8 @@ def run_classifier(hyperparameters, params, dataset):
 	""" Runs the classifier with a given set of hyperparameters"""
 
 	# Split boosts from other hyperparameters and format accordingly
-	boost_vectors, boost_labels, hyperparameters = split_hyperparameters(hyperparameters)
+	boost_vectors, boost_labels, hyperparameters = \
+	split_hyperparameters(hyperparameters)
 
 	# Override Params
 	hyperparameters["boost_labels"] = boost_labels
@@ -343,7 +349,8 @@ def verify_arguments():
 		sys.exit()
 
 	# Clear Contents from Previous Runs
-	previous_scores = "optimization_results/" + os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_top_scores.txt"
+	previous_scores = "optimization_results/" + os.path.splitext(os.path.basename(sys.argv[1]))[0]\
+	 + "_top_scores.txt"
 	if os.path.isfile(previous_scores):
 		open(previous_scores, 'w').close()
 

@@ -34,17 +34,17 @@ from meerkat.file_producer import get_s3_connection
 #####################################################
 
 class DummyFile(object):
-    def write(self, x): pass
+	def write(self, x): pass
 
 @contextlib.contextmanager
 def nostdout():
-    save_stdout = sys.stdout
-    save_stderr = sys.stderr
-    sys.stdout = DummyFile()
-    sys.stderr = DummyFile()
-    yield
-    sys.stderr = save_stderr
-    sys.stdout = save_stdout
+	save_stdout = sys.stdout
+	save_stderr = sys.stderr
+	sys.stdout = DummyFile()
+	sys.stderr = DummyFile()
+	yield
+	sys.stderr = save_stderr
+	sys.stdout = save_stdout
 
 def run_from_command_line(cla):
 	"""Runs these commands if the module is invoked from the command line"""
@@ -56,9 +56,12 @@ def run_from_command_line(cla):
 	bucket = conn.get_bucket("yodleeprivate", Location.USWest2)
 	bank_regex = re.compile("panels/meerkat_split/bank/")
 	card_regex = re.compile("ctprocessed/gpanel/card/")
-	bank_columns = ["DESCRIPTION_UNMASKED", "GOOD_DESCRIPTION", "TRANSACTION_DATE", "UNIQUE_TRANSACTION_ID"]
-	card_columns = ["DESCRIPTION_UNMASKED", "GOOD_DESCRIPTION", "TRANSACTION_DATE", "UNIQUE_TRANSACTION_ID"]
-	dtypes = {"DESCRIPTION_UNMASKED":"object", "GOOD_DESCRIPTION":"object", "TRANSACTION_DATE":"object", "UNIQUE_TRANSACTION_ID":"object"}
+	bank_columns = ["DESCRIPTION_UNMASKED", "GOOD_DESCRIPTION", \
+	"TRANSACTION_DATE", "UNIQUE_TRANSACTION_ID"]
+	card_columns = ["DESCRIPTION_UNMASKED", "GOOD_DESCRIPTION", \
+	"TRANSACTION_DATE", "UNIQUE_TRANSACTION_ID"]
+	dtypes = {"DESCRIPTION_UNMASKED":"object", "GOOD_DESCRIPTION":"object", \
+	"TRANSACTION_DATE":"object", "UNIQUE_TRANSACTION_ID":"object"}
 	bank_files, card_files = [], []
 	first_chunk = True
 
@@ -77,7 +80,8 @@ def run_from_command_line(cla):
 		try:
 			item.get_contents_to_filename(file_name)
 
-			dataframe = pd.read_csv(file_name, na_filter=False, chunksize=100000, dtype=dtypes, compression="gzip", quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+			dataframe = pd.read_csv(file_name, na_filter=False, chunksize=100000, \
+			dtype=dtypes, compression="gzip", quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
 			
 			for df in dataframe:
 
@@ -88,10 +92,12 @@ def run_from_command_line(cla):
 				sampled_df = df.ix[rows]
 
 				if first_chunk:
-					sampled_df[bank_columns].to_csv("/mnt/ephemeral/sampling/bank/bank_sample.txt", columns=bank_columns, sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
+					sampled_df[bank_columns].to_csv("/mnt/ephemeral/sampling/bank/bank_sample.txt", \
+					columns=bank_columns, sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
 					first_chunk = False
 				else:
-					sampled_df[bank_columns].to_csv("/mnt/ephemeral/sampling/bank/bank_sample.txt", header=False, columns=bank_columns, sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
+					sampled_df[bank_columns].to_csv("/mnt/ephemeral/sampling/bank/bank_sample.txt", \
+					header=False, columns=bank_columns, sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
 			
 			del card_files[i]
 			safely_remove_file(file_name)

@@ -1,5 +1,4 @@
 #!/usr/local/bin/python3.3
-# pylint: skip-file
 
 """This module takes a set of merchants with their associated manually
 formatted store numbers. The records are matched against Factual and if a
@@ -32,13 +31,11 @@ Created on Mar 25, 2014
 
 import csv 
 import sys
-import json
 import os
 import logging
 
 from scipy.stats.mstats import zscore
-from elasticsearch import Elasticsearch, helpers
-from pprint import pprint
+from elasticsearch import Elasticsearch 
 from queue import Queue
 from threading import Thread
  
@@ -76,7 +73,8 @@ def find_merchant(store):
 	"""Match document with store number to factual document"""
 
 	fields = ["address", "postcode", "name", "locality", "region"]
-	search_parts = [store["address"], store["zip_code"][0:5], store["keywords"], store["city"], string_cleanse(store["state"])]
+	search_parts = [store["address"], store["zip_code"][0:5],\
+	 store["keywords"], store["city"], string_cleanse(store["state"])]
 	factual_id = ""
 	top_result = ""
 
@@ -97,7 +95,8 @@ def find_merchant(store):
 		return "", ""
 
 	# Allow User to Verify and Return 
-	formatted = [top_hit.get("name", ""), top_hit.get("address", ""), top_hit.get("postcode", ""), top_hit.get("locality", ""), top_hit.get("region", ""),]
+	formatted = [top_hit.get("name", ""), top_hit.get("address", ""),\
+	 top_hit.get("postcode", ""), top_hit.get("locality", ""), top_hit.get("region", ""),]
 	formatted = ", ".join(formatted)
 
 	message = """
@@ -109,7 +108,7 @@ def find_merchant(store):
 	# logging.warning(message)
 
 	# Must Match Keywords
-	if not (store["keywords"].lower() in top_hit["name"].lower()):
+	if not store["keywords"].lower() in top_hit["name"].lower():
 		return "", formatted	
 
 	# Found a Match
@@ -139,7 +138,8 @@ def update_merchant(factual_id, store):
 
 	try:
 		#TODO NO HARDCODED INDEX!!!
-		output_data = es_connection.update(index="factual_index", doc_type="factual_type", id=factual_id, body=body)
+		output_data = es_connection.update(index="factual_index", \
+		doc_type="factual_type", id=factual_id, body=body)
 	except Exception:
 		logging.warning("Failed to Update Merchant")
 
@@ -179,16 +179,19 @@ def run(stores):
 		if len(factual_id) > 0:
 			status = update_merchant(factual_id, store)
 		else:
-			logging.warning("{1}Did Not Merge Store Number {0} to Index\n".format(store["store_number"], message))
+			logging.warning("{1}Did Not Merge Store Number {0} to Index\n".\
+			format(store["store_number"], message))
 			not_found.append(store)
 			continue
 
 		# Save Failed Attempts
 		if status == False:
-			logging.warning("{1}Did Not Merge Store Number {0} to Index".format(store["store_number"], message))
+			logging.warning("{1}Did Not Merge Store Number {0} to Index".\
+			format(store["store_number"], message))
 			not_found.append(store)
 		else:
-			logging.warning("{2}Successfully Merged Store Number: {0} into Factual Merchant: {1}\n".format(store["store_number"], factual_id, message))
+			logging.warning("{2}Successfully Merged Store Number: {0} into Factual Merchant: {1}\n".\
+			format(store["store_number"], factual_id, message))
 
 	# Show Success Rate
 	misses = len(not_found)
@@ -206,10 +209,12 @@ def save_mapping(stores, percent_merged):
 	"""Saves all results as a mapping file"""
 
 	store_name = stores[0]['keywords']
-	file_name = "/mnt/ephemeral/AggData_Factual_Merge/" + store_name + "_" + str(percent_merged * 100) + "%_success_rate" + ".csv"
+	file_name = "/mnt/ephemeral/AggData_Factual_Merge/" + store_name + "_" + \
+	str(percent_merged * 100) + "%_success_rate" + ".csv"
 	delimiter = ","
 	output_file = open(file_name, 'w')
-	dict_w = csv.DictWriter(output_file, delimiter=delimiter, fieldnames=stores[0].keys())
+	dict_w = csv.DictWriter\
+	(output_file, delimiter=delimiter, fieldnames=stores[0].keys())
 	dict_w.writeheader()
 	dict_w.writerows(stores)
 	output_file.close()
@@ -218,10 +223,12 @@ def save_not_found(not_found, percent_merged):
 	"""Save the stores not found in the index"""
 
 	store_name = not_found[0]['keywords']
-	file_name = "/mnt/ephemeral/AggData_Factual_Merge/" + store_name + "_" + str(percent_merged * 100) + "%_success_rate" + ".csv"
+	file_name = "/mnt/ephemeral/AggData_Factual_Merge/" + store_name + "_" + \
+	str(percent_merged * 100) + "%_success_rate" + ".csv"
 	delimiter = ","
 	output_file = open(file_name, 'w')
-	dict_w = csv.DictWriter(output_file, delimiter=delimiter, fieldnames=not_found[0].keys())
+	dict_w = csv.DictWriter(output_file, delimiter=delimiter,\
+	fieldnames=not_found[0].keys())
 	dict_w.writeheader()
 	dict_w.writerows(not_found)
 	output_file.close()
@@ -237,9 +244,10 @@ def process_multiple_merchants():
 	"""Merge in all files within a provided folder"""
 
 	dir_name = sys.argv[1]
-	merchant_files = [os.path.join(dir_name, f) for f in os.listdir(dir_name) if f.endswith(".csv")]
+	merchant_files = [os.path.join(dir_name, f) \
+	for f in os.listdir(dir_name) if f.endswith(".csv")]
 
-	q = Queue(maxsize = 0)
+	q = Queue(maxsize=0)
 	num_threads = 12
 
 	for i in range(num_threads):
@@ -283,7 +291,8 @@ def verify_arguments():
 
 	# Directory of Merchants
 	if not is_directory:
-		logging.warning("Improper usage. Please provide a directory of csv files or a single csv")
+		logging.warning\
+		("Improper usage. Please provide a directory of csv files or a single csv")
 		sys.exit()
 
 	for f in os.listdir(sys.argv[1]):
@@ -291,7 +300,8 @@ def verify_arguments():
 			return
 
 	# No CSV for Merchant Found
-	logging.warning("Improper usage. Please provide at least one csv containing store numbers")
+	logging.warning\
+	("Improper usage. Please provide at least one csv containing store numbers")
 	sys.exit()
 
 def run_from_command_line(command_line_arguments):
@@ -305,11 +315,12 @@ def run_from_command_line(command_line_arguments):
 
 if __name__ == "__main__":
 	verify_arguments()
-	cluster_nodes = [ "127.0.0.1" ]
-	es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True, sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
+	cluster_nodes = ["127.0.0.1"]
+	es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True, \
+	sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
 	
-	logging.basicConfig(format='%(threadName)s %(asctime)s %(message)s', filename='merging.log', \
-		level = logging.WARNING)
+	logging.basicConfig(format='%(threadName)s %(asctime)s %(message)s', \
+	filename='merging.log', level=logging.WARNING)
 
 	logging.warning("Beginning log...")
 
