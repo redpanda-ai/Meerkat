@@ -79,3 +79,18 @@ class WebServiceTest(unittest.TestCase):
                                 return
                         except ConnectionError:
                                 count += 1
+                return
+
+        def test_web_service_with_sample(self):
+                """Test starts, checks status of, and stops meerkat web service"""
+                #Wait for sleep_interval seconds before trying up to
+                #max_retries times
+                status = post_sample()
+                self.assertTrue(status == 200)
+                return
+
+
+
+if __name__ == "__main__":
+        unittest.main()
+                                                                                                                                                                 95,1-8        Bot
