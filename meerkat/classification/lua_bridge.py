@@ -95,8 +95,9 @@ def get_CNN(model_name):
 
 	make_batch = lua.eval('''
 		function(trans)
-			batch = torch.Tensor(128, #alphabet, 123)
-			for k = 1, 128 do
+			transLen = table.getn(trans)
+			batch = torch.Tensor(transLen, #alphabet, 123)
+			for k = 1, transLen do
 				stringToTensor(trans[k], 123, batch:select(1, k))
 			end
 			return batch
@@ -116,11 +117,12 @@ def get_CNN(model_name):
 
 	process_batch = lua.eval('''
 		function(batch)
+			batchLen = batch:size(1)
 			batch = batch:transpose(2, 3):contiguous():type("torch.CudaTensor")
 			output = model:forward(batch)
 			max, decision = output:double():max(2)
 			labels = {}
-			for k = 1, 128 do
+			for k = 1, batchLen do
 				labels[k] = decision:select(1, k)[1]
 			end
 			return labels
