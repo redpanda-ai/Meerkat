@@ -382,7 +382,7 @@ class Web_Consumer():
 
 		processed = classifier(transactions)
 
-		return processed[0:len(transactions)]
+		return processed
 
 	def __apply_subtype_CNN(self, data):
 		"""Apply the subtype CNN to transactions"""
@@ -394,8 +394,6 @@ class Web_Consumer():
 			return transactions
 
 		processed = classifier(transactions, label_key="subtype_CNN")
-
-		processed = processed[0:len(transactions)]
 
 		for t in processed:
 			txn_type, txn_sub_type = t["subtype_CNN"].split(" - ")
