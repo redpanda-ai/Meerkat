@@ -31,9 +31,6 @@ CARD_CNN = get_CNN("card")
 BANK_SUBTYPE_CNN = get_CNN("bank_subtype")
 CARD_SUBTYPE_CNN = get_CNN("card_subtype")
 
-def grouper(iterable):
-	return zip_longest(*[iter(iterable)]*128, fillvalue={"description":""})
-
 class Web_Consumer():
 	"""Acts as a web service client to process and enrich
 	transactions in real time"""
@@ -381,12 +378,9 @@ class Web_Consumer():
 	def __apply_merchant_CNN(self, data, transactions):
 		"""Apply the merchant CNN to transactions"""
 
-		batches = grouper(transactions)
 		classifier = BANK_CNN if (data["container"] == "bank") else CARD_CNN
-		processed = []
 
-		for i, batch in enumerate(batches):
-			processed += classifier(batch)
+		processed = classifier(transactions)
 
 		return processed[0:len(transactions)]
 
@@ -399,11 +393,7 @@ class Web_Consumer():
 		if len(transactions) == 0:
 			return transactions
 
-		batches = grouper(transactions)
-		processed = []
-
-		for i, batch in enumerate(batches):
-			processed += classifier(batch, label_key="subtype_CNN")
+		processed = classifier(transactions, label_key="subtype_CNN")
 
 		processed = processed[0:len(transactions)]
 
