@@ -426,7 +426,6 @@ class Web_Consumer():
 	def classify(self, data):
 		"""Classify a set of transactions"""
 		
-		pool = ThreadPool(1)
 		cpuResult = self.__cpuPool.apply_async(self.__cpu_ops, (data, ))
 		self.__apply_subtype_CNN(data)
 		self.__apply_merchant_CNN(data)
