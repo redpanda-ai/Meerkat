@@ -421,7 +421,7 @@ class Web_Consumer():
 		physical, non_physical = self.__sws(data)
 		physical = self.__enrich_physical(physical)
 		self.__apply_category_labels(physical)
-		return {"physical":physical, "non_physical":non_physical}
+		return physical, non_physical
 
 	def classify(self, data):
 		"""Classify a set of transactions"""
@@ -429,7 +429,8 @@ class Web_Consumer():
 		cpuResult = self.__cpuPool.apply_async(self.__cpu_ops, (data, ))
 		self.__apply_subtype_CNN(data)
 		self.__apply_merchant_CNN(data)
-		cpuResult.get();
+		physical, non_physical = cpuResult.get();
+		data["transaction_list"] = physical + non_physical
 		self.ensure_output_schema(data["transaction_list"])
 
 		return data
