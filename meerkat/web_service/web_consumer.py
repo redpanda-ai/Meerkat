@@ -41,7 +41,7 @@ class Web_Consumer():
 
 	def __init__(self, params=None, hyperparams=None, cities=None):
 		"""Constructor"""
-		
+
 		if params is None:
 			self.params = dict()
 		else:
@@ -52,7 +52,7 @@ class Web_Consumer():
 			self.hyperparams = dict()
 		else:
 			self.hyperparams = hyperparams
-		
+
 		if cities is None:
 			self.cities = dict()
 		else:
@@ -64,10 +64,10 @@ class Web_Consumer():
 
 	def update_hyperparams(self, hyperparams):
 		self.hyperparams = hyperparams
-	
+
 	def update_cities(self, cities):
 		self.cities = cities
-	
+
 	def __get_query(self, transaction):
 		"""Create an optimized query"""
 
@@ -147,7 +147,7 @@ class Web_Consumer():
 		hits = results['hits']['hits']
 		top_hit = hits[0]
 		hit_fields = top_hit.get("fields", "")
-		
+
 		# If no results return
 		if hit_fields == "":
 			transaction = self.__no_result(transaction)
@@ -279,7 +279,7 @@ class Web_Consumer():
 	def __business_name_fallback(self, business_names, transaction, attr_map):
 		"""Basic logic to obtain a fallback for business name
 		when no factual_id is found"""
-		
+
 		fields = self.params["output"]["results"]["fields"]
 		business_names = business_names[0:2]
 		top_name = business_names[0].lower()
@@ -320,11 +320,11 @@ class Web_Consumer():
 
 		return transactions
 
-	def __enrich_physical(self, transactions):
-		"""Enrich physical transactions with Meerkat"""
+	def __search_physical(self, transactions):
+		"""Get physical data from Meerkat"""
 
 		if len(transactions) == 0:
-			return transactions
+			return []]
 
 		enriched, queries = [], []
 		index = self.params["elasticsearch"]["index"]
@@ -343,14 +343,12 @@ class Web_Consumer():
 
 		queries = '\n'.join(map(json.dumps, queries))
 		results = self.__search_index(queries)
+		return results['responses']
 
-		# Error Handling
-		if results == None:
-			return transactions
+	def __enrich_physical(self, transactions, physical_data):
+		"""Enrich physical transactions with Meerkat"""
 
-		results = results['responses']
-
-		for r, t in zip(results, transactions):
+		for r, t in zip(physical_data, transactions):
 			trans_plus = self.__process_results(r, t)
 			enriched.append(trans_plus)
 
@@ -397,17 +395,25 @@ class Web_Consumer():
 
 		return processed
 
-	def __apply_locale_bloom(self, data):
-		""" Apply the locale bloom filter to transactions"""
+	def __query_locale_bloom(self, data):
+		""" Query the locale bloom filter for transactions"""
 
+		bloom = []
 		for trans in data["transaction_list"]:
 			try:
 				description = trans["description"]
-				trans["locale_bloom"] = location_split(description)
+				bloom.append(location_split(description))
 			except KeyError:
 				pass
 
-		return data["transaction_list"]
+		return bloom
+
+	def __apply_bloom_result(self, data, bloom):
+		""" Apply the results of the locale bloom filter to transactions"""
+
+		for trans, description in zip(data["transaction_list"], bloom)
+			trans["locale_bloom"] = description
+
 
 	def __apply_category_labels(self, physical):
 		# Add or Modify Fields
@@ -417,19 +423,23 @@ class Web_Consumer():
                         trans["category_labels"] = categories
 
 	def __cpu_ops(self, data):
-		self.__apply_locale_bloom(data)
+		bloom = self.__query_locale_bloom(data)
 		physical, non_physical = self.__sws(data)
-		physical = self.__enrich_physical(physical)
-		self.__apply_category_labels(physical)
-		return {"physical":physical, "non_physical":non_physical}
+		physical_results = self.__search_physical(physical)
+		return bloom, physical, non_physical, physical_results
 
 	def classify(self, data):
 		"""Classify a set of transactions"""
-		
+
 		cpuResult = self.__cpuPool.apply_async(self.__cpu_ops, (data, ))
 		self.__apply_subtype_CNN(data)
 		self.__apply_merchant_CNN(data)
-		cpuResult.get();
+
+		bloom, physical, non_physical, physical_results = cpuResult.get();
+		self.__apply_bloom_result(data, bloom)
+		self.__enrich_physical(physical, physical_results)
+		self.__apply_category_labels(physical)
+		data["transaction_list"] = physical + non_physical
 		self.ensure_output_schema(data["transaction_list"])
 
 		return data
