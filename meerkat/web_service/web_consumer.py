@@ -138,7 +138,7 @@ class Web_Consumer():
 		field_names = params["output"]["results"]["fields"]
 
 		# Must be at least one result
-		if results["hits"]["total"] == 0:
+		if "hits" not in results or results["hits"]["total"] == 0:
 			transaction = self.__no_result(transaction)
 			return transaction
 
