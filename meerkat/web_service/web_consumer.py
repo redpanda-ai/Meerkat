@@ -37,11 +37,11 @@ class Web_Consumer():
 	"""Acts as a web service client to process and enrich
 	transactions in real time"""
 
-	__cpuPool = ThreadPool(processes=14)
+	__cpu_pool = ThreadPool(processes=14)
 
 	def __init__(self, params=None, hyperparams=None, cities=None):
 		"""Constructor"""
-		
+
 		if params is None:
 			self.params = dict()
 		else:
@@ -52,7 +52,7 @@ class Web_Consumer():
 			self.hyperparams = dict()
 		else:
 			self.hyperparams = hyperparams
-		
+
 		if cities is None:
 			self.cities = dict()
 		else:
@@ -64,10 +64,10 @@ class Web_Consumer():
 
 	def update_hyperparams(self, hyperparams):
 		self.hyperparams = hyperparams
-	
+
 	def update_cities(self, cities):
 		self.cities = cities
-	
+
 	def __get_query(self, transaction):
 		"""Create an optimized query"""
 
@@ -147,7 +147,7 @@ class Web_Consumer():
 		hits = results['hits']['hits']
 		top_hit = hits[0]
 		hit_fields = top_hit.get("fields", "")
-		
+
 		# If no results return
 		if hit_fields == "":
 			transaction = self.__no_result(transaction)
@@ -279,7 +279,7 @@ class Web_Consumer():
 	def __business_name_fallback(self, business_names, transaction, attr_map):
 		"""Basic logic to obtain a fallback for business name
 		when no factual_id is found"""
-		
+
 		fields = self.params["output"]["results"]["fields"]
 		business_names = business_names[0:2]
 		top_name = business_names[0].lower()
@@ -425,11 +425,11 @@ class Web_Consumer():
 
 	def classify(self, data):
 		"""Classify a set of transactions"""
-		
-		cpuResult = self.__cpuPool.apply_async(self.__cpu_ops, (data, ))
+
+		cpu_result = self.__cpu_pool.apply_async(self.__cpu_ops, (data, ))
 		self.__apply_subtype_CNN(data)
 		self.__apply_merchant_CNN(data)
-		cpuResult.get();
+		cpu_result.get()
 		self.ensure_output_schema(data["transaction_list"])
 
 		return data
