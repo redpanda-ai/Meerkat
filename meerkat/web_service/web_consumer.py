@@ -324,9 +324,9 @@ class Web_Consumer():
 		"""Get physical data from Meerkat"""
 
 		if len(transactions) == 0:
-			return []
+			return []]
 
-		queries = []
+		enriched, queries = [], []
 		index = self.params["elasticsearch"]["index"]
 
 		for trans in transactions:
@@ -348,7 +348,6 @@ class Web_Consumer():
 	def __enrich_physical(self, transactions, physical_data):
 		"""Enrich physical transactions with Meerkat"""
 
-		enriched = []
 		for r, t in zip(physical_data, transactions):
 			trans_plus = self.__process_results(r, t)
 			enriched.append(trans_plus)
@@ -396,15 +395,25 @@ class Web_Consumer():
 
 		return processed
 
-	def __apply_locale_bloom(self, data):
+	def __query_locale_bloom(self, data):
 		""" Query the locale bloom filter for transactions"""
 
+		bloom = []
 		for trans in data["transaction_list"]:
 			try:
 				description = trans["description"]
-				trans["locale_bloom"] = location_split(description)
+				bloom.append(location_split(description))
 			except KeyError:
 				pass
+
+		return bloom
+
+	def __apply_bloom_result(self, data, bloom):
+		""" Apply the results of the locale bloom filter to transactions"""
+
+		for trans, description in zip(data["transaction_list"], bloom)
+			trans["locale_bloom"] = description
+
 
 	def __apply_category_labels(self, physical):
 		# Add or Modify Fields
@@ -414,10 +423,10 @@ class Web_Consumer():
                         trans["category_labels"] = categories
 
 	def __cpu_ops(self, data):
-		self.__apply_locale_bloom(data)
+		bloom = self.__query_locale_bloom(data)
 		physical, non_physical = self.__sws(data)
 		physical_results = self.__search_physical(physical)
-		return physical, non_physical, physical_results
+		return bloom, physical, non_physical, physical_results
 
 	def classify(self, data):
 		"""Classify a set of transactions"""
@@ -426,7 +435,8 @@ class Web_Consumer():
 		self.__apply_subtype_CNN(data)
 		self.__apply_merchant_CNN(data)
 
-		physical, non_physical, physical_results = cpuResult.get();
+		bloom, physical, non_physical, physical_results = cpuResult.get();
+		self.__apply_bloom_result(data, bloom)
 		self.__enrich_physical(physical, physical_results)
 		self.__apply_category_labels(physical)
 		data["transaction_list"] = physical + non_physical
