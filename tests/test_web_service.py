@@ -47,9 +47,9 @@ def check_status():
 def get_trans_text():
         """Get the json string of one_ledger.json"""
         transFile = open('./web_service_tester/one_ledger.json', 'rb')
-        trans = transFile.read()
+        transText = transFile.read()
         transFile.close()
-        return trans
+        return transText
 
 
 def classify_one(self, transaction, max_retries=10, sleep_interval=2):
@@ -76,19 +76,21 @@ def classify_one(self, transaction, max_retries=10, sleep_interval=2):
 class WebServiceTest(unittest.TestCase):
         """Our UnitTest class."""
 
-        def setUp(self):
+        @classmethod
+        def setUpClass(cls):
                 online, web_service_pid = web_service_is_online()
                 if online:
                         stop_linux_process(web_service_pid)
+                start_web_service()
 
-        def tearDown(self):
+        @classmethod
+        def tearDownClass(cls):
                 online, web_service_pid = web_service_is_online()
                 if online:
                         stop_linux_process(web_service_pid)
 
         def test_web_service_status(self):
-                """Test starts meerkat, checks status of meerkat, runs 100 classifications, and stops meerkat web service"""
-                start_web_service()
+                """Test starts meerkat, checks status of meerkat, and stops meerkat web service"""
                 count = 1
                 sleep_interval = 2
                 max_retries = 10
@@ -99,11 +101,15 @@ class WebServiceTest(unittest.TestCase):
                                 sleep(sleep_interval)
                                 status = check_status()
                                 self.assertTrue(status == 200)
-                                break
+                                return
                         except ConnectionError:
                                 count += 1
 
-                samples = 10
+                return
+
+        def test_web_service_races(self):
+                """Test starts meerkat, runs 100 classifications, and stops meerkat"""
+                samples = 100
                 pool = ThreadPool(samples)
                 transText = get_trans_text()
                 tasks = []
