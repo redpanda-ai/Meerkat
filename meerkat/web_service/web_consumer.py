@@ -37,7 +37,7 @@ class Web_Consumer():
 
 	def __init__(self, params=None, hyperparams=None, cities=None):
 		"""Constructor"""
-		
+
 		if params is None:
 			self.params = dict()
 		else:
@@ -48,7 +48,7 @@ class Web_Consumer():
 			self.hyperparams = dict()
 		else:
 			self.hyperparams = hyperparams
-		
+
 		if cities is None:
 			self.cities = dict()
 		else:
@@ -60,10 +60,10 @@ class Web_Consumer():
 
 	def update_hyperparams(self, hyperparams):
 		self.hyperparams = hyperparams
-	
+
 	def update_cities(self, cities):
 		self.cities = cities
-	
+
 	def __get_query(self, transaction):
 		"""Create an optimized query"""
 
@@ -83,6 +83,7 @@ class Web_Consumer():
 		# Construct Optimized Query
 		o_query = get_bool_query(size=result_size)
 		o_query["fields"] = fields
+		o_query["_source"] = "pin.*"
 		should_clauses = o_query["query"]["bool"]["should"]
 		field_boosts = get_boosted_fields(self.hyperparams, "standard_fields")
 		simple_query = get_qs_query(transaction, field_boosts)
@@ -143,11 +144,17 @@ class Web_Consumer():
 		hits = results['hits']['hits']
 		top_hit = hits[0]
 		hit_fields = top_hit.get("fields", "")
-		
+
 		# If no results return
 		if hit_fields == "":
 			transaction = self.__no_result(transaction)
 			return transaction
+
+		# Elasticsearch v1.0 bug workaround
+		if top_hit["_source"].get("pin", "") != "":
+			coordinates = top_hit["_source"]["pin"]["location"]["coordinates"]
+			hit_fields["longitude"] = "%.1f" % (float(coordinates[0]))
+			hit_fields["latitude"] = "%.1f" % (float(coordinates[1]))
 
 		# Collect Fallback Data
 		business_names = \
@@ -275,7 +282,7 @@ class Web_Consumer():
 	def __business_name_fallback(self, business_names, transaction, attr_map):
 		"""Basic logic to obtain a fallback for business name
 		when no factual_id is found"""
-		
+
 		fields = self.params["output"]["results"]["fields"]
 		business_names = business_names[0:2]
 		top_name = business_names[0].lower()

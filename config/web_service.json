@@ -7,10 +7,12 @@
         "results" : {
             "fields" : [
                 "name", "category_labels", "address", "locality", "country",
-                "region", "postcode", "factual_id", "internal_store_number"],
+                "region", "postcode", "factual_id", "internal_store_number",
+                "latitude", "longitude"],
             "labels" : [
                 "merchant_name", "category_labels", "street", "city", "country",
-                "state", "postal_code", "source_merchant_id", "store_id"]
+                "state", "postal_code", "source_merchant_id", "store_id",
+                "latitude", "longitude"]
         }
     },
     "elasticsearch" : {
