@@ -104,7 +104,7 @@ class WebServiceTest(unittest.TestCase):
                                 return
                         except ConnectionError:
                                 count += 1
-
+		self.assertTrue(0 == 1, "Failed to connect to Meerkat service")
                 return
 
         def test_web_service_races(self):
