@@ -10,17 +10,13 @@ Created on Nov 3, 2014
 import json
 import string
 import re
-from threading import Thread
 from multiprocessing.pool import ThreadPool
-
-from itertools import zip_longest
-from pprint import pprint
 from scipy.stats.mstats import zscore
 
 from meerkat.various_tools \
 import get_es_connection, string_cleanse, get_boosted_fields
 from meerkat.various_tools \
-import synonyms, get_bool_query, get_qs_query, load_params
+import synonyms, get_bool_query, get_qs_query
 from meerkat.classification.load import select_model
 from meerkat.classification.lua_bridge import get_CNN
 from meerkat.classification.bloom_filter.find_entities import location_split
@@ -59,10 +55,14 @@ class Web_Consumer():
 			self.cities = cities
 
 	def update_params(self, params):
+		"""Updates certain Web_Consumer class members:
+		1.  self.params: a dictionary of useful variables
+		2.  self.se: an ElasticSearch connection """
 		self.params = params
 		self.es = get_es_connection(params)
 
 	def update_hyperparams(self, hyperparams):
+		"""Updates a Web_Consumer object's hyper-parameters"""
 		self.hyperparams = hyperparams
 
 	def update_cities(self, cities):
@@ -106,53 +106,39 @@ class Web_Consumer():
 
 	def __search_index(self, queries):
 		"""Search against a structured index"""
-
 		index = self.params["elasticsearch"]["index"]
-		# pprint(queries)
-
 		try:
 			# pull routing out of queries and append to below msearch
 			results = self.es.msearch(queries, index=index)
 		except Exception:
 			return None
-
 		return results
 
 	def __z_score_delta(self, scores):
 		"""Find the Z-Score Delta"""
-
 		if len(scores) < 2:
 			return None
-
 		z_scores = zscore(scores)
 		first_score, second_score = z_scores[0:2]
 		z_score_delta = round(first_score - second_score, 3)
-
 		return z_score_delta, scores[0]
 
 	def __process_results(self, results, transaction):
 		"""Process search results and enrich transaction
 		with found data"""
-
-		params = self.params
 		hyperparams = self.hyperparams
-		field_names = params["output"]["results"]["fields"]
-
 		# Must be at least one result
 		if "hits" not in results or results["hits"]["total"] == 0:
 			transaction = self.__no_result(transaction)
 			return transaction
-
 		# Collect Necessary Information
 		hits = results['hits']['hits']
 		top_hit = hits[0]
 		hit_fields = top_hit.get("fields", "")
-
 		# If no results return
 		if hit_fields == "":
 			transaction = self.__no_result(transaction)
 			return transaction
-
 		# Collect Fallback Data
 		business_names = \
 		[result.get("fields", {"name" : ""}).get("name", "") for result in hits]
@@ -167,17 +153,14 @@ class Web_Consumer():
 		[result.get("fields", {"region" : ""}).get("region", "") for result in hits]
 		state_names = \
 		[name[0] for name in state_names if type(name) == list]
-
 		# Need Names
 		if len(business_names) < 2:
 			transaction = self.__no_result(transaction)
 			return transaction
-
 		# City Names Cause issues
 		if business_names[0] in self.cities:
 			transaction = self.__no_result(transaction)
 			return transaction
-
 		# Collect Relevancy Scores
 		scores = [hit["_score"] for hit in hits]
 		z_score_delta, raw_score = self.__z_score_delta(scores)
@@ -185,7 +168,6 @@ class Web_Consumer():
 		raw_threshold = float(hyperparams.get("raw_score_threshold", "1"))
 		decision = True \
 		if (z_score_delta > threshold) and (raw_score > raw_threshold) else False
-
 		# Enrich Data if Passes Boundary
 		args = [decision, transaction, hit_fields, z_score_delta, \
 		business_names, city_names, state_names]
@@ -257,8 +239,6 @@ class Web_Consumer():
 	def __geo_fallback(self, city_names, state_names, transaction, attr_map):
 		"""Basic logic to obtain a fallback for city and state
 		when no factual_id is found"""
-
-		fields = self.params["output"]["results"]["fields"]
 		city_names = city_names[0:2]
 		state_names = state_names[0:2]
 		states_equal = \
@@ -279,8 +259,6 @@ class Web_Consumer():
 	def __business_name_fallback(self, business_names, transaction, attr_map):
 		"""Basic logic to obtain a fallback for business name
 		when no factual_id is found"""
-
-		fields = self.params["output"]["results"]["fields"]
 		business_names = business_names[0:2]
 		top_name = business_names[0].lower()
 		all_equal = business_names.count(business_names[0]) == len(business_names)
@@ -350,8 +328,8 @@ class Web_Consumer():
 
 		results = results['responses']
 
-		for r, t in zip(results, transactions):
-			trans_plus = self.__process_results(r, t)
+		for result, transaction in zip(results, transactions):
+			trans_plus = self.__process_results(result, transaction)
 			enriched.append(trans_plus)
 
 		return enriched
@@ -389,11 +367,11 @@ class Web_Consumer():
 
 		processed = classifier(data["transaction_list"], label_key="subtype_CNN")
 
-		for t in processed:
-			txn_type, txn_sub_type = t["subtype_CNN"].split(" - ")
-			t["txn_type"] = txn_type
-			t["txn_sub_type"] = txn_sub_type
-			del t["subtype_CNN"]
+		for transaction in processed:
+			txn_type, txn_sub_type = transaction["subtype_CNN"].split(" - ")
+			transaction["txn_type"] = txn_type
+			transaction["txn_sub_type"] = txn_sub_type
+			del transaction["subtype_CNN"]
 
 		return processed
 
@@ -410,13 +388,16 @@ class Web_Consumer():
 		return data["transaction_list"]
 
 	def __apply_category_labels(self, physical):
+		"""Adds a 'category_labels' field to a physical transaction."""
 		# Add or Modify Fields
-                for trans in physical:
-                        categories = trans.get("category_labels", "")
-                        categories = json.loads(categories) if (categories != "" and categories != []) else []
-                        trans["category_labels"] = categories
+		for trans in physical:
+			categories = trans.get("category_labels", "")
+			categories = json.loads(categories) if (categories != "" and categories != []) else []
+			trans["category_labels"] = categories
 
 	def __cpu_ops(self, data):
+		"""Missing docstring comment, also __cpu_ops is not a great choice
+		for the method name"""
 		self.__apply_locale_bloom(data)
 		physical, non_physical = self.__sws(data)
 		physical = self.__enrich_physical(physical)
