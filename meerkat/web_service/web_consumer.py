@@ -87,6 +87,7 @@ class Web_Consumer():
 		# Construct Optimized Query
 		o_query = get_bool_query(size=result_size)
 		o_query["fields"] = fields
+		o_query["_source"] = "pin.*"
 		should_clauses = o_query["query"]["bool"]["should"]
 		field_boosts = get_boosted_fields(self.hyperparams, "standard_fields")
 		simple_query = get_qs_query(transaction, field_boosts)
@@ -139,6 +140,11 @@ class Web_Consumer():
 		if hit_fields == "":
 			transaction = self.__no_result(transaction)
 			return transaction
+		# Elasticsearch v1.0 bug workaround
+		if top_hit["_source"].get("pin", "") != "":
+			coordinates = top_hit["_source"]["pin"]["location"]["coordinates"]
+			hit_fields["longitude"] = "%.1f" % (float(coordinates[0]))
+			hit_fields["latitude"] = "%.1f" % (float(coordinates[1]))
 		# Collect Fallback Data
 		business_names = \
 		[result.get("fields", {"name" : ""}).get("name", "") for result in hits]
@@ -210,7 +216,7 @@ class Web_Consumer():
 			for field in field_names:
 				if field in fields_in_hit:
 					field_content = hit_fields[field][0] if\
- isinstance(hit_fields[field], (list)) else str(hit_fields[field])
+						isinstance(hit_fields[field], (list)) else str(hit_fields[field])
 					transaction[attr_map.get(field, field)] = field_content
 				else:
 					transaction[attr_map.get(field, field)] = ""
@@ -259,6 +265,7 @@ class Web_Consumer():
 	def __business_name_fallback(self, business_names, transaction, attr_map):
 		"""Basic logic to obtain a fallback for business name
 		when no factual_id is found"""
+		fields = self.params["output"]["results"]["fields"]
 		business_names = business_names[0:2]
 		top_name = business_names[0].lower()
 		all_equal = business_names.count(business_names[0]) == len(business_names)
@@ -300,7 +307,6 @@ class Web_Consumer():
 
 	def __enrich_physical(self, transactions):
 		"""Enrich physical transactions with Meerkat"""
-
 		if len(transactions) == 0:
 			return transactions
 
@@ -336,7 +342,6 @@ class Web_Consumer():
 
 	def __sws(self, data):
 		"""Split transactions into physical and non-physical"""
-
 		physical, non_physical = [], []
 
 		# Determine Whether to Search
@@ -350,16 +355,13 @@ class Web_Consumer():
 
 	def __apply_merchant_CNN(self, data):
 		"""Apply the merchant CNN to transactions"""
-
 		classifier = BANK_CNN if (data["container"] == "bank") else CARD_CNN
-
 		processed = classifier(data["transaction_list"])
 
 		return processed
 
 	def __apply_subtype_CNN(self, data):
 		"""Apply the subtype CNN to transactions"""
-
 		classifier = BANK_SUBTYPE_CNN if (data["container"] == "bank") else CARD_SUBTYPE_CNN
 
 		if len(data["transaction_list"]) == 0:
@@ -377,7 +379,6 @@ class Web_Consumer():
 
 	def __apply_locale_bloom(self, data):
 		""" Apply the locale bloom filter to transactions"""
-
 		for trans in data["transaction_list"]:
 			try:
 				description = trans["description"]
@@ -406,7 +407,6 @@ class Web_Consumer():
 
 	def classify(self, data):
 		"""Classify a set of transactions"""
-
 		cpu_result = self.__cpu_pool.apply_async(self.__cpu_ops, (data, ))
 		self.__apply_subtype_CNN(data)
 		self.__apply_merchant_CNN(data)
