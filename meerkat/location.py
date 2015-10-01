@@ -8,15 +8,9 @@ Created on Jan 27, 2014
 @author: J. Andrew Key
 """
 
-import json
-import sys
-
 import numpy as np
-#import matplotlib.pyplot as plt
-import matplotlib as mpl
+import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon
-from pprint import pprint
-from random import random
 
 def separate_geo(result_list):
 	"""Separate Results From Non Results"""
@@ -34,7 +28,6 @@ def separate_geo(result_list):
 
 def get_geo_query(scaled_shapes):
 	"""Generate multipolygon query for use with user context"""
-	
 	return {
 		"geo_shape" : {
 			"pin.location" : {
