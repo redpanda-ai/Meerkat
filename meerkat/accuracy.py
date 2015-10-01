@@ -43,7 +43,7 @@ from itertools import zip_longest
 import pandas as pd
 
 from meerkat.various_tools import load_dict_list, progress, safely_remove_file
-from meerkat.classification.lua_bridge import get_CNN, load_label_map
+from meerkat.classification.lua_bridge import get_cnn, load_label_map
 
 class DummyFile(object):
     def write(self, x): pass
@@ -262,8 +262,8 @@ def CNN_accuracy():
 	"""Run merchant CNN on a directory of Merchant Samples"""
 
 	# Load Classifiers
-	BANK_CNN = get_CNN("bank")
-	CARD_CNN = get_CNN("card")
+	BANK_CNN = get_cnn("bank")
+	CARD_CNN = get_cnn("card")
 
 	# Connect to S3
 	with nostdout():

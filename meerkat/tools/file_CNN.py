@@ -1,12 +1,12 @@
 import csv
 import pandas as pd
 
-from meerkat.classification.lua_bridge import get_CNN
+from meerkat.classification.lua_bridge import get_cnn
 
-BANK_CNN = get_CNN("bank")
-CARD_CNN = get_CNN("card")
-CARD_SUBTYPE_CNN = get_CNN("card_subtype")
-BANK_SUBTYPE_CNN = get_CNN("bank_subtype")
+BANK_CNN = get_cnn("bank")
+CARD_CNN = get_cnn("card")
+CARD_SUBTYPE_CNN = get_cnn("card_subtype")
+BANK_SUBTYPE_CNN = get_cnn("bank_subtype")
 
 def apply_to_df(reader, classifier, file_name, subtype_classifier):
 

@@ -7,8 +7,6 @@ Created on May 14, 2015
 """
 
 import ctypes
-import sys
-import csv
 import json
 
 def load_label_map(filename):
@@ -20,10 +18,11 @@ def load_label_map(filename):
 
 	return label_map
 
-def get_CNN(model_name):
+def get_cnn(model_name):
 	"""Load a function to process transactions using a CNN"""
 
-	lualib = ctypes.CDLL("/home/ubuntu/torch/install/lib/libluajit.so", mode=ctypes.RTLD_GLOBAL)
+	lualib = ctypes.CDLL("/home/ubuntu/torch/install/lib/libluajit.so",\
+		mode=ctypes.RTLD_GLOBAL)
 
 	# Must Load Lupa After the Preceding Line
 	import lupa
@@ -43,22 +42,26 @@ def get_CNN(model_name):
 
 	# Load CNN and Label map
 	if model_name == "bank":
-		reverse_label_map = load_label_map("meerkat/classification/label_maps/reverse_bank_label_map.json")
+		reverse_label_map = load_label_map(\
+			"meerkat/classification/label_maps/reverse_bank_label_map.json")
 		lua.execute('''
 			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/612_class_bank_CNN.t7b"))
 		''')
 	elif model_name == "card":
-		reverse_label_map = load_label_map("meerkat/classification/label_maps/reverse_card_label_map.json")
+		reverse_label_map = load_label_map(\
+			"meerkat/classification/label_maps/reverse_card_label_map.json")
 		lua.execute('''
 			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/750_class_card_CNN.t7b"))
 		''')
 	elif model_name == "card_subtype":
-		reverse_label_map = load_label_map("meerkat/classification/label_maps/card_subtype_label_map.json")
+		reverse_label_map = load_label_map(\
+			"meerkat/classification/label_maps/card_subtype_label_map.json")
 		lua.execute('''
 			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/card_subtype_CNN.t7b"))
 		''')
 	elif model_name == "bank_subtype":
-		reverse_label_map = load_label_map("meerkat/classification/label_maps/bank_subtype_label_map.json")
+		reverse_label_map = load_label_map(\
+			"meerkat/classification/label_maps/bank_subtype_label_map.json")
 		lua.execute('''
 			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/bank_subtype_CNN.t7b"))
 		''')
@@ -132,13 +135,12 @@ def get_CNN(model_name):
 	# Generate Helper Function
 	def apply_CNN(trans, doc_key="description", label_key="CNN"):
 		"""Apply CNN to transactions"""
-		
 		trans_list = [' '.join(x[doc_key].split()) for x in trans]
 		table_trans = list_to_table(trans_list)
 		batch = make_batch(table_trans)
 		labels = process_batch(batch)
 		decisions = list(labels.values())
-		
+
 		for i, t in enumerate(trans):
 			t[label_key] = reverse_label_map.get(str(decisions[i]), "")
 
