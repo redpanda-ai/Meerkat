@@ -396,21 +396,20 @@ class Web_Consumer():
 			categories = json.loads(categories) if (categories != "" and categories != []) else []
 			trans["category_labels"] = categories
 
-	def __cpu_ops(self, data):
-		"""Missing docstring comment, also __cpu_ops is not a great choice
-		for the method name"""
+	def __apply_cpu_classifiers(self, data):
+		"""Apply all the classifiers which are CPU bound.  Written to be run in parallel with GPU bound classifiers."""
 		self.__apply_locale_bloom(data)
 		physical, non_physical = self.__sws(data)
 		physical = self.__enrich_physical(physical)
 		self.__apply_category_labels(physical)
-		return {"physical":physical, "non_physical":non_physical}
+		return physical, non_physical
 
 	def classify(self, data):
 		"""Classify a set of transactions"""
-		cpu_result = self.__cpu_pool.apply_async(self.__cpu_ops, (data, ))
+		cpu_result = self.__cpu_pool.apply_async(self.__apply_cpu_classifiers, (data, ))
 		self.__apply_subtype_CNN(data)
 		self.__apply_merchant_CNN(data)
-		cpu_result.get()
+		cpu_result.get()  # Wait for CPU bound classifiers to finish
 		self.ensure_output_schema(data["transaction_list"])
 
 		return data
