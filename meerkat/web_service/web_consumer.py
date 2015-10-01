@@ -10,6 +10,8 @@ Created on Nov 3, 2014
 import json
 import string
 import re
+from threading import Thread
+from multiprocessing.pool import ThreadPool
 
 from itertools import zip_longest
 from pprint import pprint
@@ -35,9 +37,11 @@ class Web_Consumer():
 	"""Acts as a web service client to process and enrich
 	transactions in real time"""
 
+	__cpu_pool = ThreadPool(processes=14)
+
 	def __init__(self, params=None, hyperparams=None, cities=None):
 		"""Constructor"""
-		
+
 		if params is None:
 			self.params = dict()
 		else:
@@ -48,7 +52,7 @@ class Web_Consumer():
 			self.hyperparams = dict()
 		else:
 			self.hyperparams = hyperparams
-		
+
 		if cities is None:
 			self.cities = dict()
 		else:
@@ -60,10 +64,10 @@ class Web_Consumer():
 
 	def update_hyperparams(self, hyperparams):
 		self.hyperparams = hyperparams
-	
+
 	def update_cities(self, cities):
 		self.cities = cities
-	
+
 	def __get_query(self, transaction):
 		"""Create an optimized query"""
 
@@ -143,7 +147,7 @@ class Web_Consumer():
 		hits = results['hits']['hits']
 		top_hit = hits[0]
 		hit_fields = top_hit.get("fields", "")
-		
+
 		# If no results return
 		if hit_fields == "":
 			transaction = self.__no_result(transaction)
@@ -275,7 +279,7 @@ class Web_Consumer():
 	def __business_name_fallback(self, business_names, transaction, attr_map):
 		"""Basic logic to obtain a fallback for business name
 		when no factual_id is found"""
-		
+
 		fields = self.params["output"]["results"]["fields"]
 		business_names = business_names[0:2]
 		top_name = business_names[0].lower()
@@ -287,17 +291,8 @@ class Web_Consumer():
 
 		return transaction
 
-	def ensure_output_schema(self, data, physical, non_physical):
+	def ensure_output_schema(self, transactions):
 		"""Clean output to proper schema"""
-
-		# Add or Modify Fields
-		for trans in physical:
-			categories = trans.get("category_labels", "")
-			categories = json.loads(categories) if (categories != "" and categories != []) else []
-			trans["category_labels"] = categories
-
-		# Combine Transactions
-		transactions = physical + non_physical
 
 		# Collect Mapping Details
 		fields = self.params["output"]["results"]["fields"]
@@ -361,13 +356,13 @@ class Web_Consumer():
 
 		return enriched
 
-	def __sws(self, data, transactions):
+	def __sws(self, data):
 		"""Split transactions into physical and non-physical"""
 
 		physical, non_physical = [], []
 
 		# Determine Whether to Search
-		for trans in transactions:
+		for trans in data["transaction_list"]:
 			classifier = BANK_SWS if (data["container"] == "bank") else CARD_SWS
 			label = classifier(trans["description"])
 			trans["is_physical_merchant"] = True if (label == "1") else False
@@ -375,25 +370,24 @@ class Web_Consumer():
 
 		return physical, non_physical
 
-	def __apply_merchant_CNN(self, data, transactions):
+	def __apply_merchant_CNN(self, data):
 		"""Apply the merchant CNN to transactions"""
 
 		classifier = BANK_CNN if (data["container"] == "bank") else CARD_CNN
 
-		processed = classifier(transactions)
+		processed = classifier(data["transaction_list"])
 
 		return processed
 
 	def __apply_subtype_CNN(self, data):
 		"""Apply the subtype CNN to transactions"""
 
-		transactions = data["transaction_list"]
 		classifier = BANK_SUBTYPE_CNN if (data["container"] == "bank") else CARD_SUBTYPE_CNN
 
-		if len(transactions) == 0:
-			return transactions
+		if len(data["transaction_list"]) == 0:
+			return data["transaction_list"]
 
-		processed = classifier(transactions, label_key="subtype_CNN")
+		processed = classifier(data["transaction_list"], label_key="subtype_CNN")
 
 		for t in processed:
 			txn_type, txn_sub_type = t["subtype_CNN"].split(" - ")
@@ -403,28 +397,40 @@ class Web_Consumer():
 
 		return processed
 
-	def __apply_locale_bloom(self, data, transactions):
+	def __apply_locale_bloom(self, data):
 		""" Apply the locale bloom filter to transactions"""
 
-		for trans in transactions:
+		for trans in data["transaction_list"]:
 			try:
 				description = trans["description"]
 				trans["locale_bloom"] = location_split(description)
 			except KeyError:
 				pass
 
-		return transactions
+		return data["transaction_list"]
+
+	def __apply_category_labels(self, physical):
+		# Add or Modify Fields
+                for trans in physical:
+                        categories = trans.get("category_labels", "")
+                        categories = json.loads(categories) if (categories != "" and categories != []) else []
+                        trans["category_labels"] = categories
+
+	def __cpu_ops(self, data):
+		self.__apply_locale_bloom(data)
+		physical, non_physical = self.__sws(data)
+		physical = self.__enrich_physical(physical)
+		self.__apply_category_labels(physical)
+		return {"physical":physical, "non_physical":non_physical}
 
 	def classify(self, data):
 		"""Classify a set of transactions"""
 
-		transactions = self.__apply_subtype_CNN(data)
-		transactions = self.__apply_locale_bloom(data, transactions)
-		transactions = self.__apply_merchant_CNN(data, transactions)
-		physical, non_physical = self.__sws(data, transactions)
-		physical = self.__enrich_physical(physical)
-		transactions = self.ensure_output_schema(data, physical, non_physical)
-		data["transaction_list"] = transactions
+		cpu_result = self.__cpu_pool.apply_async(self.__cpu_ops, (data, ))
+		self.__apply_subtype_CNN(data)
+		self.__apply_merchant_CNN(data)
+		cpu_result.get()
+		self.ensure_output_schema(data["transaction_list"])
 
 		return data
 
