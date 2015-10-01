@@ -234,7 +234,7 @@ def speed_vests(start_time, accuracy_results):
 			'transactions_per_minute':transactions_per_minute}
 
 
-def apply_CNN(classifier, transactions):
+def apply_cnn(classifier, transactions):
 	"""Apply the CNN to transactions"""
 
 	batches = grouper(transactions)
@@ -252,7 +252,7 @@ def per_merchant_accuracy(params, classifier):
 
 	print("Testing sample: " + params["verification_source"])
 	transactions = load_dict_list(params["verification_source"])
-	labeled_trans = apply_CNN(classifier, transactions)
+	labeled_trans = apply_cnn(classifier, transactions)
 	accuracy_results = vest_accuracy(params, result_list=labeled_trans)
 	print_results(accuracy_results)
 

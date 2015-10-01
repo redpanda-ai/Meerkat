@@ -8,6 +8,7 @@ Created on May 14, 2015
 
 import ctypes
 import json
+import logging
 
 def load_label_map(filename):
 	"""Load a permanent label map"""
@@ -133,7 +134,7 @@ def get_cnn(model_name):
 	''')
 
 	# Generate Helper Function
-	def apply_CNN(trans, doc_key="description", label_key="CNN"):
+	def apply_cnn(trans, doc_key="description", label_key="CNN"):
 		"""Apply CNN to transactions"""
 		trans_list = [' '.join(x[doc_key].split()) for x in trans]
 		table_trans = list_to_table(trans_list)
@@ -141,12 +142,13 @@ def get_cnn(model_name):
 		labels = process_batch(batch)
 		decisions = list(labels.values())
 
-		for i, t in enumerate(trans):
-			t[label_key] = reverse_label_map.get(str(decisions[i]), "")
+		for index, transaction in enumerate(trans):
+			transaction[label_key] = reverse_label_map.get(\
+				str(decisions[index]), "")
 
 		return trans
 
-	return apply_CNN
+	return apply_cnn
 
 if __name__ == "__main__":
 	"""Print a warning to not execute this file as a module"""
