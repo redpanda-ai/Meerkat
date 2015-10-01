@@ -10,15 +10,13 @@ Created on Nov 3, 2014
 import json
 import string
 import re
-
-from itertools import zip_longest
-from pprint import pprint
+from multiprocessing.pool import ThreadPool
 from scipy.stats.mstats import zscore
 
 from meerkat.various_tools \
 import get_es_connection, string_cleanse, get_boosted_fields
 from meerkat.various_tools \
-import synonyms, get_bool_query, get_qs_query, load_params
+import synonyms, get_bool_query, get_qs_query
 from meerkat.classification.load import select_model
 from meerkat.classification.lua_bridge import get_CNN
 from meerkat.classification.bloom_filter.find_entities import location_split
@@ -34,6 +32,8 @@ CARD_SUBTYPE_CNN = get_CNN("card_subtype")
 class Web_Consumer():
 	"""Acts as a web service client to process and enrich
 	transactions in real time"""
+
+	__cpu_pool = ThreadPool(processes=14)
 
 	def __init__(self, params=None, hyperparams=None, cities=None):
 		"""Constructor"""
@@ -55,10 +55,14 @@ class Web_Consumer():
 			self.cities = cities
 
 	def update_params(self, params):
+		"""Updates certain Web_Consumer class members:
+		1.  self.params: a dictionary of useful variables
+		2.  self.se: an ElasticSearch connection """
 		self.params = params
 		self.es = get_es_connection(params)
 
 	def update_hyperparams(self, hyperparams):
+		"""Updates a Web_Consumer object's hyper-parameters"""
 		self.hyperparams = hyperparams
 
 	def update_cities(self, cities):
@@ -103,59 +107,44 @@ class Web_Consumer():
 
 	def __search_index(self, queries):
 		"""Search against a structured index"""
-
 		index = self.params["elasticsearch"]["index"]
-		# pprint(queries)
-
 		try:
 			# pull routing out of queries and append to below msearch
 			results = self.es.msearch(queries, index=index)
 		except Exception:
 			return None
-
 		return results
 
 	def __z_score_delta(self, scores):
 		"""Find the Z-Score Delta"""
-
 		if len(scores) < 2:
 			return None
-
 		z_scores = zscore(scores)
 		first_score, second_score = z_scores[0:2]
 		z_score_delta = round(first_score - second_score, 3)
-
 		return z_score_delta, scores[0]
 
 	def __process_results(self, results, transaction):
 		"""Process search results and enrich transaction
 		with found data"""
-
-		params = self.params
 		hyperparams = self.hyperparams
-		field_names = params["output"]["results"]["fields"]
-
 		# Must be at least one result
 		if "hits" not in results or results["hits"]["total"] == 0:
 			transaction = self.__no_result(transaction)
 			return transaction
-
 		# Collect Necessary Information
 		hits = results['hits']['hits']
 		top_hit = hits[0]
 		hit_fields = top_hit.get("fields", "")
-
 		# If no results return
 		if hit_fields == "":
 			transaction = self.__no_result(transaction)
 			return transaction
-
 		# Elasticsearch v1.0 bug workaround
 		if top_hit["_source"].get("pin", "") != "":
 			coordinates = top_hit["_source"]["pin"]["location"]["coordinates"]
 			hit_fields["longitude"] = "%.1f" % (float(coordinates[0]))
 			hit_fields["latitude"] = "%.1f" % (float(coordinates[1]))
-
 		# Collect Fallback Data
 		business_names = \
 		[result.get("fields", {"name" : ""}).get("name", "") for result in hits]
@@ -170,17 +159,14 @@ class Web_Consumer():
 		[result.get("fields", {"region" : ""}).get("region", "") for result in hits]
 		state_names = \
 		[name[0] for name in state_names if type(name) == list]
-
 		# Need Names
 		if len(business_names) < 2:
 			transaction = self.__no_result(transaction)
 			return transaction
-
 		# City Names Cause issues
 		if business_names[0] in self.cities:
 			transaction = self.__no_result(transaction)
 			return transaction
-
 		# Collect Relevancy Scores
 		scores = [hit["_score"] for hit in hits]
 		z_score_delta, raw_score = self.__z_score_delta(scores)
@@ -188,7 +174,6 @@ class Web_Consumer():
 		raw_threshold = float(hyperparams.get("raw_score_threshold", "1"))
 		decision = True \
 		if (z_score_delta > threshold) and (raw_score > raw_threshold) else False
-
 		# Enrich Data if Passes Boundary
 		args = [decision, transaction, hit_fields, z_score_delta, \
 		business_names, city_names, state_names]
@@ -231,7 +216,7 @@ class Web_Consumer():
 			for field in field_names:
 				if field in fields_in_hit:
 					field_content = hit_fields[field][0] if\
- isinstance(hit_fields[field], (list)) else str(hit_fields[field])
+						isinstance(hit_fields[field], (list)) else str(hit_fields[field])
 					transaction[attr_map.get(field, field)] = field_content
 				else:
 					transaction[attr_map.get(field, field)] = ""
@@ -260,8 +245,6 @@ class Web_Consumer():
 	def __geo_fallback(self, city_names, state_names, transaction, attr_map):
 		"""Basic logic to obtain a fallback for city and state
 		when no factual_id is found"""
-
-		fields = self.params["output"]["results"]["fields"]
 		city_names = city_names[0:2]
 		state_names = state_names[0:2]
 		states_equal = \
@@ -282,7 +265,6 @@ class Web_Consumer():
 	def __business_name_fallback(self, business_names, transaction, attr_map):
 		"""Basic logic to obtain a fallback for business name
 		when no factual_id is found"""
-
 		fields = self.params["output"]["results"]["fields"]
 		business_names = business_names[0:2]
 		top_name = business_names[0].lower()
@@ -294,17 +276,8 @@ class Web_Consumer():
 
 		return transaction
 
-	def ensure_output_schema(self, data, physical, non_physical):
+	def ensure_output_schema(self, transactions):
 		"""Clean output to proper schema"""
-
-		# Add or Modify Fields
-		for trans in physical:
-			categories = trans.get("category_labels", "")
-			categories = json.loads(categories) if (categories != "" and categories != []) else []
-			trans["category_labels"] = categories
-
-		# Combine Transactions
-		transactions = physical + non_physical
 
 		# Collect Mapping Details
 		fields = self.params["output"]["results"]["fields"]
@@ -334,7 +307,6 @@ class Web_Consumer():
 
 	def __enrich_physical(self, transactions):
 		"""Enrich physical transactions with Meerkat"""
-
 		if len(transactions) == 0:
 			return transactions
 
@@ -362,19 +334,18 @@ class Web_Consumer():
 
 		results = results['responses']
 
-		for r, t in zip(results, transactions):
-			trans_plus = self.__process_results(r, t)
+		for result, transaction in zip(results, transactions):
+			trans_plus = self.__process_results(result, transaction)
 			enriched.append(trans_plus)
 
 		return enriched
 
-	def __sws(self, data, transactions):
+	def __sws(self, data):
 		"""Split transactions into physical and non-physical"""
-
 		physical, non_physical = [], []
 
 		# Determine Whether to Search
-		for trans in transactions:
+		for trans in data["transaction_list"]:
 			classifier = BANK_SWS if (data["container"] == "bank") else CARD_SWS
 			label = classifier(trans["description"])
 			trans["is_physical_merchant"] = True if (label == "1") else False
@@ -382,56 +353,65 @@ class Web_Consumer():
 
 		return physical, non_physical
 
-	def __apply_merchant_CNN(self, data, transactions):
+	def __apply_merchant_CNN(self, data):
 		"""Apply the merchant CNN to transactions"""
-
 		classifier = BANK_CNN if (data["container"] == "bank") else CARD_CNN
-
-		processed = classifier(transactions)
+		processed = classifier(data["transaction_list"])
 
 		return processed
 
 	def __apply_subtype_CNN(self, data):
 		"""Apply the subtype CNN to transactions"""
-
-		transactions = data["transaction_list"]
 		classifier = BANK_SUBTYPE_CNN if (data["container"] == "bank") else CARD_SUBTYPE_CNN
 
-		if len(transactions) == 0:
-			return transactions
+		if len(data["transaction_list"]) == 0:
+			return data["transaction_list"]
 
-		processed = classifier(transactions, label_key="subtype_CNN")
+		processed = classifier(data["transaction_list"], label_key="subtype_CNN")
 
-		for t in processed:
-			txn_type, txn_sub_type = t["subtype_CNN"].split(" - ")
-			t["txn_type"] = txn_type
-			t["txn_sub_type"] = txn_sub_type
-			del t["subtype_CNN"]
+		for transaction in processed:
+			txn_type, txn_sub_type = transaction["subtype_CNN"].split(" - ")
+			transaction["txn_type"] = txn_type
+			transaction["txn_sub_type"] = txn_sub_type
+			del transaction["subtype_CNN"]
 
 		return processed
 
-	def __apply_locale_bloom(self, data, transactions):
+	def __apply_locale_bloom(self, data):
 		""" Apply the locale bloom filter to transactions"""
-
-		for trans in transactions:
+		for trans in data["transaction_list"]:
 			try:
 				description = trans["description"]
 				trans["locale_bloom"] = location_split(description)
 			except KeyError:
 				pass
 
-		return transactions
+		return data["transaction_list"]
+
+	def __apply_category_labels(self, physical):
+		"""Adds a 'category_labels' field to a physical transaction."""
+		# Add or Modify Fields
+		for trans in physical:
+			categories = trans.get("category_labels", "")
+			categories = json.loads(categories) if (categories != "" and categories != []) else []
+			trans["category_labels"] = categories
+
+	def __cpu_ops(self, data):
+		"""Missing docstring comment, also __cpu_ops is not a great choice
+		for the method name"""
+		self.__apply_locale_bloom(data)
+		physical, non_physical = self.__sws(data)
+		physical = self.__enrich_physical(physical)
+		self.__apply_category_labels(physical)
+		return {"physical":physical, "non_physical":non_physical}
 
 	def classify(self, data):
 		"""Classify a set of transactions"""
-
-		transactions = self.__apply_subtype_CNN(data)
-		transactions = self.__apply_locale_bloom(data, transactions)
-		transactions = self.__apply_merchant_CNN(data, transactions)
-		physical, non_physical = self.__sws(data, transactions)
-		physical = self.__enrich_physical(physical)
-		transactions = self.ensure_output_schema(data, physical, non_physical)
-		data["transaction_list"] = transactions
+		cpu_result = self.__cpu_pool.apply_async(self.__cpu_ops, (data, ))
+		self.__apply_subtype_CNN(data)
+		self.__apply_merchant_CNN(data)
+		cpu_result.get()
+		self.ensure_output_schema(data["transaction_list"])
 
 		return data
 
