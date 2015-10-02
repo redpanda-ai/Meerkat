@@ -14,9 +14,9 @@ from multiprocessing.pool import ThreadPool
 from scipy.stats.mstats import zscore
 
 from meerkat.various_tools \
-import get_es_connection, string_cleanse, get_boosted_fields
+	import get_es_connection, string_cleanse, get_boosted_fields
 from meerkat.various_tools \
-import synonyms, get_bool_query, get_qs_query
+	import synonyms, get_bool_query, get_qs_query, load_params
 from meerkat.classification.load import select_model
 from meerkat.classification.lua_bridge import get_CNN
 from meerkat.classification.bloom_filter.find_entities import location_split
@@ -28,6 +28,9 @@ BANK_CNN = get_CNN("bank")
 CARD_CNN = get_CNN("card")
 BANK_SUBTYPE_CNN = get_CNN("bank_subtype")
 CARD_SUBTYPE_CNN = get_CNN("card_subtype")
+BANK_DICT_FALLBACK = load_params("meerkat/classification/label_maps/cnn_merchant_category_mapping_bank.json")
+CARD_DICT_FALLBACK = load_params("meerkat/classification/label_maps/cnn_merchant_category_mapping_card.json")
+
 
 class Web_Consumer():
 	"""Acts as a web service client to process and enrich
