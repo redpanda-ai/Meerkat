@@ -279,10 +279,12 @@ class Web_Consumer():
 
 		return transaction
 
-	def __apply_missing_categories(self, transactions):
+	def __apply_missing_categories(self, transactions, container):
 		"""If the factual search fails to find categories do a static lookup on the merchant name"""
-		self.__apply_categories_from_dict(transactions, BANK_DICT_FALLBACK, "Retail Category")
-		self.__apply_categories_from_dict(transactions, CARD_DICT_FALLBACK, "PaymentOps")
+		if(container.lower() == "bank"):
+			self.__apply_categories_from_dict(transactions, BANK_DICT_FALLBACK, "Retail Category")
+		else:
+			self.__apply_categories_from_dict(transactions, CARD_DICT_FALLBACK, "PaymentOps")
 
 	def __apply_categories_from_dict(self, transactions, categories, key):
 		"""Use the given dictionary to add categories to transactions"""
@@ -429,9 +431,10 @@ class Web_Consumer():
 		cpu_result = self.__cpu_pool.apply_async(self.__cpu_ops, (data, ))
 		self.__apply_subtype_CNN(data)
 		self.__apply_merchant_CNN(data)
-		physical, non_physical = cpu_result.get()
-		self.__apply_missing_categories(data["transaction_list"])
-		data["transaction_list"] = physical + non_physical
+		cpu_result.get()
+		self.__apply_missing_categories(
+										data["transaction_list"],
+										data["container"])
 		self.ensure_output_schema(data["transaction_list"])
 
 		return data
