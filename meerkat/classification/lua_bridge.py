@@ -66,6 +66,26 @@ def get_cnn(model_name):
 		lua.execute('''
 			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/bank_subtype_CNN.t7b"))
 		''')
+	elif model_name == "bank_debit_subtype":
+		reverse_label_map = load_label_map("meerkat/classification/label_maps/bank_debit_subtype_label_map.json")
+		lua.execute('''
+			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/bank_debit_subtype_CNN.t7b"))
+		''')
+	elif model_name == "bank_credit_subtype":
+		reverse_label_map = load_label_map("meerkat/classification/label_maps/bank_credit_subtype_label_map.json")
+		lua.execute('''
+			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/bank_credit_subtype_CNN.t7b"))
+		''')
+	elif model_name == "card_debit_subtype":
+		reverse_label_map = load_label_map("meerkat/classification/label_maps/card_debit_subtype_label_map.json")
+		lua.execute('''
+			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/card_debit_subtype_CNN.t7b"))
+		''')
+	elif model_name == "card_credit_subtype":
+		reverse_label_map = load_label_map("meerkat/classification/label_maps/card_credit_subtype_label_map.json")
+		lua.execute('''
+			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/card_credit_subtype_CNN.t7b"))
+		''')
 	else:
 		print("Requested CNN does not exist. Please reference an existing model")
 
