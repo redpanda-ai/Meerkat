@@ -19,7 +19,7 @@ Created on Mar 25, 2014
 # python3.3 -m meerkat.merge_store_numbers [store_numbers_directory]
 # python3.3 -m meerkat.merge_store_numbers data/misc/Store\ Numbers/Clean/IAE
 
-# Required Columns: 
+# Required Columns:
 # keywords: Name found in factual
 # city: City name to match against
 # store_number: Store numbers formated to match transactions
@@ -29,16 +29,15 @@ Created on Mar 25, 2014
 
 #####################################################
 
-import csv 
+import csv
 import sys
 import os
 import logging
 
 from scipy.stats.mstats import zscore
-from elasticsearch import Elasticsearch 
+from elasticsearch import Elasticsearch
 from queue import Queue
 from threading import Thread
- 
 
 from meerkat.various_tools import get_bool_query, get_qs_query, string_cleanse
 
@@ -76,7 +75,6 @@ def find_merchant(store):
 	search_parts = [store["address"], store["zip_code"][0:5],\
 	 store["keywords"], store["city"], string_cleanse(store["state"])]
 	factual_id = ""
-	top_result = ""
 
 	# Generate Query
 	bool_search = get_bool_query(size=45)
@@ -92,9 +90,9 @@ def find_merchant(store):
 	score, top_hit = get_hit(results, 0)
 
 	if score == False:
-		return "", ""
+		return "", "", ""
 
-	# Allow User to Verify and Return 
+	# Allow User to Verify and Return
 	formatted = [top_hit.get("name", ""), top_hit.get("address", ""),\
 	 top_hit.get("postcode", ""), top_hit.get("locality", ""), top_hit.get("region", ""),]
 	formatted = ", ".join(formatted)
@@ -109,11 +107,11 @@ def find_merchant(store):
 
 	# Must Match Keywords
 	if not store["keywords"].lower() in top_hit["name"].lower():
-		return "", formatted	
+		return "", formatted, ""
 
 	# Found a Match
 	if score > 0.95:
-		return top_hit["factual_id"], ""
+		return top_hit["factual_id"], "", ""
 
 	return factual_id, formatted, message
 
@@ -295,8 +293,8 @@ def verify_arguments():
 		("Improper usage. Please provide a directory of csv files or a single csv")
 		sys.exit()
 
-	for f in os.listdir(sys.argv[1]):
-		if f.endswith(".csv"):
+	for filename in os.listdir(sys.argv[1]):
+		if filename.endswith(".csv"):
 			return
 
 	# No CSV for Merchant Found

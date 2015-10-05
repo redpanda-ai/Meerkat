@@ -18,16 +18,16 @@ import get_es_connection, string_cleanse, get_boosted_fields
 from meerkat.various_tools \
 import synonyms, get_bool_query, get_qs_query
 from meerkat.classification.load import select_model
-from meerkat.classification.lua_bridge import get_CNN
+from meerkat.classification.lua_bridge import get_cnn
 from meerkat.classification.bloom_filter.find_entities import location_split
 
 # Enabled Models
 BANK_SWS = select_model("bank")
 CARD_SWS = select_model("card")
-BANK_CNN = get_CNN("bank")
-CARD_CNN = get_CNN("card")
-BANK_SUBTYPE_CNN = get_CNN("bank_subtype")
-CARD_SUBTYPE_CNN = get_CNN("card_subtype")
+BANK_CNN = get_cnn("bank")
+CARD_CNN = get_cnn("card")
+BANK_SUBTYPE_CNN = get_cnn("bank_subtype")
+CARD_SUBTYPE_CNN = get_cnn("card_subtype")
 
 class Web_Consumer():
 	"""Acts as a web service client to process and enrich

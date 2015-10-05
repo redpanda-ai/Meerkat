@@ -9,10 +9,12 @@ Created on Jan 21, 2015
 
 #################### USAGE ##########################
 
-# python3.3 -m meerkat.classification.generate_common_bigrams [transaction_sample] 
-# python3.3 -m meerkat.classification.generate_common_bigrams data/card_sample.txt
+# python3.3 -m meerkat.classification.generate_common_bigrams \
+#  [transaction_sample]
+# python3.3 -m meerkat.classification.generate_common_bigrams \
+#  data/card_sample.txt
 
-# Required Columns: 
+# Required Columns:
 # DESCRIPTION_UNMASKED
 
 #####################################################
@@ -27,10 +29,12 @@ from gensim.models import Phrases
 from meerkat.various_tools import safe_print, safe_input
 
 class DummyFile(object):
-	def write(self, x): pass
+	def write(self, x):
+		pass
 
 @contextlib.contextmanager
 def nostderr():
+	"""Please add a better docstring, what is this?"""
 	save_stderr = sys.stderr
 	sys.stderr = DummyFile()
 	yield
@@ -38,7 +42,6 @@ def nostderr():
 
 def verify_arguments():
 	"""Verify Usage"""
-
 	sufficient_arguments = (len(sys.argv) == 2)
 
 	if not sufficient_arguments:
