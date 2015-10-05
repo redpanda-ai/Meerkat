@@ -46,7 +46,13 @@
 				"is_physical_merchant" : { "enum" : [ false ] },
 				"merchant_name" : { "type" : "string" },
 				"txn_sub_type" : { "type" : "string" },
-				"txn_type" : { "type" : "string" }
+				"txn_type" : { "type" : "string" },
+				"category_labels" : {
+					"type" : "array",
+					"items" : {
+						"type": "string"
+					}
+				}
 			},
 			"required": [ "transaction_id", "is_physical_merchant", "merchant_name" ],
 			"additionalProperties" : false
