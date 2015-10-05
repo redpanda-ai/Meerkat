@@ -22,12 +22,14 @@ from meerkat.classification.lua_bridge import get_cnn
 from meerkat.classification.bloom_filter.find_entities import location_split
 
 # Enabled Models
-BANK_SWS = select_model("bank")
-CARD_SWS = select_model("card")
-BANK_CNN = get_cnn("bank")
-CARD_CNN = get_cnn("card")
-BANK_SUBTYPE_CNN = get_cnn("bank_subtype")
-CARD_SUBTYPE_CNN = get_cnn("card_subtype")
+BANK_SWS = select_model("bank_sws")
+CARD_SWS = select_model("card_sws")
+BANK_MERCHANT_CNN = get_cnn("bank_merchant")
+CARD_MERCHANT_CNN = get_cnn("card_merchant")
+CARD_DEBIT_SUBTYPE_CNN = get_CNN("card_debit_subtype")
+CARD_CREDIT_SUBTYPE_CNN = get_CNN("card_credit_subtype")
+BANK_DEBIT_SUBTYPE_CNN = get_CNN("bank_debit_subtype")
+BANK_CREDIT_SUBTYPE_CNN = get_CNN("bank_credit_subtype")
 
 class Web_Consumer():
 	"""Acts as a web service client to process and enrich
@@ -355,21 +357,39 @@ class Web_Consumer():
 
 	def __apply_merchant_CNN(self, data):
 		"""Apply the merchant CNN to transactions"""
-		classifier = BANK_CNN if (data["container"] == "bank") else CARD_CNN
+		classifier = BANK_MERCHANT_CNN if (data["container"] == "bank") else CARD_MERCHANT_CNN
 		processed = classifier(data["transaction_list"])
 
 		return processed
 
 	def __apply_subtype_CNN(self, data):
 		"""Apply the subtype CNN to transactions"""
-		classifier = BANK_SUBTYPE_CNN if (data["container"] == "bank") else CARD_SUBTYPE_CNN
 
 		if len(data["transaction_list"]) == 0:
 			return data["transaction_list"]
 
-		processed = classifier(data["transaction_list"], label_key="subtype_CNN")
+		if data["container"] == "card":
+			credit_subtype_classifer = CARD_CREDIT_SUBTYPE_CNN
+			debit_subtype_classifer = CARD_DEBIT_SUBTYPE_CNN
+		elif data["container"] == "bank":
+			credit_subtype_classifer = BANK_CREDIT_SUBTYPE_CNN
+			debit_subtype_classifer = BANK_DEBIT_SUBTYPE_CNN
+
+		# Split transactions into groups
+		credit, debit = [], []
 
 		for transaction in processed:
+			if transaction["ledger_entry"] == "credit":
+				credit.append(transaction)
+			if transaction["ledger_entry"] == "debit":
+				debit.append(transaction)
+
+		# Apply classifiers
+		credit_subtype_classifer(credit, label_key="subtype_CNN")
+		debit_subtype_classifer(debit, label_key="subtype_CNN")
+
+		# Split label into type and subtype
+		for transaction in data["transaction_list"]:
 			txn_type, txn_sub_type = transaction["subtype_CNN"].split(" - ")
 			transaction["txn_type"] = txn_type
 			transaction["txn_sub_type"] = txn_sub_type

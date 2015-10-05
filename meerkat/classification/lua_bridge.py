@@ -42,29 +42,17 @@ def get_cnn(model_name):
 	''')
 
 	# Load CNN and Label map
-	if model_name == "bank":
+	if model_name == "bank_merchant":
 		reverse_label_map = load_label_map(\
 			"meerkat/classification/label_maps/reverse_bank_label_map.json")
 		lua.execute('''
 			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/612_class_bank_CNN.t7b"))
 		''')
-	elif model_name == "card":
+	elif model_name == "card_merchant":
 		reverse_label_map = load_label_map(\
 			"meerkat/classification/label_maps/reverse_card_label_map.json")
 		lua.execute('''
 			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/750_class_card_CNN.t7b"))
-		''')
-	elif model_name == "card_subtype":
-		reverse_label_map = load_label_map(\
-			"meerkat/classification/label_maps/card_subtype_label_map.json")
-		lua.execute('''
-			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/card_subtype_CNN.t7b"))
-		''')
-	elif model_name == "bank_subtype":
-		reverse_label_map = load_label_map(\
-			"meerkat/classification/label_maps/bank_subtype_label_map.json")
-		lua.execute('''
-			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/bank_subtype_CNN.t7b"))
 		''')
 	elif model_name == "bank_debit_subtype":
 		reverse_label_map = load_label_map("meerkat/classification/label_maps/bank_debit_subtype_label_map.json")
