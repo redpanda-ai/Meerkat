@@ -290,8 +290,10 @@ class Web_Consumer():
 			if (trans.get("CNN") and
 						categories.get(trans["CNN"]) and not
 						trans.get("category_labels")):
-				fallback = categories[trans["CNN"]]
-				trans["category_labels"] = [fallback[key]]
+				fallback = categories[trans["CNN"]][key]
+				if fallback == "Use Subtype Rules for Categories":
+					fallback = trans["txn_sub_type"]
+				trans["category_labels"] = [fallback]
 
 	def ensure_output_schema(self, transactions):
 		"""Clean output to proper schema"""
