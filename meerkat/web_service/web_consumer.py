@@ -395,7 +395,7 @@ class Web_Consumer():
 			transaction["txn_sub_type"] = txn_sub_type
 			del transaction["subtype_CNN"]
 
-		return processed
+		return data["transaction_list"]
 
 	def __apply_locale_bloom(self, data):
 		""" Apply the locale bloom filter to transactions"""
