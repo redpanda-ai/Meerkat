@@ -28,8 +28,10 @@ BANK_CNN = get_cnn("bank")
 CARD_CNN = get_cnn("card")
 BANK_SUBTYPE_CNN = get_cnn("bank_subtype")
 CARD_SUBTYPE_CNN = get_cnn("card_subtype")
-BANK_DICT_FALLBACK = load_params("meerkat/classification/label_maps/cnn_merchant_category_mapping_bank.json")
-CARD_DICT_FALLBACK = load_params("meerkat/classification/label_maps/cnn_merchant_category_mapping_card.json")
+BANK_CATEGORY_FALLBACK = load_params("meerkat/classification/label_maps/cnn_merchant_category_mapping_bank.json")
+CARD_CATEGORY_FALLBACK = load_params("meerkat/classification/label_maps/cnn_merchant_category_mapping_card.json")
+BANK_SUBTYPE_CAT_FALLBACK = load_params("meerkat/classification/label_maps/subtype_category_mapping_bank.json")
+CARD_SUBTYPE_CAT_FALLBACK = load_params("meerkat/classification/label_maps/subtype_category_mapping_card.json")
 
 class Web_Consumer():
 	"""Acts as a web service client to process and enrich
@@ -281,11 +283,11 @@ class Web_Consumer():
 	def __apply_missing_categories(self, transactions, container):
 		"""If the factual search fails to find categories do a static lookup on the merchant name"""
 		if(container.lower() == "bank"):
-			self.__apply_categories_from_dict(transactions, BANK_DICT_FALLBACK, "Retail Category")
+			self.__apply_categories_from_dict(transactions, BANK_CATEGORY_FALLBACK, BANK_SUBTYPE_CAT_FALLBACK, "Retail Category")
 		else:
-			self.__apply_categories_from_dict(transactions, CARD_DICT_FALLBACK, "PaymentOps")
+			self.__apply_categories_from_dict(transactions, CARD_CATEGORY_FALLBACK, CARD_SUBTYPE_CAT_FALLBACK, "PaymentOps")
 
-	def __apply_categories_from_dict(self, transactions, categories, key):
+	def __apply_categories_from_dict(self, transactions, categories, subtype_fallback, key):
 		"""Use the given dictionary to add categories to transactions"""
 		for trans in transactions:
 			if (trans.get("CNN") and
@@ -294,6 +296,7 @@ class Web_Consumer():
 				fallback = categories[trans["CNN"]][key]
 				if fallback == "Use Subtype Rules for Categories":
 					fallback = trans["txn_sub_type"]
+					fallback = subtype_fallback.get(fallback) or fallback
 				trans["category_labels"] = [fallback]
 
 	def ensure_output_schema(self, transactions):

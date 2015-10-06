@@ -33,8 +33,17 @@ class WebConsumerTest(unittest.TestCase):
         self.assertEqual(transactions[0]["category_labels"][0], "Restaurants/Dining")
 
     def test_static_subtype_category_map(self):
-        """Assert that the transaction subtype is applied when the static map indicates it should be"""
+        """Assert that the category is applied out of the transaction subytpe fallback map when the merchant map indicates it should be"""
         transactions = web_consumer_fixture.get_transaction_subtype_fallback()
+        self.consumer._Web_Consumer__apply_missing_categories(
+                                                              transactions,
+                                                              "bank")
+        self.assertEqual(len(transactions[0]["category_labels"]), 1)
+        self.assertEqual(transactions[0]["category_labels"][0], "Other Income")
+
+    def test_catgory_not_found_subtype_fallback(self):
+        """Assert that the transaction subtype is applied when it is not found in the subtype map"""
+        transactions = web_consumer_fixture.get_transaction_subtype_no_fallback()
         self.consumer._Web_Consumer__apply_missing_categories(
                                                               transactions,
                                                               "bank")
