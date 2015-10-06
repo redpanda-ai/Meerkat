@@ -18,19 +18,18 @@ from meerkat.various_tools \
 from meerkat.various_tools \
 	import synonyms, get_bool_query, get_qs_query, load_params
 from meerkat.classification.load import select_model
-from meerkat.classification.lua_bridge import get_CNN
+from meerkat.classification.lua_bridge import get_cnn
 from meerkat.classification.bloom_filter.find_entities import location_split
 
 # Enabled Models
 BANK_SWS = select_model("bank")
 CARD_SWS = select_model("card")
-BANK_CNN = get_CNN("bank")
-CARD_CNN = get_CNN("card")
-BANK_SUBTYPE_CNN = get_CNN("bank_subtype")
-CARD_SUBTYPE_CNN = get_CNN("card_subtype")
+BANK_CNN = get_cnn("bank")
+CARD_CNN = get_cnn("card")
+BANK_SUBTYPE_CNN = get_cnn("bank_subtype")
+CARD_SUBTYPE_CNN = get_cnn("card_subtype")
 BANK_DICT_FALLBACK = load_params("meerkat/classification/label_maps/cnn_merchant_category_mapping_bank.json")
 CARD_DICT_FALLBACK = load_params("meerkat/classification/label_maps/cnn_merchant_category_mapping_card.json")
-
 
 class Web_Consumer():
 	"""Acts as a web service client to process and enrich
@@ -417,9 +416,8 @@ class Web_Consumer():
 			categories = json.loads(categories) if (categories != "" and categories != []) else []
 			trans["category_labels"] = categories
 
-	def __cpu_ops(self, data):
-		"""Missing docstring comment, also __cpu_ops is not a great choice
-		for the method name"""
+	def __apply_cpu_classifiers(self, data):
+		"""Apply all the classifiers which are CPU bound.  Written to be run in parallel with GPU bound classifiers."""
 		self.__apply_locale_bloom(data)
 		physical, non_physical = self.__sws(data)
 		physical = self.__enrich_physical(physical)
@@ -428,10 +426,10 @@ class Web_Consumer():
 
 	def classify(self, data):
 		"""Classify a set of transactions"""
-		cpu_result = self.__cpu_pool.apply_async(self.__cpu_ops, (data, ))
+		cpu_result = self.__cpu_pool.apply_async(self.__apply_cpu_classifiers, (data, ))
 		self.__apply_subtype_CNN(data)
 		self.__apply_merchant_CNN(data)
-		cpu_result.get()
+		cpu_result.get()  # Wait for CPU bound classifiers to finish
 		self.__apply_missing_categories(
 										data["transaction_list"],
 										data["container"])
