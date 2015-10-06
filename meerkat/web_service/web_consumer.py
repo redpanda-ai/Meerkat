@@ -26,10 +26,10 @@ BANK_SWS = select_model("bank_sws")
 CARD_SWS = select_model("card_sws")
 BANK_MERCHANT_CNN = get_cnn("bank_merchant")
 CARD_MERCHANT_CNN = get_cnn("card_merchant")
-CARD_DEBIT_SUBTYPE_CNN = get_CNN("card_debit_subtype")
-CARD_CREDIT_SUBTYPE_CNN = get_CNN("card_credit_subtype")
-BANK_DEBIT_SUBTYPE_CNN = get_CNN("bank_debit_subtype")
-BANK_CREDIT_SUBTYPE_CNN = get_CNN("bank_credit_subtype")
+CARD_DEBIT_SUBTYPE_CNN = get_cnn("card_debit_subtype")
+CARD_CREDIT_SUBTYPE_CNN = get_cnn("card_credit_subtype")
+BANK_DEBIT_SUBTYPE_CNN = get_cnn("bank_debit_subtype")
+BANK_CREDIT_SUBTYPE_CNN = get_cnn("bank_credit_subtype")
 
 class Web_Consumer():
 	"""Acts as a web service client to process and enrich

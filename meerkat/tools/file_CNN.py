@@ -14,12 +14,12 @@ from meerkat.classification.lua_bridge import get_CNN, load_label_map
 
 #####################################################
 
-BANK_MERCHANT_CNN = get_CNN("bank")
-CARD_MERCHANT_CNN = get_CNN("card")
-CARD_DEBIT_SUBTYPE_CNN = get_CNN("card_debit_subtype")
-CARD_CREDIT_SUBTYPE_CNN = get_CNN("card_credit_subtype")
-BANK_DEBIT_SUBTYPE_CNN = get_CNN("bank_debit_subtype")
-BANK_CREDIT_SUBTYPE_CNN = get_CNN("bank_credit_subtype")
+BANK_MERCHANT_CNN = get_cnn("bank")
+CARD_MERCHANT_CNN = get_cnn("card")
+CARD_DEBIT_SUBTYPE_CNN = get_cnn("card_debit_subtype")
+CARD_CREDIT_SUBTYPE_CNN = get_cnn("card_credit_subtype")
+BANK_DEBIT_SUBTYPE_CNN = get_cnn("bank_debit_subtype")
+BANK_CREDIT_SUBTYPE_CNN = get_cnn("bank_credit_subtype")
 
 def apply_classifiers(df, merchant_classifier, subtype_classifier):
 	"""Apply classifiers to an individual dataframe"""
