@@ -378,7 +378,7 @@ class Web_Consumer():
 		# Split transactions into groups
 		credit, debit = [], []
 
-		for transaction in processed:
+		for transaction in data["transaction_list"]:
 			if transaction["ledger_entry"] == "credit":
 				credit.append(transaction)
 			if transaction["ledger_entry"] == "debit":
