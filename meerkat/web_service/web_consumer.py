@@ -385,8 +385,10 @@ class Web_Consumer():
 				debit.append(transaction)
 
 		# Apply classifiers
-		credit_subtype_classifer(credit, label_key="subtype_CNN")
-		debit_subtype_classifer(debit, label_key="subtype_CNN")
+		if len(credit) > 0:
+			credit_subtype_classifer(credit, label_key="subtype_CNN")
+		if len(debit) > 0:
+			debit_subtype_classifer(debit, label_key="subtype_CNN")
 
 		# Split label into type and subtype
 		for transaction in data["transaction_list"]:
