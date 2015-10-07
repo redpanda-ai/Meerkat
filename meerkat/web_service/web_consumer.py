@@ -14,9 +14,9 @@ from multiprocessing.pool import ThreadPool
 from scipy.stats.mstats import zscore
 
 from meerkat.various_tools \
-import get_es_connection, string_cleanse, get_boosted_fields
+	import get_es_connection, string_cleanse, get_boosted_fields
 from meerkat.various_tools \
-import synonyms, get_bool_query, get_qs_query
+	import synonyms, get_bool_query, get_qs_query, load_params
 from meerkat.classification.load import select_model
 from meerkat.classification.lua_bridge import get_cnn
 from meerkat.classification.bloom_filter.find_entities import location_split
@@ -30,6 +30,10 @@ CARD_DEBIT_SUBTYPE_CNN = get_cnn("card_debit_subtype")
 CARD_CREDIT_SUBTYPE_CNN = get_cnn("card_credit_subtype")
 BANK_DEBIT_SUBTYPE_CNN = get_cnn("bank_debit_subtype")
 BANK_CREDIT_SUBTYPE_CNN = get_cnn("bank_credit_subtype")
+BANK_CATEGORY_FALLBACK = load_params("meerkat/classification/label_maps/cnn_merchant_category_mapping_bank.json")
+CARD_CATEGORY_FALLBACK = load_params("meerkat/classification/label_maps/cnn_merchant_category_mapping_card.json")
+BANK_SUBTYPE_CAT_FALLBACK = load_params("meerkat/classification/label_maps/subtype_category_mapping_bank.json")
+CARD_SUBTYPE_CAT_FALLBACK = load_params("meerkat/classification/label_maps/subtype_category_mapping_card.json")
 
 class Web_Consumer():
 	"""Acts as a web service client to process and enrich
@@ -145,8 +149,8 @@ class Web_Consumer():
 		# Elasticsearch v1.0 bug workaround
 		if top_hit["_source"].get("pin", "") != "":
 			coordinates = top_hit["_source"]["pin"]["location"]["coordinates"]
-			hit_fields["longitude"] = "%.1f" % (float(coordinates[0]))
-			hit_fields["latitude"] = "%.1f" % (float(coordinates[1]))
+			hit_fields["longitude"] = "%.6f" % (float(coordinates[0]))
+			hit_fields["latitude"] = "%.6f" % (float(coordinates[1]))
 		# Collect Fallback Data
 		business_names = \
 		[result.get("fields", {"name" : ""}).get("name", "") for result in hits]
@@ -277,6 +281,25 @@ class Web_Consumer():
 			transaction[attr_map['name']] = business_names[0]
 
 		return transaction
+
+	def __apply_missing_categories(self, transactions, container):
+		"""If the factual search fails to find categories do a static lookup on the merchant name"""
+		if(container.lower() == "bank"):
+			self.__apply_categories_from_dict(transactions, BANK_CATEGORY_FALLBACK, BANK_SUBTYPE_CAT_FALLBACK, "Retail Category")
+		else:
+			self.__apply_categories_from_dict(transactions, CARD_CATEGORY_FALLBACK, CARD_SUBTYPE_CAT_FALLBACK, "PaymentOps")
+
+	def __apply_categories_from_dict(self, transactions, categories, subtype_fallback, key):
+		"""Use the given dictionary to add categories to transactions"""
+		for trans in transactions:
+			if (trans.get("CNN") and
+						categories.get(trans["CNN"]) and not
+						trans.get("category_labels")):
+				fallback = categories[trans["CNN"]][key]
+				if fallback == "Use Subtype Rules for Categories":
+					fallback = trans["txn_sub_type"]
+					fallback = subtype_fallback.get(fallback) or fallback
+				trans["category_labels"] = [fallback]
 
 	def ensure_output_schema(self, transactions):
 		"""Clean output to proper schema"""
@@ -432,6 +455,9 @@ class Web_Consumer():
 		self.__apply_subtype_CNN(data)
 		self.__apply_merchant_CNN(data)
 		cpu_result.get()  # Wait for CPU bound classifiers to finish
+		self.__apply_missing_categories(
+										data["transaction_list"],
+										data["container"])
 		self.ensure_output_schema(data["transaction_list"])
 
 		return data
