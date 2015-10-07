@@ -149,8 +149,8 @@ class Web_Consumer():
 		# Elasticsearch v1.0 bug workaround
 		if top_hit["_source"].get("pin", "") != "":
 			coordinates = top_hit["_source"]["pin"]["location"]["coordinates"]
-			hit_fields["longitude"] = "%.1f" % (float(coordinates[0]))
-			hit_fields["latitude"] = "%.1f" % (float(coordinates[1]))
+			hit_fields["longitude"] = "%.6f" % (float(coordinates[0]))
+			hit_fields["latitude"] = "%.6f" % (float(coordinates[1]))
 		# Collect Fallback Data
 		business_names = \
 		[result.get("fields", {"name" : ""}).get("name", "") for result in hits]
