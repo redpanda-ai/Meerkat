@@ -262,8 +262,8 @@ def CNN_accuracy():
 	"""Run merchant CNN on a directory of Merchant Samples"""
 
 	# Load Classifiers
-	BANK_CNN = get_cnn("bank")
-	CARD_CNN = get_cnn("card")
+	BANK_CNN = get_cnn("bank_merchant")
+	CARD_CNN = get_cnn("card_merchant")
 
 	# Connect to S3
 	with nostdout():

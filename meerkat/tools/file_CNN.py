@@ -14,8 +14,8 @@ from meerkat.classification.lua_bridge import get_CNN, load_label_map
 
 #####################################################
 
-BANK_MERCHANT_CNN = get_cnn("bank")
-CARD_MERCHANT_CNN = get_cnn("card")
+BANK_MERCHANT_CNN = get_cnn("bank_merchant")
+CARD_MERCHANT_CNN = get_cnn("card_merchant")
 CARD_DEBIT_SUBTYPE_CNN = get_cnn("card_debit_subtype")
 CARD_CREDIT_SUBTYPE_CNN = get_cnn("card_credit_subtype")
 BANK_DEBIT_SUBTYPE_CNN = get_cnn("bank_debit_subtype")
