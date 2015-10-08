@@ -33,7 +33,7 @@ def find_merchant(transaction):
 				   (longest == None or len(longest) < len(transaction[start:end])):
 					longest = transaction[start:end]
 
-	return TRIE_LOOKUP.get(longest, None)
+	return TRIE_LOOKUP.get(longest, "")
 
 def column_print(merchant, expected, transaction):
 	merchant = str(merchant)
