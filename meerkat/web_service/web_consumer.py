@@ -292,14 +292,15 @@ class Web_Consumer():
 	def __apply_categories_from_dict(self, transactions, categories, subtype_fallback, key):
 		"""Use the given dictionary to add categories to transactions"""
 		for trans in transactions:
-			if (trans.get("CNN") and
-						categories.get(trans["CNN"]) and not
-						trans.get("category_labels")):
-				fallback = categories[trans["CNN"]][key]
-				if fallback == "Use Subtype Rules for Categories":
-					fallback = trans["txn_sub_type"]
-					fallback = subtype_fallback.get(fallback) or fallback
-				trans["category_labels"] = [fallback]
+			if trans.get("category_labels"):
+				continue
+			merchant = trans.get("CNN") or ""
+			fallback = categories.get(merchant)[key] or ""
+			if (fallback == "Use Subtype Rules for Categories" or
+						fallback == ""):
+				fallback = trans["txn_sub_type"]
+				fallback = subtype_fallback.get(fallback) or fallback
+			trans["category_labels"] = [fallback]
 
 	def ensure_output_schema(self, transactions):
 		"""Clean output to proper schema"""
