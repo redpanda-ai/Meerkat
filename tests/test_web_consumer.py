@@ -7,6 +7,13 @@ from tests.fixture import web_consumer_fixture
 class WebConsumerTest(unittest.TestCase):
     """Our UnitTest class."""
 
+    @classmethod
+    def setUpClass(cls):
+        web_consumer.BANK_CREDIT_SUBTYPE_CNN = web_consumer_fixture.get_mock_cnn
+        web_consumer.BANK_DEBIT_SUBTYPE_CNN = web_consumer_fixture.get_mock_cnn
+        web_consumer.BANK_MERCHANT_CNN = web_consumer_fixture.get_mock_cnn
+        web_consumer.CARD_MERCHANT_CNN = web_consumer_fixture.get_mock_cnn
+
     def setUp(self):
         self.consumer = web_consumer.Web_Consumer()
         return
@@ -49,6 +56,23 @@ class WebConsumerTest(unittest.TestCase):
                                                               "bank")
         self.assertEqual(len(transactions[0]["category_labels"]), 1)
         self.assertEqual(transactions[0]["category_labels"][0], "Joseph Rules")
+
+    def test_apply_subtype_cnn_bank(self):
+        """Assert type/subtype are set on each transaction passed to the subypte CNN"""
+        test_request = web_consumer_fixture.get_test_request_bank()
+        self.consumer._Web_Consumer__apply_subtype_CNN(test_request)
+        self.assertEqual(len(test_request["transaction_list"]), 2)
+        for trans in test_request["transaction_list"]:
+            self.assertEqual(trans["txn_type"], "joseph")
+            self.assertEqual(trans["txn_sub_type"], "rules")
+
+    def test_apply_merchant_cnn_bank(self):
+        """Assert merchant name is set on each transaction passed to the merchant CNN"""
+        test_request = web_consumer_fixture.get_test_request_bank()
+        self.consumer._Web_Consumer__apply_merchant_CNN(test_request)
+        self.assertEqual(len(test_request["transaction_list"]), 2)
+        for trans in test_request["transaction_list"]:
+            self.assertEqual(trans["CNN"], "joseph - rules")
 
 if __name__ == "__main__":
     unittest.main()

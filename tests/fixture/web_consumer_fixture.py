@@ -45,5 +45,32 @@ def get_transaction_subtype_no_fallback():
     }]
 
 
-def fake_bank_subtype_CNN_subtype_payment(transactions):
-    return
+def get_test_request_bank():
+    return {
+        "container": "bank",
+        "transaction_list": get_test_transaction_list()
+    }
+
+
+def get_test_request_card():
+    return {
+        "container": "card",
+        "transaction_list": get_test_transaction_list()
+    }
+
+
+def get_test_transaction_list():
+    return [
+        {
+            "ledger_entry": "credit"
+        },
+        {
+            "ledger_entry": "debit"
+        }
+    ]
+
+
+def get_mock_cnn(transactions, label_key="CNN"):
+    for trans in transactions:
+        trans[label_key] = "joseph - rules"
+    return transactions
