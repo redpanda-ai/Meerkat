@@ -313,13 +313,15 @@ class Web_Consumer():
 		# Override / Strip Fields
 		for trans in transactions:
 
+			# Fallback on merchant trie
+			merchant_trie_match = find_merchant(trans["description"])
+
+			if (attr_map["name"] not in trans or trans[attr_map["name"]] == "") and merchant_trie_match != "":
+				trans[attr_map["name"]] = merchant_trie_match
+
 			# Override output with CNN v1
 			if trans["CNN"] != "":
 				trans[attr_map["name"]] = trans["CNN"]
-
-			# Fallback on merchant trie
-			if attr_map["name"] in trans and trans[attr_map["name"]] == "":
-				trans[attr_map["name"]] = find_merchant(trans["description"])
 
 			# Override Locale with Bloom Results
 			if trans["locale_bloom"] != None and trans["is_physical_merchant"] == True:
