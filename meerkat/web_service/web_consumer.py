@@ -20,6 +20,7 @@ from meerkat.various_tools \
 from meerkat.classification.load import select_model
 from meerkat.classification.lua_bridge import get_cnn
 from meerkat.classification.bloom_filter.find_entities import location_split
+from meerkat.classification.find_merchants import find_merchant
 
 # Enabled Models
 BANK_SWS = select_model("bank_sws")
@@ -315,6 +316,10 @@ class Web_Consumer():
 			# Override output with CNN v1
 			if trans["CNN"] != "":
 				trans[attr_map["name"]] = trans["CNN"]
+
+			# Fallback on merchant trie
+			if trans[attr_map["name"]] == "":
+				trans[attr_map["name"]] = find_merchant(trans["description"])
 
 			# Override Locale with Bloom Results
 			if trans["locale_bloom"] != None and trans["is_physical_merchant"] == True:

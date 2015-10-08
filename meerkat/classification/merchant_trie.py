@@ -45,7 +45,7 @@ def create_merchant_trie(input_filename, output_filename):
 	merchant_json = get_json_from_file(input_filename)
 	merchants = set()
 	for key in merchant_json.keys():
-		merchants.add(standardize(key))
+		merchants.add(key)
 
 	merchants = mt.Trie(merchants)
 
@@ -58,10 +58,9 @@ def generate_merchant_trie():
 		trie.load("meerkat/classification/models/merchant_trie.marisa")
 	else:
 		trie = create_merchant_trie(\
-		"meerkat/classification/label_maps/permanent_bank_label_map.json", \
+		"meerkat/classification/label_maps/trie_lookup.json", \
 			'meerkat/classification/models/merchant_trie.marisa')
 	return trie
-
 
 if __name__ == "__main__":
 	my_merchant_trie = generate_merchant_trie()
