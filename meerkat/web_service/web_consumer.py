@@ -318,7 +318,7 @@ class Web_Consumer():
 				trans[attr_map["name"]] = trans["CNN"]
 
 			# Fallback on merchant trie
-			if trans[attr_map["name"]] == "":
+			if attr_map["name"] in trans and trans[attr_map["name"]] == "":
 				trans[attr_map["name"]] = find_merchant(trans["description"])
 
 			# Override Locale with Bloom Results
