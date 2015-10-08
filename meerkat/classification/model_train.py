@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3.3
 
 """This module generates and trains classificaton models for
-transactions using SciKit Learn. Specifically it uses a Stochastic 
+transactions using SciKit Learn. Specifically it uses a Stochastic
 Gradient Descent classifier that is optimized using Grid Search
 
 Created on Feb 25, 2014
@@ -11,7 +11,7 @@ Created on Feb 25, 2014
 #################### USAGE ##########################
 
 # Experts only! Do not touch!
-# python3.3 -m meerkat.classification.model_train [file_name] [label_column_name]
+# python3 -m meerkat.classification.model_train [file_name] [label_column_name]
 
 #####################################################
 
@@ -24,16 +24,11 @@ import os
 from random import random
 
 import pandas as pd
-#Import below is unused
-#from sklearn.cross_validation import train_test_split
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
-#Import below is unused
-#from sklearn.feature_extraction import DictVectorizer
 from sklearn.linear_model import SGDClassifier
 from sklearn.grid_search import GridSearchCV
-#FeatureUnion imported from sklearn.pipeline is unused
-from sklearn.pipeline import Pipeline #, FeatureUnion
+from sklearn.pipeline import Pipeline
 from sklearn.externals import joblib
 from sklearn.base import BaseEstimator, TransformerMixin
 
@@ -62,7 +57,7 @@ class DateTransformer(BaseEstimator, TransformerMixin):
 
 def split_data(filename):
 	"""Divides the training set into parts for testing and training."""
-	
+
 	if not os.path.isfile(filename):
 		logging.error("Please provide a set of labeled transactions to"\
 			+ "build the classifier on")
@@ -196,7 +191,6 @@ def test_model(file_to_test, model):
 
 def run_from_command_line(command_line_arguments):
 	"""Runs the module when invoked from the command line."""
-	
 	if len(command_line_arguments) == 3:
 		data = split_data(command_line_arguments[1])
 		build_model(*data)

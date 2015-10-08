@@ -18,21 +18,12 @@ def select_model(mode):
 	requested model"""
 
 	# Switch on Models
-	if mode == "card":
+	if mode == "card_sws":
 		logging.warning("--- Loading Card SWS Model ---")
-		model_path = "meerkat/classification/models/final_card.pkl"
-	elif mode == "bank":
+		model_path = "meerkat/classification/models/final_card_sws.pkl"
+	elif mode == "bank_sws":
 		logging.warning("--- Loading Bank SWS Model ---")
-		model_path = "meerkat/classification/models/final_bank.pkl"
-	elif mode == "bank_NPMN":
-		logging.warning("--- Loading Non-Physical Bank Model ---")
-		model_path = "meerkat/classification/models/bank_NPMN.pkl"
-	elif mode == "sub_transaction_type":
-		logging.warning("--- Loading Sub Transaction Type Model ---")
-		model_path = "meerkat/classification/models/STO_bank_model.pkl"
-	elif mode == "transaction_type":
-		logging.warning("--- Loading Transaction Type Model ---")
-		model_path = "meerkat/classification/models/TO_bank_model.pkl"
+		model_path = "meerkat/classification/models/final_bank_sws.pkl"
 	else:
 		logging.warning("--- Classifier requested not found. Terminating ---")
 		sys.exit()

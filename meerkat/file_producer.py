@@ -110,7 +110,7 @@ def convert_dataframe_to_queue(params, dataframe):
 	"""Converts a dataframe to a queue for processing"""
 	container = params["container"]
 	#Pull the correct model
-	classifier = select_model(container)
+	classifier = select_model(container + "_sws")
 	desc_queue = queue.Queue()
 	name_map = {"GOOD_DESCRIPTION" : "MERCHANT_NAME",\
 		"MERCHANT_NAME" : "GOOD_DESCRIPTION"}

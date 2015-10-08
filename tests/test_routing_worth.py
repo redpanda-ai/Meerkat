@@ -2,7 +2,7 @@ from meerkat.classification.load import select_model
 import csv
 
 def main():
-	classifier = select_model("bank")
+	classifier = select_model("bank_sws")
 	counts = [0,0,0]
 	with open("data/input/merchant_labels.csv", encoding = "latin-1") as f:
 		data = csv.reader(f, delimiter = ",")
