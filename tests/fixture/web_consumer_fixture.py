@@ -1,3 +1,6 @@
+import uuid
+
+
 def get_transaction():
     """Create and return an array containing a single transaction"""
     return [{
@@ -72,21 +75,162 @@ def get_test_transaction_list():
     return [
         {
             "ledger_entry": "credit",
-            "description": "some physical location"
+            "description": "some physical location",
+            "locale_bloom": ["Mockville", "CA"]
         },
         {
             "ledger_entry": "debit",
-            "description": "some non-physical location"
+            "description": "some non-physical location",
+            "locale_bloom": ["Mockville", "CA"]
         },
         {
             "ledger_entry": "credit",
-            "description": "some physical location"
+            "description": "some physical location",
+            "locale_bloom": ["Mockville", "CA"]
         },
         {
             "ledger_entry": "debit",
-            "description": "some non-physical location"
+            "description": "some non-physical location",
+            "locale_bloom": ["Mockville", "CA"]
         }
     ]
+
+
+def get_mock_hyperparams():
+    """Return a mock object with the necessary fields of the web_consumer's hyperparams.  Consider loading regular hyperparams from json"""
+    return {
+        "es_result_size": "45",
+        "z_score_threshold": "2.857",
+        "raw_score_threshold": "1.000",
+        "good_description": "2",
+        "boost_labels": ["standard_fields"],
+        "boost_vectors": {
+            "address": [0.541],
+            "address_extended": [1.282],
+            "admin_region": [0.69],
+            "category_labels": [1.319],
+            "chain_name": [0.999],
+            "email": [0.516],
+            "internal_store_number": [1.9],
+            "locality": [1.367],
+            "name": [2.781],
+            "neighborhood": [0.801],
+            "po_box": [1.292],
+            "post_town": [0.577],
+            "postcode": [0.914],
+            "region": [1.685],
+            "tel": [0.597]
+        }
+    }
+
+
+def get_mock_params():
+    """Return an object with the necessary fields of the web_consumer's params.  Consider loading the regular params from json"""
+    return {
+        "input": {
+            "hyperparameters": "test",
+            "encoding": "utf-8"
+        },
+        "output": {
+            "results": {
+                "fields": [
+                    "name", "category_labels", "address", "locality", "country",
+                    "region", "postcode", "factual_id", "internal_store_number",
+                    "latitude", "longitude"],
+                "labels": [
+                    "merchant_name", "category_labels", "street", "city", "country",
+                    "state", "postal_code", "source_merchant_id", "store_id",
+                    "latitude", "longitude"]
+            }
+        },
+        "elasticsearch": {
+            "cluster_nodes": [
+                "test"
+            ],
+            "index": "factual_index",
+            "type": "factual_type"
+        }
+    }
+
+
+def get_mock_esconnection(params):
+    return
+
+
+def get_mock_msearch(queries):
+    """Return a mock literal search method which creates a mock response for every query"""
+    queries = queries.split("\n")
+    responses = []
+    for query in queries:
+        if "index" in query:
+            continue
+        responses.append(get_mock_factual())
+    return {
+        "responses": responses
+    }
+
+
+def get_mock_factual():
+    """Return a mock factual response"""
+    hits = [get_mock_hit(10)]
+    for i in range(9):
+        hits.append(get_mock_hit(1))
+    return {
+        "took": 31,
+        "timed_out": False,
+        "hits": {
+            "total": 1,
+            "max_score": 4.82026,
+            "hits": hits
+        }
+    }
+
+
+def get_mock_hit(score):
+    randomId = uuid.uuid4()
+    return {
+        "fields": {
+            "postcode": [
+                "12345"
+            ],
+            "name": [
+                "Mock Merchant"
+            ],
+            "locality": [
+                "Mockville"
+            ],
+            "region": [
+                "CA"
+            ],
+            "category_labels": [
+                "[\"Retail\",\"Gift and Novelty\"]"
+            ],
+            "factual_id": [
+                randomId.hex
+            ],
+            "address": [
+                "123 Mock St"
+            ],
+            "country": [
+                "us"
+            ]
+        },
+        "_source": {
+            "pin": {
+                "location": {
+                    "coordinates": [
+                        "-73.807267",
+                        "40.989156"
+                    ],
+                    "type": "point"
+                }
+            }
+        },
+        "_type": "factual_type",
+        "_index": "factual_index",
+        "_id": randomId.hex,
+        "_score": score
+    }
 
 
 def get_mock_cnn(transactions, label_key="CNN"):
