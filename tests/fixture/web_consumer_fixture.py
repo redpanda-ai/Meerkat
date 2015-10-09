@@ -94,12 +94,12 @@ def get_test_transaction_list():
         },
         {
             "ledger_entry": "debit",
-            "description": "some non-physical location",
+            "description": "some physical location",
             "locale_bloom": ["Mockville", "CA"]
         },
         {
             "ledger_entry": "credit",
-            "description": "some physical location",
+            "description": "some non-physical location",
             "locale_bloom": ["Mockville", "CA"]
         },
         {
