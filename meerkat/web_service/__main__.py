@@ -16,13 +16,14 @@ import os
 import tornado.httpserver
 import tornado.ioloop
 import yaml
+import sys
 
 from tornado_json.application import Application
 from tornado.options import define, options
 from meerkat.web_service.api import Meerkat_API
 
 # Define Some Defaults
-define("port", default=443, help="run on the given port", type=int)
+define("port", default=(len(sys.argv) > 1 and str(sys.argv[1]) or 443), help="run on the given port", type=int)
 
 def main():
 	"""Launches an HTTPS web service."""
