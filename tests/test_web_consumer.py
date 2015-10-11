@@ -68,6 +68,28 @@ class WebConsumerTest(unittest.TestCase):
         self.assertEqual(len(transactions[0]["category_labels"]), 1)
         self.assertEqual(transactions[0]["category_labels"][0], "Joseph Rules")
 
+    def test_no_merchant_name_subtype_fallback(self):
+        """Assert that when no merchant name is found the category is looked up using the subtype"""
+        transactions = web_consumer_fixture.get_transaction_subtype_no_merchant()
+
+        self.consumer._Web_Consumer__apply_missing_categories(
+                                                              transactions,
+                                                              "bank")
+
+        self.assertEqual(len(transactions[0]["category_labels"]), 1)
+        self.assertEqual(transactions[0]["category_labels"][0], "Cash Withdrawal")
+
+    def test_no_merchant_name_no_subtype_fallback(self):
+        """Assert that when no merchant name is found the category is looked up using the subtype"""
+        transactions = web_consumer_fixture.get_transaction_subtype_no_merchant_no_fallback()
+
+        self.consumer._Web_Consumer__apply_missing_categories(
+                                                              transactions,
+                                                              "bank")
+
+        self.assertEqual(len(transactions[0]["category_labels"]), 1)
+        self.assertEqual(transactions[0]["category_labels"][0], "Joseph Rules")
+
     def test_apply_subtype_cnn_bank(self):
         """Assert type/subtype are set on each transaction passed to the subypte CNN"""
         test_request = web_consumer_fixture.get_test_request_bank()

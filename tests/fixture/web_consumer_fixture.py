@@ -54,6 +54,20 @@ def get_transaction_subtype_no_fallback():
     }]
 
 
+def get_transaction_subtype_no_merchant():
+    """Return an array containing a single transaction with a subtype but no merchant name"""
+    return [{
+        "txn_sub_type": "ATM Withdrawal"
+    }]
+
+
+def get_transaction_subtype_no_merchant_no_fallback():
+    """Return an array containing a single transaction with a subtype but no merchant name and no fallback in the static maps"""
+    return [{
+        "txn_sub_type": "Joseph Rules"
+    }]
+
+
 def get_test_request_bank():
     """return an API request with the "bank" container"""
     return {
@@ -80,12 +94,12 @@ def get_test_transaction_list():
         },
         {
             "ledger_entry": "debit",
-            "description": "some non-physical location",
+            "description": "some physical location",
             "locale_bloom": ["Mockville", "CA"]
         },
         {
             "ledger_entry": "credit",
-            "description": "some physical location",
+            "description": "some non-physical location",
             "locale_bloom": ["Mockville", "CA"]
         },
         {

@@ -22,12 +22,14 @@
 			"transaction_id" : 2,
 			"is_physical_merchant" : false,
 			"txn_type" : "Payment",
-			"txn_sub_type": ""
+			"txn_sub_type": "",
+			"category_labels" : [""]
 		},
 		{
 			"transaction_id" : 3,
 			"is_physical_merchant" : false,
-			"merchant_name" : "Amazon"
+			"merchant_name" : "Amazon",
+			"category_labels" : ["General Merchandise"]
 		},
 		{
 			"transaction_id" : 4,
