@@ -1,0 +1,120 @@
+{
+	"concurrency" : 8,
+	"batch_size" : 500,
+	"input" : {
+		"filename" : "/data/2/smaller_100000.tab",
+		"encoding" : "utf-8"
+	},
+	"logging" : {
+		"level" : "info",
+		"path" : "out.log",
+		"formatter" : "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+		"console" : false
+	},
+	"elasticsearch" : {
+		"cluster_nodes" : [
+			"127.0.0.1"
+        ],
+		"index" : "routed_index",
+		"type" : "routed_type",
+		"boost_labels" : [ "query_string", "composite.address" ],
+		"boost_vectors" : {
+			"factual_id" :        [ 0.0, 0.0 ],
+			"name" :              [ 1.0, 0.0 ],
+			"address" :           [ 1.0, 0.0 ],
+			"address_extended" :  [ 1.0, 0.0 ],
+			"po_box" :            [ 1.0, 0.0 ],
+			"locality" :          [ 1.0, 0.0 ],
+			"region" :            [ 1.0, 0.0 ],
+			"post_town" :         [ 1.0, 0.0 ],
+			"admin_region" :      [ 1.0, 0.0 ],
+			"postcode" :          [ 1.0, 0.0 ],
+			"country" :           [ 1.0, 0.0 ],
+			"tel" :               [ 1.0, 0.0 ],
+			"fax" :               [ 1.0, 0.0 ],
+			"neighborhood" :      [ 1.0, 0.0 ],
+			"email" :             [ 1.0, 0.0 ],
+			"category_ids" :      [ 1.0, 0.0 ],
+			"category_labels" :   [ 1.0, 0.0 ],
+			"status" :            [ 1.0, 0.0 ],
+			"chain_name" :        [ 1.0, 0.0 ],
+			"chain_id" :          [ 1.0, 0.0 ],
+			"pin.location" :      [ 0.0, 0.0 ],
+			"composite.address" : [ 0.0, 3.0 ]
+		},
+		"composite_fields" : [
+			{
+				"address" : {
+					"components" : [ "address", "address_extended", "locality", "region",
+						"postcode", "country" ],
+					"format" : "{0} {1} {2}, {3} {4}, {5}",
+					"index" : "analyzed",
+					"type" : "string"
+				}
+			}
+		],
+		"dispersed_fields" : [
+			{
+				"address": {
+					"dispersion_regex" : "^(?P<number_part>\\w+)\\s+(?P<street_part>.+)$",
+					"components" : [
+						{
+							"name" : "number_part",
+							"index" : "analyzed",
+							"type" : "string"
+						},
+						{
+							"name" : "street_part",
+							"index" : "analyzed",
+							"type" : "string"
+						}
+					]
+				}
+			}
+		],
+		"type_mapping" : {
+			"mappings" : {
+				"routed_type" : {
+					"_source" : {
+						"enabled" : true
+					},
+					"_routing" : {
+					"required" : true,
+					"path" : "region"
+					},
+					"properties" : {
+						"factual_id" : { "index" : "analyzed", "type" : "string" },
+						"name" : { "index" : "analyzed", "type" : "string" },
+						"address" : { "index" : "analyzed", "type" : "string" },
+						"address_extended" : { "index" : "analyzed", "type" : "string" },
+						"po_box" : { "index" : "analyzed", "type" : "string" },
+						"locality" : { "index" : "analyzed", "type" : "string" },
+						"region" : { "index" : "analyzed", "type" : "string" },
+						"post_town" : { "index" : "analyzed", "type" : "string" },
+						"admin_region" : { "index" : "analyzed", "type" : "string" },
+						"postcode" : { "index" : "analyzed", "type" : "string" },
+						"country" : { "index" : "analyzed", "type" : "string" },
+						"tel" : { "index" : "analyzed", "type" : "string" },
+						"fax" : { "index" : "analyzed", "type" : "string" },
+						"neighborhood" : { "index" : "analyzed", "type" : "string" },
+						"website" : { "index" : "analyzed", "type" : "string" },
+						"email" : { "index" : "analyzed", "type" : "string" },
+						"category_ids" : { "index" : "analyzed", "type" : "string" },
+						"category_labels" : { "index" : "analyzed", "type" : "string" },
+						"status" : { "index" : "analyzed", "type" : "string" },
+						"chain_name" : { "index" : "analyzed", "type" : "string" },
+						"chain_id" : { "index" : "analyzed", "type" : "string" },
+						"internal_store_number" : {"index" : "analyzed", "type" : "string"},
+						"pin" : { "properties" : { "location" : {
+							"type" : "geo_shape", "tree" : "quadtree", "precision" : "1m" } }
+						}
+					}
+				}
+			},
+			"settings" : {
+				"number_of_replicas" : 0,
+				"number_of_shards" : 10
+			}
+		}
+	}
+}
