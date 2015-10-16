@@ -220,6 +220,10 @@ class ThreadConsumer(threading.Thread):
 					del document["longitude"]
 					del document["latitude"]
 
+				if "region" not in document or document["region"].strip() == "":
+					my_logger.critical("Region not found")
+					document["region"] = "XX"
+
 				#Routine to create composite fields
 				self.__create_composite_fields(document)
 
