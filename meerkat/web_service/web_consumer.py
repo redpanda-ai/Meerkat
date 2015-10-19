@@ -302,7 +302,7 @@ class Web_Consumer():
 		for trans in transactions:
 			if trans.get("category_labels"):
 				continue
-			merchant = trans.get("CNN") or ""
+			merchant = (trans.get("CNN") or "").strip()
 			fallback = categories.get(merchant)[key] or ""
 			if (fallback == "Use Subtype Rules for Categories" or
 						fallback == ""):
