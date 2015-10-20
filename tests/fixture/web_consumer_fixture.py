@@ -68,6 +68,13 @@ def get_transaction_subtype_no_merchant_no_fallback():
     }]
 
 
+def get_transaction_subtype_non_existant_merchant():
+    """Return an array containing a single transaction with a merchant that doesn't exist in the subtype map"""
+    return [{
+        "CNN": "Joseph Rules"
+    }]
+
+
 def get_test_request_bank():
     """return an API request with the "bank" container"""
     return {

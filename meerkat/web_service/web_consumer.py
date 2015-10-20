@@ -302,12 +302,13 @@ class Web_Consumer():
 		for trans in transactions:
 			if trans.get("category_labels"):
 				continue
-			merchant = trans.get("CNN") or ""
-			fallback = categories.get(merchant)[key] or ""
+			merchant = trans.get("CNN", "").strip()
+			category = categories.get(merchant)
+			fallback = category and category.get(key) or ""
 			if (fallback == "Use Subtype Rules for Categories" or
 						fallback == ""):
-				fallback = trans["txn_sub_type"]
-				fallback = subtype_fallback.get(fallback) or fallback
+				fallback = trans.get("txn_sub_type", "")
+				fallback = subtype_fallback.get(fallback, fallback)
 			trans["category_labels"] = [fallback]
 
 	def ensure_output_schema(self, transactions):
