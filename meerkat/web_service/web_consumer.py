@@ -307,7 +307,7 @@ class Web_Consumer():
 			fallback = category and category.get(key) or ""
 			if (fallback == "Use Subtype Rules for Categories" or
 						fallback == ""):
-				fallback = trans["txn_sub_type"]
+				fallback = trans.get("txn_sub_type") or ""
 				fallback = subtype_fallback.get(fallback) or fallback
 			trans["category_labels"] = [fallback]
 
