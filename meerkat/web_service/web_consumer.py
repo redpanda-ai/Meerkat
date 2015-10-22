@@ -10,6 +10,7 @@ Created on Nov 3, 2014
 import json
 import string
 import re
+import logging
 from multiprocessing.pool import ThreadPool
 from scipy.stats.mstats import zscore
 
@@ -229,6 +230,10 @@ class Web_Consumer():
 						isinstance(hit_fields[field], (list)) else str(hit_fields[field])
 					transaction[attr_map.get(field, field)] = field_content
 				else:
+					if(field == "country"):
+						logging.warning("Factual response for merchant {} has no country code.  Defaulting to US.".format(hit_fields["factual_id"][0]))
+						transaction[attr_map.get(field, field)] = "US"
+						continue
 					transaction[attr_map.get(field, field)] = ""
 
 		# Add Business Name, City and State as a fallback
