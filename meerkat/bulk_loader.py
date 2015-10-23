@@ -212,6 +212,7 @@ class ThreadConsumer(threading.Thread):
 		while len(self.batch_list) > 0:
 			current_item = self.batch_list.pop(0)
 			item_list = current_item.split("\t")
+			#If we are missing items at the end, we add blank values
 			len_list = len(item_list)
 			item_delta = len_header - len_list
 			if item_delta > 0:
@@ -227,7 +228,7 @@ class ThreadConsumer(threading.Thread):
 						#my_logger.info(document["pin"])
 					del document["longitude"]
 					del document["latitude"]
-
+				#If the region is not found, add "XX" instead
 				if "region" not in document or document["region"].strip() == "":
 					my_logger.critical("Region not found")
 					document["region"] = "XX"
@@ -248,7 +249,7 @@ class ThreadConsumer(threading.Thread):
 				}
 				actions.append(action)
 			else:
-				my_logger.info("Whoah!")
+				my_logger.info("Header has {0} values, but item has {1} values."(format(len_header, len_item)))
 		# Make Calls to Elastic Search
 		my_logger.info("Docs: {0}".format(len(docs)))
 		success, errors = helpers.bulk(self.es_connection, actions)
