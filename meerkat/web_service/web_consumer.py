@@ -230,11 +230,11 @@ class Web_Consumer():
 						isinstance(hit_fields[field], (list)) else str(hit_fields[field])
 					transaction[attr_map.get(field, field)] = field_content
 				else:
-					if(field == "country"):
-						logging.warning("Factual response for merchant {} has no country code.  Defaulting to US.".format(hit_fields["factual_id"][0]))
-						transaction[attr_map.get(field, field)] = "US"
-						continue
 					transaction[attr_map.get(field, field)] = ""
+
+			if not transaction.get("country") or transaction["country"] == "":
+				logging.warning("Factual response for merchant {} has no country code.  Defaulting to US.".format(hit_fields["factual_id"][0]))
+				transaction["country"] = "US"
 
 		# Add Business Name, City and State as a fallback
 		if decision == False:
