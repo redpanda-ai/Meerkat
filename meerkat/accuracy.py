@@ -240,7 +240,7 @@ def apply_cnn(classifier, transactions):
 	batches = grouper(transactions)
 	processed = []
 
-	for batch in enumerate(batches):
+	for i, batch in enumerate(batches):
 		processed += classifier(batch, doc_key="DESCRIPTION_UNMASKED", \
 label_key="MERCHANT_NAME")
 
