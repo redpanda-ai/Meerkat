@@ -10,6 +10,7 @@ Created on Nov 3, 2014
 import json
 import string
 import re
+import logging
 from multiprocessing.pool import ThreadPool
 from scipy.stats.mstats import zscore
 
@@ -230,6 +231,10 @@ class Web_Consumer():
 					transaction[attr_map.get(field, field)] = field_content
 				else:
 					transaction[attr_map.get(field, field)] = ""
+
+			if not transaction.get("country") or transaction["country"] == "":
+				logging.warning("Factual response for merchant {} has no country code.  Defaulting to US.".format(hit_fields["factual_id"][0]))
+				transaction["country"] = "US"
 
 		# Add Business Name, City and State as a fallback
 		if decision == False:
