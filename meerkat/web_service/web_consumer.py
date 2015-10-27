@@ -437,7 +437,6 @@ class Web_Consumer():
 		# Split label into type and subtype
 		for transaction in data["transaction_list"]:
 			transaction["cnn_type_found"] = True
-			print(transaction["subtype_CNN"])
 			txn_type, txn_sub_type = transaction["subtype_CNN"].split(" - ")
 			transaction["txn_type"] = txn_type
 			transaction["txn_sub_type"] = txn_sub_type
