@@ -46,7 +46,7 @@ class Web_Consumer():
 
 	__cpu_pool = ThreadPool(processes=14)
 
-	def __init__(self, params=None, hyperparams=None, cities=None):
+	def __init__(self, params=None, hyperparams=None, cities=None, stats=None):
 		"""Constructor"""
 
 		if params is None:
@@ -64,6 +64,9 @@ class Web_Consumer():
 			self.cities = dict()
 		else:
 			self.cities = cities
+
+		if stats:
+			self.stats = stats
 
 	def update_params(self, params):
 		"""Updates certain Web_Consumer class members:
@@ -479,8 +482,11 @@ class Web_Consumer():
 		cpu_result.get()  # Wait for CPU bound classifiers to finish
 		self.__apply_missing_categories(
 			data["transaction_list"], data["container"])
-		self.ensure_output_schema(data["transaction_list"])
 
+		if self.stats:
+			self.stats.add_stats(data["transaction_list"])
+
+		self.ensure_output_schema(data["transaction_list"])
 		return data
 
 if __name__ == "__main__":

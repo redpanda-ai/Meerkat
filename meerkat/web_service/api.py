@@ -9,13 +9,15 @@ from meerkat.web_service.web_consumer import Web_Consumer
 from meerkat.web_service import schema
 from meerkat.various_tools import (load_params, get_us_cities,\
 	load_hyperparameters)
+from meerkat.web_service.stats import Stats
 
 class Meerkat_API(APIHandler):
 	"""This class is the Meerkat API."""
 	cities = get_us_cities()
 	params = load_params("config/web_service.json")
 	hyperparams = load_hyperparameters(params)
-	meerkat = Web_Consumer(params, hyperparams, cities)
+	stats = Stats()
+	meerkat = Web_Consumer(params, hyperparams, cities, stats)
 	#This thread pool can deal with 'blocking functions' like meerkat.classify
 	thread_pool = concurrent.futures.ThreadPoolExecutor(14)
 
@@ -54,10 +56,11 @@ class Meerkat_API(APIHandler):
 		#results = self.meerkat.classify(data)
 		return results
 
-
+	@gen.coroutine
 	def get(self):
 		"""Handle get requests"""
-		return None
+		results = yield self.thread_pool.submit(self.stats.get_stats)
+		self.finish(results)
 
 #Print a warning to not execute this file as a module
 if __name__ == "__main__":
