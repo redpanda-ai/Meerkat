@@ -168,7 +168,14 @@ def get_mock_params():
 
 
 def get_mock_esconnection(params):
-    return
+    index = params["elasticsearch"]["index"]
+    index_type = params["elasticsearch"]["type"]
+    mapping = {index: {"mappings": {index_type: {}}}}
+    indices = lambda: None
+    indices.get_mapping = lambda: mapping
+    es = lambda: None
+    es.indices = indices
+    return es
 
 
 def get_mock_msearch(queries):
