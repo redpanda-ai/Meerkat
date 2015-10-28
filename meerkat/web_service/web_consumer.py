@@ -1,4 +1,5 @@
 #!/usr/local/bin/python3.3
+# pylint: disable=line-too-long
 
 """This module enriches transactions with additional
 data found by Meerkat
@@ -54,30 +55,17 @@ class Web_Consumer():
 		else:
 			self.params = params
 			self.es = get_es_connection(params)
+			mapping = self.es.indices.get_mapping()
+			index = params["elasticsearch"]["index"]
+			index_type = params["elasticsearch"]["type"]
+			self.params["routed"] = "_routing" in mapping[index]["mappings"][index_type]
 
-		if hyperparams is None:
-			self.hyperparams = dict()
-		else:
-			self.hyperparams = hyperparams
-
-		if cities is None:
-			self.cities = dict()
-		else:
-			self.cities = cities
-
-	def update_params(self, params):
-		"""Updates certain Web_Consumer class members:
-		1.  self.params: a dictionary of useful variables
-		2.  self.se: an ElasticSearch connection """
-		self.params = params
-		self.es = get_es_connection(params)
+		self.hyperparams = hyperparams if hyperparams else {}
+		self.cities = cities if cities else {}
 
 	def update_hyperparams(self, hyperparams):
 		"""Updates a Web_Consumer object's hyper-parameters"""
 		self.hyperparams = hyperparams
-
-	def update_cities(self, cities):
-		self.cities = cities
 
 	def __get_query(self, transaction):
 		"""Create an optimized query"""
@@ -111,9 +99,6 @@ class Web_Consumer():
 			should_clauses.append(city_query)
 			should_clauses.append(state_query)
 
-			# add routing term
-			# o_query["query"]["match"] = "%s, %s" % (locale_bloom[0], locale_bloom[1])
-
 		return o_query
 
 	def __search_index(self, queries):
@@ -122,7 +107,8 @@ class Web_Consumer():
 		try:
 			# pull routing out of queries and append to below msearch
 			results = self.es.msearch(queries, index=index)
-		except Exception:
+		except Exception as e:
+			print(e)
 			return None
 		return results
 
@@ -253,7 +239,7 @@ class Web_Consumer():
 		# Add Source
 		index = params["elasticsearch"]["index"]
 		transaction["source"] = "FACTUAL" if ("factual" in index) and\
-		 (transaction["match_found"] == True) else "YODLEE"
+		 (transaction["match_found"] == True) else "OTHER"
 
 		return transaction
 
@@ -328,19 +314,22 @@ class Web_Consumer():
 		for trans in transactions:
 
 			# Override output with CNN v1
-			if trans["CNN"] != "":
-				trans[attr_map["name"]] = trans["CNN"]
+			if trans.get("CNN", "") != "":
+				trans[attr_map["name"]] = trans.get("CNN", "")
+				
 
 			# Override Locale with Bloom Results
 			if trans["locale_bloom"] != None and trans["is_physical_merchant"] == True:
 				trans["city"] = trans["locale_bloom"][0]
 				trans["state"] = trans["locale_bloom"][1]
 
+			if "CNN" in trans:
+				del trans["CNN"]
+
 			del trans["locale_bloom"]
 			del trans["description"]
 			del trans["amount"]
 			del trans["date"]
-			del trans["CNN"]
 			del trans["ledger_entry"]
 
 		return transactions
@@ -356,13 +345,13 @@ class Web_Consumer():
 		for trans in transactions:
 			query = self.__get_query(trans)
 
+			header = {"index": index}
 			# add routing to header
-			#try:
-			#	locality = query['query']['bool']['should'][1]['query_string']['query']
-			#	region = query['query']['bool']['should'][2]['query_string']['query']
-			queries.append({"index" : index})#, "routing" : "%s%s" % (locality, region)})
-			#except IndexError:
-			#	queries.append({"index" : index})
+			if self.params["routed"] and trans.get("locale_bloom"):
+				region = trans["locale_bloom"][1]
+				header["routing"] = region.upper()
+
+			queries.append(header)
 			queries.append(query)
 
 		queries = '\n'.join(map(json.dumps, queries))
@@ -470,15 +459,20 @@ class Web_Consumer():
 		self.__apply_category_labels(physical)
 		return physical, non_physical
 
-	def classify(self, data):
+	def classify(self, data, optimizing=False):
 		"""Classify a set of transactions"""
-		cpu_result = self.__cpu_pool.apply_async(
-			self.__apply_cpu_classifiers, (data, ))
-		self.__apply_subtype_CNN(data)
-		self.__apply_merchant_CNN(data)
-		cpu_result.get()  # Wait for CPU bound classifiers to finish
-		self.__apply_missing_categories(
-			data["transaction_list"], data["container"])
+
+		cpu_result = self.__cpu_pool.apply_async(self.__apply_cpu_classifiers, (data, ))
+
+		if not optimizing:
+			self.__apply_subtype_CNN(data)
+			self.__apply_merchant_CNN(data)
+
+		cpu_result.get() # Wait for CPU bound classifiers to finish
+
+		if not optimizing:
+			self.__apply_missing_categories(data["transaction_list"], data["container"])
+
 		self.ensure_output_schema(data["transaction_list"])
 
 		return data

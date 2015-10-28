@@ -6,7 +6,7 @@ import logging
 import os
 import sys
 import csv
-from .various_tools import safely_remove_file
+from ../various_tools import safely_remove_file
 
 #Usage
 # python3.3 -m meerkat.gzip_slicer <path_to_some_directory_of_gzipped_csv_files>
