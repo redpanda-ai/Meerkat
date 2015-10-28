@@ -13,7 +13,6 @@ import string
 import re
 from multiprocessing.pool import ThreadPool
 from scipy.stats.mstats import zscore
-from elasticsearch.client import IndicesClient
 
 from meerkat.various_tools \
 	import get_es_connection, string_cleanse, get_boosted_fields
@@ -55,8 +54,7 @@ class Web_Consumer():
 		else:
 			self.params = params
 			self.es = get_es_connection(params)
-			iclient = IndicesClient(self.es)
-			mapping = iclient.get_mapping()
+			mapping = self.es.indices.get_mapping()
 			index = params["elasticsearch"]["index"]
 			index_type = params["elasticsearch"]["type"]
 			self.params["routed"] = "_routing" in mapping[index]["mappings"][index_type]
@@ -466,7 +464,7 @@ class Web_Consumer():
 
 		if not optimizing:
 			self.__apply_missing_categories(data["transaction_list"], data["container"])
-			
+
 		self.ensure_output_schema(data["transaction_list"], optimizing)
 
 		return data
