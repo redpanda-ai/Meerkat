@@ -31,10 +31,14 @@ CARD_DEBIT_SUBTYPE_CNN = get_cnn("card_debit_subtype")
 CARD_CREDIT_SUBTYPE_CNN = get_cnn("card_credit_subtype")
 BANK_DEBIT_SUBTYPE_CNN = get_cnn("bank_debit_subtype")
 BANK_CREDIT_SUBTYPE_CNN = get_cnn("bank_credit_subtype")
-BANK_CATEGORY_FALLBACK = load_params("meerkat/classification/label_maps/cnn_merchant_category_mapping_bank.json")
-CARD_CATEGORY_FALLBACK = load_params("meerkat/classification/label_maps/cnn_merchant_category_mapping_card.json")
-BANK_SUBTYPE_CAT_FALLBACK = load_params("meerkat/classification/label_maps/subtype_category_mapping_bank.json")
-CARD_SUBTYPE_CAT_FALLBACK = load_params("meerkat/classification/label_maps/subtype_category_mapping_card.json")
+BANK_CATEGORY_FALLBACK = load_params(
+	"meerkat/classification/label_maps/cnn_merchant_category_mapping_bank.json")
+CARD_CATEGORY_FALLBACK = load_params(
+	"meerkat/classification/label_maps/cnn_merchant_category_mapping_card.json")
+BANK_SUBTYPE_CAT_FALLBACK = load_params(
+	"meerkat/classification/label_maps/subtype_category_mapping_bank.json")
+CARD_SUBTYPE_CAT_FALLBACK = load_params(
+	"meerkat/classification/label_maps/subtype_category_mapping_card.json")
 
 class Web_Consumer():
 	"""Acts as a web service client to process and enrich
@@ -267,7 +271,7 @@ class Web_Consumer():
 		if city_in_transaction:
 			transaction[attr_map['locality']] = city_names[0]
 
-		if (states_equal and state_in_transaction):
+		if states_equal and state_in_transaction:
 			transaction[attr_map['region']] = state_names[0]
 
 		return transaction
@@ -281,19 +285,23 @@ class Web_Consumer():
 		all_equal = business_names.count(business_names[0]) == len(business_names)
 		not_a_city = top_name not in self.cities
 
-		if (all_equal and not_a_city):
+		if all_equal and not_a_city:
 			transaction[attr_map['name']] = business_names[0]
 
 		return transaction
 
 	def __apply_missing_categories(self, transactions, container):
-		"""If the factual search fails to find categories do a static lookup on the merchant name"""
-		if(container.lower() == "bank"):
-			self.__apply_categories_from_dict(transactions, BANK_CATEGORY_FALLBACK, BANK_SUBTYPE_CAT_FALLBACK, "Retail Category")
+		"""If the factual search fails to find categories do a static lookup
+		on the merchant name"""
+		if container.lower() == "bank":
+			self.__apply_categories_from_dict(transactions,
+				BANK_CATEGORY_FALLBACK, BANK_SUBTYPE_CAT_FALLBACK, "Retail Category")
 		else:
-			self.__apply_categories_from_dict(transactions, CARD_CATEGORY_FALLBACK, CARD_SUBTYPE_CAT_FALLBACK, "PaymentOps")
+			self.__apply_categories_from_dict(transactions,
+				CARD_CATEGORY_FALLBACK, CARD_SUBTYPE_CAT_FALLBACK, "PaymentOps")
 
-	def __apply_categories_from_dict(self, transactions, categories, subtype_fallback, key):
+	def __apply_categories_from_dict(self, transactions, categories,
+		subtype_fallback, key):
 		"""Use the given dictionary to add categories to transactions"""
 		for trans in transactions:
 			if trans.get("category_labels"):
@@ -385,10 +393,12 @@ class Web_Consumer():
 
 	def __apply_merchant_CNN(self, data):
 		"""Apply the merchant CNN to transactions"""
-		classifier = BANK_MERCHANT_CNN if (data["container"] == "bank") else CARD_MERCHANT_CNN
-		processed = classifier(data["transaction_list"])
-
-		return processed
+		classifier = None
+		if data["container"] == "bank":
+			classifier = BANK_MERCHANT_CNN
+		else:
+			classifier = CARD_MERCHANT_CNN
+		return classifier(data["transaction_list"])
 
 	def __apply_subtype_CNN(self, data):
 		"""Apply the subtype CNN to transactions"""
@@ -443,11 +453,15 @@ class Web_Consumer():
 		# Add or Modify Fields
 		for trans in physical:
 			categories = trans.get("category_labels", "")
-			categories = json.loads(categories) if (categories != "" and categories != []) else []
+			if categories != "" and categories != []:
+				categories = json.loads(categories)
+			else:
+				categories = []
 			trans["category_labels"] = categories
 
 	def __apply_cpu_classifiers(self, data):
-		"""Apply all the classifiers which are CPU bound.  Written to be run in parallel with GPU bound classifiers."""
+		"""Apply all the classifiers which are CPU bound.  Written to be
+		run in parallel with GPU bound classifiers."""
 		self.__apply_locale_bloom(data)
 		physical, non_physical = self.__sws(data)
 		physical = self.__enrich_physical(physical)
@@ -456,13 +470,13 @@ class Web_Consumer():
 
 	def classify(self, data):
 		"""Classify a set of transactions"""
-		cpu_result = self.__cpu_pool.apply_async(self.__apply_cpu_classifiers, (data, ))
+		cpu_result = self.__cpu_pool.apply_async(
+			self.__apply_cpu_classifiers, (data, ))
 		self.__apply_subtype_CNN(data)
 		self.__apply_merchant_CNN(data)
 		cpu_result.get()  # Wait for CPU bound classifiers to finish
 		self.__apply_missing_categories(
-										data["transaction_list"],
-										data["container"])
+			data["transaction_list"], data["container"])
 		self.ensure_output_schema(data["transaction_list"])
 
 		return data

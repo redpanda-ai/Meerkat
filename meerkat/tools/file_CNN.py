@@ -5,7 +5,7 @@ import math
 import pandas as pd
 import numpy as np
 
-from meerkat.classification.lua_bridge import get_CNN, load_label_map
+from meerkat.classification.lua_bridge import get_cnn, load_label_map
 
 #################### USAGE ##########################
 

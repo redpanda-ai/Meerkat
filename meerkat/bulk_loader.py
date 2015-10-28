@@ -38,7 +38,7 @@ def initialize():
 	"""Validates the command line arguments."""
 	input_file, params = None, None
 
-	if len(sys.argv) != 2:
+	if len(sys.argv) != 3:
 		#usage()
 		raise InvalidArguments(msg="Supply a single argument for the json"\
 		+ "formatted configuration file.", expr=None)
@@ -63,7 +63,8 @@ def load_document_queue(params):
 	document_queue = queue.Queue()
 
 	try:
-		filename = params["input"]["filename"]
+		#filename = params["input"]["filename"]
+		filename = sys.argv[2]
 		encoding = params["input"]["encoding"]
 		with open(filename, 'r', encoding=encoding) as inputfile:
 			records = [line.rstrip('\n') for line in inputfile]
@@ -207,19 +208,27 @@ class ThreadConsumer(threading.Thread):
 		#blank values
 		params = self.params
 		docs, actions = [], []
+		len_header = len(header)
 		while len(self.batch_list) > 0:
 			current_item = self.batch_list.pop(0)
 			item_list = current_item.split("\t")
-
+			#If we are missing items at the end, we add blank values
+			len_list = len(item_list)
+			item_delta = len_header - len_list
+			if item_delta > 0:
+				item_list.extend([""] * item_delta)
 			if len(header) == len(item_list):
 				document = {x: y for (x, y) in list(zip(header, item_list)) if y != ""}
 				#merge latitude and longitude into a point
 				if "longitude" in document and "latitude" in document:
-					document["pin"] = {"location":{"type": "point", "coordinates" :[
-						document["longitude"], document["latitude"]]}}
+					if document["longitude"].strip() != "" and document["latitude"].strip() != "":
+						document["pin"] = {"location":{"type": "point",
+							"coordinates" :[ document["longitude"],
+							 document["latitude"]]}}
+						#my_logger.info(document["pin"])
 					del document["longitude"]
 					del document["latitude"]
-
+				#If the region is not found, add "XX" instead
 				if "region" not in document or document["region"].strip() == "":
 					my_logger.critical("Region not found")
 					document["region"] = "XX"
@@ -239,8 +248,12 @@ class ThreadConsumer(threading.Thread):
 					"timestamp": datetime.now()
 				}
 				actions.append(action)
+			else:
+				my_logger.info("Header has {0} values, but item has {1} values."(format(len_header, len_item)))
 		# Make Calls to Elastic Search
-		_, _ = helpers.bulk(self.es_connection, actions)
+		my_logger.info("Docs: {0}".format(len(docs)))
+		success, errors = helpers.bulk(self.es_connection, actions)
+		my_logger.info("Success: {0} - Errors: {1}".format(success, errors))
 		#_, errors = helpers.bulk(self.es_connection, actions)
 		# Evaluate Success Rate
 		#success, failure, total = 0, 0, 0
@@ -422,7 +435,7 @@ def guarantee_index_and_doc_type(params):
 	else:
 		logging.warning("Index does not exist, creating")
 		index_body = params["elasticsearch"]["type_mapping"]
-		result = es_connection.indices.create(index=es_index, body=index_body)
+		_ = es_connection.indices.create(index=es_index, body=index_body)
 		# okay, acknowledged = result["ok"], result["acknowledged"]
 		# try:
 		# 	result["ok"] and result["acknowledged"]
