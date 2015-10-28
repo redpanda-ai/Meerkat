@@ -44,7 +44,7 @@ from meerkat.various_tools import load_params
 from meerkat.web_service.web_consumer import Web_Consumer
 
 consumer = Web_Consumer()
-BATCH_SIZE = 1000
+BATCH_SIZE = 100
 
 def run_meerkat(params, dataset):
 	"""Run meerkat on a set of transactions"""

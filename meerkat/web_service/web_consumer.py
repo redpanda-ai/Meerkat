@@ -12,6 +12,7 @@ import string
 import re
 from multiprocessing.pool import ThreadPool
 from scipy.stats.mstats import zscore
+from elasticsearch.client import IndicesClient
 
 from meerkat.various_tools \
 	import get_es_connection, string_cleanse, get_boosted_fields
@@ -49,6 +50,11 @@ class Web_Consumer():
 		else:
 			self.params = params
 			self.es = get_es_connection(params)
+			iclient = IndicesClient(self.es)
+			mapping = iclient.get_mapping()
+			index = params["elasticsearch"]["index"]
+			index_type = params["elasticsearch"]["type"]
+			self.params["routed"] = "_routing" in mapping[index]["mappings"][index_type]
 
 		if hyperparams is None:
 			self.hyperparams = dict()
@@ -106,9 +112,6 @@ class Web_Consumer():
 			should_clauses.append(city_query)
 			should_clauses.append(state_query)
 
-			# add routing term
-			# o_query["query"]["match"] = "%s, %s" % (locale_bloom[0], locale_bloom[1])
-
 		return o_query
 
 	def __search_index(self, queries):
@@ -117,7 +120,8 @@ class Web_Consumer():
 		try:
 			# pull routing out of queries and append to below msearch
 			results = self.es.msearch(queries, index=index)
-		except Exception:
+		except Exception as e:
+			print(e)
 			return None
 		return results
 
@@ -342,13 +346,13 @@ class Web_Consumer():
 		for trans in transactions:
 			query = self.__get_query(trans)
 
+			header = {"index": index}
 			# add routing to header
-			#try:
-			#	locality = query['query']['bool']['should'][1]['query_string']['query']
-			#	region = query['query']['bool']['should'][2]['query_string']['query']
-			queries.append({"index" : index})#, "routing" : "%s%s" % (locality, region)})
-			#except IndexError:
-			#	queries.append({"index" : index})
+			if self.params["routed"] and trans.get("locale_bloom"):
+				region = trans["locale_bloom"][1]
+				header["routing"] = region.upper()
+
+			queries.append(header)
 			queries.append(query)
 
 		queries = '\n'.join(map(json.dumps, queries))
