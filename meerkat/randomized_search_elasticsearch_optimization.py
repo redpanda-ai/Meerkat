@@ -43,7 +43,9 @@ import load_dict_list, safe_print, get_us_cities
 from meerkat.various_tools import load_params 
 from meerkat.web_service.web_consumer import Web_Consumer
 
-consumer = Web_Consumer()
+PARAMS = load_params(sys.argv[1])
+CITIES = get_us_cities()
+consumer = Web_Consumer(cities=CITIES, params=PARAMS)
 BATCH_SIZE = 100
 
 def run_meerkat(params, dataset):
@@ -62,9 +64,8 @@ def run_meerkat(params, dataset):
 
 		print("Batch number: {0}".format(x))
 		batch_in = format_web_consumer(batch)
-		batch_result = consumer.classify(batch_in)
+		batch_result = consumer.classify(batch_in, optimizing=True)
 		result_list.extend(batch_result["transaction_list"])
-
 
 	# Test Accuracy
 	#pprint(result_list)
@@ -100,11 +101,6 @@ def randomized_optimization(hyperparameters, known, params, dataset):
 	providing a range to sample from. 
 	Runs the classifier a fixed number of times and
 	provides the top score found"""
-
-	#Update values stored in params, hyperparams, cities fields of Web_Consumer object 'consumer'
-	consumer.update_params(params)
-	cities = get_us_cities()
-	consumer.update_cities(cities)
 	
 	# Init
 	base_name = os.path.splitext(os.path.basename(sys.argv[1]))[0]
@@ -369,17 +365,15 @@ def format_web_consumer(dataset):
 	
 	return formatted
 
-
 def run_from_command_line(command_line_arguments):
 	"""Runs these commands if the module is invoked from the command line"""
 
 	# Meta Information
 	start_time = datetime.datetime.now()
 	verify_arguments()
-	params = load_params(sys.argv[1])
 		
 	# Add Local Params
-	add_local_params(params)
+	params = add_local_params(PARAMS)
 
 	known = {
 		"es_result_size" : "45"

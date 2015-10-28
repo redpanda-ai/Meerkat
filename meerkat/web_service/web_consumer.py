@@ -1,4 +1,5 @@
 #!/usr/local/bin/python3.3
+# pylint: disable=line-too-long
 
 """This module enriches transactions with additional
 data found by Meerkat
@@ -60,29 +61,12 @@ class Web_Consumer():
 			index_type = params["elasticsearch"]["type"]
 			self.params["routed"] = "_routing" in mapping[index]["mappings"][index_type]
 
-		if hyperparams is None:
-			self.hyperparams = dict()
-		else:
-			self.hyperparams = hyperparams
-
-		if cities is None:
-			self.cities = dict()
-		else:
-			self.cities = cities
-
-	def update_params(self, params):
-		"""Updates certain Web_Consumer class members:
-		1.  self.params: a dictionary of useful variables
-		2.  self.se: an ElasticSearch connection """
-		self.params = params
-		self.es = get_es_connection(params)
+		self.hyperparams = hyperparams if hyperparams else {}
+		self.cities = cities if cities else {}
 
 	def update_hyperparams(self, hyperparams):
 		"""Updates a Web_Consumer object's hyper-parameters"""
 		self.hyperparams = hyperparams
-
-	def update_cities(self, cities):
-		self.cities = cities
 
 	def __get_query(self, transaction):
 		"""Create an optimized query"""
@@ -306,15 +290,16 @@ class Web_Consumer():
 		for trans in transactions:
 			if trans.get("category_labels"):
 				continue
-			merchant = trans.get("CNN") or ""
-			fallback = categories.get(merchant)[key] or ""
+			merchant = trans.get("CNN", "").strip()
+			category = categories.get(merchant)
+			fallback = category and category.get(key) or ""
 			if (fallback == "Use Subtype Rules for Categories" or
 						fallback == ""):
 				fallback = trans["txn_sub_type"]
 				fallback = subtype_fallback.get(fallback) or fallback
 			trans["category_labels"] = [fallback]
 
-	def ensure_output_schema(self, transactions):
+	def ensure_output_schema(self, transactions, optimizing):
 		"""Clean output to proper schema"""
 
 		# Collect Mapping Details
@@ -326,8 +311,9 @@ class Web_Consumer():
 		for trans in transactions:
 
 			# Override output with CNN v1
-			if trans["CNN"] != "":
+			if not optimizing and trans["CNN"] != "":
 				trans[attr_map["name"]] = trans["CNN"]
+				del trans["CNN"]
 
 			# Override Locale with Bloom Results
 			if trans["locale_bloom"] != None and trans["is_physical_merchant"] == True:
@@ -338,7 +324,6 @@ class Web_Consumer():
 			del trans["description"]
 			del trans["amount"]
 			del trans["date"]
-			del trans["CNN"]
 			del trans["ledger_entry"]
 
 		return transactions
@@ -468,16 +453,21 @@ class Web_Consumer():
 		self.__apply_category_labels(physical)
 		return physical, non_physical
 
-	def classify(self, data):
+	def classify(self, data, optimizing=False):
 		"""Classify a set of transactions"""
-		cpu_result = self.__cpu_pool.apply_async(
-			self.__apply_cpu_classifiers, (data, ))
-		self.__apply_subtype_CNN(data)
-		self.__apply_merchant_CNN(data)
-		cpu_result.get()  # Wait for CPU bound classifiers to finish
-		self.__apply_missing_categories(
-			data["transaction_list"], data["container"])
-		self.ensure_output_schema(data["transaction_list"])
+
+		cpu_result = self.__cpu_pool.apply_async(self.__apply_cpu_classifiers, (data, ))
+
+		if not optimizing:
+			self.__apply_subtype_CNN(data)
+			self.__apply_merchant_CNN(data)
+
+		cpu_result.get() # Wait for CPU bound classifiers to finish
+
+		if not optimizing:
+			self.__apply_missing_categories(data["transaction_list"], data["container"])
+			
+		self.ensure_output_schema(data["transaction_list"], optimizing)
 
 		return data
 

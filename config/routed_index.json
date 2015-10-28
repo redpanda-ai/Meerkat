@@ -2,7 +2,7 @@
 	"concurrency" : 8,
 	"batch_size" : 500,
 	"input" : {
-		"filename" : "/data/2/smaller_100000.tab",
+		"filename" : "data/input/smaller_100000.tab",
 		"encoding" : "utf-8"
 	},
 	"logging" : {
