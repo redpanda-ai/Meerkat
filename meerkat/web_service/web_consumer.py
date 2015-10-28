@@ -297,7 +297,7 @@ class Web_Consumer():
 				fallback = subtype_fallback.get(fallback) or fallback
 			trans["category_labels"] = [fallback]
 
-	def ensure_output_schema(self, transactions, optimizing):
+	def ensure_output_schema(self, transactions):
 		"""Clean output to proper schema"""
 
 		# Collect Mapping Details
@@ -309,14 +309,17 @@ class Web_Consumer():
 		for trans in transactions:
 
 			# Override output with CNN v1
-			if not optimizing and trans["CNN"] != "":
-				trans[attr_map["name"]] = trans["CNN"]
-				del trans["CNN"]
+			if trans.get("CNN", "") != "":
+				trans[attr_map["name"]] = trans.get("CNN", "")
+				
 
 			# Override Locale with Bloom Results
 			if trans["locale_bloom"] != None and trans["is_physical_merchant"] == True:
 				trans["city"] = trans["locale_bloom"][0]
 				trans["state"] = trans["locale_bloom"][1]
+
+			if "CNN" in trans:
+				del trans["CNN"]
 
 			del trans["locale_bloom"]
 			del trans["description"]
@@ -465,7 +468,7 @@ class Web_Consumer():
 		if not optimizing:
 			self.__apply_missing_categories(data["transaction_list"], data["container"])
 
-		self.ensure_output_schema(data["transaction_list"], optimizing)
+		self.ensure_output_schema(data["transaction_list"])
 
 		return data
 
