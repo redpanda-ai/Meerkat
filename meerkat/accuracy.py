@@ -1,4 +1,5 @@
 #!/usr/local/bin/python3.3
+# pylint: disable=line-too-long
 
 """This script is aimed at testing the accuracy of the Meerkat Classifier.
 We iteratively use this accuracy as a feedback score to tune and optimize
