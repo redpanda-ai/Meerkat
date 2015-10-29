@@ -213,12 +213,10 @@ def speed_vests(start_time, accuracy_results):
 
 	print("\nSPEED TESTS:")
 	print("{0:35} = {1:11}".format("Total Time Taken", str(time_delta)[0:11]))
-	print("{0:35} = {1:11.2f}".format("Time per Transaction (in seconds)",
-		time_per_transaction))
-	print("{0:35} = {1:11.2f}".format("Transactions Per Minute",
-		transactions_per_minute))
+	print("{0:35} = {1:11.2f}".format("Time per Transaction (in seconds)", time_per_transaction))
+	print("{0:35} = {1:11.2f}".format("Transactions Per Minute", transactions_per_minute))
 
-	return {'time_delta':time_delta,
+	return {'time_delta': time_delta,
 			'time_per_transaction': time_per_transaction,
 			'transactions_per_minute':transactions_per_minute}
 
@@ -268,12 +266,10 @@ def CNN_accuracy():
 def process_file_collection(bucket, prefix, classifier):
 	"""Test a list of files"""
 
-	label_map = load_label_map\
-	("meerkat/classification/label_maps/deep_clean_map.json")
+	label_map = load_label_map("meerkat/classification/label_maps/deep_clean_map.json")
 	params = {}
 	params["label_key"] = "MERCHANT_NAME"
-	results = open\
-	("data/output/per_merchant_tests_" + prefix.split('/')[-2] + ".csv", "a")
+	results = open("data/output/per_merchant_tests_" + prefix.split('/')[-2] + ".csv", "a")
 	writer = csv.writer(results, delimiter=',', quotechar='"')
 	writer.writerow(["Merchant", "Recall", "Precision"])
 
@@ -309,27 +305,18 @@ def print_results(results):
 	sys.stdout.write('\n\n')
 
 	print("STATS:")
-	print("{0:35} = {1:11}".format("Total Transactions Processed",
-		results['total_processed']))
-	print("{0:35} = {1:10.2f}%".format("Total Labeled Physical",
-		results['total_physical']))
-	print("{0:35} = {1:10.2f}%".format("Total Labeled Non Physical",
-		results['total_non_physical']))
-	print("{0:35} = {1:10.2f}%".format("Binary Classifier Accuracy",
-		results['binary_accuracy']))
+	print("{0:35} = {1:11}".format("Total Transactions Processed", results['total_processed']))
+	print("{0:35} = {1:10.2f}%".format("Total Labeled Physical", results['total_physical']))
+	print("{0:35} = {1:10.2f}%".format("Total Labeled Non Physical", results['total_non_physical']))
+	print("{0:35} = {1:10.2f}%".format("Binary Classifier Accuracy", results['binary_accuracy']))
 
 	sys.stdout.write('\n')
 
-	print("{0:35} = {1:10.2f}%".format("Recall all transactions",
-		results['total_recall']))
-	print("{0:35} = {1:10.2f}%".format("Recall physical",
-		results['total_recall_physical']))
-	print("{0:35} = {1:11}".format("Number of transactions labeled",
-		results['num_labeled']))
-	print("{0:35} = {1:11}".format("Number of transactions verified",
-		results['num_verified']))
-	print("{0:35} = {1:10.2f}%".format("Precision",
-		results['precision']))
+	print("{0:35} = {1:10.2f}%".format("Recall all transactions", results['total_recall']))
+	print("{0:35} = {1:10.2f}%".format("Recall physical", results['total_recall_physical']))
+	print("{0:35} = {1:11}".format("Number of transactions labeled", results['num_labeled']))
+	print("{0:35} = {1:11}".format("Number of transactions verified", results['num_verified']))
+	print("{0:35} = {1:10.2f}%".format("Precision", results['precision']))
 
 	#print("", "UNLABELED:", '\n'.join(sorted(results['unlabeled'])), sep="\n")
 	#print("", "MISLABELED:", '\n'.join(sorted(results['mislabeled'])), sep="\n")
