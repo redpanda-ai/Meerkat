@@ -312,8 +312,13 @@ class Web_Consumer():
 			fallback = category and category.get(key) or ""
 			if (fallback == "Use Subtype Rules for Categories" or
 						fallback == ""):
+				# Get the subtype from the transaction
 				fallback = trans.get("txn_sub_type", "")
+				# Get the categories from the subtype map
 				fallback = subtype_fallback.get(fallback, fallback)
+				# Get the subtype for credit/debit if it's different
+				fallback = isinstance(fallback, dict) and fallback[trans["ledger_entry"].lower()] or fallback
+
 			trans["category_labels"] = [fallback]
 
 	def ensure_output_schema(self, transactions):
