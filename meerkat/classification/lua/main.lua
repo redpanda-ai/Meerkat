@@ -14,7 +14,6 @@ require("data")
 require("model")
 require("train")
 require("test")
-require("mui")
 
 -- Configurations
 dofile("config.lua")
