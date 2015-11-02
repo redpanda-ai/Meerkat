@@ -35,6 +35,8 @@ import sys
 import random
 import json
 import statistics
+import pandas as pd
+import time
 
 from itertools import zip_longest
 
@@ -49,15 +51,9 @@ parser.add_argument('--dictionary', '-d', required=True, help="mapping of model 
 parser.add_argument('--samples', '-s', required=False, help="optional number of random data points to test.  Default is all test data")
 parser.add_argument('--humandictionary', '-D', required=True, help="Mapping of GOOD_DESCRIPTION names to the IDs output by your CNN")
 
-def grouper(iterable):
-	"""Returns batches of size 128 of iterable elements"""
-	return zip_longest(*[iter(iterable)]*128, fillvalue={"DESCRIPTION_UNMASKED": ""})
-
-def generic_test(machine, human, cnn_column, human_column):
+def generic_test(machine, human, cnn_column, human_column, human_map, machine_map):
 	"""Tests both the recall and precision of the pinpoint classifier against
 	human-labeled training data."""
-
-	sys.stdout.write('\n')
 	doc_label = 'DESCRIPTION_UNMASKED'
 
 	# Create Quicker Lookup
@@ -75,13 +71,16 @@ def generic_test(machine, human, cnn_column, human_column):
 			continue
 
 		# Get human answer index
-		key = str(machine_row["UNIQUE_TRANSACTION_ID"])
+		key = machine_row["UNIQUE_TRANSACTION_ID"]
 		human_row = index_lookup.get(key)
 
 		# Identify unlabeled points
 		if not human_row or not human_row.get(human_column):
 			needs_hand_labeling.append(machine_row[doc_label])
 			continue
+
+		if human_row[human_column].lower() in human_map:
+			human_row[human_column] = machine_map[str(human_map[human_row[human_column].lower()])]
 
 		if machine_row[cnn_column] == human_row[human_column]:
 			correct.append(human_row[doc_label] +
@@ -90,103 +89,62 @@ def generic_test(machine, human, cnn_column, human_column):
 
 		mislabeled.append(human_row[doc_label] + " (ACTUAL: " + human_row[human_column] + ")" + " (FOUND: " + machine_row[cnn_column] + ")")
 
-	return {
-		"needs_hand_labeling": needs_hand_labeling,
-		"mislabeled": mislabeled,
-		"unlabeled": unlabeled,
-		"correct": correct
-	}
-
-def vest_accuracy(transactions, label_key, result_list):
-	"""Takes file by default but can accept result
-	queue/ non_physical list. Attempts to provide various
-	accuracy tests"""
-
-	machine_labeled = result_list or []
-	if len(machine_labeled) <= 0:
-		logging.warning("No labeled results provided to vest_accuracy()")
-		return
-
-	# Load Verification Source
-	human_labeled = transactions or []
-	if len(human_labeled) <= 0:
-		logging.warning("No human labeled transactions provided to vest_accuracy()")
-
-	# Test Classifier for recall and precision
-	acc_results = generic_test(machine_labeled, human_labeled, label_key, "GOOD_DESCRIPTION")
-
-	# Collect results into dict for easier access
-	total_processed = len(machine_labeled)
-	num_labeled = total_processed - len(acc_results["unlabeled"])
-	num_verified = num_labeled - len(acc_results["needs_hand_labeling"])
-	return {
-		"total_processed": total_processed,
-		"correct": acc_results["correct"],
-		"needs_hand_labeling": acc_results["needs_hand_labeling"],
-		"unlabeled": acc_results["unlabeled"],
-		"num_verified": num_verified,
-		"num_labeled": num_labeled,
-		"mislabeled": acc_results["mislabeled"],
-		"total_recall": num_labeled / total_processed * 100,
-		"precision": len(acc_results["correct"]) / max(num_verified, 1) * 100
-	}
-
-def apply_cnn(classifier, transactions):
-	"""Apply the CNN to transactions"""
-
-	batches = grouper(transactions)
-	processed = []
-
-	for i, batch in enumerate(batches):
-		processed += classifier(batch, doc_key="DESCRIPTION_UNMASKED", label_key="MERCHANT_NAME")
-
-	return processed[0:len(transactions)]
+	return len(machine), needs_hand_labeling, mislabeled, unlabeled, correct
 
 def CNN_accuracy(test_file, model, model_dict, num_tests, human_dict):
 	"""Run given CNN on a file of Merchant Samples"""
+	start = time.time()
 
 	# Load Classifier, and transactions
 	classifier = get_cnn_by_path(model, model_dict)
-	transactions = load_dict_list(test_file)
-	transactions = num_tests and random.sample(transactions, min(num_tests, len(transactions))) or transactions
-
-	# Label the points using the classifier and report accuracy
-	labeled_trans = apply_cnn(classifier, transactions)
 	human_map = load_params(human_dict)
 	machine_map = load_params(model_dict)
-	for trans in labeled_trans:
-		if trans["GOOD_DESCRIPTION"].lower() in human_map:
-			trans["GOOD_DESCRIPTION"] = machine_map[str(human_map[trans["GOOD_DESCRIPTION"].lower()])]
-	accuracy_results = vest_accuracy(transactions, "MERCHANT_NAME", labeled_trans)
+	reader = pd.read_csv(test_file, chunksize=1000, na_filter=False,\
+	quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
 
-	print_results(accuracy_results)
+	bulk_total = 0
+	bulk_needs_hand_labeling = 0
+	bulk_mislabeled = 0
+	bulk_unlabeled = 0
+	bulk_correct = 0
+	# Process Transactions
+	for chunk in reader:
+		transactions = chunk.to_dict("records")
+		# Label the points using the classifier and report accuracy
+		machine_labeled = classifier(transactions, doc_key="DESCRIPTION_UNMASKED", label_key="MERCHANT_NAME")
+
+		total, needs_hand_labeling, mislabeled, unlabeled, correct = generic_test(machine_labeled, transactions, "MERCHANT_NAME", "GOOD_DESCRIPTION", human_map, machine_map)
+		bulk_total += total
+		bulk_needs_hand_labeling += len(needs_hand_labeling)
+		bulk_mislabeled += len(mislabeled)
+		bulk_unlabeled += len(unlabeled)
+		bulk_correct += len(correct)
+
+	print_results(bulk_total, bulk_needs_hand_labeling, bulk_correct, bulk_mislabeled, bulk_unlabeled)
+	print("Total run time was {}s".format(time.time() - start))
 	# results = open("data/output/single_test.csv", "a")
 	# writer = csv.writer(results, delimiter=',', quotechar='"')
 	# writer.writerow([merchant["name"], merchant['total_recall'], merchant["precision"]])
 	# results.close()
 
-def print_results(results):
+def print_results(total, needs_hand_labeling, correct, mislabeled, unlabeled):
 	"""Provide useful readable output"""
-
-	if results is None:
-		return
+	num_labeled = total - unlabeled
+	num_verified = num_labeled - needs_hand_labeling
+	total_recall = num_labeled / total * 100
+	precision = correct / max(num_verified, 1) * 100
 
 	sys.stdout.write('\n\n')
 
 	print("STATS:")
-	print("{0:35} = {1:11}".format("Total Transactions Processed",
-		results['total_processed']))
+	print("{0:35} = {1:11}".format("Total Transactions Processed", total))
 
 	sys.stdout.write('\n')
 
-	print("{0:35} = {1:10.2f}%".format("Recall all transactions",
-		results['total_recall']))
-	print("{0:35} = {1:11}".format("Number of transactions labeled",
-		results['num_labeled']))
-	print("{0:35} = {1:11}".format("Number of transactions verified",
-		results['num_verified']))
-	print("{0:35} = {1:10.2f}%".format("Precision",
-		results['precision']))
+	print("{0:35} = {1:10.2f}%".format("Recall all transactions", total_recall))
+	print("{0:35} = {1:11}".format("Number of transactions labeled", num_labeled))
+	print("{0:35} = {1:11}".format("Number of transactions verified", num_verified))
+	print("{0:35} = {1:10.2f}%".format("Precision", precision))
 
 def run_from_command_line(args):
 	"""Runs these commands if the module is invoked from the command line"""
