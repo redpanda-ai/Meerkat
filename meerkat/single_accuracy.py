@@ -30,17 +30,12 @@ Created on Jan 8, 2014
 #####################################################
 
 import csv
-import logging
 import sys
-import random
 import json
-import statistics
 import pandas as pd
 import time
 
-from itertools import zip_longest
-
-from meerkat.various_tools import load_dict_list, load_params
+from meerkat.various_tools import load_params
 from meerkat.classification.lua_bridge import get_cnn_by_path
 import argparse
 
@@ -48,7 +43,6 @@ parser = argparse.ArgumentParser(description="Test a given machine learning mode
 parser.add_argument('--testfile', '-f', required=True, help="path to the test data")
 parser.add_argument('--model', '-m', required=True, help="path to the model under test")
 parser.add_argument('--dictionary', '-d', required=True, help="mapping of model output IDs to human readable names")
-parser.add_argument('--samples', '-s', required=False, help="optional number of random data points to test.  Default is all test data")
 parser.add_argument('--humandictionary', '-D', required=True, help="Mapping of GOOD_DESCRIPTION names to the IDs output by your CNN")
 
 def generic_test(machine, human, cnn_column, human_column, human_map, machine_map):
@@ -91,7 +85,7 @@ def generic_test(machine, human, cnn_column, human_column, human_map, machine_ma
 
 	return len(machine), needs_hand_labeling, mislabeled, unlabeled, correct
 
-def CNN_accuracy(test_file, model, model_dict, num_tests, human_dict):
+def CNN_accuracy(test_file, model, model_dict, human_dict):
 	"""Run given CNN on a file of Merchant Samples"""
 	start = time.time()
 
@@ -149,7 +143,7 @@ def print_results(total, needs_hand_labeling, correct, mislabeled, unlabeled):
 def run_from_command_line(args):
 	"""Runs these commands if the module is invoked from the command line"""
 
-	CNN_accuracy(args.testfile, args.model, args.dictionary, args.samples, args.humandictionary)
+	CNN_accuracy(args.testfile, args.model, args.dictionary, args.humandictionary)
 
 if __name__ == "__main__":
 	cmd_args = parser.parse_args()
