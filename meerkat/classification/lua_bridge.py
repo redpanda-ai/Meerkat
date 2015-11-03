@@ -10,6 +10,8 @@ import ctypes
 import json
 import logging
 
+__lua = {}
+
 def load_label_map(filename):
 	"""Load a permanent label map"""
 
@@ -40,19 +42,9 @@ def get_cnn(model_name):
 
 def get_cnn_by_path(model_path, dict_path):
 	"""Load a function to process transactions using a CNN"""
-	lualib = ctypes.CDLL("/home/ubuntu/torch/install/lib/libluajit.so", mode=ctypes.RTLD_GLOBAL)
-
-	# Must Load Lupa After the Preceding Line
-	import lupa
-	from lupa import LuaRuntime
-
-	# Load Runtime and Lua Modules
-	lua = LuaRuntime(unpack_returned_tuples=True)
-	nn = lua.require('nn')
-	model = lua.require('meerkat/classification/lua/model')
-	torch = lua.require('torch')
-	cutorch = lua.require('cutorch')
-	cunn = lua.require('cunn')
+	if "lua" not in __lua:
+		__lua["lua"] = __load_lua()
+	lua = __lua["lua"]
 	# Load Config
 	lua.execute('''
 		dofile("meerkat/classification/lua/config.lua")
@@ -141,6 +133,22 @@ def get_cnn_by_path(model_path, dict_path):
 		return trans
 
 	return apply_cnn
+
+def __load_lua():
+	lualib = ctypes.CDLL("/home/ubuntu/torch/install/lib/libluajit.so", mode=ctypes.RTLD_GLOBAL)
+
+	# Must Load Lupa After the Preceding Line
+	import lupa
+	from lupa import LuaRuntime
+
+	# Load Runtime and Lua Modules
+	lua = LuaRuntime(unpack_returned_tuples=True)
+	nn = lua.require('nn')
+	model = lua.require('meerkat/classification/lua/model')
+	torch = lua.require('torch')
+	cutorch = lua.require('cutorch')
+	cunn = lua.require('cunn')
+	return lua
 
 if __name__ == "__main__":
 	"""Print a warning to not execute this file as a module"""
