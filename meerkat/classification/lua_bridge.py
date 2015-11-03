@@ -40,8 +40,7 @@ def get_cnn(model_name):
 
 def get_cnn_by_path(model_path, dict_path):
 	"""Load a function to process transactions using a CNN"""
-	lualib = ctypes.CDLL("/home/ubuntu/torch/install/lib/libluajit.so",\
-		mode=ctypes.RTLD_GLOBAL)
+	lualib = ctypes.CDLL("/home/ubuntu/torch/install/lib/libluajit.so", mode=ctypes.RTLD_GLOBAL)
 
 	# Must Load Lupa After the Preceding Line
 	import lupa
@@ -137,8 +136,7 @@ def get_cnn_by_path(model_path, dict_path):
 		decisions = list(labels.values())
 
 		for index, transaction in enumerate(trans):
-			transaction[label_key] = reverse_label_map.get(\
-				str(decisions[index]), "")
+			transaction[label_key] = reverse_label_map.get(str(decisions[index]), "")
 
 		return trans
 
@@ -146,6 +144,5 @@ def get_cnn_by_path(model_path, dict_path):
 
 if __name__ == "__main__":
 	"""Print a warning to not execute this file as a module"""
-	logging.warning("This module is a library that contains useful functions;" +\
- "it should not be run from the console.")
+	logging.warning("This module is a library that contains useful functions; it should not be run from the console.")
 

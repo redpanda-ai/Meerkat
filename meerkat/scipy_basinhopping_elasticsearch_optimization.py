@@ -3,16 +3,16 @@
 """This module is the core of the Meerkat engine. It allows us to rapidly
 evaluate many possible configurations if provided a well labeled dataset.
 Iteratively it runs Meerkat with randomized levels of configurations and
-then converges on the best possible values. 
+then converges on the best possible values.
 
 In context of Machine Learning, this module performs hyperparameter
-optimization. This involves tuning the numeric values located at  
+optimization. This involves tuning the numeric values located at
 Meerkat/config/hyperparameters. These key value pairs map to
 hyperparameters used through out the Meerkat Classifier in aid of tuning
 or refining the queries used with ElasticSearch.
 
 This module utilizes a common method known as grid search. In particular
-we are using a custom implementation of randomized optimization as it 
+we are using a custom implementation of randomized optimization as it
 works better where it is resource intensive to exaustively perform a
 standard grid_search.
 
@@ -28,7 +28,7 @@ Created on Feb 26, 2014
 #####################################################
 
 import json
-import sys 
+import sys
 import os
 import queue
 import collections
@@ -41,10 +41,11 @@ from numpy import array, array_split
 from scipy.optimize import basinhopping
 
 from meerkat.web_service.web_consumer import Web_Consumer
-from meerkat.accuracy import print_results, vest_accuracy
+from meerkat.tools.single_accuracy import print_results
+from meerkat.accuracy import vest_accuracy
 from meerkat.various_tools \
 import load_dict_list, safe_print, get_us_cities
-from meerkat.various_tools import load_params 
+from meerkat.various_tools import load_params
 
 CITIES = get_us_cities()
 
@@ -106,7 +107,7 @@ def run_meerkat(params, dataset):
 
 	# Test Accuracy
 	accuracy_results = vest_accuracy(params, result_list=result_list)
-	print_results(accuracy_results)
+	print_results(accuracy_results["total"], accuracy_results["needs_hand_labeling"], accuracy_results["mislabeled"], accuracy_results["unlabeled"], accuracy_results["correct"])
 
 	return accuracy_results
 
@@ -144,7 +145,7 @@ def save_top_score(top_score):
 	record.close()
 
 def split_hyperparameters(hyperparameters):
-	
+
 	boost_vectors = {}
 	boost_labels = ["standard_fields"]
 	non_boost = ["es_result_size", "z_score_threshold", "good_description"]
@@ -155,7 +156,7 @@ def split_hyperparameters(hyperparameters):
 			other[key] = value
 		else:
 			boost_vectors[key] = [value]
-		
+
 	return boost_vectors, boost_labels, other
 
 def get_desc_queue(dataset):
@@ -214,7 +215,7 @@ def add_local_params(params):
 	return params
 
 def format_web_consumer(dataset):
- 
+
 	formatted = json.load(open("meerkat/web_service/example_input.json", "r"))
 	formatted["transaction_list"] = dataset
 	trans_id = 1
@@ -247,24 +248,24 @@ def run_from_command_line(command_line_arguments):
 	verify_arguments()
 	params = load_params(sys.argv[1])
 	params["label_key"] = "FACTUAL_ID"
-	
+
 	# Add Local Params
 	add_local_params(params)
 
 	hyperparams = {
-		"address" : "0.541",          
+		"address" : "0.541",
 	    "address_extended" : "1.282",
 	    "admin_region" : "0.69",
-	    "category_labels" : "1.319",          
-	    "locality" : "1.367",         
-	    "region" : "1.685",           
-	    "post_town" : "0.577",             
-	    "postcode" : "0.9",                
-	    "tel" : "0.6",                            
-	    "neighborhood" : "0.801",     
-	    "email" : "0.5",                      
+	    "category_labels" : "1.319",
+	    "locality" : "1.367",
+	    "region" : "1.685",
+	    "post_town" : "0.577",
+	    "postcode" : "0.9",
+	    "tel" : "0.6",
+	    "neighborhood" : "0.801",
+	    "email" : "0.5",
 	    "chain_name" : "1",
-	    "internal_store_number" : "1.9",  
+	    "internal_store_number" : "1.9",
 	    "name" : "2.781",
 	    "good_description" : "2",
 		"z_score_threshold" : "2.897",
@@ -294,7 +295,7 @@ def run_from_command_line(command_line_arguments):
 	}
 
 	alt_bounds = {
-		"es_result_size": (45, 45), 
+		"es_result_size": (45, 45),
 	}
 
 	param_names = list(hyperparams.keys())
@@ -317,7 +318,7 @@ def run_from_command_line(command_line_arguments):
 		consumer.update_cities(CITIES)
 		accuracy = run_classifier(hyperparam, params, dataset)
 		error = (100 - accuracy['precision']) / 100
-		
+
 		safe_print(hyperparam)
 		safe_print(error)
 

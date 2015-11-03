@@ -1,31 +1,16 @@
 #!/usr/local/bin/python3.3
 
-"""This script is aimed at testing the accuracy of the Meerkat Classifier.
-We iteratively use this accuracy as a feedback score to tune and optimize
-Meerkat as a whole. The use of this script requires a csv containing human
-labeled data that has been verified as accurate. The input file to this
-script should be randomized over the selection of data being modeled.
+"""This utility loads a single classifier, runs it over the given data, compares the classifier's answers to the
 
-To configure accuracy, this module should be provided a verification
-source that can be referenced in the config file under the key
-params["verification_source"]. This should be a reference to a file
-containing manually labeled transactions.
-
-Created on Jan 8, 2014
+Created in October, 2015
 @author: Matthew Sevrens
 @author: J. Andrew Key
+@author: Joseph Altmaier
 """
 
 #################### USAGE ##########################
 
-# Note: Needs refining. Experts only!
-
-# Suggested Future Work:
-#
-# 	Instead of matching being binary, produce a
-# 	loss function that penalizes less for matching
-# 	the wrong location if the majority of the
-#	informaiton is correct
+# python3 -m meerkat.tools.single_accuracy -m PATH_TO_CLASSIFIER -d PATH_TO_CLASSIFIER_OUTPUT_MAP -D PATH_TO_TEST_DATA_NAME_MAPPING -f PATH_TO_TEST_DATA
 
 #####################################################
 
@@ -33,7 +18,6 @@ import csv
 import sys
 import json
 import pandas as pd
-import time
 
 from meerkat.various_tools import load_params
 from meerkat.classification.lua_bridge import get_cnn_by_path
@@ -43,7 +27,7 @@ parser = argparse.ArgumentParser(description="Test a given machine learning mode
 parser.add_argument('--testfile', '-f', required=True, help="path to the test data")
 parser.add_argument('--model', '-m', required=True, help="path to the model under test")
 parser.add_argument('--dictionary', '-d', required=True, help="mapping of model output IDs to human readable names")
-parser.add_argument('--humandictionary', '-D', required=True, help="Mapping of GOOD_DESCRIPTION names to the IDs output by your CNN")
+parser.add_argument('--humandictionary', '-D', required=False, help="Optional mapping of GOOD_DESCRIPTION names to the IDs output by your CNN")
 
 def generic_test(machine, human, cnn_column, human_column, human_map, machine_map):
 	"""Tests both the recall and precision of the pinpoint classifier against
@@ -73,7 +57,7 @@ def generic_test(machine, human, cnn_column, human_column, human_map, machine_ma
 			needs_hand_labeling.append(machine_row[doc_label])
 			continue
 
-		if human_row[human_column].lower() in human_map:
+		if machine_map and human_map and human_row[human_column].lower() in human_map:
 			human_row[human_column] = machine_map[str(human_map[human_row[human_column].lower()])]
 
 		if machine_row[cnn_column] == human_row[human_column]:
@@ -85,16 +69,12 @@ def generic_test(machine, human, cnn_column, human_column, human_map, machine_ma
 
 	return len(machine), needs_hand_labeling, mislabeled, unlabeled, correct
 
-def CNN_accuracy(test_file, model, model_dict, human_dict):
+def CNN_accuracy(test_file, classifier, model_dict=None, human_dict=None):
 	"""Run given CNN on a file of Merchant Samples"""
-	start = time.time()
-
 	# Load Classifier, and transactions
-	classifier = get_cnn_by_path(model, model_dict)
-	human_map = load_params(human_dict)
-	machine_map = load_params(model_dict)
-	reader = pd.read_csv(test_file, chunksize=1000, na_filter=False,\
-	quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+	human_map = __load_label_map(human_dict)
+	machine_map = __load_label_map(model_dict)
+	reader = pd.read_csv(test_file, chunksize=1000, na_filter=False, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
 
 	bulk_total = 0
 	bulk_needs_hand_labeling = 0
@@ -114,19 +94,23 @@ def CNN_accuracy(test_file, model, model_dict, human_dict):
 		bulk_unlabeled += len(unlabeled)
 		bulk_correct += len(correct)
 
-	print_results(bulk_total, bulk_needs_hand_labeling, bulk_correct, bulk_mislabeled, bulk_unlabeled)
-	print("Total run time was {}s".format(time.time() - start))
+	num_labeled = bulk_total - bulk_unlabeled
+	num_verified = num_labeled - bulk_needs_hand_labeling
+	total_recall = num_labeled / bulk_total * 100
+	precision = bulk_correct / max(num_verified, 1) * 100
+	return bulk_total, bulk_needs_hand_labeling, bulk_correct, bulk_mislabeled, bulk_unlabeled, num_labeled, num_verified, total_recall, precision
 	# results = open("data/output/single_test.csv", "a")
 	# writer = csv.writer(results, delimiter=',', quotechar='"')
 	# writer.writerow([merchant["name"], merchant['total_recall'], merchant["precision"]])
 	# results.close()
 
-def print_results(total, needs_hand_labeling, correct, mislabeled, unlabeled):
+def __load_label_map(label_map):
+	if isinstance(label_map, dict):
+		return label_map
+	return label_map and load_params(label_map) or None
+
+def print_results(total, needs_hand_labeling, correct, mislabeled, unlabeled, num_labeled, num_verified, total_recall, precision):
 	"""Provide useful readable output"""
-	num_labeled = total - unlabeled
-	num_verified = num_labeled - needs_hand_labeling
-	total_recall = num_labeled / total * 100
-	precision = correct / max(num_verified, 1) * 100
 
 	sys.stdout.write('\n\n')
 
@@ -143,7 +127,8 @@ def print_results(total, needs_hand_labeling, correct, mislabeled, unlabeled):
 def run_from_command_line(args):
 	"""Runs these commands if the module is invoked from the command line"""
 
-	CNN_accuracy(args.testfile, args.model, args.dictionary, args.humandictionary)
+	classifier = get_cnn_by_path(args.model, args.dictionary)
+	print_results(*CNN_accuracy(args.testfile, classifier, args.dictionary, args.humandictionary))
 
 if __name__ == "__main__":
 	cmd_args = parser.parse_args()
