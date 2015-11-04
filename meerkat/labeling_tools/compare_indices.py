@@ -339,6 +339,7 @@ def reconcile_changed_details(params, es_connection_1, es_connection_2):
 		safe_print("Is the new merchant correct?")
 		safe_print("[enter] Skip")
 		safe_print("{:7s} Yes".format("[y]"))
+		safe_print("{:7s} Save and Quit".format("[s]"))
 
 		choice = safe_input()
 
@@ -346,6 +347,8 @@ def reconcile_changed_details(params, es_connection_1, es_connection_2):
 		if choice == "y":
 			transaction["relinked_id"] = transaction["FACTUAL_ID"]
 			params["compare_indices"]["relinked"].append(transaction)
+		elif choice == "s":
+			save_relinked_transactions(params)
 		else:
 			params["compare_indices"]["id_changed"].append(transaction)
 
@@ -439,6 +442,8 @@ def save_relinked_transactions(params):
 
 	write_dict_list(transactions, file_name, column_order=field_order)
 
+	sys.exit()
+
 def line_break():
 	"""Prints a break line to show current record has changed"""
 	safe_print("------------------", "\n")
@@ -469,7 +474,7 @@ def display_user_context(params, transaction):
 	safe_print("User " + str(transaction["UNIQUE_MEM_ID"]) + " Context: \n")
 
 	if len(cities) > 0:
-		safe_print("\nCities:")
+		safe_print("Cities user has shopped in before:")
 		for city in cities:
 			safe_print(city)
 
