@@ -32,10 +32,10 @@ import collections
 from copy import deepcopy
 from scipy.stats.mstats import zscore
 
-from meerkat.file_consumer import get_qs_query, get_bool_query
-from meerkat.various_tools import (load_params, get_es_connection,
-	string_cleanse, get_merchant_by_id, load_dict_ordered, write_dict_list, \
-	safe_print, synonyms, get_magic_query, stopwords, safe_input)
+from meerkat.various_tools import get_qs_query, get_bool_query, safe_input
+from meerkat.various_tools import load_params, get_es_connection, string_cleanse
+from meerkat.various_tools import get_merchant_by_id, load_dict_ordered, write_dict_list
+from meerkat.various_tools import safe_print, synonyms, get_magic_query, stopwords
 
 class DummyFile(object):
 	"""does nothing"""
