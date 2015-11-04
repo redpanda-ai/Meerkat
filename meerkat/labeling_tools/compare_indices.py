@@ -41,7 +41,7 @@ from meerkat.various_tools import safe_print, synonyms, get_magic_query, stopwor
 
 class DummyFile(object):
 	"""Catches stderr and stdout to prevent libraries from printing to screen"""
-    def write(self, x): pass
+	def write(self, x): pass
 
 @contextlib.contextmanager
 def nostderr():
