@@ -348,6 +348,7 @@ def reconcile_changed_details(params, es_connection_1, es_connection_2):
 			transaction["relinked_id"] = transaction["FACTUAL_ID"]
 			params["compare_indices"]["relinked"].append(transaction)
 		elif choice == "s":
+			params["compare_indices"]["details_changed"].append(transaction)
 			save_relinked_transactions(params)
 		else:
 			params["compare_indices"]["id_changed"].append(transaction)
