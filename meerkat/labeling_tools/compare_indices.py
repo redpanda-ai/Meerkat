@@ -316,7 +316,7 @@ def reconcile_changed_details(params, es_connection_1, es_connection_2):
 		random.shuffle(details_changed)
 		transaction = details_changed.pop()
 		old_mapping = enrich_transaction(params, transaction, es_connection_1, index=params["elasticsearch"]["index"], doc_type=params["elasticsearch"]["type"])
-		new_mapping = enrich_transaction(params, transaction, es_connection_2, index=sys.argv[4], doc_type=sys.argv[5])
+		new_mapping = enrich_transaction(params, transaction, es_connection_2, index=sys.argv[4], doc_type=sys.argv[5], routing=old_mapping["STATE"])
 
 		# Track Task Completion
 		percent_done = (1 - (len(details_changed) / total)) * 100
