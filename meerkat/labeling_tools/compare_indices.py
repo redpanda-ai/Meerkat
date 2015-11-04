@@ -170,7 +170,7 @@ def identify_changes(params, es_connection_1, es_connection_2):
 
 		# Compare Indices
 		old_mapping = enrich_transaction(params, transaction, es_connection_1, index=params["elasticsearch"]["index"], doc_type=params["elasticsearch"]["type"])
-		new_mapping = enrich_transaction(params, transaction, es_connection_2, index=sys.argv[4], doc_type=sys.argv[5])
+		new_mapping = enrich_transaction(params, transaction, es_connection_2, index=sys.argv[4], doc_type=sys.argv[5], routing=old_mapping["STATE"].upper())
 
 		if new_mapping["merchant_found"] == False:
 			params["compare_indices"]["id_changed"].append(old_mapping)
@@ -632,7 +632,7 @@ def clean_transaction(transaction):
 
 	return transaction
 
-def enrich_transaction(params, transaction, es_connection, index="", FACTUAL_ID="", doc_type=""):
+def enrich_transaction(params, transaction, es_connection, index="", FACTUAL_ID="", doc_type="", routing=None):
 	"""Return a copy of a transaction, enriched with data from a 
 	provided FACTUAL_ID"""
 
@@ -646,7 +646,7 @@ def enrich_transaction(params, transaction, es_connection, index="", FACTUAL_ID=
 		FACTUAL_ID = transaction.get("FACTUAL_ID", "NULL")
 
 	with nostderr():
-		merchant = get_merchant_by_id(params, FACTUAL_ID, es_connection, index=index, doc_type=doc_type)
+		merchant = get_merchant_by_id(params, FACTUAL_ID, es_connection, index=index, doc_type=doc_type, routing=routing)
 
 	if merchant == None:
 		merchant = {}
