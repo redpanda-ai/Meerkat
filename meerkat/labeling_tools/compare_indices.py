@@ -607,7 +607,7 @@ def decision_boundary(params, store, results):
 		user_input = changed_id_user_prompt(params, old_details, results, store)
 
 	if user_input == "s":
-		params["compare_indices"]["skipped"].append(transaction)
+		params["compare_indices"]["skipped"].append(store)
 		save_relinked_transactions(params)
 
 	# Transaction is NULL
