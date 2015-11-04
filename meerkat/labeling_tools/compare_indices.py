@@ -468,11 +468,6 @@ def display_user_context(params, transaction):
 
 	safe_print("User " + str(transaction["UNIQUE_MEM_ID"]) + " Context: \n")
 
-	if len(points) > 0:
-		safe_print("Latitude, Longitude")
-		for point in points:
-			safe_print(point)
-
 	if len(cities) > 0:
 		safe_print("\nCities:")
 		for city in cities:
