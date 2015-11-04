@@ -316,7 +316,7 @@ def reconcile_changed_details(params, es_connection_1, es_connection_2):
 		random.shuffle(details_changed)
 		transaction = details_changed.pop()
 		old_mapping = enrich_transaction(params, transaction, es_connection_1, index=params["elasticsearch"]["index"], doc_type=params["elasticsearch"]["type"])
-		new_mapping = enrich_transaction(params, transaction, es_connection_2, index=sys.argv[4], sys.argv[5])
+		new_mapping = enrich_transaction(params, transaction, es_connection_2, index=sys.argv[4], doc_type=sys.argv[5])
 
 		# Track Task Completion
 		percent_done = (1 - (len(details_changed) / total)) * 100
@@ -632,7 +632,7 @@ def clean_transaction(transaction):
 
 	return transaction
 
-def enrich_transaction(params, transaction, es_connection, index="", FACTUAL_ID=""):
+def enrich_transaction(params, transaction, es_connection, index="", FACTUAL_ID="", doc_type=""):
 	"""Return a copy of a transaction, enriched with data from a 
 	provided FACTUAL_ID"""
 
@@ -646,7 +646,7 @@ def enrich_transaction(params, transaction, es_connection, index="", FACTUAL_ID=
 		FACTUAL_ID = transaction.get("FACTUAL_ID", "NULL")
 
 	with nostderr():
-		merchant = get_merchant_by_id(params, FACTUAL_ID, es_connection, index=index)
+		merchant = get_merchant_by_id(params, FACTUAL_ID, es_connection, index=index, doc_type=doc_type)
 
 	if merchant == None:
 		merchant = {}
