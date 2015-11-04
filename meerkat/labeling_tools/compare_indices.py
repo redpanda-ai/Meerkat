@@ -761,7 +761,7 @@ def z_score_delta(scores):
 def verify_arguments():
 	"""Verify Usage"""
 
-	sufficient_arguments = (len(sys.argv) == 5)
+	sufficient_arguments = (len(sys.argv) == 6)
 
 	if not sufficient_arguments:
 		safe_print("Insufficient arguments. Please see usage")
