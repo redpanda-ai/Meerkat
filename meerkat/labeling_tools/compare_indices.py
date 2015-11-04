@@ -421,9 +421,6 @@ def save_relinked_transactions(params):
 	while file_name == "":
 		file_name = safe_input()
 
-	# TODO auto append "_in_progress" to file name
-	# if relinked_id is not full populated
-
 	field_order = params["compare_indices"]["field_order"]
 	field_order = [field for field in field_order if field]
 	if "relinked" not in field_order:
@@ -434,8 +431,9 @@ def save_relinked_transactions(params):
 	relinked = params["compare_indices"]["relinked"]
 	id_changed = params["compare_indices"]["id_changed"]
 	skipped = params["compare_indices"]["skipped"]
+	unlinked = params["compare_indices"]["unlinked"]
 
-	transactions = changed_details + null + relinked + skipped + id_changed
+	transactions = changed_details + null + relinked + skipped + id_changed + unlinked
 
 	for transaction in transactions:
 		transaction = clean_transaction(transaction)
@@ -542,6 +540,7 @@ def print_multiselect_prompt(results):
 
 	safe_print("{:7}".format("[null]"), "Transaction has been reviewed before and has no matching merchant in new index. Set to NULL")	
 	safe_print("[enter] Skip")
+	safe_print("{:7s} Save and Quit".format("[s]"))
 	safe_print("{:7} Transaction did not occur at a specific location. Remove it from training data\n".format("[rm]"))
 
 	user_input = safe_input("Please select a choice above: \n")
@@ -557,6 +556,10 @@ def null_decision_boundary(params, transaction, results):
 	# Remove from Set
 	if user_input == "rm":
 		return
+
+	elif choice == "s":
+		params["compare_indices"]["skipped"].append(transaction)
+		save_relinked_transactions(params)
 
 	# Set to NULL
 	if user_input == "null":
