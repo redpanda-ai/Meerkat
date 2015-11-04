@@ -141,7 +141,6 @@ def identify_changes(params, es_connection_1, es_connection_2):
 	"""Locate changes in training data between indices"""
 
 	transactions, field_order = load_dict_ordered(sys.argv[2])
-	field_order = [field.lower() for field in field_order]
 	params["compare_indices"]["field_order"] = field_order
 
 	safe_print("Locating changes in training set:")
@@ -336,7 +335,7 @@ def reconcile_changed_details(params, es_connection_1, es_connection_2):
 		sys.stdout.write('\n')
 
 		# Prompt User
-		safe_print("Is the new merchant correct?")
+		safe_print("Is the new merchant the same?")
 		safe_print("[enter] Skip")
 		safe_print("{:7s} Yes".format("[y]"))
 		safe_print("{:7s} Save and Quit".format("[s]"))
