@@ -12,13 +12,13 @@ Created on July 21, 2014
 #################### USAGE ##########################
 
 # Note: In Progress
-# python3.3 -m meerkat.labeling_tools.compare_indices [config_file] [labeled_transactions] [old_index] [new_index]
-# python3.3 -m meerkat.labeling_tools.compare_indices config/test.json data/misc/ground_truth_card.txt factual_index factual_index_2
+# python3.3 -m meerkat.labeling_tools.compare_indices [config_file] [labeled_transactions] [old_index] [new_index] [old_ip] [new_ip]
+# python3.3 -m meerkat.labeling_tools.compare_indices config/test.json data/misc/ground_truth_card.txt factual_index factual_index_2 internal-default-vpc-meerkat-lb-2028162053.us-west-2.elb.amazonaws.com 172.31.33.44
 
 # Required Columns: 
 # DESCRIPTION_UNMASKED
 # UNIQUE_MEM_ID
-# factual_id
+# FACTUAL_ID
 # GOOD_DESCRIPTION
 
 #####################################################
@@ -51,17 +51,17 @@ def nostderr():
 	yield
 	sys.stderr = save_stderr
 
-def relink_transactions(params, es_connection):
-	"""Relink transactions to their new factual_ids"""
+def relink_transactions(params, es_connection_1, es_connection_2):
+	"""Relink transactions to their new FACTUAL_IDs"""
 
 	# Generate User Context
-	generate_user_context(params, es_connection)
+	generate_user_context(params, es_connection_1)
 
 	# Locate Changes
-	identify_changes(params, es_connection)
+	identify_changes(params, es_connection_1, es_connection_2)
 
 	# Select Mode and Fix Changes
-	mode_change(params, es_connection)
+	mode_change(params, es_connection_1, es_connection_2)
 	
 	# Save Changes
 	save_relinked_transactions(params)
@@ -78,17 +78,17 @@ def generate_user_context(params, es_connection):
 
 		# Ensure previously found context is added
 		if transaction.get("relinked_id", "") != "":
-			transaction["factual_id"] = transaction["relinked_id"]
+			transaction["FACTUAL_ID"] = transaction["relinked_id"]
 
 		# No Null
-		if transaction.get("factual_id", "NULL") == "NULL":
+		if transaction.get("FACTUAL_ID", "NULL") == "NULL":
 			continue
 
 		# Progress
 		progress(i, transactions)
 
 		# Save Context
-		enriched = enrich_transaction(params, transaction, es_connection, index=sys.argv[4])
+		enriched = enrich_transaction(params, transaction, es_connection, index=sys.argv[3])
 		unique_mem_id = enriched["UNIQUE_MEM_ID"]
 		location = enriched["LATITUDE"] + ", " + enriched["LONGITUDE"]
 		city = enriched["CITY"] + ", " + enriched["STATE"]
@@ -103,7 +103,7 @@ def generate_user_context(params, es_connection):
 
 	sys.stdout.write('\n\n')
 
-def mode_change(params, es_connection):
+def mode_change(params, es_connection_1, es_connection_2):
 	"""Define what mode to work in"""
 
 	mode = ""
@@ -111,38 +111,39 @@ def mode_change(params, es_connection):
 
 	safe_print("Which task would you like to complete? \n")
 	safe_print("[0] Run all relinking tasks")
-	safe_print("[1] Relink transactions where factual_id no longer exists")
+	safe_print("[1] Relink transactions where FACTUAL_ID no longer exists")
 	safe_print("[2] Verify changes to merchants")
-	safe_print("[3] Link transactions with NULL factual_id")
+	safe_print("[3] Link transactions with NULL FACTUAL_ID")
 	safe_print("[4] Label unlinked transactions \n")
 
 	while mode not in accepted_inputs: 
 		mode = safe_input()
 	
 	if mode == "0":
-		run_all_modes(params, es_connection)
+		run_all_modes(params, es_connection_1, es_connection_2)
 	elif mode == "1": 
-		reconcile_changed_ids(params, es_connection)
+		reconcile_changed_ids(params, es_connection_2)
 	elif mode == "2":
-		reconcile_changed_details(params, es_connection)
-		reconcile_changed_ids(params, es_connection)
+		reconcile_changed_details(params, es_connection_1, es_connection_2)
+		reconcile_changed_ids(params, es_connection_2)
 	elif mode == "3":
-		reconcile_null(params, es_connection)
+		reconcile_null(params, es_connection_2)
 	elif mode == "4":
-		autolink_and_verify(params, es_connection)
-		reconcile_null(params, es_connection)
+		autolink_and_verify(params, es_connection_2)
+		reconcile_null(params, es_connection_2)
 
-def run_all_modes(params, es_connection):
+def run_all_modes(params, es_connection_1, es_connection_2):
 	"""Run the entire relinking program"""
 
-	reconcile_changed_details(params, es_connection)
-	reconcile_changed_ids(params, es_connection)
-	reconcile_null(params, es_connection)
+	reconcile_changed_details(params, es_connection_1, es_connection_2)
+	reconcile_changed_ids(params, es_connection_2)
+	reconcile_null(params, es_connection_2)
 
-def identify_changes(params, es_connection):
+def identify_changes(params, es_connection_1, es_connection_2):
 	"""Locate changes in training data between indices"""
 
 	transactions, field_order = load_dict_ordered(sys.argv[2])
+	field_order = [field.lower() for field in field_order]
 	params["compare_indices"]["field_order"] = field_order
 
 	safe_print("Locating changes in training set:")
@@ -160,20 +161,20 @@ def identify_changes(params, es_connection):
 			continue
 
 		# Unlinked 
-		if transaction.get("factual_id", "") == "":
+		if transaction.get("FACTUAL_ID", "") == "":
 			params["compare_indices"]["unlinked"].append(transaction)
 			continue
 
 		# Null
-		if transaction.get("factual_id", "") == "NULL":
+		if transaction.get("FACTUAL_ID", "") == "NULL":
 			params["compare_indices"]["NULL"].append(transaction)
 			continue
 
 		# Compare Indices
 		old_mapping = enrich_transaction(params, transaction, \
-										 es_connection, index=sys.argv[3])
+										 es_connection_1, index=sys.argv[3])
 		new_mapping = enrich_transaction(params, transaction, \
-										 es_connection, index=sys.argv[4])
+										 es_connection_2, index=sys.argv[4])
 
 		if new_mapping["merchant_found"] == False:
 			params["compare_indices"]["id_changed"].append(old_mapping)
@@ -186,7 +187,7 @@ def identify_changes(params, es_connection):
 			continue
 
 		# No Changes Found
-		transaction["relinked_id"] = transaction["factual_id"]
+		transaction["relinked_id"] = transaction["FACTUAL_ID"]
 		params["compare_indices"]["relinked"].append(transaction)
 
 	print_stats(params, transactions)
@@ -224,7 +225,7 @@ def has_mapping_changed(old_mapping, new_mapping):
 	return False
 
 def reconcile_changed_ids(params, es_connection):
-	"""Attempt to find a matching factual_id using address"""
+	"""Attempt to find a matching FACTUAL_ID using address"""
 
 	prompt_mode_change("changed id")
 
@@ -294,18 +295,18 @@ def reconcile_autolinked(params, transaction, results):
 		params["compare_indices"]["relinked"].append(transaction)
 		return
 
-	# Change factual_id, move to relinked
+	# Change FACTUAL_ID, move to relinked
 	if user_input in accepted_inputs:
 		_, hit = get_hit(results, int(user_input))
-		transaction["relinked_id"] = hit["factual_id"]
+		transaction["relinked_id"] = hit["FACTUAL_ID"]
 		update_user_context(params, transaction, hit)
 		params["compare_indices"]["relinked"].append(transaction)
 	else:
 		# Add transaction to another queue for later analysis
-		transaction["factual_id"] = "NULL"
+		transaction["FACTUAL_ID"] = "NULL"
 		params["compare_indices"]["NULL"].append(transaction)
 
-def reconcile_changed_details(params, es_connection):
+def reconcile_changed_details(params, es_connection_1, es_connection_2):
 	"""Decide whether new details are erroneous"""
 
 	prompt_mode_change("changed details")
@@ -318,8 +319,8 @@ def reconcile_changed_details(params, es_connection):
 		details_changed = params["compare_indices"]["details_changed"]
 		random.shuffle(details_changed)
 		transaction = details_changed.pop()
-		old_mapping = enrich_transaction(params, transaction, es_connection, index=sys.argv[3])
-		new_mapping = enrich_transaction(params, transaction, es_connection, index=sys.argv[4])
+		old_mapping = enrich_transaction(params, transaction, es_connection_1, index=sys.argv[3])
+		new_mapping = enrich_transaction(params, transaction, es_connection_2, index=sys.argv[4])
 
 		# Track Task Completion
 		percent_done = (1 - (len(details_changed) / total)) * 100
@@ -347,7 +348,7 @@ def reconcile_changed_details(params, es_connection):
 
 		# Take Action
 		if choice == "y":
-			transaction["relinked_id"] = transaction["factual_id"]
+			transaction["relinked_id"] = transaction["FACTUAL_ID"]
 			params["compare_indices"]["relinked"].append(transaction)
 		else:
 			params["compare_indices"]["id_changed"].append(transaction)
@@ -386,7 +387,7 @@ def reconcile_skipped(params, es_connection):
 	print_stats(params)
 
 def reconcile_null(params, es_connection):
-	"""Attempt to find a factual_id for a NULL entry"""
+	"""Attempt to find a FACTUAL_ID for a NULL entry"""
 
 	null = params["compare_indices"]["NULL"]
 	params["compare_indices"]["NULL"] = []
@@ -569,10 +570,10 @@ def null_decision_boundary(params, transaction, results):
 		params["compare_indices"]["relinked"].append(transaction)
 		return
 
-	# Change factual_id, move to relinked
+	# Change FACTUAL_ID, move to relinked
 	if user_input in accepted_inputs:
 		_, hit = get_hit(results, int(user_input))
-		transaction["relinked_id"] = hit["factual_id"]
+		transaction["relinked_id"] = hit["FACTUAL_ID"]
 		update_user_context(params, transaction, hit)
 		params["compare_indices"]["relinked"].append(transaction)
 	else:
@@ -618,7 +619,7 @@ def decision_boundary(params, store, results):
 	if user_input == "rm":
 		return
 
-	# Change factual_id, move to relinked
+	# Change FACTUAL_ID, move to relinked
 	if user_input in accepted_inputs:
 		score, hit = get_hit(results, int(user_input))
 		store["relinked_id"] = hit["factual_id"]
@@ -638,9 +639,9 @@ def clean_transaction(transaction):
 
 	return transaction
 
-def enrich_transaction(params, transaction, es_connection, index="", factual_id=""):
+def enrich_transaction(params, transaction, es_connection, index="", FACTUAL_ID=""):
 	"""Return a copy of a transaction, enriched with data from a 
-	provided factual_id"""
+	provided FACTUAL_ID"""
 
 	transaction = deepcopy(transaction)
 	transaction["merchant_found"] = True
@@ -650,11 +651,11 @@ def enrich_transaction(params, transaction, es_connection, index="", factual_id=
 					  "STORE_NUMBER", "ZIP_CODE", "STREET"]
 	
 	# Get merchant and suppress errors
-	if factual_id == "":
-		factual_id = transaction.get("factual_id", "NULL")
+	if FACTUAL_ID == "":
+		FACTUAL_ID = transaction.get("FACTUAL_ID", "NULL")
 
 	with nostderr():
-		merchant = get_merchant_by_id(params, factual_id, es_connection, index=index)
+		merchant = get_merchant_by_id(params, FACTUAL_ID, es_connection, index=index)
 
 	if merchant == None:
 		merchant = {}
@@ -770,7 +771,7 @@ def z_score_delta(scores):
 def verify_arguments():
 	"""Verify Usage"""
 
-	sufficient_arguments = (len(sys.argv) == 5)
+	sufficient_arguments = (len(sys.argv) == 7)
 
 	if not sufficient_arguments:
 		safe_print("Insufficient arguments. Please see usage")
@@ -809,8 +810,11 @@ def run_from_command_line():
 	verify_arguments()
 	params = load_params(sys.argv[1])
 	params = add_local_params(params)
-	es_connection = get_es_connection(params)
-	relink_transactions(params, es_connection)
+	params["elasticsearch"]["cluster_nodes"] = [sys.argv[5]]
+	es_connection_1 = get_es_connection(params)
+	params["elasticsearch"]["cluster_nodes"] = [sys.argv[6]]
+	es_connection_2 = get_es_connection(params)
+	relink_transactions(params, es_connection_1, es_connection_2)
 	
 if __name__ == "__main__":
 	run_from_command_line()
