@@ -13,14 +13,16 @@ Created on July 21, 2014
 #################### USAGE ##########################
 
 # Note: In Progress
-# python3.3 -m meerkat.labeling_tools.compare_indices [config_file] [labeled_transactions] [old_index] [new_index] [old_ip] [new_ip]
-# python3.3 -m meerkat.labeling_tools.compare_indices config/test.json data/misc/ground_truth_card.txt factual_index factual_index_2 internal-default-vpc-meerkat-lb-2028162053.us-west-2.elb.amazonaws.com 172.31.33.44
+# python3.3 -m meerkat.labeling_tools.compare_indices [config_file] [labeled_transactions] [new_ip] [new_index] [new_type] 
+# python3.3 -m meerkat.labeling_tools.compare_indices config/test.json data/misc/ground_truth_card.txt 172.31.41.93 routed_index routed_type
 
 # Required Columns: 
 # DESCRIPTION_UNMASKED
 # UNIQUE_MEM_ID
 # FACTUAL_ID
 # GOOD_DESCRIPTION
+
+# Note: Old index details should be included in config_file while new index details are passed in as command line arguments
 
 #####################################################
 
@@ -86,7 +88,7 @@ def generate_user_context(params, es_connection):
 		progress(i, transactions)
 
 		# Save Context
-		enriched = enrich_transaction(params, transaction, es_connection, index=sys.argv[3])
+		enriched = enrich_transaction(params, transaction, es_connection, index=params["elasticsearch"]["index"], doc_type=params["elasticsearch"]["type"])
 		unique_mem_id = enriched["UNIQUE_MEM_ID"]
 		location = enriched["LATITUDE"] + ", " + enriched["LONGITUDE"]
 		city = enriched["CITY"] + ", " + enriched["STATE"]
@@ -167,8 +169,8 @@ def identify_changes(params, es_connection_1, es_connection_2):
 			continue
 
 		# Compare Indices
-		old_mapping = enrich_transaction(params, transaction, es_connection_1, index=sys.argv[3])
-		new_mapping = enrich_transaction(params, transaction, es_connection_2, index=sys.argv[4])
+		old_mapping = enrich_transaction(params, transaction, es_connection_1, index=params["elasticsearch"]["index"], doc_type=params["elasticsearch"]["type"])
+		new_mapping = enrich_transaction(params, transaction, es_connection_2, index=sys.argv[4], doc_type=sys.argv[5])
 
 		if new_mapping["merchant_found"] == False:
 			params["compare_indices"]["id_changed"].append(old_mapping)
@@ -313,8 +315,8 @@ def reconcile_changed_details(params, es_connection_1, es_connection_2):
 		details_changed = params["compare_indices"]["details_changed"]
 		random.shuffle(details_changed)
 		transaction = details_changed.pop()
-		old_mapping = enrich_transaction(params, transaction, es_connection_1, index=sys.argv[3])
-		new_mapping = enrich_transaction(params, transaction, es_connection_2, index=sys.argv[4])
+		old_mapping = enrich_transaction(params, transaction, es_connection_1, index=params["elasticsearch"]["index"], doc_type=params["elasticsearch"]["type"])
+		new_mapping = enrich_transaction(params, transaction, es_connection_2, index=sys.argv[4], sys.argv[5])
 
 		# Track Task Completion
 		percent_done = (1 - (len(details_changed) / total)) * 100
@@ -446,7 +448,7 @@ def skipped_details_prompt(params, transaction, es_connection):
 
 	safe_print("Base query: " + transaction["DESCRIPTION_UNMASKED"] + "\n")
 	display_user_context(params, transaction)
-	store = enrich_transaction(params, transaction, es_connection, index=sys.argv[3])
+	store = enrich_transaction(params, transaction, es_connection, index=params["elasticsearch"]["index"], doc_type=params["elasticsearch"]["type"])
 	old_details = [store["PHYSICAL_MERCHANT"], store["STREET"], store["CITY"], string_cleanse(store["STATE"]), store["ZIP_CODE"],]
 	old_details_formatted = ", ".join(old_details)
 	safe_print("Old index details: {}".format(old_details_formatted))
@@ -759,7 +761,7 @@ def z_score_delta(scores):
 def verify_arguments():
 	"""Verify Usage"""
 
-	sufficient_arguments = (len(sys.argv) == 7)
+	sufficient_arguments = (len(sys.argv) == 5)
 
 	if not sufficient_arguments:
 		safe_print("Insufficient arguments. Please see usage")
@@ -798,9 +800,8 @@ def run_from_command_line():
 	verify_arguments()
 	params = load_params(sys.argv[1])
 	params = add_local_params(params)
-	params["elasticsearch"]["cluster_nodes"] = [sys.argv[5]]
 	es_connection_1 = get_es_connection(params)
-	params["elasticsearch"]["cluster_nodes"] = [sys.argv[6]]
+	params["elasticsearch"]["cluster_nodes"] = [sys.argv[3]]
 	es_connection_2 = get_es_connection(params)
 	relink_transactions(params, es_connection_1, es_connection_2)
 	
