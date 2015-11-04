@@ -38,11 +38,8 @@ from meerkat.various_tools import get_merchant_by_id, load_dict_ordered, write_d
 from meerkat.various_tools import safe_print, synonyms, get_magic_query, stopwords
 
 class DummyFile(object):
-	"""does nothing"""
-	def write(self, message):
-		"""I'm sorry but I'm going to lose connection because I'm about to drive\
-		into a tunnel in a canyon on an airplane while hanging up the phone."""
-		pass
+	"""Catches stderr and stdout to prevent libraries from printing to screen"""
+    def write(self, x): pass
 
 @contextlib.contextmanager
 def nostderr():
