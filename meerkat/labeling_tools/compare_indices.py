@@ -1,5 +1,6 @@
 #!/usr/local/bin/python3.3
 # pylint: disable=line-too-long
+
 """This module takes a file containing transactions and their associated
 uuid relative to a specific index, and helps to reconcile changes as the 
 index evolves over time. It also can be used to label files from scratch
@@ -93,12 +94,10 @@ def generate_user_context(params, es_connection):
 		location = enriched["LATITUDE"] + ", " + enriched["LONGITUDE"]
 		city = enriched["CITY"] + ", " + enriched["STATE"]
 
-		if location not in params["compare_indices"]["user_context"][unique_mem_id] \
-		and location != ", ":
+		if location not in params["compare_indices"]["user_context"][unique_mem_id] and location != ", ":
 			params["compare_indices"]["user_context"][unique_mem_id].append(location)
 
-		if city not in params["compare_indices"]["user_cities"][unique_mem_id] \
-		and city != ", ":
+		if city not in params["compare_indices"]["user_cities"][unique_mem_id] and city != ", ":
 			params["compare_indices"]["user_cities"][unique_mem_id].append(city)
 
 	sys.stdout.write('\n\n')
@@ -171,10 +170,8 @@ def identify_changes(params, es_connection_1, es_connection_2):
 			continue
 
 		# Compare Indices
-		old_mapping = enrich_transaction(params, transaction, \
-										 es_connection_1, index=sys.argv[3])
-		new_mapping = enrich_transaction(params, transaction, \
-										 es_connection_2, index=sys.argv[4])
+		old_mapping = enrich_transaction(params, transaction, es_connection_1, index=sys.argv[3])
+		new_mapping = enrich_transaction(params, transaction, es_connection_2, index=sys.argv[4])
 
 		if new_mapping["merchant_found"] == False:
 			params["compare_indices"]["id_changed"].append(old_mapping)
@@ -544,11 +541,9 @@ def print_multiselect_prompt(results):
 	for i in range(5):
 		print_formatted_result(results, i)
 
-	safe_print("{:7}".format("[null]"), "Transaction has been reviewed before \
-		and has no matching merchant in new index. Set to NULL")	
+	safe_print("{:7}".format("[null]"), "Transaction has been reviewed before and has no matching merchant in new index. Set to NULL")	
 	safe_print("[enter] Skip")
-	safe_print("{:7} Transaction did not occur at a specific location. \
-		Remove it from training data\n".format("[rm]"))
+	safe_print("{:7} Transaction did not occur at a specific location. Remove it from training data\n".format("[rm]"))
 
 	user_input = safe_input("Please select a choice above: \n")
 
@@ -584,10 +579,10 @@ def decision_boundary(params, store, results):
 	"""Decide if there is a match"""
 
 	fields = ["name", "address", "locality", "region", "postcode"]
-	old_details = [store["PHYSICAL_MERCHANT"], \
-				   store["STREET"], \
-				   store["CITY"], \
-				   string_cleanse(store["STATE"]), \
+	old_details = [store["PHYSICAL_MERCHANT"],
+				   store["STREET"],
+				   store["CITY"],
+				   string_cleanse(store["STATE"]),
 				   store.get("ZIP_CODE", "")]
 	accepted_inputs = [str(x) for x in list(range(5))]
 	score, top_hit = get_hit(results, 0)
@@ -631,8 +626,7 @@ def decision_boundary(params, store, results):
 def clean_transaction(transaction):
 	"""Strips any enriched data"""
 
-	fields_to_clear = ["PHYSICAL_MERCHANT", "STORE_NUMBER", "STREET", "CITY", \
-					   "STATE", "ZIP_CODE", "LATITUDE", "LONGITUDE"]
+	fields_to_clear = ["PHYSICAL_MERCHANT", "STORE_NUMBER", "STREET", "CITY", "STATE", "ZIP_CODE", "LATITUDE", "LONGITUDE"]
 
 	for field in fields_to_clear:
 		transaction[field] = ""
@@ -645,10 +639,8 @@ def enrich_transaction(params, transaction, es_connection, index="", FACTUAL_ID=
 
 	transaction = deepcopy(transaction)
 	transaction["merchant_found"] = True
-	fields_to_get = ["name", "region", "locality", \
-					 "internal_store_number", "postcode", "address"]
-	fields_to_fill = ["PHYSICAL_MERCHANT", "STATE", "CITY", \
-					  "STORE_NUMBER", "ZIP_CODE", "STREET"]
+	fields_to_get = ["name", "region", "locality", "internal_store_number", "postcode", "address"]
+	fields_to_fill = ["PHYSICAL_MERCHANT", "STATE", "CITY", "STORE_NUMBER", "ZIP_CODE", "STREET"]
 	
 	# Get merchant and suppress errors
 	if FACTUAL_ID == "":
@@ -679,11 +671,11 @@ def find_merchant_by_address(store, es_connection, additional_data=[]):
 	"""Match document with address to factual document"""
 
 	fields = ["name^2", "address", "locality", "region", "postcode"]
-	old_details = [store.get("PHYSICAL_MERCHANT", ""), \
-				   store.get("STREET", ""), \
-				   store.get("CITY", ""), \
-				   string_cleanse(store.get("STATE", "")), \
-				   				  store.get("ZIP_CODE", "")]
+	old_details = [store.get("PHYSICAL_MERCHANT", ""),
+				   store.get("STREET", ""),
+				   store.get("CITY", ""),
+				   string_cleanse(store.get("STATE", "")),
+				   store.get("ZIP_CODE", "")]
 	index = sys.argv[4]
 	results = ""
 
@@ -729,8 +721,7 @@ def changed_id_user_prompt(params, old_details, results, store):
 def print_formatted_result(results, index):
 	"""Display a potential result in readable format"""
 
-	fields_to_print = ["name", "address", "locality", \
-					   "region", "postcode", "internal_store_number"]
+	fields_to_print = ["name", "address", "locality", "region", "postcode", "internal_store_number"]
 	_, hit = get_hit(results, index)
 
 	# No Result
