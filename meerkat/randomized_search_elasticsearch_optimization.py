@@ -37,8 +37,7 @@ from random import uniform
 from pprint import pprint
 
 from meerkat.classification.load import select_model
-from meerkat.accuracy import vest_accuracy
-from meerkat.tools.single_accuracy import print_results
+from meerkat.tools.single_accuracy import print_results, vest_accuracy
 from meerkat.various_tools \
 import load_dict_list, safe_print, get_us_cities
 from meerkat.various_tools import load_params
@@ -70,7 +69,7 @@ def run_meerkat(params, dataset):
 	# Test Accuracy
 	#pprint(result_list)
 	accuracy_results = vest_accuracy(params, result_list=result_list)
-	print_results(accuracy_results["total"], accuracy_results["needs_hand_labeling"], accuracy_results["mislabeled"], accuracy_results["unlabeled"], accuracy_results["correct"], accuracy_results["num_labeled"], accuracy_results["num_verified"], accuracy_results["total_recall"], accuracy_results["precision"])
+	print_results(accuracy_results)
 
 	return accuracy_results
 

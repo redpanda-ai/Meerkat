@@ -17,9 +17,11 @@ Created in October, 2015
 import csv
 import sys
 import json
+import os
+import logging
 import pandas as pd
 
-from meerkat.various_tools import load_params
+from meerkat.various_tools import load_params, load_dict_list
 from meerkat.classification.lua_bridge import get_cnn_by_path
 import argparse
 
@@ -94,11 +96,7 @@ def CNN_accuracy(test_file, classifier, model_dict=None, human_dict=None):
 		bulk_unlabeled += len(unlabeled)
 		bulk_correct += len(correct)
 
-	num_labeled = bulk_total - bulk_unlabeled
-	num_verified = num_labeled - bulk_needs_hand_labeling
-	total_recall = num_labeled / bulk_total * 100
-	precision = bulk_correct / max(num_verified, 1) * 100
-	return bulk_total, bulk_needs_hand_labeling, bulk_correct, bulk_mislabeled, bulk_unlabeled, num_labeled, num_verified, total_recall, precision
+	return enhance_results(bulk_total, bulk_needs_hand_labeling, bulk_mislabeled, bulk_unlabeled, bulk_correct)
 	# results = open("data/output/single_test.csv", "a")
 	# writer = csv.writer(results, delimiter=',', quotechar='"')
 	# writer.writerow([merchant["name"], merchant['total_recall'], merchant["precision"]])
@@ -109,26 +107,75 @@ def __load_label_map(label_map):
 		return label_map
 	return label_map and load_params(label_map) or None
 
-def print_results(total, needs_hand_labeling, correct, mislabeled, unlabeled, num_labeled, num_verified, total_recall, precision):
+def print_results(results):
 	"""Provide useful readable output"""
 
 	sys.stdout.write('\n\n')
 
 	print("STATS:")
-	print("{0:35} = {1:11}".format("Total Transactions Processed", total))
+	print("{0:35} = {1:11}".format("Total Transactions Processed", results["total"]))
 
 	sys.stdout.write('\n')
 
-	print("{0:35} = {1:10.2f}%".format("Recall all transactions", total_recall))
-	print("{0:35} = {1:11}".format("Number of transactions labeled", num_labeled))
-	print("{0:35} = {1:11}".format("Number of transactions verified", num_verified))
-	print("{0:35} = {1:10.2f}%".format("Precision", precision))
+	print("{0:35} = {1:10.2f}%".format("Recall all transactions", results["total_recall"]))
+	print("{0:35} = {1:11}".format("Number of transactions labeled", results["num_labeled"]))
+	print("{0:35} = {1:11}".format("Number of transactions verified", results["num_verified"]))
+	print("{0:35} = {1:10.2f}%".format("Precision", results["precision"]))
+
+def enhance_results(total, needs_hand_labeling, mislabeled, unlabeled, correct):
+	num_labeled = total - unlabeled
+	total_recall_physical = num_labeled / total * 100
+	num_labeled = total - unlabeled
+	num_verified = num_labeled - needs_hand_labeling
+	total_recall = num_labeled / total * 100
+	precision = correct / max(num_verified, 1) * 100
+	return {
+		"total": total,
+		"needs_hand_labeling": needs_hand_labeling,
+		"mislabeled": mislabeled,
+		"unlabeled": unlabeled,
+		"correct": correct,
+		"total_recall_physical": total_recall_physical,
+		"num_labeled": num_labeled,
+		"num_verified": num_verified,
+		"total_recall": total_recall,
+		"precision": precision
+		}
+
+def vest_accuracy(params, file_path=None, non_physical_trans=[], result_list=[]):
+	"""Takes file by default but can accept result
+	queue/ non_physical list. Attempts to provide various
+	accuracy tests"""
+
+	# Load machine labeled transactions
+	if len(result_list) > 0:
+		machine_labeled = result_list
+	if not result_list and file_path and os.path.isfile(file_path):
+		machine_labeled = load_dict_list(file_path)
+	if not machine_labeled or len(machine_labeled) <= 0:
+		logging.warning("Not enough information provided to perform " + "accuracy tests on")
+		return
+
+	# Load human labeled transactions
+	verification_source = params.get("verification_source", "data/misc/verifiedLabeledTrans.txt")
+	human_labeled = load_dict_list(verification_source)
+
+	# Test Classifier for recall and precision
+	label_key = params.get("label_key", "FACTUAL_ID")
+	total, needs_hand_labeling, mislabeled, unlabeled, correct = generic_test(machine_labeled, human_labeled, label_key, label_key, None, None)
+	results = enhance_results(total, len(needs_hand_labeling), len(mislabeled), len(unlabeled), len(correct))
+
+	total_processed = len(machine_labeled) + len(non_physical_trans)
+	results["total_processed"] = total_processed
+	results["total_non_physical"] = len(non_physical_trans) / total_processed * 100
+	results["total_physical"] = total / total_processed * 100
+	return results
 
 def run_from_command_line(args):
 	"""Runs these commands if the module is invoked from the command line"""
 
 	classifier = get_cnn_by_path(args.model, args.dictionary)
-	print_results(*CNN_accuracy(args.testfile, classifier, args.dictionary, args.humandictionary))
+	print_results(CNN_accuracy(args.testfile, classifier, args.dictionary, args.humandictionary))
 
 if __name__ == "__main__":
 	cmd_args = parser.parse_args()

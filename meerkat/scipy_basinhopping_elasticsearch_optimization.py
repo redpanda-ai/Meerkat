@@ -41,8 +41,7 @@ from numpy import array, array_split
 from scipy.optimize import basinhopping
 
 from meerkat.web_service.web_consumer import Web_Consumer
-from meerkat.tools.single_accuracy import print_results
-from meerkat.accuracy import vest_accuracy
+from meerkat.tools.single_accuracy import print_results, vest_accuracy
 from meerkat.various_tools \
 import load_dict_list, safe_print, get_us_cities
 from meerkat.various_tools import load_params
@@ -107,7 +106,7 @@ def run_meerkat(params, dataset):
 
 	# Test Accuracy
 	accuracy_results = vest_accuracy(params, result_list=result_list)
-	print_results(accuracy_results["total"], accuracy_results["needs_hand_labeling"], accuracy_results["mislabeled"], accuracy_results["unlabeled"], accuracy_results["correct"])
+	print_results(accuracy_results)
 
 	return accuracy_results
 

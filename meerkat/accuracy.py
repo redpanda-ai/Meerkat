@@ -83,55 +83,6 @@ def test_bulk_classifier(human_labeled, non_physical_trans, my_lists):
 				if human_labeled_row['IS_PHYSICAL_TRANSACTION'] == '1':
 					my_lists["incorrect_non_physical"].append(item)
 
-def vest_accuracy(params, file_path=None, non_physical_trans=None, result_list=None):
-	"""Takes file by default but can accept result
-	queue/ non_physical list. Attempts to provide various
-	accuracy tests"""
-
-	if non_physical_trans is None:
-		non_physical_trans = []
-	if result_list is None:
-		result_list = []
-
-	if len(result_list) > 0:
-		machine_labeled = result_list
-	elif file_path is not None and os.path.isfile(file_path):
-		machine_labeled_file = open(file_path, encoding="utf-8", errors='replace')
-		machine_labeled = list(csv.DictReader(machine_labeled_file))
-	else:
-		logging.warning("Not enough information provided to perform " + "accuracy tests on")
-		return
-
-	# Load Verification Source
-	verification_source = params.get("verification_source", "data/misc/verifiedLabeledTrans.txt")
-	human_labeled = load_dict_list(verification_source)
-
-	# Test Classifier for recall and precision
-	label_key = params.get("label_key", "FACTUAL_ID")
-	total, needs_hand_labeling, mislabeled, unlabeled, correct = generic_test(machine_labeled, human_labeled, label_key, label_key, None, None)
-	num_labeled = total - len(unlabeled)
-	total_recall_physical = num_labeled / total * 100
-	total_processed = len(machine_labeled) + len(non_physical_trans)
-	num_labeled = total - len(unlabeled)
-	num_verified = num_labeled - len(needs_hand_labeling)
-	total_recall = num_labeled / total * 100
-	precision = len(correct) / max(num_verified, 1) * 100
-	return {
-		"total": total,
-		"needs_hand_labeling": len(needs_hand_labeling),
-		"mislabeled": len(mislabeled),
-		"unlabeled": len(unlabeled),
-		"correct": len(correct),
-		"total_recall_physical": total_recall_physical,
-		"total_processed": total_processed,
-		"num_labeled": num_labeled,
-		"num_verified": num_verified,
-		"total_recall": total_recall,
-		"precision": precision,
-		"total_non_physical": len(non_physical_trans) / total_processed * 100,
-		"total_physical": total / total_processed * 100
-		}
-
 def speed_vests(start_time, accuracy_results):
 	"""Run a number of tests related to speed"""
 
@@ -200,9 +151,9 @@ def process_file_collection(bucket, prefix, classifier, classifier_id_map):
 
 		params["verification_source"] = unzipped_file_name
 		print("Testing Merchant: " + merchant_name)
-		total, needs_hand_labeling, correct, mislabeled, unlabeled, num_labeled, num_verified, total_recall, precision = CNN_accuracy(unzipped_file_name, classifier, classifier_id_map, label_map)
-		print_results(total, needs_hand_labeling, correct, mislabeled, unlabeled, num_labeled, num_verified, total_recall, precision)
-		writer.writerow([merchant_name, total_recall, precision])
+		accuracy_results = CNN_accuracy(unzipped_file_name, classifier, classifier_id_map, label_map)
+		print_results(accuracy_results)
+		writer.writerow([merchant_name, accuracy_results["total_recall"], accuracy_results["precision"]])
 		safely_remove_file(unzipped_file_name)
 
 	results.close()
