@@ -293,7 +293,7 @@ def reconcile_autolinked(params, transaction, results):
 	# Change FACTUAL_ID, move to relinked
 	if user_input in accepted_inputs:
 		_, hit = get_hit(results, int(user_input))
-		transaction["relinked_id"] = hit["FACTUAL_ID"]
+		transaction["relinked_id"] = hit["factual_id"]
 		update_user_context(params, transaction, hit)
 		params["compare_indices"]["relinked"].append(transaction)
 	else:
@@ -570,7 +570,7 @@ def null_decision_boundary(params, transaction, results):
 	# Change FACTUAL_ID, move to relinked
 	if user_input in accepted_inputs:
 		_, hit = get_hit(results, int(user_input))
-		transaction["relinked_id"] = hit["FACTUAL_ID"]
+		transaction["relinked_id"] = hit["factual_id"]
 		update_user_context(params, transaction, hit)
 		params["compare_indices"]["relinked"].append(transaction)
 	else:
