@@ -284,6 +284,10 @@ def reconcile_autolinked(params, transaction, results):
 	if user_input == "rm":
 		return
 
+	if user_input == "s":
+		params["compare_indices"]["unlinked"].append(transaction)
+		save_relinked_transactions(params)
+
 	# Set to NULL
 	if user_input == "null":
 		transaction["relinked_id"] = "NULL"
