@@ -390,7 +390,6 @@ def reconcile_null(params, es_connection):
 
 	null = params["compare_indices"]["NULL"]
 	null_len = len(null)
-	random.shuffle(null)
 
 	# Prompt a mode change
 	prompt_mode_change("NULL")
@@ -400,9 +399,11 @@ def reconcile_null(params, es_connection):
 		line_break()
 		progress = 100 - ((len(null) / null_len) * 100)
 		safe_print(round(progress, 2), "% ", "done with NULL")
+		random.shuffle(null)
 		transaction = null.pop()
 		results = search_with_user_safe_input(params, es_connection, transaction)
 		if results == False:
+			params["compare_indices"]["NULL"].append(transaction)
 			continue
 		null_decision_boundary(params, transaction, results)
 
