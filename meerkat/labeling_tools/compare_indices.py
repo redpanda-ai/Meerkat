@@ -389,7 +389,6 @@ def reconcile_null(params, es_connection):
 	"""Attempt to find a FACTUAL_ID for a NULL entry"""
 
 	null = params["compare_indices"]["NULL"]
-	params["compare_indices"]["NULL"] = []
 	null_len = len(null)
 	random.shuffle(null)
 
