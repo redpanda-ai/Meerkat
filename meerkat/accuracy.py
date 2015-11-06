@@ -1,4 +1,5 @@
 #!/usr/local/bin/python3.3
+# pylint: disable=line-too-long
 
 """This script is aimed at testing the accuracy of the Meerkat Classifier.
 We iteratively use this accuracy as a feedback score to tune and optimize
@@ -88,7 +89,6 @@ def test_bulk_classifier(human_labeled, non_physical_trans, my_lists):
 def generic_test(machine, human, cnn_column, human_column, human_map, machine_map, doc_key=default_doc_key):
 	"""Tests both the recall and precision of the pinpoint classifier against
 	human-labeled training data."""
-
 	# Create Quicker Lookup
 	index_lookup = {row["UNIQUE_TRANSACTION_ID"]: row for row in human}
 
@@ -235,10 +235,8 @@ def speed_vests(start_time, accuracy_results):
 
 	print("\nSPEED TESTS:")
 	print("{0:35} = {1:11}".format("Total Time Taken", str(time_delta)[0:11]))
-	print("{0:35} = {1:11.2f}".format("Time per Transaction (in seconds)",
-		time_per_transaction))
-	print("{0:35} = {1:11.2f}".format("Transactions Per Minute",
-		transactions_per_minute))
+	print("{0:35} = {1:11.2f}".format("Time per Transaction (in seconds)", time_per_transaction))
+	print("{0:35} = {1:11.2f}".format("Transactions Per Minute", transactions_per_minute))
 
 	return {'time_delta': time_delta,
 			'time_per_transaction': time_per_transaction,

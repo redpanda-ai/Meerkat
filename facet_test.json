@@ -1,0 +1,15 @@
+{
+	"from" : 0,
+	"size" : 0,
+	"query" : {
+		"match_all" : { }
+	},
+	"facets" : {
+		"region" : {
+			"terms" : {
+				"field" : "region",
+				"size" : 11
+			}
+		}
+	}
+}
