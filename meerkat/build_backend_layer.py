@@ -21,6 +21,7 @@ import fileinput
 import json
 import paramiko
 import shutil
+import socket
 import sys
 import time
 import logging
@@ -173,8 +174,12 @@ def confirm_security_groups(conn, params):
 	if not new_group_found:
 		print("Adding group {0}".format(params["name"]))
 		#Need to add vpc_id as named parameters
-		all_groups.append(create_security_group(conn, params["name"],\
-			params["vpc-id"]))
+		new_sec_group = create_security_group(conn, params["name"],\
+			params["vpc-id"])
+		#Add some rules to the new sec group
+		my_ip_address = socket.gethostbyname(socket.gethostname()) + "/32"
+		new_sec_group.authorize('tcp', 22, 22, my_ip_address)
+		all_groups.append(new_sec_group)
 	for group in all_groups:
 		print(group)
 	params["all_security_groups"] = all_groups

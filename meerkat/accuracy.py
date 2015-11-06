@@ -1,4 +1,5 @@
 #!/usr/local/bin/python3.3
+# pylint: disable=line-too-long
 
 """This script is aimed at testing the accuracy of the Meerkat Classifier.
 We iteratively use this accuracy as a feedback score to tune and optimize
@@ -108,12 +109,10 @@ def generic_test(machine, human, lists, column):
 				lists["needs_hand_labeling"].append(machine_row[doc_label])
 				continue
 			elif machine_row[column] == human_row[column]:
-				lists["correct"].append(human_row[doc_label] + \
-				" (ACTUAL:" + human_row[column] + ")")
+				lists["correct"].append(human_row[doc_label] + " (ACTUAL:" + human_row[column] + ")")
 				continue
 			else:
-				lists["mislabeled"].append(human_row[doc_label] + " (ACTUAL: " \
- 				+ human_row[column] + ")" + " (FOUND: " + machine_row[column] + ")")
+				lists["mislabeled"].append(human_row[doc_label] + " (ACTUAL: " + human_row[column] + ")" + " (FOUND: " + machine_row[column] + ")")
 				continue
 
 def test_bulk_classifier(human_labeled, non_physical_trans, my_lists):
@@ -132,8 +131,7 @@ def test_bulk_classifier(human_labeled, non_physical_trans, my_lists):
 				if human_labeled_row['IS_PHYSICAL_TRANSACTION'] == '1':
 					my_lists["incorrect_non_physical"].append(item)
 
-def vest_accuracy(params, file_path=None, non_physical_trans=None,\
-	result_list=None):
+def vest_accuracy(params, file_path=None, non_physical_trans=None, result_list=None):
 	"""Takes file by default but can accept result
 	queue/ non_physical list. Attempts to provide various
 	accuracy tests"""
@@ -149,13 +147,11 @@ def vest_accuracy(params, file_path=None, non_physical_trans=None,\
 		machine_labeled_file = open(file_path, encoding="utf-8", errors='replace')
 		machine_labeled = list(csv.DictReader(machine_labeled_file))
 	else:
-		logging.warning("Not enough information provided to perform "\
-			+ "accuracy tests on")
+		logging.warning("Not enough information provided to perform accuracy tests on")
 		return
 
 	# Load Verification Source
-	verification_source = params.get("verification_source",\
-		"data/misc/verifiedLabeledTrans.txt")
+	verification_source = params.get("verification_source", "data/misc/verifiedLabeledTrans.txt")
 	human_labeled = load_dict_list(verification_source)
 
 	my_counters = {
@@ -177,27 +173,22 @@ def vest_accuracy(params, file_path=None, non_physical_trans=None,\
 	label_key = params.get("label_key", "FACTUAL_ID")
 	generic_test(machine_labeled, human_labeled, my_lists, label_key)
 
-
 	# Test Bulk (binary) Classifier for accuracy
 	#test_bulk_classifier(human_labeled, non_physical_trans, my_lists)
 
 	# Collect results into dict for easier access
 	my_counters["num_labeled"] = my_counters["total"] - len(my_lists["unlabeled"])
-	my_counters["num_verified"] = my_counters["num_labeled"] -\
-		len(my_lists["needs_hand_labeling"])
+	my_counters["num_verified"] = my_counters["num_labeled"] - len(my_lists["needs_hand_labeling"])
 	if my_counters["num_verified"] <= 0:
 		my_counters["num_verified"] = 1
-	binary_accuracy = 100 - ((len(my_lists["non_physical"])\
-		+ len(my_lists["incorrect_non_physical"])) /
-		my_counters["total_processed"]) * 100
+	binary_accuracy = 100 - ((len(my_lists["non_physical"]) + len(my_lists["incorrect_non_physical"])) / my_counters["total_processed"]) * 100
 
 	#rounded_percent = lambda x: math.ceil(x * 100)
 
 	return {
 		"total_processed": my_counters["total_processed"],
 		"total_physical": my_counters["total"] / my_counters["total_processed"] * 100,
-		"total_non_physical": len(non_physical_trans) /
-			my_counters["total_processed"] * 100,
+		"total_non_physical": len(non_physical_trans) / my_counters["total_processed"] * 100,
 		"correct": my_lists["correct"],
 		"needs_hand_labeling": my_lists["needs_hand_labeling"],
 		"non_physical": my_lists["non_physical"],
@@ -205,10 +196,8 @@ def vest_accuracy(params, file_path=None, non_physical_trans=None,\
 		"num_verified": my_counters["num_verified"],
 		"num_labeled": my_counters["num_labeled"],
 		"mislabeled": my_lists["mislabeled"],
-		"total_recall": my_counters["num_labeled"] /
-			my_counters["total_processed"] * 100,
-		"total_recall_physical": my_counters["num_labeled"] /
-			my_counters["total"] * 100,
+		"total_recall": my_counters["num_labeled"] / my_counters["total_processed"] * 100,
+		"total_recall_physical": my_counters["num_labeled"] / my_counters["total"] * 100,
 		"precision": len(my_lists["correct"]) / my_counters["num_verified"] * 100,
 		"binary_accuracy": binary_accuracy
 	}
@@ -224,12 +213,10 @@ def speed_vests(start_time, accuracy_results):
 
 	print("\nSPEED TESTS:")
 	print("{0:35} = {1:11}".format("Total Time Taken", str(time_delta)[0:11]))
-	print("{0:35} = {1:11.2f}".format("Time per Transaction (in seconds)",
-		time_per_transaction))
-	print("{0:35} = {1:11.2f}".format("Transactions Per Minute",
-		transactions_per_minute))
+	print("{0:35} = {1:11.2f}".format("Time per Transaction (in seconds)", time_per_transaction))
+	print("{0:35} = {1:11.2f}".format("Transactions Per Minute", transactions_per_minute))
 
-	return {'time_delta':time_delta,
+	return {'time_delta': time_delta,
 			'time_per_transaction': time_per_transaction,
 			'transactions_per_minute':transactions_per_minute}
 
@@ -241,8 +228,7 @@ def apply_cnn(classifier, transactions):
 	processed = []
 
 	for i, batch in enumerate(batches):
-		processed += classifier(batch, doc_key="DESCRIPTION_UNMASKED", \
-label_key="MERCHANT_NAME")
+		processed += classifier(batch, doc_key="DESCRIPTION_UNMASKED", label_key="MERCHANT_NAME")
 
 	return processed[0:len(transactions)]
 
@@ -280,12 +266,10 @@ def CNN_accuracy():
 def process_file_collection(bucket, prefix, classifier):
 	"""Test a list of files"""
 
-	label_map = load_label_map\
-	("meerkat/classification/label_maps/deep_clean_map.json")
+	label_map = load_label_map("meerkat/classification/label_maps/deep_clean_map.json")
 	params = {}
 	params["label_key"] = "MERCHANT_NAME"
-	results = open\
-	("data/output/per_merchant_tests_" + prefix.split('/')[-2] + ".csv", "a")
+	results = open("data/output/per_merchant_tests_" + prefix.split('/')[-2] + ".csv", "a")
 	writer = csv.writer(results, delimiter=',', quotechar='"')
 	writer.writerow(["Merchant", "Recall", "Precision"])
 
@@ -297,20 +281,17 @@ def process_file_collection(bucket, prefix, classifier):
 		file_name = "data/input/" + os.path.basename(sample.key)
 		sample.get_contents_to_filename(file_name)
 
-		df = pd.read_csv(file_name, na_filter=False, compression="gzip",\
-		 quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+		df = pd.read_csv(file_name, na_filter=False, compression="gzip", quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
 		df.rename(columns={"DESCRIPTION": "DESCRIPTION_UNMASKED"}, inplace=True)
 		df["MERCHANT_NAME"] = merchant_name
 		unzipped_file_name = "data/misc/Merchant Samples/" + label_num + ".txt"
-		df.to_csv(unzipped_file_name, sep="|", mode="w", \
-		encoding="utf-8", index=False, index_label=False)
+		df.to_csv(unzipped_file_name, sep="|", mode="w", encoding="utf-8", index=False, index_label=False)
 		safely_remove_file(file_name)
 		
 		params["verification_source"] = unzipped_file_name
 		print("Testing Merchant: " + merchant_name)
 		accuracy_results = per_merchant_accuracy(params, classifier)
-		writer.writerow([merchant_name, accuracy_results['total_recall'], \
-		accuracy_results["precision"]])
+		writer.writerow([merchant_name, accuracy_results['total_recall'], accuracy_results["precision"]])
 		safely_remove_file(unzipped_file_name)
 
 	results.close()
@@ -324,27 +305,18 @@ def print_results(results):
 	sys.stdout.write('\n\n')
 
 	print("STATS:")
-	print("{0:35} = {1:11}".format("Total Transactions Processed",
-		results['total_processed']))
-	print("{0:35} = {1:10.2f}%".format("Total Labeled Physical",
-		results['total_physical']))
-	print("{0:35} = {1:10.2f}%".format("Total Labeled Non Physical",
-		results['total_non_physical']))
-	print("{0:35} = {1:10.2f}%".format("Binary Classifier Accuracy",
-		results['binary_accuracy']))
+	print("{0:35} = {1:11}".format("Total Transactions Processed", results['total_processed']))
+	print("{0:35} = {1:10.2f}%".format("Total Labeled Physical", results['total_physical']))
+	print("{0:35} = {1:10.2f}%".format("Total Labeled Non Physical", results['total_non_physical']))
+	print("{0:35} = {1:10.2f}%".format("Binary Classifier Accuracy", results['binary_accuracy']))
 
 	sys.stdout.write('\n')
 
-	print("{0:35} = {1:10.2f}%".format("Recall all transactions",
-		results['total_recall']))
-	print("{0:35} = {1:10.2f}%".format("Recall physical",
-		results['total_recall_physical']))
-	print("{0:35} = {1:11}".format("Number of transactions labeled",
-		results['num_labeled']))
-	print("{0:35} = {1:11}".format("Number of transactions verified",
-		results['num_verified']))
-	print("{0:35} = {1:10.2f}%".format("Precision",
-		results['precision']))
+	print("{0:35} = {1:10.2f}%".format("Recall all transactions", results['total_recall']))
+	print("{0:35} = {1:10.2f}%".format("Recall physical", results['total_recall_physical']))
+	print("{0:35} = {1:11}".format("Number of transactions labeled", results['num_labeled']))
+	print("{0:35} = {1:11}".format("Number of transactions verified", results['num_verified']))
+	print("{0:35} = {1:10.2f}%".format("Precision", results['precision']))
 
 	#print("", "UNLABELED:", '\n'.join(sorted(results['unlabeled'])), sep="\n")
 	#print("", "MISLABELED:", '\n'.join(sorted(results['mislabeled'])), sep="\n")

@@ -10,7 +10,7 @@
 	],
 	"ami-id" : "ami-cf707eff",
 	"key_name" : "jkey",
-	"key_file" : "/root/.ssh/jkey.pem",
+	"key_file" : "/home/ubuntu/.ssh/jkey.pem",
 	"instance_type" : "c3.xlarge",
 	"minimum_master_nodes" : 1,
 	"instance_layout" : {
@@ -63,7 +63,7 @@
 		"service elasticsearch start"
 	],
 	"template_files" : {
-		"path" : "/root/git/Meerkat/config/templates/",
+		"path" : "./config/templates/",
 		"elasticsearch_yml" : "elasticsearch.yml.template",
 		"search" : "search.json.template",
 		"load" : "load.json.template",
