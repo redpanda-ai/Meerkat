@@ -41,9 +41,11 @@ from boto.s3.connection import Location
 
 import pandas as pd
 
-from meerkat.various_tools import load_dict_list, safely_remove_file
+from meerkat.various_tools import load_dict_list, safely_remove_file, load_params
 from meerkat.classification.lua_bridge import get_cnn, load_label_map
-from meerkat.tools.single_accuracy import CNN_accuracy, print_results, generic_test
+
+default_doc_key = "DESCRIPTION_UNMASKED"
+default_label_key = "GOOD_DESCRIPTION"
 
 class DummyFile(object):
     def write(self, x): pass
@@ -82,6 +84,145 @@ def test_bulk_classifier(human_labeled, non_physical_trans, my_lists):
 			if item == human_labeled_row['DESCRIPTION_UNMASKED']:
 				if human_labeled_row['IS_PHYSICAL_TRANSACTION'] == '1':
 					my_lists["incorrect_non_physical"].append(item)
+
+def generic_test(machine, human, cnn_column, human_column, human_map, machine_map, doc_key=default_doc_key):
+	"""Tests both the recall and precision of the pinpoint classifier against
+	human-labeled training data."""
+
+	# Create Quicker Lookup
+	index_lookup = {row["UNIQUE_TRANSACTION_ID"]: row for row in human}
+
+	unlabeled = []
+	needs_hand_labeling = []
+	correct = []
+	mislabeled = []
+	# Test Each Machine Labeled Row
+	for index, machine_row in enumerate(machine):
+		# Continue if Unlabeled
+		if machine_row[cnn_column] == "":
+			unlabeled.append(machine_row[doc_key])
+			continue
+
+		# Get human answer index
+		key = machine_row["UNIQUE_TRANSACTION_ID"]
+		human_row = index_lookup.get(key)
+
+		# Identify unlabeled points
+		if not human_row or not human_row.get(human_column):
+			needs_hand_labeling.append(machine_row[doc_key])
+			continue
+
+		if machine_map and human_map and human_row[human_column].lower() in human_map:
+			human_row[human_column] = machine_map[str(human_map[human_row[human_column].lower()])]
+
+		if machine_row[cnn_column] == human_row[human_column]:
+			correct.append(human_row[doc_key] +
+			" (ACTUAL:" + human_row[human_column] + ")")
+			continue
+
+		mislabeled.append(human_row[doc_key] + " (ACTUAL: " + human_row[human_column] + ")" + " (FOUND: " + machine_row[cnn_column] + ")")
+
+	return len(machine), needs_hand_labeling, mislabeled, unlabeled, correct
+
+def CNN_accuracy(test_file, classifier, model_dict=None, human_dict=None, label_key=default_label_key, doc_key=default_doc_key):
+	"""Run given CNN over a given input file and return some stats"""
+	# Load Classifier, and transactions
+	human_map = __load_label_map(human_dict)
+	machine_map = __load_label_map(model_dict)
+	reader = pd.read_csv(test_file, chunksize=1000, na_filter=False, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+
+	bulk_total = 0
+	bulk_needs_hand_labeling = 0
+	bulk_mislabeled = 0
+	bulk_unlabeled = 0
+	bulk_correct = 0
+	# Process Transactions
+	for chunk in reader:
+		transactions = chunk.to_dict("records")
+		# Label the points using the classifier and report accuracy
+		machine_labeled = classifier(transactions, doc_key=doc_key, label_key="MERCHANT_NAME")
+
+		total, needs_hand_labeling, mislabeled, unlabeled, correct = generic_test(machine_labeled, transactions, "MERCHANT_NAME", label_key, human_map, machine_map, doc_key)
+		bulk_total += total
+		bulk_needs_hand_labeling += len(needs_hand_labeling)
+		bulk_mislabeled += len(mislabeled)
+		bulk_unlabeled += len(unlabeled)
+		bulk_correct += len(correct)
+
+	return enhance_results(bulk_total, bulk_needs_hand_labeling, bulk_mislabeled, bulk_unlabeled, bulk_correct)
+	# results = open("data/output/single_test.csv", "a")
+	# writer = csv.writer(results, delimiter=',', quotechar='"')
+	# writer.writerow([merchant["name"], merchant['total_recall'], merchant["precision"]])
+	# results.close()
+
+def __load_label_map(label_map):
+	if isinstance(label_map, dict):
+		return label_map
+	return label_map and load_params(label_map) or None
+
+def print_results(results):
+	"""Provide useful readable output"""
+
+	sys.stdout.write('\n\n')
+
+	print("STATS:")
+	print("{0:35} = {1:11}".format("Total Transactions Processed", results["total"]))
+
+	sys.stdout.write('\n')
+
+	print("{0:35} = {1:10.2f}%".format("Recall all transactions", results["total_recall"]))
+	print("{0:35} = {1:11}".format("Number of transactions labeled", results["num_labeled"]))
+	print("{0:35} = {1:11}".format("Number of transactions verified", results["num_verified"]))
+	print("{0:35} = {1:10.2f}%".format("Precision", results["precision"]))
+
+def enhance_results(total, needs_hand_labeling, mislabeled, unlabeled, correct):
+	num_labeled = total - unlabeled
+	total_recall_physical = num_labeled / total * 100
+	num_labeled = total - unlabeled
+	num_verified = num_labeled - needs_hand_labeling
+	total_recall = num_labeled / total * 100
+	precision = correct / max(num_verified, 1) * 100
+	return {
+		"total": total,
+		"needs_hand_labeling": needs_hand_labeling,
+		"mislabeled": mislabeled,
+		"unlabeled": unlabeled,
+		"correct": correct,
+		"total_recall_physical": total_recall_physical,
+		"num_labeled": num_labeled,
+		"num_verified": num_verified,
+		"total_recall": total_recall,
+		"precision": precision
+		}
+
+def vest_accuracy(params, file_path=None, non_physical_trans=[], result_list=[]):
+	"""Takes file by default but can accept result
+	queue/ non_physical list. Attempts to provide various
+	accuracy tests"""
+
+	# Load machine labeled transactions
+	if len(result_list) > 0:
+		machine_labeled = result_list
+	if not result_list and file_path and os.path.isfile(file_path):
+		machine_labeled = load_dict_list(file_path)
+	if not machine_labeled or len(machine_labeled) <= 0:
+		logging.warning("Not enough information provided to perform " + "accuracy tests on")
+		return
+
+	# Load human labeled transactions
+	verification_source = params.get("verification_source", "data/misc/verifiedLabeledTrans.txt")
+	human_labeled = load_dict_list(verification_source)
+
+	# Test Classifier for recall and precision
+	label_key = params.get("label_key", "FACTUAL_ID")
+	total, needs_hand_labeling, mislabeled, unlabeled, correct = generic_test(machine_labeled, human_labeled, label_key, label_key, None, None)
+	results = enhance_results(total, len(needs_hand_labeling), len(mislabeled), len(unlabeled), len(correct))
+
+	total_processed = len(machine_labeled) + len(non_physical_trans)
+	results["total_processed"] = total_processed
+	results["total_non_physical"] = len(non_physical_trans) / total_processed * 100
+	results["total_physical"] = total / total_processed * 100
+	return results
 
 def speed_vests(start_time, accuracy_results):
 	"""Run a number of tests related to speed"""

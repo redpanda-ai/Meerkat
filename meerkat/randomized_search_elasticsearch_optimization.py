@@ -37,7 +37,7 @@ from random import uniform
 from pprint import pprint
 
 from meerkat.classification.load import select_model
-from meerkat.tools.single_accuracy import print_results, vest_accuracy
+from meerkat.accuracy import print_results, vest_accuracy
 from meerkat.various_tools \
 import load_dict_list, safe_print, get_us_cities
 from meerkat.various_tools import load_params

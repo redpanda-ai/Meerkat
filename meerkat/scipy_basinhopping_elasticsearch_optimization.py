@@ -41,7 +41,7 @@ from numpy import array, array_split
 from scipy.optimize import basinhopping
 
 from meerkat.web_service.web_consumer import Web_Consumer
-from meerkat.tools.single_accuracy import print_results, vest_accuracy
+from meerkat.accuracy import print_results, vest_accuracy
 from meerkat.various_tools \
 import load_dict_list, safe_print, get_us_cities
 from meerkat.various_tools import load_params
