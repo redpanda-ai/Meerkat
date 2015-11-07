@@ -20,8 +20,26 @@ def load_label_map(filename):
 	return label_map
 
 def get_cnn(model_name):
-	"""Load a function to process transactions using a CNN"""
+	"""Load a CNN model by name"""
 
+	# Load CNN and Label map
+	if model_name == "bank_merchant":
+		return get_cnn_by_path("meerkat/classification/models/612_class_bank_CNN.t7b", "meerkat/classification/label_maps/reverse_bank_label_map.json")
+	elif model_name == "card_merchant":
+		return get_cnn_by_path("meerkat/classification/models/750_class_card_CNN.t7b", "meerkat/classification/label_maps/reverse_card_label_map.json")
+	elif model_name == "bank_debit_subtype":
+		return get_cnn_by_path("meerkat/classification/models/bank_debit_subtype_CNN.t7b", "meerkat/classification/label_maps/bank_debit_subtype_label_map.json")
+	elif model_name == "bank_credit_subtype":
+		return get_cnn_by_path("meerkat/classification/models/bank_credit_subtype_CNN.t7b", "meerkat/classification/label_maps/bank_credit_subtype_label_map.json")
+	elif model_name == "card_debit_subtype":
+		return get_cnn_by_path("meerkat/classification/models/card_debit_subtype_CNN.t7b", "meerkat/classification/label_maps/card_debit_subtype_label_map.json")
+	elif model_name == "card_credit_subtype":
+		return get_cnn_by_path("meerkat/classification/models/card_credit_subtype_CNN.t7b", "meerkat/classification/label_maps/card_credit_subtype_label_map.json")
+	else:
+		print("Requested CNN does not exist. Please reference an existing model")
+
+def get_cnn_by_path(model_path, dict_path):
+	"""Load a function to process transactions using a CNN"""
 	lualib = ctypes.CDLL("/home/ubuntu/torch/install/lib/libluajit.so",\
 		mode=ctypes.RTLD_GLOBAL)
 
@@ -41,41 +59,9 @@ def get_cnn(model_name):
 		dofile("meerkat/classification/lua/config.lua")
 	''')
 
-	# Load CNN and Label map
-	if model_name == "bank_merchant":
-		reverse_label_map = load_label_map(\
-			"meerkat/classification/label_maps/reverse_bank_label_map.json")
-		lua.execute('''
-			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/612_class_bank_CNN.t7b"))
-		''')
-	elif model_name == "card_merchant":
-		reverse_label_map = load_label_map(\
-			"meerkat/classification/label_maps/reverse_card_label_map.json")
-		lua.execute('''
-			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/750_class_card_CNN.t7b"))
-		''')
-	elif model_name == "bank_debit_subtype":
-		reverse_label_map = load_label_map("meerkat/classification/label_maps/bank_debit_subtype_label_map.json")
-		lua.execute('''
-			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/bank_debit_subtype_CNN.t7b"))
-		''')
-	elif model_name == "bank_credit_subtype":
-		reverse_label_map = load_label_map("meerkat/classification/label_maps/bank_credit_subtype_label_map.json")
-		lua.execute('''
-			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/bank_credit_subtype_CNN.t7b"))
-		''')
-	elif model_name == "card_debit_subtype":
-		reverse_label_map = load_label_map("meerkat/classification/label_maps/card_debit_subtype_label_map.json")
-		lua.execute('''
-			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/card_debit_subtype_CNN.t7b"))
-		''')
-	elif model_name == "card_credit_subtype":
-		reverse_label_map = load_label_map("meerkat/classification/label_maps/card_credit_subtype_label_map.json")
-		lua.execute('''
-			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/card_credit_subtype_CNN.t7b"))
-		''')
-	else:
-		print("Requested CNN does not exist. Please reference an existing model")
+	reverse_label_map = load_label_map(dict_path)
+	lua_load_model = 'model = Model:makeCleanSequential(torch.load("' + model_path + '"))'
+	lua.execute(lua_load_model)
 
 	# Prepare CNN
 	lua.execute('''
