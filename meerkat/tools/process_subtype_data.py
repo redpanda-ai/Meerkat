@@ -50,7 +50,7 @@ def process_data(groups, ledger_entry):
 			processed.append(unmasked_row)
 
 	# Convert to Dataframe and Shuffle
-	training_data_df = pd.DataFrame(proposed)
+	training_data_df = pd.DataFrame(processed)
 	training_data_df = training_data_df.reindex(np.random.permutation(training_data_df.index))
 
 	# Make Test and Train
