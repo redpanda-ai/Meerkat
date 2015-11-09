@@ -8,6 +8,7 @@ Created on Nov 9, 2015
 """
 
 import pandas as pd
+import numpy as np
 
 import json
 import csv
