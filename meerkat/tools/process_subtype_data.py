@@ -41,7 +41,7 @@ def process_data(groups, ledger_entry):
 			  	      'BLANK': "",
 			          'DESCRIPTION': ' '.join(row["DESCRIPTION"].split())
 		}
-		proposed.append(masked_row)
+		processed.append(masked_row)
 
 		if row["DESCRIPTION_UNMASKED"] != "":
 			unmasked_row = {'CLASS_NUM' : label_map[row["PROPOSED_SUBTYPE"]], 
