@@ -1,8 +1,9 @@
 import json
-import random
-from meerkat.accuracy import CNN_accuracy, print_results
+import os
+from meerkat.accuracy import CNN_accuracy, print_results, nostdout, get_s3_connection
 from meerkat.classification.lua_bridge import get_cnn
-from meerkat.various_tools import load_params, load_dict_list, write_dict_list
+from meerkat.various_tools import load_params
+from boto.s3.connection import Location
 
 BANK_MERCHANT_CNN = get_cnn("bank_merchant")
 CARD_MERCHANT_CNN = get_cnn("card_merchant")
@@ -11,7 +12,10 @@ CARD_CREDIT_SUBTYPE_CNN = get_cnn("card_credit_subtype")
 BANK_DEBIT_SUBTYPE_CNN = get_cnn("bank_debit_subtype")
 BANK_CREDIT_SUBTYPE_CNN = get_cnn("bank_credit_subtype")
 
+FOLDER = "development/dashboard/"
+
 def run_from_command_line():
+    keys = __get_data_from_s3()
     bank_merchant = "1k_labeled_bank_merchant_samples"
     bank_label_map = "meerkat/classification/label_maps/permanent_bank_label_map.json"
     bank_cnn_map = "meerkat/classification/label_maps/reverse_bank_label_map.json"
@@ -48,12 +52,35 @@ def run_from_command_line():
     card_credit_results = CNN_accuracy(card_credit_subtype, CARD_CREDIT_SUBTYPE_CNN, card_credit_map, card_credit_reverse_map, label_key="Proposed Subtype")
     print_results(card_credit_results)
 
+    __remove_local_data(keys)
+
 def __invert_subtype_map(subtype_map):
     reverse_map = {}
     for k, v in subtype_map.items():
         txn_type, txn_sub_type = v.split(" - ")
         reverse_map[txn_sub_type.lower()] = k
     return reverse_map
+
+def __get_data_from_s3():
+    with nostdout():
+        conn = get_s3_connection()
+    bucket = conn.get_bucket("s3yodlee", Location.USWest2)
+    keys = bucket.list(FOLDER)
+    for key in keys:
+        if(key.name.lower() == FOLDER.lower()):
+            continue
+        print("getting data file " + str(key.name))
+        filename = key.name.split("/")[-1]
+        key.get_contents_to_filename(filename)
+        # bucket.get_key(key)
+    return keys
+
+def __remove_local_data(keys):
+    for key in keys:
+        if(key.name.lower() == FOLDER.lower()):
+            continue
+        filename = key.name.split("/")[-1]
+        os.remove(filename)
 
 if __name__ == "__main__":
     run_from_command_line()
