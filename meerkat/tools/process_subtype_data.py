@@ -15,8 +15,8 @@ import sys
 
 #################### USAGE ##########################
 
-# python3 meerkat.tools.process_subtype_data.py [container]
-# python3 meerkat.tools.process_subtype_data.py card
+# python3 -m meerkat.tools.process_subtype_data [container]
+# python3 -m meerkat.tools.process_subtype_data card
 
 #####################################################
 
@@ -37,11 +37,16 @@ def process_data(groups, ledger_entry):
 
 	# Process Rows
 	for index, row in df.iterrows():
-		masked_row = {'CLASS_NUM' : label_map[row["PROPOSED_SUBTYPE"]], 
-			  	      'BLANK': "",
-			          'DESCRIPTION': ' '.join(row["DESCRIPTION"].split())
-		}
-		processed.append(masked_row)
+
+		try:
+			masked_row = {'CLASS_NUM' : label_map[row["PROPOSED_SUBTYPE"]], 
+				  	      'BLANK': "",
+				          'DESCRIPTION': ' '.join(row["DESCRIPTION"].split())
+			}
+			processed.append(masked_row)
+		except: 
+			print("The type " + row["PROPOSED_SUBTYPE"] + " is not allowed for the " + sys.argv[1] + " " + ledger_entry + " model")
+			continue
 
 		if row["DESCRIPTION_UNMASKED"] != "":
 			unmasked_row = {'CLASS_NUM' : label_map[row["PROPOSED_SUBTYPE"]], 
