@@ -29,7 +29,7 @@ def load_label_map(filename):
 def process_data(groups, ledger_entry):
 	"""Process and save data"""
 
-	label_map = load_label_map("meerkat/classification/label_maps/" + sys.argv[1] + "_" ledger_entry + "_subtype_label_map.json")
+	label_map = load_label_map("meerkat/classification/label_maps/" + sys.argv[1] + "_" + ledger_entry + "_subtype_label_map.json")
 	label_map = dict(zip(label_map.values(), label_map.keys()))
 	df = groups[ledger_entry]
 	processed = []
