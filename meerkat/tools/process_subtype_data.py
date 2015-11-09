@@ -41,7 +41,6 @@ def process_data(groups, ledger_entry):
 
 		try:
 			masked_row = {'CLASS_NUM' : label_map[row["PROPOSED_SUBTYPE"]], 
-				  	      'BLANK': "",
 				          'DESCRIPTION': ' '.join(row["DESCRIPTION"].split())
 			}
 			processed.append(masked_row)
@@ -51,7 +50,6 @@ def process_data(groups, ledger_entry):
 
 		if row["DESCRIPTION_UNMASKED"] != "":
 			unmasked_row = {'CLASS_NUM' : label_map[row["PROPOSED_SUBTYPE"]], 
-			  	            'BLANK': "",
 			                'DESCRIPTION': ' '.join(row["DESCRIPTION_UNMASKED"].split())
 			}
 			processed.append(unmasked_row)
@@ -67,8 +65,8 @@ def process_data(groups, ledger_entry):
 
 	# Save
 	file_prefix = sys.argv[1] + "_" + ledger_entry
-	train.to_csv("data/output/" + file_prefix + "_train_subtype.csv", cols=["CLASS_NUM", "BLANK", "DESCRIPTION"], header=False, index=False, index_label=False)
-	test.to_csv("data/output/" + file_prefix + "_test_subtype.csv", cols=["CLASS_NUM", "BLANK", "DESCRIPTION"], header=False, index=False, index_label=False)
+	train.to_csv("data/output/" + file_prefix + "_train_subtype.csv", cols=["CLASS_NUM", "DESCRIPTION"], header=False, index=False, index_label=False)
+	test.to_csv("data/output/" + file_prefix + "_test_subtype.csv", cols=["CLASS_NUM", "DESCRIPTION"], header=False, index=False, index_label=False)
 
 df = pd.read_csv("data/input/aggregated_" + sys.argv[1] + "_subtype_training_data.csv", na_filter=False, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
 grouped = df.groupby('LEDGER_ENTRY', as_index=False)
