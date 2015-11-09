@@ -60,8 +60,8 @@ def process_data(groups, ledger_entry):
 
 	# Save
 	file_prefix = sys.argv[1] + "_" + ledger_entry
-	train.to_csv(file_prefix + "_train_subtype.csv", cols=["CLASS_NUM", "BLANK", "DESCRIPTION"], header=False, index=False, index_label=False)
-	test.to_csv(file_prefix + "_test_subtype.csv", cols=["CLASS_NUM", "BLANK", "DESCRIPTION"], header=False, index=False, index_label=False)
+	train.to_csv("data/output/" + file_prefix + "_train_subtype.csv", cols=["CLASS_NUM", "BLANK", "DESCRIPTION"], header=False, index=False, index_label=False)
+	test.to_csv("data/output/" + file_prefix + "_test_subtype.csv", cols=["CLASS_NUM", "BLANK", "DESCRIPTION"], header=False, index=False, index_label=False)
 
 df = pd.read_csv("data/input/aggregated_" + sys.argv[1] + "_subtype_training_data.csv", na_filter=False, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
 grouped = df.groupby('LEDGER_ENTRY', as_index=False)
