@@ -20,10 +20,27 @@ def load_label_map(filename):
 	return label_map
 
 def get_cnn(model_name):
-	"""Load a function to process transactions using a CNN"""
+	"""Load a CNN model by name"""
 
-	lualib = ctypes.CDLL("/home/ubuntu/torch/install/lib/libluajit.so",\
-		mode=ctypes.RTLD_GLOBAL)
+	# Load CNN and Label map
+	if model_name == "bank_merchant":
+		return get_cnn_by_path("meerkat/classification/models/612_class_bank_CNN.t7b", "meerkat/classification/label_maps/reverse_bank_label_map.json")
+	elif model_name == "card_merchant":
+		return get_cnn_by_path("meerkat/classification/models/750_class_card_CNN.t7b", "meerkat/classification/label_maps/reverse_card_label_map.json")
+	elif model_name == "bank_debit_subtype":
+		return get_cnn_by_path("meerkat/classification/models/bank_debit_subtype_CNN.t7b", "meerkat/classification/label_maps/bank_debit_subtype_label_map.json")
+	elif model_name == "bank_credit_subtype":
+		return get_cnn_by_path("meerkat/classification/models/bank_credit_subtype_CNN.t7b", "meerkat/classification/label_maps/bank_credit_subtype_label_map.json")
+	elif model_name == "card_debit_subtype":
+		return get_cnn_by_path("meerkat/classification/models/card_debit_subtype_CNN.t7b", "meerkat/classification/label_maps/card_debit_subtype_label_map.json")
+	elif model_name == "card_credit_subtype":
+		return get_cnn_by_path("meerkat/classification/models/card_credit_subtype_CNN.t7b", "meerkat/classification/label_maps/card_credit_subtype_label_map.json")
+	else:
+		print("Requested CNN does not exist. Please reference an existing model")
+
+def get_cnn_by_path(model_path, dict_path):
+	"""Load a function to process transactions using a CNN"""
+	lualib = ctypes.CDLL("/home/ubuntu/torch/install/lib/libluajit.so", mode=ctypes.RTLD_GLOBAL)
 
 	# Must Load Lupa After the Preceding Line
 	import lupa
@@ -41,41 +58,9 @@ def get_cnn(model_name):
 		dofile("meerkat/classification/lua/config.lua")
 	''')
 
-	# Load CNN and Label map
-	if model_name == "bank_merchant":
-		reverse_label_map = load_label_map(\
-			"meerkat/classification/label_maps/reverse_bank_label_map.json")
-		lua.execute('''
-			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/612_class_bank_CNN.t7b"))
-		''')
-	elif model_name == "card_merchant":
-		reverse_label_map = load_label_map(\
-			"meerkat/classification/label_maps/reverse_card_label_map.json")
-		lua.execute('''
-			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/750_class_card_CNN.t7b"))
-		''')
-	elif model_name == "bank_debit_subtype":
-		reverse_label_map = load_label_map("meerkat/classification/label_maps/bank_debit_subtype_label_map.json")
-		lua.execute('''
-			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/bank_debit_subtype_CNN.t7b"))
-		''')
-	elif model_name == "bank_credit_subtype":
-		reverse_label_map = load_label_map("meerkat/classification/label_maps/bank_credit_subtype_label_map.json")
-		lua.execute('''
-			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/bank_credit_subtype_CNN.t7b"))
-		''')
-	elif model_name == "card_debit_subtype":
-		reverse_label_map = load_label_map("meerkat/classification/label_maps/card_debit_subtype_label_map.json")
-		lua.execute('''
-			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/card_debit_subtype_CNN.t7b"))
-		''')
-	elif model_name == "card_credit_subtype":
-		reverse_label_map = load_label_map("meerkat/classification/label_maps/card_credit_subtype_label_map.json")
-		lua.execute('''
-			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/card_credit_subtype_CNN.t7b"))
-		''')
-	else:
-		print("Requested CNN does not exist. Please reference an existing model")
+	reverse_label_map = load_label_map(dict_path)
+	lua_load_model = 'model = Model:makeCleanSequential(torch.load("' + model_path + '"))'
+	lua.execute(lua_load_model)
 
 	# Prepare CNN
 	lua.execute('''
@@ -151,8 +136,7 @@ def get_cnn(model_name):
 		decisions = list(labels.values())
 
 		for index, transaction in enumerate(trans):
-			transaction[label_key] = reverse_label_map.get(\
-				str(decisions[index]), "")
+			transaction[label_key] = reverse_label_map.get(str(decisions[index]), "")
 
 		return trans
 
@@ -160,6 +144,5 @@ def get_cnn(model_name):
 
 if __name__ == "__main__":
 	"""Print a warning to not execute this file as a module"""
-	logging.warning("This module is a library that contains useful functions;" +\
- "it should not be run from the console.")
+	logging.warning("This module is a library that contains useful functions; it should not be run from the console.")
 
