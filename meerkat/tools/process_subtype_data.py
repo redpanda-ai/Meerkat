@@ -15,8 +15,8 @@ import sys
 
 #################### USAGE ##########################
 
-# python3 process_subtype_data.py [container]
-# python3 process_subtype_data.py card
+# python3 meerkat.tools.process_subtype_data.py [container]
+# python3 meerkat.tools.process_subtype_data.py card
 
 #####################################################
 
