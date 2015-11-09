@@ -77,9 +77,10 @@ class AccuracyTests(unittest.TestCase):
 		"""Assert that 35 of the test transactions are found to be non-physical."""
 		self.assertEqual(round(self._accuracy_results['total_non_physical']), 35)
 
-	def test_binary_accuracy(self):
-		"""Assert that ?binary accuracy? is at 100%."""
-		self.assertEqual(self._accuracy_results['binary_accuracy'], 100)
+    # This test is meaningless. The way we calculated binary accuracy always returned 100.  Will fix in the future.
+	# def test_binary_accuracy(self):
+	# 	"""Assert that ?binary accuracy? is at 100%."""
+	# 	self.assertEqual(self._accuracy_results['binary_accuracy'], 100)
 
 	def test_total_recall(self):
 		"""Assert that recall is at least 25%."""
@@ -96,10 +97,10 @@ class AccuracyTests(unittest.TestCase):
 	def test_time_per_transaction(self):
 		"""No idea what this does, ask Matt!"""
 		self.assertTrue(round(self._speed_results['time_per_transaction'], 1) < 1)
-	
+
 	def test_transactions_per_minute(self):
 		"""Assert that we achieve at least 50 transactions per minute."""
 		self.assertTrue(round(self._speed_results['transactions_per_minute']) > 50)
-		
+
 if __name__ == '__main__':
 	unittest.main(argv=[sys.argv[0]])

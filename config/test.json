@@ -38,7 +38,7 @@
 	},
 	"elasticsearch" : {
 		"cluster_nodes" : [
-			"172.31.26.85", "172.31.26.84", "172.31.26.87", "172.31.26.86"
+			"internal-default-vpc-meerkat-lb-2028162053.us-west-2.elb.amazonaws.com"
     	],
 		"index" : "factual_index",
 		"type" : "factual_type"

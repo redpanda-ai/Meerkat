@@ -10,6 +10,8 @@ import ctypes
 import json
 import logging
 
+LOGSOFTMAX_THRESHOLD = -1
+
 def load_label_map(filename):
 	"""Load a permanent label map"""
 
@@ -40,8 +42,7 @@ def get_cnn(model_name):
 
 def get_cnn_by_path(model_path, dict_path):
 	"""Load a function to process transactions using a CNN"""
-	lualib = ctypes.CDLL("/home/ubuntu/torch/install/lib/libluajit.so",\
-		mode=ctypes.RTLD_GLOBAL)
+	lualib = ctypes.CDLL("/home/ubuntu/torch/install/lib/libluajit.so", mode=ctypes.RTLD_GLOBAL)
 
 	# Must Load Lupa After the Preceding Line
 	import lupa
@@ -120,25 +121,29 @@ def get_cnn_by_path(model_path, dict_path):
 			output = model:forward(batch)
 			max, decision = output:double():max(2)
 			labels = {}
+			activations = {}
 			for k = 1, batchLen do
 				labels[k] = decision:select(1, k)[1]
+				activations[k] = max:select(1, k)[1]
 			end
-			return labels
+			return labels, activations
 		end
 	''')
 
 	# Generate Helper Function
 	def apply_cnn(trans, doc_key="description", label_key="CNN"):
 		"""Apply CNN to transactions"""
+
 		trans_list = [' '.join(x[doc_key].split()) for x in trans]
 		table_trans = list_to_table(trans_list)
 		batch = make_batch(table_trans)
-		labels = process_batch(batch)
+		labels, activations = process_batch(batch)
 		decisions = list(labels.values())
+		confidences = list(activations.values())
 
 		for index, transaction in enumerate(trans):
-			transaction[label_key] = reverse_label_map.get(\
-				str(decisions[index]), "")
+			label = reverse_label_map.get(str(decisions[index]), "") if confidences[index] > LOGSOFTMAX_THRESHOLD else ""
+			transaction[label_key] = label
 
 		return trans
 
@@ -146,6 +151,5 @@ def get_cnn_by_path(model_path, dict_path):
 
 if __name__ == "__main__":
 	"""Print a warning to not execute this file as a module"""
-	logging.warning("This module is a library that contains useful functions;" +\
- "it should not be run from the console.")
+	logging.warning("This module is a library that contains useful functions; it should not be run from the console.")
 
