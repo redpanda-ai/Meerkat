@@ -142,8 +142,8 @@ def get_cnn_by_path(model_path, dict_path):
 		confidences = list(activations.values())
 
 		for index, transaction in enumerate(trans):
-			merchant = reverse_label_map.get(str(decisions[index]), "") if confidences[index] > LOGSOFTMAX_THRESHOLD else ""
-			transaction[label_key] = merchant
+			label = reverse_label_map.get(str(decisions[index]), "") if confidences[index] > LOGSOFTMAX_THRESHOLD else ""
+			transaction[label_key] = label
 
 		return trans
 
