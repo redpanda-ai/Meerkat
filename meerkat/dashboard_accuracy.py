@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 from meerkat.accuracy import CNN_accuracy, print_results, nostdout, get_s3_connection
 from meerkat.classification.lua_bridge import get_cnn
 from meerkat.various_tools import load_params
@@ -84,3 +85,4 @@ def __remove_local_data(keys):
 
 if __name__ == "__main__":
     run_from_command_line()
+    sys.exit(0)
