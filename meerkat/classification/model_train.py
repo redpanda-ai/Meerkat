@@ -33,7 +33,13 @@ from sklearn.externals import joblib
 from sklearn.base import BaseEstimator, TransformerMixin
 
 class ColumnExtractor(BaseEstimator, TransformerMixin):
-
+	#pylint:disable=invalid-name,unused-argument
+	"""This extracts columns.
+		X is the trainging set.
+		y is the target values.
+		**fit_params is an optional parameter
+		that returns a transformed version of training set.
+	"""
 	def __init__(self, columns=[]):
 		self.columns = columns
 
@@ -44,6 +50,12 @@ class ColumnExtractor(BaseEstimator, TransformerMixin):
 		return self
 
 class DateTransformer(BaseEstimator, TransformerMixin):
+	#pylint:disable=invalid-name,unused-argument
+	"""This transforms dates.
+		X is the trainging set.
+		y is the target values.
+		**fit_params is an optional parameter that returns a transformed version of training set.
+	"""
 
 	def __init__(self, columns=[]):
 		pass
