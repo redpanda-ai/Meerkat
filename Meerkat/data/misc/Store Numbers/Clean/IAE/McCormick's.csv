@@ -1,0 +1,69 @@
+keywords,city,Aggdata Store Number,store_number,address,state,zip_code
+McCormick,Portland,1,SCHMICK1 1,401 SW 12th Ave.,OR,97205
+McCormick,Seattle,2,SCHMICK2 2,722 Fourth Ave.,WA,98104
+McCormick,Beaverton,5,SCHMICK5 5,9945 SW Beaverton-Hillsdale Highway,OR,97005
+McCormick,Denver,9,SCHMICK9 9,1659 Wazee St,CO,80202
+McCormick,Irvine,15,SCHMICK15 15,2000 Main Street,CA,92614
+McCormick,San Francisco,16,SCHMICK16 16,900 North Point St.,CA,94109
+McCormick,Los Angeles,17,SCHMICK17 17,4th & Hope,CA,90071
+McCormick,Portland,21,SCHMICK21 21,611 SW Tenth Avenue,OR,97205
+McCormick,Portland,26,SCHMICK26 26,0309 SW Montgomery,OR,97201
+McCormick,Pasadena,33,SCHMICK33 33,111 N. Los Robles,CA,91101
+McCormick,Washington,38,SCHMICK38 38,1652 K St. NW,DC,20006
+McCormick,Reston,40,SCHMICK40 40,11920 Democracy Drive,VA,20190
+McCormick,Baltimore,41,SCHMICK41 41,711 Eastern Ave.,MD,21202
+McCormick,El Segundo,42,SCHMICK42 42,2101 Rosecrans Ave.,CA,90245
+McCormick,Las Vegas,43,SCHMICK43 43,335 Hughes Center Dr.,NV,89169
+McCormick,Chicago,45,SCHMICK45 45,41 E. Chestnut St.,IL,60611
+McCormick,Houston,46,SCHMICK46 46,1151-01 Uptown Park Blvd,TX,77056
+McCormick,Berkeley,49,SCHMICK49 49,1919 Fourth St.,CA,94710
+McCormick,Atlanta,51,SCHMICK51 51,600 Ashwood Parkway,GA,30338
+McCormick,Kansas City,52,SCHMICK52 52,448 W. 47th Street,MO,64112
+McCormick,Minneapolis,53,SCHMICK53 53,800 Nicollet Mall,MN,55402
+McCormick,McLean,54,SCHMICK54 54,8484 Westpark Drive,VA,22102
+McCormick,Boston,56,SCHMICK56 56,34 Columbus Ave.,MA,2116
+McCormick,Troy,57,SCHMICK57 57,2850 Coolidge Rd.,MI,48084
+McCormick,Philadelphia,58,SCHMICK58 58,1 South Broad Street,PA,19107
+McCormick,Boston,60,SCHMICK60 60,1 Faneuil Hall Market Pl,MA,2109
+McCormick,Atlanta,62,SCHMICK62 62,190 Marietta Street,GA,30303
+McCormick,San Jose,65,SCHMICK65 65,170 South Market Street,CA,95113
+McCormick,Baltimore,66,SCHMICK66 66,201 E. Pratt Street,MD,21202
+McCormick,Bridgewater,67,SCHMICK67 67,400 Commons Way,NJ,8807
+McCormick,Denver,69,SCHMICK69 69,8100 E. Union Ave,CO,80237
+McCormick,San Diego,70,SCHMICK70 70,675 L Street,CA,92101
+McCormick,Providence,72,SCHMICK72 72,11 Dorrance Street,RI,2903
+McCormick,Washington,73,SCHMICK73 73,901 F Street NW,DC,20004
+McCormick,Reston,74,SCHMICK74 74,11901 Democracy Dr.,VA,20190
+McCormick,New York,75,SCHMICK75 75,1285 Avenue of the Americas,NY,10019
+McCormick,Arlington,76,SCHMICK76 76,2010 Crystal Drive,VA,22202
+McCormick,Tigard,77,SCHMICK77 77,17015 SW 72nd Ave,OR,97224
+McCormick,Charlotte,78,SCHMICK78 78,4335 Barclay Downs Dr,NC,28209
+McCormick,Kansas City,79,SCHMICK79 79,4646 JC Nichols Pkwy,MO,64112
+McCormick,Pittsburgh,80,SCHMICK80 80,2667 Sidney St.,PA,15203
+McCormick,Charlotte,81,SCHMICK81 81,200 South Tryon Street,NC,28202
+McCormick,Bellevue,82,SCHMICK82 82,700 Bellevue Way,WA,98004
+McCormick,Indianapolis,83,SCHMICK83 83,110 North Illinois St.,IN,46204
+McCormick,Columbus,85,SCHMICK85 85,3965 New Bond Street,OH,43219
+McCormick,Chicago,87,SCHMICK87 87,One E. Wacker Dr.,IL,60601
+McCormick,Cincinnati,89,SCHMICK89 89,21 East 5th Street,OH,45202
+McCormick,Oak Brook,92,SCHMICK92 92,3001 Butterfield Road,IL,60523
+McCormick,Austin,95,SCHMICK95 95,11600 Century Oaks Terrace,TX,78758
+McCormick,Cherry Hill,96,SCHMICK96 96,941 Haddonfield Road,NJ,8002
+McCormick,Wauwatosa,97,SCHMICK97 97,2550 North Mayfair Rd.,WI,53226
+McCormick,Beavercreek,98,SCHMICK98 98,4429 Cedar Park Drive,OH,45440
+McCormick,Pittsburgh,100,SCHMICK100 100,301 Fifth Avenue,PA,15222
+McCormick,Skokie,101,SCHMICK101 101,4999 Old Orchard Center,IL,60077
+McCormick,Anaheim,102,SCHMICK102 102,321 West Katella Avenue,CA,92802
+McCormick,Virginia Beach,103,SCHMICK103 103,211 Market Street,VA,23462
+McCormick,Oxon Hill,105,SCHMICK105 105,145 National Plaza,MD,20745
+McCormick,Atlantic City,107,SCHMICK107 107,777 Harrah's Blvd.,NJ,8401
+McCormick,Rosemont,108,SCHMICK108 108,5320 N. River Road,IL,60018
+McCormick,Raleigh,109,SCHMICK109 109,4325 Glenwood Avenue,NC,27612
+McCormick,Edina,110,SCHMICK110 110,3203 Galleria,MN,55435
+McCormick,Naples,112,SCHMICK112 112,9114 Strada Place,FL,34108
+McCormick,Houston,113,SCHMICK113 113,1201 Fannin Street,TX,77002
+McCormick,Des Peres,114,SCHMICK114 114,17 West County Center,MO,63131
+McCormick,Roseville,116,SCHMICK116 116,1194 Roseville Parkway,CA,95678
+McCormick,Houston,117,SCHMICK117 117,791 Town & Country Blvd.,TX,77024
+McCormick,Cherry Hill,130,SCHMICK130 130,941 Haddonfield Road,NJ,8002
+McCormick,Seattle,135,SCHMICK135 135,1200 Westlake Avenue North,WA,98109

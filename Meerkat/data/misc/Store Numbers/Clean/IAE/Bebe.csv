@@ -1,0 +1,170 @@
+keywords,city,Aggdata Store Number,store_number,address,state,zip_code
+bebe,Santa Clara,3,#3,2855 Stevens Creek Blvd. #1117,CA,95050
+bebe,San Francisco,6,#6,865 Market St. #232,CA,94103
+bebe,Sacramento,7,#7,1689 Arden Way #1320,CA,95815
+bebe,Sherman Oaks,10,#10,14006 Riverside Dr. #23,CA,91423
+bebe,Brea,11,#11,1104A Brea Mall,CA,92821
+bebe,Newport Beach,12,#12,7014 E Camelback Rd. #1131,AZ,85251
+bebe,Scottsdale,16,#16,3500 S Las Vegas Blvd. #N11,NV,89109
+bebe,Las Vegas,18,#18,6600 Topanga Canyon Blvd. #1080,CA,91303
+bebe,Canoga Park,20,#20,2800 W Big Beaver Rd. #T247,MI,48084
+bebe,Troy,21,#21,3101 PGA Blvd. #F121,FL,33410
+bebe,Palm Beach Gardens,23,#23,1100 S Hayes St. #S10A,VA,22202
+bebe,Arlington,25,#25,630 Old County Rd. #2040,NY,11530
+bebe,Garden City,27,#27,2105 Glendale Galleria #EU6,CA,91210
+bebe,Glendale,28,#28,2800 N Main St. #168A,CA,92705
+bebe,Santa Ana,29,#29,1815 S Hawthorne Blvd. #134,CA,90278
+bebe,Redondo Beach,30,#30,100 Fifth Ave.,NY,10011
+bebe,New York,32,#32,108 Hillsdale Mall #1386,CA,94403
+bebe,San Mateo,34,#34,19575 Biscayne Blvd. #203,FL,33180
+bebe,Aventura,35,#35,27918 Novi Rd.,MI,48377
+bebe,Houston,36,#36,13350 Dallas Pkwy. #1218,TX,75240
+bebe,Novi,37,#37,7875 Montogomery Rd. #R-25,OH,45236
+bebe,Dallas,38,#38,6000 Glades Rd. #1081A,FL,33431
+bebe,Cincinnati,39,#39,8500 Beverly Rd. #615,CA,90048
+bebe,Boca Raton,40,#40,8702 Keystone Crossing #108,IN,46240
+bebe,Natick,41,#41,1215 Cumberland Mall,GA,30339
+bebe,Los Angeles,42,#42,1450 Ala Moana Blvd. #2048,HI,96814
+bebe,Indianapolis,44,#44,7101 Democracy Blvd. #1232,MD,20817
+bebe,Fort Lauderda,45,#45,904 Brandon Town Center Mall,FL,33511
+bebe,Atlanta,47,#47,4400 Sharon Rd. #E13A,NC,28211
+bebe,Honolulu,49,#49,125 Westchester Ave. #2280,NY,10601
+bebe,Bethesda,51,#51,400 S Baldwin #D12,CA,91007
+bebe,Brandon,54,#54,4505 La Jolla Village Dr. #C-8,CA,92122
+bebe,Charlotte,55,#55,160 N Gulph Rd. #1357,PA,19406
+bebe,Burlington,56,#56,250 W Shore Plaza #E12,FL,33609
+bebe,White Plains,58,#58,1300 W Sunset Rd. #1230,NV,89014
+bebe,Arcadia,61,#61,253 Old Orchard Center #A-1,IL,60077
+bebe,San Diego,67,#67,12677 Wayzata Blvd.,MN,55305
+bebe,Schaumburg,68,#68,2901 S Capital of Texas Hwy. #B-8,TX,78746
+bebe,Woodbridge,70,#70,8888 SW 136th St. #555A,FL,33176
+bebe,King of Pruss,72,#72,4400 Ashford Dunwoody Rd. #2136,GA,30346
+bebe,Tampa,73,#73,3200 S Las Vegas Blvd. #1055,NV,89109
+bebe,Henderson,74,#74,3000 E First Ave. #B220,CO,80206
+bebe,Bellevue,76,#76,7007 Friars Rd. #317,CA,92108
+bebe,Skokie,80,#80,715 Paseo Nuevo,CA,93101
+bebe,Minnetonka,81,#81,300 Monticello Ave. #249,VA,23510
+bebe,San Diego,82,#82,2126 Abbot Martin Rd. #152-154,TN,37215
+bebe,Austin,83,#83,600 Pine St. #215,WA,98101
+bebe,Atlanta,84,#84,3377 Las Vegas Blvd. #2105,NV,89109
+bebe,Miami,86,#86,226B Sun Valley Mall,CA,94520
+bebe,Edison,87,#87,11824 L Fair Oaks #118,VA,22033
+bebe,Atlanta,89,#89,14600 Lakeside Circle #E-111,MI,48313
+bebe,Las Vegas,91,#91,8001 Orange Blossom Trail #410A,FL,32809
+bebe,Denver,94,#94,160 Walt Whitman Rd.,NY,11746
+bebe,San Diego,95,#95,220 Summit Blvd. #150,AL,35243
+bebe,Paramus,96,#96,700 SW 5th Ave. #3050,OR,97204
+bebe,Santa Barbara,100,#100,3333 Buford Dr. #1038,GA,30519
+bebe,Norfolk,101,#101,1029 Lincoln Rd.,FL,33139
+bebe,Nashville,103,#103,3663 S Las Vegas Blvd. #670,NV,89109
+bebe,Seattle,106,#106,2601 Preston Rd. #1054,TX,75034
+bebe,Las Vegas,107,#107,10300 Little Patuxent Pkwy. #1050,MD,21044
+bebe,Concord,109,#109,3301 Veterans Memorial Blvd. #50,LA,70002
+bebe,Farmington,110,#110,2200 S 10th St. #R02,TX,78503
+bebe,Fairfax,112,#112,1151 Galleria Blvd. #117,CA,95678
+bebe,Sterling Heig,113,#113,825 Dulaney Valley Rd. #3100,MD,21204
+bebe,Orlando,116,#116,7535 N Kendall Dr. #1660A,FL,33156
+bebe,Huntington St,117,#117,289 King St.,SC,29401
+bebe,Mission Viejo,118,#118,6801 Hollywood Blvd. #243,CA,90028
+bebe,Birmingham,119,#119,6121 W Park Blvd. #B-107,TX,75093
+bebe,Portland,122,#122,2223 N West Shore Blvd.,FL,33607
+bebe,Buford,123,#123,10300 W Forest Hill Blvd. #226,FL,33414
+bebe,Stamford,124,#124,3111 W Chandler Blvd. #1042,AZ,85226
+bebe,Richmond Heig,125,#125,1500 Polaris Pkwy. #1082,OH,43240
+bebe,Pleasanton,127,#127,1000 Ross Park Mall Dr. #K09,PA,15237
+bebe,Short Hills,128,#128,2030 N Halsted St.,IL,60614
+bebe,Miami Beach,130,#130,1961 Chain Bridge Rd. #K1L,VA,22102
+bebe,Las Vegas,132,#132,1455 NW 107th Ave. #374A,FL,33172
+bebe,Frisco,133,#133,2655 Richmond Ave. #1526,NY,10314
+bebe,Columbia,135,#135,8401 Gateway Blvd. West #E14B,TX,79925
+bebe,Metairie,137,#137,350 Ave. San Lorenzo #2100,FL,33146
+bebe,McAllen,138,#138,2760 N Germantown Pkwy. #144,TN,38133
+bebe,Roseville,139,#139,500 Baybrook Mall #1202,TX,77546
+bebe,Towson,141,#141,400 Ernest Barrett Pkwy. #265,GA,30144
+bebe,Miami,142,#142,40 W County Center #1140,MO,63131
+bebe,Cherry Hill,144,#144,11737 W 95th St. #141,KS,66214
+bebe,Charleston,146,#146,1094 Willowbrook Mall,TX,77070
+bebe,Los Angeles,150,#150,15215 N Kierland Blvd. #180,AZ,85254
+bebe,Plano,151,#151,211 Los Cerritos Center,CA,90703
+bebe,Tampa,154,#154,2905 E Skyline Dr. #233,AZ,85718
+bebe,Wellington,155,#155,5000 Shelbyville Rd. #1420,KY,40207
+bebe,Chandler,156,#156,133 Christiana Mall,DE,19702
+bebe,Columbus,157,#157,1 Crossgates Mall Rd. #B202,NY,12203
+bebe,Pittsburgh,159,#159,83 Fortune Dr. #229,CA,92618
+bebe,Chicago,161,#161,1201 Lake Woodlands Dr. #1174,TX,77380
+bebe,Mclean,162,#162,4711 River City Dr. #107,FL,32246
+bebe,Dallas,163,#163,5300 San Dario #176,TX,78041
+bebe,Miami,164,#164,6801 Northlake Mall Dr. #277,NC,28216
+bebe,Staten Island,168,#168,639 E Shaw Ave. #127,CA,93710
+bebe,El Paso,169,#169,104 N Garden,MN,55425
+bebe,Coral Gables,170,#170,"15900 La Cantera Pkwy., Bldg. #6, #6535",TX,78256
+bebe,Memphis,175,#175,109 East Oak St.,IL,60611
+bebe,Friendswood,178,#178,9321 SW Washington Square Rd. #T-05,OR,97223
+bebe,Kennesaw,179,#179,10250 Santa Monica Blvd. #6,CA,90067
+bebe,Des Peres,180,#180,215 Rosedale Center #465,MN,55113
+bebe,Overland Park,182,#182,835 N Michigan Ave. #4040,IL,60611
+bebe,Houston,183,#183,2785 Cabot Dr. #155,CA,92883
+bebe,Baton Rouge,187,#187,23151 Fashion Dr. #117,FL,33928
+bebe,San Juan,188,#188,2015 Birch Rd. #1015,CA,91915
+bebe,Scottsdale,189,#189,134 Lehigh Valley Mall #1023,PA,18052
+bebe,Cerritos,190,#190,14564 SW 5th St.,FL,33027
+bebe,Rancho Cucamonga,191,#191,90-15 Queens Blvd. #2053,NY,11373
+bebe,Tucson,192,#192,10 Columbus Circle #113,NY,10019
+bebe,Louisville,195,#195,13925 S Virginia St. #210,NV,89511
+bebe,Newark,196,#196,4325 Glenwood Ave. #2108,NC,27612
+bebe,Albany,197,#197,320 W 5th Ave. #220,AK,99501
+bebe,Irvine,201,#201,100 Columbiana Circle #1068,SC,29212
+bebe,The Woodlands,202,#202,11501 Century Oaks #109,TX,78758
+bebe,Jacksonville,203,#203,1 Walden Galleria #TH152,NY,14225
+bebe,Laredo,204,#204,26300 Cedar Rd. # 1250,OH,44122
+bebe,Charlotte,205,#205,"2240 Q Street NE, #10C",NM,87110
+bebe,Fresno,207,#207,2008 E Park Place #D,CA,90245
+bebe,Atlantic City,208,#208,1 W 34th St.,NY,10001
+bebe,Bloomington,209,#209,"6569 Las Vegas Blvd. S, Bldg Q, #C-169",NV,89119
+bebe,San Antonio,210,#210,2701 Ming Ave. #185,CA,93304
+bebe,Chicago,211,#211,2020 Mall Walk,NY,10704
+bebe,Tigard,212,#212,5675 N Center Park Way #N-139,WI,53217
+bebe,Los Angeles,216,#216,5654 Bay St.,CA,94608
+bebe,Lake Grove,217,#217,73-425 El Paseo Dr. #110,CA,92260
+bebe,Roseville,218,#218,3401 Dale Rd. #646,CA,95356
+bebe,Chicago,220,#220,17370 Hall Rd. #123,MI,48038
+bebe,Corona,225,#225,414 Park City Center,PA,17601
+bebe,Estero,226,#226,637 Southcenter Mall,WA,98188
+bebe,Chula Vista,227,#227,11957 Market St.,VA,20190
+bebe,Whitehall,229,#229,50 South Main St. #170,UT,84101
+bebe,Pembroke Pine,230,#230,488 Broadway,NY,10012
+bebe,Elmhurst,231,#231,4135 Legendary Dr. #F116,FL,32541
+bebe,New York,232,#232,9200 Stony Point Pkwy. #110,VA,23235
+bebe,Reno,234,#234,401 Newport Center Dr. #811,CA,92660
+bebe,St. Thomas,235,#235,5085 Westheimer Road #B2711,TX,77056
+bebe,Boston,236,#236,1245 Worcester St. #1052,MA,1760
+bebe,Raleigh,237,#237,2414 E Sunrise Blvd. #F-12,FL,33304
+bebe,Anchorage,239,#239,75 Middlesex Turnpike,MA,1803
+bebe,Columbia,240,#240,5 Woodfield Shopping Center #J-304,IL,60173
+bebe,Austin,243,#243,186 Woodbridge Center Dr.,NJ,7095
+bebe,Buffalo,245,#245,144 Bellevue Square #144,WA,98004
+bebe,Beachwood,246,#246,324 Horton Plaza #135,CA,92101
+bebe,Albuquerque,249,#249,3393 Peachtree Rd. NE #3075,GA,30326
+bebe,El Segundo,250,#250,424 Menlo Park #1555A,NJ,8837
+bebe,New York,251,#251,1 Garden State Plaza #E03,NJ,7652
+bebe,Las Vegas,255,#255,57 Westfarms #D-113,CT,6032
+bebe,Bakersfield,256,#256,555 The Shops at Mission Viejo #106,CA,92691
+bebe,Yonkers,260,#260,100 Greyrock Place #E-129,CT,6901
+bebe,Lawrence Township,261,#261,1155 St. Louis Galleria #1455,MO,63117
+bebe,Glendale,266,#266,2405 Stoneridge Mall Rd. #E224,CA,94588
+bebe,Emeryville,267,#267,1200 Morris Turnpike #C-103,NJ,7078
+bebe,Palm Desert,270,#270,2000 Route 38 #1708,NJ,8002
+bebe,Modesto,271,#271,8687 N. Central Expressway #624,TX,75225
+bebe,Clinton Towns,280,#280,6401 Bluebonnet Blvd. #100,LA,70836
+bebe,Lancaster,281,#281,525 Roosevelt Field #441-443,PR,918
+bebe,Tukwila,282,#282,12535 S Main St. #1610,CA,91739
+bebe,Reston,286,#286,"1 Atlantic Ocean, #BW-116, Unit #1116",NJ,8401
+bebe,Salt Lake City,288,#288,313 Smith Haven Mall #E05,NY,11755
+bebe,Danbury,289,#289,5328 Yacht Haven Grande #110,,802
+bebe,New York,290,#290,349-351 Newbury St.,MA,2115
+bebe,Destin,292,#292,150 Quaker Bridge Mall #1031B,NJ,8648
+bebe,Peabody,294,#294,7 Backus Ave. #F-104,CT,6810
+bebe,Braintree,295,#295,210 Andover St. #X-105,MA,1960
+bebe,Richmond,296,#296,250 Granite St. #1380,MA,2184
+bebe,Waipahu,711,#711,94-796 Lumiaina St. #308,HI,96797
+bebe,Carlsbad,713,#713,5610 Paseo Del Norte #112,CA,92008

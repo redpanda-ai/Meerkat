@@ -1,0 +1,32 @@
+{
+	"filter" : ".*201412.*",
+	"local" : [
+		{
+			"name" : "src_1",
+			"path" : "/mnt/ephemeral/src_1"
+		},
+		{
+			"name" : "src_2",
+			"path" : "/mnt/ephemeral/src_2"
+		},
+		{
+			"name" : "dst",
+			"path" : "/mnt/ephemeral/dst"
+		}
+	],
+	"S3" : [
+		{
+			"name" : "src_1",
+			"path" : "S3://yodleeprivate/panels/meerkat_split/bank/"
+		},
+		{
+			"name" : "src_2",
+			"path" : "S3://yodleeprivate/panels/meerkat/bank/"
+		},
+		{
+			"name" : "dst",
+			"path" : "S3://yodleeprivate/panels/meerkat/lost_files/merged_ct_and_meerkat/bank/"
+		}
+	],
+	"sort_keys" : [ "MEM_ID", "BANK_ACCOUNT_ID", "BANK_TRANSACTION_ID"]
+}
