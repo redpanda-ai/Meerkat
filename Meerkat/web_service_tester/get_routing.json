@@ -1,8 +1,0 @@
-{
-   "order":{
-      "_routing":{
-         "required":true,
-         "path":"postcode"
-      }
-   }
-}
