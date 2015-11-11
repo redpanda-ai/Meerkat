@@ -84,7 +84,7 @@ def run_from_command_line(cla):
 
 	print("Number of " + sys.argv[1] + " files " + str(len(files)))
 	output_file = "data/output/" + sys.argv[1] + "_sample.txt"
-	map_labels = lambda x: ct_to_cnn_map.get(x["GOOD_DESCRIPTION"], "")
+	map_labels = lambda x: ct_to_cnn_map.get(x["GOOD_DESCRIPTION"].lower(), "")
 
 	# Sample Files
 	for i, item in enumerate(files):
@@ -100,9 +100,8 @@ def run_from_command_line(cla):
 				groups = dict(list(grouped))
 
 				for merchant, merchant_df in groups.items():
-					print(merchant + ": " + str(df.shape[1]))
-					sys.exit()
-
+					print(merchant + ": " + str(merchant_df.shape[0]))
+			
 				num_to_sample = math.ceil(len(df.index) * 0.0075)
 			
 				print("Sampled " + str(num_to_sample) + " transactions from file")
