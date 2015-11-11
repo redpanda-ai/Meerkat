@@ -76,9 +76,14 @@ def run_from_command_line(cla):
 		if regex.search(panel.key) and os.path.basename(panel.key) != "":
 			files.append(panel)
 
+	# Build Label Map
+	ct_to_cnn_map = {}
+	for key, value in label_map.items():
+		if str(value) in reverse_label_map:
+			ct_to_cnn_map[key] = reverse_label_map[str(value)]
+
 	print("Number of " + sys.argv[1] + " files " + str(len(files)))
 	output_file = "data/output/" + sys.argv[1] + "_sample.txt"
-	ct_to_cnn_map = {key: reverse_label_map[str(value)] for key, value in label_map}
 	map_labels = lambda x: ct_to_cnn_map.get(x["GOOD_DESCRIPTION"], "")
 
 	# Sample Files
