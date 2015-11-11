@@ -17,7 +17,7 @@ import re
 import sys
 import queue
 
-import boto.sns
+import boto
 import numpy as np
 
 CLEAN_PATTERN = re.compile(r"\\+\|")
@@ -129,6 +129,15 @@ def get_es_connection(params):
 		sniffer_timeout=15, sniff_timeout=15)
 
 	return es_connection
+
+def get_s3_connection():
+	"""Returns a connection to S3"""
+	try:
+		conn = boto.connect_s3()
+	except boto.s3.connection.HostRequiredError:
+		print("Error connecting to S3, check your credentials")
+		sys.exit()
+	return conn
 
 def post_SNS(message):
 	"""Post an SNS message"""
