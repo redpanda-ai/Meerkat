@@ -1,9 +1,0 @@
-{
-	"order" :
-	{
-		"_routing" :
-		{
-			"required" : true
-		}
-	}
-}
