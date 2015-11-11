@@ -99,7 +99,7 @@ def run_from_command_line(cla):
 				grouped = df.groupby('MERCHANT_NAME', as_index=False)
 				groups = dict(list(grouped))
 
-				for merchant, merchant_df in groups:
+				for merchant, merchant_df in groups.items():
 					print(merchant + ": " + str(df.shape[1]))
 					sys.exit()
 
