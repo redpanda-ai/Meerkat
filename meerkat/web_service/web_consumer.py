@@ -467,7 +467,7 @@ class Web_Consumer():
 			self.__apply_missing_categories(data["transaction_list"], data["container"])
 
 		if self.stats:
-			self.stats.add_stats(data["transaction_list"])
+			self.stats.add_stats(data["transaction_list"], data["container"])
 
 		self.ensure_output_schema(data["transaction_list"])
 
