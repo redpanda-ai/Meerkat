@@ -1,8 +1,7 @@
 #!/usr/local/bin/python3.3
 
-"""This module monitors S3 and our file processing farm of EC2 instances.
-If it notices new input files to process, it does so.  So long as there
-are available 'slots'.  The remaining input files are kept in a stack.
+"""This module samples a collection of panel files and creates a
+training set for the CNN merchant classifier
 
 Created on Apr 13, 2015
 @author: Matthew Sevrens
@@ -20,8 +19,7 @@ from boto.s3.connection import Key, Location
 import pandas as pd
 import numpy as np
 
-from meerkat.various_tools import safely_remove_file, clean_bad_escapes
-from meerkat.file_producer import get_s3_connection
+from meerkat.various_tools import safely_remove_file, clean_bad_escapes, load_params, get_s3_connection
 
 #################### USAGE ##########################
 
@@ -55,17 +53,20 @@ def run_from_command_line(cla):
 		conn = get_s3_connection()
 		
 	bucket = conn.get_bucket("yodleeprivate", Location.USWest2)
-	bank_regex = re.compile("panels/meerkat_split/bank/")
-	card_regex = re.compile("ctprocessed/gpanel/card/")
 	columns = ["DESCRIPTION_UNMASKED", "DECRIPTION", "GOOD_DESCRIPTION", "TRANSACTION_DATE", "UNIQUE_TRANSACTION_ID", "AMOUNT", "UNIQUE_MEM_ID", "TYPE"]
 	dtypes = {x: "object" for x in columns}
+	columns.append("MERCHANT_NAME")
 	files = []
 	first_chunk = True
 
 	if sys.argv[1] == "bank":
-		regex = bank_regex
+		regex = re.compile("panels/meerkat_split/bank/")
+		label_map = load_params("meerkat/classification/label_maps/expanded_permanent_bank_label_map.json")
+		reverse_label_map = load_params("meerkat/classification/label_maps/expanded_reverse_bank_label_map.json")
 	elif sys.argv[1] == "card":
-		regex = card_regex
+		regex = re.compile("ctprocessed/gpanel/card/")
+		label_map = load_params("meerkat/classification/label_maps/expanded_permanent_card_label_map.json")
+		reverse_label_map = load_params("meerkat/classification/label_maps/expanded_reverse_card_label_map.json")
 	else: 
 		print("Please select bank or card for container")
 		sys.exit()
@@ -77,16 +78,25 @@ def run_from_command_line(cla):
 
 	print("Number of " + sys.argv[1] + " files " + str(len(files)))
 	output_file = "data/output/" + sys.argv[1] + "_sample.txt"
+	ct_to_cnn_map = {key: reverse_label_map[str(value)] for key, value in label_map}
+	map_labels = lambda x: ct_to_cnn_map.get(x["GOOD_DESCRIPTION"], "")
 
-	# Sample Card Files
+	# Sample Files
 	for i, item in enumerate(files):
 		file_name = "data/output/" + os.path.basename(item.key)
 		try:
 			item.get_contents_to_filename(file_name)
-
-			dataframe = pd.read_csv(file_name, na_filter=False, chunksize=100000, dtype=dtypes, compression="gzip", quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+			reader = pd.read_csv(file_name, na_filter=False, chunksize=100000, dtype=dtypes, compression="gzip", quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
 			
-			for df in dataframe:
+			for df in reader:
+
+				df['MERCHANT_NAME'] = df.apply(map_labels, axis=1)
+				grouped = df.groupby('MERCHANT_NAME', as_index=False)
+				groups = dict(list(grouped))
+
+				for merchant, merchant_df in groups:
+					print(merchant + ": " + str(df.shape[1]))
+					sys.exit()
 
 				num_to_sample = math.ceil(len(df.index) * 0.0075)
 			
