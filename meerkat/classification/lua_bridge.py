@@ -26,41 +26,26 @@ def get_cnn(model_name):
 
 	# Load CNN and Label map
 	if model_name == "bank_merchant":
-		return get_cnn_by_path(
-			"meerkat/classification/models/612_class_bank_CNN.t7b",
-			"meerkat/classification/label_maps/reverse_bank_label_map.json")
+		return get_cnn_by_path("meerkat/classification/models/612_class_bank_CNN.t7b", "meerkat/classification/label_maps/reverse_bank_label_map.json")
 	elif model_name == "card_merchant":
-		return get_cnn_by_path(
-			"meerkat/classification/models/750_class_card_CNN.t7b",
-			"meerkat/classification/label_maps/reverse_card_label_map.json")
+		return get_cnn_by_path("meerkat/classification/models/750_class_card_CNN.t7b", "meerkat/classification/label_maps/reverse_card_label_map.json")
 	elif model_name == "bank_debit_subtype":
-		return get_cnn_by_path(
-			"meerkat/classification/models/bank_debit_subtype_CNN.t7b",
-			"meerkat/classification/label_maps/bank_debit_subtype_label_map.json")
+		return get_cnn_by_path("meerkat/classification/models/bank_debit_subtype_CNN.t7b", "meerkat/classification/label_maps/bank_debit_subtype_label_map.json")
 	elif model_name == "bank_credit_subtype":
-		return get_cnn_by_path(
-			"meerkat/classification/models/bank_credit_subtype_CNN.t7b",
-			"meerkat/classification/label_maps/bank_credit_subtype_label_map.json")
+		return get_cnn_by_path("meerkat/classification/models/bank_credit_subtype_CNN.t7b", "meerkat/classification/label_maps/bank_credit_subtype_label_map.json")
 	elif model_name == "card_debit_subtype":
-		return get_cnn_by_path(
-			"meerkat/classification/models/card_debit_subtype_CNN.t7b",
-			"meerkat/classification/label_maps/card_debit_subtype_label_map.json")
+		return get_cnn_by_path("meerkat/classification/models/card_debit_subtype_CNN.t7b", "meerkat/classification/label_maps/card_debit_subtype_label_map.json")
 	elif model_name == "card_credit_subtype":
-		return get_cnn_by_path(
-			"meerkat/classification/models/card_credit_subtype_CNN.t7b",
-			"meerkat/classification/label_maps/card_credit_subtype_label_map.json")
+		return get_cnn_by_path("meerkat/classification/models/card_credit_subtype_CNN.t7b", "meerkat/classification/label_maps/card_credit_subtype_label_map.json")
 	else:
 		print("Requested CNN does not exist. Please reference an existing model")
 
 def get_cnn_by_path(model_path, dict_path):
 	"""Load a function to process transactions using a CNN"""
-	lualib = ctypes.CDLL(
-		"/home/ubuntu/torch/install/lib/libluajit.so",
-		mode=ctypes.RTLD_GLOBAL)
+	lualib = ctypes.CDLL("/home/ubuntu/torch/install/lib/libluajit.so", mode=ctypes.RTLD_GLOBAL)
 
 	# Must Load Lupa After the Preceding Line
 	import lupa
-	# pylint:disable=no-name-in-module
 	from lupa import LuaRuntime
 
 	# Load Runtime and Lua Modules
@@ -165,7 +150,6 @@ def get_cnn_by_path(model_path, dict_path):
 	return apply_cnn
 
 if __name__ == "__main__":
-	# pylint:disable=pointless-string-statement
 	"""Print a warning to not execute this file as a module"""
-	logging.warning("This module is a library that contains useful functions;it should not be run from the console.")
+	logging.warning("This module is a library that contains useful functions; it should not be run from the console.")
 

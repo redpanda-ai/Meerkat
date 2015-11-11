@@ -199,7 +199,7 @@ def gradient_descent(initial_values, params, known, dataset):
 
 		# Save Iterations Top Hyperparameters
 		print("\n", "Top Precision: " + str(round(top_score["precision"], 2)))
-		print("\n", "Top Recall: " + str(round(top_score["total_recall_physical"], 2)))
+		print("\n", "Top Recall: " + str(round(top_score["total_recall_physical"],2)))
 		save_top_score(top_score)
 
 	return top_score
@@ -254,7 +254,7 @@ def randomize(hyperparameters, known={}, learning_rate=0.3):
 		lower = float(value) - learning_rate
 		lower = lower if lower >= 0 else 0
 		upper = float(value) + learning_rate
-		upper = upper if upper <= 3 else 3
+		upper = upper if upper <=3 else 3
 		new_value = uniform(lower, upper)
 
 		# HACK

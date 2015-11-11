@@ -1,5 +1,5 @@
 #!/usr/local/bin/python3.3
-# pylint: disable=line-too-long,invalid-name
+# pylint: disable=line-too-long
 
 """This script is aimed at testing the accuracy of the Meerkat Classifier.
 We iteratively use this accuracy as a feedback score to tune and optimize
@@ -49,8 +49,7 @@ default_doc_key = "DESCRIPTION_UNMASKED"
 default_label_key = "GOOD_DESCRIPTION"
 
 class DummyFile(object):
-    def write(self, x): 
-    	pass
+    def write(self, x): pass
 
 @contextlib.contextmanager
 def nostdout():

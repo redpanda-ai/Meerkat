@@ -54,8 +54,7 @@ class DateTransformer(BaseEstimator, TransformerMixin):
 	"""This transforms dates.
 		X is the trainging set.
 		y is the target values.
-		**fit_params is an optional parameter
-		that returns a transformed version of training set.
+		**fit_params is an optional parameter that returns a transformed version of training set.
 	"""
 
 	def __init__(self, columns=[]):

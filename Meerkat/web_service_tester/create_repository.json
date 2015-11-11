@@ -1,7 +1,0 @@
-{
-    "type": "fs",
-    "settings": {
-        "location": "/data/2/backups/my_backup",
-        "compress": true
-    }
-}
