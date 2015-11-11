@@ -9,6 +9,7 @@ Created on Nov 3, 2014
 """
 
 import json
+# pylint:disable=deprecated-module
 import string
 import re
 import logging
