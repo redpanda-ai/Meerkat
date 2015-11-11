@@ -1,0 +1,7 @@
+# ignore automatically generated files
+__pycache__/
+*.py[cod]
+*.log
+API_Documentation.md
+*.xml
+*.out

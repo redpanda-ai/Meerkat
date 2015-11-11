@@ -1,0 +1,72 @@
+{
+	"region" : "us-west-2",
+	"vpc-id" : "vpc-a930dacc",
+	"subnet-id" : "subnet-e58d7580",
+	"security_groups" : [
+		"github",
+		"meerkat_private",
+		"s3cmd",
+		"es_develop"
+	],
+	"ami-id" : "ami-cf707eff",
+	"key_name" : "jkey",
+	"key_file" : "/home/ubuntu/.ssh/jkey.pem",
+	"instance_type" : "c3.xlarge",
+	"minimum_master_nodes" : 1,
+	"instance_layout" : {
+		"masters" : 0,
+		"hybrids" : 1,
+		"slaves" : 0
+	},
+	"placement" : "us-west-2b",
+	"block_device_mapping" : [
+		{ "name" : "ephemeral0", "mount": "/dev/sdb" },
+		{ "name" : "ephemeral1", "mount": "/dev/sdc" }
+	],
+	"ebs_mapping" : [
+		{ "snapshot-id": "snap-00567253", "mount" : "/dev/sdg" }
+	],
+	"mount_data_commands" : [
+		"mkdir -p /data/0",
+		"mkdir -p /data/1",
+		"mkdir -p /data/2",
+		"mount /dev/xvdb /data/0",
+		"mount /dev/xvdc /data/1",
+		"mount /dev/xvdg /data/2",
+		"mkdir -p /data/0/input",
+		"mkdir -p /data/0/output",
+		"mkdir -p /data/1/input",
+		"mkdir -p /data/1/output",
+		"mkdir -p /data/1/error",
+		"mkdir -p /data/2/input",
+		"mkdir -p /data/2/output",
+		"mkdir -p /data/1/log/elasticsearch",
+		"chown -R elasticsearch /data",
+		"df | grep 'data'"
+	],
+	"configure_master_commands" : [
+		"sed -i 's/__NODE_MASTER/true/' /etc/elasticsearch/elasticsearch.yml",
+		"sed -i 's/__NODE_DATA/false/' /etc/elasticsearch/elasticsearch.yml",
+		"sed -i 's:__ES_DATA_PATH:/data/2:' /etc/elasticsearch/elasticsearch.yml",
+		"service elasticsearch start"
+	],
+	"configure_slave_commands" : [
+		"sed -i 's/__NODE_MASTER/false/' /etc/elasticsearch/elasticsearch.yml",
+		"sed -i 's/__NODE_DATA/true/' /etc/elasticsearch/elasticsearch.yml",
+		"sed -i 's:__ES_DATA_PATH:/data/2:' /etc/elasticsearch/elasticsearch.yml",
+		"service elasticsearch start"
+	],
+	"configure_hybrid_commands" : [
+		"sed -i 's/__NODE_MASTER/true/' /etc/elasticsearch/elasticsearch.yml",
+		"sed -i 's/__NODE_DATA/true/' /etc/elasticsearch/elasticsearch.yml",
+		"sed -i 's:__ES_DATA_PATH:/data/2:' /etc/elasticsearch/elasticsearch.yml",
+		"service elasticsearch start"
+	],
+	"template_files" : {
+		"path" : "./config/templates/",
+		"elasticsearch_yml" : "elasticsearch.yml.template",
+		"search" : "search.json.template",
+		"load" : "load.json.template",
+		"merge" : "merge.json.template"
+	}
+}

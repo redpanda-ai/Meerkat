@@ -1,0 +1,21 @@
+{
+    "cobrand_id": 2,
+    "container": "bank",
+    "transaction_list": [
+        {
+            "amount": 19.99,
+            "date": "2014-08-10T00:00:00",
+            "description": "McDonald's Hamburgers New York, NY",
+            "ledger_entry": "debit",
+            "transaction_id": 1
+        },
+        {
+            "amount": 29.99,
+            "date": "2014-08-10T00:00:00",
+            "description": "Transaction New York, NY",
+            "ledger_entry": "debit",
+            "transaction_id": 2
+        }
+    ],
+    "user_id": 3
+}

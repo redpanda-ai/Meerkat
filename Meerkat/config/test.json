@@ -1,0 +1,46 @@
+{
+	"concurrency" : 36,
+	"verification_source" : "data/misc/ground_truth_card.txt",
+	"container" : "card",
+	"mode" : "test",
+	"input" : {
+		"hyperparameters" : "config/hyperparameters/new.json",
+		"filename" : "/mnt/ephemeral/input/100000_CARD.txt",
+		"delimiter" : "|",
+		"encoding" : "utf-8",
+		"split" : {
+			"processing_location" : "/mnt/ephemeral/input/",
+			"row_limit" : 1000
+		}
+	},
+	"logging" : {
+		"level" : "warning",
+		"path" : "logs/foo.log",
+		"formatter" : "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+		"console" : true
+	},
+	"output" : {
+		"results" : {
+			"fields" : [
+				"name", "chain_id", "category_labels", "address", "locality",
+				"region", "postcode", "website", "tel", "chain_name",
+				"latitude", "longitude", "neighborhood", "factual_id", "internal_store_number"],
+			"labels" : [
+				"MERCHANT_NAME", "STORE_ID", "FACTUAL_CATEGORY", "STREET", "CITY",
+				"STATE", "ZIP_CODE", "WEBSITE", "PHONE_NUMBER", "CHAIN_NAME",
+				"LATITUDE", "LONGITUDE", "NEIGHBORHOOD", "FACTUAL_ID", "STORE_NUMBER"]
+		},
+		"file" : {
+			"format" : "csv",
+			"processing_location" : "/mnt/ephemeral/output/",
+			"delimiter" : "|"
+		}
+	},
+	"elasticsearch" : {
+		"cluster_nodes" : [
+			"internal-default-vpc-meerkat-lb-2028162053.us-west-2.elb.amazonaws.com"
+    	],
+		"index" : "factual_index",
+		"type" : "factual_type"
+	}
+}
