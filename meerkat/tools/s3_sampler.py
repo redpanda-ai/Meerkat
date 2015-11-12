@@ -106,17 +106,20 @@ def run_from_command_line(cla):
 				grouped = df.groupby('MERCHANT_NAME', as_index=False)
 				groups = dict(list(grouped))
 
+				# Apply Reservoir Sampling Over Each Merchant
 				for merchant, merchant_df in groups.items():
 					n = 1000000 if merchant == "" else SAMPLE_SIZE
 					output_df = pd.read_csv("data/output/s3_sample/" + num_map[merchant], na_filter=False, dtype=dtypes, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
-					for row in merchant_df.rows():
+					for row in merchant_df.iterrows():
 						merchant_count[merchant] += 1
 						count = merchant_count[merchant]
+						row_to_add = [merchant_df[c] for c in columns]
 						if count < n:
-							# add to df
+							output_df.loc[len(output_df) + 1] = row_to_add
 						elif count >= n and random.random() < n / count:
-							index_to_replace = random.randint(0, n)
-							# replace random row
+							i = random.randint(0, n)
+							for c in columns:
+								output_df.loc[i] = row_to_add
 					# save df
 			
 			del files[i]
