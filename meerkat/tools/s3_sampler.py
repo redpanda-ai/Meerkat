@@ -110,7 +110,10 @@ def run_from_command_line(cla):
 				for merchant, merchant_df in groups.items():
 					n = 1000000 if merchant == "" else SAMPLE_SIZE
 					merchant_file_name = "data/output/s3_sample/" + num_map[merchant]
-					output_df = pd.read_csv(merchant_file_name, na_filter=False, dtype=dtypes, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+					try:
+						output_df = pd.read_csv(merchant_file_name, na_filter=False, dtype=dtypes, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+					except:
+						output_df = pd.DataFrame(columns=columns)
 					# TODO: If no file exists create empty df
 					for row in merchant_df.iterrows():
 						merchant_count[merchant] += 1
