@@ -110,7 +110,7 @@ def run_from_command_line(cla):
 			# Apply Reservoir Sampling Over Each Merchant
 			for merchant, merchant_df in groups.items():
 
-				print(merchant + ": " + str(len(merchant_df)))
+				merchant_df = merchant_df[columns]
 				
 				n = 1000000 if merchant == "" else SAMPLE_SIZE
 				merchant_file_name = "data/output/s3_sample/" + num_map[merchant] + ".csv"
@@ -124,9 +124,8 @@ def run_from_command_line(cla):
 				# Apply Reservoir Sampling
 				o_len = len(output_df)
 				m_len = len(merchant_df)
-				count = merchant_count[merchant]
 
-				if count < n:
+				if merchant_count[merchant] < n:
 					if o_len + m_len <= n:
 						output_df = output_df.append(merchant_df, ignore_index=True)
 						merchant_count[merchant] += m_len
@@ -134,14 +133,15 @@ def run_from_command_line(cla):
 						continue
 					else:
 						r = n - o_len
-						output_df = output_df.append(merchant_df.iloc[0:r], ignore_index=True)
+						output_df = output_df.append(merchant_df.iloc[0:r-1], ignore_index=True)
 						merchant_count[merchant] += r
-						merchant_df = merchant_df.iloc[r+1:m_len-1]
-				elif count >= n:
-					for i in merchant_df.index:
-						merchant_count[merchant] += 1
-						if random.random() < n / count:
-							output_df.ix[np.random.choice(output_df.index.values, 1)] = merchant_df.loc[i]
+						merchant_df = merchant_df.iloc[r:m_len-1]
+			
+				for k in merchant_df.index:
+					merchant_count[merchant] += 1
+					rand = random.random()
+					if rand < n / merchant_count[merchant]:
+						output_df.iloc[int(rand*n)] = merchant_df.loc[k]
 					
 				# Save Output		
 				output_df.to_csv(merchant_file_name, columns=columns, sep="|", mode="w", encoding="utf-8", index=False, index_label=False)
