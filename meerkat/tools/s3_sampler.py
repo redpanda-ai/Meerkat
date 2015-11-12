@@ -14,12 +14,16 @@ import csv
 import re
 import os
 import contextlib
+import random
 
+from collections import defaultdict
 from boto.s3.connection import Key, Location
 import pandas as pd
 import numpy as np
 
 from meerkat.various_tools import safely_remove_file, clean_bad_escapes, load_params, get_s3_connection
+
+SAMPLE_SIZE = 10000
 
 #################### USAGE ##########################
 
@@ -57,7 +61,9 @@ def run_from_command_line(cla):
 	dtypes = {x: "object" for x in columns}
 	columns.append("MERCHANT_NAME")
 	files = []
-	first_chunk = True
+
+	# Create Output Folder if it doesn't exist
+	os.makedirs("data/output/s3_sample", exist_ok=True)
 
 	if sys.argv[1] == "bank":
 		regex = re.compile("panels/meerkat_split/bank/")
@@ -83,15 +89,16 @@ def run_from_command_line(cla):
 			ct_to_cnn_map[key] = reverse_label_map[str(value)]
 
 	print("Number of " + sys.argv[1] + " files " + str(len(files)))
-	output_file = "data/output/" + sys.argv[1] + "_sample.txt"
+	num_map = dict(zip(reverse_label_map.values(), reverse_label_map.keys()))
 	map_labels = lambda x: ct_to_cnn_map.get(x["GOOD_DESCRIPTION"].lower(), "")
+	merchant_count = defaultdict(lambda: 0)
 
 	# Sample Files
 	for i, item in enumerate(files):
 		file_name = "data/output/" + os.path.basename(item.key)
 		try:
 			item.get_contents_to_filename(file_name)
-			reader = pd.read_csv(file_name, na_filter=False, chunksize=100000, dtype=dtypes, compression="gzip", quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+			reader = pd.read_csv(file_name, na_filter=False, chunksize=1000000, dtype=dtypes, compression="gzip", quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
 			
 			for df in reader:
 
@@ -100,19 +107,17 @@ def run_from_command_line(cla):
 				groups = dict(list(grouped))
 
 				for merchant, merchant_df in groups.items():
-					print(merchant + ": " + str(merchant_df.shape[0]))
-			
-				num_to_sample = math.ceil(len(df.index) * 0.0075)
-			
-				print("Sampled " + str(num_to_sample) + " transactions from file")
-				rows = np.random.choice(df.index.values, num_to_sample)
-				sampled_df = df.ix[rows]
-
-				if first_chunk:
-					sampled_df[columns].to_csv(output_file, columns=columns, sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
-					first_chunk = False
-				else:
-					sampled_df[columns].to_csv(output_file, header=False, columns=columns, sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
+					n = 1000000 if merchant == "" else SAMPLE_SIZE
+					output_df = pd.read_csv("data/output/s3_sample/" + num_map[merchant], na_filter=False, dtype=dtypes, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+					for row in merchant_df.rows():
+						merchant_count[merchant] += 1
+						count = merchant_count[merchant]
+						if count < n:
+							# add to df
+						elif count >= n and random.random() < n / count:
+							index_to_replace = random.randint(0, n)
+							# replace random row
+					# save df
 			
 			del files[i]
 			safely_remove_file(file_name)
