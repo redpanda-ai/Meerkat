@@ -109,18 +109,19 @@ def run_from_command_line(cla):
 				# Apply Reservoir Sampling Over Each Merchant
 				for merchant, merchant_df in groups.items():
 					n = 1000000 if merchant == "" else SAMPLE_SIZE
-					output_df = pd.read_csv("data/output/s3_sample/" + num_map[merchant], na_filter=False, dtype=dtypes, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+					merchant_file_name = "data/output/s3_sample/" + num_map[merchant]
+					output_df = pd.read_csv(merchant_file_name, na_filter=False, dtype=dtypes, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+					# TODO: If no file exists create empty df
 					for row in merchant_df.iterrows():
 						merchant_count[merchant] += 1
 						count = merchant_count[merchant]
-						row_to_add = [merchant_df[c] for c in columns]
+						row_to_add = [row[c] for c in columns]
 						if count < n:
-							output_df.loc[len(output_df) + 1] = row_to_add
+							output_df = output_df.append(row_to_add, ignore_index=True)
 						elif count >= n and random.random() < n / count:
 							i = random.randint(0, n)
-							for c in columns:
-								output_df.loc[i] = row_to_add
-					# save df
+							output_df.loc[i] = row_to_add
+					output_df.to_csv(merchant_file_name, columns=columns, sep="|", mode="w", encoding="utf-8", index=False, index_label=False)
 			
 			del files[i]
 			safely_remove_file(file_name)
