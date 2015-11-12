@@ -102,6 +102,7 @@ def run_from_command_line(cla):
 			
 			for df in reader:
 
+				# Replace CT labels with well formatted labels
 				df['MERCHANT_NAME'] = df.apply(map_labels, axis=1)
 				grouped = df.groupby('MERCHANT_NAME', as_index=False)
 				groups = dict(list(grouped))
@@ -110,7 +111,7 @@ def run_from_command_line(cla):
 				for merchant, merchant_df in groups.items():
 					
 					n = 1000000 if merchant == "" else SAMPLE_SIZE
-					merchant_file_name = "data/output/s3_sample/" + num_map[merchant]
+					merchant_file_name = "data/output/s3_sample/" + num_map[merchant] + ".csv"
 					
 					# Create Dataframe if file doesn't exist
 					try:
