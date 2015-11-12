@@ -57,7 +57,7 @@ def run_from_command_line(cla):
 		conn = get_s3_connection()
 		
 	bucket = conn.get_bucket("yodleeprivate", Location.USWest2)
-	columns = ["DESCRIPTION_UNMASKED", "DECRIPTION", "GOOD_DESCRIPTION", "TRANSACTION_DATE", "UNIQUE_TRANSACTION_ID", "AMOUNT", "UNIQUE_MEM_ID", "TYPE"]
+	columns = ["DESCRIPTION_UNMASKED", "DESCRIPTION", "GOOD_DESCRIPTION", "TRANSACTION_DATE", "UNIQUE_TRANSACTION_ID", "AMOUNT", "UNIQUE_MEM_ID", "TYPE"]
 	dtypes = {x: "object" for x in columns}
 	columns.append("MERCHANT_NAME")
 	files = []
