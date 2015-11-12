@@ -119,6 +119,28 @@ def run_from_command_line(cla):
 					except:
 						output_df = pd.DataFrame(columns=columns)
 
+					# More Efficient Reservoir Sampling
+					o_len = len(output_df)
+					m_len = len(merchant_df)
+					count = merchant_count[merchant]
+
+					if count < n:
+						if olen + m_len <= n:
+							output_df = output_df.append(merchant_df, ignore_index=True)
+							merchant_count[merchant] += m_len
+							continue
+						else:
+							r = n - o_len
+							output_df = output_df.append(merchant_df.loc[0:r], ignore_index=True)
+							merchant_count[merchant] += r
+							merchant_df = merchant_df.loc[r+1:m_len-1]
+					elif count >= n:
+						for i in range(len(merchant_df)):
+							merchant_count[merchant] += 1
+							rand = random.random()
+							if rand < n / count:
+								output_df.loc[int(rand*n)] = merchant_df.loc[i]
+						
 					# Apply Reservoir Sampling
 					for row in merchant_df.iterrows():
 						merchant_count[merchant] += 1
