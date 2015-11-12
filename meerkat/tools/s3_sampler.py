@@ -96,63 +96,58 @@ def run_from_command_line(cla):
 	# Sample Files
 	for i, item in enumerate(files):
 		file_name = "data/output/" + os.path.basename(item.key)
-		try:
-			item.get_contents_to_filename(file_name)
-			reader = pd.read_csv(file_name, na_filter=False, chunksize=1000000, dtype=dtypes, compression="gzip", quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
-			
-			for df in reader:
+		
+		item.get_contents_to_filename(file_name)
+		reader = pd.read_csv(file_name, na_filter=False, chunksize=1000000, dtype=dtypes, compression="gzip", quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+		
+		for df in reader:
 
-				# Replace CT labels with well formatted labels
-				df['MERCHANT_NAME'] = df.apply(map_labels, axis=1)
-				grouped = df.groupby('MERCHANT_NAME', as_index=False)
-				groups = dict(list(grouped))
+			# Replace CT labels with well formatted labels
+			df['MERCHANT_NAME'] = df.apply(map_labels, axis=1)
+			grouped = df.groupby('MERCHANT_NAME', as_index=False)
+			groups = dict(list(grouped))
 
-				# Apply Reservoir Sampling Over Each Merchant
-				for merchant, merchant_df in groups.items():
+			# Apply Reservoir Sampling Over Each Merchant
+			for merchant, merchant_df in groups.items():
 
-					print(merchant + ": " + str(len(merchant_df)))
+				print(merchant + ": " + str(len(merchant_df)))
+				
+				n = 1000000 if merchant == "" else SAMPLE_SIZE
+				merchant_file_name = "data/output/s3_sample/" + num_map[merchant] + ".csv"
+
+				# Create Dataframe if file doesn't exist
+				try:
+					output_df = pd.read_csv(merchant_file_name, na_filter=False, dtype=dtypes, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+				except:
+					output_df = pd.DataFrame(columns=columns)
+
+				# Apply Reservoir Sampling
+				o_len = len(output_df)
+				m_len = len(merchant_df)
+				count = merchant_count[merchant]
+
+				if count < n:
+					if o_len + m_len <= n:
+						output_df = output_df.append(merchant_df, ignore_index=True)
+						merchant_count[merchant] += m_len
+						output_df.to_csv(merchant_file_name, columns=columns, sep="|", mode="w", encoding="utf-8", index=False, index_label=False)
+						continue
+					else:
+						r = n - o_len
+						output_df = output_df.append(merchant_df.iloc[0:r], ignore_index=True)
+						merchant_count[merchant] += r
+						merchant_df = merchant_df.iloc[r+1:m_len-1]
+				elif count >= n:
+					for i in merchant_df.index:
+						merchant_count[merchant] += 1
+						if random.random() < n / count:
+							output_df.ix[np.random.choice(output_df.index.values, 1)] = merchant_df.loc[i]
 					
-					n = 1000000 if merchant == "" else SAMPLE_SIZE
-					merchant_file_name = "data/output/s3_sample/" + num_map[merchant] + ".csv"
-
-					# Create Dataframe if file doesn't exist
-					try:
-						output_df = pd.read_csv(merchant_file_name, na_filter=False, dtype=dtypes, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
-					except:
-						output_df = pd.DataFrame(columns=columns)
-
-					# Apply Reservoir Sampling
-					o_len = len(output_df)
-					m_len = len(merchant_df)
-					count = merchant_count[merchant]
-
-					if count < n:
-						if o_len + m_len <= n:
-							output_df = output_df.append(merchant_df, ignore_index=True)
-							merchant_count[merchant] += m_len
-							output_df.to_csv(merchant_file_name, columns=columns, sep="|", mode="w", encoding="utf-8", index=False, index_label=False)
-							continue
-						else:
-							r = n - o_len
-							output_df = output_df.append(merchant_df.loc[0:r], ignore_index=True)
-							merchant_count[merchant] += r
-							merchant_df = merchant_df.loc[r+1:m_len-1]
-					elif count >= n:
-						for i in range(len(merchant_df)):
-							merchant_count[merchant] += 1
-							rand = random.random()
-							if rand < n / count:
-								output_df.loc[int(rand*n)] = merchant_df.loc[i]
-						
-					# Save Output		
-					output_df.to_csv(merchant_file_name, columns=columns, sep="|", mode="w", encoding="utf-8", index=False, index_label=False)
-			
-			del files[i]
-			safely_remove_file(file_name)
-
-		except:
-			safely_remove_file(file_name)
-			continue
+				# Save Output		
+				output_df.to_csv(merchant_file_name, columns=columns, sep="|", mode="w", encoding="utf-8", index=False, index_label=False)
+		
+		del files[i]
+		safely_remove_file(file_name)
 
 if __name__ == "__main__":
 	run_from_command_line(sys.argv)
