@@ -109,25 +109,28 @@ def run_from_command_line(cla):
 
 				# Apply Reservoir Sampling Over Each Merchant
 				for merchant, merchant_df in groups.items():
+
+					print(merchant + ": " + str(len(merchant_df)))
 					
 					n = 1000000 if merchant == "" else SAMPLE_SIZE
 					merchant_file_name = "data/output/s3_sample/" + num_map[merchant] + ".csv"
-					
+
 					# Create Dataframe if file doesn't exist
 					try:
 						output_df = pd.read_csv(merchant_file_name, na_filter=False, dtype=dtypes, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
 					except:
 						output_df = pd.DataFrame(columns=columns)
 
-					# More Efficient Reservoir Sampling
+					# Apply Reservoir Sampling
 					o_len = len(output_df)
 					m_len = len(merchant_df)
 					count = merchant_count[merchant]
 
 					if count < n:
-						if olen + m_len <= n:
+						if o_len + m_len <= n:
 							output_df = output_df.append(merchant_df, ignore_index=True)
 							merchant_count[merchant] += m_len
+							output_df.to_csv(merchant_file_name, columns=columns, sep="|", mode="w", encoding="utf-8", index=False, index_label=False)
 							continue
 						else:
 							r = n - o_len
@@ -141,17 +144,6 @@ def run_from_command_line(cla):
 							if rand < n / count:
 								output_df.loc[int(rand*n)] = merchant_df.loc[i]
 						
-					# Apply Reservoir Sampling
-					for row in merchant_df.iterrows():
-						merchant_count[merchant] += 1
-						count = merchant_count[merchant]
-						row_to_add = [row[c] for c in columns]
-						if count < n:
-							output_df = output_df.append(row_to_add, ignore_index=True)
-						elif count >= n and random.random() < n / count:
-							i = random.randint(0, n)
-							output_df.loc[i] = row_to_add
-
 					# Save Output		
 					output_df.to_csv(merchant_file_name, columns=columns, sep="|", mode="w", encoding="utf-8", index=False, index_label=False)
 			
