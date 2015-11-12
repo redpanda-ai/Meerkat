@@ -108,13 +108,17 @@ def run_from_command_line(cla):
 
 				# Apply Reservoir Sampling Over Each Merchant
 				for merchant, merchant_df in groups.items():
+					
 					n = 1000000 if merchant == "" else SAMPLE_SIZE
 					merchant_file_name = "data/output/s3_sample/" + num_map[merchant]
+					
+					# Create Dataframe if file doesn't exist
 					try:
 						output_df = pd.read_csv(merchant_file_name, na_filter=False, dtype=dtypes, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
 					except:
 						output_df = pd.DataFrame(columns=columns)
-					# TODO: If no file exists create empty df
+
+					# Apply Reservoir Sampling
 					for row in merchant_df.iterrows():
 						merchant_count[merchant] += 1
 						count = merchant_count[merchant]
@@ -124,6 +128,8 @@ def run_from_command_line(cla):
 						elif count >= n and random.random() < n / count:
 							i = random.randint(0, n)
 							output_df.loc[i] = row_to_add
+
+					# Save Output		
 					output_df.to_csv(merchant_file_name, columns=columns, sep="|", mode="w", encoding="utf-8", index=False, index_label=False)
 			
 			del files[i]
