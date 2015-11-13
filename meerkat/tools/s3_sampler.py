@@ -144,7 +144,7 @@ def run_from_command_line(cla):
 						if o_len + m_len <= n:
 							output_df = output_df.append(merchant_df, ignore_index=False)
 							merchant_count[merchant] += m_len
-							output_df.to_csv(merchant_file_name, columns=columns, sep="|", mode="w", encoding="utf-8", index=False, index_label=False)
+							output_df.to_csv(merchant_file_name, columns=columns, sep="|", quoting=csv.QUOTE_NONE, mode="w", encoding="utf-8", index=False, index_label=False)
 							continue
 						else:
 							r = n - o_len
@@ -159,7 +159,7 @@ def run_from_command_line(cla):
 							output_df.iloc[int(rand*n)] = merchant_df.loc[k]
 						
 					# Save Output		
-					output_df.to_csv(merchant_file_name, columns=columns, sep="|", mode="w", encoding="utf-8", index=False, index_label=False)
+					output_df.to_csv(merchant_file_name, columns=columns, sep="|", mode="w", quoting=csv.QUOTE_NONE, encoding="utf-8", index=False, index_label=False)
 			
 			del files[i]
 			safely_remove_file(file_name)
