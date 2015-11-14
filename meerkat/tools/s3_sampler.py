@@ -104,6 +104,8 @@ def run_from_command_line(cla):
 
 			for df in reader:
 
+				print("chunk")
+
 				# Replace CT labels with well formatted labels
 				df['MERCHANT_NAME'] = df.apply(map_labels, axis=1)
 				grouped = df.groupby('MERCHANT_NAME', as_index=False)
@@ -112,7 +114,7 @@ def run_from_command_line(cla):
 				# Apply Reservoir Sampling Over Each Merchant
 				for merchant, merchant_df in groups.items():
 
-					print(merchant + ": " + str(len(merchant_df)))
+					#print(merchant + ": " + str(len(merchant_df)))
 					merchant_df = merchant_df[columns]
 					
 					n = SAMPLE_SIZE
@@ -152,12 +154,19 @@ def run_from_command_line(cla):
 							merchant_count[merchant] += r
 							merchant_df = merchant_df.iloc[r:m_len-1]
 				
+					rows_to_add = []
+					rows_to_drop = []
+
 					for k in merchant_df.index:
 						merchant_count[merchant] += 1
 						rand = random.random()
 						if rand < n / merchant_count[merchant]:
-							output_df.iloc[int(rand*n)] = merchant_df.loc[k]
-						
+							rows_to_add.append(k)
+							rows_to_drop.append(int(rand*n))
+
+					if len(rows_to_add) > 0:
+						output_df.iloc[rows_to_drop] = merchant_df.loc[rows_to_add].values
+							
 					# Save Output		
 					output_df.to_csv(merchant_file_name, columns=columns, sep="|", mode="w", quoting=csv.QUOTE_NONE, encoding="utf-8", index=False, index_label=False)
 			
