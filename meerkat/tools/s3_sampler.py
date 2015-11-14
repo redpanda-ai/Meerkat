@@ -164,7 +164,6 @@ def run_from_command_line(cla):
 							save_df(output_df, merchant_file_name, columns)
 				
 					rows_to_add = []
-					rows_to_drop = []
 
 					# Select Rows to Replace
 					for k in merchant_df.index:
@@ -172,7 +171,6 @@ def run_from_command_line(cla):
 						rand = random.random()
 						if rand < n / merchant_count[merchant]:
 							rows_to_add.append(k)
-							rows_to_drop.append(int(rand*n))
 
 					if len(rows_to_add) > 0:
 
@@ -181,7 +179,7 @@ def run_from_command_line(cla):
 							output_df = load_df(merchant_file_name, dtypes)
 						
 						# Replace Rows
-						output_df.iloc[rows_to_drop] = merchant_df.loc[rows_to_add].values
+						output_df.loc[np.random.choice(output_df.index.values, len(rows_to_add))] = merchant_df.loc[rows_to_add].values
 
 						# Save Output
 						save_df(output_df, merchant_file_name, columns)
