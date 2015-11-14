@@ -107,7 +107,7 @@ def run_from_command_line(cla):
 		
 		try:
 			item.get_contents_to_filename(file_name)
-			reader = pd.read_csv(file_name, na_filter=False, chunksize=100000, dtype=dtypes, compression="gzip", quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+			reader = pd.read_csv(file_name, na_filter=False, chunksize=500000, dtype=dtypes, compression="gzip", quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
 			first_null_chunk = True
 
 			for df in reader:
