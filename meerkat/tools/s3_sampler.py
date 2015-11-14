@@ -49,6 +49,14 @@ def nostdout():
 	sys.stderr = save_stderr
 	sys.stdout = save_stdout
 
+def save_df(df, file_name, columns):
+	"""Save a dataframe"""
+	df.to_csv(file_name, columns=columns, sep="|", mode="w", quoting=csv.QUOTE_NONE, encoding="utf-8", index=False, index_label=False)
+
+def load_df(file_name, dtypes):
+	"""Load a dataframe"""
+	return pd.read_csv(file_name, na_filter=False, dtype=dtypes, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+
 def run_from_command_line(cla):
 	"""Runs these commands if the module is invoked from the command line"""
 
@@ -97,85 +105,93 @@ def run_from_command_line(cla):
 	for i, item in enumerate(files):
 		file_name = "data/output/" + os.path.basename(item.key)
 		
-		try:
-			item.get_contents_to_filename(file_name)
-			reader = pd.read_csv(file_name, na_filter=False, chunksize=100000, dtype=dtypes, compression="gzip", quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
-			first_null_chunk = True
+		#try:
+		item.get_contents_to_filename(file_name)
+		reader = pd.read_csv(file_name, na_filter=False, chunksize=100000, dtype=dtypes, compression="gzip", quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+		first_null_chunk = True
 
-			for df in reader:
+		for df in reader:
 
-				print("chunk")
+			print("chunk")
 
-				# Replace CT labels with well formatted labels
-				df['MERCHANT_NAME'] = df.apply(map_labels, axis=1)
-				grouped = df.groupby('MERCHANT_NAME', as_index=False)
-				groups = dict(list(grouped))
+			# Replace CT labels with well formatted labels
+			df['MERCHANT_NAME'] = df.apply(map_labels, axis=1)
+			grouped = df.groupby('MERCHANT_NAME', as_index=False)
+			groups = dict(list(grouped))
 
-				# Apply Reservoir Sampling Over Each Merchant
-				for merchant, merchant_df in groups.items():
+			# Apply Reservoir Sampling Over Each Merchant
+			for merchant, merchant_df in groups.items():
 
-					#print(merchant + ": " + str(len(merchant_df)))
-					merchant_df = merchant_df[columns]
-					
-					n = SAMPLE_SIZE
-					merchant_file_name = "data/output/s3_sample/" + num_map[merchant] + ".csv"
+				#print(merchant + ": " + str(len(merchant_df)))
+				merchant_df = merchant_df[columns]
+				output_df = None
+				
+				n = SAMPLE_SIZE
+				merchant_file_name = "data/output/s3_sample/" + num_map[merchant] + ".csv"
 
-					# Sample Null Class Differently for performance reasons
-					if merchant == "":
-						num_to_sample = math.ceil(len(merchant_df.index) * 0.0075)
-						rows = np.random.choice(merchant_df.index.values, num_to_sample)
-						sampled_df = merchant_df.ix[rows]
-						if first_null_chunk:
-							sampled_df.to_csv(merchant_file_name, columns=columns, sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
-							first_null_chunk = False
-						else: 
-							sampled_df.to_csv(merchant_file_name, header=False, columns=columns, sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
-						continue
+				# Sample Null Class Differently for performance reasons
+				if merchant == "":
+					num_to_sample = math.ceil(len(merchant_df.index) * 0.0075)
+					rows = np.random.choice(merchant_df.index.values, num_to_sample)
+					sampled_df = merchant_df.ix[rows]
+					if first_null_chunk:
+						sampled_df.to_csv(merchant_file_name, columns=columns, sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
+						first_null_chunk = False
+					else: 
+						sampled_df.to_csv(merchant_file_name, header=False, columns=columns, sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
+					continue
 
-					# Create Dataframe if file doesn't exist
-					try:
-						output_df = pd.read_csv(merchant_file_name, na_filter=False, dtype=dtypes, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
-					except:
-						output_df = pd.DataFrame(columns=columns)
+				# Create Dataframe if file doesn't exist
+				if merchant_count[merchant] == 0:
+					output_df = pd.DataFrame(columns=columns)
+				elif merchant_count[merchant] < n:
+					output_df = load_df(merchant_file_name, dtypes)		
 
-					# Apply Reservoir Sampling
+				# Fill Reservoirs
+				if merchant_count[merchant] < n:
 					o_len = len(output_df)
 					m_len = len(merchant_df)
-
-					if merchant_count[merchant] < n:
-						if o_len + m_len <= n:
-							output_df = output_df.append(merchant_df, ignore_index=False)
-							merchant_count[merchant] += m_len
-							output_df.to_csv(merchant_file_name, columns=columns, sep="|", quoting=csv.QUOTE_NONE, mode="w", encoding="utf-8", index=False, index_label=False)
-							continue
-						else:
-							r = n - o_len
-							output_df = output_df.append(merchant_df.iloc[0:r-1], ignore_index=False)
-							merchant_count[merchant] += r
-							merchant_df = merchant_df.iloc[r:m_len-1]
-				
-					rows_to_add = []
-					rows_to_drop = []
-
-					for k in merchant_df.index:
-						merchant_count[merchant] += 1
-						rand = random.random()
-						if rand < n / merchant_count[merchant]:
-							rows_to_add.append(k)
-							rows_to_drop.append(int(rand*n))
-
-					if len(rows_to_add) > 0:
-						output_df.iloc[rows_to_drop] = merchant_df.loc[rows_to_add].values
-							
-					# Save Output		
-					output_df.to_csv(merchant_file_name, columns=columns, sep="|", mode="w", quoting=csv.QUOTE_NONE, encoding="utf-8", index=False, index_label=False)
+					if o_len + m_len <= n:
+						output_df = output_df.append(merchant_df, ignore_index=False)
+						merchant_count[merchant] += m_len
+						save_df(output_df, merchant_file_name, columns)
+						continue
+					else:
+						r = n - o_len
+						output_df = output_df.append(merchant_df.iloc[0:r], ignore_index=False)
+						merchant_count[merchant] += r
+						merchant_df = merchant_df.iloc[r+1:m_len-1]
+						save_df(output_df, merchant_file_name, columns)
 			
-			del files[i]
-			safely_remove_file(file_name)
+				rows_to_add = []
+				rows_to_drop = []
 
-		except:
-			safely_remove_file(file_name)
-			continue
+				# Select Rows to Replace
+				for k in merchant_df.index:
+					merchant_count[merchant] += 1
+					rand = random.random()
+					if rand < n / merchant_count[merchant]:
+						rows_to_add.append(k)
+						rows_to_drop.append(int(rand*n))
+
+				if len(rows_to_add) > 0:
+
+					# Load df if not loaded yet
+					if output_df is None:
+						output_df = load_df(merchant_file_name, dtypes)
+					
+					# Replace Rows
+					output_df.iloc[rows_to_drop] = merchant_df.loc[rows_to_add].values
+
+					# Save Output
+					save_df(output_df, merchant_file_name, columns)
+						
+		del files[i]
+		safely_remove_file(file_name)
+
+		#except:
+		#	safely_remove_file(file_name)
+		#	continue
 
 if __name__ == "__main__":
 	run_from_command_line(sys.argv)
