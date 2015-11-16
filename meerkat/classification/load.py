@@ -39,6 +39,7 @@ def select_model(mode):
 	return classifier
 
 if __name__ == "__main__":
+	# pylint:disable=pointless-string-statement
 	"""Print a warning to not execute this file as a module"""
 	logging.warning("This module is a library that contains useful functions;" +\
 	 "it should not be run from the console.")

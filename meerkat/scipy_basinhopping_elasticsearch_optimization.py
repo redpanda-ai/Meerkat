@@ -37,6 +37,7 @@ from random import shuffle
 
 from pprint import pprint
 import numpy as np
+#pylint:disable=no-name-in-module
 from numpy import array, array_split
 from scipy.optimize import basinhopping
 
@@ -238,7 +239,8 @@ def verify_arguments():
 		sys.exit()
 
 	# Clear Contents from Previous Runs
-	#open("optimization_results/" + os.path.splitext(os.path.basename(sys.argv[1]))[0] + '_top_scores.txt', 'w').close()
+	# open("optimization_results/" + os.path.splitext(os.path.basename(sys.argv[1]))[0] +
+	# '_top_scores.txt', 'w').close()
 
 def run_from_command_line(command_line_arguments):
 	"""Runs these commands if the module is invoked from the command line"""

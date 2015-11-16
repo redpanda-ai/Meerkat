@@ -18,6 +18,7 @@ import pprint
 import queue
 import re
 import threading
+# pylint:disable=deprecated-module
 import string
 
 from elasticsearch import Elasticsearch

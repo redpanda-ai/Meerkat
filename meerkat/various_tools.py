@@ -137,7 +137,8 @@ def post_SNS(message):
 	conn = boto.sns.connect_to_region(region)
 	_ = conn.publish(topic=topic, message=message)
 
-def get_merchant_by_id(params, factual_id, es_connection, index="", doc_type="factual_type", routing=None):
+def get_merchant_by_id(params, factual_id, es_connection, \
+	index="", doc_type="factual_type", routing=None):
 	"""Fetch the details for a single factual_id"""
 
 	if index == "":
@@ -148,7 +149,8 @@ def get_merchant_by_id(params, factual_id, es_connection, index="", doc_type="fa
 
 	try:
 		if routing:
-			result = es_connection.get(index=index, doc_type=doc_type, id=factual_id, routing=routing)
+			result = es_connection.get(index=index, doc_type=doc_type, \
+				id=factual_id, routing=routing)
 		else:
 			result = es_connection.get(index=index, doc_type=doc_type, id=factual_id)
 		hit = result["_source"]

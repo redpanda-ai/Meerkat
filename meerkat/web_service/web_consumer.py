@@ -469,5 +469,6 @@ class Web_Consumer():
 		return data
 
 if __name__ == "__main__":
+	# pylint: disable=pointless-string-statement
 	"""Print a warning to not execute this file as a module"""
 	print("This module is a Class; it should not be run from the console.")

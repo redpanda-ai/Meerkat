@@ -34,7 +34,8 @@ from meerkat.file_producer import get_s3_connection
 #####################################################
 
 class DummyFile(object):
-	def write(self, x): pass
+	def write(self, x): 
+		pass
 
 @contextlib.contextmanager
 def nostdout():
@@ -81,7 +82,8 @@ def run_from_command_line(cla):
 			item.get_contents_to_filename(file_name)
 
 			dataframe = pd.read_csv(file_name, na_filter=False, chunksize=100000, \
-			dtype=dtypes, compression="gzip", quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+			dtype=dtypes, compression="gzip", quoting=csv.QUOTE_NONE, encoding="utf-8", \
+			sep='|', error_bad_lines=False)
 			
 			for df in dataframe:
 
@@ -93,11 +95,13 @@ def run_from_command_line(cla):
 
 				if first_chunk:
 					sampled_df[bank_columns].to_csv("/mnt/ephemeral/sampling/bank/bank_sample.txt", \
-					columns=bank_columns, sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
+					columns=bank_columns, sep="|", mode="a", encoding="utf-8", \
+					index=False, index_label=False)
 					first_chunk = False
 				else:
 					sampled_df[bank_columns].to_csv("/mnt/ephemeral/sampling/bank/bank_sample.txt", \
-					header=False, columns=bank_columns, sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
+					header=False, columns=bank_columns, sep="|", mode="a", encoding="utf-8", \
+					index=False, index_label=False)
 			
 			del card_files[i]
 			safely_remove_file(file_name)
