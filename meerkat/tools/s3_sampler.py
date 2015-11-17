@@ -15,6 +15,7 @@ import re
 import os
 import contextlib
 import random
+import psutil
 
 from collections import defaultdict
 from boto.s3.connection import Key, Location
@@ -56,6 +57,11 @@ def save_df(df, file_name, columns):
 def load_df(file_name, dtypes):
 	"""Load a dataframe"""
 	return pd.read_csv(file_name, na_filter=False, dtype=dtypes, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+
+def save_cache(cache, columns):
+	"""Save files in cache"""
+	for file_name, df in cache.items():
+		save_df(df, file_name, columns)
 
 def run_from_command_line(cla):
 	"""Runs these commands if the module is invoked from the command line"""
@@ -100,6 +106,8 @@ def run_from_command_line(cla):
 	num_map = dict(zip(reverse_label_map.values(), reverse_label_map.keys()))
 	map_labels = lambda x: ct_to_cnn_map.get(x["GOOD_DESCRIPTION"].lower(), "")
 	merchant_count = defaultdict(lambda: 0)
+	df_cache = {}
+	cache_full = False
 
 	# Sample Files
 	for i, item in enumerate(files):
@@ -122,7 +130,6 @@ def run_from_command_line(cla):
 				# Apply Reservoir Sampling Over Each Merchant
 				for merchant, merchant_df in groups.items():
 
-					#print(merchant + ": " + str(len(merchant_df)))
 					merchant_df = merchant_df[columns]
 					output_df = None
 					
@@ -142,7 +149,9 @@ def run_from_command_line(cla):
 						continue
 
 					# Create Dataframe if file doesn't exist
-					if merchant_count[merchant] == 0:
+					if merchant_file_name in df_cache:
+						output_df = df_cache[merchant_file_name]
+					elif merchant_count[merchant] == 0:
 						output_df = pd.DataFrame(columns=columns)
 					elif merchant_count[merchant] < n:
 						output_df = load_df(merchant_file_name, dtypes)		
@@ -181,15 +190,23 @@ def run_from_command_line(cla):
 						# Replace Rows
 						output_df.iloc[np.random.choice(range(n), len(rows_to_add))] = merchant_df.loc[rows_to_add].values
 
-						# Save Output
-						save_df(output_df, merchant_file_name, columns)
-							
+						# Save or Cache Output
+						if cache_full and merchant_file_name not in df_cache:
+							save_df(output_df, merchant_file_name, columns)
+						else:
+							df_cache[merchant_file_name] = output_df
+							mem = psutil.virtual_memory().percent
+							if mem > 90:
+								cache_full = True
+
 			del files[i]
 			safely_remove_file(file_name)
 
 		except:
 			safely_remove_file(file_name)
 			continue
+
+	save_cache(df_cache, columns)
 
 if __name__ == "__main__":
 	run_from_command_line(sys.argv)
