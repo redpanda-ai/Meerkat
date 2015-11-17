@@ -179,7 +179,7 @@ def run_from_command_line(cla):
 							output_df = load_df(merchant_file_name, dtypes)
 						
 						# Replace Rows
-						output_df.loc[np.random.choice(output_df.index.values, len(rows_to_add))] = merchant_df.loc[rows_to_add].values
+						output_df.iloc[np.random.choice(range(n), len(rows_to_add))] = merchant_df.loc[rows_to_add].values
 
 						# Save Output
 						save_df(output_df, merchant_file_name, columns)
