@@ -16,9 +16,11 @@ import os
 import contextlib
 import random
 import psutil
+import traceback
 
 from collections import defaultdict
 from boto.s3.connection import Key, Location
+from pandas.parser import CParserError
 import pandas as pd
 import numpy as np
 
@@ -63,13 +65,30 @@ def save_cache(cache, columns):
 	for file_name, df in cache.items():
 		save_df(df, file_name, columns)
 
+def __preprocess_frame(df, ct_to_cnn):
+	df['GOOD_DESCRIPTION'] = df["GOOD_DESCRIPTION"].str.lower()
+	df['GOOD_DESCRIPTION'].replace(ct_to_cnn, inplace=True)
+	df['MERCHANT_NAME'] = df['GOOD_DESCRIPTION']
+	grouped = df.groupby('MERCHANT_NAME', as_index=False)
+	return dict(list(grouped))
+
+def __sample_null(merchant_df, columns, first_null_chunk, merchant_file_name):
+	num_to_sample = math.ceil(len(merchant_df.index) * 0.0075)
+	rows = np.random.choice(merchant_df.index.values, num_to_sample)
+	sampled_df = merchant_df.ix[rows]
+	if first_null_chunk:
+		sampled_df.to_csv(merchant_file_name, columns=columns, sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
+		first_null_chunk = False
+	else:
+		sampled_df.to_csv(merchant_file_name, header=False, columns=columns, sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
+
 def run_from_command_line(cla):
 	"""Runs these commands if the module is invoked from the command line"""
 
 	# Connect to S3
 	with nostdout():
 		conn = get_s3_connection()
-		
+
 	bucket = conn.get_bucket("yodleeprivate", Location.USWest2)
 	columns = ["DESCRIPTION_UNMASKED", "DESCRIPTION", "GOOD_DESCRIPTION", "TRANSACTION_DATE", "UNIQUE_TRANSACTION_ID", "AMOUNT", "UNIQUE_MEM_ID", "TYPE"]
 	dtypes = {x: "object" for x in columns}
@@ -87,7 +106,7 @@ def run_from_command_line(cla):
 		regex = re.compile("ctprocessed/gpanel/card/")
 		label_map = load_params("meerkat/classification/label_maps/expanded_permanent_card_label_map.json")
 		reverse_label_map = load_params("meerkat/classification/label_maps/expanded_reverse_card_label_map.json")
-	else: 
+	else:
 		print("Please select bank or card for container")
 		sys.exit()
 
@@ -102,9 +121,10 @@ def run_from_command_line(cla):
 		if str(value) in reverse_label_map:
 			ct_to_cnn_map[key] = reverse_label_map[str(value)]
 
+	label_set = set(reverse_label_map.values())
+
 	print("Number of " + sys.argv[1] + " files " + str(len(files)))
 	num_map = dict(zip(reverse_label_map.values(), reverse_label_map.keys()))
-	map_labels = lambda x: ct_to_cnn_map.get(x["GOOD_DESCRIPTION"].lower(), "")
 	merchant_count = defaultdict(lambda: 0)
 	df_cache = {}
 	cache_full = False
@@ -112,7 +132,7 @@ def run_from_command_line(cla):
 	# Sample Files
 	for i, item in enumerate(files):
 		file_name = "data/output/" + os.path.basename(item.key)
-		
+
 		try:
 			item.get_contents_to_filename(file_name)
 			reader = pd.read_csv(file_name, na_filter=False, chunksize=500000, dtype=dtypes, compression="gzip", quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
@@ -123,29 +143,22 @@ def run_from_command_line(cla):
 				print("chunk")
 
 				# Replace CT labels with well formatted labels
-				df['MERCHANT_NAME'] = df.apply(map_labels, axis=1)
-				grouped = df.groupby('MERCHANT_NAME', as_index=False)
-				groups = dict(list(grouped))
+				groups = __preprocess_frame(df, ct_to_cnn_map)
 
 				# Apply Reservoir Sampling Over Each Merchant
 				for merchant, merchant_df in groups.items():
+					if merchant not in label_set:
+						merchant = ""
 
 					merchant_df = merchant_df[columns]
 					output_df = None
-					
+
 					n = SAMPLE_SIZE
 					merchant_file_name = "data/output/s3_sample/" + num_map[merchant] + ".csv"
 
 					# Sample Null Class Differently for performance reasons
 					if merchant == "":
-						num_to_sample = math.ceil(len(merchant_df.index) * 0.0075)
-						rows = np.random.choice(merchant_df.index.values, num_to_sample)
-						sampled_df = merchant_df.ix[rows]
-						if first_null_chunk:
-							sampled_df.to_csv(merchant_file_name, columns=columns, sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
-							first_null_chunk = False
-						else: 
-							sampled_df.to_csv(merchant_file_name, header=False, columns=columns, sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
+						__sample_null(merchant_df, columns, first_null_chunk, merchant_file_name)
 						continue
 
 					# Create Dataframe if file doesn't exist
@@ -154,7 +167,7 @@ def run_from_command_line(cla):
 					elif merchant_count[merchant] == 0:
 						output_df = pd.DataFrame(columns=columns)
 					elif merchant_count[merchant] < n:
-						output_df = load_df(merchant_file_name, dtypes)		
+						output_df = load_df(merchant_file_name, dtypes)
 
 					# Fill Reservoirs
 					if merchant_count[merchant] < n:
@@ -171,7 +184,7 @@ def run_from_command_line(cla):
 							merchant_count[merchant] += r
 							merchant_df = merchant_df.iloc[r+1:m_len-1]
 							save_df(output_df, merchant_file_name, columns)
-				
+
 					rows_to_add = []
 
 					# Select Rows to Replace
@@ -186,7 +199,7 @@ def run_from_command_line(cla):
 						# Load df if not loaded yet
 						if output_df is None:
 							output_df = load_df(merchant_file_name, dtypes)
-						
+
 						# Replace Rows
 						output_df.iloc[np.random.choice(range(n), len(rows_to_add))] = merchant_df.loc[rows_to_add].values
 
@@ -201,8 +214,13 @@ def run_from_command_line(cla):
 
 			del files[i]
 			safely_remove_file(file_name)
-
-		except:
+		except KeyboardInterrupt as e:
+			return
+		except CParserError as e:
+			return
+		except Exception as e:
+			print(str(type(e)))
+			traceback.print_exc()
 			safely_remove_file(file_name)
 			continue
 
