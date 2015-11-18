@@ -1,6 +1,7 @@
 #!/usr/local/bin/python3.3
 
-"""This utility loads a single classifier, runs it over the given data, compares the classifier's answers to the
+"""This utility loads a single classifier, runs it over the given data, 
+compares the classifier's answers to the
 
 Created in October, 2015
 @author: Matthew Sevrens
@@ -19,12 +20,20 @@ import meerkat.accuracy
 import argparse
 
 parser = argparse.ArgumentParser(description="Test a given machine learning model against the given labeled data")
-parser.add_argument('--testfile', '-f', required=True, help="path to the test data")
-parser.add_argument('--model', '-m', required=True, help="path to the model under test")
-parser.add_argument('--dictionary', '-d', required=True, help="mapping of model output IDs to human readable names")
-parser.add_argument('--humandictionary', '-D', required=False, help="Optional mapping of human labels to the IDs output by your CNN.  Default is None")
-parser.add_argument('--labelkey', '-l', required=False, default=meerkat.accuracy.default_label_key, help="Optional column containing the human label for a transaction.  Default is 'GOOD_DESCRIPTION'")
-parser.add_argument('--inputcolumn', '-i', required=False, default=meerkat.accuracy.default_doc_key, help="Optional column containing the data to be input to the CNN.  Default is 'DESCRIPTION_UNMASKED'")
+parser.add_argument('--testfile', '-f', required=True, \
+	help="path to the test data")
+parser.add_argument('--model', '-m', required=True, \
+	help="path to the model under test")
+parser.add_argument('--dictionary', '-d', required=True, \
+	help="mapping of model output IDs to human readable names")
+parser.add_argument('--humandictionary', '-D', required=False, \
+	help="Optional mapping of human labels to the IDs output by your CNN.  Default is None")
+parser.add_argument('--labelkey', '-l', required=False, \
+	default=meerkat.accuracy.default_label_key, \
+	help="Optional column containing the human label for a transaction.  Default is 'GOOD_DESCRIPTION'")
+parser.add_argument('--inputcolumn', '-i', required=False, \
+	default=meerkat.accuracy.default_doc_key, \
+	help="Optional column containing the data to be input to the CNN.  Default is 'DESCRIPTION_UNMASKED'")
 
 def run_from_command_line(args):
 	"""Runs these commands if the module is invoked from the command line"""

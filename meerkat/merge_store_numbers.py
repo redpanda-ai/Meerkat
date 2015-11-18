@@ -94,7 +94,8 @@ def find_merchant(store):
 
 	# Allow User to Verify and Return
 	formatted = [top_hit.get("name", ""), top_hit.get("address", ""),\
-	 top_hit.get("postcode", ""), top_hit.get("locality", ""), top_hit.get("region", ""),]
+	 top_hit.get("postcode", ""), top_hit.get("locality", ""), \
+	 top_hit.get("region", ""),]
 	formatted = ", ".join(formatted)
 
 	message = """

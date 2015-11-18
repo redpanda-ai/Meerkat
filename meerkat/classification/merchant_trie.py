@@ -8,6 +8,7 @@ Created on June 30, 2015
 
 import json
 import sys
+# pylint:disable=deprecated-module
 import string
 import os
 import marisa_trie as mt

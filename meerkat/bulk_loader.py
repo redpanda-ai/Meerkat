@@ -223,8 +223,8 @@ class ThreadConsumer(threading.Thread):
 				if "longitude" in document and "latitude" in document:
 					if document["longitude"].strip() != "" and document["latitude"].strip() != "":
 						document["pin"] = {"location":{"type": "point",
-							"coordinates" :[ document["longitude"],
-							 document["latitude"]]}}
+							"coordinates" :[document["longitude"],
+							document["latitude"]]}}
 						#my_logger.info(document["pin"])
 					del document["longitude"]
 					del document["latitude"]
