@@ -6,10 +6,10 @@ from tornado import gen
 from tornado_json.requesthandlers import APIHandler
 
 from meerkat.web_service.web_consumer import Web_Consumer
+from meerkat.web_service.stats import Stats
 from meerkat.web_service import schema
 from meerkat.various_tools import (load_params, get_us_cities,\
 	load_hyperparameters)
-from meerkat.web_service.stats import Stats
 
 class Meerkat_API(APIHandler):
 	"""This class is the Meerkat API."""
@@ -60,7 +60,7 @@ class Meerkat_API(APIHandler):
 	def get(self):
 		"""Handle get requests"""
 		results = yield self.thread_pool.submit(self.stats.get_stats)
-		self.finish(results)
+		self.write(results)
 
 #Print a warning to not execute this file as a module
 if __name__ == "__main__":
