@@ -45,7 +45,7 @@ def guarantee_index_and_doc_type(params):
     es_connection = Elasticsearch(cluster_nodes, index=es_index,\
         sniff_on_start=True, sniff_on_connection_fail=True,\
         sniffer_timeout=15, sniff_timeout=15)
-    
+
     if es_connection.indices.exists(index=es_index):
         logging.critical("Index exists, continuing")
         if es_connection.indices.exists_type(index=es_index, doc_type=es_doc_type):
@@ -134,7 +134,7 @@ def __invert_subtype_map(subtype_map):
 
 def __get_data_from_s3():
     conn = get_s3_connection()
-    bucket = conn.get_bucket("s3yodlee", Location.USWest2)
+    bucket = conn.get_bucket("s3yodlee", Location.USWest2, validate=False)
     keys = bucket.list(FOLDER)
     for key in keys:
         if(key.name.lower() == FOLDER.lower()):
