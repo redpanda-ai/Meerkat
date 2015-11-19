@@ -67,20 +67,12 @@ def save_cache(cache, columns):
 
 def __preprocess_frame(df, ct_to_cnn):
 	df['GOOD_DESCRIPTION'] = df["GOOD_DESCRIPTION"].str.lower()
-	df['GOOD_DESCRIPTION'].replace(ct_to_cnn, inplace=True)
-	df['MERCHANT_NAME'] = df['GOOD_DESCRIPTION']
+	merch_names = []
+	for item in df['GOOD_DESCRIPTION']:
+		merch_names.append(ct_to_cnn.get(item, ""))
+	df['MERCHANT_NAME'] = merch_names
 	grouped = df.groupby('MERCHANT_NAME', as_index=False)
 	return dict(list(grouped))
-
-def __sample_null(merchant_df, columns, first_null_chunk, merchant_file_name):
-	num_to_sample = math.ceil(len(merchant_df.index) * 0.0075)
-	rows = np.random.choice(merchant_df.index.values, num_to_sample)
-	sampled_df = merchant_df.ix[rows]
-	if first_null_chunk:
-		sampled_df.to_csv(merchant_file_name, columns=columns, sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
-		first_null_chunk = False
-	else:
-		sampled_df.to_csv(merchant_file_name, header=False, columns=columns, sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
 
 def run_from_command_line(cla):
 	"""Runs these commands if the module is invoked from the command line"""
@@ -121,8 +113,6 @@ def run_from_command_line(cla):
 		if str(value) in reverse_label_map:
 			ct_to_cnn_map[key] = reverse_label_map[str(value)]
 
-	label_set = set(reverse_label_map.values())
-
 	print("Number of " + sys.argv[1] + " files " + str(len(files)))
 	num_map = dict(zip(reverse_label_map.values(), reverse_label_map.keys()))
 	merchant_count = defaultdict(lambda: 0)
@@ -147,9 +137,6 @@ def run_from_command_line(cla):
 
 				# Apply Reservoir Sampling Over Each Merchant
 				for merchant, merchant_df in groups.items():
-					if merchant not in label_set:
-						merchant = ""
-
 					merchant_df = merchant_df[columns]
 					output_df = None
 
@@ -158,7 +145,14 @@ def run_from_command_line(cla):
 
 					# Sample Null Class Differently for performance reasons
 					if merchant == "":
-						__sample_null(merchant_df, columns, first_null_chunk, merchant_file_name)
+						num_to_sample = math.ceil(len(merchant_df.index) * 0.0075)
+						rows = np.random.choice(merchant_df.index.values, num_to_sample)
+						sampled_df = merchant_df.ix[rows]
+						if first_null_chunk:
+							sampled_df.to_csv(merchant_file_name, columns=columns, sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
+							first_null_chunk = False
+						else:
+							sampled_df.to_csv(merchant_file_name, header=False, columns=columns, sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
 						continue
 
 					# Create Dataframe if file doesn't exist
