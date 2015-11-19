@@ -45,24 +45,20 @@ def guarantee_index_and_doc_type(params):
     es_connection = Elasticsearch(cluster_nodes, index=es_index,\
         sniff_on_start=True, sniff_on_connection_fail=True,\
         sniffer_timeout=15, sniff_timeout=15)
-
+    
     if es_connection.indices.exists(index=es_index):
         logging.critical("Index exists, continuing")
         if es_connection.indices.exists_type(index=es_index, doc_type=es_doc_type):
             logging.critical("Doc type exists, continuing")
     else:
         logging.warning("Index does not exist, creating")
-        # index_body = params["elasticsearch"]["type_mapping"]
         es_connection.indices.create(index=es_index)
     return es_connection
 
 def run_from_command_line():
-    # params = load_params(sys.argv[1])
-    # print(len(sys.argv)) # 2
-    results_params = initialize()
-    # es_connection = get_es_connection(params)
-    es_connection = guarantee_index_and_doc_type(results_params)
     pp = pprint.PrettyPrinter(indent = 4)
+    results_params = initialize()
+    es_connection = guarantee_index_and_doc_type(results_params)
     es_index = results_params["elasticsearch"]["index"]
     es_doc_type = results_params["elasticsearch"]["type"]
 
@@ -78,10 +74,7 @@ def run_from_command_line():
     bank_merchant_body["results_content"] = bank_merchant_results
     bank_merchant_body["results_type"] = "bank_merchant_results"
     bank_merchant_body["results_date"] = datetime.now()
-    # pp.pprint(bank_merchant_body)
-
     es_connection.index(index=es_index, doc_type=es_doc_type, body=bank_merchant_body)
-    # pp.pprint(es_connection.search(index="results_index", body={"query": {"match": {'results_type':'bank_merchant_results'}}}))
 
     card_merchant = "1k_labeled_card_merchant_samples"
     card_label_map = "meerkat/classification/label_maps/permanent_card_label_map.json"
@@ -93,11 +86,7 @@ def run_from_command_line():
     card_merchant_body["results_content"] = card_merchant_results
     card_merchant_body["results_type"] = "card_merchant_results"
     card_merchant_body["results_date"] = datetime.now()
-    # pp.pprint(card_merchant_body)
-
     es_connection.index(index=es_index, doc_type=es_doc_type, body=card_merchant_body)
-    # pp.pprint(es_connection.search(index="results_index", body={"query": {"match": {'results_type':'card_merchant_results'}}}))
-
 
     bank_debit_subtype = "1k_labeled_bank_debit_samples"
     bank_debit_map = load_params("meerkat/classification/label_maps/bank_debit_subtype_label_map.json")
@@ -105,11 +94,23 @@ def run_from_command_line():
     bank_debit_results = CNN_accuracy(bank_debit_subtype, BANK_DEBIT_SUBTYPE_CNN, bank_debit_map, bank_debit_reverse_map, label_key="Proposed Subtype")
     print_results(bank_debit_results)
 
+    bank_debit_subtype_body = {}
+    bank_debit_subtype_body["results_content"] = bank_debit_results
+    bank_debit_subtype_body["results_type"] = "bank_debit_results"
+    bank_debit_subtype_body["results_date"] = datetime.now()
+    es_connection.index(index=es_index, doc_type=es_doc_type, body=bank_debit_subtype_body)
+
     bank_credit_subtype = "1k_labeled_bank_credit_samples"
     bank_credit_map = load_params("meerkat/classification/label_maps/bank_credit_subtype_label_map.json")
     bank_credit_reverse_map = __invert_subtype_map(bank_credit_map)
     bank_credit_results = CNN_accuracy(bank_credit_subtype, BANK_CREDIT_SUBTYPE_CNN, bank_credit_map, bank_credit_reverse_map, label_key="Proposed Subtype")
     print_results(bank_credit_results)
+
+    bank_credit_subtype_body = {}
+    bank_credit_subtype_body["results_content"] = bank_credit_results
+    bank_credit_subtype_body["results_type"] = "bank_credit_results"
+    bank_credit_subtype_body["results_date"] = datetime.now()
+    es_connection.index(index=es_index, doc_type=es_doc_type, body=bank_credit_subtype_body)
 
     card_debit_subtype = "1k_labeled_card_debit_samples"
     card_debit_map = load_params("meerkat/classification/label_maps/card_debit_subtype_label_map.json")
@@ -117,11 +118,23 @@ def run_from_command_line():
     card_debit_results = CNN_accuracy(card_debit_subtype, CARD_DEBIT_SUBTYPE_CNN, card_debit_map, card_debit_reverse_map, label_key="Proposed Subtype")
     print_results(card_debit_results)
 
+    card_debit_subtype_body = {}
+    card_debit_subtype_body["results_content"] = card_debit_results
+    card_debit_subtype_body["results_type"] = "card_debit_results"
+    card_debit_subtype_body["results_date"] = datetime.now()
+    es_connection.index(index=es_index, doc_type=es_doc_type, body=card_debit_subtype_body)
+
     card_credit_subtype = "1k_labeled_card_credit_samples"
     card_credit_map = load_params("meerkat/classification/label_maps/card_credit_subtype_label_map.json")
     card_credit_reverse_map = __invert_subtype_map(card_credit_map)
     card_credit_results = CNN_accuracy(card_credit_subtype, CARD_CREDIT_SUBTYPE_CNN, card_credit_map, card_credit_reverse_map, label_key="Proposed Subtype")
     print_results(card_credit_results)
+
+    card_credit_subtype_body = {}
+    card_credit_subtype_body["results_content"] = card_credit_results
+    card_credit_subtype_body["results_type"] = "card_credit_results"
+    card_credit_subtype_body["results_date"] = datetime.now()
+    es_connection.index(index=es_index, doc_type=es_doc_type, body=card_credit_subtype_body)
 
     __remove_local_data(keys)
 
@@ -134,7 +147,7 @@ def __invert_subtype_map(subtype_map):
 
 def __get_data_from_s3():
     conn = get_s3_connection()
-    bucket = conn.get_bucket("s3yodlee", Location.USWest2, validate=False)
+    bucket = conn.get_bucket("s3yodlee", Location.USWest2)
     keys = bucket.list(FOLDER)
     for key in keys:
         if(key.name.lower() == FOLDER.lower()):

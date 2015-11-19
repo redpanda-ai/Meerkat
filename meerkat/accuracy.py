@@ -164,7 +164,6 @@ def print_results(results):
 	"""Provide useful readable output"""
 
 	sys.stdout.write('\n\n')
-	# print(results)
 	print("STATS:")
 	print("{0:35} = {1:11}".format("Total Transactions Processed", results["total"]))
 
