@@ -147,11 +147,7 @@ def __invert_subtype_map(subtype_map):
 
 def __get_data_from_s3():
     conn = get_s3_connection()
-<<<<<<< HEAD
-    bucket = conn.get_bucket("s3yodlee", Location.USWest2)
-=======
     bucket = conn.get_bucket("s3yodlee", False, Location.USWest2)
->>>>>>> 9f2ee532e7ba4ae192df20fcdb17cb2ea6a1bc7c
     keys = bucket.list(FOLDER)
     for key in keys:
         if(key.name.lower() == FOLDER.lower()):
