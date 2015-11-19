@@ -1,0 +1,9 @@
+{
+    "elasticsearch" : {
+        "cluster_nodes" : [
+            "172.31.9.6"
+        ],
+        "index" : "results_index",
+        "type" : "results"
+    }
+}
