@@ -16,14 +16,14 @@ config.thes = false
 
 -- Training data
 config.train_data = {}
-config.train_data.file = paths.concat(paths.cwd(), "../data/train.t7b")
+config.train_data.file = paths.concat(paths.cwd(), "../../../data/input/train.t7b")
 config.train_data.alphabet = alphabet
 config.train_data.length = 123
 config.train_data.batch_size = 128
 
 -- Validation data
 config.val_data = {}
-config.val_data.file =  paths.concat(paths.cwd(), "../data/test.t7b")
+config.val_data.file =  paths.concat(paths.cwd(), "../../../data/input/test.t7b")
 config.val_data.alphabet = alphabet
 config.val_data.length = 123
 config.train_data.batch_size = 128
@@ -44,26 +44,19 @@ config.model[8] = {module = "nn.Threshold"}
 -- 108 x 256
 config.model[9] = {module = "nn.TemporalConvolution", inputFrameSize = 256, outputFrameSize = 256, kW = 3}
 config.model[10] = {module = "nn.Threshold"}
--- 106 x 256
+-- 104 x 256
 config.model[11] = {module = "nn.TemporalConvolution", inputFrameSize = 256, outputFrameSize = 256, kW = 3}
 config.model[12] = {module = "nn.Threshold"}
--- 104 x 256
-config.model[13] = {module = "nn.TemporalConvolution", inputFrameSize = 256, outputFrameSize = 256, kW = 3}
-config.model[14] = {module = "nn.Threshold"}
-config.model[15] = {module = "nn.TemporalMaxPooling", kW = 3, dW = 3}
+config.model[13] = {module = "nn.TemporalMaxPooling", kW = 3, dW = 3}
 -- 34 x 256
-config.model[16] = {module = "nn.Reshape", size = 256}
+config.model[14] = {module = "nn.Reshape", size = 256}
 -- 8704
-config.model[17] = {module = "nn.Linear", inputSize = 256, outputSize = 1024}
-config.model[18] = {module = "nn.Threshold"}
-config.model[19] = {module = "nn.Dropout", p = 0.5}
+config.model[15] = {module = "nn.Linear", inputSize = 256, outputSize = 1024}
+config.model[16] = {module = "nn.Threshold"}
+config.model[17] = {module = "nn.Dropout", p = 0.5}
 -- 1024
-config.model[20] = {module = "nn.Linear", inputSize = 1024, outputSize = 1024}
-config.model[21] = {module = "nn.Threshold"}
-config.model[22] = {module = "nn.Dropout", p = 0.5}
--- 1024
-config.model[23] = {module = "nn.Linear", inputSize = 1024, outputSize = 500}
-config.model[24] = {module = "nn.LogSoftMax"}
+config.model[18] = {module = "nn.Linear", inputSize = 1024, outputSize = 156}
+config.model[19] = {module = "nn.LogSoftMax"}
 
 -- The loss
 config.loss = nn.ClassNLLCriterion

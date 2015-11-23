@@ -46,7 +46,7 @@ def main():
 	# This file is located in S3 under
 	# s3yodlee/development/bank/3_year_card_sample.txt
 	# transactions = open("data/input/3_year_card_sample.log")
-	transactions = open("data/input/merchant_labels.csv", encoding ="ISO-8859-1")
+	transactions = open("data/input/merchant_labels.csv", encoding="ISO-8859-1")
 	reader = csv.reader(transactions, delimiter=',')
 	correct = 0
 	count = 0

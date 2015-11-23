@@ -23,7 +23,8 @@ from tornado.options import define, options
 from meerkat.web_service.api import Meerkat_API
 
 # Define Some Defaults
-define("port", default=(len(sys.argv) > 1 and str(sys.argv[1]) or 443), help="run on the given port", type=int)
+define("port", default=(len(sys.argv) > 1 and str(sys.argv[1]) or 443),
+	help="run on the given port", type=int)
 
 def main():
 	"""Launches an HTTPS web service."""
@@ -37,6 +38,7 @@ def main():
 
 	# Define valid routes
 	routes = [
+		("/meerkat/v1.6/?", Meerkat_API),
 		("/meerkat/v1.5/?", Meerkat_API),
 		("/meerkat/v1.4/?", Meerkat_API),
 		("/meerkat/v1.3/?", Meerkat_API),

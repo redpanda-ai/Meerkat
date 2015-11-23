@@ -90,6 +90,17 @@ class WebConsumerTest(unittest.TestCase):
         self.assertEqual(len(transactions[0]["category_labels"]), 1)
         self.assertEqual(transactions[0]["category_labels"][0], "Joseph Rules")
 
+    def test_fallback_bad_merchant_name(self):
+        """Assert that when a merchant is not found in the fallback map the request does not fail"""
+        transactions = web_consumer_fixture.get_transaction_subtype_non_existant_merchant()
+
+        self.consumer._Web_Consumer__apply_missing_categories(
+                                                              transactions,
+                                                              "bank")
+
+        self.assertEqual(len(transactions[0]["category_labels"]), 1)
+        self.assertEqual(transactions[0]["category_labels"][0], "")
+
     def test_apply_subtype_cnn_bank(self):
         """Assert type/subtype are set on each transaction passed to the subypte CNN"""
         test_request = web_consumer_fixture.get_test_request_bank()

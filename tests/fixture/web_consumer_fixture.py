@@ -68,6 +68,13 @@ def get_transaction_subtype_no_merchant_no_fallback():
     }]
 
 
+def get_transaction_subtype_non_existant_merchant():
+    """Return an array containing a single transaction with a merchant that doesn't exist in the subtype map"""
+    return [{
+        "CNN": "Joseph Rules"
+    }]
+
+
 def get_test_request_bank():
     """return an API request with the "bank" container"""
     return {
@@ -168,7 +175,14 @@ def get_mock_params():
 
 
 def get_mock_esconnection(params):
-    return
+    index = params["elasticsearch"]["index"]
+    index_type = params["elasticsearch"]["type"]
+    mapping = {index: {"mappings": {index_type: {}}}}
+    indices = lambda: None
+    indices.get_mapping = lambda: mapping
+    es = lambda: None
+    es.indices = indices
+    return es
 
 
 def get_mock_msearch(queries):

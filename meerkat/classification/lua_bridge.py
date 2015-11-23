@@ -10,6 +10,8 @@ import ctypes
 import json
 import logging
 
+LOGSOFTMAX_THRESHOLD = -1
+
 def load_label_map(filename):
 	"""Load a permanent label map"""
 
@@ -20,13 +22,45 @@ def load_label_map(filename):
 	return label_map
 
 def get_cnn(model_name):
-	"""Load a function to process transactions using a CNN"""
+	"""Load a CNN model by name"""
 
-	lualib = ctypes.CDLL("/home/ubuntu/torch/install/lib/libluajit.so",\
+	# Load CNN and Label map
+	if model_name == "bank_merchant":
+		return get_cnn_by_path(
+			"meerkat/classification/models/612_class_bank_CNN.t7b",
+			"meerkat/classification/label_maps/reverse_bank_label_map.json")
+	elif model_name == "card_merchant":
+		return get_cnn_by_path(
+			"meerkat/classification/models/750_class_card_CNN.t7b",
+			"meerkat/classification/label_maps/reverse_card_label_map.json")
+	elif model_name == "bank_debit_subtype":
+		return get_cnn_by_path(
+			"meerkat/classification/models/bank_debit_subtype_CNN.t7b",
+			"meerkat/classification/label_maps/bank_debit_subtype_label_map.json")
+	elif model_name == "bank_credit_subtype":
+		return get_cnn_by_path(
+			"meerkat/classification/models/bank_credit_subtype_CNN.t7b",
+			"meerkat/classification/label_maps/bank_credit_subtype_label_map.json")
+	elif model_name == "card_debit_subtype":
+		return get_cnn_by_path(
+			"meerkat/classification/models/card_debit_subtype_CNN.t7b",
+			"meerkat/classification/label_maps/card_debit_subtype_label_map.json")
+	elif model_name == "card_credit_subtype":
+		return get_cnn_by_path(
+			"meerkat/classification/models/card_credit_subtype_CNN.t7b",
+			"meerkat/classification/label_maps/card_credit_subtype_label_map.json")
+	else:
+		print("Requested CNN does not exist. Please reference an existing model")
+
+def get_cnn_by_path(model_path, dict_path):
+	"""Load a function to process transactions using a CNN"""
+	lualib = ctypes.CDLL(
+		"/home/ubuntu/torch/install/lib/libluajit.so",
 		mode=ctypes.RTLD_GLOBAL)
 
 	# Must Load Lupa After the Preceding Line
 	import lupa
+	# pylint:disable=no-name-in-module
 	from lupa import LuaRuntime
 
 	# Load Runtime and Lua Modules
@@ -41,41 +75,9 @@ def get_cnn(model_name):
 		dofile("meerkat/classification/lua/config.lua")
 	''')
 
-	# Load CNN and Label map
-	if model_name == "bank_merchant":
-		reverse_label_map = load_label_map(\
-			"meerkat/classification/label_maps/reverse_bank_label_map.json")
-		lua.execute('''
-			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/612_class_bank_CNN.t7b"))
-		''')
-	elif model_name == "card_merchant":
-		reverse_label_map = load_label_map(\
-			"meerkat/classification/label_maps/reverse_card_label_map.json")
-		lua.execute('''
-			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/750_class_card_CNN.t7b"))
-		''')
-	elif model_name == "bank_debit_subtype":
-		reverse_label_map = load_label_map("meerkat/classification/label_maps/bank_debit_subtype_label_map.json")
-		lua.execute('''
-			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/bank_debit_subtype_CNN.t7b"))
-		''')
-	elif model_name == "bank_credit_subtype":
-		reverse_label_map = load_label_map("meerkat/classification/label_maps/bank_credit_subtype_label_map.json")
-		lua.execute('''
-			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/bank_credit_subtype_CNN.t7b"))
-		''')
-	elif model_name == "card_debit_subtype":
-		reverse_label_map = load_label_map("meerkat/classification/label_maps/card_debit_subtype_label_map.json")
-		lua.execute('''
-			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/card_debit_subtype_CNN.t7b"))
-		''')
-	elif model_name == "card_credit_subtype":
-		reverse_label_map = load_label_map("meerkat/classification/label_maps/card_credit_subtype_label_map.json")
-		lua.execute('''
-			model = Model:makeCleanSequential(torch.load("meerkat/classification/models/card_credit_subtype_CNN.t7b"))
-		''')
-	else:
-		print("Requested CNN does not exist. Please reference an existing model")
+	reverse_label_map = load_label_map(dict_path)
+	lua_load_model = 'model = Model:makeCleanSequential(torch.load("' + model_path + '"))'
+	lua.execute(lua_load_model)
 
 	# Prepare CNN
 	lua.execute('''
@@ -134,32 +136,36 @@ def get_cnn(model_name):
 			output = model:forward(batch)
 			max, decision = output:double():max(2)
 			labels = {}
+			activations = {}
 			for k = 1, batchLen do
 				labels[k] = decision:select(1, k)[1]
+				activations[k] = max:select(1, k)[1]
 			end
-			return labels
+			return labels, activations
 		end
 	''')
 
 	# Generate Helper Function
 	def apply_cnn(trans, doc_key="description", label_key="CNN"):
 		"""Apply CNN to transactions"""
+
 		trans_list = [' '.join(x[doc_key].split()) for x in trans]
 		table_trans = list_to_table(trans_list)
 		batch = make_batch(table_trans)
-		labels = process_batch(batch)
+		labels, activations = process_batch(batch)
 		decisions = list(labels.values())
+		confidences = list(activations.values())
 
 		for index, transaction in enumerate(trans):
-			transaction[label_key] = reverse_label_map.get(\
-				str(decisions[index]), "")
+			label = reverse_label_map.get(str(decisions[index]), "") if confidences[index] > LOGSOFTMAX_THRESHOLD else ""
+			transaction[label_key] = label
 
 		return trans
 
 	return apply_cnn
 
 if __name__ == "__main__":
+	# pylint:disable=pointless-string-statement
 	"""Print a warning to not execute this file as a module"""
-	logging.warning("This module is a library that contains useful functions;" +\
- "it should not be run from the console.")
+	logging.warning("This module is a library that contains useful functions;it should not be run from the console.")
 

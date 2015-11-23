@@ -21,8 +21,8 @@ def main():
 		
 	output_file = open("matt_8000", 'w')
 	dict_w = csv.DictWriter(output_file, \
-							delimiter = "|", \
-							fieldnames = subsample[0].keys())
+							delimiter="|", \
+							fieldnames=subsample[0].keys())
 	dict_w.writeheader()
 	dict_w.writerows(subsample)
 	output_file.close()

@@ -17,7 +17,7 @@ import re
 import sys
 import queue
 
-import boto.sns
+import boto
 import numpy as np
 
 CLEAN_PATTERN = re.compile(r"\\+\|")
@@ -130,6 +130,15 @@ def get_es_connection(params):
 
 	return es_connection
 
+def get_s3_connection():
+	"""Returns a connection to S3"""
+	try:
+		conn = boto.connect_s3()
+	except boto.s3.connection.HostRequiredError:
+		print("Error connecting to S3, check your credentials")
+		sys.exit()
+	return conn
+
 def post_SNS(message):
 	"""Post an SNS message"""
 	region = 'us-west-2'
@@ -137,7 +146,7 @@ def post_SNS(message):
 	conn = boto.sns.connect_to_region(region)
 	_ = conn.publish(topic=topic, message=message)
 
-def get_merchant_by_id(params, factual_id, es_connection, index=""):
+def get_merchant_by_id(params, factual_id, es_connection, index="", doc_type="factual_type", routing=None):
 	"""Fetch the details for a single factual_id"""
 
 	if index == "":
@@ -147,8 +156,10 @@ def get_merchant_by_id(params, factual_id, es_connection, index=""):
 		return None
 
 	try:
-		result = es_connection.get(index=index,\
-			doc_type='factual_type', id=factual_id)
+		if routing:
+			result = es_connection.get(index=index, doc_type=doc_type, id=factual_id, routing=routing)
+		else:
+			result = es_connection.get(index=index, doc_type=doc_type, id=factual_id)
 		hit = result["_source"]
 		return hit
 	except:
