@@ -22,7 +22,8 @@ from boto.s3.connection import Key, Location
 import pandas as pd
 import numpy as np
 
-from meerkat.various_tools import safely_remove_file, clean_bad_escapes, load_params, get_s3_connection
+from meerkat.various_tools import (safely_remove_file, clean_bad_escapes,
+	load_params, get_s3_connection)
 
 SAMPLE_SIZE = 10000
 
