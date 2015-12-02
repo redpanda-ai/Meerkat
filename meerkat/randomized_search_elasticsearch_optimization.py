@@ -39,11 +39,11 @@ from pprint import pprint
 from meerkat.accuracy import print_results, vest_accuracy
 from meerkat.various_tools import load_dict_list, safe_print, get_us_cities
 from meerkat.various_tools import load_params
-from meerkat.web_service.web_consumer import Web_Consumer
+from meerkat.web_service.web_consumer import WebConsumer
 
 PARAMS = load_params(sys.argv[1])
 CITIES = get_us_cities()
-consumer = Web_Consumer(cities=CITIES, params=PARAMS)
+consumer = WebConsumer(cities=CITIES, params=PARAMS)
 BATCH_SIZE = 100
 
 def run_meerkat(params, dataset):
