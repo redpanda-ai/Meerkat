@@ -170,7 +170,7 @@ def confirm_security_groups(conn, params):
 			new_group_found = True
 			all_groups.append(group)
 	if groups_found == existing_group_count:
-		print("All pre-existing groups found, continuing".format(group))
+		print("All pre-existing groups found, continuing")
 	if not new_group_found:
 		print("Adding group {0}".format(params["name"]))
 		#Need to add vpc_id as named parameters
@@ -184,16 +184,17 @@ def confirm_security_groups(conn, params):
 		print(group)
 	params["all_security_groups"] = all_groups
 
-def connect_to_ec2(region):
-	"""Returns a connection to EC2"""
-	try:
-		conn = boto.ec2.connect_to_region(region,\
-			aws_access_key_id=AWS_ACCESS_KEY_ID,\
-			aws_secret_access_key=AWS_SECRET_ACCESS_KEY, debug=2)
-	except:
-		print("Error connecting to EC2, check your credentials")
-		sys.exit()
-	return conn
+
+#def connect_to_ec2(region):
+#	"""Returns a connection to EC2"""
+#	try:
+#		conn = boto.ec2.connect_to_region(region,\
+#			aws_access_key_id=AWS_ACCESS_KEY_ID,\
+#			aws_secret_access_key=AWS_SECRET_ACCESS_KEY, debug=2)
+#	except:
+#		print("Error connecting to EC2, check your credentials")
+#		sys.exit()
+#	return conn
 
 def copy_configuration_to_hosts(params, dst_file):
 	"""Copies configuration files to each instance in your ES cluster."""
@@ -348,7 +349,7 @@ def poll_for_cluster_status(params):
 						sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
 				except Exception as err:
 					print("Exception while trying to make Elasticsearch connection.")
-					raise("Error trying to connect to ES node.")
+					raise "Error trying to connect to ES node."
 				print("Cluster is online.")
 				print("Attempting to poll for health.")
 				status, number_of_nodes = "unknown", 0
@@ -478,10 +479,11 @@ def start():
 	send_shell_commands(params, "configure_master_commands", "masters")
 	send_shell_commands(params, "configure_hybrid_commands", "hybrids")
 	send_shell_commands(params, "configure_slave_commands", "slaves")
-	ip = poll_for_cluster_status(params)
-	print("Creating Elasticsearch repository... ", end = "")
-	# create elasticsearch snapshot repository
-	command = "curl %s:9200/_snapshot/my_backup -d @web_service_tester/create_repository.json > out.log" % ip
+	ip_address = poll_for_cluster_status(params)
+	print("Creating Elasticsearch repository... ", end="")
+	# create elasticsearch snapshot repositor
+	command = """curl %s:9200/_snapshot/my_backup -d @web_service_tester/
+		create_repository.json > out.log""" % ip_address
 	os.system(command)
 	print("done!")
 	print("Congratulations! Your cluster is fully operational!")

@@ -28,7 +28,6 @@ Created on Feb 26, 2014
 
 #####################################################
 
-import logging
 import sys
 import datetime
 import os
@@ -37,7 +36,6 @@ from random import uniform
 
 from pprint import pprint
 
-from meerkat.classification.load import select_model
 from meerkat.accuracy import print_results, vest_accuracy
 from meerkat.various_tools import load_dict_list, safe_print, get_us_cities
 from meerkat.various_tools import load_params
@@ -160,7 +158,6 @@ def get_initial_values(hyperparameters, params, known, dataset):
 		precision = accuracy["precision"]
 		recall = accuracy["total_recall_physical"]
 		same_or_higher_precision = precision >= top_score["precision"]
-		same_or_higher_recall = recall >= top_score["total_recall_physical"]
 		not_too_high = precision <= settings["max_precision"]
 		has_min_recall = recall >= settings["min_recall"]
 
@@ -188,13 +185,12 @@ def gradient_descent(initial_values, params, known, dataset):
 
 	settings = params["optimization"]["settings"]
 	top_score = initial_values
-	learning_rate = settings["iteration_learning_rate"]
 	save_top_score(initial_values)
 	iterations = settings["gradient_descent_iterations"]
 
 	print("\n----------- Stochastic Gradient Descent ------------")
 
-	for i in range(iterations):
+	for _ in range(iterations):
 		top_score = run_iteration(top_score, params, known, dataset)
 
 		# Save Iterations Top Hyperparameters
@@ -268,7 +264,8 @@ def randomize(hyperparameters, known={}, learning_rate=0.3):
 
 def save_top_score(top_score):
 
-	record = open("optimization_results/" + os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_top_scores.txt", "a")
+	record = open("optimization_results/" + os.path.splitext(os.path.basename(sys.argv[1]))[0] +
+		"_top_scores.txt", "a")
 	pprint("Precision = " + str(top_score['precision']) + "%", record)
 	pprint("Best Recall = " + str(top_score['total_recall_physical']) +"%", record)
 	boost_vectors, boost_labels, other = split_hyperparameters(top_score["hyperparameters"])
@@ -277,7 +274,7 @@ def save_top_score(top_score):
 	record.close()
 
 def split_hyperparameters(hyperparameters):
-
+	"""partition hyperparameters into 2 parts based on keys and non_boost list"""
 	boost_vectors = {}
 	boost_labels = ["standard_fields"]
 	non_boost = ["es_result_size", "z_score_threshold", "good_description"]
@@ -353,7 +350,7 @@ def format_web_consumer(dataset):
 
 	return formatted
 
-def run_from_command_line(command_line_arguments):
+def run_from_command_line():
 	"""Runs these commands if the module is invoked from the command line"""
 
 	# Meta Information
