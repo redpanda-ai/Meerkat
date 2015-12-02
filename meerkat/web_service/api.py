@@ -5,7 +5,7 @@ import json
 from tornado import gen
 from tornado_json.requesthandlers import APIHandler
 
-from meerkat.web_service.web_consumer import Web_Consumer
+from meerkat.web_service.web_consumer import WebConsumer
 from meerkat.web_service import schema
 from meerkat.various_tools import (load_params, get_us_cities,\
 	load_hyperparameters)
@@ -15,7 +15,7 @@ class Meerkat_API(APIHandler):
 	cities = get_us_cities()
 	params = load_params("config/web_service.json")
 	hyperparams = load_hyperparameters(params)
-	meerkat = Web_Consumer(params, hyperparams, cities)
+	meerkat = WebConsumer(params, hyperparams, cities)
 	#This thread pool can deal with 'blocking functions' like meerkat.classify
 	thread_pool = concurrent.futures.ThreadPoolExecutor(14)
 

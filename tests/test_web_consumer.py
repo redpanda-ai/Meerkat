@@ -18,7 +18,7 @@ class WebConsumerTest(unittest.TestCase):
         web_consumer.get_es_connection = web_consumer_fixture.get_mock_esconnection
 
     def setUp(self):
-        self.consumer = web_consumer.Web_Consumer(params=web_consumer_fixture.get_mock_params(), hyperparams=web_consumer_fixture.get_mock_hyperparams())
+        self.consumer = web_consumer.WebConsumer(params=web_consumer_fixture.get_mock_params(), hyperparams=web_consumer_fixture.get_mock_hyperparams())
         return
 
     def tearDown(self):
@@ -28,7 +28,7 @@ class WebConsumerTest(unittest.TestCase):
         """Assert that the correct static category label has been applied from the bank map"""
         transactions = web_consumer_fixture.get_transaction_bank_fallback_classifiable()
 
-        self.consumer._Web_Consumer__apply_missing_categories(
+        self.consumer._WebConsumer__apply_missing_categories(
                                                               transactions,
                                                               "bank")
 
@@ -39,7 +39,7 @@ class WebConsumerTest(unittest.TestCase):
         """Assert that the correct static category label has been applied from the card map"""
         transactions = web_consumer_fixture.get_transaction_card_fallback_classifiable()
 
-        self.consumer._Web_Consumer__apply_missing_categories(
+        self.consumer._WebConsumer__apply_missing_categories(
                                                               transactions,
                                                               "card")
 
@@ -50,7 +50,7 @@ class WebConsumerTest(unittest.TestCase):
         """Assert that the category is applied out of the transaction subytpe fallback map when the merchant map indicates it should be"""
         transactions = web_consumer_fixture.get_transaction_subtype_fallback()
 
-        self.consumer._Web_Consumer__apply_missing_categories(
+        self.consumer._WebConsumer__apply_missing_categories(
                                                               transactions,
                                                               "bank")
 
@@ -61,7 +61,7 @@ class WebConsumerTest(unittest.TestCase):
         """Assert that the transaction subtype is applied when it is not found in the subtype map"""
         transactions = web_consumer_fixture.get_transaction_subtype_no_fallback()
 
-        self.consumer._Web_Consumer__apply_missing_categories(
+        self.consumer._WebConsumer__apply_missing_categories(
                                                               transactions,
                                                               "bank")
 
@@ -72,7 +72,7 @@ class WebConsumerTest(unittest.TestCase):
         """Assert that when no merchant name is found the category is looked up using the subtype"""
         transactions = web_consumer_fixture.get_transaction_subtype_no_merchant()
 
-        self.consumer._Web_Consumer__apply_missing_categories(
+        self.consumer._WebConsumer__apply_missing_categories(
                                                               transactions,
                                                               "bank")
 
@@ -83,7 +83,7 @@ class WebConsumerTest(unittest.TestCase):
         """Assert that when no merchant name is found the category is looked up using the subtype"""
         transactions = web_consumer_fixture.get_transaction_subtype_no_merchant_no_fallback()
 
-        self.consumer._Web_Consumer__apply_missing_categories(
+        self.consumer._WebConsumer__apply_missing_categories(
                                                               transactions,
                                                               "bank")
 
@@ -94,7 +94,7 @@ class WebConsumerTest(unittest.TestCase):
         """Assert that when a merchant is not found in the fallback map the request does not fail"""
         transactions = web_consumer_fixture.get_transaction_subtype_non_existant_merchant()
 
-        self.consumer._Web_Consumer__apply_missing_categories(
+        self.consumer._WebConsumer__apply_missing_categories(
                                                               transactions,
                                                               "bank")
 
@@ -106,7 +106,7 @@ class WebConsumerTest(unittest.TestCase):
         test_request = web_consumer_fixture.get_test_request_bank()
         request_len = len(test_request["transaction_list"])
 
-        self.consumer._Web_Consumer__apply_subtype_CNN(test_request)
+        self.consumer._WebConsumer__apply_subtype_cnn(test_request)
 
         self.assertEqual(len(test_request["transaction_list"]), request_len)
         for trans in test_request["transaction_list"]:
@@ -118,7 +118,7 @@ class WebConsumerTest(unittest.TestCase):
         test_request = web_consumer_fixture.get_test_request_bank()
         request_len = len(test_request["transaction_list"])
 
-        self.consumer._Web_Consumer__apply_merchant_CNN(test_request)
+        self.consumer._WebConsumer__apply_merchant_cnn(test_request)
 
         self.assertEqual(len(test_request["transaction_list"]), request_len)
         for trans in test_request["transaction_list"]:
@@ -129,7 +129,7 @@ class WebConsumerTest(unittest.TestCase):
         test_request = web_consumer_fixture.get_test_request_bank()
         request_len = len(test_request["transaction_list"])
 
-        self.consumer._Web_Consumer__sws(test_request)
+        self.consumer._WebConsumer__sws(test_request)
 
         self.assertEqual(len(test_request["transaction_list"]), request_len)
         for trans in test_request["transaction_list"]:
@@ -137,11 +137,11 @@ class WebConsumerTest(unittest.TestCase):
 
     def test_apply_enrich_physical(self):
         """Assert transactions returned from enrich_physical have all the expected fields for a successful search"""
-        self.consumer._Web_Consumer__search_index = web_consumer_fixture.get_mock_msearch
+        self.consumer._WebConsumer__search_index = web_consumer_fixture.get_mock_msearch
         transactions = web_consumer_fixture.get_test_transaction_list()
         # request_len = len(transactions)
 
-        self.consumer._Web_Consumer__enrich_physical(transactions)
+        self.consumer._WebConsumer__enrich_physical(transactions)
         for trans in transactions:
             self.assertTrue("ledger_entry" in trans)
             self.assertTrue("country" in trans)
