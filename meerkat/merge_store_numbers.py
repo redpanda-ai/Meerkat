@@ -196,7 +196,7 @@ def run(stores):
 	misses = len(not_found)
 	hits = total - misses
 	percent_merged = hits / total
-	percent_missed = round((misses / total), 3)
+	#percent_missed = round((misses / total), 3)
 	logging.warning("HITS: {0}".format(hits))
 	logging.warning("MISSES: {0}".format(misses))
 	logging.warning("PERCENT MERGED: {0}".format(percent_merged))
@@ -232,12 +232,12 @@ def save_not_found(not_found, percent_merged):
 	dict_w.writerows(not_found)
 	output_file.close()
 
-def start_thread(q):
+def start_thread(_queue):
 	while True:
-		merchant = q.get()
+		merchant = _queue.get()
 		stores = load_store_numbers(merchant)
 		run(stores)
-		q.task_done()
+		_queue.task_done()
 
 def process_multiple_merchants():
 	"""Merge in all files within a provided folder"""
@@ -246,11 +246,11 @@ def process_multiple_merchants():
 	merchant_files = [os.path.join(dir_name, f) \
 	for f in os.listdir(dir_name) if f.endswith(".csv")]
 
-	q = Queue(maxsize=0)
+	_queue = Queue(maxsize=0)
 	num_threads = 12
 
 	for i in range(num_threads):
-		worker = Thread(target=start_thread, args=(q,))
+		worker = Thread(target=start_thread, args=(_queue,))
 		worker.name = "Thread %d" % i
 		worker.setDaemon(True)
 		worker.start()
@@ -259,11 +259,11 @@ def process_multiple_merchants():
 	for merchant in merchant_files:
 		logging.warning("Processing %s" % merchant)
 		try:
-			q.put(merchant)
+			_queue.put(merchant)
 		except: 
 			continue
 
-	q.join()
+	_queue.join()
 
 def process_single_merchant():
 	"""Merge in store numbers from a single files"""
@@ -303,7 +303,7 @@ def verify_arguments():
 	("Improper usage. Please provide at least one csv containing store numbers")
 	sys.exit()
 
-def run_from_command_line(command_line_arguments):
+def run_from_command_line():
 	"""Runs these commands if the module is invoked from the command line"""
 
 	# Load and Process Merchants
@@ -326,4 +326,3 @@ if __name__ == "__main__":
 	run_from_command_line(sys.argv)
 
 	logging.shutdown()
-	
