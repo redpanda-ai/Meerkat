@@ -274,7 +274,7 @@ def save_top_score(top_score):
 	record.close()
 
 def split_hyperparameters(hyperparameters):
-	"""partition hyperparamets into 2 parts based on keys and non_boost list"""
+	"""partition hyperparameters into 2 parts based on keys and non_boost list"""
 	boost_vectors = {}
 	boost_labels = ["standard_fields"]
 	non_boost = ["es_result_size", "z_score_threshold", "good_description"]
