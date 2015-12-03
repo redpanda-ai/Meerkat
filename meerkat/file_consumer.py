@@ -58,10 +58,9 @@ class FileConsumer(threading.Thread):
 			boost_column_vectors[boost_column_labels[i]] = np.array(my_list)
 		return boost_row_labels, boost_column_vectors
 
-	def __interactive_mode(self, scores, transaction, hits,\
-		business_names, city_names, state_names):
+	def __interactive_mode(self, *argv):
 		"""Interact with the results as they come"""
-
+		scores, transaction, hits, business_names, city_names, state_names = argv[:]
 		score = scores[0]
 		z_score, raw_score = self.__generate_z_score_delta(scores)
 		decision = self.__decision_boundary(z_score, raw_score)
@@ -123,7 +122,7 @@ class FileConsumer(threading.Thread):
 
 		prompt = stats + "\n\n" + attributes
 		print(prompt)
-		user = input(prompt)
+		#user = input(prompt)
 
 	def __generate_z_score_delta(self, scores):
 		"""Generate the Z-score delta between the first and second scores."""
@@ -156,9 +155,9 @@ class FileConsumer(threading.Thread):
 		else:
 			return False
 
-	def __init__(self, thread_id, params, desc_queue, result_queue,\
-		hyperparameters, cities):
+	def __init__(self, *argv):
 		''' Constructor '''
+		thread_id, params, desc_queue, result_queue, hyperparameters, cities = argv[:]
 		threading.Thread.__init__(self)
 		self.thread_id = thread_id
 		self.desc_queue = desc_queue
@@ -410,10 +409,9 @@ class FileConsumer(threading.Thread):
 
 		return enriched_transaction
 
-	def __enrich_transaction(self, decision, transaction, hit_fields,\
-		z_score_delta, business_names, city_names, state_names):
+	def __enrich_transaction(self, *argv):
 		"""Enriches the transaction if it passes the boundary"""
-
+		decision, transaction, hit_fields, z_score_delta, business_names, city_names, state_names = argv[0]
 		enriched_transaction = transaction
 		field_names = self.params["output"]["results"]["fields"]
 		fields_in_hit = [field for field in hit_fields]
@@ -515,7 +513,7 @@ class FileConsumer(threading.Thread):
 
 	def __search_index(self, input_as_object):
 		"""Searches the merchants index and the merchant mapping"""
-		logger = logging.getLogger("thread " + str(self.thread_id))
+		#logger = logging.getLogger("thread " + str(self.thread_id))
 		#input_data = json.dumps(input_as_object, sort_keys=True, indent=4\
 		#, separators=(',', ': ')).encode('UTF-8')
 
