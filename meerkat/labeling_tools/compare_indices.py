@@ -40,14 +40,18 @@ from meerkat.various_tools import get_merchant_by_id, load_dict_ordered, write_d
 from meerkat.various_tools import safe_print, synonyms, get_magic_query, stopwords
 
 class DummyFile(object):
-	"""Catches stderr and stdout to prevent libraries from printing to screen"""
-	def write(self, _):
-		"It does nothing, on purpose"
+	"""Resemble the stdout/stderr object but it prints nothing to screen"""
+	def write(self, msg):
+		"It writes nothing, on purpose"
 		pass
 
 @contextlib.contextmanager
 def nostderr():
-	"""temporarily remove stderr"""
+	"""
+	It redirects the stderr stream to DummyFile object that do nothing with error message.
+	'yield' is where unit tests take place.
+	After the yield, restore sys.stderr to its original structure
+	"""
 	save_stderr = sys.stderr
 	sys.stderr = DummyFile()
 	yield
