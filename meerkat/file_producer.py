@@ -426,8 +426,8 @@ def flush_errors(params, errors, dst_file_name, line_count):
 		2.  Flushes a summary line with metrics about the error rate.
 		3.  Writes the completed file out to the local host."""
 	print("Flushing errors")
-	my_options = params["my_producer_options"]
-	dst_local_path = my_options["local_files"]["dst_path"]
+	#my_options = params["my_producer_options"]
+	#dst_local_path = my_options["local_files"]["dst_path"]
 	error_count = len(errors)
 	# Set the name of the error file
 	params["local_gzipped_err_file"] =\
@@ -447,7 +447,7 @@ def flush_errors(params, errors, dst_file_name, line_count):
 
 def run_chunk(params, *argv):
 	"""Run a single chunk from a dataframe_reader"""
-	chunk, line_count, _, __ = argv[:4]
+	chunk, line_count, _, _ = argv[:4]
 	hyperparameters, cities, header, dst_file_name = argv[4:8]
 	first_chunk, errors = argv[8:10]
 	# Save Errors
