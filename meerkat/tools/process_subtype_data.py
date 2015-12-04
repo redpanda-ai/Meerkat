@@ -72,10 +72,16 @@ def process_data(groups, ledger_entry):
 	test.to_csv("data/output/" + file_prefix + "_test_subtype.csv",
 		cols=["CLASS_NUM", "DESCRIPTION"], header=False, index=False, index_label=False)
 
-df = pd.read_csv("data/input/aggregated_" + sys.argv[1] + "_subtype_training_data.csv", 
-	na_filter=False, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
-grouped = df.groupby('LEDGER_ENTRY', as_index=False)
-groups = dict(list(grouped))
+def get_df():
+	""" Load the df """
+	df = pd.read_csv("data/input/aggregated_" + sys.argv[1] + "_subtype_training_data.csv", 
+		na_filter=False, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+	return df
 
-process_data(groups, "credit")
-process_data(groups, "debit")
+def get_grouped():
+	""" Get the grouped df """
+	grouped = get_df().groupby('LEDGER_ENTRY', as_index=False)
+	return grouped
+
+process_data(dict(list(get_grouped())), "credit")
+process_data(dict(list(get_grouped())), "debit")
