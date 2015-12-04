@@ -49,8 +49,8 @@ default_doc_key = "DESCRIPTION_UNMASKED"
 default_label_key = "GOOD_DESCRIPTION"
 
 class DummyFile(object):
-    def write(self, x): 
-    	pass
+	def write(self, x): 
+		pass
 
 @contextlib.contextmanager
 def nostdout():
@@ -87,9 +87,12 @@ def test_bulk_classifier(human_labeled, non_physical_trans, my_lists):
 				if human_labeled_row['IS_PHYSICAL_TRANSACTION'] == '1':
 					my_lists["incorrect_non_physical"].append(item)
 
-def generic_test(machine, human, cnn_column, human_column, human_map, machine_map, doc_key=default_doc_key):
+def generic_test(*args, **kwargs):
 	"""Tests both the recall and precision of the pinpoint classifier against
 	human-labeled training data."""
+	machine, human, cnn_column, human_column, human_map, machine_map = args[:]	
+	doc_key = kwargs.get("doc_key", default_doc_key)
+
 	# Create Quicker Lookup
 	index_lookup = {row["UNIQUE_TRANSACTION_ID"]: row for row in human}
 
@@ -98,7 +101,7 @@ def generic_test(machine, human, cnn_column, human_column, human_map, machine_ma
 	correct = []
 	mislabeled = []
 	# Test Each Machine Labeled Row
-	for index, machine_row in enumerate(machine):
+	for _, machine_row in enumerate(machine):
 		# Continue if Unlabeled
 		if machine_row[cnn_column] == "":
 			unlabeled.append(machine_row[doc_key])
@@ -125,9 +128,15 @@ def generic_test(machine, human, cnn_column, human_column, human_map, machine_ma
 
 	return len(machine), needs_hand_labeling, mislabeled, unlabeled, correct
 
-def CNN_accuracy(test_file, classifier, model_dict=None, human_dict=None, label_key=default_label_key, doc_key=default_doc_key):
+def CNN_accuracy(*args, **kwargs):
 	"""Run given CNN over a given input file and return some stats"""
 	# Load Classifier, and transactions
+	test_file, classifier = args[:]
+	model_dict = kwargs.get("model_dict", None)
+	human_dict = kwargs.get("human_dict", None)
+	label_key = kwargs.get("label_key", default_label_key)
+	doc_key = kwargs.get("doc_key", default_doc_key)
+
 	human_map = __load_label_map(human_dict)
 	machine_map = __load_label_map(model_dict)
 	reader = pd.read_csv(test_file, chunksize=1000, na_filter=False, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
@@ -298,11 +307,11 @@ def process_file_collection(bucket, prefix, classifier, classifier_id_map):
 
 	results.close()
 
-def run_from_command_line(command_line_arguments):
+def run_from_command_line():
 	"""Runs these commands if the module is invoked from the command line"""
 
 	#print_results(vest_accuracy(params=None))
 	all_CNN_accuracy()
 
 if __name__ == "__main__":
-	run_from_command_line(sys.argv)
+	run_from_command_line()
