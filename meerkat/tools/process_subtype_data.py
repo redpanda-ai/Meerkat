@@ -38,7 +38,7 @@ def process_data(groups, ledger_entry):
 	processed = []
 
 	# Process Rows
-	for row in df.iterrows():
+	for _, row in df.iterrows():
 
 		try:
 			masked_row = {'CLASS_NUM' : label_map[row["PROPOSED_SUBTYPE"]], 
