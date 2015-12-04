@@ -138,7 +138,7 @@ def save_top_score(top_score):
 	os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_top_scores.txt", "a")
 	pprint("Precision = {0}%".format(top_score['precision']), record)
 	pprint("Best Recall = {0}%".format(top_score['total_recall_physical']), record)
-	boost_vectors, other = split_hyperparameters(top_score["hyperparameters"])[::2]
+	boost_vectors, _, other = split_hyperparameters(top_score["hyperparameters"])[::2]
 	pprint(boost_vectors, record)
 	pprint(other, record)
 	record.close()
@@ -171,7 +171,7 @@ def get_desc_queue(dataset):
 		users[user].append(row)
 
 	# Add Users to Queue
-	for key in users.items():
+	for key, _ in users.items():
 		desc_queue.put(users[key])
 
 	return desc_queue
@@ -241,7 +241,7 @@ def verify_arguments():
 	# open("optimization_results/" + os.path.splitext(os.path.basename(sys.argv[1]))[0] +
 	# '_top_scores.txt', 'w').close()
 
-def run_from_command_line(command_line_arguments):
+def run_from_command_line():
 	"""Runs these commands if the module is invoked from the command line"""
 
 	# Meta Information
@@ -333,4 +333,4 @@ def run_from_command_line(command_line_arguments):
 	safe_print(res)
 
 if __name__ == "__main__":
-	run_from_command_line(sys.argv)
+	run_from_command_line()
