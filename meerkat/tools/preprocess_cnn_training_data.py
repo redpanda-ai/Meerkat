@@ -40,7 +40,7 @@ def get_lookup_dicts(input_dataframe):
 	lookup[""] = 1
 
 	for key in lookup.keys():
-		new_key = lookup[key]
+		#new_key = lookup[key]
 		reverse_lookup[lookup[key]] = key
 	#Write lookup.json out to a file
 	with open("lookup.json", 'w') as outfile:
@@ -70,15 +70,18 @@ def write_training_and_testing_csv(df):
 		columns=["CLASS", "GOOD_DESCRIPTION", "DESCRIPTION_UNMASKED"], header=False,
 		index=False)
 
-#Main function
-if __name__ == "__main__":
+def run_from_command_line():
+	"""Runs these commands if the module is invoked from the command line """
 	logging.warning("Building histogram")
 	local_src_file = sys.argv[1]
 	logging.warning("Analyzing {0}".format(local_src_file))
 	initial_dataframe = pd.read_csv\
 	(local_src_file, sep='|', encoding="utf-8", error_bad_lines=False)
 
-	lookup, reverse_lookup = get_lookup_dicts(initial_dataframe)
+	lookup, _ = get_lookup_dicts(initial_dataframe)
 	df = get_transformed_training_data(lookup, initial_dataframe)
 	write_training_and_testing_csv(df)
 
+#Main function
+if __name__ == "__main__":
+	run_from_command_line()
