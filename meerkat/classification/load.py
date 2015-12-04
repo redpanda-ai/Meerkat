@@ -33,6 +33,7 @@ def select_model(mode):
 
 	# Generate Helper Function
 	def classifier(description):
+		"""classify the variable description with Card or Bank model"""
 		result = list(model.predict([description]))[0]
 		return result
 			
