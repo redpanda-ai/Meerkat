@@ -147,20 +147,20 @@ def run_from_command_line():
 	
 	dataframe = pd.read_csv(local_filename, na_filter=False, \
 	quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
-	sLen = dataframe.shape[0]
+	s_len = dataframe.shape[0]
 
 	# Add new columns if first time labeling this data set
 	if (tc_col) not in dataframe.columns:
 		if "TXN_TYPE" in dataframe.columns:
 			dataframe.rename(columns={"TXN_TYPE": tc_col}, inplace=True)
 		else:
-			dataframe[tc_col] = pd.Series(([""] * sLen))
+			dataframe[tc_col] = pd.Series(([""] * s_len))
 
 	if (sc_col) not in dataframe.columns:
 		if "SUB_TXN_TYPE" in dataframe.columns:
 			dataframe.rename(columns={"SUB_TXN_TYPE": sc_col}, inplace=True)
 		else:
-			dataframe[sc_col] = pd.Series(([""] * sLen))
+			dataframe[sc_col] = pd.Series(([""] * s_len))
 
 	# Shuffle Rows
 	dataframe = dataframe.reindex(np.random.permutation(dataframe.index))
@@ -206,8 +206,8 @@ def run_from_command_line():
 			# Show Progress
 			complete = dataframe[tc_col].str.contains(choice_regex).sum()
 			sub_complete = dataframe[sc_col].str.contains(sub_choice_regex).sum()
-			percent_complete = complete / sLen * 100
-			sub_percent_complete = sub_complete / sLen * 100
+			percent_complete = complete / s_len * 100
+			sub_percent_complete = sub_complete / s_len * 100
 			os.system("clear")
 			safe_print("{} ".format(complete) + "top choices completed.")
 			safe_print("{0:.2f}%".format(percent_complete) + \
