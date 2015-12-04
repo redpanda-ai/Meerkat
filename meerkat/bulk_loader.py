@@ -208,13 +208,11 @@ class ThreadConsumer(threading.Thread):
 		#blank values
 		params = self.params
 		docs, actions = [], []
-		len_header = len(header)
 		while len(self.batch_list) > 0:
 			current_item = self.batch_list.pop(0)
 			item_list = current_item.split("\t")
 			#If we are missing items at the end, we add blank values
-			len_list = len(item_list)
-			item_delta = len_header - len_list
+			item_delta = len(header) - len(item_list)
 			if item_delta > 0:
 				item_list.extend([""] * item_delta)
 			if len(header) == len(item_list):
@@ -249,7 +247,8 @@ class ThreadConsumer(threading.Thread):
 				}
 				actions.append(action)
 			else:
-				my_logger.info("Header has {0} values, but item has {1} values."(format(len_header, len_item)))
+				my_logger.info("Header has {0} values, but item has {1} values.".\
+					format(len(header), len(item_list)))
 		# Make Calls to Elastic Search
 		my_logger.info("Docs: {0}".format(len(docs)))
 		success, errors = helpers.bulk(self.es_connection, actions)
