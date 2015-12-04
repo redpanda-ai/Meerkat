@@ -42,15 +42,16 @@ def get_json_from_file(input_filename):
 	return None
 
 def create_merchant_trie(input_filename, output_filename):
-	"""creates a trie from an input file and writes the trie to an output file"""
+	"""creates a trie from an input file and writes the trie to an output file,
+		and return the trie for
+	"""
 	merchant_json = get_json_from_file(input_filename)
 	merchants = set()
 	for key in merchant_json.keys():
 		merchants.add(standardize(key))
-
 	merchants = mt.Trie(merchants)
-
-	merchants.save('meerkat/classification/models/merchant_trie.marisa')
+	merchants.save(output_filename)
+	return merchants
 
 def generate_merchant_trie():
 	"""either loads the trie from a file or creates one if no file is found"""
@@ -65,9 +66,9 @@ def generate_merchant_trie():
 
 
 if __name__ == "__main__":
-	my_merchant_trie = generate_merchant_trie()
+	MY_MERCHANT_TRIE = generate_merchant_trie()
 	# quick test to see if everything loaded
 	# for key in json.loads(open\
 	#("meerkat/classification/label_maps/permanent_bank_label_map.json").read()):
-	# 	print(standardize(key) in my_merchant_trie)
+	# 	print(standardize(key) in MY_MERCHANT_TRIE)
 

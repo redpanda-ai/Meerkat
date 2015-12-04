@@ -40,13 +40,18 @@ from meerkat.various_tools import get_merchant_by_id, load_dict_ordered, write_d
 from meerkat.various_tools import safe_print, synonyms, get_magic_query, stopwords
 
 class DummyFile(object):
-	"""Catches stderr and stdout to prevent libraries from printing to screen"""
-	def write(self, x):
+	"""Resemble the stdout/stderr object but it prints nothing to screen"""
+	def write(self, msg):
+		"It writes nothing, on purpose"
 		pass
 
 @contextlib.contextmanager
 def nostderr():
-	"""temporarily remove stderr"""
+	"""
+	It redirects the stderr stream to DummyFile object that do nothing with error message.
+	'yield' is where unit tests take place.
+	After the yield, restore sys.stderr to its original structure
+	"""
 	save_stderr = sys.stderr
 	sys.stderr = DummyFile()
 	yield
@@ -644,10 +649,15 @@ def clean_transaction(transaction):
 
 	return transaction
 
-def enrich_transaction(params, transaction, es_connection, index="", FACTUAL_ID="", doc_type="", routing=None):
+def enrich_transaction(*args, **kwargs):
 	"""Return a copy of a transaction, enriched with data from a 
 	provided FACTUAL_ID"""
-
+	params, transaction, es_connection = args[:]
+	index = kwargs.get('index', "")
+# pylint: disable=invalid-name
+	FACTUAL_ID = kwargs.get('FACTUAL_ID', "")
+	doc_type = kwargs.get('doc_type', "")
+	routing = kwargs.get('routing', None)
 	transaction = deepcopy(transaction)
 	transaction["merchant_found"] = True
 	fields_to_get = ["name", "region", "locality", "internal_store_number", "postcode", "address"]
@@ -746,7 +756,7 @@ def print_formatted_result(results, index):
 	safe_print("{:7}".format("[" + str(index) + "] ") + " " + str(details_formatted))
 
 def get_hit(search_results, index):
-
+	"""get z-score of the hits and return an indexed hit"""
 	# Must have results
 	if search_results['hits']['total'] < (index + 1):
 		return False, False

@@ -147,11 +147,15 @@ class WebConsumer():
 
 		# Collect Fallback Data
 		names = {}
-		names["business_names"] = [result.get("fields", {"name" : ""}).get("name", "") for result in hits]
-		names["business_names"] = [name[0] for name in names["business_names"] if isinstance(name, list)]
-		names["city_names"] = [result.get("fields", {"locality" : ""}).get("locality", "") for result in hits]
+		names["business_names"] =\
+			[result.get("fields", {"name" : ""}).get("name", "") for result in hits]
+		names["business_names"] =\
+			[name[0] for name in names["business_names"] if isinstance(name, list)]
+		names["city_names"] =\
+			[result.get("fields", {"locality" : ""}).get("locality", "") for result in hits]
 		names["city_names"] = [name[0] for name in names["city_names"] if isinstance(name, list)]
-		names["state_names"] = [result.get("fields", {"region" : ""}).get("region", "") for result in hits]
+		names["state_names"] =\
+			[result.get("fields", {"region" : ""}).get("region", "") for result in hits]
 		names["state_names"] = [name[0] for name in names["state_names"] if isinstance(name, list)]
 
 		# Need Names
