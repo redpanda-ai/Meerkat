@@ -36,14 +36,18 @@ from meerkat.various_tools import safe_print, safe_input, load_params
 from meerkat.file_producer import get_s3_connection
 
 class DummyFile(object):
-	"""does nothing"""
-	def write(self, message):
-		"""I'm sorry but I'm going to lose connection because I'm about to drive\
-		into a tunnel in a canyon on an airplane while hanging up the phone."""
+	"""Resemble the stdout/stderr object but it prints nothing to screen"""
+	def write(self, msg):
+		"""It writes nothing, on purpose"""
 		pass
 
 @contextlib.contextmanager
 def nostdout():
+	"""
+	It redirects the stderr stream to DummyFile object that do nothing with error message.
+	'yield' is where unit tests take place.
+	 After the yield, restore sys.stderr to its original structure
+	"""
 	save_stdout = sys.stdout
 	save_stderr = sys.stderr
 	sys.stdout = DummyFile()

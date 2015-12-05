@@ -33,9 +33,10 @@ def find_merchant(transaction):
 				   len(transaction[start:end]) > 3 and \
 				   (longest == None or len(longest) < len(transaction[start:end])):
 					longest = transaction[start:end]
-
 	return longest
+
 def column_print(merchant, expected, transaction):
+	"""print out infomation in a nice format"""
 	out = ""
 	out += merchant[:15] + (" " * (15 - len(merchant))) + " | "
 	out += expected[:15] + (" " * (15 - len(expected))) + " | "

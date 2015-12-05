@@ -16,7 +16,7 @@ Created on March 16, 2014
 
 #import sys
 
-#import pylab as pl
+import pylab as pl
 import numpy as np
 #import matplotlib.pyplot as plt
 
@@ -24,6 +24,8 @@ from sklearn.cluster import DBSCAN
 #from sklearn import metrics
 #from sklearn.datasets.samples_generator import make_blobs
 from sklearn.preprocessing import StandardScaler
+
+#pylint: disable=no-name-in-module
 from scipy.spatial import ConvexHull
 
 #from pprint import pprint
@@ -93,7 +95,7 @@ def collect_clusters(scaled_points, labels, location_list):
 
 	#The previous version of "convex_hull" converted coordinates from
 	# floating point pairs to strings pairs.  If you need that functionality, 
-	# use the "convert_geoshapes_coordinates_to_strings" function provided below
+	# use the "convert_coordinates_to_string" function provided below
 
 	return geoshape_list
 
@@ -126,7 +128,7 @@ def convex_hull(clusters, locations):
 
 	return geoshapes
 
-def convert_geoshapes_coordinates_to_strings(geoshape_list):
+def convert_coordinates_to_string(geoshape_list):
 	"""Returns a copy of geoshape_list where each coordinate is formatted 
 	as a comma separated pair of string values. """
 	new_geoshape_list = []

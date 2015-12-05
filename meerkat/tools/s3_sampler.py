@@ -37,15 +37,18 @@ SAMPLE_SIZE = 10000
 #####################################################
 
 class DummyFile(object):
-	"""Matt, we need a docstring comment for this class"""
-	def write(self, not_sure_what_this_parame_is_for):
-		"""Matt, we need a docstring comment for this function.
-		also its parameter"""
+	""""Resemble the stdout/stderr object but it prints nothing to screen"""
+	def write(self, msg):
+		"""It writes nothing, on purpose"""
 		pass
 
 @contextlib.contextmanager
 def nostdout():
-	"""Matt, we need a docstring comment for this function"""
+	"""
+	It redirects the stderr stream to DummyFile object that do nothing with error message.
+	'yield' is where unit tests take place.
+	After the yield, restore sys.stderr and sys.stdout to its original structure
+	"""
 	save_stdout = sys.stdout
 	save_stderr = sys.stderr
 	sys.stdout = DummyFile()
@@ -228,4 +231,4 @@ def run_from_command_line():
 	save_cache(df_cache, columns)
 
 if __name__ == "__main__":
-	run_from_command_line(sys.argv)
+	run_from_command_line()

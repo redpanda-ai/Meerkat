@@ -26,15 +26,21 @@ import sys
 
 from gensim.models import Phrases
 
-from meerkat.various_tools import safe_print, safe_input
+from meerkat.various_tools import safe_print
 
 class DummyFile(object):
-	def write(self, x):
+	"""Resemble the stdout/stderr object but it prints nothing to screen"""
+	def write(self, msg):
+	"""It writes nothing, on purpose"""
 		pass
 
 @contextlib.contextmanager
 def nostderr():
-	"""Please add a better docstring, what is this?"""
+	"""
+	It redirects the stderr stream to DummyFile object that do nothing with error message.
+	'yield' is where unit tests take place.
+	After the yield, restore sys.stderr to its original structure
+	"""
 	save_stderr = sys.stderr
 	sys.stderr = DummyFile()
 	yield

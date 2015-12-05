@@ -45,6 +45,28 @@ def get_yodlee_factual_map(params):
 class FileConsumer(threading.Thread):
 	"""Acts as a client to an ElasticSearch cluster, tokenizing description
 	strings that it pulls from a synchronized queue."""
+	# pylint: disable=too-many-instance-attributes
+	def __init__(self, *args):
+		''' Constructor '''
+		threading.Thread.__init__(self)
+		self.thread_id = args[0]
+		self.params = args[1]
+		self.desc_queue = args[2]
+		self.result_queue = args[3]
+		self.hyperparameters = args[4]
+		self.cities = args[5]
+		self.user = None
+		cluster_nodes = \
+			self.params["my_producer_options"]["elasticsearch"]["cluster_nodes"]
+		self.es_connection = Elasticsearch(cluster_nodes,\
+			sniff_on_start=True, sniff_on_connection_fail=True,\
+			sniffer_timeout=15, sniff_timeout=15)
+		self.my_meta = None
+		self.__reset_my_meta()
+		self.__set_logger()
+		self.boost_row_labels, self.boost_column_vectors =\
+			self.__build_boost_vectors()
+
 
 	def __build_boost_vectors(self):
 		"""Turns configuration entries into a dictionary of numpy arrays."""
@@ -58,24 +80,22 @@ class FileConsumer(threading.Thread):
 			boost_column_vectors[boost_column_labels[i]] = np.array(my_list)
 		return boost_row_labels, boost_column_vectors
 
-	def __interactive_mode(self, *argv):
+	def __interactive_mode(self, *args):
 		"""Interact with the results as they come"""
-		scores, transaction, hits, business_names, city_names, state_names = argv[:]
-		score = scores[0]
+		scores, transaction, hits, business_names, city_names, state_names = args[:]
 		z_score, raw_score = self.__generate_z_score_delta(scores)
 		decision = self.__decision_boundary(z_score, raw_score)
 		description = ' '.join(transaction["DESCRIPTION_UNMASKED"].split())
 		first_hit = hits[0]["fields"]
-		fields_to_get = ["name", "region", "locality",\
+		fields_to_get = ["name", "region", "locality",
 			"internal_store_number", "postcode", "address"]
-		field_content = [first_hit.get(field, ["_____"])[0]\
+		field_content = [first_hit.get(field, ["_____"])[0]
 			for field in fields_to_get]
 		city_fallback, state_fallback, name_fallback = "", "", ""
 
 		labels = ["Transaction", "Query", "Score", "Z-Score", "Decision"]
-		query = synonyms(description)
-		query = string_cleanse(query)
-		data = [description, query, score, z_score, decision]
+		query = string_cleanse(synonyms(description))
+		data = [description, query, scores[0], z_score, decision]
 
 		# Populate Decisions
 		if not decision:
@@ -83,15 +103,15 @@ class FileConsumer(threading.Thread):
 			city_names = city_names[0:2]
 			state_names = state_names[0:2]
 			states_equal = state_names.count(state_names[0]) == len(state_names)
-			city_in_transaction = (city_names[0].lower()\
+			city_in_transaction = (city_names[0].lower()
 				in transaction["DESCRIPTION_UNMASKED"].lower())
-			state_in_transaction = (state_names[0].lower()\
+			state_in_transaction = (state_names[0].lower()
 				in transaction["DESCRIPTION_UNMASKED"].lower())
 			business_names = business_names[0:2]
 			top_name = business_names[0].lower()
 			all_equal = business_names.count(business_names[0]) == len(business_names)
 			not_a_city = top_name not in self.cities
-			name_fallback = ("", business_names[0].title())[((\
+			name_fallback = ("", business_names[0].title())[((
 				all_equal and not_a_city)) == True]
 			name_fallback = (name_fallback,\
 				transaction['GOOD_DESCRIPTION'])\
@@ -131,7 +151,7 @@ class FileConsumer(threading.Thread):
 
 		if len(scores) < 2:
 			logger.info("Unable to generate Z-Score")
-			return 0
+			return 0, scores[0]
 
 		z_scores = zscore(scores)
 		first_score, second_score = z_scores[0:2]
@@ -154,30 +174,6 @@ class FileConsumer(threading.Thread):
 			return True
 		else:
 			return False
-
-	def __init__(self, *argv):
-		''' Constructor '''
-		thread_id, params, desc_queue, result_queue, hyperparameters, cities = argv[:]
-		threading.Thread.__init__(self)
-		self.thread_id = thread_id
-		self.desc_queue = desc_queue
-		self.result_queue = result_queue
-		self.user = None
-		self.params = params
-		self.hyperparameters = hyperparameters
-		self.cities = cities
-
-		cluster_nodes = \
-		self.params["my_producer_options"]["elasticsearch"]["cluster_nodes"]
-		self.es_connection = Elasticsearch(cluster_nodes,\
-			sniff_on_start=True, sniff_on_connection_fail=True,\
-			sniffer_timeout=15, sniff_timeout=15)
-
-		self.my_meta = None
-		self.__reset_my_meta()
-		self.__set_logger()
-		self.boost_row_labels, self.boost_column_vectors =\
-			self.__build_boost_vectors()
 
 	def __text_features(self):
 		"""Classify transactions using text features only"""
@@ -409,9 +405,10 @@ class FileConsumer(threading.Thread):
 
 		return enriched_transaction
 
-	def __enrich_transaction(self, *argv):
+	def __enrich_transaction(self, *args):
 		"""Enriches the transaction if it passes the boundary"""
-		decision, transaction, hit_fields, z_score_delta, business_names, city_names, state_names = argv[0]
+		decision, transaction, hit_fields,\
+			z_score_delta, business_names, city_names, state_names = args[:]
 		enriched_transaction = transaction
 		field_names = self.params["output"]["results"]["fields"]
 		fields_in_hit = [field for field in hit_fields]
@@ -561,8 +558,8 @@ class FileConsumer(threading.Thread):
 
 		try:
 			_ = self.es_connection.index(index="user_index",\
-				doc_type="transaction", id=transaction_id, body=update_body,\
-				routing=transaction["UNIQUE_MEM_ID"])
+				doc_type="transaction", id=transaction_id, body=update_body)
+#				routing=transaction["UNIQUE_MEM_ID"])
 		except Exception:
 			logging.critical("Unable to update the following: %s",\
 				str(transaction["DESCRIPTION_UNMASKED"]))
