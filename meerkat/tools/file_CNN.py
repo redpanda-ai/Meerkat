@@ -5,7 +5,7 @@ import math
 import pandas as pd
 import numpy as np
 
-from meerkat.classification.lua_bridge import get_cnn, load_label_map
+from meerkat.classification.lua_bridge import get_cnn
 
 #################### USAGE ##########################
 
@@ -36,8 +36,8 @@ def apply_classifiers(df, merchant_classifier, subtype_classifier):
 	trans = subtype_classifier(trans, doc_key="DESCRIPTION_UNMASKED", label_key="SUBTYPE_CNN")
 	trans = trans[0:t_len]
 
-	for t in trans:
-		t["SUBTYPE_CNN"] = t["SUBTYPE_CNN"].split(" - ")[1]
+	for tran in trans:
+		tran["SUBTYPE_CNN"] = tran["SUBTYPE_CNN"].split(" - ")[1]
 
 	return pd.DataFrame(trans)
 
@@ -69,16 +69,21 @@ def apply_to_df(dataframe, file_out):
 		out_df = apply_classifiers(df, merchant_classifier, credit_subtype_classifer)
 
 		if first_chunk:
-			out_df.to_csv(file_out, sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
+			out_df.to_csv(file_out, sep="|", mode="a", encoding="utf-8",
+						  index=False, index_label=False)
 			first_chunk = False
 		else:
-			out_df.to_csv(file_out, header=False, sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
+			out_df.to_csv(file_out, header=False, sep="|", mode="a",
+						  encoding="utf-8", index=False, index_label=False)
 
 	for df in debit_split_chunks:
 
 		out_df = apply_classifiers(df, merchant_classifier, debit_subtype_classifer)
-		out_df.to_csv(file_out, header=False, sep="|", mode="a", encoding="utf-8", index=False, index_label=False)
+		out_df.to_csv(file_out, header=False, sep="|", mode="a", encoding="utf-8",
+					  index=False, index_label=False)
 
 # Load Dataframe
-df = pd.read_csv(sys.argv[1], na_filter=False, quoting=csv.QUOTE_NONE, encoding="utf-8", sep="|", error_bad_lines=False)
+# pylint: disable=invalid-name
+df = pd.read_csv(sys.argv[1], na_filter=False, quoting=csv.QUOTE_NONE, encoding="utf-8",
+				 sep="|", error_bad_lines=False)
 apply_to_df(df, "data/output/CNN_processed.txt")

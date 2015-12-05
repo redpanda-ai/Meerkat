@@ -146,8 +146,12 @@ def post_SNS(message):
 	conn = boto.sns.connect_to_region(region)
 	_ = conn.publish(topic=topic, message=message)
 
-def get_merchant_by_id(params, factual_id, es_connection, index="", doc_type="factual_type", routing=None):
+def get_merchant_by_id(*args, **kwargs):
 	"""Fetch the details for a single factual_id"""
+	params, factual_id, es_connection = args[:]
+	index = kwargs.get('index', "")
+	doc_type = kwargs.get('doc_type', "factual_type")
+	routing = kwargs.get('routing', None)
 
 	if index == "":
 		index = params.get("elasticsearch", {}).get("index", "")

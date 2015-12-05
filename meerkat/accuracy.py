@@ -49,11 +49,18 @@ default_doc_key = "DESCRIPTION_UNMASKED"
 default_label_key = "GOOD_DESCRIPTION"
 
 class DummyFile(object):
-	def write(self, x): 
+	"""Resemble the stdout/stderr object but it prints nothing to screen"""
+	def write(self, msg):
+		"""It writes nothing, on purpose"""
 		pass
 
 @contextlib.contextmanager
 def nostdout():
+	"""
+	It redirects the stderr stream to DummyFile object that do nothing with error message.
+	'yield' is where unit tests take place.
+	After the yield, restore sys.stderr and stdout to its original structure
+	"""
 	save_stdout = sys.stdout
 	save_stderr = sys.stderr
 	sys.stdout = DummyFile()

@@ -11,9 +11,10 @@ from meerkat.various_tools import safely_remove_file
 #Usage
 # python3.3 -m meerkat.gzip_slicer <path_to_some_directory_of_gzipped_csv_files>
 
-def split_csv(filehandler, delimiter=',', row_limit=10000,\
-	output_name_template='output_%s.csv', output_path='.', keep_headers=True):
-	""" Adapted from Jordi Rivero:
+def split_csv(filehandler, **kwargs):
+# pylint: disable=too-many-locals
+	"""
+	Adapted from Jordi Rivero:
 	https://gist.github.com/jrivero
 	Splits a CSV file into multiple pieces.
 
@@ -28,7 +29,14 @@ def split_csv(filehandler, delimiter=',', row_limit=10000,\
 
 	Example usage:
 		>> from various_tools import split_csv;
-		>> split_csv(open('/home/ben/input.csv', 'r')); """
+		>> split_csv(open('/home/ben/input.csv', 'r'));
+	"""
+	delimiter = kwargs.get('delimiter', ',')
+	row_limit = kwargs.get('row_limit', 10000)
+	output_name_template = kwargs.get('output_name_template', 'output_%s.csv')
+	output_path = kwargs.get('output_path', '.')
+	keep_headers = kwargs.get('keep_headers', True)
+
 	reader = csv.reader(filehandler, delimiter=delimiter)
 	#Start at piece one
 	current_piece = 1
@@ -93,6 +101,5 @@ def slice_me(working_directory, input_filename):
 os.chdir(sys.argv[1])
 
 #Gather all txt.gz files
-input_files = sorted(glob.glob('*.txt.gz'))
-for current_file in input_files:
+for current_file in sorted(glob.glob('*.txt.gz')):
 	slice_me(sys.argv[1], current_file)
