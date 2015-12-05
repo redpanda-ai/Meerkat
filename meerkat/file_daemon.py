@@ -138,7 +138,7 @@ def get_files_in_progress(params):
 		cmd_result = cmd(retcode=None)
 		cmd_split = cmd_result.split("\n")
 		for line in cmd_split:
-			splits = re.split('\s+', line)
+			splits = re.split(r'\s+', line)
 			if len(splits) > 12:
 				if splits[10] == "meerkat.file_producer":
 					panel_name, panel_file = splits[11:13]
@@ -162,7 +162,7 @@ def launch_remote_clients_into_available_slots(params):
 		cmd_result = cmd(retcode=None)
 		cmd_split = cmd_result.split("\n")
 		for line in cmd_split:
-			splits = re.split('\s+', line)
+			splits = re.split(r'\s+', line)
 			if len(splits) > 12:
 				if splits[10] == "meerkat.file_producer":
 					process_count += 1

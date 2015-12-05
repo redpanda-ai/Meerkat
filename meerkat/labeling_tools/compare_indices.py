@@ -653,22 +653,22 @@ def enrich_transaction(*args, **kwargs):
 	"""Return a copy of a transaction, enriched with data from a 
 	provided FACTUAL_ID"""
 	params, transaction, es_connection = args[:]
-	index = kwargs.get('index', "")
-# pylint: disable=invalid-name
-	FACTUAL_ID = kwargs.get('FACTUAL_ID', "")
-	doc_type = kwargs.get('doc_type', "")
-	routing = kwargs.get('routing', None)
+	index = kwargs.get("index", "")
+	factual_id = kwargs.get("FACTUAL_ID", "")
+	doc_type = kwargs.get("doc_type", "")
+	routing = kwargs.get("routing", None)
+
 	transaction = deepcopy(transaction)
 	transaction["merchant_found"] = True
 	fields_to_get = ["name", "region", "locality", "internal_store_number", "postcode", "address"]
 	fields_to_fill = ["PHYSICAL_MERCHANT", "STATE", "CITY", "STORE_NUMBER", "ZIP_CODE", "STREET"]
 	
 	# Get merchant and suppress errors
-	if FACTUAL_ID == "":
-		FACTUAL_ID = transaction.get("FACTUAL_ID", "NULL")
+	if factual_id == "":
+		factual_id = transaction.get("FACTUAL_ID", "NULL")
 
 	with nostderr():
-		merchant = get_merchant_by_id(params, FACTUAL_ID, es_connection, index=index, doc_type=doc_type, routing=routing)
+		merchant = get_merchant_by_id(params, factual_id, es_connection, index=index, doc_type=doc_type, routing=routing)
 
 	if merchant == None:
 		merchant = {}
