@@ -31,7 +31,7 @@ from meerkat.various_tools import safe_print
 class DummyFile(object):
 	"""Resemble the stdout/stderr object but it prints nothing to screen"""
 	def write(self, msg):
-	"""It writes nothing, on purpose"""
+		"""It writes nothing, on purpose"""
 		pass
 
 @contextlib.contextmanager
