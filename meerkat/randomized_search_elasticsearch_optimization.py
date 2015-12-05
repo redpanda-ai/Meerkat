@@ -50,9 +50,9 @@ def run_meerkat(params, dataset):
 	"""Run meerkat on a set of transactions"""
 
 	result_list = []
-	n = (len(dataset))/BATCH_SIZE
-	n = int(n - (n%1))
-	for x in range(0, n+1):
+	number = (len(dataset))/BATCH_SIZE
+	number = int(number - (number%1))
+	for x in range(0, number+1):
 		batch = []
 		for i in range(x*BATCH_SIZE, (x+1)*BATCH_SIZE):
 			try:
@@ -137,15 +137,13 @@ def get_initial_values(hyperparameters, params, known, dataset):
 
 	settings = params["optimization"]["settings"]
 	top_score = {"precision" : 0, "total_recall_physical" : 0}
-	iterations = settings["initial_search_space"]
-	learning_rate = settings["initial_learning_rate"]
 
 	print("Training on " + str(len(dataset)) + " unique transactions")
 
-	for i in range(iterations):
+	for i in range(settings["initial_search_space"]):
 
 		if i > 0:
-			randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=learning_rate)
+			randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=settings["initial_learning_rate"])
 		else:
 			randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=0)
 
@@ -206,9 +204,8 @@ def run_iteration(top_score, params, known, dataset):
 	hyperparameters = top_score['hyperparameters']
 	new_top_score = top_score
 	learning_rate = settings["iteration_learning_rate"]
-	iterations = settings["iteration_search_space"]
 
-	for i in range(iterations):
+	for i in range(settings["iteration_search_space"]):
 
 		randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=learning_rate)
 
@@ -268,7 +265,7 @@ def save_top_score(top_score):
 		"_top_scores.txt", "a")
 	pprint("Precision = " + str(top_score['precision']) + "%", record)
 	pprint("Best Recall = " + str(top_score['total_recall_physical']) +"%", record)
-	boost_vectors, boost_labels, other = split_hyperparameters(top_score["hyperparameters"])
+	boost_vectors, _, other = split_hyperparameters(top_score["hyperparameters"])
 	pprint(boost_vectors, record)
 	pprint(other, record)
 	record.close()
@@ -392,4 +389,4 @@ def run_from_command_line():
 	print("TOTAL TIME TAKEN FOR OPTIMIZATION: ", time_delta)
 
 if __name__ == "__main__":
-	run_from_command_line(sys.argv)
+	run_from_command_line()

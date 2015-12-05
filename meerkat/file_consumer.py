@@ -142,7 +142,7 @@ class FileConsumer(threading.Thread):
 
 		prompt = stats + "\n\n" + attributes
 		print(prompt)
-#		user = input(prompt)
+		#user = input(prompt)
 
 	def __generate_z_score_delta(self, scores):
 		"""Generate the Z-score delta between the first and second scores."""

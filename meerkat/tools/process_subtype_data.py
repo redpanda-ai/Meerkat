@@ -31,13 +31,14 @@ def load_label_map(filename):
 def process_data(groups, ledger_entry):
 	"""Process and save data"""
 
-	label_map = load_label_map("meerkat/classification/label_maps/" + sys.argv[1] + "_" + ledger_entry + "_subtype_label_map.json")
+	label_map = load_label_map("meerkat/classification/label_maps/" + sys.argv[1] +
+		"_" + ledger_entry + "_subtype_label_map.json")
 	label_map = dict(zip(label_map.values(), label_map.keys()))
 	df = groups[ledger_entry]
 	processed = []
 
 	# Process Rows
-	for index, row in df.iterrows():
+	for _, row in df.iterrows():
 
 		try:
 			masked_row = {'CLASS_NUM' : label_map[row["PROPOSED_SUBTYPE"]], 
@@ -45,7 +46,8 @@ def process_data(groups, ledger_entry):
 			}
 			processed.append(masked_row)
 		except: 
-			print("The type " + row["PROPOSED_SUBTYPE"] + " is not allowed for the " + sys.argv[1] + " " + ledger_entry + " model")
+			print("The type " + row["PROPOSED_SUBTYPE"] + " is not allowed for the " + sys.argv[1] +
+				" " + ledger_entry + " model")
 			continue
 
 		if row["DESCRIPTION_UNMASKED"] != "":
@@ -65,12 +67,21 @@ def process_data(groups, ledger_entry):
 
 	# Save
 	file_prefix = sys.argv[1] + "_" + ledger_entry
-	train.to_csv("data/output/" + file_prefix + "_train_subtype.csv", cols=["CLASS_NUM", "DESCRIPTION"], header=False, index=False, index_label=False)
-	test.to_csv("data/output/" + file_prefix + "_test_subtype.csv", cols=["CLASS_NUM", "DESCRIPTION"], header=False, index=False, index_label=False)
+	train.to_csv("data/output/" + file_prefix + "_train_subtype.csv",
+		cols=["CLASS_NUM", "DESCRIPTION"], header=False, index=False, index_label=False)
+	test.to_csv("data/output/" + file_prefix + "_test_subtype.csv",
+		cols=["CLASS_NUM", "DESCRIPTION"], header=False, index=False, index_label=False)
 
-df = pd.read_csv("data/input/aggregated_" + sys.argv[1] + "_subtype_training_data.csv", na_filter=False, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
-grouped = df.groupby('LEDGER_ENTRY', as_index=False)
-groups = dict(list(grouped))
+def get_df():
+	""" Load the df """
+	df = pd.read_csv("data/input/aggregated_" + sys.argv[1] + "_subtype_training_data.csv", 
+		na_filter=False, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+	return df
 
-process_data(groups, "credit")
-process_data(groups, "debit")
+def get_grouped():
+	""" Get the grouped df """
+	grouped = get_df().groupby('LEDGER_ENTRY', as_index=False)
+	return grouped
+
+process_data(dict(list(get_grouped())), "credit")
+process_data(dict(list(get_grouped())), "debit")

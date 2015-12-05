@@ -90,9 +90,9 @@ def run_meerkat(params, dataset):
 	"""Run meerkat on a set of transactions"""
 
 	result_list = []
-	n = (len(dataset))/BATCH_SIZE
-	n = int(n - (n%1))
-	for x in range(0, n+1):
+	number = (len(dataset))/BATCH_SIZE
+	number = int(number - (number%1))
+	for x in range(0, number+1):
 		batch = []
 		for i in range(x*BATCH_SIZE, (x+1)*BATCH_SIZE):
 			try:
@@ -133,19 +133,18 @@ def load_dataset(params):
 	return dataset
 
 def save_top_score(top_score):
-
+	""" Save top scores """
 	record = open("optimization_results/" + \
 	os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_top_scores.txt", "a")
 	pprint("Precision = {0}%".format(top_score['precision']), record)
 	pprint("Best Recall = {0}%".format(top_score['total_recall_physical']), record)
-	boost_vectors, boost_labels, other = \
-	split_hyperparameters(top_score["hyperparameters"])
+	boost_vectors, _, other = split_hyperparameters(top_score["hyperparameters"])[::2]
 	pprint(boost_vectors, record)
 	pprint(other, record)
 	record.close()
 
 def split_hyperparameters(hyperparameters):
-
+	""" Split a given set of hyperparameters """
 	boost_vectors = {}
 	boost_labels = ["standard_fields"]
 	non_boost = ["es_result_size", "z_score_threshold", "good_description"]
@@ -172,7 +171,7 @@ def get_desc_queue(dataset):
 		users[user].append(row)
 
 	# Add Users to Queue
-	for key, value in users.items():
+	for key, _ in users.items():
 		desc_queue.put(users[key])
 
 	return desc_queue
@@ -215,7 +214,7 @@ def add_local_params(params):
 	return params
 
 def format_web_consumer(dataset):
-
+	""" Format the input json file """
 	formatted = json.load(open("meerkat/web_service/example_input.json", "r"))
 	formatted["transaction_list"] = dataset
 	trans_id = 1
@@ -242,7 +241,7 @@ def verify_arguments():
 	# open("optimization_results/" + os.path.splitext(os.path.basename(sys.argv[1]))[0] +
 	# '_top_scores.txt', 'w').close()
 
-def run_from_command_line(command_line_arguments):
+def run_from_command_line():
 	"""Runs these commands if the module is invoked from the command line"""
 
 	# Meta Information
@@ -301,7 +300,8 @@ def run_from_command_line(command_line_arguments):
 
 	param_names = list(hyperparams.keys())
 	initial_guess = [float(x) for x in list(hyperparams.values())]
-	x0 = np.array(initial_guess)
+	# x0 is the initial guess
+	x0 = np.array(initial_guess) # pylint:disable=invalid-name
 	bounds = [(alt_bounds[x] if x in alt_bounds \
 	else (float(hyperparams[x]) - 0.5, float(hyperparams[x]) + 0.5)) for x in param_names]
 	xmin = np.array([x[0] for x in bounds])
@@ -328,8 +328,9 @@ def run_from_command_line(command_line_arguments):
 	take_step = RandomDisplacementBounds(xmin, xmax, 0.1)
 	minimizer_kwargs = \
 	dict(method="L-BFGS-B", bounds=bounds, options={"maxiter": 10, "disp": True})
-	res = basinhopping(loss, x0, niter=10, T=0.3, minimizer_kwargs=minimizer_kwargs, take_step=take_step, niter_success=5)
+	res = basinhopping(loss, x0, niter=10, T=0.3, minimizer_kwargs=minimizer_kwargs,
+		take_step=take_step, niter_success=5)
 	safe_print(res)
 
 if __name__ == "__main__":
-	run_from_command_line(sys.argv)
+	run_from_command_line()

@@ -114,11 +114,11 @@ def load_data_list(transactions, labels, file_name, test_size=1):
 def extract_features(transactions):
 	"""Extract features for dict vectorizer"""
 
-	l = 'TRANSACTION_DATE'
-	f = lambda x: str(x[l].weekday()) if not isinstance(x[l], float) else ""
-	g = lambda x: str(x[l].day) if not isinstance(x[l], float) else ""
-	transactions['WEEKDAY'] = transactions.apply(f, axis=1)
-	transactions['DAYOFMONTH'] = transactions.apply(g, axis=1)
+	date = 'TRANSACTION_DATE'
+	weekdays = lambda x: str(x[date].weekday()) if not isinstance(x[date], float) else ""
+	days = lambda x: str(x[date].day) if not isinstance(x[date], float) else ""
+	transactions['WEEKDAY'] = transactions.apply(weekdays, axis=1)
+	transactions['DAYOFMONTH'] = transactions.apply(days, axis=1)
 
 	return transactions
 
@@ -143,36 +143,34 @@ def build_model(transactions, labels):
 		('clf', SGDClassifier())
 	])
 
-	"""
-	complex_pipeline = Pipeline([
-		('features', FeatureUnion([
-			('bag_of_words', Pipeline([
-				('extract', ColumnExtractor(0)),
-				('vect', CountVectorizer()),
-				('tfidf', TfidfTransformer())
-			])),
-			('day_of_week', Pipeline([
-				('extract', DateTransformer()),
-				('dict', DictVectorizer())
-			]))
-		])),
-		('clf', SGDClassifier())
-	])
+	#complex_pipeline = Pipeline([
+		#('features', FeatureUnion([
+			#('bag_of_words', Pipeline([
+				#('extract', ColumnExtractor(0)),
+				#('vect', CountVectorizer()),
+				#('tfidf', TfidfTransformer())
+			#])),
+			#('day_of_week', Pipeline([
+				#('extract', DateTransformer()),
+				#('dict', DictVectorizer())
+			#]))
+		#])),
+		#('clf', SGDClassifier())
+	#])
 
-	transactions = extract_features(transactions)
+	#transactions = extract_features(transactions)
 
-	complex_parameters = {
-		'features__bag_of_words__vect__max_df': (0.25, 0.35),
-		'features__bag_of_words__vect__max_features': (8500, None),
-		'features__bag_of_words__vect__ngram_range': ((1, 1), (1, 2)), 
+	#complex_parameters = {
+		#'features__bag_of_words__vect__max_df': (0.25, 0.35),
+		#'features__bag_of_words__vect__max_features': (8500, None),
+		#'features__bag_of_words__vect__ngram_range': ((1, 1), (1, 2)), 
 		# unigrams or bigrams
-		'features__bag_of_words__tfidf__use_idf': (True, False),
-		'features__bag_of_words__tfidf__norm': ('l1', 'l2'),
-		'clf__alpha': (0.0000055, 0.000008),
-		'clf__penalty': ('l2', 'elasticnet'),
-		'clf__n_iter': (50, 80)
-	}
-	"""
+		#'features__bag_of_words__tfidf__use_idf': (True, False),
+		#'features__bag_of_words__tfidf__norm': ('l1', 'l2'),
+		#'clf__alpha': (0.0000055, 0.000008),
+		#'clf__penalty': ('l2', 'elasticnet'),
+		#'clf__n_iter': (50, 80)
+	#}
 
 	grid_search = GridSearchCV(simple_pipeline, simple_parameters, n_jobs=8,\
 	 verbose=3, cv=3)

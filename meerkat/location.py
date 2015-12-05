@@ -42,6 +42,7 @@ def get_geo_query(scaled_shapes):
 def scale_polygon(list_of_points, scale=2.0):
 	"""This function accepts a list of points representing a polygon and scales
 	them about its centroid."""
+	#pylint:disable=invalid-name
 	#Create a matrix from the list of points, M
 	M = np.matrix(list_of_points)
 	#Sum axis 0 (the columns) to produce a 1 x n matrix (row vector)
@@ -67,6 +68,7 @@ def scale_polygon(list_of_points, scale=2.0):
 def plot_double_polygon(polygon_points, scaled_polygon_points, S
 	, zoom_out_factor=2.5):
 	"""This draws a simple plot to demonstrate scaling."""
+	#pylint:disable=invalid-name
 	fig = plt.figure()
 	ax1 = fig.add_subplot(111)
 	ax1.add_patch(Polygon(polygon_points, closed=True, fill=False,
@@ -102,7 +104,8 @@ def visualize(location_list, original_geoshapes, scaled_geoshapes, user_id):
 	a useful way"""
 
 	# Meta
-	ax = plt.gca()
+	# The function gca() returns the current axes
+	ax = plt.gca() #pylint:disable=invalid-name
 
 	# Plot Points
 	point_lat = [float(point[1]) for point in location_list]
