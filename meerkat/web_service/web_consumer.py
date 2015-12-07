@@ -431,9 +431,22 @@ class WebConsumer():
 
 		# Split label into type and subtype
 		for transaction in data["transaction_list"]:
-			txn_type, txn_sub_type = transaction["subtype_CNN"].split(" - ")
+
+			if " - " not in transaction["subtype_CNN"]:
+				if transaction["ledger_entry"] == "debit":
+					transaction["subtype_CNN"] = "Other Expenses - Debit"
+				elif transaction["ledger_entry"] == "credit":
+					if data["container"] == "bank":
+						transaction["subtype_CNN"] = "Other Income - Credit"
+					elif data["container"] == "card":
+						transaction["subtype_CNN"] = "Bank Adjustment - Adjustment"
+				else:
+					transaction["subtype_CNN"] = " - "
+
+            txn_type, txn_sub_type = transaction["subtype_CNN"].split(" - ")
 			transaction["txn_type"] = txn_type
 			transaction["txn_sub_type"] = txn_sub_type
+
 			del transaction["subtype_CNN"]
 
 		return data["transaction_list"]
