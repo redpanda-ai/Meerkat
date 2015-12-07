@@ -442,11 +442,11 @@ class WebConsumer():
 						transaction["subtype_CNN"] = "Bank Adjustment - Adjustment"
 				else:
 					transaction["subtype_CNN"] = " - "
-
-            txn_type, txn_sub_type = transaction["subtype_CNN"].split(" - ")
+			
+			txn_type, txn_sub_type = transaction["subtype_CNN"].split(" - ")
 			transaction["txn_type"] = txn_type
 			transaction["txn_sub_type"] = txn_sub_type
-
+			
 			del transaction["subtype_CNN"]
 
 		return data["transaction_list"]
