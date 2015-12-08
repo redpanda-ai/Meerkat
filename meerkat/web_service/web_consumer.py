@@ -477,7 +477,7 @@ class WebConsumer():
 			else:
 				categories = []
 
-			# Manage newer factual category representation:
+			# Merge sublists into single list if any exist:
 			if any(isinstance(elem, list) for elem in categories):
 				categories = list(set([item for sublist in categories for item in sublist]))
 
