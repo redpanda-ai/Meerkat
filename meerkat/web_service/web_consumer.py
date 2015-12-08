@@ -465,14 +465,22 @@ class WebConsumer():
 
 	@staticmethod
 	def __apply_category_labels(physical):
-		"""Adds a 'category_labels' field to a physical transaction."""
+		"""Adds a 'category_labels' field to a physical transaction if found in index"""
+
 		# Add or Modify Fields
 		for trans in physical:
+
 			categories = trans.get("category_labels", "")
+
 			if categories != "" and categories != []:
 				categories = json.loads(categories)
 			else:
 				categories = []
+
+			# Manage newer factual category representation:
+			if any(isinstance(elem, list) for elem in categories):
+				categories = list(set([item for sublist in categories for item in sublist]))
+
 			trans["category_labels"] = categories
 
 	def __apply_cpu_classifiers(self, data):
