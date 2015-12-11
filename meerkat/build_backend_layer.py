@@ -174,8 +174,7 @@ def confirm_security_groups(conn, params):
 	if not new_group_found:
 		print("Adding group {0}".format(params["name"]))
 		#Need to add vpc_id as named parameters
-		new_sec_group = create_security_group(conn, params["name"],\
-			params["vpc-id"])
+		new_sec_group = create_security_group(conn, params["name"], params["vpc-id"])
 		#Add some rules to the new sec group
 		my_ip_address = socket.gethostbyname(socket.gethostname()) + "/32"
 		new_sec_group.authorize('tcp', 22, 22, my_ip_address)
@@ -459,7 +458,7 @@ def send_shell_commands(params, command_set, instance_list):
 			if j >= 0:
 				print("Making attempt {0} of {1} for ssh access.".format(j, max_attempts))
 			for instance in params[instance_list]:
-				run_ssh_commands(instance.private_ip_address, params, command_set)
+				_ = run_ssh_commands(instance.private_ip_address, params, command_set)
 			break
 		except:
 			j += 1
