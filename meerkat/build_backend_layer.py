@@ -421,29 +421,34 @@ def poll_pending_instances(reservations, instance_count, params):
 	print("All instances running.")
 	params["instances"] = instances
 
-def run_ssh_commands(instance_ip_address, params, command_list):
+def run_ssh_commands(instance_ip_address, params, command_list, login="root"):
 	"""Issues a list of commands via SSH to an EC2 instance."""
 	rsa_private_key_file = params["key_file"]
 	shell_commands = params[command_list]
 	ssh = paramiko.SSHClient()
 	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 	try:
-		ssh.connect(instance_ip_address, username="root",\
+		ssh.connect(instance_ip_address, username=login,\
 			key_filename=rsa_private_key_file)
 	except Exception as err:
 		print("Exception trying to ssh into host {0}".format(err))
 		raise Exception("Error trying to ssh into host.")
 
+	all_stdout = []
 	for item in shell_commands:
 		print(item)
 		_, stdout, stderr = ssh.exec_command(item)
 		my_stdout = str(stdout.readlines())
+		all_stdout.append(my_stdout)
 		my_stderr = str(stderr.readlines())
 		if my_stdout != "[]":
 			print(my_stdout)
 		if my_stderr != "[]":
 			print(my_stderr)
+	stdout.close()
+	stderr.close()
 	ssh.close()
+	return all_stdout
 
 def send_shell_commands(params, command_set, instance_list):
 	"""Sends a list of shell commands, to each instance, displaying the result."""
@@ -488,4 +493,5 @@ def start():
 	print("done!")
 	print("Congratulations! Your cluster is fully operational!")
 #Main program
-start()
+if __name__ == "__main__":
+	start()
