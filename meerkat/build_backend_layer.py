@@ -26,6 +26,7 @@ import sys
 import time
 import logging
 import os
+import jsonschema
 
 from elasticsearch import Elasticsearch
 from boto.ec2.connection import EC2Connection
@@ -260,6 +261,11 @@ def get_instance_lists(params):
 	master_count = layout["masters"]
 	hybrid_count = layout["hybrids"]
 	slave_count = layout["slaves"]
+
+	if (master_count < 0 or hybrid_count < 0 or slave_count < 0
+		or master_count + hybrid_count + slave_count != len(params["instances"])):
+		raise ValueError("Invalid count numbers")
+
 	print("Masters: {0}, Hybrids: {1}, Slaves: {2}".format(master_count,\
 		hybrid_count, slave_count))
 	#Split the instances into separate lists
@@ -305,20 +311,40 @@ def get_unicast_hosts(params):
 		result += '"' + host.private_ip_address + '", '
 	params["unicast_hosts"] = result[:-2]
 
+def validate_configuration(config_path, schema_path):
+	try:
+		config_file = open(config_path, encoding='utf-8')
+		schema_file = open(schema_path, encoding='utf-8')
+		try:
+			config = json.load(config_file)
+			schema = json.load(schema_file)
+		except ValueError:
+			logging.error("Config file is mal-formatted")
+			sys.exit()	
+		
+		try:	
+			jsonschema.validate(config, schema)
+		except jsonschema.exceptions.ValidationError as validation_error:
+			logging.error("Schema definition is invalid, aborting")
+			logging.error(validation_error.message)
+			sys.exit()
+		logging.warning("Configuration schema is valid.")		
+		config_file.close()
+		schema_file.close()
+	except IOError:
+		logging.error("File not found, aborting.")
+		sys.exit()
+	return config
+
 def initialize():
 	"""Validates the command line arguments."""
 	input_file, params = None, None
 	if len(sys.argv) != 3:
 		print("Supply the following arguments: config_file, cluster-name")
 		raise InvalidArguments(msg="Incorrect number of arguments", expr=None)
-	try:
-		input_file = open(sys.argv[1], encoding='utf-8')
-		params = json.loads(input_file.read())
-		input_file.close()
-		params["name"] = sys.argv[2]
-	except IOError:
-		logging.error("%s not found, aborting.", sys.argv[1])
-		sys.exit()
+	
+	params = validate_configuration(sys.argv[1], "config/backend/schema.json")
+	params["name"] = sys.argv[2]
 	return params
 
 def map_block_devices(params):
