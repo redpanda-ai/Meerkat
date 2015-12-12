@@ -4,10 +4,11 @@
 		"layout" : {
 			"type" : "object",
 			"properties" : {
-				"masters" : {"type" : "number"},
-				"hybrids" : {"type" : "number"},
-				"slaves" : {"type" : "number"}
-			}
+				"masters" : {"type" : "integer", "minimum": 0, "maximum": 100},
+				"hybrids" : {"type" : "integer", "minimum": 0, "maximum": 100},
+				"slaves" : {"type" : "integer", "minimum": 0, "maximum": 100}
+			},
+			"required": [ "masters", "hybrids", "slaves" ]
 		},
 		"template" : {
 			"type" : "object",
@@ -29,7 +30,7 @@
         "key_name" : {"type" : "string"},
         "key_file" : {"type" : "string"},
         "instance_type" : {"type" : "string"},
-	    "minimum_master_nodes" : {"type" : "number"},
+	    "minimum_master_nodes" : {"type" : "integer"},
 		"instance_layout" : {"$ref" : "#/definitions/layout"},
         "placement" : {"type" : "string"},
 		"block_device_mapping" : {"type" : "array"},
