@@ -26,13 +26,13 @@ import sys
 import time
 import logging
 import os
-import jsonschema
 
 from elasticsearch import Elasticsearch
 from boto.ec2.connection import EC2Connection
 from boto.ec2.blockdevicemapping import BlockDeviceType, BlockDeviceMapping
 from boto.exception import EC2ResponseError
 from .custom_exceptions import InvalidArguments
+from .various_tools import validate_configuration
 
 def acquire_instances(ec2_conn, params):
 	"""Requests EC2 instances from Amazon and monitors the request until
@@ -262,8 +262,7 @@ def get_instance_lists(params):
 	hybrid_count = layout["hybrids"]
 	slave_count = layout["slaves"]
 
-	if (master_count < 0 or hybrid_count < 0 or slave_count < 0
-		or master_count + hybrid_count + slave_count != len(params["instances"])):
+	if master_count + hybrid_count + slave_count != len(params["instances"]):
 		raise ValueError("Invalid count numbers")
 
 	print("Masters: {0}, Hybrids: {1}, Slaves: {2}".format(master_count,\
@@ -310,31 +309,6 @@ def get_unicast_hosts(params):
 	for host in hosts:
 		result += '"' + host.private_ip_address + '", '
 	params["unicast_hosts"] = result[:-2]
-
-def validate_configuration(config_path, schema_path):
-	try:
-		config_file = open(config_path, encoding='utf-8')
-		schema_file = open(schema_path, encoding='utf-8')
-		try:
-			config = json.load(config_file)
-			schema = json.load(schema_file)
-		except ValueError:
-			logging.error("Config file is mal-formatted")
-			sys.exit()	
-		
-		try:	
-			jsonschema.validate(config, schema)
-		except jsonschema.exceptions.ValidationError as validation_error:
-			logging.error("Schema definition is invalid, aborting")
-			logging.error(validation_error.message)
-			sys.exit()
-		logging.warning("Configuration schema is valid.")		
-		config_file.close()
-		schema_file.close()
-	except IOError:
-		logging.error("File not found, aborting.")
-		sys.exit()
-	return config
 
 def initialize():
 	"""Validates the command line arguments."""

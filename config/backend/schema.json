@@ -1,4 +1,5 @@
 {
+	"$schema": "http://json-schema.org/draft-04/schema#",
 	"type" : "object",
 	"definitions" : {
 		"layout" : {
@@ -18,27 +19,51 @@
 				"search" : {"type" : "string"},
 				"load" : {"type" : "string"},
 				"merge" : {"type" : "string"}
-			}
+			},
+			"required" : ["path", "elasticsearch_yml", "search", "load", "merge"]
+		},
+		"device_mapping" : {
+			"type" : "object",
+			"properties" : {
+				"name" : {"type" : "string"},
+				"mount" : {"type" : "string", "pattern" : "^/dev/[^/]+(/[^/]+)*$"}
+			},
+			"required" : ["name", "mount"]
+		},
+		"ebs_mapping" : {
+			"type" : "object",
+			"properties" : {
+				"snapshot-id" : {"type" : "string", "pattern" : "^snap-"},
+				"mount" : {"type" : "string", "pattern" : "^/dev/[^/]+(/[^/]+)*$"}
+			},
+			"required" : ["snapshot-id", "mount"]
 		}
 	},
     "properties" : {
         "region" : {"type" : "string"},
-        "vpc-id" : {"type" : "string"},
-        "subnet-id" : {"type" : "string"},
+        "vpc-id" : {"type" : "string", "pattern" : "^vpc-"},
+        "subnet-id" : {"type" : "string", "pattern" : "^subnet-"},
         "security_groups" : {"type" : "array"},
-        "ami-id" : {"type" : "string"},
+        "ami-id" : {"type" : "string", "pattern" : "^ami-"},
         "key_name" : {"type" : "string"},
         "key_file" : {"type" : "string"},
         "instance_type" : {"type" : "string"},
 	    "minimum_master_nodes" : {"type" : "integer"},
 		"instance_layout" : {"$ref" : "#/definitions/layout"},
         "placement" : {"type" : "string"},
-		"block_device_mapping" : {"type" : "array"},
-		"ebs_mapping" : {"type": "array"},
+		"block_device_mapping" : {
+			"type" : "array",
+			"items" : {"$ref" : "#/definitions/device_mapping"}
+		},
+		"ebs_mapping" : {
+			"type": "array",
+			"items" : {"$ref" : "#/definitions/ebs_mapping"}
+		},
 		"mount_data_commands" : {"type": "array"},
 		"configure_master_commands" : {"type": "array"},
 		"configure_slave_commands" : {"type": "array"},
 		"configure_hybrid_commands" : {"type": "array"},
 		"template_files" : {"$ref" : "#/definitions/template"}
-    }
+    },
+	"required" : ["region", "vpc-id", "subnet-id", "security_groups", "ami-id", "key_name", "key_file", "instance_type", "minimum_master_nodes", "instance_layout", "placement", "block_device_mapping", "ebs_mapping", "mount_data_commands", "configure_master_commands", "configure_slave_commands", "configure_hybrid_commands", "template_files"]
 }
