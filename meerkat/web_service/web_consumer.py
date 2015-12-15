@@ -431,9 +431,22 @@ class WebConsumer():
 
 		# Split label into type and subtype
 		for transaction in data["transaction_list"]:
+
+			if " - " not in transaction["subtype_CNN"]:
+				if transaction["ledger_entry"] == "debit":
+					transaction["subtype_CNN"] = "Other Expenses - Debit"
+				elif transaction["ledger_entry"] == "credit":
+					if data["container"] == "bank":
+						transaction["subtype_CNN"] = "Other Income - Credit"
+					elif data["container"] == "card":
+						transaction["subtype_CNN"] = "Bank Adjustment - Adjustment"
+				else:
+					transaction["subtype_CNN"] = " - "
+			
 			txn_type, txn_sub_type = transaction["subtype_CNN"].split(" - ")
 			transaction["txn_type"] = txn_type
 			transaction["txn_sub_type"] = txn_sub_type
+			
 			del transaction["subtype_CNN"]
 
 		return data["transaction_list"]
@@ -452,14 +465,22 @@ class WebConsumer():
 
 	@staticmethod
 	def __apply_category_labels(physical):
-		"""Adds a 'category_labels' field to a physical transaction."""
+		"""Adds a 'category_labels' field to a physical transaction if found in index"""
+
 		# Add or Modify Fields
 		for trans in physical:
+
 			categories = trans.get("category_labels", "")
+
 			if categories != "" and categories != []:
 				categories = json.loads(categories)
 			else:
 				categories = []
+
+			# Merge sublists into single list if any exist:
+			if any(isinstance(elem, list) for elem in categories):
+				categories = list(set([item for sublist in categories for item in sublist]))
+
 			trans["category_labels"] = categories
 
 	def __apply_cpu_classifiers(self, data):

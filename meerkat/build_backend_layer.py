@@ -32,6 +32,7 @@ from boto.ec2.connection import EC2Connection
 from boto.ec2.blockdevicemapping import BlockDeviceType, BlockDeviceMapping
 from boto.exception import EC2ResponseError
 from .custom_exceptions import InvalidArguments
+from .various_tools import validate_configuration
 
 def acquire_instances(ec2_conn, params):
 	"""Requests EC2 instances from Amazon and monitors the request until
@@ -174,8 +175,7 @@ def confirm_security_groups(conn, params):
 	if not new_group_found:
 		print("Adding group {0}".format(params["name"]))
 		#Need to add vpc_id as named parameters
-		new_sec_group = create_security_group(conn, params["name"],\
-			params["vpc-id"])
+		new_sec_group = create_security_group(conn, params["name"], params["vpc-id"])
 		#Add some rules to the new sec group
 		my_ip_address = socket.gethostbyname(socket.gethostname()) + "/32"
 		new_sec_group.authorize('tcp', 22, 22, my_ip_address)
@@ -196,7 +196,7 @@ def confirm_security_groups(conn, params):
 #		sys.exit()
 #	return conn
 
-def copy_configuration_to_hosts(params, dst_file):
+def copy_configuration_to_hosts(params, dst_file, login='root'):
 	"""Copies configuration files to each instance in your ES cluster."""
 	rsa_private_key_file = params["key_file"]
 	ssh = paramiko.SSHClient()
@@ -204,7 +204,7 @@ def copy_configuration_to_hosts(params, dst_file):
 	for instance in params["instances"]:
 		instance_ip_address = instance.private_ip_address
 		print("Pushing config file to {0}".format(instance_ip_address))
-		ssh.connect(instance_ip_address, username="root",\
+		ssh.connect(instance_ip_address, username=login,\
 			key_filename=rsa_private_key_file)
 		sftp = ssh.open_sftp()
 		#ALERT hard-coded string
@@ -260,6 +260,10 @@ def get_instance_lists(params):
 	master_count = layout["masters"]
 	hybrid_count = layout["hybrids"]
 	slave_count = layout["slaves"]
+
+	if master_count + hybrid_count + slave_count != len(params["instances"]):
+		raise ValueError("Invalid count numbers")
+
 	print("Masters: {0}, Hybrids: {1}, Slaves: {2}".format(master_count,\
 		hybrid_count, slave_count))
 	#Split the instances into separate lists
@@ -311,14 +315,9 @@ def initialize():
 	if len(sys.argv) != 3:
 		print("Supply the following arguments: config_file, cluster-name")
 		raise InvalidArguments(msg="Incorrect number of arguments", expr=None)
-	try:
-		input_file = open(sys.argv[1], encoding='utf-8')
-		params = json.loads(input_file.read())
-		input_file.close()
-		params["name"] = sys.argv[2]
-	except IOError:
-		logging.error("%s not found, aborting.", sys.argv[1])
-		sys.exit()
+	
+	params = validate_configuration(sys.argv[1], "config/backend/schema.json")
+	params["name"] = sys.argv[2]
 	return params
 
 def map_block_devices(params):
@@ -459,7 +458,7 @@ def send_shell_commands(params, command_set, instance_list):
 			if j >= 0:
 				print("Making attempt {0} of {1} for ssh access.".format(j, max_attempts))
 			for instance in params[instance_list]:
-				run_ssh_commands(instance.private_ip_address, params, command_set)
+				_ = run_ssh_commands(instance.private_ip_address, params, command_set)
 			break
 		except:
 			j += 1
