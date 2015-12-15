@@ -44,7 +44,7 @@ class BuildBackendLayerTests(unittest.TestCase):
 		cls.ec2_conn = EC2Connection(region=cls.my_region)
 		cls.hvm_other_linux_ami = 'ami-f5e4a3c5'
 		cls.default_sg = cls.ec2_conn.get_all_security_groups(filters=
-			{'group-name': 'default', 'vpc-id': cls.default_vpc_id})
+			{'group-name': 'default', 'vpc-id': cls.default_vpc_id})[0]
 		cls.default_availability_zone = 'us-west-2b'
 		cls.default_subnet_id = 'subnet-e58d7580'
 		cls.default_ip = get_current_instance_public_ip()
@@ -66,9 +66,27 @@ class BuildBackendLayerTests(unittest.TestCase):
 		delete_instance(self.ec2_conn, result.instance_ids)
 	"""
 
+	def test_confirm_security_groups__new_sg(self):
+		test_sg_id = 'dummy_sg_' + str(uuid.uuid4())
+		params = {'security_groups': [],
+			'name': test_sg_id, "vpc-id": self.default_vpc_id}
+		expected = 1
+		builder.confirm_security_groups(self.ec2_conn, params)
+		result = params['all_security_groups']
+		self.assertEqual(expected,len(result))
+		delete_security_group(self.ec2_conn, test_sg_id, self.default_vpc_id)
+
+	def test_confirm_security_groups__no_new_sg(self):
+		params = {'security_groups':[], 'name':'AWS-Elastica-Testing', 'vpc-id':
+			self.default_vpc_id}
+		expected = 1
+		builder.confirm_security_groups(self.ec2_conn, params)
+		result = params['all_security_groups']
+		self.assertEqual(expected, len(result))
+
 	def test_acquire_instances__wrong_virtualization(self):
 		"""use a non-hvm ami"""
-		params = {'all_security_groups':self.default_sg, 'key_name': 'jkey',
+		params = {'all_security_groups':[self.default_sg], 'key_name': 'jkey',
 			'instance_layout': {'hybrids':1, 'masters':0, 'slaves':0},
 			'ami-id': 'ami-cf707eff', 'instance_type': 't2.micro',
 			'placement': self.default_availability_zone, 'subnet-id':
@@ -77,20 +95,22 @@ class BuildBackendLayerTests(unittest.TestCase):
 
 	def test_acquire_instances__wrong_subnet_id(self):
 		"""use a subnet id default to us-west-2c"""
-		params = {'all_security_groups':self.default_sg, 'key_name': 'jkey',
+		params = {'all_security_groups':[self.default_sg], 'key_name': 'jkey',
 			'instance_layout': {'hybrids':1, 'masters':0, 'slaves':0},
 			'ami-id': self.hvm_other_linux_ami, 'instance_type': 't2.micro',
 			'placement': self.default_availability_zone, 'subnet-id':
 			'subnet-a092abe6'}
 		self.assertRaises(SystemExit, builder.acquire_instances, self.ec2_conn, params)
 
+	"""
 	def test_copy_configuration_to_hosts__normal_use(self):
 		params = {"key_file" : "tests/test.pem",
 			'instances': [self.default_instance]}
-		dst_file = '~/git/Meerkat/tests/test.txt'
-		_ = builder.copy_configuration_to_hosts(params, dst_file)
+		dst_file = 'tests/test.txt'
+		builder.copy_configuration_to_hosts(params, dst_file, login='ubuntu')
+	"""
 
-	def test_create_security_group__normal_use(self):
+	def test_create_security_group__normal_case(self):
 		test_sg_id = 'dummy_sg_' + str(uuid.uuid4())
 		expected = test_sg_id
 		result = builder.create_security_group(self.ec2_conn, test_sg_id,
