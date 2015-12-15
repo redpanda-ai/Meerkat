@@ -59,7 +59,7 @@ def acquire_instances(ec2_conn, params):
 			subnet_id=params["subnet-id"], security_group_ids=sec_group_ids)
 	except EC2ResponseError as err:
 		logging.info("Error getting instances, aborting: Exception {0}".format(err))
-		logging.info("Unexpected error:", sys.exc_info()[0])
+#		logging.info("Unexpected error:", sys.exc_info()[0])
 		logging.info(reservations)
 		sys.exit()
 	poll_pending_instances(reservations, instance_count, params)
@@ -165,28 +165,41 @@ def confirm_security_groups(conn, params):
 	all_groups = []
 	for group in security_groups:
 		if group.name in existing_groups:
-			logging.info("Security group {0} found, continuing".format(group))
+#			logging.info("Security group {0} found, continuing".format(group))
+			print("Security group {0} found, continuing".format(group))
 			groups_found += 1
 			all_groups.append(group)
 		elif group.name == params["name"]:
 			new_group_found = True
 			all_groups.append(group)
 	if groups_found == existing_group_count:
-		logging.info("All pre-existing groups found, continuing")
+		print("All pre-existing groups found, continuing")
+#		logging.info("All pre-existing groups found, continuing")
 	if not new_group_found:
-		logging.info("Adding group {0}".format(params["name"]))
+		print("Adding group {0}".format(params["name"]))
+#		logging.info("Adding group {0}".format(params["name"]))
 		#Need to add vpc_id as named parameters
-		new_sec_group = create_security_group(conn, params["name"],\
-			params["vpc-id"])
+		new_sec_group = create_security_group(conn, params["name"], params["vpc-id"])
 		#Add some rules to the new sec group
 		my_ip_address = socket.gethostbyname(socket.gethostname()) + "/32"
 		new_sec_group.authorize('tcp', 22, 22, my_ip_address)
 		all_groups.append(new_sec_group)
 	for group in all_groups:
-		logging.info(group)
+		print(group)
 	params["all_security_groups"] = all_groups
 
-def copy_configuration_to_hosts(params, dst_file):
+#def connect_to_ec2(region):
+#	"""Returns a connection to EC2"""
+#	try:
+#		conn = boto.ec2.connect_to_region(region,\
+#			aws_access_key_id=AWS_ACCESS_KEY_ID,\
+#			aws_secret_access_key=AWS_SECRET_ACCESS_KEY, debug=2)
+#	except:
+#		print("Error connecting to EC2, check your credentials")
+#		sys.exit()
+#	return conn
+
+def copy_configuration_to_hosts(params, dst_file, login='root'):
 	"""Copies configuration files to each instance in your ES cluster."""
 	rsa_private_key_file = params["key_file"]
 	ssh = paramiko.SSHClient()
@@ -194,7 +207,7 @@ def copy_configuration_to_hosts(params, dst_file):
 	for instance in params["instances"]:
 		instance_ip_address = instance.private_ip_address
 		logging.info("Pushing config file to {0}".format(instance_ip_address))
-		ssh.connect(instance_ip_address, username="root",\
+		ssh.connect(instance_ip_address, username=login,\
 			key_filename=rsa_private_key_file)
 		sftp = ssh.open_sftp()
 		#ALERT hard-coded string
@@ -448,7 +461,7 @@ def send_shell_commands(params, command_set, instance_list):
 			if j >= 0:
 				logging.info("Making attempt {0} of {1} for ssh access.".format(j, max_attempts))
 			for instance in params[instance_list]:
-				run_ssh_commands(instance.private_ip_address, params, command_set)
+				_ = run_ssh_commands(instance.private_ip_address, params, command_set)
 			break
 		except:
 			j += 1
@@ -456,7 +469,7 @@ def send_shell_commands(params, command_set, instance_list):
 			time.sleep(10)
 
 def check_group_existence(params):
-	new_group = sys.argv[2]
+	new_group =  params["name"]
 	required_groups = params["security_groups"]
 	if new_group in required_groups: 
 		raise Exception("The new group already exists")
