@@ -1,13 +1,9 @@
-"""Unit test for meerkat.various_tools"""
+"""Unit test for meerkat.build_backend_layer"""
 
-import meerkat.various_tools
-import numpy as np
 import unittest
 import sys
-import json
 import meerkat.build_backend_layer as builder
 
-from jsonschema import validate
 from meerkat.custom_exceptions import InvalidArguments
 from nose_parameterized import parameterized
 
@@ -37,7 +33,6 @@ class BuildBackendLayerTests(unittest.TestCase):
 			self.assertEqual(expected, result)
 		else:
 			self.assertRaises(expected, builder.run_ssh_commands, host, fix, cl, login=login)
-
 	def test_initialize__normal_case(self):
 		""" Assert that params is initialized """
 		sys.argv = ["meerkat.build_backend_layer", "config/backend/1_c3_xlarge_az_a.json", "cluster_name"]
@@ -45,7 +40,7 @@ class BuildBackendLayerTests(unittest.TestCase):
 		self.assertNotEqual(result, None)
 		
 	def test_initialize__invalid_arguments_number(self):
-		""" Assert that when the input argument number is incorrect, InvalidArguments Exception is thrown """
+		""" Assert that when arguments number is invalid, InvalidArguments Exception is thrown """
 		sys.argv = ["meerkat.build_backend_layer", "cluster_name"]
 		self.assertRaises(InvalidArguments, builder.initialize)
 
@@ -78,7 +73,7 @@ class BuildBackendLayerTests(unittest.TestCase):
 		(["localhost", "52.34.28.58"], '"localhost", "52.34.28.58"'),
 		([], '')
 	])
-	def test_get_master_ip_list__normal_case(self, masters, expected):
+	def test_get_master_ip_list__parameterized(self, masters, expected):
 		""" Assert that a list of masters are created """
 		master_list = []
 		for m in masters:
@@ -96,6 +91,19 @@ class BuildBackendLayerTests(unittest.TestCase):
 #		builder.confirm_security_groups(cls.conn, fix)
 #		self.assertEqual(params["all_security_groups"], expected)
 
+	@parameterized.expand([
+		([Master("1.2.3.4"), Master("5.6.7.8")], 1, '"1.2.3.4"'),
+		([], 1, ''),
+		([Master("1.2.3.4"), Master("5.6.7.8"), Master("localhost")], 2, '"1.2.3.4", "5.6.7.8"')
+	])
+	def test_get_unicast_hosts__parameterized(self, instances, min_nodes, expected):
+		""" Assert that a list of unicast hosts are created """
+		fix = {
+			"instances" : instances,
+			"minimum_master_nodes" : min_nodes
+		}
+		builder.get_unicast_hosts(fix)
+		self.assertEqual(fix["unicast_hosts"], expected)
 
 if __name__ == '__main__':
 	unittest.main()
