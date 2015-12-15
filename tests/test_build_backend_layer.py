@@ -18,36 +18,25 @@ class Master:
 class BuildBackendLayerTests(unittest.TestCase):
 	"""Our UnitTest class."""
 
-	def test_run_ssh_commands__missing_pem_file(self):
+	@parameterized.expand([
+		("tests/test.pem", ["uname", "whoami"], ["['Linux\\n']", "['ubuntu\\n']"]),
+		("tests/test.pem", ["uname"], [ "['Linux\\n']" ]),
+		("tests/test.pem", None, KeyError),
+		("tests/missing.pem", None, Exception),
+	])
+	def test_run_ssh_commands__parameterized(self, key_file, command_list, expected):
+		"""Tests the run_ssh_commands function with parameters."""
+		host, cl, login = "localhost", "command_list", "ubuntu"
 		fix = {
-			"key_file" : "tests/missing.pem",
-			"command_list" : ["uname"]
+			"key_file" : key_file
 		}
-		self.assertRaises(Exception, builder.run_ssh_commands, "localhost", fix, "command_list", login="ubuntu")
-
-	def test_run_ssh_commands__three_commands(self):
-		fix = {
-			"key_file" : "tests/test.pem",
-			"command_list" : ["uname", "whoami"]
-		}
-		expected = ["['Linux\\n']", "['ubuntu\\n']"]
-		result = builder.run_ssh_commands("localhost", fix, "command_list", login="ubuntu")
-		self.assertEqual(expected, result)
-
-	def test_run_ssh_commands__normal_use(self):
-		fix = {
-			"key_file" : "tests/test.pem",
-			"command_list" : ["uname"]
-		}
-		expected = [ "['Linux\\n']" ]
-		result = builder.run_ssh_commands("localhost", fix, "command_list", login="ubuntu")
-		self.assertEqual(expected, result)
-
-	def test_run_ssh_commands__no_commands(self):
-		fix = {
-			"key_file" : "tests/test.pem",
-		}
-		self.assertRaises(KeyError, builder.run_ssh_commands, "localhost", fix, "command_list", login="ubuntu")
+		if command_list is not None :
+			fix["command_list"] = command_list
+		if isinstance(expected, list):
+			result = builder.run_ssh_commands(host, fix, cl, login=login)
+			self.assertEqual(expected, result)
+		else:
+			self.assertRaises(expected, builder.run_ssh_commands, host, fix, cl, login=login)
 
 	def test_initialize__normal_case(self):
 		""" Assert that params is initialized """
@@ -62,70 +51,51 @@ class BuildBackendLayerTests(unittest.TestCase):
 
 	@parameterized.expand([
 		(1, 0, 2, ["instance0", "instance1", "instance2"], (["instance0"],[],["instance1", "instance2"])),
-		(0, 1, 0, ["instance0"], ([],["instance0"],[]))
+		(0, 1, 0, ["instance0"], ([],["instance0"],[])),
+		(0, 0, 0, [], ([], [], [])),
+		(1, 1, 1, ["instance0"], ValueError),
+		(1, 1, 1, ["instance0", "instance1"], ValueError)
 	])
 	def test_get_instance_lists_parameterized(self, masters, hybrids, slaves, instance_list, expected):
 		"""Assert that instance lists are built correctly."""
 		fix = {
 			"instance_layout" : {
-                "masters" : masters,
-                "hybrids" : hybrids,
-                "slaves" : slaves
-            },
-            "instances" : instance_list
-        }
-		builder.get_instance_lists(fix)
-		self.assertEqual(fix["masters"], expected[0])
-		self.assertEqual(fix["hybrids"], expected[1])
-		self.assertEqual(fix["slaves"], expected[2])
-
-
-	def test_get_instance_lists__empty_layout(self):
-		""" Assert that an empty list of instances are generated """
-		fix = {
-			"instance_layout" : {
-				"masters" : 0,
-				"hybrids" : 0,
-				"slaves" : 0
+				"masters" : masters,
+				"hybrids" : hybrids,
+				"slaves" : slaves
 			},
-			"instances" : []
+			"instances" : instance_list
 		}
-		builder.get_instance_lists(fix)
-		self.assertEqual(fix["masters"], [])
-		self.assertEqual(fix["hybrids"], [])
-		self.assertEqual(fix["slaves"], [])
+		if isinstance(expected, tuple):
+			builder.get_instance_lists(fix)
+			self.assertEqual(fix["masters"], expected[0])
+			self.assertEqual(fix["hybrids"], expected[1])
+			self.assertEqual(fix["slaves"], expected[2])
+		else:
+			self.assertRaises(expected, builder.get_instance_lists, fix)
 
-	def test_get_instance_lists__invalid_count_numbers(self):
-		""" Assert that when sum of count numbers isn't equal to number of instances, ValueError is thrown """
-		fix = {
-			"instance_layout" : {
-				"masters" : 1,
-				"hybrids" : 1,
-				"slaves" : 1
-			},
-			"instances" : ["instance0"]
-		}
-		self.assertRaises(ValueError, builder.get_instance_lists, fix)
-
-	def test_get_master_ip_list__normal_case(self):
+	@parameterized.expand([
+		(["localhost", "52.34.28.58"], '"localhost", "52.34.28.58"'),
+		([], '')
+	])
+	def test_get_master_ip_list__normal_case(self, masters, expected):
 		""" Assert that a list of masters are created """
-		master0 = Master("localhost")
-		master1 = Master("52.34.28.58")
-		fix = {
-			"masters" : [master0, master1]
-		}		
-		expected = '"localhost", "52.34.28.58"'
+		master_list = []
+		for m in masters:
+			master_list.append(Master(m))
+		fix = { "masters" : master_list }
 		builder.get_master_ip_list(fix)
 		self.assertEqual(expected, fix["master_ip_list"])
 
-	def test_get_master_ip_list__empty_masters_list(self):
-		""" Assert that an empty list of masters are created """
-		fix = {
-			"masters" : []
-		}		
-		expected = ''
-		builder.get_master_ip_list(fix)
-		self.assertEqual(expected, fix["master_ip_list"])
+#	@parameterized.expand([
+#		(["meerkat_private", "s3cmd", "github"], ["sg_1"], ["meerkat_private", "s3cmd", "github", "sg_1"])
+#	])
+#	def test_confirm_security_groups__parameterized(self, security_groups, cluster_name, expected):
+#		"""Assert that security groups are correctly processed."""
+#		fix = { "security_group" : security_groups }
+#		builder.confirm_security_groups(cls.conn, fix)
+#		self.assertEqual(params["all_security_groups"], expected)
+
 
 if __name__ == '__main__':
 	unittest.main()
