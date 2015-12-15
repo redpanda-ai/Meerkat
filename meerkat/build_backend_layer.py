@@ -195,7 +195,7 @@ def confirm_security_groups(conn, params):
 #		sys.exit()
 #	return conn
 
-def copy_configuration_to_hosts(params, dst_file):
+def copy_configuration_to_hosts(params, dst_file, login='root'):
 	"""Copies configuration files to each instance in your ES cluster."""
 	rsa_private_key_file = params["key_file"]
 	ssh = paramiko.SSHClient()
@@ -203,7 +203,7 @@ def copy_configuration_to_hosts(params, dst_file):
 	for instance in params["instances"]:
 		instance_ip_address = instance.private_ip_address
 		print("Pushing config file to {0}".format(instance_ip_address))
-		ssh.connect(instance_ip_address, username="root",\
+		ssh.connect(instance_ip_address, username=login,\
 			key_filename=rsa_private_key_file)
 		sftp = ssh.open_sftp()
 		#ALERT hard-coded string
