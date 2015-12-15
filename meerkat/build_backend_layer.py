@@ -159,6 +159,7 @@ def confirm_security_groups(conn, params):
 	existing_groups = params["security_groups"]
 	existing_group_count = len(existing_groups)
 	security_groups = conn.get_all_security_groups()
+	check_group_existence(conn, params)
 	groups_found = 0
 	new_group_found = False
 	all_groups = []
@@ -465,6 +466,14 @@ def send_shell_commands(params, command_set, instance_list):
 			j += 1
 			print("Attempt #{0} in 10 seconds.".format(j))
 			time.sleep(10)
+
+def check_group_existence(ec2_conn, params):
+	new_group = sys.argv[2]
+	required_groups = params["security_groups"]
+	filter = {"vpc-id":params["vpc-id"], "group-name":new_group}
+	ec2_groups = ec2_conn.get_all_security_groups(filters=filter)
+	if new_group in required_groups and len(ec2_groups) > 0:
+		raise Exception("The new group already exists")
 
 def start():
 	"""This function runs the entire sequence needed to build a cluster."""
