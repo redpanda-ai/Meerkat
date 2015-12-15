@@ -32,6 +32,7 @@ from boto.ec2.connection import EC2Connection
 from boto.ec2.blockdevicemapping import BlockDeviceType, BlockDeviceMapping
 from boto.exception import EC2ResponseError
 from .custom_exceptions import InvalidArguments
+from .various_tools import validate_configuration
 
 def acquire_instances(ec2_conn, params):
 	"""Requests EC2 instances from Amazon and monitors the request until
@@ -259,6 +260,10 @@ def get_instance_lists(params):
 	master_count = layout["masters"]
 	hybrid_count = layout["hybrids"]
 	slave_count = layout["slaves"]
+
+	if master_count + hybrid_count + slave_count != len(params["instances"]):
+		raise ValueError("Invalid count numbers")
+
 	print("Masters: {0}, Hybrids: {1}, Slaves: {2}".format(master_count,\
 		hybrid_count, slave_count))
 	#Split the instances into separate lists
@@ -310,14 +315,9 @@ def initialize():
 	if len(sys.argv) != 3:
 		print("Supply the following arguments: config_file, cluster-name")
 		raise InvalidArguments(msg="Incorrect number of arguments", expr=None)
-	try:
-		input_file = open(sys.argv[1], encoding='utf-8')
-		params = json.loads(input_file.read())
-		input_file.close()
-		params["name"] = sys.argv[2]
-	except IOError:
-		logging.error("%s not found, aborting.", sys.argv[1])
-		sys.exit()
+	
+	params = validate_configuration(sys.argv[1], "config/backend/schema.json")
+	params["name"] = sys.argv[2]
 	return params
 
 def map_block_devices(params):
