@@ -9,6 +9,7 @@ import meerkat.build_backend_layer as builder
 
 from jsonschema import validate
 from meerkat.custom_exceptions import InvalidArguments
+from nose_parameterized import parameterized
 
 class Master:
 	def __init__(self, private_ip_address):
@@ -59,20 +60,25 @@ class BuildBackendLayerTests(unittest.TestCase):
 		sys.argv = ["meerkat.build_backend_layer", "cluster_name"]
 		self.assertRaises(InvalidArguments, builder.initialize)
 
-	def test_get_instance_lists__normal_case(self):
-		""" Assert that a list of instances are generated """
+	@parameterized.expand([
+		(1, 0, 2, ["instance0", "instance1", "instance2"], (["instance0"],[],["instance1", "instance2"])),
+		(0, 1, 0, ["instance0"], ([],["instance0"],[]))
+	])
+	def test_get_instance_lists_parameterized(self, masters, hybrids, slaves, instance_list, expected):
+		"""Assert that instance lists are built correctly."""
 		fix = {
 			"instance_layout" : {
-                "masters" : 1,
-                "hybrids" : 0,
-                "slaves" : 2
+                "masters" : masters,
+                "hybrids" : hybrids,
+                "slaves" : slaves
             },
-            "instances" : ["instance0", "instance1", "instance2"]
+            "instances" : instance_list
         }
 		builder.get_instance_lists(fix)
-		self.assertEqual(fix["masters"], ["instance0"])
-		self.assertEqual(fix["hybrids"], [])
-		self.assertEqual(fix["slaves"], ["instance1", "instance2"])
+		self.assertEqual(fix["masters"], expected[0])
+		self.assertEqual(fix["hybrids"], expected[1])
+		self.assertEqual(fix["slaves"], expected[2])
+
 
 	def test_get_instance_lists__empty_layout(self):
 		""" Assert that an empty list of instances are generated """
