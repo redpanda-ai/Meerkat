@@ -483,13 +483,26 @@ class WebConsumer():
 
 			trans["category_labels"] = categories
 
+	@staticmethod
+	def __enrich_physical_without_search(transactions):
+		""" When not search, enrich physical transcation with necessary fields """
+		for transaction in transactions:
+			transaction["country"] = "US"
+			transaction["source_merchant_id"] = ""
+			transaction["source"] = "OTHER"	
+			transaction["match_found"] = False
+		return transactions
+
 	def __apply_cpu_classifiers(self, data):
 		"""Apply all the classifiers which are CPU bound.  Written to be
 		run in parallel with GPU bound classifiers."""
 		self.__apply_locale_bloom(data)
 		physical, non_physical = self.__sws(data)
-		physical = self.__enrich_physical(physical)
-		self.__apply_category_labels(physical)
+		if "should_search" not in self.params or self.params["should_search"]:
+			physical = self.__enrich_physical(physical)
+			self.__apply_category_labels(physical)
+		else:
+			physical = self.__enrich_physical_without_search(physical)
 		return physical, non_physical
 
 	def classify(self, data, optimizing=False):
