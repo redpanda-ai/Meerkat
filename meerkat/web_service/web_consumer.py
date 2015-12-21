@@ -520,7 +520,6 @@ class WebConsumer():
 			self.__apply_missing_categories(data["transaction_list"], data["container"])
 
 		self.ensure_output_schema(data["transaction_list"])
-
 		return data
 
 if __name__ == "__main__":
