@@ -487,9 +487,8 @@ class WebConsumer():
 	def __enrich_physical_no_search(transactions):
 		""" When not search, enrich physical transcation with necessary fields """
 		for transaction in transactions:
-			#transaction["country"] = "US"
-			#transaction["source_merchant_id"] = ""
-			#transaction["merchant_name"] = ""
+			transaction["country"] = "US"
+			transaction["merchant_name"] = ""
 			transaction["source"] = "OTHER"
 			transaction["match_found"] = False
 		return transactions
