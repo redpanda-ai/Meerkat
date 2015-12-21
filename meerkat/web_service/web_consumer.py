@@ -484,7 +484,7 @@ class WebConsumer():
 			trans["category_labels"] = categories
 
 	@staticmethod
-	def __enrich_physical_without_search(transactions):
+	def __enrich_physical_no_search(transactions):
 		""" When not search, enrich physical transcation with necessary fields """
 		for transaction in transactions:
 			#transaction["country"] = "US"
@@ -503,7 +503,7 @@ class WebConsumer():
 			physical = self.__enrich_physical(physical)
 			self.__apply_category_labels(physical)
 		else:
-			physical = self.__enrich_physical_without_search(physical)
+			physical = self.__enrich_physical_no_search(physical)
 		return physical, non_physical
 
 	def classify(self, data, optimizing=False):
