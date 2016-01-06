@@ -68,5 +68,5 @@ dict_2_json(label_map, sys.argv[2] + "_subtype_label_map.json")
 train.to_csv(sys.argv[2] + "_train_subtype.csv", cols=["LABEL", "DESCRIPTION_UNMASKED"], header=False, index=False, index_label=False)
 test.to_csv(sys.argv[2] + "_test_subtype.csv", cols=["LABEL", "DESCRIPTION_UNMASKED"], header=False, index=False, index_label=False)
 
-test_full.to_csv(sys.argv[2] + "_test_subtype_full.csv")
-train_full.to_csv(sys.argv[2] + "_train_subtype_full.csv")
+test_full.to_csv(sys.argv[2] + "_test_subtype_full.csv", index=False)
+train_full.to_csv(sys.argv[2] + "_train_subtype_full.csv", index=False)
