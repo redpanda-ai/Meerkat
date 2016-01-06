@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import csv
 
 import numpy as np
 import pandas as pd
@@ -29,6 +30,7 @@ training_data = []
 # Load Data
 df = pd.read_csv(sys.argv[1], quoting=csv.QUOTE_NONE, na_filter=False,
 	encoding="utf-8", sep='|', error_bad_lines=False, low_memory=False)
+df['UNIQUE_TRANSACTION_ID'] = df.index
 df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
 grouped = df.groupby('LEDGER_ENTRY', as_index=False)
 groups = dict(list(grouped))
@@ -56,10 +58,15 @@ df["DESCRIPTION_UNMASKED"] = df.apply(b, axis=1)
 training_data_df = df[['LABEL', 'DESCRIPTION_UNMASKED']]
 msk = np.random.rand(len(training_data_df)) < 0.90
 train = training_data_df[msk]
+train_full = df[msk]
 test = training_data_df[~msk]
+test_full = df[msk]
 
 # Save
 label_map = dict(zip(label_map.values(), label_map.keys()))
 dict_2_json(label_map, sys.argv[2] + "_subtype_label_map.json")
 train.to_csv(sys.argv[2] + "_train_subtype.csv", cols=["LABEL", "DESCRIPTION_UNMASKED"], header=False, index=False, index_label=False)
 test.to_csv(sys.argv[2] + "_test_subtype.csv", cols=["LABEL", "DESCRIPTION_UNMASKED"], header=False, index=False, index_label=False)
+
+test_full.to_csv(sys.argv[2] + "_test_subtype_full.csv")
+train_full.to_csv(sys.argv[2] + "_train_subtype_full.csv")
