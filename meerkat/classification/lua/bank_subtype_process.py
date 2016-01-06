@@ -27,7 +27,8 @@ def load_label_map(filename):
 training_data = []
 
 # Load Data
-df = pd.read_csv(sys.argv[1], quoting=csv.QUOTE_NONE, na_filter=False, encoding="utf-8", sep='|', error_bad_lines=False, low_memory=False)
+df = pd.read_csv(sys.argv[1], quoting=csv.QUOTE_NONE, na_filter=False,
+	encoding="utf-8", sep='|', error_bad_lines=False, low_memory=False)
 df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
 grouped = df.groupby('LEDGER_ENTRY', as_index=False)
 groups = dict(list(grouped))
