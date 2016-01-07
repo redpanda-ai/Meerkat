@@ -44,7 +44,7 @@ from meerkat.various_tools import (get_us_cities, post_SNS)
 USED_IN_HEADER, ORIGIN, NAME_IN_MEERKAT, NAME_IN_ORIGIN = 0, 1, 2, 3
 
 #Allowed pylint exception
-# pylint: disable=bad-continuation
+#pylint: disable=bad-continuation
 
 def get_field_mappings(params):
 	"""Returns a list of field_mappings."""
