@@ -60,7 +60,7 @@ msk = np.random.rand(len(training_data_df)) < 0.90
 train = training_data_df[msk]
 train_full = df[msk]
 test = training_data_df[~msk]
-test_full = df[msk]
+test_full = df[~msk]
 
 # Save
 label_map = dict(zip(label_map.values(), label_map.keys()))
