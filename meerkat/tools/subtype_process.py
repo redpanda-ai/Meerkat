@@ -35,7 +35,7 @@ df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
 grouped = df.groupby('LEDGER_ENTRY', as_index=False)
 groups = dict(list(grouped))
 df = groups[sys.argv[2]]
-df["PROPOSED_SUBTYPE"] = df["PROPOSED_SUBTYPE"].str.strip()
+df["PROPOSED_SUBTYPE"] = df["PROPOSED_SUBTYPE"].str.strip().str.lower()
 class_names = df["PROPOSED_SUBTYPE"].value_counts().index.tolist()
 
 # Create a label map
