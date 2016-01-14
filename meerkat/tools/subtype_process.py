@@ -1,12 +1,11 @@
 #!/usr/local/bin/python3.3
 
-import os
-import sys
-import json
-import csv
+"""This script loads raw bank subtype data and partitions it into training
+and test data. It also produces a index-label mapping json file.
 
-import numpy as np
-import pandas as pd
+@author: Matthew Sevrens
+@author: Oscar Pan
+"""
 
 #################### USAGE ##########################
 """
@@ -15,6 +14,15 @@ python3 -m meerkat.tools.subtype_process \
 data/input/Bank_complete_data_subtype_original.csv credit
 """
 #####################################################
+
+import os
+import sys
+import json
+import csv
+
+import numpy as np
+import pandas as pd
+
 
 def dict_2_json(obj, filename):
 	"""Saves a dict as a json file"""
