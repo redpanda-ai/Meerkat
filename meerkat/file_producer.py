@@ -38,7 +38,7 @@ from meerkat.custom_exceptions import InvalidArguments
 from meerkat.file_consumer import FileConsumer
 from meerkat.classification.load import select_model
 from meerkat.various_tools import (safely_remove_file)
-from meerkat.various_tools import (get_us_cities, post_SNS)
+from meerkat.various_tools import (get_us_cities, post_sns)
 
 #CONSTANTS
 USED_IN_HEADER, ORIGIN, NAME_IN_MEERKAT, NAME_IN_ORIGIN = 0, 1, 2, 3
@@ -358,7 +358,7 @@ def process_single_input_file(params):
 	]
 	report_message = get_report_message(report, params["errors"])
 	logging.warning(report_message)
-	post_SNS(report_message)
+	post_sns(report_message)
 	# Remove
 	push_file_to_s3(params, "err")
 	sys.exit()
