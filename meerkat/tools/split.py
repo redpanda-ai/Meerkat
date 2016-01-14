@@ -1,3 +1,4 @@
+"""Process big files"""
 import gzip
 import sys
 import math

@@ -43,7 +43,7 @@ from meerkat.web_service.web_consumer import WebConsumer
 
 PARAMS = load_params(sys.argv[1])
 CITIES = get_us_cities()
-consumer = WebConsumer(cities=CITIES, params=PARAMS)
+CONSUMER = WebConsumer(cities=CITIES, params=PARAMS)
 BATCH_SIZE = 100
 
 def run_meerkat(params, dataset):
@@ -52,17 +52,17 @@ def run_meerkat(params, dataset):
 	result_list = []
 	number = (len(dataset))/BATCH_SIZE
 	number = int(number - (number%1))
-	for x in range(0, number+1):
+	for data in range(0, number+1):
 		batch = []
-		for i in range(x*BATCH_SIZE, (x+1)*BATCH_SIZE):
+		for i in range(data*BATCH_SIZE, (data+1)*BATCH_SIZE):
 			try:
 				batch.append(dataset[i])
 			except IndexError:
 				break
 
-		print("Batch number: {0}".format(x))
+		print("Batch number: {0}".format(data))
 		batch_in = format_web_consumer(batch)
-		batch_result = consumer.classify(batch_in, optimizing=True)
+		batch_result = CONSUMER.classify(batch_in, optimizing=True)
 		result_list.extend(batch_result["transaction_list"])
 
 	# Test Accuracy
@@ -180,7 +180,7 @@ def get_initial_values(hyperparameters, params, known, dataset):
 	return top_score
 
 def gradient_descent(initial_values, params, known, dataset):
-
+	"""Provide the top score based on gradient function"""
 	settings = params["optimization"]["settings"]
 	top_score = initial_values
 	save_top_score(initial_values)
@@ -199,6 +199,7 @@ def gradient_descent(initial_values, params, known, dataset):
 	return top_score
 
 def run_iteration(top_score, params, known, dataset):
+	"Provide the top score based on parameters"""
 
 	settings = params["optimization"]["settings"]
 	hyperparameters = top_score['hyperparameters']
@@ -260,7 +261,7 @@ def randomize(hyperparameters, known={}, learning_rate=0.3):
 	return dict(list(randomized.items()) + list(known.items()))
 
 def save_top_score(top_score):
-
+	"""Provide top score"""
 	record = open("optimization_results/" + os.path.splitext(os.path.basename(sys.argv[1]))[0] +
 		"_top_scores.txt", "a")
 	pprint("Precision = " + str(top_score['precision']) + "%", record)
@@ -295,7 +296,7 @@ def run_classifier(hyperparameters, params, dataset):
 	hyperparameters["boost_labels"] = boost_labels
 	hyperparameters["boost_vectors"] = boost_vectors
 
-	consumer.update_hyperparams(hyperparameters)
+	CONSUMER.update_hyperparams(hyperparameters)
 	accuracy = run_meerkat(params, dataset)
 
 	return accuracy
@@ -333,7 +334,7 @@ def verify_arguments():
 		open(previous_scores, 'w').close()
 
 def format_web_consumer(dataset):
-
+	"""Provide formatted dataset"""
 	formatted = json.load(open("meerkat/web_service/example_input.json", "r"))
 	formatted["transaction_list"] = dataset
 	trans_id = 1

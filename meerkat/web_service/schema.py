@@ -1,3 +1,4 @@
+"""Process and validate the schema"""
 import json
 import jsonschema
 
@@ -9,6 +10,7 @@ from tornado_json.utils import container
 
 def validate(input_schema=None, output_schema=None,\
 	input_example=None, output_example=None):
+	"""validate schema"""
 	@container
 	def _validate(rh_method):
 		"""Decorator for RequestHandler schema validation
@@ -31,6 +33,7 @@ def validate(input_schema=None, output_schema=None,\
 		@wraps(rh_method)
 		@gen.coroutine
 		def _wrapper(self, *args, **kwargs):
+			"""Process ``None`` schema"""
 			# In case the specified input_schema is ``None``, we
 			#   don't json.loads the input, but just set it to ``None``
 			#   instead.

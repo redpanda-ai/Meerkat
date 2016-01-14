@@ -1,3 +1,4 @@
+"""Process big files"""
 #!/bin/python3.3
 
 import glob
@@ -67,6 +68,7 @@ def split_csv(filehandler, **kwargs):
 	return file_list
 
 def slice_me(working_directory, input_filename):
+	"""remove big files"""
 	os.chdir(working_directory)
 	unzipped_filename = input_filename[:-3]
 	#Gunzip the big file

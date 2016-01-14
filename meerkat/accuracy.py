@@ -173,6 +173,7 @@ def CNN_accuracy(*args, **kwargs):
 	# results.close()
 
 def __load_label_map(label_map):
+	"""Provide label map"""
 	if isinstance(label_map, dict):
 		return label_map
 	return label_map and load_params(label_map) or None
@@ -193,6 +194,8 @@ def print_results(results):
 	print("{0:35} = {1:10.2f}%".format("Precision", results["precision"]))
 
 def enhance_results(total, needs_hand_labeling, mislabeled, unlabeled, correct):
+	"""Groupe results"""
+
 	num_labeled = total - unlabeled
 	total_recall_physical = num_labeled / total * 100
 	num_labeled = total - unlabeled

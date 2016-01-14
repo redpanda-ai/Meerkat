@@ -1,3 +1,4 @@
+"""Format the datasets and write data to file"""
 import csv
 import json
 import logging
@@ -8,6 +9,7 @@ import sys
 #python3 -m meerkat.tools.preprocess_cnn_training_data 3_year_bank_sample.txt 
 
 def get_lookup_dicts(input_dataframe):
+	"""provide a hashmap"""
 	# Normalize GOOD_DESCRIPTION to lowercase before making a histogram
 	input_dataframe["GOOD_DESCRIPTION"] = input_dataframe.GOOD_DESCRIPTION.apply(
 		lambda x: str(x).lower() if str(x).lower() != "nan" else "")	
@@ -53,6 +55,7 @@ def get_lookup_dicts(input_dataframe):
 	return lookup, reverse_lookup
 
 def get_transformed_training_data(lookup, input_dataframe):
+	"""provide transformed trainning dataset"""
 	#Pull out two columns
 	sub_frame = input_dataframe.ix[:, ['GOOD_DESCRIPTION', 'DESCRIPTION_UNMASKED']]
 	#sub_frame["DESCRIPTION_UNMASKED"] = sub_frame.DESCRIPTION_UNMASKED.apply(
@@ -66,6 +69,7 @@ def get_transformed_training_data(lookup, input_dataframe):
 	return sub_frame.ix[:, ['CLASS', 'GOOD_DESCRIPTION', 'DESCRIPTION_UNMASKED']]
 
 def write_training_and_testing_csv(df):
+	"""write data to csv file"""
 	df.to_csv("train.csv", quoting=csv.QUOTE_ALL, chunksize=1000,
 		columns=["CLASS", "GOOD_DESCRIPTION", "DESCRIPTION_UNMASKED"], header=False,
 		index=False)
