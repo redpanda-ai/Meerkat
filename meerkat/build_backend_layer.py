@@ -469,7 +469,7 @@ def send_shell_commands(params, command_set, instance_list):
 			time.sleep(10)
 
 def check_group_existence(params):
-	new_group =  params["name"]
+	new_group = params["name"]
 	required_groups = params["security_groups"]
 	if new_group in required_groups: 
 		raise Exception("The new group already exists")
