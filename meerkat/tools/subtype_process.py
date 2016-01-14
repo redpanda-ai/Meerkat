@@ -1,3 +1,5 @@
+#!/usr/local/bin/python3.3
+
 import os
 import sys
 import json
@@ -64,9 +66,15 @@ test_full = df[~msk]
 
 # Save
 label_map = dict(zip(label_map.values(), label_map.keys()))
-dict_2_json(label_map, sys.argv[2] + "_subtype_label_map.json")
-train.to_csv(sys.argv[2] + "_train_subtype.csv", cols=["LABEL", "DESCRIPTION_UNMASKED"], header=False, index=False, index_label=False)
-test.to_csv(sys.argv[2] + "_test_subtype.csv", cols=["LABEL", "DESCRIPTION_UNMASKED"], header=False, index=False, index_label=False)
+dict_2_json(label_map, 'data/preprocessed/' + sys.argv[2] + "_subtype_label_map.json")
+train.to_csv('data/preprocessed/' + sys.argv[2] + "_train_subtype.csv",
+	 cols=["LABEL", "DESCRIPTION_UNMASKED"], header=False, index=False,
+	 index_label=False)
+test.to_csv('data/preprocessed/' + sys.argv[2] + "_test_subtype.csv",
+	 cols=["LABEL", "DESCRIPTION_UNMASKED"], header=False, index=False,
+	 index_label=False)
 
-test_full.to_csv(sys.argv[2] + "_test_subtype_full.csv", index=False)
-train_full.to_csv(sys.argv[2] + "_train_subtype_full.csv", index=False)
+test_full.to_csv('data/preprocessed/' + sys.argv[2] + "_test_subtype_full.csv",
+	 index=False, sep='|')
+train_full.to_csv('data/preprocessed/' + sys.argv[2] + "_train_subtype_full.csv",
+	 index=False, sep='|')
