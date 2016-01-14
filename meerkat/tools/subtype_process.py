@@ -9,10 +9,11 @@ import numpy as np
 import pandas as pd
 
 #################### USAGE ##########################
-
-# python3 process.py [file_name] [ledger_entry]
-# python3 process.py Bank_complete_data_subtype_original.csv credit
-
+"""
+python3 process.py [file_name] [ledger_entry]
+python3 -m meerkat.tools.subtype_process \
+data/input/Bank_complete_data_subtype_original.csv credit
+"""
 #####################################################
 
 def dict_2_json(obj, filename):
