@@ -1,4 +1,7 @@
 #!/usr/local/bin/python3.3
+# pylint: disable=bad-continuation
+# pylint: disable=no-value-for-parameter
+# pylint: disable=unexpected-keyword-arg
 
 """This module generates and trains a binary classification model for
 transactions using SciKit Learn. Specifically it uses a Stochastic
@@ -10,7 +13,8 @@ Created on Feb 25, 2014
 
 #################### USAGE ##########################
 
-# Experts only! Do not touch!
+# python3.3 -m meerkat.classification.train [labeled_file] [label_key]
+# python3.3 -m meerkat.classification.train data/input/matt_8000_card.txt IS_PHYSICAL_TRANSACTION
 
 #####################################################
 
@@ -28,34 +32,33 @@ from sklearn.grid_search import GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.externals import joblib
 
-def split_data(labeled_transactions="data/misc/matt_8000_card.csv"):
+def split_data(labeled_trans="data/misc/matt_8000_card.csv"):
 	"""Divides the training set into parts for testing and training."""
-	if not os.path.isfile(labeled_transactions):
-		logging.error("Please provide a set of labeled transactions to"\
-			+ "build the classifier on")
 
-	transactions = []
+	if not os.path.isfile(labeled_trans):
+		logging.error("Please provide a set of labeled transactions to build the classifier on")
+
+	trans = []
 	labels = []
 
 	# Load Data
-	transactions, labels = load_data(transactions, labels, labeled_transactions)
+	trans, labels = load_data(trans, labels, labeled_trans)
 
 	# Append More
-	#transactions, labels = load_data(transactions,
-	#labels, "data/misc/verifiedLabeledTrans.csv")
+	#trans, labels = load_data(trans, labels, "data/misc/verifiedLabeledTrans.csv")
 
-	print("NUMBER OF TRANSACTIONS: ", len(transactions))
+	print("NUMBER OF TRANSACTIONS: ", len(trans))
 
 	# Split into training and testing sets
-	if len(transactions) < 100:
+	if len(trans) < 100:
 		logging.error("Not enough labeled data to create a model from")
 
-	trans_train, trans_test, labels_train,\
-		labels_test = train_test_split(transactions, labels, test_size=0.2)
+	split_results = train_test_split(trans, labels, test_size=0.2)
+	trans_train, trans_test, labels_train, labels_test = split_results
 
 	return trans_train, trans_test, labels_train, labels_test
 
-def load_data(transactions, labels, file_name, test_size=1):
+def load_data(trans, labels, file_name, test_size=1):
 	"""Loads human labeled data from a file."""
 
 	human_labeled_file = open(file_name, encoding='utf-8', errors="replace")
@@ -63,17 +66,16 @@ def load_data(transactions, labels, file_name, test_size=1):
 	human_labeled_file.close()
 
 	for i in range(len(human_labeled)):
-		if human_labeled[i]["IS_PHYSICAL_TRANSACTION"] != "" and random() < test_size:
-			transactions.append(human_labeled[i]["DESCRIPTION_UNMASKED"])
-			labels.append(human_labeled[i]["IS_PHYSICAL_TRANSACTION"])
+		if human_labeled[i][sys.argv[2]] != "" and random() < test_size:
+			trans.append(human_labeled[i]["DESCRIPTION_UNMASKED"])
+			labels.append(human_labeled[i][sys.argv[2]])
 
-	return transactions, labels
+	return trans, labels
 
 def build_model(trans_train, trans_test, labels_train, labels_test):
 	"""Creates a classifier using the training set and then scores the
 	result."""
-	# pylint: disable=bad-continuation
-	# pylint: disable=no-value-for-parameter
+
 	pipeline = Pipeline([
 		('vect', CountVectorizer()),
 		('tfidf', TfidfTransformer()),
@@ -91,13 +93,13 @@ def build_model(trans_train, trans_test, labels_train, labels_test):
 		'clf__n_iter': (10, 50, 80)
 	}
 
-	# pylint: disable=unexpected-keyword-arg
 	grid_search = GridSearchCV(pipeline, parameters, n_jobs=-1, verbose=1, cv=4)
 	grid_search.fit(trans_train, labels_train)
 	score = grid_search.score(trans_test, labels_test)
 
 	print("Best score: %0.3f" % grid_search.best_score_)
 	print("Best parameters set:")
+
 	best_parameters = grid_search.best_estimator_.get_params()
 	for param_name in sorted(parameters.keys()):
 		print("\t%s: %r" % (param_name, best_parameters[param_name]))
@@ -105,26 +107,24 @@ def build_model(trans_train, trans_test, labels_train, labels_test):
 	print("Actual Score: " + str(score))
 
 	# Save Model
-	joblib.dump(grid_search,\
-		'meerkat/binary_classifier/models/final_bank.pkl', compress=3)
-
-	test_model("data/misc/10K_Bank.txt", grid_search)
+	model_name = 'meerkat/classification/models/new_model' + sys.argv[2] + '.pkl'
+	joblib.dump(grid_search, model_name, compress=3)
 
 def test_model(file_to_test, model):
 	"""Tests our classifier."""
-	transactions, labels = load_data([], [], file_to_test)
-	score = model.score(transactions, labels)
+	trans, labels = load_data([], [], file_to_test)
+	score = model.score(trans, labels)
 
 	print(file_to_test, " Score: ", score)
 
-def run_from_command_line(command_line_arguments):
+def run_from_command_line(cla):
 	"""Runs the module when invoked from the command line."""
-	if len(command_line_arguments) == 2\
-	and os.path.isfile(command_line_arguments[1]):
-		trans_train, trans_test, labels_train, labels_test =\
-			split_data(labeled_transactions=command_line_arguments[1])
+
+	if len(cla) == 3 and os.path.isfile(cla[1]):
+		trans_train, trans_test, labels_train, labels_test = split_data(labeled_trans=cla[1])
 	else:
 		trans_train, trans_test, labels_train, labels_test = split_data()
+
 	build_model(trans_train, trans_test, labels_train, labels_test)
 
 if __name__ == "__main__":

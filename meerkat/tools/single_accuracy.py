@@ -49,7 +49,7 @@ def run_from_command_line(args):
 
 	classifier = get_cnn_by_path(args.model, args.dictionary)
 	meerkat.accuracy.print_results(meerkat.accuracy.CNN_accuracy(args.testfile, classifier, 
-		args.dictionary, args.humandictionary, args.labelkey, args.inputcolumn))
+		model_dict=args.dictionary, human_dict=args.humandictionary, label_key=args.labelkey, doc_key=args.inputcolumn))
 
 if __name__ == "__main__":
 	run_from_command_line(get_parser().parse_args())

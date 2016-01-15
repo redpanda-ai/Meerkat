@@ -157,9 +157,9 @@ def CNN_accuracy(*args, **kwargs):
 	for chunk in reader:
 		transactions = chunk.to_dict("records")
 		# Label the points using the classifier and report accuracy
-		machine_labeled = classifier(transactions, doc_key=doc_key, label_key="MERCHANT_NAME")
+		machine_labeled = classifier(transactions, doc_key=doc_key, label_key="CNN_output")
 
-		total, needs_hand_labeling, mislabeled, unlabeled, correct = generic_test(machine_labeled, transactions, "MERCHANT_NAME", label_key, human_map, machine_map, doc_key)
+		total, needs_hand_labeling, mislabeled, unlabeled, correct = generic_test(machine_labeled, transactions, "CNN_output", label_key, human_map, machine_map, doc_key=doc_key)
 		bulk_total += total
 		bulk_needs_hand_labeling += len(needs_hand_labeling)
 		bulk_mislabeled += len(mislabeled)
