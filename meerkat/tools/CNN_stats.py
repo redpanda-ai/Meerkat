@@ -62,22 +62,22 @@ cm2 = pd.DataFrame(cm2)
 actual = pd.DataFrame(cm2.sum(axis=1))
 recall = true_positive / actual
 #if we use pandas 0.17 we can do the rounding neater
-recall = np.round(recall, decimals=2)
+recall = np.round(recall, decimals=3)
 column_sum = pd.DataFrame(cm2.sum())
 false_positive = column_sum - true_positive
 precision = true_positive / column_sum
-precision = np.round(precision, decimals=2)
+precision = np.round(precision, decimals=3)
 misclassification = actual - true_positive
 label = pd.DataFrame(pd.read_json(sys.argv[2], typ='series')).sort_index()
 label.index = range(size)
 
 stat = pd.concat([label, actual, true_positive, false_positive, recall, precision,
 	misclassification], axis=1)
-stat.columns = ['Subtype', 'Actual', 'True_Positive', 'False_Positive', 'Recall',
+stat.columns = ['Class', 'Actual', 'True_Positive', 'False_Positive', 'Recall',
 	 'Precision', 'Misclassification']
 
 cm2 = pd.concat([label, cm2], axis=1)
-cm2.columns = ['Subtype'] + [str(x) for x in range(size)]
+cm2.columns = ['Class'] + [str(x) for x in range(size)]
 
 stat.to_csv('CNN_stat.csv', index=False)
 cm2.to_csv('Con_Matrix.csv')
