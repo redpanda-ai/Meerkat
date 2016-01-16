@@ -104,7 +104,7 @@ class WebConsumer():
 			# pull routing out of queries and append to below msearch
 			results = self.elastic_search.msearch(queries, index=index)
 		except Exception as exception:
-			print(exception)
+			logging.warning(exception)
 			return None
 		return results
 
