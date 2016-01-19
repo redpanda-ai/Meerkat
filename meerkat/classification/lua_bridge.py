@@ -35,8 +35,8 @@ def get_cnn(model_name):
 			"meerkat/classification/label_maps/new_rlm_card.json")
 	elif model_name == "bank_debit_subtype":
 		return get_cnn_by_path(
-			"meerkat/classification/models/bank_debit_subtype_CNN.t7b",
-			"meerkat/classification/label_maps/bank_debit_subtype_label_map.json")
+			"meerkat/classification/models/bank_debit_subtype_CNN_01192016.t7b",
+			"meerkat/classification/label_maps/bank_debit_subtype_label_map_01192016.json")
 	elif model_name == "bank_credit_subtype":
 		return get_cnn_by_path(
 			"meerkat/classification/models/bank_credit_subtype_CNN_01192016.t7b",
