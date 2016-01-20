@@ -47,63 +47,41 @@ def compare_label(*args, **kwargs):
 	machine, cnn_column, human_column, cm = args[:]
 	doc_key = kwargs.get("doc_key", default_doc_key)
 
-	# Create Quicker Lookup
-	#index_lookup = {row["UNIQUE_TRANSACTION_ID"]: row for row in human}
-
 	unpredicted = []
 	needs_hand_labeling = []
 	correct = []
 	mislabeled = []
+
 	# Test Each Machine Labeled Row
 	for machine_row in machine:
 
-		#Get human answer index
-		#key = machine_row["UNIQUE_TRANSACTION_ID"]
-		#human_row = index_lookup.get(key)
-
-		"""
-		# Continue if Unlabeled
-		if machine_row[cnn_column] == "":
-			unpredicted.append([machine_row[doc_key], human_row[human_column]])
-			continue
-
-		# Identify unlabeled points
-		if not human_row or not human_row.get(human_column):
-			needs_hand_labeling.append(machine_row[doc_key])
-			continue
-
-		# predicted label matches human label
-		if machine_row[cnn_column] == human_row[human_column]:
-			correct.append([human_row[doc_key], human_row[human_column]])
-			continue
-
-		mislabeled.append([human_row[doc_key], human_row[human_column],
-			machine_row[cnn_column]])
-		"""
 		# Update cm
+		# predicted_label is None if a predicted subtype is ""
+		if machine_row['PREDICTED_LABEL'] is None:
+			column = num_labels
+		else:
+			column = machine_row['PREDICTED_LABEL'] - 1
 		row = machine_row['LABEL'] - 1
-		column = machine_row['PREDICTED_LABEL'] - 1
 		cm[row][column] += 1
 
+		# Continue if unlabeled
 		if machine_row[cnn_column] == "":
 			unpredicted.append([machine_row[doc_key], machine_row[human_column]])
 			continue
+
+		# Identify unlabeled points
 		if not machine_row[human_column]:
 			needs_hand_labeling.append(machine_row[doc_key])
 			continue
+
+		# Predicted label matches human label
 		if machine_row[cnn_column] == machine_row[human_column]:
 			correct.append([machine_row[doc_key], machine_row[human_column]])
 			continue
+
 		mislabeled.append([machine_row[doc_key], machine_row[human_column],
 			machine_row[cnn_column]])
 	return mislabeled, correct, unpredicted, needs_hand_labeling, cm
-
-def make_unique_ID(row):
-	"""assign each transaction a unique ID"""
-	if row['UNIQUE_TRANSACTION_ID'] == '0':
-		return row['TRANSACTION_UNMASKED']+ ' ' + str(row['AMOUNT'])
-	else:
-		return row['UNIQUE_TRANSACTION_ID']
 
 def load_and_reverse_label_map(filename):
 	"""Load label map into a dict and switch keys and values"""
@@ -122,16 +100,17 @@ def fill_description(df):
 
 # Main
 classifier = get_cnn_by_path(sys.argv[1], sys.argv[2])
-test_file = sys.argv[3]
-reader = pd.read_csv(test_file, chunksize=1000, na_filter=False,
+reader = pd.read_csv(sys.argv[3], chunksize=1000, na_filter=False,
 	quoting=csv.QUOTE_NONE, encoding='utf-8', sep='|', error_bad_lines=False)
 reversed_label_map = load_and_reverse_label_map(sys.argv[2])
 num_labels = len(reversed_label_map)
-confusion_matrix = [[0 for i in range(num_labels)] for j in range(num_labels)]
+confusion_matrix = [[0 for i in range(num_labels + 1)] for j in range(num_labels)]
+mislabeled_exists = False
+correct_exists = False
+unpredicted_exists = False
+needs_hand_labeling_exists = False
 
 for chunk in reader:
-	chunk['UNIQUE_TRANSACTION_ID'] = chunk.apply(make_unique_ID, axis=1)
-	# The line before assumes description unmasked exists
 	chunk[default_doc_key] = chunk.apply(fill_description, axis=1)
 	transactions = chunk.to_dict('records')
 	machine_labeled = classifier(transactions, doc_key=default_doc_key,
@@ -140,6 +119,7 @@ for chunk in reader:
 	# Add indexes for predicted labels
 	for item in machine_labeled:
 		if item[default_machine_label_key] == "":
+			item['PREDICTED_LABEL'] = None
 			continue
 		item['PREDICTED_LABEL'] = reversed_label_map[item[default_machine_label_key]]
 
@@ -148,29 +128,50 @@ for chunk in reader:
 		default_human_label_key, confusion_matrix, doc_key=default_doc_key)
 
 	# Save
-	# Check if data/CNN_stats/ esxists, if not creste one
-	if not os.path.exists('data/CNN_stats/'):
-		os.makedirs('data/CNN_stats/')
+
+	# Check if data/CNN_stats/ esxists, if not create one
+	os.makedirs('data/CNN_stats/', exist_ok=True)
 
 	if len(mislabeled) > 0:
 		df = pd.DataFrame(mislabeled)
-		df.to_csv('data/CNN_stats/mislabeled.csv', mode='a', index=False,
-			header=['TRANSACTION_DESCRIPTION', 'ACTUAL', 'PREDICTED'])
+		if not mislabeled_exists:
+			df.to_csv('data/CNN_stats/mislabeled.csv', index=False,
+				header=['TRANSACTION_DESCRIPTION', 'ACTUAL', 'PREDICTED'])
+			mislabeled_exists = True
+		else:
+			df.to_csv('data/CNN_stats/mislabeled.csv', mode='a', index=False,
+				header=False)
 
 	if len(correct) > 0:
 		df = pd.DataFrame(correct)
-		df.to_csv('data/CNN_stats/correct.csv', mode='a', index=False,
-			header=['TRANSACTION_DESCRIPTION', 'ACTUAL'])
+		if not correct_exists:
+			df.to_csv('data/CNN_stats/correct.csv', index=False,
+				header=['TRANSACTION_DESCRIPTION', 'ACTUAL'])
+			correct_exists = True
+		else:
+			df.to_csv('data/CNN_stats/correct.csv', mode='a', index=False,
+				header=False)
 
 	if len(unpredicted) > 0:
 		df = pd.DataFrame(unpredicted)
-		df.to_csv('data/CNN_stats/unpredicted.csv', mode='a', index=False,
-			header=['TRASACTION_DESCRIPTION', 'ACTUAL'])
+		if not unpredicted_exists:
+			df.to_csv('data/CNN_stats/unpredicted.csv', index=False,
+				header=['TRANSACTION_DESCRIPTION', 'ACTUAL'])
+			unpredicted_exists = True
+		else:
+			df.to_csv('data/CNN_stats/unpredicted.csv', mode='a', index=False,
+				header=False)
 
 	if len(needs_hand_labeling) > 0:
 		df = pd.DataFrame(needs_hand_labeling)
-		df.to_csv('data/CNN_stats/need_labeling.csv', mode='a', index=False,
-			header=['TRANSACTION_DESCRIPTION'])
+		if not needs_hand_labeling_exists:
+			df.to_csv('data/CNN_stats/need_labeling.csv', index=False,
+				header=['TRANSACTION_DESCRIPTION'])
+			needs_hand_labeling_exists = True
+		else:
+			df.to_csv('data/CNN_stats/need_labeling.csv', mode='a', index=False,
+				header=False)
+
 
 # calculate recall, precision, false +/-, true +/- from confusion maxtrix
 true_positive = pd.DataFrame([confusion_matrix[i][i] for i in range(num_labels)])
@@ -179,21 +180,21 @@ actual = pd.DataFrame(cm.sum(axis=1))
 recall = true_positive / actual
 #if we use pandas 0.17 we can do the rounding neater
 recall = np.round(recall, decimals=4)
-column_sum = pd.DataFrame(cm.sum())
+column_sum = pd.DataFrame(cm.sum()).ix[:,:num_labels]
 false_positive = column_sum - true_positive
 precision = true_positive / column_sum
 precision = np.round(precision, decimals=4)
-misclassification = actual - true_positive
+false_negative = actual - true_positive
 label = pd.DataFrame(pd.read_json(sys.argv[2], typ='series')).sort_index()
 label.index = range(num_labels)
 
 stat = pd.concat([label, actual, true_positive, false_positive, recall, precision,
-	misclassification], axis=1)
+	false_negative], axis=1)
 stat.columns = ['Class', 'Actual', 'True_Positive', 'False_Positive', 'Recall',
-	'Precision', 'False_Negative']
+	'Precision', 'False_Negative(false_negative & unpredicted)']
 
 cm = pd.concat([label, cm], axis=1)
-cm.columns = ['Class'] + [str(x) for x in range(num_labels)]
+cm.columns = ['Class'] + [str(x) for x in range(num_labels)] + ['Unpredicted']
 
 stat.to_csv('data/CNN_stats/CNN_stat.csv', index=False)
 cm.to_csv('data/CNN_stats/Con_Matrix.csv')
