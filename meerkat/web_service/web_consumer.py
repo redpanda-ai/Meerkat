@@ -1,5 +1,4 @@
 #!/usr/local/bin/python3.3
-# pylint: disable=line-too-long
 
 """This module enriches transactions with additional
 data found by Meerkat
@@ -20,6 +19,7 @@ from meerkat.various_tools import get_es_connection, string_cleanse, get_boosted
 from meerkat.various_tools import synonyms, get_bool_query, get_qs_query, load_params
 from meerkat.classification.load import select_model
 from meerkat.classification.lua_bridge import get_cnn
+# pylint:disable=no-name-in-module
 from meerkat.classification.bloom_filter.find_entities import location_split
 
 # Enabled Models
@@ -37,7 +37,7 @@ CARD_CATEGORY_FALLBACK = load_params(LMDIR + "cnn_merchant_category_mapping_card
 BANK_SUBTYPE_CAT_FALLBACK = load_params(LMDIR + "subtype_category_mapping_bank.json")
 CARD_SUBTYPE_CAT_FALLBACK = load_params(LMDIR + "subtype_category_mapping_card.json")
 
-class Web_Consumer():
+class WebConsumer():
 	"""Acts as a web service client to process and enrich
 	transactions in real time"""
 
@@ -50,8 +50,8 @@ class Web_Consumer():
 			self.params = dict()
 		else:
 			self.params = params
-			self.es = get_es_connection(params)
-			mapping = self.es.indices.get_mapping()
+			self.elastic_search = get_es_connection(params)
+			mapping = self.elastic_search.indices.get_mapping()
 			index = params["elasticsearch"]["index"]
 			index_type = params["elasticsearch"]["type"]
 			self.params["routed"] = "_routing" in mapping[index]["mappings"][index_type]
@@ -60,7 +60,7 @@ class Web_Consumer():
 		self.cities = cities if cities else {}
 
 	def update_hyperparams(self, hyperparams):
-		"""Updates a Web_Consumer object's hyper-parameters"""
+		"""Updates a WebConsumer object's hyper-parameters"""
 		self.hyperparams = hyperparams
 
 	def __get_query(self, transaction):
@@ -102,16 +102,17 @@ class Web_Consumer():
 		index = self.params["elasticsearch"]["index"]
 		try:
 			# pull routing out of queries and append to below msearch
-			results = self.es.msearch(queries, index=index)
-		except Exception as e:
-			print(e)
+			results = self.elastic_search.msearch(queries, index=index)
+		except Exception as exception:
+			logging.warning(exception)
 			return None
 		return results
 
-	def __z_score_delta(self, scores):
+	@staticmethod
+	def __z_score_delta(scores):
 		"""Find the Z-Score Delta"""
 		if len(scores) < 2:
-			return None
+			return None, None
 		z_scores = zscore(scores)
 		first_score, second_score = z_scores[0:2]
 		z_score_delta = round(first_score - second_score, 3)
@@ -145,35 +146,40 @@ class Web_Consumer():
 			hit_fields["latitude"] = "%.6f" % (float(coordinates[1]))
 
 		# Collect Fallback Data
-		business_names = [result.get("fields", {"name" : ""}).get("name", "") for result in hits]
-		business_names = [name[0] for name in business_names if type(name) == list]
-		city_names = [result.get("fields", {"locality" : ""}).get("locality", "") for result in hits]
-		city_names = [name[0] for name in city_names if type(name) == list]
-		state_names = [result.get("fields", {"region" : ""}).get("region", "") for result in hits]
-		state_names = [name[0] for name in state_names if type(name) == list]
+		names = {}
+		names["business_names"] =\
+			[result.get("fields", {"name" : ""}).get("name", "") for result in hits]
+		names["business_names"] =\
+			[name[0] for name in names["business_names"] if isinstance(name, list)]
+		names["city_names"] =\
+			[result.get("fields", {"locality" : ""}).get("locality", "") for result in hits]
+		names["city_names"] = [name[0] for name in names["city_names"] if isinstance(name, list)]
+		names["state_names"] =\
+			[result.get("fields", {"region" : ""}).get("region", "") for result in hits]
+		names["state_names"] = [name[0] for name in names["state_names"] if isinstance(name, list)]
 
 		# Need Names
-		if len(business_names) < 2:
+		if len(names["business_names"]) < 2:
 			transaction = self.__no_result(transaction)
 			return transaction
 
 		# City Names Cause issues
-		if business_names[0] in self.cities:
+		if names["business_names"][0] in self.cities:
 			transaction = self.__no_result(transaction)
 			return transaction
 
 		# Collect Relevancy Scores
 		scores = [hit["_score"] for hit in hits]
 		z_score_delta, raw_score = self.__z_score_delta(scores)
-		threshold = float(hyperparams.get("z_score_threshold", "2"))
-		raw_threshold = float(hyperparams.get("raw_score_threshold", "1"))
-		decision = True if (z_score_delta > threshold) and (raw_score > raw_threshold) else False
+		
+		thresholds = [float(hyperparams.get("z_score_threshold", "2")), \
+			float(hyperparams.get("raw_score_threshold", "1"))]
+		decision = True if (z_score_delta > thresholds[0]) and (raw_score > thresholds[1]) else False
 		
 		# Enrich Data if Passes Boundary
-		args = [decision, transaction, hit_fields, z_score_delta, business_names, city_names, state_names]
-		enriched_transaction = self.__enrich_transaction(*args)
-
-		return enriched_transaction
+		args = [decision, transaction, hit_fields,\
+			 names["business_names"], names["city_names"], names["state_names"]]
+		return self.__enrich_transaction(*args)
 
 	def __no_result(self, transaction):
 		"""Make sure transactions have proper attribute names"""
@@ -190,8 +196,15 @@ class Web_Consumer():
 
 		return transaction
 
-	def __enrich_transaction(self, decision, transaction, hit_fields, z_score_delta, business_names, city_names, state_names):
+	def __enrich_transaction(self, *argv):
 		"""Enriches the transaction with additional data"""
+		
+		decision = argv[0]
+		transaction = argv[1]
+		hit_fields = argv[2]
+		business_names = argv[3]
+		city_names = argv[4]
+		state_names = argv[5]
 
 		params = self.params
 		field_names = params["output"]["results"]["fields"]
@@ -199,22 +212,22 @@ class Web_Consumer():
 		transaction["match_found"] = False
 
 		# Collect Mapping Details
-		fields = params["output"]["results"]["fields"]
-		labels = params["output"]["results"]["labels"]
-		attr_map = dict(zip(fields, labels))
+		attr_map = dict(zip(params["output"]["results"]["fields"], params["output"]["results"]["labels"]))
 
 		# Enrich with found data
 		if decision == True:
 			transaction["match_found"] = True
 			for field in field_names:
 				if field in fields_in_hit:
-					field_content = hit_fields[field][0] if isinstance(hit_fields[field], (list)) else str(hit_fields[field])
+					field_content = hit_fields[field][0] if isinstance(hit_fields[field],\
+ 						(list)) else str(hit_fields[field])
 					transaction[attr_map.get(field, field)] = field_content
 				else:
 					transaction[attr_map.get(field, field)] = ""
 
 			if not transaction.get("country") or transaction["country"] == "":
-				logging.warning("Factual response for merchant {} has no country code.  Defaulting to US.".format(hit_fields["factual_id"][0]))
+				logging.warning(("Factual response for merchant {} has no country code. "  
+					"Defaulting to US.").format(hit_fields["factual_id"][0]))
 				transaction["country"] = "US"
 
 		# Add Business Name, City and State as a fallback
@@ -230,11 +243,13 @@ class Web_Consumer():
 
 		# Add Source
 		index = params["elasticsearch"]["index"]
-		transaction["source"] = "FACTUAL" if ("factual" in index) and (transaction["match_found"] == True) else "OTHER"
+		transaction["source"] = "FACTUAL" if (("factual" in index) and 
+		    (transaction["match_found"] == True)) else "OTHER"
 
 		return transaction
 
-	def __geo_fallback(self, city_names, state_names, transaction, attr_map):
+	@staticmethod
+	def __geo_fallback(city_names, state_names, transaction, attr_map):
 		"""Basic logic to obtain a fallback for city and state
 		when no factual_id is found"""
 		city_names = city_names[0:2]
@@ -254,7 +269,6 @@ class Web_Consumer():
 	def __business_name_fallback(self, business_names, transaction, attr_map):
 		"""Basic logic to obtain a fallback for business name
 		when no factual_id is found"""
-		fields = self.params["output"]["results"]["fields"]
 		business_names = business_names[0:2]
 		top_name = business_names[0].lower()
 		all_equal = business_names.count(business_names[0]) == len(business_names)
@@ -269,12 +283,14 @@ class Web_Consumer():
 		"""If the factual search fails to find categories do a static lookup
 		on the merchant name"""
 		if container.lower() == "bank":
-			self.__apply_categories_from_dict(transactions, BANK_CATEGORY_FALLBACK, BANK_SUBTYPE_CAT_FALLBACK, "Retail Category")
+			self.__apply_categories_from_dict(transactions,\
+				BANK_CATEGORY_FALLBACK, BANK_SUBTYPE_CAT_FALLBACK, "Retail Category")
 		else:
-			self.__apply_categories_from_dict(transactions, CARD_CATEGORY_FALLBACK, CARD_SUBTYPE_CAT_FALLBACK, "PaymentOps")
+			self.__apply_categories_from_dict(transactions,\
+				CARD_CATEGORY_FALLBACK, CARD_SUBTYPE_CAT_FALLBACK, "PaymentOps")
 
-	def __apply_categories_from_dict(self, transactions, categories,
-		subtype_fallback, key):
+	@staticmethod
+	def __apply_categories_from_dict(transactions, categories, subtype_fallback, key):
 		"""Use the given dictionary to add categories to transactions"""
 		for trans in transactions:
 			if trans.get("category_labels"):
@@ -360,7 +376,8 @@ class Web_Consumer():
 
 		return enriched
 
-	def __sws(self, data):
+	@staticmethod
+	def __sws(data):
 		"""Split transactions into physical and non-physical"""
 		physical, non_physical = [], []
 
@@ -373,7 +390,8 @@ class Web_Consumer():
 
 		return physical, non_physical
 
-	def __apply_merchant_CNN(self, data):
+	@staticmethod
+	def __apply_merchant_cnn(data):
 		"""Apply the merchant CNN to transactions"""
 		classifier = None
 		if data["container"] == "bank":
@@ -382,7 +400,8 @@ class Web_Consumer():
 			classifier = CARD_MERCHANT_CNN
 		return classifier(data["transaction_list"])
 
-	def __apply_subtype_CNN(self, data):
+	@staticmethod
+	def __apply_subtype_cnn(data):
 		"""Apply the subtype CNN to transactions"""
 
 		if len(data["transaction_list"]) == 0:
@@ -412,14 +431,28 @@ class Web_Consumer():
 
 		# Split label into type and subtype
 		for transaction in data["transaction_list"]:
+
+			if " - " not in transaction["subtype_CNN"]:
+				if transaction["ledger_entry"] == "debit":
+					transaction["subtype_CNN"] = "Other Expenses - Debit"
+				elif transaction["ledger_entry"] == "credit":
+					if data["container"] == "bank":
+						transaction["subtype_CNN"] = "Other Income - Credit"
+					elif data["container"] == "card":
+						transaction["subtype_CNN"] = "Bank Adjustment - Adjustment"
+				else:
+					transaction["subtype_CNN"] = " - "
+			
 			txn_type, txn_sub_type = transaction["subtype_CNN"].split(" - ")
 			transaction["txn_type"] = txn_type
 			transaction["txn_sub_type"] = txn_sub_type
+			
 			del transaction["subtype_CNN"]
 
 		return data["transaction_list"]
 
-	def __apply_locale_bloom(self, data):
+	@staticmethod
+	def __apply_locale_bloom(data):
 		""" Apply the locale bloom filter to transactions"""
 		for trans in data["transaction_list"]:
 			try:
@@ -430,24 +463,46 @@ class Web_Consumer():
 
 		return data["transaction_list"]
 
-	def __apply_category_labels(self, physical):
-		"""Adds a 'category_labels' field to a physical transaction."""
+	@staticmethod
+	def __apply_category_labels(physical):
+		"""Adds a 'category_labels' field to a physical transaction if found in index"""
+
 		# Add or Modify Fields
 		for trans in physical:
+
 			categories = trans.get("category_labels", "")
+
 			if categories != "" and categories != []:
 				categories = json.loads(categories)
 			else:
 				categories = []
+
+			# Merge sublists into single list if any exist:
+			if any(isinstance(elem, list) for elem in categories):
+				categories = list(set([item for sublist in categories for item in sublist]))
+
 			trans["category_labels"] = categories
+
+	@staticmethod
+	def __enrich_physical_no_search(transactions):
+		""" When not search, enrich physical transcation with necessary fields """
+		for transaction in transactions:
+			transaction["country"] = "US"
+			transaction["merchant_name"] = ""
+			transaction["source"] = "OTHER"
+			transaction["match_found"] = False
+		return transactions
 
 	def __apply_cpu_classifiers(self, data):
 		"""Apply all the classifiers which are CPU bound.  Written to be
 		run in parallel with GPU bound classifiers."""
 		self.__apply_locale_bloom(data)
 		physical, non_physical = self.__sws(data)
-		physical = self.__enrich_physical(physical)
-		self.__apply_category_labels(physical)
+		if "should_search" not in self.params or self.params["should_search"]:
+			physical = self.__enrich_physical(physical)
+			self.__apply_category_labels(physical)
+		else:
+			physical = self.__enrich_physical_no_search(physical)
 		return physical, non_physical
 
 	def classify(self, data, optimizing=False):
@@ -456,8 +511,8 @@ class Web_Consumer():
 		cpu_result = self.__cpu_pool.apply_async(self.__apply_cpu_classifiers, (data, ))
 
 		if not optimizing:
-			self.__apply_subtype_CNN(data)
-			self.__apply_merchant_CNN(data)
+			self.__apply_subtype_cnn(data)
+			self.__apply_merchant_cnn(data)
 
 		cpu_result.get() # Wait for CPU bound classifiers to finish
 
@@ -465,7 +520,6 @@ class Web_Consumer():
 			self.__apply_missing_categories(data["transaction_list"], data["container"])
 
 		self.ensure_output_schema(data["transaction_list"])
-
 		return data
 
 if __name__ == "__main__":

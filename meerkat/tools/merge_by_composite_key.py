@@ -1,3 +1,5 @@
+"""process files and processes in s3"""
+
 import boto
 import csv
 import gzip
@@ -55,11 +57,13 @@ def get_pending_list():
 	return diff(my_inter, lists[2])
 
 def get_s3_contents(bucket_name, sub_dir):
+	"""gets s3 contents"""
 	bucket = CONN.get_bucket(bucket_name, Location.USWest2)
 	my_filter = re.compile(PARAMS["filter"])
 	return [j for j in bucket.list(prefix=sub_dir) if my_filter.search(j.key)]
 
 def set_s3():
+	""" sets s3 directory"""
 	my_re = re.compile("S3://([^/]+)/(.*/)")
 	for s3_dir in PARAMS["S3"]:
 		path = s3_dir["path"]
@@ -75,6 +79,7 @@ def set_s3():
 			logging.warning("Path is invalid, double-check your configuration file.")
 
 def set_directories():
+	"""sets directory"""
 	for directory in PARAMS["local"]:
 		path = directory["path"]
 		if not os.path.exists(path):
@@ -85,6 +90,7 @@ def set_directories():
 			logging.debug("{0} found, continuing.".format(path))
 
 def sort_the_file(my_file):
+	"""sort files"""
 	logging.warning("Reading {0}".format(my_file))
 	my_header = defaultdict(list)
 	my_map = defaultdict(list)
@@ -133,9 +139,11 @@ def get_columns(my_data, filter_name):
 	return result
 
 def get_new_filter(header_a, header_b):
+	"""provide the filter"""
 	return [idx for idx, x in enumerate(header_a) if x in header_b]
 
 def merge_the_files(args, expected_lines, remainder):
+	"""merge files"""
 	logging.warning("Merging")
 
 	file_name, merged_file, header_1, header_2, map_1, map_2 = args
@@ -182,6 +190,7 @@ def merge_the_files(args, expected_lines, remainder):
 	logging.warning("{0} bytes written.".format(bytes_written))
 
 def merge(file_name):
+	"""merge files"""
 	#Abort early if the file was already completed.
 	my_key = re.compile(".*/([^/]+)")
 	finished_objects = PARAMS["S3"][2]["s3_objects"]
@@ -217,6 +226,7 @@ def merge(file_name):
 	merge_the_files(args, count_1, remainder)
 
 def process_pending_list():
+	"""process the pending lists"""
 	logging.warning("Processing pending list")
 	my_key = re.compile(".*/([^/]+)")
 	#Remove all but the pending files in each list
@@ -236,11 +246,12 @@ def process_pending_list():
 		filename = pull_file_from_s3(1, i)
 		merge(filename)
 
-def pull_file_from_s3(i, x):
+def pull_file_from_s3(i, data):
+	"""pull files from s3 directory"""
 	my_key = re.compile(".*/([^/]+)")
 	local = PARAMS["local"][i]["path"]
 	bucket = PARAMS["S3"][i]
-	s3_object = bucket["s3_objects"][x]
+	s3_object = bucket["s3_objects"][data]
 	filename = my_key.search(s3_object.key).group(1)
 	s3_object.get_contents_to_filename(local + "/" + filename)
 	logging.warning\

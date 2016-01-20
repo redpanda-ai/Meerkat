@@ -27,20 +27,20 @@ def get_cnn(model_name):
 	# Load CNN and Label map
 	if model_name == "bank_merchant":
 		return get_cnn_by_path(
-			"meerkat/classification/models/612_class_bank_CNN.t7b",
-			"meerkat/classification/label_maps/reverse_bank_label_map.json")
+			"meerkat/classification/models/624_class_bank_CNN.t7b",
+			"meerkat/classification/label_maps/new_rlm_bank.json")
 	elif model_name == "card_merchant":
 		return get_cnn_by_path(
-			"meerkat/classification/models/750_class_card_CNN.t7b",
-			"meerkat/classification/label_maps/reverse_card_label_map.json")
+			"meerkat/classification/models/751_class_card_CNN.t7b",
+			"meerkat/classification/label_maps/new_rlm_card.json")
 	elif model_name == "bank_debit_subtype":
 		return get_cnn_by_path(
-			"meerkat/classification/models/bank_debit_subtype_CNN.t7b",
-			"meerkat/classification/label_maps/bank_debit_subtype_label_map.json")
+			"meerkat/classification/models/bank_debit_subtype_CNN_01192016.t7b",
+			"meerkat/classification/label_maps/bank_debit_subtype_label_map_01192016.json")
 	elif model_name == "bank_credit_subtype":
 		return get_cnn_by_path(
-			"meerkat/classification/models/bank_credit_subtype_CNN.t7b",
-			"meerkat/classification/label_maps/bank_credit_subtype_label_map.json")
+			"meerkat/classification/models/bank_credit_subtype_CNN_01192016.t7b",
+			"meerkat/classification/label_maps/bank_credit_subtype_label_map_01192016.json")
 	elif model_name == "card_debit_subtype":
 		return get_cnn_by_path(
 			"meerkat/classification/models/card_debit_subtype_CNN.t7b",
@@ -54,6 +54,7 @@ def get_cnn(model_name):
 
 def get_cnn_by_path(model_path, dict_path):
 	"""Load a function to process transactions using a CNN"""
+	# pylint:disable=unused-variable
 	lualib = ctypes.CDLL(
 		"/home/ubuntu/torch/install/lib/libluajit.so",
 		mode=ctypes.RTLD_GLOBAL)
@@ -167,5 +168,6 @@ def get_cnn_by_path(model_path, dict_path):
 if __name__ == "__main__":
 	# pylint:disable=pointless-string-statement
 	"""Print a warning to not execute this file as a module"""
-	logging.warning("This module is a library that contains useful functions;it should not be run from the console.")
+	logging.warning("This module is a library that contains useful functions;"
+		"it should not be run from the console.")
 

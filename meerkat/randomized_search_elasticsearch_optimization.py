@@ -28,7 +28,6 @@ Created on Feb 26, 2014
 
 #####################################################
 
-import logging
 import sys
 import datetime
 import os
@@ -37,34 +36,33 @@ from random import uniform
 
 from pprint import pprint
 
-from meerkat.classification.load import select_model
 from meerkat.accuracy import print_results, vest_accuracy
 from meerkat.various_tools import load_dict_list, safe_print, get_us_cities
 from meerkat.various_tools import load_params
-from meerkat.web_service.web_consumer import Web_Consumer
+from meerkat.web_service.web_consumer import WebConsumer
 
 PARAMS = load_params(sys.argv[1])
 CITIES = get_us_cities()
-consumer = Web_Consumer(cities=CITIES, params=PARAMS)
+CONSUMER = WebConsumer(cities=CITIES, params=PARAMS)
 BATCH_SIZE = 100
 
 def run_meerkat(params, dataset):
 	"""Run meerkat on a set of transactions"""
 
 	result_list = []
-	n = (len(dataset))/BATCH_SIZE
-	n = int(n - (n%1))
-	for x in range(0, n+1):
+	number = (len(dataset))/BATCH_SIZE
+	number = int(number - (number%1))
+	for data in range(0, number+1):
 		batch = []
-		for i in range(x*BATCH_SIZE, (x+1)*BATCH_SIZE):
+		for i in range(data*BATCH_SIZE, (data+1)*BATCH_SIZE):
 			try:
 				batch.append(dataset[i])
 			except IndexError:
 				break
 
-		print("Batch number: {0}".format(x))
+		print("Batch number: {0}".format(data))
 		batch_in = format_web_consumer(batch)
-		batch_result = consumer.classify(batch_in, optimizing=True)
+		batch_result = CONSUMER.classify(batch_in, optimizing=True)
 		result_list.extend(batch_result["transaction_list"])
 
 	# Test Accuracy
@@ -139,15 +137,13 @@ def get_initial_values(hyperparameters, params, known, dataset):
 
 	settings = params["optimization"]["settings"]
 	top_score = {"precision" : 0, "total_recall_physical" : 0}
-	iterations = settings["initial_search_space"]
-	learning_rate = settings["initial_learning_rate"]
 
 	print("Training on " + str(len(dataset)) + " unique transactions")
 
-	for i in range(iterations):
+	for i in range(settings["initial_search_space"]):
 
 		if i > 0:
-			randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=learning_rate)
+			randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=settings["initial_learning_rate"])
 		else:
 			randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=0)
 
@@ -160,7 +156,6 @@ def get_initial_values(hyperparameters, params, known, dataset):
 		precision = accuracy["precision"]
 		recall = accuracy["total_recall_physical"]
 		same_or_higher_precision = precision >= top_score["precision"]
-		same_or_higher_recall = recall >= top_score["total_recall_physical"]
 		not_too_high = precision <= settings["max_precision"]
 		has_min_recall = recall >= settings["min_recall"]
 
@@ -185,16 +180,15 @@ def get_initial_values(hyperparameters, params, known, dataset):
 	return top_score
 
 def gradient_descent(initial_values, params, known, dataset):
-
+	"""Provide the top score based on gradient function"""
 	settings = params["optimization"]["settings"]
 	top_score = initial_values
-	learning_rate = settings["iteration_learning_rate"]
 	save_top_score(initial_values)
 	iterations = settings["gradient_descent_iterations"]
 
 	print("\n----------- Stochastic Gradient Descent ------------")
 
-	for i in range(iterations):
+	for _ in range(iterations):
 		top_score = run_iteration(top_score, params, known, dataset)
 
 		# Save Iterations Top Hyperparameters
@@ -205,14 +199,14 @@ def gradient_descent(initial_values, params, known, dataset):
 	return top_score
 
 def run_iteration(top_score, params, known, dataset):
+	"Provide the top score based on parameters"""
 
 	settings = params["optimization"]["settings"]
 	hyperparameters = top_score['hyperparameters']
 	new_top_score = top_score
 	learning_rate = settings["iteration_learning_rate"]
-	iterations = settings["iteration_search_space"]
 
-	for i in range(iterations):
+	for i in range(settings["iteration_search_space"]):
 
 		randomized_hyperparameters = randomize(hyperparameters, known, learning_rate=learning_rate)
 
@@ -267,17 +261,18 @@ def randomize(hyperparameters, known={}, learning_rate=0.3):
 	return dict(list(randomized.items()) + list(known.items()))
 
 def save_top_score(top_score):
-
-	record = open("optimization_results/" + os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_top_scores.txt", "a")
+	"""Provide top score"""
+	record = open("optimization_results/" + os.path.splitext(os.path.basename(sys.argv[1]))[0] +
+		"_top_scores.txt", "a")
 	pprint("Precision = " + str(top_score['precision']) + "%", record)
 	pprint("Best Recall = " + str(top_score['total_recall_physical']) +"%", record)
-	boost_vectors, boost_labels, other = split_hyperparameters(top_score["hyperparameters"])
+	boost_vectors, _, other = split_hyperparameters(top_score["hyperparameters"])
 	pprint(boost_vectors, record)
 	pprint(other, record)
 	record.close()
 
 def split_hyperparameters(hyperparameters):
-
+	"""partition hyperparameters into 2 parts based on keys and non_boost list"""
 	boost_vectors = {}
 	boost_labels = ["standard_fields"]
 	non_boost = ["es_result_size", "z_score_threshold", "good_description"]
@@ -301,7 +296,7 @@ def run_classifier(hyperparameters, params, dataset):
 	hyperparameters["boost_labels"] = boost_labels
 	hyperparameters["boost_vectors"] = boost_vectors
 
-	consumer.update_hyperparams(hyperparameters)
+	CONSUMER.update_hyperparams(hyperparameters)
 	accuracy = run_meerkat(params, dataset)
 
 	return accuracy
@@ -339,7 +334,7 @@ def verify_arguments():
 		open(previous_scores, 'w').close()
 
 def format_web_consumer(dataset):
-
+	"""Provide formatted dataset"""
 	formatted = json.load(open("meerkat/web_service/example_input.json", "r"))
 	formatted["transaction_list"] = dataset
 	trans_id = 1
@@ -353,7 +348,7 @@ def format_web_consumer(dataset):
 
 	return formatted
 
-def run_from_command_line(command_line_arguments):
+def run_from_command_line():
 	"""Runs these commands if the module is invoked from the command line"""
 
 	# Meta Information
@@ -395,4 +390,4 @@ def run_from_command_line(command_line_arguments):
 	print("TOTAL TIME TAKEN FOR OPTIMIZATION: ", time_delta)
 
 if __name__ == "__main__":
-	run_from_command_line(sys.argv)
+	run_from_command_line()

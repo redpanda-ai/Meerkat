@@ -244,7 +244,7 @@ def wait_for_healthy_cluster(params, target_nodes):
 def scale(params, judgment):
 	"""Scales our elasticsearch cluster up or down."""
 	logging.info("Scale action is: {0}.".format(judgment))
-	#TODO: switch to a random ec2_slave candidate
+	# TODO: switch to a random ec2_slave candidate
 	candidate, target_offset = None, None
 	try:
 		if judgment == "contract":

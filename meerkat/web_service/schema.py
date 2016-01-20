@@ -1,3 +1,4 @@
+"""Process and validate the schema"""
 import json
 import jsonschema
 
@@ -9,6 +10,7 @@ from tornado_json.utils import container
 
 def validate(input_schema=None, output_schema=None,\
 	input_example=None, output_example=None):
+	"""validate schema"""
 	@container
 	def _validate(rh_method):
 		"""Decorator for RequestHandler schema validation
@@ -31,6 +33,7 @@ def validate(input_schema=None, output_schema=None,\
 		@wraps(rh_method)
 		@gen.coroutine
 		def _wrapper(self, *args, **kwargs):
+			"""Process ``None`` schema"""
 			# In case the specified input_schema is ``None``, we
 			#   don't json.loads the input, but just set it to ``None``
 			#   instead.
@@ -42,7 +45,7 @@ def validate(input_schema=None, output_schema=None,\
 					#   in headers if provided
 					encoding = "UTF-8"
 					input_ = json.loads(self.request.body.decode(encoding))
-				except ValueError as e:
+				except ValueError as _:
 					raise jsonschema.ValidationError(
 						"Input is malformed; could not decode JSON object."
 					)
@@ -72,12 +75,12 @@ def validate(input_schema=None, output_schema=None,\
 						output,
 						output_schema
 					)
-				except jsonschema.ValidationError as e:
+				except jsonschema.ValidationError as err:
 					# We essentially re-raise this as a TypeError because
 					#  we don't want this error data passed back to the client
 					#  because it's a fault on our end. The client should
 					#  only see a 500 - Internal Server Error.
-					raise TypeError(str(e))
+					raise TypeError(str(err))
 
 			# If no ValidationError has been raised up until here, we write
 			#  back output

@@ -1,0 +1,23 @@
+{
+    "1": "bank adjustment - adjustment",
+    "2": "bank adjustment - credit adjustment",
+    "3": "deposits & credits - atm deposit",
+    "4": "deposits & credits - check deposit",
+    "5": "deposits & credits - deposit",
+    "6": "deposits & credits - direct deposit",
+    "7": "deposits & credits - investment income or cash",
+    "8": "deposits & credits - mobile deposit",
+    "9": "deposits & credits - rewards",
+    "10": "deposits & credits - ssa",
+    "11": "deposits & credits - tax refund",
+    "12": "deposits & credits - teller deposit",
+    "13": "interest - interest",
+    "14": "other income - credit",
+    "15": "refund - fee refund",
+    "16": "refund - refund",
+    "17": "refund - reimbursement",
+    "18": "refund - service charge refund",
+    "19": "transfer - overdraft protection",
+    "20": "transfer - transfer",
+    "21": "transfer - wire transfer"
+}

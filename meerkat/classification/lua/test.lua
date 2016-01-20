@@ -87,5 +87,5 @@ function Test:run(logfunc)
       self.clock = sys.clock()
    end
    -- Average on the confusion matrix
-   if self.confusion and self.n ~= 0 then self.confusion:div(self.n) end
+   -- if self.confusion and self.n ~= 0 then self.confusion:div(self.n) end
 end

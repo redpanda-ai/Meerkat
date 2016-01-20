@@ -14,7 +14,7 @@ Created on Dec 4, 2014
 
 #####################################################
 
-import csv
+#import csv
 import sys
 import operator
 import collections
@@ -48,7 +48,7 @@ def save_token_subset(word2vec, word_list):
 
 	pickle.dump(vector_dict, open("data/misc/prophet_vectors.pkl", "wb"))
 
-def t_SNE(X, word2vec):
+def t_sne(X, word2vec): #pylint:disable=invalid-name
 	"""Run stochastic neighbor embedding"""
 
 	# Visualize an easy dataset for exploration
@@ -58,13 +58,13 @@ def t_SNE(X, word2vec):
 	# Dimensionality Reduction
 	model = TSNE(n_components=2, random_state=0)
 	X = model.fit_transform(X.astype(np.float))
-	reduced = dict(zip(tokens, list(X)))
+	#reduced = dict(zip(tokens, list(X)))
 	# TODO save output to file for analysis
 
 def cluster_vectors(word2vec):
 	"""Clusters a set of word vectors"""
-
-	n_clusters = int(word2vec.syn0.shape[0] / 20)
+	#pylint:disable=invalid-name
+	n_clusters = int(word2vec.syn0.shape[0] / 20) #pylint:disable=unused-variable
 	tokens = word2vec.vocab.keys()[0:30000]
 	# TODO only cluster tokens found in transactions
 	X = np.array([word2vec[t].T for t in tokens])
@@ -73,7 +73,7 @@ def cluster_vectors(word2vec):
 	save_token_subset(word2vec, tokens)
 
 	# Dimensionality Reduction (for visualization)
-	t_SNE(X, word2vec)
+	t_sne(X, word2vec)
 	
 	# Clustering
 	clusters = kmeans(n_clusters=75, max_iter=100, \
@@ -89,12 +89,12 @@ def cluster_vectors(word2vec):
 	for key in collected.keys():
 		safe_print(key, collected[key], "\n")
 
-def run_from_command_line(command_line_arguments):
+def run_from_command_line():
 	"""Runs the module when invoked from the command line."""
 
 	word2vec = Word2Vec.load_word2vec_format(sys.argv[1], binary=True)
 	cluster_vectors(word2vec)
 
 if __name__ == "__main__":
-	run_from_command_line(sys.argv)
+	run_from_command_line()
 

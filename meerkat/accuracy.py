@@ -49,11 +49,18 @@ default_doc_key = "DESCRIPTION_UNMASKED"
 default_label_key = "GOOD_DESCRIPTION"
 
 class DummyFile(object):
-    def write(self, x): 
-    	pass
+	"""Resemble the stdout/stderr object but it prints nothing to screen"""
+	def write(self, msg):
+		"""It writes nothing, on purpose"""
+		pass
 
 @contextlib.contextmanager
 def nostdout():
+	"""
+	It redirects the stderr stream to DummyFile object that do nothing with error message.
+	'yield' is where unit tests take place.
+	After the yield, restore sys.stderr and stdout to its original structure
+	"""
 	save_stdout = sys.stdout
 	save_stderr = sys.stderr
 	sys.stdout = DummyFile()
@@ -87,9 +94,12 @@ def test_bulk_classifier(human_labeled, non_physical_trans, my_lists):
 				if human_labeled_row['IS_PHYSICAL_TRANSACTION'] == '1':
 					my_lists["incorrect_non_physical"].append(item)
 
-def generic_test(machine, human, cnn_column, human_column, human_map, machine_map, doc_key=default_doc_key):
+def generic_test(*args, **kwargs):
 	"""Tests both the recall and precision of the pinpoint classifier against
 	human-labeled training data."""
+	machine, human, cnn_column, human_column, human_map, machine_map = args[:]	
+	doc_key = kwargs.get("doc_key", default_doc_key)
+
 	# Create Quicker Lookup
 	index_lookup = {row["UNIQUE_TRANSACTION_ID"]: row for row in human}
 
@@ -98,7 +108,7 @@ def generic_test(machine, human, cnn_column, human_column, human_map, machine_ma
 	correct = []
 	mislabeled = []
 	# Test Each Machine Labeled Row
-	for index, machine_row in enumerate(machine):
+	for _, machine_row in enumerate(machine):
 		# Continue if Unlabeled
 		if machine_row[cnn_column] == "":
 			unlabeled.append(machine_row[doc_key])
@@ -125,9 +135,15 @@ def generic_test(machine, human, cnn_column, human_column, human_map, machine_ma
 
 	return len(machine), needs_hand_labeling, mislabeled, unlabeled, correct
 
-def CNN_accuracy(test_file, classifier, model_dict=None, human_dict=None, label_key=default_label_key, doc_key=default_doc_key):
+def CNN_accuracy(*args, **kwargs):
 	"""Run given CNN over a given input file and return some stats"""
 	# Load Classifier, and transactions
+	test_file, classifier = args[:]
+	model_dict = kwargs.get("model_dict", None)
+	human_dict = kwargs.get("human_dict", None)
+	label_key = kwargs.get("label_key", default_label_key)
+	doc_key = kwargs.get("doc_key", default_doc_key)
+
 	human_map = __load_label_map(human_dict)
 	machine_map = __load_label_map(model_dict)
 	reader = pd.read_csv(test_file, chunksize=1000, na_filter=False, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
@@ -141,9 +157,9 @@ def CNN_accuracy(test_file, classifier, model_dict=None, human_dict=None, label_
 	for chunk in reader:
 		transactions = chunk.to_dict("records")
 		# Label the points using the classifier and report accuracy
-		machine_labeled = classifier(transactions, doc_key=doc_key, label_key="MERCHANT_NAME")
+		machine_labeled = classifier(transactions, doc_key=doc_key, label_key="CNN_output")
 
-		total, needs_hand_labeling, mislabeled, unlabeled, correct = generic_test(machine_labeled, transactions, "MERCHANT_NAME", label_key, human_map, machine_map, doc_key)
+		total, needs_hand_labeling, mislabeled, unlabeled, correct = generic_test(machine_labeled, transactions, "CNN_output", label_key, human_map, machine_map, doc_key=doc_key)
 		bulk_total += total
 		bulk_needs_hand_labeling += len(needs_hand_labeling)
 		bulk_mislabeled += len(mislabeled)
@@ -157,6 +173,7 @@ def CNN_accuracy(test_file, classifier, model_dict=None, human_dict=None, label_
 	# results.close()
 
 def __load_label_map(label_map):
+	"""Provide label map"""
 	if isinstance(label_map, dict):
 		return label_map
 	return label_map and load_params(label_map) or None
@@ -177,6 +194,8 @@ def print_results(results):
 	print("{0:35} = {1:10.2f}%".format("Precision", results["precision"]))
 
 def enhance_results(total, needs_hand_labeling, mislabeled, unlabeled, correct):
+	"""Groupe results"""
+
 	num_labeled = total - unlabeled
 	total_recall_physical = num_labeled / total * 100
 	num_labeled = total - unlabeled
@@ -298,11 +317,11 @@ def process_file_collection(bucket, prefix, classifier, classifier_id_map):
 
 	results.close()
 
-def run_from_command_line(command_line_arguments):
+def run_from_command_line():
 	"""Runs these commands if the module is invoked from the command line"""
 
 	#print_results(vest_accuracy(params=None))
 	all_CNN_accuracy()
 
 if __name__ == "__main__":
-	run_from_command_line(sys.argv)
+	run_from_command_line()
