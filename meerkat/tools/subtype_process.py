@@ -74,6 +74,10 @@ test = training_data_df[~msk]
 test_full = df[~msk]
 
 # Save
+# Check if a dir exsits, if not create one
+if not os.path.exists('data/preprocessed/'):
+	os.makedirs('data/preprocessed/')
+
 label_map = dict(zip(label_map.values(), label_map.keys()))
 dict_2_json(label_map, 'data/preprocessed/' + sys.argv[2] + "_subtype_label_map.json")
 train.to_csv('data/preprocessed/' + sys.argv[2] + "_train_subtype.csv",
