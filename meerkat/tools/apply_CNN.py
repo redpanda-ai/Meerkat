@@ -32,6 +32,7 @@ import pandas as pd
 import sys
 import csv
 import json
+import os
 
 from meerkat.classification.lua_bridge import get_cnn_by_path
 
@@ -141,6 +142,10 @@ for chunk in reader:
 		default_human_label_key, doc_key=default_doc_key)
 
 	# Save
+	# Check if data/CNN_stats/ esxists, if not creste one
+	if not os.path.exists('data/CNN_stats/'):
+		os.makedirs('data/CNN_stats/')
+
 	if len(mislabeled) > 0:
 		df = pd.DataFrame(mislabeled)
 		df.to_csv('data/CNN_stats/mislabeled.csv', mode='a', index=False,
