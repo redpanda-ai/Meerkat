@@ -80,7 +80,7 @@ test_full = df[~msk]
 
 # Save
 # Check if a dir exsits, if not create one
-path = 'data/preprocessedd/'
+path = 'data/preprocessed/'
 os.makedirs(path, exist_ok=True)
 
 label_map = dict(zip(label_map.values(), label_map.keys()))
