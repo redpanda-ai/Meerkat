@@ -119,14 +119,15 @@ num_labels = len(reversed_label_map)
 confusion_matrix = [[0 for i in range(num_labels + 1)] for j in range(num_labels)]
 
 # Prepare for data saving
-os.makedirs('data/CNN_stats/', exist_ok=True)
-write_mislabeled = get_write_func("data/CNN_stats/mislabeled.csv",
+path = 'data/CNN_stats/'
+os.makedirs(path, exist_ok=True)
+write_mislabeled = get_write_func(path + "mislabeled.csv",
 	['TRANSACTION_DESCRIPTION', 'ACTUAL', 'PREDICTED'])
-write_correct = get_write_func("data/CNN_stats/correct.csv",
+write_correct = get_write_func(path + "correct.csv",
 	['TRANSACTION_DESCRIPTION', 'ACTUAL'])
-write_unpredicted = get_write_func("data/CNN_stats/unpredicted.csv",
+write_unpredicted = get_write_func(path + "unpredicted.csv",
 	["TRANSACTION_DESCRIPTION", 'ACTUAL'])
-write_needs_hand_labeling = get_write_func("data/CNN_stats/need_labeling.csv",
+write_needs_hand_labeling = get_write_func(path + "need_labeling.csv",
 	["TRANSACTION_DESCRIPTION"])
 
 for chunk in reader:
