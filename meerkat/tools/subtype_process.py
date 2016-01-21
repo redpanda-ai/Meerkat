@@ -30,13 +30,6 @@ def dict_2_json(obj, filename):
 	with open(filename, 'w') as fp:
 		json.dump(obj, fp, indent=4)
 
-def load_label_map(filename):
-	"""Load a permanent label map"""
-	input_file = open(filename, encoding='utf-8')
-	label_map = json.loads(input_file.read())
-	input_file.close()
-	return label_map
-
 def cap_first_letter(label):
 	"""Make sure the first letter of each word is capitalized"""
 	temp = label.split()
