@@ -11,7 +11,7 @@ and test data. It also produces a index-label mapping json file.
 """
 python3 process.py [file_name] [ledger_entry]
 python3 -m meerkat.tools.subtype_process \
-data/input/Bank_complete_data_subtype_original.csv credit
+data/input/Bank_complete_data_subtype_original.csv credit bank
 """
 #####################################################
 
@@ -80,18 +80,20 @@ test_full = df[~msk]
 
 # Save
 # Check if a dir exsits, if not create one
-os.makedirs('data/preprocessed/', exist_ok=True)
+path = 'data/preprocessedd/'
+os.makedirs(path, exist_ok=True)
 
 label_map = dict(zip(label_map.values(), label_map.keys()))
-dict_2_json(label_map, 'data/preprocessed/' + sys.argv[2] + "_subtype_label_map.json")
-train.to_csv('data/preprocessed/' + sys.argv[2] + "_train_subtype.csv",
+dict_2_json(label_map, path + sys.argv[3] + '_' + sys.argv[2]
+	 + "_subtype_label_map.json")
+train.to_csv(path + sys.argv[3] + '_' + sys.argv[2] + "_train_subtype.csv",
 	 cols=["LABEL", "DESCRIPTION_UNMASKED"], header=False, index=False,
 	 index_label=False)
-test.to_csv('data/preprocessed/' + sys.argv[2] + "_test_subtype.csv",
+test.to_csv(path + sys.argv[3] + '_' + sys.argv[2] + "_test_subtype.csv",
 	 cols=["LABEL", "DESCRIPTION_UNMASKED"], header=False, index=False,
 	 index_label=False)
 
-test_full.to_csv('data/preprocessed/' + sys.argv[2] + "_test_subtype_full.csv",
+test_full.to_csv(path + sys.argv[3] + '_' + sys.argv[2] + "_test_subtype_full.csv",
 	 index=False, sep='|')
-train_full.to_csv('data/preprocessed/' + sys.argv[2] + "_train_subtype_full.csv",
+train_full.to_csv(path + sys.argv[3] + '_' + sys.argv[2] + "_train_subtype_full.csv",
 	 index=False, sep='|')
