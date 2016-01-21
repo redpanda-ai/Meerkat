@@ -98,6 +98,18 @@ def fill_description(df):
 	else:
 		return df['DESCRIPTION_UNMASKED']
 
+def get_write_func(filename, header):
+	file_exists = False
+	def write_func(data):
+		if len(data) > 0:
+			nonlocal file_exists
+			mode = "a" if file_exists else "w"
+			add_head = False if file_exists else header
+			df = pd.DataFrame(data)
+			df.to_csv(filename, mode=mode, index=False, header=add_head)
+			file_exists = True
+	return write_func
+
 # Main
 classifier = get_cnn_by_path(sys.argv[1], sys.argv[2])
 reader = pd.read_csv(sys.argv[3], chunksize=1000, na_filter=False,
@@ -105,10 +117,17 @@ reader = pd.read_csv(sys.argv[3], chunksize=1000, na_filter=False,
 reversed_label_map = load_and_reverse_label_map(sys.argv[2])
 num_labels = len(reversed_label_map)
 confusion_matrix = [[0 for i in range(num_labels + 1)] for j in range(num_labels)]
-mislabeled_exists = False
-correct_exists = False
-unpredicted_exists = False
-needs_hand_labeling_exists = False
+
+# Prepare for data saving
+os.makedirs('data/CNN_stats/', exist_ok=True)
+write_mislabeled = get_write_func("data/CNN_stats/mislabeled.csv",
+	['TRANSACTION_DESCRIPTION', 'ACTUAL', 'PREDICTED'])
+write_correct = get_write_func("data/CNN_stats/correct.csv",
+	['TRANSACTION_DESCRIPTION', 'ACTUAL'])
+write_unpredicted = get_write_func("data/CNN_stats/unpredicted.csv",
+	["TRANSACTION_DESCRIPTION", 'ACTUAL'])
+write_needs_hand_labeling = get_write_func("data/CNN_stats/need_labeling.csv",
+	["TRANSACTION_DESCRIPTION"])
 
 for chunk in reader:
 	chunk[default_doc_key] = chunk.apply(fill_description, axis=1)
@@ -128,50 +147,10 @@ for chunk in reader:
 		default_human_label_key, confusion_matrix, doc_key=default_doc_key)
 
 	# Save
-
-	# Check if data/CNN_stats/ esxists, if not create one
-	os.makedirs('data/CNN_stats/', exist_ok=True)
-
-	if len(mislabeled) > 0:
-		df = pd.DataFrame(mislabeled)
-		if not mislabeled_exists:
-			df.to_csv('data/CNN_stats/mislabeled.csv', index=False,
-				header=['TRANSACTION_DESCRIPTION', 'ACTUAL', 'PREDICTED'])
-			mislabeled_exists = True
-		else:
-			df.to_csv('data/CNN_stats/mislabeled.csv', mode='a', index=False,
-				header=False)
-
-	if len(correct) > 0:
-		df = pd.DataFrame(correct)
-		if not correct_exists:
-			df.to_csv('data/CNN_stats/correct.csv', index=False,
-				header=['TRANSACTION_DESCRIPTION', 'ACTUAL'])
-			correct_exists = True
-		else:
-			df.to_csv('data/CNN_stats/correct.csv', mode='a', index=False,
-				header=False)
-
-	if len(unpredicted) > 0:
-		df = pd.DataFrame(unpredicted)
-		if not unpredicted_exists:
-			df.to_csv('data/CNN_stats/unpredicted.csv', index=False,
-				header=['TRANSACTION_DESCRIPTION', 'ACTUAL'])
-			unpredicted_exists = True
-		else:
-			df.to_csv('data/CNN_stats/unpredicted.csv', mode='a', index=False,
-				header=False)
-
-	if len(needs_hand_labeling) > 0:
-		df = pd.DataFrame(needs_hand_labeling)
-		if not needs_hand_labeling_exists:
-			df.to_csv('data/CNN_stats/need_labeling.csv', index=False,
-				header=['TRANSACTION_DESCRIPTION'])
-			needs_hand_labeling_exists = True
-		else:
-			df.to_csv('data/CNN_stats/need_labeling.csv', mode='a', index=False,
-				header=False)
-
+	write_mislabeled(mislabeled)
+	write_correct(correct)
+	write_unpredicted(unpredicted)
+	write_needs_hand_labeling(needs_hand_labeling)
 
 # calculate recall, precision, false +/-, true +/- from confusion maxtrix
 true_positive = pd.DataFrame([confusion_matrix[i][i] for i in range(num_labels)])
