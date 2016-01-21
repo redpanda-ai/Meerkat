@@ -41,7 +41,9 @@ def cap_first_letter(label):
 	"""Make sure the first letter of each word is capitalized"""
 	temp = label.split()
 	for i in range(len(temp)):
-		if temp not in ['by', 'with']:
+		if temp[i].lower() in ['by', 'with', 'or', 'at', 'in']:
+			temp[i] = temp[i].lower()
+		else:
 			temp[i] = temp[i][0].upper() + temp[i][1:]
 	return ' '.join(word for word in temp)
 
@@ -85,18 +87,18 @@ test_full = df[~msk]
 
 # Save
 # Check if a dir exsits, if not create one
-os.makedirs('data/preprocessedd/', exist_ok=True)
+os.makedirs('data/preprocessed/', exist_ok=True)
 
 label_map = dict(zip(label_map.values(), label_map.keys()))
-dict_2_json(label_map, 'data/preprocessedd/' + sys.argv[2] + "_subtype_label_map.json")
-train.to_csv('data/preprocessedd/' + sys.argv[2] + "_train_subtype.csv",
+dict_2_json(label_map, 'data/preprocessed/' + sys.argv[2] + "_subtype_label_map.json")
+train.to_csv('data/preprocessed/' + sys.argv[2] + "_train_subtype.csv",
 	 cols=["LABEL", "DESCRIPTION_UNMASKED"], header=False, index=False,
 	 index_label=False)
-test.to_csv('data/preprocessedd/' + sys.argv[2] + "_test_subtype.csv",
+test.to_csv('data/preprocessed/' + sys.argv[2] + "_test_subtype.csv",
 	 cols=["LABEL", "DESCRIPTION_UNMASKED"], header=False, index=False,
 	 index_label=False)
 
-test_full.to_csv('data/preprocessedd/' + sys.argv[2] + "_test_subtype_full.csv",
+test_full.to_csv('data/preprocessed/' + sys.argv[2] + "_test_subtype_full.csv",
 	 index=False, sep='|')
-train_full.to_csv('data/preprocessedd/' + sys.argv[2] + "_train_subtype_full.csv",
+train_full.to_csv('data/preprocessed/' + sys.argv[2] + "_train_subtype_full.csv",
 	 index=False, sep='|')
