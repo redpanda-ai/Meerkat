@@ -8,8 +8,16 @@ predicts labels of the test set. It also out perfomance statistics.
 
 #################### USAGE ##########################
 """
-python3 -m meerkat.tools.apply_CNN  <path_to_classifier> \
- <path_to_classifier_output_map> <path_to_test_data>
+python3 -m meerkat.tools.apply_CNN \
+-m <path_to_model> \
+-f <path_to_testfile> \
+-l <path_to_label_map> \
+-D <primary_doc_key> \
+-d <optional_secondary_doc_key> \
+-k <human_label_key> \
+-p <optional_predicted_label_key>
+
+Key values will be shifted to upper case.
 """
 #####################################################
 
@@ -29,23 +37,41 @@ An entry of machine_labeled has such format:
 #####################################################
 
 import pandas as pd
-import sys
 import csv
 import json
 import os
+import argparse
 import numpy as np
 
 from meerkat.classification.lua_bridge import get_cnn_by_path
 
-
-default_doc_key = 'DESCRIPTION_UNMASKED'
-default_machine_label_key = 'PREDICTED_SUBTYPE'
-default_human_label_key = 'PROPOSED_SUBTYPE'
+def get_parser():
+	""" Create the parser """
+	parser = argparse.ArgumentParser(description="Test a CNN against a dataset and\
+		return performance statistics")
+	parser.add_argument('--model', '-m', required=True,
+		help='Path to the model under test')
+	parser.add_argument('--testfile', '-f', required=True,
+		help='Path to the test data')
+	parser.add_argument('--label_map', '-l', required=True,
+		help='Path to a label map')
+	parser.add_argument('--doc_key', '-D', required=True, type=lambda x: x.upper(),
+		help='Header name of primary transaction description column')
+	parser.add_argument('--secondary_doc_key', '-d', required=False, default='',
+		type=lambda x: x.upper(),
+		help='Header name of secondary transaction description in case\
+			primary is empty')
+	parser.add_argument('--label_key', '-k', required=True, type=lambda x: x.upper(),
+		help="Header name of the ground truth label column")
+	parser.add_argument('--predicted_key', '-p', required=False,
+		type=lambda x: x.upper(), default='PREDICTED_CLASS',
+		help='Header name of predicted class column')
+	return parser
 
 def compare_label(*args, **kwargs):
 	"""similar to generic_test in accuracy.py, with unnecessary items dropped"""
 	machine, cnn_column, human_column, cm = args[:]
-	doc_key = kwargs.get("doc_key", default_doc_key)
+	doc_key = kwargs.get("doc_key")
 
 	unpredicted = []
 	needs_hand_labeling = []
@@ -93,10 +119,10 @@ def load_and_reverse_label_map(filename):
 
 def fill_description(df):
 	"""Replace Description_Unmasked"""
-	if df['DESCRIPTION_UNMASKED'] == "":
-		return df['DESCRIPTION']
+	if df[doc_key] == "":
+		return df[sec_doc_key]
 	else:
-		return df['DESCRIPTION_UNMASKED']
+		return df[doc_key]
 
 def get_write_func(filename, header):
 	file_exists = False
@@ -111,10 +137,15 @@ def get_write_func(filename, header):
 	return write_func
 
 # Main
-classifier = get_cnn_by_path(sys.argv[1], sys.argv[2])
-reader = pd.read_csv(sys.argv[3], chunksize=1000, na_filter=False,
+args = get_parser().parse_args()
+doc_key = args.doc_key
+sec_doc_key = args.secondary_doc_key
+machine_label_key = args.predicted_key
+human_label_key = args.label_key
+classifier = get_cnn_by_path(args.model, args.label_map)
+reader = pd.read_csv(args.testfile, chunksize=1000, na_filter=False,
 	quoting=csv.QUOTE_NONE, encoding='utf-8', sep='|', error_bad_lines=False)
-reversed_label_map = load_and_reverse_label_map(sys.argv[2])
+reversed_label_map = load_and_reverse_label_map(args.label_map)
 num_labels = len(reversed_label_map)
 confusion_matrix = [[0 for i in range(num_labels + 1)] for j in range(num_labels)]
 
@@ -131,21 +162,22 @@ write_needs_hand_labeling = get_write_func(path + "need_labeling.csv",
 	["TRANSACTION_DESCRIPTION"])
 
 for chunk in reader:
-	chunk[default_doc_key] = chunk.apply(fill_description, axis=1)
+	if sec_doc_key != '':
+		chunk[doc_key] = chunk.apply(fill_description, axis=1)
 	transactions = chunk.to_dict('records')
-	machine_labeled = classifier(transactions, doc_key=default_doc_key,
-		label_key=default_machine_label_key)
+	machine_labeled = classifier(transactions, doc_key=doc_key,
+		label_key=machine_label_key)
 
 	# Add indexes for predicted labels
 	for item in machine_labeled:
-		if item[default_machine_label_key] == "":
+		if item[machine_label_key] == "":
 			item['PREDICTED_LABEL'] = None
 			continue
-		item['PREDICTED_LABEL'] = reversed_label_map[item[default_machine_label_key]]
+		item['PREDICTED_LABEL'] = reversed_label_map[item[machine_label_key]]
 
 	mislabeled, correct, unpredicted, needs_hand_labeling, confusion_matrix =\
-		compare_label(machine_labeled, default_machine_label_key,
-		default_human_label_key, confusion_matrix, doc_key=default_doc_key)
+		compare_label(machine_labeled, machine_label_key,
+		human_label_key, confusion_matrix, doc_key=doc_key)
 
 	# Save
 	write_mislabeled(mislabeled)
@@ -165,7 +197,7 @@ false_positive = column_sum - true_positive
 precision = true_positive / column_sum
 precision = np.round(precision, decimals=4)
 false_negative = actual - true_positive
-label = pd.DataFrame(pd.read_json(sys.argv[2], typ='series')).sort_index()
+label = pd.DataFrame(pd.read_json(args.label_map, typ='series')).sort_index()
 label.index = range(num_labels)
 
 stat = pd.concat([label, actual, true_positive, false_positive, recall, precision,
