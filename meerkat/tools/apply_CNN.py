@@ -9,13 +9,13 @@ predicts labels of the test set. It also out perfomance statistics.
 #################### USAGE ##########################
 """
 python3 -m meerkat.tools.apply_CNN \
--m <path_to_model> \
--f <path_to_testfile> \
--l <path_to_label_map> \
--D <primary_doc_key> \
--d <optional_secondary_doc_key> \
--k <human_label_key> \
--p <optional_predicted_label_key>
+-model <path_to_classifier> \
+-data <path_to_testdata> \
+-map <path_to_label_map> \
+-doc <primary_doc_key> \
+-secdoc <optional_secondary_doc_key> \
+-label <ground_truth_label_key> \
+-predict <optional_predicted_label_key>
 
 Key values will be shifted to upper case.
 """
@@ -49,21 +49,21 @@ def get_parser():
 	""" Create the parser """
 	parser = argparse.ArgumentParser(description="Test a CNN against a dataset and\
 		return performance statistics")
-	parser.add_argument('--model', '-m', required=True,
+	parser.add_argument('--model', '-model', required=True,
 		help='Path to the model under test')
-	parser.add_argument('--testfile', '-f', required=True,
+	parser.add_argument('--testdata', '-data', required=True,
 		help='Path to the test data')
-	parser.add_argument('--label_map', '-l', required=True,
+	parser.add_argument('--label_map', '-map', required=True,
 		help='Path to a label map')
-	parser.add_argument('--doc_key', '-D', required=True, type=lambda x: x.upper(),
+	parser.add_argument('--doc_key', '-doc', required=True, type=lambda x: x.upper(),
 		help='Header name of primary transaction description column')
-	parser.add_argument('--secondary_doc_key', '-d', required=False, default='',
+	parser.add_argument('--secondary_doc_key', '-secdoc', required=False, default='',
 		type=lambda x: x.upper(),
 		help='Header name of secondary transaction description in case\
 			primary is empty')
-	parser.add_argument('--label_key', '-k', required=True, type=lambda x: x.upper(),
-		help="Header name of the ground truth label column")
-	parser.add_argument('--predicted_key', '-p', required=False,
+	parser.add_argument('--label_key', '-label', required=True,
+		type=lambda x: x.upper(), help="Header name of the ground truth label column")
+	parser.add_argument('--predicted_key', '-predict', required=False,
 		type=lambda x: x.upper(), default='PREDICTED_CLASS',
 		help='Header name of predicted class column')
 	return parser
@@ -143,7 +143,7 @@ sec_doc_key = args.secondary_doc_key
 machine_label_key = args.predicted_key
 human_label_key = args.label_key
 classifier = get_cnn_by_path(args.model, args.label_map)
-reader = pd.read_csv(args.testfile, chunksize=1000, na_filter=False,
+reader = pd.read_csv(args.testdata, chunksize=1000, na_filter=False,
 	quoting=csv.QUOTE_NONE, encoding='utf-8', sep='|', error_bad_lines=False)
 reversed_label_map = load_and_reverse_label_map(args.label_map)
 num_labels = len(reversed_label_map)
