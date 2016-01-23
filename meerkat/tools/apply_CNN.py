@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3.3
 
-"""This utility loads a training CNN (sequentail_*.t7b) and a test set,
-predicts labels of the test set. It also out perfomance statistics.
+"""This utility loads a trained CNN (sequentail_*.t7b) and a test set,
+predicts labels of the test set. It also returns performance statistics.
 
 @author: Oscar Pan
 """
