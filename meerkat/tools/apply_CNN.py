@@ -12,9 +12,9 @@ python3 -m meerkat.tools.apply_CNN \
 -model <path_to_classifier> \
 -data <path_to_testdata> \
 -map <path_to_label_map> \
--doc <primary_doc_key> \
--secdoc <optional_secondary_doc_key> \
 -label <ground_truth_label_key> \
+-doc <optional_primary_doc_key> \
+-secdoc <optional_secondary_doc_key> \
 -predict <optional_predicted_label_key>
 
 Key values will be shifted to upper case.
@@ -27,10 +27,9 @@ An entry of machine_labeled has such format:
 {'AMOUNT': 9.84,
  'DESCRIPTION': ' CKCD DEBIT 03/30 SICILIA PIZZA',
  'DESCRIPTION_UNMASKED': ' CKCD DEBIT 03/30 SICILIA PIZZA',
- 'LABEL': 27,
  'LEDGER_ENTRY': 'debit',
- 'PREDICTED_SUBTYPE': 'purchase - purchase',
- 'PROPOSED_SUBTYPE': 'purchase - purchase',
+ 'PREDICTED_SUBTYPE': 'Purchase - Purchase',
+ 'PROPOSED_SUBTYPE': 'Purchase - Purchase',
  'TRANSACTION_DATE': '2013-12-30',
  'UNIQUE_TRANSACTION_ID': 19}
 """
@@ -55,10 +54,11 @@ def get_parser():
 		help='Path to the test data')
 	parser.add_argument('--label_map', '-map', required=True,
 		help='Path to a label map')
-	parser.add_argument('--doc_key', '-doc', required=True, type=lambda x: x.upper(),
+	parser.add_argument('--doc_key', '-doc', required=False, type=lambda x: x.upper(),
+		default='DESCRIPTION_UNMASKED',
 		help='Header name of primary transaction description column')
-	parser.add_argument('--secondary_doc_key', '-secdoc', required=False, default='',
-		type=lambda x: x.upper(),
+	parser.add_argument('--secondary_doc_key', '-secdoc', required=False,
+		default='DESCRIPTION', type=lambda x: x.upper(),
 		help='Header name of secondary transaction description in case\
 			primary is empty')
 	parser.add_argument('--label_key', '-label', required=True,
@@ -83,12 +83,16 @@ def compare_label(*args, **kwargs):
 
 		# Update cm
 		# predicted_label is None if a predicted subtype is ""
-		if machine_row['PREDICTED_LABEL'] is None:
+		if machine_row['ACTUAL_INDEX'] is None:
+			pass
+		elif machine_row['PREDICTED_INDEX'] is None:
 			column = num_labels
+			row = machine_row['ACTUAL_INDEX'] - 1
+			cm[row][column] += 1
 		else:
-			column = machine_row['PREDICTED_LABEL'] - 1
-		row = machine_row['LABEL'] - 1
-		cm[row][column] += 1
+			column = machine_row['PREDICTED_INDEX'] - 1
+			row = machine_row['ACTUAL_INDEX'] - 1
+			cm[row][column] += 1
 
 		# Continue if unlabeled
 		if machine_row[cnn_column] == "":
@@ -170,10 +174,14 @@ for chunk in reader:
 
 	# Add indexes for predicted labels
 	for item in machine_labeled:
-		if item[machine_label_key] == "":
-			item['PREDICTED_LABEL'] = None
+		if item[human_label_key] == "":
+			item['ACTUAL_INDEX'] = None
 			continue
-		item['PREDICTED_LABEL'] = reversed_label_map[item[machine_label_key]]
+		item['ACTUAL_INDEX'] = reversed_label_map[item[human_label_key]]
+		if item[machine_label_key] == "":
+			item['PREDICTED_INDEX'] = None
+			continue
+		item['PREDICTED_INDEX'] = reversed_label_map[item[machine_label_key]]
 
 	mislabeled, correct, unpredicted, needs_hand_labeling, confusion_matrix =\
 		compare_label(machine_labeled, machine_label_key,
