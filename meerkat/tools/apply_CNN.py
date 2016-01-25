@@ -16,6 +16,8 @@ python3 -m meerkat.tools.apply_CNN \
 -doc <optional_primary_doc_key> \
 -secdoc <optional_secondary_doc_key> \
 -predict <optional_predicted_label_key>
+#if working with merchant data
+- merchant
 
 Key values will be shifted to upper case.
 """
@@ -66,6 +68,8 @@ def get_parser():
 	parser.add_argument('--predicted_key', '-predict', required=False,
 		type=lambda x: x.upper(), default='PREDICTED_CLASS',
 		help='Header name of predicted class column')
+	parser.add_argument('--is_merchant', '-merchant', required=False,
+		action='store_true', help='If working on merchant data need to indicate True.')
 	return parser
 
 def compare_label(*args, **kwargs):
@@ -151,6 +155,20 @@ reader = pd.read_csv(args.testdata, chunksize=1000, na_filter=False,
 	quoting=csv.QUOTE_NONE, encoding='utf-8', sep='|', error_bad_lines=False)
 reversed_label_map = load_and_reverse_label_map(args.label_map)
 num_labels = len(reversed_label_map)
+######################Ad Hoc fix for duplicate entries in merchant label map#######
+if args.is_merchant:
+	reversed_label_map["Dick's Sporting Goods"] = 94
+	reversed_label_map["Kroger"] = 31
+	reversed_label_map["Carl's Jr."] = 304
+	reversed_label_map["Eurest Dining"] = 274
+	reversed_label_map["Marriott Hotels"] = 52
+	num_labels += 5
+	reversed_label_map['Duplicate, see index 93'] = 147
+	reversed_label_map['Duplicate, see index 30'] = 101
+	reversed_label_map['Duplicate, see index 303'] = 321
+	reversed_label_map['Duplicate, see index 273'] = 291
+	reversed_label_map['Duplicate, see index 51'] = 195
+###################################################################################
 confusion_matrix = [[0 for i in range(num_labels + 1)] for j in range(num_labels)]
 
 # Prepare for data saving
@@ -172,13 +190,13 @@ for chunk in reader:
 	machine_labeled = classifier(transactions, doc_key=doc_key,
 		label_key=machine_label_key)
 
-	# Add indexes for predicted labels
+	# Add indexes for labels
 	for item in machine_labeled:
-		if item[human_label_key] == "":
+		if item[human_label_key] == "" and not args.is_merchant:
 			item['ACTUAL_INDEX'] = None
 			continue
 		item['ACTUAL_INDEX'] = reversed_label_map[item[human_label_key]]
-		if item[machine_label_key] == "":
+		if item[machine_label_key] == "" and not args.is_merchant:
 			item['PREDICTED_INDEX'] = None
 			continue
 		item['PREDICTED_INDEX'] = reversed_label_map[item[machine_label_key]]
