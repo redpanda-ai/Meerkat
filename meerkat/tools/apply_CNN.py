@@ -76,6 +76,7 @@ def compare_label(*args, **kwargs):
 	"""similar to generic_test in accuracy.py, with unnecessary items dropped"""
 	machine, cnn_column, human_column, cm = args[:]
 	doc_key = kwargs.get("doc_key")
+	is_merchant = kwargs.get("is_merchant", False)
 
 	unpredicted = []
 	needs_hand_labeling = []
@@ -99,7 +100,7 @@ def compare_label(*args, **kwargs):
 			cm[row][column] += 1
 
 		# Continue if unlabeled
-		if machine_row[cnn_column] == "":
+		if machine_row[cnn_column] == "" and not is_merchant:
 			unpredicted.append([machine_row[doc_key], machine_row[human_column]])
 			continue
 
@@ -202,8 +203,8 @@ for chunk in reader:
 		item['PREDICTED_INDEX'] = reversed_label_map[item[machine_label_key]]
 
 	mislabeled, correct, unpredicted, needs_hand_labeling, confusion_matrix =\
-		compare_label(machine_labeled, machine_label_key,
-		human_label_key, confusion_matrix, doc_key=doc_key)
+		compare_label(machine_labeled, machine_label_key, human_label_key,
+		confusion_matrix, doc_key=doc_key, is_merchant=args.is_merchant)
 
 	# Save
 	write_mislabeled(mislabeled)
