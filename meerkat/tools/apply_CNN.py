@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3.3
+#/usr/local/bin/python3.3
 
 """This utility loads a trained CNN (sequentail_*.t7b) and a test set,
 predicts labels of the test set. It also returns performance statistics.
@@ -44,7 +44,7 @@ import os
 import argparse
 import numpy as np
 
-from meerkat.classification.lua_bridge import get_cnn_by_path
+from meerkat.classification.lua_bridge_for_test import get_cnn_by_path
 
 def get_parser():
 	""" Create the parser """
@@ -76,7 +76,6 @@ def compare_label(*args, **kwargs):
 	"""similar to generic_test in accuracy.py, with unnecessary items dropped"""
 	machine, cnn_column, human_column, cm = args[:]
 	doc_key = kwargs.get("doc_key")
-	is_merchant = kwargs.get("is_merchant", False)
 
 	unpredicted = []
 	needs_hand_labeling = []
@@ -87,7 +86,7 @@ def compare_label(*args, **kwargs):
 	for machine_row in machine:
 
 		# Update cm
-		# predicted_label is None if a predicted subtype is ""
+		# predicted_label is None if a predicted subtype is "_"
 		if machine_row['ACTUAL_INDEX'] is None:
 			pass
 		elif machine_row['PREDICTED_INDEX'] is None:
@@ -100,7 +99,7 @@ def compare_label(*args, **kwargs):
 			cm[row][column] += 1
 
 		# Continue if unlabeled
-		if machine_row[cnn_column] == "" and not is_merchant:
+		if machine_row[cnn_column] == "_":
 			unpredicted.append([machine_row[doc_key], machine_row[human_column]])
 			continue
 
@@ -193,18 +192,18 @@ for chunk in reader:
 
 	# Add indexes for labels
 	for item in machine_labeled:
-		if item[human_label_key] == "" and not args.is_merchant:
+		if item[human_label_key] == "_":
 			item['ACTUAL_INDEX'] = None
 			continue
 		item['ACTUAL_INDEX'] = reversed_label_map[item[human_label_key]]
-		if item[machine_label_key] == "" and not args.is_merchant:
+		if item[machine_label_key] == "_":
 			item['PREDICTED_INDEX'] = None
 			continue
 		item['PREDICTED_INDEX'] = reversed_label_map[item[machine_label_key]]
 
 	mislabeled, correct, unpredicted, needs_hand_labeling, confusion_matrix =\
 		compare_label(machine_labeled, machine_label_key, human_label_key,
-		confusion_matrix, doc_key=doc_key, is_merchant=args.is_merchant)
+		confusion_matrix, doc_key=doc_key)
 
 	# Save
 	write_mislabeled(mislabeled)
@@ -220,17 +219,19 @@ recall = true_positive / actual
 #if we use pandas 0.17 we can do the rounding neater
 recall = np.round(recall, decimals=4)
 column_sum = pd.DataFrame(cm.sum()).ix[:,:num_labels]
+unpredicted = pd.DataFrame(cm.ix[:,num_labels])
+unpredicted.columns = [0]
 false_positive = column_sum - true_positive
 precision = true_positive / column_sum
 precision = np.round(precision, decimals=4)
-false_negative = actual - true_positive
+false_negative = actual - true_positive - unpredicted
 label = pd.DataFrame(pd.read_json(args.label_map, typ='series')).sort_index()
 label.index = range(num_labels)
 
 stat = pd.concat([label, actual, true_positive, false_positive, recall, precision,
-	false_negative], axis=1)
+	false_negative, unpredicted], axis=1)
 stat.columns = ['Class', 'Actual', 'True_Positive', 'False_Positive', 'Recall',
-	'Precision', 'False_Negative(false_negative & unpredicted)']
+	'Precision', 'False_Negative', 'Unpredicted']
 
 cm = pd.concat([label, cm], axis=1)
 cm.columns = ['Class'] + [str(x) for x in range(num_labels)] + ['Unpredicted']
