@@ -17,7 +17,7 @@ python3 -m meerkat.tools.apply_CNN \
 -secdoc <optional_secondary_doc_key> \
 -predict <optional_predicted_label_key>
 #if working with merchant data
-- merchant
+-merchant
 
 Key values will be shifted to upper case.
 """
@@ -44,7 +44,7 @@ import os
 import argparse
 import numpy as np
 
-from meerkat.classification.lua_bridge_for_test import get_cnn_by_path
+from meerkat.classification.lua_bridge import get_cnn_by_path
 
 def get_parser():
 	""" Create the parser """
@@ -86,7 +86,7 @@ def compare_label(*args, **kwargs):
 	for machine_row in machine:
 
 		# Update cm
-		# predicted_label is None if a predicted subtype is "_"
+		# predicted_label is None if a predicted subtype is ""
 		if machine_row['ACTUAL_INDEX'] is None:
 			pass
 		elif machine_row['PREDICTED_INDEX'] is None:
@@ -99,7 +99,7 @@ def compare_label(*args, **kwargs):
 			cm[row][column] += 1
 
 		# Continue if unlabeled
-		if machine_row[cnn_column] == "_":
+		if machine_row[cnn_column] == "":
 			unpredicted.append([machine_row[doc_key], machine_row[human_column]])
 			continue
 
@@ -157,6 +157,7 @@ reversed_label_map = load_and_reverse_label_map(args.label_map)
 num_labels = len(reversed_label_map)
 ######################Ad Hoc fix for duplicate entries in merchant label map#######
 if args.is_merchant:
+	reversed_label_map["Null Class"] = reversed_label_map.pop("")
 	reversed_label_map["Dick's Sporting Goods"] = 94
 	reversed_label_map["Kroger"] = 31
 	reversed_label_map["Carl's Jr."] = 304
@@ -192,11 +193,11 @@ for chunk in reader:
 
 	# Add indexes for labels
 	for item in machine_labeled:
-		if item[human_label_key] == "_":
+		if item[human_label_key] == "":
 			item['ACTUAL_INDEX'] = None
 			continue
 		item['ACTUAL_INDEX'] = reversed_label_map[item[human_label_key]]
-		if item[machine_label_key] == "_":
+		if item[machine_label_key] == "":
 			item['PREDICTED_INDEX'] = None
 			continue
 		item['PREDICTED_INDEX'] = reversed_label_map[item[machine_label_key]]

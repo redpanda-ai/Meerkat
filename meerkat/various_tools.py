@@ -120,12 +120,12 @@ def queue_to_list(result_queue):
 
 def load_params(filename):
 	"""Load a set of parameters provided a filename"""
-
-	input_file = open(filename, encoding='utf-8')
-	params = json.loads(input_file.read())
-	input_file.close()
-
-	return params
+	if isinstance(filename, str):
+		input_file = open(filename, encoding='utf-8')
+		params = json.loads(input_file.read())
+		input_file.close()
+		return params
+	return filename
 
 def load_hyperparameters(params):
 	"""Attempts to load parameter key"""
