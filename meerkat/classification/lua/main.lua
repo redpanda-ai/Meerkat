@@ -119,7 +119,7 @@ function main.new()
       print("Loading main record...")
       local resume = torch.load(config.main.resume)
       main.record = resume.record
-      if resume.momentum then main.train.old_grads:copy(resume.momentum) end
+      if resume.momentum then main.train.old_grads:copy(resume.momentum[{{1, main.train.old_grads:size()[1]}}]) end
    end
    collectgarbage()
 end
