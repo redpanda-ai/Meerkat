@@ -123,7 +123,7 @@ def load_and_reverse_label_map(filename):
 	label_map = json.load(input_file)
 	reversed_map = dict((value, int(key)) for key, value in label_map.items())
 	input_file.close()
-	return reversed_map
+	return reversed_map, label_map
 
 def fill_description(df):
 	"""Replace Description_Unmasked"""
@@ -150,13 +150,13 @@ doc_key = args.doc_key
 sec_doc_key = args.secondary_doc_key
 machine_label_key = args.predicted_key
 human_label_key = args.label_key
-classifier = get_cnn_by_path(args.model, args.label_map)
 reader = pd.read_csv(args.testdata, chunksize=1000, na_filter=False,
 	quoting=csv.QUOTE_NONE, encoding='utf-8', sep='|', error_bad_lines=False)
-reversed_label_map = load_and_reverse_label_map(args.label_map)
+reversed_label_map, label_map = load_and_reverse_label_map(args.label_map)
 num_labels = len(reversed_label_map)
 ######################Ad Hoc fix for duplicate entries in merchant label map#######
 if args.is_merchant:
+	label_map["1"] = "Null Class"
 	reversed_label_map["Null Class"] = reversed_label_map.pop("")
 	reversed_label_map["Dick's Sporting Goods"] = 94
 	reversed_label_map["Kroger"] = 31
@@ -171,6 +171,7 @@ if args.is_merchant:
 	reversed_label_map['Duplicate, see index 51'] = 195
 ###################################################################################
 confusion_matrix = [[0 for i in range(num_labels + 1)] for j in range(num_labels)]
+classifier = get_cnn_by_path(args.model, label_map)
 
 # Prepare for data saving
 path = 'data/CNN_stats/'
