@@ -16,10 +16,12 @@ python3 -m meerkat.tools.apply_CNN \
 -doc <optional_primary_doc_key> \
 -secdoc <optional_secondary_doc_key> \
 -predict <optional_predicted_label_key>
-#if working with merchant data
+# If working with merchant data
 -merchant
+# If only want to return confusion matrix and performance statistics
+-fast
 
-Key values will be shifted to upper case.
+# Key values will be shifted to upper case.
 """
 #####################################################
 
@@ -45,6 +47,7 @@ import argparse
 import numpy as np
 
 from meerkat.classification.lua_bridge import get_cnn_by_path
+from meerkat.various_tools import load_params
 
 def get_parser():
 	""" Create the parser """
@@ -70,6 +73,8 @@ def get_parser():
 		help='Header name of predicted class column')
 	parser.add_argument('--is_merchant', '-merchant', required=False,
 		action='store_true', help='If working on merchant data need to indicate True.')
+	parser.add_argument('--fast_mode', '-fast', required=False, action='store_true',
+		help='Use fast mode to save i/o time.')
 	return parser
 
 def compare_label(*args, **kwargs):
@@ -98,39 +103,38 @@ def compare_label(*args, **kwargs):
 			row = machine_row['ACTUAL_INDEX'] - 1
 			cm[row][column] += 1
 
-		# Continue if unlabeled
-		if machine_row[cnn_column] == "":
-			unpredicted.append([machine_row[doc_key], machine_row[human_column]])
-			continue
+		# If fast mode True then do not record
+		if not fast_mode:
+			# Continue if unlabeled
+			if machine_row[cnn_column] == "":
+				unpredicted.append([machine_row[doc_key], machine_row[human_column]])
+				continue
 
-		# Identify unlabeled points
-		if not machine_row[human_column]:
-			needs_hand_labeling.append(machine_row[doc_key])
-			continue
+			# Identify unlabeled points
+			if not machine_row[human_column]:
+				needs_hand_labeling.append(machine_row[doc_key])
+				continue
 
-		# Predicted label matches human label
-		if machine_row[cnn_column] == machine_row[human_column]:
-			correct.append([machine_row[doc_key], machine_row[human_column]])
-			continue
+			# Predicted label matches human label
+			if machine_row[cnn_column] == machine_row[human_column]:
+				correct.append([machine_row[doc_key], machine_row[human_column]])
+				continue
 
-		mislabeled.append([machine_row[doc_key], machine_row[human_column],
-			machine_row[cnn_column]])
+			mislabeled.append([machine_row[doc_key], machine_row[human_column],
+				machine_row[cnn_column]])
 	return mislabeled, correct, unpredicted, needs_hand_labeling, cm
-
-def load_and_reverse_label_map(filename):
-	"""Load label map into a dict and switch keys and values"""
-	input_file = open(filename, encoding='utf-8')
-	label_map = json.load(input_file)
-	reversed_map = dict((value, int(key)) for key, value in label_map.items())
-	input_file.close()
-	return reversed_map, label_map
 
 def fill_description(df):
 	"""Replace Description_Unmasked"""
 	if df[doc_key] == "":
 		return df[sec_doc_key]
-	else:
-		return df[doc_key]
+	return df[doc_key]
+
+def change_label_name(df):
+	"""replace label '' with 'Null Class' """
+	if df[human_label_key] == "":
+		return "Null Class"
+	return df[human_label_key]
 
 def get_write_func(filename, header):
 	file_exists = False
@@ -150,26 +154,26 @@ doc_key = args.doc_key
 sec_doc_key = args.secondary_doc_key
 machine_label_key = args.predicted_key
 human_label_key = args.label_key
+fast_mode = args.fast_mode
 reader = pd.read_csv(args.testdata, chunksize=1000, na_filter=False,
 	quoting=csv.QUOTE_NONE, encoding='utf-8', sep='|', error_bad_lines=False)
-reversed_label_map, label_map = load_and_reverse_label_map(args.label_map)
-num_labels = len(reversed_label_map)
-######################Ad Hoc fix for duplicate entries in merchant label map#######
+label_map = load_params(args.label_map)
+num_labels = len(label_map)
+class_names = list(label_map.values())
+
+# Create reversed label map and check it there are duplicate keys
+reversed_label_map = {}
+for key, value in label_map.items():
+	if class_names.count(value) > 1:
+		reversed_label_map[value] =\
+			 sorted(reversed_label_map.get(value, []) + [int(key)])
+	else:
+		reversed_label_map[value] = int(key)
+
 if args.is_merchant:
 	label_map["1"] = "Null Class"
 	reversed_label_map["Null Class"] = reversed_label_map.pop("")
-	reversed_label_map["Dick's Sporting Goods"] = 94
-	reversed_label_map["Kroger"] = 31
-	reversed_label_map["Carl's Jr."] = 304
-	reversed_label_map["Eurest Dining"] = 274
-	reversed_label_map["Marriott Hotels"] = 52
-	num_labels += 5
-	reversed_label_map['Duplicate, see index 93'] = 147
-	reversed_label_map['Duplicate, see index 30'] = 101
-	reversed_label_map['Duplicate, see index 303'] = 321
-	reversed_label_map['Duplicate, see index 273'] = 291
-	reversed_label_map['Duplicate, see index 51'] = 195
-###################################################################################
+
 confusion_matrix = [[0 for i in range(num_labels + 1)] for j in range(num_labels)]
 classifier = get_cnn_by_path(args.model, label_map)
 
@@ -188,6 +192,8 @@ write_needs_hand_labeling = get_write_func(path + "need_labeling.csv",
 for chunk in reader:
 	if sec_doc_key != '':
 		chunk[doc_key] = chunk.apply(fill_description, axis=1)
+	if args.is_merchant:
+		chunk[human_label_key] = chunk.apply(change_label_name, axis=1)
 	transactions = chunk.to_dict('records')
 	machine_labeled = classifier(transactions, doc_key=doc_key,
 		label_key=machine_label_key)
@@ -197,11 +203,19 @@ for chunk in reader:
 		if item[human_label_key] == "":
 			item['ACTUAL_INDEX'] = None
 			continue
-		item['ACTUAL_INDEX'] = reversed_label_map[item[human_label_key]]
+		temp = reversed_label_map[item[human_label_key]]
+		if isinstance(temp, list):
+			item['ACTUAL_INDEX'] = temp[0]
+		else:
+			item['ACTUAL_INDEX'] = temp
 		if item[machine_label_key] == "":
 			item['PREDICTED_INDEX'] = None
 			continue
-		item['PREDICTED_INDEX'] = reversed_label_map[item[machine_label_key]]
+		temp = reversed_label_map[item[machine_label_key]]
+		if isinstance(temp, list):
+			item['PREDICTED_INDEX'] = temp[0]
+		else:
+			item['PREDICTED_INDEX'] = temp
 
 	mislabeled, correct, unpredicted, needs_hand_labeling, confusion_matrix =\
 		compare_label(machine_labeled, machine_label_key, human_label_key,
@@ -213,12 +227,12 @@ for chunk in reader:
 	write_unpredicted(unpredicted)
 	write_needs_hand_labeling(needs_hand_labeling)
 
-# calculate recall, precision, false +/-, true +/- from confusion maxtrix
+# Calculate recall, precision, false +/-, true +/- from confusion maxtrix
 true_positive = pd.DataFrame([confusion_matrix[i][i] for i in range(num_labels)])
 cm = pd.DataFrame(confusion_matrix)
 actual = pd.DataFrame(cm.sum(axis=1))
 recall = true_positive / actual
-#if we use pandas 0.17 we can do the rounding neater
+# If we use pandas 0.17 we can do the rounding neater
 recall = np.round(recall, decimals=4)
 column_sum = pd.DataFrame(cm.sum()).ix[:,:num_labels]
 unpredicted = pd.DataFrame(cm.ix[:,num_labels])
@@ -236,7 +250,8 @@ stat.columns = ['Class', 'Actual', 'True_Positive', 'False_Positive', 'Recall',
 	'Precision', 'False_Negative', 'Unpredicted']
 
 cm = pd.concat([label, cm], axis=1)
-cm.columns = ['Class'] + [str(x) for x in range(num_labels)] + ['Unpredicted']
+cm.columns = ['Class'] + [str(x) for x in range(1, num_labels + 1)] + ['Unpredicted']
+cm.index = range(1, num_labels + 1)
 
 stat.to_csv('data/CNN_stats/CNN_stat.csv', index=False)
 cm.to_csv('data/CNN_stats/Con_Matrix.csv')
