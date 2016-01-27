@@ -11,6 +11,7 @@
 				"txn_sub_type" : { "type" : "string" },
 				"txn_type" : { "type" : "string" },
 				"website" : { "type" : "string" },
+				"phone_number" : {"type" : "string"},
 				"category_labels" : {
 					"type" : "array",
 					"items" : {
@@ -18,7 +19,7 @@
 					}
 				}
 			},
-			"required": [ "transaction_id", "is_physical_merchant", "match_found", "website" ]
+			"required": [ "transaction_id", "is_physical_merchant", "match_found", "website", "phone_number"]
 		},
 		"physical_merchant_response" : {
 			"type" : "object",
@@ -35,6 +36,7 @@
 					}
 				},
 				"website" : { "type" : "string" },
+				"phone_number" : {"type" : "string"},
 				"source" : { "enum": [ "FACTUAL", "OTHER" ] },
 				"source_merchant_id" : { "type" : "string" },
 				"street" : { "type" : "string" },
@@ -45,7 +47,7 @@
 				"txn_sub_type" : { "type" : "string" },
 				"txn_type" : { "type" : "string" }
 			},
-			"required": [ "transaction_id", "is_physical_merchant", "match_found", "merchant_name", "source_merchant_id", "country", "category_labels", "website" ]
+			"required": [ "transaction_id", "is_physical_merchant", "match_found", "merchant_name", "source_merchant_id", "country", "category_labels", "website", "phone_number" ]
 		},
 		"non_physical_merchant_response" : {
 			"type" : "object",
@@ -56,6 +58,7 @@
 				"txn_sub_type" : { "type" : "string" },
 				"txn_type" : { "type" : "string" },
 				"website" : { "type" : "string" },
+				"phone_number" : {"type" : "string"},
 				"category_labels" : {
 					"type" : "array",
 					"items" : {
@@ -63,7 +66,7 @@
 					}
 				}
 			},
-			"required": [ "transaction_id", "is_physical_merchant", "merchant_name", "category_labels", "website" ],
+			"required": [ "transaction_id", "is_physical_merchant", "merchant_name", "category_labels", "website", "phone_number" ],
 			"additionalProperties" : false
 		},
 		"non_merchant_category_response" : {
@@ -74,6 +77,7 @@
 				"txn_sub_type" : { "type" : "string" },
 				"txn_type" : { "type" : "string" },
 				"website" : { "type" : "string" },
+				"phone_number" : {"type" : "string"},
 				"category_labels" : {
 					"type" : "array",
 					"items" : {
@@ -81,7 +85,7 @@
 					}
 				}
 			},
-			"required": [ "transaction_id", "is_physical_merchant", "txn_type", "txn_sub_type", "category_labels", "website"],
+			"required": [ "transaction_id", "is_physical_merchant", "txn_type", "txn_sub_type", "category_labels", "website", "phone_number"],
 			"additionalProperties" : false
 		}
 	},
