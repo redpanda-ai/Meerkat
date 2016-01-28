@@ -243,8 +243,17 @@ class WebConsumer():
 
 		# Add Source
 		index = params["elasticsearch"]["index"]
-		transaction["source"] = "FACTUAL" if (("factual" in index) and 
-		    (transaction["match_found"] == True)) else "OTHER"
+		transaction["source"] = "FACTUAL" if (("factual" in index) and
+			(transaction["match_found"] == True)) else "OTHER"
+
+		# Get website from Elastic Search
+		# transaction[attr_map["website"]]
+		if transaction.get("website") is not None:
+			transaction["website"] = transaction.get("website")
+			if transaction["website"] == "":
+				transaction["website"] = "Blank value in search engine"
+		else:
+			transaction["website"] = "No value in search engine."
 
 		return transaction
 
