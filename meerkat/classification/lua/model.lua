@@ -18,6 +18,7 @@ function Model:__init(config)
          self.sequential = Model:makeTransferSequential(config)
       else
          self.sequential = Model:createSequential(config)
+      end
    end
    self.p = config.p or 0.5
    self.tensortype = torch.getdefaulttensortype()

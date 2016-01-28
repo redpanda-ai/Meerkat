@@ -80,7 +80,7 @@ function main.argparse()
    end
 
    -- Transfer knowledge from pretrained network
-    if string.match(opt.transfer, ".t7b") then
+    if opt.resume == 0 and string.match(opt.transfer, ".t7b") then
       config.model.transfer = opt.transfer
       -- Don't do randomize
       if config.main.randomize then
