@@ -12,13 +12,12 @@ local Model = torch.class("Model")
 function Model:__init(config)
    -- Create a sequential for self
    if config.file then
+      self.sequential = Model:makeCleanSequential(torch.load(config.file))
+   else
       if config.transfer then
          self.sequential = Model:makeTransferSequential(config)
       else
-         self.sequential = Model:makeCleanSequential(torch.load(config.file))
-      end
-   else
-      self.sequential = Model:createSequential(config)
+         self.sequential = Model:createSequential(config)
    end
    self.p = config.p or 0.5
    self.tensortype = torch.getdefaulttensortype()
@@ -126,7 +125,7 @@ end
 
 -- Make a clean sequential model with a new output layer
 function Model:makeTransferSequential(config)
-   local model = torch.load(config.file)
+   local model = torch.load(config.transfer)
    local new = nn.Sequential()
    for i = 1,#model.modules do
       if i == #model.modules - 1 then
