@@ -47,7 +47,7 @@ function main.argparse()
 
    -- Options
    cmd:option("-resume",0,"Resumption point in epoch. 0 means not resumption.")
-   cmd:option("-transfer", 0, "Whether or not to transfer parameters from previous model")
+   cmd:option("-transfer", "", "A previously trained model to transfer knowledge from")
    cmd:text()
    
    -- Parse the option
@@ -78,8 +78,10 @@ function main.argparse()
         print("Disabled randomization for resumption")
       end
       -- Add transfer flag
-      if opt.transfer ~= 0 then
-         config.model.transfer = true
+      if string.match(opt.transfer, ".t7b") then
+        config.model.transfer = opt.transfer
+      else
+        error(opt.transfer.." not a valid model to transfer knowledge from")
       end
    end
 
