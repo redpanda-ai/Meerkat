@@ -77,19 +77,19 @@ function main.argparse()
         config.main.randomize = nil
         print("Disabled randomization for resumption")
       end
-   end
-
-   -- Transfer knowledge from pretrained network
-    if opt.resume == 0 and string.match(opt.transfer, ".t7b") then
-      config.model.transfer = opt.transfer
-      -- Don't do randomize
-      if config.main.randomize then
-        config.main.randomize = nil
-        print("Disabled randomization for transfer")
+   else
+      -- Transfer knowledge from pretrained network
+      if string.match(opt.transfer, ".t7b") then
+        config.model.transfer = opt.transfer
+        -- Don't do randomize
+        if config.main.randomize then
+          config.main.randomize = nil
+          print("Disabled randomization for transfer")
+        end
+      else
+        error(opt.transfer.." not a valid model to transfer knowledge from")
       end
-    else
-      error(opt.transfer.." not a valid model to transfer knowledge from")
-    end
+   end
 
    return opt
 end
