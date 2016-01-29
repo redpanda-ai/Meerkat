@@ -246,6 +246,9 @@ class WebConsumer():
 		transaction["source"] = "FACTUAL" if (("factual" in index) and
 			(transaction["match_found"] == True)) else "OTHER"
 
+		"""Add the following fields to the web service output schema.
+		website, phone_number, fax_number, chain_name, neighborhood, transaction_origin, confidence_score."""
+
 		# Get website from Elastic Search
 		# transaction[attr_map["website"]]
 		if transaction.get("website") is not None:
@@ -277,6 +280,13 @@ class WebConsumer():
 			transaction["neighborhood"] = neighbor if len(neighbor) > 0 else "Blank value in ES."
 		else:
 			transaction["neighborhood"] = "It is a None value."
+
+		# Get the original place of the transaction.
+		origin = transaction.get("post_town")
+		if origin is not None:
+			transaction["post_town"] = origin if len(origin) > 0 else "Blank value in ES."
+		else:
+			transaction["post_town"] = "It is a None value."
 
 		return transaction
 

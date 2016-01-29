@@ -21,7 +21,8 @@
 			"phone_number" : "",
 			"fax_number" : "",
 			"chain_name" : "",
-			"neighborhood" : ""
+			"neighborhood" : "",
+			"transaction_origin" : ""
 		},
 		{
 			"transaction_id" : 2,
@@ -33,7 +34,8 @@
 			"phone_number" : "",
 			"fax_number" : "",
 			"chain_name" : "",
-			"neighborhood" : ""
+			"neighborhood" : "",
+			"transaction_origin" : ""
 		},
 		{
 			"transaction_id" : 3,
@@ -44,6 +46,7 @@
 			"fax_number" : "",
 			"chain_name" : "",
 			"neighborhood" : "",
+			"transaction_origin" : "",
 			"category_labels" : ["General Merchandise"]
 		},
 		{
@@ -54,6 +57,7 @@
 			"fax_number" : "",
 			"chain_name" : "",
 			"neighborhood" : "",
+			"transaction_origin" : "",
 			"match_found" : false
 		},
 		{
@@ -64,6 +68,7 @@
 			"fax_number" : "",
 			"chain_name" : "",
 			"neighborhood" : "",
+			"transaction_origin" : "",
 			"match_found" : false
 		}
 	]
