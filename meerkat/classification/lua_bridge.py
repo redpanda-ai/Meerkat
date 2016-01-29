@@ -9,17 +9,9 @@ Created on May 14, 2015
 import ctypes
 import json
 import logging
+from meerkat.various_tools import load_params
 
 LOGSOFTMAX_THRESHOLD = -1
-
-def load_label_map(filename):
-	"""Load a permanent label map"""
-
-	input_file = open(filename, encoding='utf-8')
-	label_map = json.loads(input_file.read())
-	input_file.close()
-
-	return label_map
 
 def get_cnn(model_name):
 	"""Load a CNN model by name"""
@@ -76,7 +68,7 @@ def get_cnn_by_path(model_path, dict_path):
 		dofile("meerkat/classification/lua/config.lua")
 	''')
 
-	reverse_label_map = load_label_map(dict_path)
+	reverse_label_map = load_params(dict_path)
 	lua_load_model = 'model = Model:makeCleanSequential(torch.load("' + model_path + '"))'
 	lua.execute(lua_load_model)
 
