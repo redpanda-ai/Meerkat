@@ -130,7 +130,10 @@ function Model:makeTransferSequential(config)
    local new = nn.Sequential()
    for i = 1,#model.modules do
       if i == #model.modules - 1 then
-         new:add(Model:createModule(config[#model.modules - 1]))
+         local m = Model:createModule(config[#model.modules - 1])
+         local w,dw = m:getParameters()
+         w:normal():mul(5e-2)
+         new:add(m)
       else
          local m = Model:makeCleanModule(model.modules[i])
          if m then
