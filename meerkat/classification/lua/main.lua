@@ -78,11 +78,9 @@ function main.argparse()
         print("Disabled randomization for resumption")
       end
    else
-      -- Transfer knowledge from pretrained network
-      if opt.transfer ~= ""
+      if opt.transfer ~= "" then
         if string.match(opt.transfer, ".t7b") then
           config.model.transfer = opt.transfer
-          -- Don't do randomize
           if config.main.randomize then
             config.main.randomize = nil
             print("Disabled randomization for transfer")
@@ -129,7 +127,7 @@ function main.new()
       print("Loading main record...")
       local resume = torch.load(config.main.resume)
       main.record = resume.record
-      if resume.momentum then main.train.old_grads:copy(resume.momentum) end
+      if resume.momentum then main.train.old_grads:copy(resume.momentum[{{1, main.train.old_grads:size()[1]}}]) end
    end
    collectgarbage()
 end
