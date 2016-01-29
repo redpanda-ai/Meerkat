@@ -255,6 +255,29 @@ class WebConsumer():
 		else:
 			transaction["website"] = "No value in search engine."
 
+		# Get phone_number from Elastic Search
+		if transaction.get("tel"):
+			transaction["tel"] = transaction.get("tel")
+			if transaction["tel"] == "":
+				transaction["tel"] = "There is no phone_number returned by search engine."
+		else:
+			transaction["tel"] = "123-456-7890"
+
+		# Get fax number from search engine.
+		fax = transaction.get("fax")
+		transaction["fax"] = fax if fax is not None else "000-000-0000"
+
+		# Get chain_name from search engine.
+		chain = transaction.get("chain_name")
+		transaction["chain_name"] = chain if chain is not None else "No chain_name retured from search engine."
+
+		# Get neighborhood from search engine.
+		neighbor = transaction.get("neighborhood")
+		if neighbor is not None:
+			transaction["neighborhood"] = neighbor if len(neighbor) > 0 else "Blank value in ES."
+		else:
+			transaction["neighborhood"] = "It is a None value."
+
 		return transaction
 
 	@staticmethod
