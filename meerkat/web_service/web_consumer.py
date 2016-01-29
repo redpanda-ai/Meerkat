@@ -178,7 +178,7 @@ class WebConsumer():
 		
 		# Enrich Data if Passes Boundary
 		args = [decision, transaction, hit_fields,\
-			 names["business_names"], names["city_names"], names["state_names"]]
+			 names["business_names"], names["city_names"], names["state_names"], z_score_delta]
 		return self.__enrich_transaction(*args)
 
 	def __no_result(self, transaction):
@@ -205,6 +205,7 @@ class WebConsumer():
 		business_names = argv[3]
 		city_names = argv[4]
 		state_names = argv[5]
+		confidence_score = argv[6]
 
 		params = self.params
 		field_names = params["output"]["results"]["fields"]
@@ -246,47 +247,11 @@ class WebConsumer():
 		transaction["source"] = "FACTUAL" if (("factual" in index) and
 			(transaction["match_found"] == True)) else "OTHER"
 
-		"""Add the following fields to the web service output schema.
-		website, phone_number, fax_number, chain_name, neighborhood, transaction_origin, confidence_score."""
+		# Add "transaction_origin" to the output schema.
+		transaction["transaction_origin"] = decision
 
-		# Get website from Elastic Search
-		# transaction[attr_map["website"]]
-		if transaction.get("website") is not None:
-			transaction["website"] = transaction.get("website")
-			if transaction["website"] == "":
-				transaction["website"] = "Blank value in search engine"
-		else:
-			transaction["website"] = "No value in search engine."
-
-		# Get phone_number from Elastic Search
-		if transaction.get("tel"):
-			transaction["tel"] = transaction.get("tel")
-			if transaction["tel"] == "":
-				transaction["tel"] = "There is no phone_number returned by search engine."
-		else:
-			transaction["tel"] = "123-456-7890"
-
-		# Get fax number from search engine.
-		fax = transaction.get("fax")
-		transaction["fax"] = fax if fax is not None else "000-000-0000"
-
-		# Get chain_name from search engine.
-		chain = transaction.get("chain_name")
-		transaction["chain_name"] = chain if chain is not None else "No chain_name retured from search engine."
-
-		# Get neighborhood from search engine.
-		neighbor = transaction.get("neighborhood")
-		if neighbor is not None:
-			transaction["neighborhood"] = neighbor if len(neighbor) > 0 else "Blank value in ES."
-		else:
-			transaction["neighborhood"] = "It is a None value."
-
-		# Get the original place of the transaction.
-		origin = transaction.get("post_town")
-		if origin is not None:
-			transaction["post_town"] = origin if len(origin) > 0 else "Blank value in ES."
-		else:
-			transaction["post_town"] = "It is a None value."
+		# Add "confidence_score" to the output schema.
+		transaction["confidence_score"] = confidence_score
 
 		return transaction
 
