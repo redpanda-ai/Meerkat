@@ -247,8 +247,6 @@ class WebConsumer():
 		transaction["source"] = "FACTUAL" if (("factual" in index) and
 			(transaction["match_found"] == True)) else "OTHER"
 
-		# Add "transaction_origin" to the output schema.
-		transaction["transaction_origin"] = decision
 		# Add "confidence_score" to the output schema.
 		transaction["confidence_score"] = confidence_score
 
@@ -504,6 +502,15 @@ class WebConsumer():
 		run in parallel with GPU bound classifiers."""
 		self.__apply_locale_bloom(data)
 		physical, non_physical = self.__sws(data)
+
+		# Add transaction_origin (Physical or Non-Physical) to each transaction.
+		for trans in physical:
+			trans["transaction_origin"] = "Physical"
+
+		for trans in non_physical:
+			trans["transaction_origin"] = "Non-Physical"
+
+
 		if "should_search" not in self.params or self.params["should_search"]:
 			physical = self.__enrich_physical(physical)
 			self.__apply_category_labels(physical)
