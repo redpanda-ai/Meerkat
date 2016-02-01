@@ -249,7 +249,6 @@ class WebConsumer():
 
 		# Add "transaction_origin" to the output schema.
 		transaction["transaction_origin"] = decision
-
 		# Add "confidence_score" to the output schema.
 		transaction["confidence_score"] = confidence_score
 
