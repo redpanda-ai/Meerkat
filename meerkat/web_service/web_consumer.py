@@ -178,7 +178,7 @@ class WebConsumer():
 		
 		# Enrich Data if Passes Boundary
 		args = [decision, transaction, hit_fields,\
-			 names["business_names"], names["city_names"], names["state_names"]]
+			 names["business_names"], names["city_names"], names["state_names"], z_score_delta]
 		return self.__enrich_transaction(*args)
 
 	def __no_result(self, transaction):
@@ -205,6 +205,7 @@ class WebConsumer():
 		business_names = argv[3]
 		city_names = argv[4]
 		state_names = argv[5]
+		confidence_score = argv[6]
 
 		params = self.params
 		field_names = params["output"]["results"]["fields"]
@@ -243,8 +244,14 @@ class WebConsumer():
 
 		# Add Source
 		index = params["elasticsearch"]["index"]
-		transaction["source"] = "FACTUAL" if (("factual" in index) and 
-		    (transaction["match_found"] == True)) else "OTHER"
+		transaction["source"] = "FACTUAL" if (("factual" in index) and
+			(transaction["match_found"] == True)) else "OTHER"
+
+		# Add "transaction_origin" to the output schema.
+		transaction["transaction_origin"] = decision
+
+		# Add "confidence_score" to the output schema.
+		transaction["confidence_score"] = confidence_score
 
 		return transaction
 
