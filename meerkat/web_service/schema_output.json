@@ -22,7 +22,7 @@
 					}
 				}
 			},
-			"required": [ "transaction_id", "is_physical_merchant", "match_found", "website", "phone_number", "fax_number", "chain_name", "neighborhood"]
+			"required": [ "transaction_id", "is_physical_merchant", "match_found"]
 		},
 		"physical_merchant_response" : {
 			"type" : "object",
@@ -53,7 +53,7 @@
 				"txn_sub_type" : { "type" : "string" },
 				"txn_type" : { "type" : "string" }
 			},
-			"required": [ "transaction_id", "is_physical_merchant", "match_found", "merchant_name", "source_merchant_id", "country", "category_labels", "website", "phone_number", "fax_number", "chain_name", "neighborhood"]
+			"required": [ "transaction_id", "is_physical_merchant", "match_found", "merchant_name", "source_merchant_id", "country", "category_labels"]
 		},
 		"non_physical_merchant_response" : {
 			"type" : "object",
@@ -75,7 +75,7 @@
 					}
 				}
 			},
-			"required": [ "transaction_id", "is_physical_merchant", "merchant_name", "category_labels", "website", "phone_number", "fax_number", "chain_name", "neighborhood"],
+			"required": [ "transaction_id", "is_physical_merchant", "merchant_name", "category_labels"],
 			"additionalProperties" : false
 		},
 		"non_merchant_category_response" : {
@@ -97,7 +97,7 @@
 					}
 				}
 			},
-			"required": [ "transaction_id", "is_physical_merchant", "txn_type", "txn_sub_type", "category_labels", "website", "phone_number", "fax_number", "chain_name", "neighborhood"],
+			"required": [ "transaction_id", "is_physical_merchant", "txn_type", "txn_sub_type", "category_labels"],
 			"additionalProperties" : false
 		}
 	},
