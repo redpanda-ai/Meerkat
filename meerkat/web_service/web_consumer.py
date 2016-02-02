@@ -503,15 +503,6 @@ class WebConsumer():
 		self.__apply_locale_bloom(data)
 		physical, non_physical = self.__sws(data)
 
-		# Add transaction_origin (Physical or Non-Physical) to each transaction.
-		'''
-		for trans in physical:
-			trans["transaction_origin"] = "Physical"
-
-		for trans in non_physical:
-			trans["transaction_origin"] = "Non-Physical"
-		'''
-
 		if "should_search" not in self.params or self.params["should_search"]:
 			physical = self.__enrich_physical(physical)
 			self.__apply_category_labels(physical)
