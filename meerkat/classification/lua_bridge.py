@@ -19,20 +19,20 @@ def get_cnn(model_name):
 	# Load CNN and Label map
 	if model_name == "bank_merchant":
 		return get_cnn_by_path(
-			"meerkat/classification/models/624_class_bank_CNN.t7b",
-			"meerkat/classification/label_maps/new_rlm_bank.json")
+			"meerkat/classification/models/bank_merchant_CNN.t7b",
+			"meerkat/classification/label_maps/bank_merchant_label_map.json")
 	elif model_name == "card_merchant":
 		return get_cnn_by_path(
-			"meerkat/classification/models/751_class_card_CNN.t7b",
-			"meerkat/classification/label_maps/new_rlm_card.json")
+			"meerkat/classification/models/card_merchant_CNN.t7b",
+			"meerkat/classification/label_maps/card_merchant_label_map.json")
 	elif model_name == "bank_debit_subtype":
 		return get_cnn_by_path(
-			"meerkat/classification/models/bank_debit_subtype_CNN_01192016.t7b",
-			"meerkat/classification/label_maps/bank_debit_subtype_label_map_01192016.json")
+			"meerkat/classification/models/bank_debit_subtype_CNN.t7b",
+			"meerkat/classification/label_maps/bank_debit_subtype_label_map.json")
 	elif model_name == "bank_credit_subtype":
 		return get_cnn_by_path(
-			"meerkat/classification/models/bank_credit_subtype_CNN_01192016.t7b",
-			"meerkat/classification/label_maps/bank_credit_subtype_label_map_01192016.json")
+			"meerkat/classification/models/bank_credit_subtype_CNN.t7b",
+			"meerkat/classification/label_maps/bank_credit_subtype_label_map.json")
 	elif model_name == "card_debit_subtype":
 		return get_cnn_by_path(
 			"meerkat/classification/models/card_debit_subtype_CNN.t7b",
