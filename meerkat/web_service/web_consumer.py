@@ -248,7 +248,7 @@ class WebConsumer():
 			(transaction["match_found"] == True)) else "OTHER"
 
 		# Add "confidence_score" to the output schema.
-		transaction["confidence_score"] = 0.5
+		transaction["confidence_score"] = ""
 
 		return transaction
 
