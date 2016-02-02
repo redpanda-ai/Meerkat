@@ -76,47 +76,67 @@ def get_label_map(*args, **kwargs):
 	df['LABEL'] = df.apply(a, axis=1)
 	return label_map
 
-def get_testing_and_training_dataframes(*args, **kwargs):
-	"""Stuff"""
-	df = kwargs["df"]
-	label_df = df[['LABEL', 'DESCRIPTION_UNMASKED']]
-	msk = np.random.rand(len(label_df)) < 0.90
-	df_train_labels, df_test_labels = label_df[msk], label_df[~msk]
-	df_train, df_test = df[msk], df[~msk]
-	return df_train_labels, df_test_labels, df_train, df_test
+def get_test_and_train_dataframes(*args, **kwargs):
+	"""Produce (rich and poor) X (test and train) dataframes"""
+	df_rich = kwargs["df"]
+	df_poor = df_rich[['LABEL', 'DESCRIPTION_UNMASKED']]
+	msk = np.random.rand(len(df_poor)) < 0.90
+	return {
+		"df_poor_train" : df_poor[msk],
+		"df_poor_test" : df_poor[~msk],
+		"df_rich_train" : df_rich[msk],
+		"df_test" : df_rich[~msk]
+	}
+
+def get_json_and_csv_files(*args, **kwargs):
+	"""This function generates CSV and JSON files"""
+	prefix = output_path + bank_or_card + "." + debit_or_credit + "."
+	#set file names
+	files = {
+		"map_file" : prefix + "map.json",
+		"test_rich" : prefix + "test.rich.csv",
+		"train_rich" : prefix + "train.rich.csv",
+		"test_poor" : prefix + "test.poor.csv",
+		"train_poor" : prefix + "train.poor.csv"
+	}
+	#Write the JSON file
+	dict_2_json(kwargs["label_map"], files["map_file"])
+	#Write the rich CSVs
+	rich_kwargs = { "index" : False, "sep" : "|" }
+	kwargs["df_test"].to_csv(files["test_rich"], **rich_kwargs)
+	kwargs["df_rich_train"].to_csv(files["train_rich"], **rich_kwargs)
+	#Write the poor CSVs
+	poor_kwargs = { "cols" : ["LABEL", "DESCRIPTION_UNMASKED"], "header": False,
+		"index" : False, "index_label": False }
+	kwargs["df_poor_test"].to_csv(files["test_poor"], **poor_kwargs)
+	kwargs["df_poor_train"].to_csv(files["train_poor"], **poor_kwargs)
+	#Return file names
+	return files
 
 def process_stage_1(*args, **kwargs):
-	debit_or_credit = kwargs["debit_or_credit"]
-	bank_or_card = kwargs["bank_or_card"]
+	"""Coordinates activity for the job stream"""
 	# Create an output directory if it does not exist
-	output_path = kwargs["output_path"]
-	os.makedirs(output_path, exist_ok=True)
+	os.makedirs(kwargs["output_path"], exist_ok=True)
 	# Load Data
-	print(kwargs)
 	if len(kwargs["local_files"]) == 1:
 		input_file = kwargs["local_files"].pop()
+		del kwargs["local_files"]
 	else:
 		print("Cannot proceed, no files found in S3")
 		sys.exit(0)
-	print(input_file)
-	df, class_names = load(input_file=input_file, debit_or_credit=debit_or_credit)
-	# Generate mappings
+	df, class_names = load(input_file=input_file, debit_or_credit=kwargs["debit_or_credit"])
+	# Generate a mapping (class_name: label_number)
 	label_map = get_label_map(df=df, class_names=class_names)
-	# Replace DESCRIPTION_UNMASKED FOR ALL rows
+	# Reverse the mapping (label_number: class_name)
+	kwargs["label_map"] = dict(zip(label_map.values(), label_map.keys()))
+	# Clean the "DESCRIPTION_UNMASKED" values within the dataframe
 	fill_description = lambda x: x["DESCRIPTION"] if x["DESCRIPTION_UNMASKED"] == "" else x["DESCRIPTION_UNMASKED"]
 	df["DESCRIPTION_UNMASKED"] = df.apply(fill_description, axis=1)
+	kwargs["df"] = df
 	# Make Test and Train data frames
-	df_train_labels, df_test_labels, df_train, df_test = get_testing_and_training_dataframes(df=df)
-	# Save
-	label_map = dict(zip(label_map.values(), label_map.keys()))
-	prefix = output_path + bank_or_card + "_" + debit_or_credit
-	dict_2_json(label_map, prefix + "_subtype_label_map.json")
-	df_test.to_csv(prefix + ".subtype.test.full.csv", index=False, sep='|')
-	df_test_labels.to_csv(prefix + ".subytpe.test.labels.csv", cols=["LABEL", "DESCRIPTION_UNMASKED"],
-		header=False, index=False, index_label=False)
-	df_train.to_csv(prefix + ".subtype.train.full.csv", index=False, sep='|')
-	df_train_labels.to_csv(prefix + ".subtype.train.labels.csv", cols=["LABEL", "DESCRIPTION_UNMASKED"],
-		header=False, index=False, index_label=False)
+	kwargs.update(get_test_and_train_dataframes(**kwargs))
+	# Generate the output files (CSV and JSON) and return the file handles
+	kwargs.update(get_json_and_csv_files(**kwargs))
 
 """ Main program"""
 if __name__ == "__main__":
