@@ -248,7 +248,7 @@ class WebConsumer():
 			(transaction["match_found"] == True)) else "OTHER"
 
 		# Add "confidence_score" to the output schema.
-		transaction["confidence_score"] = confidence_score
+		transaction["confidence_score"] = 0.5
 
 		return transaction
 
@@ -504,12 +504,13 @@ class WebConsumer():
 		physical, non_physical = self.__sws(data)
 
 		# Add transaction_origin (Physical or Non-Physical) to each transaction.
+		'''
 		for trans in physical:
 			trans["transaction_origin"] = "Physical"
 
 		for trans in non_physical:
 			trans["transaction_origin"] = "Non-Physical"
-
+		'''
 
 		if "should_search" not in self.params or self.params["should_search"]:
 			physical = self.__enrich_physical(physical)
