@@ -43,7 +43,8 @@ from boto.s3.connection import Location
 import pandas as pd
 
 from meerkat.various_tools import load_dict_list, safely_remove_file, load_params
-from meerkat.classification.lua_bridge import get_cnn, load_label_map
+from meerkat.classification.lua_bridge import get_cnn
+from meerkat.various_tools import load_params
 
 default_doc_key = "DESCRIPTION_UNMASKED"
 default_label_key = "GOOD_DESCRIPTION"
@@ -284,7 +285,7 @@ def all_CNN_accuracy():
 def process_file_collection(bucket, prefix, classifier, classifier_id_map):
 	"""Test a list of files"""
 
-	label_map = load_label_map("meerkat/classification/label_maps/deep_clean_map.json")
+	label_map = load_params("meerkat/classification/label_maps/deep_clean_map.json")
 	params = {}
 	params["label_key"] = "MERCHANT_NAME"
 	results = open("data/output/per_merchant_tests_" + prefix.split('/')[-2] + ".csv", "a")
