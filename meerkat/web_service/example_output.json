@@ -22,7 +22,11 @@
 			"fax_number" : "",
 			"chain_name" : "",
 			"neighbourhood" : "",
-			"confidence_score" : 0.0
+			"confidence_score" : "",
+			"latitude" : "",
+			"longitude" : "",
+			"txn_type" : "",
+			"txn_sub_type" : ""
 		},
 		{
 			"transaction_id" : 2,

@@ -237,6 +237,10 @@ class WebConsumer():
 				transaction[attr_map.get(field, field)] = ""
 			transaction = self.__business_name_fallback(business_names, transaction, attr_map)
 			transaction = self.__geo_fallback(city_names, state_names, transaction, attr_map)
+			#Ensure that we have a latitude and longitude fields
+			#transaction["latitude"] = ""
+			#transaction["longitude"] = ""
+			transaction["country"] = "US"
 
 		# Ensure Proper Casing
 		if transaction[attr_map['name']] == transaction[attr_map['name']].upper():
@@ -248,7 +252,7 @@ class WebConsumer():
 			(transaction["match_found"] == True)) else "OTHER"
 
 		# Add "confidence_score" to the output schema.
-		transaction["confidence_score"] = None
+		transaction["confidence_score"] = ""
 
 		return transaction
 
