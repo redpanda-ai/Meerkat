@@ -1,10 +1,12 @@
 """ Just a test bed for new ideas."""
 
-import os
-import sys
-import json
+import argparse
 import csv
+import json
+import logging
+import os
 import string
+import sys
 
 import numpy as np
 import pandas as pd
@@ -14,6 +16,7 @@ from boto import connect_s3
 
 def dict_2_json(obj, filename):
 	"""Saves a dict as a json file"""
+	logging.info("Generating JSON.")
 	with open(filename, 'w') as fp:
 		json.dump(obj, fp, indent=4)
 
@@ -30,11 +33,14 @@ def cap_first_letter(label):
 def pull_from_s3(*args, **kwargs):
 	"""Pulls the contents of an S3 directory into a local file, returning
 	the first file"""
+	bucket_name, prefix = kwargs["bucket"], kwargs["prefix"]
+	logging.info("Scanning S3 at {0}".format(bucket_name + "/" + prefix))
 	conn = connect_s3()
-	bucket = conn.get_bucket(kwargs["bucket"], Location.USWest2)
-	listing = bucket.list(prefix=kwargs["prefix"])
+	bucket = conn.get_bucket(bucket_name, Location.USWest2)
+	listing = bucket.list(prefix=prefix)
 
 	my_filter = kwargs["my_filter"]
+	logging.info("Filtering S3 objects by '{0}' extension".format(my_filter))
 	s3_object_list = [
 		s3_object
 		for s3_object in listing
@@ -42,16 +48,19 @@ def pull_from_s3(*args, **kwargs):
 	]
 	get_filename = lambda x: kwargs["input_path"] + x.key[x.key.rfind("/")+1:]
 	local_files = []
+	# Collect all files at the S3 location with the correct extension and write
+	# Them to a local file
+	
 	for s3_object in s3_object_list:
 		local_file = get_filename(s3_object)
-		print("Local Filename: {0}, S3Key: {1}".format(local_file, s3_object))
+		logging.info("Found the following file: {0}".format(local_file))
 		s3_object.get_contents_to_filename(local_file)
 		local_files.append(local_file)
 
-	# Return the first file found
-	if len(local_files) >= 1:
+	# However we only wish to process the first one
+	if local_files:
 		return local_files.pop()
-	# Or give an informative error
+	# Or give an informative error, if we don't have any
 	else:
 		raise Exception("Cannot proceed, there must be at least one file at the"
 			" S3 location provided.")
@@ -59,7 +68,7 @@ def pull_from_s3(*args, **kwargs):
 def load(*args, **kwargs):
 	"""Load the CSV into a pandas data frame"""
 	filename, debit_or_credit = kwargs["input_file"], kwargs["debit_or_credit"]
-
+	logging.info("Loading csv file and slicing by '{0}' ".format(debit_or_credit))
 	df = pd.read_csv(filename, quoting=csv.QUOTE_NONE, na_filter=False,
 		encoding="utf-8", sep='|', error_bad_lines=False, low_memory=False)
 	df['UNIQUE_TRANSACTION_ID'] = df.index
@@ -73,7 +82,8 @@ def load(*args, **kwargs):
 	return df, class_names
 
 def get_label_map(*args, **kwargs):
-	"""Stuff"""
+	"""Generates a label map."""
+	logging.info("Generating label map")
 	class_names = kwargs["class_names"]
 	# Create a label map
 	label_numbers = list(range(1, (len(class_names) + 1)))
@@ -85,6 +95,7 @@ def get_label_map(*args, **kwargs):
 	return label_map
 
 def get_test_and_train_dataframes(*args, **kwargs):
+	logging.info("Building test and train dataframes")
 	"""Produce (rich and poor) X (test and train) dataframes"""
 	df_rich = kwargs["df"]
 	df_poor = df_rich[['LABEL', 'DESCRIPTION_UNMASKED']]
@@ -145,8 +156,22 @@ def process_stage_1(*args, **kwargs):
 	# Generate the output files (CSV and JSON) and return the file handles
 	kwargs.update(get_json_and_csv_files(**kwargs))
 
+def parse_arguments():
+	parser = argparse.ArgumentParser("stream")
+	parser.add_argument("-ld", "--debug", help="log at DEBUG level",
+		action="store_true")
+	parser.add_argument("-li", "--info", help="log at INFO level",
+		action="store_true")
+	args = parser.parse_args()
+	if args.debug:
+		logging.basicConfig(level=logging.DEBUG)
+	elif args.info:
+		logging.basicConfig(level=logging.INFO)
+
 """ Main program"""
 if __name__ == "__main__":
+	parse_arguments()
+
 	bucket = "yodleemisc"
 	prefix = "hvudumala/Type_Subtype_finaldata/Card/"
 	my_filter = "csv"
@@ -156,5 +181,4 @@ if __name__ == "__main__":
 		input_path=input_path)
 	process_stage_1(input_file=input_file, debit_or_credit=debit_or_credit,
 		output_path=output_path, bank_or_card=bank_or_card)
-
 
