@@ -44,7 +44,6 @@ import pandas as pd
 
 from meerkat.various_tools import load_dict_list, safely_remove_file, load_params
 from meerkat.classification.lua_bridge import get_cnn
-from meerkat.various_tools import load_params
 
 default_doc_key = "DESCRIPTION_UNMASKED"
 default_label_key = "GOOD_DESCRIPTION"
