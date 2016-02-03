@@ -23,5 +23,5 @@
         "type" : "factual_type"
     },
     "should_search" : true,
-    "show_conflict" : true
+    "show_conflict" : false
 }

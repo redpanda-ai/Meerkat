@@ -309,15 +309,6 @@ class WebConsumer():
 
 			trans["category_labels"] = [fallback]
 
-	def __has_conflict(self, trans):
-		"""judge if search engine locale contradict with bloom locale"""
-
-		if trans["locale_bloom"] != None and trans["is_physical_merchant"] == True and (trans["city"] != trans["locale_bloom"][0] or trans["state"] != trans["locale_bloom"][1]):
-			return True
-
-		return False
-
-
 	def ensure_output_schema(self, transactions):
 		"""Clean output to proper schema"""
 
@@ -332,17 +323,17 @@ class WebConsumer():
 			# Override output with CNN v1
 			if trans.get("CNN", "") != "":
 				trans[attr_map["name"]] = trans.get("CNN", "")
-				
+
+			# Write conflict to log if needed
+			if "show_conflict" in self.params and self.params["show_conflict"]:
+				if trans["locale_bloom"] != None and trans["is_physical_merchant"] == True:
+					if trans["city"] != trans["locale_bloom"][0] or trans["state"] != trans["locale_bloom"][1]:
+						logging.info("Source_merchant_id: %s; Transaction id: %s; Description: %s; Search locale: %s, %s; Bloom locale: %s, %s", trans["source_merchant_id"], trans["transaction_id"], trans["description"], trans["city"], trans["state"], trans["locale_bloom"][0], trans["locale_bloom"][1])
 
 			# Override Locale with Bloom Results
-			if trans["locale_bloom"] != None and trans["is_physical_merchant"] == True and ("show_conflict" not in self.params or not self.params["show_conflict"]):
+			if trans["locale_bloom"] != None and trans["is_physical_merchant"] == True:
 				trans["city"] = trans["locale_bloom"][0]
 				trans["state"] = trans["locale_bloom"][1]
-
-			# show conflict if search engine locale contradicts bloom locale
-			if self.__has_conflict(trans) and "show_conflict" in self.params and self.params["show_conflict"]:
-				trans["city"] += '[' + trans["locale_bloom"][0] + ']'
-				trans["state"] += '[' + trans["locale_bloom"][1] + ']'
 
 			if "CNN" in trans:
 				del trans["CNN"]
