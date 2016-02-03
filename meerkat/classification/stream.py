@@ -28,7 +28,8 @@ def cap_first_letter(label):
 	return ' '.join(word for word in temp)
 
 def pull_from_s3(*args, **kwargs):
-	"""Pulls the contents of an S3 directory into a local file"""
+	"""Pulls the contents of an S3 directory into a local file, returning
+	the first file"""
 	conn = connect_s3()
 	bucket = conn.get_bucket(kwargs["bucket"], Location.USWest2)
 	listing = bucket.list(prefix=kwargs["prefix"])
@@ -46,7 +47,14 @@ def pull_from_s3(*args, **kwargs):
 		print("Local Filename: {0}, S3Key: {1}".format(local_file, s3_object))
 		s3_object.get_contents_to_filename(local_file)
 		local_files.append(local_file)
-	return local_files
+
+	# Return the first file found
+	if len(local_files) >= 1:
+		return local_files.pop()
+	# Or give an informative error
+	else:
+		raise Exception("Cannot proceed, there must be at least one file at the"
+			" S3 location provided.")
 
 def load(*args, **kwargs):
 	"""Load the CSV into a pandas data frame"""
@@ -113,25 +121,24 @@ def get_json_and_csv_files(*args, **kwargs):
 	#Return file names
 	return files
 
+def fill_description_unmasked(row):
+	"""Ensures that blank values for DESCRIPTION_UNMASKED are always filled."""
+	if row["DESCRIPTION_UNMASKED"] == "":
+		return row["DESCRIPTION"]
+	return row["DESCRIPTION_UNMASKED"]
+
 def process_stage_1(*args, **kwargs):
 	"""Coordinates activity for the job stream"""
 	# Create an output directory if it does not exist
 	os.makedirs(kwargs["output_path"], exist_ok=True)
-	# Load Data
-	if len(kwargs["local_files"]) == 1:
-		input_file = kwargs["local_files"].pop()
-		del kwargs["local_files"]
-	else:
-		print("Cannot proceed, no files found in S3")
-		sys.exit(0)
-	df, class_names = load(input_file=input_file, debit_or_credit=kwargs["debit_or_credit"])
+	# Load data frame and class names
+	df, class_names = load(input_file=kwargs["input_file"], debit_or_credit=kwargs["debit_or_credit"])
 	# Generate a mapping (class_name: label_number)
 	label_map = get_label_map(df=df, class_names=class_names)
 	# Reverse the mapping (label_number: class_name)
 	kwargs["label_map"] = dict(zip(label_map.values(), label_map.keys()))
 	# Clean the "DESCRIPTION_UNMASKED" values within the dataframe
-	fill_description = lambda x: x["DESCRIPTION"] if x["DESCRIPTION_UNMASKED"] == "" else x["DESCRIPTION_UNMASKED"]
-	df["DESCRIPTION_UNMASKED"] = df.apply(fill_description, axis=1)
+	df["DESCRIPTION_UNMASKED"] = df.apply(fill_description_unmasked, axis=1)
 	kwargs["df"] = df
 	# Make Test and Train data frames
 	kwargs.update(get_test_and_train_dataframes(**kwargs))
@@ -145,9 +152,9 @@ if __name__ == "__main__":
 	my_filter = "csv"
 	input_path, output_path = "./", "./output/"
 	bank_or_card, debit_or_credit = "card", "debit"
-	local_files = pull_from_s3(bucket=bucket, prefix=prefix, my_filter=my_filter,
+	input_file = pull_from_s3(bucket=bucket, prefix=prefix, my_filter=my_filter,
 		input_path=input_path)
-	process_stage_1(local_files=local_files, debit_or_credit=debit_or_credit,
+	process_stage_1(input_file=input_file, debit_or_credit=debit_or_credit,
 		output_path=output_path, bank_or_card=bank_or_card)
 
 
