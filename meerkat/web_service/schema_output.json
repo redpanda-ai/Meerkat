@@ -2,25 +2,6 @@
 	"$schema" : "http://json-schema.org/draft-04/schema#",
 	"title" : "meerkat_categorize output",
 	"definitions" : {
-		"no_match_found" : {
-			"type" : "object",
-			"properties" : {
-				"transaction_id" : { "type" : "number" },
-				"is_physical_merchant" : { "enum" : [ true, false ] },
-				"match_found" : { "enum" : [ false ] },
-				"txn_sub_type" : { "type" : "string" },
-				"txn_type" : { "type" : "string" },
-				"category_labels" : {
-					"type" : "array",
-					"items" : {
-						"type": "string"
-					}
-				}
-			},
-			"required": [ "transaction_id", "is_physical_merchant", "match_found",
-				"txn_sub_type", "txn_type", "category_labels"],
-			"additionalProperties" : false
-		},
 		"physical_merchant_response" : {
 			"type" : "object",
 			"properties" : {
@@ -114,7 +95,6 @@
 			"items" : {
 				"oneOf": [
 					{"$ref": "#/definitions/physical_merchant_response"},
-					{"$ref": "#/definitions/no_match_found"},
 					{"$ref": "#/definitions/non_physical_merchant_response"},
 					{"$ref": "#/definitions/non_merchant_category_response"}
 				]
