@@ -17,7 +17,9 @@
 					}
 				}
 			},
-			"required": [ "transaction_id", "is_physical_merchant", "match_found"]
+			"required": [ "transaction_id", "is_physical_merchant", "match_found",
+				"txn_sub_type", "txn_type", "category_labels"],
+			"additionalProperties" : false
 		},
 		"physical_merchant_response" : {
 			"type" : "object",
@@ -49,7 +51,11 @@
 				"txn_sub_type" : { "type" : "string" },
 				"txn_type" : { "type" : "string" }
 			},
-			"required": [ "transaction_id", "is_physical_merchant", "match_found", "merchant_name", "source_merchant_id", "country", "category_labels", "website", "phone_number", "fax_number", "chain_name", "neighbourhood", "confidence_score"]
+			"required": [ "transaction_id", "is_physical_merchant", "match_found",
+				"merchant_name", "source_merchant_id", "country", "category_labels",
+				"website", "phone_number", "fax_number", "chain_name", "neighbourhood",
+				"confidence_score"],
+			"additionalProperties" : false
 		},
 		"non_physical_merchant_response" : {
 			"type" : "object",

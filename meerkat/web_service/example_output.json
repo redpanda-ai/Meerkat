@@ -40,12 +40,18 @@
 		{
 			"transaction_id" : 4,
 			"is_physical_merchant" : true,
-			"match_found" : false
+			"match_found" : false,
+			"txn_type" : "",
+			"txn_sub_type" : "",
+			"category_labels" : [""]
 		},
 		{
 			"transaction_id" : 5,
 			"is_physical_merchant" : false,
-			"match_found" : false
+			"match_found" : false,
+			"txn_type" : "",
+			"txn_sub_type" : "",
+			"category_labels" : [""]
 		}
 	]
 }
