@@ -50,7 +50,7 @@ def get_transaction_subtype_no_fallback():
     """Return an array containing a single transaction for a merchant whose category must be looked up using the transaction subtype and whose transaction subtype does not appear in the fallback map"""
     return [{
         "CNN": {"label": "Capital One", "category": "Use Subtype Rules for Categories"},
-        "txn_sub_type": "Joseph Rules"
+        "subtype_CNN": {"label": "Joseph Rules"}
     }]
 
 
@@ -64,14 +64,14 @@ def get_transaction_subtype_no_merchant():
 def get_transaction_subtype_no_merchant_no_fallback():
     """Return an array containing a single transaction with a subtype but no merchant name and no fallback in the static maps"""
     return [{
-        "txn_sub_type": "Joseph Rules"
+        "subtype_CNN": {"label": "Joseph Rules"}
     }]
 
 
 def get_transaction_subtype_non_existant_merchant():
     """Return an array containing a single transaction with a merchant that doesn't exist in the subtype map"""
     return [{
-        "CNN": "Joseph Rules"
+        "CNN": {"label": "Joseph Rules"}
     }]
 
 
