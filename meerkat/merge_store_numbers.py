@@ -14,10 +14,14 @@ Created on Mar 25, 2014
 #################### USAGE ##########################
 
 # Note: Store numbers must be comma delimited
-
-# python3.3 -m meerkat.merge_store_numbers [store_numbers_file]
-# python3.3 -m meerkat.merge_store_numbers [store_numbers_directory]
-# python3.3 -m meerkat.merge_store_numbers data/misc/Store\ Numbers/Clean/IAE
+"""
+python3 -m meerkat.merge_store_numbers [store_numbers_file] \
+[cluster_nodes] [index] [doc_type]
+python3 -m meerkat.merge_store_numbers [store_numbers_directory] \
+[cluster_nodes] [index] [doc_type]
+python3 -m meerkat.merge_store_numbers data/misc/Store\ Numbers/Clean/IAE \
+["127.0.0.1"] factual_index factual_type
+"""
 
 # Required Columns:
 # keywords: Name found in factual
@@ -136,7 +140,6 @@ def update_merchant(factual_id, store):
 	body = {"doc" : {"internal_store_number" : store_number}}
 
 	try:
-		#TODO NO HARDCODED INDEX!!!
 		output_data = get_es_connection().update(index=sys.argv[3], \
 		doc_type=sys.argv[4], id=factual_id, body=body)
 	except Exception:
@@ -152,7 +155,6 @@ def search_index(query):
 	output_data = ""
 
 	try:
-		#TODO NO HARDCODED INDEX!!!
 		output_data = get_es_connection().search(index=sys.argv[3], body=query)
 	except Exception:
 		output_data = {"hits":{"total":0}}
