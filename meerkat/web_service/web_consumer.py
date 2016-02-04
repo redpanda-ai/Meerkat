@@ -337,7 +337,12 @@ class WebConsumer():
 			# Override output with CNN v1
 			if trans.get("CNN", "") != "":
 				trans[attr_map["name"]] = trans.get("CNN", "")
-				
+
+			# Write conflict to log if needed
+			if "show_conflict" in self.params and self.params["show_conflict"]:
+				if trans["locale_bloom"] != None and trans["is_physical_merchant"] == True:
+					if trans["city"] != trans["locale_bloom"][0] or trans["state"] != trans["locale_bloom"][1]:
+						logging.info("Source_merchant_id: %s; Transaction id: %s; Description: %s; Search locale: %s, %s; Bloom locale: %s, %s", trans["source_merchant_id"], trans["transaction_id"], trans["description"], trans["city"], trans["state"], trans["locale_bloom"][0], trans["locale_bloom"][1])
 
 			# Override Locale with Bloom Results
 			# Add city and state to each transaction
