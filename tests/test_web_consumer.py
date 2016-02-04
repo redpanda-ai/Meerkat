@@ -101,7 +101,7 @@ class WebConsumerTest(unittest.TestCase):
 
         self.assertEqual(len(test_request["transaction_list"]), request_len)
         for trans in test_request["transaction_list"]:
-            self.assertEqual(trans["CNN"], "joseph - rules")
+            self.assertEqual(trans["CNN"]["label"], "joseph - rules")
 
     def test_apply_sws_classifier(self):
         """Assert all transactions are classified as physical or non-physical"""
