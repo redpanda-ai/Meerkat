@@ -195,7 +195,7 @@ class WebConsumer():
 			transaction[attr_map.get(field, field)] = ""
 
 		transaction["match_found"] = False
-		#Experimental
+		# Add fields required
 		if transaction["country"] == "":
 			transaction["country"] = "US"
 		transaction["source"] = "FACTUAL"
@@ -245,7 +245,7 @@ class WebConsumer():
 				transaction[attr_map.get(field, field)] = ""
 			transaction = self.__business_name_fallback(business_names, transaction, attr_map)
 			transaction = self.__geo_fallback(city_names, state_names, transaction, attr_map)
-			#Ensure that we have a latitude and longitude fields
+			#Ensuring that there is a country code that matches the schema limitation
 			transaction["country"] = "US"
 
 		# Ensure Proper Casing
