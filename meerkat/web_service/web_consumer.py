@@ -100,13 +100,15 @@ class WebConsumer():
 	def __search_index(self, queries):
 		"""Search against a structured index"""
 		index = self.params["elasticsearch"]["index"]
-		try:
-			# pull routing out of queries and append to below msearch
-			results = self.elastic_search.msearch(queries, index=index)
-		except Exception as exception:
-			logging.warning(exception)
-			return None
+		results = self.elastic_search.msearch(queries, index=index)
 		return results
+		#try:
+		#	# pull routing out of queries and append to below msearch
+		#	results = self.elastic_search.msearch(queries, index=index)
+		#except Exception as exception:
+		#	logging.warning(exception)
+		#	return None
+		#return results
 
 	@staticmethod
 	def __z_score_delta(scores):
@@ -178,7 +180,7 @@ class WebConsumer():
 		
 		# Enrich Data if Passes Boundary
 		args = [decision, transaction, hit_fields,\
-			 names["business_names"], names["city_names"], names["state_names"]]
+			 names["business_names"], names["city_names"], names["state_names"], z_score_delta]
 		return self.__enrich_transaction(*args)
 
 	def __no_result(self, transaction):
@@ -193,6 +195,12 @@ class WebConsumer():
 			transaction[attr_map.get(field, field)] = ""
 
 		transaction["match_found"] = False
+		# Add fields required
+		if transaction["country"] == "":
+			transaction["country"] = "US"
+		transaction["source"] = "FACTUAL"
+		transaction["confidence_score"] = ""
+
 
 		return transaction
 
@@ -205,6 +213,7 @@ class WebConsumer():
 		business_names = argv[3]
 		city_names = argv[4]
 		state_names = argv[5]
+		confidence_score = argv[6]
 
 		params = self.params
 		field_names = params["output"]["results"]["fields"]
@@ -236,6 +245,8 @@ class WebConsumer():
 				transaction[attr_map.get(field, field)] = ""
 			transaction = self.__business_name_fallback(business_names, transaction, attr_map)
 			transaction = self.__geo_fallback(city_names, state_names, transaction, attr_map)
+			#Ensuring that there is a country code that matches the schema limitation
+			transaction["country"] = "US"
 
 		# Ensure Proper Casing
 		if transaction[attr_map['name']] == transaction[attr_map['name']].upper():
@@ -243,8 +254,11 @@ class WebConsumer():
 
 		# Add Source
 		index = params["elasticsearch"]["index"]
-		transaction["source"] = "FACTUAL" if (("factual" in index) and 
-		    (transaction["match_found"] == True)) else "OTHER"
+		transaction["source"] = "FACTUAL" if (("factual" in index) and
+			(transaction["match_found"] == True)) else "OTHER"
+
+		# Add "confidence_score" to the output schema.
+		transaction["confidence_score"] = ""
 
 		return transaction
 
@@ -498,6 +512,7 @@ class WebConsumer():
 		run in parallel with GPU bound classifiers."""
 		self.__apply_locale_bloom(data)
 		physical, non_physical = self.__sws(data)
+
 		if "should_search" not in self.params or self.params["should_search"]:
 			physical = self.__enrich_physical(physical)
 			self.__apply_category_labels(physical)
