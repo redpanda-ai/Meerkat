@@ -16,11 +16,11 @@ Created on Mar 25, 2014
 # Note: Store numbers must be comma delimited
 """
 python3 -m meerkat.merge_store_numbers [store_numbers_file] \
-[cluster_nodes] [index] [doc_type]
+[cluster_address] [index] [doc_type]
 python3 -m meerkat.merge_store_numbers [store_numbers_directory] \
-[cluster_nodes] [index] [doc_type]
+[cluster_address] [index] [doc_type]
 python3 -m meerkat.merge_store_numbers data/misc/Store\ Numbers/Clean/IAE \
-["127.0.0.1"] factual_index factual_type
+127.0.0.1 factual_index factual_type
 """
 
 # Required Columns:
@@ -306,7 +306,7 @@ def run_from_command_line():
 
 def get_es_connection():
 	""" Get the Elastic search connection. """
-	es_connection = Elasticsearch(sys.argv[2], sniff_on_start=True, 
+	es_connection = Elasticsearch([sys.argv[2]], sniff_on_start=True, 
 		sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
 	return es_connection
 
