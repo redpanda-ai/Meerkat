@@ -23,7 +23,6 @@ from meerkat.classification.lua_bridge import get_cnn
 from meerkat.classification.bloom_filter.find_entities import location_split
 
 # Enabled Models
-LMDIR = "meerkat/classification/label_maps/"
 BANK_SWS = select_model("bank_sws")
 CARD_SWS = select_model("card_sws")
 BANK_MERCHANT_CNN = get_cnn("bank_merchant")
@@ -32,10 +31,6 @@ CARD_DEBIT_SUBTYPE_CNN = get_cnn("card_debit_subtype")
 CARD_CREDIT_SUBTYPE_CNN = get_cnn("card_credit_subtype")
 BANK_DEBIT_SUBTYPE_CNN = get_cnn("bank_debit_subtype")
 BANK_CREDIT_SUBTYPE_CNN = get_cnn("bank_credit_subtype")
-BANK_CATEGORY_FALLBACK = load_params(LMDIR + "cnn_merchant_category_mapping_bank.json")
-CARD_CATEGORY_FALLBACK = load_params(LMDIR + "cnn_merchant_category_mapping_card.json")
-BANK_SUBTYPE_CAT_FALLBACK = load_params(LMDIR + "subtype_category_mapping_bank.json")
-CARD_SUBTYPE_CAT_FALLBACK = load_params(LMDIR + "subtype_category_mapping_card.json")
 
 class WebConsumer():
 	"""Acts as a web service client to process and enrich
@@ -282,32 +277,22 @@ class WebConsumer():
 	def __apply_missing_categories(self, transactions, container):
 		"""If the factual search fails to find categories do a static lookup
 		on the merchant name"""
-		if container.lower() == "bank":
-			self.__apply_categories_from_dict(transactions,\
-				BANK_CATEGORY_FALLBACK, BANK_SUBTYPE_CAT_FALLBACK, "Retail Category")
-		else:
-			self.__apply_categories_from_dict(transactions,\
-				CARD_CATEGORY_FALLBACK, CARD_SUBTYPE_CAT_FALLBACK, "PaymentOps")
-
-	@staticmethod
-	def __apply_categories_from_dict(transactions, categories, subtype_fallback, key):
-		"""Use the given dictionary to add categories to transactions"""
+		
 		for trans in transactions:
+
 			if trans.get("category_labels"):
 				continue
-			merchant = trans.get("CNN", "").strip()
-			category = categories.get(merchant)
-			fallback = category and category.get(key) or ""
-			if (fallback == "Use Subtype Rules for Categories" or
-						fallback == ""):
-				# Get the subtype from the transaction
-				fallback = trans.get("txn_sub_type", "")
-				# Get the categories from the subtype map
-				fallback = subtype_fallback.get(fallback, fallback)
-				# Get the subtype for credit/debit if it's different
+
+			fallback = trans.get("CNN", {}).get("category", "").strip()
+
+			if (fallback == "Use Subtype Rules for Categories" or fallback == ""):
+				fallback = trans.get("subtype_CNN", {}).get("category", "")
 				fallback = isinstance(fallback, dict) and fallback[trans["ledger_entry"].lower()] or fallback
 
 			trans["category_labels"] = [fallback]
+			trans["CNN"] = trans.get("CNN", {}).get("label", "")
+
+			del trans["subtype_CNN"]
 
 	def ensure_output_schema(self, transactions):
 		"""Clean output to proper schema"""
@@ -324,7 +309,6 @@ class WebConsumer():
 			if trans.get("CNN", "") != "":
 				trans[attr_map["name"]] = trans.get("CNN", "")
 				
-
 			# Override Locale with Bloom Results
 			if trans["locale_bloom"] != None and trans["is_physical_merchant"] == True:
 				trans["city"] = trans["locale_bloom"][0]
@@ -432,22 +416,22 @@ class WebConsumer():
 		# Split label into type and subtype
 		for transaction in data["transaction_list"]:
 
-			if " - " not in transaction["subtype_CNN"]:
+			label = transaction["subtype_CNN"].get("label", "")
+
+			if " - " not in label:
 				if transaction["ledger_entry"] == "debit":
-					transaction["subtype_CNN"] = "Other Expenses - Debit"
+					label = "Other Expenses - Debit"
 				elif transaction["ledger_entry"] == "credit":
 					if data["container"] == "bank":
-						transaction["subtype_CNN"] = "Other Income - Credit"
+						label = "Other Income - Credit"
 					elif data["container"] == "card":
-						transaction["subtype_CNN"] = "Bank Adjustment - Adjustment"
+						label = "Bank Adjustment - Adjustment"
 				else:
-					transaction["subtype_CNN"] = " - "
+					label = " - "
 			
-			txn_type, txn_sub_type = transaction["subtype_CNN"].split(" - ")
+			txn_type, txn_sub_type = label.split(" - ")
 			transaction["txn_type"] = txn_type
 			transaction["txn_sub_type"] = txn_sub_type
-			
-			del transaction["subtype_CNN"]
 
 		return data["transaction_list"]
 
