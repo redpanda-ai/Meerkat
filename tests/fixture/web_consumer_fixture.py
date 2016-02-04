@@ -41,15 +41,15 @@ def get_transaction_card_fallback_classifiable():
 def get_transaction_subtype_fallback():
     """Return an array containing a single transaction for a merchant whose category must be looked up using the transaction subtype"""
     return [{
-        "CNN": "Capital One",
-        "txn_sub_type": "SSA"
+        "CNN": {"label": "Capital One", "category": "Use Subtype Rules for Categories"},
+        "subtype_CNN": {"label": "Deposits & Credits - SSA", "category": "Other Income"}
     }]
 
 
 def get_transaction_subtype_no_fallback():
-    """Return an array containing a single transaction for a merchant whose category must be looked up using the transaction subtype and whose transaction subtype does not appearn in the fallback map"""
+    """Return an array containing a single transaction for a merchant whose category must be looked up using the transaction subtype and whose transaction subtype does not appear in the fallback map"""
     return [{
-        "CNN": "Capital One",
+        "CNN": {"label": "Capital One", "category": "Use Subtype Rules for Categories"},
         "txn_sub_type": "Joseph Rules"
     }]
 
@@ -57,7 +57,7 @@ def get_transaction_subtype_no_fallback():
 def get_transaction_subtype_no_merchant():
     """Return an array containing a single transaction with a subtype but no merchant name"""
     return [{
-        "txn_sub_type": "ATM Withdrawal"
+        "subtype_CNN": {"label": "Withdrawal - ATM Withdrawal", "category": "Cash Withdrawal"}
     }]
 
 

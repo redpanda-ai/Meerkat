@@ -274,7 +274,7 @@ class WebConsumer():
 
 		return transaction
 
-	def __apply_missing_categories(self, transactions, container):
+	def __apply_missing_categories(self, transactions):
 		"""If the factual search fails to find categories do a static lookup
 		on the merchant name"""
 		
@@ -503,7 +503,7 @@ class WebConsumer():
 		cpu_result.get() # Wait for CPU bound classifiers to finish
 
 		if not optimizing:
-			self.__apply_missing_categories(data["transaction_list"], data["container"])
+			self.__apply_missing_categories(data["transaction_list"])
 
 		self.ensure_output_schema(data["transaction_list"])
 		return data
