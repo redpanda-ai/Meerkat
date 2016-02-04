@@ -44,6 +44,8 @@
 		"non_physical_merchant_response" : {
 			"type" : "object",
 			"properties" : {
+				"city" : { "type" : "string" },
+				"state" : { "type" : "string" },
 				"transaction_id" : { "type" : "number" },
 				"is_physical_merchant" : { "enum" : [ false ] },
 				"merchant_name" : { "type" : "string" },
@@ -56,12 +58,14 @@
 					}
 				}
 			},
-			"required": [ "transaction_id", "is_physical_merchant", "merchant_name", "category_labels"],
+			"required": [ "city", "state", "transaction_id", "is_physical_merchant", "merchant_name", "category_labels"],
 			"additionalProperties" : false
 		},
 		"non_merchant_category_response" : {
 			"type" : "object",
 			"properties" : {
+				"city" : { "type" : "string" },
+				"state" : { "type" : "string" },
 				"transaction_id" : { "type" : "number" },
 				"is_physical_merchant" : { "enum" : [ false ] },
 				"txn_sub_type" : { "type" : "string" },
@@ -73,7 +77,7 @@
 					}
 				}
 			},
-			"required": [ "transaction_id", "is_physical_merchant", "txn_type", "txn_sub_type", "category_labels"],
+			"required": [ "city", "state", "transaction_id", "is_physical_merchant", "txn_type", "txn_sub_type", "category_labels"],
 			"additionalProperties" : false
 		}
 	},
