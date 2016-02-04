@@ -137,8 +137,8 @@ def update_merchant(factual_id, store):
 
 	try:
 		#TODO NO HARDCODED INDEX!!!
-		output_data = get_es_connection().update(index="factual_index", \
-		doc_type="factual_type", id=factual_id, body=body)
+		output_data = get_es_connection().update(index=sys.argv[3], \
+		doc_type=sys.argv[4], id=factual_id, body=body)
 	except Exception:
 		logging.warning("Failed to Update Merchant")
 
@@ -153,7 +153,7 @@ def search_index(query):
 
 	try:
 		#TODO NO HARDCODED INDEX!!!
-		output_data = get_es_connection().search(index="factual_index", body=query)
+		output_data = get_es_connection().search(index=sys.argv[3], body=query)
 	except Exception:
 		output_data = {"hits":{"total":0}}
 
@@ -265,7 +265,7 @@ def process_single_merchant():
 def verify_arguments():
 	"""Verify Usage"""
 
-	sufficient_arguments = (len(sys.argv) == 2)
+	sufficient_arguments = (len(sys.argv) == 5)
 
 	if not sufficient_arguments:
 		logging.warning("Insufficient arguments. Please see usage")
@@ -304,7 +304,7 @@ def run_from_command_line():
 
 def get_es_connection():
 	""" Get the Elastic search connection. """
-	es_connection = Elasticsearch(["127.0.0.1"], sniff_on_start=True, 
+	es_connection = Elasticsearch(sys.argv[2], sniff_on_start=True, 
 		sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
 	return es_connection
 
