@@ -281,6 +281,8 @@ class WebConsumer():
 		for trans in transactions:
 
 			if trans.get("category_labels"):
+				trans["CNN"] = trans.get("CNN", {}).get("label", "")
+				del trans["subtype_CNN"]
 				continue
 
 			fallback = trans.get("CNN", {}).get("category", "").strip()
