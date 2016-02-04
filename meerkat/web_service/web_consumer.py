@@ -100,13 +100,15 @@ class WebConsumer():
 	def __search_index(self, queries):
 		"""Search against a structured index"""
 		index = self.params["elasticsearch"]["index"]
-		try:
-			# pull routing out of queries and append to below msearch
-			results = self.elastic_search.msearch(queries, index=index)
-		except Exception as exception:
-			logging.warning(exception)
-			return None
+		results = self.elastic_search.msearch(queries, index=index)
 		return results
+		#try:
+		#	# pull routing out of queries and append to below msearch
+		#	results = self.elastic_search.msearch(queries, index=index)
+		#except Exception as exception:
+		#	logging.warning(exception)
+		#	return None
+		#return results
 
 	@staticmethod
 	def __z_score_delta(scores):
@@ -193,6 +195,12 @@ class WebConsumer():
 			transaction[attr_map.get(field, field)] = ""
 
 		transaction["match_found"] = False
+		#Experimental
+		if transaction["country"] == "":
+			transaction["country"] = "US"
+		transaction["source"] = "FACTUAL"
+		transaction["confidence_score"] = ""
+
 
 		return transaction
 
@@ -238,8 +246,6 @@ class WebConsumer():
 			transaction = self.__business_name_fallback(business_names, transaction, attr_map)
 			transaction = self.__geo_fallback(city_names, state_names, transaction, attr_map)
 			#Ensure that we have a latitude and longitude fields
-			#transaction["latitude"] = ""
-			#transaction["longitude"] = ""
 			transaction["country"] = "US"
 
 		# Ensure Proper Casing
