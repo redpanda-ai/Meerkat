@@ -260,13 +260,11 @@ def get_mock_hit(score):
         "_score": score
     }
 
-
-def get_mock_cnn(transactions, label_key="CNN"):
+def get_mock_cnn(transactions, label_key="CNN", label_only=False):
     """Return a mock CNN which appends a parsable merchant name"""
     for trans in transactions:
-        trans[label_key] = "joseph - rules"
+        trans[label_key] = {"label": "joseph - rules", "category": "ruling class"}
     return transactions
-
 
 def get_mock_sws(description):
     """Return a mock SWS classifier which returns true or false depending on the test data"""
