@@ -1,5 +1,5 @@
 ## Meerkat
-=====
+
 ***Meerkat***, Yodlee's Data Exploration and Enrichment Platform, blends a host of technologies into a powerful web service that allows us to predict various attributes of a financial transaction.  These attributes include
 * Geolocation (e.g. Street Address, City, State, Latitude and Longitude)
 * Name of merchant (e.g. Kroger, Target, CVS, McDonald's)
@@ -7,7 +7,7 @@
 
 ## Useful links
 * [latest release] (https://github.com/joeandrewkey/Meerkat/releases/latest)
-* [roadmap for upcoming release] (https://github.com/joeandrewkey/Meerkat/issues/254)
+* [roadmap for upcoming release] (https://docs.google.com/spreadsheets/d/1dZHkMUd81VXEi4F7tY7l6WM_UXwbW3ze1p2xK2LDkiA/edit#gid=0)
 * [wiki] (https://github.com/joeandrewkey/Meerkat/wiki)
 * [issues] (https://github.com/joeandrewkey/Meerkat/issues)
 
@@ -19,5 +19,7 @@ Contributors
 ------------
 * J. Andrew Key
 * Matt Sevrens
-* Sivan K. Mehta
-* Rayaan A. Khatau
+* Tina Wu
+* Oscar Pan
+* Feifei Zhu
+* Jie Zhang

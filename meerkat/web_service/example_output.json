@@ -16,7 +16,17 @@
 			"city" : "Sunnyvale",
 			"state" : "CA",
 			"country" : "US",
-			"postal_code" : "94087"
+			"postal_code" : "94087",
+			"website" : "",
+			"phone_number" : "",
+			"fax_number" : "",
+			"chain_name" : "",
+			"neighbourhood" : "",
+			"confidence_score" : "",
+			"latitude" : "",
+			"longitude" : "",
+			"txn_type" : "",
+			"txn_sub_type" : ""
 		},
 		{
 			"transaction_id" : 2,
@@ -30,16 +40,6 @@
 			"is_physical_merchant" : false,
 			"merchant_name" : "Amazon",
 			"category_labels" : ["General Merchandise"]
-		},
-		{
-			"transaction_id" : 4,
-			"is_physical_merchant" : true,
-			"match_found" : false
-		},
-		{
-			"transaction_id" : 5,
-			"is_physical_merchant" : false,
-			"match_found" : false
 		}
 	]
 }
