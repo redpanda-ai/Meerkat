@@ -208,7 +208,11 @@ def save_mapping(stores, percent_merged):
 	"""Saves all results as a mapping file"""
 
 	store_name = stores[0]['keywords']
-	file_name = "/mnt/ephemeral/AggData_Factual_Merge/" + store_name + "_" + \
+
+	path = "data/output/AggData_Factual_Merge/"
+	os.makedirs(path, exist_ok=True)
+
+	file_name = path + store_name + "_" + \
 	str(percent_merged * 100) + "%_success_rate" + ".csv"
 	delimiter = ","
 	output_file = open(file_name, 'w')
