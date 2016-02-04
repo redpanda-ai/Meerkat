@@ -282,7 +282,7 @@ class WebConsumer():
 
 			if trans.get("category_labels"):
 				trans["CNN"] = trans.get("CNN", {}).get("label", "")
-				del trans["subtype_CNN"]
+				if "subtype_CNN" in trans: del trans["subtype_CNN"]
 				continue
 
 			fallback = trans.get("CNN", {}).get("category", "").strip()
@@ -294,7 +294,7 @@ class WebConsumer():
 			trans["category_labels"] = [fallback]
 			trans["CNN"] = trans.get("CNN", {}).get("label", "")
 
-			del trans["subtype_CNN"]
+			if "subtype_CNN" in trans: del trans["subtype_CNN"]
 
 	def ensure_output_schema(self, transactions):
 		"""Clean output to proper schema"""
