@@ -82,7 +82,7 @@ def load(*args, **kwargs):
 	return df, class_names
 
 def get_label_map(*args, **kwargs):
-	"""Generates a label map."""
+	"""Generates a label map (class_name: label number)."""
 	logging.info("Generating label map")
 	class_names = kwargs["class_names"]
 	# Create a label map
@@ -138,8 +138,9 @@ def fill_description_unmasked(row):
 		return row["DESCRIPTION"]
 	return row["DESCRIPTION_UNMASKED"]
 
-def process_stage_1(*args, **kwargs):
-	"""Coordinates activity for the job stream"""
+def slice_into_dataframes(*args, **kwargs):
+	"""Slice into test and train dataframs, make a label map, and produce 
+	CSV files."""
 	# Create an output directory if it does not exist
 	os.makedirs(kwargs["output_path"], exist_ok=True)
 	# Load data frame and class names
@@ -158,9 +159,9 @@ def process_stage_1(*args, **kwargs):
 
 def parse_arguments():
 	parser = argparse.ArgumentParser("stream")
-	parser.add_argument("-ld", "--debug", help="log at DEBUG level",
+	parser.add_argument("-d", "--debug", help="log at DEBUG level",
 		action="store_true")
-	parser.add_argument("-li", "--info", help="log at INFO level",
+	parser.add_argument("-v", "--info", help="log at INFO level",
 		action="store_true")
 	args = parser.parse_args()
 	if args.debug:
@@ -168,17 +169,24 @@ def parse_arguments():
 	elif args.info:
 		logging.basicConfig(level=logging.INFO)
 
+def convert_csv_to_torch_7_binaries():
+	"""Use plumbum to convert CSV files to torch 7 binaries."""
+	logging.info("Converting CSV to torch binaries.")
+
 """ Main program"""
 if __name__ == "__main__":
 	parse_arguments()
-
+	#1. Grab the input file from S3
 	bucket = "yodleemisc"
 	prefix = "hvudumala/Type_Subtype_finaldata/Card/"
-	my_filter = "csv"
-	input_path, output_path = "./", "./output/"
-	bank_or_card, debit_or_credit = "card", "debit"
+	my_filter, input_path = "csv", "./"
 	input_file = pull_from_s3(bucket=bucket, prefix=prefix, my_filter=my_filter,
 		input_path=input_path)
-	process_stage_1(input_file=input_file, debit_or_credit=debit_or_credit,
+	#2.  Slice it into dataframes and make a mapping file.
+	output_path = "./output/"
+	bank_or_card, debit_or_credit = "card", "debit"
+	slice_into_dataframes(input_file=input_file, debit_or_credit=debit_or_credit,
 		output_path=output_path, bank_or_card=bank_or_card)
+	#3.  Use qlua to convert the files into training and testing sets.
+	convert_csv_to_torch_7_binaries()
 
