@@ -29,6 +29,8 @@
 			"txn_sub_type" : ""
 		},
 		{
+			"city" : "",
+			"state" : "",
 			"transaction_id" : 2,
 			"is_physical_merchant" : false,
 			"txn_type" : "Payment",
@@ -36,6 +38,8 @@
 			"category_labels" : [""]
 		},
 		{
+			"city" : "",
+			"state" : "",
 			"transaction_id" : 3,
 			"is_physical_merchant" : false,
 			"merchant_name" : "Amazon",

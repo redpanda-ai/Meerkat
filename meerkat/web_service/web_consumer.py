@@ -340,9 +340,13 @@ class WebConsumer():
 				
 
 			# Override Locale with Bloom Results
-			if trans["locale_bloom"] != None and trans["is_physical_merchant"] == True:
+			# Add city and state to each transaction
+			if trans["locale_bloom"] != None:
 				trans["city"] = trans["locale_bloom"][0]
 				trans["state"] = trans["locale_bloom"][1]
+			else:
+				trans["city"] = ""
+				trans["state"] = ""
 
 			if "CNN" in trans:
 				del trans["CNN"]
