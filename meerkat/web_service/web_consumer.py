@@ -288,7 +288,7 @@ class WebConsumer():
 			fallback = trans.get("CNN", {}).get("category", "").strip()
 
 			if (fallback == "Use Subtype Rules for Categories" or fallback == ""):
-				fallback = trans.get("subtype_CNN", {}).get("category", "")
+				fallback = trans.get("subtype_CNN", {}).get("category", trans.get("subtype_CNN", {}).get("label", ""))
 				fallback = isinstance(fallback, dict) and fallback[trans["ledger_entry"].lower()] or fallback
 
 			trans["category_labels"] = [fallback]
