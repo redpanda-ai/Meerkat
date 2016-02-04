@@ -201,7 +201,7 @@ def run(stores):
 	logging.warning("MISSES: {0}".format(misses))
 	logging.warning("PERCENT MERGED: {0}".format(percent_merged))
 
-	# Save Not Found
+	# Save Mapping
 	save_mapping(stores, percent_merged)
 
 def save_mapping(stores, percent_merged):
@@ -220,20 +220,6 @@ def save_mapping(stores, percent_merged):
 	(output_file, delimiter=delimiter, fieldnames=stores[0].keys())
 	dict_w.writeheader()
 	dict_w.writerows(stores)
-	output_file.close()
-
-def save_not_found(not_found, percent_merged):
-	"""Save the stores not found in the index"""
-
-	store_name = not_found[0]['keywords']
-	file_name = "/mnt/ephemeral/AggData_Factual_Merge/" + store_name + "_" + \
-	str(percent_merged * 100) + "%_success_rate" + ".csv"
-	delimiter = ","
-	output_file = open(file_name, 'w')
-	dict_w = csv.DictWriter(output_file, delimiter=delimiter,\
-	fieldnames=not_found[0].keys())
-	dict_w.writeheader()
-	dict_w.writerows(not_found)
 	output_file.close()
 
 def start_thread(_queue):
