@@ -139,7 +139,7 @@ def get_cnn_by_path(model_path, dict_path):
 	''')
 
 	# Generate Helper Function
-	def apply_cnn(trans, doc_key="description", label_key="CNN"):
+	def apply_cnn(trans, doc_key="description", label_key="CNN", label_only=True):
 		"""Apply CNN to transactions"""
 
 		trans_list = [' '.join(x[doc_key].split()) for x in trans]
@@ -151,6 +151,7 @@ def get_cnn_by_path(model_path, dict_path):
 
 		for index, transaction in enumerate(trans):
 			label = reverse_label_map.get(str(decisions[index]), "") if confidences[index] > LOGSOFTMAX_THRESHOLD else ""
+			if isinstance(label, dict) and label_only: label = label["label"]
 			transaction[label_key] = label
 
 		return trans

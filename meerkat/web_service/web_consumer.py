@@ -384,7 +384,7 @@ class WebConsumer():
 			classifier = BANK_MERCHANT_CNN
 		else:
 			classifier = CARD_MERCHANT_CNN
-		return classifier(data["transaction_list"])
+		return classifier(data["transaction_list"], label_only=False)
 
 	@staticmethod
 	def __apply_subtype_cnn(data):
@@ -411,9 +411,9 @@ class WebConsumer():
 
 		# Apply classifiers
 		if len(credit) > 0:
-			credit_subtype_classifer(credit, label_key="subtype_CNN")
+			credit_subtype_classifer(credit, label_key="subtype_CNN", label_only=False)
 		if len(debit) > 0:
-			debit_subtype_classifer(debit, label_key="subtype_CNN")
+			debit_subtype_classifer(debit, label_key="subtype_CNN", label_only=False)
 
 		# Split label into type and subtype
 		for transaction in data["transaction_list"]:
