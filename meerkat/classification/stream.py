@@ -5,6 +5,7 @@ import csv
 import json
 import logging
 import os
+
 import string
 import sys
 
@@ -13,6 +14,7 @@ import pandas as pd
 
 from boto.s3.connection import Key, Location
 from boto import connect_s3
+from plumbum import local
 
 def dict_2_json(obj, filename):
 	"""Saves a dict as a json file"""
@@ -156,6 +158,8 @@ def slice_into_dataframes(*args, **kwargs):
 	kwargs.update(get_test_and_train_dataframes(**kwargs))
 	# Generate the output files (CSV and JSON) and return the file handles
 	kwargs.update(get_json_and_csv_files(**kwargs))
+	#logging.info("The kwargs dictionary contains: \n{0}".format(kwargs))
+	return kwargs["train_poor"], kwargs["test_poor"]
 
 def parse_arguments():
 	parser = argparse.ArgumentParser("stream")
@@ -169,9 +173,13 @@ def parse_arguments():
 	elif args.info:
 		logging.basicConfig(level=logging.INFO)
 
-def convert_csv_to_torch_7_binaries():
+def convert_csv_to_torch_7_binaries(input_file):
 	"""Use plumbum to convert CSV files to torch 7 binaries."""
-	logging.info("Converting CSV to torch binaries.")
+	output_file = input_file[:-4] + ".t7b"
+	logging.info("Converting {0} to {1}.".format(input_file, output_file))
+	command = local["qlua"]["meerkat/classification/lua/csv2t7b.lua"]["-input"][input_file]["-output"][output_file]
+	result = command()
+	logging.info("The result is {0}".format(result))
 
 """ Main program"""
 if __name__ == "__main__":
@@ -185,8 +193,9 @@ if __name__ == "__main__":
 	#2.  Slice it into dataframes and make a mapping file.
 	output_path = "./output/"
 	bank_or_card, debit_or_credit = "card", "debit"
-	slice_into_dataframes(input_file=input_file, debit_or_credit=debit_or_credit,
+	train_poor, test_poor = slice_into_dataframes(input_file=input_file, debit_or_credit=debit_or_credit,
 		output_path=output_path, bank_or_card=bank_or_card)
 	#3.  Use qlua to convert the files into training and testing sets.
-	convert_csv_to_torch_7_binaries()
+	convert_csv_to_torch_7_binaries(train_poor)
+	convert_csv_to_torch_7_binaries(test_poor)
 
