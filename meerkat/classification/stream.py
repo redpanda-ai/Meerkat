@@ -159,7 +159,7 @@ def slice_into_dataframes(*args, **kwargs):
 	# Generate the output files (CSV and JSON) and return the file handles
 	kwargs.update(get_json_and_csv_files(**kwargs))
 	#logging.info("The kwargs dictionary contains: \n{0}".format(kwargs))
-	return kwargs["train_poor"], kwargs["test_poor"]
+	return kwargs["train_poor"], kwargs["test_poor"], len(class_names)
 
 def parse_arguments():
 	parser = argparse.ArgumentParser("stream")
@@ -181,6 +181,11 @@ def convert_csv_to_torch_7_binaries(input_file):
 	result = command()
 	logging.info("The result is {0}".format(result))
 
+def create_new_configuration_file(num_of_classes):
+	logging.info("Generate a new configuration file with the correct number of classes.")
+	command = local["sed"]["s:156:21:"]["meerkat/classification/lua/config.lua"] > "meerkat/classification/lua/config_21.lua"
+	command()
+
 """ Main program"""
 if __name__ == "__main__":
 	parse_arguments()
@@ -193,9 +198,10 @@ if __name__ == "__main__":
 	#2.  Slice it into dataframes and make a mapping file.
 	output_path = "./output/"
 	bank_or_card, debit_or_credit = "card", "debit"
-	train_poor, test_poor = slice_into_dataframes(input_file=input_file, debit_or_credit=debit_or_credit,
+	train_poor, test_poor, num_of_classes = slice_into_dataframes(input_file=input_file, debit_or_credit=debit_or_credit,
 		output_path=output_path, bank_or_card=bank_or_card)
 	#3.  Use qlua to convert the files into training and testing sets.
-	convert_csv_to_torch_7_binaries(train_poor)
-	convert_csv_to_torch_7_binaries(test_poor)
-
+	#convert_csv_to_torch_7_binaries(train_poor)
+	#convert_csv_to_torch_7_binaries(test_poor)
+	#4 Create a new configuration file based on the number of classes.
+	create_new_configuration_file(num_of_classes)
