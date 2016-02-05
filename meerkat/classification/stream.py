@@ -177,7 +177,7 @@ def convert_csv_to_torch_7_binaries(input_file):
 	"""Use plumbum to convert CSV files to torch 7 binaries."""
 	output_file = input_file[:-4] + ".t7b"
 	logging.info("Converting {0} to {1}.".format(input_file, output_file))
-	command = local["qlua"]["meerkat/classification/lua/csv2t7b.lua"]["-input"][input_file]["-output"][output_file]
+	command = local["yes"] | local["qlua"]["meerkat/classification/lua/csv2t7b.lua"]["-input"][input_file]["-output"][output_file]
 	result = command()
 	logging.info("The result is {0}".format(result))
 
