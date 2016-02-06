@@ -172,7 +172,6 @@ def parse_arguments():
 	parser.add_argument("card_or_bank", help="Whether we are processing card or bank transactions.")
 	parser.add_argument("debit_or_credit", help="What kind of transactions do you wanna process, debit or credit?")
 
-
 	args = parser.parse_args()
 	if args.debug:
 		logging.basicConfig(level=logging.DEBUG)
@@ -195,6 +194,7 @@ def convert_csv_to_torch_7_binaries(input_file):
 
 def create_new_configuration_file(num_of_classes, output_path, train_file, test_file):
 	logging.info("Generate a new configuration file with the correct number of classes.")
+	logging.info("Output_path = {0}".format(output_path))
 	output_dir_len = len(output_path)
 	train_file = train_file[output_dir_len:]
 	test_file = test_file[output_dir_len:]
@@ -227,6 +227,8 @@ if __name__ == "__main__":
 		input_path=input_path)
 	#2.  Slice it into dataframes and make a mapping file.
 	output_path = args.output_dir
+	if output_path[-1:] != "/":
+		output_path += "/"
 	bank_or_card, debit_or_credit = args.card_or_bank, args.debit_or_credit
 	train_poor, test_poor, num_of_classes = slice_into_dataframes(input_file=input_file, debit_or_credit=debit_or_credit,
 		output_path=output_path, bank_or_card=bank_or_card)
