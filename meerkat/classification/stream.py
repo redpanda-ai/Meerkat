@@ -234,6 +234,5 @@ if __name__ == "__main__":
 	copy_file("meerkat/classification/lua/model.lua", output_path)
 	copy_file("meerkat/classification/lua/train.lua", output_path)
 	copy_file("meerkat/classification/lua/test.lua", output_path)
-
 	#6 Excuete main.lua.
 	execute_main_lua(output_path, "main.lua")
