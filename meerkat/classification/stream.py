@@ -184,19 +184,30 @@ def convert_csv_to_torch_7_binaries(input_file):
 	#command = local["yes"] | local["qlua"]["meerkat/classification/lua/csv2t7b.lua"]["-input"][input_file]["-output"][output_file]
 	result = command()
 	logging.info("The result is {0}".format(result))
+	return output_file
 
-def create_new_configuration_file(num_of_classes, output_path):
+def create_new_configuration_file(num_of_classes, output_path, train_file, test_file):
 	logging.info("Generate a new configuration file with the correct number of classes.")
-	command = local["sed"]["s:156:" + str(num_of_classes) + ":"]["meerkat/classification/lua/config.lua"] > output_path + "config.lua"
+	output_dir_len = len(output_path)
+	train_file = train_file[output_dir_len:]
+	test_file = test_file[output_dir_len:]
+	command = \
+		local["sed"]["s:156:" + str(num_of_classes) + ":"]["meerkat/classification/lua/config.lua"] \
+		| local["sed"]["s:__train_t7b__:" + train_file + ":"] \
+		| local["sed"]["s:__test_t7b__:" + test_file + ":"] \
+		 > output_path + "config.lua"
 	command()
 
 def copy_file(input_file, directory):
 	logging.info("Copy the file {0} to directory: {1}".format(input_file, directory))
 	local["cp"][input_file][directory]()
 
-def execute_main_lua(input_file):
+def execute_main_lua(output_path, input_file):
 	logging.info("Executing main.lua in background.")
-	(local["qlua"][input_file]) & NOHUP
+	with local.cwd(output_path):
+		(local["qlua"][input_file]) & NOHUP
+	logging.info("It's running.")
+
 
 """ Main program"""
 if __name__ == "__main__":
@@ -213,12 +224,16 @@ if __name__ == "__main__":
 	train_poor, test_poor, num_of_classes = slice_into_dataframes(input_file=input_file, debit_or_credit=debit_or_credit,
 		output_path=output_path, bank_or_card=bank_or_card)
 	#3.  Use qlua to convert the files into training and testing sets.
-	convert_csv_to_torch_7_binaries(train_poor)
-	convert_csv_to_torch_7_binaries(test_poor)
+	train_file = convert_csv_to_torch_7_binaries(train_poor)
+	test_file = convert_csv_to_torch_7_binaries(test_poor)
 	#4 Create a new configuration file based on the number of classes.
-	create_new_configuration_file(num_of_classes, output_path)
+	create_new_configuration_file(num_of_classes, output_path, train_file, test_file)
 	#5 Copy main.lua and data.lua to output directory.
 	copy_file("meerkat/classification/lua/main.lua", output_path)
 	copy_file("meerkat/classification/lua/data.lua", output_path)
+	copy_file("meerkat/classification/lua/model.lua", output_path)
+	copy_file("meerkat/classification/lua/train.lua", output_path)
+	copy_file("meerkat/classification/lua/test.lua", output_path)
+
 	#6 Excuete main.lua.
-	execute_main_lua(output_path + "main.lua")
+	execute_main_lua(output_path, "main.lua")
