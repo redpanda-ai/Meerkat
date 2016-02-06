@@ -14,7 +14,7 @@ import pandas as pd
 
 from boto.s3.connection import Key, Location
 from boto import connect_s3
-from plumbum import local
+from plumbum import local, BG
 
 def dict_2_json(obj, filename):
 	"""Saves a dict as a json file"""
@@ -194,6 +194,10 @@ def copy_file(input_file, directory):
 	logging.info("")
 	local["cp"][input_file][directory]()
 
+def execute_main_lua(input_file):
+	logging.info("Executing main.lua in background.")
+	(local["qlua"][input_file]) & BG
+
 """ Main program"""
 if __name__ == "__main__":
 	parse_arguments()
@@ -215,3 +219,4 @@ if __name__ == "__main__":
 	create_new_configuration_file(num_of_classes, output_path)
 	#5 Copy main.lua to output directory.
 	copy_file("meerkat/classification/lua/main.lua", output_path)
+	execute_main_lua(output_path + "main.lua")
