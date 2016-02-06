@@ -167,11 +167,18 @@ def parse_arguments():
 		action="store_true")
 	parser.add_argument("-v", "--info", help="log at INFO level",
 		action="store_true")
+
+	parser.add_argument("output_dir", help="Where do you want to write out all of your files?")
+	parser.add_argument("card_or_bank", help="Whether we are processing card or bank transactions.")
+	parser.add_argument("debit_or_credit", help="What kind of transactions do you wanna process, debit or credit?")
+
+
 	args = parser.parse_args()
 	if args.debug:
 		logging.basicConfig(level=logging.DEBUG)
 	elif args.info:
 		logging.basicConfig(level=logging.INFO)
+	return args
 
 def convert_csv_to_torch_7_binaries(input_file):
 	"""Use plumbum to convert CSV files to torch 7 binaries."""
@@ -211,7 +218,7 @@ def execute_main_lua(output_path, input_file):
 
 """ Main program"""
 if __name__ == "__main__":
-	parse_arguments()
+	args = parse_arguments()
 	#1. Grab the input file from S3
 	bucket = "yodleemisc"
 	prefix = "hvudumala/Type_Subtype_finaldata/Card/"
@@ -219,8 +226,8 @@ if __name__ == "__main__":
 	input_file = pull_from_s3(bucket=bucket, prefix=prefix, my_filter=my_filter,
 		input_path=input_path)
 	#2.  Slice it into dataframes and make a mapping file.
-	output_path = "./output/"
-	bank_or_card, debit_or_credit = "card", "debit"
+	output_path = args.output_dir
+	bank_or_card, debit_or_credit = args.card_or_bank, args.debit_or_credit
 	train_poor, test_poor, num_of_classes = slice_into_dataframes(input_file=input_file, debit_or_credit=debit_or_credit,
 		output_path=output_path, bank_or_card=bank_or_card)
 	#3.  Use qlua to convert the files into training and testing sets.
