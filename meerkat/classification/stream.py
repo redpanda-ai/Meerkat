@@ -177,14 +177,22 @@ def convert_csv_to_torch_7_binaries(input_file):
 	"""Use plumbum to convert CSV files to torch 7 binaries."""
 	output_file = input_file[:-4] + ".t7b"
 	logging.info("Converting {0} to {1}.".format(input_file, output_file))
-	command = local["yes"] | local["qlua"]["meerkat/classification/lua/csv2t7b.lua"]["-input"][input_file]["-output"][output_file]
+	# Remove the output_file
+	if os.path.isfile(output_file):
+		os.remove(output_file)
+	command = local["qlua"]["meerkat/classification/lua/csv2t7b.lua"]["-input"][input_file]["-output"][output_file]
+	#command = local["yes"] | local["qlua"]["meerkat/classification/lua/csv2t7b.lua"]["-input"][input_file]["-output"][output_file]
 	result = command()
 	logging.info("The result is {0}".format(result))
 
-def create_new_configuration_file(num_of_classes):
+def create_new_configuration_file(num_of_classes, output_path):
 	logging.info("Generate a new configuration file with the correct number of classes.")
-	command = local["sed"]["s:156:21:"]["meerkat/classification/lua/config.lua"] > "meerkat/classification/lua/config_21.lua"
+	command = local["sed"]["s:156:" + str(num_of_classes) + ":"]["meerkat/classification/lua/config.lua"] > output_path + "config.lua"
 	command()
+
+def copy_file(input_file, directory):
+	logging.info("")
+	local["cp"][input_file][directory]()
 
 """ Main program"""
 if __name__ == "__main__":
@@ -201,7 +209,9 @@ if __name__ == "__main__":
 	train_poor, test_poor, num_of_classes = slice_into_dataframes(input_file=input_file, debit_or_credit=debit_or_credit,
 		output_path=output_path, bank_or_card=bank_or_card)
 	#3.  Use qlua to convert the files into training and testing sets.
-	#convert_csv_to_torch_7_binaries(train_poor)
-	#convert_csv_to_torch_7_binaries(test_poor)
+	convert_csv_to_torch_7_binaries(train_poor)
+	convert_csv_to_torch_7_binaries(test_poor)
 	#4 Create a new configuration file based on the number of classes.
-	create_new_configuration_file(num_of_classes)
+	create_new_configuration_file(num_of_classes, output_path)
+	#5 Copy main.lua to output directory.
+	copy_file("meerkat/classification/lua/main.lua", output_path)
