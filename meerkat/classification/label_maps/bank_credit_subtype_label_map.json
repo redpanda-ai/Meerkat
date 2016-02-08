@@ -1,25 +1,92 @@
 {
-    "1": "Bank Adjustment - Adjustment",
-    "2": "Bank Adjustment - Credit Adjustment",
-    "3": "Deposit - ATM Deposit",
-    "4": "Deposit - Check Deposit",
-    "5": "Deposit - Deposit",
-    "6": "Deposit - Direct Deposit",
-    "7": "Deposit - Investment Income",
-    "8": "Deposit - Mobile Deposit",
-    "9": "Deposit - Rewards",
-    "10": "Deposit - SSA",
-    "11": "Deposit - Tax Refund",
-    "12": "Deposit - Teller Deposit",
-    "13": "Interest - Interest",
-    "14": "Other Income - Credit",
-    "15": "Payment - Child Support",
-    "16": "Payment - Credit Card Payment",
-    "17": "Refund - Fee Refund",
-    "18": "Refund - Refund",
-    "19": "Refund - Reimbursement",
-    "20": "Refund - Service Charge Refund",
-    "21": "Transfer - Overdraft Protection",
-    "22": "Transfer - Transfer",
-    "23": "Transfer - Wire Transfer"
+    "1": {
+        "category": {
+            "credit": "Other Income",
+            "debit": "Other Expenses"
+        },
+        "label": "Bank Adjustment - Adjustment"
+    },
+    "2": {
+        "category": {
+            "credit": "Other Income",
+            "debit": "Other Expenses"
+        },
+        "label": "Bank Adjustment - Credit Adjustment"
+    },
+    "3": {
+        "category": "Deposits",
+        "label": "Deposits & Credits - ATM Deposit"
+    },
+    "4": {
+        "category": "Deposits",
+        "label": "Deposits & Credits - Check Deposit"
+    },
+    "5": {
+        "category": "Deposits",
+        "label": "Deposits & Credits - Deposit"
+    },
+    "6": {
+        "category": "Paychecks/Salary",
+        "label": "Deposits & Credits - Direct Deposit"
+    },
+    "7": {
+        "category": "Investment Income",
+        "label": "Deposits & Credits - Investment Income"
+    },
+    "8": {
+        "category": "Deposits",
+        "label": "Deposits & Credits - Mobile Deposit"
+    },
+    "9": {
+        "category": "Other Income",
+        "label": "Deposits & Credits - Rewards"
+    },
+    "10": {
+        "category": "Other Income",
+        "label": "Deposits & Credits - SSA"
+    },
+    "11": {
+        "category": "Other Income",
+        "label": "Deposits & Credits - Tax Refund"
+    },
+    "12": {
+        "category": "Deposits",
+        "label": "Deposits & Credits - Teller Deposit"
+    },
+    "13": {
+        "category": "Interest",
+        "label": "Interest - Interest"
+    },
+    "14": {
+        "category": "Other Income",
+        "label": "Other Income - Credit"
+    },
+    "15": {
+        "category": "Service Charges/Fees",
+        "label": "Refund - Fee Refund"
+    },
+    "16": {
+        "category": "Other Income",
+        "label": "Refund - Refund"
+    },
+    "17": {
+        "category": "Expense Reimbursement",
+        "label": "Refund - Reimbursement"
+    },
+    "18": {
+        "category": "Service Charges/Fees",
+        "label": "Refund - Service Charge Refund"
+    },
+    "19": {
+        "category": "Transfers",
+        "label": "Transfer - Overdraft Protection"
+    },
+    "20": {
+        "category": "Transfers",
+        "label": "Transfer - Transfer"
+    },
+    "21": {
+        "category": "Transfers",
+        "label": "Transfer - Wire Transfer"
+    }
 }

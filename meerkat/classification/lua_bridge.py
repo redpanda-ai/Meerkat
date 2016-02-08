@@ -19,20 +19,20 @@ def get_cnn(model_name):
 	# Load CNN and Label map
 	if model_name == "bank_merchant":
 		return get_cnn_by_path(
-			"meerkat/classification/models/624_class_bank_CNN.t7b",
-			"meerkat/classification/label_maps/new_rlm_bank.json")
+			"meerkat/classification/models/bank_merchant_CNN.t7b",
+			"meerkat/classification/label_maps/bank_merchant_label_map.json")
 	elif model_name == "card_merchant":
 		return get_cnn_by_path(
-			"meerkat/classification/models/751_class_card_CNN.t7b",
-			"meerkat/classification/label_maps/new_rlm_card.json")
+			"meerkat/classification/models/card_merchant_CNN.t7b",
+			"meerkat/classification/label_maps/card_merchant_label_map.json")
 	elif model_name == "bank_debit_subtype":
 		return get_cnn_by_path(
-			"meerkat/classification/models/bank_debit_subtype_CNN_01192016.t7b",
-			"meerkat/classification/label_maps/bank_debit_subtype_label_map_01192016.json")
+			"meerkat/classification/models/bank_debit_subtype_CNN.t7b",
+			"meerkat/classification/label_maps/bank_debit_subtype_label_map.json")
 	elif model_name == "bank_credit_subtype":
 		return get_cnn_by_path(
-			"meerkat/classification/models/bank_credit_subtype_CNN_01192016.t7b",
-			"meerkat/classification/label_maps/bank_credit_subtype_label_map_01192016.json")
+			"meerkat/classification/models/bank_credit_subtype_CNN.t7b",
+			"meerkat/classification/label_maps/bank_credit_subtype_label_map.json")
 	elif model_name == "card_debit_subtype":
 		return get_cnn_by_path(
 			"meerkat/classification/models/card_debit_subtype_CNN.t7b",
@@ -139,7 +139,7 @@ def get_cnn_by_path(model_path, dict_path):
 	''')
 
 	# Generate Helper Function
-	def apply_cnn(trans, doc_key="description", label_key="CNN"):
+	def apply_cnn(trans, doc_key="description", label_key="CNN", label_only=True):
 		"""Apply CNN to transactions"""
 
 		trans_list = [' '.join(x[doc_key].split()) for x in trans]
@@ -151,6 +151,7 @@ def get_cnn_by_path(model_path, dict_path):
 
 		for index, transaction in enumerate(trans):
 			label = reverse_label_map.get(str(decisions[index]), "") if confidences[index] > LOGSOFTMAX_THRESHOLD else ""
+			if isinstance(label, dict) and label_only: label = label["label"]
 			transaction[label_key] = label
 
 		return trans

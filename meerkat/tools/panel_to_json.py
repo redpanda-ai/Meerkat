@@ -1,9 +1,10 @@
-"""This module samples panel files to produce JSON."""
+"""This module samples panel files to produce JSON for use
+with the web service."""
 
 #################### USAGE ##########################
 
-# python3.3 panel_to_json.py [panel_file] [number_of_transactions]
-# python3.3 panel_to_json.py card_sample_3_years_large.txt 1500
+# python3 -m meerkat.tools.panel_to_json [panel_file] [number_of_transactions]
+# python3 -m meerkat.tools.panel_to_json card_sample_3_years_large.txt 1500
 
 #####################################################
 
@@ -26,7 +27,7 @@ def string_cleanse(original_string):
 	with_spaces = re.sub(cleanse_pattern, " ", original_string)
 	return ' '.join(with_spaces.split())
 
-def well_named_function():
+def sample_panel_to_json():
 	"""This function brings it all together."""
 	query = {
 		"cobrand_id" : 1234,
@@ -54,5 +55,5 @@ def well_named_function():
 
 	dict_2_json(query, "web_service_input.json")
 
-if __name__ == "main":
-	well_named_function()
+if __name__ == '__main__':
+	sample_panel_to_json()
