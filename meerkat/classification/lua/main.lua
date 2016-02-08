@@ -47,6 +47,7 @@ function main.argparse()
 
    -- Options
    cmd:option("-resume",0,"Resumption point in epoch. 0 means not resumption.")
+   cmd:option("-transfer", "", "A previously trained model to transfer knowledge from")
    cmd:text()
    
    -- Parse the option
@@ -57,14 +58,14 @@ function main.argparse()
       -- Find the main resumption file
       local files = main.findFiles(paths.concat(config.main.save,"main_"..tostring(opt.resume).."_*.t7b"))
       if #files ~= 1 then
-	     error("Found "..tostring(#files).." main resumption point.")
+        error("Found "..tostring(#files).." main resumption point.")
       end
       config.main.resume = files[1]
       print("Using main resumption point "..config.main.resume)
       -- Find the model resumption file
       local files = main.findFiles(paths.concat(config.main.save,"sequential_"..tostring(opt.resume).."_*.t7b"))
       if #files ~= 1 then
-	     error("Found "..tostring(#files).." model resumption point.")
+        error("Found "..tostring(#files).." model resumption point.")
       end
       config.model.file = files[1]
       print("Using model resumption point "..config.model.file)
@@ -73,8 +74,20 @@ function main.argparse()
       print("Next training epoch resumed to "..config.train.epoch)
       -- Don't do randomize
       if config.main.randomize then
-	     config.main.randomize = nil
-	     print("Disabled randomization for resumption")
+        config.main.randomize = nil
+        print("Disabled randomization for resumption")
+      end
+   else
+      if opt.transfer ~= "" then
+        if string.match(opt.transfer, ".t7b") then
+          config.model.transfer = opt.transfer
+          if config.main.randomize then
+            config.main.randomize = nil
+            print("Disabled randomization for transfer")
+          end
+        else
+          error(opt.transfer.." not a valid model to transfer knowledge from")
+        end
       end
    end
 
@@ -124,11 +137,11 @@ function main.run()
    --Run for this number of era
    for i = 1,config.main.eras do
       if config.main.dropout then
-	     print("Enabling dropouts")
-	     main.model:enableDropouts()
+        print("Enabling dropouts")
+        main.model:enableDropouts()
       else
-	     print("Disabling dropouts")
-	     main.model:disableDropouts()
+        print("Disabling dropouts")
+        main.model:disableDropouts()
       end
       print("Training for era "..i)
       main.train:run(config.main.epoches, main.trainlog)
@@ -140,19 +153,19 @@ function main.run()
       main.test_val:run(main.testlog)
 
       if config.main.test == nil or config.main.test == true then
-	     print("Disabling dropouts")
-	     print("Testing on test data for era "..i)
-	     main.test_val:run(main.testlog)
+        print("Disabling dropouts")
+        print("Testing on test data for era "..i)
+        main.test_val:run(main.testlog)
       end
 
       print("Recording on era "..i)
       main.record[#main.record+1] = {train_error = main.test_train.e,
-				                         train_loss = main.test_train.l,
-				                         val_error = main.test_val.e,
-				                         val_loss = main.test_val.l}
+                                     train_loss = main.test_train.l,
+                                     val_error = main.test_val.e,
+                                     val_loss = main.test_val.l}
       if config.test.confusion then
-	     main.record[#main.record].train_confusion = main.test_train.confusion:clone()
-	     main.record[#main.record].val_confusion = main.test_val.confusion:clone()
+        main.record[#main.record].train_confusion = main.test_train.confusion:clone()
+        main.record[#main.record].val_confusion = main.test_val.confusion:clone()
       end
       
       print("Saving data")
@@ -175,9 +188,9 @@ function main.save()
    -- Make the save
    local time = os.time()
    torch.save(paths.concat(config.main.save,"main_"..(main.train.epoch-1).."_"..time..".t7b"),
-	      {config = config, record = main.record, momentum = main.train.old_grads:double()})
+         {config = config, record = main.record, momentum = main.train.old_grads:double()})
    torch.save(paths.concat(config.main.save,"sequential_"..(main.train.epoch-1).."_"..time..".t7b"),
-	      main.model:clearSequential(main.model:makeCleanSequential(main.model.sequential)))
+         main.model:clearSequential(main.model:makeCleanSequential(main.model.sequential)))
    main.eps_error = main.eps_error or gnuplot.epsfigure(paths.concat(config.main.save,"figure_error.eps"))
    main.eps_loss = main.eps_loss or gnuplot.epsfigure(paths.concat(config.main.save,"figure_loss.eps"))
    collectgarbage()
@@ -194,37 +207,37 @@ function main.trainlog(train)
       local msg = ""
       
       if config.main.details then
-	 msg = msg.."epo: "..(train.epoch-1)..
-	    ", rat: "..string.format("%.2e",train.rate)..
-	    ", err: "..string.format("%.2e",train.error)..
-	    ", obj: "..string.format("%.2e",train.objective)..
-	    ", dat: "..string.format("%.2e",train.time.data)..
-	    ", fpp: "..string.format("%.2e",train.time.forward)..
-	    ", bpp: "..string.format("%.2e",train.time.backward)..
-	    ", upd: "..string.format("%.2e",train.time.update)
+    msg = msg.."epo: "..(train.epoch-1)..
+       ", rat: "..string.format("%.2e",train.rate)..
+       ", err: "..string.format("%.2e",train.error)..
+       ", obj: "..string.format("%.2e",train.objective)..
+       ", dat: "..string.format("%.2e",train.time.data)..
+       ", fpp: "..string.format("%.2e",train.time.forward)..
+       ", bpp: "..string.format("%.2e",train.time.backward)..
+       ", upd: "..string.format("%.2e",train.time.update)
       end
       
       if config.main.debug then
-	 msg = msg..", bmn: "..string.format("%.2e",train.batch:mean())..
-	    ", bsd: "..string.format("%.2e",train.batch:std())..
-	    ", bmi: "..string.format("%.2e",train.batch:min())..
-	    ", bmx: "..string.format("%.2e",train.batch:max())..
-	    ", pmn: "..string.format("%.2e",train.params:mean())..
-	    ", psd: "..string.format("%.2e",train.params:std())..
-	    ", pmi: "..string.format("%.2e",train.params:min())..
-	    ", pmx: "..string.format("%.2e",train.params:max())..
-	    ", gmn: "..string.format("%.2e",train.grads:mean())..
-	    ", gsd: "..string.format("%.2e",train.grads:std())..
-	    ", gmi: "..string.format("%.2e",train.grads:min())..
-	    ", gmx: "..string.format("%.2e",train.grads:max())..
-	    ", omn: "..string.format("%.2e",train.old_grads:mean())..
-	    ", osd: "..string.format("%.2e",train.old_grads:std())..
-	    ", omi: "..string.format("%.2e",train.old_grads:min())..
-	    ", omx: "..string.format("%.2e",train.old_grads:max())
+    msg = msg..", bmn: "..string.format("%.2e",train.batch:mean())..
+       ", bsd: "..string.format("%.2e",train.batch:std())..
+       ", bmi: "..string.format("%.2e",train.batch:min())..
+       ", bmx: "..string.format("%.2e",train.batch:max())..
+       ", pmn: "..string.format("%.2e",train.params:mean())..
+       ", psd: "..string.format("%.2e",train.params:std())..
+       ", pmi: "..string.format("%.2e",train.params:min())..
+       ", pmx: "..string.format("%.2e",train.params:max())..
+       ", gmn: "..string.format("%.2e",train.grads:mean())..
+       ", gsd: "..string.format("%.2e",train.grads:std())..
+       ", gmi: "..string.format("%.2e",train.grads:min())..
+       ", gmx: "..string.format("%.2e",train.grads:max())..
+       ", omn: "..string.format("%.2e",train.old_grads:mean())..
+       ", osd: "..string.format("%.2e",train.old_grads:std())..
+       ", omi: "..string.format("%.2e",train.old_grads:min())..
+       ", omx: "..string.format("%.2e",train.old_grads:max())
       end
       
       if config.main.details or config.main.debug then
-	 print(msg)
+    print(msg)
       end
 
       main.clock.log = os.time()
@@ -239,13 +252,13 @@ function main.testlog(test)
    if not config.main.details then return end
    if (os.time() - main.clock.log) >= (config.main.logtime or 1) then
       print("n: "..test.n..
-	       ", e: "..string.format("%.2e",test.e)..
-	       ", l: "..string.format("%.2e",test.l)..
-	       ", err: "..string.format("%.2e",test.err)..
-	       ", obj: "..string.format("%.2e",test.objective)..
-	       ", dat: "..string.format("%.2e",test.time.data)..
-	       ", fpp: "..string.format("%.2e",test.time.forward)..
-	       ", acc: "..string.format("%.2e",test.time.accumulate))
+          ", e: "..string.format("%.2e",test.e)..
+          ", l: "..string.format("%.2e",test.l)..
+          ", err: "..string.format("%.2e",test.err)..
+          ", obj: "..string.format("%.2e",test.objective)..
+          ", dat: "..string.format("%.2e",test.time.data)..
+          ", fpp: "..string.format("%.2e",test.time.forward)..
+          ", acc: "..string.format("%.2e",test.time.accumulate))
       main.clock.log = os.time()
    end
 end

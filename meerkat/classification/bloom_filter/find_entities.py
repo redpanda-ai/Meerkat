@@ -69,7 +69,7 @@ def generate_city_map():
 	"""
 	print("generate location map")
 
-	csv_file = csv.reader(open("meerkat/classification/bloom_filter/assets/us_cities_larger.csv"), \
+	csv_file = csv.reader(open("meerkat/classification/bloom_filter/assets/us_cities_larger.csv", encoding="utf-8"), \
 		delimiter="\t")
 	data = {}
 	for row in csv_file:
