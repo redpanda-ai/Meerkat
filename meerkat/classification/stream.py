@@ -224,7 +224,11 @@ def main_stream():
 	args = parse_arguments()
 	#1. Grab the input file from S3
 	bucket = "yodleemisc"
-	prefix = "hvudumala/Type_Subtype_finaldata/Card/"
+
+	#prefix = "hvudumala/Type_Subtype_finaldata/Card/"
+	#Download files from Card or Bank directory.
+	prefix = "hvudumala/Type_Subtype_finaldata/" + cap_first_letter(args.card_or_bank)
+
 	my_filter, input_path = "csv", "./"
 	input_file = pull_from_s3(bucket=bucket, prefix=prefix, my_filter=my_filter,
 		input_path=input_path)
