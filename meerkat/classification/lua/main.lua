@@ -24,6 +24,7 @@ torch.manualSeed(os.time())
 
 -- Create namespaces
 main = {}
+io.stdout:setvbuf "no"
 
 -- The main program
 function main.main()
