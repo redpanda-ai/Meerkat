@@ -1,6 +1,5 @@
 import uuid
 
-
 def get_transaction():
     """Create and return an array containing a single transaction"""
     return [{
@@ -10,7 +9,6 @@ def get_transaction():
         "transaction_id": 5024853,
         "ledger_entry": "debit"
     }]
-
 
 def get_transaction_with_subtype():
     """Create and return an array containing a single transaction with a subtype appended"""
@@ -23,57 +21,49 @@ def get_transaction_with_subtype():
         "subtype_CNN": "Payment - Payment"
     }]
 
-
 def get_transaction_bank_fallback_classifiable():
     """Return an array containing a single transaction for a merchant whose name only appears in the bank fallback map"""
     return [{
-        "CNN": "Con Edison"
+        "CNN": {"label": "Con Edison", "category": "Utilities"}
     }]
-
 
 def get_transaction_card_fallback_classifiable():
     """Return an array containing a single transaction for a merchant whose name only appears in the card fallback map"""
     return [{
-        "CNN": "Legal Sea Foods"
+        "CNN": {"label": "Legal Sea Foods", "category": "Restaurants/Dining"}
     }]
-
 
 def get_transaction_subtype_fallback():
     """Return an array containing a single transaction for a merchant whose category must be looked up using the transaction subtype"""
     return [{
-        "CNN": "Capital One",
-        "txn_sub_type": "SSA"
+        "CNN": {"label": "Capital One", "category": "Use Subtype Rules for Categories"},
+        "subtype_CNN": {"label": "Deposits & Credits - SSA", "category": "Other Income"}
     }]
-
 
 def get_transaction_subtype_no_fallback():
-    """Return an array containing a single transaction for a merchant whose category must be looked up using the transaction subtype and whose transaction subtype does not appearn in the fallback map"""
+    """Return an array containing a single transaction for a merchant whose category must be looked up using the transaction subtype and whose transaction subtype does not appear in the fallback map"""
     return [{
-        "CNN": "Capital One",
-        "txn_sub_type": "Joseph Rules"
+        "CNN": {"label": "Capital One", "category": "Use Subtype Rules for Categories"},
+        "subtype_CNN": {"label": "Joseph Rules", "category": "Joseph Rules"}
     }]
-
 
 def get_transaction_subtype_no_merchant():
     """Return an array containing a single transaction with a subtype but no merchant name"""
     return [{
-        "txn_sub_type": "ATM Withdrawal"
+        "subtype_CNN": {"label": "Withdrawal - ATM Withdrawal", "category": "Cash Withdrawal"}
     }]
-
 
 def get_transaction_subtype_no_merchant_no_fallback():
     """Return an array containing a single transaction with a subtype but no merchant name and no fallback in the static maps"""
     return [{
-        "txn_sub_type": "Joseph Rules"
+        "subtype_CNN": {"label": "Joseph Rules"}
     }]
-
 
 def get_transaction_subtype_non_existant_merchant():
     """Return an array containing a single transaction with a merchant that doesn't exist in the subtype map"""
     return [{
-        "CNN": "Joseph Rules"
+        "CNN": {"label": "Joseph Rules"}
     }]
-
 
 def get_test_request_bank():
     """return an API request with the "bank" container"""
@@ -82,14 +72,12 @@ def get_test_request_bank():
         "transaction_list": get_test_transaction_list()
     }
 
-
 def get_test_request_card():
     """return an API request with the "card" container"""
     return {
         "container": "card",
         "transaction_list": get_test_transaction_list()
     }
-
 
 def get_test_transaction_list():
     """Return a list of transactions which will test different paths in the web_consumer"""
@@ -115,7 +103,6 @@ def get_test_transaction_list():
             "locale_bloom": ["Mockville", "CA"]
         }
     ]
-
 
 def get_mock_hyperparams():
     """Return a mock object with the necessary fields of the web_consumer's hyperparams.  Consider loading regular hyperparams from json"""
@@ -143,7 +130,6 @@ def get_mock_hyperparams():
             "tel": [0.597]
         }
     }
-
 
 def get_mock_params():
     """Return an object with the necessary fields of the web_consumer's params.  Consider loading the regular params from json"""
@@ -173,7 +159,6 @@ def get_mock_params():
         }
     }
 
-
 def get_mock_esconnection(params):
     index = params["elasticsearch"]["index"]
     index_type = params["elasticsearch"]["type"]
@@ -183,7 +168,6 @@ def get_mock_esconnection(params):
     es = lambda: None
     es.indices = indices
     return es
-
 
 def get_mock_msearch(queries):
     """Return a mock literal search method which creates a mock response for every query"""
@@ -196,7 +180,6 @@ def get_mock_msearch(queries):
     return {
         "responses": responses
     }
-
 
 def get_mock_factual():
     """Return a mock factual response"""
@@ -212,7 +195,6 @@ def get_mock_factual():
             "hits": hits
         }
     }
-
 
 def get_mock_hit(score):
     randomId = uuid.uuid4()
@@ -260,13 +242,11 @@ def get_mock_hit(score):
         "_score": score
     }
 
-
-def get_mock_cnn(transactions, label_key="CNN"):
+def get_mock_cnn(transactions, label_key="CNN", label_only=False):
     """Return a mock CNN which appends a parsable merchant name"""
     for trans in transactions:
-        trans[label_key] = "joseph - rules"
+        trans[label_key] = {"label": "joseph - rules", "category": "ruling class"}
     return transactions
-
 
 def get_mock_sws(description):
     """Return a mock SWS classifier which returns true or false depending on the test data"""
