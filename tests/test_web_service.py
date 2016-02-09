@@ -1,5 +1,5 @@
 from plumbum import local
-from plumbum.cmd import sleep
+from plumbum.cmd import sleep, sudo
 from requests.exceptions import ConnectionError
 from multiprocessing.pool import ThreadPool
 import json
@@ -46,11 +46,11 @@ class WebServiceTest(unittest.TestCase):
 
 	@classmethod
 	def setUpClass(cls):
-		local["sudo"]["supervisorctl"]["restart"]["meerkat"]()
+		sudo[local["supervisorctl"]["restart"]["meerkat"]]()
 
 	@classmethod
 	def tearDownClass(cls):
-		local["sudo"]["supervisorctl"]["stop"]["meerkat"]()
+		sudo[local["supervisorctl"]["stop"]["meerkat"]]()
 
 	def test_web_service_status(self):
 		"""Test starts meerkat, checks status of meerkat, and stops meerkat web service"""
