@@ -23,7 +23,6 @@ from meerkat.classification.lua_bridge import get_cnn
 from meerkat.classification.bloom_filter.find_entities import location_split
 
 # Enabled Models
-LMDIR = "meerkat/classification/label_maps/"
 BANK_SWS = select_model("bank_sws")
 CARD_SWS = select_model("card_sws")
 BANK_MERCHANT_CNN = get_cnn("bank_merchant")
@@ -32,10 +31,6 @@ CARD_DEBIT_SUBTYPE_CNN = get_cnn("card_debit_subtype")
 CARD_CREDIT_SUBTYPE_CNN = get_cnn("card_credit_subtype")
 BANK_DEBIT_SUBTYPE_CNN = get_cnn("bank_debit_subtype")
 BANK_CREDIT_SUBTYPE_CNN = get_cnn("bank_credit_subtype")
-BANK_CATEGORY_FALLBACK = load_params(LMDIR + "cnn_merchant_category_mapping_bank.json")
-CARD_CATEGORY_FALLBACK = load_params(LMDIR + "cnn_merchant_category_mapping_card.json")
-BANK_SUBTYPE_CAT_FALLBACK = load_params(LMDIR + "subtype_category_mapping_bank.json")
-CARD_SUBTYPE_CAT_FALLBACK = load_params(LMDIR + "subtype_category_mapping_card.json")
 
 class WebConsumer():
 	"""Acts as a web service client to process and enrich
@@ -100,13 +95,15 @@ class WebConsumer():
 	def __search_index(self, queries):
 		"""Search against a structured index"""
 		index = self.params["elasticsearch"]["index"]
-		try:
-			# pull routing out of queries and append to below msearch
-			results = self.elastic_search.msearch(queries, index=index)
-		except Exception as exception:
-			logging.warning(exception)
-			return None
+		results = self.elastic_search.msearch(queries, index=index)
 		return results
+		#try:
+		#	# pull routing out of queries and append to below msearch
+		#	results = self.elastic_search.msearch(queries, index=index)
+		#except Exception as exception:
+		#	logging.warning(exception)
+		#	return None
+		#return results
 
 	@staticmethod
 	def __z_score_delta(scores):
@@ -178,7 +175,7 @@ class WebConsumer():
 		
 		# Enrich Data if Passes Boundary
 		args = [decision, transaction, hit_fields,\
-			 names["business_names"], names["city_names"], names["state_names"]]
+			 names["business_names"], names["city_names"], names["state_names"], z_score_delta]
 		return self.__enrich_transaction(*args)
 
 	def __no_result(self, transaction):
@@ -193,6 +190,12 @@ class WebConsumer():
 			transaction[attr_map.get(field, field)] = ""
 
 		transaction["match_found"] = False
+		# Add fields required
+		if transaction["country"] == "":
+			transaction["country"] = "US"
+		transaction["source"] = "FACTUAL"
+		transaction["confidence_score"] = ""
+
 
 		return transaction
 
@@ -205,6 +208,7 @@ class WebConsumer():
 		business_names = argv[3]
 		city_names = argv[4]
 		state_names = argv[5]
+		confidence_score = argv[6]
 
 		params = self.params
 		field_names = params["output"]["results"]["fields"]
@@ -236,6 +240,8 @@ class WebConsumer():
 				transaction[attr_map.get(field, field)] = ""
 			transaction = self.__business_name_fallback(business_names, transaction, attr_map)
 			transaction = self.__geo_fallback(city_names, state_names, transaction, attr_map)
+			#Ensuring that there is a country code that matches the schema limitation
+			transaction["country"] = "US"
 
 		# Ensure Proper Casing
 		if transaction[attr_map['name']] == transaction[attr_map['name']].upper():
@@ -243,8 +249,11 @@ class WebConsumer():
 
 		# Add Source
 		index = params["elasticsearch"]["index"]
-		transaction["source"] = "FACTUAL" if (("factual" in index) and 
-		    (transaction["match_found"] == True)) else "OTHER"
+		transaction["source"] = "FACTUAL" if (("factual" in index) and
+			(transaction["match_found"] == True)) else "OTHER"
+
+		# Add "confidence_score" to the output schema.
+		transaction["confidence_score"] = ""
 
 		return transaction
 
@@ -279,35 +288,27 @@ class WebConsumer():
 
 		return transaction
 
-	def __apply_missing_categories(self, transactions, container):
+	def __apply_missing_categories(self, transactions):
 		"""If the factual search fails to find categories do a static lookup
 		on the merchant name"""
-		if container.lower() == "bank":
-			self.__apply_categories_from_dict(transactions,\
-				BANK_CATEGORY_FALLBACK, BANK_SUBTYPE_CAT_FALLBACK, "Retail Category")
-		else:
-			self.__apply_categories_from_dict(transactions,\
-				CARD_CATEGORY_FALLBACK, CARD_SUBTYPE_CAT_FALLBACK, "PaymentOps")
-
-	@staticmethod
-	def __apply_categories_from_dict(transactions, categories, subtype_fallback, key):
-		"""Use the given dictionary to add categories to transactions"""
+		
 		for trans in transactions:
+
 			if trans.get("category_labels"):
+				trans["CNN"] = trans.get("CNN", {}).get("label", "")
+				if "subtype_CNN" in trans: del trans["subtype_CNN"]
 				continue
-			merchant = trans.get("CNN", "").strip()
-			category = categories.get(merchant)
-			fallback = category and category.get(key) or ""
-			if (fallback == "Use Subtype Rules for Categories" or
-						fallback == ""):
-				# Get the subtype from the transaction
-				fallback = trans.get("txn_sub_type", "")
-				# Get the categories from the subtype map
-				fallback = subtype_fallback.get(fallback, fallback)
-				# Get the subtype for credit/debit if it's different
+
+			fallback = trans.get("CNN", {}).get("category", "").strip()
+
+			if (fallback == "Use Subtype Rules for Categories" or fallback == ""):
+				fallback = trans.get("subtype_CNN", {}).get("category", trans.get("subtype_CNN", {}).get("label", ""))
 				fallback = isinstance(fallback, dict) and fallback[trans["ledger_entry"].lower()] or fallback
 
 			trans["category_labels"] = [fallback]
+			trans["CNN"] = trans.get("CNN", {}).get("label", "")
+
+			if "subtype_CNN" in trans: del trans["subtype_CNN"]
 
 	def ensure_output_schema(self, transactions):
 		"""Clean output to proper schema"""
@@ -324,11 +325,14 @@ class WebConsumer():
 			if trans.get("CNN", "") != "":
 				trans[attr_map["name"]] = trans.get("CNN", "")
 				
-
 			# Override Locale with Bloom Results
-			if trans["locale_bloom"] != None and trans["is_physical_merchant"] == True:
+			# Add city and state to each transaction
+			if trans["locale_bloom"] != None:
 				trans["city"] = trans["locale_bloom"][0]
 				trans["state"] = trans["locale_bloom"][1]
+			else:
+				trans["city"] = ""
+				trans["state"] = ""
 
 			if "CNN" in trans:
 				del trans["CNN"]
@@ -398,7 +402,7 @@ class WebConsumer():
 			classifier = BANK_MERCHANT_CNN
 		else:
 			classifier = CARD_MERCHANT_CNN
-		return classifier(data["transaction_list"])
+		return classifier(data["transaction_list"], label_only=False)
 
 	@staticmethod
 	def __apply_subtype_cnn(data):
@@ -425,29 +429,29 @@ class WebConsumer():
 
 		# Apply classifiers
 		if len(credit) > 0:
-			credit_subtype_classifer(credit, label_key="subtype_CNN")
+			credit_subtype_classifer(credit, label_key="subtype_CNN", label_only=False)
 		if len(debit) > 0:
-			debit_subtype_classifer(debit, label_key="subtype_CNN")
+			debit_subtype_classifer(debit, label_key="subtype_CNN", label_only=False)
 
 		# Split label into type and subtype
 		for transaction in data["transaction_list"]:
 
-			if " - " not in transaction["subtype_CNN"]:
+			label = transaction["subtype_CNN"].get("label", "")
+
+			if " - " not in label:
 				if transaction["ledger_entry"] == "debit":
-					transaction["subtype_CNN"] = "Other Expenses - Debit"
+					label = "Other Expenses - Debit"
 				elif transaction["ledger_entry"] == "credit":
 					if data["container"] == "bank":
-						transaction["subtype_CNN"] = "Other Income - Credit"
+						label = "Other Income - Credit"
 					elif data["container"] == "card":
-						transaction["subtype_CNN"] = "Bank Adjustment - Adjustment"
+						label = "Bank Adjustment - Adjustment"
 				else:
-					transaction["subtype_CNN"] = " - "
+					label = " - "
 			
-			txn_type, txn_sub_type = transaction["subtype_CNN"].split(" - ")
+			txn_type, txn_sub_type = label.split(" - ")
 			transaction["txn_type"] = txn_type
 			transaction["txn_sub_type"] = txn_sub_type
-			
-			del transaction["subtype_CNN"]
 
 		return data["transaction_list"]
 
@@ -498,6 +502,7 @@ class WebConsumer():
 		run in parallel with GPU bound classifiers."""
 		self.__apply_locale_bloom(data)
 		physical, non_physical = self.__sws(data)
+
 		if "should_search" not in self.params or self.params["should_search"]:
 			physical = self.__enrich_physical(physical)
 			self.__apply_category_labels(physical)
@@ -517,7 +522,7 @@ class WebConsumer():
 		cpu_result.get() # Wait for CPU bound classifiers to finish
 
 		if not optimizing:
-			self.__apply_missing_categories(data["transaction_list"], data["container"])
+			self.__apply_missing_categories(data["transaction_list"])
 
 		self.ensure_output_schema(data["transaction_list"])
 		return data

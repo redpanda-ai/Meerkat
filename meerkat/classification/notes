@@ -1,0 +1,6 @@
+1.  Pull the needed CSV files from S3 (automate using boto).
+2.  Run the functions in subtype_process module to produce training and testing CSVs (python import)
+3.  Convert the training and testing CSVs into T7Bs using csv2t7b.lua (automate using plumbum)
+4.  Update the config.lua file from a template so that the number of output classes match the last layer.
+5.  Run the qlua main.lua (automate using plumbum)
+

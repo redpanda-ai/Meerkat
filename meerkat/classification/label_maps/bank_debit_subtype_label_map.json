@@ -1,38 +1,141 @@
 {
-    "1": "Bank Adjustment - Adjustment",
-    "2": "Bank Adjustment - Credit Adjustment",
-    "3": "Charges & Fees - Annual Fee",
-    "4": "Charges & Fees - Convenience Fee",
-    "5": "Charges & Fees - Debit Card Fee",
-    "6": "Charges & Fees - Other Charges & Fees",
-    "7": "Charges & Fees - Overdraft Charge",
-    "8": "Charges & Fees - Returned Check Charge",
-    "9": "Charges & Fees - Service Charges/Fees",
-    "10": "Charges & Fees - Stop Payment Charge",
-    "11": "Payment - Auto Loan",
-    "12": "Payment - Home Loan / Mortgage",
-    "13": "Payment - Loan",
-    "14": "Payment - Personal Loan",
-    "15": "Payment - Student Loan",
-    "16": "Other Expenses - Debit",
-    "17": "Payment - ACH Debit",
-    "18": "Payment - Child Support",
-    "19": "Payment - Credit Card Payment",
-    "20": "Payment - Electronic Payment",
-    "21": "Payment - Insurance Payment",
-    "22": "Payment - Payment by Check",
-    "23": "Payment - Payment",
-    "24": "Payment - Recurring Payment",
-    "25": "Payment - Tax Payment",
-    "26": "Payment - Utilities Payment",
-    "27": "POS Debit - POS Debit",
-    "28": "Purchase - Online Purchase",
-    "29": "Purchase - Purchase with Debit Card",
-    "30": "Purchase - Purchase",
-    "31": "Purchase - Sales Tax",
-    "32": "Transfer - Overdraft Protection",
-    "33": "Transfer - Transfer",
-    "34": "Transfer - Wire Transfer",
-    "35": "Withdrawal - ATM Withdrawal",
-    "36": "Withdrawal - Withdrawal"
+    "1": {
+        "category": {
+            "credit": "Other Income",
+            "debit": "Other Expenses"
+        },
+        "label": "Bank Adjustment - Adjustment"
+    },
+    "2": {
+        "category": "Service Charges/Fees",
+        "label": "Charges & Fees - Annual Fee"
+    },
+    "3": {
+        "category": "Service Charges/Fees",
+        "label": "Charges & Fees - Convenience Fee"
+    },
+    "4": {
+        "category": "Service Charges/Fees",
+        "label": "Charges & Fees - Debit Card Fee"
+    },
+    "5": {
+        "category": "Service Charges/Fees",
+        "label": "Charges & Fees - Other Charges & Fees"
+    },
+    "6": {
+        "category": "Service Charges/Fees",
+        "label": "Charges & Fees - Overdraft Charge"
+    },
+    "7": {
+        "category": "Service Charges/Fees",
+        "label": "Charges & Fees - Returned Check Charge"
+    },
+    "8": {
+        "category": "Service Charges/Fees",
+        "label": "Charges & Fees - Service Charges/Fees"
+    },
+    "9": {
+        "category": "Service Charges/Fees",
+        "label": "Charges & Fees - Stop Payment Charge"
+    },
+    "10": {
+        "category": "Other Expenses",
+        "label": "Other Expenses - Debit"
+    },
+    "11": {
+        "category": "Other Bills",
+        "label": "Payment - ACH Debit"
+    },
+    "12": {
+        "category": "Loans",
+        "label": "Payment - Auto Loan"
+    },
+    "13": {
+        "category": "Child/Dependent Expenses",
+        "label": "Payment - Child Support"
+    },
+    "14": {
+        "category": "Credit Card Payments",
+        "label": "Payment - Credit Card Payment"
+    },
+    "15": {
+        "category": "Other Bills",
+        "label": "Payment - Electronic Payment"
+    },
+    "16": {
+        "category": "Mortgages",
+        "label": "Payment - Home Loan / Mortgage"
+    },
+    "17": {
+        "category": "Insurance",
+        "label": "Payment - Insurance Payment"
+    },
+    "18": {
+        "category": "Loans",
+        "label": "Payment - Loan"
+    },
+    "19": {
+        "category": "Other Bills",
+        "label": "Payment - Payment"
+    },
+    "20": {
+        "category": "Checks",
+        "label": "Payment - Payment by Check"
+    },
+    "21": {
+        "category": "Loans",
+        "label": "Payment - Personal Loan"
+    },
+    "22": {
+        "category": "Other Bills",
+        "label": "Payment - Recurring Payment"
+    },
+    "23": {
+        "category": "Loans",
+        "label": "Payment - Student Loan"
+    },
+    "24": {
+        "category": "Taxes",
+        "label": "Payment - Tax Payment"
+    },
+    "25": {
+        "category": "Utilities",
+        "label": "Payment - Utilities Payment"
+    },
+    "26": {
+        "category": "Other Expenses",
+        "label": "Purchase - Online Purchase"
+    },
+    "27": {
+        "category": "Other Expenses",
+        "label": "Purchase - Purchase"
+    },
+    "28": {
+        "category": "Other Expenses",
+        "label": "Purchase - Purchase with Debit Card"
+    },
+    "29": {
+        "category": "Taxes",
+        "label": "Purchase - Sales Tax"
+    },
+    "30": {
+        "category": "Transfers",
+        "label": "Transfer - Overdraft Protection"
+    },
+    "31": {
+        "category": "Transfers",
+        "label": "Transfer - Transfer"
+    },
+    "32": {
+        "category": "Transfers",
+        "label": "Transfer - Wire Transfer"
+    },
+    "33": {
+        "category": "Cash Withdrawal",
+        "label": "Withdrawal - ATM Withdrawal"
+    },
+    "34": {
+        "category": "Cash Withdrawal",
+        "label": "Withdrawal - Withdrawal"
+    }
 }

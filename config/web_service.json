@@ -8,11 +8,11 @@
             "fields" : [
                 "name", "category_labels", "address", "locality", "country",
                 "region", "postcode", "factual_id", "internal_store_number",
-                "latitude", "longitude"],
+                "latitude", "longitude", "website", "tel", "fax", "chain_name", "neighborhood"],
             "labels" : [
                 "merchant_name", "category_labels", "street", "city", "country",
                 "state", "postal_code", "source_merchant_id", "store_id",
-                "latitude", "longitude"]
+                "latitude", "longitude", "website", "phone_number", "fax_number", "chain_name", "neighbourhood"]
         }
     },
     "elasticsearch" : {

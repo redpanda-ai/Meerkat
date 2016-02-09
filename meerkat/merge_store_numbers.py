@@ -14,10 +14,14 @@ Created on Mar 25, 2014
 #################### USAGE ##########################
 
 # Note: Store numbers must be comma delimited
-
-# python3.3 -m meerkat.merge_store_numbers [store_numbers_file]
-# python3.3 -m meerkat.merge_store_numbers [store_numbers_directory]
-# python3.3 -m meerkat.merge_store_numbers data/misc/Store\ Numbers/Clean/IAE
+"""
+python3 -m meerkat.merge_store_numbers [store_numbers_file] \
+[cluster_address] [index] [doc_type]
+python3 -m meerkat.merge_store_numbers [store_numbers_directory] \
+[cluster_address] [index] [doc_type]
+python3 -m meerkat.merge_store_numbers data/misc/Store\ Numbers/Clean/IAE \
+127.0.0.1 factual_index factual_type
+"""
 
 # Required Columns:
 # keywords: Name found in factual
@@ -136,9 +140,8 @@ def update_merchant(factual_id, store):
 	body = {"doc" : {"internal_store_number" : store_number}}
 
 	try:
-		#TODO NO HARDCODED INDEX!!!
-		output_data = get_es_connection().update(index="factual_index", \
-		doc_type="factual_type", id=factual_id, body=body)
+		output_data = get_es_connection().update(index=sys.argv[3], \
+		doc_type=sys.argv[4], id=factual_id, body=body)
 	except Exception:
 		logging.warning("Failed to Update Merchant")
 
@@ -152,8 +155,7 @@ def search_index(query):
 	output_data = ""
 
 	try:
-		#TODO NO HARDCODED INDEX!!!
-		output_data = get_es_connection().search(index="factual_index", body=query)
+		output_data = get_es_connection().search(index=sys.argv[3], body=query)
 	except Exception:
 		output_data = {"hits":{"total":0}}
 
@@ -201,14 +203,18 @@ def run(stores):
 	logging.warning("MISSES: {0}".format(misses))
 	logging.warning("PERCENT MERGED: {0}".format(percent_merged))
 
-	# Save Not Found
+	# Save Mapping
 	save_mapping(stores, percent_merged)
 
 def save_mapping(stores, percent_merged):
 	"""Saves all results as a mapping file"""
 
 	store_name = stores[0]['keywords']
-	file_name = "/mnt/ephemeral/AggData_Factual_Merge/" + store_name + "_" + \
+
+	path = "data/output/AggData_Factual_Merge/"
+	os.makedirs(path, exist_ok=True)
+
+	file_name = path + store_name + "_" + \
 	str(percent_merged * 100) + "%_success_rate" + ".csv"
 	delimiter = ","
 	output_file = open(file_name, 'w')
@@ -216,20 +222,6 @@ def save_mapping(stores, percent_merged):
 	(output_file, delimiter=delimiter, fieldnames=stores[0].keys())
 	dict_w.writeheader()
 	dict_w.writerows(stores)
-	output_file.close()
-
-def save_not_found(not_found, percent_merged):
-	"""Save the stores not found in the index"""
-
-	store_name = not_found[0]['keywords']
-	file_name = "/mnt/ephemeral/AggData_Factual_Merge/" + store_name + "_" + \
-	str(percent_merged * 100) + "%_success_rate" + ".csv"
-	delimiter = ","
-	output_file = open(file_name, 'w')
-	dict_w = csv.DictWriter(output_file, delimiter=delimiter,\
-	fieldnames=not_found[0].keys())
-	dict_w.writeheader()
-	dict_w.writerows(not_found)
 	output_file.close()
 
 def start_thread(_queue):
@@ -275,7 +267,7 @@ def process_single_merchant():
 def verify_arguments():
 	"""Verify Usage"""
 
-	sufficient_arguments = (len(sys.argv) == 2)
+	sufficient_arguments = (len(sys.argv) == 5)
 
 	if not sufficient_arguments:
 		logging.warning("Insufficient arguments. Please see usage")
@@ -314,7 +306,7 @@ def run_from_command_line():
 
 def get_es_connection():
 	""" Get the Elastic search connection. """
-	es_connection = Elasticsearch(["127.0.0.1"], sniff_on_start=True, 
+	es_connection = Elasticsearch([sys.argv[2]], sniff_on_start=True, 
 		sniff_on_connection_fail=True, sniffer_timeout=15, sniff_timeout=15)
 	return es_connection
 

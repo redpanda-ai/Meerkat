@@ -26,78 +26,57 @@ class WebConsumerTest(unittest.TestCase):
 
     def test_static_bank_category_map(self):
         """Assert that the correct static category label has been applied from the bank map"""
+        
         transactions = web_consumer_fixture.get_transaction_bank_fallback_classifiable()
-
-        self.consumer._WebConsumer__apply_missing_categories(
-                                                              transactions,
-                                                              "bank")
-
+        self.consumer._WebConsumer__apply_missing_categories(transactions)
         self.assertEqual(len(transactions[0]["category_labels"]), 1)
         self.assertEqual(transactions[0]["category_labels"][0], "Utilities")
 
     def test_static_card_category_map(self):
         """Assert that the correct static category label has been applied from the card map"""
+        
         transactions = web_consumer_fixture.get_transaction_card_fallback_classifiable()
-
-        self.consumer._WebConsumer__apply_missing_categories(
-                                                              transactions,
-                                                              "card")
-
+        self.consumer._WebConsumer__apply_missing_categories(transactions)
         self.assertEqual(len(transactions[0]["category_labels"]), 1)
         self.assertEqual(transactions[0]["category_labels"][0], "Restaurants/Dining")
 
     def test_static_subtype_category_map(self):
         """Assert that the category is applied out of the transaction subytpe fallback map when the merchant map indicates it should be"""
+        
         transactions = web_consumer_fixture.get_transaction_subtype_fallback()
-
-        self.consumer._WebConsumer__apply_missing_categories(
-                                                              transactions,
-                                                              "bank")
-
+        self.consumer._WebConsumer__apply_missing_categories(transactions)
         self.assertEqual(len(transactions[0]["category_labels"]), 1)
         self.assertEqual(transactions[0]["category_labels"][0], "Other Income")
 
     def test_catgory_not_found_subtype_fallback(self):
         """Assert that the transaction subtype is applied when it is not found in the subtype map"""
+
         transactions = web_consumer_fixture.get_transaction_subtype_no_fallback()
-
-        self.consumer._WebConsumer__apply_missing_categories(
-                                                              transactions,
-                                                              "bank")
-
+        self.consumer._WebConsumer__apply_missing_categories(transactions)
         self.assertEqual(len(transactions[0]["category_labels"]), 1)
         self.assertEqual(transactions[0]["category_labels"][0], "Joseph Rules")
 
     def test_no_merchant_name_subtype_fallback(self):
         """Assert that when no merchant name is found the category is looked up using the subtype"""
+        
         transactions = web_consumer_fixture.get_transaction_subtype_no_merchant()
-
-        self.consumer._WebConsumer__apply_missing_categories(
-                                                              transactions,
-                                                              "bank")
-
+        self.consumer._WebConsumer__apply_missing_categories(transactions)
         self.assertEqual(len(transactions[0]["category_labels"]), 1)
         self.assertEqual(transactions[0]["category_labels"][0], "Cash Withdrawal")
 
     def test_no_merchant_name_no_subtype_fallback(self):
         """Assert that when no merchant name is found the category is looked up using the subtype"""
+        
         transactions = web_consumer_fixture.get_transaction_subtype_no_merchant_no_fallback()
-
-        self.consumer._WebConsumer__apply_missing_categories(
-                                                              transactions,
-                                                              "bank")
-
+        self.consumer._WebConsumer__apply_missing_categories(transactions)
         self.assertEqual(len(transactions[0]["category_labels"]), 1)
         self.assertEqual(transactions[0]["category_labels"][0], "Joseph Rules")
 
     def test_fallback_bad_merchant_name(self):
         """Assert that when a merchant is not found in the fallback map the request does not fail"""
+        
         transactions = web_consumer_fixture.get_transaction_subtype_non_existant_merchant()
-
-        self.consumer._WebConsumer__apply_missing_categories(
-                                                              transactions,
-                                                              "bank")
-
+        self.consumer._WebConsumer__apply_missing_categories(transactions)
         self.assertEqual(len(transactions[0]["category_labels"]), 1)
         self.assertEqual(transactions[0]["category_labels"][0], "")
 
@@ -122,7 +101,7 @@ class WebConsumerTest(unittest.TestCase):
 
         self.assertEqual(len(test_request["transaction_list"]), request_len)
         for trans in test_request["transaction_list"]:
-            self.assertEqual(trans["CNN"], "joseph - rules")
+            self.assertEqual(trans["CNN"]["label"], "joseph - rules")
 
     def test_apply_sws_classifier(self):
         """Assert all transactions are classified as physical or non-physical"""
