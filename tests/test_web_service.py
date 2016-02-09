@@ -1,4 +1,5 @@
 from plumbum import local
+from plumbum.cmd import sleep
 from requests.exceptions import ConnectionError
 from multiprocessing.pool import ThreadPool
 import json
@@ -13,14 +14,12 @@ def check_status():
 	r.connection.close()
 	return (status)
 
-
 def get_trans_text():
 	"""Get the json string of one_ledger.json"""
 	transFile = open('./web_service_tester/one_ledger.json', 'rb')
 	transText = transFile.read()
 	transFile.close()
 	return transText
-
 
 def classify_one(self, transaction, max_retries=10, sleep_interval=2):
 	"""Send a single transaction to the web service for classification"""
@@ -30,7 +29,7 @@ def classify_one(self, transaction, max_retries=10, sleep_interval=2):
 		try:
 			sleep(sleep_interval)
 			r_post = requests.post(
-				"https://localhost:443/meerkat/v1.3",
+				"https://localhost/meerkat/v1.6",
 				data=transaction,
 				verify=False)
 
