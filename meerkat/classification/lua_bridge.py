@@ -148,9 +148,10 @@ def get_cnn_by_path(model_path, dict_path):
 		labels, activations = process_batch(batch)
 		decisions = list(labels.values())
 		confidences = list(activations.values())
+		low_confidence = {"label": "", "category": ""}
 
 		for index, transaction in enumerate(trans):
-			label = reverse_label_map.get(str(decisions[index]), "") if confidences[index] > LOGSOFTMAX_THRESHOLD else ""
+			label = reverse_label_map.get(str(decisions[index]), "") if confidences[index] > LOGSOFTMAX_THRESHOLD else low_confidence
 			if isinstance(label, dict) and label_only: label = label["label"]
 			transaction[label_key] = label
 
