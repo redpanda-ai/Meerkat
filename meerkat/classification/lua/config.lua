@@ -16,14 +16,14 @@ config.thes = false
 
 -- Training data
 config.train_data = {}
-config.train_data.file = paths.concat(paths.cwd(), "../../../data/input/train.t7b")
+config.train_data.file = paths.concat(paths.cwd(), "__train_t7b__")
 config.train_data.alphabet = alphabet
 config.train_data.length = 123
 config.train_data.batch_size = 128
 
 -- Validation data
 config.val_data = {}
-config.val_data.file =  paths.concat(paths.cwd(), "../../../data/input/test.t7b")
+config.val_data.file =  paths.concat(paths.cwd(), "__test_t7b__")
 config.val_data.alphabet = alphabet
 config.val_data.length = 123
 config.train_data.batch_size = 128
