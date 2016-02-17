@@ -217,4 +217,7 @@ def execute_main_lua(output_path, input_file):
 		(local["qlua"][input_file]) & NOHUP
 	logging.info("It's running.")
 
-
+if __name__ == "__main__":
+	logging.error("Sorry, this module is a useful library of useful "
+		"functions you can import into your code, you should not "
+		"execute it from the command line.")
