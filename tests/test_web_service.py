@@ -5,6 +5,7 @@ from multiprocessing.pool import ThreadPool
 import json
 import requests
 import unittest
+from nose_parameterized import parameterized
 
 def check_status():
 	"""Get a status code (e.g. 200) from the web service"""
@@ -14,9 +15,9 @@ def check_status():
 	r.connection.close()
 	return (status)
 
-def get_trans_text():
+def get_trans_text(path):
 	"""Get the json string of one_ledger.json"""
-	transFile = open('./web_service_tester/one_ledger.json', 'rb')
+	transFile = open(path, 'rb')
 	transText = transFile.read()
 	transFile.close()
 	return transText
@@ -29,7 +30,7 @@ def classify_one(self, transaction, max_retries=10, sleep_interval=2):
 		try:
 			sleep(sleep_interval)
 			r_post = requests.post(
-				"https://localhost/meerkat/v1.6",
+				"https://localhost/meerkat/v1.7",
 				data=transaction,
 				verify=False)
 
@@ -74,7 +75,7 @@ class WebServiceTest(unittest.TestCase):
 		"""Test starts meerkat, runs 100 classifications, and stops meerkat"""
 		samples = 100
 		pool = ThreadPool(samples)
-		transText = get_trans_text()
+		transText = get_trans_text('./web_service_tester/one_ledger.json')
 		tasks = []
 		for i in range(samples):
 			tasks.append(pool.apply_async(
@@ -90,6 +91,16 @@ class WebServiceTest(unittest.TestCase):
 					 classified[0],
 					 classified[i],
 					 "Two results were not equal\n{}\n\n{}".format(classified[0], classified[i]))
+		return
+
+	@parameterized.expand([
+		('./data/input/input.json'),
+		('./data/input/web_service_input.json')
+	])
+	def test_web_service_representative(self, path):
+		"""Test starts meerkat, runs representative transactions, and stop meerkat"""
+		transText = get_trans_text(path)
+		task = classify_one(self, transText)
 		return
 
 if __name__ == "__main__":
