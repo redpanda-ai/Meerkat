@@ -77,79 +77,79 @@ def get_parser():
 		help='Use fast mode to save i/o time.')
 	return parser
 
-def compare_label(*args, **kwargs):
-	"""similar to generic_test in accuracy.py, with unnecessary items dropped"""
-	machine, cnn_column, human_column, cm = args[:]
-	doc_key = kwargs.get("doc_key")
-
-	unpredicted = []
-	needs_hand_labeling = []
-	correct = []
-	mislabeled = []
-
-	# Test Each Machine Labeled Row
-	for machine_row in machine:
-
-		# Update cm
-		# predicted_label is None if a predicted subtype is ""
-		if machine_row['ACTUAL_INDEX'] is None:
-			pass
-		elif machine_row['PREDICTED_INDEX'] is None:
-			column = num_labels
-			row = machine_row['ACTUAL_INDEX'] - 1
-			cm[row][column] += 1
-		else:
-			column = machine_row['PREDICTED_INDEX'] - 1
-			row = machine_row['ACTUAL_INDEX'] - 1
-			cm[row][column] += 1
-
-		# If fast mode True then do not record
-		if not fast_mode:
-			# Continue if unlabeled
-			if machine_row[cnn_column] == "":
-				unpredicted.append([machine_row[doc_key], machine_row[human_column]])
-				continue
-
-			# Identify unlabeled points
-			if not machine_row[human_column]:
-				needs_hand_labeling.append(machine_row[doc_key])
-				continue
-
-			# Predicted label matches human label
-			if machine_row[cnn_column] == machine_row[human_column]:
-				correct.append([machine_row[doc_key], machine_row[human_column]])
-				continue
-
-			mislabeled.append([machine_row[doc_key], machine_row[human_column],
-				machine_row[cnn_column]])
-	return mislabeled, correct, unpredicted, needs_hand_labeling, cm
-
-def fill_description(df):
-	"""Replace Description_Unmasked"""
-	if df[doc_key] == "":
-		return df[sec_doc_key]
-	return df[doc_key]
-
-def change_label_name(df):
-	"""replace label '' with 'Null Class' """
-	if df[human_label_key] == "":
-		return "Null Class"
-	return df[human_label_key]
-
-def get_write_func(filename, header):
-	file_exists = False
-	def write_func(data):
-		if len(data) > 0:
-			nonlocal file_exists
-			mode = "a" if file_exists else "w"
-			add_head = False if file_exists else header
-			df = pd.DataFrame(data)
-			df.to_csv(filename, mode=mode, index=False, header=add_head)
-			file_exists = True
-	return write_func
-
 def run_from_command_line():
 	"""Runs these commands if the module is invoked from the command line"""
+
+	def compare_label(*args, **kwargs):
+		"""similar to generic_test in accuracy.py, with unnecessary items dropped"""
+		machine, cnn_column, human_column, cm = args[:]
+		doc_key = kwargs.get("doc_key")
+
+		unpredicted = []
+		needs_hand_labeling = []
+		correct = []
+		mislabeled = []
+
+		# Test Each Machine Labeled Row
+		for machine_row in machine:
+
+			# Update cm
+			# predicted_label is None if a predicted subtype is ""
+			if machine_row['ACTUAL_INDEX'] is None:
+				pass
+			elif machine_row['PREDICTED_INDEX'] is None:
+				column = num_labels
+				row = machine_row['ACTUAL_INDEX'] - 1
+				cm[row][column] += 1
+			else:
+				column = machine_row['PREDICTED_INDEX'] - 1
+				row = machine_row['ACTUAL_INDEX'] - 1
+				cm[row][column] += 1
+
+			# If fast mode True then do not record
+			if not fast_mode:
+				# Continue if unlabeled
+				if machine_row[cnn_column] == "":
+					unpredicted.append([machine_row[doc_key], machine_row[human_column]])
+					continue
+
+				# Identify unlabeled points
+				if not machine_row[human_column]:
+					needs_hand_labeling.append(machine_row[doc_key])
+					continue
+
+				# Predicted label matches human label
+				if machine_row[cnn_column] == machine_row[human_column]:
+					correct.append([machine_row[doc_key], machine_row[human_column]])
+					continue
+
+				mislabeled.append([machine_row[doc_key], machine_row[human_column],
+					machine_row[cnn_column]])
+		return mislabeled, correct, unpredicted, needs_hand_labeling, cm
+
+	def fill_description(df):
+		"""Replace Description_Unmasked"""
+		if df[doc_key] == "":
+			return df[sec_doc_key]
+		return df[doc_key]
+
+	def change_label_name(df):
+		"""replace label '' with 'Null Class' """
+		if df[human_label_key] == "":
+			return "Null Class"
+		return df[human_label_key]
+
+	def get_write_func(filename, header):
+		file_exists = False
+		def write_func(data):
+			if len(data) > 0:
+				nonlocal file_exists
+				mode = "a" if file_exists else "w"
+				add_head = False if file_exists else header
+				df = pd.DataFrame(data)
+				df.to_csv(filename, mode=mode, index=False, header=add_head)
+				file_exists = True
+		return write_func
 
 	# Main
 	args = get_parser().parse_args()
