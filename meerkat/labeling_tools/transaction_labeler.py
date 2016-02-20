@@ -32,8 +32,7 @@ import numpy as np
 import pandas as pd
 from boto.s3.connection import Key, Location
 
-from meerkat.various_tools import safe_print, safe_input, load_params
-from meerkat.file_producer import get_s3_connection
+from meerkat.various_tools import safe_print, safe_input, load_params, get_s3_connection
 
 class DummyFile(object):
 	"""Resemble the stdout/stderr object but it prints nothing to screen"""
