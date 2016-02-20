@@ -20,21 +20,26 @@ import os
 import sys
 from .tools import (load, get_label_map, get_test_and_train_dataframes,
 	get_json_and_csv_files)
-
-# Load Data
-if __name__ == "__main__":
+	
+def run_from_command_line():
+	"""Runs these commands if the module is invoked from the command line"""
+	
 	input_file, debit_or_credit, bank_or_card = sys.argv[1:]
 	df, class_names = load(input_file=input_file, debit_or_credit=debit_or_credit)
+	
 	# Create a label map
 	label_map = get_label_map(df=df, class_names=class_names)
+	
 	# Reverse the mapping (label_number: class_name)
 	label_map = dict(zip(label_map.values(), label_map.keys()))
+	
 	# Make Test and Train
 	results = get_test_and_train_dataframes(df=df)
-	#Save
+	
+	# Save and create an output directory if it does not exist
 	output_path = "/data/preprocessed/"
-	# Create an output directory if it does not exist
 	os.makedirs(output_path, exist_ok=True)
+	
 	file_names = get_json_and_csv_files(output_path=output_path,
 		debit_or_credit=debit_or_credit, bank_or_card=bank_or_card,
 		label_map=label_map,
@@ -44,3 +49,6 @@ if __name__ == "__main__":
 		df_poor_train=results["df_poor_train"])
 	logging.info("File names are {0}".format(file_names))
 
+# Load Data
+if __name__ == "__main__":
+	run_from_command_line()
