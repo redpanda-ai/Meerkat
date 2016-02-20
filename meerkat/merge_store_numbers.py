@@ -121,6 +121,7 @@ def find_merchant(store):
 	return factual_id, formatted, message
 
 def get_hit(search_results, index):
+	"""Get hit and z_score from results"""
 
 	# Must have results
 	if search_results['hits']['total'] == 0:
@@ -225,6 +226,7 @@ def save_mapping(stores, percent_merged):
 	output_file.close()
 
 def start_thread(_queue):
+	"""Start thread"""
 	while True:
 		merchant = _queue.get()
 		stores = load_store_numbers(merchant)
