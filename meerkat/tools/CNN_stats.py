@@ -148,111 +148,116 @@ def get_write_func(filename, header):
 			file_exists = True
 	return write_func
 
-# Main
-args = get_parser().parse_args()
-doc_key = args.doc_key
-sec_doc_key = args.secondary_doc_key
-machine_label_key = args.predicted_key
-human_label_key = args.label_key
-fast_mode = args.fast_mode
-reader = pd.read_csv(args.testdata, chunksize=1000, na_filter=False,
-	quoting=csv.QUOTE_NONE, encoding='utf-8', sep='|', error_bad_lines=False)
-label_map = load_params(args.label_map)
-num_labels = len(label_map)
-class_names = list(label_map.values())
+def run_from_command_line():
+	"""Runs these commands if the module is invoked from the command line"""
 
-# Create reversed label map and check it there are duplicate keys
-reversed_label_map = {}
-for key, value in label_map.items():
-	if class_names.count(value) > 1:
-		reversed_label_map[value] =\
-			 sorted(reversed_label_map.get(value, []) + [int(key)])
-	else:
-		reversed_label_map[value] = int(key)
+	# Main
+	args = get_parser().parse_args()
+	doc_key = args.doc_key
+	sec_doc_key = args.secondary_doc_key
+	machine_label_key = args.predicted_key
+	human_label_key = args.label_key
+	fast_mode = args.fast_mode
+	reader = pd.read_csv(args.testdata, chunksize=1000, na_filter=False,
+		quoting=csv.QUOTE_NONE, encoding='utf-8', sep='|', error_bad_lines=False)
+	label_map = load_params(args.label_map)
+	num_labels = len(label_map)
+	class_names = list(label_map.values())
 
-if args.is_merchant:
-	label_map["1"] = "Null Class"
-	reversed_label_map["Null Class"] = reversed_label_map.pop("")
+	# Create reversed label map and check it there are duplicate keys
+	reversed_label_map = {}
+	for key, value in label_map.items():
+		if class_names.count(value) > 1:
+			reversed_label_map[value] =\
+				 sorted(reversed_label_map.get(value, []) + [int(key)])
+		else:
+			reversed_label_map[value] = int(key)
 
-confusion_matrix = [[0 for i in range(num_labels + 1)] for j in range(num_labels)]
-classifier = get_cnn_by_path(args.model, label_map)
-
-# Prepare for data saving
-path = 'data/CNN_stats/'
-os.makedirs(path, exist_ok=True)
-write_mislabeled = get_write_func(path + "mislabeled.csv",
-	['TRANSACTION_DESCRIPTION', 'ACTUAL', 'PREDICTED'])
-write_correct = get_write_func(path + "correct.csv",
-	['TRANSACTION_DESCRIPTION', 'ACTUAL'])
-write_unpredicted = get_write_func(path + "unpredicted.csv",
-	["TRANSACTION_DESCRIPTION", 'ACTUAL'])
-write_needs_hand_labeling = get_write_func(path + "need_labeling.csv",
-	["TRANSACTION_DESCRIPTION"])
-
-for chunk in reader:
-	if sec_doc_key != '':
-		chunk[doc_key] = chunk.apply(fill_description, axis=1)
 	if args.is_merchant:
-		chunk[human_label_key] = chunk.apply(change_label_name, axis=1)
-	transactions = chunk.to_dict('records')
-	machine_labeled = classifier(transactions, doc_key=doc_key,
-		label_key=machine_label_key)
+		label_map["1"] = "Null Class"
+		reversed_label_map["Null Class"] = reversed_label_map.pop("")
 
-	# Add indexes for labels
-	for item in machine_labeled:
-		if item[human_label_key] == "":
-			item['ACTUAL_INDEX'] = None
-			continue
-		temp = reversed_label_map[item[human_label_key]]
-		if isinstance(temp, list):
-			item['ACTUAL_INDEX'] = temp[0]
-		else:
-			item['ACTUAL_INDEX'] = temp
-		if item[machine_label_key] == "":
-			item['PREDICTED_INDEX'] = None
-			continue
-		temp = reversed_label_map[item[machine_label_key]]
-		if isinstance(temp, list):
-			item['PREDICTED_INDEX'] = temp[0]
-		else:
-			item['PREDICTED_INDEX'] = temp
+	confusion_matrix = [[0 for i in range(num_labels + 1)] for j in range(num_labels)]
+	classifier = get_cnn_by_path(args.model, label_map)
 
-	mislabeled, correct, unpredicted, needs_hand_labeling, confusion_matrix =\
-		compare_label(machine_labeled, machine_label_key, human_label_key,
-		confusion_matrix, doc_key=doc_key)
+	# Prepare for data saving
+	path = 'data/CNN_stats/'
+	os.makedirs(path, exist_ok=True)
+	write_mislabeled = get_write_func(path + "mislabeled.csv",
+		['TRANSACTION_DESCRIPTION', 'ACTUAL', 'PREDICTED'])
+	write_correct = get_write_func(path + "correct.csv",
+		['TRANSACTION_DESCRIPTION', 'ACTUAL'])
+	write_unpredicted = get_write_func(path + "unpredicted.csv",
+		["TRANSACTION_DESCRIPTION", 'ACTUAL'])
+	write_needs_hand_labeling = get_write_func(path + "need_labeling.csv",
+		["TRANSACTION_DESCRIPTION"])
 
-	# Save
-	write_mislabeled(mislabeled)
-	write_correct(correct)
-	write_unpredicted(unpredicted)
-	write_needs_hand_labeling(needs_hand_labeling)
+	for chunk in reader:
+		if sec_doc_key != '':
+			chunk[doc_key] = chunk.apply(fill_description, axis=1)
+		if args.is_merchant:
+			chunk[human_label_key] = chunk.apply(change_label_name, axis=1)
+		transactions = chunk.to_dict('records')
+		machine_labeled = classifier(transactions, doc_key=doc_key,
+			label_key=machine_label_key)
 
-# Calculate recall, precision, false +/-, true +/- from confusion maxtrix
-true_positive = pd.DataFrame([confusion_matrix[i][i] for i in range(num_labels)])
-cm = pd.DataFrame(confusion_matrix)
-actual = pd.DataFrame(cm.sum(axis=1))
-recall = true_positive / actual
-# If we use pandas 0.17 we can do the rounding neater
-recall = np.round(recall, decimals=4)
-column_sum = pd.DataFrame(cm.sum()).ix[:,:num_labels]
-unpredicted = pd.DataFrame(cm.ix[:,num_labels])
-unpredicted.columns = [0]
-false_positive = column_sum - true_positive
-precision = true_positive / column_sum
-precision = np.round(precision, decimals=4)
-false_negative = actual - true_positive - unpredicted
-label = pd.DataFrame(pd.read_json(args.label_map, typ='series')).sort_index()
-label.index = range(num_labels)
+		# Add indexes for labels
+		for item in machine_labeled:
+			if item[human_label_key] == "":
+				item['ACTUAL_INDEX'] = None
+				continue
+			temp = reversed_label_map[item[human_label_key]]
+			if isinstance(temp, list):
+				item['ACTUAL_INDEX'] = temp[0]
+			else:
+				item['ACTUAL_INDEX'] = temp
+			if item[machine_label_key] == "":
+				item['PREDICTED_INDEX'] = None
+				continue
+			temp = reversed_label_map[item[machine_label_key]]
+			if isinstance(temp, list):
+				item['PREDICTED_INDEX'] = temp[0]
+			else:
+				item['PREDICTED_INDEX'] = temp
 
-stat = pd.concat([label, actual, true_positive, false_positive, recall, precision,
-	false_negative, unpredicted], axis=1)
-stat.columns = ['Class', 'Actual', 'True_Positive', 'False_Positive', 'Recall',
-	'Precision', 'False_Negative', 'Unpredicted']
+		mislabeled, correct, unpredicted, needs_hand_labeling, confusion_matrix =\
+			compare_label(machine_labeled, machine_label_key, human_label_key,
+			confusion_matrix, doc_key=doc_key)
 
-cm = pd.concat([label, cm], axis=1)
-cm.columns = ['Class'] + [str(x) for x in range(1, num_labels + 1)] + ['Unpredicted']
-cm.index = range(1, num_labels + 1)
+		# Save
+		write_mislabeled(mislabeled)
+		write_correct(correct)
+		write_unpredicted(unpredicted)
+		write_needs_hand_labeling(needs_hand_labeling)
 
-stat.to_csv('data/CNN_stats/CNN_stat.csv', index=False)
-cm.to_csv('data/CNN_stats/Con_Matrix.csv')
+	# Calculate recall, precision, false +/-, true +/- from confusion maxtrix
+	true_positive = pd.DataFrame([confusion_matrix[i][i] for i in range(num_labels)])
+	cm = pd.DataFrame(confusion_matrix)
+	actual = pd.DataFrame(cm.sum(axis=1))
+	recall = true_positive / actual
+	# If we use pandas 0.17 we can do the rounding neater
+	recall = np.round(recall, decimals=4)
+	column_sum = pd.DataFrame(cm.sum()).ix[:,:num_labels]
+	unpredicted = pd.DataFrame(cm.ix[:,num_labels])
+	unpredicted.columns = [0]
+	false_positive = column_sum - true_positive
+	precision = true_positive / column_sum
+	precision = np.round(precision, decimals=4)
+	false_negative = actual - true_positive - unpredicted
+	label = pd.DataFrame(pd.read_json(args.label_map, typ='series')).sort_index()
+	label.index = range(num_labels)
 
+	stat = pd.concat([label, actual, true_positive, false_positive, recall, precision,
+		false_negative, unpredicted], axis=1)
+	stat.columns = ['Class', 'Actual', 'True_Positive', 'False_Positive', 'Recall',
+		'Precision', 'False_Negative', 'Unpredicted']
+
+	cm = pd.concat([label, cm], axis=1)
+	cm.columns = ['Class'] + [str(x) for x in range(1, num_labels + 1)] + ['Unpredicted']
+	cm.index = range(1, num_labels + 1)
+
+	stat.to_csv('data/CNN_stats/CNN_stat.csv', index=False)
+	cm.to_csv('data/CNN_stats/Con_Matrix.csv')
+
+if __name__ == "__main__":
+	run_from_command_line()
