@@ -82,7 +82,7 @@ def run_from_command_line():
 
 	def compare_label(*args, **kwargs):
 		"""similar to generic_test in accuracy.py, with unnecessary items dropped"""
-		machine, cnn_column, human_column, cm = args[:]
+		machine, cnn_column, human_column, conf_mat = args[:]
 		doc_key = kwargs.get("doc_key")
 
 		unpredicted = []
@@ -93,18 +93,18 @@ def run_from_command_line():
 		# Test Each Machine Labeled Row
 		for machine_row in machine:
 
-			# Update cm
+			# Update conf_mat
 			# predicted_label is None if a predicted subtype is ""
 			if machine_row['ACTUAL_INDEX'] is None:
 				pass
 			elif machine_row['PREDICTED_INDEX'] is None:
 				column = num_labels
 				row = machine_row['ACTUAL_INDEX'] - 1
-				cm[row][column] += 1
+				conf_mat[row][column] += 1
 			else:
 				column = machine_row['PREDICTED_INDEX'] - 1
 				row = machine_row['ACTUAL_INDEX'] - 1
-				cm[row][column] += 1
+				conf_mat[row][column] += 1
 
 			# If fast mode True then do not record
 			if not fast_mode:
@@ -125,7 +125,7 @@ def run_from_command_line():
 
 				mislabeled.append([machine_row[doc_key], machine_row[human_column],
 					machine_row[cnn_column]])
-		return mislabeled, correct, unpredicted, needs_hand_labeling, cm
+		return mislabeled, correct, unpredicted, needs_hand_labeling, conf_mat
 
 	def fill_description(df):
 		"""Replace Description_Unmasked"""
@@ -232,13 +232,13 @@ def run_from_command_line():
 
 	# Calculate recall, precision, false +/-, true +/- from confusion maxtrix
 	true_positive = pd.DataFrame([confusion_matrix[i][i] for i in range(num_labels)])
-	cm = pd.DataFrame(confusion_matrix)
-	actual = pd.DataFrame(cm.sum(axis=1))
+	conf_mat = pd.DataFrame(confusion_matrix)
+	actual = pd.DataFrame(conf_mat.sum(axis=1))
 	recall = true_positive / actual
 	# If we use pandas 0.17 we can do the rounding neater
 	recall = np.round(recall, decimals=4)
-	column_sum = pd.DataFrame(cm.sum()).ix[:,:num_labels]
-	unpredicted = pd.DataFrame(cm.ix[:,num_labels])
+	column_sum = pd.DataFrame(conf_mat.sum()).ix[:,:num_labels]
+	unpredicted = pd.DataFrame(conf_mat.ix[:,num_labels])
 	unpredicted.columns = [0]
 	false_positive = column_sum - true_positive
 	precision = true_positive / column_sum
@@ -252,12 +252,12 @@ def run_from_command_line():
 	stat.columns = ['Class', 'Actual', 'True_Positive', 'False_Positive', 'Recall',
 		'Precision', 'False_Negative', 'Unpredicted']
 
-	cm = pd.concat([label, cm], axis=1)
-	cm.columns = ['Class'] + [str(x) for x in range(1, num_labels + 1)] + ['Unpredicted']
-	cm.index = range(1, num_labels + 1)
+	conf_mat = pd.concat([label, conf_mat], axis=1)
+	conf_mat.columns = ['Class'] + [str(x) for x in range(1, num_labels + 1)] + ['Unpredicted']
+	conf_mat.index = range(1, num_labels + 1)
 
 	stat.to_csv('data/CNN_stats/CNN_stat.csv', index=False)
-	cm.to_csv('data/CNN_stats/Con_Matrix.csv')
+	conf_mat.to_csv('data/CNN_stats/Con_Matrix.csv')
 
 if __name__ == "__main__":
 	run_from_command_line()
