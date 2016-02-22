@@ -82,13 +82,13 @@ class AccuracyTests(unittest.TestCase):
 	# 	"""Assert that ?binary accuracy? is at 100%."""
 	# 	self.assertEqual(self._accuracy_results['binary_accuracy'], 100)
 
-	def test_total_recall(self):
-		"""Assert that recall is at least 25%."""
-		self.assertTrue(round(self._accuracy_results['total_recall']) > 25)
+	def test_percent_labeled(self):
+		"""Assert that percent labeled is at least 25%."""
+		self.assertTrue(round(self._accuracy_results['percent_labeled']) > 25)
 
-	def test_total_recall_physical(self):
-		"""Assert that recall for physical transactions is at least 35%."""
-		self.assertTrue(round(self._accuracy_results['total_recall_physical']) > 35)
+	def test_percent_labeled_physical(self):
+		"""Assert that percent_labeled for physical transactions is at least 35%."""
+		self.assertTrue(round(self._accuracy_results['percent_labeled']) > 35)
 
 	def test_time_taken(self):
 		"""Assert that the entire test finishes in under 100 seconds."""
