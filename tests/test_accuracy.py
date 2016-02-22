@@ -88,7 +88,7 @@ class AccuracyTests(unittest.TestCase):
 
 	def test_percent_labeled_physical(self):
 		"""Assert that percent_labeled for physical transactions is at least 35%."""
-		self.assertTrue(round(self._accuracy_results['total_percent_labeled']) > 35)
+		self.assertTrue(round(self._accuracy_results['percent_labeled']) > 35)
 
 	def test_time_taken(self):
 		"""Assert that the entire test finishes in under 100 seconds."""
