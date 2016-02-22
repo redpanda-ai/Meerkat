@@ -95,7 +95,7 @@ def test_bulk_classifier(human_labeled, non_physical_trans, my_lists):
 					my_lists["incorrect_non_physical"].append(item)
 
 def generic_test(*args, **kwargs):
-	"""Tests both the recall and precision of the pinpoint classifier against
+	"""Finds both the percent labeled and precision of the pinpoint classifier against
 	human-labeled training data."""
 	machine, human, cnn_column, human_column, human_map, machine_map = args[:]	
 	doc_key = kwargs.get("doc_key", default_doc_key)
@@ -169,7 +169,7 @@ def CNN_accuracy(*args, **kwargs):
 	return enhance_results(bulk_total, bulk_needs_hand_labeling, bulk_mislabeled, bulk_unlabeled, bulk_correct)
 	# results = open("data/output/single_test.csv", "a")
 	# writer = csv.writer(results, delimiter=',', quotechar='"')
-	# writer.writerow([merchant["name"], merchant['total_recall'], merchant["precision"]])
+	# writer.writerow([merchant["name"], merchant['percent_labeled'], merchant["precision"]])
 	# results.close()
 
 def __load_label_map(label_map):
@@ -188,30 +188,30 @@ def print_results(results):
 
 	sys.stdout.write('\n')
 
-	print("{0:35} = {1:10.2f}%".format("Recall all transactions", results["total_recall"]))
+	print("{0:35} = {1:10.2f}%".format("Percent of labeled transactions", results["percent_labeled"]))
 	print("{0:35} = {1:11}".format("Number of transactions labeled", results["num_labeled"]))
 	print("{0:35} = {1:11}".format("Number of transactions verified", results["num_verified"]))
 	print("{0:35} = {1:10.2f}%".format("Precision", results["precision"]))
 
 def enhance_results(total, needs_hand_labeling, mislabeled, unlabeled, correct):
-	"""Groupe results"""
+	"""Group results"""
 
 	num_labeled = total - unlabeled
-	total_recall_physical = num_labeled / total * 100
-	num_labeled = total - unlabeled
+	percent_labeled_physical = num_labeled / total * 100
 	num_verified = num_labeled - needs_hand_labeling
-	total_recall = num_labeled / total * 100
+	percent_labeled = num_labeled / total * 100
 	precision = correct / max(num_verified, 1) * 100
+
 	return {
 		"total": total,
 		"needs_hand_labeling": needs_hand_labeling,
 		"mislabeled": mislabeled,
 		"unlabeled": unlabeled,
 		"correct": correct,
-		"total_recall_physical": total_recall_physical,
+		"percent_labeled_physical": percent_labeled_physical,
 		"num_labeled": num_labeled,
 		"num_verified": num_verified,
-		"total_recall": total_recall,
+		"percent_labeled": percent_labeled,
 		"precision": precision
 		}
 
@@ -233,7 +233,7 @@ def vest_accuracy(params, file_path=None, non_physical_trans=[], result_list=[])
 	verification_source = params.get("verification_source", "data/misc/verifiedLabeledTrans.txt")
 	human_labeled = load_dict_list(verification_source)
 
-	# Test Classifier for recall and precision
+	# Test Classifier for total labeled and precision
 	label_key = params.get("label_key", "FACTUAL_ID")
 	total, needs_hand_labeling, mislabeled, unlabeled, correct = generic_test(machine_labeled, human_labeled, label_key, label_key, None, None)
 	results = enhance_results(total, len(needs_hand_labeling), len(mislabeled), len(unlabeled), len(correct))
@@ -289,7 +289,7 @@ def process_file_collection(bucket, prefix, classifier, classifier_id_map):
 	params["label_key"] = "MERCHANT_NAME"
 	results = open("data/output/per_merchant_tests_" + prefix.split('/')[-2] + ".csv", "a")
 	writer = csv.writer(results, delimiter=',', quotechar='"')
-	writer.writerow(["Merchant", "Recall", "Precision"])
+	writer.writerow(["Merchant", "Percent_Labeled", "Precision"])
 
 	for label_num in label_map.keys():
 
@@ -312,7 +312,7 @@ def process_file_collection(bucket, prefix, classifier, classifier_id_map):
 		print("Testing Merchant: " + merchant_name)
 		accuracy_results = CNN_accuracy(unzipped_file_name, classifier, classifier_id_map, label_map)
 		print_results(accuracy_results)
-		writer.writerow([merchant_name, accuracy_results["total_recall"], accuracy_results["precision"]])
+		writer.writerow([merchant_name, accuracy_results["percent_labeled"], accuracy_results["precision"]])
 		safely_remove_file(unzipped_file_name)
 
 	results.close()
