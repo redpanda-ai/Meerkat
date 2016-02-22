@@ -110,14 +110,14 @@ def randomized_optimization(hyperparameters, known, params, dataset):
 		pprint(params["optimization"]["scores"], fout)
 
 	print("Precision = " + str(top_score['precision']) + "%")
-	print("Best Recall = " + str(top_score['total_recall_physical']) + "%")
+	print("Best Percent Labeled = " + str(top_score['percent_labeled_physical']) + "%")
 	print("HYPERPARAMETERS:")
 	print("ALL RESULTS:")
 
 	# Save Final Parameters
 	str_precision = str(round(top_score['precision'], 2))
-	str_recall = str(round(top_score['total_recall_physical'], 2))
-	file_name = "optimization_results/" + base_name + "_" + str_precision + "Precision" + str_recall + "Recall.json"
+	str_percent_labeled = str(round(top_score['percent_labeled_physical'], 2))
+	file_name = "optimization_results/" + base_name + "_" + str_precision + "Precision" + str_percent_labeled + "Percent_Labeled.json"
 	new_parameters = open(file_name, 'w')
 	pprint(top_score["hyperparameters"], new_parameters)
 
@@ -136,7 +136,7 @@ def get_initial_values(hyperparameters, params, known, dataset):
 	"""Do a simple search to find starter values"""
 
 	settings = params["optimization"]["settings"]
-	top_score = {"precision" : 0, "total_recall_physical" : 0}
+	top_score = {"precision" : 0, "percent_labeled_physical" : 0}
 
 	print("Training on " + str(len(dataset)) + " unique transactions")
 
@@ -154,22 +154,22 @@ def get_initial_values(hyperparameters, params, known, dataset):
 		# Run Classifier
 		accuracy = run_classifier(randomized_hyperparameters, params, dataset)
 		precision = accuracy["precision"]
-		recall = accuracy["total_recall_physical"]
+		percent_labeled = accuracy["percent_labeled_physical"]
 		same_or_higher_precision = precision >= top_score["precision"]
 		not_too_high = precision <= settings["max_precision"]
-		has_min_recall = recall >= settings["min_recall"]
+		has_min_percent_labeled = percent_labeled >= settings["min_percent_labeled"]
 
-		if has_min_recall and not_too_high and same_or_higher_precision:
+		if has_min_percent_labeled and not_too_high and same_or_higher_precision:
 			top_score = accuracy
 			top_score['hyperparameters'] = randomized_hyperparameters
 			safe_print("\nSCORE PRECISION: " + str(round(accuracy["precision"], 2)))
-			safe_print("SCORE RECALL: " + str(round(accuracy["total_recall_physical"], 2)) + "\n")
+			safe_print("SCORE PERCENT LABELED: " + str(round(accuracy["percent_labeled_physical"], 2)) + "\n")
 
 		# Keep Track of All Scores
 		score = {
 			"hyperparameters" : randomized_hyperparameters,
 			"precision" : round(accuracy["precision"], 2),
-			"recall" : round(accuracy["total_recall_physical"], 2)
+			"percent_labeled" : round(accuracy["percent_labeled_physical"], 2)
 		}
 
 		params["optimization"]["scores"].append(score)
@@ -193,7 +193,7 @@ def gradient_descent(initial_values, params, known, dataset):
 
 		# Save Iterations Top Hyperparameters
 		print("\n", "Top Precision: " + str(round(top_score["precision"], 2)))
-		print("\n", "Top Recall: " + str(round(top_score["total_recall_physical"], 2)))
+		print("\n", "Top Percent Labeled: " + str(round(top_score["percent_labeled_physical"], 2)))
 		save_top_score(top_score)
 
 	return top_score
@@ -217,21 +217,21 @@ def run_iteration(top_score, params, known, dataset):
 
 		# Run Classifier
 		accuracy = run_classifier(randomized_hyperparameters, params, dataset)
-		same_or_higher_recall = accuracy["total_recall_physical"] >= new_top_score["total_recall_physical"]
+		same_or_higher_percent_labeled = accuracy["percent_labeled_physical"] >= new_top_score["percent_labeled_physical"]
 		same_or_higher_precision = accuracy["precision"] >= new_top_score["precision"]
 		not_too_high_precision = accuracy["precision"] <= settings["max_precision"]
 
-		if same_or_higher_recall and same_or_higher_precision and not_too_high_precision:
+		if same_or_higher_percent_labeled and same_or_higher_precision and not_too_high_precision:
 
 			new_top_score = accuracy
 			new_top_score['hyperparameters'] = randomized_hyperparameters
 			safe_print("\n", "SCORE PRECISION: " + str(round(accuracy["precision"], 2)))
-			safe_print("\n", "SCORE RECALL: " + str(round(accuracy["total_recall_physical"], 2)))
+			safe_print("\n", "SCORE PERCENT LABELED: " + str(round(accuracy["percent_labeled_physical"], 2)))
 
 		score = {
 			"hyperparameters" : randomized_hyperparameters,
 			"precision" : round(accuracy["precision"], 2),
-			"recall" : round(accuracy["total_recall_physical"], 2)
+			"percent_labeled" : round(accuracy["percent_labeled_physical"], 2)
 		}
 
 		params["optimization"]["scores"].append(score)
@@ -265,7 +265,7 @@ def save_top_score(top_score):
 	record = open("optimization_results/" + os.path.splitext(os.path.basename(sys.argv[1]))[0] +
 		"_top_scores.txt", "a")
 	pprint("Precision = " + str(top_score['precision']) + "%", record)
-	pprint("Best Recall = " + str(top_score['total_recall_physical']) +"%", record)
+	pprint("Best Percent Labeled = " + str(top_score['percent_labeled_physical']) +"%", record)
 	boost_vectors, _, other = split_hyperparameters(top_score["hyperparameters"])
 	pprint(boost_vectors, record)
 	pprint(other, record)
@@ -315,7 +315,7 @@ def add_local_params(params):
 		"iteration_learning_rate": 0.1,
 		"gradient_descent_iterations": 10,
 		"max_precision": 97.5,
-		"min_recall": 31
+		"min_percent_labeled": 31
 	}
 
 	return params
