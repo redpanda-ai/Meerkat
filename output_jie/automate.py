@@ -3,6 +3,8 @@ import sys
 import re
 import json
 import logging
+import time
+
 from plumbum import local
 import pandas as pd
 
@@ -10,7 +12,7 @@ def getFile():
 	"""Get the latest t7b file under current directory"""
 	logging.info("Get the latest main_*.t7b file")
 	command = local["ls"]["-Falt"] \
-			| local["grep"]["main"] \
+			| local["grep"]["main_"] \
 			| local["head"]["-n"]["1"] \
 			| local["awk"]["{print $9}"]
 
@@ -49,7 +51,7 @@ def loadStaticsToMap(filename):
 	return eras
 
 def getTheBestErrorRate(eras):
-	"""Get the best error rate among eras"""
+	"""Get the best error rate among different eras"""
 	bestErrorRate = 1.0
 	bestEra = 0
 
@@ -61,13 +63,31 @@ def getTheBestErrorRate(eras):
 
 def main_stream():
 	"""The main program"""
-	latest_t7b = getFile()
-	writeToLuaFile(latest_t7b, "output_statics.lua")
-	executeLuaFile("output_statics.lua")
+	fileList = [] # A list to store all the main_*.t7b files.
 
-	eras = loadStaticsToMap("staticsJsonFile")
-	bestErrorRate, bestEraNumber = getTheBestErrorRate(eras)
-	print(bestEraNumber)
+	while True:
+		latest_t7b = getFile()
+
+		if latest_t7b is not None:
+			if len(fileList) == 0 or latest_t7b != fileList[len(fileList) - 1]: # Has new file.
+				fileList.append(latest_t7b)
+
+				writeToLuaFile(latest_t7b, "output_statics.lua")
+				executeLuaFile("output_statics.lua")
+				eras = loadStaticsToMap("staticsJsonFile")
+				bestErrorRate, bestEraNumber = getTheBestErrorRate(eras)
+
+				# Stop the training process if threshold meets.
+				if len(eras) - bestEraNumber > 2:
+					print("The training process has been stopped.")
+					return
+
+			else: # No new file.
+				sleep()
+		else: # latest_t7b is None
+			sleep()
+
+		#main_stream()
 
 if __name__ == "__main__":
 	main_stream()
