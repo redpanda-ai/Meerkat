@@ -16,7 +16,13 @@ def getFile():
 			| local["head"]["-n"]["1"] \
 			| local["awk"]["{print $9}"]
 
-	latestFile = command()[0:-1]
+	result = command()
+
+	'''No main_*.t7b files'''
+	if result is None or len(result) == 0:
+		return None
+
+	latestFile = result[0:-1]
 	return latestFile
 
 def writeToLuaFile(inputFileName, outputLuaFile):
@@ -66,6 +72,9 @@ def main_stream():
 	fileList = [] # A list to store all the main_*.t7b files.
 
 	while True:
+		print("Suspend the program for 1 minutes, and wait for a new file.")
+		time.sleep(20) # Sleep for 1 minutes.
+
 		latest_t7b = getFile()
 
 		if latest_t7b is not None:
@@ -78,16 +87,19 @@ def main_stream():
 				bestErrorRate, bestEraNumber = getTheBestErrorRate(eras)
 
 				# Stop the training process if threshold meets.
-				if len(eras) - bestEraNumber > 2:
+				if len(eras) - bestEraNumber > 6:
 					print("The training process has been stopped.")
+					print(fileList)
+					return
+				else:
+					print(bestErrorRate)
+					print(bestEraNumber)
 					return
 
 			else: # No new file.
-				sleep()
-		else: # latest_t7b is None
-			sleep()
-
-		#main_stream()
+				pass
+		else: # latest_t7b is None.
+			pass
 
 if __name__ == "__main__":
 	main_stream()
