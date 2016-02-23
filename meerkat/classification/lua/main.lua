@@ -102,6 +102,10 @@ function main.new()
    main.train_data = Data(config.train_data)
    main.val_data = Data(config.val_data)
 
+   -- Set Output Neurons
+   print("Setting output neurons...")
+   config.model[#config.model - 1].outputSize = #torch.load(config.val_data.file).index
+
    -- Load the model
    print("Loading the model...")
    main.model = Model(config.model)
