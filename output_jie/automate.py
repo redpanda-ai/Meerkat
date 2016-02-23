@@ -34,9 +34,8 @@ def loadStaticsToMap(filename):
 	key_val_re = re.compile("\s*([a-zA-z]+)\s:\s*(.+)")
 	index_re = re.compile("\s*([0-9]+)\s:\s*(.+)")
 	clean_re = re.compile(r'\x1b[^m]*m')
-	# A list of dictionaries.
-	eras = []
 
+	eras = [] # A list of dictionaries.
 	my_era = {}
 	with open(filename, encoding="utf-8") as input_file:
 		for line in input_file:
@@ -47,8 +46,15 @@ def loadStaticsToMap(filename):
 				if len(my_era) != 0:
 					eras.append(my_era)
 				my_era = {}
-
 	return eras
+
+def getTheBestErrorRate(eras):
+	"""Get the best error rate among eras"""
+	bestErrorRate = 1.0
+	for era in eras:
+		if float(era["val_error"]) < bestErrorRate:
+			bestErrorRate = float(era["val_error"])
+	return bestErrorRate
 
 def main_stream():
 	"""The main program"""
@@ -59,6 +65,7 @@ def main_stream():
 	eras = loadStaticsToMap("staticsJsonFile")
 	print(len(eras))
 	print(eras[0])
+	print(getTheBestErrorRate(eras))
 
 if __name__ == "__main__":
 	main_stream()
