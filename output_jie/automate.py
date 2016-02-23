@@ -51,10 +51,13 @@ def loadStaticsToMap(filename):
 def getTheBestErrorRate(eras):
 	"""Get the best error rate among eras"""
 	bestErrorRate = 1.0
-	for era in eras:
-		if float(era["val_error"]) < bestErrorRate:
-			bestErrorRate = float(era["val_error"])
-	return bestErrorRate
+	bestEra = 0
+
+	for i in range(len(eras)):
+		if float(eras[i]["val_error"]) < bestErrorRate:
+			bestErrorRate = float(eras[i]["val_error"])
+			bestEraNumber = i + 1
+	return bestErrorRate, bestEraNumber
 
 def main_stream():
 	"""The main program"""
@@ -63,9 +66,8 @@ def main_stream():
 	executeLuaFile("output_statics.lua")
 
 	eras = loadStaticsToMap("staticsJsonFile")
-	print(len(eras))
-	print(eras[0])
-	print(getTheBestErrorRate(eras))
+	bestErrorRate, bestEraNumber = getTheBestErrorRate(eras)
+	print(bestEraNumber)
 
 if __name__ == "__main__":
 	main_stream()
