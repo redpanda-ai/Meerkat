@@ -20,11 +20,17 @@ def writeToLuaFile(inputFileName, outputLuaFile):
 					"records = main.record\n" + \
 					"print(records)\n")
 
+def executeLuaFile(luaFile):
+	"""Execute the input lua file"""
+	command = local["th"][luaFile]
+	statics = command()
+	return statics
+
 def main_stream():
 	latest_t7b = getFile()
-	print(latest_t7b)
 
 	writeToLuaFile(latest_t7b, "output_statics.lua")
+	print(executeLuaFile("output_statics.lua"))
 
 if __name__ == "__main__":
 	main_stream()
