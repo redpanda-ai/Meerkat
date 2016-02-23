@@ -200,7 +200,7 @@ def create_new_configuration_file(num_of_classes, output_path, train_file, test_
 	test_file = test_file[output_dir_len:]
 	command = \
 		local["sed"]["s:\./train\.t7b:" + train_file + ":"]["meerkat/classification/lua/config.lua"] \
-		| local["sed"]["s:\./test\.t7b__:" + test_file + ":"] \
+		| local["sed"]["s:\./test\.t7b:" + test_file + ":"] \
 		 > output_path + "config.lua"
 	command()
 
