@@ -1,4 +1,3 @@
-import argparse
 import csv
 import json
 import logging
@@ -37,24 +36,40 @@ def pull_from_s3(**kwargs):
 	bucket = conn.get_bucket(bucket_name, Location.USWest2)
 	listing = bucket.list(prefix=prefix)
 
-	my_filter = kwargs["my_filter"]
-	logging.info("Filtering S3 objects by '{0}' extension".format(my_filter))
-	s3_object_list = [
-		s3_object
-		for s3_object in listing
-		if s3_object.key[-len(my_filter):] == my_filter
-	]
-	get_filename = lambda x: kwargs["input_path"] + x.key[x.key.rfind("/")+1:]
-	local_files = []
+	extension = kwargs["extension"]
+	logging.info("Filtering S3 objects by '{0}' extension".format(extension))
+	if kwargs["file_name"] == '':
+		s3_object_list = [
+			s3_object
+			for s3_object in listing
+			if s3_object.key.endswith(extension)
+			]
+		if len(s3_object_list) != 1:
+			raise Exception('There does not exist a unique {0} file.\
+				Please specifiy file name using file name flag.'\
+				.format(extension))
+	else:
+		s3_object_list = [
+			s3_object
+			for s3_object in listing
+			if s3_object.key.endswith(kwargs["file_name"])
+			]
+		if len(s3_object_list) == 0:
+			raise Exception('Unable to find {0}'.format(kwargs["file_name"]))
+
+	get_filename = lambda x: kwargs["save_path"] + x.key[x.key.rfind("/")+1:]
+	# local_files = []
 	# Collect all files at the S3 location with the correct extension and write
 	# Them to a local file
 	
-	for s3_object in s3_object_list:
-		local_file = get_filename(s3_object)
-		logging.info("Found the following file: {0}".format(local_file))
-		s3_object.get_contents_to_filename(local_file)
-		local_files.append(local_file)
+	# for s3_object in s3_object_list:
+	local_file = get_filename(s3_object_list[0])
+	logging.info("Found the following file: {0}".format(local_file))
+	s3_object_list[0].get_contents_to_filename(local_file)
 
+	return local_file
+	# local_files.append(local_file)
+"""
 	# However we only wish to process the first one
 	if local_files:
 		return local_files.pop()
@@ -62,6 +77,7 @@ def pull_from_s3(**kwargs):
 	else:
 		raise Exception("Cannot proceed, there must be at least one file at the"
 			" S3 location provided.")
+"""
 
 def load(**kwargs):
 	"""Load the CSV into a pandas data frame"""
@@ -79,17 +95,12 @@ def load(**kwargs):
 	class_names = df["PROPOSED_SUBTYPE"].value_counts().index.tolist()
 	return df, class_names
 
-def get_label_map(**kwargs):
+def get_label_map(class_names):
 	"""Generates a label map (class_name: label number)."""
 	logging.info("Generating label map")
-	class_names = kwargs["class_names"]
 	# Create a label map
 	label_numbers = list(range(1, (len(class_names) + 1)))
 	label_map = dict(zip(sorted(class_names), label_numbers))
-	# Map Numbers
-	my_lambda = lambda x: label_map[x["PROPOSED_SUBTYPE"]]
-	df = kwargs["df"]
-	df['LABEL'] = df.apply(my_lambda, axis=1)
 	return label_map
 
 def get_test_and_train_dataframes(**kwargs):
@@ -101,28 +112,26 @@ def get_test_and_train_dataframes(**kwargs):
 	return {
 		"df_poor_train" : df_poor[msk],
 		"df_poor_test" : df_poor[~msk],
-		"df_rich_train" : df_rich[msk],
-		"df_test" : df_rich[~msk]
+		# "df_rich_test" : df_rich[~msk],
+		# "df_rich_train" : df_rich[msk]
 	}
 
 def get_json_and_csv_files(**kwargs):
 	"""This function generates CSV and JSON files"""
-	prefix = kwargs["output_path"] + kwargs["bank_or_card"] + "." + kwargs["debit_or_credit"] + "."
+	prefix = kwargs["output_path"] + kwargs["bank_or_card"] + "_" + kwargs["debit_or_credit"] + "_"
 	logging.info("Prefix is : {0}".format(prefix))
 	#set file names
 	files = {
 		"map_file" : prefix + "map.json",
-		"test_rich" : prefix + "test.rich.csv",
-		"train_rich" : prefix + "train.rich.csv",
-		"test_poor" : prefix + "test.poor.csv",
-		"train_poor" : prefix + "train.poor.csv"
+		"test_poor" : prefix + "test_poor.csv",
+		"train_poor" : prefix + "train_poor.csv"
 	}
 	#Write the JSON file
 	dict_2_json(kwargs["label_map"], files["map_file"])
-	#Write the rich CSVs
-	rich_kwargs = {"index" : False, "sep" : "|"}
-	kwargs["df_test"].to_csv(files["test_rich"], **rich_kwargs)
-	kwargs["df_rich_train"].to_csv(files["train_rich"], **rich_kwargs)
+	# Write the rich CSVs
+	# rich_kwargs = {"index" : False, "sep" : "|"}
+	# kwargs["df_test"].to_csv(files["test_rich"], **rich_kwargs)
+	# kwargs["df_rich_train"].to_csv(files["train_rich"], **rich_kwargs)
 	#Write the poor CSVs
 	poor_kwargs = {"cols" : ["LABEL", "DESCRIPTION_UNMASKED"], "header": False,
 		"index" : False, "index_label": False}
@@ -145,7 +154,7 @@ def slice_into_dataframes(**kwargs):
 	# Load data frame and class names
 	df, class_names = load(input_file=kwargs["input_file"], debit_or_credit=kwargs["debit_or_credit"])
 	# Generate a mapping (class_name: label_number)
-	label_map = get_label_map(df=df, class_names=class_names)
+	label_map = get_label_map(class_names)
 	# Reverse the mapping (label_number: class_name)
 	kwargs["label_map"] = dict(zip(label_map.values(), label_map.keys()))
 	# Clean the "DESCRIPTION_UNMASKED" values within the dataframe
@@ -157,26 +166,6 @@ def slice_into_dataframes(**kwargs):
 	kwargs.update(get_json_and_csv_files(**kwargs))
 	#logging.info("The kwargs dictionary contains: \n{0}".format(kwargs))
 	return kwargs["train_poor"], kwargs["test_poor"], len(class_names)
-
-def parse_arguments():
-	"""This function parses arguments from our command line."""
-	parser = argparse.ArgumentParser("stream")
-	parser.add_argument("-d", "--debug", help="log at DEBUG level",
-		action="store_true")
-	parser.add_argument("-v", "--info", help="log at INFO level",
-		action="store_true")
-
-	parser.add_argument("output_dir", help="Where do you want to write out all of your files?")
-	parser.add_argument("card_or_bank", help="Whether we are processing card or bank transactions.")
-	parser.add_argument("debit_or_credit",
-		help="What kind of transactions do you wanna process, debit or credit?")
-
-	args = parser.parse_args()
-	if args.debug:
-		logging.basicConfig(level=logging.DEBUG)
-	elif args.info:
-		logging.basicConfig(level=logging.INFO)
-	return args
 
 def convert_csv_to_torch_7_binaries(input_file):
 	"""Use plumbum to convert CSV files to torch 7 binaries."""
@@ -217,7 +206,40 @@ def execute_main_lua(output_path, input_file):
 		(local["qlua"][input_file]) & NOHUP
 	logging.info("It's running.")
 
+def fill_description_unmasked(row):
+	"""Ensures that blank values for DESCRIPTION_UNMASKED are always filled."""
+	if row["DESCRIPTION_UNMASKED"] == "":
+		return row["DESCRIPTION"]
+	return row["DESCRIPTION_UNMASKED"]
+
+def unzip_and_merge(gz_file):
+	directory = './merchant_unzip/' 
+	os.makedirs(directory, exist_ok=True)
+	dataframe = []
+	local['tar']['xf'][gz_file]['-C'][directory]()
+	for i in os.listdir(directory):
+		if i.endswith('.csv'):
+			df = pd.read_csv(directory + i, na_filter=False, encoding='utf-8',
+				sep='|', error_bad_lines=False, quoting=csv.QUOTE_NONE,
+				low_memory=False)
+			dataframe.append(df)
+	merged = pd.concat(dataframe, ignore_index=True)
+	return merged 
+
+def seperate_debit_credit(subtype_file):
+	"""Load the CSV into a pandas data frame, return debit and credit df"""
+	logging.info("Loading csv file")
+	df = pd.read_csv(subtype_file, quoting=csv.QUOTE_NONE, na_filter=False,
+		encoding="utf-8", sep='|', error_bad_lines=False, low_memory=False)
+	df['UNIQUE_TRANSACTION_ID'] = df.index
+	df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
+	df["PROPOSED_SUBTYPE"] = df["PROPOSED_SUBTYPE"].str.strip()
+	df['PROPOSED_SUBTYPE'] = df['PROPOSED_SUBTYPE'].apply(cap_first_letter)
+	grouped = df.groupby('LEDGER_ENTRY', as_index=False)
+	groups = dict(list(grouped))
+	return (groups['credit'], groups['debit'])
+
 if __name__ == "__main__":
-	logging.error("Sorry, this module is a useful library of useful "
+	logging.error("Sorry, this module is a library of useful "
 		"functions you can import into your code, you should not "
 		"execute it from the command line.")
