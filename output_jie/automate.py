@@ -1,4 +1,5 @@
 import os
+import json
 import logging
 from plumbum import local
 
@@ -22,15 +23,23 @@ def writeToLuaFile(inputFileName, outputLuaFile):
 
 def executeLuaFile(luaFile):
 	"""Execute the input lua file"""
-	command = local["th"][luaFile]
-	statics = command()
-	return statics
+	command = local["th"][luaFile] > "staticsJsonFile.json"
+	command()
+
+def loadStaticsToMap(filename):
+	"""Load the training statics to a hashMap"""
+	inputfile = open(filename, encoding='utf-8')
+	hashmap = json.load(inputfile.read())
+	return hashmap
 
 def main_stream():
+	"""The main program"""
 	latest_t7b = getFile()
 
 	writeToLuaFile(latest_t7b, "output_statics.lua")
-	print(executeLuaFile("output_statics.lua"))
+	executeLuaFile("output_statics.lua")
+
+	loadStaticsToMap("staticsJsonFile.json")
 
 if __name__ == "__main__":
 	main_stream()
