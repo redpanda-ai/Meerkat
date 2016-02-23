@@ -70,6 +70,7 @@ def getTheBestErrorRate(eras):
 def main_stream():
 	"""The main program"""
 	fileList = [] # A list to store all the main_*.t7b files.
+	threshold = 2 # The highest era number - the era number of the best error rate.
 
 	while True:
 		print("Suspend the program for 1 minutes, and wait for a new file.")
@@ -87,18 +88,21 @@ def main_stream():
 				bestErrorRate, bestEraNumber = getTheBestErrorRate(eras)
 
 				# Stop the training process if threshold meets.
-				if len(eras) - bestEraNumber > 6:
+				if len(eras) - bestEraNumber > threshold:
 					print("The training process has been stopped.")
 					print(fileList)
 					return
 				else:
+					print("The training process is still on")
 					print(bestErrorRate)
 					print(bestEraNumber)
 					return
 
 			else: # No new file.
+				print("No new file detected")
 				pass
 		else: # latest_t7b is None.
+			print("The latest_t7b is None")
 			pass
 
 if __name__ == "__main__":
