@@ -32,11 +32,19 @@ class Meerkat_API(APIHandler):
 	with open("meerkat/web_service/example_output.json") as data_file:
 		example_output = json.load(data_file)
 
+	with open("meerkat/web_service/schema_debug_output.json") as data_file:
+		schema_debug_output = json.load(data_file)
+
+	with open("meerkat/web_service/example_debug_output.json") as data_file:
+		example_debug_output = json.load(data_file)
+
 	@schema.validate(
 		input_schema=schema_input,
 		input_example=example_input,
 		output_schema=schema_output,
-		output_example=example_output
+		output_example=example_output,
+		debug_output_schema=schema_debug_output,
+		debug_output_example=example_debug_output
 	)
 
 	@gen.coroutine
