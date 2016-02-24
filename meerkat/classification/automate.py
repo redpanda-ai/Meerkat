@@ -103,6 +103,7 @@ def main_stream():
 					logging.info("The training process has been stopped.")
 					logging.info("The CNN statics files have been zipped in Best_CNN_Statics.")
 					zipDir(latest_t7b, "staticsJsonFile")
+					stopStream()
 					return
 				else:
 					logging.info("The training process is still on")
