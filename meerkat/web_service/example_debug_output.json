@@ -1,0 +1,93 @@
+{
+	"cobrand_id" : 1234,
+	"user_id" : 2345,
+	"container" : "card",
+	"transaction_list" : [
+		{
+			"transaction_id" : 1,
+			"is_physical_merchant" : true,
+			"match_found" : true,
+			"merchant_name" : "Safeway",
+			"store_id" : "#12",
+			"category_labels" : ["Grocery", "Pharmacy"],
+			"source" : "FACTUAL",
+			"source_merchant_id" : "3ec075f0-33c2-11e4-8c21-0800200c9a66",
+			"street" : "742 El Camino Real",
+			"city" : "Sunnyvale",
+			"state" : "CA",
+			"country" : "US",
+			"postal_code" : "94087",
+			"website" : "",
+			"phone_number" : "",
+			"fax_number" : "",
+			"chain_name" : "",
+			"neighbourhood" : "",
+			"confidence_score" : "",
+			"latitude" : "",
+			"longitude" : "",
+			"txn_type" : "",
+			"txn_sub_type" : "",
+			"bloom_filter" : {
+				"city": "Sunnyvale",
+				"state": "CA"
+			},
+			"cnn" : {
+				"merchant_name" : "",
+				"txn_type" : "",
+				"txn_sub_type" : ""
+			},
+			"search" : {
+				"merchant_name" : "",
+				"category_labels" : ["Grocery", "Pharmacy"],
+				"street" : "742 El Camino Real",
+				"city" : "Sunnyvale",
+				"state" : "CA",
+				"country" : "US",
+				"postal_code" : "94087",
+				"website" : "",
+				"phone_number" : "",
+				"fax_number" : "",
+				"chain_name" : "",
+				"neighbourhood" : "",
+				"latitude" : "",
+				"longitude" : "",
+				"store_id" : "#12",
+				"source_merchant_id" : "3ec075f0-33c2-11e4-8c21-0800200c9a66"
+			}
+		},
+		{
+			"city" : "",
+			"state" : "",
+			"transaction_id" : 2,
+			"is_physical_merchant" : false,
+			"txn_type" : "Payment",
+			"txn_sub_type": "",
+			"category_labels" : [""],
+			"bloom_filter" : {
+				"city": "Sunnyvale",
+				"state": "CA"
+			},
+			"cnn" : {
+				"txn_type" : "",
+				"txn_sub_type" : ""
+			}
+		},
+		{
+			"city" : "",
+			"state" : "",
+			"transaction_id" : 3,
+			"is_physical_merchant" : false,
+			"merchant_name" : "Amazon",
+			"category_labels" : ["General Merchandise"],
+			"bloom_filter" : {
+				"city": "Sunnyvale",
+				"state": "CA"
+			},
+			"cnn" : {
+				"merchant_name" : "",
+				"txn_type" : "",
+				"txn_sub_type" : ""
+			}
+		}
+	]
+}

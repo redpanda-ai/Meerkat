@@ -9,7 +9,8 @@ from tornado.concurrent import Future
 from tornado_json.utils import container
 
 def validate(input_schema=None, output_schema=None,\
-	input_example=None, output_example=None):
+	input_example=None, output_example=None,\
+	debug_output_example=None, debug_output_schema=None):
 	"""validate schema"""
 	@container
 	def _validate(rh_method):
@@ -67,20 +68,36 @@ def validate(input_schema=None, output_schema=None,\
 			if isinstance(output, Future):
 				output = yield output
 
-			if output_schema is not None:
-				# We wrap output in an object before validating in case
-				#  output is a string (and ergo not a validatable JSON object)
-				try:
-					jsonschema.validate(
-						output,
-						output_schema
-					)
-				except jsonschema.ValidationError as err:
-					# We essentially re-raise this as a TypeError because
-					#  we don't want this error data passed back to the client
-					#  because it's a fault on our end. The client should
-					#  only see a 500 - Internal Server Error.
-					raise TypeError(str(err))
+			if "debug" not in input_ or input_["debug"] == False:
+				if output_schema is not None:
+					# We wrap output in an object before validating in case
+					#  output is a string (and ergo not a validatable JSON object)
+					try:
+						jsonschema.validate(
+							output,
+							output_schema
+						)
+					except jsonschema.ValidationError as err:
+						# We essentially re-raise this as a TypeError because
+						#  we don't want this error data passed back to the client
+						#  because it's a fault on our end. The client should
+						#  only see a 500 - Internal Server Error.
+						raise TypeError(str(err))
+			elif input_["debug"] == True:
+				if debug_output_schema is not None:
+					# We wrap output in an object before validating in case
+					#  output is a string (and ergo not a validatable JSON object)
+					try:
+						jsonschema.validate(
+							output,
+							debug_output_schema
+						)
+					except jsonschema.ValidationError as err:
+						# We essentially re-raise this as a TypeError because
+						#  we don't want this error data passed back to the client
+						#  because it's a fault on our end. The client should
+						#  only see a 500 - Internal Server Error.
+						raise TypeError(str(err))
 
 			# If no ValidationError has been raised up until here, we write
 			#  back output
@@ -90,6 +107,9 @@ def validate(input_schema=None, output_schema=None,\
 		setattr(_wrapper, "output_schema", output_schema)
 		setattr(_wrapper, "input_example", input_example)
 		setattr(_wrapper, "output_example", output_example)
+		setattr(_wrapper, "debug_output_example", debug_output_example)
+		setattr(_wrapper, "debug_output_schema", debug_output_schema)
+
 
 		return _wrapper
 	return _validate

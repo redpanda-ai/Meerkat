@@ -294,6 +294,8 @@ class WebConsumer():
 		
 		for trans in transactions:
 
+			trans["search"] = { "category_labels" : trans.get("category_labels", [])}
+
 			if trans.get("category_labels"):
 				trans["CNN"] = trans.get("CNN", {}).get("label", "")
 				if "subtype_CNN" in trans: del trans["subtype_CNN"]
@@ -310,7 +312,7 @@ class WebConsumer():
 
 			if "subtype_CNN" in trans: del trans["subtype_CNN"]
 
-	def ensure_output_schema(self, transactions):
+	def ensure_output_schema(self, transactions, debug):
 		"""Clean output to proper schema"""
 
 		# Collect Mapping Details
@@ -321,20 +323,50 @@ class WebConsumer():
 		# Override / Strip Fields
 		for trans in transactions:
 
+			if debug and trans["is_physical_merchant"]:
+				trans["search"]["merchant_name"] = trans["merchant_name"]
+				trans["search"]["street"] = trans["street"]
+				trans["search"]["city"] = trans["city"]
+				trans["search"]["country"] = trans["country"]
+				trans["search"]["state"] = trans["state"]
+				trans["search"]["postal_code"] = trans["postal_code"]
+				trans["search"]["source_merchant_id"] = trans["source_merchant_id"]
+				trans["search"]["store_id"] = trans["store_id"]
+				trans["search"]["latitude"] = trans["latitude"]
+				trans["search"]["longitude"] = trans["longitude"]
+				trans["search"]["website"] = trans["website"]
+				trans["search"]["phone_number"] = trans["phone_number"]
+				trans["search"]["fax_number"] = trans["fax_number"]
+				trans["search"]["chain_name"] = trans["chain_name"]
+				trans["search"]["neighbourhood"] = trans["neighbourhood"]
+			else:
+				del trans["search"]
+
 			# Override output with CNN v1
 			if trans.get("CNN", "") != "":
 				trans[attr_map["name"]] = trans.get("CNN", "")
-				
+
 			# Override Locale with Bloom Results
 			# Add city and state to each transaction
 			if trans["locale_bloom"] != None:
 				trans["city"] = trans["locale_bloom"][0]
 				trans["state"] = trans["locale_bloom"][1]
+				if debug:
+					trans["bloom_filter"] = { "city": trans["locale_bloom"][0],\
+					"state": trans["locale_bloom"][1]}
 			else:
 				trans["city"] = ""
 				trans["state"] = ""
+				if debug:
+					trans["bloom_filter"] = { "city": "", "state": "" }
+
+			if debug:
+				trans["cnn"] = { "txn_type" : trans["txn_type"],\
+				"txn_sub_type" : trans["txn_sub_type"] }
 
 			if "CNN" in trans:
+				if debug:
+					trans["cnn"]["merchant_name"] = trans["CNN"]
 				del trans["CNN"]
 
 			del trans["locale_bloom"]
@@ -524,7 +556,9 @@ class WebConsumer():
 		if not optimizing:
 			self.__apply_missing_categories(data["transaction_list"])
 
-		self.ensure_output_schema(data["transaction_list"])
+		debug = data.get("debug", False)
+
+		self.ensure_output_schema(data["transaction_list"], debug)
 		return data
 
 if __name__ == "__main__":
