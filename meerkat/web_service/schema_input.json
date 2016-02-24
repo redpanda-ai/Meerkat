@@ -26,6 +26,7 @@
 			"type" : "number"
 		},
 		"container" : { "enum" : [ "bank", "card" ] },
+		"debug" : { "enum" : [ true, false ] },
 		"transaction_list" : {
 			"description" : "An array containing at least one transaction_record.",
 			"type" : "array",
