@@ -1,3 +1,45 @@
+#/usr/local/bin/python3.3
+
+"""This module load csv and json data and verify:
+
+1 csv
+1.1 csv dta should have same or more transactions as the original data set
+1.2 verify csv data format is correct for the type of CNN being trained
+1.3 verify any class has at least 500 transactions
+
+2 json
+2.1 verify json format is correct
+2.2 verify json is 1-indexed
+2.3 verify no duplicate label numbers in json
+2.4 verify no duplicate label names in json
+
+3 consistency between csv and json
+3.1 verify no missing label numbers in json
+3.2 verify no extra label numbers in json
+3.3 verify no missing label numbers in json
+3.4 verify no extra label names in json
+
+To Do:
+Integrate with stream.py, so that csv and json can be pulled from s3 automatedly
+
+@author: Tina Wu
+"""
+
+#################### USAGE ##########################
+"""
+python3 -m meerkat.classification.verify_data \
+<csv_input> <json_input> <cnn_type_arg1> <>cnn_type_arg2>
+
+# Exampl - merchant_card CNN
+python3 -m meerkat.classification.verify_data \
+data/input/merchant_card data/input/merchant_card/card_merchant_label_map.json \
+merchant card
+# Note that: data/input/merchant_card is a directory containing all csv files 
+# from s3
+
+"""
+#####################################################
+
 import os
 import json
 import csv
