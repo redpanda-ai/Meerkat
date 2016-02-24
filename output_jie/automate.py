@@ -1,3 +1,5 @@
+"""Stop the CNN training process if the threshold reached."""
+
 import os
 import sys
 import re
@@ -94,14 +96,14 @@ def main_stream():
 
 				# Stop the training process if threshold meets.
 				if len(eras) - bestEraNumber > threshold:
-					print("The training process has been stopped.")
-					print(fileList)
+					logging.info("The training process has been stopped.")
+					logging.info("The CNN statics files have been zipped in Best_CNN_Statics.")
 					zipDir(latest_t7b, "staticsJsonFile")
 					return
 				else:
-					print("The training process is still on")
-					print(bestErrorRate)
-					print(bestEraNumber)
+					logging.info("The training process is still on")
+					logging.info(bestErrorRate)
+					logging.info(bestEraNumber)
 
 			else: # No new file.
 				print("No new file detected")
