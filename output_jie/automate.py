@@ -11,19 +11,17 @@ import pandas as pd
 def getFile():
 	"""Get the latest t7b file under current directory"""
 	logging.info("Get the latest main_*.t7b file")
+
 	command = local["ls"]["-Falt"] \
-			| local["grep"]["main_"] \
+			| local["grep"]["main"] \
 			| local["head"]["-n"]["1"] \
 			| local["awk"]["{print $9}"]
 
 	result = command()
-
-	'''No main_*.t7b files'''
-	if result is None or len(result) == 0:
+	if result is None or len(result) <= 10: # No main_*.t7b files.
 		return None
-
-	latestFile = result[0:-1]
-	return latestFile
+	else:
+		return result[0:-1]
 
 def writeToLuaFile(inputFileName, outputLuaFile):
 	"""Write three lines of code to the outputLuaFile"""
@@ -59,7 +57,7 @@ def loadStaticsToMap(filename):
 def getTheBestErrorRate(eras):
 	"""Get the best error rate among different eras"""
 	bestErrorRate = 1.0
-	bestEra = 0
+	bestEraNumber = 1
 
 	for i in range(len(eras)):
 		if float(eras[i]["val_error"]) < bestErrorRate:
@@ -67,14 +65,21 @@ def getTheBestErrorRate(eras):
 			bestEraNumber = i + 1
 	return bestErrorRate, bestEraNumber
 
+def zipDir(file1, file2):
+	"""Copy files to Best_CNN_Statics directory and zip it"""
+	local["mkdir"]["Best_CNN_Statics"]()
+	local["cp"][file1]["Best_CNN_Statics"]()
+	local["cp"][file2]["Best_CNN_Statics"]()
+	local["tar"]["-zcvf"]["Best_CNN_Statics.tar.gz"]["Best_CNN_Statics"]()
+
 def main_stream():
 	"""The main program"""
 	fileList = [] # A list to store all the main_*.t7b files.
 	threshold = 2 # The highest era number - the era number of the best error rate.
 
 	while True:
-		print("Suspend the program for 1 minutes, and wait for a new file.")
-		time.sleep(20) # Sleep for 1 minutes.
+		print("Suspend the program for 10 seconds, and wait for a new file.")
+		time.sleep(10) # Sleep for 10 seconds.
 
 		latest_t7b = getFile()
 
@@ -91,12 +96,12 @@ def main_stream():
 				if len(eras) - bestEraNumber > threshold:
 					print("The training process has been stopped.")
 					print(fileList)
+					zipDir(latest_t7b, "staticsJsonFile")
 					return
 				else:
 					print("The training process is still on")
 					print(bestErrorRate)
 					print(bestEraNumber)
-					return
 
 			else: # No new file.
 				print("No new file detected")
