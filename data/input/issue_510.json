@@ -1,0 +1,33 @@
+{
+  "cobrand_id" : 1234,
+  "user_id" : 2345,
+  "container" : "bank",
+  "user_city" : "Mountain View",
+  "user_state" : "CA",
+  "user_country" : "US",
+  "cobrand_region" : 1,
+  "services_list" : ["bank_merchant_cnn", "should_search"],
+  "transaction_list" : [
+  {
+    "amount":4.99,
+    "date":"2014-12-09",
+    "ledger_entry":"debit",
+    "description":"CHECKCARD  1208 APL* ITUNES.COM/BILL                        866-712-7753 CA 24692164342000869308530",
+    "transaction_id":1
+  },
+  {
+    "amount":50,
+    "date":"2014-12-22",
+    "ledger_entry":"debit",
+    "description":"USAA 529 ACH     CONTRIB    ***********2052~~08888~~~~78824~~0~~~~0065",
+    "transaction_id":2
+  },
+  {
+    "amount":62.17,
+    "date":"2014-12-16",
+    "ledger_entry":"debit",
+    "description":"Debit Card Purchase RENAISSANCE HOTELS F/B NEW YORK NY",
+    "transaction_id":3
+  }
+]
+}

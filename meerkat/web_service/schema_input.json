@@ -38,6 +38,31 @@
 			"minItems": 1,
 			"maxItems": 1000,
 			"uniqueItems": true
+		},
+		"user_city" : {
+			"description" : "User's city",
+			"type" : "string"
+		},
+		"user_state" : {
+			"description" : "User's state",
+			"type" : "string"
+		},
+		"user_country" : {
+			"description" : "User's country",
+			"type" : "string",
+			"maxLength" : 2,
+			"minLength" : 2
+		},
+		"cobrand_region" : {
+			"description" : "Cobrand's region",
+			"type" : "integer"
+		},
+		"services_list" : {
+			"description" : "Services to be enabled",
+			"type" : "array",
+			"items" : {
+				"type" : "string"
+			}
 		}
 	},
 	"required": ["cobrand_id", "user_id", "container", "transaction_list"]

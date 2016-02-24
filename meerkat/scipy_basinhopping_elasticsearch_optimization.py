@@ -136,7 +136,7 @@ def save_top_score(top_score):
 	""" Save top scores """
 	record = open("optimization_results/" + \
 	os.path.splitext(os.path.basename(sys.argv[1]))[0] + "_top_scores.txt", "a")
-	pprint("Precision = {0}%".format(top_score['precision']), record)
+	pprint("Predictive Accuracy = {0}%".format(top_score['predictive_accuracy']), record)
 	pprint("Best Recall = {0}%".format(top_score['total_recall_physical']), record)
 	boost_vectors, _, other = split_hyperparameters(top_score["hyperparameters"])[::2]
 	pprint(boost_vectors, record)
@@ -207,7 +207,7 @@ def add_local_params(params):
 		"iteration_search_space": 15,
 		"iteration_learning_rate": 0.1,
 		"gradient_descent_iterations": 10,
-		"max_precision": 97.5,
+		"max_predictive_accuracy": 97.5,
 		"min_recall": 31
 	}
 
@@ -318,7 +318,7 @@ def run_from_command_line():
 		consumer.update_params(params)
 		consumer.update_cities(CITIES)
 		accuracy = run_classifier(hyperparam, params, dataset)
-		error = (100 - accuracy['precision']) / 100
+		error = (100 - accuracy['precictive_accuracy']) / 100
 
 		safe_print(hyperparam)
 		safe_print(error)

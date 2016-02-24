@@ -1,5 +1,5 @@
 #!/usr/local/bin/python3
-# pylint: disable=all
+#pylint: skip-file
 
 """This module is a utility tool. It takes a file of transactions with a
 column header of DESCRIPTION_UNMASKED and outputs a file containing either
