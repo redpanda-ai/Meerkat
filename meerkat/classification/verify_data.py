@@ -139,6 +139,65 @@ def verify_csv(**kwargs):
 
 	return label_names_csv
 
+def dict_raise_on_duplicates(ordered_pairs):
+	"""Check duplicate keys in JSON"""
+	dictionary = {}
+	for key, value in ordered_pairs:
+		if key in dictionary:
+			raise ValueError("duplicate key: %r" % (key,))
+		else:
+			dictionary[key] = value
+	return dictionary
+
+def load_json(json_input):
+	"""Verify JSON file is correct"""
+	try:
+		json_file = open(json_input, encoding='utf-8')
+		try:
+			label_map_json = json.load(json_file, object_pairs_hook=dict_raise_on_duplicates)
+			return label_map_json
+		except ValueError as err:
+			logging.error("The label map json file is mal-formatted: {0}".format(err))
+			sys.exit()
+		json_file.close()
+	except IOError:
+		logging.error("Json file not found, aborting.")
+		sys.exit()
+	logging.info("JSON file format is correct")
+
+def verify_json(**kwargs):
+	"""verify json label map"""
+	json_input = kwargs["json_input"]
+
+	label_map_json = load_json(json_input)
+
+	keys_json = [int(x) for x in label_map_json.keys()]
+	label_numbers_json = sorted(list(keys_json))
+
+	# Verify that the json map is 1-indexed
+	if 0 in label_numbers_json:
+		logging.error("JSON label map is 0-indexed")
+		sys.exit()
+
+	label_names_json = []
+	for value in label_map_json.values():
+		label_names_json.append(value["label"])
+	label_names_json = sorted(label_names_json)
+
+	# check there are no duplicate class names in json
+	unique_label_names_json = set(label_names_json)
+	if len(label_names_json) != len(unique_label_names_json):
+		counter_names = collections.Counter(label_names_json)
+		duplicate_names_list = []
+		for name in counter_names:
+			if counter_names[name] > 1:
+				duplicate_names_list.append(name)
+		duplicate_names = ', '.join(item for item in set(duplicate_names_list))
+		logging.error("There are duplicate class names in json: {0}".format(duplicate_names))
+		sys.exit()
+
+	return label_names_json, label_numbers_json
+
 def verify_data(**kwargs):
 	"""This function verifies csv data and json label map"""
 	logging.basicConfig(level=logging.INFO)
@@ -148,6 +207,7 @@ def verify_data(**kwargs):
 	cnn_type = kwargs["cnn_type"]
 
 	label_names_csv = verify_csv(csv_input=csv_input, cnn_type=cnn_type)
+	label_names_json, label_numbers_json = verify_json(json_input=json_input)
 
 if __name__ == "__main__":
 	csv_input = sys.argv[1]
