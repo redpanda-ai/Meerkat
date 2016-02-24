@@ -12,7 +12,7 @@ import pandas as pd
 
 def getFile():
 	"""Get the latest t7b file under current directory"""
-	logging.info("Get the latest main_*.t7b file")
+	print("Get the latest main_*.t7b file")
 
 	command = local["ls"]["-Falt"] \
 			| local["grep"]["main"] \
@@ -100,15 +100,15 @@ def main_stream():
 
 				# Stop the training process if threshold meets.
 				if len(eras) - bestEraNumber > threshold:
-					logging.info("The training process has been stopped.")
-					logging.info("The CNN statics files have been zipped in Best_CNN_Statics.")
+					print("The training process has been stopped.")
+					print("The CNN statics files have been zipped in Best_CNN_Statics.")
 					zipDir(latest_t7b, "staticsJsonFile")
 					stopStream()
 					return
 				else:
-					logging.info("The training process is still on")
-					logging.info(bestErrorRate)
-					logging.info(bestEraNumber)
+					print("The training process is still on")
+					print(bestErrorRate)
+					print(bestEraNumber)
 
 			else: # No new file.
 				print("No new file detected")
