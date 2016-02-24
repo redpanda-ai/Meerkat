@@ -12,7 +12,7 @@ import pandas as pd
 
 def getFile():
 	"""Get the latest t7b file under current directory"""
-	logging.info("Get the latest main_*.t7b file")
+	print("Get the latest main_*.t7b file")
 
 	command = local["ls"]["-Falt"] \
 			| local["grep"]["main"] \
@@ -74,14 +74,18 @@ def zipDir(file1, file2):
 	local["cp"][file2]["Best_CNN_Statics"]()
 	local["tar"]["-zcvf"]["Best_CNN_Statics.tar.gz"]["Best_CNN_Statics"]()
 
+def stopStream():
+	"""Stop stream.py when the threshold reached."""
+	local["pkill"]["qlua"]
+
 def main_stream():
 	"""The main program"""
 	fileList = [] # A list to store all the main_*.t7b files.
 	threshold = 2 # The highest era number - the era number of the best error rate.
 
 	while True:
-		print("Suspend the program for 10 seconds, and wait for a new file.")
-		time.sleep(10) # Sleep for 10 seconds.
+		print("Suspend the program for 10 minutes, and wait for a new file.")
+		time.sleep(600) # Sleep for 10 minutes.
 
 		latest_t7b = getFile()
 
@@ -96,14 +100,15 @@ def main_stream():
 
 				# Stop the training process if threshold meets.
 				if len(eras) - bestEraNumber > threshold:
-					logging.info("The training process has been stopped.")
-					logging.info("The CNN statics files have been zipped in Best_CNN_Statics.")
+					print("The training process has been stopped.")
+					print("The CNN statics files have been zipped in Best_CNN_Statics.")
 					zipDir(latest_t7b, "staticsJsonFile")
+					stopStream()
 					return
 				else:
-					logging.info("The training process is still on")
-					logging.info(bestErrorRate)
-					logging.info(bestEraNumber)
+					print("The training process is still on")
+					print(bestErrorRate)
+					print(bestEraNumber)
 
 			else: # No new file.
 				print("No new file detected")
