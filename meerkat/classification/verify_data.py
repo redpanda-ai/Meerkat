@@ -198,6 +198,39 @@ def verify_json(**kwargs):
 
 	return label_names_json, label_numbers_json
 
+def check_consistency(label_names_csv, label_names_json, label_numbers_json):
+	"""Check consistency between csv data and json"""
+	label_numbers_csv = list(range(1, (len(label_names_csv) + 1)))
+
+	err_msg = ""
+	# Verify that there are no missing or extra class numbers in json
+	if label_numbers_json != label_numbers_csv:
+		missing_numbers_list = sorted(list(set(label_numbers_csv) - set(label_numbers_json)))
+		missing_numbers = ', '.join(str(item) for item in missing_numbers_list)
+		if missing_numbers != "":
+			err_msg += "There are missing class numbers in json: " + missing_numbers + "\n"
+
+		extra_numbers_list = sorted(list(set(label_numbers_json) - set(label_numbers_csv)))
+		extra_numbers = ', '.join(str(item) for item in extra_numbers_list)
+		if extra_numbers != "":
+			err_msg += "There are extra class numbers in json: " + extra_numbers + "\n"
+
+	# Verify that there are no missing or extra class names in json
+	if label_names_json != label_names_csv:
+		missing_names_list = sorted(list(set(label_names_csv) - set(label_names_json)))
+		missing_names = ', '.join(str(item) for item in missing_names_list)
+		if missing_names != "":
+			err_msg += "There are missing class names in json: " + missing_names + "\n"
+
+		extra_names_list = sorted(list(set(label_names_json) - set(label_names_csv)))
+		extra_names = ', '.join(str(item) for item in extra_names_list)
+		if extra_names != "":
+			err_msg += "There are extra class names in json: " + extra_names + "\n"
+
+	if err_msg != "":
+		logging.error("There are inconsistency errors between csv and json:\n{0}".format(err_msg))
+		sys.exit()
+
 def verify_data(**kwargs):
 	"""This function verifies csv data and json label map"""
 	logging.basicConfig(level=logging.INFO)
@@ -208,6 +241,9 @@ def verify_data(**kwargs):
 
 	label_names_csv = verify_csv(csv_input=csv_input, cnn_type=cnn_type)
 	label_names_json, label_numbers_json = verify_json(json_input=json_input)
+	check_consistency(label_names_csv, label_names_json, label_numbers_json)
+
+	logging.info("CSV and JSON are verified")
 
 if __name__ == "__main__":
 	csv_input = sys.argv[1]
