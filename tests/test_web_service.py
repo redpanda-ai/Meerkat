@@ -97,7 +97,8 @@ class WebServiceTest(unittest.TestCase):
 		('./data/input/input.json'),
 		('./data/input/web_service_input.json'),
 		('./data/input/issue_512.json'),
-		('./data/input/issue_510.json')
+		('./data/input/issue_510.json'),
+		('./data/input/issue_510_and_512.json')
 	])
 	def test_web_service_representative(self, path):
 		"""Test starts meerkat, runs representative transactions, and stop meerkat"""
