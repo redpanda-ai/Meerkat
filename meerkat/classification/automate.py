@@ -74,6 +74,10 @@ def zipDir(file1, file2):
 	local["cp"][file2]["Best_CNN_Statics"]()
 	local["tar"]["-zcvf"]["Best_CNN_Statics.tar.gz"]["Best_CNN_Statics"]()
 
+def stopStream():
+	"""Stop stream.py when the threshold reached."""
+	local["pkill"]["qlua"]
+
 def main_stream():
 	"""The main program"""
 	fileList = [] # A list to store all the main_*.t7b files.
