@@ -78,7 +78,7 @@ def zipDir(file1, file2):
 
 def stopStream():
 	"""Stop stream.py when the threshold reached."""
-	local["pkill"]["qlua"]
+	local["pkill"]["qlua"]()
 
 def main_stream():
 	"""The main program"""
