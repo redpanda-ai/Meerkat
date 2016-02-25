@@ -58,15 +58,15 @@ def getCNNStatics(inputFile):
 	error_vals = list(lua_table.values())
 	return dict(zip(error_list, error_vals))
 
-def getTheBestErrorRate(eras):
+def getTheBestErrorRate(erasDict):
 	"""Get the best error rate among different eras"""
 	bestErrorRate = 1.0
 	bestEraNumber = 1
 
-	for i in range(len(eras)):
-		if float(eras[i]["val_error"]) < bestErrorRate:
-			bestErrorRate = float(eras[i]["val_error"])
-			bestEraNumber = i + 1
+	df = pd.DataFrame.from_dict(erasDict, orient="index")
+	bestErrorRate = df.min().values[0]
+	bestEraNumber = df.idxmin().values[0]
+
 	return bestErrorRate, bestEraNumber
 
 def zipDir(file1, file2):
@@ -87,8 +87,9 @@ def main_stream():
 
 	staticsDict = getCNNStatics(getFile())
 	print(staticsDict)
+	print(getTheBestErrorRate(staticsDict))
+	print(len(staticsDict))
 
-'''
 	while True:
 		print("Suspend the program for 10 minutes, and wait for a new file.")
 		time.sleep(600) # Sleep for 10 minutes.
@@ -122,7 +123,6 @@ def main_stream():
 		else: # latest_t7b is None.
 			print("The latest_t7b is None")
 			pass
-'''
 
 if __name__ == "__main__":
 	main_stream()
