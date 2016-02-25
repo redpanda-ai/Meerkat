@@ -32,8 +32,8 @@ def main_stream():
 				if len(staticsDict) - bestEraNumber > threshold:
 					print("The training process has been stopped.")
 					print("The CNN statics files have been zipped in Best_CNN_Statics.")
-					json.dump(staticsDict, open("text.txt", "w"))
-					zipDir(fileList[bestEraNumber - 1], "text.txt")
+					json.dump(staticsDict, open("all_error_rates", "w"))
+					zipDir(fileList[bestEraNumber - 1], "all_error_rates")
 					stopStream()
 					return
 				else:

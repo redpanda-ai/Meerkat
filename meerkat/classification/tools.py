@@ -16,7 +16,7 @@ from boto import connect_s3
 from plumbum import local, NOHUP
 
 def getFile(directory):
-	"""Get the latest t7b file under current directory."""
+	"""Get the latest t7b file under directory."""
 	print("Get the latest main_*.t7b file")
 
 	command = local["ls"]["-Falt"][directory] \
