@@ -3,7 +3,7 @@
 """This module verify csv and json:
 
 1 csv
-1.1 csv data should have same or more transactions as the original data set
+1.1 csv data should have at lease 99% transactions as the original data set
 1.2 verify csv data format is correct for the type of CNN being trained
 1.3 verify any class should have at least 500 transactions
 
@@ -94,18 +94,18 @@ def verify_total_numbers(df, cnn_type):
 	original_data_size = original_data_sizes[cnn_str]
 
 	err_msg = ""
+	# get the total percent of transactions less than original data set
 	total_percent = (original_data_size - len(df)) / original_data_size
 	if total_percent >= 0.01:
 		err_msg += ("Data set size of csv is " + "{:.1%}".format(total_percent) +
 			" smaller than original data set size.\n")
 		err_msg += "{:<40}".format("Data set size in csv: ") + str(len(df)) + "\n"
 		err_msg += "{:<40}".format("Original data set size: ") + str(original_data_size) + "\n"
-	logging.info("csv data set size is {0}".format(len(df)))
+	else:
+		logging.info("csv data set size ({0}) is verified".format(len(df)))
 
 	# Generate count numbers for labels in csv
-	label_key_csv = "MERCHANT_NAME"
-	if cnn_type[0] == "subtype":
-		label_key_csv = "PROPOSED_SUBTYPE"
+	label_key_csv = "MERCHANT_NAME" if cnn_type[0] == "merchant" else "PROPOSED_SUBTYPE"
 	label_names_csv = sorted(df[label_key_csv].value_counts().index.tolist())
 	label_counts_csv = df[label_key_csv].value_counts()
 
@@ -113,11 +113,11 @@ def verify_total_numbers(df, cnn_type):
 	# as null class in original data sets
 	if cnn_type[0] == "merchant":
 		null_class_size = label_counts_csv[""]
-		null_class_sizes = {
+		original_null_class_sizes = {
 			"bank": 12425494,
 			"card": 4193517
 		}
-		original_null_class_size = null_class_sizes[cnn_type[1]]
+		original_null_class_size = original_null_class_sizes[cnn_type[1]]
 		null_percent = (original_null_class_size - null_class_size) / original_null_class_size
 		if null_percent >= 0.01:
 			err_msg += ("Null class size in csv is " + "{:.1%}".format(null_percent) +
@@ -125,7 +125,8 @@ def verify_total_numbers(df, cnn_type):
 			err_msg += "{:<40}".format("Null class size in csv: ") + str(null_class_size) + "\n"
 			err_msg += ("{:<40}".format("Null class size in original data set: ") +
 				str(original_null_class_size))
-		logging.info("Null class size is: {0}".format(null_class_size))
+		else:
+			logging.info("Null class size ({0}) is verified".format(null_class_size))
 
 	if err_msg != "":
 		if total_percent >= 0.05 or null_percent >= 0.05:
@@ -141,22 +142,20 @@ def verify_csv_format(df, cnn_type):
 	column_header = list(df.columns.values)
 	column_header.sort()
 	
-	merchant_column_header = ['AMOUNT', 'DESCRIPTION', 'DESCRIPTION_UNMASKED', 'GOOD_DESCRIPTION',
+	merchant_header = ['AMOUNT', 'DESCRIPTION', 'DESCRIPTION_UNMASKED', 'GOOD_DESCRIPTION',
 		'MERCHANT_NAME', 'TRANSACTION_DATE', 'TYPE', 'UNIQUE_MEM_ID', 'UNIQUE_TRANSACTION_ID']
-	subtype_column_header = ['AMOUNT', 'DESCRIPTION', 'DESCRIPTION_UNMASKED', 'LEDGER_ENTRY',
+	subtype_header = ['AMOUNT', 'DESCRIPTION', 'DESCRIPTION_UNMASKED', 'LEDGER_ENTRY',
 		'PROPOSED_SUBTYPE', 'TRANSACTION_DATE', 'UNIQUE_TRANSACTION_ID']
 
-	cnn_column_header = merchant_column_header
-	if cnn_type[0] == "subtype":
-		cnn_column_header = subtype_column_header
+	cnn_column_header = merchant_header if cnn_type[0] == "merchant" else subtype_header
 
 	if column_header != cnn_column_header:
-		logging.error("csv data format is incorrect.")
+		logging.error("csv data format is incorrect")
 		sys.exit()
-	logging.info("csv data format is correct.")
+	logging.info("csv data format is correct")
 
 def verify_numbers_in_each_class(label_names_csv, label_counts_csv):
-	"""Verify that for any particular class, there're at least 500 transactions"""
+	"""Verify that for any particular class, there are at least 500 transactions"""
 	err_msg = ""
 	for i in range(len(label_names_csv)):
 		if label_counts_csv[i] < 500:
@@ -186,38 +185,40 @@ def verify_csv(**kwargs):
 	verify_csv_format(df, cnn_type)
 	verify_numbers_in_each_class(label_names_csv, label_counts_csv)
 
+	logging.info("csv is verified\n")
 	return label_names_csv
 
 def dict_raise_on_duplicates(ordered_pairs):
-	"""Check duplicate keys in JSON"""
+	"""Verify that there is no duplicate key in json"""
 	dictionary = {}
 	for key, value in ordered_pairs:
 		if key in dictionary:
 			raise ValueError("duplicate key: %r" % (key,))
 		else:
 			dictionary[key] = value
+	logging.info("There is no duplicate key in json")
 	return dictionary
 
 def load_json(json_input):
-	"""Verify JSON file is correct"""
+	"""Verify that json can be loaded and there is no duplicate keys in json"""
 	try:
 		json_file = open(json_input, encoding='utf-8')
 		try:
 			label_map_json = json.load(json_file, object_pairs_hook=dict_raise_on_duplicates)
-			logging.info("JSON file format is correct")
+			logging.info("json file format is correct")
 			return label_map_json
 		except ValueError as err:
-			logging.error("The label map json file is mal-formatted: {0}".format(err))
+			logging.error("json file is mal-formatted: {0}".format(err))
 			sys.exit()
 		json_file.close()
 	except IOError:
-		logging.error("Json file not found, aborting.")
+		logging.error("json file not found")
 		sys.exit()
 
 def verify_json_1_indexed(label_numbers_json):
 	"""Verify that the json map is 1-indexed"""
 	if 0 in label_numbers_json:
-		logging.error("JSON label map is 0-indexed")
+		logging.error("json is 0-indexed")
 		sys.exit()
 	logging.info("json is 1-indexed")
 
@@ -240,11 +241,14 @@ def verify_json(**kwargs):
 	json_input = kwargs["json_input"]
 
 	label_map_json = load_json(json_input)
+
+	# Create a sorted list for label numbers in json
 	keys_json = [int(x) for x in label_map_json.keys()]
 	label_numbers_json = sorted(list(keys_json))
 
 	verify_json_1_indexed(label_numbers_json)
 
+	# Create a sorted list for label names in json
 	label_names_json = []
 	for value in label_map_json.values():
 		label_names_json.append(value["label"])
@@ -252,14 +256,15 @@ def verify_json(**kwargs):
 
 	verify_json_no_dup_names(label_names_json)
 
+	logging.info("json is verified\n")
 	return label_names_json, label_numbers_json
 
 def check_consistency(label_names_csv, label_names_json, label_numbers_json):
-	"""Check consistency between csv data and json"""
+	"""Check consistency between csv data and json data"""
 	label_numbers_csv = list(range(1, (len(label_names_csv) + 1)))
 
 	err_msg = ""
-	# Verify that there are no missing or extra class numbers in json
+	# Verify that there is no missing or extra class number in json
 	if label_numbers_json != label_numbers_csv:
 		missing_numbers_list = sorted(list(set(label_numbers_csv) - set(label_numbers_json)))
 		missing_numbers = ', '.join(str(item) for item in missing_numbers_list)
@@ -271,7 +276,7 @@ def check_consistency(label_names_csv, label_names_json, label_numbers_json):
 		if extra_numbers != "":
 			err_msg += "There are extra class numbers in json: " + extra_numbers + "\n"
 
-	# Verify that there are no missing or extra class names in json
+	# Verify that there is no missing or extra class name in json
 	if label_names_json != label_names_csv:
 		missing_names_list = sorted(list(set(label_names_csv) - set(label_names_json)))
 		missing_names = ', '.join(str(item) for item in missing_names_list)
@@ -287,7 +292,7 @@ def check_consistency(label_names_csv, label_names_json, label_numbers_json):
 		logging.error("There are inconsistency errors between csv and json:\n{0}".format(err_msg))
 		sys.exit()
 	else:
-		logging.info("json is in consistency with csv")
+		logging.info("json is consistent with csv\n")
 
 def verify_data(**kwargs):
 	"""This function verifies csv data and json label map"""
@@ -301,7 +306,7 @@ def verify_data(**kwargs):
 	label_names_json, label_numbers_json = verify_json(json_input=json_input)
 	check_consistency(label_names_csv, label_names_json, label_numbers_json)
 
-	logging.info("CSV and JSON are verified")
+	logging.info("json and csv validation success")
 
 if __name__ == "__main__":
 	csv_input = sys.argv[1]
