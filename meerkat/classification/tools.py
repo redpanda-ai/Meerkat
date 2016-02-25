@@ -15,11 +15,11 @@ from boto.s3.connection import Location
 from boto import connect_s3
 from plumbum import local, NOHUP
 
-def getFile():
+def getFile(directory):
 	"""Get the latest t7b file under current directory."""
 	print("Get the latest main_*.t7b file")
 
-	command = local["ls"]["-Falt"] \
+	command = local["ls"]["-Falt"][directory] \
 			| local["grep"]["main"] \
 			| local["head"]["-n"]["1"] \
 			| local["awk"]["{print $9}"]
