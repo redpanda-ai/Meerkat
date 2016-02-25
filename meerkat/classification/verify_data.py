@@ -98,11 +98,11 @@ def verify_total_numbers(df, cnn_type):
 	total_percent = (original_data_size - len(df)) / original_data_size
 	if total_percent >= 0.01:
 		err_msg += ("Data set size of csv is " + "{:.1%}".format(total_percent) +
-			" smaller than original data set size.\n")
-		err_msg += "{:<40}".format("Data set size in csv: ") + str(len(df)) + "\n"
-		err_msg += "{:<40}".format("Original data set size: ") + str(original_data_size) + "\n"
+			" smaller than original data set size\n")
+		err_msg += "{:<40}".format("Data set size of csv: ") + "{:>15,}".format(len(df)) + "\n"
+		err_msg += "{:<40}".format("Original data set size: ") + "{:>15,}".format(original_data_size) + "\n"
 	else:
-		logging.info("csv data set size ({0}) is verified".format(len(df)))
+		logging.info("Data set size of csv is verified: {0:>15,}".format(len(df)))
 
 	# Generate count numbers for labels in csv
 	label_key_csv = "MERCHANT_NAME" if cnn_type[0] == "merchant" else "PROPOSED_SUBTYPE"
@@ -121,12 +121,12 @@ def verify_total_numbers(df, cnn_type):
 		null_percent = (original_null_class_size - null_class_size) / original_null_class_size
 		if null_percent >= 0.01:
 			err_msg += ("Null class size in csv is " + "{:.1%}".format(null_percent) +
-				" smaller than null class size in original data set.\n")
-			err_msg += "{:<40}".format("Null class size in csv: ") + str(null_class_size) + "\n"
+				" smaller than null class size in original data set\n")
+			err_msg += "{:<40}".format("Null class size in csv: ") + "{:>15,}".format(null_class_size) + "\n"
 			err_msg += ("{:<40}".format("Null class size in original data set: ") +
-				str(original_null_class_size))
+				"{:>15,}".format(original_null_class_size))
 		else:
-			logging.info("Null class size ({0}) is verified".format(null_class_size))
+			logging.info("Null class size is verified: {0:>15,}".format(null_class_size))
 
 	if err_msg != "":
 		if total_percent >= 0.05 or null_percent >= 0.05:
@@ -295,7 +295,7 @@ def check_consistency(label_names_csv, label_names_json, label_numbers_json):
 		logging.info("json is consistent with csv\n")
 
 def verify_data(**kwargs):
-	"""This function verifies csv data and json label map"""
+	"""This function verifies csv data and json data"""
 	logging.basicConfig(level=logging.INFO)
 
 	csv_input = kwargs["csv_input"]
