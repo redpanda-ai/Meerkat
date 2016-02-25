@@ -82,8 +82,8 @@ def verify_total_numbers(df, cnn_type):
 	"""Check that in csv there should be enough transactions"""
 	# Data sets should have at least 99% transactions as the original data sets
 	original_data_sizes = {
-		"merchant_bank": 2, #23942324,
-		"merchant_card": 2, #16228034,
+		"merchant_bank": 23942324,
+		"merchant_card": 16228034,
 		"subtype_bank_debit": 117773,
 		"subtype_bank_credit": 29654,
 		"subtype_card_debit": 151336,
@@ -116,7 +116,7 @@ def verify_total_numbers(df, cnn_type):
 	if cnn_type[0] == "merchant":
 		null_class_size = label_counts_csv[""]
 		original_null_class_sizes = {
-			"bank": 2, #12425494,
+			"bank": 12425494,
 			"card": 4193517
 		}
 		original_null_class_size = original_null_class_sizes[cnn_type[1]]
