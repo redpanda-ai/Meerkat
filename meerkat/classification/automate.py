@@ -85,14 +85,9 @@ def main_stream():
 	fileList = [] # A list to store all the main_*.t7b files.
 	threshold = 2 # The highest era number - the era number of the best error rate.
 
-	staticsDict = getCNNStatics(getFile())
-	print(staticsDict)
-	print(getTheBestErrorRate(staticsDict))
-	print(len(staticsDict))
-
 	while True:
 		print("Suspend the program for 10 minutes, and wait for a new file.")
-		time.sleep(600) # Sleep for 10 minutes.
+		time.sleep(10) # Sleep for 10 minutes.
 
 		latest_t7b = getFile()
 
@@ -100,16 +95,15 @@ def main_stream():
 			if len(fileList) == 0 or latest_t7b != fileList[len(fileList) - 1]: # Has new file.
 				fileList.append(latest_t7b)
 
-				writeToLuaFile(latest_t7b, "output_statics.lua")
-				executeLuaFile("output_statics.lua")
-				eras = loadStaticsToMap("staticsJsonFile")
-				bestErrorRate, bestEraNumber = getTheBestErrorRate(eras)
+				staticsDict = getCNNStatics(latest_t7b)
+				bestErrorRate, bestEraNumber = getTheBestErrorRate(staticsDict)
 
 				# Stop the training process if threshold meets.
-				if len(eras) - bestEraNumber > threshold:
+				if len(staticsDict) - bestEraNumber > threshold:
 					print("The training process has been stopped.")
 					print("The CNN statics files have been zipped in Best_CNN_Statics.")
-					zipDir(latest_t7b, "staticsJsonFile")
+					json.dump(staticsDict, open("text.txt", "w"))
+					zipDir(fileList[bestEraNumber - 1], "text.txt")
 					stopStream()
 					return
 				else:
