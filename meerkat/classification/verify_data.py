@@ -99,8 +99,10 @@ def verify_total_numbers(df, cnn_type):
 	if total_percent >= 0.01:
 		err_msg += ("Data set size of csv is " + "{:.1%}".format(total_percent) +
 			" smaller than original data set size\n")
-		err_msg += "{:<40}".format("Data set size of csv: ") + "{:>15,}".format(len(df)) + "\n"
-		err_msg += "{:<40}".format("Original data set size: ") + "{:>15,}".format(original_data_size) + "\n"
+		err_msg += ("{:<40}".format("Data set size of csv: ") +
+			"{:>15,}".format(len(df)) + "\n")
+		err_msg += ("{:<40}".format("Original data set size: ") +
+			"{:>15,}".format(original_data_size) + "\n")
 	else:
 		logging.info("Data set size of csv is verified: {0:>15,}".format(len(df)))
 
@@ -309,7 +311,4 @@ def verify_data(**kwargs):
 	logging.info("json and csv validation success")
 
 if __name__ == "__main__":
-	csv_input = sys.argv[1]
-	json_input = sys.argv[2]
-	cnn_type = sys.argv[3:]
-	verify_data(csv_input=csv_input, json_input=json_input, cnn_type=cnn_type)
+	verify_data(csv_input=sys.argv[1], json_input=sys.argv[2], cnn_type=sys.argv[3:])
