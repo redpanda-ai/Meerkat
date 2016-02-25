@@ -19,7 +19,7 @@
 3.3 verify no missing label numbers in json
 3.4 verify no extra label names in json
 
-To Do:
+To do:
 Integrate with stream.py
 
 @author: Tina Wu
@@ -37,9 +37,10 @@ data/input/merchant_card/card_merchant_label_map.json \
 merchant card
 
 # Note:
-For merchant CNN, csv_input is the directory where you store all csv files
-downloaded from s3.
-For subtype CNN, csv_input is the file path where you store the csv file downloaded from s3.
+For merchant CNN, csv_input is the directory where you store
+all csv files downloaded from s3.
+For subtype CNN, csv_input is the file path where you store
+the csv file downloaded from s3.
 
 """
 #####################################################
@@ -81,8 +82,8 @@ def verify_total_numbers(df, cnn_type):
 	"""Check that in csv there should be enough transactions"""
 	# Data sets should have at least 99% transactions as the original data sets
 	original_data_sizes = {
-		"merchant_bank": 2, #23942324,
-		"merchant_card": 2, # 16228034,
+		"merchant_bank": 23942324,
+		"merchant_card": 16228034,
 		"subtype_bank_debit": 117773,
 		"subtype_bank_credit": 29654,
 		"subtype_card_debit": 151336,
@@ -113,7 +114,7 @@ def verify_total_numbers(df, cnn_type):
 	if cnn_type[0] == "merchant":
 		null_class_size = label_counts_csv[""]
 		null_class_sizes = {
-			"bank": 2, #12425494,
+			"bank": 12425494,
 			"card": 4193517
 		}
 		original_null_class_size = null_class_sizes[cnn_type[1]]
@@ -203,6 +204,7 @@ def load_json(json_input):
 		json_file = open(json_input, encoding='utf-8')
 		try:
 			label_map_json = json.load(json_file, object_pairs_hook=dict_raise_on_duplicates)
+			logging.info("JSON file format is correct")
 			return label_map_json
 		except ValueError as err:
 			logging.error("The label map json file is mal-formatted: {0}".format(err))
@@ -211,29 +213,16 @@ def load_json(json_input):
 	except IOError:
 		logging.error("Json file not found, aborting.")
 		sys.exit()
-	logging.info("JSON file format is correct")
 
-def verify_json(**kwargs):
-	"""verify json label map"""
-	json_input = kwargs["json_input"]
-
-	label_map_json = load_json(json_input)
-
-	keys_json = [int(x) for x in label_map_json.keys()]
-	label_numbers_json = sorted(list(keys_json))
-
-	# Verify that the json map is 1-indexed
+def verify_json_1_indexed(label_numbers_json):
+	"""Verify that the json map is 1-indexed"""
 	if 0 in label_numbers_json:
 		logging.error("JSON label map is 0-indexed")
 		sys.exit()
 	logging.info("json is 1-indexed")
 
-	label_names_json = []
-	for value in label_map_json.values():
-		label_names_json.append(value["label"])
-	label_names_json = sorted(label_names_json)
-
-	# check there is no duplicate class name in json
+def verify_json_no_dup_names(label_names_json):
+	"""Verify that there is no duplicate class name in json"""
 	unique_label_names_json = set(label_names_json)
 	if len(label_names_json) != len(unique_label_names_json):
 		counter_names = collections.Counter(label_names_json)
@@ -245,6 +234,23 @@ def verify_json(**kwargs):
 		logging.error("There are duplicate class names in json: {0}".format(duplicate_names))
 		sys.exit()
 	logging.info("There is no duplicate class name in json")
+
+def verify_json(**kwargs):
+	"""verify json label map"""
+	json_input = kwargs["json_input"]
+
+	label_map_json = load_json(json_input)
+	keys_json = [int(x) for x in label_map_json.keys()]
+	label_numbers_json = sorted(list(keys_json))
+
+	verify_json_1_indexed(label_numbers_json)
+
+	label_names_json = []
+	for value in label_map_json.values():
+		label_names_json.append(value["label"])
+	label_names_json = sorted(label_names_json)
+
+	verify_json_no_dup_names(label_names_json)
 
 	return label_names_json, label_numbers_json
 
