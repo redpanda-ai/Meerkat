@@ -6,12 +6,13 @@ import re
 import json
 import logging
 import time
+import ctypes
 
 from plumbum import local
 import pandas as pd
 
 def getFile():
-	"""Get the latest t7b file under current directory"""
+	"""Get the latest t7b file under current directory."""
 	print("Get the latest main_*.t7b file")
 
 	command = local["ls"]["-Falt"] \
@@ -25,36 +26,37 @@ def getFile():
 	else:
 		return result[0:-1]
 
-def writeToLuaFile(inputFileName, outputLuaFile):
-	"""Write three lines of code to the outputLuaFile"""
-	fpointer = open(outputLuaFile, "w")
-	fpointer.write("main = torch.load('" + inputFileName + "')\n" + \
-					"records = main.record\n" + \
-					"print(records)\n")
+def getCNNStatics(inputFile):
+	"""Get the era number and error rate."""
+	lualib = ctypes.CDLL("/home/ubuntu/torch/install/lib/libluajit.so", mode=ctypes.RTLD_GLOBAL)
 
-def executeLuaFile(luaFile):
-	"""Execute the input lua file"""
-	command = local["th"][luaFile] > "staticsJsonFile"
-	command()
+	# Must be imported after previous statement
+	import lupa
+	from lupa import LuaRuntime
 
-def loadStaticsToMap(filename):
-	"""Load the training statics to a list of dictionaries"""
-	key_val_re = re.compile("\s*([a-zA-z]+)\s:\s*(.+)")
-	index_re = re.compile("\s*([0-9]+)\s:\s*(.+)")
-	clean_re = re.compile(r'\x1b[^m]*m')
+	# Load Runtime and Lua Modules
+	lua = LuaRuntime(unpack_returned_tuples=True)
+	torch = lua.require('torch')
 
-	eras = [] # A list of dictionaries.
-	my_era = {}
-	with open(filename, encoding="utf-8") as input_file:
-		for line in input_file:
-			if key_val_re.match(line):
-				m = key_val_re.search(line)
-				my_era[m.group(1)] = clean_re.sub('', m.group(2))
-			elif index_re.match(line):
-				if len(my_era) != 0:
-					eras.append(my_era)
-				my_era = {}
-	return eras
+	template = '''
+		function(filename)
+			rows = {}
+			main = torch.load(filename)
+			for i = 0, #main.record - 1 do
+				error_rate = main.record[#main.record - i ]["val_error"]
+				rows[#main.record -i] = error_rate
+			end
+			return rows
+		end
+	'''
+
+	# Load Lua Functions
+	get_error = lua.eval(template)
+	lua_table = get_error(inputFile)
+
+	error_list = list(lua_table)
+	error_vals = list(lua_table.values())
+	return dict(zip(error_list, error_vals))
 
 def getTheBestErrorRate(eras):
 	"""Get the best error rate among different eras"""
@@ -83,6 +85,10 @@ def main_stream():
 	fileList = [] # A list to store all the main_*.t7b files.
 	threshold = 2 # The highest era number - the era number of the best error rate.
 
+	staticsDict = getCNNStatics(getFile())
+	print(staticsDict)
+
+'''
 	while True:
 		print("Suspend the program for 10 minutes, and wait for a new file.")
 		time.sleep(600) # Sleep for 10 minutes.
@@ -116,6 +122,7 @@ def main_stream():
 		else: # latest_t7b is None.
 			print("The latest_t7b is None")
 			pass
+'''
 
 if __name__ == "__main__":
 	main_stream()
