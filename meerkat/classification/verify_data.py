@@ -19,9 +19,6 @@
 3.3 verify no missing label numbers in json
 3.4 verify no extra label names in json
 
-To do:
-Integrate with stream.py
-
 @author: Tina Wu
 """
 
