@@ -28,19 +28,14 @@ Integrate with stream.py
 #################### USAGE ##########################
 """
 python3 -m meerkat.classification.verify_data \
-<csv_input> <json_input> <cnn_type_arg1> <>cnn_type_arg2>
+<csv_input> <json_input> <merchant_or_subtype> <bank_or_card> \
+--credit_or_debit <optinal_credit_or_debit>
 
 # Example - merchant_card CNN
 python3 -m meerkat.classification.verify_data \
 data/input/merchant_card \
 data/input/merchant_card/card_merchant_label_map.json \
 merchant card
-
-# Note:
-For merchant CNN, csv_input is the directory where you store
-all csv files downloaded from s3.
-For subtype CNN, csv_input is the file path where you store
-the csv file downloaded from s3.
 
 """
 #####################################################
@@ -51,12 +46,13 @@ import csv
 import logging
 import sys
 import collections
+import argparse
 import pandas as pd
 
 def read_csv_to_df(csv_input, cnn_type):
 	"""Read csv file into pandas data frames"""
 	df = []
-	if cnn_type[0] == "merchant":
+	if os.path.isdir(csv_input):
 		samples = []
 		for i in os.listdir(csv_input):
 			if i.endswith(".csv"):
@@ -306,5 +302,32 @@ def verify_data(**kwargs):
 
 	logging.info("json and csv validation success")
 
+def parse_arguments():
+	"""This function parses arguments from our command line."""
+	parser = argparse.ArgumentParser()
+
+	# Required arugments
+	parser.add_argument("csv_input", help="what is the csv data, allowed format: a directory path \
+		containing all csv files; a csv file path; pandas data frame")
+	parser.add_argument("json_input", help="where is the json file")
+	parser.add_argument("merchant_or_subtype",
+		help="What kind of dataset do you want to process, subtype or merchant")
+	parser.add_argument("bank_or_card", help="Whether we are processing card or \
+		bank transactions")
+
+	# Optional arguments
+	parser.add_argument("--credit_or_debit", default='',
+		help="What kind of transactions do you wanna process, debit or credit")
+
+	args = parser.parse_args()
+	if args.merchant_or_subtype == 'subtype' and args.credit_or_debit == '':
+		raise Exception('For subtype data you need to declare debit or credit')
+	return args
+
 if __name__ == "__main__":
-	verify_data(csv_input=sys.argv[1], json_input=sys.argv[2], cnn_type=sys.argv[3:])
+	args = parse_arguments()
+	cnn_type = [args.merchant_or_subtype, args.bank_or_card]
+	if args.credit_or_debit != "":
+		cnn_type.append(args.credit_or_debit)
+
+	verify_data(csv_input=args.csv_input, json_input=args.json_input, cnn_type=cnn_type)
