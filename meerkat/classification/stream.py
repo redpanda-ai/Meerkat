@@ -17,12 +17,13 @@ python3 -m meerkat.classification.stream \
 <required 'debit' or 'credit' for 'subtype'> \
 <optional bucket name> \
 <optional input_directory>
-<optional raw_data_file_name> \
+<optional raw_train_file_name> \
+<optional raw_test_file_name> \
 <optional debug_flag> \
 <optional log_flag>
 
 python3 -m meerkat.classification.stream output_CNN subtype bank \
---debit_or_credit debit \
+--credit_or_debit debit \
 --bucket yodleemisc \
 --input_dir  hvudumala/Type_Subtype_finaldata/Bank/ \
 --file_name Bank_complete_data_subtype_original_updated.csv \
@@ -33,7 +34,7 @@ python3 -m meerkat.classification.stream output_CNN subtype bank \
 import argparse
 import logging
 
-from .subtype_process import preprocess as subtype_preprocess
+from .preprocess import preprocess
 from .tools import (cap_first_letter, pull_from_s3,
 	convert_csv_to_torch_7_binaries, create_new_configuration_file,
 	copy_file, execute_main_lua)
@@ -42,27 +43,30 @@ def parse_arguments():
 	"""This function parses arguments from our command line."""
 	parser = argparse.ArgumentParser("stream")
 	# Required arugments
-	parser.add_argument("output_dir", help="Where do you want to write out all \
-		of your files?")
 	parser.add_argument("merchant_or_subtype",
 		help="What kind of dataset do you want to process, subtype or merchant?")
 	parser.add_argument("bank_or_card", help="Whether we are processing card or \
 		bank transactions.")
+	parser.add_argument("train_file", help="Name of training file to be pulled")
+	parser.add_argument("test_file", help="Name of test file to be pulled")
+	parser.add_argument("label_map", help="Name of label map be pulled")
 
 	# Optional arguments
-	parser.add_argument("--debit_or_credit", default='',
+	parser.add_argument("--output_dir", help="Where do you want to write out all \
+		of your files? By default it will go to meerkat/data/", default='')
+	parser.add_argument("--credit_or_debit", default='',
 		help="What kind of transactions do you wanna process, debit or credit?")
 	parser.add_argument("--bucket", help="Input bucket name, default is s3yodlee.",
 		default = 's3yodlee')
 	parser.add_argument("--input_dir", help="Path of the directory immediately\
 		containing input file", default='')
-	parser.add_argument("--file_name", help="Name of file to be pulled", default='')
 	parser.add_argument("-d", "--debug", help="log at DEBUG level",
 		action="store_true")
 	parser.add_argument("-v", "--info", help="log at INFO level",
 		action="store_true")
+
 	args = parser.parse_args()
-	if args.merchant_or_subtype == 'subtype' and args.debit_or_credit == '':
+	if args.merchant_or_subtype == 'subtype' and args.credit_or_debit == '':
 		raise Exception('For subtype data you need to declare debit or credit.')
 	if args.debug:
 		logging.basicConfig(level=logging.DEBUG)
@@ -75,10 +79,11 @@ def main_stream():
 	args = parse_arguments()
 	bucket = args.bucket
 	bank_or_card = args.bank_or_card
-	debit_or_credit = args.debit_or_credit
+	credit_or_debit = args.credita_or_debit
 	merchant_or_subtype = args.merchant_or_subtype
-	data_type = merchant_or_subtype + '_' + bank_or_card + '_' + debit_or_credit
-	dir_paths = {'subtype_card_debit': 'data/subtype/card/debit',
+	data_type = merchant_or_subtype + '_' + bank_or_card + '_' +\
+		credit_or_debit
+	dir_paths = {'subtype_card_debit': 'data/subtype/card/debit/',
 		'subtype_card_credit': 'data/subtype/card/credit/',
 		'subtype_bank_debit': 'data/subtype/bank/debit/',
 		'subtype_bank_credit': 'data/subtype/bank/credit/',
@@ -90,32 +95,35 @@ def main_stream():
 	else:
 		prefix = args.input_dir
 
-	extension, save_path = ".csv", "./data/input/" + merchant_or_subtype + "/"
-	#1. Download data and save to input_path
-	input_file = pull_from_s3(bucket=bucket, prefix=prefix, extension=extension,
-		file_name=args.file_name, save_path=save_path)
-	#2.  Slice it into dataframes and make a mapping file.
-	output_path = args.output_dir
-	if output_path[-1] != "/":
-		output_path += "/"
-	if merchant_or_subtype == "subtype":
-		train_poor, test_poor, num_of_classes = subtype_preprocess(
-			input_file, debit_or_credit, bank_or_card, output_path=output_path)
+	if args.output_dir == '':
+		save_path = "./data/input/" + data_type + "/"
 	else:
-		raise Exception('!!!!')
+		save_path = args.output_dir + '/'*(args.output_dir[-1] != '/')
+	os.makedirs(save_path, exist_ok=True)
+
+	train_file = pull_from_s3(bucket=bucket, prefix=prefix, extension='.csv',
+		file_name=args.train_file, save_path=save_path)
+	test_file = pull_from_s3(bucket=bucket, prefix=prefix, extension='.csv',
+		file_name=args.test_file, save_path=save_path)
+	label_map = pull_from_s3(bucket=bucket, prefix=prefix, extension='.json',
+		file_name=args.label_map, save_path=save_path)
+	#2. Slice it into dataframes and make a mapping file.
+	train_poor, val_poor, num_of_classes = preprocess(
+		train_file, label_map, merchant_or_subtype, bank_or_card,
+		credit_or_debit, output_path=save_path)
 	#3.  Use qlua to convert the files into training and testing sets.
-	train_file = convert_csv_to_torch_7_binaries(train_poor)
-	test_file = convert_csv_to_torch_7_binaries(test_poor)
+	train_poor = convert_csv_to_torch_7_binaries(train_poor)
+	val_poor = convert_csv_to_torch_7_binaries(val_poor)
 	#4 Create a new configuration file based on the number of classes.
-	create_new_configuration_file(num_of_classes, output_path, train_file, test_file)
+	create_new_configuration_file(num_of_classes, save_path, train_poor, val_poor)
 	#5 Copy main.lua and data.lua to output directory.
-	copy_file("meerkat/classification/lua/main.lua", output_path)
-	copy_file("meerkat/classification/lua/data.lua", output_path)
-	copy_file("meerkat/classification/lua/model.lua", output_path)
-	copy_file("meerkat/classification/lua/train.lua", output_path)
-	copy_file("meerkat/classification/lua/test.lua", output_path)
+	copy_file("meerkat/classification/lua/main.lua", save_path)
+	copy_file("meerkat/classification/lua/data.lua", save_path)
+	copy_file("meerkat/classification/lua/model.lua", save_path)
+	copy_file("meerkat/classification/lua/train.lua", save_path)
+	copy_file("meerkat/classification/lua/test.lua", save_path)
 	#6 Excuete main.lua.
-	execute_main_lua(output_path, "main.lua")
+	execute_main_lua(save_path, "main.lua")
 
 # The main program starts here if run from the command line.
 if __name__ == "__main__":

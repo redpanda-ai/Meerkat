@@ -67,10 +67,10 @@ def random_split(df, train_size):
 
 def make_save_function(col, dirt, merchant_or_subtype, bank_or_card, date):
 	def save_result(results, train_or_test, credit_or_debit=''):
-		kwargs = {"cols" : col, "header" : False, "index" : False, 
-			"index_label" : False}
+		credit_or_debit = '_'*(credit_or_debit!='') + credit_or_debit
+		kwargs = {"cols" : col, "index" : False, 'sep' : '|'}
 		path = dirt + merchant_or_subtype + '_' + bank_or_card +\
-			'_'*len(credit_or_debit) + credit_or_debit + '_' +\
+			credit_or_debit + '_' +\
 			train_or_test + '_' + date + '.csv'
 		results[train_or_test].to_csv(path, **kwargs)
 	return save_result
@@ -120,21 +120,22 @@ def main_split_data():
 	date = datetime.now()
 	date = str(date.month).zfill(2) + str(date.day).zfill(2) + str(date.year)
 	if merchant_or_subtype == 'merchant':
-		dirt = './' + data_type + '/'
+		dirt = save_path + data_type + '/'
 		os.makedirs(dirt, exist_ok=True)
-		df = unzip_and_merge(input_file)
+		df, label_map_path = unzip_and_merge(input_file, bank_or_card)
 		save = make_save_function(df.columns, dirt, merchant_or_subtype,
 			bank_or_card, date)
-		# validate_data()
+		# validate_data(df, label_map_path, blablabal)
 		results = random_split(df, args.train_size)
 		save(results, 'train')
 		save(results, 'test')
+		local['mv'][label_map_path][dirt]()
 		local['aws']['s3']['sync'][dirt][dir_paths[data_type]]()
 	else:
 		df_credit, df_debit = seperate_debit_credit(input_file)
 		# validate_data()
 		# save debit
-		dirt_debit = './' + data_type + '_debit/'
+		dirt_debit = save_path + data_type + '_debit/'
 		os.makedirs(dirt_debit, exist_ok=True)
 		results_debit = random_split(df_debit, args.train_size)
 		save = make_save_function(df_debit.columns, dirt_debit,
@@ -144,7 +145,7 @@ def main_split_data():
 		local['aws']['s3']['sync'][dirt_debit][dir_paths\
 			[data_type + '_debit']]()
 		# save credit
-		dirt_credit = './' + data_type + '_credit/'
+		dirt_credit = save_path + data_type + '_credit/'
 		os.makedirs(dirt_credit, exist_ok=True)
 		results_credit = random_split(df_credit, args.train_size)
 		save = make_save_function(df_credit.columns, dirt_credit,
