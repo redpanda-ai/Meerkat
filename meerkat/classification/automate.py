@@ -15,8 +15,8 @@ def main_stream():
 	threshold = 2 # The highest era number - the era number of the best error rate.
 
 	while True:
-		print("Suspend the program for 1 minutes, and wait for a new file.")
-		time.sleep(60) # Sleep for 1 minutes.
+		print("Suspend the program for 1 minute, and wait for a new file.")
+		time.sleep(60) # Sleep for 1 minute.
 
 		latest_t7b = getFile(sys.argv[1])
 
