@@ -1,22 +1,37 @@
+import re
+import sys
+import logging
 
 from .tools import (parse_arguments, cap_first_letter, pull_from_s3, slice_into_dataframes,
 	convert_csv_to_torch_7_binaries, create_new_configuration_file, copy_file, execute_main_lua)
 
-""" Just a test bed for new ideas."""
+"""Streamlines the entire CNN training process."""
 
 def main_stream():
 	"""It all happens here"""
 	args = parse_arguments()
 	#1. Grab the input file from S3
-	bucket = "yodleemisc"
-
-	#prefix = "hvudumala/Type_Subtype_finaldata/Card/"
-	#Download files from Card or Bank directory.
-	prefix = "hvudumala/Type_Subtype_finaldata/" + cap_first_letter(args.card_or_bank)
+	if args.input:
+		logging.warning("Overriding default S3 location to {0}".format(args.input))
+		my_regex = re.compile("^([^/]+)/(.*$)")
+		if my_regex.search(args.input):
+			results = my_regex.match(args.input)
+			bucket, prefix = results.group(1), results.group(2)
+			logging.warning("Valid S3 location: bucket {0}, prefix {1}".format(bucket, prefix))
+		else:
+			logging.critical("Invalid S3 location, aborting")
+			sys.exit()
+	else:
+		#Download files from Card or Bank directory.
+		logging.warning("Using default S3 location.")
+		bucket = "yodleemisc"
+		prefix = "hvudumala/Type_Subtype_finaldata/" + cap_first_letter(args.card_or_bank)
 
 	my_filter, input_path = "csv", "./"
 	input_file = pull_from_s3(bucket=bucket, prefix=prefix, my_filter=my_filter,
 		input_path=input_path)
+	#Temp
+	sys.exit()
 	#2.  Slice it into dataframes and make a mapping file.
 	output_path = args.output_dir
 	if output_path[-1:] != "/":

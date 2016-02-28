@@ -235,18 +235,21 @@ def parse_arguments():
 	parser = argparse.ArgumentParser("stream")
 	parser.add_argument("-d", "--debug", help="log at DEBUG level",
 		action="store_true")
-	parser.add_argument("-v", "--info", help="log at INFO level",
+	parser.add_argument("-v", "--verbose", help="log at INFO level",
 		action="store_true")
+	parser.add_argument("-i", "--input", nargs="?", help="override S3 input location")
 
 	parser.add_argument("output_dir", help="Where do you want to write out all of your files?")
-	parser.add_argument("card_or_bank", help="Whether we are processing card or bank transactions.")
+	parser.add_argument("card_or_bank", help="Card or Bank transactions?",
+		choices=["card", "bank"])
 	parser.add_argument("debit_or_credit",
-		help="What kind of transactions do you wanna process, debit or credit?")
+		help="Debit or Credit transactions?",
+		choices=["debit", "credit"])
 
 	args = parser.parse_args()
 	if args.debug:
 		logging.basicConfig(level=logging.DEBUG)
-	elif args.info:
+	elif args.verbose:
 		logging.basicConfig(level=logging.INFO)
 	return args
 
