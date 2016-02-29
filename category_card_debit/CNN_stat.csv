@@ -1,0 +1,46 @@
+Class,Actual,True_Positive,False_Positive,Recall,Precision,Misclassification
+ATM/Cash Withdrawals,157,154,2,0.981,0.987,3
+Advertising,223,221,2,0.991,0.991,2
+Automotive Expenses,193,190,3,0.984,0.984,3
+Business Miscellaneous,179,174,2,0.972,0.989,5
+Cable/Satellite Services,217,217,6,1.0,0.973,0
+Charitable Giving,197,195,3,0.99,0.985,2
+Child/Dependent Expenses,191,184,0,0.963,1.0,7
+Clothing/Shoes,190,182,25,0.958,0.879,8
+Consulting,199,199,0,1.0,1.0,0
+Dues And Subscriptions,186,182,0,0.978,1.0,4
+Education,201,191,15,0.95,0.927,10
+Electronics,204,198,5,0.971,0.975,6
+Entertainment,209,202,5,0.967,0.976,7
+Gasoline/Fuel,206,204,1,0.99,0.995,2
+General Merchandise,209,200,17,0.957,0.922,9
+Gifts,189,183,1,0.968,0.995,6
+Groceries,178,177,2,0.994,0.989,1
+Healthcare/Medical,216,213,0,0.986,1.0,3
+Hobbies,203,200,5,0.985,0.976,3
+Home Improvement,208,205,5,0.986,0.976,3
+Home Maintenance,211,199,0,0.943,1.0,12
+Insurance,168,167,0,0.994,1.0,1
+Interest,202,202,7,1.0,0.967,0
+Jewellery,177,177,1,1.0,0.994,0
+Loans,209,207,3,0.99,0.986,2
+Mortgages,209,208,3,0.995,0.986,1
+Office Maintenance,200,189,97,0.945,0.661,11
+Office Supplies,204,110,11,0.539,0.909,94
+Online Services,167,165,0,0.988,1.0,2
+Other Bills,146,134,5,0.918,0.964,12
+Other Expenses,138,129,6,0.935,0.956,9
+Personal Care,200,196,0,0.98,1.0,4
+Pets/Pet Care,196,193,0,0.985,1.0,3
+Postage And Shipping,188,188,1,1.0,0.995,0
+Printing,211,209,2,0.991,0.991,2
+Rent,206,204,1,0.99,0.995,2
+Restaurants/Dining,227,226,0,0.996,1.0,1
+Retirement Contributions,213,213,1,1.0,0.995,0
+Service Charges/Fees,229,220,1,0.961,0.995,9
+Services,190,189,0,0.995,1.0,1
+Taxes,198,198,6,1.0,0.971,0
+Telephone Services,221,208,2,0.941,0.99,13
+Transfers,197,197,1,1.0,0.995,0
+Travel,201,195,18,0.97,0.915,6
+Utilities,202,193,13,0.955,0.937,9
