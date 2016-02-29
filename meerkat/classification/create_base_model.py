@@ -1,5 +1,6 @@
 import os
 import time
+import sys
 from collections import defaultdict
 from meerkat.classification.tools import stopStream, execute_main_lua, create_new_configuration_file
 from meerkat.classification.tools import copy_file
@@ -37,16 +38,19 @@ def setup_directory(output_path):
 
 def create_base_model():
 
+	output_path = "base_model_training/"
 	datasets = collect_datasets()
-	setup_directory("base_model_training/")
+	setup_directory(output_path)
 
 	# Train each model sequentially and transfer the output model each time
-	for model in datasets.keys():
+	for model, data in datasets.items():
 
 		# Move data files and create new config
-		create_new_configuration_file(None, output_path, model["train"], model["test"])
-		copy_file("meerkat/classification/lua/base_model_data/" + model["train"], output_path)
-		copy_file("meerkat/classification/lua/base_model_data/" + model["test"], output_path)
+		create_new_configuration_file(None, output_path, output_path + data["train"], output_path + data["test"])
+		copy_file("meerkat/classification/lua/base_model_data/" + data["train"], output_path)
+		copy_file("meerkat/classification/lua/base_model_data/" + data["test"], output_path)
+
+		sys.exit()
 
 if __name__ == "__main__":
 	create_base_model()
