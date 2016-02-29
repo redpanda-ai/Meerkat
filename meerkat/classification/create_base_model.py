@@ -2,6 +2,7 @@ import os
 import time
 import sys
 from collections import defaultdict
+from plumbum import local, NOHUP
 from meerkat.classification.tools import stopStream, execute_main_lua, create_new_configuration_file
 from meerkat.classification.tools import copy_file
 
@@ -41,6 +42,7 @@ def create_base_model():
 	output_path = "base_model_training/"
 	datasets = collect_datasets()
 	setup_directory(output_path)
+	last_trained_model = ""
 
 	# Train each model sequentially and transfer the output model each time
 	for model, data in datasets.items():
@@ -49,6 +51,11 @@ def create_base_model():
 		create_new_configuration_file(None, output_path, output_path + data["train"], output_path + data["test"])
 		copy_file("meerkat/classification/lua/base_model_data/" + data["train"], output_path)
 		copy_file("meerkat/classification/lua/base_model_data/" + data["test"], output_path)
+
+		# Start training
+		with local.cwd(output_path):
+			command = (local["th"]["main.lua"]["-transfer"]["../meerkat/classification/models/bank_merchant_CNN.t7b"]) & NOHUP
+			command()
 
 		sys.exit()
 
