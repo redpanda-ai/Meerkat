@@ -3,8 +3,7 @@ import time
 import sys
 from collections import defaultdict
 from plumbum import local, NOHUP
-from meerkat.classification.tools import stopStream, execute_main_lua, create_new_configuration_file
-from meerkat.classification.tools import copy_file
+from meerkat.classification.tools import create_new_configuration_file, copy_file
 
 #################### USAGE ##########################
 
@@ -43,6 +42,7 @@ def create_base_model():
 	datasets = collect_datasets()
 	setup_directory(output_path)
 	last_trained_model = ""
+	training = True
 
 	# Train each model sequentially and transfer the output model each time
 	for model, data in datasets.items():
@@ -55,10 +55,20 @@ def create_base_model():
 		# Start training
 		if last_trained_model == "":
 			with local.cwd(output_path):
-				(local["th"]["main.lua"]) & NOHUP
+				command = (local["th"]["main.lua"]) & NOHUP
 		else:
 			with local.cwd(output_path):
-				command = (local["th"]["main.lua"]["-transfer"]["../meerkat/classification/models/bank_merchant_CNN.t7b"]) & NOHUP
+				command = (local["th"]["main.lua"]["-transfer"][output_path + last_trained_model]) & NOHUP
+
+		# Wait for training to finish one era
+		while training:
+			time.sleep(60)
+			for file in os.listdir(output_path):
+				if "sequential" in file:
+					last_trained_model = file
+					training = False
+					local["pkill"]["th"]()
+					break
 
 		sys.exit()
 
