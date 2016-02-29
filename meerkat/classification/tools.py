@@ -140,26 +140,27 @@ def load(**kwargs):
 	filename, debit_or_credit = kwargs["input_file"], kwargs["debit_or_credit"]
 	logging.info("Loading csv file and slicing by '{0}' ".format(debit_or_credit))
 	df = pd.read_csv(filename, quoting=csv.QUOTE_NONE, na_filter=False,
-		encoding="utf-8", sep='|', error_bad_lines=False, low_memory=False)
+		encoding=kwargs["encoding"], sep='|', error_bad_lines=False, low_memory=False)
 	df['UNIQUE_TRANSACTION_ID'] = df.index
 	df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
 	grouped = df.groupby('LEDGER_ENTRY', as_index=False)
 	groups = dict(list(grouped))
 	df = groups[debit_or_credit]
-	df["PROPOSED_SUBTYPE"] = df["PROPOSED_SUBTYPE"].str.strip()
-	df['PROPOSED_SUBTYPE'] = df['PROPOSED_SUBTYPE'].apply(cap_first_letter)
-	class_names = df["PROPOSED_SUBTYPE"].value_counts().index.tolist()
+	class_label = kwargs["class_label"]
+	logging.info("Our class_label column is {0}".format(class_label))
+	df[class_label] = df[class_label].str.strip().apply(cap_first_letter)
+	class_names = df[class_label].value_counts().index.tolist()
 	return df, class_names
 
 def get_label_map(**kwargs):
 	"""Generates a label map (class_name: label number)."""
 	logging.info("Generating label map")
-	class_names = kwargs["class_names"]
+	class_names, class_label = kwargs["class_names"], kwargs["class_label"]
 	# Create a label map
 	label_numbers = list(range(1, (len(class_names) + 1)))
 	label_map = dict(zip(sorted(class_names), label_numbers))
 	# Map Numbers
-	my_lambda = lambda x: label_map[x["PROPOSED_SUBTYPE"]]
+	my_lambda = lambda x: label_map[x[class_label]]
 	df = kwargs["df"]
 	df['LABEL'] = df.apply(my_lambda, axis=1)
 	return label_map
@@ -210,14 +211,16 @@ def fill_description_unmasked(row):
 	return row["DESCRIPTION_UNMASKED"]
 
 def slice_into_dataframes(**kwargs):
-	"""Slice into test and train dataframs, make a label map, and produce 
+	"""Slice into test and train dataframes, make a label map, and produce
 	CSV files."""
+	logging.info("Slicing into dataframes.")
 	# Create an output directory if it does not exist
 	os.makedirs(kwargs["output_path"], exist_ok=True)
 	# Load data frame and class names
-	df, class_names = load(input_file=kwargs["input_file"], debit_or_credit=kwargs["debit_or_credit"])
+	df, class_names = load(input_file=kwargs["input_file"], debit_or_credit=kwargs["debit_or_credit"],
+		encoding=kwargs["encoding"], class_label=kwargs["class_label"])
 	# Generate a mapping (class_name: label_number)
-	label_map = get_label_map(df=df, class_names=class_names)
+	label_map = get_label_map(df=df, class_names=class_names, class_label=kwargs["class_label"])
 	# Reverse the mapping (label_number: class_name)
 	kwargs["label_map"] = dict(zip(label_map.values(), label_map.keys()))
 	# Clean the "DESCRIPTION_UNMASKED" values within the dataframe
@@ -227,7 +230,7 @@ def slice_into_dataframes(**kwargs):
 	kwargs.update(get_test_and_train_dataframes(**kwargs))
 	# Generate the output files (CSV and JSON) and return the file handles
 	kwargs.update(get_json_and_csv_files(**kwargs))
-	#logging.info("The kwargs dictionary contains: \n{0}".format(kwargs))
+	logging.debug("The kwargs dictionary contains: \n{0}".format(kwargs))
 	return kwargs["train_poor"], kwargs["test_poor"], len(class_names)
 
 def parse_arguments():
@@ -238,6 +241,10 @@ def parse_arguments():
 	parser.add_argument("-v", "--verbose", help="log at INFO level",
 		action="store_true")
 	parser.add_argument("-i", "--input", nargs="?", help="override S3 input location")
+	parser.add_argument("-e", "--encoding", help="why aren't you using utf-8?",
+		default="utf-8")
+	parser.add_argument("-c", "--class_label", help="which column contains your class labels?",
+		default="PROPOSED_SUBTYPE")
 
 	parser.add_argument("output_dir", help="Where do you want to write out all of your files?")
 	parser.add_argument("card_or_bank", help="Card or Bank transactions?",
