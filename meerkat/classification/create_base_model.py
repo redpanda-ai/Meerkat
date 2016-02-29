@@ -53,8 +53,12 @@ def create_base_model():
 		copy_file("meerkat/classification/lua/base_model_data/" + data["test"], output_path)
 
 		# Start training
-		with local.cwd(output_path):
-			command = (local["th"]["main.lua"]["-transfer"]["../meerkat/classification/models/bank_merchant_CNN.t7b"]) & NOHUP
+		if last_trained_model == "":
+			with local.cwd(output_path):
+				(local["th"]["main.lua"]) & NOHUP
+		else:
+			with local.cwd(output_path):
+				command = (local["th"]["main.lua"]["-transfer"]["../meerkat/classification/models/bank_merchant_CNN.t7b"]) & NOHUP
 
 		sys.exit()
 
