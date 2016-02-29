@@ -55,7 +55,6 @@ def create_base_model():
 		# Start training
 		with local.cwd(output_path):
 			command = (local["th"]["main.lua"]["-transfer"]["../meerkat/classification/models/bank_merchant_CNN.t7b"]) & NOHUP
-			command()
 
 		sys.exit()
 
