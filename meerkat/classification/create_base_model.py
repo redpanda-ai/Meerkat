@@ -42,7 +42,7 @@ def create_base_model():
 	datasets = collect_datasets()
 	setup_directory(output_path)
 	last_trained_model = ""
-	training = True
+	models_trained = 0
 
 	# Train each model sequentially and transfer the output model each time
 	for model, data in datasets.items():
@@ -55,22 +55,31 @@ def create_base_model():
 		# Start training
 		if last_trained_model == "":
 			with local.cwd(output_path):
-				command = (local["th"]["main.lua"]) & NOHUP
+				(local["th"]["main.lua"]) & NOHUP
 		else:
 			with local.cwd(output_path):
-				command = (local["th"]["main.lua"]["-transfer"][output_path + last_trained_model]) & NOHUP
+				command = (local["th"]["main.lua"]["-transfer"][last_trained_model]) & NOHUP
 
 		# Wait for training to finish one era
+		training = True
 		while training:
-			time.sleep(60)
+			time.sleep(30)
 			for file in os.listdir(output_path):
 				if "sequential" in file:
-					last_trained_model = file
+					models_trained += 1
+					os.remove(output_path + last_trained_model) if last_trained_model != "" else None
+					last_trained_model = "base_model_" + str(models_trained) + ".t7b"
+					os.rename(output_path + file, output_path + last_trained_model)
 					training = False
-					local["pkill"]["th"]()
+					(local["pkill"]["th"])
 					break
 
-		sys.exit()
+		# Clean Up Directory
+		os.remove(output_path + data["train"])
+		os.remove(output_path + data["test"])
+		for file in os.listdir(output_path):
+			if "main_" in file:
+				os.remove(output_path + file)
 
 if __name__ == "__main__":
 	create_base_model()
