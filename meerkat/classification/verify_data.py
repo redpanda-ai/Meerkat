@@ -146,9 +146,9 @@ def read_csv_to_df(csv_input, cnn_type):
 				samples.append(i)
 
 		for sample in samples:
-			df_one_merchant = pd.read_csv(csv_input + "/" + sample, na_filter=False, encoding="utf-8",
+			df_one_sample = pd.read_csv(csv_input + "/" + sample, na_filter=False, encoding="utf-8",
 				sep="|", error_bad_lines=False, quoting=csv.QUOTE_NONE)
-			df.append(df_one_merchant)
+			df.append(df_one_sample)
 		merged = pd.concat(df, ignore_index=True)
 		return merged
 
