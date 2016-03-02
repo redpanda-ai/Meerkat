@@ -2,7 +2,10 @@ import csv
 import json
 import logging
 import os
-
+import sys
+import re
+import time
+import ctypes
 
 import numpy as np
 import pandas as pd
@@ -10,6 +13,68 @@ import pandas as pd
 from boto.s3.connection import Location
 from boto import connect_s3
 from plumbum import local, NOHUP
+
+def get_new_maint7b(directory, file_list):
+	"""Get the latest t7b file under directory."""
+	print("Get the latest main_*.t7b file")
+	for i in os.listdir(directory):
+		if i.startswith('main_') and i not in file_list:
+			file_list.append(i)
+			return i
+
+def getCNNStatics(inputFile):
+	"""Get the era number and error rate."""
+	lualib = ctypes.CDLL("/home/ubuntu/torch/install/lib/libluajit.so", mode=ctypes.RTLD_GLOBAL)
+
+	# Must be imported after previous statement
+	import lupa
+	from lupa import LuaRuntime
+
+	# Load Runtime and Lua Modules
+	lua = LuaRuntime(unpack_returned_tuples=True)
+	torch = lua.require('torch')
+
+	template = '''
+		function(filename)
+			rows = {}
+			main = torch.load(filename)
+			for i = 0, #main.record - 1 do
+				error_rate = main.record[#main.record - i ]["val_error"]
+				rows[#main.record -i] = error_rate
+			end
+			return rows
+		end
+	'''
+
+	# Load Lua Functions
+	get_error = lua.eval(template)
+	lua_table = get_error(inputFile)
+
+	error_list = list(lua_table)
+	error_vals = list(lua_table.values())
+	return dict(zip(error_list, error_vals))
+
+def getTheBestErrorRate(erasDict):
+	"""Get the best error rate among different eras"""
+	bestErrorRate = 1.0
+	bestEraNumber = 1
+
+	df = pd.DataFrame.from_dict(erasDict, orient="index")
+	bestErrorRate = df.min().values[0]
+	bestEraNumber = df.idxmin().values[0]
+
+	return bestErrorRate, bestEraNumber
+
+def zipDir(file1, file2):
+	"""Copy files to Best_CNN_Statics directory and zip it"""
+	local["mkdir"]["Best_CNN_Statics"]()
+	local["cp"][file1]["Best_CNN_Statics"]()
+	local["cp"][file2]["Best_CNN_Statics"]()
+	local["tar"]["-zcvf"]["Best_CNN_Statics.tar.gz"]["Best_CNN_Statics"]()
+
+def stopStream():
+	"""Stop stream.py when the threshold reached."""
+	local["pkill"]["qlua"]()
 
 def dict_2_json(obj, filename):
 	"""Saves a dict as a json file"""
@@ -53,7 +118,7 @@ def pull_from_s3(**kwargs):
 		s3_object_list = [
 			s3_object
 			for s3_object in listing
-			if s3_object.key.endswith(kwargs["file_name"])
+			if s3_object.key.endswith(extension)
 			]
 		if len(s3_object_list) == 0:
 			raise Exception('Unable to find {0}'.format(kwargs["file_name"]))
@@ -107,9 +172,15 @@ def get_label_map(class_names):
 def show_label_stat(results, train_or_test,label='LABEL'):
 	key = 'df_poor_' + train_or_test
 	print('Label counts for {0}ing set:'.format(train_or_test))
-	print(results[key][label].value_counts().sort_index())
+	temp = results[key][label].value_counts()
+	temp.index = temp.index.astype(int)
+	temp = temp.sort_index()
+	pd.set_option('display.max_rows', len(temp))
+	# print(temp)
+	print("There are {0} classes".format(len(temp)))
+	pd.reset_option('display.max_rows')
 
-def get_test_and_train_dataframes(df_rich, train_size=0.9):
+def get_test_and_train_dataframes(df_rich, train_size=0.96):
 	"""Produce (rich and poor) X (test and train) dataframes"""
 	logging.info("Building test and train dataframes")
 	df_poor = df_rich[['LABEL', 'DESCRIPTION_UNMASKED']]
@@ -126,7 +197,7 @@ def get_test_and_train_dataframes(df_rich, train_size=0.9):
 
 def get_csv_files(**kwargs):
 	"""This function generates CSV and JSON files, returns paths of the files"""
-	prefix = kwargs["output_path"] +  kwargs["merchant_or_subtype"] + \
+	prefix = kwargs["output_path"] +  kwargs["merchant_or_subtype"] + '_' + \
 		kwargs["bank_or_card"] + "_"*(kwargs["credit_or_debit"]!='') + \
 		kwargs["credit_or_debit"] + "_"
 	logging.info("Prefix is : {0}".format(prefix))
@@ -219,9 +290,8 @@ def create_new_configuration_file(num_of_classes, output_path, train_file, test_
 	train_file = train_file[output_dir_len:]
 	test_file = test_file[output_dir_len:]
 	command = \
-		local["sed"]["s:156:" + str(num_of_classes) + ":"]["meerkat/classification/lua/config.lua"] \
-		| local["sed"]["s:__train_t7b__:" + train_file + ":"] \
-		| local["sed"]["s:__test_t7b__:" + test_file + ":"] \
+		local["sed"]["s:\./train\.t7b:" + train_file + ":"]["meerkat/classification/lua/config.lua"] \
+		| local["sed"]["s:\./test\.t7b:" + test_file + ":"] \
 		 > output_path + "config.lua"
 	command()
 
@@ -264,8 +334,7 @@ def merge_csvs(directory):
 	for i in os.listdir(directory):
 		if i.endswith('.csv'):
 			df = pd.read_csv(directory + i, na_filter=False, encoding='utf-8',
-				sep='|', error_bad_lines=False, quoting=csv.QUOTE_NONE,
-				low_memory=False)
+				sep='|', error_bad_lines=False, quoting=csv.QUOTE_NONE)
 			dataframes.append(df)
 	merged = pd.concat(dataframes, ignore_index=True)
 	return merged
@@ -274,7 +343,7 @@ def seperate_debit_credit(subtype_file):
 	"""Load the CSV into a pandas data frame, return debit and credit df"""
 	logging.info("Loading csv file")
 	df = pd.read_csv(subtype_file, quoting=csv.QUOTE_NONE, na_filter=False,
-		encoding="utf-8", sep='|', error_bad_lines=False, low_memory=False)
+		encoding="utf-8", sep='|', error_bad_lines=False)
 	df['UNIQUE_TRANSACTION_ID'] = df.index
 	df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
 	df["PROPOSED_SUBTYPE"] = df["PROPOSED_SUBTYPE"].str.strip()
@@ -282,6 +351,14 @@ def seperate_debit_credit(subtype_file):
 	grouped = df.groupby('LEDGER_ENTRY', as_index=False)
 	groups = dict(list(grouped))
 	return (groups['credit'], groups['debit'])
+
+def reverse_map(label_map, key='label'):
+	"""reverse {key : {category, label}} to {label: key} and
+	{key: value} to {value: key} dictionary}"""
+	get_key = lambda x: x[key] if isinstance(x, dict) else x
+	reversed_label_map = dict(zip(map(get_key, label_map.values()),
+		label_map.keys()))
+	return reversed_label_map
 
 if __name__ == "__main__":
 	logging.error("Sorry, this module is a library of useful "

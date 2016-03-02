@@ -27,7 +27,8 @@ import argparse
 
 from .tools import (get_label_map, get_test_and_train_dataframes,
 	cap_first_letter, get_json_and_csv_files, fill_description_unmasked,
-	get_csv_files)
+	get_csv_files, reverse_map)
+from .verify_data import load_json
 
 def parse_arguments():
 	"""Parse arguments from command line."""
@@ -55,57 +56,33 @@ def parse_arguments():
 		logging.basicConfig(level=logging.INFO)
 	return args
 
-def dict_raise_on_duplicates(ordered_pairs):
-	"""Check duplicate keys in JSON"""
-	dictionary = {}
-	for key, value in ordered_pairs:
-		if key in dictionary:
-			raise ValueError("duplicate key: %r" % (key,))
-		else:
-			dictionary[key] = value
-	return dictionary
-
-def load_json(json_input):
-	"""Verify JSON file is correct"""
-	try:
-		json_file = open(json_input, encoding='utf-8')
-		try:
-			label_map_json = json.load(json_file, object_pairs_hook=dict_raise_on_duplicates)
-			return label_map_json
-		except ValueError as err:
-			logging.error("The label map json file is mal-formatted: {0}".format(err))
-			sys.exit()
-		json_file.close()
-	except IOError:
-		logging.error("Json file not found, aborting.")
-		sys.exit()
-	logging.info("JSON file format is correct")
-
-def reverse_map(label_map, key='label'):
-	get_key = lambda x: x[key] if isinstance(x, dict) else x
-	reversed_label_map = dict(zip(map(get_key, label_map.values()),
-		label_map.keys()))
-	return reversed_label_map
-
 def preprocess(input_file, label_map, merchant_or_subtype, bank_or_card,
 		credit_or_debit, output_path='./data/preprocessed/'):
 	logging.info("Loading {0} {1} csv file ".format(merchant_or_subtype,
 		bank_or_card))
-	df = pd.read_csv(input_file, quoting=csv.QUOTE_NONE, na_filter=False,
+	df = pd.read_csv(input_file, quoting=csv.QUOTE_NONE,
 		encoding="utf-8", sep='|', error_bad_lines=False, low_memory=False)
 	# Clean the "DESCRIPTION_UNMASKED" values within the dataframe
 	df["DESCRIPTION_UNMASKED"] = df.apply(fill_description_unmasked, axis=1)
+	num_nulls = len(df[df['DESCRIPTION_UNMASKED'].isnull()])
+	print('There are {0} transactions with no transaction text'.\
+		format(num_nulls))
+	df = df[df['DESCRIPTION_UNMASKED'].notnull()]
+	df.to_csv('temp.csv',sep='|',index=False)
+	df = pd.read_csv('temp.csv', quoting=csv.QUOTE_NONE, na_filter=False,
+		encoding="utf-8", sep='|', error_bad_lines=False, low_memory=False)
 	# Load label map
-	# number-class label map
+	# index-class label map
 	label_map = load_json(label_map)
-	# make a class-number label map
+	# make a class-index label map
 	reversed_label_map = reverse_map(label_map)
-	if not len(label_map) == len(reversed_label_map) == len(df[label].value_counts()):
-		raise Exception('Number of indexes does not match number of labels')
-	# Map Numbers
 	ground_truth = {'subtype' : 'PROPOSED_SUBTYPE',
 		'merchant' : 'MERCHANT_NAME'}
 	label = ground_truth[merchant_or_subtype]
+	if not len(label_map) == len(reversed_label_map) ==\
+		len(df[label].value_counts()):
+		raise Exception('Number of indexes does not match number of labels')
+	# Map Numbers
 	map_numbers = lambda x: reversed_label_map[x[label]]
 	df['LABEL'] = df.apply(map_numbers, axis=1)
 
@@ -125,6 +102,6 @@ def preprocess(input_file, label_map, merchant_or_subtype, bank_or_card,
 
 # Load Data
 if __name__ == "__main__":
-	args = parse_arguments()
-	_ = preprocess(args.file_name, args.label_map, args.merchant_or_subtype,
-		args.bank_or_card, args.credit_or_debit)
+	ARGS = parse_arguments()
+	_ = preprocess(ARGS.file_name, ARGS.label_map, ARGS.merchant_or_subtype,
+		ARGS.bank_or_card, ARGS.credit_or_debit)

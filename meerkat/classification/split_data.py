@@ -29,6 +29,7 @@ import numpy as np
 import os
 
 from datetime import datetime
+from .verify_data import verify_data
 from .tools import pull_from_s3, unzip_and_merge, seperate_debit_credit
 from plumbum import local
 
@@ -123,9 +124,10 @@ def main_split_data():
 		dirt = save_path + data_type + '/'
 		os.makedirs(dirt, exist_ok=True)
 		df, label_map_path = unzip_and_merge(input_file, bank_or_card)
+		verify_data(csv_input=df, json_input=label_map_path,
+			cnn_type=[merchant_or_subtype, bank_or_card])
 		save = make_save_function(df.columns, dirt, merchant_or_subtype,
 			bank_or_card, date)
-		# validate_data(df, label_map_path, blablabal)
 		results = random_split(df, args.train_size)
 		save(results, 'train')
 		save(results, 'test')
@@ -133,7 +135,14 @@ def main_split_data():
 		local['aws']['s3']['sync'][dirt][dir_paths[data_type]]()
 	else:
 		df_credit, df_debit = seperate_debit_credit(input_file)
-		# validate_data()
+		# WILL BE USED FOR NEXT ITERATION
+		# credit_map_path = './meerkat/classification/label_maps/bank_credit_subtype_label_map.json'
+		# debit_map_path = './meerkat/classification/label_maps/bank_debit_subtype_label_map.json'
+		# verify_data(csv_input=df_credit, json_input=credit_map_path,
+			# cnn_type=[merchant_or_subtype, bank_or_card, 'credit'])
+		# verify_data(csv_input=df_debit, json_input=debit_map_path,
+			# cnn_type=[merchant_or_subtype, bank_or_card, 'debit'])
+		# Need to get label_map_path
 		# save debit
 		dirt_debit = save_path + data_type + '_debit/'
 		os.makedirs(dirt_debit, exist_ok=True)

@@ -43,6 +43,7 @@ def preprocess(input_file, debit_or_credit, bank_or_card,
 	results = get_test_and_train_dataframes(df=df)
 	# Create an output directory if it does not exist
 	os.makedirs(output_path, exist_ok=True)
+	
 	file_names = get_json_and_csv_files(output_path=output_path,
 		debit_or_credit=debit_or_credit, bank_or_card=bank_or_card,
 		label_map=reversed_label_map,

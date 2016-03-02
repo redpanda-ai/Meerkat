@@ -11,10 +11,12 @@ performane matrics.
 ############################## USAGE ############################
 """
 python3 -m meerkat.classification.stream \
-<required name_of_ouput_directory> \
 <required 'merchant' or 'subtype'> \
 <required 'bank' or 'card'> \
+<required training_file_name> \
+<required test_file_name> \
 <required 'debit' or 'credit' for 'subtype'> \
+<optional name_of_ouput_directory> \
 <optional bucket name> \
 <optional input_directory>
 <optional raw_train_file_name> \
@@ -22,22 +24,21 @@ python3 -m meerkat.classification.stream \
 <optional debug_flag> \
 <optional log_flag>
 
-python3 -m meerkat.classification.stream output_CNN subtype bank \
---credit_or_debit debit \
---bucket yodleemisc \
---input_dir  hvudumala/Type_Subtype_finaldata/Bank/ \
---file_name Bank_complete_data_subtype_original_updated.csv \
--d -v
-
+python3 -m meerkat.classification.stream merchant card \
+merchant_card_train_02262016.csv merchant_card_test_02262016.csv
+--output_dir output_CNN
 """
 ################################################################
 import argparse
 import logging
+import os
 
-from .preprocess import preprocess
-from .tools import (cap_first_letter, pull_from_s3,
+from meerkat.classification.preprocess import preprocess
+from meerkat.classification.automate import main_stream as check_accuracy
+from meerkat.classification.tools import (cap_first_letter, pull_from_s3,
 	convert_csv_to_torch_7_binaries, create_new_configuration_file,
 	copy_file, execute_main_lua)
+from meerkat.tools.CNN_stats import main_process as apply_cnn
 
 def parse_arguments():
 	"""This function parses arguments from our command line."""
@@ -49,9 +50,9 @@ def parse_arguments():
 		bank transactions.")
 	parser.add_argument("train_file", help="Name of training file to be pulled")
 	parser.add_argument("test_file", help="Name of test file to be pulled")
-	parser.add_argument("label_map", help="Name of label map be pulled")
 
 	# Optional arguments
+	parser.add_argument("--label_map", help="Name of label map be pulled")
 	parser.add_argument("--output_dir", help="Where do you want to write out all \
 		of your files? By default it will go to meerkat/data/", default='')
 	parser.add_argument("--credit_or_debit", default='',
@@ -79,7 +80,7 @@ def main_stream():
 	args = parse_arguments()
 	bucket = args.bucket
 	bank_or_card = args.bank_or_card
-	credit_or_debit = args.credita_or_debit
+	credit_or_debit = args.credit_or_debit
 	merchant_or_subtype = args.merchant_or_subtype
 	data_type = merchant_or_subtype + '_' + bank_or_card + '_' +\
 		credit_or_debit
@@ -122,8 +123,26 @@ def main_stream():
 	copy_file("meerkat/classification/lua/model.lua", save_path)
 	copy_file("meerkat/classification/lua/train.lua", save_path)
 	copy_file("meerkat/classification/lua/test.lua", save_path)
-	#6 Excuete main.lua.
+	#6 Excuete main.lua and send to background.
 	execute_main_lua(save_path, "main.lua")
+	#7 Check training progress
+	best_model_path = check_accuracy(save_path)
+	print('The path to the best model is {0}.'.format(best_model_path))
+	#8 apply final model to test set and save all metrics
+	ground_truth_labels = {'merchant' : 'MERCHANT_NAME',
+		'subtype' : 'PROPOSED_SUBTYPE'}
+	args.model = best_model_path
+	args.testdata = test_file
+	args.label_map = label_map
+	args.doc_key = 'DESCRIPTION_UNMASKED'
+	args.secondary_doc_key = 'DESCRIPTION'
+	args.label_key = ground_truth_labels[merchant_or_subtype]
+	args.predicted_key = 'PREDICTED_CLASS'
+	args.is_merchant = (merchant_or_subtype == 'merchant')
+	args.fast_mode = True
+	print('Apply the best CNN to test data and calculate performance metrics')
+	apply_cnn(args)
+	print('The whole streamline process has finished')
 
 # The main program starts here if run from the command line.
 if __name__ == "__main__":
