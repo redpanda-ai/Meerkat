@@ -131,6 +131,8 @@ def main_split_data():
 		results = random_split(df, args.train_size)
 		save(results, 'train')
 		save(results, 'test')
+		del df
+		del results 
 		local['mv'][label_map_path][dirt]()
 		local['aws']['s3']['sync'][dirt][dir_paths[data_type]]()
 	else:
