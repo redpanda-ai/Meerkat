@@ -8,7 +8,7 @@ predicts labels of the test set. It also returns performance statistics.
 
 #################### USAGE ##########################
 """
-python3 -m meerkat.tools.apply_CNN \
+python3 -m meerkat.tools.CNN_stats \
 -model <path_to_classifier> \
 -data <path_to_testdata> \
 -map <path_to_label_map> \
@@ -49,7 +49,7 @@ import numpy as np
 from meerkat.classification.lua_bridge import get_cnn_by_path
 from meerkat.various_tools import load_params
 
-def get_parser():
+def parse_arguments():
 	""" Create the parser """
 	parser = argparse.ArgumentParser(description="Test a CNN against a dataset and\
 		return performance statistics")
@@ -75,84 +75,71 @@ def get_parser():
 		action='store_true', help='If working on merchant data need to indicate True.')
 	parser.add_argument('--fast_mode', '-fast', required=False, action='store_true',
 		help='Use fast mode to save i/o time.')
-	return parser
+	args = parser.parse_args()
+	return args
 
-def run_from_command_line():
-	"""Runs these commands if the module is invoked from the command line"""
+def compare_label(*args, **kwargs):
+	"""similar to generic_test in accuracy.py, with unnecessary items dropped"""
+	machine, cnn_column, human_column, conf_mat, num_labels = args[:]
+	doc_key = kwargs.get("doc_key")
+	fast_mode = kwargs.get('fast_mode', False)
+	unpredicted = []
+	needs_hand_labeling = []
+	correct = []
+	mislabeled = []
 
-	def compare_label(*args, **kwargs):
-		"""similar to generic_test in accuracy.py, with unnecessary items dropped"""
-		machine, cnn_column, human_column, conf_mat = args[:]
-		doc_key = kwargs.get("doc_key")
+	# Test Each Machine Labeled Row
+	for machine_row in machine:
 
-		unpredicted = []
-		needs_hand_labeling = []
-		correct = []
-		mislabeled = []
+		# Update conf_mat
+		# predicted_label is None if a predicted subtype is ""
+		if machine_row['ACTUAL_INDEX'] is None:
+			pass
+		elif machine_row['PREDICTED_INDEX'] is None:
+			column = num_labels
+			row = machine_row['ACTUAL_INDEX'] - 1
+			conf_mat[row][column] += 1
+		else:
+			column = machine_row['PREDICTED_INDEX'] - 1
+			row = machine_row['ACTUAL_INDEX'] - 1
+			conf_mat[row][column] += 1
 
-		# Test Each Machine Labeled Row
-		for machine_row in machine:
+		# If fast mode True then do not record
+		if not fast_mode:
+			# Continue if unlabeled
+			if machine_row[cnn_column] == "":
+				unpredicted.append([machine_row[doc_key], machine_row[human_column]])
+				continue
 
-			# Update conf_mat
-			# predicted_label is None if a predicted subtype is ""
-			if machine_row['ACTUAL_INDEX'] is None:
-				pass
-			elif machine_row['PREDICTED_INDEX'] is None:
-				column = num_labels
-				row = machine_row['ACTUAL_INDEX'] - 1
-				conf_mat[row][column] += 1
-			else:
-				column = machine_row['PREDICTED_INDEX'] - 1
-				row = machine_row['ACTUAL_INDEX'] - 1
-				conf_mat[row][column] += 1
+			# Identify unlabeled points
+			if not machine_row[human_column]:
+				needs_hand_labeling.append(machine_row[doc_key])
+				continue
 
-			# If fast mode True then do not record
-			if not fast_mode:
-				# Continue if unlabeled
-				if machine_row[cnn_column] == "":
-					unpredicted.append([machine_row[doc_key], machine_row[human_column]])
-					continue
+			# Predicted label matches human label
+			if machine_row[cnn_column] == machine_row[human_column]:
+				correct.append([machine_row[doc_key], machine_row[human_column]])
+				continue
 
-				# Identify unlabeled points
-				if not machine_row[human_column]:
-					needs_hand_labeling.append(machine_row[doc_key])
-					continue
+			mislabeled.append([machine_row[doc_key], machine_row[human_column],
+				machine_row[cnn_column]])
+	return mislabeled, correct, unpredicted, needs_hand_labeling, conf_mat
 
-				# Predicted label matches human label
-				if machine_row[cnn_column] == machine_row[human_column]:
-					correct.append([machine_row[doc_key], machine_row[human_column]])
-					continue
 
-				mislabeled.append([machine_row[doc_key], machine_row[human_column],
-					machine_row[cnn_column]])
-		return mislabeled, correct, unpredicted, needs_hand_labeling, conf_mat
-
-	def fill_description(df):
-		"""Replace Description_Unmasked"""
-		if df[doc_key] == "":
-			return df[sec_doc_key]
-		return df[doc_key]
-
-	def change_label_name(df):
-		"""replace label '' with 'Null Class' """
-		if df[human_label_key] == "":
-			return "Null Class"
-		return df[human_label_key]
-
-	def get_write_func(filename, header):
-		file_exists = False
-		def write_func(data):
-			if len(data) > 0:
-				nonlocal file_exists
-				mode = "a" if file_exists else "w"
-				add_head = False if file_exists else header
-				df = pd.DataFrame(data)
-				df.to_csv(filename, mode=mode, index=False, header=add_head)
-				file_exists = True
-		return write_func
+def get_write_func(filename, header):
+	file_exists = False
+	def write_func(data):
+		if len(data) > 0:
+			nonlocal file_exists
+			mode = "a" if file_exists else "w"
+			add_head = False if file_exists else header
+			df = pd.DataFrame(data)
+			df.to_csv(filename, mode=mode, index=False, header=add_head)
+			file_exists = True
+	return write_func
 
 	# Main
-	args = get_parser().parse_args()
+def main_process(args):
 	doc_key = args.doc_key
 	sec_doc_key = args.secondary_doc_key
 	machine_label_key = args.predicted_key
@@ -161,6 +148,8 @@ def run_from_command_line():
 	reader = pd.read_csv(args.testdata, chunksize=1000, na_filter=False,
 		quoting=csv.QUOTE_NONE, encoding='utf-8', sep='|', error_bad_lines=False)
 	label_map = load_params(args.label_map)
+	get_key = lambda x: x['label'] if isinstance(x, dict) else x
+	label_map = dict(zip(label_map.keys(),map(get_key, label_map.values())))
 	num_labels = len(label_map)
 	class_names = list(label_map.values())
 
@@ -192,6 +181,11 @@ def run_from_command_line():
 	write_needs_hand_labeling = get_write_func(path + "need_labeling.csv",
 		["TRANSACTION_DESCRIPTION"])
 
+	change_label_name = lambda x: "Null Class" if x[human_label_key] == '' else\
+		x[human_label_key]
+
+	fill_description = lambda x: x[sec_doc_key] if x[doc_key] == ''\
+		else x[doc_key]
 	for chunk in reader:
 		if sec_doc_key != '':
 			chunk[doc_key] = chunk.apply(fill_description, axis=1)
@@ -222,7 +216,7 @@ def run_from_command_line():
 
 		mislabeled, correct, unpredicted, needs_hand_labeling, confusion_matrix =\
 			compare_label(machine_labeled, machine_label_key, human_label_key,
-			confusion_matrix, doc_key=doc_key)
+			confusion_matrix, num_labels, doc_key=doc_key,fast_mode=fast_mode)
 
 		# Save
 		write_mislabeled(mislabeled)
@@ -244,7 +238,9 @@ def run_from_command_line():
 	precision = true_positive / column_sum
 	precision = np.round(precision, decimals=4)
 	false_negative = actual - true_positive - unpredicted
-	label = pd.DataFrame(pd.read_json(args.label_map, typ='series')).sort_index()
+	label = pd.DataFrame(label_map, index=[0]).transpose()
+	label.index = label.index.astype(int)
+	label = label.sort_index()
 	label.index = range(num_labels)
 
 	stat = pd.concat([label, actual, true_positive, false_positive, recall, precision,
@@ -260,4 +256,4 @@ def run_from_command_line():
 	conf_mat.to_csv('data/CNN_stats/Con_Matrix.csv')
 
 if __name__ == "__main__":
-	run_from_command_line()
+	main_process(parse_arguments())
