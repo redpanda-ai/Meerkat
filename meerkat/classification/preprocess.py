@@ -60,17 +60,10 @@ def preprocess(input_file, label_map, merchant_or_subtype, bank_or_card,
 		credit_or_debit, output_path='./data/preprocessed/'):
 	logging.info("Loading {0} {1} csv file ".format(merchant_or_subtype,
 		bank_or_card))
-	df = pd.read_csv(input_file, quoting=csv.QUOTE_NONE,
-		encoding="utf-8", sep='|', error_bad_lines=False, low_memory=False)
+	df = pd.read_csv(input_file, quoting=csv.QUOTE_NONE, na_filter=False,
+		encoding="utf-8", sep='|', error_bad_lines=False)
 	# Clean the "DESCRIPTION_UNMASKED" values within the dataframe
 	df["DESCRIPTION_UNMASKED"] = df.apply(fill_description_unmasked, axis=1)
-	num_nulls = len(df[df['DESCRIPTION_UNMASKED'].isnull()])
-	print('There are {0} transactions with no transaction text'.\
-		format(num_nulls))
-	df = df[df['DESCRIPTION_UNMASKED'].notnull()]
-	df.to_csv('temp.csv',sep='|',index=False)
-	df = pd.read_csv('temp.csv', quoting=csv.QUOTE_NONE, na_filter=False,
-		encoding="utf-8", sep='|', error_bad_lines=False, low_memory=False)
 	# Load label map
 	# index-class label map
 	label_map = load_json(label_map)

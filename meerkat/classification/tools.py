@@ -13,6 +13,14 @@ import pandas as pd
 from boto.s3.connection import Location
 from boto import connect_s3
 from plumbum import local, NOHUP
+def remove_empty_transactions(csv_path):
+	df = pd.read_csv(csv_path)
+	num_nan = len(df[df['DESCRIPTION_UNMASKED'].isnull()])
+	print('There are {0} transactions without description'.format(num_nan))
+	df = df[df['DESCRIPTION_UNMASKED'].notnull()]
+	poor_kwargs = {"cols" : ["LABEL", "DESCRIPTION_UNMASKED"], "header": False,
+		"index" : False, "index_label": False}
+	df.to_csv(csv_path, **poor_kwargs)
 
 def get_new_maint7b(directory, file_list):
 	"""Get the latest t7b file under directory."""
@@ -118,10 +126,10 @@ def pull_from_s3(**kwargs):
 		s3_object_list = [
 			s3_object
 			for s3_object in listing
-			if s3_object.key.endswith(extension)
+			if s3_object.key.endswith(file_name)
 			]
 		if len(s3_object_list) == 0:
-			raise Exception('Unable to find {0}'.format(kwargs["file_name"]))
+			raise Exception('Unable to find {0}'.format(file_name))
 
 	get_filename = lambda x: kwargs["save_path"] + x.key[x.key.rfind("/")+1:]
 	# local_files = []
@@ -180,7 +188,7 @@ def show_label_stat(results, train_or_test,label='LABEL'):
 	print("There are {0} classes".format(len(temp)))
 	pd.reset_option('display.max_rows')
 
-def get_test_and_train_dataframes(df_rich, train_size=0.96):
+def get_test_and_train_dataframes(df_rich, train_size=0.90):
 	"""Produce (rich and poor) X (test and train) dataframes"""
 	logging.info("Building test and train dataframes")
 	df_poor = df_rich[['LABEL', 'DESCRIPTION_UNMASKED']]
@@ -211,7 +219,7 @@ def get_csv_files(**kwargs):
 	# kwargs["df_rich_test"].to_csv(files["test_rich"], **rich_kwargs)
 	# kwargs["df_rich_train"].to_csv(files["train_rich"], **rich_kwargs)
 	#Write the poor CSVs
-	poor_kwargs = {"cols" : ["LABEL", "DESCRIPTION_UNMASKED"], "header": False,
+	poor_kwargs = {"cols" : ["LABEL", "DESCRIPTION_UNMASKED"],
 		"index" : False, "index_label": False}
 	kwargs["df_poor_test"].to_csv(files["test_poor"], **poor_kwargs)
 	kwargs["df_poor_train"].to_csv(files["train_poor"], **poor_kwargs)
