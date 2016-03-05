@@ -62,10 +62,12 @@ class DateTransformer(BaseEstimator, TransformerMixin):
 		pass
 
 	def transform(self, X, **transform_params):
+		"""Transforms dates into a usable feature"""
 		dict_list = [dict(zip(("TYPE"), x[-2:])) for x in X]
 		return dict_list
 
 	def fit(self, X, y=None, **fit_params):
+		"""Required to work with scikit learn"""
 		return self
 
 def split_data(filename):
@@ -195,7 +197,7 @@ def build_model(transactions, labels):
 
 def test_model(file_to_test, model):
 	"""Tests our classifier."""
-	transactions, labels = load_data([], [], file_to_test)
+	transactions, labels = load_data_list([], [], file_to_test)
 	score = model.score(transactions, labels)
 
 	print(file_to_test, " Score: ", score)

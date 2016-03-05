@@ -1,0 +1,160 @@
+{
+	"$schema" : "http://json-schema.org/draft-04/schema#",
+	"title" : "meerkat_categorize output",
+	"definitions" : {
+		"physical_merchant_response" : {
+			"type" : "object",
+			"properties" : {
+				"category_labels" : {
+					"type" : "array",
+					"items" : {
+						"type": "string"
+					}
+				},
+				"chain_name" : { "type" : "string"},
+				"city" : { "type" : "string" },
+				"confidence_score" : { "type" : "string" },
+				"country" : { "type" : "string", "maxLength" : 2, "minLength" : 2 },
+				"fax_number" : { "type" : "string"},
+				"is_physical_merchant" : { "enum" : [ true ] },
+				"latitude" : { "type" : "string" },
+				"longitude" : { "type" : "string" },
+				"match_found" : { "enum" : [ true, false ] },
+				"merchant_name" : { "type" : "string" },
+				"neighbourhood" : { "type" : "string"},
+				"phone_number" : { "type" : "string"},
+				"postal_code" : { "type" : "string" },
+				"source" : { "enum": [ "FACTUAL", "OTHER" ] },
+				"source_merchant_id" : { "type" : "string" },
+				"state" : { "type" : "string" },
+				"store_id" : { "type" : "string" },
+				"street" : { "type" : "string" },
+				"transaction_id" : { "type" : "number" },
+				"txn_sub_type" : { "type" : "string" },
+				"txn_type" : { "type" : "string" },
+				"website" : { "type" : "string" },
+				"bloom_filter": {
+					"city" : { "type" : "string" },
+					"state" : { "type" : "string" }
+				},
+				"cnn" : {
+					"merchant_name" : { "type" : "string" },
+					"txn_type" : { "type" : "string" },
+					"txn_sub_type" : { "type" : "string"}
+				},
+				"search" : {
+					"merchant_name" : { "type" : "string" },
+					"category_labels" : {
+						"type" : "array",
+						"items" : {
+							"type": "string"
+						}
+					},
+					"street" : { "type" : "string" },
+					"city" : { "type" : "string" },
+					"country" : { "type" : "string", "maxLength" : 2, "minLength" : 2 },
+					"state" : { "type" : "string" },
+					"postal_code" : { "type" : "string" },
+					"source_merchant_id" : { "type" : "string" },
+					"store_id" : { "type" : "string" },
+					"latitude" : { "type" : "string" },
+					"longitude" : { "type" : "string" },
+					"website" : { "type" : "string" },
+					"phone_number" : { "type" : "string"},
+					"fax_number" : { "type" : "string"},
+					"chain_name" : { "type" : "string"},
+					"neighbourhood" : { "type" : "string"}
+				}
+			},
+			"required": [ "category_labels", "chain_name", "city", "confidence_score", "country",
+				"fax_number", "is_physical_merchant", "latitude", "longitude", "match_found",
+				"merchant_name", "neighbourhood", "phone_number", "postal_code", "source",
+				"source_merchant_id","state", "store_id", "street", "transaction_id",
+				"txn_sub_type", "txn_type", "website", "bloom_filter", "cnn", "search"],
+			"additionalProperties" : false
+		},
+		"non_physical_merchant_response" : {
+			"type" : "object",
+			"properties" : {
+				"city" : { "type" : "string" },
+				"state" : { "type" : "string" },
+				"transaction_id" : { "type" : "number" },
+				"is_physical_merchant" : { "enum" : [ false ] },
+				"merchant_name" : { "type" : "string" },
+				"txn_sub_type" : { "type" : "string" },
+				"txn_type" : { "type" : "string" },
+				"category_labels" : {
+					"type" : "array",
+					"items" : {
+						"type": "string"
+					}
+				},
+				"bloom_filter": {
+					"city" : { "type" : "string" },
+					"state" : { "type" : "string" }
+				},
+				"cnn" : {
+					"merchant_name" : { "type" : "string" },
+					"txn_type" : { "type" : "string" },
+					"txn_sub_type" : { "type" : "string"}
+				}
+			},
+			"required": [ "city", "state", "transaction_id", "is_physical_merchant", "merchant_name", "category_labels", "bloom_filter", "cnn"],
+			"additionalProperties" : false
+		},
+		"non_merchant_category_response" : {
+			"type" : "object",
+			"properties" : {
+				"city" : { "type" : "string" },
+				"state" : { "type" : "string" },
+				"transaction_id" : { "type" : "number" },
+				"is_physical_merchant" : { "enum" : [ false ] },
+				"txn_sub_type" : { "type" : "string" },
+				"txn_type" : { "type" : "string" },
+				"category_labels" : {
+					"type" : "array",
+					"items" : {
+						"type": "string"
+					}
+				},
+				"bloom_filter" : {
+					"city" : { "type" : "string" },
+					"state" : { "type" : "string" }
+				},
+				"cnn" : {
+					"txn_type" : { "type" : "string"},
+					"txn_sub_type" : { "type" : "string" }
+				}
+			},
+			"required": [ "city", "state", "transaction_id", "is_physical_merchant", "txn_type", "txn_sub_type", "category_labels", "bloom_filter", "cnn"],
+			"additionalProperties" : false
+		}
+	},
+	"description": "A schema for defining output from 'meerkat_categorize'",
+	"type" : "object",
+	"properties" : {
+		"cobrand_id" : {
+			"description" : "Yodlee's number to uniquely identify the cobrand",
+			"type" : "number"
+		},
+		"user_id" : {
+			"description" : "Yodlee's number to uniquely identify a user within a cobrand",
+			"type" : "number"
+		},
+		"container" : { "enum" : [ "bank", "card" ] },
+		"transaction_list" : {
+			"description" : "An array containing at least one of the following response types.",
+			"type" : "array",
+			"items" : {
+				"oneOf": [
+					{"$ref": "#/definitions/physical_merchant_response"},
+					{"$ref": "#/definitions/non_physical_merchant_response"},
+					{"$ref": "#/definitions/non_merchant_category_response"}
+				]
+			},
+			"minItems": 1,
+			"uniqueItems": true
+		}
+	},
+	"required": ["cobrand_id", "user_id", "container", "transaction_list"]
+}

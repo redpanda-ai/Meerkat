@@ -2,6 +2,12 @@
 	"cobrand_id" : 1234,
 	"user_id" : 2345,
 	"container" : "card",
+	"debug" : false,
+	"user_city" : "Sunnyvale",
+	"user_state" : "CA",
+	"user_country" : "US",
+	"cobrand_region" : 1,
+	"services_list" : ["bank_merchant_cnn", "should_search"],
 	"transaction_list" : [
 		{
 			"transaction_id": 1,
