@@ -7,7 +7,11 @@ from meerkat.classification.tools import create_new_configuration_file, copy_fil
 
 #################### USAGE ##########################
 
-# python3 -m meerkat.classification.create_base_model
+# python3 -m meerkat.classification.create_base_model [t7b_folder]
+# python3 -m meerkat.classification.create_base_model meerkat/classification/lua/base_model_data/
+
+# t7b_folder is a folder containing training and testing sets for each
+# model desired to fold into the base model
 
 #####################################################
 
@@ -16,7 +20,7 @@ def collect_datasets():
 	datasets = defaultdict(lambda: {"train": "", "test": ""})
 
 	# Collect training and testing data
-	for file in os.listdir("meerkat/classification/lua/base_model_data/"):
+	for file in os.listdir(sys.argv[1]):
 		if file.endswith(".t7b"):
 			file_trunc = file.replace(".test.poor.t7b", "")
 			file_trunc = file_trunc.replace(".train.poor.t7b", "")
