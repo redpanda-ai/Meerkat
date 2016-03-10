@@ -112,9 +112,6 @@ def main_stream():
 	train_poor, val_poor, num_of_classes = preprocess(
 		train_file, label_map, merchant_or_subtype, bank_or_card,
 		credit_or_debit, output_path=save_path)
-	# Remove empty data
-	remove_empty_transactions(train_poor)
-	remove_empty_transactions(val_poor)
 	#3.  Use qlua to convert the files into training and testing sets.
 	train_poor = convert_csv_to_torch_7_binaries(train_poor)
 	val_poor = convert_csv_to_torch_7_binaries(val_poor)
