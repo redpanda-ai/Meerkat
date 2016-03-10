@@ -13,14 +13,6 @@ import pandas as pd
 from boto.s3.connection import Location
 from boto import connect_s3
 from plumbum import local, NOHUP
-def remove_empty_transactions(csv_path):
-	df = pd.read_csv(csv_path)
-	num_nan = len(df[df['DESCRIPTION_UNMASKED'].isnull()])
-	print('There are {0} transactions without description'.format(num_nan))
-	df = df[df['DESCRIPTION_UNMASKED'].notnull()]
-	poor_kwargs = {"cols" : ["LABEL", "DESCRIPTION_UNMASKED"], "header": False,
-		"index" : False, "index_label": False}
-	df.to_csv(csv_path, **poor_kwargs)
 
 def get_new_maint7b(directory, file_list):
 	"""Get the latest t7b file under directory."""
@@ -214,13 +206,8 @@ def get_csv_files(**kwargs):
 		"test_poor" : prefix + "val_poor.csv",
 		"train_poor" : prefix + "train_poor.csv"
 	}
-	# Write the rich CSVs
-	# rich_kwargs = {"index" : False, "sep" : "|"}
-	# kwargs["df_rich_test"].to_csv(files["test_rich"], **rich_kwargs)
-	# kwargs["df_rich_train"].to_csv(files["train_rich"], **rich_kwargs)
 	#Write the poor CSVs
-	poor_kwargs = {"cols" : ["LABEL", "DESCRIPTION_UNMASKED"],
-		"index" : False, "index_label": False}
+	poor_kwargs = {"header" : False, "index" : False, "index_label": False}
 	kwargs["df_poor_test"].to_csv(files["test_poor"], **poor_kwargs)
 	kwargs["df_poor_train"].to_csv(files["train_poor"], **poor_kwargs)
 	#Return file names
@@ -345,13 +332,27 @@ def merge_csvs(directory):
 				sep='|', error_bad_lines=False, quoting=csv.QUOTE_NONE)
 			dataframes.append(df)
 	merged = pd.concat(dataframes, ignore_index=True)
+	merged = check_empty_transaction(merged)
 	return merged
+
+def check_empty_transaction(df):
+	empty_transaction = df[(df['DESCRIPTION_UNMASKED'] == '') &\
+		(df['DESCRIPTION'] == '')]
+	if len(empty_transaction) != 0:
+		print ("There are {0} empty transactions, \
+			save to empty_transactions.csv"
+			.format(len(empty_transaction)))
+		empty_transaction.to_csv('empty_transactions.csv',
+			sep='|', index=False)
+	return df[(df['DESCRIPTION_UNMASKED'] != '') |\
+			(df['DESCRIPTION'] != '')]
 
 def seperate_debit_credit(subtype_file):
 	"""Load the CSV into a pandas data frame, return debit and credit df"""
 	logging.info("Loading csv file")
 	df = pd.read_csv(subtype_file, quoting=csv.QUOTE_NONE, na_filter=False,
 		encoding="utf-8", sep='|', error_bad_lines=False)
+	df = check_empty_transaction(df)
 	df['UNIQUE_TRANSACTION_ID'] = df.index
 	df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
 	df["PROPOSED_SUBTYPE"] = df["PROPOSED_SUBTYPE"].str.strip()

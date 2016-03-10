@@ -134,7 +134,8 @@ def get_write_func(filename, header):
 			mode = "a" if file_exists else "w"
 			add_head = False if file_exists else header
 			df = pd.DataFrame(data)
-			df.to_csv(filename, mode=mode, index=False, header=add_head)
+			df.to_csv(filename, mode=mode, index=False, header=add_head,
+				sep='|')
 			file_exists = True
 	return write_func
 
