@@ -7,7 +7,7 @@
 
 ## Useful links
 * [latest release] (https://github.com/joeandrewkey/Meerkat/releases/latest)
-* [roadmap for upcoming release] (https://docs.google.com/spreadsheets/d/1vn5d9KevxA7-HxWl25T_CE9vgDlkN9EnJ6FEpnO2COk/edit#gid=0)
+* [roadmap for upcoming release] (https://docs.google.com/spreadsheets/d/1Ce_iRNJYdxwbuKowQlcysjKeiKnfGWMZDvQp5mMQZ5Y/edit#gid=0)
 * [wiki] (https://github.com/joeandrewkey/Meerkat/wiki)
 * [issues] (https://github.com/joeandrewkey/Meerkat/issues)
 
