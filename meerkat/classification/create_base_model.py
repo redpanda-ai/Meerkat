@@ -34,6 +34,7 @@ def collect_datasets():
 def setup_directory(output_path):
 
 	os.makedirs(output_path, exist_ok=True)
+	os.makedirs(output_path + "cache_files/", exist_ok=True)
 	copy_file("meerkat/classification/lua/main.lua", output_path)
 	copy_file("meerkat/classification/lua/data.lua", output_path)
 	copy_file("meerkat/classification/lua/model.lua", output_path)
@@ -83,7 +84,8 @@ def create_base_model():
 		os.remove(output_path + data["test"])
 		for file in os.listdir(output_path):
 			if "main_" in file:
-				os.remove(output_path + file)
+				os.rename(output_path + file, output_path + "cache_files/" + model + "_" + str(models_trained) + "_" + file)
+				break
 
 if __name__ == "__main__":
 	create_base_model()
