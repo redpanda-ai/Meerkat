@@ -15,6 +15,26 @@ Created on Mar 14, 2016
 
 import tensorflow as tf
 import numpy as np
+import pandas as pd
+import csv
+import json
+from .verify_data import load_json
+from .tools import fill_description_unmasked
+
+input_file = "Card_complete_data_subtype_original_updated_credit.csv"
+df = pd.read_csv(input_file, quoting=csv.QUOTE_NONE, na_filter=False,
+		encoding="utf-8", sep='|', error_bad_lines=False)
+
+df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
+grouped = df.groupby('LEDGER_ENTRY', as_index=False)
+groups = dict(list(grouped))
+df = groups["credit"]
+# Clean the "DESCRIPTION_UNMASKED" values within the dataframe
+df["DESCRIPTION_UNMASKED"] = df.apply(fill_description_unmasked, axis=1)
+print(len(df))
+
+label_map = "card_credit_subtype_label_map.json"
+label_map = load_json(label_map)
 
 ALPHABET = "abcdefghijklmnopqrstuvwxyz0123456789,;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}"
 ALPHA_DICT = {a : i for i, a in enumerate(ALPHABET)}
@@ -31,6 +51,7 @@ def string_to_tensor(str, l):
 
 def build_cnn():
 	"""Build CNN"""
+
 
 	graph = tf.Graph()
 	num_labels = 10
