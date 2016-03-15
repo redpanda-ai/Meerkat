@@ -39,7 +39,7 @@ def load_data():
 	label_map = "card_credit_subtype_label_map.json"
 	label_map = load_json(label_map)
 	reversed_map = reverse_map(label_map)
-	a = lambda x: reversed_map.get(str(x["PROPOSED_SUBTYPE"]), "")
+	a = lambda x: int(reversed_map.get(str(x["PROPOSED_SUBTYPE"]), ""))
 
 	input_file = "Card_complete_data_subtype_original_updated_credit.csv"
 	df = pd.read_csv(input_file, quoting=csv.QUOTE_NONE, na_filter=False, encoding="utf-8", sep='|', error_bad_lines=False)
@@ -99,7 +99,9 @@ def run_session(graph):
 		for step in range(num_eras):
 
 			batch = random.choice(batched)
-			print(batch)
+			labels = numpy.array(batched[0]["LABEL_NUM"])
+			labels = (np.arange(NUM_LABELS) == labels[:,None]).astype(np.float32)
+			print(labels)
 
 			if (step % epochs == 0):
 
