@@ -99,7 +99,7 @@ def run_session(graph):
 		for step in range(num_eras):
 
 			batch = random.choice(batched)
-			labels = numpy.array(batched[0]["LABEL_NUM"].astype(int))
+			labels = np.array(batched[0]["LABEL_NUM"].astype(int))
 			labels = (np.arange(NUM_LABELS) == labels[:,None]).astype(np.float32)
 			print(labels)
 
