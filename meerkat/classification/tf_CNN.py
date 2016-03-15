@@ -104,5 +104,7 @@ def run_session(graph):
 
 				print("Save details")
 
+			sys.exit()
+
 if __name__ == "__main__":
 	build_cnn()
