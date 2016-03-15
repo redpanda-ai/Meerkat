@@ -18,9 +18,21 @@ import tensorflow as tf
 def build_cnn():
 	"""Build CNN"""
 
-	x = tf.placeholder(tf.float32, shape=[128, 1, 69, 123])
-	w = tf.Variable(tf.random_normal([1, 69, 123, 256], name="W"))
-	tf.nn.conv2d(x, w, [1,1,1,1], padding="SAME")
+	graph = tf.Graph()
+
+	# Create Graph
+	with graph.as_default():
+
+		x = tf.placeholder(tf.float32, shape=[128, 1, 69, 123])
+		w = tf.Variable(tf.random_normal([1, 69, 123, 256], name="W"))
+		tf.nn.conv2d(x, w, [1,1,1,1], padding="SAME")
+
+def run_session(graph):
+	"""Run Session"""
+
+	with tf.Session(graph=graph) as session:
+
+		tf.initialize_all_variables().run()
 
 if __name__ == "__main__":
 	build_cnn()
