@@ -99,9 +99,15 @@ def run_session(graph):
 		for step in range(num_eras):
 
 			batch = random.choice(batched)
-			labels = np.array(batched[0]["LABEL_NUM"].astype(int))
+			labels = np.array(batch["LABEL_NUM"].astype(int))
 			labels = (np.arange(NUM_LABELS) == labels[:,None]).astype(np.float32)
-			print(labels)
+			docs = batch["DESCRIPTION_UNMASKED"].tolist()
+			trans = numpy.zeros(shape=(BATCH_SIZE, 1, ALPHABET_LENGTH, DOC_LENGTH))
+			for i, t in enumerate(docs):
+    			trans[i][0] = string_to_tensor(t, DOC_LENGTH)
+
+    		print(labels)
+    		print(trans)
 
 			if (step % epochs == 0):
 
