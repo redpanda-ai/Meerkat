@@ -57,13 +57,19 @@ def get_cnn_by_path(model_path, dict_path):
 	# pylint:disable=no-name-in-module
 	from lupa import LuaRuntime
 
+	# Check if GPU exists
+	checked = local['lspci']()
+	hasGPU = 'nvidia' in checked.lower()
+
 	# Load Runtime and Lua Modules
 	lua = LuaRuntime(unpack_returned_tuples=True)
 	nn = lua.require('nn')
 	model = lua.require('meerkat/classification/lua/model')
 	torch = lua.require('torch')
-	cutorch = lua.require('cutorch')
-	cunn = lua.require('cunn')
+	if hasGPU:
+		cutorch = lua.require('cutorch')
+		cunn = lua.require('cunn')
+
 	# Load Config
 	lua.execute('''
 		dofile("meerkat/classification/lua/config.lua")
@@ -73,18 +79,13 @@ def get_cnn_by_path(model_path, dict_path):
 	lua_load_model = 'model = Model:makeCleanSequential(torch.load("' + model_path + '"))'
 	lua.execute(lua_load_model)
 
-	# Check if GPU exists
-	checked = local['lspci']()
-	hasGPU = 'nvidia' in checked.lower()
-
 	# Prepare CNN
 	lua.execute('''
-		if hasGPU then
+		if python.eval("hasGPU") then
 			model = model:type("torch.CudaTensor")
 		else
 			model = model:type("torch.DoubleTensor")
 		end
-		cutorch.synchronize()
 
 		alphabet = config.alphabet
 		dict = {}
@@ -134,7 +135,7 @@ def get_cnn_by_path(model_path, dict_path):
 	process_batch = lua.eval('''
 		function(batch)
 			batchLen = batch:size(1)
-			if hasGPU then
+			if python.eval("hasGPU") then
 				batch = batch:transpose(2, 3):contiguous():type("torch.CudaTensor")
 			else
 				batch = batch:transpose(2, 3):contiguous():type("torch.DoubleTensor")
