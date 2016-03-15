@@ -23,11 +23,11 @@ def string_to_tensor(str, l):
 	"""Convert transaction to tensor format"""
 
 	s = str.lower()[0:l]
- 	t = np.zeros((len(ALPHABET), l), dtype=np.float32)
- 	for i, c in reversed(list(enumerate(s))):
- 		if c in ALPHABET:
- 			t[ALPHA_DICT[c]][len(s) - i - 1] = 1
- 	return t
+	t = np.zeros((len(ALPHABET), l), dtype=np.float32)
+	for i, c in reversed(list(enumerate(s))):
+		if c in ALPHABET:
+			t[ALPHA_DICT[c]][len(s) - i - 1] = 1
+	return t
 
 def build_cnn():
 	"""Build CNN"""
