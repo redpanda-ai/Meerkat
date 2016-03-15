@@ -102,7 +102,7 @@ def run_session(graph):
 			labels = np.array(batch["LABEL_NUM"].astype(int))
 			labels = (np.arange(NUM_LABELS) == labels[:,None]).astype(np.float32)
 			docs = batch["DESCRIPTION_UNMASKED"].tolist()
-			trans = numpy.zeros(shape=(BATCH_SIZE, 1, ALPHABET_LENGTH, DOC_LENGTH))
+			trans = np.zeros(shape=(BATCH_SIZE, 1, ALPHABET_LENGTH, DOC_LENGTH))
 			for i, t in enumerate(docs):
 				trans[i][0] = string_to_tensor(t, DOC_LENGTH)
 
