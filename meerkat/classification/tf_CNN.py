@@ -104,10 +104,10 @@ def run_session(graph):
 			docs = batch["DESCRIPTION_UNMASKED"].tolist()
 			trans = numpy.zeros(shape=(BATCH_SIZE, 1, ALPHABET_LENGTH, DOC_LENGTH))
 			for i, t in enumerate(docs):
-    			trans[i][0] = string_to_tensor(t, DOC_LENGTH)
+				trans[i][0] = string_to_tensor(t, DOC_LENGTH)
 
-    		print(labels)
-    		print(trans)
+			print(labels)
+			print(trans)
 
 			if (step % epochs == 0):
 
