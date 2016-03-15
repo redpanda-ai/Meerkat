@@ -133,9 +133,9 @@ def get_cnn_by_path(model_path, dict_path):
 	''')
 
 	process_batch = lua.eval('''
-		function(batch)
+		function(batch, hasGPU)
 			batchLen = batch:size(1)
-			if python.eval("hasGPU") then
+			if hasGPU then
 				batch = batch:transpose(2, 3):contiguous():type("torch.CudaTensor")
 			else
 				batch = batch:transpose(2, 3):contiguous():type("torch.DoubleTensor")
@@ -159,7 +159,7 @@ def get_cnn_by_path(model_path, dict_path):
 		trans_list = [' '.join(x[doc_key].split()) for x in trans]
 		table_trans = list_to_table(trans_list)
 		batch = make_batch(table_trans)
-		labels, activations = process_batch(batch)
+		labels, activations = process_batch(batch, hasGPU)
 		decisions = list(labels.values())
 		confidences = list(activations.values())
 		low_confidence = {"label": "", "category": ""}
