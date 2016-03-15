@@ -53,7 +53,7 @@ def load_data():
 	df["LABEL_NUM"] = df.apply(a, axis=1)
 	df = df[df["LABEL_NUM"] != ""]
 
-	batched = np.array_split(df, math.ceil(df.shape[0] / 128))
+	batched = np.array_split(df, math.ceil(df.shape[0] / 129))
 
 	return label_map, batched
 
@@ -80,40 +80,41 @@ def build_cnn():
 		w = tf.Variable(tf.random_normal([1, ALPHABET_LENGTH, DOC_LENGTH, 256], name="W"))
 		tf.nn.conv2d(x, w, [1,1,1,1], padding="SAME")
 
+	def run_session(graph):
+		"""Run Session"""
+
+		# Train Network
+		label_map, batched = load_data()
+		epochs = 5000
+		eras = 10
+
+		with tf.Session(graph=graph) as session:
+
+			tf.initialize_all_variables().run()
+			num_eras = epochs * eras
+
+			for step in range(num_eras):
+
+				batch = random.choice(batched)[0:128]
+				labels = np.array(batch["LABEL_NUM"].astype(int))
+				labels = (np.arange(NUM_LABELS) == labels[:,None]).astype(np.float32)
+				docs = batch["DESCRIPTION_UNMASKED"].tolist()
+				trans = np.zeros(shape=(BATCH_SIZE, 1, ALPHABET_LENGTH, DOC_LENGTH))
+				for i, t in enumerate(docs):
+					trans[i][0] = string_to_tensor(t, DOC_LENGTH)
+
+				feed_dict = {x : trans, y : labels}
+
+				print(session.run(w, feed_dict=feed_dict))
+
+				if (step % epochs == 0):
+
+					print("Save details")
+
+				sys.exit()
+
 	# Run Graph
 	run_session(graph)
-
-def run_session(graph):
-	"""Run Session"""
-
-	# Train Network
-	label_map, batched = load_data()
-	epochs = 5000
-	eras = 10
-
-	with tf.Session(graph=graph) as session:
-
-		tf.initialize_all_variables().run()
-		num_eras = epochs * eras
-
-		for step in range(num_eras):
-
-			batch = random.choice(batched)
-			labels = np.array(batch["LABEL_NUM"].astype(int))
-			labels = (np.arange(NUM_LABELS) == labels[:,None]).astype(np.float32)
-			docs = batch["DESCRIPTION_UNMASKED"].tolist()
-			trans = np.zeros(shape=(BATCH_SIZE, 1, ALPHABET_LENGTH, DOC_LENGTH))
-			for i, t in enumerate(docs):
-				trans[i][0] = string_to_tensor(t, DOC_LENGTH)
-
-			print(labels)
-			print(trans)
-
-			if (step % epochs == 0):
-
-				print("Save details")
-
-			sys.exit()
 
 if __name__ == "__main__":
 	build_cnn()
