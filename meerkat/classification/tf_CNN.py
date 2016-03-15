@@ -74,10 +74,13 @@ def build_cnn():
 	# Create Graph
 	with graph.as_default():
 
-		x = tf.placeholder(tf.float32, shape=[batch_size, 1, alphabet_length, doc_length])
-		y = tf.placeholder(tf.float32, shape=(batch_size, num_labels))
-		w = tf.Variable(tf.random_normal([1, alphabet_length, doc_length, 256], name="W"))
+		x = tf.placeholder(tf.float32, shape=[BATCH_SIZE, 1, ALPHABET_LENGTH, DOC_LENGTH])
+		y = tf.placeholder(tf.float32, shape=(BATCH_SIZE, NUM_LABELS))
+		w = tf.Variable(tf.random_normal([1, ALPHABET_LENGTH, DOC_LENGTH, 256], name="W"))
 		tf.nn.conv2d(x, w, [1,1,1,1], padding="SAME")
+
+	# Run Graph
+	run_session(graph)
 
 def run_session(graph):
 	"""Run Session"""
