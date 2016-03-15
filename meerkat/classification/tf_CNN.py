@@ -16,17 +16,29 @@ Created on Mar 14, 2016
 import tensorflow as tf
 import numpy as np
 import pandas as pd
+
 import csv
 import json
+import math
+import random
 
 from .verify_data import load_json
-from .tools import fill_description_unmasked
+from .tools import fill_description_unmasked, reverse_map
 
 ALPHABET = "abcdefghijklmnopqrstuvwxyz0123456789,;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}"
 ALPHA_DICT = {a : i for i, a in enumerate(ALPHABET)}
+NUM_LABELS = 10
+BATCH_SIZE = 128
+DOC_LENGTH = 123
+ALPHABET_LENGTH = len(ALPHABET)
 
 def load_data():
 	"""Load data and label map"""
+
+	label_map = "card_credit_subtype_label_map.json"
+	label_map = load_json(label_map)
+	reversed_map = reverse_map(label_map)
+	a = lambda x: reversed_map.get(str(x["PROPOSED_SUBTYPE"]), "")
 
 	input_file = "Card_complete_data_subtype_original_updated_credit.csv"
 	df = pd.read_csv(input_file, quoting=csv.QUOTE_NONE, na_filter=False, encoding="utf-8", sep='|', error_bad_lines=False)
@@ -36,11 +48,13 @@ def load_data():
 	groups = dict(list(grouped))
 	df = groups["credit"]
 	df["DESCRIPTION_UNMASKED"] = df.apply(fill_description_unmasked, axis=1)
+	df = df.reindex(np.random.permutation(df.index))
+	df["LABEL_NUM"] = df.apply(a, axis=1)
+	df = df[df["LABEL_NUM"] != ""]
 
-	label_map = "card_credit_subtype_label_map.json"
-	label_map = load_json(label_map)
+	batched = np.array_split(df, math.ceil(df.shape[0] / 128))
 
-	return label_map, df
+	return label_map, batched
 
 def string_to_tensor(str, l):
 	"""Convert transaction to tensor format"""
@@ -56,11 +70,6 @@ def build_cnn():
 	"""Build CNN"""
 
 	graph = tf.Graph()
-	label_map, df = load_data()
-	num_labels = 10
-	batch_size = 128
-	doc_length = 123
-	alphabet_length = len(ALPHABET)
 
 	# Create Graph
 	with graph.as_default():
@@ -74,6 +83,7 @@ def run_session(graph):
 	"""Run Session"""
 
 	# Train Network
+	label_map, batched = load_data()
 	epochs = 5000
 	eras = 10
 
@@ -83,6 +93,9 @@ def run_session(graph):
 		num_eras = epochs * eras
 
 		for step in range(num_eras):
+
+			batch = random.choice(batched)
+			print(batch)
 
 			if (step % epochs == 0):
 
