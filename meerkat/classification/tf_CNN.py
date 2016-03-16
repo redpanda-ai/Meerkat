@@ -67,16 +67,16 @@ def string_to_tensor(str, l):
 			t[ALPHA_DICT[c]][len(s) - i - 1] = 1
 	return t
 
-def get_bias(kernel_width, input_frame_size):
-	"""Initialize bias"""
-	stdv = 1/sqrt(kernel_width * input_frame_size)
-	bias = tf.Variable(tf.random_uniform([256], minval=-stdv, maxval=stdv), name="B")
+def bias_variable(shape, kernel_width, input_frame_size):
+	"""Initialize biases"""
+	stdv = 1 / sqrt(kernel_width * input_frame_size)
+	bias = tf.Variable(tf.random_uniform(shape, minval=-stdv, maxval=stdv), name="B")
 	return bias
 
-def get_weight():
-	"""Initialize weight"""
+def weight_variable(shape):
+	"""Initialize weights"""
 
-	weight = tf.Variable(tf.random_normal([1, ALPHABET_LENGTH, DOC_LENGTH, 256]), name="W")
+	weight = tf.Variable(tf.random_normal(shape), name="W")
 	return weight
 
 def build_cnn():
@@ -89,12 +89,13 @@ def build_cnn():
 
 		x = tf.placeholder(tf.float32, shape=[BATCH_SIZE, 1, ALPHABET_LENGTH, DOC_LENGTH])
 		y = tf.placeholder(tf.float32, shape=(BATCH_SIZE, NUM_LABELS))
-		weight = get_weight()
-		kernel_width = 7
-		bias = get_bias(kernel_width, ALPHABET_LENGTH)
-		conv = tf.nn.conv2d(x, weight, [1,1,1,1], padding="SAME")
-		#TODO: relu threshold
-		hidden = tf.nn.relu(conv + bias)
+		
+		W_conv1 = weight_variable([1, ALPHABET_LENGTH, DOC_LENGTH, 256])
+		b_conv1 = bias_variable([256], 7, ALPHABET_LENGTH)
+
+		#TODO: ReLU threshold
+		h_conv1 = tf.nn.relu(tf.nn.conv2d(x, W_conv1, [1,1,1,1], padding="SAME") + b_conv1)
+		h_pool1 = tf.nn.max_pool(h_conv1, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='SAME')
 
 	def run_session(graph):
 		"""Run Session"""
@@ -121,9 +122,8 @@ def build_cnn():
 
 				feed_dict = {x : trans, y : labels}
 
-				print(session.run(weight, feed_dict=feed_dict))
-				print(session.run(bias, feed_dict=feed_dict))
-				print(session.run(hidden, feed_dict=feed_dict).shape)
+				print(session.run(h_pool1, feed_dict=feed_dict))
+
 				if (step % epochs == 0):
 
 					print("Save details")
