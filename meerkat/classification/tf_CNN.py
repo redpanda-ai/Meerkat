@@ -70,6 +70,7 @@ def string_to_tensor(str, l):
 
 def bias_variable(shape, kernel_width, input_frame_size):
 	"""Initialize biases"""
+
 	stdv = 1 / sqrt(kernel_width * input_frame_size)
 	bias = tf.Variable(tf.random_uniform(shape, minval=-stdv, maxval=stdv), name="B")
 	return bias
@@ -94,9 +95,25 @@ def build_cnn():
 		W_conv1 = weight_variable([1, 7, ALPHABET_LENGTH, 256])
 		b_conv1 = bias_variable([256], 7, ALPHABET_LENGTH)
 
+		W_conv2 = weight_variable([1, 7, 256, 256])
+		b_conv2 = bias_variable([256], 7, 256)
+
+		W_conv3 = weight_variable([1, 3, 256, 256])
+		b_conv3 = bias_variable([256], 3, 256)
+
 		#TODO: ReLU threshold
 		h_conv1 = tf.nn.relu(tf.nn.conv2d(x, W_conv1, [1,1,1,1], padding="VALID") + b_conv1)
 		h_pool1 = tf.nn.max_pool(h_conv1, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
+
+		h_conv2 = tf.nn.relu(tf.nn.conv2d(h_pool1, W_conv2, [1,1,1,1], padding="VALID") + b_conv2)
+		h_pool2 = tf.nn.max_pool(h_conv2, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
+
+		h_conv3 = tf.nn.relu(tf.nn.conv2d(h_pool2, W_conv3, [1,1,1,1], padding="VALID") + b_conv3)
+
+		h_conv4 = tf.nn.relu(tf.nn.conv2d(h_conv3, W_conv3, [1,1,1,1], padding="VALID") + b_conv3)
+
+		h_conv5 = tf.nn.relu(tf.nn.conv2d(h_conv4, W_conv3, [1,1,1,1], padding="VALID") + b_conv3)
+		h_pool5 = tf.nn.max_pool(h_conv5, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
 
 	def run_session(graph):
 		"""Run Session"""
@@ -127,6 +144,10 @@ def build_cnn():
 
 				print(session.run(h_conv1, feed_dict=feed_dict).shape)
 				print(session.run(h_pool1, feed_dict=feed_dict).shape)
+				print(session.run(h_pool2, feed_dict=feed_dict).shape)
+				print(session.run(h_conv3, feed_dict=feed_dict).shape)
+				print(session.run(h_conv4, feed_dict=feed_dict).shape)
+				print(session.run(h_pool5, feed_dict=feed_dict).shape)
 
 				if (step % epochs == 0):
 
