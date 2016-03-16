@@ -31,6 +31,7 @@ ALPHA_DICT = {a : i for i, a in enumerate(ALPHABET)}
 NUM_LABELS = 10
 BATCH_SIZE = 128
 DOC_LENGTH = 123
+RANDOMIZE = 5e-2
 ALPHABET_LENGTH = len(ALPHABET)
 
 def load_data():
@@ -76,7 +77,7 @@ def bias_variable(shape, kernel_width, input_frame_size):
 def weight_variable(shape):
 	"""Initialize weights"""
 
-	weight = tf.Variable(tf.random_normal(shape), name="W")
+	weight = tf.Variable(tf.mul(tf.random_normal(shape), RANDOMIZE), name="W")
 	return weight
 
 def build_cnn():
