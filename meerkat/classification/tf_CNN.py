@@ -102,6 +102,12 @@ def build_cnn():
 		W_conv3 = weight_variable([1, 3, 256, 256])
 		b_conv3 = bias_variable([256], 3, 256)
 
+		W_conv4 = weight_variable([1, 3, 256, 256])
+		b_conv4 = bias_variable([256], 3, 256)
+
+		W_conv5 = weight_variable([1, 3, 256, 256])
+		b_conv5 = bias_variable([256], 3, 256)
+
 		#TODO: ReLU threshold
 		h_conv1 = tf.nn.relu(tf.nn.conv2d(x, W_conv1, [1,1,1,1], padding="VALID") + b_conv1)
 		h_pool1 = tf.nn.max_pool(h_conv1, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
@@ -111,9 +117,9 @@ def build_cnn():
 
 		h_conv3 = tf.nn.relu(tf.nn.conv2d(h_pool2, W_conv3, [1,1,1,1], padding="VALID") + b_conv3)
 
-		h_conv4 = tf.nn.relu(tf.nn.conv2d(h_conv3, W_conv3, [1,1,1,1], padding="VALID") + b_conv3)
+		h_conv4 = tf.nn.relu(tf.nn.conv2d(h_conv3, W_conv4, [1,1,1,1], padding="VALID") + b_conv4)
 
-		h_conv5 = tf.nn.relu(tf.nn.conv2d(h_conv4, W_conv3, [1,1,1,1], padding="VALID") + b_conv3)
+		h_conv5 = tf.nn.relu(tf.nn.conv2d(h_conv4, W_conv5, [1,1,1,1], padding="VALID") + b_conv5)
 		h_pool5 = tf.nn.max_pool(h_conv5, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
 
 		h_reshape = tf.reshape(h_pool5, [BATCH_SIZE, RESHAPE])
