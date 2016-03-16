@@ -22,7 +22,7 @@ import csv
 import json
 import math
 import random
-
+from math import sqrt
 from .verify_data import load_json
 from .tools import fill_description_unmasked, reverse_map
 
@@ -67,6 +67,18 @@ def string_to_tensor(str, l):
 			t[ALPHA_DICT[c]][len(s) - i - 1] = 1
 	return t
 
+def get_bias(kernel_width, input_frame_size):
+	"""Initialize bias"""
+	stdv = 1/sqrt(kernel_width * input_frame_size)
+	bias = tf.Variable(tf.random_uniform([256], minval=-stdv, maxval=stdv), name="B")
+	return bias
+
+def get_weight():
+	"""Initialize weight"""
+
+	weight = tf.Variable(tf.random_normal([1, ALPHABET_LENGTH, DOC_LENGTH, 256]), name="W")
+	return weight
+
 def build_cnn():
 	"""Build CNN"""
 
@@ -77,8 +89,12 @@ def build_cnn():
 
 		x = tf.placeholder(tf.float32, shape=[BATCH_SIZE, 1, ALPHABET_LENGTH, DOC_LENGTH])
 		y = tf.placeholder(tf.float32, shape=(BATCH_SIZE, NUM_LABELS))
-		w = tf.Variable(tf.random_normal([1, ALPHABET_LENGTH, DOC_LENGTH, 256], name="W"))
-		tf.nn.conv2d(x, w, [1,1,1,1], padding="SAME")
+		weight = get_weight()
+		kernel_width = 7
+		bias = get_bias(kernel_width, ALPHABET_LENGTH)
+		conv = tf.nn.conv2d(x, weight, [1,1,1,1], padding="SAME")
+		#TODO: relu threshold
+		hidden = tf.nn.relu(conv + bias)
 
 	def run_session(graph):
 		"""Run Session"""
@@ -105,8 +121,9 @@ def build_cnn():
 
 				feed_dict = {x : trans, y : labels}
 
-				print(session.run(w, feed_dict=feed_dict))
-
+				print(session.run(weight, feed_dict=feed_dict))
+				print(session.run(bias, feed_dict=feed_dict))
+				print(session.run(hidden, feed_dict=feed_dict).shape)
 				if (step % epochs == 0):
 
 					print("Save details")
