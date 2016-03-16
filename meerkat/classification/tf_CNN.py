@@ -88,14 +88,14 @@ def build_cnn():
 	# Create Graph
 	with graph.as_default():
 
-		x = tf.placeholder(tf.float32, shape=[BATCH_SIZE, 1, ALPHABET_LENGTH, DOC_LENGTH])
+		x = tf.placeholder(tf.float32, shape=[BATCH_SIZE, 1, DOC_LENGTH, ALPHABET_LENGTH])
 		y = tf.placeholder(tf.float32, shape=(BATCH_SIZE, NUM_LABELS))
 		
-		W_conv1 = weight_variable([1, ALPHABET_LENGTH, DOC_LENGTH, 256])
+		W_conv1 = weight_variable([1, 7, ALPHABET_LENGTH, 256])
 		b_conv1 = bias_variable([256], 7, ALPHABET_LENGTH)
 
 		#TODO: ReLU threshold
-		h_conv1 = tf.nn.relu(tf.nn.conv2d(x, W_conv1, [1,1,1,1], padding="SAME") + b_conv1)
+		h_conv1 = tf.nn.relu(tf.nn.conv2d(x, W_conv1, [1,1,1,1], padding="VALID") + b_conv1)
 		h_pool1 = tf.nn.max_pool(h_conv1, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='SAME')
 
 	def run_session(graph):
@@ -120,10 +120,13 @@ def build_cnn():
 				trans = np.zeros(shape=(BATCH_SIZE, 1, ALPHABET_LENGTH, DOC_LENGTH))
 				for i, t in enumerate(docs):
 					trans[i][0] = string_to_tensor(t, DOC_LENGTH)
+				# TODO explore need for transpose
+				trans = np.transpose(trans, (0, 1, 3, 2))
 
 				feed_dict = {x : trans, y : labels}
 
-				print(session.run(h_pool1, feed_dict=feed_dict))
+				print(session.run(h_conv1, feed_dict=feed_dict).shape)
+				print(session.run(h_pool1, feed_dict=feed_dict).shape)
 
 				if (step % epochs == 0):
 
