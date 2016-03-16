@@ -32,6 +32,7 @@ NUM_LABELS = 10
 BATCH_SIZE = 128
 DOC_LENGTH = 123
 RANDOMIZE = 5e-2
+RESHAPE = int(((DOC_LENGTH - 96) / 27) * 256)
 ALPHABET_LENGTH = len(ALPHABET)
 
 def load_data():
@@ -115,8 +116,7 @@ def build_cnn():
 		h_conv5 = tf.nn.relu(tf.nn.conv2d(h_conv4, W_conv3, [1,1,1,1], padding="VALID") + b_conv3)
 		h_pool5 = tf.nn.max_pool(h_conv5, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
 
-		shape = h_pool5.get_shape().as_list()
-		h_reshape = tf.reshape(h_pool5, [shape[0], shape[1] * shape[2] * shape[3]])
+		h_reshape = tf.reshape(h_pool5, [BATCH_SIZE, RESHAPE])
 
 	def run_session(graph):
 		"""Run Session"""
