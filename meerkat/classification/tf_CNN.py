@@ -115,6 +115,9 @@ def build_cnn():
 		h_conv5 = tf.nn.relu(tf.nn.conv2d(h_conv4, W_conv3, [1,1,1,1], padding="VALID") + b_conv3)
 		h_pool5 = tf.nn.max_pool(h_conv5, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
 
+		shape = h_pool5.get_shape().as_list()
+		h_reshape = tf.reshape(h_pool5, [shape[0], shape[1] * shape[2] * shape[3]])
+
 	def run_session(graph):
 		"""Run Session"""
 
@@ -148,6 +151,7 @@ def build_cnn():
 				print(session.run(h_conv3, feed_dict=feed_dict).shape)
 				print(session.run(h_conv4, feed_dict=feed_dict).shape)
 				print(session.run(h_pool5, feed_dict=feed_dict).shape)
+				print(session.run(h_reshape, feed_dict=feed_dict).shape)
 
 				if (step % epochs == 0):
 
