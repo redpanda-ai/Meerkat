@@ -96,7 +96,7 @@ def build_cnn():
 
 		#TODO: ReLU threshold
 		h_conv1 = tf.nn.relu(tf.nn.conv2d(x, W_conv1, [1,1,1,1], padding="VALID") + b_conv1)
-		h_pool1 = tf.nn.max_pool(h_conv1, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='SAME')
+		h_pool1 = tf.nn.max_pool(h_conv1, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
 
 	def run_session(graph):
 		"""Run Session"""
