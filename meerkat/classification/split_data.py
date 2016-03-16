@@ -124,6 +124,7 @@ def main_split_data():
 		dirt = save_path + data_type + '/'
 		os.makedirs(dirt, exist_ok=True)
 		df, label_map_path = unzip_and_merge(input_file, bank_or_card)
+		print('Validating {0} {1} data'.format(merchant_or_subtype, bank_or_card))
 		verify_data(csv_input=df, json_input=label_map_path,
 			cnn_type=[merchant_or_subtype, bank_or_card])
 		save = make_save_function(df.columns, dirt, merchant_or_subtype,
@@ -137,14 +138,18 @@ def main_split_data():
 		local['aws']['s3']['sync'][dirt][dir_paths[data_type]]()
 	else:
 		df_credit, df_debit = seperate_debit_credit(input_file)
-		# WILL BE USED FOR NEXT ITERATION
-		# credit_map_path = './meerkat/classification/label_maps/bank_credit_subtype_label_map.json'
-		# debit_map_path = './meerkat/classification/label_maps/bank_debit_subtype_label_map.json'
-		# verify_data(csv_input=df_credit, json_input=credit_map_path,
-			# cnn_type=[merchant_or_subtype, bank_or_card, 'credit'])
-		# verify_data(csv_input=df_debit, json_input=debit_map_path,
-			# cnn_type=[merchant_or_subtype, bank_or_card, 'debit'])
-		# Need to get label_map_path
+		credit_map_path = pull_from_s3(bucket=bucket, prefix=prefix,
+			extension='credit_subtype_label_map.json', save_path=save_path)
+		debit_map_path = pull_from_s3(bucket=bucket, prefix=prefix,
+			extension='debit_subtype_label_map.json', save_path=save_path)
+		print('Validating {0} {1} credit data.'.\
+			format(merchant_or_subtype, bank_or_card))
+		verify_data(csv_input=df_credit, json_input=credit_map_path,
+			cnn_type=[merchant_or_subtype, bank_or_card, 'credit'])
+		print('Validating {0} {1} debit data.'.\
+			format(merchant_or_subtype, bank_or_card))
+		verify_data(csv_input=df_debit, json_input=debit_map_path,
+			cnn_type=[merchant_or_subtype, bank_or_card, 'debit'])
 		# save debit
 		dirt_debit = save_path + data_type + '_debit/'
 		os.makedirs(dirt_debit, exist_ok=True)
@@ -153,6 +158,7 @@ def main_split_data():
 			merchant_or_subtype, bank_or_card, date)
 		save(results_debit, 'train', credit_or_debit='debit')
 		save(results_debit, 'test', credit_or_debit='debit')
+		local['mv'][debit_map_path][dirt_debit]()
 		local['aws']['s3']['sync'][dirt_debit][dir_paths\
 			[data_type + '_debit']]()
 		# save credit
@@ -163,6 +169,7 @@ def main_split_data():
 			merchant_or_subtype, bank_or_card, date)
 		save(results_credit, 'train', credit_or_debit='credit')
 		save(results_credit, 'test', credit_or_debit='credit')
+		local['mv'][credit_map_path][dirt_credit]()
 		local['aws']['s3']['sync'][dirt_credit][dir_paths\
 			[data_type + '_credit']]()
 
