@@ -238,6 +238,10 @@ def main_process(args):
 	false_positive = column_sum - true_positive
 	precision = true_positive / column_sum
 	precision = np.round(precision, decimals=4)
+
+	f_measure = (2 * precision * recall) / (precision + recall)
+	f_measure = np.round(f_measure, decimals=4)
+
 	false_negative = actual - true_positive - unpredicted
 	label = pd.DataFrame(label_map, index=[0]).transpose()
 	label.index = label.index.astype(int)
@@ -245,9 +249,9 @@ def main_process(args):
 	label.index = range(num_labels)
 
 	stat = pd.concat([label, actual, true_positive, false_positive, recall, precision,
-		false_negative, unpredicted], axis=1)
+		false_negative, unpredicted, f_measure], axis=1)
 	stat.columns = ['Class', 'Actual', 'True_Positive', 'False_Positive', 'Recall',
-		'Precision', 'False_Negative', 'Unpredicted']
+		'Precision', 'False_Negative', 'Unpredicted', 'F_Measure']
 
 	conf_mat = pd.concat([label, conf_mat], axis=1)
 	conf_mat.columns = ['Class'] + [str(x) for x in range(1, num_labels + 1)] + ['Unpredicted']
