@@ -26,7 +26,7 @@ config.val_data = {}
 config.val_data.file =  paths.concat(paths.cwd(), "./test.t7b")
 config.val_data.alphabet = alphabet
 config.val_data.length = 123
-config.train_data.batch_size = 128
+config.val_data.batch_size = 128
 
 -- The model
 config.model = {}

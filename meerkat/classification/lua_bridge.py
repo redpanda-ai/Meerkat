@@ -10,6 +10,7 @@ import ctypes
 import json
 import logging
 from meerkat.various_tools import load_params
+from plumbum import local
 
 LOGSOFTMAX_THRESHOLD = -1
 
@@ -56,13 +57,19 @@ def get_cnn_by_path(model_path, dict_path):
 	# pylint:disable=no-name-in-module
 	from lupa import LuaRuntime
 
+	# Check if GPU exists
+	checked = local['lspci']()
+	hasGPU = 'nvidia' in checked.lower()
+
 	# Load Runtime and Lua Modules
 	lua = LuaRuntime(unpack_returned_tuples=True)
 	nn = lua.require('nn')
 	model = lua.require('meerkat/classification/lua/model')
 	torch = lua.require('torch')
-	cutorch = lua.require('cutorch')
-	cunn = lua.require('cunn')
+	if hasGPU:
+		cutorch = lua.require('cutorch')
+		cunn = lua.require('cunn')
+
 	# Load Config
 	lua.execute('''
 		dofile("meerkat/classification/lua/config.lua")
@@ -74,8 +81,11 @@ def get_cnn_by_path(model_path, dict_path):
 
 	# Prepare CNN
 	lua.execute('''
-		model = model:type("torch.CudaTensor")
-		cutorch.synchronize()
+		if python.eval("hasGPU") then
+			model = model:type("torch.CudaTensor")
+		else
+			model = model:type("torch.DoubleTensor")
+		end
 
 		alphabet = config.alphabet
 		dict = {}
@@ -123,9 +133,13 @@ def get_cnn_by_path(model_path, dict_path):
 	''')
 
 	process_batch = lua.eval('''
-		function(batch)
+		function(batch, hasGPU)
 			batchLen = batch:size(1)
-			batch = batch:transpose(2, 3):contiguous():type("torch.CudaTensor")
+			if hasGPU then
+				batch = batch:transpose(2, 3):contiguous():type("torch.CudaTensor")
+			else
+				batch = batch:transpose(2, 3):contiguous():type("torch.DoubleTensor")
+			end
 			output = model:forward(batch)
 			max, decision = output:double():max(2)
 			labels = {}
@@ -145,7 +159,7 @@ def get_cnn_by_path(model_path, dict_path):
 		trans_list = [' '.join(x[doc_key].split()) for x in trans]
 		table_trans = list_to_table(trans_list)
 		batch = make_batch(table_trans)
-		labels, activations = process_batch(batch)
+		labels, activations = process_batch(batch, hasGPU)
 		decisions = list(labels.values())
 		confidences = list(activations.values())
 		low_confidence = {"label": "", "category": ""}
