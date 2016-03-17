@@ -165,12 +165,20 @@ def build_cnn():
 
 		network = model(x, train=True)
 
+		# Completely Speculative Training Code
+		loss = -tf.reduce_mean(y * network)
+		global_step = tf.Variable(0, trainable=False)
+		learning_rate = tf.train.exponential_decay(0.01, global_step, 50000, 0.95, staircase=True)
+		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss, global_step=global_step)
+		correct_prediction = tf.equal(tf.argmax(model(x, train=False), 1), tf.argmax(y, 1))
+		accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+
 	def run_session(graph):
 		"""Run Session"""
 
 		# Train Network
 		label_map, batched = load_data()
-		epochs = 5000
+		epochs = 500
 		eras = 10
 
 		with tf.Session(graph=graph) as session:
@@ -178,7 +186,7 @@ def build_cnn():
 			tf.initialize_all_variables().run()
 			num_eras = epochs * eras
 
-			for step in range(num_eras):
+			for step in range(50000):
 
 				batch = random.choice(batched)[0:128]
 				labels = np.array(batch["LABEL_NUM"].astype(int))
@@ -192,13 +200,13 @@ def build_cnn():
 
 				feed_dict = {x : trans, y : labels}
 
-				print(session.run(network, feed_dict=feed_dict))
+				optimizer.run(feed_dict=feed_dict)
+
+				if (step % 50 == 0):
+					print("train error %g"%session.run(loss, feed_dict=feed_dict))
 
 				if (step % epochs == 0):
-
-					print("Save details")
-
-				sys.exit()
+					print("test accuracy %g"%accuracy.eval(feed_dict={x: trans, y: labels}))
 
 	# Run Graph
 	run_session(graph)
