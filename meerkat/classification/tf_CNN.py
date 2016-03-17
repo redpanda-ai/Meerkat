@@ -35,6 +35,9 @@ RANDOMIZE = 5e-2
 RESHAPE = ((DOC_LENGTH - 96) / 27) * 256
 ALPHABET_LENGTH = len(ALPHABET)
 
+def accuracy(predictions, labels):
+	return (100.0 * np.sum(np.argmax(predictions, 1) == np.argmax(labels, 1)) / predictions.shape[0])
+
 def load_data():
 	"""Load data and label map"""
 
@@ -164,14 +167,13 @@ def build_cnn():
 			return network
 
 		network = model(x, train=True)
+		no_dropout = model(x, train=False)
 
 		# Completely Speculative Training Code
 		loss = -tf.reduce_mean(y * network)
 		global_step = tf.Variable(0, trainable=False)
 		learning_rate = tf.train.exponential_decay(0.01, global_step, 50000, 0.95, staircase=True)
 		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss, global_step=global_step)
-		correct_prediction = tf.equal(tf.argmax(model(x, train=False), 1), tf.argmax(y, 1))
-		accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
 	def run_session(graph):
 		"""Run Session"""
@@ -200,13 +202,14 @@ def build_cnn():
 
 				feed_dict = {x : trans, y : labels}
 
-				optimizer.run(feed_dict=feed_dict)
+				_, l, predictions = session.run([optimizer, loss, network], feed_dict=feed_dict)
 
 				if (step % 50 == 0):
 					print("train error %g"%session.run(loss, feed_dict=feed_dict))
 
 				if (step % epochs == 0):
-					print("test accuracy %g"%accuracy.eval(feed_dict={x: trans, y: labels}))
+					print("No dropout accuracy: %.1f%%" % accuracy(session.run(no_dropout, feed_dict=feed_dict), labels))
+					print("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
 
 	# Run Graph
 	run_session(graph)
