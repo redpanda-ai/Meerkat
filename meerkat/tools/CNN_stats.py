@@ -225,8 +225,27 @@ def main_process(args):
 		write_unpredicted(unpredicted)
 		write_needs_hand_labeling(needs_hand_labeling)
 
-	# Calculate recall, precision, false +/-, true +/- from confusion maxtrix
+	# Calculate f_measure, recall, precision, false +/-, true +/- from confusion maxtrix
 	true_positive = pd.DataFrame([confusion_matrix[i][i] for i in range(num_labels)])
+
+	print("Trying to figure out matrix")
+	print(len(confusion_matrix))
+	print(len(confusion_matrix[0]))
+	print(type(confusion_matrix))
+
+	print("Print diagnal")
+	print(confusion_matrix[0][0])
+	print(confusion_matrix[1][1])
+	print(confusion_matrix[2][2])
+	print("End of strulling")
+
+	real_confusion_matrix = []
+	for i in range(num_labels):
+		real_confusion_matrix.append(confusion_matrix[i][0:-1])
+
+	print(len(real_confusion_matrix))
+	print(len(real_confusion_matrix[0]))
+
 	conf_mat = pd.DataFrame(confusion_matrix)
 	actual = pd.DataFrame(conf_mat.sum(axis=1))
 	recall = true_positive / actual
