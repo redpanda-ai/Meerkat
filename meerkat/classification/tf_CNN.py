@@ -170,9 +170,9 @@ def build_cnn():
 		no_dropout = model(x, train=False)
 
 		# Completely Speculative Training Code
-		loss = -tf.reduce_mean(y * network)
+		loss = -tf.reduce_sum(network * y) / BATCH_SIZE
 		global_step = tf.Variable(0, trainable=False)
-		learning_rate = tf.train.exponential_decay(0.01, global_step, 50000, 0.95, staircase=True)
+		learning_rate = tf.train.exponential_decay(0.01, global_step, 2000, 0.95, staircase=True)
 		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss, global_step=global_step)
 
 	def run_session(graph):
@@ -205,7 +205,7 @@ def build_cnn():
 				_, l, predictions = session.run([optimizer, loss, network], feed_dict=feed_dict)
 
 				if (step % 50 == 0):
-					print("train error %g"%session.run(loss, feed_dict=feed_dict))
+					print("train loss %g"%session.run(loss, feed_dict=feed_dict))
 
 				if (step % epochs == 0):
 					print("No dropout accuracy: %.1f%%" % accuracy(session.run(no_dropout, feed_dict=feed_dict), labels))
