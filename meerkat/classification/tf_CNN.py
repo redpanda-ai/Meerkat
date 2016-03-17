@@ -32,7 +32,7 @@ NUM_LABELS = 10
 BATCH_SIZE = 128
 DOC_LENGTH = 123
 RANDOMIZE = 5e-2
-RESHAPE = int(((DOC_LENGTH - 96) / 27) * 256)
+RESHAPE = ((DOC_LENGTH - 96) / 27) * 256
 ALPHABET_LENGTH = len(ALPHABET)
 
 def load_data():
@@ -58,6 +58,16 @@ def load_data():
 	batched = np.array_split(df, math.ceil(df.shape[0] / 129))
 
 	return label_map, batched
+
+def validate_config():
+	"""Validate input configuration"""
+
+	global RESHAPE
+
+	if RESHAPE.is_integer():
+		RESHAPE = int(RESHAPE)
+	else:
+		raise ValueError('DOC_LENGTH - 96 must be divisible by 27: 123, 150, 177, 204...')
 
 def string_to_tensor(str, l):
 	"""Convert transaction to tensor format"""
@@ -194,4 +204,5 @@ def build_cnn():
 	run_session(graph)
 
 if __name__ == "__main__":
+	validate_config()
 	build_cnn()
