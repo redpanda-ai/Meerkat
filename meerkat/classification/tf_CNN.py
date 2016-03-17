@@ -69,10 +69,10 @@ def string_to_tensor(str, l):
 			t[ALPHA_DICT[c]][len(s) - i - 1] = 1
 	return t
 
-def bias_variable(shape, kernel_width, input_frame_size):
+def bias_variable(shape, mult):
 	"""Initialize biases"""
 
-	stdv = 1 / sqrt(kernel_width * input_frame_size)
+	stdv = 1 / sqrt(mult)
 	bias = tf.Variable(tf.random_uniform(shape, minval=-stdv, maxval=stdv), name="B")
 	return bias
 
@@ -94,35 +94,52 @@ def build_cnn():
 		y = tf.placeholder(tf.float32, shape=(BATCH_SIZE, NUM_LABELS))
 		
 		W_conv1 = weight_variable([1, 7, ALPHABET_LENGTH, 256])
-		b_conv1 = bias_variable([256], 7, ALPHABET_LENGTH)
+		b_conv1 = bias_variable([256], 7 * ALPHABET_LENGTH)
 
 		W_conv2 = weight_variable([1, 7, 256, 256])
-		b_conv2 = bias_variable([256], 7, 256)
+		b_conv2 = bias_variable([256], 7 * 256)
 
 		W_conv3 = weight_variable([1, 3, 256, 256])
-		b_conv3 = bias_variable([256], 3, 256)
+		b_conv3 = bias_variable([256], 3 * 256)
 
 		W_conv4 = weight_variable([1, 3, 256, 256])
-		b_conv4 = bias_variable([256], 3, 256)
+		b_conv4 = bias_variable([256], 3 * 256)
 
 		W_conv5 = weight_variable([1, 3, 256, 256])
-		b_conv5 = bias_variable([256], 3, 256)
+		b_conv5 = bias_variable([256], 3 * 256)
 
-		#TODO: ReLU threshold
-		h_conv1 = tf.nn.relu(tf.nn.conv2d(x, W_conv1, [1,1,1,1], padding="VALID") + b_conv1)
-		h_pool1 = tf.nn.max_pool(h_conv1, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
+		W_conv5 = weight_variable([1, 3, 256, 256])
+		b_conv5 = bias_variable([256], 3 * 256)
 
-		h_conv2 = tf.nn.relu(tf.nn.conv2d(h_pool1, W_conv2, [1,1,1,1], padding="VALID") + b_conv2)
-		h_pool2 = tf.nn.max_pool(h_conv2, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
+		W_fc1 = weight_variable([RESHAPE, 1024])
+		b_fc1 = bias_variable([1024], RESHAPE)
 
-		h_conv3 = tf.nn.relu(tf.nn.conv2d(h_pool2, W_conv3, [1,1,1,1], padding="VALID") + b_conv3)
+		def model(data, train=False):
 
-		h_conv4 = tf.nn.relu(tf.nn.conv2d(h_conv3, W_conv4, [1,1,1,1], padding="VALID") + b_conv4)
+			#TODO: ReLU threshold
+			h_conv1 = tf.nn.relu(tf.nn.conv2d(data, W_conv1, [1,1,1,1], padding="VALID") + b_conv1)
+			h_pool1 = tf.nn.max_pool(h_conv1, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
 
-		h_conv5 = tf.nn.relu(tf.nn.conv2d(h_conv4, W_conv5, [1,1,1,1], padding="VALID") + b_conv5)
-		h_pool5 = tf.nn.max_pool(h_conv5, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
+			h_conv2 = tf.nn.relu(tf.nn.conv2d(h_pool1, W_conv2, [1,1,1,1], padding="VALID") + b_conv2)
+			h_pool2 = tf.nn.max_pool(h_conv2, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
 
-		h_reshape = tf.reshape(h_pool5, [BATCH_SIZE, RESHAPE])
+			h_conv3 = tf.nn.relu(tf.nn.conv2d(h_pool2, W_conv3, [1,1,1,1], padding="VALID") + b_conv3)
+
+			h_conv4 = tf.nn.relu(tf.nn.conv2d(h_conv3, W_conv4, [1,1,1,1], padding="VALID") + b_conv4)
+
+			h_conv5 = tf.nn.relu(tf.nn.conv2d(h_conv4, W_conv5, [1,1,1,1], padding="VALID") + b_conv5)
+			h_pool5 = tf.nn.max_pool(h_conv5, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
+
+			h_reshape = tf.reshape(h_pool5, [BATCH_SIZE, RESHAPE])
+
+			h_fc1 = tf.nn.relu(tf.matmul(h_reshape, W_fc1) + b_fc1)
+
+			if train:
+				h_fc1 = tf.nn.dropout(h_fc1, 0.5)
+
+			return h_fc1
+
+		network = model(x, train=True)
 
 	def run_session(graph):
 		"""Run Session"""
@@ -151,13 +168,7 @@ def build_cnn():
 
 				feed_dict = {x : trans, y : labels}
 
-				print(session.run(h_conv1, feed_dict=feed_dict).shape)
-				print(session.run(h_pool1, feed_dict=feed_dict).shape)
-				print(session.run(h_pool2, feed_dict=feed_dict).shape)
-				print(session.run(h_conv3, feed_dict=feed_dict).shape)
-				print(session.run(h_conv4, feed_dict=feed_dict).shape)
-				print(session.run(h_pool5, feed_dict=feed_dict).shape)
-				print(session.run(h_reshape, feed_dict=feed_dict).shape)
+				print(session.run(network, feed_dict=feed_dict).shape)
 
 				if (step % epochs == 0):
 
