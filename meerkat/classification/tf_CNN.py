@@ -140,7 +140,9 @@ def build_cnn():
 			if train:
 				h_fc1 = tf.nn.dropout(h_fc1, 0.5)
 
-			network = tf.log(tf.nn.softmax(tf.matmul(h_fc1, W_fc2) + b_fc2))
+			h_fc2 = tf.matmul(h_fc1, W_fc2) + b_fc2
+
+			network = tf.log(tf.nn.softmax(h_fc2))
 
 			return network
 
@@ -173,7 +175,7 @@ def build_cnn():
 
 				feed_dict = {x : trans, y : labels}
 
-				print(session.run(network, feed_dict=feed_dict).shape)
+				print(session.run(network, feed_dict=feed_dict))
 
 				if (step % epochs == 0):
 
