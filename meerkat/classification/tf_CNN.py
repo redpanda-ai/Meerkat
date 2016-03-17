@@ -61,7 +61,6 @@ def load_data():
 
 def string_to_tensor(str, l):
 	"""Convert transaction to tensor format"""
-
 	s = str.lower()[0:l]
 	t = np.zeros((len(ALPHABET), l), dtype=np.float32)
 	for i, c in reversed(list(enumerate(s))):
@@ -71,16 +70,24 @@ def string_to_tensor(str, l):
 
 def bias_variable(shape, mult):
 	"""Initialize biases"""
-
 	stdv = 1 / sqrt(mult)
 	bias = tf.Variable(tf.random_uniform(shape, minval=-stdv, maxval=stdv), name="B")
 	return bias
 
 def weight_variable(shape):
 	"""Initialize weights"""
-
 	weight = tf.Variable(tf.mul(tf.random_normal(shape), RANDOMIZE), name="W")
 	return weight
+
+def conv2d(x, W):
+	"""Create convolutional layer"""
+	layer = tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='VALID')
+	return layer
+
+def max_pool(x):
+	"""Create max pooling layer"""
+	layer = tf.nn.max_pool(x, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
+	return layer
 
 def build_cnn():
 	"""Build CNN"""
@@ -120,18 +127,18 @@ def build_cnn():
 		def model(data, train=False):
 
 			#TODO: ReLU threshold
-			h_conv1 = tf.nn.relu(tf.nn.conv2d(data, W_conv1, [1,1,1,1], padding="VALID") + b_conv1)
-			h_pool1 = tf.nn.max_pool(h_conv1, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
+			h_conv1 = tf.nn.relu(conv2d(data, W_conv1) + b_conv1)
+			h_pool1 = max_pool(h_conv1)
 
-			h_conv2 = tf.nn.relu(tf.nn.conv2d(h_pool1, W_conv2, [1,1,1,1], padding="VALID") + b_conv2)
-			h_pool2 = tf.nn.max_pool(h_conv2, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
+			h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
+			h_pool2 = max_pool(h_conv2)
 
-			h_conv3 = tf.nn.relu(tf.nn.conv2d(h_pool2, W_conv3, [1,1,1,1], padding="VALID") + b_conv3)
+			h_conv3 = tf.nn.relu(conv2d(h_pool2, W_conv3) + b_conv3)
 
-			h_conv4 = tf.nn.relu(tf.nn.conv2d(h_conv3, W_conv4, [1,1,1,1], padding="VALID") + b_conv4)
+			h_conv4 = tf.nn.relu(conv2d(h_conv3, W_conv4) + b_conv4)
 
-			h_conv5 = tf.nn.relu(tf.nn.conv2d(h_conv4, W_conv5, [1,1,1,1], padding="VALID") + b_conv5)
-			h_pool5 = tf.nn.max_pool(h_conv5, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
+			h_conv5 = tf.nn.relu(conv2d(h_conv4, W_conv5) + b_conv5)
+			h_pool5 = max_pool(h_conv5)
 
 			h_reshape = tf.reshape(h_pool5, [BATCH_SIZE, RESHAPE])
 
