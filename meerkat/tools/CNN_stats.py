@@ -45,7 +45,7 @@ import json
 import os
 import argparse
 import numpy as np
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 from pylab import *
 
 from meerkat.classification.lua_bridge import get_cnn_by_path
@@ -144,15 +144,25 @@ def get_write_func(filename, header):
 def plot_confusion_matrix(con_matrix):
 	"""Plot the confusion matrix"""
 	norm_matrix = []
+
 	for i in con_matrix:
-		temp_matrix = []
 		sum_of_each_list = sum(i)
 
-		for j in i:
-			temp_matrix.append(float(j) / float(sum_of_each_list))
-		norm_matrix.append(temp_matrix)
+		if sum_of_each_list == 0:
+			norm_matrix.append(i)
+		else:
+			temp_matrix = []
+			for j in i:
+				temp_matrix.append(float(j) / float(sum_of_each_list))
+			norm_matrix.append(temp_matrix)
 
-	return norm_matrix
+	plt.clf()
+	fig = plt.figure()
+	ax = fig.add_subplot(111)
+	res = ax.imshow(array(norm_matrix), cmap=cm.jet, interpolation='nearest')
+
+	cb = fig.colorbar(res)
+	savefig("/data/CNN_stats/confusion_matrix.png", format="png")
 
 	# Main
 def main_process(args):
@@ -243,17 +253,6 @@ def main_process(args):
 	# Calculate f_measure, recall, precision, false +/-, true +/- from confusion maxtrix
 	true_positive = pd.DataFrame([confusion_matrix[i][i] for i in range(num_labels)])
 
-	print("End of strulling")
-	print("Here we have a test matrix")
-	test_matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-	print(test_matrix)
-
-	print(plot_confusion_matrix(test_matrix))
-
-	real_confusion_matrix = []
-	for i in range(num_labels):
-		real_confusion_matrix.append(confusion_matrix[i][0:-1])
-
 	conf_mat = pd.DataFrame(confusion_matrix)
 	actual = pd.DataFrame(conf_mat.sum(axis=1))
 	recall = true_positive / actual
@@ -268,6 +267,18 @@ def main_process(args):
 
 	f_measure = (2 * precision * recall) / (precision + recall)
 	f_measure = np.round(f_measure, decimals=4)
+
+	print("Here we have a test matrix for matrix plot")
+	test_matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+	print(test_matrix)
+	plot_confusion_matrix(test_matrix)
+
+
+	real_confusion_matrix = []
+	for i in range(num_labels):
+		real_confusion_matrix.append(confusion_matrix[i][0:-1])
+	plot_confusion_matrix(real_confusion_matrix)
+
 
 	false_negative = actual - true_positive - unpredicted
 	label = pd.DataFrame(label_map, index=[0]).transpose()
