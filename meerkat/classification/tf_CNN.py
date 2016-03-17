@@ -114,6 +114,9 @@ def build_cnn():
 		W_fc1 = weight_variable([RESHAPE, 1024])
 		b_fc1 = bias_variable([1024], RESHAPE)
 
+		W_fc2 = weight_variable([1024, NUM_LABELS])
+		b_fc2 = bias_variable([NUM_LABELS], 1024)
+
 		def model(data, train=False):
 
 			#TODO: ReLU threshold
@@ -137,7 +140,9 @@ def build_cnn():
 			if train:
 				h_fc1 = tf.nn.dropout(h_fc1, 0.5)
 
-			return h_fc1
+			network = tf.log(tf.nn.softmax(tf.matmul(h_fc1, W_fc2) + b_fc2))
+
+			return network
 
 		network = model(x, train=True)
 
