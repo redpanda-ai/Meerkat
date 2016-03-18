@@ -270,7 +270,8 @@ def build_cnn():
 				if (step != 0 and step % epochs == 0):
 
 					print("gradients: ")
-					print(session.run(gradients))
+					for grad in gradients:
+						print(grad.eval(feed_dict=feed_dict))
 
 					print("Testing for era %d" % (step / epochs))
 					print("Learning rate at epoch %d: %g" % (step + 1, session.run(learning_rate)))
