@@ -58,13 +58,13 @@ def load_data():
 
 	global NUM_LABELS
 
-	label_map = "card_credit_subtype_label_map.json"
+	label_map = sys.argv[2]
 	label_map = load_json(label_map)
 	NUM_LABELS = len(label_map.keys())
 	reversed_map = reverse_map(label_map)
 	a = lambda x: reversed_map.get(str(x["PROPOSED_SUBTYPE"]), "")
 
-	input_file = "Card_complete_data_subtype_original_updated_credit.csv"
+	input_file = sys.argv[1]
 	df = pd.read_csv(input_file, quoting=csv.QUOTE_NONE, na_filter=False, encoding="utf-8", sep='|', error_bad_lines=False)
 
 	df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
