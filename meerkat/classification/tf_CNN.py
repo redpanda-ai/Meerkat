@@ -42,6 +42,16 @@ def chunks(l, n):
     n = max(1, n)
     return [l[i:i + n] for i in range(0, len(l), n)]
 
+def validate_config():
+	"""Validate input configuration"""
+
+	global RESHAPE
+
+	if RESHAPE.is_integer():
+		RESHAPE = int(RESHAPE)
+	else:
+		raise ValueError('DOC_LENGTH - 96 must be divisible by 27: 123, 150, 177, 204...')
+
 def load_data():
 	"""Load data and label map"""
 
@@ -81,36 +91,31 @@ def evaluate_testset(x, y, test, chunked_test, no_dropout, session):
 		batch_length = len(batch_test)
 		if batch_length != 128: continue
 
-		labels_test = np.array(batch_test["LABEL_NUM"].astype(int))
-		labels_test = (np.arange(NUM_LABELS) == labels_test[:,None]).astype(np.float32)
-		docs_test = batch_test["DESCRIPTION_UNMASKED"].tolist()
-		trans_test = np.zeros(shape=(batch_length, 1, ALPHABET_LENGTH, DOC_LENGTH))
-
-		for i, t in enumerate(docs_test):
-			trans_test[i][0] = string_to_tensor(t, DOC_LENGTH)
-		
-		trans_test = np.transpose(trans_test, (0, 1, 3, 2))
+		trans_test, labels_test = batch_to_tensor(batch_test)
 		feed_dict_test = {x: trans_test}
 		output = session.run(no_dropout, feed_dict=feed_dict_test)
 
 		batch_correct_count = np.sum(np.argmax(output, 1) == np.argmax(labels_test, 1))
 
 		correct_count += batch_correct_count
-		total_count += batch_length
+		total_count += BATCH_SIZE
 	
 	test_accuracy = 100.0 * (correct_count / total_count)
 	print("Test accuracy: %.1f%%" % test_accuracy)
 	print("Correct count: " + str(correct_count))
 
-def validate_config():
-	"""Validate input configuration"""
+def batch_to_tensor(batch):
+	"""Convert a batch to a tensor representation"""
 
-	global RESHAPE
+	labels = np.array(batch["LABEL_NUM"].astype(int))
+	labels = (np.arange(NUM_LABELS) == labels[:,None]).astype(np.float32)
+	docs = batch["DESCRIPTION_UNMASKED"].tolist()
+	trans = np.zeros(shape=(BATCH_SIZE, 1, ALPHABET_LENGTH, DOC_LENGTH))
+	for i, t in enumerate(docs):
+		trans[i][0] = string_to_tensor(t, DOC_LENGTH)
 
-	if RESHAPE.is_integer():
-		RESHAPE = int(RESHAPE)
-	else:
-		raise ValueError('DOC_LENGTH - 96 must be divisible by 27: 123, 150, 177, 204...')
+	trans = np.transpose(trans, (0, 1, 3, 2))
+	return trans, labels
 
 def string_to_tensor(str, l):
 	"""Convert transaction to tensor format"""
@@ -211,7 +216,7 @@ def build_cnn():
 
 		loss = -tf.reduce_mean(tf.reduce_sum(network * y, 1))
 		global_step = tf.Variable(0, trainable=False)
-		learning_rate = tf.train.exponential_decay(0.01, global_step, 2000, 0.95, staircase=True) # TODO ensure correct learning rates 
+		learning_rate = tf.train.exponential_decay(0.01, global_step, 5000, 0.95, staircase=True) # TODO ensure correct learning rates 
 		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss, global_step=global_step)
 
 	def run_session(graph):
@@ -230,14 +235,7 @@ def build_cnn():
 			for step in range(50000):
 
 				batch = train.loc[np.random.choice(train.index, 128)]
-				labels = np.array(batch["LABEL_NUM"].astype(int))
-				labels = (np.arange(NUM_LABELS) == labels[:,None]).astype(np.float32)
-				docs = batch["DESCRIPTION_UNMASKED"].tolist()
-				trans = np.zeros(shape=(BATCH_SIZE, 1, ALPHABET_LENGTH, DOC_LENGTH))
-				for i, t in enumerate(docs):
-					trans[i][0] = string_to_tensor(t, DOC_LENGTH)
-				# TODO explore need for transpose
-				trans = np.transpose(trans, (0, 1, 3, 2))
+				trans, labels = batch_to_tensor(batch)
 
 				feed_dict = {x : trans, y : labels}
 
