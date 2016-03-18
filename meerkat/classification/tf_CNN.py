@@ -38,6 +38,10 @@ ALPHABET_LENGTH = len(ALPHABET)
 def accuracy(predictions, labels):
 	return (100.0 * np.sum(np.argmax(predictions, 1) == np.argmax(labels, 1)) / predictions.shape[0])
 
+def chunks(l, n):
+    n = max(1, n)
+    return [l[i:i + n] for i in range(0, len(l), n)]
+
 def load_data():
 	"""Load data and label map"""
 
@@ -58,7 +62,12 @@ def load_data():
 	df["LABEL_NUM"] = df.apply(a, axis=1)
 	df = df[df["LABEL_NUM"] != ""]
 
-	return label_map, df
+	msk = np.random.rand(len(df)) < 0.90
+	train = df[msk]
+	test = df[~msk]
+
+	chunked_test = chunks(np.array(test.index), 128)
+	return label_map, train, test, chunked_test
 
 def validate_config():
 	"""Validate input configuration"""
@@ -176,7 +185,7 @@ def build_cnn():
 		"""Run Session"""
 
 		# Train Network
-		label_map, df = load_data()
+		label_map, train, test, chunked_test = load_data()
 		epochs = 500
 		eras = 10
 
@@ -187,7 +196,7 @@ def build_cnn():
 
 			for step in range(50000):
 
-				batch = df.loc[np.random.choice(df.index, 128)]
+				batch = train.loc[np.random.choice(train.index, 128)]
 				labels = np.array(batch["LABEL_NUM"].astype(int))
 				labels = (np.arange(NUM_LABELS) == labels[:,None]).astype(np.float32)
 				docs = batch["DESCRIPTION_UNMASKED"].tolist()
@@ -207,6 +216,30 @@ def build_cnn():
 				if (step % epochs == 0):
 					print("No dropout accuracy: %.1f%%" % accuracy(session.run(no_dropout, feed_dict=feed_dict), labels))
 					print("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
+
+					test_accuracy = 0
+					total_test_size = 0
+					for i in range(len(chunked_test)):
+						batch_test = test.loc[chunked_test[i]]
+						batch_test_size = len(batch_test)
+						print(batch_test_size)
+						if batch_test_size != 128:
+							continue
+						labels_test = np.array(batch_test["LABEL_NUM"].astype(int))
+						labels_test = (np.arange(NUM_LABELS) == labels_test[:,None]).astype(np.float32)
+						docs_test = batch_test["DESCRIPTION_UNMASKED"].tolist()
+						trans_test = np.zeros(shape=(batch_test_size, 1, ALPHABET_LENGTH, DOC_LENGTH))
+						for i, t in enumerate(docs_test):
+							trans_test[i][0] = string_to_tensor(t, DOC_LENGTH)
+						trans_test = np.transpose(trans_test, (0, 1, 3, 2))
+
+						feed_dict_test = {x: trans_test, y: labels_test}
+						batch_test_accuracy = accuracy(session.run(no_dropout, feed_dict=feed_dict_test), labels_test)
+
+						updated_total_test_size = total_test_size + batch_test_size
+						test_accuracy = test_accuracy * (total_test_size / updated_total_test_size) + \
+							batch_test_accuracy * (batch_test_size / updated_total_test_size)
+					print("Test accuracy: %.1f%%" % test_accuracy)
 
 	# Run Graph
 	run_session(graph)
