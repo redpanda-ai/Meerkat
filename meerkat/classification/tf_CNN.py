@@ -116,16 +116,20 @@ def fully_random_batching(df):
 	"""Batch from train data using fully random batching"""
 	return df.loc[np.random.choice(df.index, 128)]
 
-def equal_class_batching(df):
+def equal_class_batching(df, groups_train):
 	"""Batch from train data using equal class batching"""
-	grouped = df.groupby('LABEL_NUM', as_index=False)
-	groups = dict(list(grouped))
 	batch = pd.DataFrame()
 	for i in range(BATCH_SIZE):
 		label = random.randint(1, NUM_LABELS)
-		select_group = groups[str(label)]
+		select_group = groups_train[str(label)]
 		batch = batch.append(select_group.loc[np.random.choice(select_group.index, 1)])
 	return batch
+
+def group_by_label_num(df):
+	"""Group data frame by label number"""
+	grouped = df.groupby('LABEL_NUM', as_index=False)
+	groups = dict(list(grouped))
+	return groups
 
 def batch_to_tensor(batch):
 	"""Convert a batch to a tensor representation"""
@@ -176,6 +180,7 @@ def build_cnn():
 
 	graph = tf.Graph()
 	label_map, train, test, chunked_test = load_data()
+	groups_train = group_by_label_num(train)
 
 	# Create Graph
 	with graph.as_default():
@@ -257,7 +262,7 @@ def build_cnn():
 			sampling_flag = False
 
 			for step in range(50000):
-				batch = fully_random_batching(train) if sampling_flag else equal_class_batching(train)
+				batch = fully_random_batching(train) if sampling_flag else equal_class_batching(train, groups_train)
 				sampling_flag = not sampling_flag
 
 				trans, labels = batch_to_tensor(batch)
