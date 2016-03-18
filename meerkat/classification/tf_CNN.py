@@ -43,6 +43,9 @@ def chunks(l, n):
     n = max(1, n)
     return [l[i:i + n] for i in range(0, len(l), n)]
 
+def threshold(tensor):
+	return tf.mul(tf.to_float(tf.greater_equal(tensor, 1e-6)), tensor)
+
 def validate_config():
 	"""Validate input configuration"""
 
@@ -70,7 +73,7 @@ def load_data():
 	df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
 	grouped = df.groupby('LEDGER_ENTRY', as_index=False)
 	groups = dict(list(grouped))
-	df = groups["credit"]
+	df = groups["debit"]
 	df["DESCRIPTION_UNMASKED"] = df.apply(fill_description_unmasked, axis=1)
 	df = df.reindex(np.random.permutation(df.index))
 	df["LABEL_NUM"] = df.apply(a, axis=1)
@@ -190,23 +193,22 @@ def build_cnn():
 
 		def model(data, train=False):
 
-			#TODO: ReLU threshold
-			h_conv1 = tf.nn.relu(conv2d(data, W_conv1) + b_conv1)
+			h_conv1 = threshold(conv2d(data, W_conv1) + b_conv1)
 			h_pool1 = max_pool(h_conv1)
 
-			h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
+			h_conv2 = threshold(conv2d(h_pool1, W_conv2) + b_conv2)
 			h_pool2 = max_pool(h_conv2)
 
-			h_conv3 = tf.nn.relu(conv2d(h_pool2, W_conv3) + b_conv3)
+			h_conv3 = threshold(conv2d(h_pool2, W_conv3) + b_conv3)
 
-			h_conv4 = tf.nn.relu(conv2d(h_conv3, W_conv4) + b_conv4)
+			h_conv4 = threshold(conv2d(h_conv3, W_conv4) + b_conv4)
 
-			h_conv5 = tf.nn.relu(conv2d(h_conv4, W_conv5) + b_conv5)
+			h_conv5 = threshold(conv2d(h_conv4, W_conv5) + b_conv5)
 			h_pool5 = max_pool(h_conv5)
 
 			h_reshape = tf.reshape(h_pool5, [BATCH_SIZE, RESHAPE])
 
-			h_fc1 = tf.nn.relu(tf.matmul(h_reshape, W_fc1) + b_fc1)
+			h_fc1 = threshold(tf.matmul(h_reshape, W_fc1) + b_fc1)
 
 			if train:
 				h_fc1 = tf.nn.dropout(h_fc1, 0.5)
@@ -251,6 +253,7 @@ def build_cnn():
 
 				if (step != 0 and step % epochs == 0):
 					print("Testing for era %d" % (step / epochs))
+					print("Learning rate at epoch %d: %g" % (step + 1, session.run(learning_rate)))
 					print("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
 					evaluate_testset(x, y, test, chunked_test, no_dropout, session)
 
