@@ -34,6 +34,7 @@ BATCH_SIZE = 128
 DOC_LENGTH = 123
 RANDOMIZE = 5e-2
 BASE_RATE = 1e-2 * math.sqrt(BATCH_SIZE) / math.sqrt(128)
+DECAY = 1e-5
 RESHAPE = ((DOC_LENGTH - 96) / 27) * 256
 ALPHABET_LENGTH = len(ALPHABET)
 
@@ -263,7 +264,13 @@ def build_cnn():
 				_, predictions = session.run([optimizer, network], feed_dict=feed_dict)
 
 				if (step % 50 == 0):
-					print("train loss at epoch %d: %g" % (step + 1, session.run(loss, feed_dict=feed_dict)))
+					loss_val = session.run(loss, feed_dict=feed_dict)
+					print("train loss at epoch %d: %g" % (step + 1, loss_val))
+					if np.isnan(loss_val):
+						print("Output when NaN: ")
+						print(predictions)
+						print("Layer 5 weights: ")
+						print(session.run(W_conv5))
 
 				if (step != 0 and step % epochs == 0):
 					print("Testing for era %d" % (step / epochs))
@@ -272,7 +279,7 @@ def build_cnn():
 					evaluate_testset(x, y, test, chunked_test, no_dropout, session)
 
 				if (step != 0 and step % 15000 == 0):
-					sess.run(learning_rate.assign(learning_rate / 2))
+					session.run(learning_rate.assign(learning_rate / 2))
 
 	# Run Graph
 	run_session(graph)
