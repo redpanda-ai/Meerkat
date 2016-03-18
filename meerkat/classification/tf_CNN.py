@@ -176,6 +176,7 @@ def build_cnn():
 
 	graph = tf.Graph()
 	label_map, train, test, groups_train, chunked_test = load_data()
+	weights = {}
 
 	# Create Graph
 	with graph.as_default():
@@ -185,53 +186,50 @@ def build_cnn():
 		x = tf.placeholder(tf.float32, shape=[BATCH_SIZE, 1, DOC_LENGTH, ALPHABET_LENGTH])
 		y = tf.placeholder(tf.float32, shape=(BATCH_SIZE, NUM_LABELS))
 		
-		W_conv1 = weight_variable([1, 7, ALPHABET_LENGTH, 256])
+		weights["W_conv1"] = weight_variable([1, 7, ALPHABET_LENGTH, 256])
 		b_conv1 = bias_variable([256], 7 * ALPHABET_LENGTH)
 
-		W_conv2 = weight_variable([1, 7, 256, 256])
+		weights["W_conv2"] = weight_variable([1, 7, 256, 256])
 		b_conv2 = bias_variable([256], 7 * 256)
 
-		W_conv3 = weight_variable([1, 3, 256, 256])
+		weights["W_conv3"] = weight_variable([1, 3, 256, 256])
 		b_conv3 = bias_variable([256], 3 * 256)
 
-		W_conv4 = weight_variable([1, 3, 256, 256])
+		weights["W_conv4"] = weight_variable([1, 3, 256, 256])
 		b_conv4 = bias_variable([256], 3 * 256)
 
-		W_conv5 = weight_variable([1, 3, 256, 256])
+		weights["W_conv5"] = weight_variable([1, 3, 256, 256])
 		b_conv5 = bias_variable([256], 3 * 256)
 
-		W_conv5 = weight_variable([1, 3, 256, 256])
-		b_conv5 = bias_variable([256], 3 * 256)
-
-		W_fc1 = weight_variable([RESHAPE, 1024])
+		weights["W_fc1"] = weight_variable([RESHAPE, 1024])
 		b_fc1 = bias_variable([1024], RESHAPE)
 
-		W_fc2 = weight_variable([1024, NUM_LABELS])
+		weights["W_fc2"] = weight_variable([1024, NUM_LABELS])
 		b_fc2 = bias_variable([NUM_LABELS], 1024)
 
 		def model(data, train=False):
 
-			h_conv1 = threshold(conv2d(data, W_conv1) + b_conv1)
+			h_conv1 = threshold(conv2d(data, weights["W_conv1"]) + b_conv1)
 			h_pool1 = max_pool(h_conv1)
 
-			h_conv2 = threshold(conv2d(h_pool1, W_conv2) + b_conv2)
+			h_conv2 = threshold(conv2d(h_pool1, weights["W_conv2"]) + b_conv2)
 			h_pool2 = max_pool(h_conv2)
 
-			h_conv3 = threshold(conv2d(h_pool2, W_conv3) + b_conv3)
+			h_conv3 = threshold(conv2d(h_pool2, weights["W_conv3"]) + b_conv3)
 
-			h_conv4 = threshold(conv2d(h_conv3, W_conv4) + b_conv4)
+			h_conv4 = threshold(conv2d(h_conv3, weights["W_conv4"]) + b_conv4)
 
-			h_conv5 = threshold(conv2d(h_conv4, W_conv5) + b_conv5)
+			h_conv5 = threshold(conv2d(h_conv4, weights["W_conv5"]) + b_conv5)
 			h_pool5 = max_pool(h_conv5)
 
 			h_reshape = tf.reshape(h_pool5, [BATCH_SIZE, RESHAPE])
 
-			h_fc1 = threshold(tf.matmul(h_reshape, W_fc1) + b_fc1)
+			h_fc1 = threshold(tf.matmul(h_reshape, weights["W_fc1"]) + b_fc1)
 
 			if train:
 				h_fc1 = tf.nn.dropout(h_fc1, 0.5)
 
-			h_fc2 = tf.matmul(h_fc1, W_fc2) + b_fc2
+			h_fc2 = tf.matmul(h_fc1, weights["W_fc2"]) + b_fc2
 
 			network = tf.log(tf.nn.softmax(h_fc2))
 
@@ -242,6 +240,9 @@ def build_cnn():
 
 		loss = -tf.reduce_mean(tf.reduce_sum(network * y, 1))
 		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss)
+
+		params = tf.trainable_variables()
+		gradients = tf.gradients(loss, params)
 
 	def run_session(graph):
 		"""Run Session"""
@@ -264,15 +265,13 @@ def build_cnn():
 				_, predictions = session.run([optimizer, network], feed_dict=feed_dict)
 
 				if (step % 50 == 0):
-					loss_val = session.run(loss, feed_dict=feed_dict)
-					print("train loss at epoch %d: %g" % (step + 1, loss_val))
-					if np.isnan(loss_val):
-						print("Output when NaN: ")
-						print(predictions)
-						print("Layer 5 weights: ")
-						print(session.run(W_conv5))
+					print("train loss at epoch %d: %g" % (step + 1, session.run(loss, feed_dict=feed_dict)))						
 
 				if (step != 0 and step % epochs == 0):
+
+					print("gradients: ")
+					print(session.run(gradients))
+
 					print("Testing for era %d" % (step / epochs))
 					print("Learning rate at epoch %d: %g" % (step + 1, session.run(learning_rate)))
 					print("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
