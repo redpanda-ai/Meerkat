@@ -84,8 +84,11 @@ def load_data():
 	train = df[msk]
 	test = df[~msk]
 
+	grouped_train = train.groupby('LABEL_NUM', as_index=False)
+	groups_train = dict(list(grouped_train))
+
 	chunked_test = chunks(np.array(test.index), 128)
-	return label_map, train, test, chunked_test
+	return label_map, train, test, groups_train, chunked_test
 
 def evaluate_testset(x, y, test, chunked_test, no_dropout, session):
 	"""Check error on test set"""
@@ -124,12 +127,6 @@ def equal_class_batching(df, groups_train):
 		select_group = groups_train[str(label)]
 		batch = batch.append(select_group.loc[np.random.choice(select_group.index, 1)])
 	return batch
-
-def group_by_label_num(df):
-	"""Group data frame by label number"""
-	grouped = df.groupby('LABEL_NUM', as_index=False)
-	groups = dict(list(grouped))
-	return groups
 
 def batch_to_tensor(batch):
 	"""Convert a batch to a tensor representation"""
@@ -179,8 +176,7 @@ def build_cnn():
 	"""Build CNN"""
 
 	graph = tf.Graph()
-	label_map, train, test, chunked_test = load_data()
-	groups_train = group_by_label_num(train)
+	label_map, train, test, groups_train, chunked_test = load_data()
 
 	# Create Graph
 	with graph.as_default():
