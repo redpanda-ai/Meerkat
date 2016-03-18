@@ -69,6 +69,20 @@ def load_data():
 	chunked_test = chunks(np.array(test.index), 128)
 	return label_map, train, test, chunked_test
 
+def extract_trans_and_labels(batch):
+	"""Get a batch of transactions and labels with correct type"""
+	labels = np.array(batch["LABEL_NUM"].astype(int))
+	labels = (np.arange(NUM_LABELS) == labels[:,None]).astype(np.float32)
+	docs = batch["DESCRIPTION_UNMASKED"].tolist()
+	trans = np.zeros(shape=(BATCH_SIZE, 1, ALPHABET_LENGTH, DOC_LENGTH))
+
+	for i, t in enumerate(docs):
+		trans[i][0] = string_to_tensor(t, DOC_LENGTH)
+
+	# TODO explore need for transpose
+	trans = np.transpose(trans, (0, 1, 3, 2))
+	return trans, labels
+
 def evaluate_testset(x, y, test, chunked_test, no_dropout, session):
 	"""Check error on test set"""
 
@@ -81,15 +95,8 @@ def evaluate_testset(x, y, test, chunked_test, no_dropout, session):
 		batch_length = len(batch_test)
 		if batch_length != 128: continue
 
-		labels_test = np.array(batch_test["LABEL_NUM"].astype(int))
-		labels_test = (np.arange(NUM_LABELS) == labels_test[:,None]).astype(np.float32)
-		docs_test = batch_test["DESCRIPTION_UNMASKED"].tolist()
-		trans_test = np.zeros(shape=(batch_length, 1, ALPHABET_LENGTH, DOC_LENGTH))
+		trans_test, labels_test = extract_trans_and_labels(batch_test)
 
-		for i, t in enumerate(docs_test):
-			trans_test[i][0] = string_to_tensor(t, DOC_LENGTH)
-		
-		trans_test = np.transpose(trans_test, (0, 1, 3, 2))
 		feed_dict_test = {x: trans_test}
 		output = session.run(no_dropout, feed_dict=feed_dict_test)
 
@@ -230,14 +237,7 @@ def build_cnn():
 			for step in range(50000):
 
 				batch = train.loc[np.random.choice(train.index, 128)]
-				labels = np.array(batch["LABEL_NUM"].astype(int))
-				labels = (np.arange(NUM_LABELS) == labels[:,None]).astype(np.float32)
-				docs = batch["DESCRIPTION_UNMASKED"].tolist()
-				trans = np.zeros(shape=(BATCH_SIZE, 1, ALPHABET_LENGTH, DOC_LENGTH))
-				for i, t in enumerate(docs):
-					trans[i][0] = string_to_tensor(t, DOC_LENGTH)
-				# TODO explore need for transpose
-				trans = np.transpose(trans, (0, 1, 3, 2))
+				trans, labels = extract_trans_and_labels(batch)
 
 				feed_dict = {x : trans, y : labels}
 
