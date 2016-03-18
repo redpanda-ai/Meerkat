@@ -244,9 +244,10 @@ def build_cnn():
 				_, predictions = session.run([optimizer, network], feed_dict=feed_dict)
 
 				if (step % 50 == 0):
-					print("train loss %g"%session.run(loss, feed_dict=feed_dict))
+					print("train loss at epoch %d: %g" % (step + 1, session.run(loss, feed_dict=feed_dict)))
 
-				if (step % epochs == 0):
+				if (step != 0 and step % epochs == 0):
+					print("Testing for era %d" % (step / epochs))
 					print("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
 					evaluate_testset(x, y, test, chunked_test, no_dropout, session)
 
