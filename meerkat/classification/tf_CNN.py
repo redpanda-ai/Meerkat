@@ -9,8 +9,8 @@ Created on Mar 14, 2016
 
 #################### USAGE #######################
 
-# python3 -m meerkat.classification.tf_CNN [data] [label_map]
-# python3 -m meerkat.classification.tf_CNN Card_complete_data_subtype_original_updated_credit.csv card_credit_subtype_label_map.json
+# python3 -m meerkat.classification.tf_CNN [data] [label_map] [debit_or_credit]
+# python3 -m meerkat.classification.tf_CNN Card_complete_data_subtype_original_updated_credit.csv card_credit_subtype_label_map.json credit
 
 ##################################################
 
@@ -73,7 +73,7 @@ def load_data():
 	df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
 	grouped = df.groupby('LEDGER_ENTRY', as_index=False)
 	groups = dict(list(grouped))
-	df = groups["debit"]
+	df = groups[sys.argv[3]]
 	df["DESCRIPTION_UNMASKED"] = df.apply(fill_description_unmasked, axis=1)
 	df = df.reindex(np.random.permutation(df.index))
 	df["LABEL_NUM"] = df.apply(a, axis=1)
