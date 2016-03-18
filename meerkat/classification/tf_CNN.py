@@ -33,6 +33,7 @@ NUM_LABELS = 0
 BATCH_SIZE = 128
 DOC_LENGTH = 123
 RANDOMIZE = 5e-2
+BASE_RATE = 1e-2 * math.sqrt(BATCH_SIZE) / math.sqrt(128)
 RESHAPE = ((DOC_LENGTH - 96) / 27) * 256
 ALPHABET_LENGTH = len(ALPHABET)
 
@@ -239,7 +240,7 @@ def build_cnn():
 
 		loss = -tf.reduce_mean(tf.reduce_sum(network * y, 1))
 		global_step = tf.Variable(0, trainable=False)
-		learning_rate = tf.train.exponential_decay(0.01, global_step, 5000, 0.95, staircase=True) # TODO ensure correct learning rates 
+		learning_rate = tf.Variable(BASE_RATE, trainable=False) 
 		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss, global_step=global_step)
 
 	def run_session(graph):
@@ -273,6 +274,9 @@ def build_cnn():
 					print("Learning rate at epoch %d: %g" % (step + 1, session.run(learning_rate)))
 					print("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
 					evaluate_testset(x, y, test, chunked_test, no_dropout, session)
+
+				if (step != 0 and step % 15000 == 0):
+					sess.run(learning_rate.assign(learning_rate / 2))
 
 	# Run Graph
 	run_session(graph)
