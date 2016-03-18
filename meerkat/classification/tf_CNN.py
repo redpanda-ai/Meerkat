@@ -169,10 +169,9 @@ def build_cnn():
 		network = model(x, train=True)
 		no_dropout = model(x, train=False)
 
-		# Completely Speculative Training Code
 		loss = -tf.reduce_mean(tf.reduce_sum(network * y, 1))
 		global_step = tf.Variable(0, trainable=False)
-		learning_rate = tf.train.exponential_decay(0.01, global_step, 2000, 0.95, staircase=True)
+		learning_rate = tf.train.exponential_decay(0.01, global_step, 2000, 0.95, staircase=True) # TODO ensure correct learning rates 
 		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss, global_step=global_step)
 
 	def run_session(graph):
