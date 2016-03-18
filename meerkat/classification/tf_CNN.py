@@ -115,14 +115,11 @@ def evaluate_testset(x, y, test, chunked_test, no_dropout, session):
 	print("Test accuracy: %.1f%%" % test_accuracy)
 	print("Correct count: " + str(correct_count))
 
-def fully_random_batching(df):
-	"""Batch from train data using fully random batching"""
-	return df.loc[np.random.choice(df.index, 128)]
-
-def equal_class_batching(df, groups_train):
+def mixed_batching(df, groups_train):
 	"""Batch from train data using equal class batching"""
-	indices_to_sample = []
-	for i in range(BATCH_SIZE):
+	half_batch = int(BATCH_SIZE / 2)
+	indices_to_sample = list(np.random.choice(df.index, half_batch))
+	for i in range(half_batch):
 		label = random.randint(1, NUM_LABELS)
 		select_group = groups_train[str(label)]
 		indices_to_sample.append(np.random.choice(select_group.index, 1)[0])
@@ -256,14 +253,11 @@ def build_cnn():
 
 			tf.initialize_all_variables().run()
 			num_eras = epochs * eras
-			sampling_flag = False
 
 			for step in range(50000):
-				batch = fully_random_batching(train) if sampling_flag else equal_class_batching(train, groups_train)
-				sampling_flag = not sampling_flag
 
+				batch = mixed_batching(train)
 				trans, labels = batch_to_tensor(batch)
-
 				feed_dict = {x : trans, y : labels}
 
 				_, predictions = session.run([optimizer, network], feed_dict=feed_dict)
