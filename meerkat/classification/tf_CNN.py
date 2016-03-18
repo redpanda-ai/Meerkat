@@ -58,9 +58,7 @@ def load_data():
 	df["LABEL_NUM"] = df.apply(a, axis=1)
 	df = df[df["LABEL_NUM"] != ""]
 
-	batched = np.array_split(df, math.ceil(df.shape[0] / 129))
-
-	return label_map, batched
+	return label_map, df
 
 def validate_config():
 	"""Validate input configuration"""
@@ -178,7 +176,7 @@ def build_cnn():
 		"""Run Session"""
 
 		# Train Network
-		label_map, batched = load_data()
+		label_map, df = load_data()
 		epochs = 500
 		eras = 10
 
@@ -189,7 +187,7 @@ def build_cnn():
 
 			for step in range(50000):
 
-				batch = random.choice(batched)[0:128]
+				batch = df.loc[np.random.choice(df.index, 128)]
 				labels = np.array(batch["LABEL_NUM"].astype(int))
 				labels = (np.arange(NUM_LABELS) == labels[:,None]).astype(np.float32)
 				docs = batch["DESCRIPTION_UNMASKED"].tolist()
