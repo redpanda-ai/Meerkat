@@ -180,6 +180,8 @@ def build_cnn():
 	# Create Graph
 	with graph.as_default():
 
+		learning_rate = tf.Variable(BASE_RATE, trainable=False) 
+
 		x = tf.placeholder(tf.float32, shape=[BATCH_SIZE, 1, DOC_LENGTH, ALPHABET_LENGTH])
 		y = tf.placeholder(tf.float32, shape=(BATCH_SIZE, NUM_LABELS))
 		
@@ -239,9 +241,7 @@ def build_cnn():
 		no_dropout = model(x, train=False)
 
 		loss = -tf.reduce_mean(tf.reduce_sum(network * y, 1))
-		global_step = tf.Variable(0, trainable=False)
-		learning_rate = tf.Variable(BASE_RATE, trainable=False) 
-		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss, global_step=global_step)
+		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss)
 
 	def run_session(graph):
 		"""Run Session"""
@@ -257,7 +257,7 @@ def build_cnn():
 
 			for step in range(50000):
 
-				batch = mixed_batching(train)
+				batch = mixed_batching(train, groups_train)
 				trans, labels = batch_to_tensor(batch)
 				feed_dict = {x : trans, y : labels}
 
