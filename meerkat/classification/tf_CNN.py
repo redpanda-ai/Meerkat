@@ -108,6 +108,21 @@ def evaluate_testset(x, y, test, chunked_test, no_dropout, session):
 	print("Test accuracy: %.1f%%" % test_accuracy)
 	print("Correct count: " + str(correct_count))
 
+def fully_random_batching(df):
+	"""Batch from train data using fully random batching"""
+	return df.loc[np.random.choice(df.index, 128)]
+
+def equal_class_batching(df):
+	"""Batch from train data using equal class batching"""
+	grouped = df.groupby('LABEL_NUM', as_index=False)
+	groups = dict(list(grouped))
+	batch = pd.DataFrame()
+	for i in range(BATCH_SIZE):
+		label = random.randint(1, NUM_LABELS)
+		select_group = groups[str(label)]
+		batch = batch.append(select_group.loc[np.random.choice(select_group.index, 1)])
+	return batch
+
 def batch_to_tensor(batch):
 	"""Convert a batch to a tensor representation"""
 
@@ -236,10 +251,12 @@ def build_cnn():
 
 			tf.initialize_all_variables().run()
 			num_eras = epochs * eras
+			sampling_flag = False
 
 			for step in range(50000):
+				batch = fully_random_batching(train) if sampling_flag else equal_class_batching(train)
+				sampling_flag = not sampling_flag
 
-				batch = train.loc[np.random.choice(train.index, 128)]
 				trans, labels = batch_to_tensor(batch)
 
 				feed_dict = {x : trans, y : labels}
