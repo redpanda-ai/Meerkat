@@ -121,11 +121,12 @@ def fully_random_batching(df):
 
 def equal_class_batching(df, groups_train):
 	"""Batch from train data using equal class batching"""
-	batch = pd.DataFrame()
+	indices_to_sample = []
 	for i in range(BATCH_SIZE):
 		label = random.randint(1, NUM_LABELS)
 		select_group = groups_train[str(label)]
-		batch = batch.append(select_group.loc[np.random.choice(select_group.index, 1)])
+		indices_to_sample.append(np.random.choice(select_group.index, 1)[0])
+	batch = df.loc[indices_to_sample]
 	return batch
 
 def batch_to_tensor(batch):
