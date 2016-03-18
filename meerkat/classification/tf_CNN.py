@@ -69,6 +69,34 @@ def load_data():
 	chunked_test = chunks(np.array(test.index), 128)
 	return label_map, train, test, chunked_test
 
+def evaluate_testset(x, y, test, chunked_test, no_dropout, session):
+	"""Check error on test set"""
+
+	test_accuracy = 0
+	total_test_size = 0
+
+	for i in range(len(chunked_test)):
+
+		batch_test = test.loc[chunked_test[i]]
+		if len(batch_test) != 128: continue
+
+		labels_test = np.array(batch_test["LABEL_NUM"].astype(int))
+		labels_test = (np.arange(NUM_LABELS) == labels_test[:,None]).astype(np.float32)
+		docs_test = batch_test["DESCRIPTION_UNMASKED"].tolist()
+		trans_test = np.zeros(shape=(BATCH_SIZE, 1, ALPHABET_LENGTH, DOC_LENGTH))
+
+		for i, t in enumerate(docs_test):
+			trans_test[i][0] = string_to_tensor(t, DOC_LENGTH)
+		
+		trans_test = np.transpose(trans_test, (0, 1, 3, 2))
+		feed_dict_test = {x: trans_test, y: labels_test}
+		batch_test_accuracy = accuracy(session.run(no_dropout, feed_dict=feed_dict_test), labels_test)
+
+		updated_total_test_size = total_test_size + BATCH_SIZE
+		test_accuracy = test_accuracy * (total_test_size / updated_total_test_size) + batch_test_accuracy * (BATCH_SIZE / updated_total_test_size)
+	
+	print("Test accuracy: %.1f%%" % test_accuracy)
+
 def validate_config():
 	"""Validate input configuration"""
 
@@ -214,32 +242,8 @@ def build_cnn():
 					print("train loss %g"%session.run(loss, feed_dict=feed_dict))
 
 				if (step % epochs == 0):
-					print("No dropout accuracy: %.1f%%" % accuracy(session.run(no_dropout, feed_dict=feed_dict), labels))
 					print("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
-
-					test_accuracy = 0
-					total_test_size = 0
-					for i in range(len(chunked_test)):
-						batch_test = test.loc[chunked_test[i]]
-						batch_test_size = len(batch_test)
-						print(batch_test_size)
-						if batch_test_size != 128:
-							continue
-						labels_test = np.array(batch_test["LABEL_NUM"].astype(int))
-						labels_test = (np.arange(NUM_LABELS) == labels_test[:,None]).astype(np.float32)
-						docs_test = batch_test["DESCRIPTION_UNMASKED"].tolist()
-						trans_test = np.zeros(shape=(batch_test_size, 1, ALPHABET_LENGTH, DOC_LENGTH))
-						for i, t in enumerate(docs_test):
-							trans_test[i][0] = string_to_tensor(t, DOC_LENGTH)
-						trans_test = np.transpose(trans_test, (0, 1, 3, 2))
-
-						feed_dict_test = {x: trans_test, y: labels_test}
-						batch_test_accuracy = accuracy(session.run(no_dropout, feed_dict=feed_dict_test), labels_test)
-
-						updated_total_test_size = total_test_size + batch_test_size
-						test_accuracy = test_accuracy * (total_test_size / updated_total_test_size) + \
-							batch_test_accuracy * (batch_test_size / updated_total_test_size)
-					print("Test accuracy: %.1f%%" % test_accuracy)
+					evaluate_testset(x, y, test, chunked_test, no_dropout, session)
 
 	# Run Graph
 	run_session(graph)
