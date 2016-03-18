@@ -9,7 +9,8 @@ Created on Mar 14, 2016
 
 #################### USAGE #######################
 
-# python3 -m meerkat.classification.tf_CNN
+# python3 -m meerkat.classification.tf_CNN [data] [label_map]
+# python3 -m meerkat.classification.tf_CNN Card_complete_data_subtype_original_updated_credit.csv card_credit_subtype_label_map.json
 
 ##################################################
 
@@ -28,7 +29,7 @@ from .tools import fill_description_unmasked, reverse_map
 
 ALPHABET = "abcdefghijklmnopqrstuvwxyz0123456789,;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}"
 ALPHA_DICT = {a : i for i, a in enumerate(ALPHABET)}
-NUM_LABELS = 10
+NUM_LABELS = 0
 BATCH_SIZE = 128
 DOC_LENGTH = 123
 RANDOMIZE = 5e-2
@@ -55,8 +56,11 @@ def validate_config():
 def load_data():
 	"""Load data and label map"""
 
+	global NUM_LABELS
+
 	label_map = "card_credit_subtype_label_map.json"
 	label_map = load_json(label_map)
+	NUM_LABELS = len(label_map.keys())
 	reversed_map = reverse_map(label_map)
 	a = lambda x: reversed_map.get(str(x["PROPOSED_SUBTYPE"]), "")
 
@@ -111,6 +115,7 @@ def batch_to_tensor(batch):
 	labels = (np.arange(NUM_LABELS) == labels[:,None]).astype(np.float32)
 	docs = batch["DESCRIPTION_UNMASKED"].tolist()
 	trans = np.zeros(shape=(BATCH_SIZE, 1, ALPHABET_LENGTH, DOC_LENGTH))
+	
 	for i, t in enumerate(docs):
 		trans[i][0] = string_to_tensor(t, DOC_LENGTH)
 
@@ -151,6 +156,7 @@ def build_cnn():
 	"""Build CNN"""
 
 	graph = tf.Graph()
+	label_map, train, test, chunked_test = load_data()
 
 	# Create Graph
 	with graph.as_default():
@@ -223,7 +229,6 @@ def build_cnn():
 		"""Run Session"""
 
 		# Train Network
-		label_map, train, test, chunked_test = load_data()
 		epochs = 500
 		eras = 10
 
@@ -242,9 +247,10 @@ def build_cnn():
 				_, predictions = session.run([optimizer, network], feed_dict=feed_dict)
 
 				if (step % 50 == 0):
-					print("train loss %g"%session.run(loss, feed_dict=feed_dict))
+					print("train loss at epoch %d: %g" % (step + 1, session.run(loss, feed_dict=feed_dict)))
 
-				if (step % epochs == 0):
+				if (step != 0 and step % epochs == 0):
+					print("Testing for era %d" % (step / epochs))
 					print("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
 					evaluate_testset(x, y, test, chunked_test, no_dropout, session)
 
