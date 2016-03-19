@@ -239,10 +239,23 @@ def build_cnn():
 		no_dropout = model(x, train=False)
 
 		loss = -tf.reduce_mean(tf.reduce_sum(network * y, 1))
-		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss)
-
+		optimizer = tf.train.GradientDescentOptimizer(learning_rate)
 		params = tf.trainable_variables()
-		gradients = tf.gradients(loss, params)
+
+		grads_and_vars = optimizer.compute_gradients(loss, params)
+
+		new_grads = []
+
+		for w in weights.values():
+			w = tf.mul(w, 1 - learning_rate * DECAY)
+
+		for gv in grads_and_vars:
+			old_grad = tf.identity(gv[0])
+			param = gv[1]
+			old_grad = tf.add(tf.mul(old_grad, 0.9), tf.mul(gv[0], -learning_rate))
+			new_grads.append((old_grad, param))
+
+		apply_gradients = optimizer.apply_gradients(new_grads)
 
 	def run_session(graph):
 		"""Run Session"""
@@ -262,16 +275,12 @@ def build_cnn():
 				trans, labels = batch_to_tensor(batch)
 				feed_dict = {x : trans, y : labels}
 
-				_, predictions = session.run([optimizer, network], feed_dict=feed_dict)
+				_, predictions = session.run([apply_gradients, network], feed_dict=feed_dict)
 
 				if (step % 50 == 0):
 					print("train loss at epoch %d: %g" % (step + 1, session.run(loss, feed_dict=feed_dict)))						
 
 				if (step != 0 and step % epochs == 0):
-
-					print("gradients: ")
-					for grad in gradients:
-						print(grad.eval(feed_dict=feed_dict))
 
 					print("Testing for era %d" % (step / epochs))
 					print("Learning rate at epoch %d: %g" % (step + 1, session.run(learning_rate)))
