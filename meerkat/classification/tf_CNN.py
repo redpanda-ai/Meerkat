@@ -33,6 +33,7 @@ NUM_LABELS = 0
 BATCH_SIZE = 128
 DOC_LENGTH = 123
 RANDOMIZE = 5e-2
+MOMENTUM = 0.9
 BASE_RATE = 1e-2 * math.sqrt(BATCH_SIZE) / math.sqrt(128)
 DECAY = 1e-5
 RESHAPE = ((DOC_LENGTH - 96) / 27) * 256
@@ -207,6 +208,9 @@ def build_cnn():
 		weights["W_fc2"] = weight_variable([1024, NUM_LABELS])
 		b_fc2 = bias_variable([NUM_LABELS], 1024)
 
+		params = tf.trainable_variables()
+		old_grads = {p.name: tf.zeros(p.get_shape()) for p in params}
+
 		def model(data, train=False):
 
 			h_conv1 = threshold(conv2d(data, weights["W_conv1"]) + b_conv1)
@@ -240,27 +244,25 @@ def build_cnn():
 
 		loss = -tf.reduce_mean(tf.reduce_sum(network * y, 1))
 		optimizer = tf.train.GradientDescentOptimizer(learning_rate)
-		params = tf.trainable_variables()
 
 		grads_and_vars = optimizer.compute_gradients(loss, params)
 
-		modified_grads = []
+		def apply_gradients(gv):
+			ops = []
+			for gv in grads_and_vars:
+				p = gv[1]
+				old_grads[p.name] = tf.add(tf.mul(old_grads[p.name], MOMENTUM), tf.mul(gv[0], -learning_rate))
+				op = gv[1].assign(tf.add(tf.mul(p, 1 - learning_rate * DECAY), old_grads[p.name]))
+				ops.append(op)
+			return ops
 
-		for gv in grads_and_vars:
-			old_grad = tf.identity(gv[0])
-			old_grad = tf.add(tf.mul(old_grad, 0.9), tf.mul(gv[0], -learning_rate))
-			modified_grads.append((old_grad, gv[1]))
-
-		for p in params:
-			p = tf.mul(p, 1 - learning_rate * DECAY)
-
-		apply_gradients = optimizer.apply_gradients(modified_grads)
+		apply_gradients = apply_gradients(grads_and_vars)
 
 	def run_session(graph):
 		"""Run Session"""
 
 		# Train Network
-		epochs = 500
+		epochs = 1000
 		eras = 10
 
 		with tf.Session(graph=graph) as session:
@@ -274,13 +276,14 @@ def build_cnn():
 				trans, labels = batch_to_tensor(batch)
 				feed_dict = {x : trans, y : labels}
 
-				_, predictions = session.run([apply_gradients, network], feed_dict=feed_dict)
+				session.run(apply_gradients, feed_dict=feed_dict)
 
 				if (step % 50 == 0):
 					print("train loss at epoch %d: %g" % (step + 1, session.run(loss, feed_dict=feed_dict)))						
 
 				if (step != 0 and step % epochs == 0):
 
+					predictions = session.run(network, feed_dict=feed_dict)
 					print("Testing for era %d" % (step / epochs))
 					print("Learning rate at epoch %d: %g" % (step + 1, session.run(learning_rate)))
 					print("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
