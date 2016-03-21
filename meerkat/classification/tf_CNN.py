@@ -239,22 +239,13 @@ def build_cnn():
 		no_dropout = model(x, train=False)
 
 		loss = -tf.reduce_mean(tf.reduce_sum(network * y, 1))
-		optimizer = tf.train.GradientDescentOptimizer(learning_rate)
+		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9)
 		params = tf.trainable_variables()
-
-		grads_and_vars = optimizer.compute_gradients(loss, params)
-
-		modified_grads = []
-
-		for gv in grads_and_vars:
-			old_grad = tf.identity(gv[0])
-			old_grad = tf.add(tf.mul(old_grad, 0.9), tf.mul(gv[0], -learning_rate))
-			modified_grads.append((old_grad, gv[1]))
 
 		for p in params:
 			p = tf.mul(p, 1 - learning_rate * DECAY)
 
-		apply_gradients = optimizer.apply_gradients(modified_grads)
+		optimizer = optimizer.minimize(loss)
 
 	def run_session(graph):
 		"""Run Session"""
@@ -274,7 +265,7 @@ def build_cnn():
 				trans, labels = batch_to_tensor(batch)
 				feed_dict = {x : trans, y : labels}
 
-				_, predictions = session.run([apply_gradients, network], feed_dict=feed_dict)
+				_, predictions = session.run([optimizer, network], feed_dict=feed_dict)
 
 				if (step % 50 == 0):
 					print("train loss at epoch %d: %g" % (step + 1, session.run(loss, feed_dict=feed_dict)))						
