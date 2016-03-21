@@ -1,11 +1,11 @@
 import csv
+import ctypes
 import json
 import logging
 import os
-import sys
 import re
+import sys
 import time
-import ctypes
 
 import numpy as np
 import pandas as pd
@@ -14,7 +14,7 @@ from boto.s3.connection import Location
 from boto import connect_s3
 from plumbum import local, NOHUP
 
-def get_new_maint7b(directory, file_list):
+def get_new_main_t7b(directory, file_list):
 	"""Get the latest t7b file under directory."""
 	print("Get the latest main_*.t7b file")
 	for i in os.listdir(directory):
@@ -22,7 +22,7 @@ def get_new_maint7b(directory, file_list):
 			file_list.append(i)
 			return i
 
-def getCNNStatics(inputFile):
+def get_era_and_error_rate(inputFile):
 	"""Get the era number and error rate."""
 	lualib = ctypes.CDLL("/home/ubuntu/torch/install/lib/libluajit.so", mode=ctypes.RTLD_GLOBAL)
 
@@ -54,7 +54,7 @@ def getCNNStatics(inputFile):
 	error_vals = list(lua_table.values())
 	return dict(zip(error_list, error_vals))
 
-def getTheBestErrorRate(erasDict):
+def get_best_error_rate(erasDict):
 	"""Get the best error rate among different eras"""
 	bestErrorRate = 1.0
 	bestEraNumber = 1
@@ -65,14 +65,14 @@ def getTheBestErrorRate(erasDict):
 
 	return bestErrorRate, bestEraNumber
 
-def zipDir(file1, file2):
+def zip_directories(file1, file2):
 	"""Copy files to Best_CNN_Statics directory and zip it"""
 	local["mkdir"]["Best_CNN_Statics"]()
 	local["cp"][file1]["Best_CNN_Statics"]()
 	local["cp"][file2]["Best_CNN_Statics"]()
 	local["tar"]["-zcvf"]["Best_CNN_Statics.tar.gz"]["Best_CNN_Statics"]()
 
-def stopStream():
+def kill_qlua_processeses():
 	"""Stop stream.py when the threshold reached."""
 	local["pkill"]["qlua"]()
 

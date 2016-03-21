@@ -10,6 +10,20 @@ import meerkat.classification.bloom_filter.find_entities as finder
 class VariousToolsTests(unittest.TestCase):
 	"""Our UnitTest class."""
 
+	def test_shruti_one(self):
+		"""Shruti wins"""
+		my_text = "Bicycle Shoppe e ur ek. a C A in Nevada"
+		expect = ('Eureka', 'CA')
+		result = finder.location_split(my_text)
+		self.assertEqual(expect, result)
+
+	def test_shruti_two(self):
+		"""Shruti loses"""
+		my_text = "Bicycle Shoppe e ur ex. a C A in Nevada"
+		expect = ('Eureka', 'CA')
+		result = finder.location_split(my_text)
+		self.assertEqual(expect, result)
+
 	def test_location_split__no_commas(self):
 		"""location_split test that it finds San Francisco, CA when there
 		are no commas"""

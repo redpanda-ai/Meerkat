@@ -16,8 +16,8 @@ import ctypes
 import logging
 
 from plumbum import local
-from .tools import(get_new_maint7b, getCNNStatics, getTheBestErrorRate,
-		zipDir, stopStream)
+from .tools import(get_new_main_t7b, get_era_and_error_rate, get_best_error_rate,
+		zip_directories, kill_qlua_processeses)
 
 def main_stream(directory):
 	"""The main program"""
@@ -32,13 +32,13 @@ def main_stream(directory):
 			.format(seconds/60.0))
 		time.sleep(seconds)
 
-		latest_t7b = get_new_maint7b(directory, fileList)
+		latest_t7b = get_new_main_t7b(directory, fileList)
 
 		if latest_t7b is not None:
 			local["cp"][directory + latest_t7b]["."]()
 
-			staticsDict = getCNNStatics(latest_t7b)
-			best_error, best_era = getTheBestErrorRate(staticsDict)
+			staticsDict = get_era_and_error_rate(latest_t7b)
+			best_error, best_era = get_best_error_rate(staticsDict)
 
 			# Stop the training process if threshold meets.
 			if len(staticsDict) - best_era > threshold:
@@ -46,8 +46,8 @@ def main_stream(directory):
 				# print("The CNN statics files have been zipped in "
 					# "Best_CNN_Statics.")
 				json.dump(staticsDict, open(directory + "/all_error_rates", "w"))
-				# zipDir(fileList[best_era - 1], "all_error_rates")
-				stopStream()
+				# zip_directories(fileList[best_era - 1], "all_error_rates")
+				kill_qlua_processeses()
 				return directory + latest_t7b.replace('main','sequential')
 			else:
 				print("The training process is still on")
