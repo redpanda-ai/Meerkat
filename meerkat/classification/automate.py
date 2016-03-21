@@ -21,6 +21,7 @@ from .tools import(get_new_maint7b, getCNNStatics, getTheBestErrorRate,
 
 def main_stream(directory):
 	"""The main program"""
+	directory = directory + '/'*(directory[-1] != '/')
 	# store initial files in directory
 	fileList = os.listdir(directory)
 	threshold = 2 # The highest era number - the era number of the best error rate.
@@ -34,7 +35,7 @@ def main_stream(directory):
 		latest_t7b = get_new_maint7b(directory, fileList)
 
 		if latest_t7b is not None:
-			local["cp"][directory + "/" + latest_t7b]["."]()
+			local["cp"][directory + latest_t7b]["."]()
 
 			staticsDict = getCNNStatics(latest_t7b)
 			best_error, best_era = getTheBestErrorRate(staticsDict)
