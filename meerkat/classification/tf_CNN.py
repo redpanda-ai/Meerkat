@@ -262,7 +262,7 @@ def build_cnn():
 		"""Run Session"""
 
 		# Train Network
-		epochs = 1000
+		epochs = 5000
 		eras = 10
 
 		with tf.Session(graph=graph) as session:
@@ -270,7 +270,7 @@ def build_cnn():
 			tf.initialize_all_variables().run()
 			num_eras = epochs * eras
 
-			for step in range(50000):
+			for step in range(num_eras):
 
 				batch = mixed_batching(train, groups_train)
 				trans, labels = batch_to_tensor(batch)
