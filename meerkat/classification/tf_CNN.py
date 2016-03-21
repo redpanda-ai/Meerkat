@@ -244,18 +244,17 @@ def build_cnn():
 
 		grads_and_vars = optimizer.compute_gradients(loss, params)
 
-		new_grads = []
-
-		for w in weights.values():
-			w = tf.mul(w, 1 - learning_rate * DECAY)
+		modified_grads = []
 
 		for gv in grads_and_vars:
 			old_grad = tf.identity(gv[0])
-			param = gv[1]
 			old_grad = tf.add(tf.mul(old_grad, 0.9), tf.mul(gv[0], -learning_rate))
-			new_grads.append((old_grad, param))
+			modified_grads.append((old_grad, gv[1]))
 
-		apply_gradients = optimizer.apply_gradients(new_grads)
+		for p in params:
+			p = tf.mul(p, 1 - learning_rate * DECAY)
+
+		apply_gradients = optimizer.apply_gradients(modified_grads)
 
 	def run_session(graph):
 		"""Run Session"""
