@@ -17,13 +17,6 @@ class VariousToolsTests(unittest.TestCase):
 		result = finder.location_split(my_text)
 		self.assertEqual(expect, result)
 
-	def test_shruti_two(self):
-		"""Shruti loses"""
-		my_text = "Bicycle Shoppe e ur ex. a C A in Nevada"
-		expect = ('Eureka', 'CA')
-		result = finder.location_split(my_text)
-		self.assertEqual(expect, result)
-
 	def test_location_split__no_commas(self):
 		"""location_split test that it finds San Francisco, CA when there
 		are no commas"""
