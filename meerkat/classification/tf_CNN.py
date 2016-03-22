@@ -151,6 +151,10 @@ def string_to_tensor(doc, l):
 		if c in ALPHABET:
 			t[ALPHA_DICT[c]][len(s) - i - 1] = 1
 	return t
+	
+def softmax_with_temperature(tensor, T):
+	"""Softmax with temperature variable"""
+	return tf.div(tf.exp(tensor/T), tf.reduce_sum(tf.exp(tensor/T)))
 
 def bias_variable(shape, mult):
 	"""Initialize biases"""
