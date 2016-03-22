@@ -125,6 +125,7 @@ def mixed_batching(df, groups_train):
 		label = random.randint(1, NUM_LABELS)
 		select_group = groups_train[str(label)]
 		indices_to_sample.append(np.random.choice(select_group.index, 1)[0])
+	random.shuffle(indices_to_sample)
 	batch = df.loc[indices_to_sample]
 	return batch
 
@@ -142,9 +143,9 @@ def batch_to_tensor(batch):
 	trans = np.transpose(trans, (0, 1, 3, 2))
 	return trans, labels
 
-def string_to_tensor(str, l):
+def string_to_tensor(doc, l):
 	"""Convert transaction to tensor format"""
-	s = str.lower()[0:l]
+	s = doc.lower()[0:l]
 	t = np.zeros((len(ALPHABET), l), dtype=np.float32)
 	for i, c in reversed(list(enumerate(s))):
 		if c in ALPHABET:
@@ -187,55 +188,53 @@ def build_cnn():
 		x = tf.placeholder(tf.float32, shape=[BATCH_SIZE, 1, DOC_LENGTH, ALPHABET_LENGTH])
 		y = tf.placeholder(tf.float32, shape=(BATCH_SIZE, NUM_LABELS))
 		
-		weights["W_conv1"] = weight_variable([1, 7, ALPHABET_LENGTH, 256])
+		W_conv1 = weight_variable([1, 7, ALPHABET_LENGTH, 256])
 		b_conv1 = bias_variable([256], 7 * ALPHABET_LENGTH)
 
-		weights["W_conv2"] = weight_variable([1, 7, 256, 256])
+		W_conv2 = weight_variable([1, 7, 256, 256])
 		b_conv2 = bias_variable([256], 7 * 256)
 
-		weights["W_conv3"] = weight_variable([1, 3, 256, 256])
+		W_conv3 = weight_variable([1, 3, 256, 256])
 		b_conv3 = bias_variable([256], 3 * 256)
 
-		weights["W_conv4"] = weight_variable([1, 3, 256, 256])
+		W_conv4 = weight_variable([1, 3, 256, 256])
 		b_conv4 = bias_variable([256], 3 * 256)
 
-		weights["W_conv5"] = weight_variable([1, 3, 256, 256])
+		W_conv5 = weight_variable([1, 3, 256, 256])
 		b_conv5 = bias_variable([256], 3 * 256)
 
-		weights["W_fc1"] = weight_variable([RESHAPE, 1024])
+		W_fc1 = weight_variable([RESHAPE, 1024])
 		b_fc1 = bias_variable([1024], RESHAPE)
 
-		weights["W_fc2"] = weight_variable([1024, NUM_LABELS])
+		W_fc2 = weight_variable([1024, NUM_LABELS])
 		b_fc2 = bias_variable([NUM_LABELS], 1024)
-
-		params = tf.trainable_variables()
-		old_grads = {p.name: tf.zeros(p.get_shape()) for p in params}
 
 		def model(data, train=False):
 
-			h_conv1 = threshold(conv2d(data, weights["W_conv1"]) + b_conv1)
+			h_conv1 = threshold(conv2d(data, W_conv1) + b_conv1)
 			h_pool1 = max_pool(h_conv1)
 
-			h_conv2 = threshold(conv2d(h_pool1, weights["W_conv2"]) + b_conv2)
+			h_conv2 = threshold(conv2d(h_pool1, W_conv2) + b_conv2)
 			h_pool2 = max_pool(h_conv2)
 
-			h_conv3 = threshold(conv2d(h_pool2, weights["W_conv3"]) + b_conv3)
+			h_conv3 = threshold(conv2d(h_pool2, W_conv3) + b_conv3)
 
-			h_conv4 = threshold(conv2d(h_conv3, weights["W_conv4"]) + b_conv4)
+			h_conv4 = threshold(conv2d(h_conv3, W_conv4) + b_conv4)
 
-			h_conv5 = threshold(conv2d(h_conv4, weights["W_conv5"]) + b_conv5)
+			h_conv5 = threshold(conv2d(h_conv4, W_conv5) + b_conv5)
 			h_pool5 = max_pool(h_conv5)
 
 			h_reshape = tf.reshape(h_pool5, [BATCH_SIZE, RESHAPE])
 
-			h_fc1 = threshold(tf.matmul(h_reshape, weights["W_fc1"]) + b_fc1)
+			h_fc1 = threshold(tf.matmul(h_reshape, W_fc1) + b_fc1)
 
 			if train:
 				h_fc1 = tf.nn.dropout(h_fc1, 0.5)
 
-			h_fc2 = tf.matmul(h_fc1, weights["W_fc2"]) + b_fc2
+			h_fc2 = tf.matmul(h_fc1, W_fc2) + b_fc2
 
-			network = tf.log(tf.nn.softmax(h_fc2))
+			softmax = tf.nn.softmax(h_fc2)
+			network = tf.log(tf.clip_by_value(softmax, 1e-10, 1.0))
 
 			return network
 
@@ -243,20 +242,7 @@ def build_cnn():
 		no_dropout = model(x, train=False)
 
 		loss = -tf.reduce_mean(tf.reduce_sum(network * y, 1))
-		optimizer = tf.train.GradientDescentOptimizer(learning_rate)
-
-		grads_and_vars = optimizer.compute_gradients(loss, params)
-
-		def apply_gradients(gv):
-			ops = []
-			for gv in grads_and_vars:
-				p = gv[1]
-				old_grads[p.name] = tf.add(tf.mul(old_grads[p.name], MOMENTUM), tf.mul(gv[0], -learning_rate))
-				op = gv[1].assign(tf.add(tf.mul(p, 1 - learning_rate * DECAY), old_grads[p.name]))
-				ops.append(op)
-			return ops
-
-		apply_gradients = apply_gradients(grads_and_vars)
+		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss)
 
 	def run_session(graph):
 		"""Run Session"""
@@ -276,7 +262,7 @@ def build_cnn():
 				trans, labels = batch_to_tensor(batch)
 				feed_dict = {x : trans, y : labels}
 
-				session.run(apply_gradients, feed_dict=feed_dict)
+				session.run(optimizer, feed_dict=feed_dict)
 
 				if (step % 50 == 0):
 					print("train loss at epoch %d: %g" % (step + 1, session.run(loss, feed_dict=feed_dict)))						
