@@ -132,7 +132,7 @@ def mixed_batching(df, groups_train):
 def batch_to_tensor(batch):
 	"""Convert a batch to a tensor representation"""
 
-	labels = np.array(batch["LABEL_NUM"].astype(int))
+	labels = np.array(batch["LABEL_NUM"].astype(int)) - 1
 	labels = (np.arange(NUM_LABELS) == labels[:,None]).astype(np.float32)
 	docs = batch["DESCRIPTION_UNMASKED"].tolist()
 	trans = np.zeros(shape=(BATCH_SIZE, 1, ALPHABET_LENGTH, DOC_LENGTH))
