@@ -4,6 +4,7 @@ import numpy as np
 import unittest
 import meerkat.various_tools as various_tools
 from nose_parameterized import parameterized
+from tests.fixture import various_tools_fixture
 
 class VariousToolsTests(unittest.TestCase):
 
@@ -21,6 +22,14 @@ class VariousToolsTests(unittest.TestCase):
 		for chars, no_chars in self.strings:
 			result = various_tools.string_cleanse(chars)
 			self.assertEqual(no_chars, result)
+
+	@parameterized.expand([
+		([various_tools_fixture.get_queue()["non_empty"], [1, 2, 3]]),
+		([various_tools_fixture.get_queue()["empty"], []])
+	])
+	def test_queue_to_list(self, result_queue, result_list):
+		"""Test queue_to_list with parameters"""
+		self.assertEqual(various_tools.queue_to_list(result_queue), result_list)
 
 	@parameterized.expand([
 		(["abc\\|ef\"ghi", "c ef"]),
