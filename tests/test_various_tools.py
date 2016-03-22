@@ -1,8 +1,9 @@
 """Unit test for meerkat.various_tools"""
 
-import meerkat.various_tools
 import numpy as np
 import unittest
+import meerkat.various_tools as various_tools
+from nose_parameterized import parameterized
 
 class VariousToolsTests(unittest.TestCase):
 
@@ -18,8 +19,17 @@ class VariousToolsTests(unittest.TestCase):
 		"""string_cleanse test"""
 
 		for chars, no_chars in self.strings:
-			result = meerkat.various_tools.string_cleanse(chars)
+			result = various_tools.string_cleanse(chars)
 			self.assertEqual(no_chars, result)
+
+	@parameterized.expand([
+		(["abc\\|ef\"ghi", "c ef"]),
+		(["abc\\ef\"\"ghij", "c\\efg"]),
+		(["abc|efghij", "c|efg"])
+	])
+	def test_clean_line(self, line, output):
+		"""Test clean_line with parameters"""
+		self.assertEqual(various_tools.clean_line(line), output)
 
 if __name__ == '__main__':
 	unittest.main()
