@@ -143,9 +143,9 @@ def batch_to_tensor(batch):
 	trans = np.transpose(trans, (0, 1, 3, 2))
 	return trans, labels
 
-def string_to_tensor(str, l):
+def string_to_tensor(doc, l):
 	"""Convert transaction to tensor format"""
-	s = str.lower()[0:l]
+	s = doc.lower()[0:l]
 	t = np.zeros((len(ALPHABET), l), dtype=np.float32)
 	for i, c in reversed(list(enumerate(s))):
 		if c in ALPHABET:
