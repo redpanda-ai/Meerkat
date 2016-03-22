@@ -15,3 +15,7 @@ def get_csv_input_path():
 		"correct_format": "tests/fixture/correct_format.csv",
 		"mal_format": "tests/fixture/mal_format.csv"
 	}
+
+def get_csvs_directory():
+	"""Return a directory contains several csv files"""
+	return "tests/fixture/csvs/"
