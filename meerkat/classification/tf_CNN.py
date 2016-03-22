@@ -235,7 +235,8 @@ def build_cnn():
 
 			h_fc2 = tf.matmul(h_fc1, weights["W_fc2"]) + b_fc2
 
-			network = tf.log(tf.nn.softmax(h_fc2))
+			softmax = tf.nn.softmax(h_fc2)
+			network = tf.log(tf.clip_by_value(softmax, 1e-10, 1.0))
 
 			return network
 
@@ -243,20 +244,11 @@ def build_cnn():
 		no_dropout = model(x, train=False)
 
 		loss = -tf.reduce_mean(tf.reduce_sum(network * y, 1))
-		optimizer = tf.train.GradientDescentOptimizer(learning_rate)
 
-		grads_and_vars = optimizer.compute_gradients(loss, params)
+		for p in params:
+			p.assign(tf.mul(p, 1 - learning_rate * DECAY))
 
-		def apply_gradients(gv):
-			ops = []
-			for gv in grads_and_vars:
-				p = gv[1]
-				old_grads[p.name] = tf.add(tf.mul(old_grads[p.name], MOMENTUM), tf.mul(gv[0], -learning_rate))
-				op = gv[1].assign(tf.add(tf.mul(p, 1 - learning_rate * DECAY), old_grads[p.name]))
-				ops.append(op)
-			return ops
-
-		apply_gradients = apply_gradients(grads_and_vars)
+		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss)
 
 	def run_session(graph):
 		"""Run Session"""
@@ -276,7 +268,7 @@ def build_cnn():
 				trans, labels = batch_to_tensor(batch)
 				feed_dict = {x : trans, y : labels}
 
-				session.run(apply_gradients, feed_dict=feed_dict)
+				session.run(optimizer, feed_dict=feed_dict)
 
 				if (step % 50 == 0):
 					print("train loss at epoch %d: %g" % (step + 1, session.run(loss, feed_dict=feed_dict)))						
