@@ -14,4 +14,4 @@ def get_queue():
 	return {
 		"non_empty": non_empty_queue,
 		"empty": empty_queue
-}
+	}
