@@ -161,6 +161,9 @@ def plot_confusion_matrix(con_matrix):
 	ax = fig.add_subplot(111)
 	res = ax.imshow(array(norm_matrix), cmap=cm.jet, interpolation='nearest')
 
+	for i,j in ((x,y) for x in range(len(con_matrix)) for y in range(len(con_matrix[0]))):
+		ax.annotate(str(con_matrix[i][j]), xy=(i,j), fontsize='xx-small')
+
 	cb = fig.colorbar(res)
 	savefig("/data/CNN_stats/confusion_matrix.png", format="png")
 
@@ -269,7 +272,7 @@ def main_process(args):
 	f_measure = np.round(f_measure, decimals=4)
 
 	print("Here we have a test matrix for matrix plot")
-	test_matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+	test_matrix = [[10,0,0,0,1],[2,8,0,0,0],[0,1,9,0,0],[0,1,0,9,0],[1,1,0,0,8]]
 	print(test_matrix)
 	plot_confusion_matrix(test_matrix)
 
@@ -277,7 +280,7 @@ def main_process(args):
 	real_confusion_matrix = []
 	for i in range(num_labels):
 		real_confusion_matrix.append(confusion_matrix[i][0:-1])
-	plot_confusion_matrix(real_confusion_matrix)
+	#plot_confusion_matrix(real_confusion_matrix)
 
 
 	false_negative = actual - true_positive - unpredicted
