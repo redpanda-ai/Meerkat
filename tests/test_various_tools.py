@@ -1,6 +1,5 @@
 """Unit test for meerkat.various_tools"""
 
-import numpy as np
 import unittest
 import meerkat.various_tools as various_tools
 from nose_parameterized import parameterized

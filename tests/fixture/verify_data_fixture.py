@@ -4,7 +4,6 @@ def get_json_input_path():
 	"""Return json file paths"""
 	return {
 		"correct_format": "tests/fixture/correct_format.json",
-		"mal_format": "tests/fixture/mal_format.json",
 		"dup_key": "tests/fixture/dup_key.json",
 		"not_found": "tests/missing.json"
 	}

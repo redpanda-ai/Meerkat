@@ -1,6 +1,6 @@
 """Fixtures for test_various_tools"""
 
-from queue import *
+from queue import Queue
 
 def get_params_dict():
 	"""Return a params dictionary"""
