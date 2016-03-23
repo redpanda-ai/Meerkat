@@ -25,5 +25,14 @@ class MergeStoreNumbersTests(unittest.TestCase):
 		else:
 			return
 
+	@parameterized.expand([
+		([merge_store_numbers_fixture.get_csv_file()])
+	])
+	def test_load_store_numbers(self, file_name):
+		"""Test load_store_numbers with parameters"""
+		expected = [{'keywords': 'AutoZone', 'city': 'GAMBRILLS'}, {'keywords': 'AutoZone', 'city': 'GAFFNEY'}]
+		result = merger.load_store_numbers(file_name)
+		self.assertEqual(result, expected)
+
 if __name__ == '__main__':
 	unittest.main()

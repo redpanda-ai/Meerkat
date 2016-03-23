@@ -1,5 +1,9 @@
 """Fixtures for test_merge_store_numbers"""
 
+def get_csv_file():
+	"""Return a csv file path"""
+	return "tests/fixture/store_example.csv"
+
 def get_args():
 	"""Return a list of arguments"""
 	return {
