@@ -2,6 +2,14 @@
 
 from queue import *
 
+def get_params_dict():
+	"""Return a params dictionary"""
+	return {
+		"input": {
+			"hyperparameters": "tests/fixture/correct_format.json"
+		}
+	}
+
 def get_queue():
 	"""Return a queue"""
 	non_empty_queue = Queue()

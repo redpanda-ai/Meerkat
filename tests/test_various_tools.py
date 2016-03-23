@@ -24,6 +24,14 @@ class VariousToolsTests(unittest.TestCase):
 			self.assertEqual(no_chars, result)
 
 	@parameterized.expand([
+		([various_tools_fixture.get_params_dict()])
+	])
+	def test_load_hyperparameters(self, params):
+		"""Test load_hyperparameters with parameters"""
+		result = various_tools.load_hyperparameters(params)
+		self.assertTrue(isinstance(result, dict))
+
+	@parameterized.expand([
 		([various_tools_fixture.get_queue()["non_empty"], [1, 2, 3]]),
 		([various_tools_fixture.get_queue()["empty"], []])
 	])

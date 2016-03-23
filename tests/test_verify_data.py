@@ -36,7 +36,6 @@ class VerifyDataTests(unittest.TestCase):
 
 	@parameterized.expand([
 		(["normal", verify_data_fixture.get_json_input_path()["correct_format"]]),
-		(["edge", verify_data_fixture.get_json_input_path()["mal_format"]]),
 		(["edge", verify_data_fixture.get_json_input_path()["dup_key"]]),
 		(["edge", verify_data_fixture.get_json_input_path()["not_found"]])
 	])
