@@ -30,9 +30,26 @@ class MergeStoreNumbersTests(unittest.TestCase):
 	])
 	def test_load_store_numbers(self, file_name):
 		"""Test load_store_numbers with parameters"""
-		expected = [{'keywords': 'AutoZone', 'city': 'GAMBRILLS'}, {'keywords': 'AutoZone', 'city': 'GAFFNEY'}]
+		expected = [{'keywords': 'AutoZone', 'city': 'GAMBRILLS'}, 
+			{'keywords': 'AutoZone', 'city': 'GAFFNEY'}]
 		result = merger.load_store_numbers(file_name)
 		self.assertEqual(result, expected)
+
+	@parameterized.expand([
+		([[2.0, 1.0], 2.0]),
+		([[1.0], None])
+	])
+	def test_z_score_delta(self, scores, z_score_delta):
+		"""Test z_score_delta with parameters"""
+		self.assertEqual(merger.z_score_delta(scores), z_score_delta)
+
+	@parameterized.expand([
+		([merge_store_numbers_fixture.get_result_dict()["empty_result"], 0, (False, False)]),
+		([merge_store_numbers_fixture.get_result_dict()["normal_result"], 0, (2.0, "s0")])
+	])
+	def test_get_hit(self, search_results, index, result):
+		"""Test get_hit with parameters"""
+		self.assertEqual(merger.get_hit(search_results, index), result)
 
 if __name__ == '__main__':
 	unittest.main()

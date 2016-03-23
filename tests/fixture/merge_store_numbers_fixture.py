@@ -13,3 +13,22 @@ def get_args():
 		"not_a_directory": ["arg0", "tests/fixture/missing", "arg2", "arg3", "arg4"],
 		"no_csv": ["arg0", "tests/", "arg2", "arg3", "arg4"]
 	}
+
+def get_result_dict():
+	"""Return a result dictionary"""
+	return {
+		"empty_result": {
+			"hits": {
+				"total": 0
+			}
+		},
+		"normal_result": {
+			"hits": {
+				"total": 2,
+				"hits": [
+					{"_source": "s0", "_score": 2.0},
+					{"_source": "s1", "_score": 1.0}
+				]
+			}
+		}
+	}
