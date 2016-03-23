@@ -43,9 +43,9 @@ class VariousToolsTests(unittest.TestCase):
 		self.assertEqual(various_tools.queue_to_list(result_queue), result_list)
 
 	@parameterized.expand([
-		(["abc\\|ef\"ghi", "c ef"]),
-		(["abc\\ef\"\"ghij", "c\\efg"]),
-		(["abc|efghij", "c|efg"])
+		(["abcd\\|ef\"ghij", "cd efg"]),
+		(["abcd\\ef\"\"ghij", "cd\\efg"]),
+		(["abcd|efghij", "cd|efg"])
 	])
 	def test_clean_line(self, line, output):
 		"""Test clean_line with parameters"""
