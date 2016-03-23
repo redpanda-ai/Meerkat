@@ -5,8 +5,15 @@ from queue import *
 def get_params_dict():
 	"""Return a params dictionary"""
 	return {
-		"input": {
-			"hyperparameters": "tests/fixture/correct_format.json"
+		"correct_format": {
+			"input": {
+				"hyperparameters": "tests/fixture/correct_format.json"
+			}
+		},
+		"not_found": {
+			"input": {
+				"hyperparameters": "tests/missing.json"
+			}
 		}
 	}
 
