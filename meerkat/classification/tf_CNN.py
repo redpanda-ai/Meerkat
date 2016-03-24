@@ -14,17 +14,17 @@ Created on Mar 14, 2016
 
 ##################################################
 
-import sys
 import csv
+import logging
 import math
-import random
-
-import tensorflow as tf
 import numpy as np
 import pandas as pd
+import random
+import sys
+import tensorflow as tf
 
-from .verify_data import load_json
 from .tools import fill_description_unmasked, reverse_map
+from .verify_data import load_json
 
 CONFIG = load_json(sys.argv[1])
 DATASET = CONFIG["dataset"]
@@ -112,8 +112,8 @@ def evaluate_testset(graph, sess, model, test, chunked_test):
 		total_count += BATCH_SIZE
 	
 	test_accuracy = 100.0 * (correct_count / total_count)
-	print("Test accuracy: %.2f%%" % test_accuracy)
-	print("Correct count: " + str(correct_count))
+	logging.warning("Test accuracy: %.2f%%" % test_accuracy)
+	logging.warning("Correct count: " + str(correct_count))
 
 def mixed_batching(df, groups_train):
 	"""Batch from train data using equal class batching"""
@@ -289,16 +289,16 @@ def train_model(graph, sess, saver):
 
 		# Log Loss
 		if step % 50 == 0:
-			print("train loss at epoch %d: %g" % (step + 1, sess.run(get_tensor(graph, "loss:0"), feed_dict=feed_dict)))
+			logging.warning("train loss at epoch %d: %g" % (step + 1, sess.run(get_tensor(graph, "loss:0"), feed_dict=feed_dict)))
 
 		# Evaluate Testset and Log Progress
 		if step != 0 and step % EPOCHS == 0:
 			model = get_tensor(graph, "model:0")
 			learning_rate = get_variable(graph, "lr:0")
 			predictions = sess.run(model, feed_dict=feed_dict)
-			print("Testing for era %d" % (step / EPOCHS))
-			print("Learning rate at epoch %d: %g" % (step + 1, sess.run(learning_rate)))
-			print("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
+			logging.warning("Testing for era %d" % (step / EPOCHS))
+			logging.warning("Learning rate at epoch %d: %g" % (step + 1, sess.run(learning_rate)))
+			logging.warning("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
 			evaluate_testset(graph, sess, model, test, chunked_test)
 
 		# Update Learning Rate
@@ -308,7 +308,7 @@ def train_model(graph, sess, saver):
 
 	# Save Model  
 	save_path = saver.save(sess, "meerkat/classification/models/model_" + DATASET.split(".")[0] + ".ckpt")
-	print("Model saved in file: %s" % save_path)
+	logging.warning("Model saved in file: %s" % save_path)
 
 def run_session(graph, saver):
 	"""Run Session"""
