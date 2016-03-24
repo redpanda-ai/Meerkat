@@ -52,7 +52,9 @@ class VariousToolsTests(unittest.TestCase):
 		self.assertEqual(various_tools.clean_line(line), output)
 
 	@parameterized.expand([
-		(["ach pos ", ""])
+		(["ach pos ", ""]),
+		(["pos 12/34abcd", "ABCD"]),
+		(["ab~~12345~~1234567890123456~~12345~~1~~~~1234cd", "AB CD"])
 	])
 	def test_stopwords(self, transaction, result):
 		"""Test stopwords with parameters"""
