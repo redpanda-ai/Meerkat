@@ -300,7 +300,7 @@ def train_model(graph, sess, saver):
 			print("Testing for era %d" % (step / EPOCHS))
 			print("Learning rate at epoch %d: %g" % (step + 1, sess.run(learning_rate)))
 			print("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
-			evaluate_testset(graph, test, chunked_test, model, sess)
+			evaluate_testset(graph, sess, model)
 
 		# Update Learning Rate
 		if step != 0 and step % 15000 == 0:
