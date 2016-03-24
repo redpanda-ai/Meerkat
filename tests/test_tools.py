@@ -66,6 +66,7 @@ class ToolsTests(unittest.TestCase):
 			self.assertRaises(Exception, tools.pull_from_s3, **kwargs)
 		else:
 			self.assertEqual(tools.pull_from_s3(**kwargs), "tests/fixture/csv_file_1.csv")
+			local["rm"]["tests/fixture/csv_file_1.csv"]()
 
 	@parameterized.expand([
 		(["tests/fixture/correct_format.csv", (3, 1)])
@@ -89,6 +90,7 @@ class ToolsTests(unittest.TestCase):
 	])
 	def test_fill_description_unmasked(self, row, output):
 		"""Test fill_description_unmasked with parameters"""
+
 		self.assertEqual(tools.fill_description_unmasked(row), output)
 
 	@parameterized.expand([
