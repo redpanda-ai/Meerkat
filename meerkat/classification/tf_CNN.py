@@ -40,15 +40,9 @@ DECAY = 1e-5
 RESHAPE = ((DOC_LENGTH - 96) / 27) * 256
 ALPHABET_LENGTH = len(ALPHABET)
 
-def accuracy(predictions, labels):
-	return (100.0 * np.sum(np.argmax(predictions, 1) == np.argmax(labels, 1)) / predictions.shape[0])
-
 def chunks(l, n):
     n = max(1, n)
     return [l[i:i + n] for i in range(0, len(l), n)]
-
-def threshold(tensor):
-	return tf.mul(tf.to_float(tf.greater_equal(tensor, 1e-6)), tensor)
 
 def validate_config():
 	"""Validate input configuration"""
@@ -162,6 +156,12 @@ def get_variable(graph, name):
 		variable = [v for v in tf.all_variables() if v.name == name][0]
 		return variable
 
+def accuracy(predictions, labels):
+	return (100.0 * np.sum(np.argmax(predictions, 1) == np.argmax(labels, 1)) / predictions.shape[0])
+
+def threshold(tensor):
+	return tf.mul(tf.to_float(tf.greater_equal(tensor, 1e-6)), tensor)
+
 def softmax_with_temperature(tensor, T):
 	"""Softmax with temperature variable"""
 	return tf.div(tf.exp(tensor/T), tf.reduce_sum(tf.exp(tensor/T)))
@@ -186,52 +186,6 @@ def max_pool(x):
 	"""Create max pooling layer"""
 	layer = tf.nn.max_pool(x, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
 	return layer
-
-def run_session(graph, saver):
-	"""Run Session"""
-
-	# Train Network
-	train, test, groups_train, chunked_test = load_data()
-	epochs = 5000
-	eras = 15
-
-	with tf.Session(graph=graph) as sess:
-
-		tf.initialize_all_variables().run()
-		num_eras = epochs * eras
-
-		for step in range(num_eras):
-
-			# Prepare Data for Training
-			batch = mixed_batching(train, groups_train)
-			trans, labels = batch_to_tensor(batch)
-			feed_dict = {get_tensor(graph, "x:0") : trans, get_tensor(graph, "y:0") : labels}
-
-			# Run Training Step
-			sess.run(get_op(graph, "optimizer"), feed_dict=feed_dict)
-
-			# Log Loss
-			if (step % 50 == 0):
-				print("train loss at epoch %d: %g" % (step + 1, sess.run(get_tensor(graph, "loss:0"), feed_dict=feed_dict)))
-
-			# Evaluate Testset and Log Progress
-			if (step != 0 and step % epochs == 0):
-				model = get_tensor(graph, "model:0")
-				lr = get_variable(graph, "lr:0")
-				predictions = sess.run(model, feed_dict=feed_dict)
-				print("Testing for era %d" % (step / epochs))
-				print("Learning rate at epoch %d: %g" % (step + 1, sess.run(lr)))
-				print("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
-				evaluate_testset(graph, test, chunked_test, model, sess)
-
-			# Update Learning Rate
-			if (step != 0 and step % 15000 == 0):
-				lr = get_variable(graph, "lr:0")
-				sess.run(lr.assign(lr / 2))
-
-		# Save Model  
-		save_path = saver.save(sess, "meerkat/classification/models/model_" + sys.argv[1].split(".")[0] + ".ckpt")
-		print("Model saved in file: %s" % save_path)
 
 def build_cnn():
 	"""Build CNN"""
@@ -304,9 +258,55 @@ def build_cnn():
 
 		saver = tf.train.Saver()
 
-	# Run Graph
-	run_session(graph, saver)
+	return graph, saver
+
+def run_session(graph, saver):
+	"""Run Session"""
+
+	# Train Network
+	train, test, groups_train, chunked_test = load_data()
+	epochs = 5000
+	eras = 15
+
+	with tf.Session(graph=graph) as sess:
+
+		tf.initialize_all_variables().run()
+		num_eras = epochs * eras
+
+		for step in range(num_eras):
+
+			# Prepare Data for Training
+			batch = mixed_batching(train, groups_train)
+			trans, labels = batch_to_tensor(batch)
+			feed_dict = {get_tensor(graph, "x:0") : trans, get_tensor(graph, "y:0") : labels}
+
+			# Run Training Step
+			sess.run(get_op(graph, "optimizer"), feed_dict=feed_dict)
+
+			# Log Loss
+			if (step % 50 == 0):
+				print("train loss at epoch %d: %g" % (step + 1, sess.run(get_tensor(graph, "loss:0"), feed_dict=feed_dict)))
+
+			# Evaluate Testset and Log Progress
+			if (step != 0 and step % epochs == 0):
+				model = get_tensor(graph, "model:0")
+				lr = get_variable(graph, "lr:0")
+				predictions = sess.run(model, feed_dict=feed_dict)
+				print("Testing for era %d" % (step / epochs))
+				print("Learning rate at epoch %d: %g" % (step + 1, sess.run(lr)))
+				print("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
+				evaluate_testset(graph, test, chunked_test, model, sess)
+
+			# Update Learning Rate
+			if (step != 0 and step % 15000 == 0):
+				lr = get_variable(graph, "lr:0")
+				sess.run(lr.assign(lr / 2))
+
+		# Save Model  
+		save_path = saver.save(sess, "meerkat/classification/models/model_" + sys.argv[1].split(".")[0] + ".ckpt")
+		print("Model saved in file: %s" % save_path)
 
 if __name__ == "__main__":
 	validate_config()
-	build_cnn()
+	graph, saver = build_cnn()
+	run_session(graph, saver)
