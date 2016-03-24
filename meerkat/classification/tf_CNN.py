@@ -39,6 +39,8 @@ BASE_RATE = 1e-2 * math.sqrt(BATCH_SIZE) / math.sqrt(128)
 DECAY = 1e-5
 RESHAPE = ((DOC_LENGTH - 96) / 27) * 256
 ALPHABET_LENGTH = len(ALPHABET)
+EPOCHS = 5000
+ERAS = 15
 
 def chunks(l, n):
     n = max(1, n)
@@ -260,51 +262,54 @@ def build_cnn():
 
 	return graph, saver
 
+def train_model(sess, train, test, groups_train, chunked_test):
+	"""Train the model"""
+
+	num_eras = EPOCHS * ERAS
+
+	for step in range(num_eras):
+
+		# Prepare Data for Training
+		batch = mixed_batching(train, groups_train)
+		trans, labels = batch_to_tensor(batch)
+		feed_dict = {get_tensor(graph, "x:0") : trans, get_tensor(graph, "y:0") : labels}
+
+		# Run Training Step
+		sess.run(get_op(graph, "optimizer"), feed_dict=feed_dict)
+
+		# Log Loss
+		if (step % 50 == 0):
+			print("train loss at epoch %d: %g" % (step + 1, sess.run(get_tensor(graph, "loss:0"), feed_dict=feed_dict)))
+
+		# Evaluate Testset and Log Progress
+		if (step != 0 and step % EPOCHS == 0):
+			model = get_tensor(graph, "model:0")
+			lr = get_variable(graph, "lr:0")
+			predictions = sess.run(model, feed_dict=feed_dict)
+			print("Testing for era %d" % (step / EPOCHS))
+			print("Learning rate at epoch %d: %g" % (step + 1, sess.run(lr)))
+			print("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
+			evaluate_testset(graph, test, chunked_test, model, sess)
+
+		# Update Learning Rate
+		if (step != 0 and step % 15000 == 0):
+			lr = get_variable(graph, "lr:0")
+			sess.run(lr.assign(lr / 2))
+
+	# Save Model  
+	save_path = saver.save(sess, "meerkat/classification/models/model_" + sys.argv[1].split(".")[0] + ".ckpt")
+	print("Model saved in file: %s" % save_path)
+
 def run_session(graph, saver):
 	"""Run Session"""
 
-	# Train Network
 	train, test, groups_train, chunked_test = load_data()
-	epochs = 5000
-	eras = 15
 
 	with tf.Session(graph=graph) as sess:
 
 		tf.initialize_all_variables().run()
-		num_eras = epochs * eras
 
-		for step in range(num_eras):
-
-			# Prepare Data for Training
-			batch = mixed_batching(train, groups_train)
-			trans, labels = batch_to_tensor(batch)
-			feed_dict = {get_tensor(graph, "x:0") : trans, get_tensor(graph, "y:0") : labels}
-
-			# Run Training Step
-			sess.run(get_op(graph, "optimizer"), feed_dict=feed_dict)
-
-			# Log Loss
-			if (step % 50 == 0):
-				print("train loss at epoch %d: %g" % (step + 1, sess.run(get_tensor(graph, "loss:0"), feed_dict=feed_dict)))
-
-			# Evaluate Testset and Log Progress
-			if (step != 0 and step % epochs == 0):
-				model = get_tensor(graph, "model:0")
-				lr = get_variable(graph, "lr:0")
-				predictions = sess.run(model, feed_dict=feed_dict)
-				print("Testing for era %d" % (step / epochs))
-				print("Learning rate at epoch %d: %g" % (step + 1, sess.run(lr)))
-				print("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
-				evaluate_testset(graph, test, chunked_test, model, sess)
-
-			# Update Learning Rate
-			if (step != 0 and step % 15000 == 0):
-				lr = get_variable(graph, "lr:0")
-				sess.run(lr.assign(lr / 2))
-
-		# Save Model  
-		save_path = saver.save(sess, "meerkat/classification/models/model_" + sys.argv[1].split(".")[0] + ".ckpt")
-		print("Model saved in file: %s" % save_path)
+		train_model(sess, train, test, groups_train, chunked_test)
 
 if __name__ == "__main__":
 	validate_config()
