@@ -29,7 +29,8 @@ from .tools import fill_description_unmasked, reverse_map
 
 ALPHABET = "abcdefghijklmnopqrstuvwxyz0123456789,;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}"
 ALPHA_DICT = {a : i for i, a in enumerate(ALPHABET)}
-NUM_LABELS = 0
+LABEL_MAP = load_json(sys.argv[2])
+NUM_LABELS = len(LABEL_MAP.keys())
 BATCH_SIZE = 128
 DOC_LENGTH = 123
 RANDOMIZE = 5e-2
@@ -62,12 +63,7 @@ def validate_config():
 def load_data():
 	"""Load data and label map"""
 
-	global NUM_LABELS
-
-	label_map = sys.argv[2]
-	label_map = load_json(label_map)
-	NUM_LABELS = len(label_map.keys())
-	reversed_map = reverse_map(label_map)
+	reversed_map = reverse_map(LABEL_MAP)
 	a = lambda x: reversed_map.get(str(x["PROPOSED_SUBTYPE"]), "")
 
 	input_file = sys.argv[1]
@@ -90,7 +86,7 @@ def load_data():
 	groups_train = dict(list(grouped_train))
 
 	chunked_test = chunks(np.array(test.index), 128)
-	return label_map, train, test, groups_train, chunked_test
+	return train, test, groups_train, chunked_test
 
 def evaluate_testset(x, y, test, chunked_test, no_dropout, session):
 	"""Check error on test set"""
@@ -114,7 +110,7 @@ def evaluate_testset(x, y, test, chunked_test, no_dropout, session):
 		total_count += BATCH_SIZE
 	
 	test_accuracy = 100.0 * (correct_count / total_count)
-	print("Test accuracy: %.1f%%" % test_accuracy)
+	print("Test accuracy: %.2f%%" % test_accuracy)
 	print("Correct count: " + str(correct_count))
 
 def mixed_batching(df, groups_train):
@@ -177,12 +173,53 @@ def max_pool(x):
 	layer = tf.nn.max_pool(x, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
 	return layer
 
+def run_session(graph, optimizer, model, loss, lr, x, y, saver):
+	"""Run Session"""
+
+	# Train Network
+	train, test, groups_train, chunked_test = load_data()
+	epochs = 1000
+	eras = 1
+
+	with tf.Session(graph=graph) as sess:
+
+		tf.initialize_all_variables().run()
+		num_eras = epochs * eras
+
+		for step in range(num_eras):
+
+			# Prepare Data for Training
+			batch = mixed_batching(train, groups_train)
+			trans, labels = batch_to_tensor(batch)
+			feed_dict = {x : trans, y : labels}
+
+			# Run Training Step
+			sess.run(optimizer, feed_dict=feed_dict)
+
+			# Log Loss
+			if (step % 50 == 0):
+				print("train loss at epoch %d: %g" % (step + 1, sess.run(loss, feed_dict=feed_dict)))
+
+			# Evaluate Testset and Log Progress
+			if (step != 0 and step % epochs == 0):
+				predictions = sess.run(model, feed_dict=feed_dict)
+				print("Testing for era %d" % (step / epochs))
+				print("Learning rate at epoch %d: %g" % (step + 1, sess.run(lr)))
+				print("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
+				evaluate_testset(x, y, test, chunked_test, model, sess)
+
+			# Update Learning Rate
+			if (step != 0 and step % 15000 == 0):
+				sess.run(learning_rate.assign(lr / 2))
+
+		# Save Model  
+		save_path = saver.save(sess, "meerkat/classification/models/model_" + sys.argv[1].split(".")[0] + ".ckpt")
+		print("Model saved in file: %s" % save_path)
+
 def build_cnn():
 	"""Build CNN"""
 
 	graph = tf.Graph()
-	label_map, train, test, groups_train, chunked_test = load_data()
-	weights = {}
 
 	# Create Graph
 	with graph.as_default():
@@ -242,48 +279,16 @@ def build_cnn():
 
 			return network
 
-		network = model(x, train=True)
-		no_dropout = model(x, train=False)
+		train_network = model(x, train=True)
+		test_network = model(x, train=False)
 
-		loss = -tf.reduce_mean(tf.reduce_sum(network * y, 1))
+		loss = -tf.reduce_mean(tf.reduce_sum(train_network * y, 1))
 		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss)
 
-	def run_session(graph):
-		"""Run Session"""
-
-		# Train Network
-		epochs = 5000
-		eras = 10
-
-		with tf.Session(graph=graph) as session:
-
-			tf.initialize_all_variables().run()
-			num_eras = epochs * eras
-
-			for step in range(num_eras):
-
-				batch = mixed_batching(train, groups_train)
-				trans, labels = batch_to_tensor(batch)
-				feed_dict = {x : trans, y : labels}
-
-				session.run(optimizer, feed_dict=feed_dict)
-
-				if (step % 50 == 0):
-					print("train loss at epoch %d: %g" % (step + 1, session.run(loss, feed_dict=feed_dict)))						
-
-				if (step != 0 and step % epochs == 0):
-
-					predictions = session.run(network, feed_dict=feed_dict)
-					print("Testing for era %d" % (step / epochs))
-					print("Learning rate at epoch %d: %g" % (step + 1, session.run(learning_rate)))
-					print("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
-					evaluate_testset(x, y, test, chunked_test, no_dropout, session)
-
-				if (step != 0 and step % 15000 == 0):
-					session.run(learning_rate.assign(learning_rate / 2))
+		saver = tf.train.Saver()
 
 	# Run Graph
-	run_session(graph)
+	run_session(graph, optimizer, test_network, loss, learning_rate, x, y, saver)
 
 if __name__ == "__main__":
 	validate_config()
