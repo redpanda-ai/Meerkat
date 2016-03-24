@@ -9,8 +9,8 @@ Created on Mar 14, 2016
 
 #################### USAGE #######################
 
-# python3 -m meerkat.classification.tf_CNN [data] [label_map] [debit_or_credit]
-# python3 -m meerkat.classification.tf_CNN Card_complete_data_subtype_original_updated_credit.csv card_credit_subtype_label_map.json credit
+# python3 -m meerkat.classification.tf_CNN [config]
+# python3 -m meerkat.classification.tf_CNN config/tf_cnn_config.json
 
 ##################################################
 
@@ -27,20 +27,27 @@ from math import sqrt
 from .verify_data import load_json
 from .tools import fill_description_unmasked, reverse_map
 
-ALPHABET = "abcdefghijklmnopqrstuvwxyz0123456789,;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}"
+CONFIG = load_json(sys.argv[1])
+DATASET = CONFIG["dataset"]
+MODE = CONFIG["mode"]
+MODEL = CONFIG["model"]
+MODEL_TYPE = CONFIG["model_type"]
+CONTAINER = CONFIG["container"]
+LEDGER_ENTRY = CONFIG["ledger_entry"]
+ALPHABET = CONFIG["alphabet"]
 ALPHA_DICT = {a : i for i, a in enumerate(ALPHABET)}
-LABEL_MAP = load_json(sys.argv[2])
+LABEL_MAP = load_json(CONFIG["label_map"])
 NUM_LABELS = len(LABEL_MAP.keys())
-BATCH_SIZE = 128
-DOC_LENGTH = 123
-RANDOMIZE = 5e-2
-MOMENTUM = 0.9
-BASE_RATE = 1e-2 * math.sqrt(BATCH_SIZE) / math.sqrt(128)
-DECAY = 1e-5
+BATCH_SIZE = CONFIG["batch_size"]
+DOC_LENGTH = CONFIG["doc_length"]
+RANDOMIZE = CONFIG["randomize"]
+MOMENTUM = CONFIG["momentum"]
+BASE_RATE = CONFIG["base_rate"] * math.sqrt(BATCH_SIZE) / math.sqrt(128)
+DECAY = CONFIG["decay"]
 RESHAPE = ((DOC_LENGTH - 96) / 27) * 256
 ALPHABET_LENGTH = len(ALPHABET)
-EPOCHS = 5000
-ERAS = 15
+EPOCHS = CONFIG["epochs"]
+ERAS = CONFIG["eras"]
 
 def chunks(l, n):
     n = max(1, n)
@@ -62,13 +69,12 @@ def load_data():
 	reversed_map = reverse_map(LABEL_MAP)
 	a = lambda x: reversed_map.get(str(x["PROPOSED_SUBTYPE"]), "")
 
-	input_file = sys.argv[1]
-	df = pd.read_csv(input_file, quoting=csv.QUOTE_NONE, na_filter=False, encoding="utf-8", sep='|', error_bad_lines=False)
+	df = pd.read_csv(DATASET, quoting=csv.QUOTE_NONE, na_filter=False, encoding="utf-8", sep='|', error_bad_lines=False)
 
 	df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
 	grouped = df.groupby('LEDGER_ENTRY', as_index=False)
 	groups = dict(list(grouped))
-	df = groups[sys.argv[3]]
+	df = groups[LEDGER_ENTRY]
 	df["DESCRIPTION_UNMASKED"] = df.apply(fill_description_unmasked, axis=1)
 	df = df.reindex(np.random.permutation(df.index))
 	df["LABEL_NUM"] = df.apply(a, axis=1)
@@ -189,7 +195,7 @@ def max_pool(x):
 	layer = tf.nn.max_pool(x, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
 	return layer
 
-def build_cnn():
+def build_graph():
 	"""Build CNN"""
 
 	graph = tf.Graph()
@@ -297,7 +303,7 @@ def train_model(sess, train, test, groups_train, chunked_test):
 			sess.run(lr.assign(lr / 2))
 
 	# Save Model  
-	save_path = saver.save(sess, "meerkat/classification/models/model_" + sys.argv[1].split(".")[0] + ".ckpt")
+	save_path = saver.save(sess, "meerkat/classification/models/model_" + DATASET.split(".")[0] + ".ckpt")
 	print("Model saved in file: %s" % save_path)
 
 def run_session(graph, saver):
@@ -313,5 +319,5 @@ def run_session(graph, saver):
 
 if __name__ == "__main__":
 	validate_config()
-	graph, saver = build_cnn()
+	graph, saver = build_graph()
 	run_session(graph, saver)
