@@ -9,8 +9,8 @@ Created on Mar 14, 2016
 
 #################### USAGE #######################
 
-# python3 -m meerkat.classification.tf_CNN [config]
-# python3 -m meerkat.classification.tf_CNN config/tf_cnn_config.json
+# python3 -m meerkat.classification.tensorflow_cnn [config]
+# python3 -m meerkat.classification.tensorflow_cnn config/tf_cnn_config.json
 
 ##################################################
 
@@ -192,9 +192,9 @@ def conv2d(input_x, weights):
 	layer = tf.nn.conv2d(input_x, weights, strides=[1, 1, 1, 1], padding='VALID')
 	return layer
 
-def max_pool(x):
+def max_pool(tensor):
 	"""Create max pooling layer"""
-	layer = tf.nn.max_pool(x, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
+	layer = tf.nn.max_pool(tensor, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
 	return layer
 
 def build_graph():
@@ -207,8 +207,8 @@ def build_graph():
 
 		learning_rate = tf.Variable(BASE_RATE, trainable=False, name="lr") 
 
-		x = tf.placeholder(tf.float32, shape=[BATCH_SIZE, 1, DOC_LENGTH, ALPHABET_LENGTH], name="x")
-		y = tf.placeholder(tf.float32, shape=(BATCH_SIZE, NUM_LABELS), name="y")
+		trans_placeholder = tf.placeholder(tf.float32, shape=[BATCH_SIZE, 1, DOC_LENGTH, ALPHABET_LENGTH], name="x")
+		labels_placeholder = tf.placeholder(tf.float32, shape=(BATCH_SIZE, NUM_LABELS), name="y")
 		
 		w_conv1 = weight_variable([1, 7, ALPHABET_LENGTH, 256])
 		b_conv1 = bias_variable([256], 7 * ALPHABET_LENGTH)
@@ -261,10 +261,10 @@ def build_graph():
 
 			return network
 
-		network = model(x, "network", train=True)
-		trained_model = model(x, "model", train=False)
+		network = model(trans_placeholder, "network", train=True)
+		trained_model = model(trans_placeholder, "model", train=False)
 
-		loss = tf.neg(tf.reduce_mean(tf.reduce_sum(network * y, 1)), name="loss")
+		loss = tf.neg(tf.reduce_mean(tf.reduce_sum(network * labels_placeholder, 1)), name="loss")
 		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss, name="optimizer")
 
 		saver = tf.train.Saver()
