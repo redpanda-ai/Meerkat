@@ -90,10 +90,9 @@ def load_data():
 	chunked_test = chunks(np.array(test.index), 128)
 	return train, test, groups_train, chunked_test
 
-def evaluate_testset(graph, sess, model):
+def evaluate_testset(graph, sess, model, test, chunked_test):
 	"""Check error on test set"""
 
-	_, test, _, chunked_test = load_data()
 	total_count = 0
 	correct_count = 0
 
@@ -300,7 +299,7 @@ def train_model(graph, sess, saver):
 			print("Testing for era %d" % (step / EPOCHS))
 			print("Learning rate at epoch %d: %g" % (step + 1, sess.run(learning_rate)))
 			print("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
-			evaluate_testset(graph, sess, model)
+			evaluate_testset(graph, sess, model, test, chunked_test)
 
 		# Update Learning Rate
 		if step != 0 and step % 15000 == 0:
@@ -323,7 +322,8 @@ def run_session(graph, saver):
 		elif MODE == "test":
 			saver.restore(sess, MODEL)
 			model = get_tensor(graph, "model:0")
-			evaluate_testset(graph, sess, model)
+			_, test, _, chunked_test = load_data()
+			evaluate_testset(graph, sess, model, test, chunked_test)
 
 def run_from_command_line():
 	"""Run module from command line"""
