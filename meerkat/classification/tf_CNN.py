@@ -90,9 +90,10 @@ def load_data():
 	chunked_test = chunks(np.array(test.index), 128)
 	return train, test, groups_train, chunked_test
 
-def evaluate_testset(graph, test, chunked_test, no_dropout, session):
+def evaluate_testset(graph, sess, model):
 	"""Check error on test set"""
 
+	_, test, _, chunked_test = load_data()
 	total_count = 0
 	correct_count = 0
 
@@ -104,7 +105,7 @@ def evaluate_testset(graph, test, chunked_test, no_dropout, session):
 
 		trans_test, labels_test = batch_to_tensor(batch_test)
 		feed_dict_test = {get_tensor(graph, "x:0"): trans_test}
-		output = session.run(no_dropout, feed_dict=feed_dict_test)
+		output = sess.run(model, feed_dict=feed_dict_test)
 
 		batch_correct_count = np.sum(np.argmax(output, 1) == np.argmax(labels_test, 1))
 
@@ -271,9 +272,10 @@ def build_graph():
 
 	return graph, saver
 
-def train_model(graph, sess, saver, train, test, groups_train, chunked_test):
+def train_model(graph, sess, saver):
 	"""Train the model"""
 
+	train, test, groups_train, chunked_test = load_data()
 	num_eras = EPOCHS * ERAS
 
 	for step in range(num_eras):
@@ -312,18 +314,16 @@ def train_model(graph, sess, saver, train, test, groups_train, chunked_test):
 def run_session(graph, saver):
 	"""Run Session"""
 
-	train, test, groups_train, chunked_test = load_data()
-
 	with tf.Session(graph=graph) as sess:
 
 		tf.initialize_all_variables().run()
 
 		if MODE == "train":
-			train_model(graph, sess, saver, train, test, groups_train, chunked_test)
+			train_model(graph, sess, saver)
 		elif MODE == "test":
 			saver.restore(sess, MODEL)
 			model = get_tensor(graph, "model:0")
-			evaluate_testset(graph, test, chunked_test, model, sess)
+			evaluate_testset(graph, sess, model)
 
 def run_from_command_line():
 	"""Run module from command line"""
