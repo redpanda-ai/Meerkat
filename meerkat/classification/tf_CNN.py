@@ -315,7 +315,12 @@ def run_session(graph, saver):
 
 		tf.initialize_all_variables().run()
 
-		train_model(sess, train, test, groups_train, chunked_test)
+		if MODE == "train":
+			train_model(sess, train, test, groups_train, chunked_test)
+		elif MODE == "test":
+			saver.restore(sess, MODEL)
+			model = get_tensor(graph, "model:0")
+			evaluate_testset(graph, test, chunked_test, model, sess)
 
 if __name__ == "__main__":
 	validate_config()
