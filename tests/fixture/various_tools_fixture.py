@@ -1,6 +1,7 @@
 """Fixtures for test_various_tools"""
 
 from queue import Queue
+from elasticsearch import Elasticsearch
 
 def get_params_dict():
 	"""Return a params dictionary"""
@@ -30,3 +31,8 @@ def get_queue():
 		"non_empty": non_empty_queue,
 		"empty": empty_queue
 	}
+
+def get_es_connection(cluster):
+	"""Return an es connection"""
+	es_connection = Elasticsearch([cluster])
+	return es_connection
