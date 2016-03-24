@@ -23,7 +23,7 @@ class MergeStoreNumbersTests(unittest.TestCase):
 			or case_type == "no_csv":
 			self.assertRaises(SystemExit, merger.verify_arguments)
 		else:
-			return
+			merger.verify_arguments()
 
 	@parameterized.expand([
 		([merge_store_numbers_fixture.get_csv_file()])

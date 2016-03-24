@@ -61,11 +61,11 @@ class VariousToolsTests(unittest.TestCase):
 		self.assertEqual(various_tools.stopwords(transaction), result)
 
 	@parameterized.expand([
-		([[{}, "Null", various_tools_fixture.get_es_connection("127.0.0.1")], [], None])
+		([[{}, "Null", various_tools_fixture.get_es_connection("127.0.0.1")], None])
 	])
-	def test_get_merchant_by_id(self, *args, **kwargs, result):
+	def test_get_merchant_by_id(self, args, result):
 		"""Test get_merchant_by_id with parameters"""
-		self.assertEqual(various_tools.get_merchant_by_id(args, kwargs), result)
+		self.assertEqual(various_tools.get_merchant_by_id(*args), result)
 
 if __name__ == '__main__':
 	unittest.main()
