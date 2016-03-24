@@ -152,6 +152,10 @@ def get_tensor(graph, name):
 	"""Get tensor by name"""
 	return graph.get_tensor_by_name(name)
 
+def get_op(graph, name):
+	"""Get operation by name"""
+	return graph.get_operation_by_name(name)
+
 def get_variable(graph, name):
 	"""Get variable by name"""
 	with graph.as_default():
@@ -183,7 +187,7 @@ def max_pool(x):
 	layer = tf.nn.max_pool(x, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
 	return layer
 
-def run_session(graph, optimizer, model, saver):
+def run_session(graph, saver):
 	"""Run Session"""
 
 	# Train Network
@@ -204,7 +208,7 @@ def run_session(graph, optimizer, model, saver):
 			feed_dict = {get_tensor(graph, "x:0") : trans, get_tensor(graph, "y:0") : labels}
 
 			# Run Training Step
-			sess.run(optimizer, feed_dict=feed_dict)
+			sess.run(get_op(graph, "optimizer"), feed_dict=feed_dict)
 
 			# Log Loss
 			if (step % 50 == 0):
@@ -212,6 +216,8 @@ def run_session(graph, optimizer, model, saver):
 
 			# Evaluate Testset and Log Progress
 			if (step != 0 and step % epochs == 0):
+				model = get_tensor(graph, "model:0")
+				lr = get_variable(graph, "lr:0")
 				predictions = sess.run(model, feed_dict=feed_dict)
 				print("Testing for era %d" % (step / epochs))
 				print("Learning rate at epoch %d: %g" % (step + 1, sess.run(lr)))
@@ -261,7 +267,7 @@ def build_cnn():
 		W_fc2 = weight_variable([1024, NUM_LABELS])
 		b_fc2 = bias_variable([NUM_LABELS], 1024)
 
-		def model(data, train=False):
+		def model(data, name, train=False):
 
 			h_conv1 = threshold(conv2d(data, W_conv1) + b_conv1)
 			h_pool1 = max_pool(h_conv1)
@@ -286,20 +292,20 @@ def build_cnn():
 			h_fc2 = tf.matmul(h_fc1, W_fc2) + b_fc2
 
 			softmax = tf.nn.softmax(h_fc2)
-			network = tf.log(tf.clip_by_value(softmax, 1e-10, 1.0))
+			network = tf.log(tf.clip_by_value(softmax, 1e-10, 1.0), name=name)
 
 			return network
 
-		train_network = model(x, train=True)
-		test_network = model(x, train=False)
+		network = model(x, "network", train=True)
+		trained_model = model(x, "model", train=False)
 
-		loss = tf.neg(tf.reduce_mean(tf.reduce_sum(train_network * y, 1)), name="loss")
-		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss)
+		loss = tf.neg(tf.reduce_mean(tf.reduce_sum(network * y, 1)), name="loss")
+		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss, name="optimizer")
 
 		saver = tf.train.Saver()
 
 	# Run Graph
-	run_session(graph, optimizer, test_network, saver)
+	run_session(graph, saver)
 
 if __name__ == "__main__":
 	validate_config()
