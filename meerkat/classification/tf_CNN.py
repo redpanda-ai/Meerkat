@@ -88,7 +88,7 @@ def load_data():
 	chunked_test = chunks(np.array(test.index), 128)
 	return train, test, groups_train, chunked_test
 
-def evaluate_testset(x, y, test, chunked_test, no_dropout, session):
+def evaluate_testset(graph, test, chunked_test, no_dropout, session):
 	"""Check error on test set"""
 
 	total_count = 0
@@ -101,7 +101,7 @@ def evaluate_testset(x, y, test, chunked_test, no_dropout, session):
 		if batch_length != 128: continue
 
 		trans_test, labels_test = batch_to_tensor(batch_test)
-		feed_dict_test = {x: trans_test}
+		feed_dict_test = {get_tensor(graph, "x:0"): trans_test}
 		output = session.run(no_dropout, feed_dict=feed_dict_test)
 
 		batch_correct_count = np.sum(np.argmax(output, 1) == np.argmax(labels_test, 1))
@@ -148,6 +148,16 @@ def string_to_tensor(doc, l):
 			t[ALPHA_DICT[c]][len(s) - i - 1] = 1
 	return t
 	
+def get_tensor(graph, name):
+	"""Get tensor by name"""
+	return graph.get_tensor_by_name(name)
+
+def get_variable(graph, name):
+	"""Get variable by name"""
+	with graph.as_default():
+		variable = [v for v in tf.all_variables() if v.name == name][0]
+		return variable
+
 def softmax_with_temperature(tensor, T):
 	"""Softmax with temperature variable"""
 	return tf.div(tf.exp(tensor/T), tf.reduce_sum(tf.exp(tensor/T)))
@@ -173,13 +183,13 @@ def max_pool(x):
 	layer = tf.nn.max_pool(x, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
 	return layer
 
-def run_session(graph, optimizer, model, loss, lr, x, y, saver):
+def run_session(graph, optimizer, model, saver):
 	"""Run Session"""
 
 	# Train Network
 	train, test, groups_train, chunked_test = load_data()
-	epochs = 1000
-	eras = 1
+	epochs = 5000
+	eras = 15
 
 	with tf.Session(graph=graph) as sess:
 
@@ -191,14 +201,14 @@ def run_session(graph, optimizer, model, loss, lr, x, y, saver):
 			# Prepare Data for Training
 			batch = mixed_batching(train, groups_train)
 			trans, labels = batch_to_tensor(batch)
-			feed_dict = {x : trans, y : labels}
+			feed_dict = {get_tensor(graph, "x:0") : trans, get_tensor(graph, "y:0") : labels}
 
 			# Run Training Step
 			sess.run(optimizer, feed_dict=feed_dict)
 
 			# Log Loss
 			if (step % 50 == 0):
-				print("train loss at epoch %d: %g" % (step + 1, sess.run(loss, feed_dict=feed_dict)))
+				print("train loss at epoch %d: %g" % (step + 1, sess.run(get_tensor(graph, "loss:0"), feed_dict=feed_dict)))
 
 			# Evaluate Testset and Log Progress
 			if (step != 0 and step % epochs == 0):
@@ -206,11 +216,12 @@ def run_session(graph, optimizer, model, loss, lr, x, y, saver):
 				print("Testing for era %d" % (step / epochs))
 				print("Learning rate at epoch %d: %g" % (step + 1, sess.run(lr)))
 				print("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
-				evaluate_testset(x, y, test, chunked_test, model, sess)
+				evaluate_testset(graph, test, chunked_test, model, sess)
 
 			# Update Learning Rate
 			if (step != 0 and step % 15000 == 0):
-				sess.run(learning_rate.assign(lr / 2))
+				lr = get_variable(graph, "lr:0")
+				sess.run(lr.assign(lr / 2))
 
 		# Save Model  
 		save_path = saver.save(sess, "meerkat/classification/models/model_" + sys.argv[1].split(".")[0] + ".ckpt")
@@ -224,10 +235,10 @@ def build_cnn():
 	# Create Graph
 	with graph.as_default():
 
-		learning_rate = tf.Variable(BASE_RATE, trainable=False) 
+		learning_rate = tf.Variable(BASE_RATE, trainable=False, name="lr") 
 
-		x = tf.placeholder(tf.float32, shape=[BATCH_SIZE, 1, DOC_LENGTH, ALPHABET_LENGTH])
-		y = tf.placeholder(tf.float32, shape=(BATCH_SIZE, NUM_LABELS))
+		x = tf.placeholder(tf.float32, shape=[BATCH_SIZE, 1, DOC_LENGTH, ALPHABET_LENGTH], name="x")
+		y = tf.placeholder(tf.float32, shape=(BATCH_SIZE, NUM_LABELS), name="y")
 		
 		W_conv1 = weight_variable([1, 7, ALPHABET_LENGTH, 256])
 		b_conv1 = bias_variable([256], 7 * ALPHABET_LENGTH)
@@ -282,13 +293,13 @@ def build_cnn():
 		train_network = model(x, train=True)
 		test_network = model(x, train=False)
 
-		loss = -tf.reduce_mean(tf.reduce_sum(train_network * y, 1))
+		loss = tf.neg(tf.reduce_mean(tf.reduce_sum(train_network * y, 1)), name="loss")
 		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss)
 
 		saver = tf.train.Saver()
 
 	# Run Graph
-	run_session(graph, optimizer, test_network, loss, learning_rate, x, y, saver)
+	run_session(graph, optimizer, test_network, saver)
 
 if __name__ == "__main__":
 	validate_config()
