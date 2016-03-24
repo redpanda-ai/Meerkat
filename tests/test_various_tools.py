@@ -51,5 +51,11 @@ class VariousToolsTests(unittest.TestCase):
 		"""Test clean_line with parameters"""
 		self.assertEqual(various_tools.clean_line(line), output)
 
+	@parameterized.expand([
+		(["ach pos ", ""])
+	])
+	def test_stopwords(self, transaction, result):
+		"""Test stopwords with parameters"""
+		self.assertEqual(various_tools.stopwords(transaction), result)
 if __name__ == '__main__':
 	unittest.main()
