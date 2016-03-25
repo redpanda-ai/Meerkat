@@ -205,7 +205,7 @@ def bias_variable(shape, mult):
 	bias = tf.Variable(tf.random_uniform(shape, minval=-stdv, maxval=stdv), name="B")
 	return bias
 
-def weight_variable(shape):
+def weight_variable(config, shape):
 	"""Initialize weights"""
 	weight = tf.Variable(tf.mul(tf.random_normal(shape), config["randomize"]), name="W")
 	return weight
@@ -242,25 +242,25 @@ def build_graph(config):
 		trans_placeholder = tf.placeholder(tf.float32, shape=input_shape, name="x")
 		labels_placeholder = tf.placeholder(tf.float32, shape=output_shape, name="y")
 		
-		w_conv1 = weight_variable([1, 7, alphabet_length, 256])
+		w_conv1 = weight_variable(config, [1, 7, alphabet_length, 256])
 		b_conv1 = bias_variable([256], 7 * alphabet_length)
 
-		w_conv2 = weight_variable([1, 7, 256, 256])
+		w_conv2 = weight_variable(config, [1, 7, 256, 256])
 		b_conv2 = bias_variable([256], 7 * 256)
 
-		w_conv3 = weight_variable([1, 3, 256, 256])
+		w_conv3 = weight_variable(config, [1, 3, 256, 256])
 		b_conv3 = bias_variable([256], 3 * 256)
 
-		w_conv4 = weight_variable([1, 3, 256, 256])
+		w_conv4 = weight_variable(config, [1, 3, 256, 256])
 		b_conv4 = bias_variable([256], 3 * 256)
 
-		w_conv5 = weight_variable([1, 3, 256, 256])
+		w_conv5 = weight_variable(config, [1, 3, 256, 256])
 		b_conv5 = bias_variable([256], 3 * 256)
 
-		w_fc1 = weight_variable([reshape, 1024])
+		w_fc1 = weight_variable(config, [reshape, 1024])
 		b_fc1 = bias_variable([1024], reshape)
 
-		w_fc2 = weight_variable([1024, num_labels])
+		w_fc2 = weight_variable(config, [1024, num_labels])
 		b_fc2 = bias_variable([num_labels], 1024)
 
 		def model(data, name, train=False):
@@ -309,7 +309,7 @@ def train_model(config, graph, sess, saver):
 	epochs = config["epochs"]
 	eras = config["eras"]
 	dataset = config["dataset"]
-	train, test, groups_train, chunked_test = load_data()
+	train, test, groups_train, chunked_test = load_data(config)
 	num_eras = epochs * eras
 	logging_interval = 50
 	learning_rate_interval = 15000
