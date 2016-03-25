@@ -14,7 +14,7 @@ import logging
 import tensorflow as tf
 from sklearn.externals import joblib
 
-from meerkat.classification.tensorflow_cnn import build_graph, validate_config, get_tensor
+from meerkat.classification.tensorflow_cnn import build_graph, validate_config, get_tensor, load_data, evaluate_testset
 
 def load_scikit_model(model_name):
 	"""Load either Card or Bank classifier depending on
@@ -58,10 +58,13 @@ def load_tensorflow_model(model_name):
 	graph, saver = build_graph(config)
 
 	# Load Session and Graph
-	with tf.Session(graph=graph) as sess:
-		tf.initialize_all_variables().run()
-		saver.restore(sess, model_path)
-		model = get_tensor(graph, "model:0")
+	sess = tf.Session(graph=graph)
+	saver.restore(sess, model_path)
+	model = get_tensor(graph, "model:0")
+	
+	# Temp For Testing
+	_, test, _, chunked_test = load_data(config)
+	evaluate_testset(config, graph, sess, model, test, chunked_test)
 
 	return model
 

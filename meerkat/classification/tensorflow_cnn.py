@@ -112,7 +112,7 @@ def evaluate_testset(config, graph, sess, model, test, chunked_test):
 		if batch_length != 128:
 			continue
 
-		trans_test, labels_test = batch_to_tensor(batch_test)
+		trans_test, labels_test = batch_to_tensor(config, batch_test)
 		feed_dict_test = {get_tensor(graph, "x:0"): trans_test}
 		output = sess.run(model, feed_dict=feed_dict_test)
 
