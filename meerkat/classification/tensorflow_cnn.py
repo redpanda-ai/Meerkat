@@ -67,15 +67,19 @@ def load_data():
 	"""Load data and label map"""
 
 	reversed_map = reverse_map(LABEL_MAP)
-	map_labels = lambda x: reversed_map.get(str(x["PROPOSED_SUBTYPE"]), "")
+	ground_truth_labels = {'merchant' : 'MERCHANT_NAME',
+		'subtype' : 'PROPOSED_SUBTYPE'}
+	map_labels = lambda x: reversed_map.get(str(x[ground_truth_labels[MODEL_TYPE]]), "")
 
 	df = pd.read_csv(DATASET, quoting=csv.QUOTE_NONE, na_filter=False,
 		encoding="utf-8", sep='|', error_bad_lines=False)
 
-	df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
-	grouped = df.groupby('LEDGER_ENTRY', as_index=False)
-	groups = dict(list(grouped))
-	df = groups[LEDGER_ENTRY]
+	if MODEL_TYPE == "subtype":
+		df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
+		grouped = df.groupby('LEDGER_ENTRY', as_index=False)
+		groups = dict(list(grouped))
+		df = groups[LEDGER_ENTRY]
+
 	df["DESCRIPTION_UNMASKED"] = df.apply(fill_description_unmasked, axis=1)
 	df = df.reindex(np.random.permutation(df.index))
 	df["LABEL_NUM"] = df.apply(map_labels, axis=1)
