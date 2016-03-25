@@ -26,6 +26,11 @@ import tensorflow as tf
 from .tools import fill_description_unmasked, reverse_map
 from .verify_data import load_json
 
+#MAGIC NUMBERS
+MAGIC_NUMBER_1 = 96
+MAGIC_NUMBER_2 = 27
+SMALL_FRAME_SIZE = 256 #somehow related to 68
+
 CONFIG = load_json(sys.argv[1])
 DATASET = CONFIG["dataset"]
 MODE = CONFIG["mode"]
@@ -41,9 +46,9 @@ BATCH_SIZE = CONFIG["batch_size"]
 DOC_LENGTH = CONFIG["doc_length"]
 RANDOMIZE = CONFIG["randomize"]
 MOMENTUM = CONFIG["momentum"]
-BASE_RATE = CONFIG["base_rate"] * math.sqrt(BATCH_SIZE) / math.sqrt(128)
+BASE_RATE = CONFIG["base_rate"] * math.sqrt(BATCH_SIZE) / math.sqrt(BATCH_SIZE)
 DECAY = CONFIG["decay"]
-RESHAPE = ((DOC_LENGTH - 96) / 27) * 256
+RESHAPE = ((DOC_LENGTH - MAGIC_NUMBER_1) / MAGIC_NUMBER_2) * SMALL_FRAME_SIZE
 ALPHABET_LENGTH = len(ALPHABET)
 EPOCHS = CONFIG["epochs"]
 ERAS = CONFIG["eras"]
@@ -61,7 +66,7 @@ def validate_config():
 	if RESHAPE.is_integer():
 		RESHAPE = int(RESHAPE)
 	else:
-		raise ValueError('DOC_LENGTH - 96 must be divisible by 27: 123, 150, 177, 204...')
+		raise ValueError('DOC_LENGTH - MAGIC_NUMBER_1 must be divisible by MAGIC_NUMBER_2: 123, 150, 177, 204...')
 
 def load_data():
 	"""Load data and label map"""
@@ -87,7 +92,7 @@ def load_data():
 	grouped_train = train.groupby('LABEL_NUM', as_index=False)
 	groups_train = dict(list(grouped_train))
 
-	chunked_test = chunks(np.array(test.index), 128)
+	chunked_test = chunks(np.array(test.index), BATCH_SIZE)
 	return train, test, groups_train, chunked_test
 
 def evaluate_testset(graph, sess, model, test, chunked_test):
@@ -100,7 +105,7 @@ def evaluate_testset(graph, sess, model, test, chunked_test):
 
 		batch_test = test.loc[chunked_test[i]]
 		batch_length = len(batch_test)
-		if batch_length != 128: continue
+		if batch_length != BATCH_SIZE: continue
 
 		trans_test, labels_test = batch_to_tensor(batch_test)
 		feed_dict_test = {get_tensor(graph, "x:0"): trans_test}
@@ -203,6 +208,9 @@ def build_graph():
 	graph = tf.Graph()
 
 	# Create Graph
+	kern_a, kern_b = 7, 3
+	size_frame = 256 #Size of convolutional frame
+	size_linear_layer = 1024 #Size of fully-connected layer
 	with graph.as_default():
 
 		learning_rate = tf.Variable(BASE_RATE, trainable=False, name="lr") 
@@ -210,26 +218,26 @@ def build_graph():
 		x = tf.placeholder(tf.float32, shape=[BATCH_SIZE, 1, DOC_LENGTH, ALPHABET_LENGTH], name="x")
 		y = tf.placeholder(tf.float32, shape=(BATCH_SIZE, NUM_LABELS), name="y")
 		
-		w_conv1 = weight_variable([1, 7, ALPHABET_LENGTH, 256])
-		b_conv1 = bias_variable([256], 7 * ALPHABET_LENGTH)
+		w_conv1 = weight_variable([1, kern_a, ALPHABET_LENGTH, size_frame])
+		b_conv1 = bias_variable([size_frame], kern_a * ALPHABET_LENGTH)
 
-		w_conv2 = weight_variable([1, 7, 256, 256])
-		b_conv2 = bias_variable([256], 7 * 256)
+		w_conv2 = weight_variable([1, kern_a, size_frame, size_frame])
+		b_conv2 = bias_variable([size_frame], kern_a * size_frame)
 
-		w_conv3 = weight_variable([1, 3, 256, 256])
-		b_conv3 = bias_variable([256], 3 * 256)
+		w_conv3 = weight_variable([1, kern_b, size_frame, size_frame])
+		b_conv3 = bias_variable([size_frame], kern_b * size_frame)
 
-		w_conv4 = weight_variable([1, 3, 256, 256])
-		b_conv4 = bias_variable([256], 3 * 256)
+		w_conv4 = weight_variable([1, kern_b, size_frame, size_frame])
+		b_conv4 = bias_variable([size_frame], kern_b * size_frame)
 
-		w_conv5 = weight_variable([1, 3, 256, 256])
-		b_conv5 = bias_variable([256], 3 * 256)
+		w_conv_5 = weight_variable([1, kern_b, size_frame, size_frame])
+		b_conv_5 = bias_variable([size_frame], kern_b * size_frame)
 
-		w_fc1 = weight_variable([RESHAPE, 1024])
-		b_fc1 = bias_variable([1024], RESHAPE)
+		w_linear_1 = weight_variable([RESHAPE, size_linear_layer])
+		b_linear_1 = bias_variable([size_linear_layer], RESHAPE)
 
-		w_fc2 = weight_variable([1024, NUM_LABELS])
-		b_fc2 = bias_variable([NUM_LABELS], 1024)
+		w_fc2 = weight_variable([size_linear_layer, NUM_LABELS])
+		b_fc2 = bias_variable([NUM_LABELS], size_linear_layer)
 
 		def model(data, name, train=False):
 			"""Add model layers to the graph"""
