@@ -48,12 +48,14 @@ def load_tensorflow_model(model_name):
 	# Switch on Models
 	if model_name == "card_debit_subtype":
 		model_path = "card_debit_subtype.ckpt"
+		config_path = "config/tf_cnn_config.json"
 	else:
 		logging.warning("Model not found. Terminating")
 		sys.exit()
 
 	# Load Graph
-	graph, saver = build_graph()
+	config = verify_config(config_path)
+	graph, saver = build_graph(config)
 
 	# Load Session and Graph
 	tf.initialize_all_variables().run()
