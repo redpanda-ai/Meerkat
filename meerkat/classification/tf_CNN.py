@@ -27,9 +27,9 @@ from .tools import fill_description_unmasked, reverse_map
 from .verify_data import load_json
 
 #MAGIC NUMBERS
-MAGIC_NUMBER_1 = 96
-MAGIC_NUMBER_2 = 27
-SMALL_FRAME_SIZE = 256 #somehow related to 68
+MAGIC_NUMBER_1 = 96 #From the source literature, unsure why
+MAGIC_NUMBER_2 = 27 #From the source literature, unsure why
+SMALL_FRAME_SIZE = 256
 
 CONFIG = load_json(sys.argv[1])
 DATASET = CONFIG["dataset"]
@@ -208,71 +208,75 @@ def build_graph():
 	graph = tf.Graph()
 
 	# Create Graph
-	kern_a, kern_b = 7, 3
-	size_frame = 256 #Size of convolutional frame
-	size_linear_layer = 1024 #Size of fully-connected layer
 	with graph.as_default():
 
 		learning_rate = tf.Variable(BASE_RATE, trainable=False, name="lr") 
 
-		x = tf.placeholder(tf.float32, shape=[BATCH_SIZE, 1, DOC_LENGTH, ALPHABET_LENGTH], name="x")
-		y = tf.placeholder(tf.float32, shape=(BATCH_SIZE, NUM_LABELS), name="y")
-		
-		w_conv1 = weight_variable([1, kern_a, ALPHABET_LENGTH, size_frame])
-		b_conv1 = bias_variable([size_frame], kern_a * ALPHABET_LENGTH)
+		thing_x = tf.placeholder(tf.float32, shape=[BATCH_SIZE, 1, DOC_LENGTH, ALPHABET_LENGTH], name="thing_x")
+		thing_y = tf.placeholder(tf.float32, shape=(BATCH_SIZE, NUM_LABELS), name="thing_y")
+		# Five convolutional layers
+		# First, two layers using a kernel width of 7
+		conv_width = 256 # width of convolutional frame
+		kern_7 = 7 # our kernel width is 7
+		w_conv_1 = weight_variable([1, kern_7, ALPHABET_LENGTH, conv_width])
+		b_conv_1 = bias_variable([conv_width], kern_7 * ALPHABET_LENGTH)
 
-		w_conv2 = weight_variable([1, kern_a, size_frame, size_frame])
-		b_conv2 = bias_variable([size_frame], kern_a * size_frame)
+		w_conv_2 = weight_variable([1, kern_7, conv_width, conv_width])
+		b_conv_2 = bias_variable([conv_width], kern_7 * conv_width)
 
-		w_conv3 = weight_variable([1, kern_b, size_frame, size_frame])
-		b_conv3 = bias_variable([size_frame], kern_b * size_frame)
+		# Next, three layers using a kernel width of 3
+		kern_3 = 3 # our kernel width is 3
+		w_conv_3 = weight_variable([1, kern_3, conv_width, conv_width])
+		b_conv_3 = bias_variable([conv_width], kern_3 * conv_width)
 
-		w_conv4 = weight_variable([1, kern_b, size_frame, size_frame])
-		b_conv4 = bias_variable([size_frame], kern_b * size_frame)
+		w_conv_4 = weight_variable([1, kern_3, conv_width, conv_width])
+		b_conv_4 = bias_variable([conv_width], kern_3 * conv_width)
 
-		w_conv_5 = weight_variable([1, kern_b, size_frame, size_frame])
-		b_conv_5 = bias_variable([size_frame], kern_b * size_frame)
+		w_conv_5 = weight_variable([1, kern_3, conv_width, conv_width])
+		b_conv_5 = bias_variable([conv_width], kern_3 * conv_width)
 
-		w_linear_1 = weight_variable([RESHAPE, size_linear_layer])
-		b_linear_1 = bias_variable([size_linear_layer], RESHAPE)
+		# Finally, 2 linear (fully connected) layers
+		linear_width = 1024 # width of fully-connected (linear) layer
+		w_linear_1 = weight_variable([RESHAPE, linear_width])
+		b_linear_1 = bias_variable([linear_width], RESHAPE)
 
-		w_fc2 = weight_variable([size_linear_layer, NUM_LABELS])
-		b_fc2 = bias_variable([NUM_LABELS], size_linear_layer)
+		w_linear_2 = weight_variable([linear_width, NUM_LABELS])
+		b_linear_2 = bias_variable([NUM_LABELS], linear_width)
 
 		def model(data, name, train=False):
 			"""Add model layers to the graph"""
 
-			h_conv1 = threshold(conv2d(data, w_conv1) + b_conv1)
-			h_pool1 = max_pool(h_conv1)
+			h_conv_1 = threshold(conv2d(data, w_conv_1) + b_conv_1)
+			h_pool_1 = max_pool(h_conv_1)
 
-			h_conv2 = threshold(conv2d(h_pool1, w_conv2) + b_conv2)
-			h_pool2 = max_pool(h_conv2)
+			h_conv_2 = threshold(conv2d(h_pool_1, w_conv_2) + b_conv_2)
+			h_pool_2 = max_pool(h_conv_2)
 
-			h_conv3 = threshold(conv2d(h_pool2, w_conv3) + b_conv3)
+			h_conv_3 = threshold(conv2d(h_pool_2, w_conv_3) + b_conv_3)
 
-			h_conv4 = threshold(conv2d(h_conv3, w_conv4) + b_conv4)
+			h_conv_4 = threshold(conv2d(h_conv_3, w_conv_4) + b_conv_4)
 
-			h_conv5 = threshold(conv2d(h_conv4, w_conv5) + b_conv5)
-			h_pool5 = max_pool(h_conv5)
+			h_conv_5 = threshold(conv2d(h_conv_4, w_conv_5) + b_conv_5)
+			h_pool_5 = max_pool(h_conv_5)
 
-			h_reshape = tf.reshape(h_pool5, [BATCH_SIZE, RESHAPE])
+			h_reshape = tf.reshape(h_pool_5, [BATCH_SIZE, RESHAPE])
 
-			h_fc1 = threshold(tf.matmul(h_reshape, w_fc1) + b_fc1)
+			h_linear_1 = threshold(tf.matmul(h_reshape, w_linear_1) + b_linear_1)
 
 			if train:
-				h_fc1 = tf.nn.dropout(h_fc1, 0.5)
+				h_linear_1 = tf.nn.dropout(h_linear_1, 0.5)
 
-			h_fc2 = tf.matmul(h_fc1, w_fc2) + b_fc2
+			h_linear_2 = tf.matmul(h_linear_1, w_linear_2) + b_linear_2
 
-			softmax = tf.nn.softmax(h_fc2)
+			softmax = tf.nn.softmax(h_linear_2)
 			network = tf.log(tf.clip_by_value(softmax, 1e-10, 1.0), name=name)
 
 			return network
 
-		network = model(x, "network", train=True)
-		trained_model = model(x, "model", train=False)
+		network = model(thing_x, "network", train=True)
+		trained_model = model(thing_x, "model", train=False)
 
-		loss = tf.neg(tf.reduce_mean(tf.reduce_sum(network * y, 1)), name="loss")
+		loss = tf.neg(tf.reduce_mean(tf.reduce_sum(network * thing_y, 1)), name="loss")
 		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss, name="optimizer")
 
 		saver = tf.train.Saver()
