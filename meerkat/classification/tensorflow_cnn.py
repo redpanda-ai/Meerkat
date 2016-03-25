@@ -26,6 +26,11 @@ import tensorflow as tf
 from .tools import fill_description_unmasked, reverse_map
 from .verify_data import load_json
 
+#MAGIC NUMBERS
+MAGIC_NUMBER_1 = 96 #From the source literature, unsure why
+MAGIC_NUMBER_2 = 27 #From the source literature, unsure why
+SMALL_FRAME_SIZE = 256
+
 CONFIG = load_json(sys.argv[1])
 DATASET = CONFIG["dataset"]
 MODE = CONFIG["mode"]
@@ -41,9 +46,9 @@ BATCH_SIZE = CONFIG["batch_size"]
 DOC_LENGTH = CONFIG["doc_length"]
 RANDOMIZE = CONFIG["randomize"]
 MOMENTUM = CONFIG["momentum"]
-BASE_RATE = CONFIG["base_rate"] * math.sqrt(BATCH_SIZE) / math.sqrt(128)
+BASE_RATE = CONFIG["base_rate"] * math.sqrt(BATCH_SIZE) / math.sqrt(BATCH_SIZE)
 DECAY = CONFIG["decay"]
-RESHAPE = ((DOC_LENGTH - 96) / 27) * 256
+RESHAPE = ((DOC_LENGTH - MAGIC_NUMBER_1) / MAGIC_NUMBER_2) * SMALL_FRAME_SIZE
 ALPHABET_LENGTH = len(ALPHABET)
 EPOCHS = CONFIG["epochs"]
 ERAS = CONFIG["eras"]
@@ -61,7 +66,8 @@ def validate_config():
 	if RESHAPE.is_integer():
 		RESHAPE = int(RESHAPE)
 	else:
-		raise ValueError('DOC_LENGTH - 96 must be divisible by 27: 123, 150, 177, 204...')
+		raise ValueError('DOC_LENGTH - MAGIC_NUMBER_1 must be divisible by MAGIC_NUMBER_2: 123,'
+			' 150, 177, 204...')
 
 def load_data():
 	"""Load data and label map"""
@@ -69,8 +75,8 @@ def load_data():
 	reversed_map = reverse_map(LABEL_MAP)
 	map_labels = lambda x: reversed_map.get(str(x["PROPOSED_SUBTYPE"]), "")
 
-	df = pd.read_csv(DATASET, quoting=csv.QUOTE_NONE, na_filter=False,
-		encoding="utf-8", sep='|', error_bad_lines=False)
+	df = pd.read_csv(DATASET, quoting=csv.QUOTE_NONE, na_filter=False, encoding="utf-8",
+		sep='|', error_bad_lines=False)
 
 	df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
 	grouped = df.groupby('LEDGER_ENTRY', as_index=False)
@@ -88,7 +94,7 @@ def load_data():
 	grouped_train = train.groupby('LABEL_NUM', as_index=False)
 	groups_train = dict(list(grouped_train))
 
-	chunked_test = chunks(np.array(test.index), 128)
+	chunked_test = chunks(np.array(test.index), BATCH_SIZE)
 	return train, test, groups_train, chunked_test
 
 def evaluate_testset(graph, sess, model, test, chunked_test):
@@ -101,7 +107,8 @@ def evaluate_testset(graph, sess, model, test, chunked_test):
 
 		batch_test = test.loc[chunked_test[i]]
 		batch_length = len(batch_test)
-		if batch_length != 128:
+
+		if batch_length != BATCH_SIZE:
 			continue
 
 		trans_test, labels_test = batch_to_tensor(batch_test)
@@ -209,57 +216,65 @@ def build_graph():
 
 		learning_rate = tf.Variable(BASE_RATE, trainable=False, name="lr") 
 
-		trans_placeholder = tf.placeholder(tf.float32,
-			shape=[BATCH_SIZE, 1, DOC_LENGTH, ALPHABET_LENGTH], name="x")
-		labels_placeholder = tf.placeholder(tf.float32, shape=(BATCH_SIZE, NUM_LABELS), name="y")
-		
-		w_conv1 = weight_variable([1, 7, ALPHABET_LENGTH, 256])
-		b_conv1 = bias_variable([256], 7 * ALPHABET_LENGTH)
+		trans_placeholder = tf.placeholder(tf.float32, shape=[BATCH_SIZE, 1, DOC_LENGTH, ALPHABET_LENGTH],
+			name="x")
+		labels_placeholder = tf.placeholder(tf.float32, shape=(BATCH_SIZE, NUM_LABELS),
+			name="y")
+		# Five convolutional layers
+		# First, two layers using a kernel width of 7
+		conv_width = 256 # width of convolutional frame
+		kern_7 = 7 # our kernel width is 7
+		w_conv_1 = weight_variable([1, kern_7, ALPHABET_LENGTH, conv_width])
+		b_conv_1 = bias_variable([conv_width], kern_7 * ALPHABET_LENGTH)
 
-		w_conv2 = weight_variable([1, 7, 256, 256])
-		b_conv2 = bias_variable([256], 7 * 256)
+		w_conv_2 = weight_variable([1, kern_7, conv_width, conv_width])
+		b_conv_2 = bias_variable([conv_width], kern_7 * conv_width)
 
-		w_conv3 = weight_variable([1, 3, 256, 256])
-		b_conv3 = bias_variable([256], 3 * 256)
+		# Next, three layers using a kernel width of 3
+		kern_3 = 3 # our kernel width is 3
+		w_conv_3 = weight_variable([1, kern_3, conv_width, conv_width])
+		b_conv_3 = bias_variable([conv_width], kern_3 * conv_width)
 
-		w_conv4 = weight_variable([1, 3, 256, 256])
-		b_conv4 = bias_variable([256], 3 * 256)
+		w_conv_4 = weight_variable([1, kern_3, conv_width, conv_width])
+		b_conv_4 = bias_variable([conv_width], kern_3 * conv_width)
 
-		w_conv5 = weight_variable([1, 3, 256, 256])
-		b_conv5 = bias_variable([256], 3 * 256)
+		w_conv_5 = weight_variable([1, kern_3, conv_width, conv_width])
+		b_conv_5 = bias_variable([conv_width], kern_3 * conv_width)
 
-		w_fc1 = weight_variable([RESHAPE, 1024])
-		b_fc1 = bias_variable([1024], RESHAPE)
+		# Finally, 2 linear (fully connected) layers
+		linear_width = 1024 # width of fully-connected (linear) layer
+		w_linear_1 = weight_variable([RESHAPE, linear_width])
+		b_linear_1 = bias_variable([linear_width], RESHAPE)
 
-		w_fc2 = weight_variable([1024, NUM_LABELS])
-		b_fc2 = bias_variable([NUM_LABELS], 1024)
+		w_linear_2 = weight_variable([linear_width, NUM_LABELS])
+		b_linear_2 = bias_variable([NUM_LABELS], linear_width)
 
 		def model(data, name, train=False):
 			"""Add model layers to the graph"""
 
-			h_conv1 = threshold(conv2d(data, w_conv1) + b_conv1)
-			h_pool1 = max_pool(h_conv1)
+			h_conv_1 = threshold(conv2d(data, w_conv_1) + b_conv_1)
+			h_pool_1 = max_pool(h_conv_1)
 
-			h_conv2 = threshold(conv2d(h_pool1, w_conv2) + b_conv2)
-			h_pool2 = max_pool(h_conv2)
+			h_conv_2 = threshold(conv2d(h_pool_1, w_conv_2) + b_conv_2)
+			h_pool_2 = max_pool(h_conv_2)
 
-			h_conv3 = threshold(conv2d(h_pool2, w_conv3) + b_conv3)
+			h_conv_3 = threshold(conv2d(h_pool_2, w_conv_3) + b_conv_3)
 
-			h_conv4 = threshold(conv2d(h_conv3, w_conv4) + b_conv4)
+			h_conv_4 = threshold(conv2d(h_conv_3, w_conv_4) + b_conv_4)
 
-			h_conv5 = threshold(conv2d(h_conv4, w_conv5) + b_conv5)
-			h_pool5 = max_pool(h_conv5)
+			h_conv_5 = threshold(conv2d(h_conv_4, w_conv_5) + b_conv_5)
+			h_pool_5 = max_pool(h_conv_5)
 
-			h_reshape = tf.reshape(h_pool5, [BATCH_SIZE, RESHAPE])
+			h_reshape = tf.reshape(h_pool_5, [BATCH_SIZE, RESHAPE])
 
-			h_fc1 = threshold(tf.matmul(h_reshape, w_fc1) + b_fc1)
+			h_linear_1 = threshold(tf.matmul(h_reshape, w_linear_1) + b_linear_1)
 
 			if train:
-				h_fc1 = tf.nn.dropout(h_fc1, 0.5)
+				h_linear_1 = tf.nn.dropout(h_linear_1, 0.5)
 
-			h_fc2 = tf.matmul(h_fc1, w_fc2) + b_fc2
+			h_linear_2 = tf.matmul(h_linear_1, w_linear_2) + b_linear_2
 
-			softmax = tf.nn.softmax(h_fc2)
+			softmax = tf.nn.softmax(h_linear_2)
 			network = tf.log(tf.clip_by_value(softmax, 1e-10, 1.0), name=name)
 
 			return network
@@ -280,6 +295,8 @@ def train_model(graph, sess, saver):
 	train, test, groups_train, chunked_test = load_data()
 	num_eras = EPOCHS * ERAS
 
+	logging_interval = 50
+	learning_rate_interval = 15000
 	for step in range(num_eras):
 
 		# Prepare Data for Training
@@ -291,9 +308,9 @@ def train_model(graph, sess, saver):
 		sess.run(get_op(graph, "optimizer"), feed_dict=feed_dict)
 
 		# Log Loss
-		if step % 50 == 0:
-			logging.warning("train loss at epoch %d: %g" % (step + 1, sess.run(get_tensor(graph, "loss:0"),
-				feed_dict=feed_dict)))
+		if step % logging_interval == 0:
+			logging.warning("train loss at epoch %d: %g" % (step + 1, sess.run(get_tensor(graph,
+				"loss:0"), feed_dict=feed_dict)))
 
 		# Evaluate Testset and Log Progress
 		if step != 0 and step % EPOCHS == 0:
@@ -306,7 +323,7 @@ def train_model(graph, sess, saver):
 			evaluate_testset(graph, sess, model, test, chunked_test)
 
 		# Update Learning Rate
-		if step != 0 and step % 15000 == 0:
+		if step != 0 and step % learning_rate_interval == 0:
 			learning_rate = get_variable(graph, "lr:0")
 			sess.run(learning_rate.assign(learning_rate / 2))
 
