@@ -30,8 +30,9 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 
-from .tools import fill_description_unmasked, reverse_map
-from .verify_data import load_json
+from meerkat.various_tools import load_piped_dataframe
+from meerkat.classification.tools import fill_description_unmasked, reverse_map
+from meerkat.classification.verify_data import load_json
 
 CONFIG = validate_config()
 DATASET = CONFIG["dataset"]
@@ -73,19 +74,6 @@ def validate_config():
 
 	return config
 
-def load_dataframe(filename):
-	"""Load dataframe from file name"""
-
-	options = {
-		"quoting": csv.QUOTE_NONE,
-		"na_filter": False,
-		"encoding": "utf-8",
-		"sep": "|",
-		"error_bad_lines": False
-	}
-
-	return pd.read_csv(filename, **options)
-
 def load_data():
 	"""Load data and label map"""
 
@@ -97,7 +85,7 @@ def load_data():
 	reversed_map = reverse_map(LABEL_MAP)
 	map_labels = lambda x: reversed_map.get(str(x[ground_truth_labels[MODEL_TYPE]]), "")
 
-	df = load_dataframe(DATASET)
+	df = load_piped_dataframe(DATASET)
 
 	if MODEL_TYPE == "subtype":
 		df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
