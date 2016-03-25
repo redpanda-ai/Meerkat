@@ -12,7 +12,7 @@ from sklearn.externals import joblib
 import logging
 import sys
 
-def select_model(mode):
+def load_scikit_model(mode):
 	"""Load either Card or Bank classifier depending on
 	requested model"""
 
