@@ -76,7 +76,7 @@ def load_data(config):
 
 	df = load_piped_dataframe(dataset)
 
-	if MODEL_TYPE == "subtype":
+	if model_type == "subtype":
 		df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
 		grouped = df.groupby('LEDGER_ENTRY', as_index=False)
 		groups = dict(list(grouped))
@@ -152,7 +152,7 @@ def batch_to_tensor(config, batch):
 	batch_size = config["batch_size"]
 
 	labels = np.array(batch["LABEL_NUM"].astype(int)) - 1
-	labels = (np.arange(NUM_LABELS) == labels[:, None]).astype(np.float32)
+	labels = (np.arange(num_labels) == labels[:, None]).astype(np.float32)
 	docs = batch["DESCRIPTION_UNMASKED"].tolist()
 	transactions = np.zeros(shape=(batch_size, 1, alphabet_length, doc_length))
 	
@@ -167,10 +167,10 @@ def string_to_tensor(config, doc, length):
 	alphabet = config["alphabet"]
 	alpha_dict = config["alpha_dict"]
 	doc = doc.lower()[0:length]
-	tensor = np.zeros((len(ALPHABET), length), dtype=np.float32)
+	tensor = np.zeros((len(alphabet), length), dtype=np.float32)
 	for index, char in reversed(list(enumerate(doc))):
-		if char in ALPHABET:
-			tensor[ALPHA_DICT[char]][len(doc) - index - 1] = 1
+		if char in alphabet:
+			tensor[alpha_dict[char]][len(doc) - index - 1] = 1
 	return tensor
 	
 def get_tensor(graph, name):
