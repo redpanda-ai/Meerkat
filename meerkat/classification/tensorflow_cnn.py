@@ -1,4 +1,6 @@
 #!/usr/local/bin/python3
+# pylint: disable=unused-variable
+# pylint: disable=too-many-locals
 
 """Train a CNN using tensorFlow
 
@@ -12,21 +14,27 @@ Created on Mar 14, 2016
 # python3 -m meerkat.classification.tensorflow_cnn [config]
 # python3 -m meerkat.classification.tensorflow_cnn config/tf_cnn_config.json
 
+# For details on implementation see:
+# Character-level Convolutional Networks for Text Classification
+# http://arxiv.org/abs/1509.01626
+
 ##################################################
 
 import csv
 import logging
 import math
-import numpy as np
-import pandas as pd
 import random
 import sys
+
+import numpy as np
+import pandas as pd
 import tensorflow as tf
 
-from .tools import fill_description_unmasked, reverse_map
-from .verify_data import load_json
+from meerkat.various_tools import load_piped_dataframe
+from meerkat.classification.tools import fill_description_unmasked, reverse_map
+from meerkat.classification.verify_data import load_json
 
-CONFIG = load_json(sys.argv[1])
+CONFIG = validate_config()
 DATASET = CONFIG["dataset"]
 MODE = CONFIG["mode"]
 MODEL = CONFIG["model"]
@@ -43,7 +51,7 @@ RANDOMIZE = CONFIG["randomize"]
 MOMENTUM = CONFIG["momentum"]
 BASE_RATE = CONFIG["base_rate"] * math.sqrt(BATCH_SIZE) / math.sqrt(128)
 DECAY = CONFIG["decay"]
-RESHAPE = ((DOC_LENGTH - 96) / 27) * 256
+RESHAPE = CONFIG["reshape"]
 ALPHABET_LENGTH = len(ALPHABET)
 EPOCHS = CONFIG["epochs"]
 ERAS = CONFIG["eras"]
@@ -56,26 +64,35 @@ def chunks(array, num):
 def validate_config():
 	"""Validate input configuration"""
 
-	global RESHAPE
+	config = load_json(sys.argv[1])
+	reshape = ((config["doc_length"] - 96) / 27) * 256
 
-	if RESHAPE.is_integer():
-		RESHAPE = int(RESHAPE)
+	if reshape.is_integer():
+		config["reshape"] = int(reshape)
 	else:
 		raise ValueError('DOC_LENGTH - 96 must be divisible by 27: 123, 150, 177, 204...')
+
+	return config
 
 def load_data():
 	"""Load data and label map"""
 
+	ground_truth_labels = {
+		'merchant' : 'MERCHANT_NAME',
+		'subtype' : 'PROPOSED_SUBTYPE'
+	}
+
 	reversed_map = reverse_map(LABEL_MAP)
-	map_labels = lambda x: reversed_map.get(str(x["PROPOSED_SUBTYPE"]), "")
+	map_labels = lambda x: reversed_map.get(str(x[ground_truth_labels[MODEL_TYPE]]), "")
 
-	df = pd.read_csv(DATASET, quoting=csv.QUOTE_NONE, na_filter=False,
-		encoding="utf-8", sep='|', error_bad_lines=False)
+	df = load_piped_dataframe(DATASET)
 
-	df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
-	grouped = df.groupby('LEDGER_ENTRY', as_index=False)
-	groups = dict(list(grouped))
-	df = groups[LEDGER_ENTRY]
+	if MODEL_TYPE == "subtype":
+		df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
+		grouped = df.groupby('LEDGER_ENTRY', as_index=False)
+		groups = dict(list(grouped))
+		df = groups[LEDGER_ENTRY]
+
 	df["DESCRIPTION_UNMASKED"] = df.apply(fill_description_unmasked, axis=1)
 	df = df.reindex(np.random.permutation(df.index))
 	df["LABEL_NUM"] = df.apply(map_labels, axis=1)
@@ -96,8 +113,9 @@ def evaluate_testset(graph, sess, model, test, chunked_test):
 
 	total_count = 0
 	correct_count = 0
+	num_chunks = len(chunked_test)
 
-	for i in range(len(chunked_test)):
+	for i in range(num_chunks):
 
 		batch_test = test.loc[chunked_test[i]]
 		batch_length = len(batch_test)
@@ -209,9 +227,11 @@ def build_graph():
 
 		learning_rate = tf.Variable(BASE_RATE, trainable=False, name="lr") 
 
-		trans_placeholder = tf.placeholder(tf.float32,
-			shape=[BATCH_SIZE, 1, DOC_LENGTH, ALPHABET_LENGTH], name="x")
-		labels_placeholder = tf.placeholder(tf.float32, shape=(BATCH_SIZE, NUM_LABELS), name="y")
+		input_shape = [BATCH_SIZE, 1, DOC_LENGTH, ALPHABET_LENGTH]
+		output_shape = [BATCH_SIZE, NUM_LABELS]
+
+		trans_placeholder = tf.placeholder(tf.float32, shape=input_shape, name="x")
+		labels_placeholder = tf.placeholder(tf.float32, shape=output_shape, name="y")
 		
 		w_conv1 = weight_variable([1, 7, ALPHABET_LENGTH, 256])
 		b_conv1 = bias_variable([256], 7 * ALPHABET_LENGTH)
@@ -279,6 +299,8 @@ def train_model(graph, sess, saver):
 
 	train, test, groups_train, chunked_test = load_data()
 	num_eras = EPOCHS * ERAS
+	logging_interval = 50
+	learning_rate_interval = 15000
 
 	for step in range(num_eras):
 
@@ -291,9 +313,9 @@ def train_model(graph, sess, saver):
 		sess.run(get_op(graph, "optimizer"), feed_dict=feed_dict)
 
 		# Log Loss
-		if step % 50 == 0:
-			logging.warning("train loss at epoch %d: %g" % (step + 1, sess.run(get_tensor(graph, "loss:0"),
-				feed_dict=feed_dict)))
+		if step % logging_interval == 0:
+			loss = sess.run(get_tensor(graph, "loss:0"), feed_dict=feed_dict)
+			logging.warning("train loss at epoch %d: %g" % (step + 1, loss))
 
 		# Evaluate Testset and Log Progress
 		if step != 0 and step % EPOCHS == 0:
@@ -306,13 +328,13 @@ def train_model(graph, sess, saver):
 			evaluate_testset(graph, sess, model, test, chunked_test)
 
 		# Update Learning Rate
-		if step != 0 and step % 15000 == 0:
+		if step != 0 and step % learning_rate_interval == 0:
 			learning_rate = get_variable(graph, "lr:0")
 			sess.run(learning_rate.assign(learning_rate / 2))
 
 	# Save Model
-	save_path = saver.save(sess,
-		"meerkat/classification/models/model_" + DATASET.split(".")[0] + ".ckpt")
+	save_dir = "meerkat/classification/models/"
+	save_path = saver.save(sess, save_dir + "model_" + DATASET.split(".")[0] + ".ckpt")
 	logging.warning("Model saved in file: %s" % save_path)
 
 def run_session(graph, saver):
