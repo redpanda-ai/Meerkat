@@ -9,8 +9,8 @@ Created on Mar 14, 2016
 
 #################### USAGE #######################
 
-# python3 -m meerkat.classification.tf_CNN [config]
-# python3 -m meerkat.classification.tf_CNN config/tf_cnn_config.json
+# python3 -m meerkat.classification.tensorflow_cnn [config]
+# python3 -m meerkat.classification.tensorflow_cnn config/tf_cnn_config.json
 
 ##################################################
 
@@ -107,6 +107,7 @@ def evaluate_testset(graph, sess, model, test, chunked_test):
 
 		batch_test = test.loc[chunked_test[i]]
 		batch_length = len(batch_test)
+
 		if batch_length != BATCH_SIZE:
 			continue
 
@@ -327,8 +328,8 @@ def train_model(graph, sess, saver):
 			sess.run(learning_rate.assign(learning_rate / 2))
 
 	# Save Model
-	save_path = saver.save(sess, "meerkat/classification/models/model_" +
-		DATASET.split(".")[0] + ".ckpt")
+	save_path = saver.save(sess,
+		"meerkat/classification/models/model_" + DATASET.split(".")[0] + ".ckpt")
 	logging.warning("Model saved in file: %s" % save_path)
 
 def run_session(graph, saver):
