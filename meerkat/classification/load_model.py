@@ -14,7 +14,7 @@ import logging
 import tensorflow as tf
 from sklearn.externals import joblib
 
-from meerkat.classification.tensorflow_cnn import build_graph
+from meerkat.classification.tensorflow_cnn import build_graph, validate_config
 
 def load_scikit_model(model_name):
 	"""Load either Card or Bank classifier depending on
@@ -54,7 +54,7 @@ def load_tensorflow_model(model_name):
 		sys.exit()
 
 	# Load Graph
-	config = verify_config(config_path)
+	config = validate_config(config_path)
 	graph, saver = build_graph(config)
 
 	# Load Session and Graph
