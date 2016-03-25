@@ -11,10 +11,11 @@ Created on Feb 25, 2014
 import sys
 import logging
 
+import numpy as np
 import tensorflow as tf
 from sklearn.externals import joblib
 
-from meerkat.classification.tensorflow_cnn import build_graph, validate_config, get_tensor, load_data, evaluate_testset
+from meerkat.classification.tensorflow_cnn import build_graph, validate_config, get_tensor, string_to_tensor
 
 def load_scikit_model(model_name):
 	"""Load either Card or Bank classifier depending on
@@ -56,17 +57,43 @@ def load_tensorflow_model(model_name):
 	# Load Graph
 	config = validate_config(config_path)
 	graph, saver = build_graph(config)
+	label_map = config["label_map"]
 
 	# Load Session and Graph
 	sess = tf.Session(graph=graph)
 	saver.restore(sess, model_path)
 	model = get_tensor(graph, "model:0")
 	
-	# Temp For Testing
-	_, test, _, chunked_test = load_data(config)
-	evaluate_testset(config, graph, sess, model, test, chunked_test)
+	# Generate Helper Function
+	def apply_cnn(trans, doc_key="description", label_key="CNN", label_only=True):
+		"""Apply CNN to transactions"""
 
-	return model
+		alphabet_length = config["alphabet_length"]
+		doc_length = config["doc_length"]
+		batch_size = config["batch_size"]
+		num_trans = len(trans)
+
+		while len(trans) < batch_size:
+			trans.append({"description": ""})
+
+		tensor = np.zeros(shape=(len(trans), 1, alphabet_length, doc_length))
+
+		for index, doc in enumerate(trans):
+			tensor[index][0] = string_to_tensor(config, doc[doc_key], doc_length)
+
+		tensor = np.transpose(tensor, (0, 1, 3, 2))
+		feed_dict_test = {get_tensor(graph, "x:0"): tensor}
+		output = sess.run(model, feed_dict=feed_dict_test)
+		labels = np.argmax(output, 1)
+	
+		for index, transaction in enumerate(trans):
+			label = label_map.get(str(labels[index]), "")
+			if isinstance(label, dict) and label_only: label = label["label"]
+			transaction[label_key] = label
+
+		return trans[0:num_trans]
+
+	return apply_cnn
 
 if __name__ == "__main__":
 	# pylint:disable=pointless-string-statement
