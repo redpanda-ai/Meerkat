@@ -228,6 +228,7 @@ def build_graph(config):
 	reshape = config["reshape"]
 	num_labels = config["num_labels"]
 	batch_size = config["batch_size"]
+	batch_rate = config["batch_rate"]
 	graph = tf.Graph()
 
 	# Create Graph
