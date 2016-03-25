@@ -14,7 +14,7 @@ import logging
 import tensorflow as tf
 from sklearn.externals import joblib
 
-from meerkat.classification.tensorflow_cnn import build_graph, validate_config
+from meerkat.classification.tensorflow_cnn import build_graph, validate_config, get_tensor
 
 def load_scikit_model(model_name):
 	"""Load either Card or Bank classifier depending on
@@ -47,7 +47,7 @@ def load_tensorflow_model(model_name):
 
 	# Switch on Models
 	if model_name == "card_debit_subtype":
-		model_path = "card_debit_subtype.ckpt"
+		model_path = "meerkat/classification/models/card_debit_subtype.ckpt"
 		config_path = "config/tf_cnn_config.json"
 	else:
 		logging.warning("Model not found. Terminating")
@@ -58,10 +58,10 @@ def load_tensorflow_model(model_name):
 	graph, saver = build_graph(config)
 
 	# Load Session and Graph
-	tf.initialize_all_variables().run()
-	sess = tf.Session(graph=graph)
-	saver.restore(sess, model_path)
-	model = get_tensor(graph, "model:0")
+	with tf.Session(graph=graph) as sess:
+		tf.initialize_all_variables().run()
+		saver.restore(sess, model_path)
+		model = get_tensor(graph, "model:0")
 
 	return model
 
