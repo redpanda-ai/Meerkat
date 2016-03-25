@@ -66,7 +66,8 @@ def validate_config():
 	if RESHAPE.is_integer():
 		RESHAPE = int(RESHAPE)
 	else:
-		raise ValueError('DOC_LENGTH - MAGIC_NUMBER_1 must be divisible by MAGIC_NUMBER_2: 123, 150, 177, 204...')
+		raise ValueError('DOC_LENGTH - MAGIC_NUMBER_1 must be divisible by MAGIC_NUMBER_2: 123,'
+			' 150, 177, 204...')
 
 def load_data():
 	"""Load data and label map"""
@@ -74,7 +75,8 @@ def load_data():
 	reversed_map = reverse_map(LABEL_MAP)
 	map_labels = lambda x: reversed_map.get(str(x["PROPOSED_SUBTYPE"]), "")
 
-	df = pd.read_csv(DATASET, quoting=csv.QUOTE_NONE, na_filter=False, encoding="utf-8", sep='|', error_bad_lines=False)
+	df = pd.read_csv(DATASET, quoting=csv.QUOTE_NONE, na_filter=False, encoding="utf-8",
+		sep='|', error_bad_lines=False)
 
 	df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
 	grouped = df.groupby('LEDGER_ENTRY', as_index=False)
@@ -105,7 +107,8 @@ def evaluate_testset(graph, sess, model, test, chunked_test):
 
 		batch_test = test.loc[chunked_test[i]]
 		batch_length = len(batch_test)
-		if batch_length != BATCH_SIZE: continue
+		if batch_length != BATCH_SIZE:
+			continue
 
 		trans_test, labels_test = batch_to_tensor(batch_test)
 		feed_dict_test = {get_tensor(graph, "x:0"): trans_test}
@@ -136,7 +139,7 @@ def batch_to_tensor(batch):
 	"""Convert a batch to a tensor representation"""
 
 	labels = np.array(batch["LABEL_NUM"].astype(int)) - 1
-	labels = (np.arange(NUM_LABELS) == labels[:,None]).astype(np.float32)
+	labels = (np.arange(NUM_LABELS) == labels[:, None]).astype(np.float32)
 	docs = batch["DESCRIPTION_UNMASKED"].tolist()
 	transactions = np.zeros(shape=(BATCH_SIZE, 1, ALPHABET_LENGTH, DOC_LENGTH))
 	
@@ -171,7 +174,7 @@ def get_variable(graph, name):
 
 def accuracy(predictions, labels):
 	"""Return accuracy for a batch"""
-	return (100.0 * np.sum(np.argmax(predictions, 1) == np.argmax(labels, 1)) / predictions.shape[0])
+	return 100.0 * np.sum(np.argmax(predictions, 1) == np.argmax(labels, 1)) / predictions.shape[0]
 
 def threshold(tensor):
 	"""ReLU with threshold at 1e-6"""
@@ -197,9 +200,9 @@ def conv2d(input_x, weights):
 	layer = tf.nn.conv2d(input_x, weights, strides=[1, 1, 1, 1], padding='VALID')
 	return layer
 
-def max_pool(x):
+def max_pool(tensor):
 	"""Create max pooling layer"""
-	layer = tf.nn.max_pool(x, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
+	layer = tf.nn.max_pool(tensor, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
 	return layer
 
 def build_graph():
@@ -212,8 +215,10 @@ def build_graph():
 
 		learning_rate = tf.Variable(BASE_RATE, trainable=False, name="lr") 
 
-		thing_x = tf.placeholder(tf.float32, shape=[BATCH_SIZE, 1, DOC_LENGTH, ALPHABET_LENGTH], name="thing_x")
-		thing_y = tf.placeholder(tf.float32, shape=(BATCH_SIZE, NUM_LABELS), name="thing_y")
+		trans_placeholder = tf.placeholder(tf.float32, shape=[BATCH_SIZE, 1, DOC_LENGTH, ALPHABET_LENGTH],
+			name="x")
+		labels_placeholder = tf.placeholder(tf.float32, shape=(BATCH_SIZE, NUM_LABELS),
+			name="y")
 		# Five convolutional layers
 		# First, two layers using a kernel width of 7
 		conv_width = 256 # width of convolutional frame
@@ -273,10 +278,10 @@ def build_graph():
 
 			return network
 
-		network = model(thing_x, "network", train=True)
-		trained_model = model(thing_x, "model", train=False)
+		network = model(trans_placeholder, "network", train=True)
+		trained_model = model(trans_placeholder, "model", train=False)
 
-		loss = tf.neg(tf.reduce_mean(tf.reduce_sum(network * thing_y, 1)), name="loss")
+		loss = tf.neg(tf.reduce_mean(tf.reduce_sum(network * labels_placeholder, 1)), name="loss")
 		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss, name="optimizer")
 
 		saver = tf.train.Saver()
@@ -289,6 +294,8 @@ def train_model(graph, sess, saver):
 	train, test, groups_train, chunked_test = load_data()
 	num_eras = EPOCHS * ERAS
 
+	logging_interval = 50
+	learning_rate_interval = 15000
 	for step in range(num_eras):
 
 		# Prepare Data for Training
@@ -300,8 +307,9 @@ def train_model(graph, sess, saver):
 		sess.run(get_op(graph, "optimizer"), feed_dict=feed_dict)
 
 		# Log Loss
-		if step % 50 == 0:
-			logging.warning("train loss at epoch %d: %g" % (step + 1, sess.run(get_tensor(graph, "loss:0"), feed_dict=feed_dict)))
+		if step % logging_interval == 0:
+			logging.warning("train loss at epoch %d: %g" % (step + 1, sess.run(get_tensor(graph,
+				"loss:0"), feed_dict=feed_dict)))
 
 		# Evaluate Testset and Log Progress
 		if step != 0 and step % EPOCHS == 0:
@@ -314,12 +322,13 @@ def train_model(graph, sess, saver):
 			evaluate_testset(graph, sess, model, test, chunked_test)
 
 		# Update Learning Rate
-		if step != 0 and step % 15000 == 0:
+		if step != 0 and step % learning_rate_interval == 0:
 			learning_rate = get_variable(graph, "lr:0")
 			sess.run(learning_rate.assign(learning_rate / 2))
 
-	# Save Model  
-	save_path = saver.save(sess, "meerkat/classification/models/model_" + DATASET.split(".")[0] + ".ckpt")
+	# Save Model
+	save_path = saver.save(sess, "meerkat/classification/models/model_" +
+		DATASET.split(".")[0] + ".ckpt")
 	logging.warning("Model saved in file: %s" % save_path)
 
 def run_session(graph, saver):
