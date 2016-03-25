@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 
 from meerkat.classification.lua_bridge import get_cnn
+from meerkat.various_tools import load_piped_dataframe
 
 #################### USAGE ##########################
 
