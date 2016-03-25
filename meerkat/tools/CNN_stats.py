@@ -47,7 +47,7 @@ import argparse
 import numpy as np
 
 from meerkat.classification.lua_bridge import get_cnn_by_path
-from meerkat.various_tools import load_params
+from meerkat.various_tools import load_params, load_piped_dataframe
 
 def parse_arguments():
 	""" Create the parser """
