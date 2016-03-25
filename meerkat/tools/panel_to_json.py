@@ -14,6 +14,8 @@ import pandas as pd
 import numpy as np
 import json
 
+from meerkat.various_tools import load_piped_dataframe
+
 def dict_2_json(obj, filename):
 	"""Saves a dict as a json file"""
 	with open(filename, 'w') as output_file:
@@ -36,11 +38,9 @@ def sample_panel_to_json():
 		"transaction_list" : []
 	}
 
-	data_frame = pd.read_csv(sys.argv[1], na_filter=False, encoding="utf-8",
-		 sep='|', error_bad_lines=False)
+	data_frame = load_piped_dataframe(sys.argv[1])
 
-	rows = np.random.choice(data_frame.index.values, int(sys.argv[2]),
-		replace=False)
+	rows = np.random.choice(data_frame.index.values, int(sys.argv[2]), replace=False)
 	sampled_df = data_frame.ix[rows]
 
 	for index, row in sampled_df.iterrows():

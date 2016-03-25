@@ -19,6 +19,7 @@ import queue
 
 import boto
 import numpy as np
+import pandas as pd
 
 from jsonschema import validate
 
@@ -62,6 +63,22 @@ def load_dict_ordered(file_name, encoding='utf-8', delimiter="|"):
 	dict_list = list(reader)
 	input_file.close()
 	return dict_list, reader.fieldnames
+
+def load_piped_dataframe(filename, chunksize=False):
+	"""Load piped dataframe from file name"""
+
+	options = {
+		"quoting": csv.QUOTE_NONE,
+		"na_filter": False,
+		"encoding": "utf-8",
+		"sep": "|",
+		"error_bad_lines": False
+	}
+
+	if isinstance(chunksize, int):
+		options["chunksize"] = chunked
+
+	return pd.read_csv(filename, **options)
 
 def write_dict_list(dict_list, file_name, encoding="utf-8", delimiter="|",\
 		column_order=""):

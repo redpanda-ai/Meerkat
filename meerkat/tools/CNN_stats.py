@@ -47,7 +47,7 @@ import argparse
 import numpy as np
 
 from meerkat.classification.lua_bridge import get_cnn_by_path
-from meerkat.various_tools import load_params
+from meerkat.various_tools import load_params, load_piped_dataframe
 
 def parse_arguments():
 	""" Create the parser """
@@ -146,8 +146,7 @@ def main_process(args):
 	machine_label_key = args.predicted_key
 	human_label_key = args.label_key
 	fast_mode = args.fast_mode
-	reader = pd.read_csv(args.testdata, chunksize=1000, na_filter=False,
-		quoting=csv.QUOTE_NONE, encoding='utf-8', sep='|', error_bad_lines=False)
+	reader = load_piped_dataframe(args.testdata, chunksize=1000)
 	label_map = load_params(args.label_map)
 	get_key = lambda x: x['label'] if isinstance(x, dict) else x
 	label_map = dict(zip(label_map.keys(),map(get_key, label_map.values())))
