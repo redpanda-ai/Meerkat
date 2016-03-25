@@ -70,13 +70,9 @@ def load_tensorflow_model(model_name):
 
 		alphabet_length = config["alphabet_length"]
 		doc_length = config["doc_length"]
-		batch_size = config["batch_size"]
-		num_trans = len(trans)
+		batch_size = len(trans)
 
-		while len(trans) < batch_size:
-			trans.append({"description": ""})
-
-		tensor = np.zeros(shape=(len(trans), 1, alphabet_length, doc_length))
+		tensor = np.zeros(shape=(batch_size, 1, alphabet_length, doc_length))
 
 		for index, doc in enumerate(trans):
 			tensor[index][0] = string_to_tensor(config, doc[doc_key], doc_length)
@@ -91,7 +87,7 @@ def load_tensorflow_model(model_name):
 			if isinstance(label, dict) and label_only: label = label["label"]
 			transaction[label_key] = label
 
-		return trans[0:num_trans]
+		return trans
 
 	return apply_cnn
 

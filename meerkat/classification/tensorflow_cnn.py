@@ -227,7 +227,6 @@ def build_graph(config):
 	alphabet_length = config["alphabet_length"]
 	reshape = config["reshape"]
 	num_labels = config["num_labels"]
-	batch_size = config["batch_size"]
 	base_rate = config["base_rate"]
 	graph = tf.Graph()
 
@@ -236,12 +235,12 @@ def build_graph(config):
 
 		learning_rate = tf.Variable(base_rate, trainable=False, name="lr") 
 
-		input_shape = [batch_size, 1, doc_length, alphabet_length]
-		output_shape = [batch_size, num_labels]
+		input_shape = [None, 1, doc_length, alphabet_length]
+		output_shape = [None, num_labels]
 
 		trans_placeholder = tf.placeholder(tf.float32, shape=input_shape, name="x")
 		labels_placeholder = tf.placeholder(tf.float32, shape=output_shape, name="y")
-		
+
 		w_conv1 = weight_variable(config, [1, 7, alphabet_length, 256])
 		b_conv1 = bias_variable([256], 7 * alphabet_length)
 
@@ -279,7 +278,7 @@ def build_graph(config):
 			h_conv5 = threshold(conv2d(h_conv4, w_conv5) + b_conv5)
 			h_pool5 = max_pool(h_conv5)
 
-			h_reshape = tf.reshape(h_pool5, [batch_size, reshape])
+			h_reshape = tf.reshape(h_pool5, [-1, reshape])
 
 			h_fc1 = threshold(tf.matmul(h_reshape, w_fc1) + b_fc1)
 
