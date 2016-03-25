@@ -8,19 +8,23 @@ Created on Feb 25, 2014
 @author: Matthew Sevrens
 """
 
-from sklearn.externals import joblib
-import logging
 import sys
+import logging
 
-def load_scikit_model(mode):
+import tensorflow as tf
+from sklearn.externals import joblib
+
+from meerkat.classification.tensorflow_cnn import build_graph
+
+def load_scikit_model(model_name):
 	"""Load either Card or Bank classifier depending on
 	requested model"""
 
 	# Switch on Models
-	if mode == "card_sws":
+	if model_name == "card_sws":
 		logging.warning("--- Loading Card SWS Model ---")
 		model_path = "meerkat/classification/models/final_card_sws.pkl"
-	elif mode == "bank_sws":
+	elif model_name == "bank_sws":
 		logging.warning("--- Loading Bank SWS Model ---")
 		model_path = "meerkat/classification/models/final_bank_sws.pkl"
 	else:
@@ -37,6 +41,27 @@ def load_scikit_model(mode):
 		return result
 			
 	return classifier
+
+def load_tensorflow_model(model_name):
+	"""Load a tensorFlow module by name"""
+
+	# Switch on Models
+	if model_name == "card_debit_subtype":
+		model_path = "card_debit_subtype.ckpt"
+	else:
+		logging.warning("Model not found. Terminating")
+		sys.exit()
+
+	# Load Graph
+	graph, saver = build_graph()
+
+	# Load Session and Graph
+	tf.initialize_all_variables().run()
+	sess = tf.Session(graph=graph)
+	saver.restore(sess, model_path)
+	model = get_tensor(graph, "model:0")
+
+	return model
 
 if __name__ == "__main__":
 	# pylint:disable=pointless-string-statement

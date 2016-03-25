@@ -34,38 +34,22 @@ from meerkat.various_tools import load_piped_dataframe
 from meerkat.classification.tools import fill_description_unmasked, reverse_map
 from meerkat.classification.verify_data import load_json
 
-CONFIG = validate_config()
-DATASET = CONFIG["dataset"]
-MODE = CONFIG["mode"]
-MODEL = CONFIG["model"]
-MODEL_TYPE = CONFIG["model_type"]
-CONTAINER = CONFIG["container"]
-LEDGER_ENTRY = CONFIG["ledger_entry"]
-ALPHABET = CONFIG["alphabet"]
-ALPHA_DICT = {a : i for i, a in enumerate(ALPHABET)}
-LABEL_MAP = load_json(CONFIG["label_map"])
-NUM_LABELS = len(LABEL_MAP.keys())
-BATCH_SIZE = CONFIG["batch_size"]
-DOC_LENGTH = CONFIG["doc_length"]
-RANDOMIZE = CONFIG["randomize"]
-MOMENTUM = CONFIG["momentum"]
-BASE_RATE = CONFIG["base_rate"] * math.sqrt(BATCH_SIZE) / math.sqrt(128)
-DECAY = CONFIG["decay"]
-RESHAPE = CONFIG["reshape"]
-ALPHABET_LENGTH = len(ALPHABET)
-EPOCHS = CONFIG["epochs"]
-ERAS = CONFIG["eras"]
-
 def chunks(array, num):
 	"""Chunk array into equal sized parts"""
 	num = max(1, num)
 	return [array[i:i + num] for i in range(0, len(array), num)]
 
-def validate_config():
+def validate_config(filename):
 	"""Validate input configuration"""
 
-	config = load_json(sys.argv[1])
+	default_config = "config/default_tf_config.json"
+	config = load_json(filename)
 	reshape = ((config["doc_length"] - 96) / 27) * 256
+	config["alpha_dict"] = {a : i for i, a in enumerate(config["alphabet"])}
+	config["label_map"] = load_json(config["label_map"])
+	config["num_labels"] = len(config["label_map"].keys())
+	config["base_rate"] = config["base_rate"] * math.sqrt(config["batch_size"]) / math.sqrt(128)
+	config["alphabet_length"] = len(config["alphabet"])
 
 	if reshape.is_integer():
 		config["reshape"] = int(reshape)
@@ -74,24 +58,29 @@ def validate_config():
 
 	return config
 
-def load_data():
+def load_data(config):
 	"""Load data and label map"""
+
+	model_type = config["model_type"]
+	dataset = config["dataset"]
+	label_map = config["label_map"]
+	ledger_entry = config["ledger_entry"]
 
 	ground_truth_labels = {
 		'merchant' : 'MERCHANT_NAME',
 		'subtype' : 'PROPOSED_SUBTYPE'
 	}
 
-	reversed_map = reverse_map(LABEL_MAP)
-	map_labels = lambda x: reversed_map.get(str(x[ground_truth_labels[MODEL_TYPE]]), "")
+	reversed_map = reverse_map(label_map)
+	map_labels = lambda x: reversed_map.get(str(x[ground_truth_labels[model_type]]), "")
 
-	df = load_piped_dataframe(DATASET)
+	df = load_piped_dataframe(dataset)
 
 	if MODEL_TYPE == "subtype":
 		df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
 		grouped = df.groupby('LEDGER_ENTRY', as_index=False)
 		groups = dict(list(grouped))
-		df = groups[LEDGER_ENTRY]
+		df = groups[ledger_entry]
 
 	df["DESCRIPTION_UNMASKED"] = df.apply(fill_description_unmasked, axis=1)
 	df = df.reindex(np.random.permutation(df.index))
@@ -108,9 +97,10 @@ def load_data():
 	chunked_test = chunks(np.array(test.index), 128)
 	return train, test, groups_train, chunked_test
 
-def evaluate_testset(graph, sess, model, test, chunked_test):
+def evaluate_testset(config, graph, sess, model, test, chunked_test):
 	"""Check error on test set"""
 
+	batch_size = config["batch_size"]
 	total_count = 0
 	correct_count = 0
 	num_chunks = len(chunked_test)
@@ -129,40 +119,53 @@ def evaluate_testset(graph, sess, model, test, chunked_test):
 		batch_correct_count = np.sum(np.argmax(output, 1) == np.argmax(labels_test, 1))
 
 		correct_count += batch_correct_count
-		total_count += BATCH_SIZE
+		total_count += batch_size
 	
 	test_accuracy = 100.0 * (correct_count / total_count)
 	logging.warning("Test accuracy: %.2f%%" % test_accuracy)
 	logging.warning("Correct count: " + str(correct_count))
 
-def mixed_batching(df, groups_train):
+def mixed_batching(config, df, groups_train):
 	"""Batch from train data using equal class batching"""
-	half_batch = int(BATCH_SIZE / 2)
+
+	num_labels = config["num_labels"]
+	batch_size = config["batch_size"]
+	half_batch = int(batch_size / 2)
 	indices_to_sample = list(np.random.choice(df.index, half_batch))
+
 	for index in range(half_batch):
-		label = random.randint(1, NUM_LABELS)
+		label = random.randint(1, num_labels)
 		select_group = groups_train[str(label)]
 		indices_to_sample.append(np.random.choice(select_group.index, 1)[0])
+
 	random.shuffle(indices_to_sample)
 	batch = df.loc[indices_to_sample]
+
 	return batch
 
-def batch_to_tensor(batch):
+def batch_to_tensor(config, batch):
 	"""Convert a batch to a tensor representation"""
+
+	doc_length = config["doc_length"]
+	alphabet_length = config["alphabet_length"]
+	num_labels = config["num_labels"]
+	batch_size = config["batch_size"]
 
 	labels = np.array(batch["LABEL_NUM"].astype(int)) - 1
 	labels = (np.arange(NUM_LABELS) == labels[:, None]).astype(np.float32)
 	docs = batch["DESCRIPTION_UNMASKED"].tolist()
-	transactions = np.zeros(shape=(BATCH_SIZE, 1, ALPHABET_LENGTH, DOC_LENGTH))
+	transactions = np.zeros(shape=(batch_size, 1, alphabet_length, doc_length))
 	
 	for index, trans in enumerate(docs):
-		transactions[index][0] = string_to_tensor(trans, DOC_LENGTH)
+		transactions[index][0] = string_to_tensor(config, trans, doc_length)
 
 	transactions = np.transpose(transactions, (0, 1, 3, 2))
 	return transactions, labels
 
-def string_to_tensor(doc, length):
+def string_to_tensor(config, doc, length):
 	"""Convert transaction to tensor format"""
+	alphabet = config["alphabet"]
+	alpha_dict = config["alpha_dict"]
 	doc = doc.lower()[0:length]
 	tensor = np.zeros((len(ALPHABET), length), dtype=np.float32)
 	for index, char in reversed(list(enumerate(doc))):
@@ -204,7 +207,7 @@ def bias_variable(shape, mult):
 
 def weight_variable(shape):
 	"""Initialize weights"""
-	weight = tf.Variable(tf.mul(tf.random_normal(shape), RANDOMIZE), name="W")
+	weight = tf.Variable(tf.mul(tf.random_normal(shape), config["randomize"]), name="W")
 	return weight
 
 def conv2d(input_x, weights):
@@ -217,24 +220,29 @@ def max_pool(tensor):
 	layer = tf.nn.max_pool(tensor, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
 	return layer
 
-def build_graph():
+def build_graph(config):
 	"""Build CNN"""
 
+	doc_length = config["doc_length"]
+	alphabet_length = config["alphabet_length"]
+	reshape = config["reshape"]
+	num_labels = config["num_labels"]
+	batch_size = config["batch_size"]
 	graph = tf.Graph()
 
 	# Create Graph
 	with graph.as_default():
 
-		learning_rate = tf.Variable(BASE_RATE, trainable=False, name="lr") 
+		learning_rate = tf.Variable(base_rate, trainable=False, name="lr") 
 
-		input_shape = [BATCH_SIZE, 1, DOC_LENGTH, ALPHABET_LENGTH]
-		output_shape = [BATCH_SIZE, NUM_LABELS]
+		input_shape = [batch_size, 1, doc_length, alphabet_length]
+		output_shape = [batch_size, num_labels]
 
 		trans_placeholder = tf.placeholder(tf.float32, shape=input_shape, name="x")
 		labels_placeholder = tf.placeholder(tf.float32, shape=output_shape, name="y")
 		
-		w_conv1 = weight_variable([1, 7, ALPHABET_LENGTH, 256])
-		b_conv1 = bias_variable([256], 7 * ALPHABET_LENGTH)
+		w_conv1 = weight_variable([1, 7, alphabet_length, 256])
+		b_conv1 = bias_variable([256], 7 * alphabet_length)
 
 		w_conv2 = weight_variable([1, 7, 256, 256])
 		b_conv2 = bias_variable([256], 7 * 256)
@@ -248,11 +256,11 @@ def build_graph():
 		w_conv5 = weight_variable([1, 3, 256, 256])
 		b_conv5 = bias_variable([256], 3 * 256)
 
-		w_fc1 = weight_variable([RESHAPE, 1024])
-		b_fc1 = bias_variable([1024], RESHAPE)
+		w_fc1 = weight_variable([reshape, 1024])
+		b_fc1 = bias_variable([1024], reshape)
 
-		w_fc2 = weight_variable([1024, NUM_LABELS])
-		b_fc2 = bias_variable([NUM_LABELS], 1024)
+		w_fc2 = weight_variable([1024, num_labels])
+		b_fc2 = bias_variable([num_labels], 1024)
 
 		def model(data, name, train=False):
 			"""Add model layers to the graph"""
@@ -270,7 +278,7 @@ def build_graph():
 			h_conv5 = threshold(conv2d(h_conv4, w_conv5) + b_conv5)
 			h_pool5 = max_pool(h_conv5)
 
-			h_reshape = tf.reshape(h_pool5, [BATCH_SIZE, RESHAPE])
+			h_reshape = tf.reshape(h_pool5, [batch_size, reshape])
 
 			h_fc1 = threshold(tf.matmul(h_reshape, w_fc1) + b_fc1)
 
@@ -294,19 +302,22 @@ def build_graph():
 
 	return graph, saver
 
-def train_model(graph, sess, saver):
+def train_model(config, graph, sess, saver):
 	"""Train the model"""
 
+	epochs = config["epochs"]
+	eras = config["eras"]
+	dataset = config["dataset"]
 	train, test, groups_train, chunked_test = load_data()
-	num_eras = EPOCHS * ERAS
+	num_eras = epochs * eras
 	logging_interval = 50
 	learning_rate_interval = 15000
 
 	for step in range(num_eras):
 
 		# Prepare Data for Training
-		batch = mixed_batching(train, groups_train)
-		trans, labels = batch_to_tensor(batch)
+		batch = mixed_batching(config, train, groups_train)
+		trans, labels = batch_to_tensor(config, batch)
 		feed_dict = {get_tensor(graph, "x:0") : trans, get_tensor(graph, "y:0") : labels}
 
 		# Run Training Step
@@ -318,14 +329,14 @@ def train_model(graph, sess, saver):
 			logging.warning("train loss at epoch %d: %g" % (step + 1, loss))
 
 		# Evaluate Testset and Log Progress
-		if step != 0 and step % EPOCHS == 0:
+		if step != 0 and step % epochs == 0:
 			model = get_tensor(graph, "model:0")
 			learning_rate = get_variable(graph, "lr:0")
 			predictions = sess.run(model, feed_dict=feed_dict)
-			logging.warning("Testing for era %d" % (step / EPOCHS))
+			logging.warning("Testing for era %d" % (step / epochs))
 			logging.warning("Learning rate at epoch %d: %g" % (step + 1, sess.run(learning_rate)))
 			logging.warning("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
-			evaluate_testset(graph, sess, model, test, chunked_test)
+			evaluate_testset(config, graph, sess, model, test, chunked_test)
 
 		# Update Learning Rate
 		if step != 0 and step % learning_rate_interval == 0:
@@ -334,29 +345,32 @@ def train_model(graph, sess, saver):
 
 	# Save Model
 	save_dir = "meerkat/classification/models/"
-	save_path = saver.save(sess, save_dir + "model_" + DATASET.split(".")[0] + ".ckpt")
+	save_path = saver.save(sess, save_dir + "model_" + dataset.split(".")[0] + ".ckpt")
 	logging.warning("Model saved in file: %s" % save_path)
 
-def run_session(graph, saver):
+def run_session(config, graph, saver):
 	"""Run Session"""
 
 	with tf.Session(graph=graph) as sess:
 
+		mode = config["mode"]
+		model_filename = config["model_filename"]
+
 		tf.initialize_all_variables().run()
 
-		if MODE == "train":
-			train_model(graph, sess, saver)
-		elif MODE == "test":
-			saver.restore(sess, MODEL)
+		if mode == "train":
+			train_model(config, graph, sess, saver)
+		elif mode == "test":
+			saver.restore(sess, model_filename)
 			model = get_tensor(graph, "model:0")
-			_, test, _, chunked_test = load_data()
-			evaluate_testset(graph, sess, model, test, chunked_test)
+			_, test, _, chunked_test = load_data(config)
+			evaluate_testset(config, graph, sess, model, test, chunked_test)
 
 def run_from_command_line():
 	"""Run module from command line"""
-	validate_config()
-	graph, saver = build_graph()
-	run_session(graph, saver)
+	config = validate_config(sys.argv[1])
+	graph, saver = build_graph(config)
+	run_session(config, graph, saver)
 
 if __name__ == "__main__":
 	run_from_command_line()
