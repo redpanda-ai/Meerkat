@@ -354,14 +354,14 @@ def run_session(config, graph, saver):
 	with tf.Session(graph=graph) as sess:
 
 		mode = config["mode"]
-		model_filename = config["model_filename"]
+		model_path = config["model_path"]
 
 		tf.initialize_all_variables().run()
 
 		if mode == "train":
 			train_model(config, graph, sess, saver)
 		elif mode == "test":
-			saver.restore(sess, model_filename)
+			saver.restore(sess, model_path)
 			model = get_tensor(graph, "model:0")
 			_, test, _, chunked_test = load_data(config)
 			evaluate_testset(config, graph, sess, model, test, chunked_test)

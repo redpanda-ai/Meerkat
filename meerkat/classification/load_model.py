@@ -8,6 +8,7 @@ Created on Feb 25, 2014
 @author: Matthew Sevrens
 """
 
+from os.path import isfile
 import sys
 import logging
 
@@ -46,22 +47,47 @@ def load_scikit_model(model_name):
 def load_tensorflow_model(model_name):
 	"""Load a tensorFlow module by name"""
 
+	# Load Config
+	config_path = "config/tf_cnn_config.json"
+	config = validate_config(config_path)
+
 	# Switch on Models
-	if model_name == "card_debit_subtype":
+	if model_name == "bank_merchant":
+		model_path = "meerkat/classification/models/bank_merchant.ckpt"
+		label_map_path = "meerkat/classification/label_maps/bank_merchant_label_map.json"
+	elif model_name == "card_merchant":
+		model_path = "meerkat/classification/models/card_merchant.ckpt"
+		label_map_path = "meerkat/classification/label_maps/card_merchant_label_map.json"
+	elif model_name == "bank_debit_subtype":
+		model_path = "meerkat/classification/models/bank_debit_subtype.ckpt"
+		label_map_path = "meerkat/classification/label_maps/bank_debit_subtype_label_map.json"
+	elif model_name == "bank_credit_subtype":
+		model_path = "meerkat/classification/models/bank_credit_subtype.ckpt"
+		label_map_path = "meerkat/classification/label_maps/bank_credit_subtype_label_map.json"
+	elif model_name == "card_debit_subtype":
 		model_path = "meerkat/classification/models/card_debit_subtype.ckpt"
-		config_path = "config/tf_cnn_config.json"
+		label_map_path = "meerkat/classification/label_maps/card_debit_subtype_label_map.json"
+	elif model_name == "card_credit_subtype":
+		model_path = "meerkat/classification/models/card_credit_subtype.ckpt"
+		label_map_path = "meerkat/classification/label_maps/card_debit_subtype_label_map.json"
 	else:
 		logging.warning("Model not found. Terminating")
 		sys.exit()
 
+	# Validate Model and Label Map
+	if not isfile(model_path) or not isfile(label_map_path):
+		logging.warning("Resouces to load model not found. Terminating")
+		sys.exit()
+
 	# Load Graph
-	config = validate_config(config_path)
+	config["model_path"] = model_path
+	config["label_map"] = label_map_path
 	graph, saver = build_graph(config)
 	label_map = config["label_map"]
 
 	# Load Session and Graph
 	sess = tf.Session(graph=graph)
-	saver.restore(sess, model_path)
+	saver.restore(sess, config["model_path"])
 	model = get_tensor(graph, "model:0")
 	
 	# Generate Helper Function
