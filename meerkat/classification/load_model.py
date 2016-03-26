@@ -44,7 +44,7 @@ def load_scikit_model(model_name):
 			
 	return classifier
 
-def load_tensorflow_model_by_name(model_name):
+def get_tf_cnn_by_name(model_name):
 	"""Load a tensorFlow CNN by name"""
 
 	# Switch on Models
@@ -72,7 +72,7 @@ def load_tensorflow_model_by_name(model_name):
 
 	return load_tensorflow_model_by_path(model_path, label_map_path)
 
-def load_tensorflow_model_by_path(model_path, label_map_path):
+def get_tf_cnn_by_path(model_path, label_map_path):
 	"""Load a tensorFlow module by name"""
 
 	# Load Config
