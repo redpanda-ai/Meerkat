@@ -44,12 +44,8 @@ def load_scikit_model(model_name):
 			
 	return classifier
 
-def load_tensorflow_model(model_name):
-	"""Load a tensorFlow module by name"""
-
-	# Load Config
-	config_path = "config/tf_cnn_config.json"
-	config = validate_config(config_path)
+def load_tensorflow_model_by_name(model_name):
+	"""Load a tensorFlow CNN by name"""
 
 	# Switch on Models
 	if model_name == "bank_merchant":
@@ -73,6 +69,15 @@ def load_tensorflow_model(model_name):
 	else:
 		logging.warning("Model not found. Terminating")
 		sys.exit()
+
+	return load_tensorflow_model_by_path(model_path, label_map_path)
+
+def load_tensorflow_model_by_path(model_path, label_map_path):
+	"""Load a tensorFlow module by name"""
+
+	# Load Config
+	config_path = "config/tf_cnn_config.json"
+	config = validate_config(config_path)
 
 	# Validate Model and Label Map
 	if not isfile(model_path) or not isfile(label_map_path):
