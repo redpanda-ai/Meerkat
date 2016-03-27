@@ -76,6 +76,10 @@ def load_data(config):
 
 	df = load_piped_dataframe(dataset)
 
+	# Verify number of labels
+	if not len(reversed_map) == len(df[label].value_counts()):
+		raise Exception('Number of indexes does not match number of labels')
+
 	if model_type == "subtype":
 		df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
 		grouped = df.groupby('LEDGER_ENTRY', as_index=False)
