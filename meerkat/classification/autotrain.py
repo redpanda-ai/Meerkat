@@ -17,7 +17,8 @@ performance matrics.
 # <required 'bank' or 'card'> 
 # <required training_file_name> 
 # <required test_file_name> 
-# <required 'debit' or 'credit' for 'subtype'> 
+# <required 'debit' or 'credit' for 'subtype'>
+# <required label_map> 
 # <optional name_of_ouput_directory> 
 # <optional bucket name> 
 # <optional input_directory>
@@ -68,11 +69,11 @@ def parse_arguments():
 	parser.add_argument("bank_or_card", help=help_text["bank_or_card"])
 	parser.add_argument("train_file", help=help_text["train_file"])
 	parser.add_argument("test_file", help=help_text["test_file"])
+	parser.add_argument("label_map", default='', help=help_text["label_map"])
 
 	# Optional arguments
 	parser.add_argument("--input_dir", help=help_text["input_dir"], default='')
 	parser.add_argument("--output_dir", help=help_text["output_dir"], default='')
-	parser.add_argument("--label_map", default='', help=help_text["label_map"])
 	parser.add_argument("--credit_or_debit", default='', help=help_text["credit_or_debit"])
 	parser.add_argument("--bucket", help=help_text["bucket"], default = 's3yodlee')
 	parser.add_argument("-d", "--debug", help=help_text["debug"], action="store_true")
