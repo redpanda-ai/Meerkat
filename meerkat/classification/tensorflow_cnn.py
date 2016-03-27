@@ -71,13 +71,14 @@ def load_data(config):
 		'subtype' : 'PROPOSED_SUBTYPE'
 	}
 
+	label_key = ground_truth_labels[model_type]
 	reversed_map = reverse_map(label_map)
-	map_labels = lambda x: reversed_map.get(str(x[ground_truth_labels[model_type]]), "")
+	map_labels = lambda x: reversed_map.get(str(x[label_key]), "")
 
 	df = load_piped_dataframe(dataset)
 
 	# Verify number of labels
-	if not len(reversed_map) == len(df[label].value_counts()):
+	if not len(reversed_map) == len(df[label_key].value_counts()):
 		raise Exception('Number of indexes does not match number of labels')
 
 	if model_type == "subtype":
