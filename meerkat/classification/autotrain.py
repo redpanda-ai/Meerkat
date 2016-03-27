@@ -122,9 +122,9 @@ def auto_train():
 	os.makedirs(save_path, exist_ok=True)
 
 	s3_params = {"bucket": bucket, "prefix": prefix, "save_path": save_path}
-	train_file = pull_from_s3(extension='.csv', file_name=args.train_file, **s3yodlee)
-	test_file = pull_from_s3(extension='.csv', file_name=args.test_file, **s3yodlee)
-	label_map = pull_from_s3(extension='.json', file_name=args.label_map, **s3yodlee)
+	train_file = pull_from_s3(extension='.csv', file_name=args.train_file, **s3_params)
+	test_file = pull_from_s3(extension='.csv', file_name=args.test_file, **s3_params)
+	label_map = pull_from_s3(extension='.json', file_name=args.label_map, **s3_params)
 
 	# Load and Modify Config
 	config = load_json("config/tf_cnn_config.json")
