@@ -25,6 +25,7 @@ import logging
 import math
 import random
 import sys
+import shutil
 
 import numpy as np
 import pandas as pd
@@ -126,6 +127,8 @@ def evaluate_testset(config, graph, sess, model, test, chunked_test):
 	test_accuracy = 100.0 * (correct_count / total_count)
 	logging.warning("Test accuracy: %.2f%%" % test_accuracy)
 	logging.warning("Correct count: " + str(correct_count))
+
+	return test_accuracy
 
 def mixed_batching(config, df, groups_train):
 	"""Batch from train data using equal class batching"""
@@ -315,6 +318,11 @@ def train_model(config, graph, sess, saver):
 	logging_interval = 50
 	learning_rate_interval = 15000
 
+	best_accuracy, best_era = 0
+	save_dir = "meerkat/classification/models/checkpoints/"
+	os.makedirs(save_dir, exist_ok=True)
+	checkpoints = {}
+
 	for step in range(num_eras):
 
 		# Prepare Data for Training
@@ -330,25 +338,41 @@ def train_model(config, graph, sess, saver):
 			loss = sess.run(get_tensor(graph, "loss:0"), feed_dict=feed_dict)
 			logging.warning("train loss at epoch %d: %g" % (step + 1, loss))
 
-		# Evaluate Testset and Log Progress
+		# Evaluate Testset, Log Progress and Save
 		if step != 0 and step % epochs == 0:
+
+			#Evaluate Model
 			model = get_tensor(graph, "model:0")
 			learning_rate = get_variable(graph, "lr:0")
 			predictions = sess.run(model, feed_dict=feed_dict)
 			logging.warning("Testing for era %d" % (step / epochs))
 			logging.warning("Learning rate at epoch %d: %g" % (step + 1, sess.run(learning_rate)))
 			logging.warning("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
-			evaluate_testset(config, graph, sess, model, test, chunked_test)
+			test_accuracy = evaluate_testset(config, graph, sess, model, test, chunked_test)
+
+			# Save Checkpoint
+			current_era = step / epochs
+			save_path = saver.save(sess, save_dir + "era_" + current_era + ".ckpt")
+			logging.warning("Checkpoint saved in file: %s" % save_path)
+			checkpoints[current_era] = save_path
+
+			# Stop Training if Converged
+			if test_accuracy > best_accuracy:
+				best_era = current_era
+				best_accuracy = test_accuracy
+
+			if current_era - best_era == 3:
+				save_path = checkpoints[best_era]
+				break
 
 		# Update Learning Rate
 		if step != 0 and step % learning_rate_interval == 0:
 			learning_rate = get_variable(graph, "lr:0")
 			sess.run(learning_rate.assign(learning_rate / 2))
 
-	# Save Model
-	save_dir = "meerkat/classification/models/"
-	save_path = saver.save(sess, save_dir + "model_" + dataset.split(".")[0] + ".ckpt")
-	logging.warning("Model saved in file: %s" % save_path)
+	# Clean Up Directory
+	os.rename(save_path, "meerkat/classification/models/" + dataset.split(".")[0] + ".chpt")
+	shutil.rmtree(save_dir)
 
 	return save_path
 
