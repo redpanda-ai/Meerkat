@@ -27,7 +27,7 @@ performance matrics.
 # <optional debug_flag> 
 # <optional log_flag>
 
-# python3 -m meerkat.classification.autotrain merchant card train.csv test.csv --output_dir new_CNN
+# python3 -m meerkat.classification.autotrain merchant card train.csv test.csv label_map.json
 
 ################################################################
 
@@ -97,8 +97,8 @@ def auto_train():
 	bucket = args.bucket
 	bank_or_card = args.bank_or_card
 	credit_or_debit = args.credit_or_debit
-	merchant_or_subtype = args.merchant_or_subtype
-	data_type = merchant_or_subtype + '_' + bank_or_card + '_' + credit_or_debit
+	model_type = args.model_type
+	data_type = model_type + '_' + bank_or_card + '_' + credit_or_debit
 
 	dir_paths = {
 		'subtype_card_debit': 'data/subtype/card/debit/',
