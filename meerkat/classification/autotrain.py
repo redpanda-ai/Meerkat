@@ -128,8 +128,12 @@ def auto_train():
 	config = validate_config("config/tf_cnn_config.json")
 	config["dataset"] = train_file
 	config["label_map"] = load_json(label_map)
+	config["num_labels"] = len(config["label_map"].keys())
 	config["ledger_entry"] = args.credit_or_debit
 	config["model_type"] = args.model_type
+
+	print(config["dataset"])
+	print(config["num_labels"])
 
 	# Train the model
 	graph, saver = build_graph(config)
