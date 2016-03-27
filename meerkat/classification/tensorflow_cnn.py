@@ -371,7 +371,9 @@ def train_model(config, graph, sess, saver):
 			sess.run(learning_rate.assign(learning_rate / 2))
 
 	# Clean Up Directory
-	os.rename(save_path, "meerkat/classification/models/" + dataset.split(".")[0] + ".chpt")
+	final_model_path = "meerkat/classification/models/" + dataset.split(".")[0] + ".chpt"
+	os.rename(save_path, final_model_path)
+	os.rename(save_path + ".meta", final_model_path + ".meta")
 	shutil.rmtree(save_dir)
 
 	return save_path
