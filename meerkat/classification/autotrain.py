@@ -37,10 +37,9 @@ import os
 
 import tensorflow as tf
 
-from meerkat.classification.preprocess import preprocess
-from meerkat.classification.automate import main_stream as check_accuracy
-from meerkat.classification.tools import cap_first_letter, pull_from_s3, copy_file
+from meerkat.classification.tools import pull_from_s3
 from meerkat.classification.tensorflow_cnn import build_graph, train_model, validate_config
+from meerkat.classification.verify_data import load_json
 from meerkat.tools.CNN_stats import main_process as apply_cnn
 
 def parse_arguments():
@@ -128,7 +127,7 @@ def auto_train():
 	# Load and Modify Config
 	config = validate_config("config/tf_cnn_config.json")
 	config["dataset"] = train_file
-	config["label_map"] = label_map
+	config["label_map"] = load_json(label_map)
 	config["ledger_entry"] = args.credit_or_debit
 	config["model_type"] = args.model_type
 
