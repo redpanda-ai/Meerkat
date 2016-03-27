@@ -46,7 +46,7 @@ import os
 import argparse
 import numpy as np
 
-from meerkat.classification.lua_bridge import get_cnn_by_path
+from meerkat.classification.load_model import get_tf_cnn_by_path
 from meerkat.various_tools import load_params, load_piped_dataframe
 
 def parse_arguments():
@@ -167,7 +167,7 @@ def main_process(args):
 		reversed_label_map["Null Class"] = reversed_label_map.pop("")
 
 	confusion_matrix = [[0 for i in range(num_labels + 1)] for j in range(num_labels)]
-	classifier = get_cnn_by_path(args.model, label_map)
+	classifier = get_tf_cnn_by_path(args.model, label_map)
 
 	# Prepare for data saving
 	path = 'data/CNN_stats/'

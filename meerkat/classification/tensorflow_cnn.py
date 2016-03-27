@@ -349,6 +349,8 @@ def train_model(config, graph, sess, saver):
 	save_path = saver.save(sess, save_dir + "model_" + dataset.split(".")[0] + ".ckpt")
 	logging.warning("Model saved in file: %s" % save_path)
 
+	return save_path
+
 def run_session(config, graph, saver):
 	"""Run Session"""
 

@@ -34,6 +34,8 @@ import argparse
 import logging
 import os
 
+import tensorflow as tf
+
 from meerkat.classification.preprocess import preprocess
 from meerkat.classification.automate import main_stream as check_accuracy
 from meerkat.classification.tools import cap_first_letter, pull_from_s3, copy_file
@@ -131,11 +133,11 @@ def auto_train():
 	config["model_type"] = args.model_type
 
 	# Train the model
-	# TODO
+	graph, saver = build_graph(config)
 
-	# Check training progress
-	best_model_path = check_accuracy(save_path)
-	print('The path to the best model is {0}.'.format(best_model_path))
+	with tf.Session(graph=graph) as sess:
+		tf.initialize_all_variables().run()
+		best_model_path = train_model(config, graph, sess, saver)
 
 	# Evaluate trained model using test set
 	ground_truth_labels = {
