@@ -20,6 +20,7 @@ Created on Mar 14, 2016
 
 ##################################################
 
+import os
 import csv
 import logging
 import math
@@ -318,7 +319,7 @@ def train_model(config, graph, sess, saver):
 	logging_interval = 50
 	learning_rate_interval = 15000
 
-	best_accuracy, best_era = 0
+	best_accuracy, best_era = 0, 0
 	save_dir = "meerkat/classification/models/checkpoints/"
 	os.makedirs(save_dir, exist_ok=True)
 	checkpoints = {}
