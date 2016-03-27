@@ -100,7 +100,6 @@ def load_data(config):
 def evaluate_testset(config, graph, sess, model, test, chunked_test):
 	"""Check error on test set"""
 
-	batch_size = config["batch_size"]
 	total_count = 0
 	correct_count = 0
 	num_chunks = len(chunked_test)
@@ -108,9 +107,7 @@ def evaluate_testset(config, graph, sess, model, test, chunked_test):
 	for i in range(num_chunks):
 
 		batch_test = test.loc[chunked_test[i]]
-		batch_length = len(batch_test)
-		if batch_length != 128:
-			continue
+		batch_size = len(batch_test)
 
 		trans_test, labels_test = batch_to_tensor(config, batch_test)
 		feed_dict_test = {get_tensor(graph, "x:0"): trans_test}
