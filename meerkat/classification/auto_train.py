@@ -12,7 +12,7 @@ performance matrics.
 
 ############################## USAGE ############################
 
-# python3 -m meerkat.classification.autotrain
+# python3 -m meerkat.classification.auto_train
 # <required 'merchant' or 'subtype'> 
 # <required 'bank' or 'card'> 
 # <required training_file_name> 
@@ -27,7 +27,7 @@ performance matrics.
 # <optional debug_flag> 
 # <optional log_flag>
 
-# python3 -m meerkat.classification.autotrain merchant card train.csv test.csv label_map.json
+# python3 -m meerkat.classification.auto_train merchant card train.csv test.csv label_map.json
 
 ################################################################
 
@@ -45,7 +45,7 @@ from meerkat.tools.CNN_stats import main_process as apply_cnn
 def parse_arguments():
 	"""This function parses arguments from our command line."""
 
-	parser = argparse.ArgumentParser("autotrain")
+	parser = argparse.ArgumentParser("auto_train")
 
 	# Help Text
 	help_text = {
