@@ -271,19 +271,11 @@ def main_process(args):
 	f_measure = (2 * precision * recall) / (precision + recall)
 	f_measure = np.round(f_measure, decimals=4)
 
-	print("Here we have a test matrix for matrix plot")
-	test_matrix = [[10,0,0,0,1],[2,8,0,0,0],[0,1,9,0,0],[0,1,0,9,0],[1,1,0,0,8]]
-	print(test_matrix)
-	plot_confusion_matrix(test_matrix)
-
-
 	real_confusion_matrix = []
 	for i in range(num_labels):
 		real_confusion_matrix.append(confusion_matrix[i][0:-1])
 	#plot_confusion_matrix(real_confusion_matrix)
 
-
-	false_negative = actual - true_positive - unpredicted
 	label = pd.DataFrame(label_map, index=[0]).transpose()
 	label.index = label.index.astype(int)
 	label = label.sort_index()
