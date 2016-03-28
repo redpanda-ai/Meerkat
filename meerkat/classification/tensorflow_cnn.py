@@ -124,8 +124,8 @@ def evaluate_testset(config, graph, sess, model, test, chunked_test):
 		total_count += batch_size
 	
 	test_accuracy = 100.0 * (correct_count / total_count)
-	logging.warning("Test accuracy: %.2f%%" % test_accuracy)
-	logging.warning("Correct count: " + str(correct_count))
+	logging.info("Test accuracy: %.2f%%" % test_accuracy)
+	logging.info("Correct count: " + str(correct_count))
 
 	return test_accuracy
 
@@ -335,7 +335,7 @@ def train_model(config, graph, sess, saver):
 		# Log Loss
 		if step % logging_interval == 0:
 			loss = sess.run(get_tensor(graph, "loss:0"), feed_dict=feed_dict)
-			logging.warning("train loss at epoch %d: %g" % (step + 1, loss))
+			logging.info("train loss at epoch %d: %g" % (step + 1, loss))
 
 		# Evaluate Testset, Log Progress and Save
 		if step != 0 and step % epochs == 0:
@@ -344,15 +344,15 @@ def train_model(config, graph, sess, saver):
 			model = get_tensor(graph, "model:0")
 			learning_rate = get_variable(graph, "lr:0")
 			predictions = sess.run(model, feed_dict=feed_dict)
-			logging.warning("Testing for era %d" % (step / epochs))
-			logging.warning("Learning rate at epoch %d: %g" % (step + 1, sess.run(learning_rate)))
-			logging.warning("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
+			logging.info("Testing for era %d" % (step / epochs))
+			logging.info("Learning rate at epoch %d: %g" % (step + 1, sess.run(learning_rate)))
+			logging.info("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
 			test_accuracy = evaluate_testset(config, graph, sess, model, test, chunked_test)
 
 			# Save Checkpoint
 			current_era = int(step / epochs)
 			save_path = saver.save(sess, save_dir + "era_" + str(current_era) + ".ckpt")
-			logging.warning("Checkpoint saved in file: %s" % save_path)
+			logging.info("Checkpoint saved in file: %s" % save_path)
 			checkpoints[current_era] = save_path
 
 			# Stop Training if Converged
