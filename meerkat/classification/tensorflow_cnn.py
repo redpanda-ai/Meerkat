@@ -34,7 +34,7 @@ import tensorflow as tf
 
 from meerkat.various_tools import load_piped_dataframe
 from meerkat.classification.tools import fill_description_unmasked, reverse_map
-from meerkat.classification.vari import load_params
+from meerkat.various_tools import load_params
 
 def chunks(array, num):
 	"""Chunk array into equal sized parts"""
