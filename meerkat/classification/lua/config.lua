@@ -11,9 +11,6 @@ config = {}
 local alphabet = "abcdefghijklmnopqrstuvwxyz0123456789-,;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}"
 config.alphabet = alphabet
 
--- Thesaurus
-config.thes = false
-
 -- Training data
 config.train_data = {}
 config.train_data.file = paths.concat(paths.cwd(), "./train.t7b")
@@ -26,7 +23,7 @@ config.val_data = {}
 config.val_data.file =  paths.concat(paths.cwd(), "./test.t7b")
 config.val_data.alphabet = alphabet
 config.val_data.length = 123
-config.train_data.batch_size = 128
+config.val_data.batch_size = 128
 
 -- The model
 config.model = {}
