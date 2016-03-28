@@ -113,7 +113,7 @@ def get_tf_cnn_by_path(model_path, label_map_path):
 		tensor = np.transpose(tensor, (0, 1, 3, 2))
 		feed_dict_test = {get_tensor(graph, "x:0"): tensor}
 		output = sess.run(model, feed_dict=feed_dict_test)
-		labels = np.argmax(output, 1)
+		labels = np.argmax(output, 1) + 1
 	
 		for index, transaction in enumerate(trans):
 			label = label_map.get(str(labels[index]), "")
