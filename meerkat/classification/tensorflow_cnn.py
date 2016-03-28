@@ -352,8 +352,8 @@ def train_model(config, graph, sess, saver):
 			test_accuracy = evaluate_testset(config, graph, sess, model, test, chunked_test)
 
 			# Save Checkpoint
-			current_era = step / epochs
-			save_path = saver.save(sess, save_dir + "era_" + current_era + ".ckpt")
+			current_era = int(step / epochs)
+			save_path = saver.save(sess, save_dir + "era_" + str(current_era) + ".ckpt")
 			logging.warning("Checkpoint saved in file: %s" % save_path)
 			checkpoints[current_era] = save_path
 
