@@ -16,6 +16,7 @@ import numpy as np
 import tensorflow as tf
 from sklearn.externals import joblib
 
+from meerkat.various_tools import load_params
 from meerkat.classification.tensorflow_cnn import build_graph, validate_config, get_tensor, string_to_tensor
 
 def load_scikit_model(model_name):
@@ -72,7 +73,7 @@ def get_tf_cnn_by_name(model_name):
 
 	return load_tensorflow_model_by_path(model_path, label_map_path)
 
-def get_tf_cnn_by_path(model_path, label_map):
+def get_tf_cnn_by_path(model_path, label_map_path):
 	"""Load a tensorFlow module by name"""
 
 	# Load Config
@@ -86,7 +87,7 @@ def get_tf_cnn_by_path(model_path, label_map):
 
 	# Load Graph
 	config["model_path"] = model_path
-	config["label_map"] = label_map
+	config["label_map"] = load_params(label_map_path)
 	config["num_labels"] = len(config["label_map"].keys())
 	graph, saver = build_graph(config)
 	label_map = config["label_map"]
