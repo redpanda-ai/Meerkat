@@ -73,7 +73,7 @@ def parse_arguments():
 	parser.add_argument("--input_dir", help=help_text["input_dir"], default='')
 	parser.add_argument("--output_dir", help=help_text["output_dir"], default='')
 	parser.add_argument("--credit_or_debit", default='', help=help_text["credit_or_debit"])
-	parser.add_argument("--bucket", help=help_text["bucket"], default = 's3yodlee')
+	parser.add_argument("--bucket", help=help_text["bucket"], default='s3yodlee')
 	parser.add_argument("-d", "--debug", help=help_text["debug"], action="store_true")
 	parser.add_argument("-v", "--info", help=help_text["info"], action="store_true")
 
@@ -155,10 +155,10 @@ def auto_train():
 	args.is_merchant = (model_type == 'merchant')
 	args.fast_mode = True
 
-	print('Apply the best CNN to test data and calculate performance metrics')
+	logging.warning('Apply the best CNN to test data and calculate performance metrics')
 	apply_cnn(args)
 
-	print('The whole streamline process has finished')
+	logging.warning('The whole streamline process has finished')
 
 # The main program starts here if run from the command line.
 if __name__ == "__main__":
