@@ -10,26 +10,42 @@ performance matrics.
 @author: Matt Sevrens
 """
 
-############################## USAGE ############################
+############################## USAGE ###############################################################
+USAGE = """
+usage: auto_train [-h] [--input_dir INPUT_DIR] [--output_dir OUTPUT_DIR]
+                  [--credit_or_debit CREDIT_OR_DEBIT] [--bucket BUCKET] [-d]
+                  [-v]
+                  {subtype,merchant,category} {bank,card} train_file test_file
+                  label_map
 
-# python3 -m meerkat.classification.auto_train
-# <required 'merchant' or 'subtype'> 
-# <required 'bank' or 'card'> 
-# <required training_file_name> 
-# <required test_file_name> 
-# <required 'debit' or 'credit' for 'subtype'>
-# <required label_map> 
-# <optional name_of_ouput_directory> 
-# <optional bucket name> 
-# <optional input_directory>
-# <optional raw_train_file_name> 
-# <optional raw_test_file_name> 
-# <optional debug_flag> 
-# <optional log_flag>
+positional arguments:
+  {subtype,merchant,category}
+                        Pick a valid Classifier type
+  {bank,card}           Is the model being trained on card or bank
+                        transactions?
+  train_file            Name of the training file to be pulled
+  test_file             Name of the test file to be pulled
+  label_map             Path of the label map to be pulled
 
-# python3 -m meerkat.classification.auto_train merchant card train.csv test.csv label_map.json
+optional arguments:
+  -h, --help            show this help message and exit
+  --input_dir INPUT_DIR
+                        Path of the directory containing input file
+  --output_dir OUTPUT_DIR
+                        Directory to write files to. Default is meerkat/data/
+  --credit_or_debit CREDIT_OR_DEBIT
+                        Is the model for credit or debit transactions?
+  --bucket BUCKET       Input bucket name, default is s3yodlee
+  -d, --debug           log at DEBUG level
+  -v, --info            log at INFO leve
+"""
 
-################################################################
+EXAMPLE = """
+time nohup python3 -m meerkat.classification.auto_train merchant bank merchant_bank_train.csv \
+merchant_bank_test_03182016.csv bank_merchant_label_map.json -v &
+"""
+
+###################################################################################################
 
 import argparse
 import logging
