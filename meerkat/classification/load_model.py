@@ -80,7 +80,7 @@ def get_tf_cnn_by_path(model_path, label_map_path):
 	config = validate_config(config_path)
 
 	# Validate Model and Label Map
-	if not isfile(model_path) or not isfile(label_map_path):
+	if not isfile(model_path):
 		logging.warning("Resouces to load model not found. Terminating")
 		sys.exit()
 

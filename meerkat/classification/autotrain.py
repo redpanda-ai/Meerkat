@@ -132,9 +132,6 @@ def auto_train():
 	config["ledger_entry"] = args.credit_or_debit
 	config["model_type"] = args.model_type
 
-	print(config["dataset"])
-	print(config["num_labels"])
-
 	# Train the model
 	graph, saver = build_graph(config)
 
