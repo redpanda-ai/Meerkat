@@ -34,18 +34,18 @@ import tensorflow as tf
 
 from meerkat.various_tools import load_piped_dataframe
 from meerkat.classification.tools import fill_description_unmasked, reverse_map
-from meerkat.classification.verify_data import load_json
+from meerkat.classification.vari import load_params
 
 def chunks(array, num):
 	"""Chunk array into equal sized parts"""
 	num = max(1, num)
 	return [array[i:i + num] for i in range(0, len(array), num)]
 
-def validate_config(filename):
+def validate_config(config):
 	"""Validate input configuration"""
 
 	default_config = "config/default_tf_config.json"
-	config = load_json(filename)
+	config = load_params(config)
 	reshape = ((config["doc_length"] - 96) / 27) * 256
 	config["alpha_dict"] = {a : i for i, a in enumerate(config["alphabet"])}
 	config["label_map"] = load_json(config["label_map"])

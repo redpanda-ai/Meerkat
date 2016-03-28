@@ -72,7 +72,7 @@ def get_tf_cnn_by_name(model_name):
 
 	return load_tensorflow_model_by_path(model_path, label_map_path)
 
-def get_tf_cnn_by_path(model_path, label_map_path):
+def get_tf_cnn_by_path(model_path, label_map):
 	"""Load a tensorFlow module by name"""
 
 	# Load Config
@@ -86,7 +86,8 @@ def get_tf_cnn_by_path(model_path, label_map_path):
 
 	# Load Graph
 	config["model_path"] = model_path
-	config["label_map"] = label_map_path
+	config["label_map"] = label_map
+	config["num_labels"] = len(config["label_map"].keys())
 	graph, saver = build_graph(config)
 	label_map = config["label_map"]
 
