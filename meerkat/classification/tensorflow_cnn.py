@@ -375,6 +375,7 @@ def train_model(config, graph, sess, saver):
 	final_model_path = "meerkat/classification/models/" + os.path.basename(dataset).split(".")[0] + ".ckpt"
 	os.rename(save_path, final_model_path)
 	shutil.rmtree(save_dir)
+	sess.close()
 
 	return final_model_path
 
