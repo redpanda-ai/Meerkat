@@ -45,7 +45,7 @@ import json
 import os
 import argparse
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from pylab import *
 
 from meerkat.classification.lua_bridge import get_cnn_by_path
@@ -267,6 +267,7 @@ def main_process(args):
 	false_positive = column_sum - true_positive
 	precision = true_positive / column_sum
 	precision = np.round(precision, decimals=4)
+	false_negative = actual - true_positive - unpredicted
 
 	f_measure = (2 * precision * recall) / (precision + recall)
 	f_measure = np.round(f_measure, decimals=4)
