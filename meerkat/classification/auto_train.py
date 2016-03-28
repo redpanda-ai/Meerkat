@@ -49,7 +49,7 @@ def parse_arguments():
 
 	# Help Text
 	help_text = {
-		"model_type" : "Classifier type: Subtype, Merchant or Category?",
+		"model_type" : "Pick a valid Classifier type",
 		"bank_or_card": "Is the model being trained on card or bank transactions?",
 		"train_file": "Name of the training file to be pulled",
 		"test_file": "Name of the test file to be pulled",
@@ -62,9 +62,15 @@ def parse_arguments():
 		"info": "log at INFO level"
 	}
 
+	choices = {
+		"model_type": ["subtype", "merchant", "category"],
+		"bank_or_card": ["bank", "card"]
+	}
+
 	# Required arugments
-	parser.add_argument("model_type", help=help_text["model_type"])
-	parser.add_argument("bank_or_card", help=help_text["bank_or_card"])
+	parser.add_argument("model_type", help=help_text["model_type"], choices=choices["model_type"])
+	parser.add_argument("bank_or_card", help=help_text["bank_or_card"], 
+		choices=choices["bank_or_card"])
 	parser.add_argument("train_file", help=help_text["train_file"])
 	parser.add_argument("test_file", help=help_text["test_file"])
 	parser.add_argument("label_map", default='', help=help_text["label_map"])
