@@ -76,7 +76,7 @@ def load_piped_dataframe(filename, chunksize=False):
 	}
 
 	if isinstance(chunksize, int):
-		options["chunksize"] = chunked
+		options["chunksize"] = chunksize
 
 	return pd.read_csv(filename, **options)
 
