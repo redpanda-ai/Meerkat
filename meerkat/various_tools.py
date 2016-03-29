@@ -33,8 +33,8 @@ def validate_configuration(config_path, schema_path):
 		try:
 			config = json.load(config_file)
 			schema = json.load(schema_file)
-		except ValueError:
-			logging.error("Config file is mal-formatted")
+		except ValueError as v:
+			logging.error("Config file is mal-formatted {0}".format(v))
 			sys.exit()
 
 		validate(config, schema)
