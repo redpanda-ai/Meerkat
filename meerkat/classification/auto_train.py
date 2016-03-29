@@ -50,9 +50,11 @@ merchant_bank_test_03182016.csv bank_merchant_label_map.json -v &
 import argparse
 import logging
 import os
+import sys
 
 import tensorflow as tf
 
+from plumbum import local
 from boto import connect_s3
 from boto.s3.connection import Location
 from meerkat.classification.tools import pull_from_s3
@@ -112,41 +114,49 @@ def parse_arguments():
 
 	return args
 
-def check_new_file_existence(model_type, bank_or_card, **s3_params):
-	"""Check the existence of a new file"""
+def check_new_input_file(model_type, bank_or_card, **s3_params):
+	"""Check the existence of a new input.tar.gz file"""
 	bucket_name, prefix = s3_params["bucket"], s3_params["prefix"]
 	logging.info("Scanning S3 at {0}".format(bucket_name + "/" + prefix))
 	conn = connect_s3()
 	bucket = conn.get_bucket(bucket_name, Location.USWest2)
 	listing_iso = bucket.list(prefix=prefix, delimiter='/')
-	#for key in listing:
-	#	print(key.name.encode('utf-8'))
+
 	iso_object_list = [
 		iso_object
 		for iso_object in listing_iso
 	]
+
 	version_list = []
 	for i in range(len(iso_object_list)):
-		#print(iso_object_list[i].name)
 		full_name = iso_object_list[i].name
 		if full_name.endswith("/"):
-			version_list.append(full_name[full_name.rfind("/", 0, len(full_name) - 1)+1:])
-	#print(sorted(version_list))
-	newest_dir = prefix + version_list[0]
-	#print(newest_dir)
-	listing_tar_gz = bucket.list(prefix=newest_dir)
+			folder_name = full_name[full_name.rfind("/", 0, len(full_name) - 1)+1:len(full_name)-1]
+			if folder_name.isdigit():
+				version_list.append(folder_name)
+
+	newest_version_dir = prefix + sorted(version_list, reverse=True)[0]
+	logging.info("The newest dir: ".format(newest_version_dir))
+	listing_tar_gz = bucket.list(prefix=newest_version_dir)
 	
 	tar_gz_object_list = [
 		tar_gz_object
 		for tar_gz_object in listing_tar_gz
 	]
-	
+
+	tar_gz_file_list = []
 	for i in range(len(tar_gz_object_list)):
 		full_name = tar_gz_object_list[i].name
-		if full_name[full_name.rfind("/")+1:] == "input.tar.gz":
-			print("has input data file")
-		
-	return False
+		tar_gz_name = full_name[full_name.rfind("/")+1:]
+		tar_gz_file_list.append(tar_gz_name)
+
+	if "input.tar.gz" not in tar_gz_file_list:
+		logging.critical("input.tar.gz doesn't exist in {0}".format(newest_version_dir))
+		sys.exit()
+	elif "output.tar.gz" not in tar_gz_file_list:
+		return True, newest_version_dir
+	else:
+		return False, newest_version_dir
 
 def auto_train():
 	"""Run the automated training process"""
@@ -156,15 +166,17 @@ def auto_train():
 	bank_or_card = args.bank_or_card
 	credit_or_debit = args.credit_or_debit
 	model_type = args.model_type
-	data_type = model_type + '_' + bank_or_card + '_' + credit_or_debit
+	data_type = model_type + '_' + bank_or_card
+	if model_type == "subtype":
+		data_type = data_type + '_' + credit_or_debit
 
 	dir_paths = {
 		'subtype_card_debit': 'data/subtype/card/debit/',
 		'subtype_card_credit': 'data/subtype/card/credit/',
 		'subtype_bank_debit': 'data/subtype/bank/debit/',
 		'subtype_bank_credit': 'data/subtype/bank/credit/',
-		'merchant_bank_': 'data/merchant/bank/',
-		'merchant_card_': 'data/merchant/card/'
+		'merchant_bank': 'data/merchant/bank/',
+		'merchant_card': 'data/merchant/card/'
 	}
 
 	if args.input_dir == '':
@@ -181,13 +193,22 @@ def auto_train():
 
 	s3_params = {"bucket": bucket, "prefix": prefix, "save_path": save_path}
 
-	exist_new_file = check_new_file_existence(model_type, bank_or_card, **s3_params)
-	#if exist_new_file:
-		#verify and split new data
+	exist_new_input, newest_version_dir = check_new_input_file(model_type, bank_or_card, **s3_params)
 
-	train_file = pull_from_s3(extension='.csv', file_name=args.train_file, **s3_params)
-	test_file = pull_from_s3(extension='.csv', file_name=args.test_file, **s3_params)
-	label_map = pull_from_s3(extension='.json', file_name=args.label_map, **s3_params)
+	if exist_new_input:
+		print("exist_new_input")
+		#TODO verify and split new data
+	else:
+		s3_params["prefix"] = newest_version_dir + "/"
+		output_file = pull_from_s3(extension='.tar.gz', file_name="output.tar.gz", **s3_params)
+		local["tar"]["xfv"][output_file]["-C"][save_path]()
+		train_file = save_path + "train.csv"
+		test_file = save_path + "test.csv"
+		label_map = save_path + "label_map.json"
+
+	#train_file = pull_from_s3(extension='.csv', file_name=args.train_file, **s3_params)
+	#test_file = pull_from_s3(extension='.csv', file_name=args.test_file, **s3_params)
+	#label_map = pull_from_s3(extension='.json', file_name=args.label_map, **s3_params)
 
 	# Load and Modify Config
 	config = validate_config("config/tf_cnn_config.json")
