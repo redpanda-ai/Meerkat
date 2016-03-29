@@ -17,15 +17,3 @@ def get_reversed_dict():
 		0.0179: 3,
 		0.0134: 4
 	}
-
-def get_csv_path(input_type):
-	"""Return a pandas dataframe"""
-	csv_input = {
-		"correct_format": "tests/fixture/correct_format.csv",
-		"with_empty_transaction": "tests/fixture/with_empty_transaction.csv",
-	}
-	return csv_input[input_type]
-
-def get_csvs_directory():
-	"""Return a directory contains several csv files"""
-	return "tests/fixture/csvs/"

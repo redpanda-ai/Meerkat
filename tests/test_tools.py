@@ -1,8 +1,6 @@
 """Unit test for meerkat/classification/tools.py"""
 
-import os
 import unittest
-import csv
 import pandas as pd
 import meerkat.classification.tools as tools
 from nose_parameterized import parameterized
@@ -13,12 +11,12 @@ class ToolsTests(unittest.TestCase):
 	"""Our UnitTest class."""
 
 	@parameterized.expand([
-		(["with_file_name", {"bucket": "s3yodlee", "prefix": "Meerkat_tests_fixture", "extension": "csv",
-			"file_name": "csv_file_1.csv", "save_path": "tests/fixture/"}]),
-		(["found_multiple_files", {"bucket": "s3yodlee", "prefix": "Meerkat_tests_fixture", "extension": "csv",
-			"save_path": "tests/fixture/"}]),
-		(["file_not_found", {"bucket": "s3yodlee", "prefix": "Meerkat_tests_fixture", "extension": "csv",
-			"file_name": "missing.csv", "save_path": "tests/fixture/"}])
+		(["with_file_name", {"bucket": "s3yodlee", "prefix": "Meerkat_tests_fixture",
+			"extension": "csv", "file_name": "csv_file_1.csv", "save_path": "tests/fixture/"}]),
+		(["found_multiple_files", {"bucket": "s3yodlee", "prefix": "Meerkat_tests_fixture",
+			"extension": "csv", "save_path": "tests/fixture/"}]),
+		(["file_not_found", {"bucket": "s3yodlee", "prefix": "Meerkat_tests_fixture",
+			"extension": "csv", "file_name": "missing.csv", "save_path": "tests/fixture/"}])
 	])
 	def test_pull_from_s3(self, case_type, inputs):
 		"""Test pull_from_s3 with parameters"""
@@ -45,7 +43,6 @@ class ToolsTests(unittest.TestCase):
 	])
 	def test_fill_description_unmasked(self, row, output):
 		"""Test fill_description_unmasked with parameters"""
-
 		self.assertEqual(tools.fill_description_unmasked(row), output)
 
 if __name__ == '__main__':
