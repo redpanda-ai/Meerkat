@@ -118,21 +118,34 @@ def check_new_file_existence(model_type, bank_or_card, **s3_params):
 	logging.info("Scanning S3 at {0}".format(bucket_name + "/" + prefix))
 	conn = connect_s3()
 	bucket = conn.get_bucket(bucket_name, Location.USWest2)
-	listing = bucket.list(prefix=prefix, delimiter='/')
+	listing_iso = bucket.list(prefix=prefix, delimiter='/')
 	#for key in listing:
 	#	print(key.name.encode('utf-8'))
-	s3_object_list = [
-		s3_object
-		for s3_object in listing
-		#if s3_object.key.endswith(extension)
+	iso_object_list = [
+		iso_object
+		for iso_object in listing_iso
 	]
 	version_list = []
-	for i in range(len(s3_object_list)):
-		print(s3_object_list[i].name)
-		full_name = s3_object_list[i].name
+	for i in range(len(iso_object_list)):
+		#print(iso_object_list[i].name)
+		full_name = iso_object_list[i].name
 		if full_name.endswith("/"):
 			version_list.append(full_name[full_name.rfind("/", 0, len(full_name) - 1)+1:])
-	print(version_list)
+	#print(sorted(version_list))
+	newest_dir = prefix + version_list[0]
+	#print(newest_dir)
+	listing_tar_gz = bucket.list(prefix=newest_dir)
+	
+	tar_gz_object_list = [
+		tar_gz_object
+		for tar_gz_object in listing_tar_gz
+	]
+	
+	for i in range(len(tar_gz_object_list)):
+		full_name = tar_gz_object_list[i].name
+		if full_name[full_name.rfind("/")+1:] == "input.tar.gz":
+			print("has input data file")
+		
 	return False
 
 def auto_train():
