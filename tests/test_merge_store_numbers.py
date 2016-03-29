@@ -14,7 +14,7 @@ class MergeStoreNumbersTests(unittest.TestCase):
 		(["single_merchant", merge_store_numbers_fixture.get_args()["single_merchant"]]),
 		(["directory_of_merchant", merge_store_numbers_fixture.get_args()["directory_of_merchant"]]),
 		(["not_a_directory", merge_store_numbers_fixture.get_args()["not_a_directory"]]),
-		(["no_csv", merge_store_numbers_fixture.get_args()["no_csv"]]),
+		(["no_csv", merge_store_numbers_fixture.get_args()["no_csv"]])
 	])
 	def test_verify_arguments(self, case_type, input_argv):
 		"""Test verify_arguments with parameters"""

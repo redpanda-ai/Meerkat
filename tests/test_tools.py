@@ -18,13 +18,12 @@ class ToolsTests(unittest.TestCase):
 	])
 	def test_pull_from_s3(self, case_type, inputs):
 		"""Test pull_from_s3 with parameters"""
-		kwargs = inputs
 		if case_type == "found_multiple_files":
-			self.assertRaises(Exception, tools.pull_from_s3, **kwargs)
+			self.assertRaises(Exception, tools.pull_from_s3, **inputs)
 		elif case_type == "file_not_found":
-			self.assertRaises(Exception, tools.pull_from_s3, **kwargs)
+			self.assertRaises(Exception, tools.pull_from_s3, **inputs)
 		else:
-			self.assertEqual(tools.pull_from_s3(**kwargs), "tests/fixture/csv_file_1.csv")
+			self.assertEqual(tools.pull_from_s3(**inputs), "tests/fixture/csv_file_1.csv")
 			local["rm"]["tests/fixture/csv_file_1.csv"]()
 
 	@parameterized.expand([
