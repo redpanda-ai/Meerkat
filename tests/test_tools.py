@@ -1,5 +1,6 @@
 """Unit test for meerkat/classification/tools.py"""
 
+import csv
 import unittest
 import pandas as pd
 import meerkat.classification.tools as tools
@@ -11,12 +12,9 @@ class ToolsTests(unittest.TestCase):
 	"""Our UnitTest class."""
 
 	@parameterized.expand([
-		(["with_file_name", {"bucket": "s3yodlee", "prefix": "Meerkat_tests_fixture",
-			"extension": "csv", "file_name": "csv_file_1.csv", "save_path": "tests/fixture/"}]),
-		(["found_multiple_files", {"bucket": "s3yodlee", "prefix": "Meerkat_tests_fixture",
-			"extension": "csv", "save_path": "tests/fixture/"}]),
-		(["file_not_found", {"bucket": "s3yodlee", "prefix": "Meerkat_tests_fixture",
-			"extension": "csv", "file_name": "missing.csv", "save_path": "tests/fixture/"}])
+		(["with_file_name", tools_fixture.get_s3_params("with_file_name")]),
+		(["found_multiple_files", tools_fixture.get_s3_params("found_multiple_files")]),
+		(["file_not_found", tools_fixture.get_s3_params("file_not_found")])
 	])
 	def test_pull_from_s3(self, case_type, inputs):
 		"""Test pull_from_s3 with parameters"""
@@ -44,6 +42,26 @@ class ToolsTests(unittest.TestCase):
 	def test_fill_description_unmasked(self, row, output):
 		"""Test fill_description_unmasked with parameters"""
 		self.assertEqual(tools.fill_description_unmasked(row), output)
+
+	@parameterized.expand([
+		(["non_empty", tools_fixture.get_csv_path("correct_format"), 4]),
+		(["with_empty", tools_fixture.get_csv_path("with_empty_transaction"), 1])
+	])
+	def test_check_empty_transation(self, case_type, csv_path, output):
+		"""Test check_empty_transaction with parameters"""
+		df = pd.read_csv(csv_path, quoting=csv.QUOTE_NONE, na_filter=False,
+			encoding="utf-8", sep='|', error_bad_lines=False)
+		self.assertEqual(len(tools.check_empty_transaction(df)), output)
+		if case_type == "with_empty":
+			local["rm"]["empty_transactions.csv"]()
+
+	@parameterized.expand([
+		(["tests/fixture/correct_format.csv", (3, 1)])
+	])
+	def test_seperate_debit_credit(self, subtype_file, output):
+		"""Test correct_format with parameters"""
+		result = tools.seperate_debit_credit(subtype_file)
+		self.assertEqual((len(result[0]), len(result[1])), output)
 
 if __name__ == '__main__':
 	unittest.main()
