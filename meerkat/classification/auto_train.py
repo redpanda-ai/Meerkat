@@ -110,6 +110,9 @@ def parse_arguments():
 
 	return args
 
+def check_new_file_existence():
+	"""Check the existence of a new file"""
+	
 def auto_train():
 	"""Run the automated training process"""
 
@@ -142,6 +145,11 @@ def auto_train():
 	os.makedirs(save_path, exist_ok=True)
 
 	s3_params = {"bucket": bucket, "prefix": prefix, "save_path": save_path}
+
+	exist_new_file = check_new_file_existence(model_type, bank_or_card, **s3_params)
+	#if exist_new_file:
+		#verify and split new data
+
 	train_file = pull_from_s3(extension='.csv', file_name=args.train_file, **s3_params)
 	test_file = pull_from_s3(extension='.csv', file_name=args.test_file, **s3_params)
 	label_map = pull_from_s3(extension='.json', file_name=args.label_map, **s3_params)
