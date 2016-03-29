@@ -396,6 +396,7 @@ def run_session(config, graph, saver):
 
 def run_from_command_line():
 	"""Run module from command line"""
+	logging.basicConfig(level=logging.INFO)
 	config = validate_config(sys.argv[1])
 	config["label_map"] = load_params(config["label_map"])
 	config["num_labels"] = len(config["label_map"].keys())
