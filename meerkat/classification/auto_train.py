@@ -53,6 +53,8 @@ import os
 
 import tensorflow as tf
 
+from boto import connect_s3
+from boto.s3.connection import Location
 from meerkat.classification.tools import pull_from_s3
 from meerkat.classification.tensorflow_cnn import build_graph, train_model, validate_config
 from meerkat.classification.verify_data import load_json
@@ -110,9 +112,26 @@ def parse_arguments():
 
 	return args
 
-def check_new_file_existence():
+def check_new_file_existence(model_type, bank_or_card, **s3_params):
 	"""Check the existence of a new file"""
-	
+	bucket_name, prefix = s3_params["bucket"], s3_params["prefix"]
+	logging.info("Scanning S3 at {0}".format(bucket_name + "/" + prefix))
+	conn = connect_s3()
+	bucket = conn.get_bucket(bucket_name, Location.USWest2)
+	listing = bucket.list(prefix=prefix, delimiter='/')
+	#for key in listing:
+	#	print(key.name.encode('utf-8'))
+	s3_object_list = [
+		s3_object
+		for s3_object in listing
+		#if s3_object.key.endswith(extension)
+	]
+	version_list = []
+	for i in range(len(s3_object_list)):
+		print(s3_object_list[i].name)
+		version_list.append(s3_object_list[i].name)
+	return False
+
 def auto_train():
 	"""Run the automated training process"""
 
