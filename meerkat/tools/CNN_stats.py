@@ -39,12 +39,14 @@ An entry of machine_labeled has such format:
 """
 #####################################################
 
-import pandas as pd
+import argparse
 import csv
 import json
+import logging
 import os
-import argparse
+import pandas as pd
 import numpy as np
+
 #import matplotlib.pyplot as plt
 from pylab import *
 
@@ -92,7 +94,6 @@ def compare_label(*args, **kwargs):
 
 	# Test Each Machine Labeled Row
 	for machine_row in machine:
-
 		# Update conf_mat
 		# predicted_label is None if a predicted subtype is ""
 		if machine_row['ACTUAL_INDEX'] is None:
@@ -215,7 +216,9 @@ def main_process(args):
 
 	fill_description = lambda x: x[sec_doc_key] if x[doc_key] == ''\
 		else x[doc_key]
+	chunk_count = 0
 	for chunk in reader:
+		logging.warning("Testing chunk {0}.".format(chunk_count))
 		if sec_doc_key != '':
 			chunk[doc_key] = chunk.apply(fill_description, axis=1)
 		if args.is_merchant:
@@ -252,6 +255,8 @@ def main_process(args):
 		write_correct(correct)
 		write_unpredicted(unpredicted)
 		write_needs_hand_labeling(needs_hand_labeling)
+
+		chunk_count += 1
 
 	# Calculate f_measure, recall, precision, false +/-, true +/- from confusion maxtrix
 	true_positive = pd.DataFrame([confusion_matrix[i][i] for i in range(num_labels)])
