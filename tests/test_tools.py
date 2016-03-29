@@ -18,9 +18,7 @@ class ToolsTests(unittest.TestCase):
 	])
 	def test_pull_from_s3(self, case_type, inputs):
 		"""Test pull_from_s3 with parameters"""
-		if case_type == "found_multiple_files":
-			self.assertRaises(Exception, tools.pull_from_s3, **inputs)
-		elif case_type == "file_not_found":
+		if case_type == "found_multiple_files" or case_type == "file_not_found":
 			self.assertRaises(Exception, tools.pull_from_s3, **inputs)
 		else:
 			self.assertEqual(tools.pull_from_s3(**inputs), "tests/fixture/csv_file_1.csv")
@@ -36,7 +34,7 @@ class ToolsTests(unittest.TestCase):
 	@parameterized.expand([
 		([pd.Series(["", "masked"], ["DESCRIPTION_UNMASKED", "DESCRIPTION"]), "masked"]),
 		([pd.Series(["unmasked", "masked"], ["DESCRIPTION_UNMASKED", "DESCRIPTION"]), "unmasked"]),
-		([pd.Series(["", ""], ["DESCRIPTION_UNMASKED", "DESCRIPTION"]), ""]),
+		([pd.Series(["", ""], ["DESCRIPTION_UNMASKED", "DESCRIPTION"]), ""])
 	])
 	def test_fill_description_unmasked(self, row, output):
 		"""Test fill_description_unmasked with parameters"""
