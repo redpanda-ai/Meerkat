@@ -7,44 +7,78 @@
 Created on Mar 14, 2016
 @author: Matthew Sevrens
 @author: Tina Wu
+@author: J. Andrew Key
 """
 
-#################### USAGE #######################
+#################### USAGE ########################################################################
 
-# python3 -m meerkat.classification.tensorflow_cnn [config]
-# python3 -m meerkat.classification.tensorflow_cnn config/tf_cnn_config.json
+# usage: meerkat.classification.tensorflow_cnn [-h] [-d] [-v]
+#                                             config_file schema_file
 
-# For details on implementation see:
+# positional arguments:
+#   config_file  What is the location of your configuration file?
+#   schema_file  What is the location of your schema file?
+
+# optional arguments:
+#   -h, --help   show this help message and exit
+#   -d, --debug  log at DEBUG level
+#   -v, --info   log at INFO level
+
+# For addtional details on implementation see:
 # Character-level Convolutional Networks for Text Classification
 # http://arxiv.org/abs/1509.01626
 
-##################################################
+###################################################################################################
 
-import os
+import argparse
 import csv
 import logging
 import math
+import os
+import pprint
 import random
-import sys
 import shutil
+import sys
 
 import numpy as np
 import pandas as pd
 import tensorflow as tf
 
-from meerkat.various_tools import load_piped_dataframe
 from meerkat.classification.tools import fill_description_unmasked, reverse_map
-from meerkat.various_tools import load_params
+from meerkat.various_tools import load_piped_dataframe, validate_configuration
 
 def chunks(array, num):
 	"""Chunk array into equal sized parts"""
 	num = max(1, num)
 	return [array[i:i + num] for i in range(0, len(array), num)]
 
-def validate_config(config):
+def parse_arguments():
+	"""This function parses arguments from our command line."""
+	parser = argparse.ArgumentParser("meerkat.classification.tensorflow_cnn")
+	# Required arugments
+	parser.add_argument("config_file",
+		help="What is the location of your configuration file?")
+	parser.add_argument("schema_file",
+		help="What is the location of your schema file?")
+	parser.add_argument("-d", "--debug", help="log at DEBUG level",
+		action="store_true")
+	parser.add_argument("-v", "--info", help="log at INFO level",
+		action="store_true")
+
+	args = parser.parse_args()
+	if args.debug:
+		logging.basicConfig(level=logging.DEBUG)
+	elif args.info:
+		logging.basicConfig(level=logging.INFO)
+	logging.info("Arguments parsed.")
+	return args
+
+def validate_config(args):
 	"""Validate input configuration"""
-	default_config = "meerkat/classification/config/default_tf_config.json"
-	config = load_params(config)
+	config = validate_configuration(args.config_file, args.schema_file)
+	#config = load_params(config)
+	logging.debug("Configuration is :\n{0}".format(pprint.pformat(config)))
+	sys.exit()
 	reshape = ((config["doc_length"] - 96) / 27) * 256
 	config["alpha_dict"] = {a : i for i, a in enumerate(config["alphabet"])}
 	config["base_rate"] = config["base_rate"] * math.sqrt(config["batch_size"]) / math.sqrt(128)
@@ -395,7 +429,8 @@ def run_session(config, graph, saver):
 
 def run_from_command_line():
 	"""Run module from command line"""
-	config = validate_config(sys.argv[1])
+	args = parse_arguments()
+	config = validate_config(args)
 	config["label_map"] = load_params(config["label_map"])
 	config["num_labels"] = len(config["label_map"].keys())
 	graph, saver = build_graph(config)
