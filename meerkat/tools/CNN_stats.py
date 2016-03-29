@@ -41,12 +41,11 @@ An entry of machine_labeled has such format:
 
 import pandas as pd
 import csv
-import json
 import os
 import argparse
 import numpy as np
 #import matplotlib.pyplot as plt
-from pylab import *
+#from pylab import *
 
 from meerkat.classification.lua_bridge import get_cnn_by_path
 from meerkat.various_tools import load_params
@@ -129,8 +128,10 @@ def compare_label(*args, **kwargs):
 
 
 def get_write_func(filename, header):
+	"""Have a write function"""
 	file_exists = False
 	def write_func(data):
+		"""Have a write function"""
 		if len(data) > 0:
 			nonlocal file_exists
 			mode = "a" if file_exists else "w"
@@ -141,6 +142,7 @@ def get_write_func(filename, header):
 			file_exists = True
 	return write_func
 
+'''
 def plot_confusion_matrix(con_matrix):
 	"""Plot the confusion matrix"""
 	norm_matrix = []
@@ -161,14 +163,16 @@ def plot_confusion_matrix(con_matrix):
 	ax = fig.add_subplot(111)
 	res = ax.imshow(array(norm_matrix), cmap=cm.jet, interpolation='nearest')
 
-	for i,j in ((x,y) for x in range(len(con_matrix)) for y in range(len(con_matrix[0]))):
-		ax.annotate(str(con_matrix[i][j]), xy=(i,j), fontsize='xx-small')
+	for i, j in ((x, y) for x in range(len(con_matrix)) for y in range(len(con_matrix[0]))):
+		ax.annotate(str(con_matrix[i][j]), xy=(i, j), fontsize='xx-small')
 
 	cb = fig.colorbar(res)
 	savefig("/data/CNN_stats/confusion_matrix.png", format="png")
+'''
 
 	# Main
 def main_process(args):
+	"""This is the main stream"""
 	doc_key = args.doc_key
 	sec_doc_key = args.secondary_doc_key
 	machine_label_key = args.predicted_key
@@ -178,7 +182,7 @@ def main_process(args):
 		quoting=csv.QUOTE_NONE, encoding='utf-8', sep='|', error_bad_lines=False)
 	label_map = load_params(args.label_map)
 	get_key = lambda x: x['label'] if isinstance(x, dict) else x
-	label_map = dict(zip(label_map.keys(),map(get_key, label_map.values())))
+	label_map = dict(zip(label_map.keys(), map(get_key, label_map.values())))
 	num_labels = len(label_map)
 	class_names = list(label_map.values())
 
@@ -245,7 +249,7 @@ def main_process(args):
 
 		mislabeled, correct, unpredicted, needs_hand_labeling, confusion_matrix =\
 			compare_label(machine_labeled, machine_label_key, human_label_key,
-			confusion_matrix, num_labels, doc_key=doc_key,fast_mode=fast_mode)
+			confusion_matrix, num_labels, doc_key=doc_key, fast_mode=fast_mode)
 
 		# Save
 		write_mislabeled(mislabeled)
@@ -261,8 +265,8 @@ def main_process(args):
 	recall = true_positive / actual
 	# If we use pandas 0.17 we can do the rounding neater
 	recall = np.round(recall, decimals=4)
-	column_sum = pd.DataFrame(conf_mat.sum()).ix[:,:num_labels]
-	unpredicted = pd.DataFrame(conf_mat.ix[:,num_labels])
+	column_sum = pd.DataFrame(conf_mat.sum()).ix[:, :num_labels]
+	unpredicted = pd.DataFrame(conf_mat.ix[:, num_labels])
 	unpredicted.columns = [0]
 	false_positive = column_sum - true_positive
 	precision = true_positive / column_sum
