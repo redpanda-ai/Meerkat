@@ -117,26 +117,25 @@ def parse_arguments():
 def check_new_input_file(model_type, bank_or_card, **s3_params):
 	"""Check the existence of a new input.tar.gz file"""
 	bucket_name, prefix = s3_params["bucket"], s3_params["prefix"]
-	logging.info("Scanning S3 at {0}".format(bucket_name + "/" + prefix))
 	conn = connect_s3()
 	bucket = conn.get_bucket(bucket_name, Location.USWest2)
-	listing_iso = bucket.list(prefix=prefix, delimiter='/')
+	listing_version = bucket.list(prefix=prefix, delimiter='/')
 
-	iso_object_list = [
-		iso_object
-		for iso_object in listing_iso
+	version_object_list = [
+		version_object
+		for version_object in listing_version
 	]
 
-	version_list = []
-	for i in range(len(iso_object_list)):
-		full_name = iso_object_list[i].name
+	version_dir_list = []
+	for i in range(len(version_object_list)):
+		full_name = version_object_list[i].name
 		if full_name.endswith("/"):
-			folder_name = full_name[full_name.rfind("/", 0, len(full_name) - 1)+1:len(full_name)-1]
-			if folder_name.isdigit():
-				version_list.append(folder_name)
+			dir_name = full_name[full_name.rfind("/", 0, len(full_name) - 1)+1:len(full_name)-1]
+			if dir_name.isdigit():
+				version_dir_list.append(dir_name)
 
-	newest_version_dir = prefix + sorted(version_list, reverse=True)[0]
-	logging.info("The newest dir: ".format(newest_version_dir))
+	newest_version_dir = prefix + sorted(version_dir_list, reverse=True)[0]
+	logging.info("The newest direcory is: {0}".format(newest_version_dir))
 	listing_tar_gz = bucket.list(prefix=newest_version_dir)
 	
 	tar_gz_object_list = [
@@ -147,8 +146,8 @@ def check_new_input_file(model_type, bank_or_card, **s3_params):
 	tar_gz_file_list = []
 	for i in range(len(tar_gz_object_list)):
 		full_name = tar_gz_object_list[i].name
-		tar_gz_name = full_name[full_name.rfind("/")+1:]
-		tar_gz_file_list.append(tar_gz_name)
+		tar_gz_file_name = full_name[full_name.rfind("/")+1:]
+		tar_gz_file_list.append(tar_gz_file_name)
 
 	if "input.tar.gz" not in tar_gz_file_list:
 		logging.critical("input.tar.gz doesn't exist in {0}".format(newest_version_dir))
