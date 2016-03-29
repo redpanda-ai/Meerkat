@@ -129,7 +129,10 @@ def check_new_file_existence(model_type, bank_or_card, **s3_params):
 	version_list = []
 	for i in range(len(s3_object_list)):
 		print(s3_object_list[i].name)
-		version_list.append(s3_object_list[i].name)
+		full_name = s3_object_list[i].name
+		if full_name.endswith("/"):
+			version_list.append(full_name[full_name.rfind("/", 0, len(full_name) - 1)+1:])
+	print(version_list)
 	return False
 
 def auto_train():
