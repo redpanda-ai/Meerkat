@@ -78,7 +78,6 @@ def validate_config(args):
 	config = validate_configuration(args.config_file, args.schema_file)
 	#config = load_params(config)
 	logging.debug("Configuration is :\n{0}".format(pprint.pformat(config)))
-	sys.exit()
 	reshape = ((config["doc_length"] - 96) / 27) * 256
 	config["alpha_dict"] = {a : i for i, a in enumerate(config["alphabet"])}
 	config["base_rate"] = config["base_rate"] * math.sqrt(config["batch_size"]) / math.sqrt(128)
