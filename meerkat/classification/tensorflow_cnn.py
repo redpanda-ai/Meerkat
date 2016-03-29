@@ -43,8 +43,7 @@ def chunks(array, num):
 
 def validate_config(config):
 	"""Validate input configuration"""
-
-	default_config = "config/default_tf_config.json"
+	default_config = "meerkat/classification/config/default_tf_config.json"
 	config = load_params(config)
 	reshape = ((config["doc_length"] - 96) / 27) * 256
 	config["alpha_dict"] = {a : i for i, a in enumerate(config["alphabet"])}
