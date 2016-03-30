@@ -120,8 +120,8 @@ def main_split_data(args):
 		save(results, 'test')
 		del df
 		del results
-		local['mv'][label_map_path][dirt + "label_map.json"]()
-		local['rm'][input_file]()
+		#local['mv'][label_map_path][dirt + "label_map.json"]()
+		os.rename(label_map_path, dirt + "label_map.json")
 		local['tar']['-zcvf']["output.tar.gz"]['-C'][dirt]['.']()
 		local['aws']['s3']['cp']["output.tar.gz"][dir_path]()
 	else:
