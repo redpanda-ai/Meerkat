@@ -26,12 +26,11 @@ from jsonschema import validate
 CLEAN_PATTERN = re.compile(r"\\+\|")
 QUOTE_CLEAN = re.compile(r'\"')
 
-def validate_configuration(config, schema_path):
+def validate_configuration(config, schema):
 	try:
-		schema_file = open(schema_path, encoding='utf-8')
 		try:
 			config = load_params(config)
-			schema = load_params(schema_file)
+			schema = load_params(schema)
 		except ValueError as v:
 			logging.error("Config file is mal-formatted {0}".format(v))
 			sys.exit()

@@ -79,6 +79,6 @@
 		}
 	},
 	"required" : ["alphabet", "base_rate", "batch_size", "container", "dataset", "doc_length",
-		"epochs", "eras", "label_map", "mode", "model_path", "momentum", "randomize"]
+		"epochs", "eras", "label_map", "mode", "momentum", "randomize"]
 }
 
