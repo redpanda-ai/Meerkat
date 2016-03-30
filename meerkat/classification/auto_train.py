@@ -149,10 +149,12 @@ def auto_train():
 
 	if exist_new_input:
 		logging.info("There exists new input data")
-		input_file = pull_from_s3(extension=".tar.gz", file_name="input.tar.gz", **s3_params)
-		print(input_file)
+		#input_file = pull_from_s3(extension=".tar.gz", file_name="input.tar.gz", **s3_params)
+		#print(input_file)
 		args.merchant_or_subtype = model_type
 		args.input_dir = s3_params["prefix"]
+		args.file_name = "input.tar.gz"
+		args.train_size = 0.9
 		main_split_data(args)
 
 		output_file_path = "./data/input" + data_type + "/"

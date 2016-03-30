@@ -44,11 +44,11 @@ def parse_arguments():
 		card or bank transactions.")
 
 	#optional arguments
-	parser.add_argument("--bucket", help="Input bucket name", default='s3yodlee')
+	parser.add_argument("--bucket", help="Input bucket name", default='')
 	parser.add_argument("--input_dir", help="Path of the directory immediately \
 		containing raw data file.", default='')
 	parser.add_argument("--file_name", help="Name of file to be pulled.",
-		default='input.tar.gz')
+		default='')
 	parser.add_argument("--train_size" , help="Training data proportion, \
 		default is 0.9.", default=0.9, type=float)
 	parser.add_argument("-d", "--debug", help="log at DEBUG level",
@@ -79,24 +79,24 @@ def main_split_data(args):
 	bank_or_card = args.bank_or_card
 	data_type = merchant_or_subtype + "_" + bank_or_card
 
-	#default_bucket = "s3yodlee"
+	default_bucket = "s3yodlee"
 	#default_file_type = ".tar.gz"
-	#default_file_name = "input.tar.gz"
+	default_file_name = "input.tar.gz"
 
-	#if args.bucket == '':
-	#	bucket = default_bucket
-	#else:
-	bucket = args.bucket
+	if args.bucket == '':
+		bucket = default_bucket
+	else:
+		bucket = args.bucket
 
 	#if args.input_dir == '':
 	#	prefix = default_dir_paths
 	#else:
 	prefix = args.input_dir
 
-	#if args.file_name == '':
-	#	file_name = default_file_name
-	#else:
-	file_name = args.file_name
+	if args.file_name == '':
+		file_name = default_file_name
+	else:
+		file_name = args.file_name
 
 	extension = ".tar.gz"
 	save_path = "./data/input/"
