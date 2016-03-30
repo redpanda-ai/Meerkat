@@ -111,6 +111,14 @@ def load_data(config):
 
 	# Verify number of labels
 	if not len(reversed_map) == len(df[label_key].value_counts()):
+		logging.critical("Reversed Map :\n{0}".format(pprint.pformat(reversed_map)))
+		logging.critical("df[label_key].value_counts(): {0}".format(df[label_key].value_counts()))
+		map_keys = reversed_map.keys()
+		keys_in_dataframe = df[label_key].value_counts().index.get_values()
+		missing_keys = map_keys - keys_in_dataframe
+		logging.critical("The dataframe label counts index is missing these {0} items:\n{1}"\
+			.format(len(missing_keys), pprint.pformat(missing_keys)))
+
 		raise Exception('Number of indexes does not match number of labels')
 
 	if model_type == "subtype":
