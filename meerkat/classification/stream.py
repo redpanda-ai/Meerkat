@@ -38,7 +38,7 @@ from meerkat.classification.automate import main_stream as check_accuracy
 from meerkat.classification.tools import (cap_first_letter, pull_from_s3,
 	convert_csv_to_torch_7_binaries, create_new_configuration_file,
 	copy_file, execute_main_lua)
-from meerkat.tools.CNN_stats import main_process as apply_cnn
+from meerkat.tools.cnn_stats import main_process as apply_cnn
 
 def parse_arguments():
 	"""This function parses arguments from our command line."""

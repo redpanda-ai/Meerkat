@@ -1,14 +1,14 @@
 #/usr/local/bin/python3.3
 
-"""This utility loads a trained CNN (sequentail_*.t7b) and a test set,
-predicts labels of the test set. It also returns performance statistics.
+"""This module loads and evaluates a trained CNN on a provided 
+test set. It produces various stats and a confusion matrix for analysis
 
 @author: Oscar Pan
 """
 
 #################### USAGE ##########################
 """
-python3 -m meerkat.tools.CNN_stats \
+python3 -m meerkat.tools.cnn_stats \
 -model <path_to_classifier> \
 -data <path_to_testdata> \
 -map <path_to_label_map> \
@@ -39,11 +39,11 @@ An entry of machine_labeled has such format:
 """
 #####################################################
 
-import pandas as pd
-import csv
-import json
-import os
 import argparse
+import csv
+import logging
+import os
+import pandas as pd
 import numpy as np
 
 from meerkat.classification.load_model import get_tf_cnn_by_path
@@ -90,7 +90,6 @@ def compare_label(*args, **kwargs):
 
 	# Test Each Machine Labeled Row
 	for machine_row in machine:
-
 		# Update conf_mat
 		# predicted_label is None if a predicted subtype is ""
 		if machine_row['ACTUAL_INDEX'] is None:
@@ -127,8 +126,10 @@ def compare_label(*args, **kwargs):
 
 
 def get_write_func(filename, header):
+	"""Have a write function"""
 	file_exists = False
 	def write_func(data):
+		"""Have a write function"""
 		if len(data) > 0:
 			nonlocal file_exists
 			mode = "a" if file_exists else "w"
@@ -139,8 +140,37 @@ def get_write_func(filename, header):
 			file_exists = True
 	return write_func
 
+'''
+def plot_confusion_matrix(con_matrix):
+	"""Plot the confusion matrix"""
+	norm_matrix = []
+
+	for i in con_matrix:
+		sum_of_each_list = sum(i)
+
+		if sum_of_each_list == 0:
+			norm_matrix.append(i)
+		else:
+			temp_matrix = []
+			for j in i:
+				temp_matrix.append(float(j) / float(sum_of_each_list))
+			norm_matrix.append(temp_matrix)
+
+	plt.clf()
+	fig = plt.figure()
+	ax = fig.add_subplot(111)
+	res = ax.imshow(array(norm_matrix), cmap=cm.jet, interpolation='nearest')
+
+	for i, j in ((x, y) for x in range(len(con_matrix)) for y in range(len(con_matrix[0]))):
+		ax.annotate(str(con_matrix[i][j]), xy=(i, j), fontsize='xx-small')
+
+	cb = fig.colorbar(res)
+	savefig("/data/CNN_stats/confusion_matrix.png", format="png")
+'''
+
 	# Main
 def main_process(args):
+	"""This is the main stream"""
 	doc_key = args.doc_key
 	sec_doc_key = args.secondary_doc_key
 	machine_label_key = args.predicted_key
@@ -149,7 +179,7 @@ def main_process(args):
 	reader = load_piped_dataframe(args.testdata, chunksize=1000)
 	label_map = load_params(args.label_map)
 	get_key = lambda x: x['label'] if isinstance(x, dict) else x
-	label_map = dict(zip(label_map.keys(),map(get_key, label_map.values())))
+	label_map = dict(zip(label_map.keys(), map(get_key, label_map.values())))
 	num_labels = len(label_map)
 	class_names = list(label_map.values())
 
@@ -186,7 +216,9 @@ def main_process(args):
 
 	fill_description = lambda x: x[sec_doc_key] if x[doc_key] == ''\
 		else x[doc_key]
+	chunk_count = 0
 	for chunk in reader:
+		logging.warning("Testing chunk {0}.".format(chunk_count))
 		if sec_doc_key != '':
 			chunk[doc_key] = chunk.apply(fill_description, axis=1)
 		if args.is_merchant:
@@ -216,7 +248,7 @@ def main_process(args):
 
 		mislabeled, correct, unpredicted, needs_hand_labeling, confusion_matrix =\
 			compare_label(machine_labeled, machine_label_key, human_label_key,
-			confusion_matrix, num_labels, doc_key=doc_key,fast_mode=fast_mode)
+			confusion_matrix, num_labels, doc_key=doc_key, fast_mode=fast_mode)
 
 		# Save
 		write_mislabeled(mislabeled)
@@ -224,29 +256,41 @@ def main_process(args):
 		write_unpredicted(unpredicted)
 		write_needs_hand_labeling(needs_hand_labeling)
 
-	# Calculate recall, precision, false +/-, true +/- from confusion maxtrix
+		chunk_count += 1
+
+	# Calculate f_measure, recall, precision, false +/-, true +/- from confusion maxtrix
 	true_positive = pd.DataFrame([confusion_matrix[i][i] for i in range(num_labels)])
+
 	conf_mat = pd.DataFrame(confusion_matrix)
 	actual = pd.DataFrame(conf_mat.sum(axis=1))
 	recall = true_positive / actual
 	# If we use pandas 0.17 we can do the rounding neater
 	recall = np.round(recall, decimals=4)
-	column_sum = pd.DataFrame(conf_mat.sum()).ix[:,:num_labels]
-	unpredicted = pd.DataFrame(conf_mat.ix[:,num_labels])
+	column_sum = pd.DataFrame(conf_mat.sum()).ix[:, :num_labels]
+	unpredicted = pd.DataFrame(conf_mat.ix[:, num_labels])
 	unpredicted.columns = [0]
 	false_positive = column_sum - true_positive
 	precision = true_positive / column_sum
 	precision = np.round(precision, decimals=4)
 	false_negative = actual - true_positive - unpredicted
+
+	f_measure = (2 * precision * recall) / (precision + recall)
+	f_measure = np.round(f_measure, decimals=4)
+
+	real_confusion_matrix = []
+	for i in range(num_labels):
+		real_confusion_matrix.append(confusion_matrix[i][0:-1])
+	#plot_confusion_matrix(real_confusion_matrix)
+
 	label = pd.DataFrame(label_map, index=[0]).transpose()
 	label.index = label.index.astype(int)
 	label = label.sort_index()
 	label.index = range(num_labels)
 
 	stat = pd.concat([label, actual, true_positive, false_positive, recall, precision,
-		false_negative, unpredicted], axis=1)
+		false_negative, unpredicted, f_measure], axis=1)
 	stat.columns = ['Class', 'Actual', 'True_Positive', 'False_Positive', 'Recall',
-		'Precision', 'False_Negative', 'Unpredicted']
+		'Precision', 'False_Negative', 'Unpredicted', 'F_Measure']
 
 	conf_mat = pd.concat([label, conf_mat], axis=1)
 	conf_mat.columns = ['Class'] + [str(x) for x in range(1, num_labels + 1)] + ['Unpredicted']

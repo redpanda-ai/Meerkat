@@ -7,34 +7,39 @@
 Created on Mar 14, 2016
 @author: Matthew Sevrens
 @author: Tina Wu
+@author: J. Andrew Key
 """
 
-#################### USAGE #######################
+############################################# USAGE ###############################################
 
-# python3 -m meerkat.classification.tensorflow_cnn [config]
-# python3 -m meerkat.classification.tensorflow_cnn config/tf_cnn_config.json
+# meerkat.classification.tensorflow_cnn [config_file]
+# meerkat.classification.tensorflow_cnn meerkat/classification/config/default_tf_config.json
 
-# For details on implementation see:
+# For addtional details on implementation see:
 # Character-level Convolutional Networks for Text Classification
 # http://arxiv.org/abs/1509.01626
 
-##################################################
+###################################################################################################
 
-import os
+import argparse
 import csv
 import logging
 import math
+import os
+import pprint
 import random
-import sys
 import shutil
+import sys
 
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+from jsonschema import validate
 
-from meerkat.various_tools import load_piped_dataframe
 from meerkat.classification.tools import fill_description_unmasked, reverse_map
-from meerkat.various_tools import load_params
+from meerkat.various_tools import load_params, load_piped_dataframe, validate_configuration
+
+logging.basicConfig(level=logging.INFO)
 
 def chunks(array, num):
 	"""Chunk array into equal sized parts"""
@@ -44,9 +49,13 @@ def chunks(array, num):
 def validate_config(config):
 	"""Validate input configuration"""
 
-	default_config = "config/default_tf_config.json"
 	config = load_params(config)
+	schema_file = "meerkat/classification/config/tensorflow_cnn_schema.json"
+	config = validate_configuration(config, schema_file)
+	logging.debug("Configuration is :\n{0}".format(pprint.pformat(config)))
 	reshape = ((config["doc_length"] - 96) / 27) * 256
+	config["label_map"] = load_params(config["label_map"])
+	config["num_labels"] = len(config["label_map"].keys())
 	config["alpha_dict"] = {a : i for i, a in enumerate(config["alphabet"])}
 	config["base_rate"] = config["base_rate"] * math.sqrt(config["batch_size"]) / math.sqrt(128)
 	config["alphabet_length"] = len(config["alphabet"])
@@ -79,6 +88,14 @@ def load_data(config):
 
 	# Verify number of labels
 	if not len(reversed_map) == len(df[label_key].value_counts()):
+		logging.critical("Reversed Map :\n{0}".format(pprint.pformat(reversed_map)))
+		logging.critical("df[label_key].value_counts(): {0}".format(df[label_key].value_counts()))
+		map_keys = reversed_map.keys()
+		keys_in_dataframe = df[label_key].value_counts().index.get_values()
+		missing_keys = map_keys - keys_in_dataframe
+		logging.critical("The dataframe label counts index is missing these {0} items:\n{1}"\
+			.format(len(missing_keys), pprint.pformat(missing_keys)))
+
 		raise Exception('Number of indexes does not match number of labels')
 
 	if model_type == "subtype":
@@ -370,7 +387,8 @@ def train_model(config, graph, sess, saver):
 			sess.run(learning_rate.assign(learning_rate / 2))
 
 	# Clean Up Directory
-	final_model_path = "meerkat/classification/models/" + os.path.basename(dataset).split(".")[0] + ".ckpt"
+	dataset_path = os.path.basename(dataset).split(".")[0]
+	final_model_path = "meerkat/classification/models/" + dataset_path + ".ckpt"
 	os.rename(save_path, final_model_path)
 	shutil.rmtree(save_dir)
 
@@ -398,8 +416,6 @@ def run_from_command_line():
 	"""Run module from command line"""
 	logging.basicConfig(level=logging.INFO)
 	config = validate_config(sys.argv[1])
-	config["label_map"] = load_params(config["label_map"])
-	config["num_labels"] = len(config["label_map"].keys())
 	graph, saver = build_graph(config)
 	run_session(config, graph, saver)
 
