@@ -8,10 +8,27 @@ from tornado.concurrent import Future
 
 from tornado_json.utils import container
 
+def service_list_validation(services_list):
+	if services_list != []:
+		services_set = set(services_list)
+		combos = [{"cnn_merchant"},
+			{"cnn_merchant", "bloom_filter"},
+			{"cnn_merchant", "bloom_filter", "search"},
+			{"cnn_subtype"},
+			{"cnn_merchant", "cnn_subtype"},
+			{"cnn_merchant", "cnn_subtype", "bloom_filter"}
+			]
+		if services_set not in combos:
+			raise jsonschema.ValidationError(
+				"Invalid services combination. " +\
+				"Possible services combinations are {0}.".format(combos)
+				)
+
 def validate(input_schema=None, output_schema=None,\
 	input_example=None, output_example=None,\
 	debug_output_example=None, debug_output_schema=None):
 	"""validate schema"""
+
 	@container
 	def _validate(rh_method):
 		"""Decorator for RequestHandler schema validation
@@ -55,6 +72,7 @@ def validate(input_schema=None, output_schema=None,\
 					input_,
 					input_schema
 				)
+				service_list_validation(input_.get("services_list",[]))
 			else:
 				input_ = None
 
