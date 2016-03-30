@@ -63,11 +63,9 @@ def parse_arguments():
 
 	if args.debug:
 		logging.basicConfig(level=logging.DEBUG)
-	else:
-		logging.basicConfig(level=logging.INFO)
 
 	logging.info("Arguments parsed.")
-	
+
 	return args
 
 def validate_config(config):
@@ -438,6 +436,7 @@ def run_session(config, graph, saver):
 
 def run_from_command_line():
 	"""Run module from command line"""
+	logging.basicConfig(level=logging.INFO)
 	args = parse_arguments()
 	config = validate_config(args.config_file)
 	graph, saver = build_graph(config)
