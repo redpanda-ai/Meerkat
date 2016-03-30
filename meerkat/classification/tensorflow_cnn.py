@@ -45,7 +45,7 @@ import pandas as pd
 import tensorflow as tf
 
 from meerkat.classification.tools import fill_description_unmasked, reverse_map
-from meerkat.various_tools import load_piped_dataframe, validate_configuration
+from meerkat.various_tools import load_params, load_piped_dataframe, validate_configuration
 
 def chunks(array, num):
 	"""Chunk array into equal sized parts"""
@@ -402,7 +402,8 @@ def train_model(config, graph, sess, saver):
 			sess.run(learning_rate.assign(learning_rate / 2))
 
 	# Clean Up Directory
-	final_model_path = "meerkat/classification/models/" + os.path.basename(dataset).split(".")[0] + ".ckpt"
+	final_model_path = "meerkat/classification/models/" +\
+		os.path.basename(dataset).split(".")[0] + ".ckpt"
 	os.rename(save_path, final_model_path)
 	shutil.rmtree(save_dir)
 
