@@ -4,78 +4,90 @@
         "label": "Bank Adjustment - Adjustment"
     },
     "2": {
+        "category": "Adjustment",
+        "label": "Bank Adjustment - Credit Adjustment"
+    },
+    "3": {
         "category": "Cash Advance",
         "label": "Cash Advance - Cash Advance"
     },
-    "3": {
+    "4": {
         "category": "Service Charges/Fees",
         "label": "Charges & Fees - Annual Fee"
     },
-    "4": {
+    "5": {
         "category": "Service Charges/Fees",
         "label": "Charges & Fees - Convenience Fee"
     },
-    "5": {
+    "6": {
         "category": "Service Charges/Fees",
         "label": "Charges & Fees - Other Charges & Fees"
     },
-    "6": {
-        "category": "Service Charges/Fees",
-        "label": "Charges & Fees - Service Charge"
-    },
     "7": {
+        "category": "Service Charges/Fees",
+        "label": "Charges & Fees - Service Charges/Fees"
+    },
+    "8": {
         "category": "Other Expenses",
         "label": "Other Expenses - Debit"
     },
-    "8": {
-        "category": "Other Bills",
-        "label": "Payment - Electronic Payment"
-    },
     "9": {
-        "category": "Insurance",
-        "label": "Payment - Insurance Payment"
+        "category": "Credit Card Payments",
+        "label": "Payment - Credit Card Payment"
     },
     "10": {
         "category": "Other Bills",
-        "label": "Payment - Payment"
+        "label": "Payment - Electronic Payment"
     },
     "11": {
+        "category": "Insurance",
+        "label": "Payment - Insurance Payment"
+    },
+    "12": {
+        "category": "Other Bills",
+        "label": "Payment - Payment"
+    },
+    "13": {
         "category": "Other Bills",
         "label": "Payment - Recurring Payment"
     },
-    "12": {
+    "14": {
         "category": "Utilities",
         "label": "Payment - Utilities Payment"
     },
-    "13": {
+    "15": {
         "category": "Other Expenses",
         "label": "Purchase - Online Purchase"
     },
-    "14": {
+    "16": {
         "category": "Other Expenses",
         "label": "Purchase - Purchase with Credit Card"
     },
-    "15": {
+    "17": {
         "category": "Other Expenses",
         "label": "Purchase - Purchase"
     },
-    "16": {
+    "18": {
         "category": "Taxes",
         "label": "Purchase - Sales Tax"
     },
-    "17": {
+    "19": {
         "category": "Transfers",
         "label": "Transfer - Balance Transfer"
     },
-    "18": {
+    "20": {
         "category": "Transfers",
         "label": "Transfer - Transfer"
     },
-    "19": {
+    "21": {
+        "category": "Transfers",
+        "label": "Transfer - Wire Transfer"
+    },
+    "22": {
         "category": "Cash Withdrawal",
         "label": "Withdrawal - ATM Withdrawal"
     },
-    "20": {
+    "23": {
         "category": "Cash Withdrawal",
         "label": "Withdrawal - Withdrawal"
     }
