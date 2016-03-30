@@ -26,8 +26,7 @@
 		},
 		"dataset" : {
 			"description" : "The dataset the model is being trained on",
-			"type" : "string",
-			"minLength" : 1
+			"type" : "string"
 		},
 		"doc_length" : {
 			"description" : "A fixed width of which all documents are cast to either by padding or trucation",
