@@ -46,23 +46,12 @@ from jsonschema import validate
 from meerkat.classification.tools import fill_description_unmasked, reverse_map
 from meerkat.various_tools import load_params, load_piped_dataframe, validate_configuration
 
+logging.basicConfig(level=logging.INFO)
+
 def chunks(array, num):
 	"""Chunk array into equal sized parts"""
 	num = max(1, num)
 	return [array[i:i + num] for i in range(0, len(array), num)]
-
-def parse_arguments():
-	"""This function parses arguments from our command line."""
-	
-	# Required arugments
-	parser = argparse.ArgumentParser("meerkat.classification.tensorflow_cnn")
-	parser.add_argument("config_file", help="What is the location of your configuration file?")
-	parser.add_argument("-d", "--debug", help="log at DEBUG level", action="store_true")
-
-	args = parser.parse_args()
-	logging.info("Arguments parsed.")
-
-	return args
 
 def validate_config(config):
 	"""Validate input configuration"""
@@ -82,9 +71,6 @@ def validate_config(config):
 		config["reshape"] = int(reshape)
 	else:
 		raise ValueError('DOC_LENGTH - 96 must be divisible by 27: 123, 150, 177, 204...')
-
-	# Set Default Logging Level
-	logging.basicConfig(level=logging.INFO)
 
 	return config
 
@@ -408,8 +394,8 @@ def train_model(config, graph, sess, saver):
 			sess.run(learning_rate.assign(learning_rate / 2))
 
 	# Clean Up Directory
-	final_model_path = "meerkat/classification/models/" +\
-		os.path.basename(dataset).split(".")[0] + ".ckpt"
+	dataset_path = os.path.basename(dataset).split(".")[0]
+	final_model_path = "meerkat/classification/models/" + dataset_path + ".ckpt"
 	os.rename(save_path, final_model_path)
 	shutil.rmtree(save_dir)
 
@@ -435,10 +421,7 @@ def run_session(config, graph, saver):
 
 def run_from_command_line():
 	"""Run module from command line"""
-	args = parse_arguments()
-	config = validate_config(args.config_file)
-	if args.debug:
-		logging.basicConfig(level=logging.DEBUG)
+	config = validate_config(sys.argv[1])
 	graph, saver = build_graph(config)
 	run_session(config, graph, saver)
 
