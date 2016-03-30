@@ -148,12 +148,11 @@ def auto_train():
 
 	# Load and Modify Config
 	config = load_params("meerkat/classification/config/default_tf_config.json")
+	config["label_map"] = label_map
 	config["dataset"] = train_file
 	config["ledger_entry"] = args.credit_or_debit
 	config["container"] = args.bank_or_card
 	config["model_type"] = args.model_type
-	config["label_map"] = load_params(label_map)
-	config["num_labels"] = len(config["label_map"].keys())
 	config = validate_config(config)
 
 	# Train the model

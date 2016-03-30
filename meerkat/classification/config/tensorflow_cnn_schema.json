@@ -59,7 +59,7 @@
 		"model_path" : {
 			"description" : "FIXME",
 			"type" : "string",
-			"pattern" : "^.+ckpt$"
+			"pattern" : "^(.+ckpt|\\s*)$"
 		},
 		"model_type": {
 			"description" : "FIXME",

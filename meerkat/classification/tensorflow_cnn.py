@@ -78,6 +78,8 @@ def validate_config(config):
 	config = validate_configuration(config, schema_file)
 	logging.debug("Configuration is :\n{0}".format(pprint.pformat(config)))
 	reshape = ((config["doc_length"] - 96) / 27) * 256
+	config["label_map"] = load_params(config["label_map"])
+	config["num_labels"] = len(config["label_map"].keys())
 	config["alpha_dict"] = {a : i for i, a in enumerate(config["alphabet"])}
 	config["base_rate"] = config["base_rate"] * math.sqrt(config["batch_size"]) / math.sqrt(128)
 	config["alphabet_length"] = len(config["alphabet"])
@@ -438,8 +440,6 @@ def run_from_command_line():
 	"""Run module from command line"""
 	args = parse_arguments()
 	config = validate_config(args.config_file)
-	config["label_map"] = load_params(config["label_map"])
-	config["num_labels"] = len(config["label_map"].keys())
 	graph, saver = build_graph(config)
 	run_session(config, graph, saver)
 
