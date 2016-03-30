@@ -19,6 +19,7 @@ import queue
 
 import boto
 import numpy as np
+import pandas as pd
 
 from jsonschema import validate
 
@@ -32,8 +33,8 @@ def validate_configuration(config_path, schema_path):
 		try:
 			config = json.load(config_file)
 			schema = json.load(schema_file)
-		except ValueError:
-			logging.error("Config file is mal-formatted")
+		except ValueError as v:
+			logging.error("Config file is mal-formatted {0}".format(v))
 			sys.exit()
 
 		validate(config, schema)
@@ -62,6 +63,22 @@ def load_dict_ordered(file_name, encoding='utf-8', delimiter="|"):
 	dict_list = list(reader)
 	input_file.close()
 	return dict_list, reader.fieldnames
+
+def load_piped_dataframe(filename, chunksize=False):
+	"""Load piped dataframe from file name"""
+
+	options = {
+		"quoting": csv.QUOTE_NONE,
+		"na_filter": False,
+		"encoding": "utf-8",
+		"sep": "|",
+		"error_bad_lines": False
+	}
+
+	if isinstance(chunksize, int):
+		options["chunksize"] = chunksize
+
+	return pd.read_csv(filename, **options)
 
 def write_dict_list(dict_list, file_name, encoding="utf-8", delimiter="|",\
 		column_order=""):
