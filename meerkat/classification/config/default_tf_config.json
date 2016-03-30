@@ -1,7 +1,7 @@
 {
 	"mode": "train",
 	"model_path": "meerkat/classification/models/card_debit_subtype.ckpt",
-	"dataset": "Card_complete_data_subtype_original_updated_debit.csv",
+	"dataset": "meerkat/classification/Card_complete_data_subtype_original_updated_debit.csv",
 	"label_map": "meerkat/classification/label_maps/card_debit_subtype_label_map.json",
 	"container": "card",
 	"model_type": "subtype",
