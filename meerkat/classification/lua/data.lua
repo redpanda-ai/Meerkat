@@ -21,7 +21,6 @@ function Data:__init(config)
    self.batch_size = config.batch_size or 128
    self.file = config.file
    self.prob = config.prob
-   self.thes = config.thes
    self.padding = config.padding
    self.scale = config.scale
    self.extra = config.extra
@@ -37,19 +36,6 @@ function Data:__init(config)
    if self.prob then
       for i = 1, #self.prob - 1 do
 	 self.prob[i + 1] = self.prob[i] + self.prob[i + 1]
-      end
-   end
-
-   if self.thes then
-      local data = torch.load(self.thes.file)
-      self.thes.data = {}
-      for key, defs in pairs(data) do
-	 self.thes.data[key] = {}
-	 for i, def in ipairs(defs) do
-	    for j, word in ipairs(def) do
-	       self.thes.data[key][#self.thes.data[key] + 1] = word
-	    end
-	 end
       end
    end
 end
@@ -110,39 +96,6 @@ function Data:getBatch(inputs, labels, data, extra)
 	        s = s.." "..ffi.string(torch.data(data.content:narrow(1, data.index[label][input][l], 1)))
          end
          labels[i] = label
-         -- Thesaurus replacement
-         if self.thes and math.random() < self.thes.p then
-	        local word_list = {}
-	        local word_start, word_end = s:find("%w+")
-	        while word_start do
-	           if word_end - word_start + 1 > self.thes.length and self.thes.data[s:sub(word_start, word_end)] then
-	              word_list[#word_list + 1] = {s:sub(word_start, word_end), word_start, word_end}
-	           end
-	           word_start, word_end = s:find("%w+", word_end + 1)
-	        end
-	        if #word_list > 0 then
-	           local randorder = torch.randperm(#word_list)
-	           for k = 1, #word_list do
-	              if math.random() > self.thes.p then break end
-	              local word = word_list[randorder[k]]
-	              -- Sample from thesaurus using geometric distribution
-	              local j = 1
-	              while self.thes.data[word[1]][j] do
-		             if math.random() < self.thes.q then
-		                word[1] = self.thes.data[word[1]][j]
-		                break
-		             end
-		             j = j + 1
-	              end
-	           end
-	           local news = s:sub(1, word_list[1][2] - 1) .. word_list[1][1]
-	           for k = 2, #word_list do
-	              news = news .. s:sub(word_list[k-1][3] + 1, word_list[k][2] - 1) .. word_list[k][1]
-	           end
-	           news = news .. s:sub(word_list[#word_list][3] + 1)
-	           s = news
-	        end
-         end
       end
       -- Quantize the string
       self:stringToTensor(s, self.length, inputs:select(1, i))

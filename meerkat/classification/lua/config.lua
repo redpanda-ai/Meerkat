@@ -11,9 +11,6 @@ config = {}
 local alphabet = "abcdefghijklmnopqrstuvwxyz0123456789-,;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}"
 config.alphabet = alphabet
 
--- Thesaurus
-config.thes = false
-
 -- Training data
 config.train_data = {}
 config.train_data.file = paths.concat(paths.cwd(), "./train.t7b")
