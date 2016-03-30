@@ -53,21 +53,21 @@ def chunks(array, num):
 
 def parse_arguments():
 	"""This function parses arguments from our command line."""
-	parser = argparse.ArgumentParser("meerkat.classification.tensorflow_cnn")
+	
 	# Required arugments
-	parser.add_argument("config_file",
-		help="What is the location of your configuration file?")
-	parser.add_argument("-d", "--debug", help="log at DEBUG level",
-		action="store_true")
-	parser.add_argument("-v", "--info", help="log at INFO level",
-		action="store_true")
+	parser = argparse.ArgumentParser("meerkat.classification.tensorflow_cnn")
+	parser.add_argument("config_file", help="What is the location of your configuration file?")
+	parser.add_argument("-d", "--debug", help="log at DEBUG level", action="store_true")
 
 	args = parser.parse_args()
+
 	if args.debug:
 		logging.basicConfig(level=logging.DEBUG)
-	elif args.info:
+	else:
 		logging.basicConfig(level=logging.INFO)
+
 	logging.info("Arguments parsed.")
+	
 	return args
 
 def validate_config(config):
