@@ -50,7 +50,7 @@
 		},
 		"ledger_entry": {
 			"description" : "FIXME",
-			"enum" : ["credit", "debit"]
+			"enum" : ["credit", "debit", ""]
 		},
 		"mode": {
 			"description" : "FIXME",
