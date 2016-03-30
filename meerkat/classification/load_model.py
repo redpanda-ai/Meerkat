@@ -78,7 +78,6 @@ def get_tf_cnn_by_path(model_path, label_map_path):
 
 	# Load Config
 	config_path = "meerkat/classification/config/default_tf_config.json"
-	config = validate_config(config_path)
 
 	# Validate Model and Label Map
 	if not isfile(model_path):
@@ -86,9 +85,10 @@ def get_tf_cnn_by_path(model_path, label_map_path):
 		sys.exit()
 
 	# Load Graph
+	config = load_params(config_path)
+	config["label_map"] = label_map_path
 	config["model_path"] = model_path
-	config["label_map"] = load_params(label_map_path)
-	config["num_labels"] = len(config["label_map"].keys())
+	config = validate_config(config)
 	graph, saver = build_graph(config)
 	label_map = config["label_map"]
 
