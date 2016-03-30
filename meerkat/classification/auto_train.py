@@ -57,6 +57,7 @@ import tensorflow as tf
 from plumbum import local
 from boto import connect_s3
 from boto.s3.connection import Location
+from meerkat.classification.split_data import random_split, make_save_function, main_split_data
 from meerkat.classification.tools import pull_from_s3
 from meerkat.classification.tensorflow_cnn import build_graph, train_model, validate_config
 from meerkat.classification.verify_data import load_json
@@ -193,21 +194,26 @@ def auto_train():
 	s3_params = {"bucket": bucket, "prefix": prefix, "save_path": save_path}
 
 	exist_new_input, newest_version_dir = check_new_input_file(model_type, bank_or_card, **s3_params)
+	s3_params["prefix"] = newest_version_dir + "/"
 
 	if exist_new_input:
-		print("exist_new_input")
-		#TODO verify and split new data
+		logging.info("There exists new input data")
+		input_file = pull_from_s3(extension=".tar.gz", file_name="input.tar.gz", **s3_params)
+		print(input_file)
+		args.merchant_or_subtype = model_type
+		args.input_dir = s3_params["prefix"]
+		main_split_data(args)
+
+		output_file_path = "./data/input" + data_type + "/"
+		train_file = output_file_path + "train.csv"
+		test_file = output_file_path + "test.csv"
+		label_map = output_file_path + "label_map.json"
 	else:
-		s3_params["prefix"] = newest_version_dir + "/"
 		output_file = pull_from_s3(extension='.tar.gz', file_name="output.tar.gz", **s3_params)
 		local["tar"]["xfv"][output_file]["-C"][save_path]()
 		train_file = save_path + "train.csv"
 		test_file = save_path + "test.csv"
 		label_map = save_path + "label_map.json"
-
-	#train_file = pull_from_s3(extension='.csv', file_name=args.train_file, **s3_params)
-	#test_file = pull_from_s3(extension='.csv', file_name=args.test_file, **s3_params)
-	#label_map = pull_from_s3(extension='.json', file_name=args.label_map, **s3_params)
 
 	# Load and Modify Config
 	config = validate_config("config/tf_cnn_config.json")

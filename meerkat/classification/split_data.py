@@ -66,60 +66,65 @@ def random_split(df, train_size):
 	msk = np.random.rand(len(df)) <= train_size
 	return {"train" : df[msk], "test" : df[~msk]}
 
-def make_save_function(col, dirt, merchant_or_subtype, bank_or_card, date):
-	def save_result(results, train_or_test, credit_or_debit=''):
-		credit_or_debit = '_'*(credit_or_debit!='') + credit_or_debit
+def make_save_function(col, dirt):
+	def save_result(results, train_or_test):
 		kwargs = {"cols" : col, "index" : False, 'sep' : '|'}
-		path = dirt + merchant_or_subtype + '_' + bank_or_card +\
-			credit_or_debit + '_' +\
-			train_or_test + '_' + date + '.csv'
+		path = dirt + train_or_test + '.csv'
 		results[train_or_test].to_csv(path, **kwargs)
 	return save_result
 
-def main_split_data():
-	args = parse_arguments()
+def main_split_data(args):
 	merchant_or_subtype = args.merchant_or_subtype
 	bank_or_card = args.bank_or_card
-	# To pull data according to bank or card (subtype has distinct dirs, 
-	# merchant has bank and card under the same directory)
 	data_type = merchant_or_subtype + '_' + bank_or_card
-	default_dir_paths = {'merchant_card' : "cadusumi/tde_merchants_phase2/",
-		'merchant_bank' : "cadusumi/tde_merchants_phase2/",
-		'subtype_card' :"hvudumala/Type_Subtype_finaldata/Card/",
-		'subtype_bank' : "hvudumala/Type_Subtype_finaldata/Bank/"
-		}
-	default_buckets = {'merchant' : "yodleemisc",
-		'subtype' : "yodleemisc"
-		}
-	default_file_types = {'merchant' : '.tar.gz', 'subtype' : '.csv'}
+	#default_dir_paths = {'merchant_card' : "cadusumi/tde_merchants_phase2/",
+	#	'merchant_bank' : "cadusumi/tde_merchants_phase2/",
+	#	'subtype_card' :"hvudumala/Type_Subtype_finaldata/Card/",
+	#	'subtype_bank' : "hvudumala/Type_Subtype_finaldata/Bank/"
+	#	}
+	#default_buckets = {'merchant' : "yodleemisc",
+	#	'subtype' : "yodleemisc"
+	#	}
+	#default_file_types = {'merchant' : '.tar.gz', 'subtype' : '.csv'}
+
+	default_bucket = "s3yodlee"
+	default_file_types = ".tar.gz"
+	default_file_name = "input.tar.gz"
 
 	if args.bucket == '':
-		bucket = default_buckets[merchant_or_subtype]
+		bucket = default_buckets
 	else:
 		bucket = args.bucket
 
-	if args.input_dir == '':
-		prefix = default_dir_paths[data_type]
-	else:
-		prefix = args.input_dir
+	#if args.input_dir == '':
+	#	prefix = default_dir_paths
+	#else:
+	prefix = args.input_dir
 
-	extension = default_file_types[merchant_or_subtype]
-	save_path = './'
+	if args.file_name == '':
+		file_name = default_file_name
+	else:
+		file_name = args.file_name
+
+	extension = default_file_types
+	save_path = './data/input/'
 
 	input_file = pull_from_s3(bucket=bucket, prefix=prefix, extension=extension,
-		file_name=args.file_name, save_path=save_path)
+		file_name=file_name, save_path=save_path)
 
+#	dir_paths = {'subtype_card_debit': 's3://s3yodlee/data/subtype/card/debit',
+#		'subtype_card_credit': 's3://s3yodlee/data/subtype/card/credit/',
+#		'subtype_bank_debit': 's3://s3yodlee/data/subtype/bank/debit/',
+#		'subtype_bank_credit': 's3://s3yodlee/data/subtype/bank/credit/',
+#		'merchant_bank': 's3://s3yodlee/data/merchant/bank/',
+#		'merchant_card': 's3://s3yodlee/data/merchant/card/'
+#		}
 
-	dir_paths = {'subtype_card_debit': 's3://s3yodlee/data/subtype/card/debit',
-		'subtype_card_credit': 's3://s3yodlee/data/subtype/card/credit/',
-		'subtype_bank_debit': 's3://s3yodlee/data/subtype/bank/debit/',
-		'subtype_bank_credit': 's3://s3yodlee/data/subtype/bank/credit/',
-		'merchant_bank': 's3://s3yodlee/data/merchant/bank/',
-		'merchant_card': 's3://s3yodlee/data/merchant/card/'
-		}
+#	date = datetime.now()
+#	date = str(date.month).zfill(2) + str(date.day).zfill(2) + str(date.year)
 
-	date = datetime.now()
-	date = str(date.month).zfill(2) + str(date.day).zfill(2) + str(date.year)
+	dir_path = "s3://s3yodlee/" + prefix
+
 	if merchant_or_subtype == 'merchant':
 		dirt = save_path + data_type + '/'
 		os.makedirs(dirt, exist_ok=True)
@@ -127,15 +132,17 @@ def main_split_data():
 		print('Validating {0} {1} data'.format(merchant_or_subtype, bank_or_card))
 		verify_data(csv_input=df, json_input=label_map_path,
 			cnn_type=[merchant_or_subtype, bank_or_card])
-		save = make_save_function(df.columns, dirt, merchant_or_subtype,
-			bank_or_card, date)
+		save = make_save_function(df.columns, dirt)
 		results = random_split(df, args.train_size)
 		save(results, 'train')
 		save(results, 'test')
 		del df
-		del results 
-		local['mv'][label_map_path][dirt]()
-		local['aws']['s3']['sync'][dirt][dir_paths[data_type]]()
+		del results
+		local['mv'][label_map_path][dirt + "label_map.json"]()
+		local['rm'][input_file]()
+		local['tar']['-zcvf']["output.tar.gz"]['-C'][dirt]['.']()
+		local['aws']['s3']['cp']["output.tar.gz"][dir_path]()
+		#local['aws']['s3']['sync'][dirt][dir_path]()
 	else:
 		df_credit, df_debit = seperate_debit_credit(input_file)
 		credit_map_path = pull_from_s3(bucket=bucket, prefix=prefix,
@@ -174,4 +181,5 @@ def main_split_data():
 			[data_type + '_credit']]()
 
 if __name__ == "__main__":
-	main_split_data()
+	args = parse_arguments()
+	main_split_data(args)
