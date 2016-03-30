@@ -6,7 +6,7 @@
   "user_state" : "CA",
   "user_country" : "US",
   "cobrand_region" : 1,
-  "services_list" : ["bank_merchant_cnn", "should_search"],
+  "services_list" : ["cnn_merchant", "bloom_filter"],
   "transaction_list" : [
   {
     "amount":4.99,
