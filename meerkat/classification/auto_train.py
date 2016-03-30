@@ -23,9 +23,6 @@ positional arguments:
                         Pick a valid Classifier type
   {bank,card}           Is the model being trained on card or bank
                         transactions?
-  train_file            Name of the training file to be pulled
-  test_file             Name of the test file to be pulled
-  label_map             Path of the label map to be pulled
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -41,8 +38,7 @@ optional arguments:
 """
 
 EXAMPLE = """
-time nohup python3 -m meerkat.classification.auto_train merchant bank merchant_bank_train.csv \
-merchant_bank_test_03182016.csv bank_merchant_label_map.json -v &
+time nohup python3 -m meerkat.classification.auto_train merchant bank -v &
 """
 
 ###################################################################################################
@@ -72,9 +68,6 @@ def parse_arguments():
 	help_text = {
 		"model_type" : "Pick a valid Classifier type",
 		"bank_or_card": "Is the model being trained on card or bank transactions?",
-		"train_file": "Name of the training file to be pulled",
-		"test_file": "Name of the test file to be pulled",
-		"label_map": "Path of the label map to be pulled",
 		"output_dir": "Directory to write files to. Default is meerkat/data/",
 		"credit_or_debit": "Is the model for credit or debit transactions?",
 		"bucket": "Input bucket name, default is s3yodlee",
@@ -92,9 +85,6 @@ def parse_arguments():
 	parser.add_argument("model_type", help=help_text["model_type"], choices=choices["model_type"])
 	parser.add_argument("bank_or_card", help=help_text["bank_or_card"], 
 		choices=choices["bank_or_card"])
-	parser.add_argument("train_file", help=help_text["train_file"])
-	parser.add_argument("test_file", help=help_text["test_file"])
-	parser.add_argument("label_map", default='', help=help_text["label_map"])
 
 	# Optional arguments
 	parser.add_argument("--input_dir", help=help_text["input_dir"], default='')
@@ -153,6 +143,10 @@ def auto_train():
 	exist_new_input, newest_version_dir = check_new_input_file(**s3_params)
 	s3_params["prefix"] = newest_version_dir + "/"
 
+	train_file = "train.csv"
+	test_file = "test.csv"
+	label_map = "label_map.json"
+
 	if exist_new_input:
 		logging.info("There exists new input data")
 		input_file = pull_from_s3(extension=".tar.gz", file_name="input.tar.gz", **s3_params)
@@ -162,15 +156,15 @@ def auto_train():
 		main_split_data(args)
 
 		output_file_path = "./data/input" + data_type + "/"
-		train_file = output_file_path + "train.csv"
-		test_file = output_file_path + "test.csv"
-		label_map = output_file_path + "label_map.json"
+		train_file = output_file_path + train_file
+		test_file = output_file_path + test_file
+		label_map = output_file_path + label_map
 	else:
 		output_file = pull_from_s3(extension='.tar.gz', file_name="output.tar.gz", **s3_params)
 		local["tar"]["xfv"][output_file]["-C"][save_path]()
-		train_file = save_path + "train.csv"
-		test_file = save_path + "test.csv"
-		label_map = save_path + "label_map.json"
+		train_file = save_path + train_file
+		test_file = save_path + test_file
+		label_map = save_path + label_map
 
 	# Load and Modify Config
 	config = load_params("meerkat/classification/config/default_tf_config.json")
