@@ -58,7 +58,7 @@ from plumbum import local
 from boto import connect_s3
 from boto.s3.connection import Location
 from meerkat.classification.split_data import random_split, make_save_function, main_split_data
-from meerkat.classification.tools import pull_from_s3
+from meerkat.classification.tools import pull_from_s3, check_new_input_file
 from meerkat.classification.tensorflow_cnn import build_graph, train_model, validate_config
 from meerkat.classification.verify_data import load_json
 from meerkat.tools.CNN_stats import main_process as apply_cnn
@@ -115,49 +115,6 @@ def parse_arguments():
 
 	return args
 
-def check_new_input_file(model_type, bank_or_card, **s3_params):
-	"""Check the existence of a new input.tar.gz file"""
-	bucket_name, prefix = s3_params["bucket"], s3_params["prefix"]
-	conn = connect_s3()
-	bucket = conn.get_bucket(bucket_name, Location.USWest2)
-	listing_version = bucket.list(prefix=prefix, delimiter='/')
-
-	version_object_list = [
-		version_object
-		for version_object in listing_version
-	]
-
-	version_dir_list = []
-	for i in range(len(version_object_list)):
-		full_name = version_object_list[i].name
-		if full_name.endswith("/"):
-			dir_name = full_name[full_name.rfind("/", 0, len(full_name) - 1)+1:len(full_name)-1]
-			if dir_name.isdigit():
-				version_dir_list.append(dir_name)
-
-	newest_version_dir = prefix + sorted(version_dir_list, reverse=True)[0]
-	logging.info("The newest direcory is: {0}".format(newest_version_dir))
-	listing_tar_gz = bucket.list(prefix=newest_version_dir)
-	
-	tar_gz_object_list = [
-		tar_gz_object
-		for tar_gz_object in listing_tar_gz
-	]
-
-	tar_gz_file_list = []
-	for i in range(len(tar_gz_object_list)):
-		full_name = tar_gz_object_list[i].name
-		tar_gz_file_name = full_name[full_name.rfind("/")+1:]
-		tar_gz_file_list.append(tar_gz_file_name)
-
-	if "input.tar.gz" not in tar_gz_file_list:
-		logging.critical("input.tar.gz doesn't exist in {0}".format(newest_version_dir))
-		sys.exit()
-	elif "output.tar.gz" not in tar_gz_file_list:
-		return True, newest_version_dir
-	else:
-		return False, newest_version_dir
-
 def auto_train():
 	"""Run the automated training process"""
 
@@ -193,7 +150,7 @@ def auto_train():
 
 	s3_params = {"bucket": bucket, "prefix": prefix, "save_path": save_path}
 
-	exist_new_input, newest_version_dir = check_new_input_file(model_type, bank_or_card, **s3_params)
+	exist_new_input, newest_version_dir = check_new_input_file(**s3_params)
 	s3_params["prefix"] = newest_version_dir + "/"
 
 	if exist_new_input:
