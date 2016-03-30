@@ -147,12 +147,13 @@ def auto_train():
 	label_map = pull_from_s3(extension='.json', file_name=args.label_map, **s3_params)
 
 	# Load and Modify Config
-	config = validate_config("meerkat/classification/config/default_tf_config.json")
+	config = load_params("meerkat/classification/config/default_tf_config.json")
 	config["dataset"] = train_file
-	config["label_map"] = load_json(label_map)
-	config["num_labels"] = len(config["label_map"].keys())
 	config["ledger_entry"] = args.credit_or_debit
 	config["model_type"] = args.model_type
+	config["label_map"] = load_json(label_map)
+	config["num_labels"] = len(config["label_map"].keys())
+	config = validate_config(config)
 
 	# Train the model
 	graph, saver = build_graph(config)

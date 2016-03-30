@@ -26,21 +26,17 @@ from jsonschema import validate
 CLEAN_PATTERN = re.compile(r"\\+\|")
 QUOTE_CLEAN = re.compile(r'\"')
 
-def validate_configuration(config_path, schema_path):
+def validate_configuration(config, schema_path):
 	try:
-		config_file = open(config_path, encoding='utf-8')
 		schema_file = open(schema_path, encoding='utf-8')
 		try:
-			config = json.load(config_file)
-			schema = json.load(schema_file)
+			config = load_params(config)
+			schema = load_params(schema_file)
 		except ValueError as v:
 			logging.error("Config file is mal-formatted {0}".format(v))
 			sys.exit()
-
 		validate(config, schema)
 		logging.warning("Configuration schema is valid.")
-		config_file.close()
-		schema_file.close()
 	except IOError:
 		logging.error("File not found, aborting.")
 		sys.exit()

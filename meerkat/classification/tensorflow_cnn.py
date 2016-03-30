@@ -73,6 +73,7 @@ def parse_arguments():
 def validate_config(config):
 	"""Validate input configuration"""
 
+	config = load_params(config)
 	schema_file = "meerkat/classification/config/tensorflow_cnn_schema.json"
 	config = validate_configuration(config, schema_file)
 	logging.debug("Configuration is :\n{0}".format(pprint.pformat(config)))
