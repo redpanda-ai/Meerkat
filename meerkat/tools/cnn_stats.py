@@ -1,14 +1,14 @@
 #/usr/local/bin/python3.3
 
-"""This utility loads a trained CNN (sequentail_*.t7b) and a test set,
-predicts labels of the test set. It also returns performance statistics.
+"""This module loads and evaluates a trained CNN on a provided 
+test set. It produces various stats and a confusion matrix for analysis
 
 @author: Oscar Pan
 """
 
 #################### USAGE ##########################
 """
-python3 -m meerkat.tools.CNN_stats \
+python3 -m meerkat.tools.cnn_stats \
 -model <path_to_classifier> \
 -data <path_to_testdata> \
 -map <path_to_label_map> \
