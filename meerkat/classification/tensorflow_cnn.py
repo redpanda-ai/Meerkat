@@ -60,10 +60,6 @@ def parse_arguments():
 	parser.add_argument("-d", "--debug", help="log at DEBUG level", action="store_true")
 
 	args = parser.parse_args()
-
-	if args.debug:
-		logging.basicConfig(level=logging.DEBUG)
-
 	logging.info("Arguments parsed.")
 
 	return args
@@ -86,6 +82,9 @@ def validate_config(config):
 		config["reshape"] = int(reshape)
 	else:
 		raise ValueError('DOC_LENGTH - 96 must be divisible by 27: 123, 150, 177, 204...')
+
+	# Set Default Logging Level
+	logging.basicConfig(level=logging.INFO)
 
 	return config
 
@@ -436,9 +435,10 @@ def run_session(config, graph, saver):
 
 def run_from_command_line():
 	"""Run module from command line"""
-	logging.basicConfig(level=logging.INFO)
 	args = parse_arguments()
 	config = validate_config(args.config_file)
+	if args.debug:
+		logging.basicConfig(level=logging.DEBUG)
 	graph, saver = build_graph(config)
 	run_session(config, graph, saver)
 
