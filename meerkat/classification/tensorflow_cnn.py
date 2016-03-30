@@ -41,6 +41,7 @@ import sys
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+from jsonschema import validate
 
 from meerkat.classification.tools import fill_description_unmasked, reverse_map
 from meerkat.various_tools import load_params, load_piped_dataframe, validate_configuration
@@ -69,11 +70,11 @@ def parse_arguments():
 	logging.info("Arguments parsed.")
 	return args
 
-def validate_config(args):
+def validate_config(config):
 	"""Validate input configuration"""
+
 	schema_file = "meerkat/classification/config/tensorflow_cnn_schema.json"
-	config = validate_configuration(args.config_file, schema_file)
-	#config = load_params(config)
+	config = validate_configuration(config, schema_file)
 	logging.debug("Configuration is :\n{0}".format(pprint.pformat(config)))
 	reshape = ((config["doc_length"] - 96) / 27) * 256
 	config["alpha_dict"] = {a : i for i, a in enumerate(config["alphabet"])}
@@ -435,7 +436,7 @@ def run_session(config, graph, saver):
 def run_from_command_line():
 	"""Run module from command line"""
 	args = parse_arguments()
-	config = validate_config(args)
+	config = validate_config(args.config_file)
 	config["label_map"] = load_params(config["label_map"])
 	config["num_labels"] = len(config["label_map"].keys())
 	graph, saver = build_graph(config)
