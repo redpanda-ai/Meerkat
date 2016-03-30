@@ -77,7 +77,7 @@ def get_tf_cnn_by_path(model_path, label_map_path):
 	"""Load a tensorFlow module by name"""
 
 	# Load Config
-	config_path = "config/tf_cnn_config.json"
+	config_path = "meerkat/classification/config/default_tf_config.json"
 	config = validate_config(config_path)
 
 	# Validate Model and Label Map
