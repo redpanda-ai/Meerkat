@@ -58,8 +58,6 @@ def parse_arguments():
 	# Required arugments
 	parser.add_argument("config_file",
 		help="What is the location of your configuration file?")
-	parser.add_argument("schema_file",
-		help="What is the location of your schema file?")
 	parser.add_argument("-d", "--debug", help="log at DEBUG level",
 		action="store_true")
 	parser.add_argument("-v", "--info", help="log at INFO level",
@@ -75,7 +73,8 @@ def parse_arguments():
 
 def validate_config(args):
 	"""Validate input configuration"""
-	config = validate_configuration(args.config_file, args.schema_file)
+	schema_file = "meerkat/classification/config/tensorflow_cnn_schema.json"
+	config = validate_configuration(args.config_file, schema_file)
 	#config = load_params(config)
 	logging.debug("Configuration is :\n{0}".format(pprint.pformat(config)))
 	reshape = ((config["doc_length"] - 96) / 27) * 256
