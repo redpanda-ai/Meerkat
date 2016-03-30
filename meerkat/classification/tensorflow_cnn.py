@@ -10,17 +10,10 @@ Created on Mar 14, 2016
 @author: J. Andrew Key
 """
 
-#################### USAGE ########################################################################
+############################################# USAGE ###############################################
 
-# usage: meerkat.classification.tensorflow_cnn [-h] [-d] [-v] config_file
-
-# positional arguments:
-#   config_file  What is the location of your configuration file?
-
-# optional arguments:
-#   -h, --help   show this help message and exit
-#   -d, --debug  log at DEBUG level
-#   -v, --info   log at INFO level
+# meerkat.classification.tensorflow_cnn [config_file]
+# meerkat.classification.tensorflow_cnn meerkat/classification/config/default_tf_config.json
 
 # For addtional details on implementation see:
 # Character-level Convolutional Networks for Text Classification
