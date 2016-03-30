@@ -1,0 +1,84 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "Input schema for meerkat.classification.tensorflow_cnn",
+	"definitions": { },
+	"type": "object",
+	"properties" : {
+		"alphabet" : {
+			"description" : "the list of characters used for the input language",
+			"type" : "string",
+			"minLength" : 2
+		},
+		"base_rate" : {
+			"description" : "FIXME.  Used in some calculation for the learning rate, Matt can you help?",
+			"type" : "number",
+			"minimum" : 0,
+			"maximum" : 1
+		},
+		"batch_size" : {
+			"description" : "FIXME",
+			"type" : "integer",
+			"minimum" : 1
+		},
+		"container" : {
+			"description" : "FIXME",
+			"enum": [ "bank", "card" ]
+		},
+		"dataset" : {
+			"description" : "FIXME",
+			"type" : "string",
+			"minLength" : 1
+		},
+		"doc_length" : {
+			"description" : "FIXME",
+			"enum" : [ 123, 150, 177, 204, 231, 258, 285, 312, 339, 366, 393, 420, 447, 474, 501 ]
+		},
+		"epochs" : {
+			"description" : "FIXME",
+			"type" : "integer",
+			"minimum" : 1
+		},
+		"eras" : {
+			"description" : "FIXME",
+			"type" : "integer",
+			"minimum" : 1
+		},
+		"label_map" : {
+			"description" : "FIXME",
+			"type" : "string",
+			"pattern" : "^.+json$"
+		},
+		"ledger_entry": {
+			"description" : "FIXME",
+			"enum" : ["credit", "debit", ""]
+		},
+		"mode": {
+			"description" : "FIXME",
+			"enum" : ["train", "test"]
+		},
+		"model_path" : {
+			"description" : "FIXME",
+			"type" : "string",
+			"pattern" : "^(.+ckpt|\\s*)$"
+		},
+		"model_type": {
+			"description" : "FIXME",
+			"enum" : ["category", "merchant", "subtype"]
+		},
+		"momentum" : {
+			"description" : "FIXME",
+			"type" : "number",
+			"minimum" : 0,
+			"maximum" : 1
+		},
+		"randomize" : {
+			"description" : "FIXME",
+			"type" : "number",
+			"minimum" : 0,
+			"maximum" : 1
+		}
+	},
+	"required" : ["alphabet", "base_rate", "batch_size", "container", "dataset", "doc_length",
+		"epochs", "eras", "label_map", "mode", "model_type", "momentum", "randomize"]
+}
+

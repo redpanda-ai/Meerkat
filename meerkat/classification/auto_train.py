@@ -55,8 +55,8 @@ import tensorflow as tf
 
 from meerkat.classification.tools import pull_from_s3
 from meerkat.classification.tensorflow_cnn import build_graph, train_model, validate_config
-from meerkat.classification.verify_data import load_json
-from meerkat.tools.CNN_stats import main_process as apply_cnn
+from meerkat.tools.cnn_stats import main_process as apply_cnn
+from meerkat.various_tools import load_params
 
 def parse_arguments():
 	"""This function parses arguments from our command line."""
@@ -147,12 +147,13 @@ def auto_train():
 	label_map = pull_from_s3(extension='.json', file_name=args.label_map, **s3_params)
 
 	# Load and Modify Config
-	config = validate_config("config/tf_cnn_config.json")
+	config = load_params("meerkat/classification/config/default_tf_config.json")
+	config["label_map"] = label_map
 	config["dataset"] = train_file
-	config["label_map"] = load_json(label_map)
-	config["num_labels"] = len(config["label_map"].keys())
 	config["ledger_entry"] = args.credit_or_debit
+	config["container"] = args.bank_or_card
 	config["model_type"] = args.model_type
+	config = validate_config(config)
 
 	# Train the model
 	graph, saver = build_graph(config)
