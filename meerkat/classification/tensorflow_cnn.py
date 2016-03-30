@@ -12,12 +12,10 @@ Created on Mar 14, 2016
 
 #################### USAGE ########################################################################
 
-# usage: meerkat.classification.tensorflow_cnn [-h] [-d] [-v]
-#                                             config_file schema_file
+# usage: meerkat.classification.tensorflow_cnn [-h] [-d] [-v] config_file
 
 # positional arguments:
 #   config_file  What is the location of your configuration file?
-#   schema_file  What is the location of your schema file?
 
 # optional arguments:
 #   -h, --help   show this help message and exit
