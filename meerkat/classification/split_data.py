@@ -22,6 +22,7 @@ python3 -m meerkat.classification.split_data subtype bank \
 --file_name Bank_complete_data_subtype_original_updated.csv
 """
 ################################################################
+
 import logging
 import argparse
 import pandas as pd
@@ -43,11 +44,11 @@ def parse_arguments():
 		card or bank transactions.")
 
 	#optional arguments
-	parser.add_argument("--bucket", help="Input bucket name", default='')
+	parser.add_argument("--bucket", help="Input bucket name", default='s3yodlee')
 	parser.add_argument("--input_dir", help="Path of the directory immediately \
 		containing raw data file.", default='')
 	parser.add_argument("--file_name", help="Name of file to be pulled.",
-		default='')
+		default='input.tar.gz')
 	parser.add_argument("--train_size" , help="Training data proportion, \
 		default is 0.9.", default=0.9, type=float)
 	parser.add_argument("-d", "--debug", help="log at DEBUG level",
@@ -76,52 +77,32 @@ def make_save_function(col, dirt):
 def main_split_data(args):
 	merchant_or_subtype = args.merchant_or_subtype
 	bank_or_card = args.bank_or_card
-	data_type = merchant_or_subtype + '_' + bank_or_card
-	#default_dir_paths = {'merchant_card' : "cadusumi/tde_merchants_phase2/",
-	#	'merchant_bank' : "cadusumi/tde_merchants_phase2/",
-	#	'subtype_card' :"hvudumala/Type_Subtype_finaldata/Card/",
-	#	'subtype_bank' : "hvudumala/Type_Subtype_finaldata/Bank/"
-	#	}
-	#default_buckets = {'merchant' : "yodleemisc",
-	#	'subtype' : "yodleemisc"
-	#	}
-	#default_file_types = {'merchant' : '.tar.gz', 'subtype' : '.csv'}
+	data_type = merchant_or_subtype + "_" + bank_or_card
 
-	default_bucket = "s3yodlee"
-	default_file_types = ".tar.gz"
-	default_file_name = "input.tar.gz"
+	#default_bucket = "s3yodlee"
+	#default_file_type = ".tar.gz"
+	#default_file_name = "input.tar.gz"
 
-	if args.bucket == '':
-		bucket = default_buckets
-	else:
-		bucket = args.bucket
+	#if args.bucket == '':
+	#	bucket = default_bucket
+	#else:
+	bucket = args.bucket
 
 	#if args.input_dir == '':
 	#	prefix = default_dir_paths
 	#else:
 	prefix = args.input_dir
 
-	if args.file_name == '':
-		file_name = default_file_name
-	else:
-		file_name = args.file_name
+	#if args.file_name == '':
+	#	file_name = default_file_name
+	#else:
+	file_name = args.file_name
 
-	extension = default_file_types
-	save_path = './data/input/'
+	extension = ".tar.gz"
+	save_path = "./data/input/"
 
 	input_file = pull_from_s3(bucket=bucket, prefix=prefix, extension=extension,
 		file_name=file_name, save_path=save_path)
-
-#	dir_paths = {'subtype_card_debit': 's3://s3yodlee/data/subtype/card/debit',
-#		'subtype_card_credit': 's3://s3yodlee/data/subtype/card/credit/',
-#		'subtype_bank_debit': 's3://s3yodlee/data/subtype/bank/debit/',
-#		'subtype_bank_credit': 's3://s3yodlee/data/subtype/bank/credit/',
-#		'merchant_bank': 's3://s3yodlee/data/merchant/bank/',
-#		'merchant_card': 's3://s3yodlee/data/merchant/card/'
-#		}
-
-#	date = datetime.now()
-#	date = str(date.month).zfill(2) + str(date.day).zfill(2) + str(date.year)
 
 	dir_path = "s3://s3yodlee/" + prefix
 
@@ -129,7 +110,8 @@ def main_split_data(args):
 		dirt = save_path + data_type + '/'
 		os.makedirs(dirt, exist_ok=True)
 		df, label_map_path = unzip_and_merge(input_file, bank_or_card)
-		print('Validating {0} {1} data'.format(merchant_or_subtype, bank_or_card))
+
+		logging.info('Validating {0} {1} data'.format(merchant_or_subtype, bank_or_card))
 		verify_data(csv_input=df, json_input=label_map_path,
 			cnn_type=[merchant_or_subtype, bank_or_card])
 		save = make_save_function(df.columns, dirt)
@@ -142,13 +124,20 @@ def main_split_data(args):
 		local['rm'][input_file]()
 		local['tar']['-zcvf']["output.tar.gz"]['-C'][dirt]['.']()
 		local['aws']['s3']['cp']["output.tar.gz"][dir_path]()
-		#local['aws']['s3']['sync'][dirt][dir_path]()
 	else:
-		df_credit, df_debit = seperate_debit_credit(input_file)
-		credit_map_path = pull_from_s3(bucket=bucket, prefix=prefix,
-			extension='credit_subtype_label_map.json', save_path=save_path)
-		debit_map_path = pull_from_s3(bucket=bucket, prefix=prefix,
-			extension='debit_subtype_label_map.json', save_path=save_path)
+		dirt = save_path + data_type + '/'
+		os.makedirs(dirt, exist_ok=True)
+		local['tar']['xf'][input_file]['-C'][dirt]()
+		input_csv_file = ""
+		json_files = {}
+		for file_name in os.listdir(dirt):
+			if file_name.endswith(".json"):
+				print(file_name)
+			if file_name.endswith(".csv"):
+				print(file_name)
+				input_csv_file = file_name
+		#df_credit, df_debit = seperate_debit_credit(input_csv_file)
+		"""
 		print('Validating {0} {1} credit data.'.\
 			format(merchant_or_subtype, bank_or_card))
 		verify_data(csv_input=df_credit, json_input=credit_map_path,
@@ -157,6 +146,7 @@ def main_split_data(args):
 			format(merchant_or_subtype, bank_or_card))
 		verify_data(csv_input=df_debit, json_input=debit_map_path,
 			cnn_type=[merchant_or_subtype, bank_or_card, 'debit'])
+
 		# save debit
 		dirt_debit = save_path + data_type + '_debit/'
 		os.makedirs(dirt_debit, exist_ok=True)
@@ -168,6 +158,7 @@ def main_split_data(args):
 		local['mv'][debit_map_path][dirt_debit]()
 		local['aws']['s3']['sync'][dirt_debit][dir_paths\
 			[data_type + '_debit']]()
+
 		# save credit
 		dirt_credit = save_path + data_type + '_credit/'
 		os.makedirs(dirt_credit, exist_ok=True)
@@ -179,7 +170,7 @@ def main_split_data(args):
 		local['mv'][credit_map_path][dirt_credit]()
 		local['aws']['s3']['sync'][dirt_credit][dir_paths\
 			[data_type + '_credit']]()
-
+		"""
 if __name__ == "__main__":
 	args = parse_arguments()
 	main_split_data(args)
