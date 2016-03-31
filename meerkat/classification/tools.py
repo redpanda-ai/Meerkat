@@ -374,8 +374,7 @@ def merge_csvs(directory):
 	cols = ["DESCRIPTION", "DESCRIPTION_UNMASKED", "MERCHANT_NAME"]
 	for i in os.listdir(directory):
 		if i.endswith('.csv'):
-			df = load_piped_dataframe(directory + i)
-			df = df[cols]
+			df = load_piped_dataframe(directory + i, usecols=cols)
 			dataframes.append(df)
 	merged = pd.concat(dataframes, ignore_index=True)
 	merged = check_empty_transaction(merged)

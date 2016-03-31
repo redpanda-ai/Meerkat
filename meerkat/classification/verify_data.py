@@ -193,7 +193,7 @@ def verify_csv_format(df, cnn_type):
 
 	cnn_column_header = merchant_header if cnn_type[0] == "merchant" else subtype_header
 
-	if column_header != cnn_column_header:
+	if sorted(column_header) != sorted(cnn_column_header):
 		logging.critical("csv data format is incorrect")
 		sys.exit()
 	logging.info("csv data format is correct")
