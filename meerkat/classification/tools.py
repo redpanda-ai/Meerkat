@@ -54,7 +54,7 @@ def check_new_input_file(**s3_params):
 	if "input.tar.gz" not in tar_gz_file_list:
 		logging.critical("input.tar.gz doesn't exist in {0}".format(newest_version_dir))
 		sys.exit()
-	elif "output.tar.gz" not in tar_gz_file_list:
+	elif "preprocessed.tar.gz" not in tar_gz_file_list:
 		return True, newest_version_dir, newest_version
 	else:
 		return False, newest_version_dir, newest_version
