@@ -414,6 +414,7 @@ def run_session(config, graph, saver):
 
 def run_from_command_line():
 	"""Run module from command line"""
+	logging.basicConfig(level=logging.INFO)
 	config = validate_config(sys.argv[1])
 	graph, saver = build_graph(config)
 	run_session(config, graph, saver)
