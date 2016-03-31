@@ -117,22 +117,12 @@ def main_split_data(args):
 		file_name=file_name, save_path=save_path_input)
 
 	if model_type == 'merchant':
-		df, label_map_path = unzip_and_merge(input_file, bank_or_card)
+		df, input_json_file = unzip_and_merge(input_file, bank_or_card)
 
 		logging.info('Validating {0} {1} data'.format(model_type, bank_or_card))
-		verify_data(csv_input=df, json_input=label_map_path,
+		verify_data(csv_input=df, json_input=input_json_file,
 			cnn_type=[model_type, bank_or_card])
 
-		save = make_save_function(df.columns, save_path_output)
-		results = random_split(df, args.train_size)
-		save(results, 'train')
-		save(results, 'test')
-		del df
-		del results
-
-		os.rename(label_map_path, save_path_output + "label_map.json")
-		local['tar']['-zcvf'][output_file]['-C'][save_path_output]['.']()
-		local['aws']['s3']['cp'][output_file][dir_path]()
 	else:
 		local['tar']['xf'][input_file]['-C'][save_path_input]()
 		input_csv_file = ""
@@ -153,16 +143,16 @@ def main_split_data(args):
 		verify_data(csv_input=df, json_input=input_json_file,
 			cnn_type=[model_type, bank_or_card, credit_or_debit])
 
-		save = make_save_function(df.columns, save_path_output)
-		results = random_split(df, args.train_size)
-		save(results, 'train')
-		save(results, 'test')
-		del df
-		del results
+	save = make_save_function(df.columns, save_path_output)
+	results = random_split(df, args.train_size)
+	save(results, 'train')
+	save(results, 'test')
+	del df
+	del results
 
-		os.rename(input_json_file, save_path_output + "label_map.json")
-		local['tar']['-zcvf'][output_file]['-C'][save_path_output]['.']()
-		local['aws']['s3']['cp'][output_file][dir_path]()
+	os.rename(input_json_file, save_path_output + "label_map.json")
+	local['tar']['-zcvf'][output_file]['-C'][save_path_output]['.']()
+	local['aws']['s3']['cp'][output_file][dir_path]()
 
 	logging.info('{0} uploaded to {1}'.format(output_file, bucket + '/' + prefix))
 
