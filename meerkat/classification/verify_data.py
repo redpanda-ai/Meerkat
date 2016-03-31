@@ -53,6 +53,8 @@ import collections
 import argparse
 import pandas as pd
 
+from meerkat.various_tools import load_piped_dataframe
+
 WARNING_THRESHOLD = 0.01
 CRITICAL_THRESHOLD = 0.05
 
@@ -146,15 +148,13 @@ def read_csv_to_df(csv_input, cnn_type):
 				samples.append(i)
 
 		for sample in samples:
-			df_one_sample = pd.read_csv(csv_input + "/" + sample, na_filter=False, encoding="utf-8",
-				sep="|", error_bad_lines=False, quoting=csv.QUOTE_NONE)
+			df_one_sample = load_piped_dataframe(csv_input + "/" + sample)
 			df.append(df_one_sample)
 		merged = pd.concat(df, ignore_index=True)
 		return merged
 
 	else:
-		df = pd.read_csv(csv_input, quoting=csv.QUOTE_NONE, na_filter=False,
-			encoding="utf-8", sep='|', error_bad_lines=False, low_memory=False)
+		df = load_piped_dataframe(csv_input)
 		df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
 		grouped = df.groupby('LEDGER_ENTRY', as_index=False)
 		groups = dict(list(grouped))
