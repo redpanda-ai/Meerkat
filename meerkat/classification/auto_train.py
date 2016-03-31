@@ -144,10 +144,6 @@ def auto_train():
 
 	os.makedirs(save_path, exist_ok=True)
 
-	train_file = "train.csv"
-	test_file = "test.csv"
-	label_map = "label_map.json"
-
 	if exist_new_input:
 		logging.info("There exists new input data")
 		args.input_dir = s3_params["prefix"]
@@ -159,9 +155,9 @@ def auto_train():
 		output_file = pull_from_s3(extension='.tar.gz', file_name="output.tar.gz", **s3_params)
 		local["tar"]["xfv"][output_file]["-C"][save_path]()
 
-	train_file = save_path + train_file
-	test_file = save_path + test_file
-	label_map = save_path + label_map
+	train_file = save_path + "train.csv"
+	test_file = save_path + "test.csv"
+	label_map = save_path + "label_map.json"
 
 	# Load and Modify Config
 	config = load_params("meerkat/classification/config/default_tf_config.json")
