@@ -154,6 +154,7 @@ def auto_train():
 		args.file_name = "input.tar.gz"
 		args.train_size = 0.9
 		main_split_data(args)
+		save_path = save_path + 'output/'
 	else:
 		output_file = pull_from_s3(extension='.tar.gz', file_name="output.tar.gz", **s3_params)
 		local["tar"]["xfv"][output_file]["-C"][save_path]()
