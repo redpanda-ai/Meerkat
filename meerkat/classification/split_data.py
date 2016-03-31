@@ -156,6 +156,7 @@ def main_split_data(args):
 	# Save Fewer Columns for Large Datasets
 	if len(df.index) > 5000000:
 		cols = ["DESCRIPTION_UNMASKED", ground_truth_labels[model_type]]
+		cols = cols + ["LEDGER_ENTRY"] if model_type != "merchant" else cols
 		kwargs = {"cols" : cols, "index" : False, 'sep' : '|'}
 		path = save_path_output + 'train' + '.csv'
 		results['train'].to_csv(path, **kwargs)

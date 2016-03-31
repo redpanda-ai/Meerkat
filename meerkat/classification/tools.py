@@ -375,8 +375,10 @@ def merge_csvs(directory):
 		if i.endswith('.csv'):
 			df = load_piped_dataframe(directory + i)
 			dataframes.append(df)
-	merged = pd.concat(dataframes, ignore_index=True)
-	merged = check_empty_transaction(merged)
+			if len(dataframes) > 1:
+				dataframes = [pd.concat(dataframes, ignore_index=True)]
+	merged = dataframes[0]
+	merged = check_empty_transaction()
 	return merged
 
 def check_empty_transaction(df):
