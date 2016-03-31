@@ -35,7 +35,8 @@ def check_new_input_file(**s3_params):
 			if dir_name.isdigit():
 				version_dir_list.append(dir_name)
 
-	newest_version_dir = prefix + sorted(version_dir_list, reverse=True)[0]
+	newest_version = sorted(version_dir_list, reverse=True)[0]
+	newest_version_dir = prefix + newest_version
 	logging.info("The newest direcory is: {0}".format(newest_version_dir))
 	listing_tar_gz = bucket.list(prefix=newest_version_dir)
 
@@ -54,9 +55,9 @@ def check_new_input_file(**s3_params):
 		logging.critical("input.tar.gz doesn't exist in {0}".format(newest_version_dir))
 		sys.exit()
 	elif "output.tar.gz" not in tar_gz_file_list:
-		return True, newest_version_dir
+		return True, newest_version_dir, newest_version
 	else:
-		return False, newest_version_dir
+		return False, newest_version_dir, newest_version
 
 def get_new_maint7b(directory, file_list):
 	"""Get the latest t7b file under directory."""

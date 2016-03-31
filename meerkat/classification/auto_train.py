@@ -126,22 +126,23 @@ def auto_train():
 		'merchant_card': 'data/merchant/card/'
 	}
 
-	if args.input_dir == '':
-		prefix = dir_paths[data_type]
-	else:
-		prefix = args.input_dir
+	prefix = dir_paths[data_type] if args.input_dir == '' else args.input_dir
 
 	if args.output_dir == '':
-		save_path = "./data/input/" + data_type + "/"
+		save_path = "./data/input/" + data_type
 	else:
 		save_path = args.output_dir + '/'*(args.output_dir[-1] != '/')
 
-	os.makedirs(save_path, exist_ok=True)
-
 	s3_params = {"bucket": bucket, "prefix": prefix, "save_path": save_path}
 
-	exist_new_input, newest_version_dir = check_new_input_file(**s3_params)
+	exist_new_input, newest_version_dir, version = check_new_input_file(**s3_params)
 	s3_params["prefix"] = newest_version_dir + "/"
+
+	if args.output_dir == '':
+		save_path = save_path + '_' + version + '/'
+		s3_params["save_path"] = save_path
+
+	os.makedirs(save_path, exist_ok=True)
 
 	train_file = "train.csv"
 	test_file = "test.csv"
@@ -149,24 +150,17 @@ def auto_train():
 
 	if exist_new_input:
 		logging.info("There exists new input data")
-		#input_file = pull_from_s3(extension=".tar.gz", file_name="input.tar.gz", **s3_params)
-		#print(input_file)
-		args.merchant_or_subtype = model_type
 		args.input_dir = s3_params["prefix"]
 		args.file_name = "input.tar.gz"
 		args.train_size = 0.9
 		main_split_data(args)
-
-		output_file_path = "./data/input/" + data_type + "/"
-		train_file = output_file_path + train_file
-		test_file = output_file_path + test_file
-		label_map = output_file_path + label_map
 	else:
 		output_file = pull_from_s3(extension='.tar.gz', file_name="output.tar.gz", **s3_params)
 		local["tar"]["xfv"][output_file]["-C"][save_path]()
-		train_file = save_path + train_file
-		test_file = save_path + test_file
-		label_map = save_path + label_map
+
+	train_file = save_path + train_file
+	test_file = save_path + test_file
+	label_map = save_path + label_map
 
 	# Load and Modify Config
 	config = load_params("meerkat/classification/config/default_tf_config.json")

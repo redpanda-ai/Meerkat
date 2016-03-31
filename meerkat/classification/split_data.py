@@ -108,14 +108,13 @@ def main_split_data(args):
 
 	version = prefix[prefix.rfind("/", 0, len(prefix) - 1)+1:len(prefix)-1]
 	save_path = './data/input/' + data_type + '_' + version +'/'
-	os.makedirs(save_path, exist_ok=True)
 	save_path_input = save_path + 'input/'
 	os.makedirs(save_path_input, exist_ok=True)
 	save_path_output = save_path + 'output/'
 	os.makedirs(save_path_output, exist_ok=True)
 
 	input_file = pull_from_s3(bucket=bucket, prefix=prefix, extension=extension,
-		file_name=file_name, save_path=save_path)
+		file_name=file_name, save_path=save_path_input)
 
 	if model_type == 'merchant':
 		df, label_map_path = unzip_and_merge(input_file, bank_or_card)
@@ -124,15 +123,15 @@ def main_split_data(args):
 		verify_data(csv_input=df, json_input=label_map_path,
 			cnn_type=[model_type, bank_or_card])
 
-		save = make_save_function(df.columns, save_path)
+		save = make_save_function(df.columns, save_path_output)
 		results = random_split(df, args.train_size)
 		save(results, 'train')
 		save(results, 'test')
 		del df
 		del results
 
-		os.rename(label_map_path, save_path + "label_map.json")
-		local['tar']['-zcvf'][output_file]['-C'][save_path]['.']()
+		os.rename(label_map_path, save_path_output + "label_map.json")
+		local['tar']['-zcvf'][output_file]['-C'][save_path_output]['.']()
 		local['aws']['s3']['cp'][output_file][dir_path]()
 	else:
 		local['tar']['xf'][input_file]['-C'][save_path_input]()
@@ -164,6 +163,7 @@ def main_split_data(args):
 		os.rename(input_json_file, save_path_output + "label_map.json")
 		local['tar']['-zcvf'][output_file]['-C'][save_path_output]['.']()
 		local['aws']['s3']['cp'][output_file][dir_path]()
+
 	logging.info('{0} uploaded to {1}'.format(output_file, bucket + '/' + prefix))
 
 if __name__ == "__main__":
