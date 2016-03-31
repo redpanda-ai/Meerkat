@@ -62,12 +62,19 @@ def load_dict_ordered(file_name, encoding='utf-8', delimiter="|"):
 def load_piped_dataframe(filename, chunksize=False):
 	"""Load piped dataframe from file name"""
 
+	with open(filename, 'r') as f:
+    	header = f.readline()
+
+    columns = header.split("|")
+    dtypes = {c: "object" for c in columns}
+
 	options = {
 		"quoting": csv.QUOTE_NONE,
 		"na_filter": False,
 		"encoding": "utf-8",
 		"sep": "|",
-		"error_bad_lines": False
+		"error_bad_lines": False,
+		"dtype": dtypes
 	}
 
 	if isinstance(chunksize, int):

@@ -371,14 +371,14 @@ def unzip_and_merge(gz_file, bank_or_card):
 def merge_csvs(directory):
 	"merges all csvs immediately under the directory"
 	dataframes = []
+	cols = ["DESCRIPTION", "DESCRIPTION_UNMASKED", "MERCHANT_NAME"]
 	for i in os.listdir(directory):
 		if i.endswith('.csv'):
 			df = load_piped_dataframe(directory + i)
+			df = df[cols]
 			dataframes.append(df)
-			if len(dataframes) > 1:
-				dataframes = [pd.concat(dataframes, ignore_index=True)]
-	merged = dataframes[0]
-	merged = check_empty_transaction()
+	merged = pd.concat(dataframes, ignore_index=True)
+	merged = check_empty_transaction(merged)
 	return merged
 
 def check_empty_transaction(df):

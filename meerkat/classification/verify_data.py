@@ -187,8 +187,7 @@ def verify_csv_format(df, cnn_type):
 	column_header = list(df.columns.values)
 	column_header.sort()
 	
-	merchant_header = ['AMOUNT', 'DESCRIPTION', 'DESCRIPTION_UNMASKED', 'GOOD_DESCRIPTION',
-		'MERCHANT_NAME', 'TRANSACTION_DATE', 'TYPE', 'UNIQUE_MEM_ID', 'UNIQUE_TRANSACTION_ID']
+	merchant_header = ['DESCRIPTION', 'DESCRIPTION_UNMASKED', 'MERCHANT_NAME']
 	subtype_header = ['AMOUNT', 'DESCRIPTION', 'DESCRIPTION_UNMASKED', 'LEDGER_ENTRY',
 		'PROPOSED_SUBTYPE', 'TRANSACTION_DATE', 'UNIQUE_TRANSACTION_ID']
 
