@@ -197,7 +197,7 @@ def main_process(args):
 		reversed_label_map["Null Class"] = reversed_label_map.pop("")
 
 	confusion_matrix = [[0 for i in range(num_labels + 1)] for j in range(num_labels)]
-	classifier = get_tf_cnn_by_path(args.model, label_map)
+	classifier = get_tf_cnn_by_path(args.model, args.label_map)
 
 	# Prepare for data saving
 	path = 'data/CNN_stats/'
