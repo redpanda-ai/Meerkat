@@ -140,7 +140,10 @@ def parse_arguments():
 
 def read_csv_to_df(csv_input, cnn_type):
 	"""Read csv file into pandas data frames"""
+
 	df = []
+	cols = ["DESCRIPTION", "DESCRIPTION_UNMASKED", "MERCHANT_NAME"]
+
 	if os.path.isdir(csv_input):
 		samples = []
 		for i in os.listdir(csv_input):
@@ -148,7 +151,7 @@ def read_csv_to_df(csv_input, cnn_type):
 				samples.append(i)
 
 		for sample in samples:
-			df_one_sample = load_piped_dataframe(csv_input + "/" + sample)
+			df_one_sample = load_piped_dataframe(csv_input + "/" + sample, usecols=cols)
 			df.append(df_one_sample)
 		merged = pd.concat(df, ignore_index=True)
 		return merged
