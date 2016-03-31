@@ -157,7 +157,7 @@ def auto_train():
 		args.train_size = 0.9
 		main_split_data(args)
 
-		output_file_path = "./data/input" + data_type + "/"
+		output_file_path = "./data/input/" + data_type + "/"
 		train_file = output_file_path + train_file
 		test_file = output_file_path + test_file
 		label_map = output_file_path + label_map
