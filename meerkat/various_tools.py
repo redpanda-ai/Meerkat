@@ -75,7 +75,7 @@ def load_piped_dataframe(filename, chunksize=False, usecols=False):
 		options["usecols"] = usecols
 	else:
 		with open(filename, 'r') as f:
-    		header = f.readline()
+			header = f.readline()
 		columns = header.split("|")
 
 	options["dtype"] = {c: "object" for c in columns}
