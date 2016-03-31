@@ -261,7 +261,7 @@ def verify_numbers_in_each_class(label_names_csv, label_counts_csv):
 	"""Verify that for any particular class, there are at least 500 transactions"""
 	err_msg = ""
 	for i in range(len(label_names_csv)):
-		if label_counts_csv[i] < 1:
+		if label_counts_csv[i] < 500:
 			err_msg += "{:<40}".format(label_names_csv[i]) + "{:<25}".format(str(label_counts_csv[i])) + "\n"
 	if err_msg != "":
 		err_msg = ("{:<40}".format("Class Name") + "{:<25}".format("Number of Transactions") +
