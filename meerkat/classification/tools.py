@@ -54,7 +54,7 @@ def check_new_input_file(**s3_params):
 	if "input.tar.gz" not in tar_gz_file_list:
 		logging.critical("input.tar.gz doesn't exist in {0}".format(newest_version_dir))
 		sys.exit()
-	elif "output.tar.gz" not in tar_gz_file_list:
+	elif "preprocessed.tar.gz" not in tar_gz_file_list:
 		return True, newest_version_dir, newest_version
 	else:
 		return False, newest_version_dir, newest_version
@@ -371,9 +371,10 @@ def unzip_and_merge(gz_file, bank_or_card):
 def merge_csvs(directory):
 	"merges all csvs immediately under the directory"
 	dataframes = []
+	cols = ["DESCRIPTION", "DESCRIPTION_UNMASKED", "MERCHANT_NAME"]
 	for i in os.listdir(directory):
 		if i.endswith('.csv'):
-			df = load_piped_dataframe(directory + i)
+			df = load_piped_dataframe(directory + i, usecols=cols)
 			dataframes.append(df)
 	merged = pd.concat(dataframes, ignore_index=True)
 	merged = check_empty_transaction(merged)

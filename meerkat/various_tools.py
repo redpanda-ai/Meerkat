@@ -59,7 +59,7 @@ def load_dict_ordered(file_name, encoding='utf-8', delimiter="|"):
 	input_file.close()
 	return dict_list, reader.fieldnames
 
-def load_piped_dataframe(filename, chunksize=False):
+def load_piped_dataframe(filename, chunksize=False, usecols=False):
 	"""Load piped dataframe from file name"""
 
 	options = {
@@ -69,6 +69,16 @@ def load_piped_dataframe(filename, chunksize=False):
 		"sep": "|",
 		"error_bad_lines": False
 	}
+
+	if usecols:
+		columns = usecols
+		options["usecols"] = usecols
+	else:
+		with open(filename, 'r') as f:
+			header = f.readline()
+		columns = header.split("|")
+
+	options["dtype"] = {c: "object" for c in columns}
 
 	if isinstance(chunksize, int):
 		options["chunksize"] = chunksize
