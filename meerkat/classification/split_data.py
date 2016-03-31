@@ -99,6 +99,11 @@ def main_split_data(args):
 		'subtype_bank_credit' : "data/subtype/bank/credit/"
 	}
 
+	ground_truth_labels = {
+		'merchant' : 'MERCHANT_NAME',
+		'subtype' : 'PROPOSED_SUBTYPE'
+	}
+
 	bucket = "s3yodlee" if args.bucket == '' else args.bucket
 	prefix = default_dir_paths[data_type] if args.input_dir == '' else args.input_dir
 	file_name = "input.tar.gz" if args.file_name == '' else args.file_name
@@ -143,10 +148,23 @@ def main_split_data(args):
 		verify_data(csv_input=df, json_input=input_json_file,
 			cnn_type=[model_type, bank_or_card, credit_or_debit])
 
+	# Save Results
 	save = make_save_function(df.columns, save_path_output)
 	results = random_split(df, args.train_size)
-	save(results, 'train')
 	save(results, 'test')
+
+	# Save Fewer Columns for Large Datasets
+	if len(df.index) > 5000000:
+		cols = ["DESCRIPTION_UNMASKED", ground_truth_labels[model_type]]
+		kwargs = {"cols" : cols, "index" : False, 'sep' : '|'}
+		path = save_path_output + 'train' + '.csv'
+		results['train'].to_csv(path, **kwargs)
+		kwargs = {"cols" : df.columns, "index" : False, 'sep' : '|'}
+		path = dirt + 'train_full' + '.csv'
+		results['train'].to_csv(path, **kwargs)
+	else:
+		save(results, 'train')
+
 	del df
 	del results
 
