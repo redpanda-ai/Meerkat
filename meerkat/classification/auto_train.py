@@ -114,7 +114,7 @@ def auto_train():
 	credit_or_debit = args.credit_or_debit
 	model_type = args.model_type
 	data_type = model_type + '_' + bank_or_card
-	if model_type == "subtype":
+	if model_type != "merchant":
 		data_type = data_type + '_' + credit_or_debit
 
 	dir_paths = {

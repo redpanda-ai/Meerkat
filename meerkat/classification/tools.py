@@ -13,6 +13,7 @@ import pandas as pd
 from boto.s3.connection import Location
 from boto import connect_s3
 from plumbum import local, NOHUP
+from meerkat.various_tools import load_piped_dataframe
 
 def check_new_input_file(**s3_params):
 	"""Check the existence of a new input.tar.gz file"""
@@ -371,8 +372,7 @@ def merge_csvs(directory):
 	dataframes = []
 	for i in os.listdir(directory):
 		if i.endswith('.csv'):
-			df = pd.read_csv(directory + i, na_filter=False, encoding='utf-8',
-				sep='|', error_bad_lines=False, quoting=csv.QUOTE_NONE)
+			df = load_piped_dataframe(directory + i)
 			dataframes.append(df)
 	merged = pd.concat(dataframes, ignore_index=True)
 	merged = check_empty_transaction(merged)
@@ -393,8 +393,7 @@ def check_empty_transaction(df):
 def seperate_debit_credit(subtype_file):
 	"""Load the CSV into a pandas data frame, return debit and credit df"""
 	logging.info("Loading csv file")
-	df = pd.read_csv(subtype_file, quoting=csv.QUOTE_NONE, na_filter=False,
-		encoding="utf-8", sep='|', error_bad_lines=False)
+	df = load_piped_dataframe(subtype_file)
 	df = check_empty_transaction(df)
 	df['UNIQUE_TRANSACTION_ID'] = df.index
 	df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
