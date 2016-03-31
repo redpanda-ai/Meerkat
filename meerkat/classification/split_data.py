@@ -108,14 +108,14 @@ def main_split_data(args):
 	prefix = default_dir_paths[data_type] if args.input_dir == '' else args.input_dir
 	file_name = "input.tar.gz" if args.file_name == '' else args.file_name
 	extension = ".tar.gz"
-	output_file = "output.tar.gz"
+	output_file = "preprocessed.tar.gz"
 	dir_path = "s3://s3yodlee/" + prefix
 
 	version = prefix[prefix.rfind("/", 0, len(prefix) - 1)+1:len(prefix)-1]
 	save_path = './data/input/' + data_type + '_' + version +'/'
 	save_path_input = save_path + 'input/'
 	os.makedirs(save_path_input, exist_ok=True)
-	save_path_output = save_path + 'output/'
+	save_path_output = save_path + 'preprocessed/'
 	os.makedirs(save_path_output, exist_ok=True)
 
 	input_file = pull_from_s3(bucket=bucket, prefix=prefix, extension=extension,
