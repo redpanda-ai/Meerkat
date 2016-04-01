@@ -22,6 +22,6 @@ class ToolsTests(unittest.TestCase):
 		"""Test check_new_input_file"""
 		if case_type == "missing_input":
 			self.assertRaises(SystemExit, tools.check_new_input_file, **s3params)
-		elif case_type == "unpreprocessed":
+		else:
 			self.assertEqual(tools.check_new_input_file(**s3params), result)
 
