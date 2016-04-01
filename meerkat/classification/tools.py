@@ -13,6 +13,51 @@ import pandas as pd
 from boto.s3.connection import Location
 from boto import connect_s3
 from plumbum import local, NOHUP
+from meerkat.various_tools import load_piped_dataframe
+
+def check_new_input_file(**s3_params):
+	"""Check the existence of a new input.tar.gz file"""
+	bucket_name, prefix = s3_params["bucket"], s3_params["prefix"]
+	conn = connect_s3()
+	bucket = conn.get_bucket(bucket_name, Location.USWest2)
+	listing_version = bucket.list(prefix=prefix, delimiter='/')
+
+	version_object_list = [
+		version_object
+		for version_object in listing_version
+	]
+
+	version_dir_list = []
+	for i in range(len(version_object_list)):
+		full_name = version_object_list[i].name
+		if full_name.endswith("/"):
+			dir_name = full_name[full_name.rfind("/", 0, len(full_name) - 1)+1:len(full_name)-1]
+			if dir_name.isdigit():
+				version_dir_list.append(dir_name)
+
+	newest_version = sorted(version_dir_list, reverse=True)[0]
+	newest_version_dir = prefix + newest_version
+	logging.info("The newest direcory is: {0}".format(newest_version_dir))
+	listing_tar_gz = bucket.list(prefix=newest_version_dir)
+
+	tar_gz_object_list = [
+		tar_gz_object
+		for tar_gz_object in listing_tar_gz
+	]
+
+	tar_gz_file_list = []
+	for i in range(len(tar_gz_object_list)):
+		full_name = tar_gz_object_list[i].name
+		tar_gz_file_name = full_name[full_name.rfind("/")+1:]
+		tar_gz_file_list.append(tar_gz_file_name)
+
+	if "input.tar.gz" not in tar_gz_file_list:
+		logging.critical("input.tar.gz doesn't exist in {0}".format(newest_version_dir))
+		sys.exit()
+	elif "preprocessed.tar.gz" not in tar_gz_file_list:
+		return True, newest_version_dir, newest_version
+	else:
+		return False, newest_version_dir, newest_version
 
 def get_new_maint7b(directory, file_list):
 	"""Get the latest t7b file under directory."""
@@ -326,10 +371,10 @@ def unzip_and_merge(gz_file, bank_or_card):
 def merge_csvs(directory):
 	"merges all csvs immediately under the directory"
 	dataframes = []
+	cols = ["DESCRIPTION", "DESCRIPTION_UNMASKED", "MERCHANT_NAME"]
 	for i in os.listdir(directory):
 		if i.endswith('.csv'):
-			df = pd.read_csv(directory + i, na_filter=False, encoding='utf-8',
-				sep='|', error_bad_lines=False, quoting=csv.QUOTE_NONE)
+			df = load_piped_dataframe(directory + i, usecols=cols)
 			dataframes.append(df)
 	merged = pd.concat(dataframes, ignore_index=True)
 	merged = check_empty_transaction(merged)
@@ -350,8 +395,7 @@ def check_empty_transaction(df):
 def seperate_debit_credit(subtype_file):
 	"""Load the CSV into a pandas data frame, return debit and credit df"""
 	logging.info("Loading csv file")
-	df = pd.read_csv(subtype_file, quoting=csv.QUOTE_NONE, na_filter=False,
-		encoding="utf-8", sep='|', error_bad_lines=False)
+	df = load_piped_dataframe(subtype_file)
 	df = check_empty_transaction(df)
 	df['UNIQUE_TRANSACTION_ID'] = df.index
 	df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()

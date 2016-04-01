@@ -23,9 +23,6 @@ positional arguments:
                         Pick a valid Classifier type
   {bank,card}           Is the model being trained on card or bank
                         transactions?
-  train_file            Name of the training file to be pulled
-  test_file             Name of the test file to be pulled
-  label_map             Path of the label map to be pulled
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -41,8 +38,7 @@ optional arguments:
 """
 
 EXAMPLE = """
-time nohup python3 -m meerkat.classification.auto_train merchant bank merchant_bank_train.csv \
-merchant_bank_test_03182016.csv bank_merchant_label_map.json -v &
+time nohup python3 -m meerkat.classification.auto_train merchant bank -v &
 """
 
 ###################################################################################################
@@ -50,13 +46,18 @@ merchant_bank_test_03182016.csv bank_merchant_label_map.json -v &
 import argparse
 import logging
 import os
+import sys
 
 import tensorflow as tf
 
-from meerkat.classification.tools import pull_from_s3
+from plumbum import local
+from boto import connect_s3
+from boto.s3.connection import Location
+from meerkat.classification.split_data import random_split, make_save_function, main_split_data
+from meerkat.classification.tools import pull_from_s3, check_new_input_file
 from meerkat.classification.tensorflow_cnn import build_graph, train_model, validate_config
-from meerkat.classification.verify_data import load_json
-from meerkat.tools.CNN_stats import main_process as apply_cnn
+from meerkat.tools.cnn_stats import main_process as apply_cnn
+from meerkat.various_tools import load_params
 
 def parse_arguments():
 	"""This function parses arguments from our command line."""
@@ -67,9 +68,6 @@ def parse_arguments():
 	help_text = {
 		"model_type" : "Pick a valid Classifier type",
 		"bank_or_card": "Is the model being trained on card or bank transactions?",
-		"train_file": "Name of the training file to be pulled",
-		"test_file": "Name of the test file to be pulled",
-		"label_map": "Path of the label map to be pulled",
 		"output_dir": "Directory to write files to. Default is meerkat/data/",
 		"credit_or_debit": "Is the model for credit or debit transactions?",
 		"bucket": "Input bucket name, default is s3yodlee",
@@ -87,9 +85,6 @@ def parse_arguments():
 	parser.add_argument("model_type", help=help_text["model_type"], choices=choices["model_type"])
 	parser.add_argument("bank_or_card", help=help_text["bank_or_card"], 
 		choices=choices["bank_or_card"])
-	parser.add_argument("train_file", help=help_text["train_file"])
-	parser.add_argument("test_file", help=help_text["test_file"])
-	parser.add_argument("label_map", default='', help=help_text["label_map"])
 
 	# Optional arguments
 	parser.add_argument("--input_dir", help=help_text["input_dir"], default='')
@@ -118,41 +113,60 @@ def auto_train():
 	bank_or_card = args.bank_or_card
 	credit_or_debit = args.credit_or_debit
 	model_type = args.model_type
-	data_type = model_type + '_' + bank_or_card + '_' + credit_or_debit
+	data_type = model_type + '_' + bank_or_card
+	if model_type != "merchant":
+		data_type = data_type + '_' + credit_or_debit
 
 	dir_paths = {
 		'subtype_card_debit': 'data/subtype/card/debit/',
 		'subtype_card_credit': 'data/subtype/card/credit/',
 		'subtype_bank_debit': 'data/subtype/bank/debit/',
 		'subtype_bank_credit': 'data/subtype/bank/credit/',
-		'merchant_bank_': 'data/merchant/bank/',
-		'merchant_card_': 'data/merchant/card/'
+		'merchant_bank': 'data/merchant/bank/',
+		'merchant_card': 'data/merchant/card/'
 	}
 
-	if args.input_dir == '':
-		prefix = dir_paths[data_type]
-	else:
-		prefix = args.input_dir
+	prefix = dir_paths[data_type] if args.input_dir == '' else args.input_dir
 
 	if args.output_dir == '':
-		save_path = "./data/input/" + data_type + "/"
+		save_path = "./data/input/" + data_type
 	else:
 		save_path = args.output_dir + '/'*(args.output_dir[-1] != '/')
 
+	s3_params = {"bucket": bucket, "prefix": prefix, "save_path": save_path}
+
+	exist_new_input, newest_version_dir, version = check_new_input_file(**s3_params)
+	s3_params["prefix"] = newest_version_dir + "/"
+
+	if args.output_dir == '':
+		save_path = save_path + '_' + version + '/'
+		s3_params["save_path"] = save_path
+
 	os.makedirs(save_path, exist_ok=True)
 
-	s3_params = {"bucket": bucket, "prefix": prefix, "save_path": save_path}
-	train_file = pull_from_s3(extension='.csv', file_name=args.train_file, **s3_params)
-	test_file = pull_from_s3(extension='.csv', file_name=args.test_file, **s3_params)
-	label_map = pull_from_s3(extension='.json', file_name=args.label_map, **s3_params)
+	if exist_new_input:
+		logging.info("There exists new input data")
+		args.input_dir = s3_params["prefix"]
+		args.file_name = "input.tar.gz"
+		args.train_size = 0.9
+		main_split_data(args)
+		save_path = save_path + 'preprocessed/'
+	else:
+		output_file = pull_from_s3(extension='.tar.gz', file_name="preprocessed.tar.gz", **s3_params)
+		local["tar"]["xfv"][output_file]["-C"][save_path]()
+
+	train_file = save_path + "train.csv"
+	test_file = save_path + "test.csv"
+	label_map = save_path + "label_map.json"
 
 	# Load and Modify Config
-	config = validate_config("config/tf_cnn_config.json")
+	config = load_params("meerkat/classification/config/default_tf_config.json")
+	config["label_map"] = label_map
 	config["dataset"] = train_file
-	config["label_map"] = load_json(label_map)
-	config["num_labels"] = len(config["label_map"].keys())
 	config["ledger_entry"] = args.credit_or_debit
+	config["container"] = args.bank_or_card
 	config["model_type"] = args.model_type
+	config = validate_config(config)
 
 	# Train the model
 	graph, saver = build_graph(config)
