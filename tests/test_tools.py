@@ -3,19 +3,25 @@
 import unittest
 import meerkat.classification.tools as tools
 from nose_parameterized import parameterized
+from tests.fixture import tools_fixture
 
 class ToolsTests(unittest.TestCase):
 	"""Our UnitTest class."""
 
 	@parameterized.expand([
-		(["input file not exist", {"bucket": "s3yodlee", "prefix": "Meerkat_tests_fixture/"}]),
-		(["input file not exist", {"bucket": "s3yodlee", "prefix": "Meerkat_tests_fixture"}])
+		(["missing_input", tools_fixture.get_s3params("missing_input"),
+			tools_fixture.get_result("missing_input")]),
+		(["missing_slosh", tools_fixture.get_s3params("missing_slosh"),
+			tools_fixture.get_result("missing_slosh")]),
+		(["unpreprocessed", tools_fixture.get_s3params("unpreprocessed"),
+			tools_fixture.get_result("unpreprocessed")]),
+		(["preprocessed", tools_fixture.get_s3params("preprocessed"),
+			tools_fixture.get_result("preprocessed")])
 	])
-	def test_pull_from_s3(self, case_type, s3params):
+	def test_check_new_input_file(self, case_type, s3params, result):
 		"""Test check_new_input_file"""
-		if case_type == "input file not exist":
+		if case_type == "missing_input":
 			self.assertRaises(SystemExit, tools.check_new_input_file, **s3params)
-		#else:
-		#	self.assertEqual(tools.pull_from_s3(**inputs), "tests/fixture/csv_file_1.csv")
-		#	local["rm"]["tests/fixture/csv_file_1.csv"]()
+		elif case_type == "unpreprocessed":
+			self.assertEqual(tools.check_new_input_file(**s3params), result)
 
