@@ -11,12 +11,12 @@ class ToolsTests(unittest.TestCase):
 	@parameterized.expand([
 		(["missing_input", tools_fixture.get_s3params("missing_input"),
 			tools_fixture.get_result("missing_input")]),
-		(["missing_slosh", tools_fixture.get_s3params("missing_slosh"),
-			tools_fixture.get_result("missing_slosh")]),
 		(["unpreprocessed", tools_fixture.get_s3params("unpreprocessed"),
 			tools_fixture.get_result("unpreprocessed")]),
 		(["preprocessed", tools_fixture.get_s3params("preprocessed"),
-			tools_fixture.get_result("preprocessed")])
+			tools_fixture.get_result("preprocessed")]),
+		(["missing_slosh", tools_fixture.get_s3params("missing_slosh"),
+			tools_fixture.get_result("missing_slosh")])
 	])
 	def test_check_new_input_file(self, case_type, s3params, result):
 		"""Test check_new_input_file"""
