@@ -220,9 +220,9 @@ def softmax_with_temperature(tensor, temperature):
 	"""Softmax with temperature variable"""
 	return tf.div(tf.exp(tensor/temperature), tf.reduce_sum(tf.exp(tensor/temperature)))
 
-def bias_variable(shape, mult):
+def bias_variable(shape, flat_input_shape):
 	"""Initialize biases"""
-	stdv = 1 / math.sqrt(mult)
+	stdv = 1 / math.sqrt(flat_input_shape)
 	bias = tf.Variable(tf.random_uniform(shape, minval=-stdv, maxval=stdv), name="B")
 	return bias
 
