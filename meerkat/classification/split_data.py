@@ -89,7 +89,6 @@ def main_split_data(args):
 	if model_type != "merchant":
 		data_type = data_type + '_' + credit_or_debit
 
-	#TODO update default_dir_paths
 	default_dir_paths = {
 		'merchant_card' : "meerkat/cnn/data/merchant/card/",
 		'merchant_bank' : "meerkat/cnn/data/merchant/bank/",
