@@ -91,12 +91,12 @@ def main_split_data(args):
 
 	#TODO update default_dir_paths
 	default_dir_paths = {
-		'merchant_card' : "data/merchant/card/",
-		'merchant_bank' : "data/merchant/bank/",
-		'subtype_card_debit' : "data/subtype/card/debit/",
-		'subtype_card_credit' : "data/subtype/card/credit/",
-		'subtype_bank_debit' : "data/subtype/bank/debit",
-		'subtype_bank_credit' : "data/subtype/bank/credit/"
+		'merchant_card' : "meerkat/cnn/data/merchant/card/",
+		'merchant_bank' : "meerkat/cnn/data/merchant/bank/",
+		'subtype_card_debit' : "meerkat/cnn/data/subtype/card/debit/",
+		'subtype_card_credit' : "meerkat/cnn/data/subtype/card/credit/",
+		'subtype_bank_debit' : "meerkat/cnn/data/subtype/bank/debit",
+		'subtype_bank_credit' : "meerkat/cnn/data/subtype/bank/credit/"
 	}
 
 	ground_truth_labels = {
