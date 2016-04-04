@@ -118,12 +118,12 @@ def auto_train():
 		data_type = data_type + '_' + credit_or_debit
 
 	dir_paths = {
-		'subtype_card_debit': 'data/subtype/card/debit/',
-		'subtype_card_credit': 'data/subtype/card/credit/',
-		'subtype_bank_debit': 'data/subtype/bank/debit/',
-		'subtype_bank_credit': 'data/subtype/bank/credit/',
-		'merchant_bank': 'data/merchant/bank/',
-		'merchant_card': 'data/merchant/card/'
+		'subtype_card_debit': 'meerkat/cnn/data/subtype/card/debit/',
+		'subtype_card_credit': 'meerkat/cnn/data/subtype/card/credit/',
+		'subtype_bank_debit': 'meerkat/cnn/data/subtype/bank/debit/',
+		'subtype_bank_credit': 'meerkat/cnn/data/subtype/bank/credit/',
+		'merchant_bank': 'meerkat/cnn/data/merchant/bank/',
+		'merchant_card': 'meerkat/cnn/data/merchant/card/'
 	}
 
 	prefix = dir_paths[data_type] if args.input_dir == '' else args.input_dir
