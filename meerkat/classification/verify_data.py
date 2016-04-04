@@ -180,7 +180,7 @@ def verify_csv(**kwargs):
 
 	label_names_csv, label_counts_csv = verify_total_numbers(df, cnn_type)
 	verify_csv_format(df, cnn_type)
-	verify_numbers_in_each_class(label_names_csv, label_counts_csv)
+	verify_numbers_in_each_class(label_names_csv, label_counts_csv, cnn_type)
 
 	logging.info("csv is verified\n")
 	return label_names_csv
@@ -259,9 +259,11 @@ def verify_json_no_dup_names(label_names_json):
 		sys.exit()
 	logging.info("There is no duplicate class name in json")
 
-def verify_numbers_in_each_class(label_names_csv, label_counts_csv):
+def verify_numbers_in_each_class(label_names_csv, label_counts_csv, cnn_type):
 	"""Verify that for any particular class, there are at least 500 transactions"""
 	err_msg = ""
+	if cnn_type[0] == "subtype":
+		return
 	for i in range(len(label_names_csv)):
 		if label_counts_csv[i] < 500:
 			err_msg += "{:<40}".format(label_names_csv[i]) + "{:<25}".format(str(label_counts_csv[i])) + "\n"
