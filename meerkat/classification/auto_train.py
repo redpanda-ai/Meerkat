@@ -123,7 +123,11 @@ def auto_train():
 		'subtype_bank_debit': 'meerkat/cnn/data/subtype/bank/debit/',
 		'subtype_bank_credit': 'meerkat/cnn/data/subtype/bank/credit/',
 		'merchant_bank': 'meerkat/cnn/data/merchant/bank/',
-		'merchant_card': 'meerkat/cnn/data/merchant/card/'
+		'merchant_card': 'meerkat/cnn/data/merchant/card/',
+		'category_bank_debit': 'meerkat/cnn/data/category/bank/debit/',
+		'category_bank_credit': 'meerkat/cnn/data/category/bank/credit/',
+		'category_card_debit': 'meerkat/cnn/data/category/card/debit/',
+		'category_card_credit': 'meerkat/cnn/data/category/card/credit/'
 	}
 
 	prefix = dir_paths[data_type] if args.input_dir == '' else args.input_dir
