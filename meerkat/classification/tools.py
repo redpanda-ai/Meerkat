@@ -126,7 +126,7 @@ def get_utc_iso_timestamp():
 		Example: "20160403164944" (April 3, 2016, 4:49:44 PM UTC) """
 	return datetime.datetime.utcnow().strftime("%Y%m%d%H%M%S")
 
-def push_file_to_s3(filename, bucket, object_prefix):
+def push_file_to_s3(filename, bucket_name, object_prefix):
 	"""Pushes an object to S3"""
 	conn = connect_s3()
 	bucket = conn.get_bucket(bucket_name, Location.USWest2)
