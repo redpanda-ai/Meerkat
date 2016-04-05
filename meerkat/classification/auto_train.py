@@ -195,9 +195,12 @@ def auto_train():
 	apply_cnn(args)
 
 	if exist_new_input:
-		shutil.rmtree(save_path[0:save_path.rfind("preprocessed/")])
+		remove_dir = save_path[0:save_path.rfind("preprocessed/")]
+		shutil.rmtree(remove_dir)
+		logging.info("remove the directory: {0}".format(remove_dir))
 	else:
 		shutil.rmtree(save_path)
+		logging.info("remove the directory: {0}".format(save_path))
 
 	logging.warning('The whole streamline process has finished')
 

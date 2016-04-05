@@ -162,9 +162,12 @@ def main_split_data(args):
 	local['aws']['s3']['cp'][output_file][dir_path]()
 
 	shutil.rmtree(save_path_input)
+	logging.info("remove the directory: {0}".format(save_path_input))
 	os.remove("./preprocessed.tar.gz")
 	if model_type == "merchant":
-		shutil.rmtree("./merchant_" + bank_or_card + "_unzip/")
+		merchant_unzip_path = "./merchant_" + bank_or_card + "_unzip/"
+		shutil.rmtree(merchant_unzip_path)
+		logging.info("remove the directory: {0}".format(merchant_unzip_path))
 
 	logging.info('{0} uploaded to {1}'.format(output_file, bucket + '/' + prefix))
 
