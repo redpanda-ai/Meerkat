@@ -15,8 +15,7 @@ USAGE = """
 usage: auto_train [-h] [--input_dir INPUT_DIR] [--output_dir OUTPUT_DIR]
                   [--credit_or_debit CREDIT_OR_DEBIT] [--bucket BUCKET] [-d]
                   [-v]
-                  {subtype,merchant,category} {bank,card} train_file test_file
-                  label_map
+                  {subtype,merchant,category} {bank,card}
 
 positional arguments:
   {subtype,merchant,category}
