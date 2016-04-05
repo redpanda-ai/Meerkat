@@ -75,7 +75,7 @@ def get_new_maint7b(directory, file_list):
 			file_list.append(i)
 			return i
 
-def getCNNStatics(inputFile):
+def get_cnn_statistics(inputFile):
 	"""Get the era number and error rate."""
 	lualib = ctypes.CDLL("/home/ubuntu/torch/install/lib/libluajit.so", mode=ctypes.RTLD_GLOBAL)
 
@@ -107,7 +107,7 @@ def getCNNStatics(inputFile):
 	error_vals = list(lua_table.values())
 	return dict(zip(error_list, error_vals))
 
-def getTheBestErrorRate(erasDict):
+def get_best_error_rate(erasDict):
 	"""Get the best error rate among different eras"""
 	bestErrorRate = 1.0
 	bestEraNumber = 1
@@ -127,7 +127,7 @@ def push_file_to_s3(filename, bucket, object_prefix):
 	"""Pushes an object to S3"""
 	pass
 
-def zipDir(file1, file2):
+def zip_cnn_stats_dir(file1, file2):
 	"""Copy files to Best_CNN_Statics directory and zip it"""
 	local["mkdir"]["Best_CNN_Statics"]()
 	local["cp"][file1]["Best_CNN_Statics"]()
