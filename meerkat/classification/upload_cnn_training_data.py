@@ -5,12 +5,14 @@
 created on April 4, 2016
 @author: Feifei Zhu
 """
-# python3 upload_cnn_training_data.py <source_dir> <output_name>
+# python3 -m meerkat.classification.uptrain <source_dir> <s3_path_type>
+# example: python3 -m meerkat.classification.uptrain tmp subtype_bank_debit
 
 import datetime
 import os
 import sys
 from plumbum import local
+from meerkat.classification.tools import push_file_to_s3, get_utc_iso_timestamp, make_tarfile
 
 # check files
 csv_num, json_exit = 0, False
@@ -34,9 +36,7 @@ if not json_exit:
 print("file check pass")
 
 # tar gz the files
-os.chdir(sys.argv[1])
-local['tar']['-cvzf']['../input.tar.gz']['.']()
-os.chdir('../')
+make_tarfile("input.tar.gz", sys.argv[1])
 print("files tar.gzed")
 
 # upload the tar.gz file to s3
@@ -52,9 +52,10 @@ default_dir_paths = {
 		'category_card_debit': "meerkat/cnn/data/category/card/debit/",
 		'category_card_credit': "meerkat/cnn/data/category/card/credit/",
 	}
-dtime = datetime.datetime.utcnow().strftime("%Y%m%d%H%M%S")
-dir_path = 's3://s3yodlee/' + default_dir_paths[sys.argv[2]] + dtime + '/'
-local['aws']['s3']['cp']['input.tar.gz'][dir_path]()
+dtime = get_utc_iso_timestamp()
+bucket = 's3yodlee'
+prefix = default_dir_paths[sys.argv[2]] + dtime + '/'
+push_file_to_s3('input.tar.gz', bucket, prefix)
 print("uploaded to s3")
 
 #remove the tar.gz file in local
