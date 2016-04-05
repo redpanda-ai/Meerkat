@@ -46,6 +46,7 @@ import argparse
 import logging
 import os
 import sys
+import shutil
 
 import tensorflow as tf
 
@@ -192,6 +193,11 @@ def auto_train():
 
 	logging.warning('Apply the best CNN to test data and calculate performance metrics')
 	apply_cnn(args)
+
+	if exist_new_input:
+		shutil.rmtree(save_path[0:save_path.rfind("preprocessed/")])
+	else:
+		shutil.rmtree(save_path)
 
 	logging.warning('The whole streamline process has finished')
 

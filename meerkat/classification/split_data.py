@@ -30,6 +30,7 @@ import argparse
 import pandas as pd
 import numpy as np
 import os
+import shutil
 
 from datetime import datetime
 from .verify_data import verify_data
@@ -159,6 +160,11 @@ def main_split_data(args):
 	os.rename(input_json_file, save_path_output + "label_map.json")
 	local['tar']['-zcvf'][output_file]['-C'][save_path_output]['.']()
 	local['aws']['s3']['cp'][output_file][dir_path]()
+
+	shutil.rmtree(save_path_input)
+	os.remove("./preprocessed.tar.gz")
+	if model_type == "merchant":
+		shutil.rmtree("./merchant_" + bank_or_card + "_unzip/")
 
 	logging.info('{0} uploaded to {1}'.format(output_file, bucket + '/' + prefix))
 
