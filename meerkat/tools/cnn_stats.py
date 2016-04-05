@@ -1,14 +1,14 @@
 #/usr/local/bin/python3.3
 
-"""This utility loads a trained CNN (sequentail_*.t7b) and a test set,
-predicts labels of the test set. It also returns performance statistics.
+"""This module loads and evaluates a trained CNN on a provided 
+test set. It produces various stats and a confusion matrix for analysis
 
 @author: Oscar Pan
 """
 
 #################### USAGE ##########################
 """
-python3 -m meerkat.tools.CNN_stats \
+python3 -m meerkat.tools.cnn_stats \
 -model <path_to_classifier> \
 -data <path_to_testdata> \
 -map <path_to_label_map> \
@@ -46,11 +46,8 @@ import os
 import pandas as pd
 import numpy as np
 
-#import matplotlib.pyplot as plt
-#from pylab import *
-
-from meerkat.classification.lua_bridge import get_cnn_by_path
-from meerkat.various_tools import load_params
+from meerkat.classification.load_model import get_tf_cnn_by_path
+from meerkat.various_tools import load_params, load_piped_dataframe
 
 def parse_arguments():
 	""" Create the parser """
@@ -179,8 +176,7 @@ def main_process(args):
 	machine_label_key = args.predicted_key
 	human_label_key = args.label_key
 	fast_mode = args.fast_mode
-	reader = pd.read_csv(args.testdata, chunksize=1000, na_filter=False,
-		quoting=csv.QUOTE_NONE, encoding='utf-8', sep='|', error_bad_lines=False)
+	reader = load_piped_dataframe(args.testdata, chunksize=1000)
 	label_map = load_params(args.label_map)
 	get_key = lambda x: x['label'] if isinstance(x, dict) else x
 	label_map = dict(zip(label_map.keys(), map(get_key, label_map.values())))
@@ -201,7 +197,7 @@ def main_process(args):
 		reversed_label_map["Null Class"] = reversed_label_map.pop("")
 
 	confusion_matrix = [[0 for i in range(num_labels + 1)] for j in range(num_labels)]
-	classifier = get_cnn_by_path(args.model, label_map)
+	classifier = get_tf_cnn_by_path(args.model, args.label_map)
 
 	# Prepare for data saving
 	path = 'data/CNN_stats/'

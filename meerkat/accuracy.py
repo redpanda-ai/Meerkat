@@ -43,6 +43,7 @@ from boto.s3.connection import Location
 import pandas as pd
 
 from meerkat.various_tools import load_dict_list, safely_remove_file, load_params
+from meerkat.various_tools import load_piped_dataframe
 from meerkat.classification.lua_bridge import get_cnn
 
 default_doc_key = "DESCRIPTION_UNMASKED"
@@ -146,7 +147,7 @@ def CNN_accuracy(*args, **kwargs):
 
 	human_map = __load_label_map(human_dict)
 	machine_map = __load_label_map(model_dict)
-	reader = pd.read_csv(test_file, chunksize=1000, na_filter=False, quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+	reader = load_piped_dataframe(testfile, chunksize=1000)
 
 	bulk_total = 0
 	bulk_needs_hand_labeling = 0

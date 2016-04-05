@@ -1,18 +1,74 @@
+import boto
+import boto.s3
 import csv
+import ctypes
+import datetime
 import json
 import logging
 import os
-import sys
 import re
+import sys
+import tarfile
 import time
-import ctypes
 
 import numpy as np
 import pandas as pd
 
+from boto.s3.key import Key
 from boto.s3.connection import Location
 from boto import connect_s3
 from plumbum import local, NOHUP
+from meerkat.various_tools import load_piped_dataframe
+
+def check_new_input_file(**s3_params):
+	"""Check the existence of a new input.tar.gz file"""
+	bucket_name, prefix = s3_params["bucket"], s3_params["prefix"]
+	conn = connect_s3()
+	bucket = conn.get_bucket(bucket_name, Location.USWest2)
+	listing_version = bucket.list(prefix=prefix, delimiter='/')
+
+	version_object_list = [
+		version_object
+		for version_object in listing_version
+	]
+
+	version_dir_list = []
+	for i in range(len(version_object_list)):
+		full_name = version_object_list[i].name
+		if full_name.endswith("/"):
+			dir_name = full_name[full_name.rfind("/", 0, len(full_name) - 1)+1:len(full_name)-1]
+			if dir_name.isdigit():
+				version_dir_list.append(dir_name)
+
+	newest_version = sorted(version_dir_list, reverse=True)[0]
+	newest_version_dir = prefix + newest_version
+	logging.info("The newest direcory is: {0}".format(newest_version_dir))
+	listing_tar_gz = bucket.list(prefix=newest_version_dir)
+
+	tar_gz_object_list = [
+		tar_gz_object
+		for tar_gz_object in listing_tar_gz
+	]
+
+	tar_gz_file_list = []
+	for i in range(len(tar_gz_object_list)):
+		full_name = tar_gz_object_list[i].name
+		tar_gz_file_name = full_name[full_name.rfind("/")+1:]
+		tar_gz_file_list.append(tar_gz_file_name)
+
+	if "input.tar.gz" not in tar_gz_file_list:
+		logging.critical("input.tar.gz doesn't exist in {0}".format(newest_version_dir))
+		sys.exit()
+	elif "preprocessed.tar.gz" not in tar_gz_file_list:
+		return True, newest_version_dir, newest_version
+	else:
+		return False, newest_version_dir, newest_version
+
+def make_tarfile(output_filename, source_dir):
+	"""Makes a gzipped tarball"""
+	with tarfile.open(output_filename, "w:gz") as tar:
+		reduced_name = os.path.basename(source_dir)[len(source_dir):]
+		tar.add(source_dir, arcname=reduced_name)
 
 def get_new_maint7b(directory, file_list):
 	"""Get the latest t7b file under directory."""
@@ -22,7 +78,7 @@ def get_new_maint7b(directory, file_list):
 			file_list.append(i)
 			return i
 
-def getCNNStatics(inputFile):
+def get_cnn_statistics(inputFile):
 	"""Get the era number and error rate."""
 	lualib = ctypes.CDLL("/home/ubuntu/torch/install/lib/libluajit.so", mode=ctypes.RTLD_GLOBAL)
 
@@ -54,7 +110,7 @@ def getCNNStatics(inputFile):
 	error_vals = list(lua_table.values())
 	return dict(zip(error_list, error_vals))
 
-def getTheBestErrorRate(erasDict):
+def get_best_error_rate(erasDict):
 	"""Get the best error rate among different eras"""
 	bestErrorRate = 1.0
 	bestEraNumber = 1
@@ -65,14 +121,27 @@ def getTheBestErrorRate(erasDict):
 
 	return bestErrorRate, bestEraNumber
 
-def zipDir(file1, file2):
+def get_utc_iso_timestamp():
+	"""Returns a 16 digit ISO timestamp, accurate to the second that is suitable for S3
+		Example: "20160403164944" (April 3, 2016, 4:49:44 PM UTC) """
+	return datetime.datetime.utcnow().strftime("%Y%m%d%H%M%S")
+
+def push_file_to_s3(filename, bucket, object_prefix):
+	"""Pushes an object to S3"""
+	conn = connect_s3()
+	bucket = conn.get_bucket(bucket_name, Location.USWest2)
+	key = Key(bucket)
+	key.key = object_prefix + filename
+	key.set_contents_from_filename(filename)
+
+def zip_cnn_stats_dir(file1, file2):
 	"""Copy files to Best_CNN_Statics directory and zip it"""
 	local["mkdir"]["Best_CNN_Statics"]()
 	local["cp"][file1]["Best_CNN_Statics"]()
 	local["cp"][file2]["Best_CNN_Statics"]()
 	local["tar"]["-zcvf"]["Best_CNN_Statics.tar.gz"]["Best_CNN_Statics"]()
 
-def stopStream():
+def stop_stream():
 	"""Stop stream.py when the threshold reached."""
 	local["pkill"]["qlua"]()
 
@@ -326,10 +395,10 @@ def unzip_and_merge(gz_file, bank_or_card):
 def merge_csvs(directory):
 	"merges all csvs immediately under the directory"
 	dataframes = []
+	cols = ["DESCRIPTION", "DESCRIPTION_UNMASKED", "MERCHANT_NAME"]
 	for i in os.listdir(directory):
 		if i.endswith('.csv'):
-			df = pd.read_csv(directory + i, na_filter=False, encoding='utf-8',
-				sep='|', error_bad_lines=False, quoting=csv.QUOTE_NONE)
+			df = load_piped_dataframe(directory + i, usecols=cols)
 			dataframes.append(df)
 	merged = pd.concat(dataframes, ignore_index=True)
 	merged = check_empty_transaction(merged)
@@ -350,8 +419,7 @@ def check_empty_transaction(df):
 def seperate_debit_credit(subtype_file):
 	"""Load the CSV into a pandas data frame, return debit and credit df"""
 	logging.info("Loading csv file")
-	df = pd.read_csv(subtype_file, quoting=csv.QUOTE_NONE, na_filter=False,
-		encoding="utf-8", sep='|', error_bad_lines=False)
+	df = load_piped_dataframe(subtype_file)
 	df = check_empty_transaction(df)
 	df['UNIQUE_TRANSACTION_ID'] = df.index
 	df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
