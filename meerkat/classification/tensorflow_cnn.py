@@ -62,8 +62,6 @@ def validate_config(config):
 
 	if reshape.is_integer():
 		config["reshape"] = int(reshape)
-	else:
-		raise ValueError('DOC_LENGTH - 96 must be divisible by 27: 123, 150, 177, 204...')
 
 	return config
 
