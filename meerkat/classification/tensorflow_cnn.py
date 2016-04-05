@@ -387,9 +387,12 @@ def train_model(config, graph, sess, saver):
 			sess.run(learning_rate.assign(learning_rate / 2))
 
 	# Clean Up Directory
+	
 	dataset_path = os.path.basename(dataset).split(".")[0]
 	final_model_path = "meerkat/classification/models/" + dataset_path + ".ckpt"
+	logging.info("Moving final model from {0} to {1}.".format(save_path, final_model_path))
 	os.rename(save_path, final_model_path)
+	logging.info("Deleting unneeded directory of checkpoints at {0}".format(save_dir))
 	shutil.rmtree(save_dir)
 
 	return final_model_path
