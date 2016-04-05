@@ -127,6 +127,7 @@ def auto_train():
 	}
 
 	prefix = dir_paths[data_type] if args.input_dir == '' else args.input_dir
+	prefix = prefix + '/' * (prefix[-1] != '/')
 
 	if args.output_dir == '':
 		save_path = "./data/input/" + data_type
