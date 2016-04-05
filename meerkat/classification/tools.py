@@ -134,7 +134,7 @@ def zip_cnn_stats_dir(file1, file2):
 	local["cp"][file2]["Best_CNN_Statics"]()
 	local["tar"]["-zcvf"]["Best_CNN_Statics.tar.gz"]["Best_CNN_Statics"]()
 
-def stopStream():
+def stop_stream():
 	"""Stop stream.py when the threshold reached."""
 	local["pkill"]["qlua"]()
 

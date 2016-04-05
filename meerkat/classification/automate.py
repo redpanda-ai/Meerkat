@@ -17,7 +17,7 @@ import logging
 
 from plumbum import local
 from .tools import(get_new_maint7b, get_cnn_statistics, get_best_error_rate,
-		zip_cnn_stats_dir, stopStream)
+		zip_cnn_stats_dir, stop_stream)
 
 def main_stream(directory):
 	"""The main program"""
@@ -47,7 +47,7 @@ def main_stream(directory):
 					# "Best_CNN_Statics.")
 				json.dump(staticsDict, open(directory + "/all_error_rates", "w"))
 				# zip_cnn_stats_dir(fileList[best_era - 1], "all_error_rates")
-				stopStream()
+				stop_stream()
 				return directory + latest_t7b.replace('main','sequential')
 			else:
 				print("The training process is still on")
