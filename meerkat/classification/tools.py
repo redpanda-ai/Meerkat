@@ -1,3 +1,5 @@
+import boto
+import boto.s3
 import csv
 import ctypes
 import datetime
@@ -12,6 +14,7 @@ import time
 import numpy as np
 import pandas as pd
 
+from boto.s3.key import Key
 from boto.s3.connection import Location
 from boto import connect_s3
 from plumbum import local, NOHUP
@@ -125,7 +128,11 @@ def get_utc_iso_timestamp():
 
 def push_file_to_s3(filename, bucket, object_prefix):
 	"""Pushes an object to S3"""
-	pass
+	conn = connect_s3()
+	bucket = conn.get_bucket(bucket_name, Location.USWest2)
+	key = Key(bucket)
+	key.key = object_prefix + filename
+	key.set_contents_from_filename(filename)
 
 def zip_cnn_stats_dir(file1, file2):
 	"""Copy files to Best_CNN_Statics directory and zip it"""
