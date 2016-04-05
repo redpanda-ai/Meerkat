@@ -3,6 +3,7 @@
 import unittest
 import numpy as np
 import meerkat.classification.tensorflow_cnn as tf_cnn
+
 from tests.fixture import tf_cnn_fixture
 from nose_parameterized import parameterized
 
@@ -27,6 +28,29 @@ class TensorflowCNNTests(unittest.TestCase):
 		"""Test string_to_tensor with parameters"""
 		result = tf_cnn.string_to_tensor(config, doc, length)
 		np.testing.assert_array_equal(result, expected_tensor)
+
+	@parameterized.expand([
+		([100, 10]),
+		([10, 2])
+	])
+	def test_chunks__correct_number(self, array_size, chunk_size):
+		"""Test the chunks function to confirm the correct number of chunks"""
+		array = np.ones(array_size)
+		expected = array_size / chunk_size
+		result = len(tf_cnn.chunks(array, chunk_size))
+		self.assertEqual(result, expected)
+
+	@parameterized.expand([
+		([100, 10]),
+		([10, 2])
+	])
+	def test_chunks_correct_number(self, array_size, chunk_size):
+		"""Test the chunks function to confirm the correct size of the chunks"""
+		array = np.ones(array_size)
+		expected = np.ones(chunk_size)
+		results = tf_cnn.chunks(array, chunk_size)
+		for chunk in results:
+			self.assertTrue(np.allclose(chunk, expected, rtol=1e-05, atol=1e-08))
 
 if __name__ == '__main__':
 	unittest.main()
