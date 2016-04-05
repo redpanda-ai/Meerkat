@@ -389,9 +389,6 @@ def train_model(config, graph, sess, saver):
 	# Clean Up Directory
 	dataset_path = os.path.basename(dataset).split(".")[0]
 	final_model_path = "meerkat/classification/models/" + dataset_path + ".ckpt"
-
-	copy_file("meerkat/classification/models/train.ckpt", "data/CNN_stats/")
-
 	os.rename(save_path, final_model_path)
 	shutil.rmtree(save_dir)
 
