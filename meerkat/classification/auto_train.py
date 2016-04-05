@@ -198,7 +198,6 @@ def auto_train():
 	logging.warning('Apply the best CNN to test data and calculate performance metrics')
 	apply_cnn(args)
 
-	copy_file("meerkat/classification/models/train.ckpt", "data/CNN_stats/")
 	push_file_to_s3("results.tar.gz", "s3yodlee", s3_params["prefix"])
 
 	logging.warning('The whole streamline process has finished')

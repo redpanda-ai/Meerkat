@@ -49,6 +49,7 @@ import numpy as np
 from plumbum import local
 from meerkat.classification.load_model import get_tf_cnn_by_path
 from meerkat.various_tools import load_params, load_piped_dataframe
+from meerkat.classification.tools import copy_file
 
 def parse_arguments():
 	""" Create the parser """
@@ -299,7 +300,10 @@ def main_process(args):
 
 	stat.to_csv('data/CNN_stats/CNN_stat.csv', index=False)
 	conf_mat.to_csv('data/CNN_stats/Con_Matrix.csv')
+
+	copy_file("meerkat/classification/models/train.ckpt", "data/CNN_stats/")
 	local["tar"]["-zcvf"]["results.tar.gz"]["data/CNN_stats"]()
+	local["cp"]["data/results.tar.gz"]["."]()
 
 if __name__ == "__main__":
 	main_process(parse_arguments())

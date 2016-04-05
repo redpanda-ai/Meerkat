@@ -36,7 +36,7 @@ import pandas as pd
 import tensorflow as tf
 from jsonschema import validate
 
-from meerkat.classification.tools import fill_description_unmasked, reverse_map, copy_file
+from meerkat.classification.tools import fill_description_unmasked, reverse_map
 from meerkat.various_tools import load_params, load_piped_dataframe, validate_configuration
 
 logging.basicConfig(level=logging.INFO)
