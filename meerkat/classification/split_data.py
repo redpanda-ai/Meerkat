@@ -115,8 +115,8 @@ def main_split_data(args):
 	save_path = './data/input/' + data_type + '_' + version +'/'
 	save_path_input = save_path + 'input/'
 	os.makedirs(save_path_input, exist_ok=True)
-	save_path_output = save_path + 'preprocessed/'
-	os.makedirs(save_path_output, exist_ok=True)
+	save_path_preprocessed = save_path + 'preprocessed/'
+	os.makedirs(save_path_preprocessed, exist_ok=True)
 
 	input_file = pull_from_s3(bucket=bucket, prefix=prefix, extension=extension,
 		file_name=file_name, save_path=save_path_input)
@@ -149,7 +149,7 @@ def main_split_data(args):
 			cnn_type=[model_type, bank_or_card, credit_or_debit])
 
 	# Save Results
-	save = make_save_function(df.columns, save_path_output)
+	save = make_save_function(df.columns, save_path_preprocessed)
 	results = random_split(df, args.train_size)
 	save(results, 'test')
 	save(results, 'train')
@@ -157,8 +157,8 @@ def main_split_data(args):
 	del df
 	del results
 
-	os.rename(input_json_file, save_path_output + "label_map.json")
-	local['tar']['-zcvf'][output_file]['-C'][save_path_output]['.']()
+	os.rename(input_json_file, save_path_preprocessed + "label_map.json")
+	local['tar']['-zcvf'][output_file]['-C'][save_path_preprocessed]['.']()
 	local['aws']['s3']['cp'][output_file][dir_path]()
 
 	shutil.rmtree(save_path_input)
