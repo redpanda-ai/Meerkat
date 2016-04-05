@@ -46,6 +46,7 @@ import os
 import pandas as pd
 import numpy as np
 
+from plumbum import local
 from meerkat.classification.load_model import get_tf_cnn_by_path
 from meerkat.various_tools import load_params, load_piped_dataframe
 
@@ -298,6 +299,7 @@ def main_process(args):
 
 	stat.to_csv('data/CNN_stats/CNN_stat.csv', index=False)
 	conf_mat.to_csv('data/CNN_stats/Con_Matrix.csv')
+	local["tar"]["-zcvf"]["results.tar.gz"]["data/CNN_stats"]()
 
 if __name__ == "__main__":
 	main_process(parse_arguments())
