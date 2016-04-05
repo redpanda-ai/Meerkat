@@ -54,16 +54,12 @@ def validate_config(config):
 	config = validate_configuration(config, schema_file)
 	logging.debug("Configuration is :\n{0}".format(pprint.pformat(config)))
 	reshape = ((config["doc_length"] - 96) / 27) * 256
+	config["reshape"] = int(reshape)
 	config["label_map"] = load_params(config["label_map"])
 	config["num_labels"] = len(config["label_map"].keys())
 	config["alpha_dict"] = {a : i for i, a in enumerate(config["alphabet"])}
 	config["base_rate"] = config["base_rate"] * math.sqrt(config["batch_size"]) / math.sqrt(128)
 	config["alphabet_length"] = len(config["alphabet"])
-
-	if reshape.is_integer():
-		config["reshape"] = int(reshape)
-	else:
-		raise ValueError('DOC_LENGTH - 96 must be divisible by 27: 123, 150, 177, 204...')
 
 	return config
 
