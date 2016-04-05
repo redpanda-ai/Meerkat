@@ -16,8 +16,8 @@ import ctypes
 import logging
 
 from plumbum import local
-from .tools import(get_new_maint7b, getCNNStatics, getTheBestErrorRate,
-		zipDir, stopStream)
+from .tools import(get_new_maint7b, get_cnn_statistics, get_best_error_rate,
+		zip_cnn_stats_dir, stopStream)
 
 def main_stream(directory):
 	"""The main program"""
@@ -37,8 +37,8 @@ def main_stream(directory):
 		if latest_t7b is not None:
 			local["cp"][directory + latest_t7b]["."]()
 
-			staticsDict = getCNNStatics(latest_t7b)
-			best_error, best_era = getTheBestErrorRate(staticsDict)
+			staticsDict = get_cnn_statistics(latest_t7b)
+			best_error, best_era = get_best_error_rate(staticsDict)
 
 			# Stop the training process if threshold meets.
 			if len(staticsDict) - best_era > threshold:
@@ -46,7 +46,7 @@ def main_stream(directory):
 				# print("The CNN statics files have been zipped in "
 					# "Best_CNN_Statics.")
 				json.dump(staticsDict, open(directory + "/all_error_rates", "w"))
-				# zipDir(fileList[best_era - 1], "all_error_rates")
+				# zip_cnn_stats_dir(fileList[best_era - 1], "all_error_rates")
 				stopStream()
 				return directory + latest_t7b.replace('main','sequential')
 			else:

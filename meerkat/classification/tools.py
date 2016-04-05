@@ -1,11 +1,13 @@
 import csv
+import ctypes
+import datetime
 import json
 import logging
 import os
-import sys
 import re
+import sys
+import tarfile
 import time
-import ctypes
 
 import numpy as np
 import pandas as pd
@@ -59,6 +61,12 @@ def check_new_input_file(**s3_params):
 	else:
 		return False, newest_version_dir, newest_version
 
+def make_tarfile(output_filename, source_dir):
+	"""Makes a gzipped tarball"""
+	with tarfile.open(output_filename, "w:gz") as tar:
+		reduced_name = os.path.basename(source_dir)[len(source_dir):]
+		tar.add(source_dir, arcname=reduced_name)
+
 def get_new_maint7b(directory, file_list):
 	"""Get the latest t7b file under directory."""
 	print("Get the latest main_*.t7b file")
@@ -67,7 +75,7 @@ def get_new_maint7b(directory, file_list):
 			file_list.append(i)
 			return i
 
-def getCNNStatics(inputFile):
+def get_cnn_statistics(inputFile):
 	"""Get the era number and error rate."""
 	lualib = ctypes.CDLL("/home/ubuntu/torch/install/lib/libluajit.so", mode=ctypes.RTLD_GLOBAL)
 
@@ -99,7 +107,7 @@ def getCNNStatics(inputFile):
 	error_vals = list(lua_table.values())
 	return dict(zip(error_list, error_vals))
 
-def getTheBestErrorRate(erasDict):
+def get_best_error_rate(erasDict):
 	"""Get the best error rate among different eras"""
 	bestErrorRate = 1.0
 	bestEraNumber = 1
@@ -110,7 +118,16 @@ def getTheBestErrorRate(erasDict):
 
 	return bestErrorRate, bestEraNumber
 
-def zipDir(file1, file2):
+def get_utc_iso_timestamp():
+	"""Returns a 16 digit ISO timestamp, accurate to the second that is suitable for S3
+		Example: "20160403164944" (April 3, 2016, 4:49:44 PM UTC) """
+	return datetime.datetime.utcnow().strftime("%Y%m%d%H%M%S")
+
+def push_file_to_s3(filename, bucket, object_prefix):
+	"""Pushes an object to S3"""
+	pass
+
+def zip_cnn_stats_dir(file1, file2):
 	"""Copy files to Best_CNN_Statics directory and zip it"""
 	local["mkdir"]["Best_CNN_Statics"]()
 	local["cp"][file1]["Best_CNN_Statics"]()
