@@ -5,6 +5,8 @@
 created on April 4, 2016
 @author: Feifei Zhu
 """
+# python3 upload_cnn_training_data.py <source_dir> <output_name>
+
 import datetime
 import os
 import sys
