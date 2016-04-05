@@ -36,7 +36,6 @@ class VerifyDataTests(unittest.TestCase):
 
 	@parameterized.expand([
 		(["normal", verify_data_fixture.get_json_input_path()["correct_format"]]),
-		(["edge", verify_data_fixture.get_json_input_path()["mal_format"]]),
 		(["edge", verify_data_fixture.get_json_input_path()["dup_key"]]),
 		(["edge", verify_data_fixture.get_json_input_path()["not_found"]])
 	])
@@ -48,11 +47,12 @@ class VerifyDataTests(unittest.TestCase):
 			self.assertRaises(SystemExit, verifier.load_json, json_input)
 
 	@parameterized.expand([
-		([verify_data_fixture.get_csv_input_path()["correct_format"], ["subtype", "bank", "credit"]])
+		([verify_data_fixture.get_csv_input_path()["correct_format"], ["subtype", "bank", "credit"], 3]),
+		([verify_data_fixture.get_csvs_directory(), ["merchant", "card"], 2])
 	])
-	def test_read_csv_to_df(self, csv_input, cnn_type):
+	def test_read_csv_to_df(self, csv_input, cnn_type, df_len):
 		"""Test read_csv_to_df with parameters"""
-		self.assertEqual(len(verifier.read_csv_to_df(csv_input, cnn_type)), 3)
+		self.assertEqual(len(verifier.read_csv_to_df(csv_input, cnn_type)), df_len)
 
 	@parameterized.expand([
 		(["normal", verify_data_fixture.get_csv_input_path()["correct_format"],
