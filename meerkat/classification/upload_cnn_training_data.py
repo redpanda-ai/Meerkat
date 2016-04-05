@@ -5,7 +5,8 @@
 created on April 4, 2016
 @author: Feifei Zhu
 """
-# python3 -m meerkat.classification.uptrain <source_dir> <output_name>
+# python3 -m meerkat.classification.uptrain <source_dir> <s3_path_type>
+# example: python3 -m meerkat.classification.uptrain tmp subtype_bank_debit
 
 import datetime
 import os
