@@ -10,16 +10,16 @@ class WebConsumerTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        web_consumer.bank_credit_subtype_cnn = web_consumer_fixture.get_mock_cnn
-        web_consumer.bank_debit_subtype_cnn = web_consumer_fixture.get_mock_cnn
-        web_consumer.bank_merchant_cnn = web_consumer_fixture.get_mock_cnn
-        web_consumer.card_merchant_cnn = web_consumer_fixture.get_mock_cnn
         web_consumer.BANK_SWS = web_consumer_fixture.get_mock_sws
         web_consumer.CARD_SWS = web_consumer_fixture.get_mock_sws
         web_consumer.get_es_connection = web_consumer_fixture.get_mock_esconnection
 
     def setUp(self):
         self.consumer = web_consumer.WebConsumer(params=web_consumer_fixture.get_mock_params(), hyperparams=web_consumer_fixture.get_mock_hyperparams())
+        self.consumer.bank_credit_subtype_cnn = web_consumer_fixture.get_mock_cnn
+        self.consumer.bank_debit_subtype_cnn = web_consumer_fixture.get_mock_cnn
+        self.consumer.bank_merchant_cnn = web_consumer_fixture.get_mock_cnn
+        self.consumer.card_merchant_cnn = web_consumer_fixture.get_mock_cnn
         return
 
     def tearDown(self):
