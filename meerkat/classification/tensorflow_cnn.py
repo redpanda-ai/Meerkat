@@ -54,16 +54,12 @@ def validate_config(config):
 	config = validate_configuration(config, schema_file)
 	logging.debug("Configuration is :\n{0}".format(pprint.pformat(config)))
 	reshape = ((config["doc_length"] - 96) / 27) * 256
+	config["reshape"] = int(reshape)
 	config["label_map"] = load_params(config["label_map"])
 	config["num_labels"] = len(config["label_map"].keys())
 	config["alpha_dict"] = {a : i for i, a in enumerate(config["alphabet"])}
 	config["base_rate"] = config["base_rate"] * math.sqrt(config["batch_size"]) / math.sqrt(128)
 	config["alphabet_length"] = len(config["alphabet"])
-
-	if reshape.is_integer():
-		config["reshape"] = int(reshape)
-	else:
-		raise ValueError('DOC_LENGTH - 96 must be divisible by 27: 123, 150, 177, 204...')
 
 	return config
 
@@ -387,9 +383,12 @@ def train_model(config, graph, sess, saver):
 			sess.run(learning_rate.assign(learning_rate / 2))
 
 	# Clean Up Directory
+	
 	dataset_path = os.path.basename(dataset).split(".")[0]
 	final_model_path = "meerkat/classification/models/" + dataset_path + ".ckpt"
+	logging.info("Moving final model from {0} to {1}.".format(save_path, final_model_path))
 	os.rename(save_path, final_model_path)
+	logging.info("Deleting unneeded directory of checkpoints at {0}".format(save_dir))
 	shutil.rmtree(save_dir)
 
 	return final_model_path
