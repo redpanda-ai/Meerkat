@@ -66,7 +66,7 @@ def get_tf_cnn_by_name(model_name):
 		label_map_path = "meerkat/classification/label_maps/card_debit_subtype.json"
 	elif model_name == "card_credit_subtype":
 		model_path = "meerkat/classification/models/card_credit_subtype.ckpt"
-		label_map_path = "meerkat/classification/label_maps/card_debit_subtype.json"
+		label_map_path = "meerkat/classification/label_maps/card_credit_subtype.json"
 	else:
 		logging.warning("Model not found. Terminating")
 		sys.exit()
