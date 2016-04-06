@@ -25,6 +25,12 @@ from meerkat.classification.bloom_filter.find_entities import location_split
 # Enabled Models
 BANK_SWS = load_scikit_model("bank_sws")
 CARD_SWS = load_scikit_model("card_sws")
+BANK_MERCHANT_CNN = get_tf_cnn_by_name("bank_merchant")
+CARD_MERCHANT_CNN = get_tf_cnn_by_name("card_merchant")
+CARD_DEBIT_SUBTYPE_CNN = get_tf_cnn_by_name("card_debit_subtype")
+CARD_CREDIT_SUBTYPE_CNN = get_tf_cnn_by_name("card_credit_subtype")
+BANK_DEBIT_SUBTYPE_CNN = get_tf_cnn_by_name("bank_debit_subtype")
+BANK_CREDIT_SUBTYPE_CNN = get_tf_cnn_by_name("bank_credit_subtype")
 
 class WebConsumer():
 	"""Acts as a web service client to process and enrich
@@ -45,21 +51,8 @@ class WebConsumer():
 			index_type = params["elasticsearch"]["type"]
 			self.params["routed"] = "_routing" in mapping[index]["mappings"][index_type]
 
-		self.load_models(self.params)
 		self.hyperparams = hyperparams if hyperparams else {}
 		self.cities = cities if cities else {}
-
-	def load_models(self, params):
-		"""Load all models used by web consumer"""
-
-		gmf = params["gpu_mem_fraction"]
-
-		self.bank_merchant_cnn = get_tf_cnn_by_name("bank_merchant", gpu_mem_fraction=gmf)
-		self.card_merchant_cnn = get_tf_cnn_by_name("card_merchant", gpu_mem_fraction=gmf)
-		self.card_debit_subtype_cnn = get_tf_cnn_by_name("card_debit_subtype", gpu_mem_fraction=gmf)
-		self.card_credit_subtype_cnn = get_tf_cnn_by_name("card_credit_subtype", gpu_mem_fraction=gmf)
-		self.bank_debit_subtype_cnn = get_tf_cnn_by_name("bank_debit_subtype", gpu_mem_fraction=gmf)
-		self.bank_credit_subtype_cnn = get_tf_cnn_by_name("bank_credit_subtype", gpu_mem_fraction=gmf)
 
 	def update_hyperparams(self, hyperparams):
 		"""Updates a WebConsumer object's hyper-parameters"""
@@ -439,27 +432,29 @@ class WebConsumer():
 
 		return physical, non_physical
 
-	def __apply_merchant_cnn(self, data):
+	@staticmethod
+	def __apply_merchant_cnn(data):
 		"""Apply the merchant CNN to transactions"""
 		classifier = None
 		if data["container"] == "bank":
-			classifier = self.bank_merchant_cnn
+			classifier = BANK_MERCHANT_CNN
 		else:
-			classifier = self.card_merchant_cnn
+			classifier = CARD_MERCHANT_CNN
 		return classifier(data["transaction_list"], label_only=False)
 
-	def __apply_subtype_cnn(self, data):
+	@staticmethod
+	def __apply_subtype_cnn(data):
 		"""Apply the subtype CNN to transactions"""
 
 		if len(data["transaction_list"]) == 0:
 			return data["transaction_list"]
 
 		if data["container"] == "card":
-			credit_subtype_classifer = self.card_credit_subtype_cnn
-			debit_subtype_classifer = self.card_debit_subtype_cnn
+			credit_subtype_classifer = CARD_CREDIT_SUBTYPE_CNN
+			debit_subtype_classifer = CARD_DEBIT_SUBTYPE_CNN
 		elif data["container"] == "bank":
-			credit_subtype_classifer = self.bank_credit_subtype_cnn
-			debit_subtype_classifer = self.bank_debit_subtype_cnn
+			credit_subtype_classifer = BANK_CREDIT_SUBTYPE_CNN
+			debit_subtype_classifer = BANK_DEBIT_SUBTYPE_CNN
 
 		# Split transactions into groups
 		credit, debit = [], []
