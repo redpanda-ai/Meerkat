@@ -298,12 +298,11 @@ def main_process(args):
 	conf_mat.columns = ['Class'] + [str(x) for x in range(1, num_labels + 1)] + ['Unpredicted']
 	conf_mat.index = range(1, num_labels + 1)
 
-	stat.to_csv('data/CNN_stats/CNN_stat.csv', index=False)
-	conf_mat.to_csv('data/CNN_stats/Con_Matrix.csv')
+	stat.to_csv('tensorflow_cnn_stats/CNN_stat.csv', index=False)
+	conf_mat.to_csv('tensorflow_cnn_stats/Con_Matrix.csv')
 
-	copy_file("meerkat/classification/models/train.ckpt", "data/CNN_stats/")
-	local["tar"]["-zcvf"]["results.tar.gz"]["data/CNN_stats"]()
-	local["cp"]["data/results.tar.gz"]["."]()
+	copy_file("meerkat/classification/models/train.ckpt", "tensorflow_cnn_stats/")
+	local["tar"]["-zcvf"]["results.tar.gz"]["tensorflow_cnn_stats"]()
 
 if __name__ == "__main__":
 	main_process(parse_arguments())
