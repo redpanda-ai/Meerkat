@@ -439,8 +439,7 @@ class WebConsumer():
 
 		return physical, non_physical
 
-	@staticmethod
-	def __apply_merchant_cnn(data):
+	def __apply_merchant_cnn(self, data):
 		"""Apply the merchant CNN to transactions"""
 		classifier = None
 		if data["container"] == "bank":
@@ -449,8 +448,7 @@ class WebConsumer():
 			classifier = self.card_merchant_cnn
 		return classifier(data["transaction_list"], label_only=False)
 
-	@staticmethod
-	def __apply_subtype_cnn(data):
+	def __apply_subtype_cnn(self, data):
 		"""Apply the subtype CNN to transactions"""
 
 		if len(data["transaction_list"]) == 0:
