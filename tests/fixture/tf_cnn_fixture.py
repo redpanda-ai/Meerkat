@@ -1,6 +1,7 @@
 """Fixtures for test_tensorflow_cnn"""
 
 import numpy as np
+from meerkat.various_tools import load_params
 
 def get_predictions(case_type):
 	"""Return a numpy array of predictions"""
@@ -30,6 +31,15 @@ def get_config():
 	return {
 		"alphabet": alphabet,
 		"alpha_dict": alpha_dict
+	}
+
+def get_subtype_config():
+	"""Return a different config dictionary"""
+	return {
+		"model_type": "subtype",
+		"dataset": "tests/fixture/correct_format.csv",
+		"label_map": load_params("meerkat/classification/label_maps/card_credit_subtype_label_map.json"),
+		"ledger_entry": "credit"
 	}
 
 def get_tensor(case_type):
