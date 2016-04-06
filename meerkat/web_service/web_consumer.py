@@ -45,7 +45,7 @@ class WebConsumer():
 			index_type = params["elasticsearch"]["type"]
 			self.params["routed"] = "_routing" in mapping[index]["mappings"][index_type]
 
-		self.load_models()
+		self.load_models(self.params)
 		self.hyperparams = hyperparams if hyperparams else {}
 		self.cities = cities if cities else {}
 

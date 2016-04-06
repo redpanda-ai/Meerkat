@@ -45,7 +45,7 @@ def load_scikit_model(model_name):
 			
 	return classifier
 
-def get_tf_cnn_by_name(model_name):
+def get_tf_cnn_by_name(model_name, gpu_mem_fraction=1):
 	"""Load a tensorFlow CNN by name"""
 
 	# Switch on Models
@@ -71,7 +71,7 @@ def get_tf_cnn_by_name(model_name):
 		logging.warning("Model not found. Terminating")
 		sys.exit()
 
-	return get_tf_cnn_by_path(model_path, label_map_path)
+	return get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=1)
 
 def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=1):
 	"""Load a tensorFlow module by name"""
