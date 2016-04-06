@@ -112,14 +112,14 @@ def load_data(config):
 	grouped_train = train.groupby('LABEL_NUM', as_index=False)
 	groups_train = dict(list(grouped_train))
 
-	chunked_test = chunks(np.array(test.index), 128)
-	return train, test, groups_train, chunked_test
+	return train, test, groups_train
 
-def evaluate_testset(config, graph, sess, model, test, chunked_test):
+def evaluate_testset(config, graph, sess, model, test):
 	"""Check error on test set"""
 
-	total_count = 0
+	total_count = len(test.index)
 	correct_count = 0
+	chunked_test = chunks(np.array(test.index), 128)
 	num_chunks = len(chunked_test)
 
 	for i in range(num_chunks):
@@ -134,11 +134,11 @@ def evaluate_testset(config, graph, sess, model, test, chunked_test):
 		batch_correct_count = np.sum(np.argmax(output, 1) == np.argmax(labels_test, 1))
 
 		correct_count += batch_correct_count
-		total_count += batch_size
 	
 	test_accuracy = 100.0 * (correct_count / total_count)
 	logging.info("Test accuracy: %.2f%%" % test_accuracy)
 	logging.info("Correct count: " + str(correct_count))
+	logging.info("Total count: " + str(total_count))
 
 	return test_accuracy
 
@@ -166,7 +166,7 @@ def batch_to_tensor(config, batch):
 	doc_length = config["doc_length"]
 	alphabet_length = config["alphabet_length"]
 	num_labels = config["num_labels"]
-	batch_size = config["batch_size"]
+	batch_size = len(batch.index)
 
 	labels = np.array(batch["LABEL_NUM"].astype(int)) - 1
 	labels = (np.arange(num_labels) == labels[:, None]).astype(np.float32)
@@ -325,7 +325,7 @@ def train_model(config, graph, sess, saver):
 	epochs = config["epochs"]
 	eras = config["eras"]
 	dataset = config["dataset"]
-	train, test, groups_train, chunked_test = load_data(config)
+	train, test, groups_train = load_data(config)
 	num_eras = epochs * eras
 	logging_interval = 50
 	learning_rate_interval = 15000
@@ -360,7 +360,7 @@ def train_model(config, graph, sess, saver):
 			logging.info("Testing for era %d" % (step / epochs))
 			logging.info("Learning rate at epoch %d: %g" % (step + 1, sess.run(learning_rate)))
 			logging.info("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
-			test_accuracy = evaluate_testset(config, graph, sess, model, test, chunked_test)
+			test_accuracy = evaluate_testset(config, graph, sess, model, test)
 
 			# Save Checkpoint
 			current_era = int(step / epochs)
@@ -408,8 +408,8 @@ def run_session(config, graph, saver):
 		elif mode == "test":
 			saver.restore(sess, model_path)
 			model = get_tensor(graph, "model:0")
-			_, test, _, chunked_test = load_data(config)
-			evaluate_testset(config, graph, sess, model, test, chunked_test)
+			_, test, _ = load_data(config)
+			evaluate_testset(config, graph, sess, model, test)
 
 def run_from_command_line():
 	"""Run module from command line"""
