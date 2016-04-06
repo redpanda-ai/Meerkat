@@ -36,6 +36,7 @@ class TfcnnTest(unittest.TestCase):
 	@parameterized.expand([
 		(['tests/fixture/tf_config_with_alpha_dict.json', 'kkk', 3, [[0,0,0],[0,0,0],[0,0,0]]]),
 		(['tests/fixture/tf_config_with_alpha_dict.json', 'abc', 3, [[0,0,1],[0,1,0],[1,0,0]]]),
+		(['tests/fixture/tf_config_with_alpha_dict.json', 'abccccccccc', 3, [[0,0,1],[0,1,0],[1,0,0]]]),
 		(['tests/fixture/tf_config_with_alpha_dict.json', 'a', 3, [[1,0,0],[0,0,0],[0,0,0]]])
 	])
 	def test_string_to_tensor(self, config, doc, length, expected):
