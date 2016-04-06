@@ -80,38 +80,6 @@ def get_new_maint7b(directory, file_list):
 			file_list.append(i)
 			return i
 
-def get_cnn_statistics(inputFile):
-	"""Get the era number and error rate."""
-	lualib = ctypes.CDLL("/home/ubuntu/torch/install/lib/libluajit.so", mode=ctypes.RTLD_GLOBAL)
-
-	# Must be imported after previous statement
-	import lupa
-	from lupa import LuaRuntime
-
-	# Load Runtime and Lua Modules
-	lua = LuaRuntime(unpack_returned_tuples=True)
-	torch = lua.require('torch')
-
-	template = '''
-		function(filename)
-			rows = {}
-			main = torch.load(filename)
-			for i = 0, #main.record - 1 do
-				error_rate = main.record[#main.record - i ]["val_error"]
-				rows[#main.record -i] = error_rate
-			end
-			return rows
-		end
-	'''
-
-	# Load Lua Functions
-	get_error = lua.eval(template)
-	lua_table = get_error(inputFile)
-
-	error_list = list(lua_table)
-	error_vals = list(lua_table.values())
-	return dict(zip(error_list, error_vals))
-
 def get_best_error_rate(erasDict):
 	"""Get the best error rate among different eras"""
 	bestErrorRate = 1.0
@@ -142,10 +110,6 @@ def zip_cnn_stats_dir(file1, file2):
 	local["cp"][file1]["Best_CNN_Statics"]()
 	local["cp"][file2]["Best_CNN_Statics"]()
 	local["tar"]["-zcvf"]["Best_CNN_Statics.tar.gz"]["Best_CNN_Statics"]()
-
-def stop_stream():
-	"""Stop stream.py when the threshold reached."""
-	local["pkill"]["qlua"]()
 
 def dict_2_json(obj, filename):
 	"""Saves a dict as a json file"""
@@ -335,43 +299,10 @@ def slice_into_dataframes(**kwargs):
 	#logging.info("The kwargs dictionary contains: \n{0}".format(kwargs))
 	return kwargs["train_poor"], kwargs["test_poor"], len(class_names)
 
-def convert_csv_to_torch_7_binaries(input_file):
-	"""Use plumbum to convert CSV files to torch 7 binaries."""
-	output_file = input_file[:-4] + ".t7b"
-	logging.info("Converting {0} to {1}.".format(input_file, output_file))
-	# Remove the output_file
-	if os.path.isfile(output_file):
-		os.remove(output_file)
-	command = local["qlua"]["meerkat/classification/lua/csv2t7b.lua"]\
-		["-input"][input_file]["-output"][output_file]
-	result = command()
-	logging.info("The result is {0}".format(result))
-	return output_file
-
-def create_new_configuration_file(num_of_classes, output_path, train_file, test_file):
-	"""This function generates a new config.lua file based off of a template."""
-	logging.info("Generate a new configuration file with the correct number of classes.")
-	logging.info("Output_path = {0}".format(output_path))
-	output_dir_len = len(output_path)
-	train_file = train_file[output_dir_len:]
-	test_file = test_file[output_dir_len:]
-	command = \
-		local["sed"]["s:\./train\.t7b:" + train_file + ":"]["meerkat/classification/lua/config.lua"] \
-		| local["sed"]["s:\./test\.t7b:" + test_file + ":"] \
-		 > output_path + "config.lua"
-	command()
-
 def copy_file(input_file, directory):
 	"""This function moves uses Linux's 'cp' command to copy files on the local host"""
 	logging.info("Copy the file {0} to directory: {1}".format(input_file, directory))
 	local["cp"][input_file][directory]()
-
-def execute_main_lua(output_path, input_file):
-	"""This function executes the qlua command and launches the lua script in the background."""
-	logging.info("Executing main.lua in background.")
-	with local.cwd(output_path):
-		(local["qlua"][input_file]) & NOHUP
-	logging.info("It's running.")
 
 def fill_description_unmasked(row):
 	"""Ensures that blank values for DESCRIPTION_UNMASKED are always filled."""
