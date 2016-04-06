@@ -54,7 +54,7 @@ class WebConsumer():
 		self.hyperparams = hyperparams if hyperparams else {}
 		self.cities = cities if cities else {}
 
-	def kill_sessions():
+	def kill_sessions(self):
 		"""Kill all tensorFlow sessions"""
 
 		BANK_MERCHANT_CNN.kill_session()
