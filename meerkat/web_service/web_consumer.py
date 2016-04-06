@@ -52,7 +52,7 @@ class WebConsumer():
 	def load_models(self, params):
 		"""Load all models used by web consumer"""
 
-		gmf = params["gpu_mem_fraction"] if "gpu_mem_fraction" in params else 1
+		gmf = params["gpu_mem_fraction"]
 
 		self.bank_merchant_cnn = get_tf_cnn_by_name("bank_merchant", gpu_mem_fraction=gmf)
 		self.card_merchant_cnn = get_tf_cnn_by_name("card_merchant", gpu_mem_fraction=gmf)
