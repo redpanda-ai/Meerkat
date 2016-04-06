@@ -2,9 +2,6 @@ import json
 import sys
 import unittest
 
-from plumbum import local
-from plumbum.cmd import sudo
-
 from meerkat.web_service import web_consumer
 from tests.fixture import web_consumer_fixture
 

@@ -156,7 +156,8 @@ def get_mock_params():
             ],
             "index": "factual_index",
             "type": "factual_type"
-        }
+        },
+        "gpu_mem_fraction": 0.33
     }
 
 def get_mock_esconnection(params):

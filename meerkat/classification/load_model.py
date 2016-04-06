@@ -73,7 +73,7 @@ def get_tf_cnn_by_name(model_name):
 
 	return get_tf_cnn_by_path(model_path, label_map_path)
 
-def get_tf_cnn_by_path(model_path, label_map_path):
+def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=1):
 	"""Load a tensorFlow module by name"""
 
 	# Load Config
@@ -93,7 +93,8 @@ def get_tf_cnn_by_path(model_path, label_map_path):
 	label_map = config["label_map"]
 
 	# Load Session and Graph
-	sess = tf.Session(graph=graph)
+	gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=gpu_mem_fraction)
+	sess = tf.Session(graph=graph, config=tf.ConfigProto(gpu_options=gpu_options))
 	saver.restore(sess, config["model_path"])
 	model = get_tensor(graph, "model:0")
 	
