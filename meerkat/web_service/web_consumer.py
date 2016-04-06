@@ -17,14 +17,14 @@ from scipy.stats.mstats import zscore
 
 from meerkat.various_tools import get_es_connection, string_cleanse, get_boosted_fields
 from meerkat.various_tools import synonyms, get_bool_query, get_qs_query, load_params
-from meerkat.classification.load import select_model
+from meerkat.classification.load_model import load_scikit_model
 from meerkat.classification.lua_bridge import get_cnn
 # pylint:disable=no-name-in-module
 from meerkat.classification.bloom_filter.find_entities import location_split
 
 # Enabled Models
-BANK_SWS = select_model("bank_sws")
-CARD_SWS = select_model("card_sws")
+BANK_SWS = load_scikit_model("bank_sws")
+CARD_SWS = load_scikit_model("card_sws")
 BANK_MERCHANT_CNN = get_cnn("bank_merchant")
 CARD_MERCHANT_CNN = get_cnn("card_merchant")
 CARD_DEBIT_SUBTYPE_CNN = get_cnn("card_debit_subtype")

@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 
 from meerkat.classification.lua_bridge import get_cnn
+from meerkat.various_tools import load_piped_dataframe
 
 #################### USAGE ##########################
 
@@ -84,6 +85,5 @@ def apply_to_df(dataframe, file_out):
 
 # Load Dataframe
 # pylint: disable=invalid-name
-df = pd.read_csv(sys.argv[1], na_filter=False, quoting=csv.QUOTE_NONE, encoding="utf-8",
-				 sep="|", error_bad_lines=False)
+df = load_piped_dataframe(sys.argv[1])
 apply_to_df(df, "data/output/CNN_processed.txt")

@@ -5,6 +5,8 @@ import os
 import csv
 import sys
 
+from meerkat.various_tools import load_piped_dataframe
+
 #################### USAGE ##########################
 
 # python3 -m meerkat.tools.merchant_process [container]
@@ -40,13 +42,13 @@ def run_from_command_line():
 
 	# Process Data
 	for s in samples:
-		df = pd.read_csv(directory + "/" + s, na_filter=False, encoding="utf-8", sep="|", error_bad_lines=False, quoting=csv.QUOTE_NONE)
+		df = load_piped_dataframe(directory + "/" + s)
 		df['LABEL_NUM'] = str(label_num_map[s])
 		dataframes.append(df)
 		output_map[label_num_map[s]] = df["MERCHANT_NAME"][0]
 
 	# Add Null Class
-	null_df = pd.read_csv(directory + "/1.csv", na_filter=False, encoding="utf-8", sep="|", error_bad_lines=False, quoting=csv.QUOTE_NONE)
+	null_df = load_piped_dataframe(directory + "/1.csv")
 	null_df['LABEL_NUM'] = "1"
 	dataframes.append(null_df)
 	output_map[1] = ""
