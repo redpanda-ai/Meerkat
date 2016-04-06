@@ -122,11 +122,6 @@ def get_tf_cnn_by_path(model_path, label_map_path):
 
 		return trans
 
-	def kill_session():
-		sess.close()
-
-	apply_cnn.kill_session = kill_session
-
 	return apply_cnn
 
 if __name__ == "__main__":

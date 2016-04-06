@@ -252,8 +252,3 @@ def get_mock_cnn(transactions, label_key="CNN", label_only=False):
         trans[label_key] = {"label": "joseph - rules", "category": "ruling class"}
     return transactions
 
-def kill_session():
-    """Mock kill session"""
-    pass
-
-get_mock_cnn.kill_session = kill_session

@@ -1,7 +1,9 @@
 import json
+import sys
 import unittest
 from meerkat.web_service import web_consumer
 from tests.fixture import web_consumer_fixture
+
 
 class WebConsumerTest(unittest.TestCase):
     """Our UnitTest class."""
@@ -18,11 +20,10 @@ class WebConsumerTest(unittest.TestCase):
 
     def setUp(self):
         self.consumer = web_consumer.WebConsumer(params=web_consumer_fixture.get_mock_params(), hyperparams=web_consumer_fixture.get_mock_hyperparams())
-        self.consumer.kill_sessions()
         return
 
     def tearDown(self):
-        self.consumer.kill_sessions()
+        sys.exit()
         return
 
     def test_static_bank_category_map(self):

@@ -54,16 +54,6 @@ class WebConsumer():
 		self.hyperparams = hyperparams if hyperparams else {}
 		self.cities = cities if cities else {}
 
-	def kill_sessions(self):
-		"""Kill all tensorFlow sessions"""
-
-		BANK_MERCHANT_CNN.kill_session()
-		CARD_MERCHANT_CNN.kill_session()
-		CARD_DEBIT_SUBTYPE_CNN.kill_session()
-		CARD_CREDIT_SUBTYPE_CNN.kill_session()
-		BANK_DEBIT_SUBTYPE_CNN.kill_session()
-		BANK_CREDIT_SUBTYPE_CNN.kill_session()
-
 	def update_hyperparams(self, hyperparams):
 		"""Updates a WebConsumer object's hyper-parameters"""
 		self.hyperparams = hyperparams
