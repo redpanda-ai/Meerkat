@@ -33,11 +33,12 @@ if csv_num == 0:
 if not json_exit:
 	print("should have one json file")
 	sys.exit()
-print("file check pass")
+print("files checking finished")
 
 # tar gz the files
+print("processing...")
 make_tarfile("input.tar.gz", sys.argv[1])
-print("files tar.gzed")
+print("files gziped")
 
 # upload the tar.gz file to s3
 default_dir_paths = {
@@ -55,6 +56,7 @@ default_dir_paths = {
 dtime = get_utc_iso_timestamp()
 bucket = 's3yodlee'
 prefix = default_dir_paths[sys.argv[2]] + dtime + '/'
+print("uploading to s3")
 push_file_to_s3('input.tar.gz', bucket, prefix)
 print("uploaded to s3")
 
