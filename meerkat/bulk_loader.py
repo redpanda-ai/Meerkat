@@ -425,7 +425,7 @@ def guarantee_index_and_doc_type(params):
 	cluster_nodes = params["elasticsearch"]["cluster_nodes"]
 	es_index = params["elasticsearch"]["index"]
 	doc_type = params["elasticsearch"]["type"]
-	es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True,
+	es_connection = Elasticsearch(cluster_nodes, sniff_on_start=False,
 		sniff_on_connection_fail=True, sniffer_timeout=5, sniff_timeout=5)
 	if es_connection.indices.exists(index=es_index):
 		logging.critical("Index exists, continuing")

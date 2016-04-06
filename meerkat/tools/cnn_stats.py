@@ -289,8 +289,7 @@ def main_process(args):
 	precision = true_positive / column_sum
 	precision = np.round(precision, decimals=4)
 	false_negative = actual - true_positive - unpredicted
-	accuracy = pd.DataFrame({'accuracy' : [round(sum(true_positive[0]) / sum(actual[0]), 4)
-	print(accuracy)
+	accuracy = pd.DataFrame({'accuracy' : [round(sum(true_positive[0]) / sum(actual[0]), 4)]})
 	f_measure = (2 * precision * recall) / (precision + recall)
 	f_measure = np.round(f_measure, decimals=4)
 

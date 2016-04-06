@@ -1,8 +1,9 @@
 """Unit test for meerkat.various_tools"""
 
-import meerkat.various_tools
-import numpy as np
 import unittest
+import meerkat.various_tools as various_tools
+from nose_parameterized import parameterized
+from tests.fixture import various_tools_fixture
 
 class VariousToolsTests(unittest.TestCase):
 
@@ -18,8 +19,53 @@ class VariousToolsTests(unittest.TestCase):
 		"""string_cleanse test"""
 
 		for chars, no_chars in self.strings:
-			result = meerkat.various_tools.string_cleanse(chars)
+			result = various_tools.string_cleanse(chars)
 			self.assertEqual(no_chars, result)
+
+	@parameterized.expand([
+		(["normal", various_tools_fixture.get_params_dict()["correct_format"]]),
+		(["edge", various_tools_fixture.get_params_dict()["not_found"]])
+	])
+	def test_load_hyperparameters(self, case_type, params):
+		"""Test load_hyperparameters with parameters"""
+		if case_type == "normal":
+			result = various_tools.load_hyperparameters(params)
+			self.assertTrue(isinstance(result, dict))
+		else:
+			self.assertRaises(SystemExit, various_tools.load_hyperparameters, params)
+
+	@parameterized.expand([
+		([various_tools_fixture.get_queue()["non_empty"], [1, 2, 3]]),
+		([various_tools_fixture.get_queue()["empty"], []])
+	])
+	def test_queue_to_list(self, result_queue, result_list):
+		"""Test queue_to_list with parameters"""
+		self.assertEqual(various_tools.queue_to_list(result_queue), result_list)
+
+	@parameterized.expand([
+		(["abcd\\|ef\"ghij", "cd efg"]),
+		(["abcd\\ef\"\"ghij", "cd\\efg"]),
+		(["abcd|efghij", "cd|efg"])
+	])
+	def test_clean_line(self, line, output):
+		"""Test clean_line with parameters"""
+		self.assertEqual(various_tools.clean_line(line), output)
+
+	@parameterized.expand([
+		(["ach pos ", ""]),
+		(["pos 12/34abcd", "ABCD"]),
+		(["ab~~12345~~1234567890123456~~12345~~1~~~~1234cd", "AB CD"])
+	])
+	def test_stopwords(self, transaction, result):
+		"""Test stopwords with parameters"""
+		self.assertEqual(various_tools.stopwords(transaction), result)
+
+	@parameterized.expand([
+		([[{}, "Null", various_tools_fixture.get_es_connection("127.0.0.1")], None])
+	])
+	def test_get_merchant_by_id(self, args, result):
+		"""Test get_merchant_by_id with parameters"""
+		self.assertEqual(various_tools.get_merchant_by_id(*args), result)
 
 if __name__ == '__main__':
 	unittest.main()

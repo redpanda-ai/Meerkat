@@ -54,7 +54,7 @@ from plumbum import local
 from boto import connect_s3
 from boto.s3.connection import Location
 from meerkat.classification.split_data import random_split, make_save_function, main_split_data
-from meerkat.classification.tools import pull_from_s3, check_new_input_file
+from meerkat.classification.tools import pull_from_s3, check_new_input_file, push_file_to_s3, get_utc_iso_timestamp, make_tarfile, copy_file
 from meerkat.classification.tensorflow_cnn import build_graph, train_model, validate_config
 from meerkat.tools.cnn_stats import main_process as apply_cnn
 from meerkat.various_tools import load_params
@@ -123,7 +123,11 @@ def auto_train():
 		'subtype_bank_debit': 'meerkat/cnn/data/subtype/bank/debit/',
 		'subtype_bank_credit': 'meerkat/cnn/data/subtype/bank/credit/',
 		'merchant_bank': 'meerkat/cnn/data/merchant/bank/',
-		'merchant_card': 'meerkat/cnn/data/merchant/card/'
+		'merchant_card': 'meerkat/cnn/data/merchant/card/',
+		'category_bank_debit': 'meerkat/cnn/data/category/bank/debit/',
+		'category_bank_credit': 'meerkat/cnn/data/category/bank/credit/',
+		'category_card_debit': 'meerkat/cnn/data/category/card/debit/',
+		'category_card_credit': 'meerkat/cnn/data/category/card/credit/'
 	}
 
 	prefix = dir_paths[data_type] if args.input_dir == '' else args.input_dir
@@ -194,6 +198,11 @@ def auto_train():
 
 	logging.warning('Apply the best CNN to test data and calculate performance metrics')
 	apply_cnn(args)
+	copy_file("meerkat/classification/models/train.ckpt", "data/CNN_stats/")
+	make_tarfile("results.tar.gz", "data/CNN_stats")
+	logging.info("Uploading results.tar.gz to S3 {0}".format(s3_params["prefix"]))
+	push_file_to_s3("results.tar.gz", "s3yodlee", s3_params["prefix"])
+	logging.info("Upload results.tar.gz to S3 sucessfully.")
 
 	if exist_new_input:
 		remove_dir = save_path[0:save_path.rfind("preprocessed/")]
