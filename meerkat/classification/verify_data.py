@@ -265,8 +265,9 @@ def verify_numbers_in_each_class(label_names_csv, label_counts_csv, cnn_type):
 	if cnn_type[0] == "subtype":
 		return
 	for i in range(len(label_names_csv)):
-		if label_counts_csv[i] < 500:
-			err_msg += "{:<40}".format(label_names_csv[i]) + "{:<25}".format(str(label_counts_csv[i])) + "\n"
+		label_name = label_names_csv[i]
+		if label_counts_csv[label_name] < 500:
+			err_msg += "{:<40}".format(label_name) + "{:<25}".format(str(label_counts_csv[label_name])) + "\n"
 	if err_msg != "":
 		err_msg = ("{:<40}".format("Class Name") + "{:<25}".format("Number of Transactions") +
 			"\n") + err_msg
