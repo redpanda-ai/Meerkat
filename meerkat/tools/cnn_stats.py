@@ -49,7 +49,7 @@ import numpy as np
 from plumbum import local
 from meerkat.classification.load_model import get_tf_cnn_by_path
 from meerkat.various_tools import load_params, load_piped_dataframe
-from meerkat.classification.tools import copy_file
+from meerkat.classification.tools import copy_file, make_tarfile
 
 def parse_arguments():
 	""" Create the parser """
@@ -298,11 +298,12 @@ def main_process(args):
 	conf_mat.columns = ['Class'] + [str(x) for x in range(1, num_labels + 1)] + ['Unpredicted']
 	conf_mat.index = range(1, num_labels + 1)
 
-	stat.to_csv('tensorflow_cnn_stats/CNN_stat.csv', index=False)
-	conf_mat.to_csv('tensorflow_cnn_stats/Con_Matrix.csv')
+	stat.to_csv('data/CNN_stats/CNN_stat.csv', index=False)
+	conf_mat.to_csv('data/CNN_stats/Con_Matrix.csv')
 
-	copy_file("meerkat/classification/models/train.ckpt", "tensorflow_cnn_stats/")
-	local["tar"]["-zcvf"]["results.tar.gz"]["tensorflow_cnn_stats"]()
+	copy_file("meerkat/classification/models/train.ckpt", "data/CNN_stats/")
+	make_tarfile("results.tar.gz", "data/CNN_stats")
+	logging.warning("Upload results.tar.gz to S3 sucessfully.")
 
 if __name__ == "__main__":
 	main_process(parse_arguments())
