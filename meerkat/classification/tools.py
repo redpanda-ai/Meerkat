@@ -138,30 +138,6 @@ def push_file_to_s3(source_path, bucket_name, object_prefix):
 	key.key = object_prefix + filename
 	key.set_contents_from_filename(source_path)
 
-def push_big_file_to_s3(source_path, bucket_name, object_prefix):
-	"""Pushed an big object to S3"""
-	conn = connect_s3()
-	bucket = conn.get_bucket(bucket_name, Location.USWest2)
-	filename = os.path.basename(source_path)
-	key = Key(bucket)
-	s3_path = object_prefix + filename
-	mp = bucket.initiate_multipart_upload(s3_path)
-	source_size = os.stat(source_path).st_size
-	chunk_size = 134217728
-	chunk_count = int(math.ceil(source_size / float(chunk_size)))
-	for i in range(chunk_count):
-		offset = i * chunk_size
-		bytes = min(chunk_size, source_size - offset)
-		with open(source_path, 'r') as fp:
-			fp.seek(offset)
-			mp.upload_part_from_file(fp = fp, part_num = i + 1, size = bytes)
-	if len(mp.get_all_parts()) == chunk_count:
-		mp.complete_upload()
-		logging.info("upload file done")
-	else:
-		mp.cancel_upload()
-		logging.info("upload file failed")
-
 def zip_cnn_stats_dir(file1, file2):
 	"""Copy files to Best_CNN_Statics directory and zip it"""
 	local["mkdir"]["Best_CNN_Statics"]()
