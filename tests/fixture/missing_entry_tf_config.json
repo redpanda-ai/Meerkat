@@ -2,7 +2,6 @@
 	"mode": "train",
 	"model_path": "",
 	"dataset": "",
-	"label_map": "",
 	"container": "",
 	"model_type": "",
 	"ledger_entry": "",

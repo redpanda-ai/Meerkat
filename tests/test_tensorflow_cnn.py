@@ -22,7 +22,7 @@ class TfcnnTest(unittest.TestCase):
 		self.assertEqual(tf_cnn.chunks(array, num), expected)
 
 	@parameterized.expand([
-		([['invalid', 'tests/fixture/empty_tf_config.json']]),
+		([['invalid', 'tests/fixture/missing_entry_tf_config.json']]),
 		([['valid', 'tests/fixture/valid_tf_config.json']]),
 		([['invalid', 'tests/fixture/wrong_doc_length_tf_config.json']])
 	])
