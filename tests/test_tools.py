@@ -1,11 +1,27 @@
-"""Unit test for tools files in meerkat/tools"""
+"""Unit test for meerkat/classification/tools.py"""
 
-from pprint import pformat
 import unittest
+import meerkat.classification.tools as tools
+from nose_parameterized import parameterized
+from tests.fixture import tools_fixture
 
-class VariousToolsTests(unittest.TestCase):
-
+class ToolsTests(unittest.TestCase):
 	"""Our UnitTest class."""
 
-if __name__ == '__main__':
-	unittest.main()
+	@parameterized.expand([
+		(["missing_input", tools_fixture.get_s3params("missing_input"),
+			tools_fixture.get_result("missing_input")]),
+		(["unpreprocessed", tools_fixture.get_s3params("unpreprocessed"),
+			tools_fixture.get_result("unpreprocessed")]),
+		(["preprocessed", tools_fixture.get_s3params("preprocessed"),
+			tools_fixture.get_result("preprocessed")]),
+		(["missing_slosh", tools_fixture.get_s3params("missing_slosh"),
+			tools_fixture.get_result("missing_slosh")])
+	])
+	def test_check_new_input_file(self, case_type, s3params, result):
+		"""Test check_new_input_file"""
+		if case_type == "missing_input":
+			self.assertRaises(SystemExit, tools.check_new_input_file, **s3params)
+		else:
+			self.assertEqual(tools.check_new_input_file(**s3params), result)
+

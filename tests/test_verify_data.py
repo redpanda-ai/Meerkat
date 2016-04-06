@@ -93,16 +93,16 @@ class VerifyDataTests(unittest.TestCase):
 			self.assertRaises(SystemExit, verifier.verify_json_no_dup_names, label_names_json)
 
 	@parameterized.expand([
-		(["normal", ["AA", "BB"], [600, 800]]),
-		(["edge", ["AA", "BB"], [400, 600]])
+		(["normal", ["AA", "BB"], [600, 800], ["merchant"]]),
+		(["edge", ["AA", "BB"], [400, 600], ["merchant"]])
 	])
-	def test_verify_numbers_in_each_class(self, case_type, label_names_csv, label_counts_csv):
+	def test_verify_numbers_in_each_class(self, case_type, label_names_csv, label_counts_csv, cnn_type):
 		"""Test verify_numbers_in_each_class with parameters"""
 		if case_type == "normal":
-			verifier.verify_numbers_in_each_class(label_names_csv, label_counts_csv)
+			verifier.verify_numbers_in_each_class(label_names_csv, label_counts_csv, cnn_type)
 		else:
 			self.assertRaises(SystemExit, verifier.verify_numbers_in_each_class,
-				label_names_csv, label_counts_csv)
+				label_names_csv, label_counts_csv, cnn_type)
 
 	@parameterized.expand([
 		(["edge", verify_data_fixture.get_csv_input_path()["correct_format"],

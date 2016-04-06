@@ -15,8 +15,7 @@ USAGE = """
 usage: auto_train [-h] [--input_dir INPUT_DIR] [--output_dir OUTPUT_DIR]
                   [--credit_or_debit CREDIT_OR_DEBIT] [--bucket BUCKET] [-d]
                   [-v]
-                  {subtype,merchant,category} {bank,card} train_file test_file
-                  label_map
+                  {subtype,merchant,category} {bank,card}
 
 positional arguments:
   {subtype,merchant,category}
@@ -47,6 +46,7 @@ import argparse
 import logging
 import os
 import sys
+import shutil
 
 import tensorflow as tf
 
@@ -118,15 +118,16 @@ def auto_train():
 		data_type = data_type + '_' + credit_or_debit
 
 	dir_paths = {
-		'subtype_card_debit': 'data/subtype/card/debit/',
-		'subtype_card_credit': 'data/subtype/card/credit/',
-		'subtype_bank_debit': 'data/subtype/bank/debit/',
-		'subtype_bank_credit': 'data/subtype/bank/credit/',
-		'merchant_bank': 'data/merchant/bank/',
-		'merchant_card': 'data/merchant/card/'
+		'subtype_card_debit': 'meerkat/cnn/data/subtype/card/debit/',
+		'subtype_card_credit': 'meerkat/cnn/data/subtype/card/credit/',
+		'subtype_bank_debit': 'meerkat/cnn/data/subtype/bank/debit/',
+		'subtype_bank_credit': 'meerkat/cnn/data/subtype/bank/credit/',
+		'merchant_bank': 'meerkat/cnn/data/merchant/bank/',
+		'merchant_card': 'meerkat/cnn/data/merchant/card/'
 	}
 
 	prefix = dir_paths[data_type] if args.input_dir == '' else args.input_dir
+	prefix = prefix + '/' * (prefix[-1] != '/')
 
 	if args.output_dir == '':
 		save_path = "./data/input/" + data_type
@@ -193,6 +194,13 @@ def auto_train():
 
 	logging.warning('Apply the best CNN to test data and calculate performance metrics')
 	apply_cnn(args)
+
+	if exist_new_input:
+		remove_dir = save_path[0:save_path.rfind("preprocessed/")]
+		shutil.rmtree(remove_dir)
+	else:
+		shutil.rmtree(save_path)
+	logging.info("remove directory of preprocessed files at: {0}".format(save_path))
 
 	logging.warning('The whole streamline process has finished')
 

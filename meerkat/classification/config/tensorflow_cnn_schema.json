@@ -44,8 +44,7 @@
 		},
 		"label_map" : {
 			"description" : "A map from output neuron number to class name",
-			"type" : "string",
-			"pattern" : "^.+json$"
+			"type" : ["string", "object"]
 		},
 		"ledger_entry": {
 			"description" : "Whether the transaction is related to money coming in or going out",

@@ -61,7 +61,7 @@ def preprocess(input_file, label_map, merchant_or_subtype, bank_or_card,
 		credit_or_debit, output_path='./data/preprocessed/'):
 	logging.info("Loading {0} {1} csv file ".format(merchant_or_subtype,
 		bank_or_card))
-	df = load_piped_dataframe = input_file
+	df = load_piped_dataframe(input_file)
 	# Clean the "DESCRIPTION_UNMASKED" values within the dataframe
 	df["DESCRIPTION_UNMASKED"] = df.apply(fill_description_unmasked, axis=1)
 	# Load label map
