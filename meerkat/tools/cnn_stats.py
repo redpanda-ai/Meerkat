@@ -131,6 +131,7 @@ def get_write_func(filename, header):
 	def write_func(data):
 		"""Have a write function"""
 		if len(data) > 0:
+			logging.info("Saving transactions to {0}".format(filename))
 			nonlocal file_exists
 			mode = "a" if file_exists else "w"
 			add_head = False if file_exists else header
@@ -139,6 +140,12 @@ def get_write_func(filename, header):
 				sep='|')
 			file_exists = True
 	return write_func
+
+def count_transactions(csv_file):
+	with open(csv_file) as temp:
+		reader = csv.reader(temp, delimiter='|')
+		header = reader.__next__()
+		return sum([1 for i in reader])
 
 '''
 def plot_confusion_matrix(con_matrix):
@@ -177,6 +184,8 @@ def main_process(args):
 	human_label_key = args.label_key
 	fast_mode = args.fast_mode
 	reader = load_piped_dataframe(args.testdata, chunksize=1000)
+	total_transactions = count_transactions(args.testdata)
+	processed = 0.0
 	label_map = load_params(args.label_map)
 	get_key = lambda x: x['label'] if isinstance(x, dict) else x
 	label_map = dict(zip(label_map.keys(), map(get_key, label_map.values())))
@@ -217,7 +226,13 @@ def main_process(args):
 	fill_description = lambda x: x[sec_doc_key] if x[doc_key] == ''\
 		else x[doc_key]
 	chunk_count = 0
+
+	logging.info("Total number of transactions: {0}".format(total_transactions))
+	logging.info("Testing begins.")
 	for chunk in reader:
+		processed += len(chunk)
+		my_progress =  str(round(((processed/total_transactions) * 100), 2)) + '%'
+		logging.info("Evaluating {0} of the testset".format(my_progress))
 		logging.warning("Testing chunk {0}.".format(chunk_count))
 		if sec_doc_key != '':
 			chunk[doc_key] = chunk.apply(fill_description, axis=1)
@@ -259,6 +274,7 @@ def main_process(args):
 		chunk_count += 1
 
 	# Calculate f_measure, recall, precision, false +/-, true +/- from confusion maxtrix
+	logging.info("Evaluation is finished, preparing confusion matrix and cnn_stats")
 	true_positive = pd.DataFrame([confusion_matrix[i][i] for i in range(num_labels)])
 
 	conf_mat = pd.DataFrame(confusion_matrix)
@@ -298,6 +314,8 @@ def main_process(args):
 
 	stat.to_csv('data/CNN_stats/CNN_stat.csv', index=False)
 	conf_mat.to_csv('data/CNN_stats/Con_Matrix.csv')
+
+	logging.info("cnn_stats is finished. All files are saved to Meerkat/data/CNN_stats/")
 
 if __name__ == "__main__":
 	main_process(parse_arguments())
