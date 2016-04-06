@@ -1,9 +1,12 @@
 import json
 import sys
 import unittest
+
+from plumbum import local
+from plumbum.cmd import sudo
+
 from meerkat.web_service import web_consumer
 from tests.fixture import web_consumer_fixture
-
 
 class WebConsumerTest(unittest.TestCase):
     """Our UnitTest class."""
@@ -25,6 +28,13 @@ class WebConsumerTest(unittest.TestCase):
     def tearDown(self):
         return
 
+    @classmethod
+    def teardown_class(cls):
+        process = local['lsof']["/dev/nvidia0"]().split('\n')[1]
+        process = ' '.join(process.split())
+        pid = process.split(" ")[1]
+        sudo[local["kill"]["-9"][pid]]()
+ 
     def test_static_bank_category_map(self):
         """Assert that the correct static category label has been applied from the bank map"""
         
