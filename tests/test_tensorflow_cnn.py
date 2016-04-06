@@ -53,7 +53,7 @@ class TensorflowCNNTests(unittest.TestCase):
 			self.assertTrue(np.allclose(chunk, expected, rtol=1e-05, atol=1e-08))
 
 	def test_load_data__number_of_labels_exception(self):
-		"""Confirm that we throw an informative Exception when thenumber of labels
+		"""Confirm that we throw an informative Exception when the number of labels
 		fails to match the number of label_keys in a value count"""
 		config = tf_cnn_fixture.get_subtype_config()
 		self.assertRaisesRegex(Exception, "Number of indexes does not match number of labels", tf_cnn.load_data, config)
