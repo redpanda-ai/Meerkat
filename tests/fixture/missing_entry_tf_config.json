@@ -1,0 +1,17 @@
+{
+	"mode": "train",
+	"model_path": "",
+	"dataset": "",
+	"container": "",
+	"model_type": "",
+	"ledger_entry": "",
+	"alphabet": "abcdefghijklmnopqrstuvwxyz0123456789,;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}",
+	"batch_size": 128,
+	"doc_length": 123,
+	"randomize": 5e-2,
+	"momentum": 0.9,
+	"base_rate": 1e-2,
+	"decay": 1e-5,
+	"epochs": 5000,
+	"eras": 25
+}

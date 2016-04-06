@@ -15,8 +15,7 @@ USAGE = """
 usage: auto_train [-h] [--input_dir INPUT_DIR] [--output_dir OUTPUT_DIR]
                   [--credit_or_debit CREDIT_OR_DEBIT] [--bucket BUCKET] [-d]
                   [-v]
-                  {subtype,merchant,category} {bank,card} train_file test_file
-                  label_map
+                  {subtype,merchant,category} {bank,card}
 
 positional arguments:
   {subtype,merchant,category}
@@ -47,6 +46,7 @@ import argparse
 import logging
 import os
 import sys
+import shutil
 
 import tensorflow as tf
 
@@ -131,6 +131,7 @@ def auto_train():
 	}
 
 	prefix = dir_paths[data_type] if args.input_dir == '' else args.input_dir
+	prefix = prefix + '/' * (prefix[-1] != '/')
 
 	if args.output_dir == '':
 		save_path = "./data/input/" + data_type
@@ -199,6 +200,13 @@ def auto_train():
 	apply_cnn(args)
 
 	push_file_to_s3("results.tar.gz", "s3yodlee", s3_params["prefix"])
+
+	if exist_new_input:
+		remove_dir = save_path[0:save_path.rfind("preprocessed/")]
+		shutil.rmtree(remove_dir)
+	else:
+		shutil.rmtree(save_path)
+	logging.info("remove directory of preprocessed files at: {0}".format(save_path))
 
 	logging.warning('The whole streamline process has finished')
 

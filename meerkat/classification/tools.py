@@ -23,6 +23,8 @@ from meerkat.various_tools import load_piped_dataframe
 def check_new_input_file(**s3_params):
 	"""Check the existence of a new input.tar.gz file"""
 	bucket_name, prefix = s3_params["bucket"], s3_params["prefix"]
+	prefix = prefix + '/' * (prefix[-1] != '/')
+
 	conn = connect_s3()
 	bucket = conn.get_bucket(bucket_name, Location.USWest2)
 	listing_version = bucket.list(prefix=prefix, delimiter='/')

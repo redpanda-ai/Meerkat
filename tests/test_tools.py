@@ -60,5 +60,23 @@ class ToolsTests(unittest.TestCase):
 		result = tools.seperate_debit_credit(subtype_file)
 		self.assertEqual((len(result[0]), len(result[1])), output)
 
+	@parameterized.expand([
+		(["missing_input", tools_fixture.get_s3params("missing_input"),
+			tools_fixture.get_result("missing_input")]),
+		(["unpreprocessed", tools_fixture.get_s3params("unpreprocessed"),
+			tools_fixture.get_result("unpreprocessed")]),
+		(["preprocessed", tools_fixture.get_s3params("preprocessed"),
+			tools_fixture.get_result("preprocessed")]),
+		(["missing_slosh", tools_fixture.get_s3params("missing_slosh"),
+			tools_fixture.get_result("missing_slosh")])
+	])
+	def test_check_new_input_file(self, case_type, s3params, result):
+		"""Test check_new_input_file"""
+		if case_type == "missing_input":
+			self.assertRaises(SystemExit, tools.check_new_input_file, **s3params)
+		else:
+			self.assertEqual(tools.check_new_input_file(**s3params), result)
+
 if __name__ == '__main__':
 	unittest.main()
+
