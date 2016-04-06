@@ -19,6 +19,7 @@ class TfcnnTest(unittest.TestCase):
 		([[1,2], -9, [[1],[2]]])
 	])
 	def test_chunks(self, array, num, expected):
+		"""Ensure that numpy arrays are properly sub-divided into chunks."""
 		self.assertEqual(tf_cnn.chunks(array, num), expected)
 
 	@parameterized.expand([
@@ -27,6 +28,7 @@ class TfcnnTest(unittest.TestCase):
 		([['invalid', 'tests/fixture/wrong_doc_length_tf_config.json']])
 	])
 	def test_validate_config(self, config):
+		"""Confirm that the validate_config functions as expected."""
 		case, config = config[:]
 		if case == 'invalid':
 			self.assertRaises(js.exceptions.ValidationError, tf_cnn.validate_config, config)
