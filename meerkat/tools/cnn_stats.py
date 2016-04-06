@@ -289,7 +289,8 @@ def main_process(args):
 	precision = true_positive / column_sum
 	precision = np.round(precision, decimals=4)
 	false_negative = actual - true_positive - unpredicted
-
+	accuracy = pd.DataFrame({'accuracy' : [round(sum(true_positive[0]) / sum(actual[0]), 4)
+	print(accuracy)
 	f_measure = (2 * precision * recall) / (precision + recall)
 	f_measure = np.round(f_measure, decimals=4)
 
@@ -304,9 +305,9 @@ def main_process(args):
 	label.index = range(num_labels)
 
 	stat = pd.concat([label, actual, true_positive, false_positive, recall, precision,
-		false_negative, unpredicted, f_measure], axis=1)
+		false_negative, unpredicted, f_measure, accuracy], axis=1)
 	stat.columns = ['Class', 'Actual', 'True_Positive', 'False_Positive', 'Recall',
-		'Precision', 'False_Negative', 'Unpredicted', 'F_Measure']
+		'Precision', 'False_Negative', 'Unpredicted', 'F_Measure', 'Model_Accuracy']
 
 	conf_mat = pd.concat([label, conf_mat], axis=1)
 	conf_mat.columns = ['Class'] + [str(x) for x in range(1, num_labels + 1)] + ['Unpredicted']
