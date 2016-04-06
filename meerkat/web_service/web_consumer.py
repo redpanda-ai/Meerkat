@@ -92,6 +92,7 @@ class WebConsumer():
 
 		return o_query
 
+
 	def __search_index(self, queries):
 		"""Search against a structured index"""
 		index = self.params["elasticsearch"]["index"]
@@ -312,7 +313,7 @@ class WebConsumer():
 
 			if "subtype_CNN" in trans: del trans["subtype_CNN"]
 
-	def ensure_output_schema(self, transactions, debug):
+	def ensure_output_schema(self, transactions, debug, services_list):
 		"""Clean output to proper schema"""
 
 		# Collect Mapping Details
@@ -323,7 +324,7 @@ class WebConsumer():
 		# Override / Strip Fields
 		for trans in transactions:
 
-			if debug and trans["is_physical_merchant"]:
+			if (debug or ("search" in services_list)) and trans["is_physical_merchant"]:
 				trans["search"]["merchant_name"] = trans["merchant_name"]
 				trans["search"]["street"] = trans["street"]
 				trans["search"]["city"] = trans["city"]
@@ -351,22 +352,27 @@ class WebConsumer():
 			if trans["locale_bloom"] != None:
 				trans["city"] = trans["locale_bloom"][0]
 				trans["state"] = trans["locale_bloom"][1]
-				if debug:
+				if debug or ("bloom_filter" in services_list):
 					trans["bloom_filter"] = { "city": trans["locale_bloom"][0],\
 					"state": trans["locale_bloom"][1]}
 			else:
 				trans["city"] = ""
 				trans["state"] = ""
-				if debug:
+				if debug or ("bloom_filter" in services_list):
 					trans["bloom_filter"] = { "city": "", "state": "" }
 
 			if debug:
 				trans["cnn"] = { "txn_type" : trans["txn_type"],\
 				"txn_sub_type" : trans["txn_sub_type"] }
+			elif "cnn_subtype" in services_list:
+				trans["cnn_type_subtype"] = { "txn_type" : trans["txn_type"],\
+				"txn_sub_type" : trans["txn_sub_type"] }
 
 			if "CNN" in trans:
 				if debug:
 					trans["cnn"]["merchant_name"] = trans["CNN"]
+				elif "cnn_merchant" in services_list:
+					trans["cnn_merchant"] = {"merchnat_name" : trans["CNN"]}
 				del trans["CNN"]
 
 			del trans["locale_bloom"]
@@ -375,7 +381,7 @@ class WebConsumer():
 			del trans["date"]
 			del trans["ledger_entry"]
 
-		return transactions
+		# return transactions
 
 	def __enrich_physical(self, transactions):
 		"""Enrich physical transactions with Meerkat"""
@@ -557,8 +563,10 @@ class WebConsumer():
 			self.__apply_missing_categories(data["transaction_list"])
 
 		debug = data.get("debug", False)
+		services_list = data.get("services_list", [])
+		self.ensure_output_schema(data["transaction_list"], debug,
+			services_list)
 
-		self.ensure_output_schema(data["transaction_list"], debug)
 		return data
 
 if __name__ == "__main__":
