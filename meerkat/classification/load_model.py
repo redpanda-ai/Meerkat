@@ -71,7 +71,7 @@ def get_tf_cnn_by_name(model_name, gpu_mem_fraction=False):
 		logging.warning("Model not found. Terminating")
 		sys.exit()
 
-	return get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction)
+	return get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=gpu_mem_fraction)
 
 def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=False):
 	"""Load a tensorFlow module by name"""
@@ -93,7 +93,6 @@ def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=False):
 	label_map = config["label_map"]
 
 	# Load Session and Graph
-	print(gpu_mem_fraction)
 	if gpu_mem_fraction:
 		gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=gpu_mem_fraction)
 		sess = tf.Session(graph=graph, config=tf.ConfigProto(gpu_options=gpu_options))
