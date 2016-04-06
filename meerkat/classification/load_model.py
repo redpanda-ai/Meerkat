@@ -71,7 +71,7 @@ def get_tf_cnn_by_name(model_name):
 		logging.warning("Model not found. Terminating")
 		sys.exit()
 
-	return load_tensorflow_model_by_path(model_path, label_map_path)
+	return get_tf_cnn_by_path(model_path, label_map_path)
 
 def get_tf_cnn_by_path(model_path, label_map_path):
 	"""Load a tensorFlow module by name"""
