@@ -23,7 +23,6 @@ class WebConsumerTest(unittest.TestCase):
         return
 
     def tearDown(self):
-        sys.exit()
         return
 
     def test_static_bank_category_map(self):
