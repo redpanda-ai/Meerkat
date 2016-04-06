@@ -51,22 +51,22 @@ def get_tf_cnn_by_name(model_name):
 	# Switch on Models
 	if model_name == "bank_merchant":
 		model_path = "meerkat/classification/models/bank_merchant.ckpt"
-		label_map_path = "meerkat/classification/label_maps/bank_merchant_label_map.json"
+		label_map_path = "meerkat/classification/label_maps/bank_merchant.json"
 	elif model_name == "card_merchant":
 		model_path = "meerkat/classification/models/card_merchant.ckpt"
-		label_map_path = "meerkat/classification/label_maps/card_merchant_label_map.json"
+		label_map_path = "meerkat/classification/label_maps/card_merchant.json"
 	elif model_name == "bank_debit_subtype":
 		model_path = "meerkat/classification/models/bank_debit_subtype.ckpt"
-		label_map_path = "meerkat/classification/label_maps/bank_debit_subtype_label_map.json"
+		label_map_path = "meerkat/classification/label_maps/bank_debit_subtype.json"
 	elif model_name == "bank_credit_subtype":
 		model_path = "meerkat/classification/models/bank_credit_subtype.ckpt"
-		label_map_path = "meerkat/classification/label_maps/bank_credit_subtype_label_map.json"
+		label_map_path = "meerkat/classification/label_maps/bank_credit_subtype.json"
 	elif model_name == "card_debit_subtype":
 		model_path = "meerkat/classification/models/card_debit_subtype.ckpt"
-		label_map_path = "meerkat/classification/label_maps/card_debit_subtype_label_map.json"
+		label_map_path = "meerkat/classification/label_maps/card_debit_subtype.json"
 	elif model_name == "card_credit_subtype":
 		model_path = "meerkat/classification/models/card_credit_subtype.ckpt"
-		label_map_path = "meerkat/classification/label_maps/card_debit_subtype_label_map.json"
+		label_map_path = "meerkat/classification/label_maps/card_debit_subtype.json"
 	else:
 		logging.warning("Model not found. Terminating")
 		sys.exit()
