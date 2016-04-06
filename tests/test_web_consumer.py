@@ -27,13 +27,6 @@ class WebConsumerTest(unittest.TestCase):
 
     def tearDown(self):
         return
-
-    @classmethod
-    def teardown_class(cls):
-        process = local['lsof']["/dev/nvidia0"]().split('\n')[1]
-        process = ' '.join(process.split())
-        pid = process.split(" ")[1]
-        sudo[local["kill"]["-9"][pid]]()
  
     def test_static_bank_category_map(self):
         """Assert that the correct static category label has been applied from the bank map"""
