@@ -33,6 +33,7 @@ import pandas as pd
 from boto.s3.connection import Key, Location
 
 from meerkat.various_tools import safe_print, safe_input, load_params, get_s3_connection
+from meerkat.various_tools import load_piped_dataframe
 
 class DummyFile(object):
 	"""Resemble the stdout/stderr object but it prints nothing to screen"""
@@ -148,8 +149,7 @@ def run_from_command_line():
 
 		k.get_contents_to_filename(local_filename)
 	
-	dataframe = pd.read_csv(local_filename, na_filter=False, \
-	quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+	dataframe = load_piped_dataframe(local_filename)
 	s_len = dataframe.shape[0]
 
 	# Add new columns if first time labeling this data set
