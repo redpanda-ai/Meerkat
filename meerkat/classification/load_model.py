@@ -45,7 +45,7 @@ def load_scikit_model(model_name):
 			
 	return classifier
 
-def get_tf_cnn_by_name(model_name):
+def get_tf_cnn_by_name(model_name, gpu_mem_fraction=False):
 	"""Load a tensorFlow CNN by name"""
 
 	# Switch on Models
@@ -71,9 +71,9 @@ def get_tf_cnn_by_name(model_name):
 		logging.warning("Model not found. Terminating")
 		sys.exit()
 
-	return get_tf_cnn_by_path(model_path, label_map_path)
+	return get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=gpu_mem_fraction)
 
-def get_tf_cnn_by_path(model_path, label_map_path):
+def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=False):
 	"""Load a tensorFlow module by name"""
 
 	# Load Config
@@ -93,7 +93,12 @@ def get_tf_cnn_by_path(model_path, label_map_path):
 	label_map = config["label_map"]
 
 	# Load Session and Graph
-	sess = tf.Session(graph=graph)
+	if gpu_mem_fraction:
+		gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.25)
+		sess = tf.Session(graph=graph, config=tf.ConfigProto(gpu_options=gpu_options))
+	else:
+		sess = tf.Session(graph=graph)
+
 	saver.restore(sess, config["model_path"])
 	model = get_tensor(graph, "model:0")
 	
