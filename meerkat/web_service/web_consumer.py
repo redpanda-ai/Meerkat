@@ -49,10 +49,10 @@ class WebConsumer():
 		self.hyperparams = hyperparams if hyperparams else {}
 		self.cities = cities if cities else {}
 
-	def load_tf_models(self, params):
+	def load_tf_models(self):
 		"""Load all tensorFlow models"""
 
-		gmf = params.get("gpu_mem_fraction", False)
+		gmf = self.params.get("gpu_mem_fraction", False)
 
 		self.bank_merchant_cnn = get_tf_cnn_by_name("bank_merchant", gpu_mem_fraction=gmf)
 		self.card_merchant_cnn = get_tf_cnn_by_name("card_merchant", gpu_mem_fraction=gmf)
