@@ -438,29 +438,27 @@ class WebConsumer():
 
 		return physical, non_physical
 
-	@staticmethod
-	def __apply_merchant_cnn(data):
+	def __apply_merchant_cnn(self, data):
 		"""Apply the merchant CNN to transactions"""
 		classifier = None
 		if data["container"] == "bank":
-			classifier = BANK_MERCHANT_CNN
+			classifier = self.bank_merchant_cnn
 		else:
-			classifier = CARD_MERCHANT_CNN
+			classifier = self.card_merchant_cnn
 		return classifier(data["transaction_list"], label_only=False)
 
-	@staticmethod
-	def __apply_subtype_cnn(data):
+	def __apply_subtype_cnn(self, data):
 		"""Apply the subtype CNN to transactions"""
 
 		if len(data["transaction_list"]) == 0:
 			return data["transaction_list"]
 
 		if data["container"] == "card":
-			credit_subtype_classifer = CARD_CREDIT_SUBTYPE_CNN
-			debit_subtype_classifer = CARD_DEBIT_SUBTYPE_CNN
+			credit_subtype_classifer = self.card_credit_subtype_cnn 
+			debit_subtype_classifer = self.card_debit_subtype_cnn
 		elif data["container"] == "bank":
-			credit_subtype_classifer = BANK_CREDIT_SUBTYPE_CNN
-			debit_subtype_classifer = BANK_DEBIT_SUBTYPE_CNN
+			credit_subtype_classifer = self.bank_credit_subtype_cnn
+			debit_subtype_classifer = self.bank_debit_subtype_cnn
 
 		# Split transactions into groups
 		credit, debit = [], []
