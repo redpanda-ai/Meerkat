@@ -44,7 +44,7 @@ import pandas as pd
 
 from meerkat.various_tools import load_dict_list, safely_remove_file, load_params
 from meerkat.various_tools import load_piped_dataframe
-from meerkat.classification.lua_bridge import get_cnn
+from meerkat.classification.load_model import get_tf_cnn_by_name
 
 default_doc_key = "DESCRIPTION_UNMASKED"
 default_label_key = "GOOD_DESCRIPTION"
@@ -267,8 +267,8 @@ def all_CNN_accuracy():
 	"""Run merchant CNN on a directory of Merchant Samples"""
 
 	# Load Classifiers
-	BANK_CNN = get_cnn("bank_merchant")
-	CARD_CNN = get_cnn("card_merchant")
+	BANK_CNN = get_tf_cnn_by_name("bank_merchant")
+	CARD_CNN = get_tf_cnn_by_name("card_merchant")
 
 	# Connect to S3
 	with nostdout():

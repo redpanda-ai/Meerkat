@@ -1,8 +1,9 @@
 import json
+import sys
 import unittest
+
 from meerkat.web_service import web_consumer
 from tests.fixture import web_consumer_fixture
-
 
 class WebConsumerTest(unittest.TestCase):
     """Our UnitTest class."""
@@ -23,7 +24,7 @@ class WebConsumerTest(unittest.TestCase):
 
     def tearDown(self):
         return
-
+ 
     def test_static_bank_category_map(self):
         """Assert that the correct static category label has been applied from the bank map"""
         
