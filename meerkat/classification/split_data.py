@@ -138,10 +138,7 @@ def main_split_data(args):
 			if file_name.endswith(".csv"):
 				input_csv_file = save_path_input + file_name
 
-		if credit_or_debit == "credit":
-			df, _ = seperate_debit_credit(input_csv_file)
-		else:
-			_, df = seperate_debit_credit(input_csv_file)
+		df = seperate_debit_credit(input_csv_file, credit_or_debit)
 
 		logging.info('Validating {0} {1} {2} data.'.\
 			format(model_type, bank_or_card, credit_or_debit))

@@ -420,7 +420,7 @@ def check_empty_transaction(df):
 	return df[(df['DESCRIPTION_UNMASKED'] != '') |\
 			(df['DESCRIPTION'] != '')]
 
-def seperate_debit_credit(subtype_file):
+def seperate_debit_credit(subtype_file, credit_or_debit):
 	"""Load the CSV into a pandas data frame, return debit and credit df"""
 	logging.info("Loading csv file")
 	df = load_piped_dataframe(subtype_file)
@@ -431,7 +431,7 @@ def seperate_debit_credit(subtype_file):
 	df['PROPOSED_SUBTYPE'] = df['PROPOSED_SUBTYPE'].apply(cap_first_letter)
 	grouped = df.groupby('LEDGER_ENTRY', as_index=False)
 	groups = dict(list(grouped))
-	return (groups['credit'], groups['debit'])
+	return groups[credit_or_debit]
 
 def reverse_map(label_map, key='label'):
 	"""reverse {key : {category, label}} to {label: key} and
