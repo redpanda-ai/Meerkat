@@ -162,6 +162,7 @@ def read_csv_to_df(csv_input, cnn_type):
 		grouped = df.groupby('LEDGER_ENTRY', as_index=False)
 		groups = dict(list(grouped))
 		df = groups[cnn_type[2]]
+		df["PROPOSED_SUBTYPE"] = df["PROPOSED_SUBTYPE"].str.strip()
 		return df
 
 def verify_csv(**kwargs):
