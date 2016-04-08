@@ -53,6 +53,8 @@ import collections
 import argparse
 import pandas as pd
 
+from meerkat.various_tools import load_piped_dataframe
+
 WARNING_THRESHOLD = 0.01
 CRITICAL_THRESHOLD = 0.05
 
@@ -138,7 +140,10 @@ def parse_arguments():
 
 def read_csv_to_df(csv_input, cnn_type):
 	"""Read csv file into pandas data frames"""
+
 	df = []
+	cols = ["DESCRIPTION", "DESCRIPTION_UNMASKED", "MERCHANT_NAME"]
+
 	if os.path.isdir(csv_input):
 		samples = []
 		for i in os.listdir(csv_input):
@@ -146,19 +151,18 @@ def read_csv_to_df(csv_input, cnn_type):
 				samples.append(i)
 
 		for sample in samples:
-			df_one_sample = pd.read_csv(csv_input + "/" + sample, na_filter=False, encoding="utf-8",
-				sep="|", error_bad_lines=False, quoting=csv.QUOTE_NONE)
+			df_one_sample = load_piped_dataframe(csv_input + "/" + sample, usecols=cols)
 			df.append(df_one_sample)
 		merged = pd.concat(df, ignore_index=True)
 		return merged
 
 	else:
-		df = pd.read_csv(csv_input, quoting=csv.QUOTE_NONE, na_filter=False,
-			encoding="utf-8", sep='|', error_bad_lines=False, low_memory=False)
+		df = load_piped_dataframe(csv_input)
 		df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
 		grouped = df.groupby('LEDGER_ENTRY', as_index=False)
 		groups = dict(list(grouped))
 		df = groups[cnn_type[2]]
+		df["PROPOSED_SUBTYPE"] = df["PROPOSED_SUBTYPE"].str.strip()
 		return df
 
 def verify_csv(**kwargs):
@@ -177,7 +181,7 @@ def verify_csv(**kwargs):
 
 	label_names_csv, label_counts_csv = verify_total_numbers(df, cnn_type)
 	verify_csv_format(df, cnn_type)
-	verify_numbers_in_each_class(label_names_csv, label_counts_csv)
+	verify_numbers_in_each_class(label_names_csv, label_counts_csv, cnn_type)
 
 	logging.info("csv is verified\n")
 	return label_names_csv
@@ -187,14 +191,13 @@ def verify_csv_format(df, cnn_type):
 	column_header = list(df.columns.values)
 	column_header.sort()
 	
-	merchant_header = ['AMOUNT', 'DESCRIPTION', 'DESCRIPTION_UNMASKED', 'GOOD_DESCRIPTION',
-		'MERCHANT_NAME', 'TRANSACTION_DATE', 'TYPE', 'UNIQUE_MEM_ID', 'UNIQUE_TRANSACTION_ID']
+	merchant_header = ['DESCRIPTION', 'DESCRIPTION_UNMASKED', 'MERCHANT_NAME']
 	subtype_header = ['AMOUNT', 'DESCRIPTION', 'DESCRIPTION_UNMASKED', 'LEDGER_ENTRY',
 		'PROPOSED_SUBTYPE', 'TRANSACTION_DATE', 'UNIQUE_TRANSACTION_ID']
 
 	cnn_column_header = merchant_header if cnn_type[0] == "merchant" else subtype_header
 
-	if column_header != cnn_column_header:
+	if sorted(column_header) != sorted(cnn_column_header):
 		logging.critical("csv data format is incorrect")
 		sys.exit()
 	logging.info("csv data format is correct")
@@ -257,12 +260,15 @@ def verify_json_no_dup_names(label_names_json):
 		sys.exit()
 	logging.info("There is no duplicate class name in json")
 
-def verify_numbers_in_each_class(label_names_csv, label_counts_csv):
+def verify_numbers_in_each_class(label_names_csv, label_counts_csv, cnn_type):
 	"""Verify that for any particular class, there are at least 500 transactions"""
 	err_msg = ""
+	if cnn_type[0] == "subtype":
+		return
 	for i in range(len(label_names_csv)):
-		if label_counts_csv[i] < 500:
-			err_msg += "{:<40}".format(label_names_csv[i]) + "{:<25}".format(str(label_counts_csv[i])) + "\n"
+		label_name = label_names_csv[i]
+		if label_counts_csv[label_name] < 500:
+			err_msg += "{:<40}".format(label_name) + "{:<25}".format(str(label_counts_csv[label_name])) + "\n"
 	if err_msg != "":
 		err_msg = ("{:<40}".format("Class Name") + "{:<25}".format("Number of Transactions") +
 			"\n") + err_msg

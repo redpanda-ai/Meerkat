@@ -30,7 +30,7 @@ def classify_one(self, transaction, max_retries=10, sleep_interval=2):
 		try:
 			sleep(sleep_interval)
 			r_post = requests.post(
-				"https://localhost/meerkat/v1.7",
+				"https://localhost/meerkat/v2.0",
 				data=transaction,
 				verify=False)
 

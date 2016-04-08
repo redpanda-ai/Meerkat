@@ -19,27 +19,23 @@ import queue
 
 import boto
 import numpy as np
+import pandas as pd
 
 from jsonschema import validate
 
 CLEAN_PATTERN = re.compile(r"\\+\|")
 QUOTE_CLEAN = re.compile(r'\"')
 
-def validate_configuration(config_path, schema_path):
+def validate_configuration(config, schema):
 	try:
-		config_file = open(config_path, encoding='utf-8')
-		schema_file = open(schema_path, encoding='utf-8')
 		try:
-			config = json.load(config_file)
-			schema = json.load(schema_file)
-		except ValueError:
-			logging.error("Config file is mal-formatted")
+			config = load_params(config)
+			schema = load_params(schema)
+		except ValueError as v:
+			logging.error("Config file is mal-formatted {0}".format(v))
 			sys.exit()
-
 		validate(config, schema)
 		logging.warning("Configuration schema is valid.")
-		config_file.close()
-		schema_file.close()
 	except IOError:
 		logging.error("File not found, aborting.")
 		sys.exit()
@@ -62,6 +58,32 @@ def load_dict_ordered(file_name, encoding='utf-8', delimiter="|"):
 	dict_list = list(reader)
 	input_file.close()
 	return dict_list, reader.fieldnames
+
+def load_piped_dataframe(filename, chunksize=False, usecols=False):
+	"""Load piped dataframe from file name"""
+
+	options = {
+		"quoting": csv.QUOTE_NONE,
+		"na_filter": False,
+		"encoding": "utf-8",
+		"sep": "|",
+		"error_bad_lines": False
+	}
+
+	if usecols:
+		columns = usecols
+		options["usecols"] = usecols
+	else:
+		with open(filename, 'r') as f:
+			header = f.readline()
+		columns = header.split("|")
+
+	options["dtype"] = {c: "object" for c in columns}
+
+	if isinstance(chunksize, int):
+		options["chunksize"] = chunksize
+
+	return pd.read_csv(filename, **options)
 
 def write_dict_list(dict_list, file_name, encoding="utf-8", delimiter="|",\
 		column_order=""):

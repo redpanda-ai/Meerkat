@@ -1,0 +1,82 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "Input schema for meerkat.classification.tensorflow_cnn",
+	"definitions": { },
+	"type": "object",
+	"properties" : {
+		"alphabet" : {
+			"description" : "The list of characters used for the input language",
+			"type" : "string",
+			"minLength" : 2
+		},
+		"base_rate" : {
+			"description" : "Base learning rate, modified according to batch size to prevent exploding gradients",
+			"type" : "number",
+			"minimum" : 0,
+			"maximum" : 1
+		},
+		"batch_size" : {
+			"description" : "The number of documents to batch together in one training step",
+			"type" : "integer",
+			"minimum" : 1
+		},
+		"container" : {
+			"description" : "The source of the data",
+			"enum": [ "bank", "card", ""]
+		},
+		"dataset" : {
+			"description" : "The dataset the model is being trained on",
+			"type" : "string"
+		},
+		"doc_length" : {
+			"description" : "A fixed width of which all documents are cast to either by padding or trucation",
+			"enum" : [ 123, 150, 177, 204, 231, 258, 285, 312, 339, 366, 393, 420, 447, 474, 501 ]
+		},
+		"epochs" : {
+			"description" : "The number of training steps between checkpoints",
+			"type" : "integer",
+			"minimum" : 1
+		},
+		"eras" : {
+			"description" : "The number of checkpoints to make during training",
+			"type" : "integer",
+			"minimum" : 1
+		},
+		"label_map" : {
+			"description" : "A map from output neuron number to class name",
+			"type" : ["string", "object"]
+		},
+		"ledger_entry": {
+			"description" : "Whether the transaction is related to money coming in or going out",
+			"enum" : ["credit", "debit", ""]
+		},
+		"mode": {
+			"description" : "Whether to train a model or evaluate a current one",
+			"enum" : ["train", "test"]
+		},
+		"model_path" : {
+			"description" : "The path to a model to load",
+			"type" : "string",
+			"pattern" : "^(.+ckpt|\\s*)$"
+		},
+		"model_type": {
+			"description" : "The type of model being trained",
+			"enum" : ["category", "merchant", "subtype", ""]
+		},
+		"momentum" : {
+			"description" : "A hyperparameter for momentum",
+			"type" : "number",
+			"minimum" : 0,
+			"maximum" : 1
+		},
+		"randomize" : {
+			"description" : "How much to randomize the starting weights",
+			"type" : "number",
+			"minimum" : 0,
+			"maximum" : 1
+		}
+	},
+	"required" : ["alphabet", "base_rate", "batch_size", "container", "doc_length",
+		"epochs", "eras", "label_map", "mode", "model_type", "momentum", "randomize"]
+}
+

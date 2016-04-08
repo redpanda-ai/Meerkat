@@ -1,18 +1,77 @@
+import boto
+import boto.s3
 import csv
+import ctypes
+import datetime
 import json
 import logging
 import os
-import sys
 import re
+import sys
+import tarfile
 import time
-import ctypes
+import math
 
 import numpy as np
 import pandas as pd
 
+from boto.s3.key import Key
 from boto.s3.connection import Location
 from boto import connect_s3
 from plumbum import local, NOHUP
+from meerkat.various_tools import load_piped_dataframe
+
+def check_new_input_file(**s3_params):
+	"""Check the existence of a new input.tar.gz file"""
+	bucket_name, prefix = s3_params["bucket"], s3_params["prefix"]
+	prefix = prefix + '/' * (prefix[-1] != '/')
+
+	conn = connect_s3()
+	bucket = conn.get_bucket(bucket_name, Location.USWest2)
+	listing_version = bucket.list(prefix=prefix, delimiter='/')
+
+	version_object_list = [
+		version_object
+		for version_object in listing_version
+	]
+
+	version_dir_list = []
+	for i in range(len(version_object_list)):
+		full_name = version_object_list[i].name
+		if full_name.endswith("/"):
+			dir_name = full_name[full_name.rfind("/", 0, len(full_name) - 1)+1:len(full_name)-1]
+			if dir_name.isdigit():
+				version_dir_list.append(dir_name)
+
+	newest_version = sorted(version_dir_list, reverse=True)[0]
+	newest_version_dir = prefix + newest_version
+	logging.info("The newest direcory is: {0}".format(newest_version_dir))
+	listing_tar_gz = bucket.list(prefix=newest_version_dir)
+
+	tar_gz_object_list = [
+		tar_gz_object
+		for tar_gz_object in listing_tar_gz
+	]
+
+	tar_gz_file_list = []
+	for i in range(len(tar_gz_object_list)):
+		full_name = tar_gz_object_list[i].name
+		tar_gz_file_name = full_name[full_name.rfind("/")+1:]
+		tar_gz_file_list.append(tar_gz_file_name)
+
+	if "input.tar.gz" not in tar_gz_file_list:
+		logging.critical("input.tar.gz doesn't exist in {0}".format(newest_version_dir))
+		sys.exit()
+	elif "preprocessed.tar.gz" not in tar_gz_file_list:
+		return True, newest_version_dir, newest_version
+	else:
+		return False, newest_version_dir, newest_version
+
+def make_tarfile(output_filename, source_dir):
+	"""Makes a gzipped tarball"""
+	with tarfile.open(output_filename, "w:gz") as tar:
+		reduced_name = os.path.basename(source_dir)[len(source_dir):]
+		tar.add(source_dir, arcname=reduced_name)
 
 def get_new_maint7b(directory, file_list):
 	"""Get the latest t7b file under directory."""
@@ -22,39 +81,7 @@ def get_new_maint7b(directory, file_list):
 			file_list.append(i)
 			return i
 
-def getCNNStatics(inputFile):
-	"""Get the era number and error rate."""
-	lualib = ctypes.CDLL("/home/ubuntu/torch/install/lib/libluajit.so", mode=ctypes.RTLD_GLOBAL)
-
-	# Must be imported after previous statement
-	import lupa
-	from lupa import LuaRuntime
-
-	# Load Runtime and Lua Modules
-	lua = LuaRuntime(unpack_returned_tuples=True)
-	torch = lua.require('torch')
-
-	template = '''
-		function(filename)
-			rows = {}
-			main = torch.load(filename)
-			for i = 0, #main.record - 1 do
-				error_rate = main.record[#main.record - i ]["val_error"]
-				rows[#main.record -i] = error_rate
-			end
-			return rows
-		end
-	'''
-
-	# Load Lua Functions
-	get_error = lua.eval(template)
-	lua_table = get_error(inputFile)
-
-	error_list = list(lua_table)
-	error_vals = list(lua_table.values())
-	return dict(zip(error_list, error_vals))
-
-def getTheBestErrorRate(erasDict):
+def get_best_error_rate(erasDict):
 	"""Get the best error rate among different eras"""
 	bestErrorRate = 1.0
 	bestEraNumber = 1
@@ -65,16 +92,26 @@ def getTheBestErrorRate(erasDict):
 
 	return bestErrorRate, bestEraNumber
 
-def zipDir(file1, file2):
+def get_utc_iso_timestamp():
+	"""Returns a 16 digit ISO timestamp, accurate to the second that is suitable for S3
+		Example: "20160403164944" (April 3, 2016, 4:49:44 PM UTC) """
+	return datetime.datetime.utcnow().strftime("%Y%m%d%H%M%S")
+
+def push_file_to_s3(source_path, bucket_name, object_prefix):
+	"""Pushes an object to S3"""
+	conn = connect_s3()
+	bucket = conn.get_bucket(bucket_name, Location.USWest2)
+	filename = os.path.basename(source_path)
+	key = Key(bucket)
+	key.key = object_prefix + filename
+	key.set_contents_from_filename(source_path)
+
+def zip_cnn_stats_dir(file1, file2):
 	"""Copy files to Best_CNN_Statics directory and zip it"""
 	local["mkdir"]["Best_CNN_Statics"]()
 	local["cp"][file1]["Best_CNN_Statics"]()
 	local["cp"][file2]["Best_CNN_Statics"]()
 	local["tar"]["-zcvf"]["Best_CNN_Statics.tar.gz"]["Best_CNN_Statics"]()
-
-def stopStream():
-	"""Stop stream.py when the threshold reached."""
-	local["pkill"]["qlua"]()
 
 def dict_2_json(obj, filename):
 	"""Saves a dict as a json file"""
@@ -264,43 +301,10 @@ def slice_into_dataframes(**kwargs):
 	#logging.info("The kwargs dictionary contains: \n{0}".format(kwargs))
 	return kwargs["train_poor"], kwargs["test_poor"], len(class_names)
 
-def convert_csv_to_torch_7_binaries(input_file):
-	"""Use plumbum to convert CSV files to torch 7 binaries."""
-	output_file = input_file[:-4] + ".t7b"
-	logging.info("Converting {0} to {1}.".format(input_file, output_file))
-	# Remove the output_file
-	if os.path.isfile(output_file):
-		os.remove(output_file)
-	command = local["qlua"]["meerkat/classification/lua/csv2t7b.lua"]\
-		["-input"][input_file]["-output"][output_file]
-	result = command()
-	logging.info("The result is {0}".format(result))
-	return output_file
-
-def create_new_configuration_file(num_of_classes, output_path, train_file, test_file):
-	"""This function generates a new config.lua file based off of a template."""
-	logging.info("Generate a new configuration file with the correct number of classes.")
-	logging.info("Output_path = {0}".format(output_path))
-	output_dir_len = len(output_path)
-	train_file = train_file[output_dir_len:]
-	test_file = test_file[output_dir_len:]
-	command = \
-		local["sed"]["s:\./train\.t7b:" + train_file + ":"]["meerkat/classification/lua/config.lua"] \
-		| local["sed"]["s:\./test\.t7b:" + test_file + ":"] \
-		 > output_path + "config.lua"
-	command()
-
 def copy_file(input_file, directory):
 	"""This function moves uses Linux's 'cp' command to copy files on the local host"""
 	logging.info("Copy the file {0} to directory: {1}".format(input_file, directory))
 	local["cp"][input_file][directory]()
-
-def execute_main_lua(output_path, input_file):
-	"""This function executes the qlua command and launches the lua script in the background."""
-	logging.info("Executing main.lua in background.")
-	with local.cwd(output_path):
-		(local["qlua"][input_file]) & NOHUP
-	logging.info("It's running.")
 
 def fill_description_unmasked(row):
 	"""Ensures that blank values for DESCRIPTION_UNMASKED are always filled."""
@@ -326,10 +330,10 @@ def unzip_and_merge(gz_file, bank_or_card):
 def merge_csvs(directory):
 	"merges all csvs immediately under the directory"
 	dataframes = []
+	cols = ["DESCRIPTION", "DESCRIPTION_UNMASKED", "MERCHANT_NAME"]
 	for i in os.listdir(directory):
 		if i.endswith('.csv'):
-			df = pd.read_csv(directory + i, na_filter=False, encoding='utf-8',
-				sep='|', error_bad_lines=False, quoting=csv.QUOTE_NONE)
+			df = load_piped_dataframe(directory + i, usecols=cols)
 			dataframes.append(df)
 	merged = pd.concat(dataframes, ignore_index=True)
 	merged = check_empty_transaction(merged)
@@ -347,11 +351,10 @@ def check_empty_transaction(df):
 	return df[(df['DESCRIPTION_UNMASKED'] != '') |\
 			(df['DESCRIPTION'] != '')]
 
-def seperate_debit_credit(subtype_file):
+def seperate_debit_credit(subtype_file, credit_or_debit):
 	"""Load the CSV into a pandas data frame, return debit and credit df"""
 	logging.info("Loading csv file")
-	df = pd.read_csv(subtype_file, quoting=csv.QUOTE_NONE, na_filter=False,
-		encoding="utf-8", sep='|', error_bad_lines=False)
+	df = load_piped_dataframe(subtype_file)
 	df = check_empty_transaction(df)
 	df['UNIQUE_TRANSACTION_ID'] = df.index
 	df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
@@ -359,7 +362,7 @@ def seperate_debit_credit(subtype_file):
 	df['PROPOSED_SUBTYPE'] = df['PROPOSED_SUBTYPE'].apply(cap_first_letter)
 	grouped = df.groupby('LEDGER_ENTRY', as_index=False)
 	groups = dict(list(grouped))
-	return (groups['credit'], groups['debit'])
+	return groups[credit_or_debit]
 
 def reverse_map(label_map, key='label'):
 	"""reverse {key : {category, label}} to {label: key} and
