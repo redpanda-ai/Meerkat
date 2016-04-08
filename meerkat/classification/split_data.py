@@ -1,4 +1,5 @@
 #!/usr/local/bin/python3.3
+# pylint: disable=too-many-locals
 
 """This script downloads an entire raw data file from s3, performs data
 validation to make sure future CNN training is possible. Then it splits
@@ -27,12 +28,10 @@ python3 -m meerkat.classification.split_data subtype bank \
 
 import logging
 import argparse
-import pandas as pd
 import numpy as np
 import os
 import shutil
 
-from datetime import datetime
 from .verify_data import verify_data
 from .tools import pull_from_s3, unzip_and_merge, seperate_debit_credit
 from plumbum import local
@@ -53,7 +52,7 @@ def parse_arguments():
 		containing raw data file.", default='')
 	parser.add_argument("--file_name", help="Name of file to be pulled.",
 		default='')
-	parser.add_argument("--train_size" , help="Training data proportion, \
+	parser.add_argument("--train_size", help="Training data proportion, \
 		default is 0.9.", default=0.9, type=float)
 	parser.add_argument("-d", "--debug", help="log at DEBUG level",
 		action="store_true")
@@ -72,17 +71,21 @@ def parse_arguments():
 	return args
 
 def random_split(df, train_size):
+	"""Randomly partition df into train_df and test_df"""
 	msk = np.random.rand(len(df)) <= train_size
 	return {"train" : df[msk], "test" : df[~msk]}
 
 def make_save_function(col, dirt):
+	"""Decorate save_result"""
 	def save_result(results, train_or_test):
+		"""Save results and name it with train_or_test"""
 		kwargs = {"cols" : col, "index" : False, 'sep' : '|'}
 		path = dirt + train_or_test + '.csv'
 		results[train_or_test].to_csv(path, **kwargs)
 	return save_result
 
 def main_split_data(args):
+	"""Loads, splits and uploads data according to args"""
 	model_type = args.model_type
 	bank_or_card = args.bank_or_card
 	data_type = model_type + "_" + bank_or_card
@@ -97,11 +100,6 @@ def main_split_data(args):
 		'subtype_card_credit' : "meerkat/cnn/data/subtype/card/credit/",
 		'subtype_bank_debit' : "meerkat/cnn/data/subtype/bank/debit",
 		'subtype_bank_credit' : "meerkat/cnn/data/subtype/bank/credit/"
-	}
-
-	ground_truth_labels = {
-		'merchant' : 'MERCHANT_NAME',
-		'subtype' : 'PROPOSED_SUBTYPE'
 	}
 
 	bucket = "s3yodlee" if args.bucket == '' else args.bucket
@@ -169,5 +167,5 @@ def main_split_data(args):
 	logging.info('{0} uploaded to {1}'.format(output_file, bucket + '/' + prefix))
 
 if __name__ == "__main__":
-	args = parse_arguments()
-	main_split_data(args)
+	ARGS = parse_arguments()
+	main_split_data(ARGS)
