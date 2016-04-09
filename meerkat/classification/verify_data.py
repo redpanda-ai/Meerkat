@@ -46,7 +46,6 @@ optional arguments:
 
 import os
 import json
-import csv
 import logging
 import sys
 import collections
@@ -268,7 +267,8 @@ def verify_numbers_in_each_class(label_names_csv, label_counts_csv, cnn_type):
 	for i in range(len(label_names_csv)):
 		label_name = label_names_csv[i]
 		if label_counts_csv[label_name] < 500:
-			err_msg += "{:<40}".format(label_name) + "{:<25}".format(str(label_counts_csv[label_name])) + "\n"
+			err_msg += "{:<40}".format(label_name) + \
+				"{:<25}".format(str(label_counts_csv[label_name])) + "\n"
 	if err_msg != "":
 		err_msg = ("{:<40}".format("Class Name") + "{:<25}".format("Number of Transactions") +
 			"\n") + err_msg
@@ -347,9 +347,9 @@ def verify_total_numbers(df, cnn_type):
 	return label_names_csv, label_counts_csv
 
 if __name__ == "__main__":
-	args = parse_arguments()
-	cnn_type = [args.merchant_or_subtype, args.bank_or_card]
-	if args.credit_or_debit != "":
-		cnn_type.append(args.credit_or_debit)
+	ARGS = parse_arguments()
+	CNNTYPE = [ARGS.merchant_or_subtype, ARGS.bank_or_card]
+	if ARGS.credit_or_debit != "":
+		CNNTYPE.append(ARGS.credit_or_debit)
 
-	verify_data(csv_input=args.csv_input, json_input=args.json_input, cnn_type=cnn_type)
+	verify_data(csv_input=ARGS.csv_input, json_input=ARGS.json_input, cnn_type=CNNTYPE)
