@@ -1,16 +1,12 @@
-import boto
-import boto.s3
+"""The place where you put frequently used functions"""
+
 import csv
-import ctypes
 import datetime
 import json
 import logging
 import os
-import re
 import sys
 import tarfile
-import time
-import math
 
 import numpy as np
 import pandas as pd
@@ -18,16 +14,15 @@ import pandas as pd
 from boto.s3.key import Key
 from boto.s3.connection import Location
 from boto import connect_s3
-from plumbum import local, NOHUP
+from plumbum import local
 from meerkat.various_tools import load_piped_dataframe
 
 def check_new_input_file(**s3_params):
 	"""Check the existence of a new input.tar.gz file"""
-	bucket_name, prefix = s3_params["bucket"], s3_params["prefix"]
+	prefix = s3_params["prefix"]
 	prefix = prefix + '/' * (prefix[-1] != '/')
 
-	conn = connect_s3()
-	bucket = conn.get_bucket(bucket_name, Location.USWest2)
+	bucket = connect_s3().get_bucket(s3_params["bucket"], Location.USWest2)
 	listing_version = bucket.list(prefix=prefix, delimiter='/')
 
 	version_object_list = [
@@ -206,7 +201,8 @@ def get_label_map(class_names):
 	label_map = dict(zip(sorted(class_names), label_numbers))
 	return label_map
 
-def show_label_stat(results, train_or_test,label='LABEL'):
+def show_label_stat(results, train_or_test, label='LABEL'):
+	"""Print count of each label"""
 	key = 'df_poor_' + train_or_test
 	print('Label counts for {0}ing set:'.format(train_or_test))
 	temp = results[key][label].value_counts()
@@ -222,7 +218,7 @@ def get_test_and_train_dataframes(df_rich, train_size=0.90):
 	logging.info("Building test and train dataframes")
 	df_poor = df_rich[['LABEL', 'DESCRIPTION_UNMASKED']]
 	msk = np.random.rand(len(df_poor)) < train_size
-	results =  {
+	results = {
 		"df_poor_train" : df_poor[msk],
 		"df_poor_test" : df_poor[~msk],
 		# "df_rich_test" : df_rich[~msk],
@@ -235,7 +231,7 @@ def get_test_and_train_dataframes(df_rich, train_size=0.90):
 def get_csv_files(**kwargs):
 	"""This function generates CSV and JSON files, returns paths of the files"""
 	prefix = kwargs["output_path"] +  kwargs["merchant_or_subtype"] + '_' + \
-		kwargs["bank_or_card"] + "_"*(kwargs["credit_or_debit"]!='') + \
+		kwargs["bank_or_card"] + "_" * (kwargs["credit_or_debit"] != '') + \
 		kwargs["credit_or_debit"] + "_"
 	logging.info("Prefix is : {0}".format(prefix))
 	#set file names
@@ -274,11 +270,6 @@ def get_json_and_csv_files(**kwargs):
 	#Return file names
 	return files
 
-def fill_description_unmasked(row):
-	"""Ensures that blank values for DESCRIPTION_UNMASKED are always filled."""
-	if row["DESCRIPTION_UNMASKED"] == "":
-		return row["DESCRIPTION"]
-	return row["DESCRIPTION_UNMASKED"]
 
 def slice_into_dataframes(**kwargs):
 	"""Slice into test and train dataframs, make a label map, and produce 
@@ -340,10 +331,11 @@ def merge_csvs(directory):
 	return merged
 
 def check_empty_transaction(df):
+	"""Find transactions with empty description and return df with nonempty description"""
 	empty_transaction = df[(df['DESCRIPTION_UNMASKED'] == '') &\
 		(df['DESCRIPTION'] == '')]
 	if len(empty_transaction) != 0:
-		print ("There are {0} empty transactions, \
+		print("There are {0} empty transactions, \
 			save to empty_transactions.csv"
 			.format(len(empty_transaction)))
 		empty_transaction.to_csv('empty_transactions.csv',
