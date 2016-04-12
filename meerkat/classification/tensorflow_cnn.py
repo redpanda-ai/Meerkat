@@ -72,6 +72,7 @@ def load_data(config):
 	ledger_entry = config["ledger_entry"]
 
 	ground_truth_labels = {
+		'category' : 'PROPOSED_CATEGORY',
 		'merchant' : 'MERCHANT_NAME',
 		'subtype' : 'PROPOSED_SUBTYPE'
 	}
@@ -94,7 +95,7 @@ def load_data(config):
 
 		raise Exception('Number of indexes does not match number of labels')
 
-	if model_type == "subtype":
+	if model_type != "merchant":
 		df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
 		grouped = df.groupby('LEDGER_ENTRY', as_index=False)
 		groups = dict(list(grouped))
