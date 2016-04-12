@@ -274,6 +274,7 @@ def main_process(args):
 		chunk_count += 1
 
 	# Calculate f_measure, recall, precision, false +/-, true +/- from confusion maxtrix
+	# FIXME - START I need to verify these metrics
 	logging.info("Evaluation is finished, preparing confusion matrix and cnn_stats")
 	true_positive = pd.DataFrame([confusion_matrix[i][i] for i in range(num_labels)])
 
@@ -292,6 +293,7 @@ def main_process(args):
 	accuracy = pd.DataFrame({'accuracy' : [round(sum(true_positive[0]) / sum(actual[0]), 4)]})
 	f_measure = (2 * precision * recall) / (precision + recall)
 	f_measure = np.round(f_measure, decimals=4)
+	# FIXME - START I need to verify these metrics
 
 	real_confusion_matrix = []
 	for i in range(num_labels):

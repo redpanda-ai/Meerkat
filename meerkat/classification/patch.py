@@ -50,9 +50,21 @@ def get_f_measure(stats_file):
 	#print(result_format.format("F-measure", f_measure))
 	return f_measure
 
-def get_stats_file(target):
+def get_true_positive(stats_file):
+	"""Gets the true positive for a particular confusion matrix"""
+	df = pd.read_csv(stats_file)
+	print("Confusion matrix")
+	print(df)
+	#drop columns 0, 1, and -1 to make a square matrix
+	df = df.drop(df.columns[[0,1,-1]], axis=1)
+	#get the diagonal of true positives as a vector
+	rows, _ = df.shape
+	tp = pd.DataFrame(df.iat[i,i] for i in range(rows))
+	print("True Positive {0}, Shape {1}".format(tp, tp.shape))
+	return tp
+
+def get_stats_file(target, stats_file):
 	"""Untars and gunzips the stats file from the target file"""
-	stats_file = "CNN_stat.csv"
 	if not tarfile.is_tarfile(target):
 		print("Invalid tarfile")
 		return None
@@ -77,7 +89,10 @@ def get_best_models(bucket, prefix, results, target):
 			k = Key(bucket)
 			k.key = prefix + key + timestamp + target
 			k.get_contents_to_filename(target)
-			score = get_f_measure(get_stats_file(target))
+			score = get_f_measure(get_stats_file(target, "CNN_stat.csv"))
+			matrix = get_stats_file(target, "Con_Matrix.csv")
+			get_true_positive(matrix)
+			print(matrix)
 			if score > highest_score:
 				highest_score = score
 				winner = timestamp
@@ -90,7 +105,8 @@ def main_patch():
 	"""Execute the main program"""
 	conn = boto.s3.connect_to_region('us-west-2')
 	bucket = conn.get_bucket("s3yodlee")
-	my_results, prefix = {}, "meerkat/cnn/data"
+	#REVERT HERE my_results, prefix = {}, "meerkat/cnn/data"
+	my_results, prefix = {}, "meerkat/cnn/data/category/card/credit"
 	target = "results.tar.gz"
 	find_s3_objects_recursively(conn, bucket, my_results, prefix=prefix, target=target)
 	results = get_peer_models(my_results, prefix=prefix)
