@@ -1,3 +1,5 @@
+"""This module will update Meerkat's models from S3"""
+
 import boto
 import re
 
@@ -17,26 +19,28 @@ def get_peer_models(candidate_dictionary, prefix=None):
 	"""Show the candidate models for each peer"""
 	results = {}
 	my_pattern = re.compile("(" + prefix + ")(.*/)(\d{14}/)")
-	for key in my_results:
-		#print(key)
+	for key in candidate_dictionary:
 		if my_pattern.search(key):
 			matches = my_pattern.match(key)
 			model_type, timestamp = matches.group(2), matches.group(3)
 			if model_type not in results:
 				results[model_type] = []
 			results[model_type].append(timestamp)
-			#print("Found {0}".format(matches.group(2)))
 		else:
 			print("Not Found")
 	return results
 
-if __name__ == "__main__":
+def main_patch():
+	"""Execute the main program"""
 	conn = boto.s3.connect_to_region('us-west-2')
 	bucket = conn.get_bucket("s3yodlee")
-
 	my_results, prefix = {}, "meerkat/cnn/data"
 	find_s3_objects_recursively(conn, bucket, my_results, prefix=prefix, target="results.tar.gz")
 	results = get_peer_models(my_results, prefix=prefix)
 	for key in sorted(results.keys()):
 		print("{0}: {1}".format(key, results[key]))
+
+if __name__ == "__main__":
+	#Execute the main program
+	main_patch()
 
