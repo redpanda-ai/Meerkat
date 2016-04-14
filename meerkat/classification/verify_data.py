@@ -1,4 +1,5 @@
 #/usr/local/bin/python3.3
+# pylint: disable=pointless-string-statement
 
 """This module verify csv and json:
 

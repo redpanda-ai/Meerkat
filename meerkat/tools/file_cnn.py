@@ -1,11 +1,11 @@
-import csv
+"""This module applies CNNs to transactions, saves results to a txt file"""
 import sys
 import math
 
 import pandas as pd
 import numpy as np
 
-from meerkat.classification.lua_bridge import get_cnn
+from meerkat.classification.load_model import get_tf_cnn_by_name as get_cnn
 from meerkat.various_tools import load_piped_dataframe
 
 #################### USAGE ##########################

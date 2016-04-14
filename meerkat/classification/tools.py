@@ -167,6 +167,7 @@ def pull_from_s3(**kwargs):
 
 	return local_file
 	# local_files.append(local_file)
+# pylint:disable=pointless-string-statement
 """
 	# However we only wish to process the first one
 	if local_files:

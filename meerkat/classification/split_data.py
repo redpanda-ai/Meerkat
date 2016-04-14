@@ -1,5 +1,6 @@
 #!/usr/local/bin/python3.3
 # pylint: disable=too-many-locals
+# pylint: disable=pointless-string-statement
 
 """This script downloads an entire raw data file from s3, performs data
 validation to make sure future CNN training is possible. Then it splits
