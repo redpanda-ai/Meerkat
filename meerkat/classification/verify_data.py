@@ -194,8 +194,15 @@ def verify_csv_format(df, cnn_type):
 	merchant_header = ['DESCRIPTION', 'DESCRIPTION_UNMASKED', 'MERCHANT_NAME']
 	subtype_header = ['AMOUNT', 'DESCRIPTION', 'DESCRIPTION_UNMASKED', 'LEDGER_ENTRY',
 		'PROPOSED_SUBTYPE', 'TRANSACTION_DATE', 'UNIQUE_TRANSACTION_ID']
+	category_header = ['UNIQUE_TRANSACTION_ID', 'AMOUNT', 'DESCRIPTION', 'DESCRIPTION_UNMASKED', 'LEDGER_ENTRY', 'TRANSACTION_DATE', 'PROPOSED_CATEGORY']
 
-	cnn_column_header = merchant_header if cnn_type[0] == "merchant" else subtype_header
+	cnn_column_header = []
+	if cnn_type[0] == "merchant":
+		cnn_column_header = merchant_header
+	elif cnn_type[0] == "subtype":
+		cnn_column_header = subtype_header
+	else:
+		cnn_column_header = category_header
 
 	if sorted(column_header) != sorted(cnn_column_header):
 		logging.critical("csv data format is incorrect")
@@ -293,7 +300,12 @@ def verify_total_numbers(df, cnn_type):
 		# Original card data size resource:
 		# s3://s3yodlee/development/card/aggregated_card_subtype_training_data.csv
 		"subtype_card_debit": 151336,
-		"subtype_card_credit": 23442
+		"subtype_card_credit": 23442,
+
+		"category_bank_credit": 142469,
+		"category_bank_debit": 219122,
+		"category_card_credit": 25373,
+		"category_card_debit": 204334
 	}
 
 	cnn_str = "_".join(item for item in cnn_type)
@@ -313,7 +325,13 @@ def verify_total_numbers(df, cnn_type):
 		logging.info("Data set size of csv is verified: {0:>15,}".format(len(df)))
 
 	# Generate count numbers for labels in csv
-	label_key_csv = "MERCHANT_NAME" if cnn_type[0] == "merchant" else "PROPOSED_SUBTYPE"
+	label_key_csv = ""
+	if cnn_type[0] == "merchant":
+		label_key_csv = "MERCHANT_NAME"
+	elif cnn_type[0] == "subtype":
+		label_key_csv = "PROPOSED_SUBTYPE"
+	else:
+		label_key_csv = "PROPOSED_CATEGORY"
 	label_names_csv = sorted(df[label_key_csv].value_counts().index.tolist())
 	label_counts_csv = df[label_key_csv].value_counts()
 

@@ -344,15 +344,19 @@ def check_empty_transaction(df):
 	return df[(df['DESCRIPTION_UNMASKED'] != '') |\
 			(df['DESCRIPTION'] != '')]
 
-def seperate_debit_credit(subtype_file, credit_or_debit):
+def seperate_debit_credit(csv_file, credit_or_debit, model_type):
 	"""Load the CSV into a pandas data frame, return debit and credit df"""
 	logging.info("Loading csv file")
-	df = load_piped_dataframe(subtype_file)
+	df = load_piped_dataframe(csv_file)
 	df = check_empty_transaction(df)
 	df['UNIQUE_TRANSACTION_ID'] = df.index
 	df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
-	df["PROPOSED_SUBTYPE"] = df["PROPOSED_SUBTYPE"].str.strip()
-	df['PROPOSED_SUBTYPE'] = df['PROPOSED_SUBTYPE'].apply(cap_first_letter)
+	if model_type == 'subtype':
+		df["PROPOSED_SUBTYPE"] = df["PROPOSED_SUBTYPE"].str.strip()
+		df['PROPOSED_SUBTYPE'] = df['PROPOSED_SUBTYPE'].apply(cap_first_letter)
+	if model_type == 'category':
+		df["PROPOSED_CATEGORY"] = df["PROPOSED_CATEGORY"].str.strip()
+		df['PROPOSED_CATEGORY'] = df['PROPOSED_CATEGORY'].apply(cap_first_letter)
 	grouped = df.groupby('LEDGER_ENTRY', as_index=False)
 	groups = dict(list(grouped))
 	return groups[credit_or_debit]

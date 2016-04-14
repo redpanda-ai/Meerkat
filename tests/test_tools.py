@@ -53,11 +53,11 @@ class ToolsTests(unittest.TestCase):
 			local["rm"]["empty_transactions.csv"]()
 
 	@parameterized.expand([
-		(["tests/fixture/correct_format.csv", "credit", 3])
+		(["tests/fixture/correct_format.csv", "credit", "subtype", 3])
 	])
-	def test_seperate_debit_credit(self, subtype_file, credit_or_debit, output):
+	def test_seperate_debit_credit(self, subtype_file, credit_or_debit, model_type, output):
 		"""Test correct_format with parameters"""
-		result = tools.seperate_debit_credit(subtype_file, credit_or_debit)
+		result = tools.seperate_debit_credit(subtype_file, credit_or_debit, model_type)
 		self.assertEqual(len(result), output)
 
 	@parameterized.expand([

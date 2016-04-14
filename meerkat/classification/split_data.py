@@ -100,8 +100,20 @@ def main_split_data(args):
 		'subtype_card_debit' : "meerkat/cnn/data/subtype/card/debit/",
 		'subtype_card_credit' : "meerkat/cnn/data/subtype/card/credit/",
 		'subtype_bank_debit' : "meerkat/cnn/data/subtype/bank/debit",
-		'subtype_bank_credit' : "meerkat/cnn/data/subtype/bank/credit/"
+		'subtype_bank_credit' : "meerkat/cnn/data/subtype/bank/credit/",
+		'category_bank_debit': 'meerkat/cnn/data/category/bank/debit/',
+		'category_bank_credit': 'meerkat/cnn/data/category/bank/credit/',
+		'category_card_debit': 'meerkat/cnn/data/category/card/debit/',
+		'category_card_credit': 'meerkat/cnn/data/category/card/credit/'
 	}
+
+	"""
+	ground_truth_labels = {
+		'category' : 'PROPOSED_CATEGORY',
+		'merchant' : 'MERCHANT_NAME',
+		'subtype' : 'PROPOSED_SUBTYPE'
+	}
+	"""
 
 	bucket = "s3yodlee" if args.bucket == '' else args.bucket
 	prefix = default_dir_paths[data_type] if args.input_dir == '' else args.input_dir
@@ -137,7 +149,7 @@ def main_split_data(args):
 			if file_name.endswith(".csv"):
 				input_csv_file = save_path_input + file_name
 
-		df = seperate_debit_credit(input_csv_file, credit_or_debit)
+		df = seperate_debit_credit(input_csv_file, credit_or_debit, model_type)
 
 		logging.info('Validating {0} {1} {2} data.'.\
 			format(model_type, bank_or_card, credit_or_debit))

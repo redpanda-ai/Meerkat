@@ -180,6 +180,7 @@ def auto_train():
 
 	# Evaluate trained model using test set
 	ground_truth_labels = {
+		'category' : 'PROPOSED_CATEGORY',
 		'merchant' : 'MERCHANT_NAME',
 		'subtype' : 'PROPOSED_SUBTYPE'
 	}
