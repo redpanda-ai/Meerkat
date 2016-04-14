@@ -147,7 +147,7 @@ def CNN_accuracy(*args, **kwargs):
 
 	human_map = __load_label_map(human_dict)
 	machine_map = __load_label_map(model_dict)
-	reader = load_piped_dataframe(testfile, chunksize=1000)
+	reader = load_piped_dataframe(test_file, chunksize=1000)
 
 	bulk_total = 0
 	bulk_needs_hand_labeling = 0

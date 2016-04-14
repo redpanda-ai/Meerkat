@@ -27,12 +27,13 @@ CLEAN_PATTERN = re.compile(r"\\+\|")
 QUOTE_CLEAN = re.compile(r'\"')
 
 def validate_configuration(config, schema):
+	"""validate a json config file"""
 	try:
 		try:
 			config = load_params(config)
 			schema = load_params(schema)
-		except ValueError as v:
-			logging.error("Config file is mal-formatted {0}".format(v))
+		except ValueError as val_err:
+			logging.error("Config file is mal-formatted {0}".format(val_err))
 			sys.exit()
 		validate(config, schema)
 		logging.warning("Configuration schema is valid.")
@@ -74,8 +75,8 @@ def load_piped_dataframe(filename, chunksize=False, usecols=False):
 		columns = usecols
 		options["usecols"] = usecols
 	else:
-		with open(filename, 'r') as f:
-			header = f.readline()
+		with open(filename, 'r') as reader:
+			header = reader.readline()
 		columns = header.split("|")
 
 	options["dtype"] = {c: "object" for c in columns}

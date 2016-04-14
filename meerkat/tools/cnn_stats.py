@@ -1,5 +1,5 @@
 #/usr/local/bin/python3.3
-
+# pylint: disable=pointless-string-statement
 """This module loads and evaluates a trained CNN on a provided 
 test set. It produces various stats and a confusion matrix for analysis
 
@@ -82,7 +82,6 @@ def compare_label(*args, **kwargs):
 	"""similar to generic_test in accuracy.py, with unnecessary items dropped"""
 	machine, cnn_column, human_column, conf_mat, num_labels = args[:]
 	doc_key = kwargs.get("doc_key")
-	fast_mode = kwargs.get('fast_mode', False)
 	unpredicted = []
 	needs_hand_labeling = []
 	correct = []
@@ -104,7 +103,7 @@ def compare_label(*args, **kwargs):
 			conf_mat[row][column] += 1
 
 		# If fast mode True then do not record
-		if not fast_mode:
+		if not kwargs.get('fast_mode', False):
 			# Continue if unlabeled
 			if machine_row[cnn_column] == "":
 				unpredicted.append([machine_row[doc_key], machine_row[human_column]])
@@ -142,9 +141,10 @@ def get_write_func(filename, header):
 	return write_func
 
 def count_transactions(csv_file):
+	"""count number of transactions in csv_file"""
 	with open(csv_file) as temp:
 		reader = csv.reader(temp, delimiter='|')
-		header = reader.__next__()
+		_ = reader.__next__()
 		return sum([1 for i in reader])
 
 '''
@@ -231,7 +231,7 @@ def main_process(args):
 	logging.info("Testing begins.")
 	for chunk in reader:
 		processed += len(chunk)
-		my_progress =  str(round(((processed/total_transactions) * 100), 2)) + '%'
+		my_progress = str(round(((processed/total_transactions) * 100), 2)) + '%'
 		logging.info("Evaluating {0} of the testset".format(my_progress))
 		logging.warning("Testing chunk {0}.".format(chunk_count))
 		if sec_doc_key != '':

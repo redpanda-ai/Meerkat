@@ -21,8 +21,6 @@ Created on Mar 14, 2016
 
 ###################################################################################################
 
-import argparse
-import csv
 import logging
 import math
 import os
@@ -32,9 +30,7 @@ import shutil
 import sys
 
 import numpy as np
-import pandas as pd
 import tensorflow as tf
-from jsonschema import validate
 
 from meerkat.classification.tools import fill_description_unmasked, reverse_map
 from meerkat.various_tools import load_params, load_piped_dataframe, validate_configuration
