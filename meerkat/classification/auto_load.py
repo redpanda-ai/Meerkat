@@ -5,7 +5,6 @@ import logging
 import re
 import tarfile
 import pandas as pd
-import sys
 
 from boto.s3.key import Key
 from os import rename
@@ -37,35 +36,34 @@ def get_peer_models(candidate_dictionary, prefix=None):
 			logging.warning("Not Found")
 	return results
 
-def show_dataframe(name, df):
-	"""Display information about a dataframe."""
-	logging.warning("{0}\n{1},\nShape {2},\nSize {3}".format(name, df, df.shape, df.size))
-
 def get_model_accuracy(stats_file):
 	"""Gets the true positive for a particular confusion matrix"""
 	df = pd.read_csv(stats_file)
 	#drop columns 0, 1, and -1 to make a square confusion matrix
-	df = df.drop(df.columns[[0,1,-1]], axis=1)
+	df = df.drop(df.columns[[0, 1, -1]], axis=1)
 	#Reset columns names, which are off by one
 	df.rename(columns=lambda x: int(x)-1, inplace=True)
 	#get the diagonal of true positives as a vector
 	rows, _ = df.shape
-	#First order calculations
-	true_positive = pd.DataFrame(df.iat[i,i] for i in range(rows))
-	col_sum = pd.DataFrame(df.sum(axis=1))
-	false_positive = pd.DataFrame(pd.DataFrame(df.sum(axis=0)).values - true_positive.values,
-		columns=true_positive.columns)
-	false_negative = pd.DataFrame(pd.DataFrame(df.sum(axis=1)).values - true_positive.values,
-		columns=true_positive.columns)
-	true_negative = pd.DataFrame(
-		[df.drop(i, axis=1).drop(i, axis=0).sum().sum() for i in range(rows)])
-	#Second order calculations
+
+	#First order calculations (good calculations, mostly unused)
+	true_positive = pd.DataFrame(df.iat[i, i] for i in range(rows))
+	#col_sum = pd.DataFrame(df.sum(axis=1))
+	#false_positive = pd.DataFrame(pd.DataFrame(df.sum(axis=0)).values - true_positive.values,
+	#	columns=true_positive.columns)
+	#false_negative = pd.DataFrame(pd.DataFrame(df.sum(axis=1)).values - true_positive.values,
+	#	columns=true_positive.columns)
+	#true_negative = pd.DataFrame(
+	#	[df.drop(i, axis=1).drop(i, axis=0).sum().sum() for i in range(rows)])
+
+	#Second order calculations (good calculations, mostly unused)
 	accuracy = true_positive.sum() / df.sum().sum()
-	precision = true_positive / (true_positive + false_positive)
-	recall = true_positive / (true_positive + false_negative)
-	specificity = true_negative / (true_negative + false_positive)
-	#Third order calculations
-	f_measure = 2 * precision * recall / (precision + recall)
+	#precision = true_positive / (true_positive + false_positive)
+	#recall = true_positive / (true_positive + false_negative)
+	#specificity = true_negative / (true_negative + false_positive)
+
+	#Third order calculations (good calculation, unused)
+	#f_measure = 2 * precision * recall / (precision + recall)
 	#Return the model accuracy, which is all we care about, actually
 	return accuracy.values[0]
 
@@ -78,7 +76,7 @@ def get_archived_file(archive, archived_file):
 	with tarfile.open(name=archive, mode="r:gz") as tar:
 		members = tar.getmembers()
 		logging.debug("Members {0}".format(members))
-		stats = [ member for member in members if my_pattern.search(member.name) ]
+		stats = [member for member in members if my_pattern.search(member.name)]
 		if len(stats) != 1:
 			logging.critical("Invalid tarfile, must contain exactly 1 archived_file")
 			logging.critical("Invalid Tarfile contains {0}".format(stats))
@@ -92,13 +90,11 @@ def get_archived_file(archive, archived_file):
 def get_best_models(bucket, prefix, results, target):
 	"""Gets the best model for a particular model type."""
 	model_base = "meerkat/classification/models/"
-	winners = {}
 	for key in sorted(results.keys()):
 		highest_score, winner = 0.0, None
 		result_format = "\t{0:<14}{1:>2}: {2:16}, Score: {3:0.5f}"
 		winner_format = "\t{0:<14}{1:>2}"
 		logging.warning("Evaluating {0}".format(key))
-		len_candidates = len(results[key])
 		candidate_count = 1
 		for timestamp in results[key]:
 			k = Key(bucket)
@@ -112,44 +108,38 @@ def get_best_models(bucket, prefix, results, target):
 				winner_count = candidate_count
 				#Find the actual checkpoint file.
 				leader = get_archived_file(target, ".*ckpt")
-				new_path = model_base + key.replace("/",".")[1:] + "ckpt"
+				new_path = model_base + key.replace("/", ".")[1:] + "ckpt"
 				logging.debug("Moving label_map to: {0}".format(new_path))
 				rename(leader, new_path)
 
 			logging.warning(result_format.format("Candidate", candidate_count, timestamp, score))
 			candidate_count += 1
 		set_label_map(bucket, prefix, key, winner)
-		winners[key] = winner
 		logging.warning(winner_format.format("Winner", winner_count))
-	return winners
 
 def set_label_map(bucket, prefix, key, winner):
-#	logging.warning("---------------------: {0}".format(winner))
-	#Move the json file.
+	"""Moves the appropriate label map from S3 to the local machine."""
 	input_tar = "input.tar.gz"
-	#logging.warning("Opening {0}{1}".format(winner, input_tar))
-	m = Key(bucket)
-	m.key = prefix + key + winner + input_tar
-	#logging.warning("HERE {0}".format(m.key))
-	m.get_contents_to_filename(input_tar)
+	s3_key = Key(bucket)
+	s3_key.key = prefix + key + winner + input_tar
+	s3_key.get_contents_to_filename(input_tar)
 	json_file = get_archived_file(input_tar, ".*json")
-	new_path = "meerkat/classification/models/" + key.replace("/",".")[1:] + "json"
+	new_path = "meerkat/classification/models/" + key.replace("/", ".")[1:] + "json"
 	logging.debug("Moving label_map to: {0}".format(new_path))
 	rename(json_file, new_path)
 
-def main_patch():
+def main_program():
 	"""Execute the main program"""
 	conn = boto.s3.connect_to_region('us-west-2')
 	bucket = conn.get_bucket("s3yodlee")
-	#REVERT HERE my_results, prefix = {}, "meerkat/cnn/data"
 	my_results, prefix = {}, "meerkat/cnn/data"
 	target = "results.tar.gz"
 	find_s3_objects_recursively(conn, bucket, my_results, prefix=prefix, target=target)
 	results = get_peer_models(my_results, prefix=prefix)
-	winners = get_best_models(bucket, prefix, results, target)
+	get_best_models(bucket, prefix, results, target)
 
 if __name__ == "__main__":
 	#Execute the main program
 	logging.basicConfig(format="%(asctime)s %(levelname)s: %(message)s")
-	main_patch()
+	main_program()
 
