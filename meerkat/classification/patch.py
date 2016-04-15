@@ -37,6 +37,7 @@ def get_peer_models(candidate_dictionary, prefix=None):
 def get_f_measure(stats_file):
 	"""Evaluates a single stats_file and returns the f_measure"""
 	df = pd.read_csv(stats_file)
+	print(df)
 	true_pos, false_neg = df["True_Positive"], df["False_Negative"]
 	sums = df.sum(axis=0)
 	#FIXME: I don't think this calcuation is meaningful, double-check it
@@ -50,18 +51,48 @@ def get_f_measure(stats_file):
 	#print(result_format.format("F-measure", f_measure))
 	return f_measure
 
+def show_dataframe(name, df):
+	"""Display information about a dataframe."""
+	print("{0}\n{1},\nShape {2},\nSize {3}".format(name, df, df.shape, df.size))
+
 def get_true_positive(stats_file):
 	"""Gets the true positive for a particular confusion matrix"""
 	df = pd.read_csv(stats_file)
-	print("Confusion matrix")
-	print(df)
-	#drop columns 0, 1, and -1 to make a square matrix
+	#drop columns 0, 1, and -1 to make a square confusion matrix
 	df = df.drop(df.columns[[0,1,-1]], axis=1)
+	#Reset columns names, which are off by one
+	df.rename(columns=lambda x: int(x)-1, inplace=True)
+	show_dataframe("Confusion Matrix", df)
 	#get the diagonal of true positives as a vector
 	rows, _ = df.shape
-	tp = pd.DataFrame(df.iat[i,i] for i in range(rows))
-	print("True Positive {0}, Shape {1}".format(tp, tp.shape))
-	return tp
+
+	#Calculate - part 1
+	true_positive = pd.DataFrame(df.iat[i,i] for i in range(rows))
+	col_sum = pd.DataFrame(df.sum(axis=1))
+	false_positive = pd.DataFrame(pd.DataFrame(df.sum(axis=0)).values - true_positive.values,
+		columns=true_positive.columns)
+	false_negative = pd.DataFrame(pd.DataFrame(df.sum(axis=1)).values - true_positive.values,
+		columns=true_positive.columns)
+	true_negative = pd.DataFrame(
+		[df.drop(i, axis=1).drop(i, axis=0).sum().sum() for i in range(rows)])
+
+	show_dataframe("True Positive", true_positive)
+	show_dataframe("True Negative", true_negative)
+	show_dataframe("False Positive", false_positive)
+	show_dataframe("False Negative", false_negative)
+
+	#Calculate - part 2
+	#FIXME: I think cnn_stats has incorrectly swapped the formula for precision and recall.
+	accuracy = true_positive.sum() / df.sum().sum()
+	precision = true_positive / (true_positive + false_positive)
+	recall = true_positive / (true_positive + false_negative)
+	specificity = true_negative / (true_negative + false_positive)
+	show_dataframe("Precision", precision)
+	show_dataframe("Recall", recall)
+	show_dataframe("Accuracy", accuracy)
+	show_dataframe("Specificity", specificity)
+
+	return true_positive, false_positive, false_negative, true_negative
 
 def get_stats_file(target, stats_file):
 	"""Untars and gunzips the stats file from the target file"""
