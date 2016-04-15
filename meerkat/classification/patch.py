@@ -7,6 +7,7 @@ import tarfile
 import pandas as pd
 
 from boto.s3.key import Key
+from os import rename
 
 def find_s3_objects_recursively(conn, bucket, my_results, prefix=None, target=None):
 	"""Find all S3 target objects and their locations recursively"""
@@ -67,23 +68,28 @@ def get_model_accuracy(stats_file):
 	#Return the model accuracy, which is all we care about, actually
 	return accuracy.values[0]
 
-def get_stats_file(target, stats_file):
-	"""Untars and gunzips the stats file from the target file"""
-	if not tarfile.is_tarfile(target):
+def get_archived_file(archive, archived_file):
+	"""Untars and gunzips the stats file from the archive file"""
+	if not tarfile.is_tarfile(archive):
 		logging.warning("Invalid tarfile")
 		return None
-	with tarfile.open(name=target, mode="r:gz") as tar:
+	my_pattern = re.compile(archived_file)
+	with tarfile.open(name=archive, mode="r:gz") as tar:
 		members = tar.getmembers()
-		stats = [ member for member in members if member.name == stats_file ]
+		stats = [ member for member in members if my_pattern.search(member.name) ]
 		if len(stats) != 1:
-			logging.warning("Invalid tarfile, must contain exactly 1 stats_file")
-			return None
+			logging.critical("Invalid tarfile, must contain exactly 1 archived_file")
+			logging.critical("Invalid Tarfile contains {0}".format(stats))
+			raise Exception("Invalid tarfile.")
 		else:
-			tar.extract(stats.pop())
-	return stats_file
+			my_file = stats.pop()
+			my_name = my_file.name
+			tar.extract(my_file)
+	return my_name
 
 def get_best_models(bucket, prefix, results, target):
 	"""Gets the best model for a particular model type."""
+	model_base = "meerkat/classification/models/"
 	winners = {}
 	for key in sorted(results.keys()):
 		highest_score, winner = 0.0, None
@@ -93,11 +99,14 @@ def get_best_models(bucket, prefix, results, target):
 			k = Key(bucket)
 			k.key = prefix + key + timestamp + target
 			k.get_contents_to_filename(target)
-			matrix = get_stats_file(target, "Con_Matrix.csv")
+			matrix = get_archived_file(target, "Con_Matrix.csv")
 			score = get_model_accuracy(matrix)
 			if score > highest_score:
 				highest_score = score
 				winner = timestamp
+				#Find the actual checkpoint file.
+				leader = get_archived_file(target, ".*ckpt")
+				rename(leader, model_base + key.replace("/",".") + "ckpt")
 			logging.warning(result_format.format("Candidate", timestamp, score))
 		winners[key] = winner
 		logging.warning(result_format.format("Winner", winner, highest_score))
