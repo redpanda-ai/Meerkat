@@ -76,6 +76,7 @@ def get_archived_file(archive, archived_file):
 	my_pattern = re.compile(archived_file)
 	with tarfile.open(name=archive, mode="r:gz") as tar:
 		members = tar.getmembers()
+		logging.warning("Members {0}".format(members))
 		stats = [ member for member in members if my_pattern.search(member.name) ]
 		if len(stats) != 1:
 			logging.critical("Invalid tarfile, must contain exactly 1 archived_file")
@@ -107,6 +108,15 @@ def get_best_models(bucket, prefix, results, target):
 				#Find the actual checkpoint file.
 				leader = get_archived_file(target, ".*ckpt")
 				rename(leader, model_base + key.replace("/",".") + "ckpt")
+				#Move the json file.
+				input_tar = "input.tar.gz"
+				m = Key(bucket)
+				m.key = prefix + key + timestamp + input_tar
+				m.get_contents_to_filename(input_tar)
+				print(m.key)
+				json_file = get_archived_file(input_tar, ".*json")
+				rename(json_file, model_base + key.replace("/",".") + "json")
+
 			logging.warning(result_format.format("Candidate", timestamp, score))
 		winners[key] = winner
 		logging.warning(result_format.format("Winner", winner, highest_score))
