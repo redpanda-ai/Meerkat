@@ -5,6 +5,7 @@ import logging
 import re
 import tarfile
 import pandas as pd
+import sys
 
 from boto.s3.key import Key
 from os import rename
@@ -76,7 +77,7 @@ def get_archived_file(archive, archived_file):
 	my_pattern = re.compile(archived_file)
 	with tarfile.open(name=archive, mode="r:gz") as tar:
 		members = tar.getmembers()
-		logging.warning("Members {0}".format(members))
+		logging.debug("Members {0}".format(members))
 		stats = [ member for member in members if my_pattern.search(member.name) ]
 		if len(stats) != 1:
 			logging.critical("Invalid tarfile, must contain exactly 1 archived_file")
@@ -94,8 +95,11 @@ def get_best_models(bucket, prefix, results, target):
 	winners = {}
 	for key in sorted(results.keys()):
 		highest_score, winner = 0.0, None
-		result_format = "\t{0:<14}: {1:16}, Score: {2:0.5f}"
+		result_format = "\t{0:<14}{1:>2}: {2:16}, Score: {3:0.5f}"
+		winner_format = "\t{0:<14}{1:>2}"
 		logging.warning("Evaluating {0}".format(key))
+		len_candidates = len(results[key])
+		candidate_count = 1
 		for timestamp in results[key]:
 			k = Key(bucket)
 			k.key = prefix + key + timestamp + target
@@ -105,35 +109,44 @@ def get_best_models(bucket, prefix, results, target):
 			if score > highest_score:
 				highest_score = score
 				winner = timestamp
+				winner_count = candidate_count
 				#Find the actual checkpoint file.
 				leader = get_archived_file(target, ".*ckpt")
-				rename(leader, model_base + key.replace("/",".") + "ckpt")
-				#Move the json file.
-				input_tar = "input.tar.gz"
-				m = Key(bucket)
-				m.key = prefix + key + timestamp + input_tar
-				m.get_contents_to_filename(input_tar)
-				print(m.key)
-				json_file = get_archived_file(input_tar, ".*json")
-				rename(json_file, model_base + key.replace("/",".") + "json")
+				new_path = model_base + key.replace("/",".")[1:] + "ckpt"
+				logging.debug("Moving label_map to: {0}".format(new_path))
+				rename(leader, new_path)
 
-			logging.warning(result_format.format("Candidate", timestamp, score))
+			logging.warning(result_format.format("Candidate", candidate_count, timestamp, score))
+			candidate_count += 1
+		set_label_map(bucket, prefix, key, winner)
 		winners[key] = winner
-		logging.warning(result_format.format("Winner", winner, highest_score))
+		logging.warning(winner_format.format("Winner", winner_count))
 	return winners
+
+def set_label_map(bucket, prefix, key, winner):
+#	logging.warning("---------------------: {0}".format(winner))
+	#Move the json file.
+	input_tar = "input.tar.gz"
+	#logging.warning("Opening {0}{1}".format(winner, input_tar))
+	m = Key(bucket)
+	m.key = prefix + key + winner + input_tar
+	#logging.warning("HERE {0}".format(m.key))
+	m.get_contents_to_filename(input_tar)
+	json_file = get_archived_file(input_tar, ".*json")
+	new_path = "meerkat/classification/models/" + key.replace("/",".")[1:] + "json"
+	logging.debug("Moving label_map to: {0}".format(new_path))
+	rename(json_file, new_path)
 
 def main_patch():
 	"""Execute the main program"""
 	conn = boto.s3.connect_to_region('us-west-2')
 	bucket = conn.get_bucket("s3yodlee")
 	#REVERT HERE my_results, prefix = {}, "meerkat/cnn/data"
-	my_results, prefix = {}, "meerkat/cnn/data/"
+	my_results, prefix = {}, "meerkat/cnn/data"
 	target = "results.tar.gz"
 	find_s3_objects_recursively(conn, bucket, my_results, prefix=prefix, target=target)
 	results = get_peer_models(my_results, prefix=prefix)
 	winners = get_best_models(bucket, prefix, results, target)
-	for winner in sorted(winners.keys()):
-		logging.warning("Category: {0:<25}, Winner: {1}".format(winner, winners[winner]))
 
 if __name__ == "__main__":
 	#Execute the main program
