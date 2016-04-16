@@ -89,11 +89,8 @@ def get_archived_file(archive, archived_file):
 
 def get_best_models(bucket, prefix, results, target):
 	"""Gets the best model for a particular model type."""
-	model_base = "meerkat/classification/models/"
 	for key in sorted(results.keys()):
 		highest_score, winner = 0.0, None
-		result_format = "\t{0:<14}{1:>2}: {2:16}, Score: {3:0.5f}"
-		winner_format = "\t{0:<14}{1:>2}"
 		logging.warning("Evaluating {0}".format(key))
 		candidate_count = 1
 		for timestamp in results[key]:
@@ -108,14 +105,15 @@ def get_best_models(bucket, prefix, results, target):
 				winner_count = candidate_count
 				#Find the actual checkpoint file.
 				leader = get_archived_file(target, ".*ckpt")
-				new_path = model_base + key.replace("/", ".")[1:] + "ckpt"
+				new_path = "meerkat/classification/models/" + key.replace("/", ".")[1:] + "ckpt"
 				logging.debug("Moving label_map to: {0}".format(new_path))
 				rename(leader, new_path)
 
-			logging.warning(result_format.format("Candidate", candidate_count, timestamp, score))
+			logging.warning("\t{0:<14}{1:>2}: {2:16}, Score: {3:0.5f}".format(
+				"Candidate", candidate_count, timestamp, score))
 			candidate_count += 1
 		set_label_map(bucket, prefix, key, winner)
-		logging.warning(winner_format.format("Winner", winner_count))
+		logging.warning("\t{0:<14}{1:>2}".format("Winner", winner_count))
 
 def set_label_map(bucket, prefix, key, winner):
 	"""Moves the appropriate label map from S3 to the local machine."""
@@ -132,8 +130,7 @@ def main_program():
 	"""Execute the main program"""
 	conn = boto.s3.connect_to_region('us-west-2')
 	bucket = conn.get_bucket("s3yodlee")
-	my_results, prefix = {}, "meerkat/cnn/data"
-	target = "results.tar.gz"
+	my_results, prefix, target = {}, "meerkat/cnn/data", "results.tar.gz"
 	find_s3_objects_recursively(conn, bucket, my_results, prefix=prefix, target=target)
 	results = get_peer_models(my_results, prefix=prefix)
 	get_best_models(bucket, prefix, results, target)
