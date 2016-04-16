@@ -25,13 +25,17 @@ def get_peer_models(candidate_dictionary, prefix=None):
 	"""Show the candidate models for each peer"""
 	results = {}
 	my_pattern = re.compile("(" + prefix + ")(.*/)(\d{14}/)")
+	logging.critical("Prefix {0}".format(prefix))
 	for key in candidate_dictionary:
+		logging.critical("Key {0}".format(key))
 		if my_pattern.search(key):
 			matches = my_pattern.match(key)
 			model_type, timestamp = matches.group(2), matches.group(3)
+			logging.critical("model_type {0}".format(model_type))
 			if model_type not in results:
 				results[model_type] = []
 			results[model_type].append(timestamp)
+			results[model_type].sort()
 		else:
 			logging.warning("Not Found")
 	return results
