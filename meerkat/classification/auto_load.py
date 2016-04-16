@@ -25,13 +25,10 @@ def get_peer_models(candidate_dictionary, prefix=None):
 	"""Show the candidate models for each peer"""
 	results = {}
 	my_pattern = re.compile("(" + prefix + ")(.*/)(\d{14}/)")
-	logging.critical("Prefix {0}".format(prefix))
 	for key in candidate_dictionary:
-		logging.critical("Key {0}".format(key))
 		if my_pattern.search(key):
 			matches = my_pattern.match(key)
 			model_type, timestamp = matches.group(2), matches.group(3)
-			logging.critical("model_type {0}".format(model_type))
 			if model_type not in results:
 				results[model_type] = []
 			results[model_type].append(timestamp)
@@ -40,9 +37,9 @@ def get_peer_models(candidate_dictionary, prefix=None):
 			logging.warning("Not Found")
 	return results
 
-def get_model_accuracy(stats_file):
+def get_model_accuracy(confusion_matrix):
 	"""Gets the true positive for a particular confusion matrix"""
-	df = pd.read_csv(stats_file)
+	df = pd.read_csv(confusion_matrix)
 	#drop columns 0, 1, and -1 to make a square confusion matrix
 	df = df.drop(df.columns[[0, 1, -1]], axis=1)
 	#Reset columns names, which are off by one
