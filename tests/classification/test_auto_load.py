@@ -38,6 +38,16 @@ class AutoLoadTests(unittest.TestCase):
 		result = auto_load.get_peer_models(candidate_dictionary, prefix=prefix)
 		self.assertDictEqual(result, expected)
 
+	@parameterized.expand([
+		(["con_matrix_1.csv", 0.99420625724217848]),
+		(["con_matrix_2.csv", 0.5])
+	])
+	def test_get_model_accuracy(self, confusion_matrix, expected):
+		"""Test the correct calculation of accuracy from the confusion matrix provided."""
+		confusion_matrix = "tests/classification/fixture/" + confusion_matrix
+		result = auto_load.get_model_accuracy(confusion_matrix)
+		self.assertEqual(result, expected)
+
 if __name__ == '__main__':
 	unittest.main()
 
