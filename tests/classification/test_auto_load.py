@@ -48,6 +48,20 @@ class AutoLoadTests(unittest.TestCase):
 		result = auto_load.get_model_accuracy(confusion_matrix)
 		self.assertEqual(result, expected)
 
+	@parameterized.expand([
+		(["tarball_1.tar.gz", ".*txt", True, "not a tarfile."]),
+		(["tarball_2.tar.gz", ".*csv", True, "several"]),
+		(["tarball_3.tar.gz", "foo", False, "foo.txt"])
+	])
+	def test_get_single_file_from_tarball(self, tarball, pattern, exception, expected):
+		"""Test to see that we can retrieve one and only one file from a tarball."""
+		tarball = "tests/classification/fixture/" + tarball
+		if exception:
+			self.assertRaisesRegex(Exception, expected,
+				auto_load.get_single_file_from_tarball, tarball, pattern)
+		else:
+			result = auto_load.get_single_file_from_tarball(tarball, pattern)
+			self.assertEqual(result, expected)
 if __name__ == '__main__':
 	unittest.main()
 

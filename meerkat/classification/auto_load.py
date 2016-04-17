@@ -68,22 +68,20 @@ def get_model_accuracy(confusion_matrix):
 	#Return the model accuracy, which is all we care about, actually
 	return accuracy.values[0]
 
-def get_archived_file(archive, archived_file):
+def get_single_file_from_tarball(archive, filename_pattern):
 	"""Untars and gunzips the stats file from the archive file"""
 	if not tarfile.is_tarfile(archive):
-		logging.warning("Invalid tarfile")
-		return None
-	my_pattern = re.compile(archived_file)
+		raise Exception("Invalid, not a tarfile.")
+	my_pattern = re.compile(filename_pattern)
 	with tarfile.open(name=archive, mode="r:gz") as tar:
 		members = tar.getmembers()
 		logging.debug("Members {0}".format(members))
-		stats = [member for member in members if my_pattern.search(member.name)]
-		if len(stats) != 1:
-			logging.critical("Invalid tarfile, must contain exactly 1 archived_file")
-			logging.critical("Invalid Tarfile contains {0}".format(stats))
-			raise Exception("Invalid tarfile.")
+		file_list = [member for member in members if my_pattern.search(member.name)]
+		if len(file_list) != 1:
+			logging.critical("Invalid, tarfile has several matching files.")
+			raise Exception("Invalid, tarfile has several matching files.")
 		else:
-			my_file = stats.pop()
+			my_file = file_list.pop()
 			my_name = my_file.name
 			tar.extract(my_file)
 	return my_name
@@ -98,14 +96,14 @@ def get_best_models(bucket, prefix, results, target):
 			k = Key(bucket)
 			k.key = prefix + key + timestamp + target
 			k.get_contents_to_filename(target)
-			matrix = get_archived_file(target, "Con_Matrix.csv")
+			matrix = get_single_file_from_tarball(target, "Con_Matrix.csv")
 			score = get_model_accuracy(matrix)
 			if score > highest_score:
 				highest_score = score
 				winner = timestamp
 				winner_count = candidate_count
 				#Find the actual checkpoint file.
-				leader = get_archived_file(target, ".*ckpt")
+				leader = get_single_file_from_tarball(target, ".*ckpt")
 				new_path = "meerkat/classification/models/" + key.replace("/", ".")[1:] + "ckpt"
 				logging.debug("Moving label_map to: {0}".format(new_path))
 				rename(leader, new_path)
@@ -122,7 +120,7 @@ def set_label_map(bucket, prefix, key, winner):
 	s3_key = Key(bucket)
 	s3_key.key = prefix + key + winner + input_tar
 	s3_key.get_contents_to_filename(input_tar)
-	json_file = get_archived_file(input_tar, ".*json")
+	json_file = get_single_file_from_tarball(input_tar, ".*json")
 	new_path = "meerkat/classification/models/" + key.replace("/", ".")[1:] + "json"
 	logging.debug("Moving label_map to: {0}".format(new_path))
 	rename(json_file, new_path)
