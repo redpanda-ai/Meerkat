@@ -5,7 +5,7 @@ import unittest
 import meerkat.classification.auto_load as auto_load
 
 from nose_parameterized import parameterized
-from plumbum import local
+from os.path import isfile
 
 class AutoLoadTests(unittest.TestCase):
 
@@ -47,6 +47,15 @@ class AutoLoadTests(unittest.TestCase):
 		confusion_matrix = "tests/classification/fixture/" + confusion_matrix
 		result = auto_load.get_model_accuracy(confusion_matrix)
 		self.assertEqual(result, expected)
+
+	@parameterized.expand([
+		(["tarball_4.tar.gz", "tests/classification/fixture/"] )
+	])
+	def test_set_label_map(self, tarball, output_path):
+		"""Test extraction of label_map from tarball."""
+		tarball = "tests/classification/fixture/" + tarball
+		result = auto_load.set_label_map(None, None, "", None, tarball, output_path)
+		self.assertTrue(isfile(result))
 
 	@parameterized.expand([
 		(["tarball_1.tar.gz", ".*txt", True, "not a tarfile."]),

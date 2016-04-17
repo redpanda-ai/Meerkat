@@ -111,19 +111,21 @@ def get_best_models(bucket, prefix, results, target):
 			logging.warning("\t{0:<14}{1:>2}: {2:16}, Score: {3:0.5f}".format(
 				"Candidate", candidate_count, timestamp, score))
 			candidate_count += 1
-		set_label_map(bucket, prefix, key, winner)
+		set_label_map(bucket, prefix, key, winner, "input.tar.gz", "meerkat/classification/models/")
 		logging.warning("\t{0:<14}{1:>2}".format("Winner", winner_count))
 
-def set_label_map(bucket, prefix, key, winner):
+def set_label_map(bucket, prefix, key, winner, tarball, output_path):
 	"""Moves the appropriate label map from S3 to the local machine."""
-	input_tar = "input.tar.gz"
-	s3_key = Key(bucket)
-	s3_key.key = prefix + key + winner + input_tar
-	s3_key.get_contents_to_filename(input_tar)
-	json_file = get_single_file_from_tarball(input_tar, ".*json")
-	new_path = "meerkat/classification/models/" + key.replace("/", ".")[1:] + "json"
+	if bucket is not None:
+		s3_key = Key(bucket)
+		s3_key.key = prefix + key + winner + tarball
+		s3_key.get_contents_to_filename(tarball)
+
+	json_file = get_single_file_from_tarball(tarball, ".*json")
+	new_path = output_path + key.replace("/", ".")[1:] + "json"
 	logging.debug("Moving label_map to: {0}".format(new_path))
 	rename(json_file, new_path)
+	return new_path
 
 def main_program():
 	"""Execute the main program"""
