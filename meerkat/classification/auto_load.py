@@ -1,5 +1,6 @@
 """This module will update Meerkat's models from S3"""
 
+import argparse
 import boto
 import logging
 import re
@@ -90,7 +91,7 @@ def get_best_models(bucket, prefix, results, target):
 	"""Gets the best model for a particular model type."""
 	for key in sorted(results.keys()):
 		highest_score, winner = 0.0, None
-		logging.warning("Evaluating {0}".format(key))
+		logging.info("Evaluating {0}".format(key))
 		candidate_count = 1
 		for timestamp in results[key]:
 			k = Key(bucket)
@@ -108,11 +109,11 @@ def get_best_models(bucket, prefix, results, target):
 				logging.debug("Moving label_map to: {0}".format(new_path))
 				rename(leader, new_path)
 
-			logging.warning("\t{0:<14}{1:>2}: {2:16}, Score: {3:0.5f}".format(
+			logging.info("\t{0:<14}{1:>2}: {2:16}, Score: {3:0.5f}".format(
 				"Candidate", candidate_count, timestamp, score))
 			candidate_count += 1
 		set_label_map(bucket, prefix, key, winner, "input.tar.gz", "meerkat/classification/models/")
-		logging.warning("\t{0:<14}{1:>2}".format("Winner", winner_count))
+		logging.info("\t{0:<14}{1:>2}".format("Winner", winner_count))
 
 def set_label_map(bucket, prefix, key, winner, tarball, output_path):
 	"""Moves the appropriate label map from S3 to the local machine."""
@@ -131,13 +132,24 @@ def main_program():
 	"""Execute the main program"""
 	conn = boto.s3.connect_to_region('us-west-2')
 	bucket = conn.get_bucket("s3yodlee")
-	my_results, prefix, target = {}, "meerkat/cnn/data/category/card/credit", "results.tar.gz"
+	my_results, prefix, target = {}, "meerkat/cnn/data", "results.tar.gz"
 	find_s3_objects_recursively(conn, bucket, my_results, prefix=prefix, target=target)
 	results = get_peer_models(my_results, prefix=prefix)
 	get_best_models(bucket, prefix, results, target)
 
 if __name__ == "__main__":
 	#Execute the main program
-	logging.basicConfig(format="%(asctime)s %(levelname)s: %(message)s")
+	parser = argparse.ArgumentParser("auto_load")
+	parser.add_argument("-d", "--debug", help="Show 'debug'+ level logs", action="store_true")
+	parser.add_argument("-v", "--info", help="Show 'info'+ level logs", action="store_true")
+	args = parser.parse_args()
+	if args.debug:
+		logging.basicConfig(format="%(asctime)s %(levelname)s: %(message)s", level=logging.DEBUG)
+	elif args.info:
+		logging.basicConfig(format="%(asctime)s %(levelname)s: %(message)s", level=logging.INFO)
+	else:
+		logging.basicConfig(format="%(asctime)s %(levelname)s: %(message)s", level=logging.WARNING)
+	logging.warning("Starting main program")
 	main_program()
+	logging.warning("Finishing main program")
 
