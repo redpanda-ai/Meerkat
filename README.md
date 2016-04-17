@@ -4,6 +4,7 @@
 * Geolocation (e.g. Street Address, City, State, Latitude and Longitude)
 * Name of merchant (e.g. Kroger, Target, CVS, McDonald's)
 * Type of transaction (e.g. Spend, Payroll, Refund, Fee)
+* Category of transaction (e.g. Groceries, General Merchandise, Restaurant)
 
 ## Useful links
 * [latest release] (https://github.com/joeandrewkey/Meerkat/releases/latest)
@@ -21,5 +22,3 @@ Contributors
 * Matt Sevrens
 * Tina Wu
 * Oscar Pan
-* Feifei Zhu
-* Jie Zhang
