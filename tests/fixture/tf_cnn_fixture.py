@@ -38,7 +38,7 @@ def get_subtype_config():
 	return {
 		"model_type": "subtype",
 		"dataset": "tests/fixture/correct_format.csv",
-		"label_map": load_params("meerkat/classification/label_maps/card_credit_subtype.json"),
+		"label_map": load_params("meerkat/classification/models/subtype.card.credit.json"),
 		"ledger_entry": "credit"
 	}
 
