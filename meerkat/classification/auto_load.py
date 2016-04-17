@@ -39,7 +39,7 @@ def get_peer_models(candidate_dictionary, prefix=None):
 	return results
 
 def get_model_accuracy(confusion_matrix):
-	"""Gets the true positive for a particular confusion matrix"""
+	"""Gets the accuracy for a particular confusion matrix"""
 	df = pd.read_csv(confusion_matrix)
 	#drop columns 0, 1, and -1 to make a square confusion matrix
 	df = df.drop(df.columns[[0, 1, -1]], axis=1)
