@@ -62,8 +62,13 @@ def validate_config(config):
 
 	return config
 
-def load_data(config):
-	"""Load data and label map"""
+def load_unlabeled_data(config):
+	"""Load unlabeled data"""
+
+	df = load_piped_dataframe("bank_unlabeled_1M.txt")
+
+def load_labeled_data(config):
+	"""Load labeled data and label map"""
 
 	model_type = config["model_type"]
 	dataset = config["dataset"]
@@ -338,7 +343,7 @@ def train_model(config, graph, sess, saver):
 	epochs = config["epochs"]
 	eras = config["eras"]
 	dataset = config["dataset"]
-	train, test, groups_train = load_data(config)
+	train, test, groups_train = load_labeled_data(config)
 	num_eras = epochs * eras
 	logging_interval = 50
 	learning_rate_interval = 15000
