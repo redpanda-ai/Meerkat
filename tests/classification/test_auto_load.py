@@ -1,15 +1,23 @@
 """Unit test for meerkat/classification/tools.py"""
 
 import boto
-import unittest
 import meerkat.classification.auto_load as auto_load
+import os
+import unittest
 
 from nose_parameterized import parameterized
 from os.path import isfile
 
-class AutoLoadTests(unittest.TestCase):
+def remove_file_if_exists(path):
+	"""Helper function"""
+	try:
+		os.remove(path)
+	except FileNotFoundError:
+		pass
 
+class AutoLoadTests(unittest.TestCase):
 	"""Unit tests for meerkat.classification.auto_load."""
+
 	@parameterized.expand([
 		(["us-west-2", "s3yodlee", "meerkat/cnn/data", "results.tar.gz"]),
 		(["us-west-2", "s3yodlee", "meerkat/cnn/data", "input.tar.gz"])
@@ -53,9 +61,12 @@ class AutoLoadTests(unittest.TestCase):
 	])
 	def test_set_label_map(self, tarball, output_path):
 		"""Test extraction of label_map from tarball."""
-		tarball = "tests/classification/fixture/" + tarball
-		result = auto_load.set_label_map(None, None, "", None, tarball, output_path)
+		tarball = output_path + tarball
+		label_map = output_path + "label_map.json"
+		remove_file_if_exists(label_map)
+		result = auto_load.set_label_map(None, None, "/label_map/", None, tarball, output_path)
 		self.assertTrue(isfile(result))
+		remove_file_if_exists(label_map)
 
 	@parameterized.expand([
 		(["tarball_1.tar.gz", ".*txt", True, "not a tarfile."]),
