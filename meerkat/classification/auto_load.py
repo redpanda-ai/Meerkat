@@ -143,12 +143,13 @@ if __name__ == "__main__":
 	parser.add_argument("-d", "--debug", help="Show 'debug'+ level logs", action="store_true")
 	parser.add_argument("-v", "--info", help="Show 'info'+ level logs", action="store_true")
 	args = parser.parse_args()
+	log_format = "%(asctime)s %(levelname)s: %(message)s"
 	if args.debug:
-		logging.basicConfig(format="%(asctime)s %(levelname)s: %(message)s", level=logging.DEBUG)
+		logging.basicConfig(format=log_format, level=logging.DEBUG)
 	elif args.info:
-		logging.basicConfig(format="%(asctime)s %(levelname)s: %(message)s", level=logging.INFO)
+		logging.basicConfig(format=log_format, level=logging.INFO)
 	else:
-		logging.basicConfig(format="%(asctime)s %(levelname)s: %(message)s", level=logging.WARNING)
+		logging.basicConfig(format=log_format, level=logging.WARNING)
 	logging.warning("Starting main program")
 	main_program()
 	logging.warning("Finishing main program")
