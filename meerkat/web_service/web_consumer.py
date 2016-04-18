@@ -16,7 +16,7 @@ from multiprocessing.pool import ThreadPool
 from scipy.stats.mstats import zscore
 
 from meerkat.various_tools import get_es_connection, string_cleanse, get_boosted_fields
-from meerkat.various_tools import synonyms, get_bool_query, get_qs_query, load_params
+from meerkat.various_tools import synonyms, get_bool_query, get_qs_query
 from meerkat.classification.load_model import load_scikit_model, get_tf_cnn_by_name
 
 # pylint:disable=no-name-in-module
@@ -301,23 +301,26 @@ class WebConsumer():
 		
 		for trans in transactions:
 
-			trans["search"] = { "category_labels" : trans.get("category_labels", [])}
+			trans["search"] = {"category_labels" : trans.get("category_labels", [])}
 
 			if trans.get("category_labels"):
 				trans["CNN"] = trans.get("CNN", {}).get("label", "")
-				if "subtype_CNN" in trans: del trans["subtype_CNN"]
+				if "subtype_CNN" in trans:
+					del trans["subtype_CNN"]
 				continue
 
 			fallback = trans.get("CNN", {}).get("category", "").strip()
 
-			if (fallback == "Use Subtype Rules for Categories" or fallback == ""):
-				fallback = trans.get("subtype_CNN", {}).get("category", trans.get("subtype_CNN", {}).get("label", ""))
+			if fallback == "Use Subtype Rules for Categories" or fallback == "":
+				fallback = trans.get("subtype_CNN", {}).get("category",\
+					trans.get("subtype_CNN", {}).get("label", ""))
 				fallback = isinstance(fallback, dict) and fallback[trans["ledger_entry"].lower()] or fallback
 
 			trans["category_labels"] = [fallback]
 			trans["CNN"] = trans.get("CNN", {}).get("label", "")
 
-			if "subtype_CNN" in trans: del trans["subtype_CNN"]
+			if "subtype_CNN" in trans:
+				del trans["subtype_CNN"]
 
 	def ensure_output_schema(self, transactions, debug, services_list):
 		"""Clean output to proper schema"""
@@ -359,20 +362,20 @@ class WebConsumer():
 				trans["city"] = trans["locale_bloom"][0]
 				trans["state"] = trans["locale_bloom"][1]
 				if debug or ("bloom_filter" in services_list):
-					trans["bloom_filter"] = { "city": trans["locale_bloom"][0],\
+					trans["bloom_filter"] = {"city": trans["locale_bloom"][0],\
 					"state": trans["locale_bloom"][1]}
 			else:
 				trans["city"] = ""
 				trans["state"] = ""
 				if debug or ("bloom_filter" in services_list):
-					trans["bloom_filter"] = { "city": "", "state": "" }
+					trans["bloom_filter"] = {"city": "", "state": ""}
 
 			if debug:
-				trans["cnn"] = { "txn_type" : trans["txn_type"],\
-				"txn_sub_type" : trans["txn_sub_type"] }
+				trans["cnn"] = {"txn_type" : trans["txn_type"],\
+					"txn_sub_type" : trans["txn_sub_type"]}
 			elif "cnn_subtype" in services_list:
-				trans["cnn_type_subtype"] = { "txn_type" : trans["txn_type"],\
-				"txn_sub_type" : trans["txn_sub_type"] }
+				trans["cnn_type_subtype"] = {"txn_type" : trans["txn_type"],\
+					"txn_sub_type" : trans["txn_sub_type"]}
 
 			if "CNN" in trans:
 				if debug:
