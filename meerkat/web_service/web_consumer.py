@@ -333,7 +333,7 @@ class WebConsumer():
 		# Override / Strip Fields
 		for trans in transactions:
 
-			if (debug or ("search" in services_list)) and trans["is_physical_merchant"]:
+			if debug and trans["is_physical_merchant"]:
 				trans["search"]["merchant_name"] = trans["merchant_name"]
 				trans["search"]["street"] = trans["street"]
 				trans["search"]["city"] = trans["city"]
@@ -358,37 +358,32 @@ class WebConsumer():
 
 			# Override Locale with Bloom Results
 			# Add city and state to each transaction
-			if trans["locale_bloom"] != None:
+			if trans.get("locale_bloom", None) != None:
 				trans["city"] = trans["locale_bloom"][0]
 				trans["state"] = trans["locale_bloom"][1]
-				if debug or ("bloom_filter" in services_list):
+				if debug:
 					trans["bloom_filter"] = {"city": trans["locale_bloom"][0],\
 					"state": trans["locale_bloom"][1]}
 			else:
 				trans["city"] = ""
 				trans["state"] = ""
-				if debug or ("bloom_filter" in services_list):
+				if debug :
 					trans["bloom_filter"] = {"city": "", "state": ""}
 
 			if debug:
 				trans["cnn"] = {"txn_type" : trans["txn_type"],\
 					"txn_sub_type" : trans["txn_sub_type"]}
-			elif "cnn_subtype" in services_list:
-				trans["cnn_type_subtype"] = {"txn_type" : trans["txn_type"],\
-					"txn_sub_type" : trans["txn_sub_type"]}
 
 			if "CNN" in trans:
 				if debug:
 					trans["cnn"]["merchant_name"] = trans["CNN"]
-				elif "cnn_merchant" in services_list:
-					trans["cnn_merchant"] = {"merchnat_name" : trans["CNN"]}
 				del trans["CNN"]
 
-			del trans["locale_bloom"]
-			del trans["description"]
-			del trans["amount"]
-			del trans["date"]
-			del trans["ledger_entry"]
+			trans.pop("locale_bloom", None)
+			trans.pop("description", None)
+			trans.pop("amount", None)
+			trans.pop("date", None)
+			trans.pop("ledger_entry", None)
 
 		# return transactions
 
@@ -545,20 +540,28 @@ class WebConsumer():
 	def __apply_cpu_classifiers(self, data):
 		"""Apply all the classifiers which are CPU bound.  Written to be
 		run in parallel with GPU bound classifiers."""
-		self.__apply_locale_bloom(data)
-		physical, non_physical = self.__sws(data)
+		services_list = data.get("services_list",[])
+		if "bloom_filter" in services_list or services_list == []:
+			self.__apply_locale_bloom(data)
+		if "search" in services_list or services_list == []:
+			physical, non_physical = self.__sws(data)
 
-		if "should_search" not in self.params or self.params["should_search"]:
-			physical = self.__enrich_physical(physical)
-			self.__apply_category_labels(physical)
-		else:
-			physical = self.__enrich_physical_no_search(physical)
-		return physical, non_physical
+			if "should_search" not in self.params or self.params["should_search"]:
+				physical = self.__enrich_physical(physical)
+				self.__apply_category_labels(physical)
+			else:
+				physical = self.__enrich_physical_no_search(physical)
+			return physical, non_physical
+		return data
 
 	def classify(self, data, optimizing=False):
 		"""Classify a set of transactions"""
 
 		services_list = data.get("services_list", [])
+		debug = data.get("debug", False)
+		# if debug all services are enabled
+		if debug == True:
+			services_list = []
 		cpu_result = self.__cpu_pool.apply_async(self.__apply_cpu_classifiers, (data, ))
 
 		if not optimizing:
@@ -572,7 +575,6 @@ class WebConsumer():
 		if not optimizing:
 			self.__apply_missing_categories(data["transaction_list"])
 
-		debug = data.get("debug", False)
 		self.ensure_output_schema(data["transaction_list"], debug,
 			services_list)
 
