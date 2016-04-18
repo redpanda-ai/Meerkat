@@ -39,7 +39,7 @@ def get_subtype_config():
 	"""Return a different config dictionary"""
 	label_map = "meerkat/classification/models/subtype.card.credit.json"
 	if not os.path.isfile(label_map):
-		load_models_from_s3("meerkat/cnn/data/subtype/card/credit")
+		load_models_from_s3(prefix="meerkat/cnn/data/subtype/card/credit")
 	return {
 		"model_type": "subtype",
 		"dataset": "tests/fixture/correct_format.csv",
