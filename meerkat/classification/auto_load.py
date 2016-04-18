@@ -128,11 +128,11 @@ def set_label_map(bucket, prefix, key, winner, tarball, output_path):
 	rename(json_file, new_path)
 	return new_path
 
-def main_program():
+def main_program(target="meerkat/cnn/data"):
 	"""Execute the main program"""
 	conn = boto.s3.connect_to_region('us-west-2')
 	bucket = conn.get_bucket("s3yodlee")
-	my_results, prefix, target = {}, "meerkat/cnn/data", "results.tar.gz"
+	my_results, prefix, target = {}, "results.tar.gz"
 	find_s3_objects_recursively(conn, bucket, my_results, prefix=prefix, target=target)
 	results = get_peer_models(my_results, prefix=prefix)
 	get_best_models(bucket, prefix, results, target)
