@@ -62,7 +62,8 @@
 			"type" : "array",
 			"items" : {
 				"type" : "string"
-			}
+			},
+			"minItems" : 1
 		}
 	},
 	"required": ["cobrand_id", "user_id", "container", "transaction_list"]

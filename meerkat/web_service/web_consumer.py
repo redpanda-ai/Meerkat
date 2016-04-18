@@ -558,11 +558,14 @@ class WebConsumer():
 	def classify(self, data, optimizing=False):
 		"""Classify a set of transactions"""
 
+		services_list = data.get("services_list", [])
 		cpu_result = self.__cpu_pool.apply_async(self.__apply_cpu_classifiers, (data, ))
 
 		if not optimizing:
-			self.__apply_subtype_cnn(data)
-			self.__apply_merchant_cnn(data)
+			if "cnn_subtype" in services_list or services_list == []:
+				self.__apply_subtype_cnn(data)
+			if "cnn_merchant" in services_list or services_list == []:
+				self.__apply_merchant_cnn(data)
 
 		cpu_result.get() # Wait for CPU bound classifiers to finish
 
@@ -570,7 +573,6 @@ class WebConsumer():
 			self.__apply_missing_categories(data["transaction_list"])
 
 		debug = data.get("debug", False)
-		services_list = data.get("services_list", [])
 		self.ensure_output_schema(data["transaction_list"], debug,
 			services_list)
 
