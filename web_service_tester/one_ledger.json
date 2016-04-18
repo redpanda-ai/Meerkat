@@ -1,1 +1,1 @@
-{ "container":"bank", "transaction_list":[ { "date":"2014-08-10T00:00:00", "description":"taco bell scarsdale, ny", "amount":59.0, "transaction_id":5024853, "ledger_entry":"debit" } ], "cobrand_id":99, "user_id":12177727 }
+{"debug": false, "services_list":["bloom_filter", "cnn_merchant", "cnn_subtype", "search"], "container":"bank", "transaction_list":[ { "date":"2014-08-10T00:00:00", "description":"taco bell scarsdale, ny", "amount":59.0, "transaction_id":5024853, "ledger_entry":"debit" } ], "cobrand_id":99, "user_id":12177727 }

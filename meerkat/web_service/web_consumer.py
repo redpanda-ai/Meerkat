@@ -543,6 +543,9 @@ class WebConsumer():
 		services_list = data.get("services_list",[])
 		if "bloom_filter" in services_list or services_list == []:
 			self.__apply_locale_bloom(data)
+		else:
+			for transaction in data["transaction_list"]:
+				transaction["locale_bloom"] = None
 		if "search" in services_list or services_list == []:
 			physical, non_physical = self.__sws(data)
 
@@ -567,6 +570,11 @@ class WebConsumer():
 		if not optimizing:
 			if "cnn_subtype" in services_list or services_list == []:
 				self.__apply_subtype_cnn(data)
+			else:
+				# Add the filed to ensure output schema pass
+				for transaction in data["transaction_list"]:
+					transaction["txn_sub_type"] = ""
+					transaction["txn_type"] = ""
 			if "cnn_merchant" in services_list or services_list == []:
 				self.__apply_merchant_cnn(data)
 
