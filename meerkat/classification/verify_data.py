@@ -1,4 +1,5 @@
 #/usr/local/bin/python3.3
+# pylint: disable=pointless-string-statement
 
 """This module verify csv and json:
 
@@ -46,7 +47,6 @@ optional arguments:
 
 import os
 import json
-import csv
 import logging
 import sys
 import collections
@@ -194,8 +194,15 @@ def verify_csv_format(df, cnn_type):
 	merchant_header = ['DESCRIPTION', 'DESCRIPTION_UNMASKED', 'MERCHANT_NAME']
 	subtype_header = ['AMOUNT', 'DESCRIPTION', 'DESCRIPTION_UNMASKED', 'LEDGER_ENTRY',
 		'PROPOSED_SUBTYPE', 'TRANSACTION_DATE', 'UNIQUE_TRANSACTION_ID']
+	category_header = ['UNIQUE_TRANSACTION_ID', 'AMOUNT', 'DESCRIPTION', 'DESCRIPTION_UNMASKED', 'LEDGER_ENTRY', 'TRANSACTION_DATE', 'PROPOSED_CATEGORY']
 
-	cnn_column_header = merchant_header if cnn_type[0] == "merchant" else subtype_header
+	cnn_column_header = []
+	if cnn_type[0] == "merchant":
+		cnn_column_header = merchant_header
+	elif cnn_type[0] == "subtype":
+		cnn_column_header = subtype_header
+	else:
+		cnn_column_header = category_header
 
 	if sorted(column_header) != sorted(cnn_column_header):
 		logging.critical("csv data format is incorrect")
@@ -268,7 +275,8 @@ def verify_numbers_in_each_class(label_names_csv, label_counts_csv, cnn_type):
 	for i in range(len(label_names_csv)):
 		label_name = label_names_csv[i]
 		if label_counts_csv[label_name] < 500:
-			err_msg += "{:<40}".format(label_name) + "{:<25}".format(str(label_counts_csv[label_name])) + "\n"
+			err_msg += "{:<40}".format(label_name) + \
+				"{:<25}".format(str(label_counts_csv[label_name])) + "\n"
 	if err_msg != "":
 		err_msg = ("{:<40}".format("Class Name") + "{:<25}".format("Number of Transactions") +
 			"\n") + err_msg
@@ -292,7 +300,12 @@ def verify_total_numbers(df, cnn_type):
 		# Original card data size resource:
 		# s3://s3yodlee/development/card/aggregated_card_subtype_training_data.csv
 		"subtype_card_debit": 151336,
-		"subtype_card_credit": 23442
+		"subtype_card_credit": 23442,
+
+		"category_bank_credit": 142469,
+		"category_bank_debit": 219122,
+		"category_card_credit": 25373,
+		"category_card_debit": 204334
 	}
 
 	cnn_str = "_".join(item for item in cnn_type)
@@ -312,7 +325,13 @@ def verify_total_numbers(df, cnn_type):
 		logging.info("Data set size of csv is verified: {0:>15,}".format(len(df)))
 
 	# Generate count numbers for labels in csv
-	label_key_csv = "MERCHANT_NAME" if cnn_type[0] == "merchant" else "PROPOSED_SUBTYPE"
+	label_key_csv = ""
+	if cnn_type[0] == "merchant":
+		label_key_csv = "MERCHANT_NAME"
+	elif cnn_type[0] == "subtype":
+		label_key_csv = "PROPOSED_SUBTYPE"
+	else:
+		label_key_csv = "PROPOSED_CATEGORY"
 	label_names_csv = sorted(df[label_key_csv].value_counts().index.tolist())
 	label_counts_csv = df[label_key_csv].value_counts()
 
@@ -347,9 +366,9 @@ def verify_total_numbers(df, cnn_type):
 	return label_names_csv, label_counts_csv
 
 if __name__ == "__main__":
-	args = parse_arguments()
-	cnn_type = [args.merchant_or_subtype, args.bank_or_card]
-	if args.credit_or_debit != "":
-		cnn_type.append(args.credit_or_debit)
+	ARGS = parse_arguments()
+	CNNTYPE = [ARGS.merchant_or_subtype, ARGS.bank_or_card]
+	if ARGS.credit_or_debit != "":
+		CNNTYPE.append(ARGS.credit_or_debit)
 
-	verify_data(csv_input=args.csv_input, json_input=args.json_input, cnn_type=cnn_type)
+	verify_data(csv_input=ARGS.csv_input, json_input=ARGS.json_input, cnn_type=CNNTYPE)

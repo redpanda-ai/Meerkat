@@ -21,8 +21,6 @@ Created on Mar 14, 2016
 
 ###################################################################################################
 
-import argparse
-import csv
 import logging
 import math
 import os
@@ -32,9 +30,7 @@ import shutil
 import sys
 
 import numpy as np
-import pandas as pd
 import tensorflow as tf
-from jsonschema import validate
 
 from meerkat.classification.tools import fill_description_unmasked, reverse_map
 from meerkat.various_tools import load_params, load_piped_dataframe, validate_configuration
@@ -72,6 +68,7 @@ def load_data(config):
 	ledger_entry = config["ledger_entry"]
 
 	ground_truth_labels = {
+		'category' : 'PROPOSED_CATEGORY',
 		'merchant' : 'MERCHANT_NAME',
 		'subtype' : 'PROPOSED_SUBTYPE'
 	}
@@ -94,7 +91,7 @@ def load_data(config):
 
 		raise Exception('Number of indexes does not match number of labels')
 
-	if model_type == "subtype":
+	if model_type != "merchant":
 		df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
 		grouped = df.groupby('LEDGER_ENTRY', as_index=False)
 		groups = dict(list(grouped))

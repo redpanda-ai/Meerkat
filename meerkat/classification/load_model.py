@@ -17,7 +17,8 @@ import tensorflow as tf
 from sklearn.externals import joblib
 
 from meerkat.various_tools import load_params
-from meerkat.classification.tensorflow_cnn import build_graph, validate_config, get_tensor, string_to_tensor
+from meerkat.classification.tensorflow_cnn import (build_graph,
+	validate_config, get_tensor, string_to_tensor)
 
 def load_scikit_model(model_name):
 	"""Load either Card or Bank classifier depending on
@@ -123,7 +124,8 @@ def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=False):
 	
 		for index, transaction in enumerate(trans):
 			label = label_map.get(str(labels[index]), "")
-			if isinstance(label, dict) and label_only: label = label["label"]
+			if isinstance(label, dict) and label_only:
+				label = label["label"]
 			transaction[label_key] = label
 
 		return trans

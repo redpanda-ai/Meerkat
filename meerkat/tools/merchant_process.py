@@ -1,8 +1,9 @@
+"""This module preprocess data and return a 2-column csv file for the Crepe algorithm"""
+
 import pandas as pd
 import numpy as np
 import json
 import os
-import csv
 import sys
 
 from meerkat.various_tools import load_piped_dataframe
@@ -16,8 +17,8 @@ from meerkat.various_tools import load_piped_dataframe
 
 def dict_2_json(obj, filename):
 	"""Saves a dict as a json file"""
-	with open(filename, 'w') as fp:
-		json.dump(obj, fp, indent=4)
+	with open(filename, 'w') as reader:
+		json.dump(obj, reader, indent=4)
 
 def run_from_command_line():
 	"""Runs these commands if the module is invoked from the command line"""
@@ -41,11 +42,11 @@ def run_from_command_line():
 	output_map = {}
 
 	# Process Data
-	for s in samples:
-		df = load_piped_dataframe(directory + "/" + s)
-		df['LABEL_NUM'] = str(label_num_map[s])
+	for sample in samples:
+		df = load_piped_dataframe(directory + "/" + sample)
+		df['LABEL_NUM'] = str(label_num_map[sample])
 		dataframes.append(df)
-		output_map[label_num_map[s]] = df["MERCHANT_NAME"][0]
+		output_map[label_num_map[sample]] = df["MERCHANT_NAME"][0]
 
 	# Add Null Class
 	null_df = load_piped_dataframe(directory + "/1.csv")
