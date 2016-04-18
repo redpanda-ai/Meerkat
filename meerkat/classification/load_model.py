@@ -17,7 +17,7 @@ import tensorflow as tf
 from sklearn.externals import joblib
 
 from meerkat.various_tools import load_params
-from meerkat.classiication.auto_load import main_program as load_models_from_s3
+from meerkat.classification.auto_load import main_program as load_models_from_s3
 from meerkat.classification.tensorflow_cnn import build_graph, validate_config, get_tensor, string_to_tensor
 
 def load_scikit_model(model_name):
