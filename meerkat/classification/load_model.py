@@ -17,6 +17,7 @@ import tensorflow as tf
 from sklearn.externals import joblib
 
 from meerkat.various_tools import load_params
+from meerkat.classiication.auto_load import main_program as load_models_from_s3
 from meerkat.classification.tensorflow_cnn import build_graph, validate_config, get_tensor, string_to_tensor
 
 def load_scikit_model(model_name):
@@ -82,8 +83,8 @@ def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=False):
 
 	# Validate Model and Label Map
 	if not isfile(model_path):
-		logging.warning("Resouces to load model not found. Terminating")
-		sys.exit()
+		logging.warning("Resouces to load model not found. Loading from S3")
+		load_models_from_s3()
 
 	# Load Graph
 	config = load_params(config_path)
