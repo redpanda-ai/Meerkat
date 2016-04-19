@@ -237,10 +237,9 @@ class WebConsumer():
 					transaction[attr_map.get(field, field)] = ""
 
 			if not transaction.get("country") or transaction["country"] == "":
-				logging.warning(("Factual response for merchant {} has no country code. "  
+				logging.warning(("Factual response for merchant {} has no country code. "
 					"Defaulting to US.").format(hit_fields["factual_id"][0]))
 				transaction["country"] = "US"
-
 		# Add Business Name, City and State as a fallback
 		if decision == False:
 			for field in field_names:
@@ -319,8 +318,7 @@ class WebConsumer():
 			trans["category_labels"] = [fallback]
 			trans["CNN"] = trans.get("CNN", {}).get("label", "")
 
-			if "subtype_CNN" in trans:
-				del trans["subtype_CNN"]
+			trans.pop("subtype_CNN", None)
 
 	def ensure_output_schema(self, transactions, debug, services_list):
 		"""Clean output to proper schema"""
@@ -333,7 +331,7 @@ class WebConsumer():
 		# Override / Strip Fields
 		for trans in transactions:
 
-			if debug and trans["is_physical_merchant"]:
+			if debug and trans.get("is_physical_merchant", None):
 				trans["search"]["merchant_name"] = trans["merchant_name"]
 				trans["search"]["street"] = trans["street"]
 				trans["search"]["city"] = trans["city"]
@@ -400,9 +398,9 @@ class WebConsumer():
 
 			header = {"index": index}
 			# add routing to header
-			if self.params["routed"] and trans.get("locale_bloom"):
-				region = trans["locale_bloom"][1]
-				header["routing"] = region.upper()
+			# if self.params["routed"] and trans.get("locale_bloom"):
+			region = trans["locale_bloom"][1]
+			header["routing"] = region.upper()
 
 			queries.append(header)
 			queries.append(query)
@@ -541,21 +539,22 @@ class WebConsumer():
 		"""Apply all the classifiers which are CPU bound.  Written to be
 		run in parallel with GPU bound classifiers."""
 		services_list = data.get("services_list",[])
+		if data.get("debug", False) == True:
+			services_list = []
 		if "bloom_filter" in services_list or services_list == []:
 			self.__apply_locale_bloom(data)
 		else:
 			for transaction in data["transaction_list"]:
 				transaction["locale_bloom"] = None
-		if "search" in services_list or services_list == []:
-			physical, non_physical = self.__sws(data)
+		physical, non_physical = self.__sws(data)
 
+		if "search" in services_list or services_list == []:
 			if "should_search" not in self.params or self.params["should_search"]:
 				physical = self.__enrich_physical(physical)
 				self.__apply_category_labels(physical)
 			else:
 				physical = self.__enrich_physical_no_search(physical)
-			return physical, non_physical
-		return data
+		return physical, non_physical
 
 	def classify(self, data, optimizing=False):
 		"""Classify a set of transactions"""
@@ -565,6 +564,7 @@ class WebConsumer():
 		# if debug all services are enabled
 		if debug == True:
 			services_list = []
+
 		cpu_result = self.__cpu_pool.apply_async(self.__apply_cpu_classifiers, (data, ))
 
 		if not optimizing:
