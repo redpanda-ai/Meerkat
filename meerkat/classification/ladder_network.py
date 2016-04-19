@@ -271,7 +271,8 @@ def build_graph(config):
 	# Create Graph
 	with graph.as_default():
 
-		learning_rate = tf.Variable(base_rate, trainable=False, name="lr") 
+		learning_rate = tf.Variable(base_rate, trainable=False, name="lr")
+		layers = []
 
 		input_shape = [None, 1, doc_length, alphabet_length]
 		output_shape = [None, num_labels]
@@ -306,37 +307,48 @@ def build_graph(config):
 		unlabeled = lambda x: tf.slice(x, [batch_size, 0, 0, 0], [-1, -1, -1, -1]) if x is not None else x
 		split_lu = lambda x: (labeled(x), unlabeled(x))
 
+		def ladder_layer(input_h, details, layer_type, weights=None, biases=None):
+
+			if layer_type == "conv":
+				layer = threshold(conv2d(input_h, weights) + biases)
+			elif layer_type == "pool":
+				layer = max_pool(input_h)
+			elif layer_type == "fc":
+				layer = threshold(tf.matmul(input_h, weights) + biases)
+
+			return layer
+
 		def encoder(inputs, name, train=False, noise_std=0.0):
 			"""Add model layers to the graph"""
 
-			h = inputs + tf.random_normal(tf.shape(inputs)) * noise_std
+			h_noise = inputs + tf.random_normal(tf.shape(inputs)) * noise_std
 			details = {}
 
 			details['labeled'] = {'z': {}, 'mean': {}, 'variance': {}, 'h': {}}
 			details['unlabeled'] = {'z': {}, 'mean': {}, 'variance': {}, 'h': {}}
-			details['labeled']['z'][0], details['unlabeled']['z'][0] = split_lu(h)
+			details['labeled']['z'][0], details['unlabeled']['z'][0] = split_lu(h_noise)
 
-			h_conv1 = threshold(conv2d(h, w_conv1) + b_conv1)
-			h_pool1 = max_pool(h_conv1)
+			h_conv1 = ladder_layer(h_noise, details, "conv", weights=w_conv1, biases=b_conv1)
+			h_pool1 = ladder_layer(h_conv1, details, "pool")
 
-			h_conv2 = threshold(conv2d(h_pool1, w_conv2) + b_conv2)
-			h_pool2 = max_pool(h_conv2)
+			h_conv2 = ladder_layer(h_pool1, details, "conv", weights=w_conv2, biases=b_conv2)
+			h_pool2 = ladder_layer(h_conv2, details, "pool")
 
-			h_conv3 = threshold(conv2d(h_pool2, w_conv3) + b_conv3)
+			h_conv3 = ladder_layer(h_pool2, details, "conv", weights=w_conv3, biases=b_conv3)
 
-			h_conv4 = threshold(conv2d(h_conv3, w_conv4) + b_conv4)
+			h_conv4 = ladder_layer(h_conv3, details, "conv", weights=w_conv4, biases=b_conv4)
 
-			h_conv5 = threshold(conv2d(h_conv4, w_conv5) + b_conv5)
-			h_pool5 = max_pool(h_conv5)
+			h_conv5 = ladder_layer(h_conv4, details, "conv", weights=w_conv5, biases=b_conv5)
+			h_pool5 = ladder_layer(h_conv5, details, "pool")
 
 			h_reshape = tf.reshape(h_pool5, [-1, reshape])
 
-			h_fc1 = threshold(tf.matmul(h_reshape, w_fc1) + b_fc1)
+			h_fc1 = ladder_layer(h_reshape, details, "fc", weights=w_fc1, biases=b_fc1)
 
 			if train:
 				h_fc1 = tf.nn.dropout(h_fc1, 0.5)
 
-			h_fc2 = tf.matmul(h_fc1, w_fc2) + b_fc2
+			h_fc2 = ladder_layer(h_fc1, details, "fc", weights=w_fc2, biases=b_fc2)
 
 			softmax = tf.nn.softmax(h_fc2)
 			network = tf.log(tf.clip_by_value(softmax, 1e-10, 1.0), name=name)
@@ -346,7 +358,8 @@ def build_graph(config):
 		network = encoder(trans_placeholder, "network", train=True)
 		trained_model = encoder(trans_placeholder, "model", train=False)
 
-		loss = tf.neg(tf.reduce_mean(tf.reduce_sum(network * labels_placeholder, 1)), name="loss")
+		labeled_output = tf.slice(network, [0, 0], [batch_size, -1])
+		loss = tf.neg(tf.reduce_mean(tf.reduce_sum(labeled_output * labels_placeholder, 1)), name="loss")
 		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss, name="optimizer")
 
 		saver = tf.train.Saver()
