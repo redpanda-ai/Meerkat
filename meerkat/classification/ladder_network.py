@@ -302,8 +302,8 @@ def build_graph(config):
 		b_fc2 = bias_variable([num_labels], 1024)
 
 		join = lambda l, u: tf.concat(0, [l, u])
-		labeled = lambda x: tf.slice(x, [0, 0], [batch_size, -1]) if x is not None else x
-		unlabeled = lambda x: tf.slice(x, [batch_size, 0], [-1, -1]) if x is not None else x
+		labeled = lambda x: tf.slice(x, [0, 0, 0, 0], [batch_size, -1, -1, -1]) if x is not None else x
+		unlabeled = lambda x: tf.slice(x, [batch_size, 0, 0, 0], [-1, -1, -1, -1]) if x is not None else x
 		split_lu = lambda x: (labeled(x), unlabeled(x))
 
 		def encoder(inputs, name, train=False, noise_std=0.0):
@@ -312,9 +312,9 @@ def build_graph(config):
 			h = inputs + tf.random_normal(tf.shape(inputs)) * noise_std
 			details = {}
 
-			#details['labeled'] = {'z': {}, 'mean': {}, 'variance': {}, 'h': {}}
-			#details['unlabeled'] = {'z': {}, 'mean': {}, 'variance': {}, 'h': {}}
-			#details['labeled']['z'][0], details['unlabeled']['z'][0] = split_lu(h)
+			details['labeled'] = {'z': {}, 'mean': {}, 'variance': {}, 'h': {}}
+			details['unlabeled'] = {'z': {}, 'mean': {}, 'variance': {}, 'h': {}}
+			details['labeled']['z'][0], details['unlabeled']['z'][0] = split_lu(h)
 
 			h_conv1 = threshold(conv2d(h, w_conv1) + b_conv1)
 			h_pool1 = max_pool(h_conv1)
