@@ -312,8 +312,8 @@ def main_process(args):
 	conf_mat.columns = ['Class'] + [str(x) for x in range(1, num_labels + 1)] + ['Unpredicted']
 	conf_mat.index = range(1, num_labels + 1)
 
-	stat.to_csv('data/CNN_stats/CNN_stat.csv', index=False)
-	conf_mat.to_csv('data/CNN_stats/Con_Matrix.csv')
+	stat.to_csv('data/CNN_stats/classification_report.csv', index=False)
+	conf_mat.to_csv('data/CNN_stats/confusion_matrix.csv')
 
 	logging.info("cnn_stats is finished. All files are saved to Meerkat/data/CNN_stats/")
 

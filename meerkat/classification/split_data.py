@@ -165,7 +165,9 @@ def main_split_data(args):
 	del df
 	del results
 
-	os.rename(input_json_file, save_path_preprocessed + "label_map.json")
+	label_map_path = save_path_preprocessed + "label_map.json"
+	os.rename(input_json_file, label_map_path)
+	copy_file(label_map_path, "data/CNN_stats/")
 	local['tar']['-zcvf'][output_file]['-C'][save_path_preprocessed]['.']()
 	local['aws']['s3']['cp'][output_file][dir_path]()
 
