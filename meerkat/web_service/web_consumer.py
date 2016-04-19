@@ -398,9 +398,9 @@ class WebConsumer():
 
 			header = {"index": index}
 			# add routing to header
-			# if self.params["routed"] and trans.get("locale_bloom"):
-			region = trans["locale_bloom"][1]
-			header["routing"] = region.upper()
+			if self.params["routed"] and trans.get("locale_bloom", None):
+				region = trans["locale_bloom"][1]
+				header["routing"] = region.upper()
 
 			queries.append(header)
 			queries.append(query)
