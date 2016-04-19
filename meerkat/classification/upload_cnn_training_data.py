@@ -14,10 +14,13 @@ import os
 import sys
 from plumbum import local
 from meerkat.classification.tools import push_file_to_s3, get_utc_iso_timestamp, make_tarfile
+from os import rename
 
 # check files
 def main_process():
 	"""This is the whole process"""
+	bucket = 's3yodlee'
+	prefix = default_dir_paths[sys.argv[2]] + dtime + '/'
 	csv_num, json_exit = 0, False
 	for filename in os.listdir(sys.argv[1]):
 		if filename.endswith('.csv'):
@@ -26,6 +29,7 @@ def main_process():
 			if json_exit:
 				print("should only have one json file")
 				sys.exit()
+			push_file_to_s3(filename, bucket, prefix)
 			json_exit = True
 		else:
 			print("file %s is not csv or json file" %filename)
@@ -57,8 +61,6 @@ def main_process():
 			'category_card_credit': "meerkat/cnn/data/category/card/credit/",
 		}
 	dtime = get_utc_iso_timestamp()
-	bucket = 's3yodlee'
-	prefix = default_dir_paths[sys.argv[2]] + dtime + '/'
 	print("uploading to s3")
 	push_file_to_s3('input.tar.gz', bucket, prefix)
 	print("uploaded to s3")
