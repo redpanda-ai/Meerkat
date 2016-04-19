@@ -79,8 +79,8 @@ def get_single_file_from_tarball(archive, filename_pattern):
 		logging.debug("Members {0}".format(members))
 		file_list = [member for member in members if my_pattern.search(member.name)]
 		if len(file_list) != 1:
-			logging.critical("Invalid, tarfile has several matching files.")
-			raise Exception("Invalid, tarfile has several matching files.")
+			logging.critical("Invalid, tarfile must have exactly one matching file.")
+			raise Exception("Invalid, tarfile must have exactly one matching file.")
 		else:
 			my_file = file_list.pop()
 			my_name = my_file.name
@@ -98,7 +98,7 @@ def get_best_models(bucket, prefix, results, target, s3_base):
 			k = Key(bucket)
 			k.key = prefix + key + timestamp + target
 			k.get_contents_to_filename(target)
-			matrix = get_single_file_from_tarball(target, "Con_Matrix.csv")
+			matrix = get_single_file_from_tarball(target, "confusion_matrix.csv")
 			score = get_model_accuracy(matrix)
 			if score > highest_score:
 				highest_score = score
@@ -115,7 +115,7 @@ def get_best_models(bucket, prefix, results, target, s3_base):
 				"Candidate", candidate_count, timestamp, score))
 			candidate_count += 1
 		set_label_map(bucket, prefix, key, winner, s3_base,
-			"input.tar.gz", "meerkat/classification/models/")
+			"results.tar.gz", "meerkat/classification/models/")
 		logging.info("\t{0:<14}{1:>2}".format("Winner", winner_count))
 
 def set_label_map(bucket, prefix, key, winner, s3_base, tarball, output_path):
