@@ -52,7 +52,7 @@ import tensorflow as tf
 from plumbum import local
 from meerkat.classification.split_data import main_split_data
 from meerkat.classification.tools import (pull_from_s3, check_new_input_file,
-	push_file_to_s3, make_tarfile, copy_file)
+	push_file_to_s3, make_tarfile, copy_file, check_file_exist_in_s3)
 from meerkat.classification.tensorflow_cnn import build_graph, train_model, validate_config
 from meerkat.tools.cnn_stats import main_process as apply_cnn
 from meerkat.various_tools import load_params
@@ -141,6 +141,23 @@ def auto_train():
 	exist_new_input, newest_version_dir, version = check_new_input_file(**s3_params)
 	s3_params["prefix"] = newest_version_dir + "/"
 
+	exist_results = check_file_exist_in_s3("results.tar.gz", **s3_params)
+	if exist_results:
+		valid_options = ["yes", "no"]
+		while True:
+			should_retrain = input("Model has already been trained. " +
+				"Do you want to retrain the model? (yes/no): ")
+			if should_retrain in valid_options:
+				break
+			else:
+				logging.info("Not a valid option. Valid options are: yes or no.")
+		if should_retrain == "no":
+			logging.info("Auto train ends")
+			return
+		else:
+			logging.info("Retrain the model")
+			return
+
 	if args.output_dir == '':
 		save_path = save_path + '_' + version + '/'
 		s3_params["save_path"] = save_path
@@ -200,7 +217,7 @@ def auto_train():
 	copy_file("meerkat/classification/models/train.ckpt", "data/CNN_stats/")
 	make_tarfile("results.tar.gz", "data/CNN_stats")
 	logging.info("Uploading results.tar.gz to S3 {0}".format(s3_params["prefix"]))
-	push_file_to_s3("results.tar.gz", "s3yodlee", s3_params["prefix"])
+	#push_file_to_s3("results.tar.gz", "s3yodlee", s3_params["prefix"])
 	logging.info("Upload results.tar.gz to S3 sucessfully.")
 
 	if exist_new_input:
