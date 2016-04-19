@@ -34,7 +34,7 @@ import os
 import shutil
 
 from .verify_data import verify_data
-from .tools import pull_from_s3, unzip_and_merge, seperate_debit_credit
+from .tools import pull_from_s3, unzip_and_merge, seperate_debit_credit, copy_file
 from plumbum import local
 
 def parse_arguments():
