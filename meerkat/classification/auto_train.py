@@ -152,7 +152,9 @@ def auto_train():
 	if exist_results_tarball:
 		pull_from_s3(extension='.tar.gz', file_name="results.tar.gz", **s3_params)
 		try:
-			get_single_file_from_tarball(save_path + "results.tar.gz", ".ckpt")
+			model_file = get_single_file_from_tarball(save_path + "results.tar.gz", ".ckpt")
+			os.remove(model_file)
+
 			valid_options = ["yes", "no"]
 			while True:
 				retrain_choice = input("Model has already been trained. " +
@@ -161,8 +163,10 @@ def auto_train():
 					break
 				else:
 					logging.critical("Not a valid option. Valid options are: yes or no.")
+
 			if retrain_choice == "no":
 				logging.info("Auto train ends")
+				shutil.rmtree(save_path)
 				return
 			else:
 				logging.info("Retrain the model")
