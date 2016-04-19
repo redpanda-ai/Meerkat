@@ -359,8 +359,8 @@ def build_graph(config):
 		trained_model = encoder(trans_placeholder, "model", train=False)
 
 		labeled_output = tf.slice(network, [0, 0], [batch_size, -1])
-		loss = tf.neg(tf.reduce_mean(tf.reduce_sum(labeled_output * labels_placeholder, 1)), name="loss")
-		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss, name="optimizer")
+		supervised_cost = tf.neg(tf.reduce_mean(tf.reduce_sum(labeled_output * labels_placeholder, 1)), name="loss")
+		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(supervised_cost, name="optimizer")
 
 		saver = tf.train.Saver()
 
