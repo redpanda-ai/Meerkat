@@ -62,23 +62,21 @@ def check_new_input_file(**s3_params):
 	else:
 		return False, newest_version_dir, newest_version
 
-def check_file_exist_in_s3(file_name, **s3_params):
+def check_file_exist_in_s3(target_file_name, **s3_params):
 	"""Check if a file exist in s3"""
-	prefix = kwargs["prefix"]
+	prefix = s3_params["prefix"]
 	prefix = prefix + '/' * (prefix[-1] != '/')
 
 	bucket = connect_s3().get_bucket(s3_params["bucket"], Location.USWest2)
 	listing = bucket.list(prefix=prefix, delimiter='/')
 
-	file_name = kwargs.get("file_name", '')
 	s3_object_list = [
 		s3_object
 		for s3_object in listing
-			if s3_object.key.endswith(file_name)
+			if s3_object.key.endswith(target_file_name)
 	]
-	if len(s3_object_list) == 0:
-		raise Exception('Unable to find {0}'.format(file_name))
-	return True
+
+	return True if len(s3_object_list) == 1 else False
 
 def make_tarfile(output_filename, source_dir):
 	"""Makes a gzipped tarball"""

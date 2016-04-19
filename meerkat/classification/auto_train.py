@@ -56,6 +56,7 @@ from meerkat.classification.tools import (pull_from_s3, check_new_input_file,
 from meerkat.classification.tensorflow_cnn import build_graph, train_model, validate_config
 from meerkat.tools.cnn_stats import main_process as apply_cnn
 from meerkat.various_tools import load_params
+from meerkat.classification.auto_load import get_single_file_from_tarball
 
 def parse_arguments():
 	"""This function parses arguments from our command line."""
@@ -141,8 +142,18 @@ def auto_train():
 	exist_new_input, newest_version_dir, version = check_new_input_file(**s3_params)
 	s3_params["prefix"] = newest_version_dir + "/"
 
+	if args.output_dir == '':
+		save_path = save_path + '_' + version + '/'
+		s3_params["save_path"] = save_path
+
+	os.makedirs(save_path, exist_ok=True)
+
 	exist_results = check_file_exist_in_s3("results.tar.gz", **s3_params)
 	if exist_results:
+		results_tarball = pull_from_s3(extension='.tar.gz', file_name="results.tar.gz", **s3_params)
+		name = get_single_file_from_tarball(save_path + "results.tar.gz", ".ckpt")
+		print(name)
+		#shutil.rmtree(remove_dir)
 		valid_options = ["yes", "no"]
 		while True:
 			should_retrain = input("Model has already been trained. " +
@@ -150,19 +161,13 @@ def auto_train():
 			if should_retrain in valid_options:
 				break
 			else:
-				logging.info("Not a valid option. Valid options are: yes or no.")
+				logging.critical("Not a valid option. Valid options are: yes or no.")
 		if should_retrain == "no":
 			logging.info("Auto train ends")
 			return
 		else:
 			logging.info("Retrain the model")
 			return
-
-	if args.output_dir == '':
-		save_path = save_path + '_' + version + '/'
-		s3_params["save_path"] = save_path
-
-	os.makedirs(save_path, exist_ok=True)
 
 	if exist_new_input:
 		logging.info("There exists new input data")
