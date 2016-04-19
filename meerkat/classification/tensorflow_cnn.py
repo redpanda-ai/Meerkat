@@ -24,6 +24,7 @@ Created on Mar 14, 2016
 import logging
 import math
 import os
+import os.path
 import pprint
 import random
 import shutil
@@ -33,6 +34,7 @@ import numpy as np
 import tensorflow as tf
 
 from meerkat.classification.tools import fill_description_unmasked, reverse_map
+from meerkat.classification.auto_load import main_program as load_models_from_s3
 from meerkat.various_tools import load_params, load_piped_dataframe, validate_configuration
 
 logging.basicConfig(level=logging.INFO)
@@ -50,6 +52,8 @@ def validate_config(config):
 	config = validate_configuration(config, schema_file)
 	logging.debug("Configuration is :\n{0}".format(pprint.pformat(config)))
 	reshape = ((config["doc_length"] - 96) / 27) * 256
+	if not os.path.isfile(config["label_map"]):
+		load_models_from_s3()
 	config["reshape"] = int(reshape)
 	config["label_map"] = load_params(config["label_map"])
 	config["num_labels"] = len(config["label_map"].keys())
@@ -345,7 +349,8 @@ def train_model(config, graph, sess, saver):
 		# Log Loss
 		if step % logging_interval == 0:
 			loss = sess.run(get_tensor(graph, "loss:0"), feed_dict=feed_dict)
-			logging.info("train loss at epoch %d: %g" % (step + 1, loss))
+			logging.info("Train loss at epoch {0:>8}: {1:3.7f}".format(step + 1, loss))
+			#logging.info("train loss at epoch %d: %g" % (step + 1, loss))
 
 		# Evaluate Testset, Log Progress and Save
 		if step != 0 and step % epochs == 0:

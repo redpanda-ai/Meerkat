@@ -138,6 +138,10 @@ def get_write_func(filename, header):
 			df.to_csv(filename, mode=mode, index=False, header=add_head,
 				sep='|')
 			file_exists = True
+		else:
+			#It's important to write empty files too
+			logging.info("Writing empty file {0}".format(filename))
+			open(filename, 'a').close()
 	return write_func
 
 def count_transactions(csv_file):
@@ -206,7 +210,7 @@ def main_process(args):
 		reversed_label_map["Null Class"] = reversed_label_map.pop("")
 
 	confusion_matrix = [[0 for i in range(num_labels + 1)] for j in range(num_labels)]
-	classifier = get_tf_cnn_by_path(args.model, label_map)
+	classifier = get_tf_cnn_by_path(args.model, args.label_map)
 
 	# Prepare for data saving
 	path = 'data/CNN_stats/'
@@ -312,8 +316,8 @@ def main_process(args):
 	conf_mat.columns = ['Class'] + [str(x) for x in range(1, num_labels + 1)] + ['Unpredicted']
 	conf_mat.index = range(1, num_labels + 1)
 
-	stat.to_csv('data/CNN_stats/CNN_stat.csv', index=False)
-	conf_mat.to_csv('data/CNN_stats/Con_Matrix.csv')
+	stat.to_csv('data/CNN_stats/classification_report.csv', index=False)
+	conf_mat.to_csv('data/CNN_stats/confusion_matrix.csv')
 
 	logging.info("cnn_stats is finished. All files are saved to Meerkat/data/CNN_stats/")
 

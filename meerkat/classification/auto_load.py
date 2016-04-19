@@ -79,16 +79,17 @@ def get_single_file_from_tarball(archive, filename_pattern):
 		logging.debug("Members {0}".format(members))
 		file_list = [member for member in members if my_pattern.search(member.name)]
 		if len(file_list) != 1:
-			logging.critical("Invalid, tarfile has several matching files.")
-			raise Exception("Invalid, tarfile has several matching files.")
+			logging.critical("Invalid, tarfile must have exactly one matching file.")
+			raise Exception("Invalid, tarfile must have exactly one matching file.")
 		else:
 			my_file = file_list.pop()
 			my_name = my_file.name
 			tar.extract(my_file)
 	return my_name
 
-def get_best_models(bucket, prefix, results, target):
+def get_best_models(bucket, prefix, results, target, s3_base):
 	"""Gets the best model for a particular model type."""
+	suffix = prefix[len(s3_base):]
 	for key in sorted(results.keys()):
 		highest_score, winner = 0.0, None
 		logging.info("Evaluating {0}".format(key))
@@ -97,7 +98,7 @@ def get_best_models(bucket, prefix, results, target):
 			k = Key(bucket)
 			k.key = prefix + key + timestamp + target
 			k.get_contents_to_filename(target)
-			matrix = get_single_file_from_tarball(target, "Con_Matrix.csv")
+			matrix = get_single_file_from_tarball(target, "confusion_matrix.csv")
 			score = get_model_accuracy(matrix)
 			if score > highest_score:
 				highest_score = score
@@ -105,17 +106,19 @@ def get_best_models(bucket, prefix, results, target):
 				winner_count = candidate_count
 				#Find the actual checkpoint file.
 				leader = get_single_file_from_tarball(target, ".*ckpt")
-				new_path = "meerkat/classification/models/" + key.replace("/", ".")[1:] + "ckpt"
+				new_path = "meerkat/classification/models/" \
+					+ (suffix + key).replace("/", ".")[1:] + "ckpt"
 				logging.debug("Moving label_map to: {0}".format(new_path))
 				rename(leader, new_path)
 
 			logging.info("\t{0:<14}{1:>2}: {2:16}, Score: {3:0.5f}".format(
 				"Candidate", candidate_count, timestamp, score))
 			candidate_count += 1
-		set_label_map(bucket, prefix, key, winner, "input.tar.gz", "meerkat/classification/models/")
+		set_label_map(bucket, prefix, key, winner, s3_base,
+			"results.tar.gz", "meerkat/classification/models/")
 		logging.info("\t{0:<14}{1:>2}".format("Winner", winner_count))
 
-def set_label_map(bucket, prefix, key, winner, tarball, output_path):
+def set_label_map(bucket, prefix, key, winner, s3_base, tarball, output_path):
 	"""Moves the appropriate label map from S3 to the local machine."""
 	if bucket is not None:
 		s3_key = Key(bucket)
@@ -123,19 +126,20 @@ def set_label_map(bucket, prefix, key, winner, tarball, output_path):
 		s3_key.get_contents_to_filename(tarball)
 
 	json_file = get_single_file_from_tarball(tarball, ".*json")
-	new_path = output_path + key.replace("/", ".")[1:] + "json"
+	suffix = prefix[len(s3_base):]
+	new_path = output_path + (suffix + key).replace("/", ".")[1:] + "json"
 	logging.debug("Moving label_map to: {0}".format(new_path))
 	rename(json_file, new_path)
 	return new_path
 
-def main_program():
+def main_program(prefix="meerkat/cnn/data"):
 	"""Execute the main program"""
 	conn = boto.s3.connect_to_region('us-west-2')
 	bucket = conn.get_bucket("s3yodlee")
-	my_results, prefix, target = {}, "meerkat/cnn/data", "results.tar.gz"
+	my_results, target, s3_base = {}, "results.tar.gz", "meerkat/cnn/data"
 	find_s3_objects_recursively(conn, bucket, my_results, prefix=prefix, target=target)
 	results = get_peer_models(my_results, prefix=prefix)
-	get_best_models(bucket, prefix, results, target)
+	get_best_models(bucket, prefix, results, target, s3_base)
 
 if __name__ == "__main__":
 	#Execute the main program

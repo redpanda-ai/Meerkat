@@ -64,13 +64,13 @@ class AutoLoadTests(unittest.TestCase):
 		tarball = output_path + tarball
 		label_map = output_path + "label_map.json"
 		remove_file_if_exists(label_map)
-		result = auto_load.set_label_map(None, None, "/label_map/", None, tarball, output_path)
+		result = auto_load.set_label_map(None, "", "/label_map/", None, "", tarball, output_path)
 		self.assertTrue(isfile(result))
 		remove_file_if_exists(label_map)
 
 	@parameterized.expand([
 		(["tarball_1.tar.gz", ".*txt", True, "not a tarfile."]),
-		(["tarball_2.tar.gz", ".*csv", True, "several"]),
+		(["tarball_2.tar.gz", ".*csv", True, "exactly one"]),
 		(["tarball_3.tar.gz", "foo", False, "foo.txt"])
 	])
 	def test_get_single_file_from_tarball(self, tarball, pattern, exception, expected):

@@ -32,9 +32,10 @@ import argparse
 import numpy as np
 import os
 import shutil
+import sys
 
 from .verify_data import verify_data
-from .tools import pull_from_s3, unzip_and_merge, seperate_debit_credit
+from .tools import pull_from_s3, unzip_and_merge, seperate_debit_credit, copy_file
 from plumbum import local
 
 def parse_arguments():
@@ -140,6 +141,7 @@ def main_split_data(args):
 			cnn_type=[model_type, bank_or_card])
 
 	else:
+		#FIXME horrible use of plumbum, use tarfile module
 		local['tar']['xf'][input_file]['-C'][save_path_input]()
 		input_csv_file = ""
 		input_json_file = ""
@@ -165,8 +167,17 @@ def main_split_data(args):
 	del df
 	del results
 
-	os.rename(input_json_file, save_path_preprocessed + "label_map.json")
+	label_map_path = save_path_preprocessed + "label_map.json"
+	os.rename(input_json_file, label_map_path)
+	stats_path = "data/CNN_stats"
+	if not os.path.exists(stats_path):
+		os.makedirs(stats_path)
+	logging.info("Using shutil to copy label_map.json")
+	shutil.copyfile(label_map_path, stats_path + "/" + "label_map.json")
+	logging.info("label_map.json moved")
+	#FIXME Horrible use of plumbum, use tarfile module
 	local['tar']['-zcvf'][output_file]['-C'][save_path_preprocessed]['.']()
+	#FIXME Horrible use of plumbum, use boto module
 	local['aws']['s3']['cp'][output_file][dir_path]()
 
 	shutil.rmtree(save_path_input)
