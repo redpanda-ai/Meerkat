@@ -129,7 +129,8 @@ def get_write_func(filename, header):
 	file_exists = False
 	def write_func(data):
 		"""Have a write function"""
-		if len(data) > 0:
+		#It's important to write empty files too
+		if len(data) >= 0:
 			logging.info("Saving transactions to {0}".format(filename))
 			nonlocal file_exists
 			mode = "a" if file_exists else "w"
