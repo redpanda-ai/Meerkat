@@ -335,6 +335,8 @@ def build_graph(config):
 			details['labeled']['z'][layer_n], details['unlabeled']['z'][layer_n] = split_lu(z)
 			details['unlabeled']['mean'][layer_n], details['unlabeled']['variance'][l] = mean, variance
 
+			# TODO Add non-training code
+
 			# Apply Activation
 			if layer_type == "conv" or layer_type == "fc":
 				layer = threshold(z + biases)
