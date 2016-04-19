@@ -2,6 +2,8 @@
 
 import numpy as np
 from meerkat.various_tools import load_params
+from meerkat.classification.auto_load import main_program as load_models_from_s3
+import os.path
 
 def get_predictions(case_type):
 	"""Return a numpy array of predictions"""
@@ -35,10 +37,13 @@ def get_config():
 
 def get_subtype_config():
 	"""Return a different config dictionary"""
+	label_map = "meerkat/classification/models/subtype.card.credit.json"
+	if not os.path.isfile(label_map):
+		load_models_from_s3(prefix="meerkat/cnn/data/subtype/card/credit")
 	return {
 		"model_type": "subtype",
 		"dataset": "tests/fixture/correct_format.csv",
-		"label_map": load_params("meerkat/classification/label_maps/card_credit_subtype.json"),
+		"label_map": load_params(label_map),
 		"ledger_entry": "credit"
 	}
 
