@@ -141,7 +141,7 @@ def get_write_func(filename, header):
 		else:
 			#It's important to write empty files too
 			logging.info("Writing empty file {0}".format(filename))
-			open(filename, 'w').close()
+			open(filename, 'a').close()
 	return write_func
 
 def count_transactions(csv_file):
