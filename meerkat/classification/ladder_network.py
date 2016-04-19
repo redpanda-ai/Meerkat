@@ -65,7 +65,12 @@ def validate_config(config):
 def load_unlabeled_data(config):
 	"""Load unlabeled data"""
 
-	df = load_piped_dataframe("bank_unlabeled_1M.txt")
+	unlabeled_filename = config.get("unlabeled_dataset", "")
+	df = load_piped_dataframe("category_bank_debit_500K.csv")
+	df["DESCRIPTION_UNMASKED"] = df.apply(fill_description_unmasked, axis=1)
+	df = df.reindex(np.random.permutation(df.index))
+
+	return df
 
 def load_labeled_data(config):
 	"""Load labeled data and label map"""
@@ -119,33 +124,14 @@ def load_labeled_data(config):
 
 	return train, test, groups_train
 
-def evaluate_testset(config, graph, sess, model, test):
-	"""Check error on test set"""
+def unlabeled_batching(config, df):
+	"""Fetch a batch of unlabeled data"""
 
-	total_count = len(test.index)
-	correct_count = 0
-	chunked_test = chunks(np.array(test.index), 128)
-	num_chunks = len(chunked_test)
+	batch_size = config["batch_size"]
+	indices_to_sample = list(np.random.choice(df.index, batch_size))
+	batch = df.loc[indices_to_sample]
 
-	for i in range(num_chunks):
-
-		batch_test = test.loc[chunked_test[i]]
-		batch_size = len(batch_test)
-
-		trans_test, labels_test = batch_to_tensor(config, batch_test)
-		feed_dict_test = {get_tensor(graph, "x:0"): trans_test}
-		output = sess.run(model, feed_dict=feed_dict_test)
-
-		batch_correct_count = np.sum(np.argmax(output, 1) == np.argmax(labels_test, 1))
-
-		correct_count += batch_correct_count
-	
-	test_accuracy = 100.0 * (correct_count / total_count)
-	logging.info("Test accuracy: %.2f%%" % test_accuracy)
-	logging.info("Correct count: " + str(correct_count))
-	logging.info("Total count: " + str(total_count))
-
-	return test_accuracy
+	return batch
 
 def mixed_batching(config, df, groups_train):
 	"""Batch from train data using equal class batching"""
@@ -194,7 +180,39 @@ def string_to_tensor(config, doc, length):
 		if char in alphabet:
 			tensor[alpha_dict[char]][len(doc) - index - 1] = 1
 	return tensor
+
+def evaluate_testset(config, graph, sess, model, test):
+	"""Check error on test set"""
+
+	total_count = len(test.index)
+	correct_count = 0
+	chunked_test = chunks(np.array(test.index), 128)
+	num_chunks = len(chunked_test)
+
+	for i in range(num_chunks):
+
+		batch_test = test.loc[chunked_test[i]]
+		batch_size = len(batch_test)
+
+		trans_test, labels_test = batch_to_tensor(config, batch_test)
+		feed_dict_test = {get_tensor(graph, "x:0"): trans_test}
+		output = sess.run(model, feed_dict=feed_dict_test)
+
+		batch_correct_count = np.sum(np.argmax(output, 1) == np.argmax(labels_test, 1))
+
+		correct_count += batch_correct_count
 	
+	test_accuracy = 100.0 * (correct_count / total_count)
+	logging.info("Test accuracy: %.2f%%" % test_accuracy)
+	logging.info("Correct count: " + str(correct_count))
+	logging.info("Total count: " + str(total_count))
+
+	return test_accuracy
+	
+def accuracy(predictions, labels):
+	"""Return accuracy for a batch"""
+	return 100.0 * np.sum(np.argmax(predictions, 1) == np.argmax(labels, 1)) / predictions.shape[0]
+
 def get_tensor(graph, name):
 	"""Get tensor by name"""
 	return graph.get_tensor_by_name(name)
@@ -208,10 +226,6 @@ def get_variable(graph, name):
 	with graph.as_default():
 		variable = [v for v in tf.all_variables() if v.name == name][0]
 		return variable
-
-def accuracy(predictions, labels):
-	"""Return accuracy for a batch"""
-	return 100.0 * np.sum(np.argmax(predictions, 1) == np.argmax(labels, 1)) / predictions.shape[0]
 
 def threshold(tensor):
 	"""ReLU with threshold at 1e-6"""
@@ -344,6 +358,7 @@ def train_model(config, graph, sess, saver):
 	eras = config["eras"]
 	dataset = config["dataset"]
 	train, test, groups_train = load_labeled_data(config)
+	unlabeled_data = load_unlabeled_data(config)
 	num_eras = epochs * eras
 	logging_interval = 50
 	learning_rate_interval = 15000
@@ -357,7 +372,9 @@ def train_model(config, graph, sess, saver):
 
 		# Prepare Data for Training
 		batch = mixed_batching(config, train, groups_train)
+		unlabeled_batch = unlabeled_batching(config, unlabeled_data)
 		trans, labels = batch_to_tensor(config, batch)
+		unlabeled_trans = batch_to_tensor(config, unlabeled_batch)
 		feed_dict = {get_tensor(graph, "x:0") : trans, get_tensor(graph, "y:0") : labels}
 
 		# Run Training Step
