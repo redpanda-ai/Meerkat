@@ -8,7 +8,7 @@ test set. It produces various stats and a confusion matrix for analysis
 
 #################### USAGE ##########################
 """
-python3 -m meerkat.tools.cnn_stats \
+python3 -m meerkat.classification.classification_report \
 -model <path_to_classifier> \
 -data <path_to_testdata> \
 -map <path_to_label_map> \
@@ -269,6 +269,7 @@ def main_process(args):
 			compare_label(machine_labeled, machine_label_key, human_label_key,
 			confusion_matrix, num_labels, doc_key=doc_key, fast_mode=fast_mode)
 
+
 		# Save
 		write_mislabeled(mislabeled)
 		write_correct(correct)
@@ -276,6 +277,8 @@ def main_process(args):
 		write_needs_hand_labeling(needs_hand_labeling)
 
 		chunk_count += 1
+	square_confusion_matrix = pd.DataFrame(confusion_matrix)
+	logging.critical("Early confusion_matrix is {0}".format(confusion_matrix))
 
 	# Calculate f_measure, recall, precision, false +/-, true +/- from confusion maxtrix
 	logging.info("Evaluation is finished, preparing confusion matrix and cnn_stats")
@@ -312,9 +315,17 @@ def main_process(args):
 	stat.columns = ['Class', 'Actual', 'True_Positive', 'False_Positive', 'Recall',
 		'Precision', 'False_Negative', 'Unpredicted', 'F_Measure', 'Model_Accuracy']
 
-	conf_mat = pd.concat([label, conf_mat], axis=1)
-	conf_mat.columns = ['Class'] + [str(x) for x in range(1, num_labels + 1)] + ['Unpredicted']
+	#Get a sqaure 1-indexed confusion matrix
+	df = conf_mat.drop(conf_mat.columns[[-1]], axis=1)
+	df.rename(columns=lambda x: int(x) + 1, inplace=True)
+	rows, _ = df.shape
+	df.index = range(1, rows + 1)
+	#logging.critical("Square_confusion_matrix is {0}".format(df))
+
+	#conf_mat = pd.concat([label, conf_mat], axis=1)
+	#conf_mat.columns = ['Class'] + [str(x) for x in range(1, num_labels + 1)] + ['Unpredicted']
 	conf_mat.index = range(1, num_labels + 1)
+	#logging.critical("cm is {0}".format(conf_mat))
 
 	stat.to_csv('data/CNN_stats/classification_report.csv', index=False)
 	conf_mat.to_csv('data/CNN_stats/confusion_matrix.csv')

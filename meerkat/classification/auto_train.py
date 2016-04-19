@@ -54,7 +54,7 @@ from meerkat.classification.split_data import main_split_data
 from meerkat.classification.tools import (pull_from_s3, check_new_input_file,
 	push_file_to_s3, make_tarfile, copy_file)
 from meerkat.classification.tensorflow_cnn import build_graph, train_model, validate_config
-from meerkat.tools.cnn_stats import main_process as apply_cnn
+from meerkat.classification.classification_report import main_process as apply_cnn
 from meerkat.various_tools import load_params
 
 def parse_arguments():
