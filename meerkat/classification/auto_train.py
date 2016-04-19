@@ -148,26 +148,27 @@ def auto_train():
 
 	os.makedirs(save_path, exist_ok=True)
 
-	exist_results = check_file_exist_in_s3("results.tar.gz", **s3_params)
-	if exist_results:
-		results_tarball = pull_from_s3(extension='.tar.gz', file_name="results.tar.gz", **s3_params)
-		name = get_single_file_from_tarball(save_path + "results.tar.gz", ".ckpt")
-		print(name)
-		#shutil.rmtree(remove_dir)
-		valid_options = ["yes", "no"]
-		while True:
-			should_retrain = input("Model has already been trained. " +
-				"Do you want to retrain the model? (yes/no): ")
-			if should_retrain in valid_options:
-				break
+	exist_results_tarball = check_file_exist_in_s3("results.tar.gz", **s3_params)
+	if exist_results_tarball:
+		pull_from_s3(extension='.tar.gz', file_name="results.tar.gz", **s3_params)
+		try:
+			get_single_file_from_tarball(save_path + "results.tar.gz", ".ckpt")
+			valid_options = ["yes", "no"]
+			while True:
+				retrain_choice = input("Model has already been trained. " +
+					"Do you want to retrain the model? (yes/no): ")
+				if retrain_choice in valid_options:
+					break
+				else:
+					logging.critical("Not a valid option. Valid options are: yes or no.")
+			if retrain_choice == "no":
+				logging.info("Auto train ends")
+				return
 			else:
-				logging.critical("Not a valid option. Valid options are: yes or no.")
-		if should_retrain == "no":
-			logging.info("Auto train ends")
-			return
-		else:
-			logging.info("Retrain the model")
-			return
+				logging.info("Retrain the model")
+		except:
+			logging.critical("results.tar.gz is invalid. Retrain the model")
+		os.remove(save_path + "results.tar.gz")
 
 	if exist_new_input:
 		logging.info("There exists new input data")
