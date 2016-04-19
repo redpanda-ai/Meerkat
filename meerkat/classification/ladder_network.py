@@ -69,6 +69,7 @@ def load_unlabeled_data(config):
 	df = load_piped_dataframe("category_bank_debit_500K.csv")
 	df["DESCRIPTION_UNMASKED"] = df.apply(fill_description_unmasked, axis=1)
 	df = df.reindex(np.random.permutation(df.index))
+	df["LABEL_NUM"] = "1"
 
 	return df
 
@@ -233,7 +234,7 @@ def threshold(tensor):
 
 def batch_normalization(batch, mean, var):
 	"""Perform batch normalization"""
-    return (batch - mean) / tf.sqrt(var + tf.constant(1e-10))
+	return (batch - mean) / tf.sqrt(var + tf.constant(1e-10))
 
 def bias_variable(shape, flat_input_shape):
 	"""Initialize biases"""
@@ -264,6 +265,7 @@ def build_graph(config):
 	reshape = config["reshape"]
 	num_labels = config["num_labels"]
 	base_rate = config["base_rate"]
+	batch_size = config["batch_size"]
 	graph = tf.Graph()
 
 	# Create Graph
@@ -307,14 +309,14 @@ def build_graph(config):
 		def encoder(inputs, name, train=False, noise_std=0.0):
 			"""Add model layers to the graph"""
 
-			h_noise = inputs + tf.random_normal(tf.shape(inputs)) * noise_std
+			h = inputs + tf.random_normal(tf.shape(inputs)) * noise_std
 			details = {}
 
-			details['labeled'] = {'z': {}, 'mean': {}, 'variance': {}, 'h': {}}
-        	details['unlabeled'] = {'z': {}, 'mean': {}, 'variance': {}, 'h': {}}
-        	details['labeled']['z'][0], details['unlabeled']['z'][0] = split_lu(h)
+			#details['labeled'] = {'z': {}, 'mean': {}, 'variance': {}, 'h': {}}
+			#details['unlabeled'] = {'z': {}, 'mean': {}, 'variance': {}, 'h': {}}
+			#details['labeled']['z'][0], details['unlabeled']['z'][0] = split_lu(h)
 
-			h_conv1 = threshold(conv2d(h_noise, w_conv1) + b_conv1)
+			h_conv1 = threshold(conv2d(h, w_conv1) + b_conv1)
 			h_pool1 = max_pool(h_conv1)
 
 			h_conv2 = threshold(conv2d(h_pool1, w_conv2) + b_conv2)
@@ -374,8 +376,9 @@ def train_model(config, graph, sess, saver):
 		batch = mixed_batching(config, train, groups_train)
 		unlabeled_batch = unlabeled_batching(config, unlabeled_data)
 		trans, labels = batch_to_tensor(config, batch)
-		unlabeled_trans = batch_to_tensor(config, unlabeled_batch)
-		feed_dict = {get_tensor(graph, "x:0") : trans, get_tensor(graph, "y:0") : labels}
+		unlabeled_trans, _ = batch_to_tensor(config, unlabeled_batch)
+		all_trans = np.vstack([trans, unlabeled_trans])
+		feed_dict = {get_tensor(graph, "x:0") : all_trans, get_tensor(graph, "y:0") : labels}
 
 		# Run Training Step
 		sess.run(get_op(graph, "optimizer"), feed_dict=feed_dict)
