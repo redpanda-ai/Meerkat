@@ -232,10 +232,6 @@ def threshold(tensor):
 	"""ReLU with threshold at 1e-6"""
 	return tf.mul(tf.to_float(tf.greater_equal(tensor, 1e-6)), tensor)
 
-def batch_normalization(batch, mean, var):
-	"""Perform batch normalization"""
-	return (batch - mean) / tf.sqrt(var + tf.constant(1e-10))
-
 def bias_variable(shape, flat_input_shape):
 	"""Initialize biases"""
 	stdv = 1 / math.sqrt(flat_input_shape)
@@ -256,6 +252,10 @@ def max_pool(tensor):
 	"""Create max pooling layer"""
 	layer = tf.nn.max_pool(tensor, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
 	return layer
+
+def batch_normalization(batch, mean, var):
+	"""Perform batch normalization"""
+	return (batch - mean) / tf.sqrt(var + tf.constant(1e-10))
 
 def build_graph(config):
 	"""Build CNN"""
@@ -307,14 +307,39 @@ def build_graph(config):
 		unlabeled = lambda x: tf.slice(x, [batch_size, 0, 0, 0], [-1, -1, -1, -1]) if x is not None else x
 		split_lu = lambda x: (labeled(x), unlabeled(x))
 
-		def ladder_layer(input_h, details, layer_type, weights=None, biases=None):
+		def ladder_layer(input_h, details, layer_type, noise_std, weights=None, biases=None):
+			"""Apply all necessary steps in a ladder layer"""
 
+			layer_n = len(details['labeled']['h'].keys())
+			details['labeled']['h'][layer_n], details['unlabeled']['h'][layer_n] = split_lu(input_h)
+
+			# Preactivation
 			if layer_type == "conv":
-				layer = threshold(conv2d(input_h, weights) + biases)
+				z_pre = conv2d(input_h, weights)
 			elif layer_type == "pool":
-				layer = max_pool(input_h)
+				z_pre = max_pool(input_h)
 			elif layer_type == "fc":
-				layer = threshold(tf.matmul(input_h, weights) + biases)
+				z_pre = tf.matmul(input_h, weights)
+
+			z_pre_l, z_pre_u = split_lu(z_pre)
+			mear, variance = tf.nn.moments(z_pre_u, axes=[0]) # TODO: Fix Axes
+
+			# Batch Normalization
+			if noise_std > 0:
+				z = join(batch_normalization(z_pre_l), batch_normalization(z_pre_u, mean, variance))
+				z += tf.random_normal(tf.shape(z_pre)) * noise_std
+            else:
+				z = join(update_batch_normalization(z_pre_l, layer_n), batch_normalization(z_pre_u, mean, variance)) # TODO Add update_batch_normalization
+
+			# Save Mean and Variance of Unlabeled Examples for Decoding
+			details['labeled']['z'][layer_n], details['unlabeled']['z'][layer_n] = split_lu(z)
+			details['unlabeled']['mean'][layer_n], details['unlabeled']['variance'][l] = mean, variance
+
+			# Apply Activation
+			if layer_type == "conv" or layer_type == "fc":
+				layer = threshold(z + biases)
+			else:
+				layer = z + biases
 
 			return layer
 
@@ -328,37 +353,46 @@ def build_graph(config):
 			details['unlabeled'] = {'z': {}, 'mean': {}, 'variance': {}, 'h': {}}
 			details['labeled']['z'][0], details['unlabeled']['z'][0] = split_lu(h_noise)
 
-			h_conv1 = ladder_layer(h_noise, details, "conv", weights=w_conv1, biases=b_conv1)
-			h_pool1 = ladder_layer(h_conv1, details, "pool")
+			h_conv1 = ladder_layer(h_noise, details, "conv", noise_std, weights=w_conv1, biases=b_conv1)
+			h_pool1 = ladder_layer(h_conv1, details, "pool", noise_std)
 
-			h_conv2 = ladder_layer(h_pool1, details, "conv", weights=w_conv2, biases=b_conv2)
-			h_pool2 = ladder_layer(h_conv2, details, "pool")
+			h_conv2 = ladder_layer(h_pool1, details, "conv", noise_std, weights=w_conv2, biases=b_conv2)
+			h_pool2 = ladder_layer(h_conv2, details, "pool", noise_std)
 
-			h_conv3 = ladder_layer(h_pool2, details, "conv", weights=w_conv3, biases=b_conv3)
+			h_conv3 = ladder_layer(h_pool2, details, "conv", noise_std, weights=w_conv3, biases=b_conv3)
 
-			h_conv4 = ladder_layer(h_conv3, details, "conv", weights=w_conv4, biases=b_conv4)
+			h_conv4 = ladder_layer(h_conv3, details, "conv", noise_std, weights=w_conv4, biases=b_conv4)
 
-			h_conv5 = ladder_layer(h_conv4, details, "conv", weights=w_conv5, biases=b_conv5)
-			h_pool5 = ladder_layer(h_conv5, details, "pool")
+			h_conv5 = ladder_layer(h_conv4, details, "conv", noise_std, weights=w_conv5, biases=b_conv5)
+			h_pool5 = ladder_layer(h_conv5, details, "pool", noise_std)
 
 			h_reshape = tf.reshape(h_pool5, [-1, reshape])
 
-			h_fc1 = ladder_layer(h_reshape, details, "fc", weights=w_fc1, biases=b_fc1)
+			h_fc1 = ladder_layer(h_reshape, details, "fc", noise_std, weights=w_fc1, biases=b_fc1)
 
 			if train:
 				h_fc1 = tf.nn.dropout(h_fc1, 0.5)
 
-			h_fc2 = ladder_layer(h_fc1, details, "fc", weights=w_fc2, biases=b_fc2)
+			h_fc2 = ladder_layer(h_fc1, details, "fc", noise_std, weights=w_fc2, biases=b_fc2)
 
 			softmax = tf.nn.softmax(h_fc2)
 			network = tf.log(tf.clip_by_value(softmax, 1e-10, 1.0), name=name)
 
-			return network
+			layer_n = len(details['labeled']['h'].keys())
+			details['labeled']['h'][layer_n], details['unlabeled']['h'][layer_n] = split_lu(network)
 
-		network = encoder(trans_placeholder, "network", train=True)
-		trained_model = encoder(trans_placeholder, "model", train=False)
+			return network, details
 
-		labeled_output = tf.slice(network, [0, 0], [batch_size, -1])
+		logging.info("Corrupted Encoder")
+		network_corr, details_corr = encoder(trans_placeholder, "network_corr", train=True, noise_std=0.3)
+
+		logging.info("Clean Encoder")
+		network_clean, details_clean = encoder(trans_placeholder, "network_clean", train=True)
+
+		logging.info("Trained Model")
+		trained_model, _ = encoder(trans_placeholder, "model", train=False)
+
+		labeled_output = tf.slice(network_clean, [0, 0], [batch_size, -1])
 		supervised_cost = tf.neg(tf.reduce_mean(tf.reduce_sum(labeled_output * labels_placeholder, 1)), name="loss")
 		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(supervised_cost, name="optimizer")
 
