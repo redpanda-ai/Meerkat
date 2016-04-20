@@ -70,7 +70,7 @@
 				"fax_number", "is_physical_merchant", "latitude", "longitude", "match_found",
 				"merchant_name", "neighbourhood", "phone_number", "postal_code", "source",
 				"source_merchant_id","state", "store_id", "street", "transaction_id",
-				"txn_sub_type", "txn_type", "website", "cnn", "search" ,"bloom_filter"],
+				"txn_sub_type", "txn_type", "website", "cnn", "search", "bloom_filter"],
 			"additionalProperties" : false
 		},
 		"non_physical_merchant_response" : {
