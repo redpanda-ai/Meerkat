@@ -41,10 +41,10 @@ class Meerkat_API(APIHandler):
 	@schema.validate(
 		input_schema=schema_input,
 		input_example=example_input,
-		# output_schema=schema_output,
-		# output_example=example_output,
-		# debug_output_schema=schema_debug_output,
-		# debug_output_example=example_debug_output
+		output_schema=schema_output,
+		output_example=example_output,
+		debug_output_schema=schema_debug_output,
+		debug_output_example=example_debug_output
 	)
 
 	@gen.coroutine

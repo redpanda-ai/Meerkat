@@ -330,6 +330,32 @@ class WebConsumer():
 
 		# Override / Strip Fields
 		for trans in transactions:
+			if trans["is_physical_merchant"]:
+				trans["chain_name"] = trans.get("chain_name", "")
+				trans["confidence_score"] = trans.get("confidence_score", "")
+				trans["country"] = trans.get("country", "")
+				trans["fax_number"] = trans.get("fax_number", "")
+				trans["latitude"] = trans.get("latitude", "")
+				trans["longitude"] = trans.get("longitude", "")
+				trans["match_found"] = trans.get("match_found", False)
+				trans["neighbourhood"] = trans.get("neighbourhood", "")
+				trans["phone_number"] = trans.get("phone_number", "")
+				trans["postal_code"] = trans.get("postal_code", "")
+				trans["source"] = trans.get("source", "")
+				trans["source_merchant_id"] = trans.get("source_merchant_id", "")
+				trans["store_id"] = trans.get("store_id", "")
+				trans["street"] = trans.get("street", "")
+				trans["txn_sub_type"] = trans.get("txn_sub_type", "")
+				trans["txn_type"] = trans.get("txn_type", "")
+				trans["website"] = trans.get("website", "")
+
+			trans["city"] = trans.get("city", "")
+			trans["state"] = trans.get("state", "")
+			trans["transaction_id"] = trans.get("transaction_id", None)
+			trans["is_physical_merchant"] = trans.get("is_physical_merchant", "")
+			trans["merchant_name"] = trans.get("merchant_name", "")
+			trans["txn_sub_type"] = trans.get("txn_sub_type", "")
+			trans["txn_type"] = trans.get("txn_type", "")
 
 			if debug and trans.get("is_physical_merchant", None):
 				trans["search"]["merchant_name"] = trans["merchant_name"]
