@@ -75,7 +75,16 @@ def parse_arguments():
 		action='store_true', help='If working on merchant data need to indicate True.')
 	parser.add_argument('--fast_mode', '-fast', required=False, action='store_true',
 		help='Use fast mode to save i/o time.')
+	parser.add_argument("-d", "--debug", help="Show 'debug'+ level logs", action="store_true")
+	parser.add_argument("-v", "--info", help="Show 'info'+ level logs", action="store_true")
 	args = parser.parse_args()
+	log_format = "%(asctime)s %(levelname)s: %(message)s"
+	if args.debug:
+		logging.basicConfig(format=log_format, level=logging.DEBUG)
+	elif args.info:
+		logging.basicConfig(format=log_format, level=logging.INFO)
+	else:
+		logging.basicConfig(format=log_format, level=logging.WARNING)
 	return args
 
 def compare_label(*args, **kwargs):
