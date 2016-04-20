@@ -300,7 +300,6 @@ def build_graph(config):
 	with graph.as_default():
 
 		learning_rate = tf.Variable(base_rate, trainable=False, name="lr")
-		layers = []
 
 		input_shape = [None, 1, doc_length, alphabet_length]
 		output_shape = [None, num_labels]
@@ -404,7 +403,7 @@ def build_graph(config):
 			network = tf.log(tf.clip_by_value(softmax, 1e-10, 1.0), name=name)
 
 			layer_n = len(details['labeled']['h'].keys())
-			details['labeled']['h'][layer_n], details['unlabeled']['h'][layer_n] = split_lu(config, network)
+			details['labeled']['h'][layer_n], details['unlabeled']['h'][layer_n] = split_lu(config, softmax)
 
 			return network, details
 
