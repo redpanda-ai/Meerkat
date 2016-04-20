@@ -218,35 +218,7 @@ def get_classification_report(confusion_matrix_file, label_map):
 	logging.info("Classification Report saved to: {0}".format(report_path))
 	classification_report.to_csv(report_path, index=False)
 
-'''
-def plot_confusion_matrix(con_matrix):
-	"""Plot the confusion matrix"""
-	norm_matrix = []
-
-	for i in con_matrix:
-		sum_of_each_list = sum(i)
-
-		if sum_of_each_list == 0:
-			norm_matrix.append(i)
-		else:
-			temp_matrix = []
-			for j in i:
-				temp_matrix.append(float(j) / float(sum_of_each_list))
-			norm_matrix.append(temp_matrix)
-
-	plt.clf()
-	fig = plt.figure()
-	ax = fig.add_subplot(111)
-	res = ax.imshow(array(norm_matrix), cmap=cm.jet, interpolation='nearest')
-
-	for i, j in ((x, y) for x in range(len(con_matrix)) for y in range(len(con_matrix[0]))):
-		ax.annotate(str(con_matrix[i][j]), xy=(i, j), fontsize='xx-small')
-
-	cb = fig.colorbar(res)
-	savefig("/data/CNN_stats/confusion_matrix.png", format="png")
-'''
-
-	# Main
+# Main
 def main_process(args):
 	"""This is the main stream"""
 	doc_key = args.doc_key
@@ -258,6 +230,7 @@ def main_process(args):
 	total_transactions = count_transactions(args.testdata)
 	processed = 0.0
 	label_map = load_params(args.label_map)
+
 	get_key = lambda x: x['label'] if isinstance(x, dict) else x
 	label_map = dict(zip(label_map.keys(), map(get_key, label_map.values())))
 	num_labels = len(label_map)

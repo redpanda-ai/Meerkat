@@ -162,6 +162,9 @@ def auto_train():
 	test_file = save_path + "test.csv"
 	label_map = save_path + "label_map.json"
 
+	#copy the label_map.json file
+	shutil.copyfile(label_map, "data/CNN_stats/label_map.json")
+
 	# Load and Modify Config
 	config = load_params("meerkat/classification/config/default_tf_config.json")
 	config["label_map"] = label_map
@@ -188,6 +191,7 @@ def auto_train():
 	args.model = best_model_path
 	args.testdata = test_file
 	args.label_map = label_map
+
 	args.doc_key = 'DESCRIPTION_UNMASKED'
 	args.secondary_doc_key = 'DESCRIPTION'
 	args.label_key = ground_truth_labels[model_type]
