@@ -140,7 +140,7 @@ def get_write_func(filename, header):
 			file_exists = True
 		else:
 			#It's important to write empty files too
-			logging.info("Writing empty file {0}".format(filename))
+			logging.debug("Writing empty file {0}".format(filename))
 			open(filename, 'a').close()
 	return write_func
 
@@ -150,6 +150,64 @@ def count_transactions(csv_file):
 		reader = csv.reader(temp, delimiter='|')
 		_ = reader.__next__()
 		return sum([1 for i in reader])
+
+def get_classification_report(confusion_matrix_file, label_map):
+	"""Produce a classification report for a particular confusion matrix"""
+	df = pd.read_csv(confusion_matrix_file)
+	rows, cols = df.shape
+	if rows != cols:
+		logging.critical("Rows: {0}, Columns {1}".format(rows, cols))
+		logging.critical("Unable to make a square confusion matrix, aborting.")
+		raise Exception("Unable to make a square confusion matrix, aborting.")
+	else:
+		logging.debug("Confusion matrix is a proper square, continuing")
+
+	#Convert to 0-indexed confusion matrix
+	df.rename(columns=lambda x: int(x) - 1, inplace=True)
+	#First order calculations (good calculations, mostly unused)
+	true_positive = pd.DataFrame(df.iat[i, i] for i in range(rows))
+	col_sum = pd.DataFrame(df.sum(axis=1))
+	false_positive = pd.DataFrame(pd.DataFrame(df.sum(axis=0)).values - true_positive.values,
+		columns=true_positive.columns)
+	false_negative = pd.DataFrame(pd.DataFrame(df.sum(axis=1)).values - true_positive.values,
+		columns=true_positive.columns)
+	true_negative = pd.DataFrame(
+		[df.drop(i, axis=1).drop(i, axis=0).sum().sum() for i in range(rows)])
+
+	#Second order calculations (good calculations, mostly unused)
+	accuracy = true_positive.sum() / df.sum().sum()
+	precision = true_positive / (true_positive + false_positive)
+	recall = true_positive / (true_positive + false_negative)
+	specificity = true_negative / (true_negative + false_positive)
+
+	#Third order calculations (good calculation, unused)
+	f_measure = 2 * precision * recall / (precision + recall)
+
+	#Write out the classification report
+	label = pd.DataFrame(label_map, index=[0]).transpose()
+	label.index = label.index.astype(int)
+	label = label.sort_index()
+	num_labels = len(label_map)
+	label.index = range(num_labels)
+
+	#Create a classification report
+	feature_list = [accuracy, label, true_positive, false_positive,
+		false_negative, true_negative, precision, recall, specificity,
+		f_measure]
+	feature_labels = ["Accuracy", "Class", "True Positive", "False Positive",
+		"False Negative", "True Negative", "Precision", "Recall", "Specificity",
+		"F Measure"]
+	#Craft the report
+	classification_report = pd.concat(feature_list, axis = 1)
+	classification_report.columns = feature_labels
+	#Setting rows to be 1-indexed
+	classification_report.index = range(1, rows + 1)
+
+	logging.debug("Classification Report:\n{0}".format(classification_report))
+	logging.info("Accuracy is: {0}".format(classification_report.iloc[0]["Accuracy"]))
+	report_path = 'data/CNN_stats/classification_report.csv'
+	logging.info("Classification Report saved to: {0}".format(report_path))
+	classification_report.to_csv(report_path, index=False)
 
 '''
 def plot_confusion_matrix(con_matrix):
@@ -277,9 +335,32 @@ def main_process(args):
 		write_needs_hand_labeling(needs_hand_labeling)
 
 		chunk_count += 1
-	square_confusion_matrix = pd.DataFrame(confusion_matrix)
-	logging.critical("Early confusion_matrix is {0}".format(confusion_matrix))
+	#Make a square confusion matrix dataframe, df
+	df = pd.DataFrame(confusion_matrix)
+	df = df.drop(df.columns[[-1]], axis=1)
+	#Make sure the confusion matrix is a square
+	rows, cols = df.shape
+	if rows != cols:
+		logging.critical("Rows: {0}, Columns {1}".format(rows, cols))
+		logging.critical("Unable to make a square confusion matrix, aborting.")
+		raise Exception("Unable to make a square confusion matrix, aborting.")
+	else:
+		logging.debug("Confusion matrix is a proper square, continuing")
+	#Make sure the confusion matrix is 1-indexed, to match the label_map
+	df.rename(columns=lambda x: int(x) + 1, inplace=True)
+	df.index = range(1, rows + 1)
+	#Save the confusion matrix out to a file
+	confusion_matrix_path = 'data/CNN_stats/confusion_matrix.csv'
+	rows, cols = df.shape
+	logging.debug("Rows: {0}, Columns {1}".format(rows, cols))
+	df.to_csv('data/CNN_stats/confusion_matrix.csv', index=False)
+	logging.info("Confusion matrix saved to: {0}".format(confusion_matrix_path))
+	get_classification_report(confusion_matrix_path, label_map)
 
+if __name__ == "__main__":
+	main_process(parse_arguments())
+
+"""
 	# Calculate f_measure, recall, precision, false +/-, true +/- from confusion maxtrix
 	logging.info("Evaluation is finished, preparing confusion matrix and cnn_stats")
 	true_positive = pd.DataFrame([confusion_matrix[i][i] for i in range(num_labels)])
@@ -329,8 +410,5 @@ def main_process(args):
 
 	stat.to_csv('data/CNN_stats/classification_report.csv', index=False)
 	conf_mat.to_csv('data/CNN_stats/confusion_matrix.csv')
+"""
 
-	logging.info("cnn_stats is finished. All files are saved to Meerkat/data/CNN_stats/")
-
-if __name__ == "__main__":
-	main_process(parse_arguments())
