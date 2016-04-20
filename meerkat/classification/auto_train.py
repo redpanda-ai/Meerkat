@@ -163,7 +163,8 @@ def auto_train():
 	label_map = save_path + "label_map.json"
 
 	#copy the label_map.json file
-	shutil.copyfile(label_map, "data/CNN_stats/label_map.json")
+	tarball_directory = "data/CNN_stats/"
+	shutil.copyfile(label_map, tarball_directory + "label_map.json")
 
 	# Load and Modify Config
 	config = load_params("meerkat/classification/config/default_tf_config.json")
@@ -201,14 +202,20 @@ def auto_train():
 
 	logging.warning('Apply the best CNN to test data and calculate performance metrics')
 	apply_cnn(args)
-	copy_file("meerkat/classification/models/train.ckpt", "data/CNN_stats/")
-	make_tarfile("results.tar.gz", "data/CNN_stats")
+	copy_file("meerkat/classification/models/train.ckpt", tarball_directory)
+	make_tarfile("results.tar.gz", tarball_directory)
 	logging.info("Uploading results.tar.gz to S3 {0}".format(s3_params["prefix"]))
 	push_file_to_s3("results.tar.gz", "s3yodlee", s3_params["prefix"])
 	logging.info("Upload results.tar.gz to S3 sucessfully.")
-	#Clean up files
+	#Clean up dirty files
 	os.remove("results.tar.gz")
 	logging.info("Local results.tar.gz removed.")
+	for dirty_file in os.listdir(tarball_directory):
+		file_path = os.path.join(tarball_directory, dirty_file)
+		if os.path.isfile(file_path):
+			os.unlink(file_path)
+			logging.info("Local {0} removed.".format(file_path))
+
 
 	if exist_new_input:
 		remove_dir = save_path[0:save_path.rfind("preprocessed/")]
