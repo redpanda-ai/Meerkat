@@ -206,6 +206,9 @@ def auto_train():
 	logging.info("Uploading results.tar.gz to S3 {0}".format(s3_params["prefix"]))
 	push_file_to_s3("results.tar.gz", "s3yodlee", s3_params["prefix"])
 	logging.info("Upload results.tar.gz to S3 sucessfully.")
+	#Clean up files
+	os.remove("results.tar.gz")
+	logging.info("Local results.tar.gz removed.")
 
 	if exist_new_input:
 		remove_dir = save_path[0:save_path.rfind("preprocessed/")]
