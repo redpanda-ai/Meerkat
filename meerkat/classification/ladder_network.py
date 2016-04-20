@@ -344,7 +344,8 @@ def build_graph(config):
 				z_pre = tf.matmul(input_h, weights)
 
 			z_pre_l, z_pre_u = split_lu(config, z_pre)
-			# mean, variance = tf.nn.moments(z_pre_u, axes=[0]) # TODO: Fix Axes
+			axes = list(range(len(z_pre_u.get_shape()) - 1))
+			mean, variance = tf.nn.moments(z_pre_u, axes=axes)
 
 			# Batch Normalization
 			if noise_std > 0:
@@ -355,7 +356,7 @@ def build_graph(config):
 
 			# Save Mean and Variance of Unlabeled Examples for Decoding
 			details['labeled']['z'][layer_n], details['unlabeled']['z'][layer_n] = split_lu(config, z)
-			#details['unlabeled']['mean'][layer_n], details['unlabeled']['variance'][layer_n] = mean, variance
+			details['unlabeled']['mean'][layer_n], details['unlabeled']['variance'][layer_n] = mean, variance
 
 			# TODO Add non-training code
 
@@ -366,6 +367,24 @@ def build_graph(config):
 				layer = z
 
 			return layer
+
+
+		"""
+		# Utility for Batch Normalization
+		ewma = tf.train.ExponentialMovingAverage(decay=0.99)
+		running_mean = [tf.Variable(tf.constant(0.0, shape=[l]), trainable=False) for l in layer_sizes[1:]]
+		running_var = [tf.Variable(tf.constant(1.0, shape=[l]), trainable=False) for l in layer_sizes[1:]]
+		bn_assigns = []
+
+		def update_batch_normalization(batch, l):
+		    "batch normalize + update average mean and variance of layer l"
+		    mean, var = tf.nn.moments(batch, axes=[0, 1, 2])
+		    assign_mean = running_mean[l-1].assign(mean)
+		    assign_var = running_var[l-1].assign(var)
+		    bn_assigns.append(ewma.apply([running_mean[l-1], running_var[l-1]]))
+		    with tf.control_dependencies([assign_mean, assign_var]):
+		        return (batch - mean) / tf.sqrt(var + 1e-10)
+		"""
 
 		def encoder(inputs, name, train=False, noise_std=0.0):
 			"""Add model layers to the graph"""
