@@ -41,12 +41,16 @@ def get_peer_models(candidate_dictionary, prefix=None):
 def get_model_accuracy(confusion_matrix):
 	"""Gets the accuracy for a particular confusion matrix"""
 	df = pd.read_csv(confusion_matrix)
-	#drop columns 0, 1, and -1 to make a square confusion matrix
-	df = df.drop(df.columns[[0, 1, -1]], axis=1)
-	#Reset columns names, which are off by one
-	df.rename(columns=lambda x: int(x)-1, inplace=True)
-	#get the diagonal of true positives as a vector
-	rows, _ = df.shape
+	rows, cols = df.shape
+	logging.debug("Rows: {0} x Cols {1}".format(rows, cols))
+	if cols == rows + 3:
+		#Support the old style of confusion matrix, eliminate pointless columns
+		#drop columns 0, 1, and -1 to make a square confusion matrix
+		df = df.drop(df.columns[[0, 1, -1]], axis=1)
+		#Reset columns names, which are off by one
+		df.rename(columns=lambda x: int(x)-1, inplace=True)
+		#get the diagonal of true positives as a vector
+		rows, _ = df.shape
 
 	#First order calculations (good calculations, mostly unused)
 	true_positive = pd.DataFrame(df.iat[i, i] for i in range(rows))
