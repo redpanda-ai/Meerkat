@@ -253,6 +253,34 @@ def max_pool(tensor):
 	layer = tf.nn.max_pool(tensor, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
 	return layer
 
+def join(l, u):
+	"""Join labeled and unlabeled data"""
+	return tf.concat(0, [l, u])
+
+def labeled(config, x):
+	"""Get labeled data from tensor"""
+
+	batch_size = config["batch_size"]
+	shape = len(x.get_shape())
+	begin = [0] * shape
+	size = [batch_size] + ([-1] * (shape - 1))
+
+	return tf.slice(x, begin, size) if x is not None else x
+
+def unlabeled(config, x):
+	"""Get unlabeled data from tensor"""
+
+	batch_size = config["batch_size"]
+	shape = len(x.get_shape())
+	begin = [batch_size] + ([0] * (shape - 1))
+	size = [-1] * shape
+
+	return tf.slice(x, begin, size) if x is not None else x
+
+def split_lu(config, x):
+	"""Split labeleled and labeled data"""
+	return (labeled(config, x), unlabeled(config, x))
+
 def batch_normalization(batch, mean, var):
 	"""Perform batch normalization"""
 	return (batch - mean) / tf.sqrt(var + tf.constant(1e-10))
@@ -302,16 +330,11 @@ def build_graph(config):
 		w_fc2 = weight_variable(config, [1024, num_labels])
 		b_fc2 = bias_variable([num_labels], 1024)
 
-		join = lambda l, u: tf.concat(0, [l, u])
-		labeled = lambda x: tf.slice(x, [0, 0, 0, 0], [batch_size, -1, -1, -1]) if x is not None else x
-		unlabeled = lambda x: tf.slice(x, [batch_size, 0, 0, 0], [-1, -1, -1, -1]) if x is not None else x
-		split_lu = lambda x: (labeled(x), unlabeled(x))
-
 		def ladder_layer(input_h, details, layer_type, noise_std, weights=None, biases=None):
 			"""Apply all necessary steps in a ladder layer"""
 
 			layer_n = len(details['labeled']['h'].keys())
-			details['labeled']['h'][layer_n], details['unlabeled']['h'][layer_n] = split_lu(input_h)
+			details['labeled']['h'][layer_n], details['unlabeled']['h'][layer_n] = split_lu(config, input_h)
 
 			# Preactivation
 			if layer_type == "conv":
@@ -321,19 +344,19 @@ def build_graph(config):
 			elif layer_type == "fc":
 				z_pre = tf.matmul(input_h, weights)
 
-			z_pre_l, z_pre_u = split_lu(z_pre)
-			mear, variance = tf.nn.moments(z_pre_u, axes=[0]) # TODO: Fix Axes
+			z_pre_l, z_pre_u = split_lu(config, z_pre)
+			# mean, variance = tf.nn.moments(z_pre_u, axes=[0]) # TODO: Fix Axes
 
 			# Batch Normalization
 			if noise_std > 0:
 				z = join(batch_normalization(z_pre_l), batch_normalization(z_pre_u, mean, variance))
 				z += tf.random_normal(tf.shape(z_pre)) * noise_std
-            else:
-				z = join(update_batch_normalization(z_pre_l, layer_n), batch_normalization(z_pre_u, mean, variance)) # TODO Add update_batch_normalization
+			else:
+				z = join(z_pre_l, z_pre_u) # TODO Add update_batch_normalization
 
 			# Save Mean and Variance of Unlabeled Examples for Decoding
-			details['labeled']['z'][layer_n], details['unlabeled']['z'][layer_n] = split_lu(z)
-			details['unlabeled']['mean'][layer_n], details['unlabeled']['variance'][l] = mean, variance
+			details['labeled']['z'][layer_n], details['unlabeled']['z'][layer_n] = split_lu(config, z)
+			#details['unlabeled']['mean'][layer_n], details['unlabeled']['variance'][layer_n] = mean, variance
 
 			# TODO Add non-training code
 
@@ -341,7 +364,7 @@ def build_graph(config):
 			if layer_type == "conv" or layer_type == "fc":
 				layer = threshold(z + biases)
 			else:
-				layer = z + biases
+				layer = z
 
 			return layer
 
@@ -353,7 +376,7 @@ def build_graph(config):
 
 			details['labeled'] = {'z': {}, 'mean': {}, 'variance': {}, 'h': {}}
 			details['unlabeled'] = {'z': {}, 'mean': {}, 'variance': {}, 'h': {}}
-			details['labeled']['z'][0], details['unlabeled']['z'][0] = split_lu(h_noise)
+			details['labeled']['z'][0], details['unlabeled']['z'][0] = split_lu(config, h_noise)
 
 			h_conv1 = ladder_layer(h_noise, details, "conv", noise_std, weights=w_conv1, biases=b_conv1)
 			h_pool1 = ladder_layer(h_conv1, details, "pool", noise_std)
@@ -381,12 +404,12 @@ def build_graph(config):
 			network = tf.log(tf.clip_by_value(softmax, 1e-10, 1.0), name=name)
 
 			layer_n = len(details['labeled']['h'].keys())
-			details['labeled']['h'][layer_n], details['unlabeled']['h'][layer_n] = split_lu(network)
+			details['labeled']['h'][layer_n], details['unlabeled']['h'][layer_n] = split_lu(config, network)
 
 			return network, details
 
-		logging.info("Corrupted Encoder")
-		network_corr, details_corr = encoder(trans_placeholder, "network_corr", train=True, noise_std=0.3)
+		#logging.info("Corrupted Encoder")
+		#network_corr, details_corr = encoder(trans_placeholder, "network_corr", train=True, noise_std=0.3)
 
 		logging.info("Clean Encoder")
 		network_clean, details_clean = encoder(trans_placeholder, "network_clean", train=True)
@@ -394,7 +417,7 @@ def build_graph(config):
 		logging.info("Trained Model")
 		trained_model, _ = encoder(trans_placeholder, "model", train=False)
 
-		labeled_output = tf.slice(network_clean, [0, 0], [batch_size, -1])
+		labeled_output = labeled(config, network_clean)
 		supervised_cost = tf.neg(tf.reduce_mean(tf.reduce_sum(labeled_output * labels_placeholder, 1)), name="loss")
 		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(supervised_cost, name="optimizer")
 
