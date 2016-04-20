@@ -164,7 +164,7 @@ def get_classification_report(confusion_matrix_file, label_map):
 
 	#Convert to 0-indexed confusion matrix
 	df.rename(columns=lambda x: int(x) - 1, inplace=True)
-	#First order calculations (good calculations, mostly unused)
+	#First order calculations
 	true_positive = pd.DataFrame(df.iat[i, i] for i in range(rows))
 	col_sum = pd.DataFrame(df.sum(axis=1))
 	false_positive = pd.DataFrame(pd.DataFrame(df.sum(axis=0)).values - true_positive.values,
@@ -174,13 +174,13 @@ def get_classification_report(confusion_matrix_file, label_map):
 	true_negative = pd.DataFrame(
 		[df.drop(i, axis=1).drop(i, axis=0).sum().sum() for i in range(rows)])
 
-	#Second order calculations (good calculations, mostly unused)
+	#Second order calculations
 	accuracy = true_positive.sum() / df.sum().sum()
 	precision = true_positive / (true_positive + false_positive)
 	recall = true_positive / (true_positive + false_negative)
 	specificity = true_negative / (true_negative + false_positive)
 
-	#Third order calculations (good calculation, unused)
+	#Third order calculation
 	f_measure = 2 * precision * recall / (precision + recall)
 
 	#Write out the classification report
