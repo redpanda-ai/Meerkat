@@ -24,7 +24,7 @@
 				"neighbourhood" : { "type" : "string"},
 				"phone_number" : { "type" : "string"},
 				"postal_code" : { "type" : "string" },
-				"source" : { "enum": [ "FACTUAL", "OTHER", ""] },
+				"source" : { "enum": [ "FACTUAL", "OTHER"] },
 				"source_merchant_id" : { "type" : "string" },
 				"state" : { "type" : "string" },
 				"store_id" : { "type" : "string" },

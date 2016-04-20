@@ -341,7 +341,7 @@ class WebConsumer():
 				trans["neighbourhood"] = trans.get("neighbourhood", "")
 				trans["phone_number"] = trans.get("phone_number", "")
 				trans["postal_code"] = trans.get("postal_code", "")
-				trans["source"] = trans.get("source", "")
+				trans["source"] = trans.get("source", "OTHER")
 				trans["source_merchant_id"] = trans.get("source_merchant_id", "")
 				trans["store_id"] = trans.get("store_id", "")
 				trans["street"] = trans.get("street", "")
@@ -374,7 +374,7 @@ class WebConsumer():
 				trans["search"]["chain_name"] = trans["chain_name"]
 				trans["search"]["neighbourhood"] = trans["neighbourhood"]
 			else:
-				del trans["search"]
+				trans.pop("search", None)
 
 			# Override output with CNN v1
 			if trans.get("CNN", "") != "":
@@ -385,23 +385,16 @@ class WebConsumer():
 			if trans.get("locale_bloom", None) != None:
 				trans["city"] = trans["locale_bloom"][0]
 				trans["state"] = trans["locale_bloom"][1]
-				if debug:
-					trans["bloom_filter"] = {"city": trans["locale_bloom"][0],\
-					"state": trans["locale_bloom"][1]}
 			else:
 				trans["city"] = ""
 				trans["state"] = ""
-				if debug :
-					trans["bloom_filter"] = {"city": "", "state": ""}
 
 			if debug:
-				trans["cnn"] = {"txn_type" : trans["txn_type"],\
-					"txn_sub_type" : trans["txn_sub_type"]}
-
-			if "CNN" in trans:
-				if debug:
-					trans["cnn"]["merchant_name"] = trans["CNN"]
-				del trans["CNN"]
+				trans["bloom_filter"] = {"city": trans["city"], "state": trans["state"]}
+				trans["cnn"] = {"txn_type" : trans.get("txn_type", ""),
+					"txn_sub_type" : trans.get("txn_sub_type", ""),
+					"merchant_name" : trans.pop("CNN", "")
+					}
 
 			trans.pop("locale_bloom", None)
 			trans.pop("description", None)
@@ -565,8 +558,6 @@ class WebConsumer():
 		"""Apply all the classifiers which are CPU bound.  Written to be
 		run in parallel with GPU bound classifiers."""
 		services_list = data.get("services_list",[])
-		if data.get("debug", False) == True:
-			services_list = []
 		if "bloom_filter" in services_list or services_list == []:
 			self.__apply_locale_bloom(data)
 		else:
@@ -587,9 +578,6 @@ class WebConsumer():
 
 		services_list = data.get("services_list", [])
 		debug = data.get("debug", False)
-		# if debug all services are enabled
-		if debug == True:
-			services_list = []
 
 		cpu_result = self.__cpu_pool.apply_async(self.__apply_cpu_classifiers, (data, ))
 

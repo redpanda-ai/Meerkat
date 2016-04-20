@@ -14,7 +14,7 @@
 				"chain_name" : { "type" : "string"},
 				"city" : { "type" : "string" },
 				"confidence_score" : { "type" : "string" },
-				"country" : { "type" : "string", "maxLength" : 2, "minLength" : 2 },
+				"country" : { "type" : "string", "maxLength" : 2, "minLength" : 0 },
 				"fax_number" : { "type" : "string"},
 				"is_physical_merchant" : { "enum" : [ true ] },
 				"latitude" : { "type" : "string" },
@@ -24,7 +24,7 @@
 				"neighbourhood" : { "type" : "string"},
 				"phone_number" : { "type" : "string"},
 				"postal_code" : { "type" : "string" },
-				"source" : { "enum": [ "FACTUAL", "OTHER" ] },
+				"source" : { "enum": [ "FACTUAL", "OTHER"] },
 				"source_merchant_id" : { "type" : "string" },
 				"state" : { "type" : "string" },
 				"store_id" : { "type" : "string" },
@@ -70,7 +70,7 @@
 				"fax_number", "is_physical_merchant", "latitude", "longitude", "match_found",
 				"merchant_name", "neighbourhood", "phone_number", "postal_code", "source",
 				"source_merchant_id","state", "store_id", "street", "transaction_id",
-				"txn_sub_type", "txn_type", "website", "bloom_filter", "cnn", "search"],
+				"txn_sub_type", "txn_type", "website", "cnn", "search" ,"bloom_filter"],
 			"additionalProperties" : false
 		},
 		"non_physical_merchant_response" : {
@@ -123,10 +123,11 @@
 				},
 				"cnn" : {
 					"txn_type" : { "type" : "string"},
-					"txn_sub_type" : { "type" : "string" }
+					"txn_sub_type" : { "type" : "string" },
+					"merchant_name" : {"type" : "string"}
 				}
 			},
-			"required": [ "city", "state", "transaction_id", "is_physical_merchant", "txn_type", "txn_sub_type", "category_labels", "bloom_filter", "cnn"],
+			"required": [ "city", "state", "transaction_id", "is_physical_merchant", "txn_type", "txn_sub_type", "category_labels", "cnn", "bloom_filter"],
 			"additionalProperties" : false
 		}
 	},
