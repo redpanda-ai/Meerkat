@@ -329,11 +329,8 @@ def build_graph(config):
 		w_fc2 = weight_variable(config, [1024, num_labels])
 		b_fc2 = bias_variable([num_labels], 1024)
 
-		def ladder_layer(input_h, details, layer_type, noise_std, weights=None, biases=None):
+		def ladder_layer(input_h, details, layer_type, noise_std, train, weights=None, biases=None):
 			"""Apply all necessary steps in a ladder layer"""
-
-			layer_n = len(details['labeled']['h'].keys())
-			details['labeled']['h'][layer_n], details['unlabeled']['h'][layer_n] = split_lu(config, input_h)
 
 			# Preactivation
 			if layer_type == "conv":
@@ -343,22 +340,26 @@ def build_graph(config):
 			elif layer_type == "fc":
 				z_pre = tf.matmul(input_h, weights)
 
-			z_pre_l, z_pre_u = split_lu(config, z_pre)
-			axes = list(range(len(z_pre_u.get_shape()) - 1))
-			mean, variance = tf.nn.moments(z_pre_u, axes=axes)
+			if train:
+				layer_n = len(details['labeled']['h'].keys())
+				details['labeled']['h'][layer_n], details['unlabeled']['h'][layer_n] = split_lu(config, input_h)
 
-			# Batch Normalization
-			if noise_std > 0:
-				z = join(batch_normalization(z_pre_l), batch_normalization(z_pre_u, mean, variance))
-				z += tf.random_normal(tf.shape(z_pre)) * noise_std
+				z_pre_l, z_pre_u = split_lu(config, z_pre)
+				axes = list(range(len(z_pre_u.get_shape()) - 1))
+				mean, variance = tf.nn.moments(z_pre_u, axes=axes)
+
+				# Batch Normalization
+				if noise_std > 0:
+					z = join(batch_normalization(z_pre_l), batch_normalization(z_pre_u, mean, variance))
+					z += tf.random_normal(tf.shape(z_pre)) * noise_std
+				else:
+					z = join(z_pre_l, z_pre_u) # TODO Add update_batch_normalization
+
+				# Save Mean and Variance of Unlabeled Examples for Decoding
+				details['labeled']['z'][layer_n], details['unlabeled']['z'][layer_n] = split_lu(config, z)
+				details['unlabeled']['mean'][layer_n], details['unlabeled']['variance'][layer_n] = mean, variance
 			else:
-				z = join(z_pre_l, z_pre_u) # TODO Add update_batch_normalization
-
-			# Save Mean and Variance of Unlabeled Examples for Decoding
-			details['labeled']['z'][layer_n], details['unlabeled']['z'][layer_n] = split_lu(config, z)
-			details['unlabeled']['mean'][layer_n], details['unlabeled']['variance'][layer_n] = mean, variance
-
-			# TODO Add non-training code
+				z = z_pre
 
 			# Apply Activation
 			if layer_type == "conv" or layer_type == "fc":
@@ -367,8 +368,7 @@ def build_graph(config):
 				layer = z
 
 			return layer
-
-
+		
 		"""
 		# Utility for Batch Normalization
 		ewma = tf.train.ExponentialMovingAverage(decay=0.99)
@@ -392,37 +392,39 @@ def build_graph(config):
 			h_noise = inputs + tf.random_normal(tf.shape(inputs)) * noise_std
 			details = {}
 
-			details['labeled'] = {'z': {}, 'mean': {}, 'variance': {}, 'h': {}}
-			details['unlabeled'] = {'z': {}, 'mean': {}, 'variance': {}, 'h': {}}
-			details['labeled']['z'][0], details['unlabeled']['z'][0] = split_lu(config, h_noise)
+			if train:
+				details['labeled'] = {'z': {}, 'mean': {}, 'variance': {}, 'h': {}}
+				details['unlabeled'] = {'z': {}, 'mean': {}, 'variance': {}, 'h': {}}
+				details['labeled']['z'][0], details['unlabeled']['z'][0] = split_lu(config, h_noise)
 
-			h_conv1 = ladder_layer(h_noise, details, "conv", noise_std, weights=w_conv1, biases=b_conv1)
-			h_pool1 = ladder_layer(h_conv1, details, "pool", noise_std)
+			h_conv1 = ladder_layer(h_noise, details, "conv", noise_std, train, weights=w_conv1, biases=b_conv1)
+			h_pool1 = ladder_layer(h_conv1, details, "pool", noise_std, train)
 
-			h_conv2 = ladder_layer(h_pool1, details, "conv", noise_std, weights=w_conv2, biases=b_conv2)
-			h_pool2 = ladder_layer(h_conv2, details, "pool", noise_std)
+			h_conv2 = ladder_layer(h_pool1, details, "conv", noise_std, train, weights=w_conv2, biases=b_conv2)
+			h_pool2 = ladder_layer(h_conv2, details, "pool", noise_std, train)
 
-			h_conv3 = ladder_layer(h_pool2, details, "conv", noise_std, weights=w_conv3, biases=b_conv3)
+			h_conv3 = ladder_layer(h_pool2, details, "conv", noise_std, train, weights=w_conv3, biases=b_conv3)
 
-			h_conv4 = ladder_layer(h_conv3, details, "conv", noise_std, weights=w_conv4, biases=b_conv4)
+			h_conv4 = ladder_layer(h_conv3, details, "conv", noise_std, train, weights=w_conv4, biases=b_conv4)
 
-			h_conv5 = ladder_layer(h_conv4, details, "conv", noise_std, weights=w_conv5, biases=b_conv5)
-			h_pool5 = ladder_layer(h_conv5, details, "pool", noise_std)
+			h_conv5 = ladder_layer(h_conv4, details, "conv", noise_std, train, weights=w_conv5, biases=b_conv5)
+			h_pool5 = ladder_layer(h_conv5, details, "pool", noise_std, train)
 
 			h_reshape = tf.reshape(h_pool5, [-1, reshape])
 
-			h_fc1 = ladder_layer(h_reshape, details, "fc", noise_std, weights=w_fc1, biases=b_fc1)
+			h_fc1 = ladder_layer(h_reshape, details, "fc", noise_std, train, weights=w_fc1, biases=b_fc1)
 
 			if train:
 				h_fc1 = tf.nn.dropout(h_fc1, 0.5)
 
-			h_fc2 = ladder_layer(h_fc1, details, "fc", noise_std, weights=w_fc2, biases=b_fc2)
+			h_fc2 = ladder_layer(h_fc1, details, "fc", noise_std, train, weights=w_fc2, biases=b_fc2)
 
 			softmax = tf.nn.softmax(h_fc2)
 			network = tf.log(tf.clip_by_value(softmax, 1e-10, 1.0), name=name)
 
-			layer_n = len(details['labeled']['h'].keys())
-			details['labeled']['h'][layer_n], details['unlabeled']['h'][layer_n] = split_lu(config, softmax)
+			if train:
+				layer_n = len(details['labeled']['h'].keys())
+				details['labeled']['h'][layer_n], details['unlabeled']['h'][layer_n] = split_lu(config, softmax)
 
 			return network, details
 
@@ -484,10 +486,8 @@ def train_model(config, graph, sess, saver):
 			#Evaluate Model
 			model = get_tensor(graph, "model:0")
 			learning_rate = get_variable(graph, "lr:0")
-			predictions = sess.run(model, feed_dict=feed_dict)
 			logging.info("Testing for era %d" % (step / epochs))
 			logging.info("Learning rate at epoch %d: %g" % (step + 1, sess.run(learning_rate)))
-			logging.info("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
 			test_accuracy = evaluate_testset(config, graph, sess, model, test)
 
 			# Save Checkpoint
