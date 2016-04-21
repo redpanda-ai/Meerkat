@@ -42,14 +42,15 @@ An entry of machine_labeled has such format:
 import argparse
 import csv
 import logging
+import numpy as np
 import os
 import pandas as pd
-import numpy as np
+import sys
 
 from meerkat.classification.load_model import get_tf_cnn_by_path
 from meerkat.various_tools import load_params, load_piped_dataframe
 
-def parse_arguments():
+def parse_arguments(args):
 	""" Create the parser """
 	parser = argparse.ArgumentParser(description="Test a CNN against a dataset and\
 		return performance statistics")
@@ -77,15 +78,7 @@ def parse_arguments():
 		help='Use fast mode to save i/o time.')
 	parser.add_argument("-d", "--debug", help="Show 'debug'+ level logs", action="store_true")
 	parser.add_argument("-v", "--info", help="Show 'info'+ level logs", action="store_true")
-	args = parser.parse_args()
-	log_format = "%(asctime)s %(levelname)s: %(message)s"
-	if args.debug:
-		logging.basicConfig(format=log_format, level=logging.DEBUG)
-	elif args.info:
-		logging.basicConfig(format=log_format, level=logging.INFO)
-	else:
-		logging.basicConfig(format=log_format, level=logging.WARNING)
-	return args
+	return parser.parse_args(args)
 
 def compare_label(*args, **kwargs):
 	"""similar to generic_test in accuracy.py, with unnecessary items dropped"""
@@ -340,4 +333,12 @@ def main_process(args):
 	get_classification_report(confusion_matrix_path, label_map)
 
 if __name__ == "__main__":
-	main_process(parse_arguments())
+	args = parse_arguments(sys.argv[1:])
+	log_format = "%(asctime)s %(levelname)s: %(message)s"
+	if args.debug:
+		logging.basicConfig(format=log_format, level=logging.DEBUG)
+	elif args.info:
+		logging.basicConfig(format=log_format, level=logging.INFO)
+	else:
+		logging.basicConfig(format=log_format, level=logging.WARNING)
+	main_process(args)
