@@ -227,7 +227,7 @@ def auto_train():
 	copy_file("meerkat/classification/models/train.ckpt", "data/CNN_stats/")
 	make_tarfile("results.tar.gz", "data/CNN_stats")
 	logging.info("Uploading results.tar.gz to S3 {0}".format(s3_params["prefix"]))
-	#push_file_to_s3("results.tar.gz", "s3yodlee", s3_params["prefix"])
+	push_file_to_s3("results.tar.gz", "s3yodlee", s3_params["prefix"])
 	logging.info("Upload results.tar.gz to S3 sucessfully.")
 
 	if exist_new_input:
