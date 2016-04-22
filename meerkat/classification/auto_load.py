@@ -119,15 +119,6 @@ def set_label_map(bucket, prefix, key, winner, s3_base, tarball, output_path):
 
 def main_program(prefix="meerkat/cnn/data"):
 	"""Execute the main program"""
-	conn = boto.s3.connect_to_region('us-west-2')
-	bucket = conn.get_bucket("s3yodlee")
-	my_results, target, s3_base = {}, "results.tar.gz", "meerkat/cnn/data"
-	find_s3_objects_recursively(conn, bucket, my_results, prefix=prefix, target=target)
-	results = get_peer_models(my_results, prefix=prefix)
-	get_best_models(bucket, prefix, results, target, s3_base)
-
-if __name__ == "__main__":
-	#Execute the main program
 	parser = argparse.ArgumentParser("auto_load")
 	parser.add_argument("-d", "--debug", help="Show 'debug'+ level logs", action="store_true")
 	parser.add_argument("-v", "--info", help="Show 'info'+ level logs", action="store_true")
@@ -140,6 +131,15 @@ if __name__ == "__main__":
 	else:
 		logging.basicConfig(format=log_format, level=logging.WARNING)
 	logging.warning("Starting main program")
-	main_program()
+	conn = boto.s3.connect_to_region('us-west-2')
+	bucket = conn.get_bucket("s3yodlee")
+	my_results, target, s3_base = {}, "results.tar.gz", "meerkat/cnn/data"
+	find_s3_objects_recursively(conn, bucket, my_results, prefix=prefix, target=target)
+	results = get_peer_models(my_results, prefix=prefix)
+	get_best_models(bucket, prefix, results, target, s3_base)
 	logging.warning("Finishing main program")
+
+if __name__ == "__main__":
+	#Execute the main program
+	main_program()
 
