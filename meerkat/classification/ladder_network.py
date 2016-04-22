@@ -354,15 +354,13 @@ def build_graph(config):
 					z = join(batch_normalization(z_pre_l, mean, var), batch_normalization(z_pre_u, mean, var))
 					z += tf.random_normal(tf.shape(z_pre)) * noise_std
 				else:
-					z = join(update_batch_normalization(z_pre_l, layer_n, mean, var), batch_normalization(z_pre_u, mean, var))
+					z = join(batch_normalization(z_pre_l, mean, var), batch_normalization(z_pre_u, mean, var))
 
 				# Save Mean and Variance of Unlabeled Examples for Decoding
 				details['labeled']['z'][layer_n], details['unlabeled']['z'][layer_n] = split_lu(config, z)
 				details['unlabeled']['mean'][layer_n], details['unlabeled']['variance'][layer_n] = mean, var
 			else:
-				mean = ewma.average(running_mean[layer_n-1])
-				var = ewma.average(running_var[layer_n-1])
-				z = batch_normalization(z_pre, mean, var)
+				z = z_pre
 
 			# Apply Activation
 			if layer_type == "conv" or layer_type == "fc":
@@ -371,21 +369,6 @@ def build_graph(config):
 				layer = z
 
 			return layer
-		
-		# Utility for Batch Normalization
-		layer_sizes = [256] * 8 + [1024, num_labels]
-		ewma = tf.train.ExponentialMovingAverage(decay=0.99)
-		running_mean = [tf.Variable(tf.constant(0.0, shape=[l]), trainable=False) for l in layer_sizes]
-		running_var = [tf.Variable(tf.constant(1.0, shape=[l]), trainable=False) for l in layer_sizes]
-		bn_assigns = []
-
-		def update_batch_normalization(batch, l, mean, var):
-		    "batch normalize + update average mean and variance of layer l"
-		    assign_mean = running_mean[l-1].assign(mean)
-		    assign_var = running_var[l-1].assign(var)
-		    bn_assigns.append(ewma.apply([running_mean[l-1], running_var[l-1]]))
-		    with tf.control_dependencies([assign_mean, assign_var]):
-		        return (batch - mean) / tf.sqrt(var + 1e-10)
 
 		def encoder(inputs, name, train=False, noise_std=0.0):
 			"""Add model layers to the graph"""
