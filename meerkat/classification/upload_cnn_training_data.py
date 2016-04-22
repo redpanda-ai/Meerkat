@@ -14,12 +14,25 @@ import os
 import sys
 from plumbum import local
 from meerkat.classification.tools import push_file_to_s3, get_utc_iso_timestamp, make_tarfile
-from os import rename
 
 # check files
 def main_process():
 	"""This is the whole process"""
 	bucket = 's3yodlee'
+	s3_path = "meerkat/cnn/data/"
+	default_dir_paths = {
+			'merchant_card' : s3_path + "merchant/card/",
+			'merchant_bank' : s3_path + "merchant/bank/",
+			'subtype_card_debit' : s3_path + "subtype/card/debit/",
+			'subtype_card_credit' : s3_path + "subtype/card/credit/",
+			'subtype_bank_debit' : s3_path + "subtype/bank/debit",
+			'subtype_bank_credit' : s3_path + "subtype/bank/credit/",
+			'category_bank_debit': s3_path + "category/bank/debit/",
+			'category_bank_credit': s3_path + "category/bank/credit/",
+			'category_card_debit': s3_path + "category/card/debit/",
+			'category_card_credit': s3_path + "category/card/credit/",
+	}
+	dtime = get_utc_iso_timestamp()
 	prefix = default_dir_paths[sys.argv[2]] + dtime + '/'
 	csv_num, json_exit = 0, False
 	for filename in os.listdir(sys.argv[1]):
@@ -48,19 +61,6 @@ def main_process():
 	print("files gziped")
 
 	# upload the tar.gz file to s3
-	default_dir_paths = {
-			'merchant_card' : "meerkat/cnn/data/merchant/card/",
-			'merchant_bank' : "meerkat/cnn/data/merchant/bank/",
-			'subtype_card_debit' : "meerkat/cnn/data/subtype/card/debit/",
-			'subtype_card_credit' : "meerkat/cnn/data/subtype/card/credit/",
-			'subtype_bank_debit' : "meerkat/cnn/data/subtype/bank/debit",
-			'subtype_bank_credit' : "meerkat/cnn/data/subtype/bank/credit/",
-			'category_bank_debit': "meerkat/cnn/data/category/bank/debit/",
-			'category_bank_credit': "meerkat/cnn/data/category/bank/credit/",
-			'category_card_debit': "meerkat/cnn/data/category/card/debit/",
-			'category_card_credit': "meerkat/cnn/data/category/card/credit/",
-		}
-	dtime = get_utc_iso_timestamp()
 	print("uploading to s3")
 	push_file_to_s3('input.tar.gz', bucket, prefix)
 	print("uploaded to s3")
