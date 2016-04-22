@@ -41,32 +41,17 @@ def get_peer_models(candidate_dictionary, prefix=None):
 def get_model_accuracy(confusion_matrix):
 	"""Gets the accuracy for a particular confusion matrix"""
 	df = pd.read_csv(confusion_matrix)
-	#drop columns 0, 1, and -1 to make a square confusion matrix
-	df = df.drop(df.columns[[0, 1, -1]], axis=1)
-	#Reset columns names, which are off by one
-	df.rename(columns=lambda x: int(x)-1, inplace=True)
-	#get the diagonal of true positives as a vector
-	rows, _ = df.shape
+	rows, cols = df.shape
+	logging.debug("Rows: {0} x Cols {1}".format(rows, cols))
+	if cols == rows + 3:
+		#Support the old style of confusion matrix, eliminate pointless columns
+		df = df.drop(df.columns[[0, 1, -1]], axis=1)
+		#Reset columns names, which are off by one
+		df.rename(columns=lambda x: int(x)-1, inplace=True)
 
-	#First order calculations (good calculations, mostly unused)
 	true_positive = pd.DataFrame(df.iat[i, i] for i in range(rows))
-	#col_sum = pd.DataFrame(df.sum(axis=1))
-	#false_positive = pd.DataFrame(pd.DataFrame(df.sum(axis=0)).values - true_positive.values,
-	#	columns=true_positive.columns)
-	#false_negative = pd.DataFrame(pd.DataFrame(df.sum(axis=1)).values - true_positive.values,
-	#	columns=true_positive.columns)
-	#true_negative = pd.DataFrame(
-	#	[df.drop(i, axis=1).drop(i, axis=0).sum().sum() for i in range(rows)])
-
-	#Second order calculations (good calculations, mostly unused)
 	accuracy = true_positive.sum() / df.sum().sum()
-	#precision = true_positive / (true_positive + false_positive)
-	#recall = true_positive / (true_positive + false_negative)
-	#specificity = true_negative / (true_negative + false_positive)
 
-	#Third order calculations (good calculation, unused)
-	#f_measure = 2 * precision * recall / (precision + recall)
-	#Return the model accuracy, which is all we care about, actually
 	return accuracy.values[0]
 
 def get_single_file_from_tarball(archive, filename_pattern):
