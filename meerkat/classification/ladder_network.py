@@ -329,6 +329,8 @@ def build_graph(config):
 		w_fc2 = weight_variable(config, [1024, num_labels])
 		b_fc2 = bias_variable([num_labels], 1024)
 
+		gamma = tf.Variable(1.0 * tf.ones([num_labels]))
+
 		def ladder_layer(input_h, details, layer_type, noise_std, train, weights=None, biases=None):
 			"""Apply all necessary steps in a ladder layer"""
 
@@ -354,13 +356,15 @@ def build_graph(config):
 					z = join(batch_normalization(z_pre_l, mean, var), batch_normalization(z_pre_u, mean, var))
 					z += tf.random_normal(tf.shape(z_pre)) * noise_std
 				else:
-					z = join(batch_normalization(z_pre_l, mean, var), batch_normalization(z_pre_u, mean, var))
+					z = join(update_batch_normalization(z_pre_l, layer_n, mean, var), batch_normalization(z_pre_u, mean, var))
 
 				# Save Mean and Variance of Unlabeled Examples for Decoding
 				details['labeled']['z'][layer_n], details['unlabeled']['z'][layer_n] = split_lu(config, z)
 				details['unlabeled']['mean'][layer_n], details['unlabeled']['variance'][layer_n] = mean, var
 			else:
-				z = z_pre
+				mean = ewma.average(running_mean[layer_n-1])
+				var = ewma.average(running_var[layer_n-1])
+				z = batch_normalization(z_pre, mean, var)
 
 			# Apply Activation
 			if layer_type == "conv" or layer_type == "fc":
@@ -369,6 +373,21 @@ def build_graph(config):
 				layer = z
 
 			return layer
+		
+		# Utility for Batch Normalization
+		layer_sizes = [256] * 8 + [1024, num_labels]
+		ewma = tf.train.ExponentialMovingAverage(decay=0.99)
+		running_mean = [tf.Variable(tf.constant(0.0, shape=[l]), trainable=False) for l in layer_sizes]
+		running_var = [tf.Variable(tf.constant(1.0, shape=[l]), trainable=False) for l in layer_sizes]
+		bn_assigns = []
+
+		def update_batch_normalization(batch, l, mean, var):
+		    "batch normalize + update average mean and variance of layer l"
+		    assign_mean = running_mean[l-1].assign(mean)
+		    assign_var = running_var[l-1].assign(var)
+		    bn_assigns.append(ewma.apply([running_mean[l-1], running_var[l-1]]))
+		    with tf.control_dependencies([assign_mean, assign_var]):
+		        return (batch - mean) / tf.sqrt(var + 1e-10)
 
 		def encoder(inputs, name, train=False, noise_std=0.0):
 			"""Add model layers to the graph"""
@@ -403,7 +422,7 @@ def build_graph(config):
 
 			h_fc2 = ladder_layer(h_fc1, details, "fc", noise_std, train, weights=w_fc2, biases=b_fc2)
 
-			softmax = tf.nn.softmax(h_fc2)
+			softmax = tf.nn.softmax(gamma * h_fc2)
 			network = tf.log(tf.clip_by_value(softmax, 1e-10, 1.0), name=name)
 
 			if train:
@@ -424,6 +443,10 @@ def build_graph(config):
 		labeled_output = labeled(config, network_clean)
 		supervised_cost = tf.neg(tf.reduce_mean(tf.reduce_sum(labeled_output * labels_placeholder, 1)), name="loss")
 		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(supervised_cost, name="optimizer")
+
+		bn_updates = tf.group(*bn_assigns)
+		with tf.control_dependencies([optimizer]):
+			optimizer = tf.group(bn_updates)
 
 		saver = tf.train.Saver()
 
