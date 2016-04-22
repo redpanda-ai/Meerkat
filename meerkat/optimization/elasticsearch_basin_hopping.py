@@ -27,7 +27,6 @@ Created on Feb 26, 2014
 
 #####################################################
 
-import json
 import sys
 import os
 import queue
@@ -40,20 +39,18 @@ import numpy as np
 #pylint:disable=no-name-in-module
 from numpy import array, array_split
 from scipy.optimize import basinhopping
-
 from meerkat.web_service.web_consumer import WebConsumer
 from meerkat.accuracy import print_results, vest_accuracy
-from meerkat.various_tools \
-import load_dict_list, safe_print, get_us_cities
-from meerkat.various_tools import load_params
-from meerkat.optimization.tools import add_local_params
+from meerkat.various_tools import load_params, safe_print, get_us_cities
+from meerkat.optimization.tools import (add_local_params, format_web_consumer, load_dataset,
+	split_hyperparameters)
 
 CITIES = get_us_cities()
 
 #CONSTANTS
 USED_IN_HEADER, ORIGIN, NAME_IN_MEERKAT, NAME_IN_ORIGIN = 0, 1, 2, 3
 BATCH_SIZE = 1000
-consumer = WebConsumer()
+CONSUMER = WebConsumer()
 
 class RandomDisplacementBounds(object):
 	"""random displacement with bounds"""
@@ -93,17 +90,17 @@ def run_meerkat(params, dataset):
 	result_list = []
 	number = (len(dataset))/BATCH_SIZE
 	number = int(number - (number%1))
-	for x in range(0, number+1):
+	for step in range(0, number+1):
 		batch = []
-		for i in range(x*BATCH_SIZE, (x+1)*BATCH_SIZE):
+		for i in range(step * BATCH_SIZE, (step + 1) * BATCH_SIZE):
 			try:
 				batch.append(dataset[i])
 			except IndexError:
 				break
 
-		print("Batch number: {0}".format(x))
+		print("Batch number: {0}".format(step))
 		batch_in = format_web_consumer(batch)
-		batch_result = consumer.classify(batch_in)
+		batch_result = CONSUMER.classify(batch_in)
 		result_list.extend(batch_result["transaction_list"])
 
 	# Test Accuracy
@@ -112,26 +109,6 @@ def run_meerkat(params, dataset):
 
 	return accuracy_results
 
-def load_dataset(params):
-	"""Load a verified dataset"""
-
-	verification_source = \
-	params.get("verification_source", "data/misc/ground_truth_card.txt")
-	dataset = []
-
-	# Load Data
-	verified_transactions = load_dict_list(verification_source)
-
-	# Filter Verification File
-	for i in range(len(verified_transactions)):
-		curr = verified_transactions[i]
-
-		for field in params["output"]["results"]["labels"]:
-			curr[field] = ""
-
-		dataset.append(curr)
-
-	return dataset
 
 def save_top_score(top_score):
 	""" Save top scores """
@@ -143,21 +120,6 @@ def save_top_score(top_score):
 	pprint(boost_vectors, record)
 	pprint(other, record)
 	record.close()
-
-def split_hyperparameters(hyperparameters):
-	""" Split a given set of hyperparameters """
-	boost_vectors = {}
-	boost_labels = ["standard_fields"]
-	non_boost = ["es_result_size", "z_score_threshold", "good_description"]
-	other = {}
-
-	for key, value in hyperparameters.items():
-		if key in non_boost:
-			other[key] = value
-		else:
-			boost_vectors[key] = [value]
-
-	return boost_vectors, boost_labels, other
 
 def get_desc_queue(dataset):
 	"""Alt version of get_desc_queue"""
@@ -189,25 +151,11 @@ def run_classifier(hyperparameters, params, dataset):
 	hyperparameters["boost_vectors"] = boost_vectors
 
 	# Run Classifier with new Hyperparameters. Suppress Output
-	consumer.update_hyperparams(hyperparameters)
+	CONSUMER.update_hyperparams(hyperparameters)
 	accuracy = run_meerkat(params, dataset)
 
 	return accuracy
 
-def format_web_consumer(dataset):
-	""" Format the input json file """
-	formatted = json.load(open("meerkat/web_service/example_input.json", "r"))
-	formatted["transaction_list"] = dataset
-	trans_id = 1
-	for trans in formatted["transaction_list"]:
-		trans["transaction_id"] = trans_id
-		trans_id = trans_id +1
-		trans["description"] = trans["DESCRIPTION_UNMASKED"]
-		trans["amount"] = trans["AMOUNT"]
-		trans["date"] = trans["TRANSACTION_DATE"]
-		trans["ledger_entry"] = "credit"
-
-	return formatted
 
 
 def verify_arguments():
@@ -296,8 +244,8 @@ def run_from_command_line():
 		x = [str(n) for n in x]
 		hyperparam = dict(zip(param_names, list(x)))
 		hyperparam['es_result_size'] = "45"
-		consumer.update_params(params)
-		consumer.update_cities(CITIES)
+		CONSUMER.update_params(params)
+		CONSUMER.update_cities(CITIES)
 		accuracy = run_classifier(hyperparam, params, dataset)
 		error = (100 - accuracy['precictive_accuracy']) / 100
 

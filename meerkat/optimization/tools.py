@@ -1,3 +1,9 @@
+"""A library of useful functions for our optimization package"""
+import logging
+import json
+
+from meerkat.various_tools import load_dict_list
+\
 def add_local_params(params):
 	"""Adds additional local params"""
 	params["mode"] = "train"
@@ -17,10 +23,54 @@ def add_local_params(params):
 	}
 	return params
 
-if __name__ == "__main__":
-	msg = "This is a library of useful functions, do not run it from the command line."
-	logging.critical(msg)
+def format_web_consumer(dataset):
+	"""Format the input json file """
+	formatted = json.load(open("meerkat/web_service/example_input.json", "r"))
+	formatted["transaction_list"] = dataset
+	trans_id = 1
+	for trans in formatted["transaction_list"]:
+		trans["transaction_id"] = trans_id
+		trans_id = trans_id +1
+		trans["description"] = trans["DESCRIPTION_UNMASKED"]
+		trans["amount"] = trans["AMOUNT"]
+		trans["date"] = trans["TRANSACTION_DATE"]
+		trans["ledger_entry"] = "credit"
 
+	return formatted
+
+def load_dataset(params):
+	"""Load a verified dataset"""
+	verification_source = \
+	params.get("verification_source", "data/misc/ground_truth_card.txt")
+	dataset = []
+	# Load Data
+	verified_transactions = load_dict_list(verification_source)
+	# Filter Verification File
+	for i in range(len(verified_transactions)):
+		curr = verified_transactions[i]
+		for field in params["output"]["results"]["labels"]:
+			curr[field] = ""
+		dataset.append(curr)
+
+	return dataset
+
+def split_hyperparameters(hyperparameters):
+	"""partition hyperparameters into 2 parts based on keys and non_boost list"""
+	boost_vectors = {}
+	boost_labels = ["standard_fields"]
+	non_boost = ["es_result_size", "z_score_threshold", "good_description"]
+	other = {}
+
+	for key, value in hyperparameters.items():
+		if key in non_boost:
+			other[key] = value
+		else:
+			boost_vectors[key] = [value]
+
+	return boost_vectors, boost_labels, other
+
+if __name__ == "__main__":
+	logging.critical("This is a library of useful functions, do not run it from the command line.")
 
 
 
