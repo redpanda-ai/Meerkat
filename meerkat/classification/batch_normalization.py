@@ -327,6 +327,13 @@ def build_graph(config):
 
 		gamma = tf.Variable(1.0 * tf.ones([num_labels]))
 
+		# Utility for Batch Normalization
+		layer_sizes = [256] * 8 + [1024, num_labels]
+		ewma = tf.train.ExponentialMovingAverage(decay=0.99)
+		running_mean = [tf.Variable(tf.zeros([l]), trainable=False, name="running_mean") for l in layer_sizes]
+		running_var = [tf.Variable(tf.ones([l]), trainable=False) for l in layer_sizes]
+		bn_assigns = []
+
 		def ladder_layer(input_h, details, layer_type, noise_std, train, weights=None, biases=None):
 			"""Apply all necessary steps in a ladder layer"""
 
@@ -346,7 +353,7 @@ def build_graph(config):
 			else:
 				mean = ewma.average(running_mean[layer_n-1])
 				var = ewma.average(running_var[layer_n-1])
-				z = batch_normalization(z_pre, mean=None, var=None)
+				z = batch_normalization(z_pre, mean=mean, var=var)
 
 			# Apply Activation
 			if layer_type == "conv" or layer_type == "fc":
@@ -355,13 +362,6 @@ def build_graph(config):
 				layer = z
 
 			return layer
-		
-		# Utility for Batch Normalization
-		layer_sizes = [256] * 8 + [1024, num_labels]
-		ewma = tf.train.ExponentialMovingAverage(decay=0.9)
-		running_mean = [tf.Variable(tf.constant(0.0, shape=[l]), trainable=False) for l in layer_sizes]
-		running_var = [tf.Variable(tf.constant(1.0, shape=[l]), trainable=False) for l in layer_sizes]
-		bn_assigns = []
 
 		def batch_normalization(batch, mean=None, var=None):
 			"""Perform batch normalization"""
@@ -437,7 +437,7 @@ def build_graph(config):
 
 		bn_updates = tf.group(*bn_assigns)
 		with tf.control_dependencies([optimizer]):
-			optimizer = tf.group(bn_updates)
+			bn_applier = tf.group(bn_updates, name="bn_applier")
 
 		saver = tf.train.Saver()
 
@@ -469,6 +469,7 @@ def train_model(config, graph, sess, saver):
 
 		# Run Training Step
 		sess.run(get_op(graph, "optimizer"), feed_dict=feed_dict)
+		sess.run(get_op(graph, "bn_applier"), feed_dict=feed_dict)
 
 		# Log Loss
 		if step % logging_interval == 0:
