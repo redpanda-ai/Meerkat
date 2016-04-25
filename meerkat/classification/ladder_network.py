@@ -349,10 +349,10 @@ def build_graph(config):
 
 				# Batch Normalization
 				if noise_std > 0:
-					z = join(batch_normalization(z_pre_l), batch_normalization(z_pre_u, mean, var))
+					z = join(batch_normalization(z_pre_l), batch_normalization(z_pre_u, mean=mean, var=var))
 					z += tf.random_normal(tf.shape(z_pre)) * noise_std
 				else:
-					z = join(update_batch_normalization(z_pre_l, layer_n), batch_normalization(z_pre_u, mean, var))
+					z = join(update_batch_normalization(z_pre_l, layer_n), batch_normalization(z_pre_u, mean=mean, var=var))
 
 				# Save Mean and Variance of Unlabeled Examples for Decoding
 				details['labeled']['z'][layer_n], details['unlabeled']['z'][layer_n] = split_lu(config, z)
@@ -494,7 +494,7 @@ def train_model(config, graph, sess, saver):
 			logging.info("train loss at epoch %d: %g" % (step + 1, loss))
 
 		if step % 1000 == 0:
-			predictions = sess.run(get_tensor(graph, "model:0"), feed_dict=feed_dict)
+			predictions = sess.run(get_tensor(graph, "model:0"), feed_dict={get_tensor(graph, "x:0"): trans, get_tensor(graph, "y:0"): labels})
 			logging.info("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
 
 		# Evaluate Testset, Log Progress and Save
