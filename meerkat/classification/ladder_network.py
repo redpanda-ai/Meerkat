@@ -281,10 +281,6 @@ def split_lu(config, x):
 	"""Split labeleled and labeled data"""
 	return (labeled(config, x), unlabeled(config, x))
 
-def batch_normalization(batch, mean, var):
-	"""Perform batch normalization"""
-	return (batch - mean) / tf.sqrt(var + tf.constant(1e-10))
-
 def build_graph(config):
 	"""Build CNN"""
 
@@ -356,7 +352,7 @@ def build_graph(config):
 					z = join(batch_normalization(z_pre_l, mean, var), batch_normalization(z_pre_u, mean, var))
 					z += tf.random_normal(tf.shape(z_pre)) * noise_std
 				else:
-					z = join(update_batch_normalization(z_pre_l, layer_n, mean, var), batch_normalization(z_pre_u, mean, var))
+					z = join(update_batch_normalization(z_pre_l, layer_n), batch_normalization(z_pre_u, mean, var))
 
 				# Save Mean and Variance of Unlabeled Examples for Decoding
 				details['labeled']['z'][layer_n], details['unlabeled']['z'][layer_n] = split_lu(config, z)
@@ -364,7 +360,7 @@ def build_graph(config):
 			else:
 				mean = ewma.average(running_mean[layer_n-1])
 				var = ewma.average(running_var[layer_n-1])
-				z = batch_normalization(z_pre, mean, var)
+				z = batch_normalization(z_pre, mean=mean, var=var)
 
 			# Apply Activation
 			if layer_type == "conv" or layer_type == "fc":
@@ -381,8 +377,17 @@ def build_graph(config):
 		running_var = [tf.Variable(tf.constant(1.0, shape=[l]), trainable=False) for l in layer_sizes]
 		bn_assigns = []
 
-		def update_batch_normalization(batch, l, mean, var):
+		def batch_normalization(batch, mean=None, var=None):
+			"""Perform batch normalization"""
+			if mean == None or var == None:
+				axes = [0] if len(batch.get_shape()) == 2 else [0, 1, 2]
+				mean, var = tf.nn.moments(batch, axes=axes)
+			return (batch - mean) / tf.sqrt(var + tf.constant(1e-10))
+
+		def update_batch_normalization(batch, l):
 		    "batch normalize + update average mean and variance of layer l"
+		    axes = [0] if len(batch.get_shape()) == 2 else [0, 1, 2]
+			mean, var = tf.nn.moments(batch, axes=axes)
 		    assign_mean = running_mean[l-1].assign(mean)
 		    assign_var = running_var[l-1].assign(var)
 		    bn_assigns.append(ewma.apply([running_mean[l-1], running_var[l-1]]))
@@ -446,7 +451,7 @@ def build_graph(config):
 
 		bn_updates = tf.group(*bn_assigns)
 		with tf.control_dependencies([optimizer]):
-			optimizer = tf.group(bn_updates)
+			bn_applier = tf.group(bn_updates, name="bn_applier")
 
 		saver = tf.train.Saver()
 
@@ -481,6 +486,7 @@ def train_model(config, graph, sess, saver):
 
 		# Run Training Step
 		sess.run(get_op(graph, "optimizer"), feed_dict=feed_dict)
+		sess.run(get_op(graph, "bn_applier"), feed_dict=feed_dict)
 
 		# Log Loss
 		if step % logging_interval == 0:
