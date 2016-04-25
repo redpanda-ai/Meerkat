@@ -349,7 +349,7 @@ def build_graph(config):
 
 				# Batch Normalization
 				if noise_std > 0:
-					z = join(batch_normalization(z_pre_l, mean, var), batch_normalization(z_pre_u, mean, var))
+					z = join(batch_normalization(z_pre_l), batch_normalization(z_pre_u, mean, var))
 					z += tf.random_normal(tf.shape(z_pre)) * noise_std
 				else:
 					z = join(update_batch_normalization(z_pre_l, layer_n), batch_normalization(z_pre_u, mean, var))
@@ -373,8 +373,8 @@ def build_graph(config):
 		# Utility for Batch Normalization
 		layer_sizes = [256] * 8 + [1024, num_labels]
 		ewma = tf.train.ExponentialMovingAverage(decay=0.99)
-		running_mean = [tf.Variable(tf.constant(0.0, shape=[l]), trainable=False) for l in layer_sizes]
-		running_var = [tf.Variable(tf.constant(1.0, shape=[l]), trainable=False) for l in layer_sizes]
+		running_mean = [tf.Variable(tf.zeros([l]), trainable=False) for l in layer_sizes]
+		running_var = [tf.Variable(tf.ones([l]), trainable=False) for l in layer_sizes]
 		bn_assigns = []
 
 		def batch_normalization(batch, mean=None, var=None):
@@ -492,6 +492,10 @@ def train_model(config, graph, sess, saver):
 		if step % logging_interval == 0:
 			loss = sess.run(get_tensor(graph, "loss:0"), feed_dict=feed_dict)
 			logging.info("train loss at epoch %d: %g" % (step + 1, loss))
+
+		if step % 1000 == 0:
+			predictions = sess.run(get_tensor(graph, "model:0"), feed_dict=feed_dict)
+			logging.info("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
 
 		# Evaluate Testset, Log Progress and Save
 		if step != 0 and step % epochs == 0:
