@@ -385,14 +385,14 @@ def build_graph(config):
 			return (batch - mean) / tf.sqrt(var + tf.constant(1e-10))
 
 		def update_batch_normalization(batch, l):
-		    "batch normalize + update average mean and variance of layer l"
-		    axes = [0] if len(batch.get_shape()) == 2 else [0, 1, 2]
+			"batch normalize + update average mean and variance of layer l"
+			axes = [0] if len(batch.get_shape()) == 2 else [0, 1, 2]
 			mean, var = tf.nn.moments(batch, axes=axes)
-		    assign_mean = running_mean[l-1].assign(mean)
-		    assign_var = running_var[l-1].assign(var)
-		    bn_assigns.append(ewma.apply([running_mean[l-1], running_var[l-1]]))
-		    with tf.control_dependencies([assign_mean, assign_var]):
-		        return (batch - mean) / tf.sqrt(var + 1e-10)
+			assign_mean = running_mean[l-1].assign(mean)
+			assign_var = running_var[l-1].assign(var)
+			bn_assigns.append(ewma.apply([running_mean[l-1], running_var[l-1]]))
+			with tf.control_dependencies([assign_mean, assign_var]):
+				return (batch - mean) / tf.sqrt(var + 1e-10)
 
 		def encoder(inputs, name, train=False, noise_std=0.0):
 			"""Add model layers to the graph"""
