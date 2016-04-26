@@ -325,7 +325,32 @@ def build_graph(config):
 		w_fc2 = weight_variable(config, [1024, num_labels])
 		b_fc2 = bias_variable([num_labels], 1024)
 
+		denoising_weights = weight_variable(config, [num_labels, 1024])
+
+		# Utility for Batch Normalization
 		gamma = tf.Variable(1.0 * tf.ones([num_labels]))
+		layer_sizes = [256] * 8 + [1024, num_labels]
+		ewma = tf.train.ExponentialMovingAverage(decay=0.99)
+		running_mean = [tf.Variable(tf.zeros([l]), trainable=False) for l in layer_sizes]
+		running_var = [tf.Variable(tf.ones([l]), trainable=False) for l in layer_sizes]
+		bn_assigns = []
+
+		def batch_normalization(batch, mean=None, var=None):
+			"""Perform batch normalization"""
+			if mean == None or var == None:
+				axes = [0] if len(batch.get_shape()) == 2 else [0, 1, 2]
+				mean, var = tf.nn.moments(batch, axes=axes)
+			return (batch - mean) / tf.sqrt(var + tf.constant(1e-10))
+
+		def update_batch_normalization(batch, l):
+			"batch normalize + update average mean and variance of layer l"
+			axes = [0] if len(batch.get_shape()) == 2 else [0, 1, 2]
+			mean, var = tf.nn.moments(batch, axes=axes)
+			assign_mean = running_mean[l-1].assign(mean)
+			assign_var = running_var[l-1].assign(var)
+			bn_assigns.append(ewma.apply([running_mean[l-1], running_var[l-1]]))
+			with tf.control_dependencies([assign_mean, assign_var]):
+				return (batch - mean) / tf.sqrt(var + 1e-10)
 
 		def ladder_layer(input_h, details, layer_type, noise_std, train, weights=None, biases=None):
 			"""Apply all necessary steps in a ladder layer"""
@@ -370,30 +395,6 @@ def build_graph(config):
 
 			return layer
 		
-		# Utility for Batch Normalization
-		layer_sizes = [256] * 8 + [1024, num_labels]
-		ewma = tf.train.ExponentialMovingAverage(decay=0.99)
-		running_mean = [tf.Variable(tf.zeros([l]), trainable=False) for l in layer_sizes]
-		running_var = [tf.Variable(tf.ones([l]), trainable=False) for l in layer_sizes]
-		bn_assigns = []
-
-		def batch_normalization(batch, mean=None, var=None):
-			"""Perform batch normalization"""
-			if mean == None or var == None:
-				axes = [0] if len(batch.get_shape()) == 2 else [0, 1, 2]
-				mean, var = tf.nn.moments(batch, axes=axes)
-			return (batch - mean) / tf.sqrt(var + tf.constant(1e-10))
-
-		def update_batch_normalization(batch, l):
-			"batch normalize + update average mean and variance of layer l"
-			axes = [0] if len(batch.get_shape()) == 2 else [0, 1, 2]
-			mean, var = tf.nn.moments(batch, axes=axes)
-			assign_mean = running_mean[l-1].assign(mean)
-			assign_var = running_var[l-1].assign(var)
-			bn_assigns.append(ewma.apply([running_mean[l-1], running_var[l-1]]))
-			with tf.control_dependencies([assign_mean, assign_var]):
-				return (batch - mean) / tf.sqrt(var + 1e-10)
-
 		def encoder(inputs, name, train=False, noise_std=0.0):
 			"""Add model layers to the graph"""
 
@@ -436,8 +437,9 @@ def build_graph(config):
 
 			return network, details
 
-		#logging.info("Corrupted Encoder")
-		#network_corr, details_corr = encoder(trans_placeholder, "network_corr", train=True, noise_std=0.3)
+		# Encoders
+		logging.info("Corrupted Encoder")
+		network_corr, details_corr = encoder(trans_placeholder, "network_corr", train=True, noise_std=0.3)
 
 		logging.info("Clean Encoder")
 		network_clean, details_clean = encoder(trans_placeholder, "network_clean", train=True)
@@ -445,9 +447,50 @@ def build_graph(config):
 		logging.info("Trained Model")
 		trained_model, _ = encoder(trans_placeholder, "model", train=False)
 
-		labeled_output = labeled(config, network_clean)
+		def g_gauss(z_c, u, size):
+			"gaussian denoising function proposed in the original paper"
+			wi = lambda inits, name: tf.Variable(inits * tf.ones([size]), name=name)
+			a1 = wi(0., 'a1')
+			a2 = wi(1., 'a2')
+			a3 = wi(0., 'a3')
+			a4 = wi(0., 'a4')
+			a5 = wi(0., 'a5')
+
+			a6 = wi(0., 'a6')
+			a7 = wi(1., 'a7')
+			a8 = wi(0., 'a8')
+			a9 = wi(0., 'a9')
+			a10 = wi(0., 'a10')
+
+			mu = a1 * tf.sigmoid(a2 * u + a3) + a4 * u + a5
+			v = a6 * tf.sigmoid(a7 * u + a8) + a9 * u + a10
+
+			z_est = (z_c - mu) * v + mu
+			return z_est
+
+		# Decoder
+		z_est, d_cost = {}, []
+		denoising_cost = [0] * (details_clean["layer_count"]) + [1]
+		with tf.name_scope("denoiser") as scope:
+			L = details_clean["layer_count"]
+			for l in range(L, L-2, -1):
+				z, z_c = details_clean['unlabeled']['z'][l], details_corr['unlabeled']['z'][l]
+				m, v = details_clean['unlabeled']['mean'].get(l, 0), details_clean['unlabeled']['variance'].get(l, 1-1e-10)
+				if l == L:
+					u = unlabeled(config, network_corr)
+				else:
+					u = tf.matmul(z_est[l+1], denoising_weights)
+				u = batch_normalization(u)
+				z_est[l] = g_gauss(z_c, u, layer_sizes[l-1])
+				z_est_bn = (z_est[l] - m) / v
+				d_cost.append((tf.reduce_mean(tf.reduce_sum(tf.square(z_est_bn - z), 1)) / layer_sizes[l-1]) * denoising_cost[l])
+
+		# Loss
+		unsupervised_cost = tf.add_n(d_cost)
+		labeled_output = labeled(config, network_corr)
 		supervised_cost = tf.neg(tf.reduce_mean(tf.reduce_sum(labeled_output * labels_placeholder, 1)), name="loss")
-		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(supervised_cost, name="optimizer")
+		loss = supervised_cost + unsupervised_cost
+		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss, name="optimizer")
 
 		bn_updates = tf.group(*bn_assigns)
 		with tf.control_dependencies([optimizer]):
