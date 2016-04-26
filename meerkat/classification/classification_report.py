@@ -49,6 +49,7 @@ import sys
 
 from meerkat.classification.load_model import get_tf_cnn_by_path
 from meerkat.various_tools import load_params, load_piped_dataframe
+from os.path import isfile
 
 def parse_arguments(args):
 	""" Create the parser """
@@ -128,21 +129,18 @@ def compare_label(*args, **kwargs):
 
 def get_write_func(filename, header):
 	"""Have a write function"""
-	file_exists = False
 	def write_func(data):
 		"""Have a write function"""
 		if len(data) > 0:
 			logging.info("Saving transactions to {0}".format(filename))
-			nonlocal file_exists
-			mode = "a" if file_exists else "w"
-			add_head = False if file_exists else header
 			df = pd.DataFrame(data)
-			df.to_csv(filename, mode=mode, index=False, header=add_head,
-				sep='|')
-			file_exists = True
+			if isfile(filename):
+				df.to_csv(filename, mode="a", index=False, header=False, sep='|')
+			else:
+				df.to_csv(filename, mode="w", index=False, header=header, sep='|')
 		else:
 			#It's important to write empty files too
-			logging.debug("Writing empty file {0}".format(filename))
+			logging.debug("Appending emptiness to {0}".format(filename))
 			open(filename, 'a').close()
 	return write_func
 
