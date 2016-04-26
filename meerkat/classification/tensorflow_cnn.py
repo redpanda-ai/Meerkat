@@ -1,7 +1,4 @@
 #!/usr/local/bin/python3
-# pylint: disable=unused-variable
-# pylint: disable=too-many-locals
-
 """Train a CNN using tensorFlow
 
 Created on Mar 14, 2016
@@ -29,6 +26,7 @@ import pprint
 import random
 import shutil
 import sys
+import json
 
 import numpy as np
 import tensorflow as tf
@@ -126,7 +124,7 @@ def evaluate_testset(config, graph, sess, model, test):
 	for i in range(num_chunks):
 
 		batch_test = test.loc[chunked_test[i]]
-		batch_size = len(batch_test)
+		#batch_size = len(batch_test)
 
 		trans_test, labels_test = batch_to_tensor(config, batch_test)
 		feed_dict_test = {get_tensor(graph, "x:0"): trans_test}
@@ -238,6 +236,26 @@ def max_pool(tensor):
 	layer = tf.nn.max_pool(tensor, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
 	return layer
 
+def get_cost_matrix():
+	"""Retrieve a cost matrix"""
+	cost_dict = None
+	try:
+		infile = open("./data/CNN_stats/label_map.json", encoding="utf-8")
+		cost_dict = json.loads(infile.read())
+		infile.close()
+	except IOError:
+		logging.error("label_map.json not found, aborting")
+		sys.exit()
+	#Get the class numbers sorted numerically
+	keys = sorted([int(x) for x in cost_dict.keys()])
+	#Produce an ordered list of cost values
+	cost_list = []
+	for key in keys:
+		cost = cost_dict[str(key)].get("cost", 1.0)
+		cost_list.append(cost)
+		logging.info("Cost for class {0} is {1}".format(key, cost))
+	return tf.transpose(tf.constant(cost_list), name="cm")
+
 def build_graph(config):
 	"""Build CNN"""
 
@@ -258,6 +276,8 @@ def build_graph(config):
 
 		trans_placeholder = tf.placeholder(tf.float32, shape=input_shape, name="x")
 		labels_placeholder = tf.placeholder(tf.float32, shape=output_shape, name="y")
+		#Factor in the cost matrix
+		costly_labels = tf.mul(labels_placeholder, get_cost_matrix())
 
 		w_conv1 = weight_variable(config, [1, 7, alphabet_length, 256])
 		b_conv1 = bias_variable([256], 7 * alphabet_length)
@@ -313,7 +333,7 @@ def build_graph(config):
 		network = model(trans_placeholder, "network", train=True)
 		trained_model = model(trans_placeholder, "model", train=False)
 
-		loss = tf.neg(tf.reduce_mean(tf.reduce_sum(network * labels_placeholder, 1)), name="loss")
+		loss = tf.neg(tf.reduce_mean(tf.reduce_sum(network * costly_labels, 1)), name="loss")
 		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss, name="optimizer")
 
 		saver = tf.train.Saver()
