@@ -254,7 +254,8 @@ def get_cost_matrix():
 		cost = cost_dict[str(key)].get("cost", 1.0)
 		cost_list.append(cost)
 		logging.info("Cost for class {0} is {1}".format(key, cost))
-	return tf.transpose(tf.constant(cost_list), name="cm")
+	#Expand the tensor into D1
+	return tf.expand_dims(tf.transpose(tf.constant(cost_list)), 1, name="cost_matrix")
 
 def build_graph(config):
 	"""Build CNN"""
@@ -275,9 +276,9 @@ def build_graph(config):
 		output_shape = [None, num_labels]
 
 		trans_placeholder = tf.placeholder(tf.float32, shape=input_shape, name="x")
-		labels_placeholder = tf.placeholder(tf.float32, shape=output_shape, name="y")
+		labels_placeholder = tf.placeholder(tf.float32, shape=output_shape, name="y_old")
 		#Factor in the cost matrix
-		costly_labels = tf.mul(labels_placeholder, get_cost_matrix())
+		costly_labels = tf.mul(labels_placeholder, get_cost_matrix(), name="y")
 
 		w_conv1 = weight_variable(config, [1, 7, alphabet_length, 256])
 		b_conv1 = bias_variable([256], 7 * alphabet_length)
