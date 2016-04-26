@@ -8,7 +8,7 @@ from tornado.concurrent import Future
 
 from tornado_json.utils import container
 
-def service_list_validation(services_list):
+def services_list_validation(services_list):
 	"""check whether a services combination is valid"""
 	if services_list != []:
 		services_set = set(services_list)
@@ -74,7 +74,7 @@ def validate(input_schema=None, output_schema=None,\
 					input_,
 					input_schema
 				)
-				service_list_validation(input_.get("services_list", []))
+				services_list_validation(input_.get("services_list", []))
 			else:
 				input_ = None
 

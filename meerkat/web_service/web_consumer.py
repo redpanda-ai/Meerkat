@@ -237,10 +237,9 @@ class WebConsumer():
 					transaction[attr_map.get(field, field)] = ""
 
 			if not transaction.get("country") or transaction["country"] == "":
-				logging.warning(("Factual response for merchant {} has no country code. "  
+				logging.warning(("Factual response for merchant {} has no country code. "
 					"Defaulting to US.").format(hit_fields["factual_id"][0]))
 				transaction["country"] = "US"
-
 		# Add Business Name, City and State as a fallback
 		if decision == False:
 			for field in field_names:
@@ -319,8 +318,7 @@ class WebConsumer():
 			trans["category_labels"] = [fallback]
 			trans["CNN"] = trans.get("CNN", {}).get("label", "")
 
-			if "subtype_CNN" in trans:
-				del trans["subtype_CNN"]
+			trans.pop("subtype_CNN", None)
 
 	def ensure_output_schema(self, transactions, debug, services_list):
 		"""Clean output to proper schema"""
@@ -332,8 +330,34 @@ class WebConsumer():
 
 		# Override / Strip Fields
 		for trans in transactions:
+			if trans["is_physical_merchant"]:
+				trans["chain_name"] = trans.get("chain_name", "")
+				trans["confidence_score"] = trans.get("confidence_score", "")
+				trans["country"] = trans.get("country", "")
+				trans["fax_number"] = trans.get("fax_number", "")
+				trans["latitude"] = trans.get("latitude", "")
+				trans["longitude"] = trans.get("longitude", "")
+				trans["match_found"] = trans.get("match_found", False)
+				trans["neighbourhood"] = trans.get("neighbourhood", "")
+				trans["phone_number"] = trans.get("phone_number", "")
+				trans["postal_code"] = trans.get("postal_code", "")
+				trans["source"] = trans.get("source", "OTHER")
+				trans["source_merchant_id"] = trans.get("source_merchant_id", "")
+				trans["store_id"] = trans.get("store_id", "")
+				trans["street"] = trans.get("street", "")
+				trans["txn_sub_type"] = trans.get("txn_sub_type", "")
+				trans["txn_type"] = trans.get("txn_type", "")
+				trans["website"] = trans.get("website", "")
 
-			if (debug or ("search" in services_list)) and trans["is_physical_merchant"]:
+			trans["city"] = trans.get("city", "")
+			trans["state"] = trans.get("state", "")
+			trans["transaction_id"] = trans.get("transaction_id", None)
+			trans["is_physical_merchant"] = trans.get("is_physical_merchant", "")
+			trans["merchant_name"] = trans.get("merchant_name", "")
+			trans["txn_sub_type"] = trans.get("txn_sub_type", "")
+			trans["txn_type"] = trans.get("txn_type", "")
+
+			if debug and trans.get("is_physical_merchant", None):
 				trans["search"]["merchant_name"] = trans["merchant_name"]
 				trans["search"]["street"] = trans["street"]
 				trans["search"]["city"] = trans["city"]
@@ -350,7 +374,7 @@ class WebConsumer():
 				trans["search"]["chain_name"] = trans["chain_name"]
 				trans["search"]["neighbourhood"] = trans["neighbourhood"]
 			else:
-				del trans["search"]
+				trans.pop("search", None)
 
 			# Override output with CNN v1
 			if trans.get("CNN", "") != "":
@@ -358,37 +382,26 @@ class WebConsumer():
 
 			# Override Locale with Bloom Results
 			# Add city and state to each transaction
-			if trans["locale_bloom"] != None:
+			if trans.get("locale_bloom", None) != None:
 				trans["city"] = trans["locale_bloom"][0]
 				trans["state"] = trans["locale_bloom"][1]
-				if debug or ("bloom_filter" in services_list):
-					trans["bloom_filter"] = {"city": trans["locale_bloom"][0],\
-					"state": trans["locale_bloom"][1]}
 			else:
 				trans["city"] = ""
 				trans["state"] = ""
-				if debug or ("bloom_filter" in services_list):
-					trans["bloom_filter"] = {"city": "", "state": ""}
 
 			if debug:
-				trans["cnn"] = {"txn_type" : trans["txn_type"],\
-					"txn_sub_type" : trans["txn_sub_type"]}
-			elif "cnn_subtype" in services_list:
-				trans["cnn_type_subtype"] = {"txn_type" : trans["txn_type"],\
-					"txn_sub_type" : trans["txn_sub_type"]}
+				trans["bloom_filter"] = {"city": trans["city"], "state": trans["state"]}
+				trans["cnn"] = {"txn_type" : trans.get("txn_type", ""),
+					"txn_sub_type" : trans.get("txn_sub_type", ""),
+					"merchant_name" : trans.pop("CNN", "")
+					}
 
-			if "CNN" in trans:
-				if debug:
-					trans["cnn"]["merchant_name"] = trans["CNN"]
-				elif "cnn_merchant" in services_list:
-					trans["cnn_merchant"] = {"merchnat_name" : trans["CNN"]}
-				del trans["CNN"]
-
-			del trans["locale_bloom"]
-			del trans["description"]
-			del trans["amount"]
-			del trans["date"]
-			del trans["ledger_entry"]
+			trans.pop("locale_bloom", None)
+			trans.pop("description", None)
+			trans.pop("amount", None)
+			trans.pop("date", None)
+			trans.pop("ledger_entry", None)
+			trans.pop("CNN", None)
 
 		# return transactions
 
@@ -405,7 +418,7 @@ class WebConsumer():
 
 			header = {"index": index}
 			# add routing to header
-			if self.params["routed"] and trans.get("locale_bloom"):
+			if self.params["routed"] and trans.get("locale_bloom", None):
 				region = trans["locale_bloom"][1]
 				header["routing"] = region.upper()
 
@@ -545,32 +558,46 @@ class WebConsumer():
 	def __apply_cpu_classifiers(self, data):
 		"""Apply all the classifiers which are CPU bound.  Written to be
 		run in parallel with GPU bound classifiers."""
-		self.__apply_locale_bloom(data)
+		services_list = data.get("services_list",[])
+		if "bloom_filter" in services_list or services_list == []:
+			self.__apply_locale_bloom(data)
+		else:
+			for transaction in data["transaction_list"]:
+				transaction["locale_bloom"] = None
 		physical, non_physical = self.__sws(data)
 
-		if "should_search" not in self.params or self.params["should_search"]:
-			physical = self.__enrich_physical(physical)
-			self.__apply_category_labels(physical)
-		else:
-			physical = self.__enrich_physical_no_search(physical)
+		if "search" in services_list or services_list == []:
+			if "should_search" not in self.params or self.params["should_search"]:
+				physical = self.__enrich_physical(physical)
+				self.__apply_category_labels(physical)
+			else:
+				physical = self.__enrich_physical_no_search(physical)
 		return physical, non_physical
 
 	def classify(self, data, optimizing=False):
 		"""Classify a set of transactions"""
 
+		services_list = data.get("services_list", [])
+		debug = data.get("debug", False)
+
 		cpu_result = self.__cpu_pool.apply_async(self.__apply_cpu_classifiers, (data, ))
 
 		if not optimizing:
-			self.__apply_subtype_cnn(data)
-			self.__apply_merchant_cnn(data)
+			if "cnn_subtype" in services_list or services_list == []:
+				self.__apply_subtype_cnn(data)
+			else:
+				# Add the filed to ensure output schema pass
+				for transaction in data["transaction_list"]:
+					transaction["txn_sub_type"] = ""
+					transaction["txn_type"] = ""
+			if "cnn_merchant" in services_list or services_list == []:
+				self.__apply_merchant_cnn(data)
 
 		cpu_result.get() # Wait for CPU bound classifiers to finish
 
 		if not optimizing:
 			self.__apply_missing_categories(data["transaction_list"])
 
-		debug = data.get("debug", False)
-		services_list = data.get("services_list", [])
 		self.ensure_output_schema(data["transaction_list"], debug,
 			services_list)
 
