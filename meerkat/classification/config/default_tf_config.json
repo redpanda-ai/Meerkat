@@ -13,6 +13,6 @@
 	"momentum": 0.9,
 	"base_rate": 1e-2,
 	"decay": 1e-5,
-	"epochs": 5000,
-	"eras": 25
+	"epochs": 100,
+	"eras": 10
 }
