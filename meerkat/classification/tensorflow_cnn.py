@@ -254,7 +254,8 @@ def get_cost_matrix():
 		cost = cost_dict[str(key)].get("cost", 1.0)
 		cost_list.append(cost)
 		logging.info("Cost for class {0} is {1}".format(key, cost))
-	return tf.expand_dims(tf.transpose(tf.constant(cost_list), name="cm"), 1)
+	#return tf.expand_dims(tf.transpose(tf.constant(cost_list), name="cm"), 1)
+	return tf.transpose(tf.constant(cost_list), name="cm")
 
 def build_graph(config):
 	"""Build CNN"""
