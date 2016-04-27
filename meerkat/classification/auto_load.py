@@ -75,6 +75,7 @@ def get_single_file_from_tarball(archive, filename_pattern):
 def get_best_models(bucket, prefix, results, target, s3_base):
 	"""Gets the best model for a particular model type."""
 	suffix = prefix[len(s3_base):]
+	models_dir = "meerkat/classification/models/"
 	for key in sorted(results.keys()):
 		highest_score, winner = 0.0, None
 		logging.info("Evaluating {0}".format(key))
@@ -89,13 +90,14 @@ def get_best_models(bucket, prefix, results, target, s3_base):
 				highest_score = score
 				winner = timestamp
 				winner_count = candidate_count
-				#Find the actual checkpoint file.
-				leader = get_single_file_from_tarball(target, ".*ckpt")
-				new_path = "meerkat/classification/models/" \
-					+ (suffix + key).replace("/", ".")[1:] + "ckpt"
+				# Get checkpoint and graph definition
+				model = get_single_file_from_tarball(target, ".*ckpt")
+				graph_def = get_single_file_from_tarball(target, ".*meta")
+				new_model_path = models_dir + (suffix + key).replace("/", ".")[1:] + "ckpt"
+				new_graph_def_path = models_dir + (suffix + key).replace("/", ".")[1:] + "meta"
 				logging.debug("Moving label_map to: {0}".format(new_path))
-				rename(leader, new_path)
-
+				rename(model, new_model_path)
+				rename(graph_def, new_graph_def_path)
 			logging.info("\t{0:<14}{1:>2}: {2:16}, Score: {3:0.5f}".format(
 				"Candidate", candidate_count, timestamp, score))
 			candidate_count += 1
