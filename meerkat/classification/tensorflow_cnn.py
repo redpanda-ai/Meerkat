@@ -428,7 +428,8 @@ def train_model(config, graph, sess, saver):
 
 			# Save Checkpoint
 			current_era = int(step / epochs)
-			save_path = saver.save(sess, save_dir + "era_" + str(current_era) + ".ckpt")
+			meta_path = save_dir + "era_" + str(current_era) + ".meta"
+			model_path = saver.save(sess, save_dir + "era_" + str(current_era) + ".ckpt")
 			logging.info("Checkpoint saved in file: %s" % save_path)
 			checkpoints[current_era] = save_path
 
@@ -449,8 +450,10 @@ def train_model(config, graph, sess, saver):
 	# Clean Up Directory
 	dataset_path = os.path.basename(dataset).split(".")[0]
 	final_model_path = "meerkat/classification/models/" + dataset_path + ".ckpt"
+	final_meta_path = "meerkat/classification/models/" + dataset_path + ".meta"
 	logging.info("Moving final model from {0} to {1}.".format(save_path, final_model_path))
-	os.rename(save_path, final_model_path)
+	os.rename(model_path, final_model_path)
+	os.rename(meta_path, final_meta_path)
 	logging.info("Deleting unneeded directory of checkpoints at {0}".format(save_dir))
 	shutil.rmtree(save_dir)
 
