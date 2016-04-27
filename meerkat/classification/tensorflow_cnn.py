@@ -428,7 +428,7 @@ def train_model(config, graph, sess, saver):
 
 			# Save Checkpoint
 			current_era = int(step / epochs)
-			meta_path = save_dir + "era_" + str(current_era) + ".meta"
+			meta_path = save_dir + "era_" + str(current_era) + ".ckpt.meta"
 			model_path = saver.save(sess, save_dir + "era_" + str(current_era) + ".ckpt")
 			logging.info("Checkpoint saved in file: %s" % save_path)
 			checkpoints[current_era] = save_path

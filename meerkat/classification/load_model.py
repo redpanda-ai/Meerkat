@@ -91,6 +91,7 @@ def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=False):
 	config = load_params(config_path)
 	config["label_map"] = label_map_path
 	config["model_path"] = model_path
+	meta_path = model_path.split(".ckpt")[0] + ".meta"
 	config = validate_config(config)
 	graph, saver = build_graph(config)
 	label_map = config["label_map"]
