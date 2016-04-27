@@ -87,23 +87,25 @@ def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=False):
 		logging.warning("Resouces to load model not found. Loading from S3")
 		load_models_from_s3()
 
-	# Load Graph
+	# Load Config
 	config = load_params(config_path)
 	config["label_map"] = label_map_path
 	config["model_path"] = model_path
 	meta_path = model_path.split(".ckpt")[0] + ".meta"
 	config = validate_config(config)
-	graph, saver = build_graph(config)
 	label_map = config["label_map"]
 
 	# Load Session and Graph
 	if gpu_mem_fraction:
 		gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.25)
-		sess = tf.Session(graph=graph, config=tf.ConfigProto(gpu_options=gpu_options))
+		sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
 	else:
-		sess = tf.Session(graph=graph)
+		sess = tf.Session()
 
-	saver.restore(sess, config["model_path"])
+	# Load Graph Definition and model
+	loader = tf.train.import_meta_graph("train.meta")
+	loader.restore(sess, config["model_path"])
+	graph = sess.graph
 	model = get_tensor(graph, "model:0")
 	
 	# Generate Helper Function
