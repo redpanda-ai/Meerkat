@@ -276,9 +276,7 @@ def build_graph(config):
 		output_shape = [None, num_labels]
 
 		trans_placeholder = tf.placeholder(tf.float32, shape=input_shape, name="x")
-		labels_placeholder = tf.placeholder(tf.float32, shape=output_shape, name="y_old")
-		#Factor in the cost matrix
-		costly_labels = tf.mul(labels_placeholder, get_cost_matrix(), name="y")
+		labels_placeholder = tf.placeholder(tf.float32, shape=output_shape, name="y")
 
 		w_conv1 = weight_variable(config, [1, 7, alphabet_length, 256])
 		b_conv1 = bias_variable([256], 7 * alphabet_length)
@@ -334,7 +332,8 @@ def build_graph(config):
 		network = model(trans_placeholder, "network", train=True)
 		trained_model = model(trans_placeholder, "model", train=False)
 
-		loss = tf.neg(tf.reduce_mean(tf.reduce_sum(network * costly_labels, 1)), name="loss")
+		loss = tf.neg(tf.reduce_mean(tf.reduce_sum(network * tf.mul(labels_placeholder,
+			get_cost_matrix()) , 1)), name="loss")
 		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss, name="optimizer")
 
 		saver = tf.train.Saver()
