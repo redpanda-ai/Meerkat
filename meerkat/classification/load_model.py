@@ -103,7 +103,7 @@ def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=False):
 		sess = tf.Session()
 
 	# Load Graph Definition and model
-	loader = tf.train.import_meta_graph("train.meta")
+	loader = tf.train.import_meta_graph(meta_path)
 	loader.restore(sess, config["model_path"])
 	graph = sess.graph
 	model = get_tensor(graph, "model:0")
