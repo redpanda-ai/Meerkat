@@ -164,6 +164,7 @@ def auto_train():
 
 	#copy the label_map.json file
 	tarball_directory = "data/CNN_stats/"
+	os.makedirs(tarball_directory, exist_ok=True)
 	shutil.copyfile(label_map, tarball_directory + "label_map.json")
 
 	# Load and Modify Config
