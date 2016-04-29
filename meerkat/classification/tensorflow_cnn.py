@@ -166,10 +166,8 @@ def batch_to_tensor(config, batch, cost_list):
 	num_labels = config["num_labels"]
 	batch_size = len(batch.index)
 
-	#Get an array of class numbers
+	#Get an array of class numbers, which are off-by-1
 	labels = np.array(batch["LABEL_NUM"].astype(int)) - 1
-	x = labels[:, None]
-	y = np.arange(num_labels)
 	#Here we add weights to the cost for misclassification
 	labels = (np.arange(num_labels) == labels[:, None]).astype(np.float32) * cost_list
 	docs = batch["DESCRIPTION_UNMASKED"].tolist()
