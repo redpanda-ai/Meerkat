@@ -1,7 +1,4 @@
 #!/usr/local/bin/python3
-# pylint: disable=unused-variable
-# pylint: disable=too-many-locals
-
 """Train a CNN using tensorFlow
 
 Created on Mar 14, 2016
@@ -29,6 +26,7 @@ import pprint
 import random
 import shutil
 import sys
+import json
 
 import numpy as np
 import tensorflow as tf
@@ -123,12 +121,11 @@ def evaluate_testset(config, graph, sess, model, test):
 	chunked_test = chunks(np.array(test.index), 128)
 	num_chunks = len(chunked_test)
 
+	cost_list = get_cost_list()
 	for i in range(num_chunks):
 
 		batch_test = test.loc[chunked_test[i]]
-		batch_size = len(batch_test)
-
-		trans_test, labels_test = batch_to_tensor(config, batch_test)
+		trans_test, labels_test = batch_to_tensor(config, batch_test, cost_list)
 		feed_dict_test = {get_tensor(graph, "x:0"): trans_test}
 		output = sess.run(model, feed_dict=feed_dict_test)
 
@@ -161,7 +158,7 @@ def mixed_batching(config, df, groups_train):
 
 	return batch
 
-def batch_to_tensor(config, batch):
+def batch_to_tensor(config, batch, cost_list):
 	"""Convert a batch to a tensor representation"""
 
 	doc_length = config["doc_length"]
@@ -169,8 +166,10 @@ def batch_to_tensor(config, batch):
 	num_labels = config["num_labels"]
 	batch_size = len(batch.index)
 
+	#Get an array of class numbers, which are off-by-1
 	labels = np.array(batch["LABEL_NUM"].astype(int)) - 1
-	labels = (np.arange(num_labels) == labels[:, None]).astype(np.float32)
+	#Here we add weights to the cost for misclassification
+	labels = (np.arange(num_labels) == labels[:, None]).astype(np.float32) * cost_list
 	docs = batch["DESCRIPTION_UNMASKED"].tolist()
 	transactions = np.zeros(shape=(batch_size, 1, alphabet_length, doc_length))
 	
@@ -238,6 +237,26 @@ def max_pool(tensor):
 	layer = tf.nn.max_pool(tensor, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
 	return layer
 
+def get_cost_list(infile="./data/CNN_stats/label_map.json"):
+	"""Retrieve a cost matrix"""
+	cost_dict = None
+	try:
+		infile = open(infile, encoding="utf-8")
+		cost_dict = json.loads(infile.read())
+		infile.close()
+	except IOError:
+		logging.error("label_map.json not found, aborting")
+		sys.exit()
+	#Get the class numbers sorted numerically
+	keys = sorted([int(x) for x in cost_dict.keys()])
+	#Produce an ordered list of cost values
+	cost_list = []
+	for key in keys:
+		cost = cost_dict[str(key)].get("cost", 1.0)
+		cost_list.append(cost)
+		logging.info("Cost for class {0} is {1}".format(key, cost))
+	return cost_list
+
 def build_graph(config):
 	"""Build CNN"""
 
@@ -251,8 +270,7 @@ def build_graph(config):
 	# Create Graph
 	with graph.as_default():
 
-		learning_rate = tf.Variable(base_rate, trainable=False, name="lr") 
-
+		learning_rate = tf.Variable(base_rate, trainable=False, name="lr")
 		input_shape = [None, 1, doc_length, alphabet_length]
 		output_shape = [None, num_labels]
 
@@ -336,12 +354,16 @@ def train_model(config, graph, sess, saver):
 	os.makedirs(save_dir, exist_ok=True)
 	checkpoints = {}
 
+	cost_list = get_cost_list()
 	for step in range(num_eras):
 
 		# Prepare Data for Training
 		batch = mixed_batching(config, train, groups_train)
-		trans, labels = batch_to_tensor(config, batch)
-		feed_dict = {get_tensor(graph, "x:0") : trans, get_tensor(graph, "y:0") : labels}
+		trans, labels = batch_to_tensor(config, batch, cost_list)
+		feed_dict = {
+			get_tensor(graph, "x:0") : trans,
+			get_tensor(graph, "y:0") : labels
+		}
 
 		# Run Training Step
 		sess.run(get_op(graph, "optimizer"), feed_dict=feed_dict)
