@@ -121,12 +121,13 @@ def evaluate_testset(config, graph, sess, model, test):
 	chunked_test = chunks(np.array(test.index), 128)
 	num_chunks = len(chunked_test)
 
+	cost_list = get_cost_list()
 	for i in range(num_chunks):
 
 		batch_test = test.loc[chunked_test[i]]
 		#batch_size = len(batch_test)
 
-		trans_test, labels_test = batch_to_tensor(config, batch_test)
+		trans_test, labels_test = batch_to_tensor(config, batch_test, cost_list)
 		feed_dict_test = {get_tensor(graph, "x:0"): trans_test}
 		output = sess.run(model, feed_dict=feed_dict_test)
 
@@ -159,7 +160,7 @@ def mixed_batching(config, df, groups_train):
 
 	return batch
 
-def batch_to_tensor(config, batch):
+def batch_to_tensor(config, batch, cost_list):
 	"""Convert a batch to a tensor representation"""
 
 	doc_length = config["doc_length"]
@@ -169,15 +170,10 @@ def batch_to_tensor(config, batch):
 
 	#Get an array of class numbers
 	labels = np.array(batch["LABEL_NUM"].astype(int)) - 1
-	#print("Labels are: {0}".format(labels))
 	x = labels[:, None]
-	#print(x)
 	y = np.arange(num_labels)
-	#print("Y is {0}".format(y))
-	_, cost_list = get_cost_matrix()
-	#print("Cost list is {0}".format(cost_list))
+	#Here we add weights to the cost for misclassification
 	labels = (np.arange(num_labels) == labels[:, None]).astype(np.float32) * cost_list
-	#print("new Labels are: {0}".format(labels))
 	docs = batch["DESCRIPTION_UNMASKED"].tolist()
 	transactions = np.zeros(shape=(batch_size, 1, alphabet_length, doc_length))
 	
@@ -245,7 +241,7 @@ def max_pool(tensor):
 	layer = tf.nn.max_pool(tensor, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
 	return layer
 
-def get_cost_matrix():
+def get_cost_list():
 	"""Retrieve a cost matrix"""
 	cost_dict = None
 	try:
@@ -263,8 +259,7 @@ def get_cost_matrix():
 		cost = cost_dict[str(key)].get("cost", 1.0)
 		cost_list.append(cost)
 		logging.debug("Cost for class {0} is {1}".format(key, cost))
-	#return tf.expand_dims(tf.transpose(tf.constant(cost_list), name="cm"), 1)
-	return tf.transpose(tf.constant(cost_list), name="cm"), cost_list
+	return cost_list
 
 def build_graph(config):
 	"""Build CNN"""
@@ -368,11 +363,12 @@ def train_model(config, graph, sess, saver):
 	os.makedirs(save_dir, exist_ok=True)
 	checkpoints = {}
 
+	cost_list = get_cost_list()
 	for step in range(num_eras):
 
 		# Prepare Data for Training
 		batch = mixed_batching(config, train, groups_train)
-		trans, labels = batch_to_tensor(config, batch)
+		trans, labels = batch_to_tensor(config, batch, cost_list)
 		feed_dict = {
 			get_tensor(graph, "x:0") : trans,
 			get_tensor(graph, "y:0") : labels
