@@ -420,7 +420,7 @@ def train_model(config, graph, sess, saver):
 def run_session(config, graph, saver):
 	"""Run Session"""
 
-	with tf.InteractiveSession(graph=graph) as sess:
+	with tf.Session(graph=graph) as sess:
 
 		mode = config["mode"]
 		model_path = config["model_path"]
