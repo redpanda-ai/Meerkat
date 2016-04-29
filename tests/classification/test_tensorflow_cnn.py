@@ -87,6 +87,14 @@ class TfcnnTest(unittest.TestCase):
 		for chunk in results:
 			self.assertTrue(np.allclose(chunk, expected, rtol=1e-05, atol=1e-08))
 
+	@parameterized.expand([
+		(["tests/classification/fixture/cost_matrix.json", [1.3, 0.8, 1.1]])
+	])
+	def test_get_cost_list(self, label_map_path, expected):
+		"""Confirm that you can load a cost matrix from a proper label_map"""
+		results = tf_cnn.get_cost_list(infile=label_map_path)
+		self.assertTrue(sorted(results) == sorted(expected))
+
 	def test_load_data__number_of_labels_exception(self):
 		"""Confirm that we throw an informative Exception when the number of labels
 		fails to match the number of label_keys in a value count"""
