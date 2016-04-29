@@ -125,8 +125,6 @@ def evaluate_testset(config, graph, sess, model, test):
 	for i in range(num_chunks):
 
 		batch_test = test.loc[chunked_test[i]]
-		#batch_size = len(batch_test)
-
 		trans_test, labels_test = batch_to_tensor(config, batch_test, cost_list)
 		feed_dict_test = {get_tensor(graph, "x:0"): trans_test}
 		output = sess.run(model, feed_dict=feed_dict_test)
@@ -241,11 +239,11 @@ def max_pool(tensor):
 	layer = tf.nn.max_pool(tensor, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
 	return layer
 
-def get_cost_list():
+def get_cost_list(infile="./data/CNN_stats/label_map.json"):
 	"""Retrieve a cost matrix"""
 	cost_dict = None
 	try:
-		infile = open("./data/CNN_stats/label_map.json", encoding="utf-8")
+		infile = open(infile, encoding="utf-8")
 		cost_dict = json.loads(infile.read())
 		infile.close()
 	except IOError:
@@ -258,7 +256,7 @@ def get_cost_list():
 	for key in keys:
 		cost = cost_dict[str(key)].get("cost", 1.0)
 		cost_list.append(cost)
-		logging.debug("Cost for class {0} is {1}".format(key, cost))
+		logging.info("Cost for class {0} is {1}".format(key, cost))
 	return cost_list
 
 def build_graph(config):
@@ -277,11 +275,9 @@ def build_graph(config):
 		learning_rate = tf.Variable(base_rate, trainable=False, name="lr")
 		input_shape = [None, 1, doc_length, alphabet_length]
 		output_shape = [None, num_labels]
-		cost_shape = [None, num_labels]
 
 		trans_placeholder = tf.placeholder(tf.float32, shape=input_shape, name="x")
 		labels_placeholder = tf.placeholder(tf.float32, shape=output_shape, name="y")
-		cost_placeholder = tf.placeholder(tf.float32, shape=cost_shape, name="z")
 
 		w_conv1 = weight_variable(config, [1, 7, alphabet_length, 256])
 		b_conv1 = bias_variable([256], 7 * alphabet_length)
@@ -344,9 +340,6 @@ def build_graph(config):
 
 	return graph, saver
 
-def sess_print(name, summary, message):
-	return tf.Print(name, [name], summarize=summary, message=message)
-
 def train_model(config, graph, sess, saver):
 	"""Train the model"""
 
@@ -372,7 +365,6 @@ def train_model(config, graph, sess, saver):
 		feed_dict = {
 			get_tensor(graph, "x:0") : trans,
 			get_tensor(graph, "y:0") : labels
-			#,get_tensor(graph, "z:0") : costs
 		}
 
 		# Run Training Step
