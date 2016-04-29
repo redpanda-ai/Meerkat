@@ -167,8 +167,17 @@ def batch_to_tensor(config, batch):
 	num_labels = config["num_labels"]
 	batch_size = len(batch.index)
 
+	#Get an array of class numbers
 	labels = np.array(batch["LABEL_NUM"].astype(int)) - 1
-	labels = (np.arange(num_labels) == labels[:, None]).astype(np.float32)
+	#print("Labels are: {0}".format(labels))
+	x = labels[:, None]
+	#print(x)
+	y = np.arange(num_labels)
+	#print("Y is {0}".format(y))
+	_, cost_list = get_cost_matrix()
+	#print("Cost list is {0}".format(cost_list))
+	labels = (np.arange(num_labels) == labels[:, None]).astype(np.float32) * cost_list
+	#print("new Labels are: {0}".format(labels))
 	docs = batch["DESCRIPTION_UNMASKED"].tolist()
 	transactions = np.zeros(shape=(batch_size, 1, alphabet_length, doc_length))
 	
@@ -253,9 +262,9 @@ def get_cost_matrix():
 	for key in keys:
 		cost = cost_dict[str(key)].get("cost", 1.0)
 		cost_list.append(cost)
-		logging.info("Cost for class {0} is {1}".format(key, cost))
+		logging.debug("Cost for class {0} is {1}".format(key, cost))
 	#return tf.expand_dims(tf.transpose(tf.constant(cost_list), name="cm"), 1)
-	return tf.transpose(tf.constant(cost_list), name="cm")
+	return tf.transpose(tf.constant(cost_list), name="cm"), cost_list
 
 def build_graph(config):
 	"""Build CNN"""
@@ -270,13 +279,14 @@ def build_graph(config):
 	# Create Graph
 	with graph.as_default():
 
-		learning_rate = tf.Variable(base_rate, trainable=False, name="lr") 
-
+		learning_rate = tf.Variable(base_rate, trainable=False, name="lr")
 		input_shape = [None, 1, doc_length, alphabet_length]
 		output_shape = [None, num_labels]
+		cost_shape = [None, num_labels]
 
 		trans_placeholder = tf.placeholder(tf.float32, shape=input_shape, name="x")
 		labels_placeholder = tf.placeholder(tf.float32, shape=output_shape, name="y")
+		cost_placeholder = tf.placeholder(tf.float32, shape=cost_shape, name="z")
 
 		w_conv1 = weight_variable(config, [1, 7, alphabet_length, 256])
 		b_conv1 = bias_variable([256], 7 * alphabet_length)
@@ -332,13 +342,15 @@ def build_graph(config):
 		network = model(trans_placeholder, "network", train=True)
 		trained_model = model(trans_placeholder, "model", train=False)
 
-		loss = tf.neg(tf.reduce_mean(tf.reduce_sum(network * tf.mul(labels_placeholder,
-			get_cost_matrix()) , 1)), name="loss")
+		loss = tf.neg(tf.reduce_mean(tf.reduce_sum(network * labels_placeholder, 1)), name="loss")
 		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss, name="optimizer")
 
 		saver = tf.train.Saver()
 
 	return graph, saver
+
+def sess_print(name, summary, message):
+	return tf.Print(name, [name], summarize=summary, message=message)
 
 def train_model(config, graph, sess, saver):
 	"""Train the model"""
@@ -361,7 +373,11 @@ def train_model(config, graph, sess, saver):
 		# Prepare Data for Training
 		batch = mixed_batching(config, train, groups_train)
 		trans, labels = batch_to_tensor(config, batch)
-		feed_dict = {get_tensor(graph, "x:0") : trans, get_tensor(graph, "y:0") : labels}
+		feed_dict = {
+			get_tensor(graph, "x:0") : trans,
+			get_tensor(graph, "y:0") : labels
+			#,get_tensor(graph, "z:0") : costs
+		}
 
 		# Run Training Step
 		sess.run(get_op(graph, "optimizer"), feed_dict=feed_dict)
@@ -369,7 +385,7 @@ def train_model(config, graph, sess, saver):
 		# Log Loss
 		if step % logging_interval == 0:
 			loss = sess.run(get_tensor(graph, "loss:0"), feed_dict=feed_dict)
-			logging.info("Train loss at epoch {0:>8}: {1:3.7f}".format(step + 1, loss))
+			logging.info("Train loss at epoch {0:>8}: {1}".format(step + 1, loss))
 			#logging.info("train loss at epoch %d: %g" % (step + 1, loss))
 
 		# Evaluate Testset, Log Progress and Save
@@ -418,7 +434,7 @@ def train_model(config, graph, sess, saver):
 def run_session(config, graph, saver):
 	"""Run Session"""
 
-	with tf.Session(graph=graph) as sess:
+	with tf.InteractiveSession(graph=graph) as sess:
 
 		mode = config["mode"]
 		model_path = config["model_path"]
