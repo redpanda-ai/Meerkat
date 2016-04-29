@@ -371,7 +371,7 @@ def train_model(config, graph, sess, saver):
 		# Log Loss
 		if step % logging_interval == 0:
 			loss = sess.run(get_tensor(graph, "loss:0"), feed_dict=feed_dict)
-			logging.info("Train loss at epoch {0:>8}: {1}".format(step + 1, loss))
+			logging.info("Train loss at epoch {0:>8}: {1:3.7f}".format(step + 1, loss))
 			#logging.info("train loss at epoch %d: %g" % (step + 1, loss))
 
 		# Evaluate Testset, Log Progress and Save
