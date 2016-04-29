@@ -55,7 +55,7 @@ from meerkat.classification.tools import (pull_from_s3, check_new_input_file,
 	push_file_to_s3, make_tarfile, copy_file, check_file_exist_in_s3)
 from meerkat.classification.tensorflow_cnn import build_graph, train_model, validate_config
 from meerkat.tools.cnn_stats import main_process as apply_cnn
-from meerkat.various_tools import load_params
+from meerkat.various_tools import load_params, safe_input
 from meerkat.classification.auto_load import get_single_file_from_tarball
 
 def parse_arguments():
@@ -157,7 +157,7 @@ def auto_train():
 
 			valid_options = ["yes", "no"]
 			while True:
-				retrain_choice = input("Model has already been trained. " +
+				retrain_choice = safe_input(prompt="Model has already been trained. " +
 					"Do you want to retrain the model? (yes/no): ")
 				if retrain_choice in valid_options:
 					break
