@@ -48,13 +48,18 @@ import pandas as pd
 import sys
 
 from meerkat.classification.load_model import get_tf_cnn_by_path
+from meerkat.classification.load_model import get_ensemble_cnns_by_path
 from meerkat.various_tools import load_params, load_piped_dataframe
 
 def parse_arguments(args):
 	""" Create the parser """
 	parser = argparse.ArgumentParser(description="Test a CNN against a dataset and\
 		return performance statistics")
-	parser.add_argument('--model', '-model', required=True,
+	parser.add_argument('--model1', '-model1', required=True,
+		help='Path to the model under test')
+	parser.add_argument('--model2', '-model2', required=True,
+		help='Path to the model under test')
+	parser.add_argument('--model3', '-model3', required=True,
 		help='Path to the model under test')
 	parser.add_argument('--testdata', '-data', required=True,
 		help='Path to the test data')
@@ -243,7 +248,7 @@ def main_process(args):
 		reversed_label_map["Null Class"] = reversed_label_map.pop("")
 
 	confusion_matrix = [[0 for i in range(num_labels + 1)] for j in range(num_labels)]
-	classifier = get_tf_cnn_by_path(args.model, args.label_map)
+	classifier = get_ensemble_cnns_by_path(args.model1, args.model2, args.model3, args.label_map)
 
 	# Prepare for data saving
 	path = 'data/CNN_stats/'
