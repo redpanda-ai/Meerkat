@@ -65,7 +65,10 @@ def get_single_file_from_tarball(archive, filename_pattern):
 		file_list = [member for member in members if my_pattern.search(member.name)]
 		if len(file_list) != 1:
 			logging.critical("Invalid, tarfile must have exactly one matching file.")
-			raise Exception("Invalid, tarfile must have exactly one matching file.")
+			if filename_pattern == "meta":
+				return None
+			else:
+				raise Exception("Invalid, tarfile must have exactly one matching file.")
 		else:
 			my_file = file_list.pop()
 			my_name = my_file.name
@@ -93,6 +96,11 @@ def get_best_models(bucket, prefix, results, target, s3_base):
 				# Get checkpoint and graph definition
 				model = get_single_file_from_tarball(target, ".*ckpt")
 				graph_def = get_single_file_from_tarball(target, ".*meta")
+
+				# Must have meta file
+				if not graph_def:
+					continue
+
 				new_model_path = models_dir + (suffix + key).replace("/", ".")[1:] + "ckpt"
 				new_graph_def_path = models_dir + (suffix + key).replace("/", ".")[1:] + "meta"
 				logging.debug("Moving label_map to: {0}".format(new_path))
