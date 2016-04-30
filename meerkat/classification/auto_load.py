@@ -90,17 +90,15 @@ def get_best_models(bucket, prefix, results, target, s3_base):
 			matrix = get_single_file_from_tarball(target, "confusion_matrix.csv")
 			score = get_model_accuracy(matrix)
 			if score > highest_score:
-				highest_score = score
-				winner = timestamp
-				winner_count = candidate_count
+				
 				# Get checkpoint and graph definition
 				model = get_single_file_from_tarball(target, ".*ckpt")
 				graph_def = get_single_file_from_tarball(target, ".*meta")
+				if not graph_def: continue
 
-				# Must have meta file
-				if not graph_def:
-					continue
-
+				highest_score = score
+				winner = timestamp
+				winner_count = candidate_count
 				new_model_path = models_dir + (suffix + key).replace("/", ".")[1:] + "ckpt"
 				new_graph_def_path = models_dir + (suffix + key).replace("/", ".")[1:] + "meta"
 				rename(model, new_model_path)
