@@ -65,7 +65,7 @@ def get_single_file_from_tarball(archive, filename_pattern):
 		file_list = [member for member in members if my_pattern.search(member.name)]
 		if len(file_list) != 1:
 			logging.critical("Invalid, tarfile must have exactly one matching file.")
-			if filename_pattern == "meta":
+			if filename_pattern == ".*meta":
 				return None
 			else:
 				raise Exception("Invalid, tarfile must have exactly one matching file.")
