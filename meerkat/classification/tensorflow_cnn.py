@@ -121,11 +121,10 @@ def evaluate_testset(config, graph, sess, model, test):
 	chunked_test = chunks(np.array(test.index), 128)
 	num_chunks = len(chunked_test)
 
-	cost_list = get_cost_list()
 	for i in range(num_chunks):
 
 		batch_test = test.loc[chunked_test[i]]
-		trans_test, labels_test = batch_to_tensor(config, batch_test, cost_list)
+		trans_test, labels_test = batch_to_tensor(config, batch_test)
 		feed_dict_test = {get_tensor(graph, "x:0"): trans_test}
 		output = sess.run(model, feed_dict=feed_dict_test)
 
@@ -158,7 +157,7 @@ def mixed_batching(config, df, groups_train):
 
 	return batch
 
-def batch_to_tensor(config, batch, cost_list):
+def batch_to_tensor(config, batch):
 	"""Convert a batch to a tensor representation"""
 
 	doc_length = config["doc_length"]
@@ -166,10 +165,8 @@ def batch_to_tensor(config, batch, cost_list):
 	num_labels = config["num_labels"]
 	batch_size = len(batch.index)
 
-	#Get an array of class numbers, which are off-by-1
 	labels = np.array(batch["LABEL_NUM"].astype(int)) - 1
-	#Here we add weights to the cost for misclassification
-	labels = (np.arange(num_labels) == labels[:, None]).astype(np.float32) * cost_list
+	labels = (np.arange(num_labels) == labels[:, None]).astype(np.float32)
 	docs = batch["DESCRIPTION_UNMASKED"].tolist()
 	transactions = np.zeros(shape=(batch_size, 1, alphabet_length, doc_length))
 	
@@ -237,24 +234,19 @@ def max_pool(tensor):
 	layer = tf.nn.max_pool(tensor, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
 	return layer
 
-def get_cost_list(infile="./data/CNN_stats/label_map.json"):
+def get_cost_list(config):
 	"""Retrieve a cost matrix"""
-	cost_dict = None
-	try:
-		infile = open(infile, encoding="utf-8")
-		cost_dict = json.loads(infile.read())
-		infile.close()
-	except IOError:
-		logging.error("label_map.json not found, aborting")
-		sys.exit()
-	#Get the class numbers sorted numerically
-	keys = sorted([int(x) for x in cost_dict.keys()])
-	#Produce an ordered list of cost values
+
+	# Get the class numbers sorted numerically
+	label_map = config["label_map"]
+	keys = sorted([int(x) for x in label_map.keys()])
+
+	# Produce an ordered list of cost values
 	cost_list = []
 	for key in keys:
 		cost = cost_dict[str(key)].get("cost", 1.0)
 		cost_list.append(cost)
-		logging.info("Cost for class {0} is {1}".format(key, cost))
+
 	return cost_list
 
 def build_graph(config):
@@ -266,6 +258,11 @@ def build_graph(config):
 	num_labels = config["num_labels"]
 	base_rate = config["base_rate"]
 	graph = tf.Graph()
+
+	# Get Cost Weights
+	cost_list = get_cost_list(config)
+	for i, cost in enumerate(cost_list):
+		logging.info("Cost for class {0} is {1}".format(i+1, cost))
 
 	# Create Graph
 	with graph.as_default():
@@ -331,7 +328,8 @@ def build_graph(config):
 		network = model(trans_placeholder, "network", train=True)
 		trained_model = model(trans_placeholder, "model", train=False)
 
-		loss = tf.neg(tf.reduce_mean(tf.reduce_sum(network * labels_placeholder, 1)), name="loss")
+		summed_loss = tf.reduce_sum(network * labels_placeholder, 1)
+		loss = tf.neg(tf.reduce_mean(summed_loss * cost_list), name="loss")
 		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss, name="optimizer")
 
 		saver = tf.train.Saver()
@@ -354,12 +352,11 @@ def train_model(config, graph, sess, saver):
 	os.makedirs(save_dir, exist_ok=True)
 	checkpoints = {}
 
-	cost_list = get_cost_list()
 	for step in range(num_eras):
 
 		# Prepare Data for Training
 		batch = mixed_batching(config, train, groups_train)
-		trans, labels = batch_to_tensor(config, batch, cost_list)
+		trans, labels = batch_to_tensor(config, batch)
 		feed_dict = {
 			get_tensor(graph, "x:0") : trans,
 			get_tensor(graph, "y:0") : labels
@@ -372,7 +369,6 @@ def train_model(config, graph, sess, saver):
 		if step % logging_interval == 0:
 			loss = sess.run(get_tensor(graph, "loss:0"), feed_dict=feed_dict)
 			logging.info("Train loss at epoch {0:>8}: {1:3.7f}".format(step + 1, loss))
-			#logging.info("train loss at epoch %d: %g" % (step + 1, loss))
 
 		# Evaluate Testset, Log Progress and Save
 		if step != 0 and step % epochs == 0:
