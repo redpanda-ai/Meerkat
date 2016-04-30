@@ -328,8 +328,8 @@ def build_graph(config):
 		network = model(trans_placeholder, "network", train=True)
 		trained_model = model(trans_placeholder, "model", train=False)
 
-		weighted_output = cost_list * network
-		loss = tf.neg(tf.reduce_mean(tf.reduce_sum(weighted_output * labels_placeholder, 1)), name="loss")
+		weighted_labels = cost_list * labels_placeholder
+		loss = tf.neg(tf.reduce_mean(tf.reduce_sum(network * weighted_labels, 1)), name="loss")
 		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss, name="optimizer")
 
 		saver = tf.train.Saver()
