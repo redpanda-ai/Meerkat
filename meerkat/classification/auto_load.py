@@ -77,14 +77,15 @@ def get_best_models(bucket, prefix, results, target, s3_base):
 	suffix = prefix[len(s3_base):]
 	models_dir = "meerkat/classification/models/"
 	for key in sorted(results.keys()):
-		highest_score, winner = 0.0, None
-		logging.info("Evaluating {0}".format(key))
 
 		# Ignore category models for now
 		if "category" in key:
 			continue
 
+		highest_score, winner = 0.0, None
+		logging.info("Evaluating {0}".format(key))
 		candidate_count = 1
+		
 		for timestamp in results[key]:
 			k = Key(bucket)
 			k.key = prefix + key + timestamp + target
