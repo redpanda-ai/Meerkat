@@ -64,11 +64,8 @@ def get_single_file_from_tarball(archive, filename_pattern):
 		logging.debug("Members {0}".format(members))
 		file_list = [member for member in members if my_pattern.search(member.name)]
 		if len(file_list) != 1:
-			logging.info("Invalid, tarfile must have exactly one matching file.")
-			if filename_pattern == ".*meta":
-				return None
-			else:
-				raise Exception("Invalid, tarfile must have exactly one matching file.")
+			logging.critical("Invalid, tarfile must have exactly one matching file.")
+			raise Exception("Invalid, tarfile must have exactly one matching file.")
 		else:
 			my_file = file_list.pop()
 			my_name = my_file.name
@@ -87,27 +84,32 @@ def get_best_models(bucket, prefix, results, target, s3_base):
 			k = Key(bucket)
 			k.key = prefix + key + timestamp + target
 			k.get_contents_to_filename(target)
+
+			# Require Meta
+			try:
+				get_single_file_from_tarball(target, ".*meta")
+			except:
+				continue
+
 			matrix = get_single_file_from_tarball(target, "confusion_matrix.csv")
 			score = get_model_accuracy(matrix)
 			if score > highest_score:
-				
-				# Get checkpoint and graph definition
-				model = get_single_file_from_tarball(target, ".*ckpt")
-				graph_def = get_single_file_from_tarball(target, ".*meta")
-				if not graph_def: continue
-
 				highest_score = score
 				winner = timestamp
 				winner_count = candidate_count
+				#Find the actual checkpoint file.
+				leader_model = get_single_file_from_tarball(target, ".*ckpt")
+				leader_meta = get_single_file_from_tarball(target, ".*meta")
 				new_model_path = models_dir + (suffix + key).replace("/", ".")[1:] + "ckpt"
 				new_graph_def_path = models_dir + (suffix + key).replace("/", ".")[1:] + "meta"
-				rename(model, new_model_path)
-				rename(graph_def, new_graph_def_path)
+				rename(leader_model, new_model_path)
+				rename(leader_meta, new_graph_def_path)
+
 			logging.info("\t{0:<14}{1:>2}: {2:16}, Score: {3:0.5f}".format(
 				"Candidate", candidate_count, timestamp, score))
 			candidate_count += 1
 		set_label_map(bucket, prefix, key, winner, s3_base,
-			"results.tar.gz", "meerkat/classification/label_maps/")
+			"results.tar.gz", "meerkat/classification/models/")
 		logging.info("\t{0:<14}{1:>2}".format("Winner", winner_count))
 
 def set_label_map(bucket, prefix, key, winner, s3_base, tarball, output_path):
@@ -149,4 +151,3 @@ if __name__ == "__main__":
 	logging.warning("Starting main program")
 	main_program()
 	logging.warning("Finishing main program")
-
