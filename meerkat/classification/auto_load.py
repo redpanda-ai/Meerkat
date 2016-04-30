@@ -64,7 +64,7 @@ def get_single_file_from_tarball(archive, filename_pattern):
 		logging.debug("Members {0}".format(members))
 		file_list = [member for member in members if my_pattern.search(member.name)]
 		if len(file_list) != 1:
-			logging.critical("Invalid, tarfile must have exactly one matching file.")
+			logging.info("Invalid, tarfile must have exactly one matching file.")
 			if filename_pattern == ".*meta":
 				return None
 			else:
@@ -103,14 +103,13 @@ def get_best_models(bucket, prefix, results, target, s3_base):
 
 				new_model_path = models_dir + (suffix + key).replace("/", ".")[1:] + "ckpt"
 				new_graph_def_path = models_dir + (suffix + key).replace("/", ".")[1:] + "meta"
-				logging.debug("Moving label_map to: {0}".format(new_path))
 				rename(model, new_model_path)
 				rename(graph_def, new_graph_def_path)
 			logging.info("\t{0:<14}{1:>2}: {2:16}, Score: {3:0.5f}".format(
 				"Candidate", candidate_count, timestamp, score))
 			candidate_count += 1
 		set_label_map(bucket, prefix, key, winner, s3_base,
-			"results.tar.gz", "meerkat/classification/models/")
+			"results.tar.gz", "meerkat/classification/label_maps/")
 		logging.info("\t{0:<14}{1:>2}".format("Winner", winner_count))
 
 def set_label_map(bucket, prefix, key, winner, s3_base, tarball, output_path):
