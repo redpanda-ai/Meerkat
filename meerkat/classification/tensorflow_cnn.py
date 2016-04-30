@@ -244,7 +244,7 @@ def get_cost_list(config):
 	# Produce an ordered list of cost values
 	cost_list = []
 	for key in keys:
-		cost = cost_dict[str(key)].get("cost", 1.0)
+		cost = label_map[str(key)].get("cost", 1.0)
 		cost_list.append(cost)
 
 	return cost_list
