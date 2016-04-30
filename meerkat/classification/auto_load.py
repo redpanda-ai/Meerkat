@@ -79,6 +79,11 @@ def get_best_models(bucket, prefix, results, target, s3_base):
 	for key in sorted(results.keys()):
 		highest_score, winner = 0.0, None
 		logging.info("Evaluating {0}".format(key))
+
+		# Ignore category models for now
+		if "category" in key:
+			continue
+
 		candidate_count = 1
 		for timestamp in results[key]:
 			k = Key(bucket)
