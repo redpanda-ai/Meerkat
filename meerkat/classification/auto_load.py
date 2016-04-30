@@ -114,7 +114,7 @@ def get_best_models(bucket, prefix, results, target, s3_base):
 				"Candidate", candidate_count, timestamp, score))
 			candidate_count += 1
 		set_label_map(bucket, prefix, key, winner, s3_base,
-			"results.tar.gz", "meerkat/classification/models/")
+			"results.tar.gz", "meerkat/classification/label_maps/")
 		logging.info("\t{0:<14}{1:>2}".format("Winner", winner_count))
 
 def set_label_map(bucket, prefix, key, winner, s3_base, tarball, output_path):
