@@ -199,7 +199,7 @@ def auto_train():
 	args.label_key = ground_truth_labels[model_type]
 	args.predicted_key = 'PREDICTED_CLASS'
 	args.is_merchant = (model_type == 'merchant')
-	args.fast_mode = True
+	args.fast_mode = False
 
 	logging.warning('Apply the best CNN to test data and calculate performance metrics')
 	apply_cnn(args)
