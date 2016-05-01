@@ -10,6 +10,8 @@ import pandas as pd
 from boto.s3.key import Key
 from os import rename
 
+from meerkat.various_tools import safely_remove_file
+
 def find_s3_objects_recursively(conn, bucket, my_results, prefix=None, target=None):
 	"""Find all S3 target objects and their locations recursively"""
 	folders = bucket.list(prefix=prefix, delimiter="/")
@@ -74,8 +76,10 @@ def get_single_file_from_tarball(archive, filename_pattern):
 
 def get_best_models(bucket, prefix, results, target, s3_base):
 	"""Gets the best model for a particular model type."""
+
 	suffix = prefix[len(s3_base):]
 	models_dir = "meerkat/classification/models/"
+
 	for key in sorted(results.keys()):
 
 		# Ignore category models for now
@@ -93,17 +97,18 @@ def get_best_models(bucket, prefix, results, target, s3_base):
 
 			# Require Meta
 			try:
-				get_single_file_from_tarball(target, ".*meta")
+				meta = get_single_file_from_tarball(target, ".*meta")
+				safely_remove_file(meta)
 			except:
 				continue
 
 			matrix = get_single_file_from_tarball(target, "confusion_matrix.csv")
 			score = get_model_accuracy(matrix)
+
 			if score > highest_score:
 				highest_score = score
 				winner = timestamp
 				winner_count = candidate_count
-				#Find the actual checkpoint file.
 				leader_model = get_single_file_from_tarball(target, ".*ckpt")
 				leader_meta = get_single_file_from_tarball(target, ".*meta")
 				new_model_path = models_dir + (suffix + key).replace("/", ".")[1:] + "ckpt"
@@ -117,6 +122,10 @@ def get_best_models(bucket, prefix, results, target, s3_base):
 		set_label_map(bucket, prefix, key, winner, s3_base,
 			"results.tar.gz", "meerkat/classification/label_maps/")
 		logging.info("\t{0:<14}{1:>2}".format("Winner", winner_count))
+
+		# Cleanup
+		safely_remove_file("confusion_matrix.csv")
+		safely_remove_file(target)
 
 def set_label_map(bucket, prefix, key, winner, s3_base, tarball, output_path):
 	"""Moves the appropriate label map from S3 to the local machine."""
