@@ -110,35 +110,38 @@ def get_best_models(bucket, prefix, results, target, s3_base):
 				winner = timestamp
 				winner_count = candidate_count
 				leader_model = get_single_file_from_tarball(target, ".*ckpt")
-				leader_meta = get_single_file_from_tarball(target, ".*meta")
 				new_model_path = models_dir + (suffix + key).replace("/", ".")[1:] + "ckpt"
-				new_graph_def_path = models_dir + (suffix + key).replace("/", ".")[1:] + "meta"
 				rename(leader_model, new_model_path)
-				rename(leader_meta, new_graph_def_path)
 
-			logging.info("\t{0:<14}{1:>2}: {2:16}, Score: {3:0.5f}".format(
-				"Candidate", candidate_count, timestamp, score))
+			logging.info("\t{0:<14}{1:>2}: {2:16}, Score: {3:0.5f}".format("Candidate", candidate_count, timestamp, score))
 			candidate_count += 1
-		set_label_map(bucket, prefix, key, winner, s3_base,
-			"results.tar.gz", "meerkat/classification/label_maps/")
+
+		set_label_map_and_meta(bucket, prefix, key, winner, s3_base, "results.tar.gz", "meerkat/classification/")
 		logging.info("\t{0:<14}{1:>2}".format("Winner", winner_count))
 
 	# Cleanup
 	safely_remove_file("confusion_matrix.csv")
 	safely_remove_file(target)
 
-def set_label_map(bucket, prefix, key, winner, s3_base, tarball, output_path):
+def set_label_map_and_meta(bucket, prefix, key, winner, s3_base, tarball, output_path):
 	"""Moves the appropriate label map from S3 to the local machine."""
+
+	suffix = prefix[len(s3_base):]
+
 	if bucket is not None:
 		s3_key = Key(bucket)
 		s3_key.key = prefix + key + winner + tarball
 		s3_key.get_contents_to_filename(tarball)
 
 	json_file = get_single_file_from_tarball(tarball, ".*json")
-	suffix = prefix[len(s3_base):]
-	new_path = output_path + (suffix + key).replace("/", ".")[1:] + "json"
+	meta_file = get_single_file_from_tarball(tarball, ".*meta")
+	new_path = output_path + "label_maps/" + (suffix + key).replace("/", ".")[1:] + "json"
+	new_graph_def_path = output_path + "models/" + (suffix + key).replace("/", ".")[1:] + "meta"
+
 	logging.debug("Moving label_map to: {0}".format(new_path))
 	rename(json_file, new_path)
+	rename(meta_file, new_graph_def_path)
+
 	return new_path
 
 def main_program(prefix="meerkat/cnn/data"):
