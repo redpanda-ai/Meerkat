@@ -123,9 +123,9 @@ def get_best_models(bucket, prefix, results, target, s3_base):
 			"results.tar.gz", "meerkat/classification/label_maps/")
 		logging.info("\t{0:<14}{1:>2}".format("Winner", winner_count))
 
-		# Cleanup
-		safely_remove_file("confusion_matrix.csv")
-		safely_remove_file(target)
+	# Cleanup
+	safely_remove_file("confusion_matrix.csv")
+	safely_remove_file(target)
 
 def set_label_map(bucket, prefix, key, winner, s3_base, tarball, output_path):
 	"""Moves the appropriate label map from S3 to the local machine."""
