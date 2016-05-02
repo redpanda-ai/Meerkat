@@ -52,8 +52,6 @@ def validate_config(config):
 	schema_file = "meerkat/classification/config/tensorflow_cnn_schema.json"
 	config = validate_configuration(config, schema_file)
 	logging.debug("Configuration is :\n{0}".format(pprint.pformat(config)))
-	reshape = ((config["doc_length"] - 96) / 27) * 256
-	config["reshape"] = int(reshape)
 	config["label_map"] = load_params(config["label_map"])
 	config["num_labels"] = len(config["label_map"].keys())
 	config["alpha_dict"] = {a : i for i, a in enumerate(config["alphabet"])}
@@ -270,6 +268,8 @@ def build_graph(config):
 
 		w_conv5 = weight_variable(config, [1, 3, 256, 256])
 		b_conv5 = bias_variable([256], 3 * 256)
+
+		reshape = 256 * int(h_pool5.get_shape()[2])
 
 		w_fc1 = weight_variable(config, [reshape, 1024])
 		b_fc1 = bias_variable([1024], reshape)
