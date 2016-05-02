@@ -236,7 +236,6 @@ def build_graph(config):
 
 	doc_length = config["doc_length"]
 	alphabet_length = config["alphabet_length"]
-	reshape = config["reshape"]
 	num_labels = config["num_labels"]
 	base_rate = config["base_rate"]
 	batch_size = config["batch_size"]
