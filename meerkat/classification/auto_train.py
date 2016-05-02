@@ -52,10 +52,11 @@ import tensorflow as tf
 from plumbum import local
 from meerkat.classification.split_data import main_split_data
 from meerkat.classification.tools import (pull_from_s3, check_new_input_file,
-	push_file_to_s3, make_tarfile, copy_file)
+	push_file_to_s3, make_tarfile, copy_file, check_file_exist_in_s3)
 from meerkat.classification.tensorflow_cnn import build_graph, train_model, validate_config
+from meerkat.various_tools import load_params, safe_input
+from meerkat.classification.auto_load import get_single_file_from_tarball
 from meerkat.classification.classification_report import main_process as apply_cnn
-from meerkat.various_tools import load_params
 
 def parse_arguments():
 	"""This function parses arguments from our command line."""
@@ -146,6 +147,32 @@ def auto_train():
 		s3_params["save_path"] = save_path
 
 	os.makedirs(save_path, exist_ok=True)
+
+	exist_results_tarball = check_file_exist_in_s3("results.tar.gz", **s3_params)
+	if exist_results_tarball:
+		pull_from_s3(extension='.tar.gz', file_name="results.tar.gz", **s3_params)
+		try:
+			model_file = get_single_file_from_tarball(save_path + "results.tar.gz", ".ckpt")
+			os.remove(model_file)
+
+			valid_options = ["yes", "no"]
+			while True:
+				retrain_choice = safe_input(prompt="Model has already been trained. " +
+					"Do you want to retrain the model? (yes/no): ")
+				if retrain_choice in valid_options:
+					break
+				else:
+					logging.critical("Not a valid option. Valid options are: yes or no.")
+
+			if retrain_choice == "no":
+				logging.info("Auto train ends")
+				shutil.rmtree(save_path)
+				return
+			else:
+				logging.info("Retrain the model")
+		except:
+			logging.critical("results.tar.gz is invalid. Retrain the model")
+		os.remove(save_path + "results.tar.gz")
 
 	if exist_new_input:
 		logging.info("There exists new input data")

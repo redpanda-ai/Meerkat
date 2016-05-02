@@ -2,7 +2,7 @@
 # pylint: disable=unused-variable
 # pylint: disable=too-many-locals
 
-"""Train a ladder network using tensorFlow
+"""Train a CNN using tensorFlow
 
 Created on Apr 16, 2016
 @author: Matthew Sevrens
