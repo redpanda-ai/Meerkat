@@ -233,6 +233,21 @@ def max_pool(tensor):
 	layer = tf.nn.max_pool(tensor, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
 	return layer
 
+def get_cost_list(config):
+	"""Retrieve a cost matrix"""
+
+	# Get the class numbers sorted numerically
+	label_map = config["label_map"]
+	keys = sorted([int(x) for x in label_map.keys()])
+
+	# Produce an ordered list of cost values
+	cost_list = []
+	for key in keys:
+		cost = label_map[str(key)].get("cost", 1.0)
+		cost_list.append(cost)
+
+	return cost_list
+
 def build_graph(config):
 	"""Build CNN"""
 
@@ -243,6 +258,11 @@ def build_graph(config):
 	base_rate = config["base_rate"]
 	batch_size = config["batch_size"]
 	graph = tf.Graph()
+
+	# Get Cost Weights
+	cost_list = get_cost_list(config)
+	for i, cost in enumerate(cost_list):
+		logging.info("Cost for class {0} is {1}".format(i+1, cost))
 
 	# Create Graph
 	with graph.as_default():
@@ -367,7 +387,8 @@ def build_graph(config):
 		network = encoder(trans_placeholder, "network", train=True)
 		trained_model = encoder(trans_placeholder, "model", train=False)
 
-		loss = tf.neg(tf.reduce_mean(tf.reduce_sum(network * labels_placeholder, 1)), name="loss")
+		weighted_labels = cost_list * labels_placeholder
+		loss = tf.neg(tf.reduce_mean(tf.reduce_sum(network * weighted_labels, 1)), name="loss")
 		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss, name="optimizer")
 
 		bn_updates = tf.group(*bn_assigns)

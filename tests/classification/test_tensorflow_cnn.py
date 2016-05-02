@@ -92,7 +92,8 @@ class TfcnnTest(unittest.TestCase):
 	])
 	def test_get_cost_list(self, label_map_path, expected):
 		"""Confirm that you can load a cost matrix from a proper label_map"""
-		results = tf_cnn.get_cost_list(infile=label_map_path)
+		config = {"label_map": load_params(label_map_path)}
+		results = tf_cnn.get_cost_list(config)
 		self.assertTrue(sorted(results) == sorted(expected))
 
 	def test_load_data__number_of_labels_exception(self):
