@@ -114,6 +114,35 @@ def load_data(config):
 
 	return train, test, groups_train
 
+<<<<<<< HEAD
+=======
+def evaluate_testset(config, graph, sess, model, test):
+	"""Check error on test set"""
+
+	total_count = len(test.index)
+	correct_count = 0
+	chunked_test = chunks(np.array(test.index), 128)
+	num_chunks = len(chunked_test)
+
+	for i in range(num_chunks):
+
+		batch_test = test.loc[chunked_test[i]]
+		trans_test, labels_test = batch_to_tensor(config, batch_test)
+		feed_dict_test = {get_tensor(graph, "x:0"): trans_test}
+		output = sess.run(model, feed_dict=feed_dict_test)
+
+		batch_correct_count = np.sum(np.argmax(output, 1) == np.argmax(labels_test, 1))
+
+		correct_count += batch_correct_count
+	
+	test_accuracy = 100.0 * (correct_count / total_count)
+	logging.info("Test accuracy: %.2f%%" % test_accuracy)
+	logging.info("Correct count: " + str(correct_count))
+	logging.info("Total count: " + str(total_count))
+
+	return test_accuracy
+
+>>>>>>> develop
 def mixed_batching(config, df, groups_train):
 	"""Batch from train data using equal class batching"""
 
@@ -420,7 +449,10 @@ def train_model(config, graph, sess, saver):
 		# Prepare Data for Training
 		batch = mixed_batching(config, train, groups_train)
 		trans, labels = batch_to_tensor(config, batch)
-		feed_dict = {get_tensor(graph, "x:0") : trans, get_tensor(graph, "y:0") : labels}
+		feed_dict = {
+			get_tensor(graph, "x:0") : trans,
+			get_tensor(graph, "y:0") : labels
+		}
 
 		# Run Training Step
 		sess.run(get_op(graph, "optimizer"), feed_dict=feed_dict)
@@ -429,7 +461,7 @@ def train_model(config, graph, sess, saver):
 		# Log Loss
 		if step % logging_interval == 0:
 			loss = sess.run(get_tensor(graph, "loss:0"), feed_dict=feed_dict)
-			logging.info("train loss at epoch %d: %g" % (step + 1, loss))
+			logging.info("Train loss at epoch {0:>8}: {1:3.7f}".format(step + 1, loss))
 
 		# Log Accuracy for Tracking
 		if step % 1000 == 0:
