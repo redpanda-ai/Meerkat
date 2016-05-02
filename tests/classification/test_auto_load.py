@@ -64,7 +64,7 @@ class AutoLoadTests(unittest.TestCase):
 		tarball = output_path + tarball
 		label_map = output_path + "label_map.json"
 		remove_file_if_exists(label_map)
-		result = auto_load.set_label_map(None, "", "/label_map/", None, "", tarball, output_path)
+		result = auto_load.set_label_map_and_meta(None, "", "/label_map/", None, "", tarball, output_path)
 		self.assertTrue(isfile(result))
 		remove_file_if_exists(label_map)
 

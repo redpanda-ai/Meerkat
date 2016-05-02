@@ -51,25 +51,27 @@ def get_tf_cnn_by_name(model_name, gpu_mem_fraction=False):
 	"""Load a tensorFlow CNN by name"""
 
 	base = "meerkat/classification/models/"
+	label_map_base = "meerkat/classification/label_maps/"
+
 	# Switch on Models
 	if model_name == "bank_merchant":
 		model_path = base + "merchant.bank.ckpt"
-		label_map_path = base + "merchant.bank.json"
+		label_map_path = label_map_base + "merchant.bank.json"
 	elif model_name == "card_merchant":
 		model_path = base + "merchant.card.ckpt"
-		label_map_path = base + "merchant.card.json"
+		label_map_path = label_map_base + "merchant.card.json"
 	elif model_name == "bank_debit_subtype":
 		model_path = base + "subtype.bank.debit.ckpt"
-		label_map_path = base + "subtype.bank.debit.json"
+		label_map_path = label_map_base + "subtype.bank.debit.json"
 	elif model_name == "bank_credit_subtype":
 		model_path = base + "subtype.bank.credit.ckpt"
-		label_map_path = base + "subtype.bank.credit.json"
+		label_map_path = label_map_base + "subtype.bank.credit.json"
 	elif model_name == "card_debit_subtype":
 		model_path = base + "subtype.card.debit.ckpt"
-		label_map_path = base + "subtype.card.debit.json"
+		label_map_path = label_map_base + "subtype.card.debit.json"
 	elif model_name == "card_credit_subtype":
 		model_path = base + "subtype.card.credit.ckpt"
-		label_map_path = base + "subtype.card.credit.json"
+		label_map_path = label_map_base + "subtype.card.credit.json"
 	else:
 		logging.warning("Model not found. Terminating")
 		sys.exit()

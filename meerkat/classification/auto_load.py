@@ -10,6 +10,8 @@ import pandas as pd
 from boto.s3.key import Key
 from os import rename
 
+from meerkat.various_tools import safely_remove_file
+
 def find_s3_objects_recursively(conn, bucket, my_results, prefix=None, target=None):
 	"""Find all S3 target objects and their locations recursively"""
 	folders = bucket.list(prefix=prefix, delimiter="/")
@@ -74,47 +76,72 @@ def get_single_file_from_tarball(archive, filename_pattern):
 
 def get_best_models(bucket, prefix, results, target, s3_base):
 	"""Gets the best model for a particular model type."""
+
 	suffix = prefix[len(s3_base):]
+	models_dir = "meerkat/classification/models/"
+
 	for key in sorted(results.keys()):
+
+		# Ignore category models for now
+		if "category" in key:
+			continue
+
 		highest_score, winner = 0.0, None
 		logging.info("Evaluating {0}".format(key))
 		candidate_count = 1
+		
 		for timestamp in results[key]:
 			k = Key(bucket)
 			k.key = prefix + key + timestamp + target
 			k.get_contents_to_filename(target)
+
+			# Require Meta
+			try:
+				meta = get_single_file_from_tarball(target, ".*meta")
+				safely_remove_file(meta)
+			except:
+				continue
+
 			matrix = get_single_file_from_tarball(target, "confusion_matrix.csv")
 			score = get_model_accuracy(matrix)
+
 			if score > highest_score:
 				highest_score = score
 				winner = timestamp
 				winner_count = candidate_count
-				#Find the actual checkpoint file.
-				leader = get_single_file_from_tarball(target, ".*ckpt")
-				new_path = "meerkat/classification/models/" \
-					+ (suffix + key).replace("/", ".")[1:] + "ckpt"
-				logging.debug("Moving label_map to: {0}".format(new_path))
-				rename(leader, new_path)
+				leader_model = get_single_file_from_tarball(target, ".*ckpt")
+				new_model_path = models_dir + (suffix + key).replace("/", ".")[1:] + "ckpt"
+				rename(leader_model, new_model_path)
 
-			logging.info("\t{0:<14}{1:>2}: {2:16}, Score: {3:0.5f}".format(
-				"Candidate", candidate_count, timestamp, score))
+			logging.info("\t{0:<14}{1:>2}: {2:16}, Score: {3:0.5f}".format("Candidate", candidate_count, timestamp, score))
 			candidate_count += 1
-		set_label_map(bucket, prefix, key, winner, s3_base,
-			"results.tar.gz", "meerkat/classification/models/")
+
+		set_label_map_and_meta(bucket, prefix, key, winner, s3_base, "results.tar.gz", "meerkat/classification/")
 		logging.info("\t{0:<14}{1:>2}".format("Winner", winner_count))
 
-def set_label_map(bucket, prefix, key, winner, s3_base, tarball, output_path):
+	# Cleanup
+	safely_remove_file("confusion_matrix.csv")
+	safely_remove_file(target)
+
+def set_label_map_and_meta(bucket, prefix, key, winner, s3_base, tarball, output_path):
 	"""Moves the appropriate label map from S3 to the local machine."""
+
+	suffix = prefix[len(s3_base):]
+
 	if bucket is not None:
 		s3_key = Key(bucket)
 		s3_key.key = prefix + key + winner + tarball
 		s3_key.get_contents_to_filename(tarball)
 
 	json_file = get_single_file_from_tarball(tarball, ".*json")
-	suffix = prefix[len(s3_base):]
-	new_path = output_path + (suffix + key).replace("/", ".")[1:] + "json"
+	meta_file = get_single_file_from_tarball(tarball, ".*meta")
+	new_path = output_path + "label_maps/" + (suffix + key).replace("/", ".")[1:] + "json"
+	new_graph_def_path = output_path + "models/" + (suffix + key).replace("/", ".")[1:] + "meta"
+
 	logging.debug("Moving label_map to: {0}".format(new_path))
 	rename(json_file, new_path)
+	rename(meta_file, new_graph_def_path)
+
 	return new_path
 
 def main_program(prefix="meerkat/cnn/data"):
@@ -142,4 +169,3 @@ if __name__ == "__main__":
 	logging.warning("Starting main program")
 	main_program()
 	logging.warning("Finishing main program")
-
