@@ -114,32 +114,6 @@ def load_data(config):
 
 	return train, test, groups_train
 
-def evaluate_testset(config, graph, sess, model, test):
-	"""Check error on test set"""
-
-	total_count = len(test.index)
-	correct_count = 0
-	chunked_test = chunks(np.array(test.index), 128)
-	num_chunks = len(chunked_test)
-
-	for i in range(num_chunks):
-
-		batch_test = test.loc[chunked_test[i]]
-		trans_test, labels_test = batch_to_tensor(config, batch_test)
-		feed_dict_test = {get_tensor(graph, "x:0"): trans_test}
-		output = sess.run(model, feed_dict=feed_dict_test)
-
-		batch_correct_count = np.sum(np.argmax(output, 1) == np.argmax(labels_test, 1))
-
-		correct_count += batch_correct_count
-	
-	test_accuracy = 100.0 * (correct_count / total_count)
-	logging.info("Test accuracy: %.2f%%" % test_accuracy)
-	logging.info("Correct count: " + str(correct_count))
-	logging.info("Total count: " + str(total_count))
-
-	return test_accuracy
-
 def mixed_batching(config, df, groups_train):
 	"""Batch from train data using equal class batching"""
 
