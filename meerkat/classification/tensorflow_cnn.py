@@ -114,8 +114,6 @@ def load_data(config):
 
 	return train, test, groups_train
 
-<<<<<<< HEAD
-=======
 def evaluate_testset(config, graph, sess, model, test):
 	"""Check error on test set"""
 
@@ -142,7 +140,6 @@ def evaluate_testset(config, graph, sess, model, test):
 
 	return test_accuracy
 
->>>>>>> develop
 def mixed_batching(config, df, groups_train):
 	"""Batch from train data using equal class batching"""
 
