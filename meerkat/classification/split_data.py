@@ -1,4 +1,6 @@
 #!/usr/local/bin/python3.3
+# pylint: disable=too-many-locals
+# pylint: disable=pointless-string-statement
 
 """This script downloads an entire raw data file from s3, performs data
 validation to make sure future CNN training is possible. Then it splits
@@ -27,14 +29,13 @@ python3 -m meerkat.classification.split_data subtype bank \
 
 import logging
 import argparse
-import pandas as pd
 import numpy as np
 import os
 import shutil
+import sys
 
-from datetime import datetime
 from .verify_data import verify_data
-from .tools import pull_from_s3, unzip_and_merge, seperate_debit_credit
+from .tools import pull_from_s3, unzip_and_merge, seperate_debit_credit, copy_file
 from plumbum import local
 
 def parse_arguments():
@@ -53,7 +54,7 @@ def parse_arguments():
 		containing raw data file.", default='')
 	parser.add_argument("--file_name", help="Name of file to be pulled.",
 		default='')
-	parser.add_argument("--train_size" , help="Training data proportion, \
+	parser.add_argument("--train_size", help="Training data proportion, \
 		default is 0.9.", default=0.9, type=float)
 	parser.add_argument("-d", "--debug", help="log at DEBUG level",
 		action="store_true")
@@ -72,17 +73,21 @@ def parse_arguments():
 	return args
 
 def random_split(df, train_size):
+	"""Randomly partition df into train_df and test_df"""
 	msk = np.random.rand(len(df)) <= train_size
 	return {"train" : df[msk], "test" : df[~msk]}
 
 def make_save_function(col, dirt):
+	"""Decorate save_result"""
 	def save_result(results, train_or_test):
+		"""Save results and name it with train_or_test"""
 		kwargs = {"cols" : col, "index" : False, 'sep' : '|'}
 		path = dirt + train_or_test + '.csv'
 		results[train_or_test].to_csv(path, **kwargs)
 	return save_result
 
 def main_split_data(args):
+	"""Loads, splits and uploads data according to args"""
 	model_type = args.model_type
 	bank_or_card = args.bank_or_card
 	data_type = model_type + "_" + bank_or_card
@@ -96,13 +101,20 @@ def main_split_data(args):
 		'subtype_card_debit' : "meerkat/cnn/data/subtype/card/debit/",
 		'subtype_card_credit' : "meerkat/cnn/data/subtype/card/credit/",
 		'subtype_bank_debit' : "meerkat/cnn/data/subtype/bank/debit",
-		'subtype_bank_credit' : "meerkat/cnn/data/subtype/bank/credit/"
+		'subtype_bank_credit' : "meerkat/cnn/data/subtype/bank/credit/",
+		'category_bank_debit': 'meerkat/cnn/data/category/bank/debit/',
+		'category_bank_credit': 'meerkat/cnn/data/category/bank/credit/',
+		'category_card_debit': 'meerkat/cnn/data/category/card/debit/',
+		'category_card_credit': 'meerkat/cnn/data/category/card/credit/'
 	}
 
+	"""
 	ground_truth_labels = {
+		'category' : 'PROPOSED_CATEGORY',
 		'merchant' : 'MERCHANT_NAME',
 		'subtype' : 'PROPOSED_SUBTYPE'
 	}
+	"""
 
 	bucket = "s3yodlee" if args.bucket == '' else args.bucket
 	prefix = default_dir_paths[data_type] if args.input_dir == '' else args.input_dir
@@ -129,6 +141,7 @@ def main_split_data(args):
 			cnn_type=[model_type, bank_or_card])
 
 	else:
+		#FIXME horrible use of plumbum, use tarfile module
 		local['tar']['xf'][input_file]['-C'][save_path_input]()
 		input_csv_file = ""
 		input_json_file = ""
@@ -138,7 +151,7 @@ def main_split_data(args):
 			if file_name.endswith(".csv"):
 				input_csv_file = save_path_input + file_name
 
-		df = seperate_debit_credit(input_csv_file, credit_or_debit)
+		df = seperate_debit_credit(input_csv_file, credit_or_debit, model_type)
 
 		logging.info('Validating {0} {1} {2} data.'.\
 			format(model_type, bank_or_card, credit_or_debit))
@@ -154,8 +167,17 @@ def main_split_data(args):
 	del df
 	del results
 
-	os.rename(input_json_file, save_path_preprocessed + "label_map.json")
+	label_map_path = save_path_preprocessed + "label_map.json"
+	os.rename(input_json_file, label_map_path)
+	stats_path = "data/CNN_stats"
+	if not os.path.exists(stats_path):
+		os.makedirs(stats_path)
+	logging.info("Using shutil to copy label_map.json")
+	shutil.copyfile(label_map_path, stats_path + "/" + "label_map.json")
+	logging.info("label_map.json moved")
+	#FIXME Horrible use of plumbum, use tarfile module
 	local['tar']['-zcvf'][output_file]['-C'][save_path_preprocessed]['.']()
+	#FIXME Horrible use of plumbum, use boto module
 	local['aws']['s3']['cp'][output_file][dir_path]()
 
 	shutil.rmtree(save_path_input)
@@ -169,5 +191,5 @@ def main_split_data(args):
 	logging.info('{0} uploaded to {1}'.format(output_file, bucket + '/' + prefix))
 
 if __name__ == "__main__":
-	args = parse_arguments()
-	main_split_data(args)
+	ARGS = parse_arguments()
+	main_split_data(ARGS)

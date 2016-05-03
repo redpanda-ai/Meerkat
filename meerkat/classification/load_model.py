@@ -17,7 +17,9 @@ import tensorflow as tf
 from sklearn.externals import joblib
 
 from meerkat.various_tools import load_params
-from meerkat.classification.tensorflow_cnn import build_graph, validate_config, get_tensor, string_to_tensor
+from meerkat.classification.auto_load import main_program as load_models_from_s3
+from meerkat.classification.tensorflow_cnn import (build_graph,
+	validate_config, get_tensor, string_to_tensor)
 
 def load_scikit_model(model_name):
 	"""Load either Card or Bank classifier depending on
@@ -48,25 +50,28 @@ def load_scikit_model(model_name):
 def get_tf_cnn_by_name(model_name, gpu_mem_fraction=False):
 	"""Load a tensorFlow CNN by name"""
 
+	base = "meerkat/classification/models/"
+	label_map_base = "meerkat/classification/label_maps/"
+
 	# Switch on Models
 	if model_name == "bank_merchant":
-		model_path = "meerkat/classification/models/bank_merchant.ckpt"
-		label_map_path = "meerkat/classification/label_maps/bank_merchant.json"
+		model_path = base + "merchant.bank.ckpt"
+		label_map_path = label_map_base + "merchant.bank.json"
 	elif model_name == "card_merchant":
-		model_path = "meerkat/classification/models/card_merchant.ckpt"
-		label_map_path = "meerkat/classification/label_maps/card_merchant.json"
+		model_path = base + "merchant.card.ckpt"
+		label_map_path = label_map_base + "merchant.card.json"
 	elif model_name == "bank_debit_subtype":
-		model_path = "meerkat/classification/models/bank_debit_subtype.ckpt"
-		label_map_path = "meerkat/classification/label_maps/bank_debit_subtype.json"
+		model_path = base + "subtype.bank.debit.ckpt"
+		label_map_path = label_map_base + "subtype.bank.debit.json"
 	elif model_name == "bank_credit_subtype":
-		model_path = "meerkat/classification/models/bank_credit_subtype.ckpt"
-		label_map_path = "meerkat/classification/label_maps/bank_credit_subtype.json"
+		model_path = base + "subtype.bank.credit.ckpt"
+		label_map_path = label_map_base + "subtype.bank.credit.json"
 	elif model_name == "card_debit_subtype":
-		model_path = "meerkat/classification/models/card_debit_subtype.ckpt"
-		label_map_path = "meerkat/classification/label_maps/card_debit_subtype.json"
+		model_path = base + "subtype.card.debit.ckpt"
+		label_map_path = label_map_base + "subtype.card.debit.json"
 	elif model_name == "card_credit_subtype":
-		model_path = "meerkat/classification/models/card_credit_subtype.ckpt"
-		label_map_path = "meerkat/classification/label_maps/card_credit_subtype.json"
+		model_path = base + "subtype.card.credit.ckpt"
+		label_map_path = label_map_base + "subtype.card.credit.json"
 	else:
 		logging.warning("Model not found. Terminating")
 		sys.exit()
@@ -81,8 +86,8 @@ def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=False):
 
 	# Validate Model and Label Map
 	if not isfile(model_path):
-		logging.warning("Resouces to load model not found. Terminating")
-		sys.exit()
+		logging.warning("Resouces to load model not found. Loading from S3")
+		load_models_from_s3()
 
 	# Load Graph
 	config = load_params(config_path)
@@ -122,7 +127,8 @@ def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=False):
 	
 		for index, transaction in enumerate(trans):
 			label = label_map.get(str(labels[index]), "")
-			if isinstance(label, dict) and label_only: label = label["label"]
+			if isinstance(label, dict) and label_only:
+				label = label["label"]
 			transaction[label_key] = label
 
 		return trans

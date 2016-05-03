@@ -45,19 +45,18 @@ time nohup python3 -m meerkat.classification.auto_train merchant bank -v &
 import argparse
 import logging
 import os
-import sys
 import shutil
 
 import tensorflow as tf
 
 from plumbum import local
-from boto import connect_s3
-from boto.s3.connection import Location
-from meerkat.classification.split_data import random_split, make_save_function, main_split_data
-from meerkat.classification.tools import pull_from_s3, check_new_input_file, push_file_to_s3, get_utc_iso_timestamp, make_tarfile, copy_file
+from meerkat.classification.split_data import main_split_data
+from meerkat.classification.tools import (pull_from_s3, check_new_input_file,
+	push_file_to_s3, make_tarfile, copy_file, check_file_exist_in_s3)
 from meerkat.classification.tensorflow_cnn import build_graph, train_model, validate_config
-from meerkat.tools.cnn_stats import main_process as apply_cnn
-from meerkat.various_tools import load_params
+from meerkat.various_tools import load_params, safe_input
+from meerkat.classification.auto_load import get_single_file_from_tarball
+from meerkat.classification.classification_report import main_process as apply_cnn
 
 def parse_arguments():
 	"""This function parses arguments from our command line."""
@@ -149,6 +148,32 @@ def auto_train():
 
 	os.makedirs(save_path, exist_ok=True)
 
+	exist_results_tarball = check_file_exist_in_s3("results.tar.gz", **s3_params)
+	if exist_results_tarball:
+		pull_from_s3(extension='.tar.gz', file_name="results.tar.gz", **s3_params)
+		try:
+			model_file = get_single_file_from_tarball(save_path + "results.tar.gz", ".ckpt")
+			os.remove(model_file)
+
+			valid_options = ["yes", "no"]
+			while True:
+				retrain_choice = safe_input(prompt="Model has already been trained. " +
+					"Do you want to retrain the model? (yes/no): ")
+				if retrain_choice in valid_options:
+					break
+				else:
+					logging.critical("Not a valid option. Valid options are: yes or no.")
+
+			if retrain_choice == "no":
+				logging.info("Auto train ends")
+				shutil.rmtree(save_path)
+				return
+			else:
+				logging.info("Retrain the model")
+		except:
+			logging.critical("results.tar.gz is invalid. Retrain the model")
+		os.remove(save_path + "results.tar.gz")
+
 	if exist_new_input:
 		logging.info("There exists new input data")
 		args.input_dir = s3_params["prefix"]
@@ -163,6 +188,11 @@ def auto_train():
 	train_file = save_path + "train.csv"
 	test_file = save_path + "test.csv"
 	label_map = save_path + "label_map.json"
+
+	#copy the label_map.json file
+	tarball_directory = "data/CNN_stats/"
+	os.makedirs(tarball_directory, exist_ok=True)
+	shutil.copyfile(label_map, tarball_directory + "label_map.json")
 
 	# Load and Modify Config
 	config = load_params("meerkat/classification/config/default_tf_config.json")
@@ -182,6 +212,7 @@ def auto_train():
 
 	# Evaluate trained model using test set
 	ground_truth_labels = {
+		'category' : 'PROPOSED_CATEGORY',
 		'merchant' : 'MERCHANT_NAME',
 		'subtype' : 'PROPOSED_SUBTYPE'
 	}
@@ -189,20 +220,31 @@ def auto_train():
 	args.model = best_model_path
 	args.testdata = test_file
 	args.label_map = label_map
+
 	args.doc_key = 'DESCRIPTION_UNMASKED'
 	args.secondary_doc_key = 'DESCRIPTION'
 	args.label_key = ground_truth_labels[model_type]
 	args.predicted_key = 'PREDICTED_CLASS'
 	args.is_merchant = (model_type == 'merchant')
-	args.fast_mode = True
+	args.fast_mode = False
 
 	logging.warning('Apply the best CNN to test data and calculate performance metrics')
 	apply_cnn(args)
-	copy_file("meerkat/classification/models/train.ckpt", "data/CNN_stats/")
-	make_tarfile("results.tar.gz", "data/CNN_stats")
+	copy_file("meerkat/classification/models/train.ckpt", tarball_directory)
+	copy_file("meerkat/classification/models/train.meta", tarball_directory)
+	make_tarfile("results.tar.gz", tarball_directory)
 	logging.info("Uploading results.tar.gz to S3 {0}".format(s3_params["prefix"]))
 	push_file_to_s3("results.tar.gz", "s3yodlee", s3_params["prefix"])
 	logging.info("Upload results.tar.gz to S3 sucessfully.")
+
+	#Clean up dirty files
+	os.remove("results.tar.gz")
+	logging.info("Local results.tar.gz removed.")
+	for dirty_file in os.listdir(tarball_directory):
+		file_path = os.path.join(tarball_directory, dirty_file)
+		if os.path.isfile(file_path):
+			os.unlink(file_path)
+			logging.info("Local {0} removed.".format(file_path))
 
 	if exist_new_input:
 		remove_dir = save_path[0:save_path.rfind("preprocessed/")]
