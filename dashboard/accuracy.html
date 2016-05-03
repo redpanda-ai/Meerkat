@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test accuray</title>
+  <meta charset="utf-8">
+  <script src="js/d3.v3.min.js"></script>
+  <script src="js/d3.tip.v0.6.3.js"></script>
+  <style>
+    body {
+     font: 10px sans-serif;
+    }
+
+    .axis path,
+    .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+
+    .bar {
+      fill: steelblue;
+    }
+
+    .bar:hover {
+      fill: brown;
+    }
+
+    .x.axis path {
+      display: none;
+    }
+
+    .d3-tip {
+      line-height: 1;
+      font-weight: bold;
+      padding: 12px;
+      background: white;
+      color: brown;
+      border-radius: 2px;
+    }
+
+    .d3-tip:after {
+      box-sizing: border-box;
+      display: inline;
+      font-size: 10px;
+      width: 100%;
+      line-height: 1;
+      color: brown;
+      content: "\25BC";
+      position: absolute;
+      text-align: center;
+    }
+
+    .d3-tip.n:after {
+      margin: -1px 0 0 0;
+      top: 100%;
+      left: 0;
+    }
+  </style>
+</head>
+<body>
+  <script>
+    var margin = {top: 40, right: 20, bottom: 30, left: 50},
+      width = 960 - margin.left - margin.right,
+      height = 400 - margin.top - margin.bottom;
+
+    var formatPercent = d3.format(".0%");
+
+    var x = d3.scale.ordinal();
+
+    var y = d3.scale.linear()
+      .range([height, 0]);
+
+    var xAxis = d3.svg.axis()
+      .scale(x)
+      .orient("bottom");
+
+    var yAxis = d3.svg.axis()
+      .scale(y)
+      .orient("left")
+      .tickFormat(formatPercent);
+
+    var tip = d3.tip()
+      .attr('class', 'd3-tip')
+      .offset([-10, 0])
+      .html(function(d) {
+        return "<strong>Accuracy:</strong> <span style='color:brown'>" + (d.accuracy * 100).toFixed(2) + "%</span>";
+      })
+
+    var plotBar = function(file_name) {
+      var svg = d3.select("body").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom + 20)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + (margin.top + 20) + ")");
+
+      svg.call(tip);
+
+      d3.json(file_name, function(error, data) {
+        x.domain(data.map(function(d) { return d.version; }));
+        y.domain([0.9, 1]);
+
+        x.rangeRoundBands([0, data.length * 100], .1);
+        svg.append("g")
+          .attr("class", "x axis")
+          .attr("transform", "translate(5," + height + ")")
+          .call(xAxis);
+
+        svg.append("g")
+          .attr("class", "y axis")
+          .call(yAxis)
+          .append("text")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 10)
+          .attr("dy", ".71em")
+          .style("text-anchor", "end")
+          .text("Accuracy");
+
+        svg.selectAll(".bar")
+          .data(data)
+          .enter().append("rect")
+          .attr("class", "bar")
+          .attr("x", function(d, i) { return x(d.version) + 25; })
+          .attr("width", 50)
+          .attr("y", function(d) { return y(d.accuracy); })
+          .attr("height", function(d) { return height - y(d.accuracy); })
+          .on('mouseover', tip.show)
+          .on('mouseout', tip.hide);
+
+        words = file_name.split("_");
+        if (words[1] == "merchant") {
+          title = words[1] + " " + words[2].split(".")[0];
+        } else {
+          title = words[1] + " " + words[2] + " " + words[3].split(".")[0];
+        }
+        svg.append("text")
+          .attr("x", -30)             
+          .attr("y", 20 - (margin.top / 1))
+          .style("font-size", "16px")  
+          .text(title);
+      });
+    }; 
+    plotBar("accuracy/accuracy_subtype_bank_debit.json");
+    plotBar("accuracy/accuracy_subtype_bank_credit.json");
+    plotBar("accuracy/accuracy_subtype_card_debit.json");
+    plotBar("accuracy/accuracy_subtype_card_credit.json");
+    plotBar("accuracy/accuracy_merchant_bank.json");
+    plotBar("accuracy/accuracy_merchant_card.json");
+  </script>
+</body>
+</html>

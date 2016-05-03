@@ -1,0 +1,34 @@
+{
+	"1": {
+		"category": "Service Charges/Fees",
+		"label": "Charges & Fees - Finance Charge"
+	},
+	"2": {
+		"category": "Other Income",
+		"label": "Deposits & Credits - Rewards"
+	},
+	"3": {
+		"category": "Uncategorized",
+		"label": "Other Deposits - Credit"
+	},
+	"4": {
+		"category": "Credit Card Payments",
+		"label": "Payment - Credit Card Payment"
+	},
+	"5": {
+		"category": "Service Charges/Fees",
+		"label": "Refund - Service Charge/Fee Refund"
+	},
+	"6": {
+		"category": "Uncategorized",
+		"label": "Refund - Refund"
+	},
+	"7": {
+		"category": "Transfers",
+		"label": "Transfer - Balance Transfer"
+	},
+	"8": {
+		"category": "Transfers",
+		"label": "Transfer - Transfer"
+	}
+}

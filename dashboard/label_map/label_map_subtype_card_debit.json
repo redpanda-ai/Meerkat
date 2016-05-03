@@ -1,0 +1,74 @@
+{
+	"1": {
+		"category": "Uncategorized",
+		"label": "Bank Adjustment - Adjustment"
+	},
+	"2": {
+		"category": "Cash Advance",
+		"label": "Cash Advance - Cash Advance"
+	},
+	"3": {
+		"category": "Service Charges/Fees",
+		"label": "Charges & Fees - Annual Fee"
+	},
+	"4": {
+		"category": "Service Charges/Fees",
+		"label": "Charges & Fees - Convenience Fee"
+	},
+	"5": {
+		"category": "Service Charges/Fees",
+		"label": "Charges & Fees - Finance Charge"
+	},
+	"6": {
+		"category": "Service Charges/Fees",
+		"label": "Charges & Fees - Other Charges & Fees"
+	},
+	"7": {
+		"category": "Service Charges/Fees",
+		"label": "Charges & Fees - Service Charge"
+	},
+	"8": {
+		"category": "Other Expenses",
+		"label": "Other Withdrawals - Debit"
+	},
+	"9": {
+		"category": "Insurance",
+		"label": "Payment - Insurance Payment"
+	},
+	"10": {
+		"category": "Other Bills",
+		"label": "Payment - Payment"
+	},
+	"11": {
+		"category": "Other Bills",
+		"label": "Payment - Recurring / Subscription Payment"
+	},
+	"12": {
+		"category": "Taxes",
+		"label": "Payment - Tax Payment"
+	},
+	"13": {
+		"category": "Utilities",
+		"label": "Payment - Utilities Payment"
+	},
+	"14": {
+		"category": "Other Expenses",
+		"label": "Purchase - Online Purchase"
+	},
+	"15": {
+		"category": "Other Expenses",
+		"label": "Purchase - Purchase"
+	},
+	"16": {
+		"category": "Transfers",
+		"label": "Transfer - Balance Transfer"
+	},
+	"17": {
+		"category": "Transfers",
+		"label": "Transfer - Transfer"
+	},
+	"18": {
+		"category": "Cash Withdrawal",
+		"label": "Withdrawal - ATM / Cash Withdrawal"
+	}
+}

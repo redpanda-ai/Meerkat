@@ -1,0 +1,122 @@
+{
+	"1": {
+		"category": {
+			"credit": "Other Income",
+			"debit": "Other Expenses"
+		},
+		"label": "Bank Adjustment - Adjustment"
+	},
+	"2": {
+		"category": "Service Charges/Fees",
+		"label": "Charges & Fees - Annual Fee"
+	},
+	"3": {
+		"category": "Service Charges/Fees",
+		"label": "Charges & Fees - Convenience Fee"
+	},
+	"4": {
+		"category": "Service Charges/Fees",
+		"label": "Charges & Fees - Debit Card Fee"
+	},
+	"5": {
+		"category": "Service Charges/Fees",
+		"label": "Charges & Fees - NSF Fees"
+	},
+	"6": {
+		"category": "Service Charges/Fees",
+		"label": "Charges & Fees - Other Charges & Fees"
+	},
+	"7": {
+		"category": "Service Charges/Fees",
+		"label": "Charges & Fees - Overdraft Charge"
+	},
+	"8": {
+		"category": "Service Charges/Fees",
+		"label": "Charges & Fees - Returned Check Charge"
+	},
+	"9": {
+		"category": "Service Charges/Fees",
+		"label": "Charges & Fees - Service Charge"
+	},
+	"10": {
+		"category": "Service Charges/Fees",
+		"label": "Charges & Fees - Stop Payment Charge"
+	},
+	"11": {
+		"category": "Other Expenses",
+		"label": "Other Withdrawals - Debit"
+	},
+	"12": {
+		"category": "Loans",
+		"label": "Payment - Auto Loan"
+	},
+	"13": {
+		"category": "Child/Dependent Expenses",
+		"label": "Payment - Child Support"
+	},
+	"14": {
+		"category": "Credit Card Payments",
+		"label": "Payment - Credit Card Payment"
+	},
+	"15": {
+		"category": "Mortgages",
+		"label": "Payment - Home Loan / Mortgage"
+	},
+	"16": {
+		"category": "Insurance",
+		"label": "Payment - Insurance Payment"
+	},
+	"17": {
+		"category": "Loans",
+		"label": "Payment - Loan"
+	},
+	"18": {
+		"category": "Other Bills",
+		"label": "Payment - Payment"
+	},
+	"19": {
+		"category": "Checks",
+		"label": "Payment - Payment by Check"
+	},
+	"20": {
+		"category": "Loans",
+		"label": "Payment - Personal Loan"
+	},
+	"21": {
+		"category": "Other Bills",
+		"label": "Payment - Recurring / Subscription Payment"
+	},
+	"22": {
+		"category": "Loans",
+		"label": "Payment - Student Loan"
+	},
+	"23": {
+		"category": "Taxes",
+		"label": "Payment - Tax Payment"
+	},
+	"24": {
+		"category": "Utilities",
+		"label": "Payment - Utilities Payment"
+	},
+	"25": {
+		"category": "Other Expenses",
+		"label": "Purchase - Online Purchase"
+	},
+	"26": {
+		"category": "Other Expenses",
+		"label": "Purchase - Purchase"
+	},
+	"27": {
+		"category": "Transfers",
+		"label": "Transfer - Overdraft Protection"
+	},
+	"28": {
+		"category": "Transfers",
+		"label": "Transfer - Transfer"
+	},
+	"29": {
+		"category": "Cash Withdrawal",
+		"label": "Withdrawal - ATM / Cash Withdrawal"
+	}
+	
+}
