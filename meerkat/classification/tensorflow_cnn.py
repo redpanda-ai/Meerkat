@@ -12,8 +12,8 @@ Created on Apr 16, 2016
 
 ############################################# USAGE ###############################################
 
-# meerkat.classification.ladder_network [config_file]
-# meerkat.classification.ladder_network meerkat/classification/config/default_tf_config.json
+# meerkat.classification.tensorflow_cnn [config_file]
+# meerkat.classification.tensorflow_cnn meerkat/classification/config/default_tf_config.json
 
 # For addtional details on implementation see:
 # Character-level Convolutional Networks for Text Classification
