@@ -218,13 +218,13 @@ def auto_train():
 	}
 
 	args.model = best_model_path
-	args.testdata = test_file
+	args.data = test_file
 	args.label_map = label_map
 
 	args.doc_key = 'DESCRIPTION_UNMASKED'
-	args.secondary_doc_key = 'DESCRIPTION'
-	args.label_key = ground_truth_labels[model_type]
-	args.predicted_key = 'PREDICTED_CLASS'
+	args.secdoc_key = 'DESCRIPTION'
+	args.label = ground_truth_labels[model_type]
+	args.predict_key = 'PREDICTED_CLASS'
 	args.is_merchant = (model_type == 'merchant')
 	args.fast_mode = False
 

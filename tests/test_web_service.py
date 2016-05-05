@@ -22,7 +22,7 @@ def get_trans_text(path):
 	transFile.close()
 	return transText
 
-def classify_one(self, transaction, max_retries=10, sleep_interval=2):
+def classify_one(self, transaction, max_retries=20, sleep_interval=3):
 	"""Send a single transaction to the web service for classification"""
 	sleep_interval = 2
 	count = 1
