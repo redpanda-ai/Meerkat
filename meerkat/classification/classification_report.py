@@ -9,17 +9,17 @@ test set. It produces various stats and a confusion matrix for analysis
 #################### USAGE ##########################
 """
 python3 -m meerkat.classification.classification_report \
--model <path_to_classifier> \
--data <path_to_testdata> \
--map <path_to_label_map> \
--label <ground_truth_label_key> \
--doc <optional_primary_doc_key> \
--secdoc <optional_secondary_doc_key> \
--predict <optional_predicted_label_key>
+<path_to_classifier> \
+<path_to_testdata> \
+<path_to_label_map> \
+<ground_truth_label_key> \
+--doc_key <optional_primary_doc_key> \
+--secdoc_key <optional_secondary_doc_key> \
+--predict_key <optional_predicted_label_key>
 # If working with merchant data
--merchant
+--is_merchant
 # If only want to return confusion matrix and performance statistics
--fast
+--fast_mode
 
 # Key values will be shifted to upper case.
 """
@@ -54,28 +54,20 @@ def parse_arguments(args):
 	""" Create the parser """
 	parser = argparse.ArgumentParser(description="Test a CNN against a dataset and\
 		return performance statistics")
-	parser.add_argument('--model', '-model', required=True,
-		help='Path to the model under test')
-	parser.add_argument('--testdata', '-data', required=True,
-		help='Path to the test data')
-	parser.add_argument('--label_map', '-map', required=True,
-		help='Path to a label map')
-	parser.add_argument('--doc_key', '-doc', required=False, type=lambda x: x.upper(),
-		default='DESCRIPTION_UNMASKED',
+	# Required arguments
+	parser.add_argument('model', help='Path to the model under test')
+	parser.add_argument('data', help='Path to the test data')
+	parser.add_argument('label_map', help='Path to a label map')
+	parser.add_argument('label', type=lambda x: x.upper(), help="Header name of the ground truth label column")
+	# Optional arguments
+	parser.add_argument('--doc_key', type=lambda x: x.upper(), default='DESCRIPTION_UNMASKED',
 		help='Header name of primary transaction description column')
-	parser.add_argument('--secondary_doc_key', '-secdoc', required=False,
-		default='DESCRIPTION', type=lambda x: x.upper(),
-		help='Header name of secondary transaction description in case\
-			primary is empty')
-	parser.add_argument('--label_key', '-label', required=True,
-		type=lambda x: x.upper(), help="Header name of the ground truth label column")
-	parser.add_argument('--predicted_key', '-predict', required=False,
-		type=lambda x: x.upper(), default='PREDICTED_CLASS',
+	parser.add_argument('--secdoc_key', default='DESCRIPTION', type=lambda x: x.upper(),
+		help='Header name of secondary transaction description in case primary is empty')
+	parser.add_argument('--predict_key', type=lambda x: x.upper(), default='PREDICTED_CLASS',
 		help='Header name of predicted class column')
-	parser.add_argument('--is_merchant', '-merchant', required=False,
-		action='store_true', help='If working on merchant data need to indicate True.')
-	parser.add_argument('--fast_mode', '-fast', required=False, action='store_true',
-		help='Use fast mode to save i/o time.')
+	parser.add_argument('--is_merchant', action='store_true', help='If working on merchant data need to indicate True.')
+	parser.add_argument('--fast_mode', action='store_true', help='Use fast mode to save i/o time.')
 	parser.add_argument("-d", "--debug", help="Show 'debug'+ level logs", action="store_true")
 	parser.add_argument("-v", "--info", help="Show 'info'+ level logs", action="store_true")
 	return parser.parse_args(args)
@@ -215,12 +207,12 @@ def get_classification_report(confusion_matrix_file, label_map):
 def main_process(args):
 	"""This is the main stream"""
 	doc_key = args.doc_key
-	sec_doc_key = args.secondary_doc_key
-	machine_label_key = args.predicted_key
-	human_label_key = args.label_key
+	sec_doc_key = args.secdoc_key
+	machine_label_key = args.predict_key
+	human_label_key = args.label
 	fast_mode = args.fast_mode
-	reader = load_piped_dataframe(args.testdata, chunksize=1000)
-	total_transactions = count_transactions(args.testdata)
+	reader = load_piped_dataframe(args.data, chunksize=1000)
+	total_transactions = count_transactions(args.data)
 	processed = 0.0
 	label_map = load_params(args.label_map)
 
