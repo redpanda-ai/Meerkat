@@ -385,7 +385,8 @@ class WebConsumer():
 			if trans.get("locale_bloom", None) != None:
 				trans["city"] = trans["locale_bloom"][0]
 				trans["state"] = trans["locale_bloom"][1]
-				trans["country"] = "US"
+				if trans["is_physical_merchant"]:
+					trans["country"] = "US"
 			else:
 				trans["city"] = ""
 				trans["state"] = ""
