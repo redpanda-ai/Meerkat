@@ -218,13 +218,15 @@ def threshold(tensor):
 
 def bias_variable(shape, flat_input_shape):
 	"""Initialize biases"""
-	stdv = 1 / math.sqrt(flat_input_shape)
-	bias = tf.Variable(tf.random_uniform(shape, minval=-stdv, maxval=stdv), name="B")
+	with tf.name_scope('biases'):
+		stdv = 1 / math.sqrt(flat_input_shape)
+		bias = tf.Variable(tf.random_uniform(shape, minval=-stdv, maxval=stdv), name="B")
 	return bias
 
 def weight_variable(config, shape):
 	"""Initialize weights"""
-	weight = tf.Variable(tf.mul(tf.random_normal(shape), config["randomize"]), name="W")
+	with tf.name_scope('weights'):
+		weight = tf.Variable(tf.mul(tf.random_normal(shape), config["randomize"]), name="W")
 	return weight
 
 def conv2d(input_x, weights):
@@ -306,8 +308,8 @@ def build_graph(config):
 		# Utility for Batch Normalization
 		layer_sizes = [256] * 8 + [1024, num_labels]
 		ewma = tf.train.ExponentialMovingAverage(decay=0.99)
-		running_mean = [tf.Variable(tf.zeros([l]), trainable=False) for l in layer_sizes]
-		running_var = [tf.Variable(tf.ones([l]), trainable=False) for l in layer_sizes]
+		running_mean = [tf.Variable(tf.zeros([l]), trainable=False, name="running_mean") for l in layer_sizes]
+		running_var = [tf.Variable(tf.ones([l]), trainable=False, name="running_var") for l in layer_sizes]
 		bn_assigns = []
 
 		def layer(input_h, details, layer_name, train, weights=None, biases=None):
@@ -395,7 +397,7 @@ def build_graph(config):
 		trained_model = encoder(trans_placeholder, "model", train=False)
 
 		# Calculate Loss and Optimize
-		with tf.name_scope('optimizer'):
+		with tf.name_scope('trainer'):
 			weighted_labels = cost_list * labels_placeholder
 			loss = tf.neg(tf.reduce_mean(tf.reduce_sum(network * weighted_labels, 1)), name="loss")
 			optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss, name="optimizer")
@@ -440,25 +442,28 @@ def train_model(config, graph, sess, saver):
 		}
 
 		# Run Training Step
-		sess.run(get_op(graph, "optimizer"), feed_dict=feed_dict)
+		sess.run(get_op(graph, "trainer/optimizer"), feed_dict=feed_dict)
 		sess.run(get_op(graph, "bn_applier"), feed_dict=feed_dict)
 
 		# Log Loss
 		if step % logging_interval == 0:
-			loss = sess.run(get_tensor(graph, "loss:0"), feed_dict=feed_dict)
+			loss = sess.run(get_tensor(graph, "trainer/loss:0"), feed_dict=feed_dict)
 			logging.info("Train loss at epoch {0:>8}: {1:3.7f}".format(step + 1, loss))
 
 		# Log Accuracy for Tracking
 		if step % 1000 == 0:
+
+			# Log Minibatch Accuracy
 			predictions = sess.run(get_tensor(graph, "model:0"), feed_dict=feed_dict)
 			logging.info("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
-			test_accuracy = evaluate_testset(config, graph, sess, model, test)
-
-		# Evaluate Testset, Log Progress and Save
-		if step != 0 and step % epochs == 0:
 
 			#Evaluate Model
 			model = get_tensor(graph, "model:0")
+			test_accuracy = evaluate_testset(config, graph, sess, model, test)
+
+		# Log Progress and Save
+		if step != 0 and step % epochs == 0:
+
 			learning_rate = get_variable(graph, "lr:0")
 			logging.info("Testing for era %d" % (step / epochs))
 			logging.info("Learning rate at epoch %d: %g" % (step + 1, sess.run(learning_rate)))
