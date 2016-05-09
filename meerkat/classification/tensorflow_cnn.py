@@ -452,6 +452,7 @@ def train_model(config, graph, sess, saver):
 		if step % 1000 == 0:
 			predictions = sess.run(get_tensor(graph, "model:0"), feed_dict=feed_dict)
 			logging.info("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
+			test_accuracy = evaluate_testset(config, graph, sess, model, test)
 
 		# Evaluate Testset, Log Progress and Save
 		if step != 0 and step % epochs == 0:
@@ -461,7 +462,6 @@ def train_model(config, graph, sess, saver):
 			learning_rate = get_variable(graph, "lr:0")
 			logging.info("Testing for era %d" % (step / epochs))
 			logging.info("Learning rate at epoch %d: %g" % (step + 1, sess.run(learning_rate)))
-			test_accuracy = evaluate_testset(config, graph, sess, model, test)
 
 			# Save Checkpoint
 			current_era = int(step / epochs)
