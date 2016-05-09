@@ -67,5 +67,5 @@
 		}
 	},
 	"required": ["cobrand_id", "user_id", "container", "transaction_list"],
-	"additionalProperties": false
+	"additionalProperties" : false
 }
