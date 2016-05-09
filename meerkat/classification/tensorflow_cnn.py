@@ -190,7 +190,8 @@ def evaluate_testset(config, graph, sess, model, test):
 		logging.info("Correct count: " + str(correct_count))
 		logging.info("Total count: " + str(total_count))
 
-		tf.scalar_summary('test_accuracy', tf.constant(test_accuracy))
+		accuracy = get_variable(graph, "test_accuracy:0")
+		sess.run(accuracy.assign(test_accuracy))
 
 	return test_accuracy
 	
@@ -272,6 +273,8 @@ def build_graph(config):
 	with graph.as_default():
 
 		learning_rate = tf.Variable(base_rate, trainable=False, name="lr")
+		test_accuracy = tf.Variable(0, trainable=False, name="test_accuracy")
+		tf.scalar_summary('test_accuracy', test_accuracy)
 
 		input_shape = [None, 1, doc_length, alphabet_length]
 		output_shape = [None, num_labels]
@@ -446,21 +449,10 @@ def train_model(config, graph, sess, saver):
 		sess.run(get_op(graph, "trainer/optimizer"), feed_dict=feed_dict)
 		sess.run(get_op(graph, "bn_applier"), feed_dict=feed_dict)
 
-		# Log Loss
-		if step % logging_interval == 0:
-			loss = sess.run(get_tensor(graph, "trainer/loss:0"), feed_dict=feed_dict)
-			logging.info("Train loss at epoch {0:>8}: {1:3.7f}".format(step + 1, loss))
-
-		# Log Accuracy for Tracking
+		# Log Batch Accuracy for Tracking
 		if step % 1000 == 0:
-
-			# Log Minibatch Accuracy
 			predictions = sess.run(get_tensor(graph, "model:0"), feed_dict=feed_dict)
 			logging.info("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
-
-			#Evaluate Model
-			model = get_tensor(graph, "model:0")
-			test_accuracy = evaluate_testset(config, graph, sess, model, test)
 
 		# Log Progress and Save
 		if step != 0 and step % epochs == 0:
@@ -468,6 +460,10 @@ def train_model(config, graph, sess, saver):
 			learning_rate = get_variable(graph, "lr:0")
 			logging.info("Testing for era %d" % (step / epochs))
 			logging.info("Learning rate at epoch %d: %g" % (step + 1, sess.run(learning_rate)))
+
+			# Evaluate Model and Visualize
+			model = get_tensor(graph, "model:0")
+			test_accuracy = evaluate_testset(config, graph, sess, model, test)
 
 			# Save Checkpoint
 			current_era = int(step / epochs)
@@ -484,6 +480,13 @@ def train_model(config, graph, sess, saver):
 			if current_era - best_era == 3:
 				model_path = checkpoints[best_era]
 				break
+
+		# Log Loss and Update TensorBoard
+		if step % logging_interval == 0:
+			loss = sess.run(get_tensor(graph, "trainer/loss:0"), feed_dict=feed_dict)
+			logging.info("Train loss at epoch {0:>8}: {1:3.7f}".format(step + 1, loss))
+			summary = sess.run(merged, feed_dict=feed_dict)
+			writer.add_summary(summary, step)
 
 		# Update Learning Rate
 		if step != 0 and step % learning_rate_interval == 0:
