@@ -66,5 +66,6 @@
 			"minItems" : 1
 		}
 	},
-	"required": ["cobrand_id", "user_id", "container", "transaction_list"]
+	"required": ["cobrand_id", "user_id", "container", "transaction_list"],
+	"additionalProperties": false
 }

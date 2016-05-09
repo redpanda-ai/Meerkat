@@ -385,6 +385,7 @@ class WebConsumer():
 			if trans.get("locale_bloom", None) != None:
 				trans["city"] = trans["locale_bloom"][0]
 				trans["state"] = trans["locale_bloom"][1]
+				trans["country"] = "US"
 			else:
 				trans["city"] = ""
 				trans["state"] = ""
@@ -549,7 +550,7 @@ class WebConsumer():
 	def __enrich_physical_no_search(transactions):
 		""" When not search, enrich physical transcation with necessary fields """
 		for transaction in transactions:
-			transaction["country"] = "US"
+			# transaction["country"] = "US"
 			transaction["merchant_name"] = ""
 			transaction["source"] = "OTHER"
 			transaction["match_found"] = False
@@ -567,11 +568,10 @@ class WebConsumer():
 		physical, non_physical = self.__sws(data)
 
 		if "search" in services_list or services_list == []:
-			if "should_search" not in self.params or self.params["should_search"]:
-				physical = self.__enrich_physical(physical)
-				self.__apply_category_labels(physical)
-			else:
-				physical = self.__enrich_physical_no_search(physical)
+			physical = self.__enrich_physical(physical)
+			self.__apply_category_labels(physical)
+		else:
+			physical = self.__enrich_physical_no_search(physical)
 		return physical, non_physical
 
 	def classify(self, data, optimizing=False):
