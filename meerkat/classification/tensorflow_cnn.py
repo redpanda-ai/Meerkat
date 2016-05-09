@@ -218,15 +218,13 @@ def threshold(tensor):
 
 def bias_variable(shape, flat_input_shape):
 	"""Initialize biases"""
-	with tf.name_scope('biases'):
-		stdv = 1 / math.sqrt(flat_input_shape)
-		bias = tf.Variable(tf.random_uniform(shape, minval=-stdv, maxval=stdv), name="B")
+	stdv = 1 / math.sqrt(flat_input_shape)
+	bias = tf.Variable(tf.random_uniform(shape, minval=-stdv, maxval=stdv), name="B")
 	return bias
 
 def weight_variable(config, shape):
 	"""Initialize weights"""
-	with tf.name_scope('weights'):
-		weight = tf.Variable(tf.mul(tf.random_normal(shape), config["randomize"]), name="W")
+	weight = tf.Variable(tf.mul(tf.random_normal(shape), config["randomize"]), name="W")
 	return weight
 
 def conv2d(input_x, weights):
@@ -303,14 +301,17 @@ def build_graph(config):
 		w_fc2 = weight_variable(config, [1024, num_labels])
 		b_fc2 = bias_variable([num_labels], 1024)
 
-		bn_scaler = tf.Variable(1.0 * tf.ones([num_labels]))
-
 		# Utility for Batch Normalization
+		bn_scaler = tf.Variable(1.0 * tf.ones([num_labels]))
 		layer_sizes = [256] * 8 + [1024, num_labels]
 		ewma = tf.train.ExponentialMovingAverage(decay=0.99)
-		running_mean = [tf.Variable(tf.zeros([l]), trainable=False, name="running_mean") for l in layer_sizes]
-		running_var = [tf.Variable(tf.ones([l]), trainable=False, name="running_var") for l in layer_sizes]
 		bn_assigns = []
+
+		with tf.name_scope("running_mean"):
+			running_mean = [tf.Variable(tf.zeros([l]), trainable=False) for l in layer_sizes]
+
+		with tf.name_scope("running_var"):
+			running_var = [tf.Variable(tf.ones([l]), trainable=False) for l in layer_sizes]
 
 		def layer(input_h, details, layer_name, train, weights=None, biases=None):
 			"""Apply all necessary steps in a ladder layer"""
