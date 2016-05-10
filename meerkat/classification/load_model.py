@@ -14,12 +14,12 @@ import logging
 
 import numpy as np
 import tensorflow as tf
+from tensorflow.python.framework import ops
 from sklearn.externals import joblib
 
 from meerkat.various_tools import load_params
 from meerkat.classification.auto_load import main_program as load_models_from_s3
-from meerkat.classification.tensorflow_cnn import (build_graph,
-	validate_config, get_tensor, string_to_tensor)
+from meerkat.classification.tensorflow_cnn import (validate_config, get_tensor, string_to_tensor)
 
 def load_scikit_model(model_name):
 	"""Load either Card or Bank classifier depending on
@@ -93,18 +93,22 @@ def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=False):
 	config = load_params(config_path)
 	config["label_map"] = label_map_path
 	config["model_path"] = model_path
+	meta_path = model_path.split(".ckpt")[0] + ".meta"
 	config = validate_config(config)
-	graph, saver = build_graph(config)
 	label_map = config["label_map"]
 
 	# Load Session and Graph
+	ops.reset_default_graph()
+	saver = tf.train.import_meta_graph(meta_path)
+
 	if gpu_mem_fraction:
 		gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.25)
-		sess = tf.Session(graph=graph, config=tf.ConfigProto(gpu_options=gpu_options))
+		sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
 	else:
-		sess = tf.Session(graph=graph)
+		sess = tf.Session()
 
 	saver.restore(sess, config["model_path"])
+	graph = sess.graph
 	model = get_tensor(graph, "model:0")
 	
 	# Generate Helper Function
