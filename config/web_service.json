@@ -21,6 +21,5 @@
         ],
         "index" : "factual_index",
         "type" : "factual_type"
-    },
-    "should_search" : true
+    }
 }
