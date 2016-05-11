@@ -92,7 +92,6 @@ def extract_tarball(archive, destination):
 		members = tar.getmembers()
 		logging.debug("Members {0}".format(members))
 		tar.extractall(destination)
-		tar.close()
 
 def get_new_maint7b(directory, file_list):
 	"""Get the latest t7b file under directory."""
