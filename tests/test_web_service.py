@@ -22,15 +22,14 @@ def get_trans_text(path):
 	transFile.close()
 	return transText
 
-def classify_one(self, transaction, max_retries=10, sleep_interval=2):
+def classify_one(self, transaction, max_retries=20, sleep_interval=2):
 	"""Send a single transaction to the web service for classification"""
-	sleep_interval = 2
 	count = 1
 	while count <= max_retries:
 		try:
 			sleep(sleep_interval)
 			r_post = requests.post(
-				"https://localhost/meerkat/v2.0",
+				"https://localhost/meerkat/v2.1",
 				data=transaction,
 				verify=False)
 
