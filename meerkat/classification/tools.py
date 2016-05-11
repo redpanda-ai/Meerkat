@@ -85,14 +85,14 @@ def make_tarfile(output_filename, source_dir):
 		tar.add(source_dir, arcname=reduced_name)
 
 def extract_tarball(archive, destination):
-        """Extract a tarball to a destination"""
-        if not tarfile.is_tarfile(archive):
-            raise Exception("Invalid, not a tarfile")
-        with tarfile.open(name=archive, mode="r:gz") as tar:
-            members = tar.getmembers()
-            logging.debug("Members {0}".format(members))
-            tar.extractall(destination)
-            tar.close()
+	"""Extract a tarball to a destination"""
+	if not tarfile.is_tarfile(archive):
+		raise Exception("Invalid, not a tarfile")
+	with tarfile.open(name=archive, mode="r:gz") as tar:
+		members = tar.getmembers()
+		logging.debug("Members {0}".format(members))
+		tar.extractall(destination)
+		tar.close()
 
 def get_new_maint7b(directory, file_list):
 	"""Get the latest t7b file under directory."""
