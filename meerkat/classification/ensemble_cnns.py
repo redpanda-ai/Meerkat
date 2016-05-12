@@ -40,6 +40,39 @@ from meerkat.various_tools import load_params, load_piped_dataframe, validate_co
 
 logging.basicConfig(level=logging.INFO)
 
+def ensemble_evaluate_testset(config, graph, sess, model1, model2, model3, model4, model5, test):
+	"""Check error on test set"""
+
+	total_count = len(test.index)
+	correct_count = 0
+	chunked_test = chunks(np.array(test.index), 128)
+	num_chunks = len(chunked_test)
+
+	for i in range(num_chunks):
+
+		batch_test = test.loc[chunked_test[i]]
+		batch_size = len(batch_test)
+
+		trans_test, labels_test = batch_to_tensor(config, batch_test)
+		feed_dict_test = {get_tensor(graph, "x:0"): trans_test}
+		output1 = sess.run(model1, feed_dict=feed_dict_test)
+		output2 = sess.run(model2, feed_dict=feed_dict_test)
+		output3 = sess.run(model3, feed_dict=feed_dict_test)
+		output4 = sess.run(model4, feed_dict=feed_dict_test)
+		output5 = sess.run(model5, feed_dict=feed_dict_test)
+		ensemble_output = (output1 + output2 + output3 + output4 + output5) / 5.0
+
+		batch_correct_count = np.sum(np.argmax(ensemble_output, 1) == np.argmax(labels_test, 1))
+
+		correct_count += batch_correct_count
+
+	test_accuracy = 100.0 * (correct_count / total_count)
+	logging.info("Ensemble test accuracy: %.2f%%" % test_accuracy)
+	logging.info("Correct count: " + str(correct_count))
+	logging.info("Total count: " + str(total_count))
+
+	return test_accuracy
+
 def chunks(array, num):
 	"""Chunk array into equal sized parts"""
 	num = max(1, num)
@@ -394,7 +427,7 @@ def build_graph(config):
 			h_fc2_full = layer(h_fc1_full, details, "h_fc2_full", train, weights=w_fc2, biases=b_fc2)
 			h_fc2 = layer(h_fc1, details, "h_fc2", train, weights=w_fc2, biases=b_fc2)
 
-			softmax_full = tf.nn.softmax(bn_scaler * h_fc2_full)
+			softmax_full = tf.nn.softmax(bn_scaler * h_fc2_full, name="cnn")
 			softmax_train = tf.nn.softmax(bn_scaler * h_fc2)
 			network_train = tf.log(tf.clip_by_value(softmax_train, 1e-10, 1.0), name=name)
 
@@ -471,8 +504,8 @@ def train_model(config, graph, sess, saver):
 	checkpoints = {}
 
 	# Visualize Using TensorBoard
-	merged = tf.merge_all_summaries()
-	writer = tf.train.SummaryWriter("/home/ubuntu/tensorboard_log", graph)
+	# merged = tf.merge_all_summaries()
+	# writer = tf.train.SummaryWriter("/home/ubuntu/tensorboard_log", graph)
 
 	for step in range(num_eras):
 
@@ -485,21 +518,37 @@ def train_model(config, graph, sess, saver):
 		}
 
 		# Run Training Step
-		sess.run(get_op(graph, "trainer/optimizer"), feed_dict=feed_dict)
+		# sess.run(get_op(graph, "trainer/optimizer"), feed_dict=feed_dict)
+		sess.run(get_op(graph, "optimizer1"), feed_dict=feed_dict)
+		sess.run(get_op(graph, "optimizer2"), feed_dict=feed_dict)
+		sess.run(get_op(graph, "optimizer3"), feed_dict=feed_dict)
+		sess.run(get_op(graph, "optimizer4"), feed_dict=feed_dict)
+		sess.run(get_op(graph, "optimizer5"), feed_dict=feed_dict)
 		sess.run(get_op(graph, "bn_applier"), feed_dict=feed_dict)
 
 		# Log Batch Accuracy for Tracking
 		if step % 1000 == 0:
+			pass
 
 			# Calculate Batch Accuracy
-			predictions = sess.run(get_tensor(graph, "model:0"), feed_dict=feed_dict)
-			logging.info("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
+			"""
+			predictions1 = sess.run(get_tensor(graph, "model1/cnn:0"), feed_dict=feed_dict)
+			predictions2 = sess.run(get_tensor(graph, "model2/cnn:0"), feed_dict=feed_dict)
+			predictions3 = sess.run(get_tensor(graph, "model3/cnn:0"), feed_dict=feed_dict)
+			predictions4 = sess.run(get_tensor(graph, "model4/cnn:0"), feed_dict=feed_dict)
+			predictions5 = sess.run(get_tensor(graph, "model5/cnn:0"), feed_dict=feed_dict)
+			logging.info("Minibatch accuracy for cnn1: %.1f%%" % accuracy(predictions1, labels))
+			logging.info("Minibatch accuracy for cnn2: %.1f%%" % accuracy(predictions2, labels))
+			logging.info("Minibatch accuracy for cnn3: %.1f%%" % accuracy(predictions3, labels))
+			logging.info("Minibatch accuracy for cnn4: %.1f%%" % accuracy(predictions4, labels))
+			logging.info("Minibatch accuracy for cnn5: %.1f%%" % accuracy(predictions5, labels))
 
 			# Estimate Accuracy for Visualization
 			model = get_tensor(graph, "model:0")
 			test_subsample_size = 5000 if len(test.index) >= 5000 else len(test.index)
 			indices_to_sample = list(np.random.choice(test.index, test_subsample_size, replace=False))
 			evaluate_testset(config, graph, sess, model, test.loc[indices_to_sample])
+			"""
 
 		# Log Progress and Save
 		if step != 0 and step % epochs == 0:
@@ -509,31 +558,46 @@ def train_model(config, graph, sess, saver):
 			logging.info("Learning rate at epoch %d: %g" % (step + 1, sess.run(learning_rate)))
 
 			# Evaluate Model and Visualize
-			model = get_tensor(graph, "model:0")
-			test_accuracy = evaluate_testset(config, graph, sess, model, test)
+			model1 = get_tensor(graph, "model1/cnn:0")
+			model2 = get_tensor(graph, "model2/cnn:0")
+			model3 = get_tensor(graph, "model3/cnn:0")
+			model4 = get_tensor(graph, "model4/cnn:0")
+			model5 = get_tensor(graph, "model5/cnn:0")
+			test_accuracy1 = evaluate_testset(config, graph, sess, model1, test)
+			test_accuracy2 = evaluate_testset(config, graph, sess, model2, test)
+			test_accuracy3 = evaluate_testset(config, graph, sess, model3, test)
+			test_accuracy4 = evaluate_testset(config, graph, sess, model4, test)
+			test_accuracy5 = evaluate_testset(config, graph, sess, model5, test)
+			ensemble_accuracy = ensemble_evaluate_testset(config, graph, sess, model1, model2, model3, model4, model5, test)
 
 			# Save Checkpoint
 			current_era = int(step / epochs)
 			meta_path = save_dir + "era_" + str(current_era) + ".ckpt.meta"
-			model_path = saver.save(sess, save_dir + "era_" + str(current_era) + ".ckpt")
-			logging.info("Checkpoint saved in file: %s" % model_path)
-			checkpoints[current_era] = model_path
+			model_path1 = saver1.save(sess, save_dir + "era_" + str(current_era) + "_model1.ckpt")
+			model_path2 = saver2.save(sess, save_dir + "era_" + str(current_era) + "_model2.ckpt")
+			model_path3 = saver3.save(sess, save_dir + "era_" + str(current_era) + "_model3.ckpt")
+			model_path4 = saver4.save(sess, save_dir + "era_" + str(current_era) + "_model4.ckpt")
+			model_path5 = saver5.save(sess, save_dir + "era_" + str(current_era) + "_model5.ckpt")
+			logging.info("Checkpoint saved in file: %s" % model_path1)
+			checkpoints[current_era] = model_path1
 
 			# Stop Training if Converged
-			if test_accuracy > best_accuracy:
+			if ensemble_accuracy > best_accuracy:
 				best_era = current_era
-				best_accuracy = test_accuracy
+				best_accuracy = ensemble_accuracy
 
-			if current_era - best_era == 3:
-				model_path = checkpoints[best_era]
+			if current_era - best_era == 2:
+				model_path1 = checkpoints[best_era]
 				break
 
 		# Log Loss and Update TensorBoard
+		"""
 		if step % logging_interval == 0:
 			loss = sess.run(get_tensor(graph, "trainer/loss:0"), feed_dict=feed_dict)
 			logging.info("Train loss at epoch {0:>8}: {1:3.7f}".format(step + 1, loss))
 			summary = sess.run(merged, feed_dict=feed_dict)
 			writer.add_summary(summary, step)
+		"""
 
 		# Update Learning Rate
 		if step != 0 and step % learning_rate_interval == 0:
@@ -548,11 +612,11 @@ def train_model(config, graph, sess, saver):
 	os.rename(model_path, final_model_path)
 	os.rename(meta_path, final_meta_path)
 	logging.info("Deleting unneeded directory of checkpoints at {0}".format(save_dir))
-	shutil.rmtree(save_dir)
+	# shutil.rmtree(save_dir)
 
 	return final_model_path
 
-def run_session(config, graph, saver):
+def run_session(config, graph, saver1, saver2, saver3, saver4, saver5):
 	"""Run Session"""
 
 	with tf.Session(graph=graph) as sess:
@@ -563,7 +627,7 @@ def run_session(config, graph, saver):
 		tf.initialize_all_variables().run()
 
 		if mode == "train":
-			train_model(config, graph, sess, saver)
+			_ = train_model(config, graph, sess, saver1, saver2, saver3, saver4, saver5)
 		elif mode == "test":
 			saver.restore(sess, model_path)
 			model = get_tensor(graph, "model:0")
@@ -574,8 +638,8 @@ def run_from_command_line():
 	"""Run module from command line"""
 	logging.basicConfig(level=logging.INFO)
 	config = validate_config(sys.argv[1])
-	graph, saver = build_graph(config)
-	run_session(config, graph, saver)
+	graph, saver1, saver2, saver3, saver4, saver5 = build_graph(config)
+	run_session(config, graph, saver1, saver2, saver3, saver4, saver5)
 
 if __name__ == "__main__":
 	run_from_command_line()
