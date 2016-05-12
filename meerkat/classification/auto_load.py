@@ -10,7 +10,7 @@ import pandas as pd
 from boto.s3 import connect_to_region
 from boto.s3.key import Key
 
-from meerkat.various_tools import safely_remove_file
+from meerkat.various_tools import safely_remove_file, validate_configuration
 
 def find_s3_objects_recursively(conn, bucket, my_results, prefix=None, target=None):
 	"""Find all S3 target objects and their locations recursively"""
@@ -82,7 +82,13 @@ def get_best_model_of_class(target, models_dir, **kwargs):
 	highest_score, winner, candidate_count = 0.0, None, 1
 	winner_count = candidate_count
 	#Start inner loop
-	for timestamp in kwargs["results"][kwargs["key"]]:
+	timestamps = None
+	if kwargs["aspirant"] is None:
+		timestamps = kwargs["results"][kwargs["key"]]
+	else:
+		timestamps = [kwargs["aspirant"]]
+
+	for timestamp in timestamps:
 		k = Key(kwargs["bucket"])
 		k.key = kwargs["prefix"] + kwargs["key"] + timestamp + target
 		k.get_contents_to_filename(target)
@@ -109,7 +115,7 @@ def get_best_model_of_class(target, models_dir, **kwargs):
 	return winner_count, winner
 	#End inner loop
 
-def get_best_models(bucket, prefix, results, target, s3_base):
+def get_best_models(bucket, prefix, results, target, s3_base, aspirants):
 	"""Gets the best model for a particular model type."""
 
 	suffix = prefix[len(s3_base):]
@@ -121,9 +127,16 @@ def get_best_models(bucket, prefix, results, target, s3_base):
 		if "category" in key:
 			continue
 
-		logging.info("Evaluating {0}".format(key))
+		logging.info("Evaluating '{0}'".format(key))
+		aspirant = None
+		if key in aspirants:
+			logging.info("Aspirant model for {0} is {1}".format(key, aspirants[key]))
+			aspirant = aspirants[key]
+		else:
+			logging.info("No aspirant model, evaluating based on accuracy")
+
 		winner_count, winner = get_best_model_of_class(target, models_dir, bucket=bucket,
-			prefix=prefix, results=results, key=key, suffix=suffix)
+			prefix=prefix, results=results, key=key, suffix=suffix, aspirant=aspirant)
 
 		args = [bucket, prefix, key, winner, s3_base, "results.tar.gz", "meerkat/classification/"]
 		set_label_map_and_meta(*args)
@@ -159,29 +172,35 @@ def set_label_map_and_meta(*args):
 def main_program():
 	"""Execute the main program"""
 	parser = argparse.ArgumentParser("auto_load")
-	parser.add_argument("-d", "--debug", help="Show 'debug'+ level logs", action="store_true")
-	parser.add_argument("-v", "--info", help="Show 'info'+ level logs", action="store_true")
+	parser.add_argument("-l", "--log_level", default="warning", help="Show at least this level of logs")
 	parser.add_argument("-b", "--bucket", action="store_true", default="s3yodlee",
 		help="Name of S3 bucket containing the candidate models.")
 	parser.add_argument("-r", "--region", action="store_true", default="us-west-2",
 		help="Name of the AWS region containing the S3 bucket")
 	parser.add_argument("-p", "--prefix", action="store_true", default="meerkat/cnn/data",
 		help="S3 object prefix that precedes all object keys for our candidate models")
+	parser.add_argument("-a", "--aspirants", default=None,
+		help="The local path to a JSON file of models have been pre-selected")
 	args = parser.parse_args()
 	log_format = "%(asctime)s %(levelname)s: %(message)s"
-	if args.debug:
+	if args.log_level == "debug":
 		logging.basicConfig(format=log_format, level=logging.DEBUG)
-	elif args.info:
+	elif args.log_level == "info":
 		logging.basicConfig(format=log_format, level=logging.INFO)
 	else:
-		logging.basicConfig(format=log_format, level=logging.WARNING)
+		logging.basicConfig(format=log_format, level=logging.INFO)
+	aspirants = {}
+	if args.aspirants is not None:
+		aspirants = validate_configuration(args.aspirants,
+			"meerkat/classification/config/auto_load_schema.json")["aspirants"]
+	logging.info("Aspirants are: {0}".format(aspirants))
 	logging.warning("Starting main program")
 	conn = connect_to_region(args.region)
 	bucket = conn.get_bucket(args.bucket)
 	my_results, target = {}, "results.tar.gz",
 	find_s3_objects_recursively(conn, bucket, my_results, prefix=args.prefix, target=target)
 	results = get_peer_models(my_results, prefix=args.prefix)
-	get_best_models(bucket, args.prefix, results, target, args.prefix)
+	get_best_models(bucket, args.prefix, results, target, args.prefix, aspirants)
 	logging.warning("Finishing main program")
 
 if __name__ == "__main__":
