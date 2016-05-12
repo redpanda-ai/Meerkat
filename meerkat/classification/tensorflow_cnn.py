@@ -120,7 +120,7 @@ def mixed_batching(config, df, groups_train):
 	num_labels = config["num_labels"]
 	batch_size = config["batch_size"]
 	half_batch = int(batch_size / 2)
-	indices_to_sample = list(np.random.choice(df.index, half_batch, replace=False))
+	indices_to_sample = list(np.random.choice(df.index, half_batch))
 
 	for index in range(half_batch):
 		label = random.randint(1, num_labels)
@@ -459,7 +459,7 @@ def train_model(config, graph, sess, saver):
 			# Estimate Accuracy for Visualization
 			model = get_tensor(graph, "model:0")
 			test_subsample_size = 5000 if len(test.index) >= 5000 else len(test.index)
-			indices_to_sample = list(np.random.choice(test.index, test_subsample_size, replace=False))
+			indices_to_sample = list(np.random.choice(test.index, test_subsample_size))
 			evaluate_testset(config, graph, sess, model, test.loc[indices_to_sample])
 
 		# Log Progress and Save
