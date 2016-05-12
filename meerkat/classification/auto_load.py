@@ -156,7 +156,7 @@ def set_label_map_and_meta(*args):
 	rename(meta_file, new_graph_def_path)
 	return new_path
 
-def main_program(prefix="meerkat/cnn/data"):
+def main_program():
 	"""Execute the main program"""
 	parser = argparse.ArgumentParser("auto_load")
 	parser.add_argument("-d", "--debug", help="Show 'debug'+ level logs", action="store_true")
@@ -178,10 +178,10 @@ def main_program(prefix="meerkat/cnn/data"):
 	logging.warning("Starting main program")
 	conn = connect_to_region(args.region)
 	bucket = conn.get_bucket(args.bucket)
-	my_results, target, s3_base = {}, "results.tar.gz", "meerkat/cnn/data"
-	find_s3_objects_recursively(conn, bucket, my_results, prefix=prefix, target=target)
-	results = get_peer_models(my_results, prefix=prefix)
-	get_best_models(bucket, prefix, results, target, s3_base)
+	my_results, target = {}, "results.tar.gz",
+	find_s3_objects_recursively(conn, bucket, my_results, prefix=args.prefix, target=target)
+	results = get_peer_models(my_results, prefix=args.prefix)
+	get_best_models(bucket, args.prefix, results, target, args.prefix)
 	logging.warning("Finishing main program")
 
 if __name__ == "__main__":
