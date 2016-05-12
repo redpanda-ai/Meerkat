@@ -140,7 +140,7 @@ def set_label_map_and_meta(*args):
 
 	suffix = prefix[len(s3_base):]
 
-	if bucket is not None:
+	if bucket is not None: #None is used for unit tests
 		s3_key = Key(bucket)
 		s3_key.key = prefix + key + winner + tarball
 		s3_key.get_contents_to_filename(tarball)
@@ -154,12 +154,19 @@ def set_label_map_and_meta(*args):
 	meta_file = get_single_file_from_tarball("", tarball, ".*meta")
 	new_graph_def_path = output_path + "models/" + (suffix + key).replace("/", ".")[1:] + "meta"
 	rename(meta_file, new_graph_def_path)
+	return new_path
 
 def main_program(prefix="meerkat/cnn/data"):
 	"""Execute the main program"""
 	parser = argparse.ArgumentParser("auto_load")
 	parser.add_argument("-d", "--debug", help="Show 'debug'+ level logs", action="store_true")
 	parser.add_argument("-v", "--info", help="Show 'info'+ level logs", action="store_true")
+	parser.add_argument("-b", "--bucket", action="store_true", default="s3yodlee",
+		help="Name of S3 bucket containing the candidate models.")
+	parser.add_argument("-r", "--region", action="store_true", default="us-west-2",
+		help="Name of the AWS region containing the S3 bucket")
+	parser.add_argument("-p", "--prefix", action="store_true", default="meerkat/cnn/data",
+		help="S3 object prefix that precedes all object keys for our candidate models")
 	args = parser.parse_args()
 	log_format = "%(asctime)s %(levelname)s: %(message)s"
 	if args.debug:
@@ -169,8 +176,8 @@ def main_program(prefix="meerkat/cnn/data"):
 	else:
 		logging.basicConfig(format=log_format, level=logging.WARNING)
 	logging.warning("Starting main program")
-	conn = connect_to_region('us-west-2')
-	bucket = conn.get_bucket("s3yodlee")
+	conn = connect_to_region(args.region)
+	bucket = conn.get_bucket(args.bucket)
 	my_results, target, s3_base = {}, "results.tar.gz", "meerkat/cnn/data"
 	find_s3_objects_recursively(conn, bucket, my_results, prefix=prefix, target=target)
 	results = get_peer_models(my_results, prefix=prefix)
