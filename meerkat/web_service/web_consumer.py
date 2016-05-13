@@ -303,7 +303,7 @@ class WebConsumer():
 			subtypecategory = trans.get("subtype_CNN", {}).get("category",\
 					trans.get("subtype_CNN", {}).get("label", ""))
 					
-			If subtypecategory =="Other Income"  or subtypecategory =="Other Expenses" or trans["txn_sub_type"]=="Refund"
+			if subtypecategory == "Other Income" or subtypecategory == "Other Expenses" or trans["txn_sub_type"] == "Refund":
 			
 				trans["search"] = {"category_labels" : trans.get("category_labels", [])}
 
@@ -324,7 +324,7 @@ class WebConsumer():
 				trans["CNN"] = trans.get("CNN", {}).get("label", "")
 
 				trans.pop("subtype_CNN", None)
-			Else
+			else:
 				trans["category_labels"] = [subtypecategory]	
 				trans["CNN"] = trans.get("CNN", {}).get("label", "")
 				trans.pop("subtype_CNN", None)
