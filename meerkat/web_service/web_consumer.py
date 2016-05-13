@@ -299,26 +299,35 @@ class WebConsumer():
 		on the merchant name"""
 		
 		for trans in transactions:
-
-			trans["search"] = {"category_labels" : trans.get("category_labels", [])}
-
-			if trans.get("category_labels"):
-				trans["CNN"] = trans.get("CNN", {}).get("label", "")
-				if "subtype_CNN" in trans:
-					del trans["subtype_CNN"]
-				continue
-
-			fallback = trans.get("CNN", {}).get("category", "").strip()
-
-			if fallback == "Use Subtype Rules for Categories" or fallback == "":
-				fallback = trans.get("subtype_CNN", {}).get("category",\
+			
+			subtypecategory = trans.get("subtype_CNN", {}).get("category",\
 					trans.get("subtype_CNN", {}).get("label", ""))
-				fallback = isinstance(fallback, dict) and fallback[trans["ledger_entry"].lower()] or fallback
+					
+			If subtypecategory =="Other Income"  or subtypecategory =="Other Expenses" or trans["txn_sub_type"]=="Refund"
+			
+				trans["search"] = {"category_labels" : trans.get("category_labels", [])}
 
-			trans["category_labels"] = [fallback]
-			trans["CNN"] = trans.get("CNN", {}).get("label", "")
+				if trans.get("category_labels"):
+					trans["CNN"] = trans.get("CNN", {}).get("label", "")
+					if "subtype_CNN" in trans:
+						del trans["subtype_CNN"]
+					continue
 
-			trans.pop("subtype_CNN", None)
+				fallback = trans.get("CNN", {}).get("category", "").strip()
+
+				if fallback == "Use Subtype Rules for Categories" or fallback == "":
+					fallback = trans.get("subtype_CNN", {}).get("category",\
+						trans.get("subtype_CNN", {}).get("label", ""))
+					fallback = isinstance(fallback, dict) and fallback[trans["ledger_entry"].lower()] or fallback
+
+				trans["category_labels"] = [fallback]
+				trans["CNN"] = trans.get("CNN", {}).get("label", "")
+
+				trans.pop("subtype_CNN", None)
+			Else
+				trans["category_labels"] = [subtypecategory]	
+				trans["CNN"] = trans.get("CNN", {}).get("label", "")
+				trans.pop("subtype_CNN", None)
 
 	def ensure_output_schema(self, transactions, debug, services_list):
 		"""Clean output to proper schema"""
