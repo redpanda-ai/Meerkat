@@ -16,7 +16,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.python.framework import ops
 from sklearn.externals import joblib
-
+from plumbum import local
 from meerkat.various_tools import load_params
 from meerkat.classification.auto_load import main_program as load_models_from_s3
 from meerkat.classification.tensorflow_cnn import (validate_config, get_tensor, string_to_tensor)
@@ -81,6 +81,9 @@ def get_tf_cnn_by_name(model_name, gpu_mem_fraction=False):
 def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=False):
 	"""Load a tensorFlow module by name"""
 
+	checked = local['lspci']()
+	has_gpu = 'nvidia' in checked.lower()
+
 	# Load Config
 	config_path = "meerkat/classification/config/default_tf_config.json"
 
@@ -101,16 +104,19 @@ def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=False):
 	ops.reset_default_graph()
 	saver = tf.train.import_meta_graph(meta_path)
 
-	if gpu_mem_fraction:
-		gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.25)
-		sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
+	if not has_gpu:
+		sess = tf.Session(config=tf.ConfigProto(log_device_placement=True, device_count={'GPU':0}))
 	else:
-		sess = tf.Session()
+		if gpu_mem_fraction:
+			gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.25)
+			sess = tf.Session(config=tf.ConfigProto(log_device_placement=True, gpu_options=gpu_options))
+		else:
+			sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
 
 	saver.restore(sess, config["model_path"])
 	graph = sess.graph
 	model = get_tensor(graph, "model:0")
-	
+
 	# Generate Helper Function
 	def apply_cnn(trans, doc_key="description", label_key="CNN", label_only=True):
 		"""Apply CNN to transactions"""
