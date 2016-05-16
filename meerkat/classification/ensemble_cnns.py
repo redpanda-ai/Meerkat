@@ -12,8 +12,8 @@ Created on Apr 16, 2016
 
 ############################################# USAGE ###############################################
 
-# meerkat.classification.tensorflow_cnn [config_file]
-# meerkat.classification.tensorflow_cnn meerkat/classification/config/default_tf_config.json
+# python3 -m meerkat.classification.tensorflow_cnn [config_file]
+# python3 -m meerkat.classification.tensorflow_cnn meerkat/classification/config/default_tf_config.json
 
 # For addtional details on implementation see:
 # Character-level Convolutional Networks for Text Classification
@@ -40,7 +40,7 @@ from meerkat.various_tools import load_params, load_piped_dataframe, validate_co
 
 logging.basicConfig(level=logging.INFO)
 
-def ensemble_evaluate_testset(config, graph, sess, model1, model2, model3, model4, model5, test):
+def ensemble_evaluate_testset(config, graph, sess, model, test):
 	"""Check error on test set"""
 
 	total_count = len(test.index)
@@ -55,12 +55,8 @@ def ensemble_evaluate_testset(config, graph, sess, model1, model2, model3, model
 
 		trans_test, labels_test = batch_to_tensor(config, batch_test)
 		feed_dict_test = {get_tensor(graph, "x:0"): trans_test}
-		output1 = sess.run(model1, feed_dict=feed_dict_test)
-		output2 = sess.run(model2, feed_dict=feed_dict_test)
-		output3 = sess.run(model3, feed_dict=feed_dict_test)
-		output4 = sess.run(model4, feed_dict=feed_dict_test)
-		output5 = sess.run(model5, feed_dict=feed_dict_test)
-		ensemble_output = (output1 + output2 + output3 + output4 + output5) / 5.0
+		output = [sess.run(model[i], feed_dict=feed_dict_test) for i in range(N)]
+		ensemble_output = sum(output) / (N + 0.0)
 
 		batch_correct_count = np.sum(np.argmax(ensemble_output, 1) == np.argmax(labels_test, 1))
 
@@ -286,6 +282,10 @@ def get_cost_list(config):
 
 	return cost_list
 
+
+def logsoftmax(softmax, name):
+	return tf.log(tf.clip_by_value(softmax, 1e-10, 1.0), name=name)
+
 def build_graph(config):
 	"""Build CNN"""
 
@@ -317,48 +317,17 @@ def build_graph(config):
 
 
 		# Utility for Batch Normalization
-		bn_scaler = tf.Variable(1.0 * tf.ones([num_labels]))
 		layer_sizes = [256] * 8 + [1024, num_labels]
 		ewma = tf.train.ExponentialMovingAverage(decay=0.99)
 		bn_assigns = []
 
+		"""
 		with tf.name_scope("running_mean"):
 			running_mean = [tf.Variable(tf.zeros([l]), trainable=False) for l in layer_sizes]
 
 		with tf.name_scope("running_var"):
 			running_var = [tf.Variable(tf.ones([l]), trainable=False) for l in layer_sizes]
-
-		def layer(input_h, details, layer_name, train, weights=None, biases=None):
-			"""Apply all necessary steps in a ladder layer"""
-
-			# Scope for Visualization with TensorBoard
-			with tf.name_scope(layer_name):
-
-				# Preactivation
-				if "conv" in layer_name:
-					z_pre = conv2d(input_h, weights)
-				elif "pool" in layer_name:
-					z_pre = max_pool(input_h)
-				elif "fc" in layer_name:
-					z_pre = tf.matmul(input_h, weights)
-
-				details["layer_count"] += 1
-				layer_n = details["layer_count"]
-
-				if train:
-					z = update_batch_normalization(z_pre, layer_n)
-				else:
-					mean = ewma.average(running_mean[layer_n-1])
-					var = ewma.average(running_var[layer_n-1])
-					z = batch_normalization(z_pre, mean=mean, var=var)
-
-				# Apply Activation
-				if "conv" in layer_name or "fc" in layer_name:
-					layer = threshold(z + biases)
-				else:
-					layer = z
-
-			return layer
+		"""
 
 		def batch_normalization(batch, mean=None, var=None):
 			"""Perform batch normalization"""
@@ -371,14 +340,24 @@ def build_graph(config):
 			"batch normalize + update average mean and variance of layer l"
 			axes = [0] if len(batch.get_shape()) == 2 else [0, 1, 2]
 			mean, var = tf.nn.moments(batch, axes=axes)
-			assign_mean = running_mean[l-1].assign(mean)
-			assign_var = running_var[l-1].assign(var)
-			bn_assigns.append(ewma.apply([running_mean[l-1], running_var[l-1]]))
+			assign_mean = get_variable(graph,'model1/running_mean/Variable'+('_'+str(l-1))*((l-1)!=0)+":0").assign(mean)
+			assign_var = get_variable(graph, 'model1/running_var/Variable'+('_'+str(l-1))*((l-1)!=0)+":0").assign(var)
+			# assign_mean = running_mean[l-1].assign(mean)
+			# assign_var = running_var[l-1].assign(var)
+			bn_assigns.append(ewma.apply([assign_mean, assign_var]))
+			# bn_assigns.append(ewma.apply([running_mean[l-1], running_var[l-1]]))
 			with tf.control_dependencies([assign_mean, assign_var]):
 				return (batch - mean) / tf.sqrt(var + 1e-10)
 
 		def encoder(inputs, name, train=False, noise_std=0.0):
 			# Encoder Weights and Biases
+			with tf.variable_scope("running_mean"):
+				running_mean = [tf.Variable(tf.zeros([l]), trainable=False) for l in layer_sizes]
+			with tf.variable_scope("running_var"):
+				running_var = [tf.Variable(tf.ones([l]), trainable=False) for l in layer_sizes]
+
+			bn_scaler = tf.Variable(1.0 * tf.ones([num_labels]))
+
 			w_conv1 = weight_variable(config, [1, 7, alphabet_length, 256])
 			b_conv1 = bias_variable([256], 7 * alphabet_length)
 
@@ -403,6 +382,39 @@ def build_graph(config):
 
 			details = {"layer_count": 0}
 
+			def layer(input_h, details, layer_name, train, weights=None, biases=None):
+				"""Apply all necessary steps in a ladder layer"""
+
+				# Scope for Visualization with TensorBoard
+				with tf.name_scope(layer_name):
+
+					# Preactivation
+					if "conv" in layer_name:
+						z_pre = conv2d(input_h, weights)
+					elif "pool" in layer_name:
+						z_pre = max_pool(input_h)
+					elif "fc" in layer_name:
+						z_pre = tf.matmul(input_h, weights)
+
+					if layer_name != "h_fc2":
+						details["layer_count"] += 1
+					layer_n = details["layer_count"]
+
+					if train:
+						z = update_batch_normalization(z_pre, layer_n)
+					else:
+						mean = ewma.average(running_mean[layer_n-1])
+						var = ewma.average(running_var[layer_n-1])
+						z = batch_normalization(z_pre, mean=mean, var=var)
+
+					# Apply Activation
+					if "conv" in layer_name or "fc" in layer_name:
+						layer = threshold(z + biases)
+					else:
+						layer = z
+
+				return layer
+
 			h_conv1 = layer(inputs, details, "h_conv1", train, weights=w_conv1, biases=b_conv1)
 			h_pool1 = layer(h_conv1, details, "h_pool1", train)
 
@@ -419,51 +431,45 @@ def build_graph(config):
 			h_reshape = tf.reshape(h_pool5, [-1, reshape])
 
 			h_fc1 = layer(h_reshape, details, "h_fc1", train, weights=w_fc1, biases=b_fc1)
+			h_fc2_full = layer(h_fc1, details, "h_fc2_full", train, weights=w_fc2, biases=b_fc2)
 
-			h_fc1_full = h_fc1
 			if train:
 				h_fc1 = tf.nn.dropout(h_fc1, 0.5)
 
-			h_fc2_full = layer(h_fc1_full, details, "h_fc2_full", train, weights=w_fc2, biases=b_fc2)
 			h_fc2 = layer(h_fc1, details, "h_fc2", train, weights=w_fc2, biases=b_fc2)
 
-			softmax_full = tf.nn.softmax(bn_scaler * h_fc2_full, name="cnn")
-			softmax_train = tf.nn.softmax(bn_scaler * h_fc2)
-			network_train = tf.log(tf.clip_by_value(softmax_train, 1e-10, 1.0), name=name)
+			softmax_full = tf.nn.softmax(bn_scaler * h_fc2_full)
+			softmax = tf.nn.softmax(bn_scaler * h_fc2, name=name)
 
-			return softmax_train, network_train, softmax_full
+			return softmax, softmax_full
 
-		with tf.variable_scope("model1") as model1:
-			softmax1, network1, cnn1 = encoder(trans_placeholder, "network", train=True)
-		with tf.variable_scope("model2") as model2:
-			softmax2, network2, cnn2 = encoder(trans_placeholder, "network", train=True)
-		with tf.variable_scope("model3") as model3:
-			softmax3, network3, cnn3 = encoder(trans_placeholder, "network", train=True)
-		with tf.variable_scope("model4") as model4:
-			softmax4, network4, cnn4 = encoder(trans_placeholder, "network", train=True)
-		with tf.variable_scope("model5") as model5:
-			softmax5, network5, cnn5 = encoder(trans_placeholder, "network", train=True)
 
-		ensemble = (softmax1 + softmax2 + softmax3 + softmax4 + softmax5) / 5.0
+		softmax = []
+		network = []
+		cnn = []
+
+		for i in range(1, N+1):
+			scope_name = "model" + str(i)
+			with tf.variable_scope(scope_name):
+				prob_train, prob_full = encoder(trans_placeholder, "softmax", train=True)
+				softmax.append(prob_train)
+				network.append(logsoftmax(softmax[i-1], "network"))
+				cnn.append(logsoftmax(prob_full, "cnn"))
+
+		ensemble = sum(softmax) / (N + 0.0)
 		weighted_labels = cost_list * labels_placeholder
-		# Calculate Loss and Optimize
-		def cal_loss(softmax, network, name):
-			return tf.neg(tf.reduce_mean(tf.reduce_sum(network * weighted_labels, 1)) + 0.5 * tf.reduce_mean(tf.reduce_sum((ensemble - softmax) ** 2, 1)), name=name)
 
-		loss1 = cal_loss(softmax1, network1, "loss1")
-		loss2 = cal_loss(softmax2, network2, "loss2")
-		loss3 = cal_loss(softmax3, network3, "loss3")
-		loss4 = cal_loss(softmax4, network4, "loss4")
-		loss5 = cal_loss(softmax5, network5, "loss5")
+		# Calculate Loss and Optimize
+		def cal_loss(sub_softmax, sub_network, name):
+			return tf.neg(tf.reduce_mean(tf.reduce_sum(sub_network * weighted_labels, 1)) + 0.5 * tf.reduce_mean(tf.reduce_sum((ensemble - sub_softmax) ** 2, 1)), name=name)
+
 
 		def make_optimizer(loss, op_name, scope_name):
-			return tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss, name=op_name, var_list=[x for x in tf.all_variables() if x.name.startswith(scope_name)])
+			return tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss, name=op_name, var_list=[x for x in tf.trainable_variables() if x.name.startswith(scope_name)])
 
-		optimizer1 = make_optimizer(loss1, "optimizer1", "model1")
-		optimizer2 = make_optimizer(loss2, "optimizer2", "model2")
-		optimizer3 = make_optimizer(loss3, "optimizer3", "model3")
-		optimizer4 = make_optimizer(loss4, "optimizer4", "model4")
-		optimizer5 = make_optimizer(loss5, "optimizer5", "model5")
+		with tf.name_scope("trainer"):
+			loss = [cal_loss(softmax[i], network[i], "loss"+str(i+1)) for i in range(N)]
+			optimizer = [make_optimizer(loss[i], "optimizer"+str(i+1), "model"+str(i+1)) for i in range(N)]
 
 		"""
 		with tf.name_scope('trainer'):
@@ -473,19 +479,15 @@ def build_graph(config):
 		"""
 
 		bn_updates = tf.group(*bn_assigns)
-		with tf.control_dependencies([optimizer1, optimizer2, optimizer3, optimizer4, optimizer5]):
+		with tf.control_dependencies(optimizer):
 			bn_applier = tf.group(bn_updates, name="bn_applier")
 
 		def get_saver(name):
 			return tf.train.Saver([x for x in tf.all_variables() if x.name.startswith(name)])
 
-		saver1 = get_saver("model1")
-		saver2 = get_saver("model2")
-		saver3 = get_saver("model3")
-		saver4 = get_saver("model4")
-		saver5 = get_saver("model5")
+		saver = [get_saver("model"+str(i+1)) for i in range(N)]
 
-	return graph, saver1, saver2, saver3, saver4, saver5
+	return graph, saver
 
 def train_model(config, graph, sess, saver):
 	"""Train the model"""
@@ -519,25 +521,20 @@ def train_model(config, graph, sess, saver):
 
 		# Run Training Step
 		# sess.run(get_op(graph, "trainer/optimizer"), feed_dict=feed_dict)
-		sess.run(get_op(graph, "optimizer1"), feed_dict=feed_dict)
-		sess.run(get_op(graph, "optimizer2"), feed_dict=feed_dict)
-		sess.run(get_op(graph, "optimizer3"), feed_dict=feed_dict)
-		sess.run(get_op(graph, "optimizer4"), feed_dict=feed_dict)
-		sess.run(get_op(graph, "optimizer5"), feed_dict=feed_dict)
+		for i in range(1, N+1):
+			sess.run(get_op(graph, "trainer/optimizer"+str(i)), feed_dict=feed_dict)
 		sess.run(get_op(graph, "bn_applier"), feed_dict=feed_dict)
 
 		# Log Batch Accuracy for Tracking
 		if step % 1000 == 0:
-			pass
-
 			# Calculate Batch Accuracy
-			"""
 			predictions1 = sess.run(get_tensor(graph, "model1/cnn:0"), feed_dict=feed_dict)
+			logging.info("Minibatch accuracy for cnn1: %.1f%%" % accuracy(predictions1, labels))
+			"""
 			predictions2 = sess.run(get_tensor(graph, "model2/cnn:0"), feed_dict=feed_dict)
 			predictions3 = sess.run(get_tensor(graph, "model3/cnn:0"), feed_dict=feed_dict)
 			predictions4 = sess.run(get_tensor(graph, "model4/cnn:0"), feed_dict=feed_dict)
 			predictions5 = sess.run(get_tensor(graph, "model5/cnn:0"), feed_dict=feed_dict)
-			logging.info("Minibatch accuracy for cnn1: %.1f%%" % accuracy(predictions1, labels))
 			logging.info("Minibatch accuracy for cnn2: %.1f%%" % accuracy(predictions2, labels))
 			logging.info("Minibatch accuracy for cnn3: %.1f%%" % accuracy(predictions3, labels))
 			logging.info("Minibatch accuracy for cnn4: %.1f%%" % accuracy(predictions4, labels))
@@ -558,28 +555,18 @@ def train_model(config, graph, sess, saver):
 			logging.info("Learning rate at epoch %d: %g" % (step + 1, sess.run(learning_rate)))
 
 			# Evaluate Model and Visualize
-			model1 = get_tensor(graph, "model1/cnn:0")
-			model2 = get_tensor(graph, "model2/cnn:0")
-			model3 = get_tensor(graph, "model3/cnn:0")
-			model4 = get_tensor(graph, "model4/cnn:0")
-			model5 = get_tensor(graph, "model5/cnn:0")
-			test_accuracy1 = evaluate_testset(config, graph, sess, model1, test)
-			test_accuracy2 = evaluate_testset(config, graph, sess, model2, test)
-			test_accuracy3 = evaluate_testset(config, graph, sess, model3, test)
-			test_accuracy4 = evaluate_testset(config, graph, sess, model4, test)
-			test_accuracy5 = evaluate_testset(config, graph, sess, model5, test)
-			ensemble_accuracy = ensemble_evaluate_testset(config, graph, sess, model1, model2, model3, model4, model5, test)
+			model = [get_tensor(graph, "model"+str(i+1)+"/cnn:0") for i in range(N)]
+			# test_subsample_size = 5000 if len(test.index) >= 5000 else len(test.index)
+			# indices_to_sample = list(np.random.choice(test.index, test_subsample_size, replace=False))
+			test_accuracy = [evaluate_testset(config, graph, sess, model[i], test) for i in range(N)]
+			ensemble_accuracy = ensemble_evaluate_testset(config, graph, sess, model, test)
 
 			# Save Checkpoint
 			current_era = int(step / epochs)
 			meta_path = save_dir + "era_" + str(current_era) + ".ckpt.meta"
-			model_path1 = saver1.save(sess, save_dir + "era_" + str(current_era) + "_model1.ckpt")
-			model_path2 = saver2.save(sess, save_dir + "era_" + str(current_era) + "_model2.ckpt")
-			model_path3 = saver3.save(sess, save_dir + "era_" + str(current_era) + "_model3.ckpt")
-			model_path4 = saver4.save(sess, save_dir + "era_" + str(current_era) + "_model4.ckpt")
-			model_path5 = saver5.save(sess, save_dir + "era_" + str(current_era) + "_model5.ckpt")
-			logging.info("Checkpoint saved in file: %s" % model_path1)
-			checkpoints[current_era] = model_path1
+			model_path = [saver[i].save(sess, save_dir + "era_" + str(current_era) + "_model"+str(i+1)+".ckpt") for i in range(N)]
+			logging.info("Checkpoint saved in file: %s" % model_path[0])
+			checkpoints[current_era] = model_path[0]
 
 			# Stop Training if Converged
 			if ensemble_accuracy > best_accuracy:
@@ -587,17 +574,16 @@ def train_model(config, graph, sess, saver):
 				best_accuracy = ensemble_accuracy
 
 			if current_era - best_era == 2:
-				model_path1 = checkpoints[best_era]
+				model_path[0] = checkpoints[best_era]
 				break
 
 		# Log Loss and Update TensorBoard
-		"""
 		if step % logging_interval == 0:
-			loss = sess.run(get_tensor(graph, "trainer/loss:0"), feed_dict=feed_dict)
-			logging.info("Train loss at epoch {0:>8}: {1:3.7f}".format(step + 1, loss))
-			summary = sess.run(merged, feed_dict=feed_dict)
-			writer.add_summary(summary, step)
-		"""
+			loss = [sess.run(get_tensor(graph, "trainer/loss"+str(i)+":0"), feed_dict=feed_dict) for i in range(1, N+1)]
+			for i in range(N):
+				logging.info("Train loss" + str(i+1) +" at epoch {0:>8}: {1:3.7f}".format(step + 1, loss[i]))
+			# summary = sess.run(merged, feed_dict=feed_dict)
+			# writer.add_summary(summary, step)
 
 		# Update Learning Rate
 		if step != 0 and step % learning_rate_interval == 0:
@@ -608,15 +594,15 @@ def train_model(config, graph, sess, saver):
 	dataset_path = os.path.basename(dataset).split(".")[0]
 	final_model_path = "meerkat/classification/models/" + dataset_path + ".ckpt"
 	final_meta_path = "meerkat/classification/models/" + dataset_path + ".meta"
-	logging.info("Moving final model from {0} to {1}.".format(model_path, final_model_path))
-	os.rename(model_path, final_model_path)
+	logging.info("Moving final model from {0} to {1}.".format(model_path[0], final_model_path))
+	os.rename(model_path[0], final_model_path)
 	os.rename(meta_path, final_meta_path)
 	logging.info("Deleting unneeded directory of checkpoints at {0}".format(save_dir))
 	# shutil.rmtree(save_dir)
 
 	return final_model_path
 
-def run_session(config, graph, saver1, saver2, saver3, saver4, saver5):
+def run_session(config, graph, saver):
 	"""Run Session"""
 
 	with tf.Session(graph=graph) as sess:
@@ -627,7 +613,7 @@ def run_session(config, graph, saver1, saver2, saver3, saver4, saver5):
 		tf.initialize_all_variables().run()
 
 		if mode == "train":
-			_ = train_model(config, graph, sess, saver1, saver2, saver3, saver4, saver5)
+			_ = train_model(config, graph, sess, saver)
 		elif mode == "test":
 			saver.restore(sess, model_path)
 			model = get_tensor(graph, "model:0")
@@ -638,8 +624,9 @@ def run_from_command_line():
 	"""Run module from command line"""
 	logging.basicConfig(level=logging.INFO)
 	config = validate_config(sys.argv[1])
-	graph, saver1, saver2, saver3, saver4, saver5 = build_graph(config)
-	run_session(config, graph, saver1, saver2, saver3, saver4, saver5)
+	graph, saver = build_graph(config)
+	run_session(config, graph, saver)
 
 if __name__ == "__main__":
+	N = validate_config(sys.argv[1])["num_cnns"]
 	run_from_command_line()

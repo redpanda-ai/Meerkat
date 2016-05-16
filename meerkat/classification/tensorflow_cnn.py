@@ -52,7 +52,7 @@ def validate_config(config):
 	schema_file = "meerkat/classification/config/tensorflow_cnn_schema.json"
 	config = validate_configuration(config, schema_file)
 	logging.debug("Configuration is :\n{0}".format(pprint.pformat(config)))
-	reshape = ((config["doc_length"] - 96) / 27) * 256
+	reshape = ((config["doc_length"] - 78) / 27) * 256
 	config["reshape"] = int(reshape)
 	config["label_map"] = load_params(config["label_map"])
 	config["num_labels"] = len(config["label_map"].keys())
