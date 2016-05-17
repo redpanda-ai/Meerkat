@@ -284,6 +284,7 @@ def get_cost_list(config):
 
 
 def logsoftmax(softmax, name):
+	"""Return log of the softmax"""
 	return tf.log(tf.clip_by_value(softmax, 1e-10, 1.0), name=name)
 
 def build_graph(config):
@@ -332,8 +333,6 @@ def build_graph(config):
 			"batch normalize + update average mean and variance of layer l"
 			axes = [0] if len(batch.get_shape()) == 2 else [0, 1, 2]
 			mean, var = tf.nn.moments(batch, axes=axes)
-			# assign_mean = get_variable(graph,'model1/running_mean/Variable'+('_'+str(l-1))*((l-1)!=0)+":0").assign(mean)
-			# assign_var = get_variable(graph, 'model1/running_var/Variable'+('_'+str(l-1))*((l-1)!=0)+":0").assign(var)
 			assign_mean = running_mean[model_num-1][l-1].assign(mean)
 			assign_var = running_var[model_num-1][l-1].assign(var)
 			bn_assigns.append(ewma.apply([running_mean[model_num-1][l-1], running_var[model_num-1][l-1]]))
@@ -381,13 +380,6 @@ def build_graph(config):
 
 		def encoder(inputs, name, model_num, train=False, noise_std=0.0):
 			# Encoder Weights and Biases
-			"""
-			with tf.variable_scope("running_mean"):
-				running_mean = [tf.Variable(tf.zeros([l]), trainable=False) for l in layer_sizes]
-			with tf.variable_scope("running_var"):
-				running_var = [tf.Variable(tf.ones([l]), trainable=False) for l in layer_sizes]
-			"""
-
 			"""Add model layers to the graph"""
 
 			details = {"layer_count": 0}
