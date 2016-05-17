@@ -12,8 +12,8 @@ Created on Apr 16, 2016
 
 ############################################# USAGE ###############################################
 
-# python3 -m meerkat.classification.tensorflow_cnn [config_file]
-# python3 -m meerkat.classification.tensorflow_cnn meerkat/classification/config/default_tf_config.json
+# python3 -m meerkat.classification.ensemble_cnns [config_file]
+# python3 -m meerkat.classification.ensemble_cnns meerkat/classification/config/ensemble_cnns_config.json
 
 # For addtional details on implementation see:
 # Character-level Convolutional Networks for Text Classification
@@ -63,8 +63,8 @@ def ensemble_evaluate_testset(config, graph, sess, model, test):
 		correct_count += batch_correct_count
 
 	test_accuracy = 100.0 * (correct_count / total_count)
-	logging.info("Ensemble test accuracy: %.2f%%" % test_accuracy)
-	logging.info("Correct count: " + str(correct_count))
+	logging.info("Average Ensemble test accuracy: %.2f%%" % test_accuracy)
+	logging.info("AE correct count: " + str(correct_count))
 	logging.info("Total count: " + str(total_count))
 
 	return test_accuracy
@@ -530,43 +530,10 @@ def train_model(config, graph, sess, saver):
 			for i in range(1, N+1):
 				predictions = sess.run(get_tensor(graph, "model"+str(i)+"/cnn:0"), feed_dict=feed_dict)
 				logging.info("Minibatch accuracy for cnn" + str(i) + ": %.1f%%" % accuracy(predictions, labels))
-			"""
 			# Estimate Accuracy for Visualization
-			model = get_tensor(graph, "model:0")
-			test_subsample_size = 5000 if len(test.index) >= 5000 else len(test.index)
-			indices_to_sample = list(np.random.choice(test.index, test_subsample_size, replace=False))
-			evaluate_testset(config, graph, sess, model, test.loc[indices_to_sample])
-			"""
-
-		# Log Progress and Save
-		if step != 0 and step % epochs == 0:
-
-			learning_rate = get_variable(graph, "lr:0")
-			logging.info("Testing for era %d" % (step / epochs))
-			logging.info("Learning rate at epoch %d: %g" % (step + 1, sess.run(learning_rate)))
-
-			# Evaluate Model and Visualize
 			model = [get_tensor(graph, "model"+str(i+1)+"/cnn:0") for i in range(N)]
-			test_subsample_size = 5000 if len(test.index) >= 5000 else len(test.index)
-			indices_to_sample = list(np.random.choice(test.index, test_subsample_size, replace=False))
-			test_accuracy = [evaluate_testset(config, graph, sess, model[i], test.iloc[test_accuracy]) for i in range(N)]
-			ensemble_accuracy = ensemble_evaluate_testset(config, graph, sess, model, test.iloc[test_accuracy])
-
-			# Save Checkpoint
-			current_era = int(step / epochs)
-			meta_path = save_dir + "era_" + str(current_era) + ".ckpt.meta"
-			model_path = [saver[i].save(sess, save_dir + "era_" + str(current_era) + "_model"+str(i+1)+".ckpt") for i in range(N)]
-			logging.info("Checkpoint saved in file: %s" % model_path[0])
-			checkpoints[current_era] = model_path[0]
-
-			# Stop Training if Converged
-			if ensemble_accuracy > best_accuracy:
-				best_era = current_era
-				best_accuracy = ensemble_accuracy
-
-			if current_era - best_era == 2:
-				model_path[0] = checkpoints[best_era]
-				break
+			test_accuracy = [evaluate_testset(config, graph, sess, model[i], test) for i in range(N)]
+			ensemble_accuracy = ensemble_evaluate_testset(config, graph, sess, model, test)
 
 		# Log Loss and Update TensorBoard
 		if step % logging_interval == 0:
@@ -576,6 +543,31 @@ def train_model(config, graph, sess, saver):
 			# summary = sess.run(merged, feed_dict=feed_dict)
 			# writer.add_summary(summary, step)
 
+		# Log Progress and Save
+		if step != 0 and step % epochs == 0:
+
+			learning_rate = get_variable(graph, "lr:0")
+			logging.info("Testing for era %d" % (step / epochs))
+			logging.info("Learning rate at epoch %d: %g" % (step + 1, sess.run(learning_rate)))
+
+			# Save Checkpoint
+			current_era = int(step / epochs)
+			meta_path = [save_dir + "era_" + str(current_era) + "_model"+str(i+1) + ".ckpt.meta" for i in range(N)]
+			model_path = [saver[i].save(sess, save_dir + "era_" + str(current_era) + "_model"+str(i+1) + ".ckpt") for i in range(N)]
+			checkpoints[current_era] = model_path
+			for i in range(N):
+				logging.info("Checkpoint saved in file: %s" % model_path[i])
+
+			# Stop Training if Converged
+			if ensemble_accuracy > best_accuracy:
+				best_era = current_era
+				best_accuracy = ensemble_accuracy
+
+			if current_era - best_era == 2:
+				model_path = checkpoints[best_era]
+				break
+
+
 		# Update Learning Rate
 		if step != 0 and step % learning_rate_interval == 0:
 			learning_rate = get_variable(graph, "lr:0")
@@ -583,15 +575,15 @@ def train_model(config, graph, sess, saver):
 
 	# Clean Up Directory
 	dataset_path = os.path.basename(dataset).split(".")[0]
-	final_model_path = "meerkat/classification/models/" + dataset_path + ".ckpt"
-	final_meta_path = "meerkat/classification/models/" + dataset_path + ".meta"
-	logging.info("Moving final model from {0} to {1}.".format(model_path[0], final_model_path))
-	os.rename(model_path[0], final_model_path)
-	os.rename(meta_path, final_meta_path)
-	logging.info("Deleting unneeded directory of checkpoints at {0}".format(save_dir))
-	# shutil.rmtree(save_dir)
-
-	return final_model_path
+	os.makedirs("meerkat/classification/models/ensemble_cnns/", exist_ok=True)
+	for i in range(N):
+		final_model_path = "meerkat/classification/models/ensemble_cnns/" + dataset_path + ".model" + str(i+1) + ".ckpt"
+		final_meta_path = "meerkat/classification/models/ensemble_cnns/" + dataset_path + ".model" + str(i+1) + ".meta"
+		logging.info("Moving final model from {0} to {1}.".format(model_path[i], final_model_path))
+		os.rename(model_path[i], final_model_path)
+		os.rename(meta_path[i], final_meta_path)
+		logging.info("Deleting unneeded directory of checkpoints at {0}".format(save_dir))
+		shutil.rmtree(save_dir)
 
 def run_session(config, graph, saver):
 	"""Run Session"""
@@ -604,7 +596,7 @@ def run_session(config, graph, saver):
 		tf.initialize_all_variables().run()
 
 		if mode == "train":
-			_ = train_model(config, graph, sess, saver)
+			train_model(config, graph, sess, saver)
 		elif mode == "test":
 			saver.restore(sess, model_path)
 			model = get_tensor(graph, "model:0")
