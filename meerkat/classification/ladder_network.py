@@ -354,32 +354,37 @@ def build_graph(config):
 		running_var = [tf.Variable(tf.ones([l]), trainable=False) for l in layer_sizes]
 		bn_assigns = []
 
-		def layer(input_h, details, layer_type, train, weights=None, biases=None):
+		def layer(input_h, details, layer_name, train, noise_std, weights=None, biases=None):
 			"""Apply all necessary steps in a ladder layer"""
 
-			# Preactivation
-			if layer_type == "conv":
-				z_pre = conv2d(input_h, weights)
-			elif layer_type == "pool":
-				z_pre = max_pool(input_h)
-			elif layer_type == "fc":
-				z_pre = tf.matmul(input_h, weights)
+			# Scope for Visualization with TensorBoard
+			with tf.name_scope(layer_name):
 
-			details["layer_count"] += 1
-			layer_n = details["layer_count"]
+				# Preactivation
+				if "conv" in layer_name:
+					z_pre = conv2d(input_h, weights)
+				elif "pool" in layer_name:
+					z_pre = max_pool(input_h)
+				elif "fc" in layer_name:
+					z_pre = tf.matmul(input_h, weights)
 
-			if train:
-				z = update_batch_normalization(z_pre, layer_n)
-			else:
-				mean = ewma.average(running_mean[layer_n-1])
-				var = ewma.average(running_var[layer_n-1])
-				z = batch_normalization(z_pre, mean=mean, var=var)
+				details["layer_count"] += 1
+				layer_n = details["layer_count"]
 
-			# Apply Activation
-			if layer_type == "conv" or layer_type == "fc":
-				layer = threshold(z + biases)
-			else:
-				layer = z
+				if train:
+					z = update_batch_normalization(z_pre, layer_n)
+					if noise_std > 0:
+						z += tf.random_normal(tf.shape(z_pre)) * noise_std
+				else:
+					mean = ewma.average(running_mean[layer_n-1])
+					var = ewma.average(running_var[layer_n-1])
+					z = batch_normalization(z_pre, mean=mean, var=var)
+
+				# Apply Activation
+				if "conv" in layer_name or "fc" in layer_name:
+					layer = threshold(z + biases)
+				else:
+					layer = z
 
 			return layer
 
@@ -403,36 +408,37 @@ def build_graph(config):
 		def encoder(inputs, name, train=False, noise_std=0.0):
 			"""Add model layers to the graph"""
 
+			h_noise = inputs + tf.random_normal(tf.shape(inputs)) * noise_std
 			details = {"layer_count": 0}
 
-			h_conv1 = layer(inputs, details, "conv", train, weights=w_conv1, biases=b_conv1)
-			h_pool1 = layer(h_conv1, details, "pool", train)
+			h_conv1 = layer(h_noise, details, "h_conv1", train, noise_std, weights=w_conv1, biases=b_conv1)
+			h_pool1 = layer(h_conv1, details, "h_pool1", train, noise_std)
 
-			h_conv2 = layer(h_pool1, details, "conv", train, weights=w_conv2, biases=b_conv2)
-			h_pool2 = layer(h_conv2, details, "pool", train)
+			h_conv2 = layer(h_pool1, details, "h_conv2", train, noise_std, weights=w_conv2, biases=b_conv2)
+			h_pool2 = layer(h_conv2, details, "h_pool2", train, noise_std)
 
-			h_conv3 = layer(h_pool2, details, "conv", train, weights=w_conv3, biases=b_conv3)
+			h_conv3 = layer(h_pool2, details, "h_conv3", train, noise_std, weights=w_conv3, biases=b_conv3)
 
-			h_conv4 = layer(h_conv3, details, "conv", train, weights=w_conv4, biases=b_conv4)
+			h_conv4 = layer(h_conv3, details, "h_conv4", train, noise_std, weights=w_conv4, biases=b_conv4)
 
-			h_conv5 = layer(h_conv4, details, "conv", train, weights=w_conv5, biases=b_conv5)
-			h_pool5 = layer(h_conv5, details, "pool", train)
+			h_conv5 = layer(h_conv4, details, "h_conv5", train, noise_std, weights=w_conv5, biases=b_conv5)
+			h_pool5 = layer(h_conv5, details, "h_pool5", train, noise_std)
 
 			h_reshape = tf.reshape(h_pool5, [-1, reshape])
 
-			h_fc1 = layer(h_reshape, details, "fc", train, weights=w_fc1, biases=b_fc1)
+			h_fc1 = layer(h_reshape, details, "h_fc1", train, noise_std, weights=w_fc1, biases=b_fc1)
 
-			if train:
-				h_fc1 = tf.nn.dropout(h_fc1, 0.5)
+			#if train:
+			#	h_fc1 = tf.nn.dropout(h_fc1, 0.5)
 
-			h_fc2 = layer(h_fc1, details, "fc", train, weights=w_fc2, biases=b_fc2)
+			h_fc2 = layer(h_fc1, details, "h_fc2", train, noise_std, weights=w_fc2, biases=b_fc2)
 
 			softmax = tf.nn.softmax(bn_scaler * h_fc2)
 			network = tf.log(tf.clip_by_value(softmax, 1e-10, 1.0), name=name)
 
 			return network
 
-		network = encoder(trans_placeholder, "network", train=True)
+		network = encoder(trans_placeholder, "network", train=True, noise_std=0.05)
 		trained_model = encoder(trans_placeholder, "model", train=False)
 
 		weighted_labels = cost_list * labels_placeholder
