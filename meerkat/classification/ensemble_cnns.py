@@ -582,8 +582,8 @@ def train_model(config, graph, sess, saver):
 		logging.info("Moving final model from {0} to {1}.".format(model_path[i], final_model_path))
 		os.rename(model_path[i], final_model_path)
 		os.rename(meta_path[i], final_meta_path)
-		logging.info("Deleting unneeded directory of checkpoints at {0}".format(save_dir))
-		shutil.rmtree(save_dir)
+	logging.info("Deleting unneeded directory of checkpoints at {0}".format(save_dir))
+	shutil.rmtree(save_dir)
 
 def run_session(config, graph, saver):
 	"""Run Session"""
