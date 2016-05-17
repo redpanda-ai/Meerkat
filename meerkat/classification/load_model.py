@@ -102,9 +102,9 @@ def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=False):
 
 	if gpu_mem_fraction:
 		gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.25)
-		sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=True, gpu_options=gpu_options))
+		sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, gpu_options=gpu_options))
 	else:
-		sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=True))
+		sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
 
 	saver.restore(sess, config["model_path"])
 	graph = sess.graph
