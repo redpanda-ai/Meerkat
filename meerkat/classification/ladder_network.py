@@ -502,7 +502,7 @@ def build_graph(config):
 				if l == L:
 					u = unlabeled(config, network_corr)
 				else:
-					if L == L-1:
+					if l == L-1:
 						u = tf.matmul(z_est[l+1], denoising_weights[0])
 					else:
 						u = tf.matmul(z_est[l+1], denoising_weights[1])
