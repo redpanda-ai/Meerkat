@@ -17,19 +17,11 @@
       shape-rendering: crispEdges;
     }
 
-    .line {
-      fill: none;
-      stroke: steelblue;
-      stroke-width: 2px;
-    }
-
-    .dot {
-      stroke: steelblue;
+    .bar {
       fill: steelblue;
     }
 
-    .dot:hover {
-      stroke: brown;
+    .bar:hover {
       fill: brown;
     }
 
@@ -40,7 +32,7 @@
     .d3-tip {
       line-height: 1;
       font-weight: bold;
-      padding: 0 0 10px 0;
+      padding: 12px;
       background: white;
       color: brown;
       border-radius: 2px;
@@ -56,14 +48,12 @@
       content: "\25BC";
       position: absolute;
       text-align: center;
-      z-index: -1;
     }
 
     .d3-tip.n:after {
       margin: -1px 0 0 0;
       top: 100%;
       left: 0;
-      z-index: -1;
     }
   </style>
 </head>
@@ -89,16 +79,12 @@
       .orient("left")
       .tickFormat(formatPercent);
 
-    var line = d3.svg.line()
-      .x(function(d) { return x(d.version) + 25; })
-      .y(function(d) { return y(d.accuracy); });
-
     var tip = d3.tip()
       .attr('class', 'd3-tip')
       .offset([-10, 0])
       .html(function(d) {
-        return "<span style='color:brown'>" + (d.accuracy * 100).toFixed(2) + "%</span>";
-      });
+        return "<strong>Accuracy:</strong> <span style='color:brown'>" + (d.accuracy * 100).toFixed(2) + "%</span>";
+      })
 
     var plotBar = function(file_name) {
       var svg = d3.select("body").append("svg")
@@ -116,7 +102,7 @@
         x.rangeRoundBands([0, data.length * 100], .1);
         svg.append("g")
           .attr("class", "x axis")
-          .attr("transform", "translate(-20," + height + ")")
+          .attr("transform", "translate(5," + height + ")")
           .call(xAxis);
 
         svg.append("g")
@@ -129,18 +115,14 @@
           .style("text-anchor", "end")
           .text("Accuracy");
 
-        svg.append("path")
-          .datum(data)
-          .attr("class", "line")
-          .attr("d", line);
-
-        svg.selectAll(".dot")
+        svg.selectAll(".bar")
           .data(data)
-          .enter().append("circle")
-          .attr("class", "dot")
-          .attr("r", 3)
-          .attr("cx", function(d, i) { return x(d.version) + 25; })
-          .attr("cy", function(d) { return y(d.accuracy); })
+          .enter().append("rect")
+          .attr("class", "bar")
+          .attr("x", function(d, i) { return x(d.version) + 25; })
+          .attr("width", 50)
+          .attr("y", function(d) { return y(d.accuracy); })
+          .attr("height", function(d) { return height - y(d.accuracy); })
           .on('mouseover', tip.show)
           .on('mouseout', tip.hide);
 
@@ -150,7 +132,6 @@
         } else {
           title = words[1] + " " + words[2] + " " + words[3].split(".")[0];
         }
-
         svg.append("text")
           .attr("x", -30)             
           .attr("y", 20 - (margin.top / 1))
@@ -158,7 +139,6 @@
           .text(title);
       });
     }; 
-    
     plotBar("accuracy/accuracy_subtype_bank_debit.json");
     plotBar("accuracy/accuracy_subtype_bank_credit.json");
     plotBar("accuracy/accuracy_subtype_card_debit.json");
