@@ -372,9 +372,22 @@ def build_graph(config):
 				layer_n = details["layer_count"]
 
 				if train:
-					z = update_batch_normalization(z_pre, layer_n)
+					details['labeled']['h'][layer_n], details['unlabeled']['h'][layer_n] = split_lu(config, input_h)
+					z_pre_l, z_pre_u = split_lu(config, z_pre)
+					axes = list(range(len(z_pre_u.get_shape()) - 1))
+					mean, var = tf.nn.moments(z_pre_u, axes=axes)
+
+					# Batch Normalization
 					if noise_std > 0:
+						z = join(batch_normalization(z_pre_l), batch_normalization(z_pre_u, mean=mean, var=var))
 						z += tf.random_normal(tf.shape(z_pre)) * noise_std
+					else:
+						z = join(update_batch_normalization(z_pre_l, layer_n), batch_normalization(z_pre_u, mean=mean, var=var))
+
+					# Save Mean and Variance of Unlabeled Examples for Decoding
+					details['labeled']['z'][layer_n], details['unlabeled']['z'][layer_n] = split_lu(config, z)
+					details['unlabeled']['mean'][layer_n], details['unlabeled']['variance'][layer_n] = mean, var
+					
 				else:
 					mean = ewma.average(running_mean[layer_n-1])
 					var = ewma.average(running_var[layer_n-1])
@@ -411,6 +424,11 @@ def build_graph(config):
 			h_noise = inputs + tf.random_normal(tf.shape(inputs)) * noise_std
 			details = {"layer_count": 0}
 
+			if train:
+				details['labeled'] = {'z': {}, 'mean': {}, 'variance': {}, 'h': {}}
+				details['unlabeled'] = {'z': {}, 'mean': {}, 'variance': {}, 'h': {}}
+				details['labeled']['z'][0], details['unlabeled']['z'][0] = split_lu(config, h_noise)
+
 			h_conv1 = layer(h_noise, details, "h_conv1", train, noise_std, weights=w_conv1, biases=b_conv1)
 			h_pool1 = layer(h_conv1, details, "h_pool1", train, noise_std)
 
@@ -428,21 +446,31 @@ def build_graph(config):
 
 			h_fc1 = layer(h_reshape, details, "h_fc1", train, noise_std, weights=w_fc1, biases=b_fc1)
 
-			#if train:
-			#	h_fc1 = tf.nn.dropout(h_fc1, 0.5)
-
 			h_fc2 = layer(h_fc1, details, "h_fc2", train, noise_std, weights=w_fc2, biases=b_fc2)
 
 			softmax = tf.nn.softmax(bn_scaler * h_fc2)
 			network = tf.log(tf.clip_by_value(softmax, 1e-10, 1.0), name=name)
 
-			return network
+			if train:
+				layer_n = len(details['labeled']['h'].keys())
+				details['labeled']['h'][layer_n], details['unlabeled']['h'][layer_n] = split_lu(config, softmax)
 
-		network = encoder(trans_placeholder, "network", train=True, noise_std=0.05)
-		trained_model = encoder(trans_placeholder, "model", train=False)
+			return network, details
 
-		weighted_labels = cost_list * labels_placeholder
-		loss = tf.neg(tf.reduce_mean(tf.reduce_sum(network * weighted_labels, 1)), name="loss")
+		# Encoders
+		logging.info("Corrupted Encoder")
+		network_corr, details_corr = encoder(trans_placeholder, "network_corr", train=True, noise_std=0.075)
+
+		logging.info("Clean Encoder")
+		network_clean, details_clean = encoder(trans_placeholder, "network_clean", train=True)
+
+		logging.info("Trained Model")
+		trained_model, _ = encoder(trans_placeholder, "model", train=False)
+
+		# Loss
+		labeled_output = labeled(config, network_corr)
+		supervised_cost = tf.neg(tf.reduce_mean(tf.reduce_sum(labeled_output * labels_placeholder, 1)), name="loss")
+		loss = supervised_cost
 		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss, name="optimizer")
 
 		bn_updates = tf.group(*bn_assigns)
@@ -460,6 +488,7 @@ def train_model(config, graph, sess, saver):
 	eras = config["eras"]
 	dataset = config["dataset"]
 	train, test, groups_train = load_labeled_data(config)
+	unlabeled_data = load_unlabeled_data(config)
 	num_eras = epochs * eras
 	logging_interval = 50
 	learning_rate_interval = 15000
@@ -473,7 +502,10 @@ def train_model(config, graph, sess, saver):
 
 		# Prepare Data for Training
 		batch = mixed_batching(config, train, groups_train)
+		unlabeled_batch = unlabeled_batching(config, unlabeled_data)
 		trans, labels = batch_to_tensor(config, batch)
+		unlabeled_trans, _ = batch_to_tensor(config, unlabeled_batch)
+		all_trans = np.vstack([trans, unlabeled_trans])
 		feed_dict = {
 			get_tensor(graph, "x:0") : trans,
 			get_tensor(graph, "y:0") : labels
