@@ -149,7 +149,8 @@ def mixed_batching(config, df, groups_train):
 	num_labels = config["num_labels"]
 	batch_size = config["batch_size"]
 	half_batch = int(batch_size / 2)
-	indices_to_sample = list(np.random.choice(df.index, half_batch, replace=False))
+	# indices_to_sample = list(np.random.choice(df.index, half_batch, replace=False))
+	indices_to_sample = list(np.random.choice(df.index, half_batch))
 
 	for index in range(half_batch):
 		label = random.randint(1, num_labels)
