@@ -566,7 +566,7 @@ def train_model(config, graph, sess, saver):
 
 		# Log Accuracy for Tracking
 		if step % 1000 == 0:
-			predictions = sess.run(get_tensor(graph, "model:0"), feed_dict=feed_dict)
+			predictions = sess.run(get_tensor(graph, "model:0"), feed_dict={get_tensor(graph, "x:0"): trans, get_tensor(graph, "y:0"): labels})
 			logging.info("Minibatch accuracy: %.1f%%" % accuracy(predictions, labels))
 
 		# Evaluate Testset, Log Progress and Save
