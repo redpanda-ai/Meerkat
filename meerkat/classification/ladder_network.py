@@ -347,6 +347,8 @@ def build_graph(config):
 
 		bn_scaler = tf.Variable(1.0 * tf.ones([num_labels]))
 
+		denoising_weights = weight_variable(config, [num_labels, 1024])
+
 		# Utility for Batch Normalization
 		layer_sizes = [256] * 8 + [1024, num_labels]
 		ewma = tf.train.ExponentialMovingAverage(decay=0.99)
@@ -494,7 +496,7 @@ def build_graph(config):
 		denoising_cost = [0] * (details_clean["layer_count"]) + [1]
 		with tf.name_scope("denoiser") as scope:
 			L = details_clean["layer_count"]
-			for l in range(L, L-2, -1):
+			for l in range(L, L-1, -1):
 				z, z_c = details_clean['unlabeled']['z'][l], details_corr['unlabeled']['z'][l]
 				m, v = details_clean['unlabeled']['mean'].get(l, 0), details_clean['unlabeled']['variance'].get(l, 1-1e-10)
 				if l == L:
