@@ -15,5 +15,6 @@
 	"base_rate": 2e-2,
 	"decay": 1e-5,
 	"epochs": 5000,
-	"eras": 25
+	"eras": 25,
+	"soft_target": false
 }

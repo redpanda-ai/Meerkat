@@ -15,5 +15,4 @@
 	"decay": 1e-5,
 	"epochs": 5000,
 	"eras": 25,
-	"soft_target": false
 }
