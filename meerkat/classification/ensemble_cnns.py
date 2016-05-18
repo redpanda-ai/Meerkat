@@ -463,13 +463,6 @@ def build_graph(config):
 			loss = [cal_loss(softmax[i], network[i], "loss"+str(i+1)) for i in range(N)]
 			optimizer = [make_optimizer(loss[i], "optimizer"+str(i+1), "model"+str(i+1)) for i in range(N)]
 
-		"""
-		with tf.name_scope('trainer'):
-			loss = tf.neg(tf.reduce_mean(tf.reduce_sum(network * weighted_labels, 1)), name="loss")
-			optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss, name="optimizer")
-			tf.scalar_summary('loss', loss)
-		"""
-
 		bn_updates = tf.group(*bn_assigns)
 		with tf.control_dependencies(optimizer):
 			bn_applier = tf.group(bn_updates, name="bn_applier")
