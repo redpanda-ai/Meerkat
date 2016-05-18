@@ -221,7 +221,7 @@ def main_process(args):
 	num_labels = len(label_map)
 	class_names = list(label_map.values())
 
-	# Create reversed label map and check it there are duplicate keys
+	# Create reversed label map and check if there are duplicate keys
 	reversed_label_map = {}
 	for key, value in label_map.items():
 		if class_names.count(value) > 1:
