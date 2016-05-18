@@ -387,7 +387,7 @@ def build_graph(config):
 					# Save Mean and Variance of Unlabeled Examples for Decoding
 					details['labeled']['z'][layer_n], details['unlabeled']['z'][layer_n] = split_lu(config, z)
 					details['unlabeled']['mean'][layer_n], details['unlabeled']['variance'][layer_n] = mean, var
-					
+
 				else:
 					mean = ewma.average(running_mean[layer_n-1])
 					var = ewma.average(running_var[layer_n-1])
@@ -467,10 +467,50 @@ def build_graph(config):
 		logging.info("Trained Model")
 		trained_model, _ = encoder(trans_placeholder, "model", train=False)
 
+		# Denoising Function
+		def g_gauss(z_c, u, size):
+
+			wi = lambda inits, name: tf.Variable(inits * tf.ones([size]), name=name)
+			a1 = wi(0., 'a1')
+			a2 = wi(1., 'a2')
+			a3 = wi(0., 'a3')
+			a4 = wi(0., 'a4')
+			a5 = wi(0., 'a5')
+
+			a6 = wi(0., 'a6')
+			a7 = wi(1., 'a7')
+			a8 = wi(0., 'a8')
+			a9 = wi(0., 'a9')
+			a10 = wi(0., 'a10')
+
+			mu = a1 * tf.sigmoid(a2 * u + a3) + a4 * u + a5
+			v = a6 * tf.sigmoid(a7 * u + a8) + a9 * u + a10
+
+			z_est = (z_c - mu) * v + mu
+			return z_est
+
+		# Decoder
+		z_est, d_cost = {}, []
+		denoising_cost = [0] * (details_clean["layer_count"]) + [1]
+		with tf.name_scope("denoiser") as scope:
+			L = details_clean["layer_count"]
+			for l in range(L, L-2, -1):
+				z, z_c = details_clean['unlabeled']['z'][l], details_corr['unlabeled']['z'][l]
+				m, v = details_clean['unlabeled']['mean'].get(l, 0), details_clean['unlabeled']['variance'].get(l, 1-1e-10)
+				if l == L:
+					u = unlabeled(config, network_corr)
+				else:
+					u = tf.matmul(z_est[l+1], denoising_weights)
+				u = batch_normalization(u)
+				z_est[l] = g_gauss(z_c, u, layer_sizes[l-1])
+				z_est_bn = (z_est[l] - m) / v
+				d_cost.append((tf.reduce_mean(tf.reduce_sum(tf.square(z_est_bn - z), 1)) / layer_sizes[l-1]) * denoising_cost[l])
+
 		# Loss
 		labeled_output = labeled(config, network_corr)
-		supervised_cost = tf.neg(tf.reduce_mean(tf.reduce_sum(labeled_output * labels_placeholder, 1)), name="loss")
-		loss = supervised_cost
+		supervised_cost = tf.neg(tf.reduce_mean(tf.reduce_sum(labeled_output * labels_placeholder, 1)), name="supervised_cost")
+		unsupervised_cost = tf.add_n(d_cost, name="unsupervised_cost")
+		loss = supervised_cost + unsupervised_cost
 		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss, name="optimizer")
 
 		bn_updates = tf.group(*bn_assigns)
@@ -507,7 +547,7 @@ def train_model(config, graph, sess, saver):
 		unlabeled_trans, _ = batch_to_tensor(config, unlabeled_batch)
 		all_trans = np.vstack([trans, unlabeled_trans])
 		feed_dict = {
-			get_tensor(graph, "x:0") : trans,
+			get_tensor(graph, "x:0") : all_trans,
 			get_tensor(graph, "y:0") : labels
 		}
 
@@ -517,8 +557,10 @@ def train_model(config, graph, sess, saver):
 
 		# Log Loss
 		if step % logging_interval == 0:
-			loss = sess.run(get_tensor(graph, "loss:0"), feed_dict=feed_dict)
-			logging.info("Train loss at epoch {0:>8}: {1:3.7f}".format(step + 1, loss))
+			supervised_cost = sess.run(get_tensor(graph, "supervised_cost:0"), feed_dict=feed_dict)
+			unsupervised_cost = sess.run(get_tensor(graph, "unsupervised_cost:0"), feed_dict=feed_dict)
+			logging.info("Supervised cost at epoch {0:>8}: {1:3.7f}".format(step + 1, supervised_cost))
+			logging.info("Unsupervised cost at epoch {0:>8}: {1:3.7f}".format(step + 1, unsupervised_cost))
 
 		# Log Accuracy for Tracking
 		if step % 1000 == 0:
