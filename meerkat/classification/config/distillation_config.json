@@ -17,5 +17,6 @@
 	"epochs": 5000,
 	"eras": 25,
 	"soft_target": true,
-	"temperature": 8
+	"temperature": 8,
+	"stopping_criterion": 3
 }

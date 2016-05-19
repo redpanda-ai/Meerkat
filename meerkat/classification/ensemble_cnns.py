@@ -105,7 +105,10 @@ def validate_config(config):
 	config["label_map"] = load_params(config["label_map"])
 	config["num_labels"] = len(config["label_map"].keys())
 	config["alpha_dict"] = {a : i for i, a in enumerate(config["alphabet"])}
-	config["base_rate"] = config["base_rate"] * math.sqrt(config["batch_size"]) / math.sqrt(128)
+	if not config["soft_target"]:
+		config["base_rate"] = config["base_rate"] * math.sqrt(config["batch_size"]) / math.sqrt(128)
+	else:
+		config["base_rate"] = (config["temperature"] ** 2) * config["base_rate"] * math.sqrt(config["batch_size"]) / math.sqrt(128)
 	config["alphabet_length"] = len(config["alphabet"])
 
 	return config
@@ -515,6 +518,7 @@ def train_model(config, graph, sess, saver):
 	num_eras = epochs * eras
 	logging_interval = 50
 	learning_rate_interval = 15000
+	stopping_criterion = config["stopping_criterion"]
 
 	best_accuracy, best_era = 0, 0
 	save_dir = "meerkat/classification/models/checkpoints/"
@@ -580,7 +584,7 @@ def train_model(config, graph, sess, saver):
 				best_era = current_era
 				best_accuracy = ensemble_accuracy
 
-			if current_era - best_era == 2:
+			if current_era - best_era == stopping_criterion:
 				model_path = checkpoints[best_era]
 				break
 
