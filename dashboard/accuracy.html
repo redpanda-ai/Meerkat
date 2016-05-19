@@ -19,21 +19,29 @@
 
     .line {
       fill: none;
-      stroke: steelblue;
+      stroke: #4682b4;
       stroke-width: 2px;
     }
 
     .dot {
-      stroke: steelblue;
-      fill: steelblue;
+      stroke: #4682b4;
+      fill: #4682b4;
     }
 
     .dot:hover {
-      stroke: brown;
-      fill: brown;
+      stroke: #C85A17;
+      fill: #C85A17;
+    }
+
+    .tick line{
+      opacity: 0.1;
     }
 
     .x.axis path {
+      display: none;
+    }
+
+    .y.axis path {
       display: none;
     }
 
@@ -42,7 +50,7 @@
       font-weight: bold;
       padding: 0 0 10px 0;
       background: white;
-      color: brown;
+      color: #C85A17;
       border-radius: 2px;
     }
 
@@ -52,25 +60,23 @@
       font-size: 10px;
       width: 100%;
       line-height: 1;
-      color: brown;
+      color: #C85A17;
       content: "\25BC";
       position: absolute;
       text-align: center;
-      z-index: -1;
     }
 
     .d3-tip.n:after {
       margin: -1px 0 0 0;
       top: 100%;
       left: 0;
-      z-index: -1;
     }
   </style>
 </head>
 <body>
   <script>
-    var margin = {top: 40, right: 20, bottom: 30, left: 50},
-      width = 960 - margin.left - margin.right,
+    var margin = {top: 40, right: 20, bottom: 30, left: 100},
+      width = 1200 - margin.left - margin.right,
       height = 400 - margin.top - margin.bottom;
 
     var formatPercent = d3.format(".0%");
@@ -82,25 +88,30 @@
 
     var xAxis = d3.svg.axis()
       .scale(x)
-      .orient("bottom");
+      .orient("bottom")
+      .innerTickSize(-height)
+      .outerTickSize(0)
+      .tickPadding(10);
 
     var yAxis = d3.svg.axis()
       .scale(y)
       .orient("left")
-      .tickFormat(formatPercent);
+      .tickFormat(formatPercent)
+      .outerTickSize(0)
+      .tickPadding(10);
 
     var line = d3.svg.line()
-      .x(function(d) { return x(d.version) + 25; })
+      .x(function(d) { return x(d.version); })
       .y(function(d) { return y(d.accuracy); });
 
     var tip = d3.tip()
       .attr('class', 'd3-tip')
       .offset([-10, 0])
       .html(function(d) {
-        return "<span style='color:brown'>" + (d.accuracy * 100).toFixed(2) + "%</span>";
+        return "<span style='color:#C85A17'>" + (d.accuracy * 100).toFixed(2) + "%</span>";
       });
 
-    var plotBar = function(file_name) {
+    var plotAccuracy = function(file_name) {
       var svg = d3.select("body").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom + 20)
@@ -113,21 +124,16 @@
         x.domain(data.map(function(d) { return d.version; }));
         y.domain([0.9, 1]);
 
-        x.rangeRoundBands([0, data.length * 100], .1);
+        x.rangeRoundBands([0, data.length * 100], 0);
         svg.append("g")
           .attr("class", "x axis")
-          .attr("transform", "translate(-20," + height + ")")
+          .attr("transform", "translate(-50," + height + ")")       
           .call(xAxis);
 
+        yAxis.innerTickSize(-1 * (data.length - 1) * 100);
         svg.append("g")
           .attr("class", "y axis")
-          .call(yAxis)
-          .append("text")
-          .attr("transform", "rotate(-90)")
-          .attr("y", 10)
-          .attr("dy", ".71em")
-          .style("text-anchor", "end")
-          .text("Accuracy");
+          .call(yAxis);
 
         svg.append("path")
           .datum(data)
@@ -139,7 +145,7 @@
           .enter().append("circle")
           .attr("class", "dot")
           .attr("r", 3)
-          .attr("cx", function(d, i) { return x(d.version) + 25; })
+          .attr("cx", function(d, i) { return x(d.version); })
           .attr("cy", function(d) { return y(d.accuracy); })
           .on('mouseover', tip.show)
           .on('mouseout', tip.hide);
@@ -159,12 +165,12 @@
       });
     }; 
     
-    plotBar("accuracy/accuracy_subtype_bank_debit.json");
-    plotBar("accuracy/accuracy_subtype_bank_credit.json");
-    plotBar("accuracy/accuracy_subtype_card_debit.json");
-    plotBar("accuracy/accuracy_subtype_card_credit.json");
-    plotBar("accuracy/accuracy_merchant_bank.json");
-    plotBar("accuracy/accuracy_merchant_card.json");
+    plotAccuracy("accuracy/accuracy_subtype_bank_debit.json");
+    plotAccuracy("accuracy/accuracy_subtype_bank_credit.json");
+    plotAccuracy("accuracy/accuracy_subtype_card_debit.json");
+    plotAccuracy("accuracy/accuracy_subtype_card_credit.json");
+    plotAccuracy("accuracy/accuracy_merchant_bank.json");
+    plotAccuracy("accuracy/accuracy_merchant_card.json");
   </script>
 </body>
 </html>
