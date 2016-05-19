@@ -8,6 +8,7 @@ Created on Apr 16, 2016
 @author: Matthew Sevrens
 @author: Tina Wu
 @author: J. Andrew Key
+@author: Oscar Pan
 """
 
 ############################################# USAGE ###############################################
@@ -40,11 +41,13 @@ from meerkat.various_tools import load_params, load_piped_dataframe, validate_co
 
 logging.basicConfig(level=logging.INFO)
 
+
 def ensemble_evaluate_testset(config, graph, sess, model, test):
 	"""Check error on test set"""
 
 	total_count = len(test.index)
 	correct_count = 0
+	individual_correct_count = [0 for i in range(N)]
 	chunked_test = chunks(np.array(test.index), 128)
 	num_chunks = len(chunked_test)
 
@@ -55,16 +58,23 @@ def ensemble_evaluate_testset(config, graph, sess, model, test):
 
 		trans_test, labels_test = batch_to_tensor(config, batch_test)
 		feed_dict_test = {get_tensor(graph, "x:0"): trans_test}
-		output = [sess.run(model[i], feed_dict=feed_dict_test) for i in range(N)]
+		output = [sess.run(model[j], feed_dict=feed_dict_test) for j in range(N)]
+
+		individual_batch_correct_count = [np.sum(np.argmax(output[j], 1) == np.argmax(labels_test, 1)) for j in range(N)]
+		individual_correct_count = [sum(x) for x in zip(individual_correct_count, individual_batch_correct_count)]
+
 		ensemble_output = sum(output) / (N + 0.0)
-
 		batch_correct_count = np.sum(np.argmax(ensemble_output, 1) == np.argmax(labels_test, 1))
-
 		correct_count += batch_correct_count
 
+	for i in range(N):
+		test_accuracy = 100 * (individual_correct_count[i] / (total_count + 0.0))
+		logging.info("Test accuracy of model" + str(i+1) + ": %.2f%%" % test_accuracy)
+		logging.info("Correct count: " + str(individual_correct_count[i]))
+		logging.info("Total count: " + str(total_count))
 	test_accuracy = 100.0 * (correct_count / total_count)
 	logging.info("Average Ensemble test accuracy: %.2f%%" % test_accuracy)
-	logging.info("AE correct count: " + str(correct_count))
+	logging.info("Correct count: " + str(correct_count))
 	logging.info("Total count: " + str(total_count))
 
 	return test_accuracy
@@ -518,7 +528,6 @@ def train_model(config, graph, sess, saver):
 				logging.info("Minibatch accuracy for cnn" + str(i) + ": %.1f%%" % accuracy(predictions, labels))
 			# Estimate Accuracy for Visualization
 			model = [get_tensor(graph, "model"+str(i+1)+"/cnn:0") for i in range(N)]
-			test_accuracy = [evaluate_testset(config, graph, sess, model[i], test) for i in range(N)]
 			ensemble_accuracy = ensemble_evaluate_testset(config, graph, sess, model, test)
 
 		# Log Loss and Update TensorBoard
