@@ -28,7 +28,7 @@ def load_multiple_models(cnns_dir, label_map_path):
 	for item in os.listdir(cnns_dir):
 		if item.endswith(".ckpt"):
 			model_name = item.split(".")[1]
-			classifier = get_tf_cnn_by_path(cnns_dir + item, label_map_path, model_name=model_name+"/cnn:0")
+			classifier = get_tf_cnn_by_path(cnns_dir + item, label_map_path, model_name=model_name+"/softmax_full:0")
 			logging.info("Loaded model " + item)
 			models.append(classifier)
 	return models
@@ -47,13 +47,13 @@ def get_soft_target(data_path, models, output_path):
 		for index, transaction in enumerate(trans):
 			for i in range (1, num_labels+1):
 				transaction["class_"+str(i)] = ensemble_softmax[index][i-1]
-		logging.info("Saving soft target to {0}".format(output_path + "soft_target.csv"))
 
 		mode = "a" if file_exist else "w"
 		trans = pd.DataFrame(trans)
 		add_header = False if file_exist else trans.columns
+		logging.info("Saving soft targets to {0}".format(output_path + "soft_target.csv"))
 		trans.to_csv(output_path + "soft_target.csv", mode=mode, index=False, header=add_header, sep='|')
-		file_eixst = True
+		file_exist = True
 	return output_path + "soft_target.csv"
 
 def main(cnns_dir, data_path, label_map_path):

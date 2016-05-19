@@ -15,6 +15,7 @@ Created on Apr 16, 2016
 
 # python3 -m meerkat.classification.ensemble_cnns [config_file]
 # python3 -m meerkat.classification.ensemble_cnns meerkat/classification/config/ensemble_cnns_config.json
+# python3 -m meerkat.classification.ensemble_cnns meerkat/classification/config/distillation_config.json
 
 # For addtional details on implementation see:
 # Character-level Convolutional Networks for Text Classification
@@ -41,6 +42,14 @@ from meerkat.various_tools import load_params, load_piped_dataframe, validate_co
 
 logging.basicConfig(level=logging.INFO)
 
+def load_soft_target(batch, num_labels):
+	"""load soft target from training set, assuming headers have format 'class_x'"""
+	header = ["class_" + str(i) for i in range(1, num_labels+1)]
+	return  batch[header].as_matrix()
+
+
+def softmax_with_temperature(tensor, temperature):
+	return tf.div(tf.exp(tensor/temperature), tf.reduce_sum(tf.exp(tensor/temperature)), name="softmax_flat")
 
 def ensemble_evaluate_testset(config, graph, sess, model, test):
 	"""Check error on test set"""
@@ -56,7 +65,7 @@ def ensemble_evaluate_testset(config, graph, sess, model, test):
 		batch_test = test.loc[chunked_test[i]]
 		batch_size = len(batch_test)
 
-		trans_test, labels_test = batch_to_tensor(config, batch_test)
+		trans_test, labels_test, _ = batch_to_tensor(config, batch_test)
 		feed_dict_test = {get_tensor(graph, "x:0"): trans_test}
 		output = [sess.run(model[j], feed_dict=feed_dict_test) for j in range(N)]
 
@@ -172,7 +181,7 @@ def mixed_batching(config, df, groups_train):
 
 	return batch
 
-def batch_to_tensor(config, batch):
+def batch_to_tensor(config, batch, soft_target=False):
 	"""Convert a batch to a tensor representation"""
 
 	doc_length = config["doc_length"]
@@ -182,14 +191,15 @@ def batch_to_tensor(config, batch):
 
 	labels = np.array(batch["LABEL_NUM"].astype(int)) - 1
 	labels = (np.arange(num_labels) == labels[:, None]).astype(np.float32)
+	labels_soft = load_soft_target(batch, num_labels) if soft_target else None
 	docs = batch["DESCRIPTION_UNMASKED"].tolist()
 	transactions = np.zeros(shape=(batch_size, 1, alphabet_length, doc_length))
-	
+
 	for index, trans in enumerate(docs):
 		transactions[index][0] = string_to_tensor(config, trans, doc_length)
 
 	transactions = np.transpose(transactions, (0, 1, 3, 2))
-	return transactions, labels
+	return transactions, labels, labels_soft
 
 def string_to_tensor(config, doc, length):
 	"""Convert transaction to tensor format"""
@@ -217,7 +227,7 @@ def evaluate_testset(config, graph, sess, model, test):
 			batch_test = test.loc[chunked_test[i]]
 			batch_size = len(batch_test)
 
-			trans_test, labels_test = batch_to_tensor(config, batch_test)
+			trans_test, labels_test, _ = batch_to_tensor(config, batch_test)
 			feed_dict_test = {get_tensor(graph, "x:0"): trans_test}
 			output = sess.run(model, feed_dict=feed_dict_test)
 
@@ -293,7 +303,6 @@ def get_cost_list(config):
 
 	return cost_list
 
-
 def logsoftmax(softmax, name):
 	"""Return log of the softmax"""
 	return tf.log(tf.clip_by_value(softmax, 1e-10, 1.0), name=name)
@@ -307,6 +316,7 @@ def build_graph(config):
 	num_labels = config["num_labels"]
 	base_rate = config["base_rate"]
 	batch_size = config["batch_size"]
+	soft_target = config["soft_target"]
 	graph = tf.Graph()
 
 	# Get Cost Weights
@@ -326,7 +336,7 @@ def build_graph(config):
 
 		trans_placeholder = tf.placeholder(tf.float32, shape=input_shape, name="x")
 		labels_placeholder = tf.placeholder(tf.float32, shape=output_shape, name="y")
-
+		soft_labels_placeholder = tf.placeholder(tf.float32, shape=output_shape, name="y_soft")
 
 		# Utility for Batch Normalization
 		layer_sizes = [256] * 8 + [1024, num_labels]
@@ -356,7 +366,7 @@ def build_graph(config):
 			# Scope for Visualization with TensorBoard
 			with tf.name_scope(layer_name):
 
-				# Preactivation
+				# Preactivatin
 				if "conv" in layer_name:
 					z_pre = conv2d(input_h, weights)
 				elif "pool" in layer_name:
@@ -389,7 +399,7 @@ def build_graph(config):
 		with tf.name_scope("running_var"):
 			running_var = [[tf.Variable(tf.ones([l]), trainable=False) for l in layer_sizes] for i in range(N)]
 
-		def encoder(inputs, name, model_num, train=False, noise_std=0.0):
+		def encoder(inputs, name, model_num, train=False, noise_std=0.0, soft_target=False):
 			# Encoder Weights and Biases
 			"""Add model layers to the graph"""
 
@@ -413,14 +423,18 @@ def build_graph(config):
 
 			h_fc1 = layer(h_reshape, details, "h_fc1", train, model_num, weights=w_fc1, biases=b_fc1)
 
-			if train:
+			if train and not soft_target:
 				h_fc1 = tf.nn.dropout(h_fc1, 0.5)
 
 			h_fc2 = layer(h_fc1, details, "h_fc2", train, model_num, weights=w_fc2, biases=b_fc2)
 
 			softmax = tf.nn.softmax(bn_scaler * h_fc2, name=name)
-
-			return softmax
+			if not soft_target:
+				return softmax
+			else:
+				temperature = config["temperature"]
+				softmax_flat = softmax_with_temperature(bn_scaler * h_fc2, temperature)
+				return softmax, softmax_flat
 
 
 		softmax = []
@@ -452,7 +466,11 @@ def build_graph(config):
 
 				w_fc2 = weight_variable(config, [1024, num_labels])
 				b_fc2 = bias_variable([num_labels], 1024)
-				prob_train = encoder(trans_placeholder, "softmax", i, train=True)
+
+				if not soft_target:
+					prob_train = encoder(trans_placeholder, "softmax", i, train=True)
+				else:
+					prob_train, softmax_flat = encoder(trans_placeholder, "softmax", i, train=True, soft_target=soft_target)
 				softmax.append(prob_train)
 				network.append(logsoftmax(softmax[i-1], "network"))
 				prob_full = encoder(trans_placeholder, "softmax_full", i, train=False)
@@ -470,7 +488,10 @@ def build_graph(config):
 			return tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss, name=op_name, var_list=[x for x in tf.trainable_variables() if x.name.startswith(scope_name)])
 
 		with tf.name_scope("trainer"):
-			loss = [cal_loss(softmax[i], network[i], "loss"+str(i+1)) for i in range(N)]
+			if not soft_target:
+				loss = [cal_loss(softmax[i], network[i], "loss"+str(i+1)) for i in range(N)]
+			else:
+				loss = [tf.neg(0.85 * tf.reduce_mean(tf.reduce_sum(logsoftmax(softmax_flat, "network_flat") * soft_labels_placeholder, 1)) + 0.15 * tf.reduce_mean(tf.reduce_sum(network[0] * weighted_labels, 1)), name = "loss1")]
 			optimizer = [make_optimizer(loss[i], "optimizer"+str(i+1), "model"+str(i+1)) for i in range(N)]
 
 		bn_updates = tf.group(*bn_assigns)
@@ -508,10 +529,11 @@ def train_model(config, graph, sess, saver):
 
 		# Prepare Data for Training
 		batch = mixed_batching(config, train, groups_train)
-		trans, labels = batch_to_tensor(config, batch)
+		trans, labels, labels_soft = batch_to_tensor(config, batch, soft_target=config["soft_target"])
 		feed_dict = {
 			get_tensor(graph, "x:0") : trans,
-			get_tensor(graph, "y:0") : labels
+			get_tensor(graph, "y:0") : labels,
+			get_tensor(graph, "y_soft:0") : labels_soft
 		}
 
 		# Run Training Step
