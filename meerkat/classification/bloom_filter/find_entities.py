@@ -61,10 +61,10 @@ def generate_city_map():
 	"""
 		generates a dictionary with the following structure
 
-		(city, state) : (zip, latitude, longitude)
+		(CityState) : (City, State)
 
 		eg:
-		(Beverly Hills, CA) : (90210, 34.0731, 118.3994)
+		(BEVERLYHILLSCA) : (Beverly Hills, CA)
 
 	"""
 	print("generate location map")
@@ -169,4 +169,5 @@ def main():
 	print(location_bloom_results.describe())
 
 if __name__ == "__main__":
-	main()
+#	main()
+	print(location_split('DEBIT CARD PURCHASE XXXXX7106 VENETIAN NAIL SPA PLANTATION FL'))
