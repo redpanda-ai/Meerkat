@@ -35,8 +35,8 @@ import shutil
 import sys
 
 from .verify_data import verify_data
-from .tools import pull_from_s3, unzip_and_merge, seperate_debit_credit, copy_file
-from plumbum import local
+from .tools import (pull_from_s3, unzip_and_merge, seperate_debit_credit, 
+	copy_file, extract_tarball, make_tarfile, push_file_to_s3)
 
 def parse_arguments():
 	"""This function parses arguments from our command line."""
@@ -141,8 +141,7 @@ def main_split_data(args):
 			cnn_type=[model_type, bank_or_card])
 
 	else:
-		#FIXME horrible use of plumbum, use tarfile module
-		local['tar']['xf'][input_file]['-C'][save_path_input]()
+		extract_tarball(input_file, save_path_input)
 		input_csv_file = ""
 		input_json_file = ""
 		for file_name in os.listdir(save_path_input):
@@ -175,10 +174,8 @@ def main_split_data(args):
 	logging.info("Using shutil to copy label_map.json")
 	shutil.copyfile(label_map_path, stats_path + "/" + "label_map.json")
 	logging.info("label_map.json moved")
-	#FIXME Horrible use of plumbum, use tarfile module
-	local['tar']['-zcvf'][output_file]['-C'][save_path_preprocessed]['.']()
-	#FIXME Horrible use of plumbum, use boto module
-	local['aws']['s3']['cp'][output_file][dir_path]()
+	make_tarfile(output_file, save_path_preprocessed)
+	push_file_to_s3(output_file, "s3yodlee", prefix)
 
 	shutil.rmtree(save_path_input)
 	logging.info("remove directory of input files at: {0}".format(save_path_input))

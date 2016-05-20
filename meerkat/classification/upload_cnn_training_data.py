@@ -12,15 +12,28 @@ created on April 4, 2016
 
 import os
 import sys
-from plumbum import local
 from meerkat.classification.tools import push_file_to_s3, get_utc_iso_timestamp, make_tarfile
-from os import rename
 
 # check files
 def main_process():
 	"""This is the whole process"""
 	bucket = 's3yodlee'
+	# upload the tar.gz file to s3
+	default_dir_paths = {
+			'merchant_card' : "meerkat/cnn/data/merchant/card/",
+			'merchant_bank' : "meerkat/cnn/data/merchant/bank/",
+			'subtype_card_debit' : "meerkat/cnn/data/subtype/card/debit/",
+			'subtype_card_credit' : "meerkat/cnn/data/subtype/card/credit/",
+			'subtype_bank_debit' : "meerkat/cnn/data/subtype/bank/debit",
+			'subtype_bank_credit' : "meerkat/cnn/data/subtype/bank/credit/",
+			'category_bank_debit': "meerkat/cnn/data/category/bank/debit/",
+			'category_bank_credit': "meerkat/cnn/data/category/bank/credit/",
+			'category_card_debit': "meerkat/cnn/data/category/card/debit/",
+			'category_card_credit': "meerkat/cnn/data/category/card/credit/",
+		}
+	dtime = get_utc_iso_timestamp()
 	prefix = default_dir_paths[sys.argv[2]] + dtime + '/'
+
 	csv_num, json_exit = 0, False
 	for filename in os.listdir(sys.argv[1]):
 		if filename.endswith('.csv'):
@@ -29,7 +42,6 @@ def main_process():
 			if json_exit:
 				print("should only have one json file")
 				sys.exit()
-			push_file_to_s3(filename, bucket, prefix)
 			json_exit = True
 		else:
 			print("file %s is not csv or json file" %filename)
@@ -47,26 +59,12 @@ def main_process():
 	make_tarfile("input.tar.gz", sys.argv[1])
 	print("files gziped")
 
-	# upload the tar.gz file to s3
-	default_dir_paths = {
-			'merchant_card' : "meerkat/cnn/data/merchant/card/",
-			'merchant_bank' : "meerkat/cnn/data/merchant/bank/",
-			'subtype_card_debit' : "meerkat/cnn/data/subtype/card/debit/",
-			'subtype_card_credit' : "meerkat/cnn/data/subtype/card/credit/",
-			'subtype_bank_debit' : "meerkat/cnn/data/subtype/bank/debit",
-			'subtype_bank_credit' : "meerkat/cnn/data/subtype/bank/credit/",
-			'category_bank_debit': "meerkat/cnn/data/category/bank/debit/",
-			'category_bank_credit': "meerkat/cnn/data/category/bank/credit/",
-			'category_card_debit': "meerkat/cnn/data/category/card/debit/",
-			'category_card_credit': "meerkat/cnn/data/category/card/credit/",
-		}
-	dtime = get_utc_iso_timestamp()
 	print("uploading to s3")
 	push_file_to_s3('input.tar.gz', bucket, prefix)
 	print("uploaded to s3")
 
 	#remove the tar.gz file in local
-	local['rm']['-f']['input.tar.gz']()
+	os.remove("input.tar.gz")
 
 if __name__ == "__main__":
 	main_process()

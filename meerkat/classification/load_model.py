@@ -16,7 +16,6 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.python.framework import ops
 from sklearn.externals import joblib
-
 from meerkat.various_tools import load_params
 from meerkat.classification.auto_load import main_program as load_models_from_s3
 from meerkat.classification.tensorflow_cnn import (validate_config, get_tensor, string_to_tensor)
@@ -103,17 +102,18 @@ def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=False, model
 
 	if gpu_mem_fraction:
 		gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.25)
-		sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
+		sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, gpu_options=gpu_options))
 	else:
-		sess = tf.Session()
+		sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
 
 	saver.restore(sess, config["model_path"])
 	graph = sess.graph
+
 	if not model_name:
 		model = get_tensor(graph, "model:0")
 	else:
 		model = get_tensor(graph, model_name)
-	
+
 	# Generate Helper Function
 	def apply_cnn(trans, doc_key="description", label_key="CNN", label_only=True, soft_target=False):
 		"""Apply CNN to transactions"""

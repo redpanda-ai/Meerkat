@@ -49,10 +49,9 @@ import shutil
 
 import tensorflow as tf
 
-from plumbum import local
 from meerkat.classification.split_data import main_split_data
 from meerkat.classification.tools import (pull_from_s3, check_new_input_file,
-	push_file_to_s3, make_tarfile, copy_file, check_file_exist_in_s3)
+	push_file_to_s3, make_tarfile, copy_file, check_file_exist_in_s3, extract_tarball)
 from meerkat.classification.tensorflow_cnn import build_graph, train_model, validate_config
 from meerkat.various_tools import load_params, safe_input
 from meerkat.classification.auto_load import get_single_file_from_tarball
@@ -183,7 +182,7 @@ def auto_train():
 		save_path = save_path + 'preprocessed/'
 	else:
 		output_file = pull_from_s3(extension='.tar.gz', file_name="preprocessed.tar.gz", **s3_params)
-		local["tar"]["xfv"][output_file]["-C"][save_path]()
+		extract_tarball(output_file, save_path)
 
 	train_file = save_path + "train.csv"
 	test_file = save_path + "test.csv"
