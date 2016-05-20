@@ -54,7 +54,7 @@
   </div>
 
   <script type="text/javascript">
-    d3.csv("classification_report/classification_report_subtype_card_debit_20160429164200.csv", function(error, data) {
+    d3.csv("classification_report/classification_report_subtype_bank_credit_20160516182340.csv", function(error, data) {
       if (error) throw error;
 
       var baseWidth = data.length < 15 ? 1000 : data.length * 60 + 100;
@@ -160,7 +160,7 @@
         .attr("y", 40)
         .style("font-size", "15px") 
         .attr("class", "title") 
-        .text("Subtype Card Debit 20160429164200 - Classification Report");
+        .text("Subtype Bank Credit 20160516182340 - Classification Report");
 
       function change() {
         var sortKey;
