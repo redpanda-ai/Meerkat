@@ -13,6 +13,7 @@ python3 -m meerkat.classification.classification_report \
 <path_to_testdata> \
 <path_to_label_map> \
 <ground_truth_label_key> \
+--model_name <optional_tensor_name> \
 --doc_key <optional_primary_doc_key> \
 --secdoc_key <optional_secondary_doc_key> \
 --predict_key <optional_predicted_label_key>
@@ -60,6 +61,7 @@ def parse_arguments(args):
 	parser.add_argument('label_map', help='Path to a label map')
 	parser.add_argument('label', type=lambda x: x.upper(), help="Header name of the ground truth label column")
 	# Optional arguments
+	parser.add_argument('--model_name', default = '', help='Name of the tensor stored in graph.')
 	parser.add_argument('--doc_key', type=lambda x: x.upper(), default='DESCRIPTION_UNMASKED',
 		help='Header name of primary transaction description column')
 	parser.add_argument('--secdoc_key', default='DESCRIPTION', type=lambda x: x.upper(),
@@ -210,6 +212,7 @@ def main_process(args):
 	sec_doc_key = args.secdoc_key
 	machine_label_key = args.predict_key
 	human_label_key = args.label
+	model_name = False if args.model_name == '' else args.model_name
 	fast_mode = args.fast_mode
 	reader = load_piped_dataframe(args.data, chunksize=1000)
 	total_transactions = count_transactions(args.data)
@@ -235,7 +238,7 @@ def main_process(args):
 		reversed_label_map["Null Class"] = reversed_label_map.pop("")
 
 	confusion_matrix = [[0 for i in range(num_labels + 1)] for j in range(num_labels)]
-	classifier = get_tf_cnn_by_path(args.model, args.label_map)
+	classifier = get_tf_cnn_by_path(args.model, args.label_map, model_name=model_name)
 
 	# Prepare for data saving
 	path = 'data/CNN_stats/'
