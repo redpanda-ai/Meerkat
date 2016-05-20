@@ -54,6 +54,7 @@ def softmax_with_temperature(tensor, temperature):
 def ensemble_evaluate_testset(config, graph, sess, model, test):
 	"""Check error on test set"""
 
+	N = config["num_cnns"]
 	total_count = len(test.index)
 	correct_count = 0
 	individual_correct_count = [0 for i in range(N)]
@@ -321,6 +322,7 @@ def build_graph(config):
 	batch_size = config["batch_size"]
 	soft_target = config["soft_target"]
 	graph = tf.Graph()
+	N = config["num_cnns"]
 
 	# Get Cost Weights
 	cost_list = get_cost_list(config)
@@ -518,7 +520,7 @@ def train_model(config, graph, sess, saver):
 	num_eras = epochs * eras
 	logging_interval = 50
 	learning_rate_interval = 15000
-	stopping_criterion = config["stopping_criterion"]
+	N = config["num_cnns"]
 
 	best_accuracy, best_era = 0, 0
 	save_dir = "meerkat/classification/models/checkpoints/"
@@ -536,9 +538,10 @@ def train_model(config, graph, sess, saver):
 		trans, labels, labels_soft = batch_to_tensor(config, batch, soft_target=config["soft_target"])
 		feed_dict = {
 			get_tensor(graph, "x:0") : trans,
-			get_tensor(graph, "y:0") : labels,
-			get_tensor(graph, "y_soft:0") : labels_soft
+			get_tensor(graph, "y:0") : labels
 		}
+		if config["soft_target"]:
+			feed_dict[get_tensor(graph, "y_soft:0")] = labels_soft
 
 		# Run Training Step
 		# sess.run(get_op(graph, "trainer/optimizer"), feed_dict=feed_dict)
@@ -584,7 +587,7 @@ def train_model(config, graph, sess, saver):
 				best_era = current_era
 				best_accuracy = ensemble_accuracy
 
-			if current_era - best_era == stopping_criterion:
+			if current_era - best_era == config["stopping_criterion"]:
 				model_path = checkpoints[best_era]
 				break
 
@@ -605,6 +608,9 @@ def train_model(config, graph, sess, saver):
 		os.rename(meta_path[i], final_meta_path)
 	logging.info("Deleting unneeded directory of checkpoints at {0}".format(save_dir))
 	shutil.rmtree(save_dir)
+
+	if config["soft_target"]:
+		return final_model_path
 
 def run_session(config, graph, saver):
 	"""Run Session"""
@@ -632,5 +638,4 @@ def run_from_command_line():
 	run_session(config, graph, saver)
 
 if __name__ == "__main__":
-	N = validate_config(sys.argv[1])["num_cnns"]
 	run_from_command_line()
