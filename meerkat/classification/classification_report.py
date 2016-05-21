@@ -197,8 +197,8 @@ def main_process(args):
 	processed = 0.0
 	label_map = load_params(args.label_map)
 
-	# get_key = lambda x: x['label'] if isinstance(x, dict) else x
-	# label_map = dict(zip(label_map.keys(), map(get_key, label_map.values())))
+	get_key = lambda x: x['label'] if isinstance(x, dict) else x
+	label_map = dict(zip(label_map.keys(), map(get_key, label_map.values())))
 	reversed_label_map = reverse_map(label_map)
 	num_labels = len(label_map)
 	class_names = list(label_map.values())
