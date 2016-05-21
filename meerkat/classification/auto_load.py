@@ -191,12 +191,16 @@ def main_program():
 		logging.basicConfig(format=log_format, level=logging.INFO)
 	aspirants = {}
 	if args.config is not None:
-		config = args.aspirants, "meerkat/classification/config/auto_load_schema.json")
-		aspirants = config.get("aspirants", default={})
-		args.region = config.get("region", default=args.region)
-		args.prefix = config.get("prefix", default=args.prefix)
-		args.bucket = config.get("bucket", default=args.bucket)
+		config = validate_configuration(args.config, "meerkat/classification/config/auto_load_schema.json")
+		aspirants = config.get("aspirants", {})
+		args.region = config.get("region", args.region)
+		args.prefix = config.get("prefix", args.prefix)
+		args.bucket = config.get("bucket", args.bucket)
 	logging.info("Aspirants are: {0}".format(aspirants))
+	logging.info("Region: {0}".format(args.region))
+	logging.info("Prefix: {0}".format(args.prefix))
+	logging.info("Bucket: {0}".format(args.bucket))
+
 	logging.warning("Starting main program")
 	conn = connect_to_region(args.region)
 	bucket = conn.get_bucket(args.bucket)
