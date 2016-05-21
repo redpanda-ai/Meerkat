@@ -173,11 +173,11 @@ def main_program():
 	"""Execute the main program"""
 	parser = argparse.ArgumentParser("auto_load")
 	parser.add_argument("-l", "--log_level", default="warning", help="Show at least this level of logs")
-	parser.add_argument("-b", "--bucket", action="store_true", default="s3yodlee",
+	parser.add_argument("-b", "--bucket", default="s3yodlee",
 		help="Name of S3 bucket containing the candidate models.")
-	parser.add_argument("-r", "--region", action="store_true", default="us-west-2",
+	parser.add_argument("-r", "--region", default="us-west-2",
 		help="Name of the AWS region containing the S3 bucket")
-	parser.add_argument("-p", "--prefix", action="store_true", default="meerkat/cnn/data",
+	parser.add_argument("-p", "--prefix", default="meerkat/cnn/data",
 		help="S3 object prefix that precedes all object keys for our candidate models")
 	parser.add_argument("-a", "--aspirants", default=None,
 		help="The local path to a JSON file of models have been pre-selected")
