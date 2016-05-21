@@ -179,7 +179,7 @@ def main_program():
 		help="Name of the AWS region containing the S3 bucket")
 	parser.add_argument("-p", "--prefix", default="meerkat/cnn/data",
 		help="S3 object prefix that precedes all object keys for our candidate models")
-	parser.add_argument("-a", "--aspirants", default=None,
+	parser.add_argument("-c", "--config", default=None,
 		help="The local path to a JSON file of models have been pre-selected")
 	args = parser.parse_args()
 	log_format = "%(asctime)s %(levelname)s: %(message)s"
@@ -190,9 +190,12 @@ def main_program():
 	else:
 		logging.basicConfig(format=log_format, level=logging.INFO)
 	aspirants = {}
-	if args.aspirants is not None:
-		aspirants = validate_configuration(args.aspirants,
-			"meerkat/classification/config/auto_load_schema.json")["aspirants"]
+	if args.config is not None:
+		config = args.aspirants, "meerkat/classification/config/auto_load_schema.json")
+		aspirants = config.get("aspirants", default={})
+		args.region = config.get("region", default=args.region)
+		args.prefix = config.get("prefix", default=args.prefix)
+		args.bucket = config.get("bucket", default=args.bucket)
 	logging.info("Aspirants are: {0}".format(aspirants))
 	logging.warning("Starting main program")
 	conn = connect_to_region(args.region)

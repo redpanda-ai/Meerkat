@@ -3,8 +3,10 @@
 	"title": "Input schema for meerkat.classification.auto_load",
 	"description": "Stuff",
 	"type": "object",
-	"required": ["aspirants"],
 	"properties": {
-		"aspirants": { "type": "object" }
+		"aspirants": { "type": "object" },
+		"region": { "type": "string"},
+		"bucket": { "type": "string"},
+		"prefix": { "type": "string"}
 	}
 }
