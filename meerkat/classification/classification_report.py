@@ -77,7 +77,6 @@ def compare_label(*args, **kwargs):
 	"""similar to generic_test in accuracy.py, with unnecessary items dropped"""
 	machine, cnn_column, human_column, conf_mat, num_labels = args[:]
 	doc_key = kwargs.get("doc_key")
-	needs_hand_labeling = []
 	correct = []
 	mislabeled = []
 
@@ -251,7 +250,6 @@ def main_process(args):
 		mislabeled, correct, confusion_matrix =\
 			compare_label(machine_labeled, machine_label_key, human_label_key,
 			confusion_matrix, num_labels, doc_key=doc_key, fast_mode=fast_mode)
-
 
 		# Save
 		write_mislabeled(mislabeled)

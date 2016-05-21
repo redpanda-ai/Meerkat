@@ -223,6 +223,7 @@ def auto_train():
 		config["temperature"] = 8
 		config["num_cnns"] = 1
 		config["datatest"] = "./data/output/soft_target.csv"
+		config["stopping_criterion"] = 3
 
 		graph, saver = build_ensemble_graph(config)
 
