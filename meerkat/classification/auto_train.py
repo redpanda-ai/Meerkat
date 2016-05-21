@@ -220,6 +220,7 @@ def auto_train():
 
 		get_soft_target("meerkat/classification/models/ensemble_cnns/", train_file, label_map)
 		config["soft_target"] = True
+		config["temperature"] = 8
 		config["num_cnns"] = 1
 		config["datatest"] = "./data/output/soft_target.csv"
 
