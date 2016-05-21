@@ -252,7 +252,6 @@ def auto_train():
 	args.secdoc_key = 'DESCRIPTION'
 	args.label = ground_truth_labels[model_type]
 	args.predict_key = 'PREDICTED_CLASS'
-	args.is_merchant = (model_type == 'merchant')
 	args.fast_mode = False
 	if args.ensemble:
 		args.model_name = "model1/cnn:0"

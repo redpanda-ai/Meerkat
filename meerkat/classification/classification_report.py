@@ -18,7 +18,6 @@ python3 -m meerkat.classification.classification_report \
 --secdoc_key <optional_secondary_doc_key> \
 --predict_key <optional_predicted_label_key>
 # If working with merchant data
---is_merchant
 # If only want to return confusion matrix and performance statistics
 --fast_mode
 
@@ -50,6 +49,7 @@ import sys
 
 from meerkat.classification.load_model import get_tf_cnn_by_path
 from meerkat.various_tools import load_params, load_piped_dataframe
+from meerkat.classification.tools import reverse_map
 
 def parse_arguments(args):
 	""" Create the parser """
@@ -68,7 +68,6 @@ def parse_arguments(args):
 		help='Header name of secondary transaction description in case primary is empty')
 	parser.add_argument('--predict_key', type=lambda x: x.upper(), default='PREDICTED_CLASS',
 		help='Header name of predicted class column')
-	parser.add_argument('--is_merchant', action='store_true', help='If working on merchant data need to indicate True.')
 	parser.add_argument('--fast_mode', action='store_true', help='Use fast mode to save i/o time.')
 	parser.add_argument("-d", "--debug", help="Show 'debug'+ level logs", action="store_true")
 	parser.add_argument("-v", "--info", help="Show 'info'+ level logs", action="store_true")
@@ -78,7 +77,6 @@ def compare_label(*args, **kwargs):
 	"""similar to generic_test in accuracy.py, with unnecessary items dropped"""
 	machine, cnn_column, human_column, conf_mat, num_labels = args[:]
 	doc_key = kwargs.get("doc_key")
-	unpredicted = []
 	needs_hand_labeling = []
 	correct = []
 	mislabeled = []
@@ -86,38 +84,19 @@ def compare_label(*args, **kwargs):
 	# Test Each Machine Labeled Row
 	for machine_row in machine:
 		# Update conf_mat
-		# predicted_label is None if a predicted subtype is ""
-		if machine_row['ACTUAL_INDEX'] is None:
-			pass
-		elif machine_row['PREDICTED_INDEX'] is None:
-			column = num_labels
-			row = machine_row['ACTUAL_INDEX'] - 1
-			conf_mat[row][column] += 1
-		else:
-			column = machine_row['PREDICTED_INDEX'] - 1
-			row = machine_row['ACTUAL_INDEX'] - 1
-			conf_mat[row][column] += 1
+		column = int(machine_row['PREDICTED_INDEX']) - 1
+		row = int(machine_row['ACTUAL_INDEX']) - 1
+		conf_mat[row][column] += 1
 
 		# If fast mode True then do not record
 		if not kwargs.get('fast_mode', False):
-			# Continue if unlabeled
-			if machine_row[cnn_column] == "":
-				unpredicted.append([machine_row[doc_key], machine_row[human_column]])
-				continue
-
-			# Identify unlabeled points
-			if not machine_row[human_column]:
-				needs_hand_labeling.append(machine_row[doc_key])
-				continue
-
 			# Predicted label matches human label
 			if machine_row[cnn_column] == machine_row[human_column]:
 				correct.append([machine_row[doc_key], machine_row[human_column]])
-				continue
-
-			mislabeled.append([machine_row[doc_key], machine_row[human_column],
-				machine_row[cnn_column]])
-	return mislabeled, correct, unpredicted, needs_hand_labeling, conf_mat
+			else:
+				mislabeled.append([machine_row[doc_key], machine_row[human_column],
+					machine_row[cnn_column]])
+	return mislabeled, correct, conf_mat
 
 
 def get_write_func(filename, header):
@@ -221,9 +200,11 @@ def main_process(args):
 
 	get_key = lambda x: x['label'] if isinstance(x, dict) else x
 	label_map = dict(zip(label_map.keys(), map(get_key, label_map.values())))
+	reversed_label_map = reverse_map(label_map)
 	num_labels = len(label_map)
 	class_names = list(label_map.values())
 
+	"""
 	# Create reversed label map and check if there are duplicate keys
 	reversed_label_map = {}
 	for key, value in label_map.items():
@@ -232,10 +213,7 @@ def main_process(args):
 				 sorted(reversed_label_map.get(value, []) + [int(key)])
 		else:
 			reversed_label_map[value] = int(key)
-
-	if args.is_merchant:
-		label_map["1"] = "Null Class"
-		reversed_label_map["Null Class"] = reversed_label_map.pop("")
+	"""
 
 	confusion_matrix = [[0 for i in range(num_labels + 1)] for j in range(num_labels)]
 	classifier = get_tf_cnn_by_path(args.model, args.label_map, model_name=model_name)
@@ -247,13 +225,6 @@ def main_process(args):
 		['TRANSACTION_DESCRIPTION', 'ACTUAL', 'PREDICTED'])
 	write_correct = get_write_func(path + "correct.csv",
 		['TRANSACTION_DESCRIPTION', 'ACTUAL'])
-	write_unpredicted = get_write_func(path + "unpredicted.csv",
-		["TRANSACTION_DESCRIPTION", 'ACTUAL'])
-	write_needs_hand_labeling = get_write_func(path + "need_labeling.csv",
-		["TRANSACTION_DESCRIPTION"])
-
-	change_label_name = lambda x: "Null Class" if x[human_label_key] == '' else\
-		x[human_label_key]
 
 	fill_description = lambda x: x[sec_doc_key] if x[doc_key] == ''\
 		else x[doc_key]
@@ -268,32 +239,16 @@ def main_process(args):
 		logging.warning("Testing chunk {0}.".format(chunk_count))
 		if sec_doc_key != '':
 			chunk[doc_key] = chunk.apply(fill_description, axis=1)
-		if args.is_merchant:
-			chunk[human_label_key] = chunk.apply(change_label_name, axis=1)
 		transactions = chunk.to_dict('records')
 		machine_labeled = classifier(transactions, doc_key=doc_key,
 			label_key=machine_label_key)
 
 		# Add indexes for labels
 		for item in machine_labeled:
-			if item[human_label_key] == "":
-				item['ACTUAL_INDEX'] = None
-				continue
-			temp = reversed_label_map[item[human_label_key]]
-			if isinstance(temp, list):
-				item['ACTUAL_INDEX'] = temp[0]
-			else:
-				item['ACTUAL_INDEX'] = temp
-			if item[machine_label_key] == "":
-				item['PREDICTED_INDEX'] = None
-				continue
-			temp = reversed_label_map[item[machine_label_key]]
-			if isinstance(temp, list):
-				item['PREDICTED_INDEX'] = temp[0]
-			else:
-				item['PREDICTED_INDEX'] = temp
+			item['ACTUAL_INDEX'] = reversed_label_map[item[human_label_key]]
+			item['PREDICTED_INDEX'] = reversed_label_map[item[machine_label_key]]
 
-		mislabeled, correct, unpredicted, needs_hand_labeling, confusion_matrix =\
+		mislabeled, correct, confusion_matrix =\
 			compare_label(machine_labeled, machine_label_key, human_label_key,
 			confusion_matrix, num_labels, doc_key=doc_key, fast_mode=fast_mode)
 
@@ -301,8 +256,6 @@ def main_process(args):
 		# Save
 		write_mislabeled(mislabeled)
 		write_correct(correct)
-		write_unpredicted(unpredicted)
-		write_needs_hand_labeling(needs_hand_labeling)
 
 		chunk_count += 1
 	#Make a square confusion matrix dataframe, df
