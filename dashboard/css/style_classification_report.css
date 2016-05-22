@@ -1,0 +1,71 @@
+body {
+  font: 10px sans-serif;
+}
+
+#svg-chart {
+  position: relative;
+}
+
+#sort-box-title {
+  position: absolute;
+  top: 25px;
+  left: 710px;
+}
+
+#sort-box-form {
+  position: absolute;
+  top: 20px;
+  left: 750px;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.bar {
+  fill: #4682b4;;
+}
+
+.x.axis path {
+  display: none;
+}
+
+.legendBody {
+  border-top: 1px solid grey; 
+  border-bottom: 1px solid grey; 
+}
+
+.legend {
+  margin-bottom: 40px;
+  display: inline-block;
+  border-collapse: collapse;
+  border-spacing: 0px;
+}
+
+.legend td {
+  padding: 4px 5px;
+  vertical-align: bottom;
+}
+
+.legendFreq, .legendPerc{
+  align: right;
+  width: 50px;
+}
+
+#wrap {
+  width: 90%;
+  margin: 10px auto;
+}
+
+#pie-chart-left-col {
+  float: left;
+  width: 45%;
+}
+
+#pie-chart-right-col {
+  float: right;
+  width: 45%;
+}

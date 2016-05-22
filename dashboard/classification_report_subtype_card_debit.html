@@ -3,46 +3,15 @@
 <head>
   <title>Classification Report</title>
   <meta charset="utf-8">
+  <link rel="stylesheet" type="text/css" href="css/style_classification_report.css">
   <script src="js/d3.v3.min.js"></script>
-  <style>
-    body {
-      font: 10px sans-serif;
-    }
-
-    #svg-chart {
-      position: relative;
-    }
-
-    #sort-box-title {
-      position: absolute;
-      top: 25px;
-      left: 710px;
-    }
-
-    #sort-box-form {
-      position: absolute;
-      top: 20px;
-      left: 750px;
-    }
-
-    .axis path,
-    .axis line {
-      fill: none;
-      stroke: #000;
-      shape-rendering: crispEdges;
-    }
-
-    .bar {
-      fill: #4682b4;;
-    }
-
-    .x.axis path {
-      display: none;
-    }
-  </style>
+  <script type="text/javascript">
+    var csvFileName = "classification_report/classification_report_subtype_card_debit_20160429164200.csv";
+  </script>
+  <script src="js/script_classification_report.js"></script>
 </head>
 <body>    
-  <div id="svg-chart" style='overflow:auto; width:1400px; height:700px;'>
+  <div id="svg-chart" style='overflow:auto; width:1400px; height:750px;'>
     <p id="sort-box-title"> Sort by </p>
     <form id="sort-box-form">
       <input type="radio" name="stats" value="Precision"> Precision <br>
@@ -52,149 +21,9 @@
       <input type="radio" name="stats" value="ClassName"> Class Name
     </form>
   </div>
-
-  <script type="text/javascript">
-    d3.csv("classification_report/classification_report_subtype_card_debit_20160429164200.csv", function(error, data) {
-      if (error) throw error;
-
-      var baseWidth = data.length < 15 ? 1000 : data.length * 60 + 100;
-      var margin = {top: 30, right: 20, bottom: 30, left: 80},
-        width = baseWidth - margin.left - margin.right,
-        height = 400 - margin.top - margin.bottom;
-
-      var x0 = d3.scale.ordinal();
-
-      var x1 = d3.scale.ordinal();
-
-      var y = d3.scale.linear()
-        .range([height, 0]);
-
-      var color = d3.scale.ordinal()
-        .range(["#98abc5", "#7b6888", "#d0743c", "#ff8c00"]);
-
-      var xAxis = d3.svg.axis()
-        .scale(x0)
-        .orient("bottom");
-
-      var formatPercent = d3.format(".0%");
-      var yAxis = d3.svg.axis()
-        .scale(y)
-        .orient("left")
-        .tickFormat(formatPercent);
-      console.log(width);
-      var svg = d3.select("#svg-chart").append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom + 250)
-        .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-      var statNames = ['Precision', 'Recall', 'Specificity', 'F Measure'];
-
-      data.forEach(function(d) {
-        d.stats = statNames.map(function(name) { return {name: name, value: +d[name]}; });
-      });
-
-      minVal = d3.min(data, function(d) {
-        return Math.min(d.stats[0].value, d.stats[1].value, d.stats[2].value, d.stats[3].value); 
-      });
-
-      x0.rangeRoundBands([0, data.length * 60], 0);
-      x0.domain(data.map(function(d) { return d.Class; }));
-      x1.domain(statNames).rangeRoundBands([10, 50]);
-      y.domain([minVal - 0.05, d3.max(data, function(d) { return d3.max(d.stats, function(d) { return d.value; }); })]);
-
-      svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + (height + 100) + ")")
-        .call(xAxis)
-        .selectAll("text")
-        .attr("y", 0)
-        .attr("x", 9)
-        .attr("dy", ".35em")
-        .attr("transform", "rotate(90)")
-        .style("text-anchor", "start");
-
-      svg.append("g")
-        .attr("class", "y axis")
-        .attr("transform", "translate(0, 100)")
-        .call(yAxis);
-
-      var className = svg.selectAll(".className")
-        .data(data)
-        .enter().append("g")
-        .attr("class", "g")
-        .attr("y", 100)
-        .attr("transform", function(d) { return "translate(" + x0(d.Class) + ",0)"; });
-
-      className.selectAll("rect")
-        .data(function(d) { return d.stats; })
-        .enter().append("rect")
-        .attr("width", x1.rangeBand() - 5)
-        .attr("x", function(d) { return x1(d.name); })
-        .attr("y", function(d) { return y(d.value) + 100; })
-        .attr("height", function(d) { return height - y(d.value); })
-        .style("fill", function(d) { return color(d.name); });
-
-      d3.selectAll("input").on("change", change);
-
-      var legend = svg.selectAll(".legend")
-        .data(statNames.slice())
-        .enter().append("g")
-        .attr("class", "legend")
-        .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
-
-      legend.append("rect")
-        .attr("x",  560)
-        .attr("width", 18)
-        .attr("height", 18)
-        .style("fill", color);
-
-      legend.append("text")
-        .attr("x", 550)
-        .attr("y", 9)
-        .attr("dy", ".35em")
-        .style("text-anchor", "end")
-        .text(function(d) { return d; });
-
-      svg.append("text")           
-        .attr("y", 40)
-        .style("font-size", "15px") 
-        .attr("class", "title") 
-        .text("Subtype Card Debit 20160429164200 - Classification Report");
-
-      function change() {
-        var sortKey;
-        switch(this.value) {
-          case "Precision": sortKey = function(a, b) { return b.stats[0].value - a.stats[0].value; }; break;
-          case "Recall": sortKey = function(a, b) { return b.stats[1].value - a.stats[1].value; }; break;
-          case "Specificity": sortKey = function(a, b) { return b.stats[2].value - a.stats[2].value; }; break;
-          case "FMeasure": sortKey = function(a, b) { return b.stats[3].value - a.stats[3].value; }; break;
-          default: sortKey = function(a, b) { return d3.ascending(a.Class, b.Class); }
-        }
-
-        var x2 = x0.domain(data.sort(sortKey)
-          .map(function(d) { return d.Class; }))
-          .copy();
-
-        var transition = svg.transition().duration(500),
-          delay = function(d, i) { return i * 1; };
-
-        transition.select(".x.axis")
-          .call(xAxis)
-          .selectAll("g")
-          .delay(delay)
-          .selectAll("text")
-          .attr("y", 0)
-          .attr("x", 9)
-          .attr("dy", ".35em")
-          .attr("transform", "rotate(90)")
-          .style("text-anchor", "start");
-
-        transition.selectAll("g.g")
-          .delay(delay)
-          .attr("transform", function(d) { return "translate(" + x2(d.Class) + ",0)"; });
-      }
-    });
-  </script>
+  <div id="wrap">
+    <div id="pie-chart-left-col"></div>
+    <div id="pie-chart-right-col"></div>
+  </div>
 </body>
 </html>
