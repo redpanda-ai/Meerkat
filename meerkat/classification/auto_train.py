@@ -37,7 +37,7 @@ optional arguments:
 """
 
 EXAMPLE = """
-time nohup python3 -m meerkat.classification.auto_train merchant bank -v &
+time nohup python3 -m meerkat.classification.auto_train merchant bank -v --ensemble &
 """
 
 ###################################################################################################
@@ -222,13 +222,13 @@ def auto_train():
 		config["soft_target"] = True
 		config["temperature"] = 8
 		config["num_cnns"] = 1
-		config["datatest"] = "./data/output/soft_target.csv"
+		config["dataset"] = "./data/output/soft_target.csv"
 		config["stopping_criterion"] = 3
 
 		graph, saver = build_ensemble_graph(config)
 
 		with tf.Session(graph=graph) as sess:
-			tf.initialize_all_variables().run
+			tf.initialize_all_variables().run()
 			best_model_path = train_ensemble_model(config, graph, sess, saver)
 
 	else:
@@ -259,8 +259,10 @@ def auto_train():
 
 	logging.warning('Apply the best CNN to test data and calculate performance metrics')
 	apply_cnn(args)
-	copy_file("meerkat/classification/models/train.ckpt", tarball_directory)
-	copy_file("meerkat/classification/models/train.meta", tarball_directory)
+	copy_file(best_model_path, tarball_directory)
+	copy_file(best_model_path.replace(".ckpt", ".meta"), tarball_directory)
+	# copy_file("meerkat/classification/models/train.ckpt", tarball_directory)
+	# copy_file("meerkat/classification/models/train.meta", tarball_directory)
 	make_tarfile("results.tar.gz", tarball_directory)
 	logging.info("Uploading results.tar.gz to S3 {0}".format(s3_params["prefix"]))
 	push_file_to_s3("results.tar.gz", "s3yodlee", s3_params["prefix"])
