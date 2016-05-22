@@ -59,7 +59,7 @@ def get_soft_target(data_path, models, output_path):
 def main(cnns_dir, data_path, label_map_path):
 	output_path = "data/output/"
 	models = load_multiple_models(cnns_dir, label_map_path)
-	soft_target_data_path = get_soft_target(data_path, models, output_path)
+	_ = get_soft_target(data_path, models, output_path)
 
 if __name__ == "__main__":
 	main(sys.argv[1], sys.argv[2], sys.argv[3])
