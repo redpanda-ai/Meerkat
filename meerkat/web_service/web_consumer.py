@@ -313,7 +313,7 @@ class WebConsumer():
 
 			sub_type = trans.get("txn_sub_type", "")
 
-			if subtype_category in general_category or sub_type in subtype_list:
+			if len(subtype_category) == 0 or subtype_category in general_category or sub_type in subtype_list:
 				# Regular spending transaction
 				trans["search"] = {"category_labels" : trans.get("category_labels", [])}
 
