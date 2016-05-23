@@ -604,6 +604,18 @@ def train_model(config, graph, sess, saver):
 		final_model_path = "meerkat/classification/models/ensemble_cnns/" + dataset_path + ".model" + str(i+1) + ".ckpt"
 		final_meta_path = "meerkat/classification/models/ensemble_cnns/" + dataset_path + ".model" + str(i+1) + ".meta"
 		logging.info("Moving final model from {0} to {1}.".format(model_path[i], final_model_path))
+
+	#rename cnn tensor name
+		if soft_target:
+			saver = tf.train.import_meta_graph(meta_path[i])
+			sess = tf.Session()
+			saver.restore(sess, model_path[i])
+			graph = sess.graph
+			models = get_tensor(graph, "model1/cnn:0")
+			with graph.as_default():
+				model = tf.identity(models, "model")
+			_ = saver.save(sess, model_path[i])
+
 		os.rename(model_path[i], final_model_path)
 		os.rename(meta_path[i], final_meta_path)
 	logging.info("Deleting unneeded directory of checkpoints at {0}".format(save_dir))
