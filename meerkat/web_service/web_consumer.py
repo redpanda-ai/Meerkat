@@ -297,7 +297,13 @@ class WebConsumer():
 	def __apply_missing_categories(self, transactions):
 		"""If the factual search fails to find categories do a static lookup
 		on the merchant name"""
-		general_category = set(['Other Income', 'Other Expenses', 'Other Bills', 'Service Charges/Fees', 'Transfers'])
+		json_object = open('./config/web_service.json')
+		json_data = json.loads(json_object.read())
+
+		general_category = json_data['general_category']
+		#general_category = ['Other Income', 'Other Expenses', 'Other Bills', 'Service Charges/Fees', 'Transfers']
+		subtype_list = json_data['subtype_category']
+		#subtype_list = ['Service Charge/Fee Refund', 'Refund']
 
 		for trans in transactions:
 			subtype_category = trans.get("subtype_CNN", {}).get("category",\
@@ -305,17 +311,9 @@ class WebConsumer():
 			if isinstance(subtype_category, dict):
 				subtype_category = subtype_category[trans["ledger_entry"].lower()]
 
-			condition_1 = False
-			if subtype_category in general_category:
-				condition_1 = True
-
-			condition_2 = False
-			#sub_type = trans["txn_sub_type"]
 			sub_type = trans.get("txn_sub_type", "")
-			if sub_type == "Service Charge/Fee Refund" or sub_type == "Refund":
-				condition_2 = True
 
-			if condition_1 == True or condition_2 == True:
+			if subtype_category in general_category or sub_type in subtype_list:
 				# Regular spending transaction
 				trans["search"] = {"category_labels" : trans.get("category_labels", [])}
 
