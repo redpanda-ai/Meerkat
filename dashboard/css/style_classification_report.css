@@ -56,16 +56,27 @@ body {
 }
 
 #wrap {
-  width: 90%;
-  margin: 10px auto;
+  margin: 20px 0 0 50px;
 }
 
-#pie-chart-left-col {
+#pie-chart-left-col-1 {
   float: left;
-  width: 45%;
+  width: 500px;
 }
 
-#pie-chart-right-col {
-  float: right;
-  width: 45%;
+#pie-chart-right-col-1 {
+  margin-left: 500px;
+}
+
+#pie-chart-left-col-2 {
+  float: left;
+  width: 500px;
+}
+
+#pie-chart-right-col-2 {
+  margin-left: 500px;
+}
+
+.clear {
+  clear: both;
 }

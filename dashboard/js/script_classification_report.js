@@ -256,8 +256,8 @@ d3.csv(csvFileName, function(error, data) {
     }
   }
 
-  pieGraph('#pie-chart-left-col', statPie[0], "Precision");
-  pieGraph('#pie-chart-right-col', statPie[1], "Recall");
-  pieGraph('#pie-chart-left-col', statPie[2], "Specificity");
-  pieGraph('#pie-chart-right-col', statPie[3], "F Measure");
+  pieGraph('#pie-chart-left-col-1', statPie[0], "Precision");
+  pieGraph('#pie-chart-right-col-1', statPie[1], "Recall");
+  pieGraph('#pie-chart-left-col-2', statPie[2], "Specificity");
+  pieGraph('#pie-chart-right-col-2', statPie[3], "F Measure");
 });
