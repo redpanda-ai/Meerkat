@@ -217,12 +217,12 @@ def get_merchant_by_id(*args, **kwargs):
 
 def safely_remove_file(filename):
 	"""Safely removes a file"""
-	print("Removing {0}".format(filename))
+	logging.debug("Removing {0}".format(filename))
 	try:
 		os.remove(filename)
 	except OSError:
-		print("Unable to remove {0}".format(filename))
-	print("File removed.")
+		logging.critical("Unable to remove {0}".format(filename))
+	logging.info("{0} removed".format(filename))
 
 def purge(my_dir, pattern):
 	"""Cleans up processing location on System Exit"""

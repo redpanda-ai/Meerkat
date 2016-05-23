@@ -1,0 +1,12 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "Input schema for meerkat.classification.auto_load",
+	"description": "Stuff",
+	"type": "object",
+	"properties": {
+		"aspirants": { "type": "object" },
+		"region": { "type": "string"},
+		"bucket": { "type": "string"},
+		"prefix": { "type": "string"}
+	}
+}
