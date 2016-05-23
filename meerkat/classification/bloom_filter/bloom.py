@@ -48,7 +48,18 @@ def create_location_bloom(src_filename, dst_filename):
 			location = (city_name, state_name)
 			sbf.add(location)
 
-	get_diff_json_csv()
+	try:
+		open('meerkat/classification/bloom_filter/assets/csv_not_json.txt')
+	except:
+		get_diff_json_csv()
+
+	with open('meerkat/classification/bloom_filter/assets/csv_not_json.txt') as f:
+		for line in f:
+			city, state = line.split()
+			city_name = standardize(city)
+			state_name = state.upper()
+			location = (city_name, state_name)
+			sbf.add(location)
 
 	with open(dst_filename, "bw+") as location_bloom:
 		sbf.tofile(location_bloom)
