@@ -22,6 +22,6 @@
         "index" : "factual_index",
         "type" : "factual_type"
     },
-    "general_category" : ["Other Income", "Other Expenses", "Other Bills", "Service Charges/Fees", "Transfers"],
+    "general_category" : ["Other Income", "Other Expenses", "Other Bills", "Service Charges/Fees", "Transfers", "Checks"],
     "subtype_category" : ["Service Charge/Fee Refund", "Refund"]
 }
