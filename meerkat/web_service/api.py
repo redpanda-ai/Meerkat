@@ -1,6 +1,10 @@
 """This module defines the Meerkat web service API."""
 import concurrent.futures
 import json
+import logging
+import os
+import re
+import shutil
 
 from tornado import gen
 from tornado_json.requesthandlers import APIHandler
@@ -13,8 +17,16 @@ from meerkat.various_tools import (load_params, get_us_cities,\
 class Meerkat_API(APIHandler):
 	"""This class is the Meerkat API."""
 	cities = get_us_cities()
-	params = load_params("config/web_service.json")
+	params = load_params("meerkat/web_service/config/web_service.json")
 	hyperparams = load_hyperparameters(params)
+	#Flush old cnn models, if applicable
+	if params.get("flush_old_tf_cnns", False):
+		target_dir = "meerkat/classification/models/"
+		for file_name in os.listdir(target_dir):
+			if file_name.endswith(".meta") or file_name.endswith(".ckpt"):
+				file_path = os.path.join(target_dir, file_name)
+				logging.warning("Removing {0}".format(file_path))
+				os.unlink(file_path)
 	meerkat = WebConsumer(params, hyperparams, cities)
 	#This thread pool can deal with 'blocking functions' like meerkat.classify
 	thread_pool = concurrent.futures.ThreadPoolExecutor(14)
