@@ -81,6 +81,16 @@ def generate_city_map():
 			# state = row[1] # for small.csv
 			add_with_subs(data, city, state)
 
+	try:
+		open("meerkat/classification/bloom_filter/assets/json_not_csv.txt")
+	except:
+		get_diff_json_csv()
+
+	with open("meerkat/classification/bloom_filter/assets/json_not_csv.txt") as f:
+		for line in f:
+			city, state = line.strip().split('\t')
+			add_with_subs(data, city, state)
+
 	pickle.dump(data, open("meerkat/classification/bloom_filter/assets/CITY_SUBS.log", 'wb'))
 
 	return data
