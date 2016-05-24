@@ -119,7 +119,10 @@ def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=False, model
 		"""Apply CNN to transactions"""
 
 		alphabet_length = config["alphabet_length"]
-		doc_length = config["doc_length"]
+		if "merchant" not in config["model_path"]:
+			doc_length = config["doc_length"]
+		else:
+			doc_length = 123
 		batch_size = len(trans)
 
 		tensor = np.zeros(shape=(batch_size, 1, alphabet_length, doc_length))
