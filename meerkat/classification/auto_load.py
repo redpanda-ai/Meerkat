@@ -29,7 +29,7 @@ def find_s3_objects_recursively(conn, bucket, my_results, prefix=None, target=No
 def get_peer_models(candidate_dictionary, prefix=None):
 	"""Show the candidate models for each peer"""
 	results = {}
-	my_pattern = re.compile("(" + prefix + ")(.*/)(\d{14}/)")
+	my_pattern = re.compile("(" + prefix + r")(.*/)(\d{14}/)")
 	for key in candidate_dictionary:
 		if my_pattern.search(key):
 			matches = my_pattern.match(key)
@@ -115,9 +115,10 @@ def get_best_model_of_class(target, models_dir, **kwargs):
 	return winner_count, winner
 	#End inner loop
 
-def get_best_models(bucket, prefix, results, target, s3_base, aspirants):
+#def get_best_models(bucket, prefix, results, target, s3_base, aspirants):
+def get_best_models(*args):
 	"""Gets the best model for a particular model type."""
-
+	bucket, prefix, results, target, s3_base, aspirants = args[:]
 	suffix = prefix[len(s3_base):]
 	models_dir = "meerkat/classification/models/"
 
@@ -147,6 +148,8 @@ def get_best_models(bucket, prefix, results, target, s3_base, aspirants):
 	safely_remove_file(target)
 
 def get_asset_name(suffix, key, extension):
+	"""Cleans up the name of a meta, json, or ckpt file, which may
+	have a leading dot '.'"""
 	result = (suffix + key).replace("/", ".") + extension
 	if result.startswith("."):
 		result = result[1:]
@@ -179,7 +182,8 @@ def main_program(bucket="s3yodlee", region="us-west-2", prefix="meerkat/cnn/data
 	config=None):
 	"""Execute the main program"""
 	parser = argparse.ArgumentParser("auto_load")
-	parser.add_argument("-l", "--log_level", default="warning", help="Show at least this level of logs")
+	parser.add_argument("-l", "--log_level", default="warning",
+		help="Show at least this level of logs")
 	parser.add_argument("-b", "--bucket", default=bucket,
 		help="Name of S3 bucket containing the candidate models.")
 	parser.add_argument("-r", "--region", default=region,
@@ -198,7 +202,8 @@ def main_program(bucket="s3yodlee", region="us-west-2", prefix="meerkat/cnn/data
 		logging.basicConfig(format=log_format, level=logging.INFO)
 	aspirants = {}
 	if args.config is not None:
-		config = validate_configuration(args.config, "meerkat/classification/config/auto_load_schema.json")
+		config = validate_configuration(args.config,
+			"meerkat/classification/config/auto_load_schema.json")
 		aspirants = config.get("aspirants", {})
 		args.region = config.get("region", args.region)
 		args.prefix = config.get("prefix", args.prefix)
