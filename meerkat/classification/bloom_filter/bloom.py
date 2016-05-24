@@ -55,7 +55,7 @@ def create_location_bloom(src_filename, dst_filename):
 
 	with open('meerkat/classification/bloom_filter/assets/csv_not_json.txt') as f:
 		for line in f:
-			city, state = line.split()
+			city, state = line.split('\t')
 			city_name = standardize(city)
 			state_name = state.upper()
 			location = (city_name, state_name)
