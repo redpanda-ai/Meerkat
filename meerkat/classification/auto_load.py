@@ -1,14 +1,14 @@
 """This module will update Meerkat's models from S3"""
 
 import argparse
-import boto
 import logging
 import re
 import tarfile
+import os
 import pandas as pd
 
+from boto.s3 import connect_to_region
 from boto.s3.key import Key
-from os import rename
 
 from meerkat.various_tools import safely_remove_file
 
@@ -17,8 +17,10 @@ def find_s3_objects_recursively(conn, bucket, my_results, prefix=None, target=No
 	folders = bucket.list(prefix=prefix, delimiter="/")
 	for s3_object in folders:
 		if s3_object.name != prefix:
-			if s3_object.name[-len(target):] == target:
+			last_slash = s3_object.name[-len(target) - 1] == "/"
+			if s3_object.name[-len(target):] == target and last_slash:
 				my_results[prefix] = target
+				logging.debug("name is {0}".format(s3_object.name))
 				return s3_object.name
 			elif s3_object.name[-1:] == "/":
 				find_s3_objects_recursively(conn, bucket, my_results, prefix=s3_object.name,
@@ -56,7 +58,7 @@ def get_model_accuracy(confusion_matrix):
 
 	return accuracy.values[0]
 
-def get_single_file_from_tarball(archive, filename_pattern):
+def get_single_file_from_tarball(archive_name, archive, filename_pattern):
 	"""Untars and gunzips the stats file from the archive file"""
 	if not tarfile.is_tarfile(archive):
 		raise Exception("Invalid, not a tarfile.")
@@ -66,13 +68,46 @@ def get_single_file_from_tarball(archive, filename_pattern):
 		logging.debug("Members {0}".format(members))
 		file_list = [member for member in members if my_pattern.search(member.name)]
 		if len(file_list) != 1:
-			logging.critical("Invalid, tarfile must have exactly one matching file.")
-			raise Exception("Invalid, tarfile must have exactly one matching file.")
+			format_string = "Archive {0} does not contain exactly one file matching pattern: {1}."
+			logging.warning(format_string.format(archive_name, filename_pattern))
+			raise Exception("Bad archive")
 		else:
 			my_file = file_list.pop()
 			my_name = my_file.name
 			tar.extract(my_file)
 	return my_name
+
+def get_best_model_of_class(target, models_dir, **kwargs):
+	"""Finds the best candidate model of all contenders."""
+	highest_score, winner, candidate_count = 0.0, None, 1
+	winner_count = candidate_count
+	#Start inner loop
+	for timestamp in kwargs["results"][kwargs["key"]]:
+		k = Key(kwargs["bucket"])
+		k.key = kwargs["prefix"] + kwargs["key"] + timestamp + target
+		k.get_contents_to_filename(target)
+		# Require Meta
+		try:
+			meta = get_single_file_from_tarball(timestamp, target, ".*meta")
+			safely_remove_file(meta)
+		except:
+			continue
+
+		matrix = get_single_file_from_tarball(timestamp, target, "confusion_matrix.csv")
+		score = get_model_accuracy(matrix)
+
+		if score > highest_score:
+			highest_score = score
+			winner = timestamp
+			winner_count = candidate_count
+			leader_model = get_single_file_from_tarball(timestamp, target, ".*ckpt")
+			new_model_path = models_dir + (kwargs["suffix"] + kwargs["key"]).replace("/", ".")[1:] + "ckpt"
+			os.rename(leader_model, new_model_path)
+		logging.info("\t{0:<14}{1:>2}: {2:16}, Score: {3:0.5f}".format("Candidate",
+			candidate_count, timestamp, score))
+		candidate_count += 1
+	return winner_count, winner
+	#End inner loop
 
 def get_best_models(bucket, prefix, results, target, s3_base):
 	"""Gets the best model for a particular model type."""
@@ -86,78 +121,52 @@ def get_best_models(bucket, prefix, results, target, s3_base):
 		if "category" in key:
 			continue
 
-		highest_score, winner = 0.0, None
 		logging.info("Evaluating {0}".format(key))
-		candidate_count = 1
-		
-		for timestamp in results[key]:
-			k = Key(bucket)
-			k.key = prefix + key + timestamp + target
-			k.get_contents_to_filename(target)
+		winner_count, winner = get_best_model_of_class(target, models_dir, bucket=bucket,
+			prefix=prefix, results=results, key=key, suffix=suffix)
 
-			# Require Meta
-			try:
-				meta = get_single_file_from_tarball(target, ".*meta")
-				safely_remove_file(meta)
-			except:
-				continue
-
-			matrix = get_single_file_from_tarball(target, "confusion_matrix.csv")
-			score = get_model_accuracy(matrix)
-
-			if score > highest_score:
-				highest_score = score
-				winner = timestamp
-				winner_count = candidate_count
-				leader_model = get_single_file_from_tarball(target, ".*ckpt")
-				new_model_path = models_dir + (suffix + key).replace("/", ".")[1:] + "ckpt"
-				rename(leader_model, new_model_path)
-
-			logging.info("\t{0:<14}{1:>2}: {2:16}, Score: {3:0.5f}".format("Candidate", candidate_count, timestamp, score))
-			candidate_count += 1
-
-		set_label_map_and_meta(bucket, prefix, key, winner, s3_base, "results.tar.gz", "meerkat/classification/")
+		args = [bucket, prefix, key, winner, s3_base, "results.tar.gz", "meerkat/classification/"]
+		set_label_map_and_meta(*args)
 		logging.info("\t{0:<14}{1:>2}".format("Winner", winner_count))
 
 	# Cleanup
 	safely_remove_file("confusion_matrix.csv")
 	safely_remove_file(target)
 
-def set_label_map_and_meta(bucket, prefix, key, winner, s3_base, tarball, output_path):
-	"""Moves the appropriate label map from S3 to the local machine."""
+def set_label_map_and_meta(*args):
+	"""Moves the appropriate label map and meta files from a tarball in S3 to 
+	a specific path on the local machine."""
+	bucket, prefix, key, winner, s3_base, tarball, output_path = args[:]
 
 	suffix = prefix[len(s3_base):]
 
-	if bucket is not None:
+	if bucket is not None: #None is used for unit tests
 		s3_key = Key(bucket)
 		s3_key.key = prefix + key + winner + tarball
 		s3_key.get_contents_to_filename(tarball)
 
-	json_file = get_single_file_from_tarball(tarball, ".*json")
-	meta_file = get_single_file_from_tarball(tarball, ".*meta")
+	#Move label_map
+	json_file = get_single_file_from_tarball("", tarball, ".*json")
 	new_path = output_path + "label_maps/" + (suffix + key).replace("/", ".")[1:] + "json"
-	new_graph_def_path = output_path + "models/" + (suffix + key).replace("/", ".")[1:] + "meta"
-
 	logging.debug("Moving label_map to: {0}".format(new_path))
-	rename(json_file, new_path)
-	rename(meta_file, new_graph_def_path)
-
+	os.rename(json_file, new_path)
+	#Move graph
+	meta_file = get_single_file_from_tarball("", tarball, ".*meta")
+	new_graph_def_path = output_path + "models/" + (suffix + key).replace("/", ".")[1:] + "meta"
+	os.rename(meta_file, new_graph_def_path)
 	return new_path
 
-def main_program(prefix="meerkat/cnn/data"):
+def main_program():
 	"""Execute the main program"""
-	conn = boto.s3.connect_to_region('us-west-2')
-	bucket = conn.get_bucket("s3yodlee")
-	my_results, target, s3_base = {}, "results.tar.gz", "meerkat/cnn/data"
-	find_s3_objects_recursively(conn, bucket, my_results, prefix=prefix, target=target)
-	results = get_peer_models(my_results, prefix=prefix)
-	get_best_models(bucket, prefix, results, target, s3_base)
-
-if __name__ == "__main__":
-	#Execute the main program
 	parser = argparse.ArgumentParser("auto_load")
 	parser.add_argument("-d", "--debug", help="Show 'debug'+ level logs", action="store_true")
 	parser.add_argument("-v", "--info", help="Show 'info'+ level logs", action="store_true")
+	parser.add_argument("-b", "--bucket", action="store_true", default="s3yodlee",
+		help="Name of S3 bucket containing the candidate models.")
+	parser.add_argument("-r", "--region", action="store_true", default="us-west-2",
+		help="Name of the AWS region containing the S3 bucket")
+	parser.add_argument("-p", "--prefix", action="store_true", default="meerkat/cnn/data",
+		help="S3 object prefix that precedes all object keys for our candidate models")
 	args = parser.parse_args()
 	log_format = "%(asctime)s %(levelname)s: %(message)s"
 	if args.debug:
@@ -167,5 +176,14 @@ if __name__ == "__main__":
 	else:
 		logging.basicConfig(format=log_format, level=logging.WARNING)
 	logging.warning("Starting main program")
-	main_program()
+	conn = connect_to_region(args.region)
+	bucket = conn.get_bucket(args.bucket)
+	my_results, target = {}, "results.tar.gz",
+	find_s3_objects_recursively(conn, bucket, my_results, prefix=args.prefix, target=target)
+	results = get_peer_models(my_results, prefix=args.prefix)
+	get_best_models(bucket, args.prefix, results, target, args.prefix)
 	logging.warning("Finishing main program")
+
+if __name__ == "__main__":
+	#Execute the main program
+	main_program()

@@ -70,7 +70,7 @@ class AutoLoadTests(unittest.TestCase):
 
 	@parameterized.expand([
 		(["tarball_1.tar.gz", ".*txt", True, "not a tarfile."]),
-		(["tarball_2.tar.gz", ".*csv", True, "exactly one"]),
+		(["tarball_2.tar.gz", ".*csv", True, "Bad archive"]),
 		(["tarball_3.tar.gz", "foo", False, "foo.txt"])
 	])
 	def test_get_single_file_from_tarball(self, tarball, pattern, exception, expected):
@@ -78,9 +78,9 @@ class AutoLoadTests(unittest.TestCase):
 		tarball = "tests/classification/fixture/" + tarball
 		if exception:
 			self.assertRaisesRegex(Exception, expected,
-				auto_load.get_single_file_from_tarball, tarball, pattern)
+				auto_load.get_single_file_from_tarball, "", tarball, pattern)
 		else:
-			result = auto_load.get_single_file_from_tarball(tarball, pattern)
+			result = auto_load.get_single_file_from_tarball("", tarball, pattern)
 			self.assertEqual(result, expected)
 if __name__ == '__main__':
 	unittest.main()
