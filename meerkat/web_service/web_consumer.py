@@ -55,7 +55,8 @@ class WebConsumer():
 
 		gmf = self.params.get("gpu_mem_fraction", False)
 		auto_load_config = self.params.get("auto_load_config", None)
-		load_models_from_s3(config=auto_load_config)
+		if auto_load_config is not None:
+			load_models_from_s3(config=auto_load_config)
 
 		self.bank_merchant_cnn = get_tf_cnn_by_name("bank_merchant", gpu_mem_fraction=gmf)
 		self.card_merchant_cnn = get_tf_cnn_by_name("card_merchant", gpu_mem_fraction=gmf)
