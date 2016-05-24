@@ -169,17 +169,18 @@ def set_label_map_and_meta(*args):
 	os.rename(meta_file, new_graph_def_path)
 	return new_path
 
-def main_program():
+def main_program(bucket="s3yodlee", region="us-west-2", prefix="meerkat/cnn/data",
+	config=None):
 	"""Execute the main program"""
 	parser = argparse.ArgumentParser("auto_load")
 	parser.add_argument("-l", "--log_level", default="warning", help="Show at least this level of logs")
-	parser.add_argument("-b", "--bucket", default="s3yodlee",
+	parser.add_argument("-b", "--bucket", default=bucket,
 		help="Name of S3 bucket containing the candidate models.")
-	parser.add_argument("-r", "--region", default="us-west-2",
+	parser.add_argument("-r", "--region", default=region,
 		help="Name of the AWS region containing the S3 bucket")
-	parser.add_argument("-p", "--prefix", default="meerkat/cnn/data",
+	parser.add_argument("-p", "--prefix", default=prefix,
 		help="S3 object prefix that precedes all object keys for our candidate models")
-	parser.add_argument("-c", "--config", default=None,
+	parser.add_argument("-c", "--config", default=config,
 		help="The local path to a JSON file of models have been pre-selected")
 	args = parser.parse_args()
 	log_format = "%(asctime)s %(levelname)s: %(message)s"

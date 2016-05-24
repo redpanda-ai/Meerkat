@@ -18,6 +18,7 @@ from scipy.stats.mstats import zscore
 from meerkat.various_tools import get_es_connection, string_cleanse, get_boosted_fields
 from meerkat.various_tools import synonyms, get_bool_query, get_qs_query
 from meerkat.classification.load_model import load_scikit_model, get_tf_cnn_by_name
+from meerkat.classification.auto_load import main_program as load_models_from_s3
 
 # pylint:disable=no-name-in-module
 from meerkat.classification.bloom_filter.find_entities import location_split
@@ -53,6 +54,8 @@ class WebConsumer():
 		"""Load all tensorFlow models"""
 
 		gmf = self.params.get("gpu_mem_fraction", False)
+		auto_load_config = self.params.get("auto_load_config", None)
+		load_models_from_s3(config=auto_load_config)
 
 		self.bank_merchant_cnn = get_tf_cnn_by_name("bank_merchant", gpu_mem_fraction=gmf)
 		self.card_merchant_cnn = get_tf_cnn_by_name("card_merchant", gpu_mem_fraction=gmf)
