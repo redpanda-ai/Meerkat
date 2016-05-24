@@ -107,7 +107,7 @@ def get_best_model_of_class(target, models_dir, **kwargs):
 			winner = timestamp
 			winner_count = candidate_count
 			leader_model = get_single_file_from_tarball(timestamp, target, ".*ckpt")
-			new_model_path = models_dir + (kwargs["suffix"] + kwargs["key"]).replace("/", ".") + "ckpt"
+			new_model_path = models_dir + get_asset_name(kwargs["suffix"], kwargs["key"], "ckpt")
 			os.rename(leader_model, new_model_path)
 		logging.info("\t{0:<14}{1:>2}: {2:16}, Score: {3:0.5f}".format("Candidate",
 			candidate_count, timestamp, score))
@@ -146,6 +146,12 @@ def get_best_models(bucket, prefix, results, target, s3_base, aspirants):
 	safely_remove_file("confusion_matrix.csv")
 	safely_remove_file(target)
 
+def get_asset_name(suffix, key, extension):
+	result = (suffix + key).replace("/", ".") + extension
+	if result.startswith("."):
+		result = result[1:]
+	return result
+
 def set_label_map_and_meta(*args):
 	"""Moves the appropriate label map and meta files from a tarball in S3 to 
 	a specific path on the local machine."""
@@ -160,12 +166,12 @@ def set_label_map_and_meta(*args):
 
 	#Move label_map
 	json_file = get_single_file_from_tarball("", tarball, ".*json")
-	new_path = output_path + "label_maps/" + (suffix + key).replace("/", ".") + "json"
+	new_path = output_path + "label_maps/" + get_asset_name(suffix, key, "json")
 	logging.debug("Moving label_map to: {0}".format(new_path))
 	os.rename(json_file, new_path)
 	#Move graph
 	meta_file = get_single_file_from_tarball("", tarball, ".*meta")
-	new_graph_def_path = output_path + "models/" + (suffix + key).replace("/", ".") + "meta"
+	new_graph_def_path = output_path + "models/" + get_asset_name(suffix, key, "meta")
 	os.rename(meta_file, new_graph_def_path)
 	return new_path
 
