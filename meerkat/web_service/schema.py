@@ -74,7 +74,7 @@ def validate(input_schema=None, output_schema=None,\
 					input_,
 					input_schema
 				)
-				services_list_validation(input_.get("services_list", []))
+				# services_list_validation(input_.get("services_list", []))
 			else:
 				input_ = None
 
