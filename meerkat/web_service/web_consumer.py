@@ -12,12 +12,14 @@ import json
 import string
 import re
 import logging
+import os
 from multiprocessing.pool import ThreadPool
 from scipy.stats.mstats import zscore
 
 from meerkat.various_tools import get_es_connection, string_cleanse, get_boosted_fields
 from meerkat.various_tools import synonyms, get_bool_query, get_qs_query
 from meerkat.classification.load_model import load_scikit_model, get_tf_cnn_by_name
+from meerkat.classification.auto_load import main_program as load_models_from_s3
 
 # pylint:disable=no-name-in-module
 from meerkat.classification.bloom_filter.find_entities import location_split
@@ -53,6 +55,19 @@ class WebConsumer():
 		"""Load all tensorFlow models"""
 
 		gmf = self.params.get("gpu_mem_fraction", False)
+		auto_load_config = self.params.get("auto_load_config", None)
+
+		#Auto load cnn models from S2, if necessary
+		if auto_load_config is not None:
+			#Flush old models, to be safe
+			target_dir = "meerkat/classification/models/"
+			for file_name in os.listdir(target_dir):
+				if file_name.endswith(".meta") or file_name.endswith(".ckpt"):
+					file_path = os.path.join(target_dir, file_name)
+					logging.warning("Removing {0}".format(file_path))
+					os.unlink(file_path)
+			#Load new models from S3
+			load_models_from_s3(config=auto_load_config)
 
 		self.bank_merchant_cnn = get_tf_cnn_by_name("bank_merchant", gpu_mem_fraction=gmf)
 		self.card_merchant_cnn = get_tf_cnn_by_name("card_merchant", gpu_mem_fraction=gmf)
@@ -297,7 +312,7 @@ class WebConsumer():
 	def __apply_missing_categories(self, transactions):
 		"""If the factual search fails to find categories do a static lookup
 		on the merchant name"""
-		json_object = open('./config/web_service.json')
+		json_object = open('meerkat/web_service/config/web_service.json')
 		json_data = json.loads(json_object.read())
 
 		general_category = json_data['general_category']
