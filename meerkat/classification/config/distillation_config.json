@@ -1,7 +1,8 @@
 {
+	"num_cnns" : 1,
 	"mode": "train",
 	"model_path": "",
-	"dataset": "",
+	"dataset": "data/output/soft_target.csv",
 	"label_map": "",
 	"container": "",
 	"model_type": "",
@@ -14,5 +15,8 @@
 	"base_rate": 2e-2,
 	"decay": 1e-5,
 	"epochs": 5000,
-	"eras": 25
+	"eras": 25,
+	"soft_target": true,
+	"temperature": 8,
+	"stopping_criterion": 3
 }

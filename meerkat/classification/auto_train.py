@@ -37,7 +37,7 @@ optional arguments:
 """
 
 EXAMPLE = """
-time nohup python3 -m meerkat.classification.auto_train merchant bank -v &
+time nohup python3 -m meerkat.classification.auto_train merchant bank -v --ensemble &
 """
 
 ###################################################################################################
@@ -49,11 +49,13 @@ import shutil
 
 import tensorflow as tf
 
-from plumbum import local
 from meerkat.classification.split_data import main_split_data
 from meerkat.classification.tools import (pull_from_s3, check_new_input_file,
-	push_file_to_s3, make_tarfile, copy_file, check_file_exist_in_s3)
+	push_file_to_s3, make_tarfile, copy_file, check_file_exist_in_s3, extract_tarball)
 from meerkat.classification.tensorflow_cnn import build_graph, train_model, validate_config
+from meerkat.classification.ensemble_cnns import build_graph as build_ensemble_graph
+from meerkat.classification.ensemble_cnns import train_model as train_ensemble_model
+from meerkat.classification.soft_target import main as get_soft_target
 from meerkat.various_tools import load_params, safe_input
 from meerkat.classification.auto_load import get_single_file_from_tarball
 from meerkat.classification.classification_report import main_process as apply_cnn
@@ -72,7 +74,8 @@ def parse_arguments():
 		"bucket": "Input bucket name, default is s3yodlee",
 		"input_dir": "Path of the directory containing input file",
 		"debug": "log at DEBUG level",
-		"info": "log at INFO level"
+		"info": "log at INFO level",
+		"ensemble": "Including this flag will use ensemble method."
 	}
 
 	choices = {
@@ -86,6 +89,7 @@ def parse_arguments():
 		choices=choices["bank_or_card"])
 
 	# Optional arguments
+	parser.add_argument("--ensemble", action="store_true", help=help_text["ensemble"])
 	parser.add_argument("--input_dir", help=help_text["input_dir"], default='')
 	parser.add_argument("--output_dir", help=help_text["output_dir"], default='')
 	parser.add_argument("--credit_or_debit", default='', help=help_text["credit_or_debit"])
@@ -183,7 +187,7 @@ def auto_train():
 		save_path = save_path + 'preprocessed/'
 	else:
 		output_file = pull_from_s3(extension='.tar.gz', file_name="preprocessed.tar.gz", **s3_params)
-		local["tar"]["xfv"][output_file]["-C"][save_path]()
+		extract_tarball(output_file, save_path)
 
 	train_file = save_path + "train.csv"
 	test_file = save_path + "test.csv"
@@ -195,7 +199,10 @@ def auto_train():
 	shutil.copyfile(label_map, tarball_directory + "label_map.json")
 
 	# Load and Modify Config
-	config = load_params("meerkat/classification/config/default_tf_config.json")
+	if args.ensemble:
+		config = load_params("meerkat/classification/config/ensemble_cnns_config.json")
+	else:
+		config = load_params("meerkat/classification/config/default_tf_config.json")
 	config["label_map"] = label_map
 	config["dataset"] = train_file
 	config["ledger_entry"] = args.credit_or_debit
@@ -204,11 +211,32 @@ def auto_train():
 	config = validate_config(config)
 
 	# Train the model
-	graph, saver = build_graph(config)
+	if args.ensemble:
+		graph, saver = build_ensemble_graph(config)
 
-	with tf.Session(graph=graph) as sess:
-		tf.initialize_all_variables().run()
-		best_model_path = train_model(config, graph, sess, saver)
+		with tf.Session(graph=graph) as sess:
+			tf.initialize_all_variables().run()
+			train_ensemble_model(config, graph, sess, saver)
+
+		get_soft_target("meerkat/classification/models/ensemble_cnns/", train_file, label_map)
+		config["soft_target"] = True
+		config["temperature"] = 8
+		config["num_cnns"] = 1
+		config["dataset"] = "./data/output/soft_target.csv"
+		config["stopping_criterion"] = 3
+
+		graph, saver = build_ensemble_graph(config)
+
+		with tf.Session(graph=graph) as sess:
+			tf.initialize_all_variables().run()
+			best_model_path = train_ensemble_model(config, graph, sess, saver)
+
+	else:
+		graph, saver = build_graph(config)
+
+		with tf.Session(graph=graph) as sess:
+			tf.initialize_all_variables().run()
+			best_model_path = train_model(config, graph, sess, saver)
 
 	# Evaluate trained model using test set
 	ground_truth_labels = {
@@ -225,13 +253,14 @@ def auto_train():
 	args.secdoc_key = 'DESCRIPTION'
 	args.label = ground_truth_labels[model_type]
 	args.predict_key = 'PREDICTED_CLASS'
-	args.is_merchant = (model_type == 'merchant')
 	args.fast_mode = False
 
 	logging.warning('Apply the best CNN to test data and calculate performance metrics')
 	apply_cnn(args)
-	copy_file("meerkat/classification/models/train.ckpt", tarball_directory)
-	copy_file("meerkat/classification/models/train.meta", tarball_directory)
+	copy_file(best_model_path, tarball_directory)
+	copy_file(best_model_path.replace(".ckpt", ".meta"), tarball_directory)
+	# copy_file("meerkat/classification/models/train.ckpt", tarball_directory)
+	# copy_file("meerkat/classification/models/train.meta", tarball_directory)
 	make_tarfile("results.tar.gz", tarball_directory)
 	logging.info("Uploading results.tar.gz to S3 {0}".format(s3_params["prefix"]))
 	push_file_to_s3("results.tar.gz", "s3yodlee", s3_params["prefix"])
