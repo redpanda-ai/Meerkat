@@ -107,7 +107,7 @@ def get_best_model_of_class(target, models_dir, **kwargs):
 			winner = timestamp
 			winner_count = candidate_count
 			leader_model = get_single_file_from_tarball(timestamp, target, ".*ckpt")
-			new_model_path = models_dir + (kwargs["suffix"] + kwargs["key"]).replace("/", ".")[1:] + "ckpt"
+			new_model_path = models_dir + (kwargs["suffix"] + kwargs["key"]).replace("/", ".") + "ckpt"
 			os.rename(leader_model, new_model_path)
 		logging.info("\t{0:<14}{1:>2}: {2:16}, Score: {3:0.5f}".format("Candidate",
 			candidate_count, timestamp, score))
@@ -160,12 +160,12 @@ def set_label_map_and_meta(*args):
 
 	#Move label_map
 	json_file = get_single_file_from_tarball("", tarball, ".*json")
-	new_path = output_path + "label_maps/" + (suffix + key).replace("/", ".")[1:] + "json"
+	new_path = output_path + "label_maps/" + (suffix + key).replace("/", ".") + "json"
 	logging.debug("Moving label_map to: {0}".format(new_path))
 	os.rename(json_file, new_path)
 	#Move graph
 	meta_file = get_single_file_from_tarball("", tarball, ".*meta")
-	new_graph_def_path = output_path + "models/" + (suffix + key).replace("/", ".")[1:] + "meta"
+	new_graph_def_path = output_path + "models/" + (suffix + key).replace("/", ".") + "meta"
 	os.rename(meta_file, new_graph_def_path)
 	return new_path
 
