@@ -30,7 +30,7 @@
 		},
 		"doc_length" : {
 			"description" : "A fixed width of which all documents are cast to either by padding or trucation",
-			"enum" : [105, 132, 159, 186]
+			"enum" : [123, 105, 132, 159, 186]
 		},
 		"epochs" : {
 			"description" : "The number of training steps between checkpoints",
