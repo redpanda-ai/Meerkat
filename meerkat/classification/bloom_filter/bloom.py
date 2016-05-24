@@ -49,11 +49,11 @@ def create_location_bloom(src_filename, dst_filename):
 			sbf.add(location)
 
 	try:
-		open('meerkat/classification/bloom_filter/assets/csv_not_json.txt')
+		open('meerkat/classification/bloom_filter/assets/csv_not_json')
 	except:
 		get_diff_json_csv()
 
-	with open('meerkat/classification/bloom_filter/assets/csv_not_json.txt') as f:
+	with open('meerkat/classification/bloom_filter/assets/csv_not_json') as f:
 		for line in f:
 			city, state = line.strip().split('\t')
 			city_name = standardize(city)
@@ -88,13 +88,13 @@ def get_diff_json_csv():
 			location = (standardize(city), state)
 			dict_csv[location] = (city, state)
 
-	with open('meerkat/classification/bloom_filter/assets/csv_not_json.txt', 'w') as f:
+	with open('meerkat/classification/bloom_filter/assets/csv_not_json', 'w') as f:
 		for key in dict_csv.keys():
 			if key not in dict_json:
 				tup = dict_csv[key]
 				f.write('{0}	{1}'.format(tup[0], tup[1]) + '\n')
 
-	with open('meerkat/classification/bloom_filter/assets/json_not_csv.txt', 'w') as f:
+	with open('meerkat/classification/bloom_filter/assets/json_not_csv', 'w') as f:
 		for key in dict_json.keys():
 			if key not in dict_csv:
 				tup = dict_json[key]

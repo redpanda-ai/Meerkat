@@ -82,11 +82,11 @@ def generate_city_map():
 			add_with_subs(data, city, state)
 
 	try:
-		open("meerkat/classification/bloom_filter/assets/json_not_csv.txt")
+		open("meerkat/classification/bloom_filter/assets/json_not_csv")
 	except:
 		get_diff_json_csv()
 
-	with open("meerkat/classification/bloom_filter/assets/json_not_csv.txt") as f:
+	with open("meerkat/classification/bloom_filter/assets/json_not_csv") as f:
 		for line in f:
 			city, state = line.strip().split('\t')
 			add_with_subs(data, city, state)
