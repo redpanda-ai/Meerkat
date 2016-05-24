@@ -1,18 +1,22 @@
 {
+	"num_cnns" : 1,
 	"mode": "train",
 	"model_path": "",
-	"dataset": "",
-	"label_map": "tests/fixture/foo.json",
-	"container": "bank",
-	"model_type": "subtype",
+	"dataset": "data/output/soft_target.csv",
+	"label_map": "",
+	"container": "",
+	"model_type": "",
 	"ledger_entry": "",
 	"alphabet": "abcdefghijklmnopqrstuvwxyz0123456789,;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}",
 	"batch_size": 128,
 	"doc_length": 132,
 	"randomize": 5e-2,
 	"momentum": 0.9,
-	"base_rate": 1e-2,
+	"base_rate": 2e-2,
 	"decay": 1e-5,
 	"epochs": 5000,
-	"eras": 25
+	"eras": 25,
+	"soft_target": true,
+	"temperature": 8,
+	"stopping_criterion": 3
 }

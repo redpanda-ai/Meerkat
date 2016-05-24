@@ -297,28 +297,45 @@ class WebConsumer():
 	def __apply_missing_categories(self, transactions):
 		"""If the factual search fails to find categories do a static lookup
 		on the merchant name"""
-		
+		json_object = open('./config/web_service.json')
+		json_data = json.loads(json_object.read())
+
+		general_category = json_data['general_category']
+		#general_category = ['Other Income', 'Other Expenses', 'Other Bills', 'Service Charges/Fees', 'Transfers']
+		subtype_list = json_data['subtype_category']
+		#subtype_list = ['Service Charge/Fee Refund', 'Refund']
+
 		for trans in transactions:
+			subtype_category = trans.get("subtype_CNN", {}).get("category",\
+				 trans.get("subtype_CNN", {}).get("label", ""))
+			if isinstance(subtype_category, dict):
+				subtype_category = subtype_category[trans["ledger_entry"].lower()]
 
-			trans["search"] = {"category_labels" : trans.get("category_labels", [])}
+			sub_type = trans.get("txn_sub_type", "")
 
-			if trans.get("category_labels"):
+			if len(subtype_category) == 0 or subtype_category in general_category or sub_type in subtype_list:
+				# Regular spending transaction
+				trans["search"] = {"category_labels" : trans.get("category_labels", [])}
+
+				if trans.get("category_labels"):
+					trans["CNN"] = trans.get("CNN", {}).get("label", "")
+					if "subtype_CNN" in trans:
+						del trans["subtype_CNN"]
+					continue
+
+				fallback = trans.get("CNN", {}).get("category", "").strip()
+
+				if fallback == "Use Subtype Rules for Categories" or fallback == "":
+					fallback = subtype_category
+
+				trans["category_labels"] = [fallback]
 				trans["CNN"] = trans.get("CNN", {}).get("label", "")
-				if "subtype_CNN" in trans:
-					del trans["subtype_CNN"]
-				continue
-
-			fallback = trans.get("CNN", {}).get("category", "").strip()
-
-			if fallback == "Use Subtype Rules for Categories" or fallback == "":
-				fallback = trans.get("subtype_CNN", {}).get("category",\
-					trans.get("subtype_CNN", {}).get("label", ""))
-				fallback = isinstance(fallback, dict) and fallback[trans["ledger_entry"].lower()] or fallback
-
-			trans["category_labels"] = [fallback]
-			trans["CNN"] = trans.get("CNN", {}).get("label", "")
-
-			trans.pop("subtype_CNN", None)
+				trans.pop("subtype_CNN", None)
+			else:
+				# Payroll transaction
+				trans["category_labels"] = [subtype_category]
+				trans["CNN"] = trans.get("CNN", {}).get("label", "")
+				trans.pop("subtype_CNN", None)
 
 	def ensure_output_schema(self, transactions, debug, services_list):
 		"""Clean output to proper schema"""

@@ -77,7 +77,7 @@ def get_tf_cnn_by_name(model_name, gpu_mem_fraction=False):
 
 	return get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=gpu_mem_fraction)
 
-def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=False):
+def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=False, model_name=False):
 	"""Load a tensorFlow module by name"""
 
 	# Load Config
@@ -108,14 +108,21 @@ def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=False):
 
 	saver.restore(sess, config["model_path"])
 	graph = sess.graph
-	model = get_tensor(graph, "model:0")
+
+	if not model_name:
+		model = get_tensor(graph, "model:0")
+	else:
+		model = get_tensor(graph, model_name)
 
 	# Generate Helper Function
-	def apply_cnn(trans, doc_key="description", label_key="CNN", label_only=True):
+	def apply_cnn(trans, doc_key="description", label_key="CNN", label_only=True, soft_target=False):
 		"""Apply CNN to transactions"""
 
 		alphabet_length = config["alphabet_length"]
-		doc_length = config["doc_length"]
+		if "merchant" not in config["model_path"]:
+			doc_length = config["doc_length"]
+		else:
+			doc_length = 123
 		batch_size = len(trans)
 
 		tensor = np.zeros(shape=(batch_size, 1, alphabet_length, doc_length))
@@ -126,13 +133,16 @@ def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=False):
 		tensor = np.transpose(tensor, (0, 1, 3, 2))
 		feed_dict_test = {get_tensor(graph, "x:0"): tensor}
 		output = sess.run(model, feed_dict=feed_dict_test)
-		labels = np.argmax(output, 1) + 1
-	
-		for index, transaction in enumerate(trans):
-			label = label_map.get(str(labels[index]), "")
-			if isinstance(label, dict) and label_only:
-				label = label["label"]
-			transaction[label_key] = label
+		if not soft_target:
+			labels = np.argmax(output, 1) + 1
+
+			for index, transaction in enumerate(trans):
+				label = label_map.get(str(labels[index]), "")
+				if isinstance(label, dict) and label_only:
+					label = label["label"]
+				transaction[label_key] = label
+		else:
+			return output
 
 		return trans
 
