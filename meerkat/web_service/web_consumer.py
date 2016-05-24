@@ -312,7 +312,7 @@ class WebConsumer():
 	def __apply_missing_categories(self, transactions):
 		"""If the factual search fails to find categories do a static lookup
 		on the merchant name"""
-		json_object = open('./config/web_service.json')
+		json_object = open('meerkat/web_service/config/web_service.json')
 		json_data = json.loads(json_object.read())
 
 		general_category = json_data['general_category']
