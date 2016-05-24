@@ -12,6 +12,7 @@ import json
 import string
 import re
 import logging
+import os
 from multiprocessing.pool import ThreadPool
 from scipy.stats.mstats import zscore
 
@@ -55,7 +56,17 @@ class WebConsumer():
 
 		gmf = self.params.get("gpu_mem_fraction", False)
 		auto_load_config = self.params.get("auto_load_config", None)
+
+		#Auto load cnn models from S2, if necessary
 		if auto_load_config is not None:
+			#Flush old models, to be safe
+			target_dir = "meerkat/classification/models/"
+			for file_name in os.listdir(target_dir):
+				if file_name.endswith(".meta") or file_name.endswith(".ckpt"):
+					file_path = os.path.join(target_dir, file_name)
+					logging.warning("Removing {0}".format(file_path))
+					os.unlink(file_path)
+			#Load new models from S3
 			load_models_from_s3(config=auto_load_config)
 
 		self.bank_merchant_cnn = get_tf_cnn_by_name("bank_merchant", gpu_mem_fraction=gmf)
