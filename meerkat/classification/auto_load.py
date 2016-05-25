@@ -182,7 +182,7 @@ def main_program(bucket="s3yodlee", region="us-west-2", prefix="meerkat/cnn/data
 	config=None):
 	"""Execute the main program"""
 	parser = argparse.ArgumentParser("auto_load")
-	parser.add_argument("-l", "--log_level", default="warning",
+	parser.add_argument("-l", "--log_level", default="info",
 		help="Show at least this level of logs")
 	parser.add_argument("-b", "--bucket", default=bucket,
 		help="Name of S3 bucket containing the candidate models.")

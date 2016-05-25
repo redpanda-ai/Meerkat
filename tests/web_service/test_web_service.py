@@ -5,6 +5,8 @@ from multiprocessing.pool import ThreadPool
 import json
 import requests
 import unittest
+import logging
+import sys
 from nose_parameterized import parameterized
 
 def check_status():
@@ -18,9 +20,9 @@ def check_status():
 def get_trans_text(path):
 	"""Get the json string of one_ledger.json"""
 	transFile = open(path, 'rb')
-	transText = transFile.read()
+	transaction_text = transFile.read()
 	transFile.close()
-	return transText
+	return transaction_text
 
 def classify_one(self, transaction, max_retries=20, sleep_interval=2):
 	"""Send a single transaction to the web service for classification"""
@@ -41,12 +43,37 @@ def classify_one(self, transaction, max_retries=20, sleep_interval=2):
 
 	return r_post.content
 
+def startup_helper(transaction, max_retries=100, sleep_interval=3):
+	"""Send a single transaction to the web service for classification"""
+	count = 1
+	while count <= max_retries:
+		try:
+			sleep(sleep_interval)
+			r_post = requests.post(
+				"https://localhost/meerkat/v2.1",
+				data=transaction,
+				verify=False)
+			r_post.connection.close()
+			if r_post.status_code == 200:
+				logging.warning("Web service startup complete")
+				break
+		except ConnectionError:
+			count += 1
+			logging.warning("Web service startup time: {0}".format(count * sleep_interval))
+	if count >= max_retries:
+		logging.critical("Web service failed to start, aborting.".format(count * sleep_interval))
+		sys.exit()
+	return r_post.content
+
 class WebServiceTest(unittest.TestCase):
 	"""Our UnitTest class."""
 
 	@classmethod
 	def setUpClass(cls):
 		sudo[local["supervisorctl"]["restart"]["meerkat"]]()
+		trans_text = get_trans_text('./web_service_tester/one_ledger.json')
+		_ = startup_helper(trans_text)
+		logging.warning("Meerkat fully online.")
 
 	@classmethod
 	def tearDownClass(cls):
@@ -74,12 +101,12 @@ class WebServiceTest(unittest.TestCase):
 		"""Test starts meerkat, runs 100 classifications, and stops meerkat"""
 		samples = 100
 		pool = ThreadPool(samples)
-		transText = get_trans_text('./web_service_tester/one_ledger.json')
+		transaction_text = get_trans_text('./web_service_tester/one_ledger.json')
 		tasks = []
 		for i in range(samples):
 			tasks.append(pool.apply_async(
 				     classify_one,
-				     (self, transText)))
+				     (self, transaction_text)))
 		classified = []
 		for task in tasks:
 			classified.append(sorted(json.loads(
@@ -101,8 +128,8 @@ class WebServiceTest(unittest.TestCase):
 	])
 	def test_web_service_representative(self, path):
 		"""Test starts meerkat, runs representative transactions, and stop meerkat"""
-		transText = get_trans_text(path)
-		task = classify_one(self, transText)
+		transaction_text = get_trans_text(path)
+		task = classify_one(self, transaction_text)
 		return
 
 if __name__ == "__main__":
