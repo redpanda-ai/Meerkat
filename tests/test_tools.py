@@ -1,12 +1,12 @@
 """Unit test for meerkat/classification/tools.py"""
 
+import os
 import csv
 import unittest
 import pandas as pd
 import meerkat.classification.tools as tools
 from nose_parameterized import parameterized
 from tests.fixture import tools_fixture
-from plumbum import local
 
 class ToolsTests(unittest.TestCase):
 	"""Our UnitTest class."""
@@ -22,7 +22,7 @@ class ToolsTests(unittest.TestCase):
 			self.assertRaises(Exception, tools.pull_from_s3, **inputs)
 		else:
 			self.assertEqual(tools.pull_from_s3(**inputs), "tests/fixture/csv_file_1.csv")
-			local["rm"]["tests/fixture/csv_file_1.csv"]()
+			os.remove("tests/fixture/csv_file_1.csv")
 
 	@parameterized.expand([
 		([tools_fixture.get_dict(), tools_fixture.get_reversed_dict()])
@@ -50,7 +50,7 @@ class ToolsTests(unittest.TestCase):
 			encoding="utf-8", sep='|', error_bad_lines=False)
 		self.assertEqual(len(tools.check_empty_transaction(df)), output)
 		if case_type == "with_empty":
-			local["rm"]["empty_transactions.csv"]()
+			os.remove("empty_transactions.csv")
 
 	@parameterized.expand([
 		(["tests/fixture/correct_format.csv", "credit", "subtype", 3])

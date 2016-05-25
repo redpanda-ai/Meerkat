@@ -1,0 +1,7 @@
+{
+	"aspirants" : {
+		"subtype/card/debit/" : "20160429164200/"
+	},
+	"bucket" : "yodlee-dev",
+	"prefix" : "meerkat/data/"
+}

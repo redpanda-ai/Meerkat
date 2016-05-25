@@ -7,6 +7,7 @@ import logging
 import os
 import sys
 import tarfile
+import shutil
 
 import numpy as np
 import pandas as pd
@@ -14,7 +15,6 @@ import pandas as pd
 from boto.s3.key import Key
 from boto.s3.connection import Location
 from boto import connect_s3
-from plumbum import local
 from meerkat.various_tools import load_piped_dataframe
 
 def check_new_input_file(**s3_params):
@@ -84,6 +84,15 @@ def make_tarfile(output_filename, source_dir):
 		reduced_name = os.path.basename(source_dir)[len(source_dir):]
 		tar.add(source_dir, arcname=reduced_name)
 
+def extract_tarball(archive, destination):
+	"""Extract a tarball to a destination"""
+	if not tarfile.is_tarfile(archive):
+		raise Exception("Invalid, not a tarfile")
+	with tarfile.open(name=archive, mode="r:gz") as tar:
+		members = tar.getmembers()
+		logging.debug("Members {0}".format(members))
+		tar.extractall(destination)
+
 def get_new_maint7b(directory, file_list):
 	"""Get the latest t7b file under directory."""
 	print("Get the latest main_*.t7b file")
@@ -119,10 +128,10 @@ def push_file_to_s3(source_path, bucket_name, object_prefix):
 
 def zip_cnn_stats_dir(file1, file2):
 	"""Copy files to Best_CNN_Statics directory and zip it"""
-	local["mkdir"]["Best_CNN_Statics"]()
-	local["cp"][file1]["Best_CNN_Statics"]()
-	local["cp"][file2]["Best_CNN_Statics"]()
-	local["tar"]["-zcvf"]["Best_CNN_Statics.tar.gz"]["Best_CNN_Statics"]()
+	os.makedirs("Best_CNN_Statics", exist_ok=True)
+	shutil.copy(file1, "Best_CNN_Statics")
+	shutil.copy(file2, "Best_CNN_Statics")
+	make_tarfile("Best_CNN_Statics.tar.gz", "Best_CNN_Statics")
 
 def dict_2_json(obj, filename):
 	"""Saves a dict as a json file"""
@@ -312,7 +321,7 @@ def slice_into_dataframes(**kwargs):
 def copy_file(input_file, directory):
 	"""This function moves uses Linux's 'cp' command to copy files on the local host"""
 	logging.info("Copy the file {0} to directory: {1}".format(input_file, directory))
-	local["cp"][input_file][directory]()
+	shutil.copy(input_file, directory)
 
 def fill_description_unmasked(row):
 	"""Ensures that blank values for DESCRIPTION_UNMASKED are always filled."""
@@ -326,7 +335,7 @@ def unzip_and_merge(gz_file, bank_or_card):
 	directory = './merchant_' + bank_or_card + '_unzip/'
 	os.makedirs(directory, exist_ok=True)
 	label_maps = []
-	local['tar']['xf'][gz_file]['-C'][directory]()
+	extract_tarball(gz_file, directory)
 	merged = merge_csvs(directory)
 	for i in os.listdir(directory):
 		if i.endswith('.json'):

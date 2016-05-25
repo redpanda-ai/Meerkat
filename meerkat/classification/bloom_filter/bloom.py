@@ -10,7 +10,7 @@ Updated on June 29, 2015
 @author: Sivan Mehta
 """
 
-import json, sys, os, string
+import json, sys, os, string, csv
 from pybloom import ScalableBloomFilter
 
 def standardize(text):
@@ -48,10 +48,57 @@ def create_location_bloom(src_filename, dst_filename):
 			location = (city_name, state_name)
 			sbf.add(location)
 
+	try:
+		open('meerkat/classification/bloom_filter/assets/csv_not_json')
+	except:
+		get_diff_json_csv()
+
+	with open('meerkat/classification/bloom_filter/assets/csv_not_json') as f:
+		for line in f:
+			city, state = line.strip().split('\t')
+			city_name = standardize(city)
+			state_name = state.upper()
+			location = (city_name, state_name)
+			sbf.add(location)
+
 	with open(dst_filename, "bw+") as location_bloom:
 		sbf.tofile(location_bloom)
 
 	return sbf
+
+def get_diff_json_csv():
+	dict_json = dict()
+	locations = get_json_from_file('meerkat/classification/bloom_filter/assets/locations.json')
+	states = locations["aggregations"]["states"]["buckets"]
+	for state in states:
+		state_name = state["key"].upper()
+		for city in state["localities"]["buckets"]:
+			city_name = standardize(city["key"])
+			location = (city_name, state_name)
+			dict_json[location] = (city["key"], state_name)
+
+	dict_csv = dict()
+	csv_file = csv.reader(open("meerkat/classification/bloom_filter/assets/us_cities_larger.csv", encoding="utf-8"), delimiter="\t")
+	for row in csv_file:
+		try:
+			int(row[2])
+		except ValueError:
+			city = row[2]
+			state = row[4]
+			location = (standardize(city), state)
+			dict_csv[location] = (city, state)
+
+	with open('meerkat/classification/bloom_filter/assets/csv_not_json', 'w') as f:
+		for key in dict_csv.keys():
+			if key not in dict_json:
+				tup = dict_csv[key]
+				f.write('{0}	{1}'.format(tup[0], tup[1]) + '\n')
+
+	with open('meerkat/classification/bloom_filter/assets/json_not_csv', 'w') as f:
+		for key in dict_json.keys():
+			if key not in dict_csv:
+				tup = dict_json[key]
+				f.write('{0}	{1}'.format(tup[0], tup[1]) + '\n')
 
 def get_location_bloom():
 	"""Attempts to fetch a bloom filter from a file, making a new bloom filter

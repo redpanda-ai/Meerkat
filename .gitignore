@@ -5,3 +5,7 @@ __pycache__/
 API_Documentation.md
 *.xml
 *.out
+*.ckpt
+*.meta
+*.swp
+meerkat/classification/label_maps/*.json

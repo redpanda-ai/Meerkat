@@ -1,6 +1,10 @@
 """This module defines the Meerkat web service API."""
 import concurrent.futures
 import json
+import logging
+import os
+import re
+import shutil
 
 from tornado import gen
 from tornado_json.requesthandlers import APIHandler
@@ -13,7 +17,7 @@ from meerkat.various_tools import (load_params, get_us_cities,\
 class Meerkat_API(APIHandler):
 	"""This class is the Meerkat API."""
 	cities = get_us_cities()
-	params = load_params("config/web_service.json")
+	params = load_params("meerkat/web_service/config/web_service.json")
 	hyperparams = load_hyperparameters(params)
 	meerkat = WebConsumer(params, hyperparams, cities)
 	#This thread pool can deal with 'blocking functions' like meerkat.classify

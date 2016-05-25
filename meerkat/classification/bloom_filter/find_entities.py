@@ -61,17 +61,28 @@ def generate_city_map():
 	"""
 		generates a dictionary with the following structure
 
-		(city, state) : (zip, latitude, longitude)
+		(CityState) : (City, State)
 
 		eg:
-		(Beverly Hills, CA) : (90210, 34.0731, 118.3994)
+		(BEVERLYHILLSCA) : (Beverly Hills, CA)
 
 	"""
 	print("generate location map")
 
+	data = {}
+	try:
+		open("meerkat/classification/bloom_filter/assets/json_not_csv")
+	except:
+		get_diff_json_csv()
+
+	with open("meerkat/classification/bloom_filter/assets/json_not_csv") as f:
+		for line in f:
+			city, state = line.strip().split('\t')
+			add_with_subs(data, city, state)
+
 	csv_file = csv.reader(open("meerkat/classification/bloom_filter/assets/us_cities_larger.csv", encoding="utf-8"), \
 		delimiter="\t")
-	data = {}
+
 	for row in csv_file:
 		try:
 			int(row[2]) # some of the rows don't acually record a state name
@@ -169,4 +180,5 @@ def main():
 	print(location_bloom_results.describe())
 
 if __name__ == "__main__":
-	main()
+#	main()
+	print(location_split('DEBIT CARD PURCHASE XXXXX7106 VENETIAN NAIL SPA PLANTATION FL'))
