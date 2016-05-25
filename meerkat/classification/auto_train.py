@@ -254,6 +254,7 @@ def auto_train():
 	args.label = ground_truth_labels[model_type]
 	args.predict_key = 'PREDICTED_CLASS'
 	args.fast_mode = False
+	args.model_name = ''
 
 	logging.warning('Apply the best CNN to test data and calculate performance metrics')
 	apply_cnn(args)

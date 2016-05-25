@@ -69,9 +69,20 @@ def generate_city_map():
 	"""
 	print("generate location map")
 
+	data = {}
+	try:
+		open("meerkat/classification/bloom_filter/assets/json_not_csv")
+	except:
+		get_diff_json_csv()
+
+	with open("meerkat/classification/bloom_filter/assets/json_not_csv") as f:
+		for line in f:
+			city, state = line.strip().split('\t')
+			add_with_subs(data, city, state)
+
 	csv_file = csv.reader(open("meerkat/classification/bloom_filter/assets/us_cities_larger.csv", encoding="utf-8"), \
 		delimiter="\t")
-	data = {}
+
 	for row in csv_file:
 		try:
 			int(row[2]) # some of the rows don't acually record a state name
