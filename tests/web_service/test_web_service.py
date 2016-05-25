@@ -6,6 +6,7 @@ import json
 import requests
 import unittest
 import logging
+import sys
 from nose_parameterized import parameterized
 
 def check_status():
@@ -42,7 +43,7 @@ def classify_one(self, transaction, max_retries=20, sleep_interval=2):
 
 	return r_post.content
 
-def startup_helper(transaction, max_retries=20, sleep_interval=2):
+def startup_helper(transaction, max_retries=100, sleep_interval=3):
 	"""Send a single transaction to the web service for classification"""
 	count = 1
 	while count <= max_retries:
@@ -59,6 +60,9 @@ def startup_helper(transaction, max_retries=20, sleep_interval=2):
 		except ConnectionError:
 			count += 1
 			logging.warning("Web service startup time: {0}".format(count * sleep_interval))
+	if count >= max_retries:
+		logging.critical("Web service failed to start, aborting.".format(count * sleep_interval))
+		sys.exit()
 	return r_post.content
 
 class WebServiceTest(unittest.TestCase):
@@ -68,7 +72,7 @@ class WebServiceTest(unittest.TestCase):
 	def setUpClass(cls):
 		sudo[local["supervisorctl"]["restart"]["meerkat"]]()
 		trans_text = get_trans_text('./web_service_tester/one_ledger.json')
-		_ = startup_helper(trans_text, max_retries=30, sleep_interval=3)
+		_ = startup_helper(trans_text)
 		logging.warning("Meerkat fully online.")
 
 	@classmethod
