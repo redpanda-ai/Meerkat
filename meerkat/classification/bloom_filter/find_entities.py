@@ -41,6 +41,7 @@ SUBS = {
 
 	# Abbreviations
 	"SAINT": "ST",
+	"FORT": "FT",
 	"CITY" : ""
 
 	# can get more in the future
@@ -70,6 +71,8 @@ def generate_city_map():
 	print("generate location map")
 
 	data = {}
+
+	'''
 	try:
 		open("meerkat/classification/bloom_filter/assets/json_not_csv")
 	except:
@@ -79,9 +82,9 @@ def generate_city_map():
 		for line in f:
 			city, state = line.strip().split('\t')
 			add_with_subs(data, city, state)
+	'''
 
-	csv_file = csv.reader(open("meerkat/classification/bloom_filter/assets/us_cities_larger.csv", encoding="utf-8"), \
-		delimiter="\t")
+	csv_file = csv.reader(open("meerkat/classification/bloom_filter/assets/us_cities_larger.csv", encoding="utf-8"), delimiter="\t")
 
 	for row in csv_file:
 		try:
@@ -134,8 +137,20 @@ def in_location_bloom(text):
 
 		return biggest
 
+def tag_text(text):
+	for mark in string.punctuation:
+		text = text.replace(mark, " ")
+	tag = ''
+	for part in text.split():
+		tag += 'B'
+		for i in range(len(part) - 1):
+			tag += 'C'
+	tag += 'B'
+	return tag
+
 def location_split(my_text):
 	# Capitalize and remove spaces
+#	tag = tag_text(my_text)
 	my_text = standardize(my_text)
 
 	for i in range(len(my_text) - 1, -1, -1):
@@ -161,9 +176,9 @@ def location_split(my_text):
 def main():
 	"""runs the file"""
 	print("find_entities")
-	# input_file = "meerkat/classification/bloom_filter/input_file.txt.gz"
+	input_file = "meerkat/classification/bloom_filter/input_file.txt.gz"
 	# input_file = "data/input/should_search_labels.csv.gz"
-	input_file = sys.argv[1]
+#	input_file = sys.argv[1]
 	data_frame = pd.io.parsers.read_csv(input_file, sep="|", compression="gzip")
 	descriptions = data_frame['DESCRIPTION_UNMASKED']
 	location_bloom_results = descriptions.apply(location_split)
@@ -181,4 +196,4 @@ def main():
 
 if __name__ == "__main__":
 #	main()
-	print(location_split('DEBIT CARD PURCHASE XXXXX7106 VENETIAN NAIL SPA PLANTATION FL'))
+	print(location_split('KROGER #0224FTWORTHTXDEBIT FOR CHEC...'))
