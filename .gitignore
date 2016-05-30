@@ -9,4 +9,4 @@ API_Documentation.md
 *.meta
 *.swp
 meerkat/classification/label_maps/*.json
-README.md
+
