@@ -107,11 +107,19 @@ class WebConsumer():
 
 		# Add Locale Sub Query
 		if locale_bloom != None:
-			city_query = get_qs_query(locale_bloom[0].lower(), ['locality'])
-			state_query = get_qs_query(locale_bloom[1].lower(), ['region'])
-			should_clauses.append(city_query)
-			should_clauses.append(state_query)
+			city = get_qs_query(locale_bloom[0].lower(), ['locality'])
+			neighborhood = get_qs_query(locale_bloom[0].lower(),
+				['neighborhood'])
+			state = get_qs_query(locale_bloom[1].lower(), ['region'])
 
+			locality_or_neighborhood = get_bool_query()
+			my_should = locality_or_neighborhood["query"]["bool"]["should"]
+			my_should.append(city)
+			my_should.append(neighborhood)
+			must_clauses = [ state, locality_or_neighborhood ]
+			#should_clauses.append(state)
+			o_query["query"]["bool"]["must"] = must_clauses
+		logging.critical("The query is {0}".format(o_query))
 		return o_query
 
 	def __search_index(self, queries):
