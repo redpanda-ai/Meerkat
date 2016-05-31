@@ -117,9 +117,8 @@ class WebConsumer():
 			my_should.append(city)
 			my_should.append(neighborhood)
 			must_clauses = [ state, locality_or_neighborhood ]
-			#should_clauses.append(state)
 			o_query["query"]["bool"]["must"] = must_clauses
-		logging.critical("The query is {0}".format(o_query))
+		logging.debug("The query is {0}".format(o_query))
 		return o_query
 
 	def __search_index(self, queries):
