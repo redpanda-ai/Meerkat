@@ -4,27 +4,28 @@ import logging
 from time import sleep
 import threading
 
-
-def load_data_queue(params, num_elements):
-	data_queue = queue.Queue()
-	for i in range(num_elements):
-		data_queue.put(random.randint(1, 500))
-	data_queue_populated = True
-	return data_queue, data_queue_populated
-
 def start_consumers(params, num_consumers):
 	for	i in range(num_consumers):
 		consumer = Consumer(i, params)
 		consumer.setDaemon(True)
 		consumer.start()
 
-class Consumer(threading.Thread):
-	def __init__(self, thread_id, params):
+def start_producer(params, thread_id, num_elements):
+	producer = Producer(thread_id, params, num_elements)
+	producer.setDaemon(True)
+	producer.start()
+	return producer
+
+class Producer(threading.Thread):
+	def __init__(self, thread_id, params, num_elements):
+		#global concurrency_queue
 		threading.Thread.__init__(self)
 		self.thread_id = thread_id
 		self.params = params
+		self.num_elements = num_elements
 		self.data_queue = params["data_queue"]
-		self.params["concurrency_queue"].put(self.thread_id)
+		concurrency_queue.put(self.thread_id)
+		self.data_queue_populated = False
 		self.__set_logger()
 
 	def __set_logger(self):
@@ -38,6 +39,46 @@ class Consumer(threading.Thread):
 		my_logger.warning("Log initialized")
 
 	def run(self):
+		#global concurrency_queue
+		my_logger = logging.getLogger("thread {0}".format(self.thread_id))
+		my_logger.setLevel(logging.INFO)
+		my_formatter = logging.Formatter("%(asctime)s = %(name)s - %(levelname)s - %(message)s")
+		console_handler = logging.StreamHandler()
+		console_handler.setLevel(logging.WARNING)
+		console_handler.setFormatter(my_formatter)
+		my_logger.addHandler(console_handler)
+		params, self.data_queue, num_elements = self.params, self.data_queue, self.num_elements
+		for i in range(num_elements):
+			foo = random.randint(1, 500)
+			self.data_queue.put(foo)
+			my_logger.warning("Added {0}".format(foo))
+			sleep(0.01)
+
+		self.data_queue_populated = True
+		concurrency_queue.get()
+		concurrency_queue.task_done()
+
+class Consumer(threading.Thread):
+	def __init__(self, thread_id, params):
+		#global concurrency_queue
+		threading.Thread.__init__(self)
+		self.thread_id = thread_id
+		self.params = params
+		self.data_queue = params["data_queue"]
+		self.__set_logger()
+
+	def __set_logger(self):
+		my_logger = logging.getLogger("thread {0}".format(self.thread_id))
+		my_logger.setLevel(logging.INFO)
+		my_formatter = logging.Formatter("%(asctime)s = %(name)s - %(levelname)s - %(message)s")
+		console_handler = logging.StreamHandler()
+		console_handler.setLevel(logging.WARNING)
+		console_handler.setFormatter(my_formatter)
+		my_logger.addHandler(console_handler)
+		my_logger.warning("Log initialized")
+
+	def run(self):
+		#global concurrency_queue
 		my_logger = logging.getLogger("thread {0}".format(self.thread_id))
 		my_logger.setLevel(logging.INFO)
 		my_formatter = logging.Formatter("%(asctime)s = %(name)s - %(levelname)s - %(message)s")
@@ -46,7 +87,6 @@ class Consumer(threading.Thread):
 		console_handler.setFormatter(my_formatter)
 		my_logger.addHandler(console_handler)
 		params, data_queue =  self.params, self.data_queue
-		concurrency_queue = params["concurrency_queue"]
 		data_queue_populated = params["data_queue_populated"]
 		while True:
 			if data_queue_populated and data_queue.empty():
@@ -62,11 +102,12 @@ class Consumer(threading.Thread):
 #main program
 my_params = {}
 my_params["data_queue_populated"] = False
-my_params["concurrency_queue"] = queue.Queue()
-my_params["data_queue"], my_params["data_queue_populated"] = load_data_queue(my_params, 1000)
+concurrency_queue = queue.Queue()
+my_params["data_queue"] = queue.Queue()
+producer = start_producer(my_params, -1, 100)
 start_consumers(my_params, 10)
+my_params["data_queue"], my_params["data_queue_populated"] = producer.data_queue, producer.data_queue_populated
 my_params["data_queue"].join()
-my_params["concurrency_queue"].join()
+concurrency_queue.join()
 logging.critical("End of Program")
-
 
