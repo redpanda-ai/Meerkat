@@ -7,7 +7,7 @@ import meerkat.classification.tensorflow_cnn as tf_cnn
 import jsonschema as js
 import numpy as np
 from meerkat.various_tools import load_params
-from tests.fixture import tf_cnn_fixture
+from tests.classification.fixture import tf_cnn_fixture
 from nose_parameterized import parameterized
 
 class TfcnnTest(unittest.TestCase):
@@ -23,9 +23,9 @@ class TfcnnTest(unittest.TestCase):
 		self.assertEqual(tf_cnn.chunks(array, num), expected)
 
 	@parameterized.expand([
-		([['invalid', 'tests/fixture/missing_entry_tf_config.json']]),
-		([['valid', 'tests/fixture/valid_tf_config.json']]),
-		([['invalid', 'tests/fixture/wrong_doc_length_tf_config.json']])
+		([['invalid', 'tests/classification/fixture/missing_entry_tf_config.json']]),
+		([['valid', 'tests/classification/fixture/valid_tf_config.json']]),
+		([['invalid', 'tests/classification/fixture/wrong_doc_length_tf_config.json']])
 	])
 	def test_validate_config(self, config):
 		"""Confirm that the validate_config functions as expected."""
@@ -36,10 +36,10 @@ class TfcnnTest(unittest.TestCase):
 			self.assertEqual(type(tf_cnn.validate_config(config)), dict)
 
 	@parameterized.expand([
-		(['tests/fixture/tf_config_with_alpha_dict.json', 'kkk', 3, [[0,0,0],[0,0,0],[0,0,0]]]),
-		(['tests/fixture/tf_config_with_alpha_dict.json', 'abc', 3, [[0,0,1],[0,1,0],[1,0,0]]]),
-		(['tests/fixture/tf_config_with_alpha_dict.json', 'abccccccccc', 3, [[0,0,1],[0,1,0],[1,0,0]]]),
-		(['tests/fixture/tf_config_with_alpha_dict.json', 'a', 3, [[1,0,0],[0,0,0],[0,0,0]]])
+		(['tests/classification/fixture/tf_config_with_alpha_dict.json', 'kkk', 3, [[0,0,0],[0,0,0],[0,0,0]]]),
+		(['tests/classification/fixture/tf_config_with_alpha_dict.json', 'abc', 3, [[0,0,1],[0,1,0],[1,0,0]]]),
+		(['tests/classification/fixture/tf_config_with_alpha_dict.json', 'abccccccccc', 3, [[0,0,1],[0,1,0],[1,0,0]]]),
+		(['tests/classification/fixture/tf_config_with_alpha_dict.json', 'a', 3, [[1,0,0],[0,0,0],[0,0,0]]])
 	])
 	def test_string_to_tensor(self, config, doc, length, expected):
 		config = load_params(config)
