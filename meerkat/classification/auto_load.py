@@ -5,12 +5,15 @@ import logging
 import re
 import tarfile
 import os
+import sys
 import pandas as pd
 
 from boto.s3 import connect_to_region
 from boto.s3.key import Key
+import boto3
 
 from meerkat.various_tools import safely_remove_file, validate_configuration
+from meerkat.classification.tools import push_file_to_s3
 
 def find_s3_objects_recursively(conn, bucket, my_results, prefix=None, target=None):
 	"""Find all S3 target objects and their locations recursively"""
@@ -25,6 +28,11 @@ def find_s3_objects_recursively(conn, bucket, my_results, prefix=None, target=No
 			elif s3_object.name[-1:] == "/":
 				find_s3_objects_recursively(conn, bucket, my_results, prefix=s3_object.name,
 					target=target)
+
+def s3_key_exists(bucket, key):
+	client = boto3.client('s3')
+	results = client.list_objects(Bucket=bucket.name, Prefix=key)
+	return 'Contents' in results
 
 def get_peer_models(candidate_dictionary, prefix=None):
 	"""Show the candidate models for each peer"""
@@ -42,21 +50,9 @@ def get_peer_models(candidate_dictionary, prefix=None):
 			logging.warning("Not Found")
 	return results
 
-def get_model_accuracy(confusion_matrix):
-	"""Gets the accuracy for a particular confusion matrix"""
-	df = pd.read_csv(confusion_matrix)
-	rows, cols = df.shape
-	logging.debug("Rows: {0} x Cols {1}".format(rows, cols))
-	if cols == rows + 3:
-		#Support the old style of confusion matrix, eliminate pointless columns
-		df = df.drop(df.columns[[0, 1, -1]], axis=1)
-		#Reset columns names, which are off by one
-		df.rename(columns=lambda x: int(x)-1, inplace=True)
-
-	true_positive = pd.DataFrame(df.iat[i, i] for i in range(rows))
-	accuracy = true_positive.sum() / df.sum().sum()
-
-	return accuracy.values[0]
+def get_model_accuracy(classification_report):
+	df = pd.read_csv(classification_report)
+	return float(df.iat[0, 0])
 
 def get_single_file_from_tarball(archive_name, archive, filename_pattern):
 	"""Untars and gunzips the stats file from the archive file"""
@@ -77,6 +73,26 @@ def get_single_file_from_tarball(archive_name, archive, filename_pattern):
 			tar.extract(my_file)
 	return my_name
 
+def fetch_tarball_and_extract(timestamp, target, **kwargs):
+	k = Key(kwargs["bucket"])
+	k.key = kwargs["prefix"] + kwargs["key"] + timestamp + target
+	k.get_contents_to_filename(target)
+	# Require Meta
+	# Fixme, pretty sure we can just check the tarball for the meta file instead of extracting
+	try:
+		meta = get_single_file_from_tarball(timestamp, target, ".*meta")
+		safely_remove_file(meta)
+	except:
+		pass
+	matrix = get_single_file_from_tarball(timestamp, target, "confusion_matrix.csv")
+	classification_report = get_single_file_from_tarball(timestamp, target, "classification_report.csv")
+	logging.warning("Tarball fetched and classification_report.csv extracted.")
+	upload_path = kwargs["prefix"] + kwargs["key"] + timestamp
+	push_file_to_s3("confusion_matrix.csv", kwargs["bucket"], upload_path)
+	push_file_to_s3("classification_report.csv", kwargs["bucket"], upload_path)
+	logging.warning("Classification_report.csv pushed to S3.")
+	return classification_report
+
 def get_best_model_of_class(target, models_dir, **kwargs):
 	"""Finds the best candidate model of all contenders."""
 	highest_score, winner, candidate_count = 0.0, None, 1
@@ -88,27 +104,31 @@ def get_best_model_of_class(target, models_dir, **kwargs):
 	else:
 		timestamps = [kwargs["aspirant"]]
 
+	s3_client = boto3.client('s3')
 	for timestamp in timestamps:
-		k = Key(kwargs["bucket"])
-		k.key = kwargs["prefix"] + kwargs["key"] + timestamp + target
-		k.get_contents_to_filename(target)
-		# Require Meta
-		try:
-			meta = get_single_file_from_tarball(timestamp, target, ".*meta")
-			safely_remove_file(meta)
-		except:
-			continue
-
-		matrix = get_single_file_from_tarball(timestamp, target, "confusion_matrix.csv")
-		score = get_model_accuracy(matrix)
+		long_key = kwargs["prefix"] + kwargs["key"] + timestamp + "classification_report.csv"
+		classification_report = None
+		if s3_key_exists(kwargs["bucket"], long_key):
+			target_file = "classification_report.csv"
+			s3_client.download_file(kwargs['bucket'].name, long_key, target_file)
+			classification_report = target_file
+			logging.critical("Classification Report fetched from S3 at {0}.".format(long_key))
+		else:
+			logging.critical("Didn't find {0}".format(long_key))
+			classification_report = fetch_tarball_and_extract(timestamp, target, **kwargs)
+			logging.critical("Tarball fetched from S3 and classification_report extracted from {0}.".format(long_key))
+		#Changing here
+		score = get_model_accuracy(classification_report)
+		logging.info("Score :{0}".format(score))
+		#End change
 
 		if score > highest_score:
 			highest_score = score
 			winner = timestamp
 			winner_count = candidate_count
-			leader_model = get_single_file_from_tarball(timestamp, target, ".*ckpt")
-			new_model_path = models_dir + get_asset_name(kwargs["suffix"], kwargs["key"], "ckpt")
-			os.rename(leader_model, new_model_path)
+			#leader_model = get_single_file_from_tarball(timestamp, target, ".*ckpt")
+			#new_model_path = models_dir + get_asset_name(kwargs["suffix"], kwargs["key"], "ckpt")
+			#os.rename(leader_model, new_model_path)
 		logging.info("\t{0:<14}{1:>2}: {2:16}, Score: {3:0.5f}".format("Candidate",
 			candidate_count, timestamp, score))
 		candidate_count += 1
@@ -219,6 +239,7 @@ def main_program(bucket="s3yodlee", region="us-west-2", prefix="meerkat/cnn/data
 	my_results, target = {}, "results.tar.gz",
 	find_s3_objects_recursively(conn, bucket, my_results, prefix=args.prefix, target=target)
 	results = get_peer_models(my_results, prefix=args.prefix)
+	logging.critical("Results: {0}".format(results))
 	get_best_models(bucket, args.prefix, results, target, args.prefix, aspirants)
 	logging.warning("Finishing main program")
 
