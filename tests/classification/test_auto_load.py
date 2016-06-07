@@ -47,8 +47,7 @@ class AutoLoadTests(unittest.TestCase):
 		self.assertDictEqual(result, expected)
 
 	@parameterized.expand([
-		(["con_matrix_1.csv", 0.99420625724217848]),
-		(["con_matrix_2.csv", 0.5])
+		(["classification_report_1.csv", 0.9662985220074711])
 	])
 	def test_get_model_accuracy(self, confusion_matrix, expected):
 		"""Test the correct calculation of accuracy from the confusion matrix provided."""
