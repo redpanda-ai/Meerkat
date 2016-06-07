@@ -93,17 +93,6 @@ def extract_tarball(archive, destination):
 		logging.debug("Members {0}".format(members))
 		tar.extractall(destination)
 
-def get_best_error_rate(erasDict):
-	"""Get the best error rate among different eras"""
-	bestErrorRate = 1.0
-	bestEraNumber = 1
-
-	df = pd.DataFrame.from_dict(erasDict, orient="index")
-	bestErrorRate = df.min().values[0]
-	bestEraNumber = df.idxmin().values[0]
-
-	return bestErrorRate, bestEraNumber
-
 def get_utc_iso_timestamp():
 	"""Returns a 16 digit ISO timestamp, accurate to the second that is suitable for S3
 		Example: "20160403164944" (April 3, 2016, 4:49:44 PM UTC) """
