@@ -1,5 +1,5 @@
 #!/usr/local/bin/python3
-# pylint: disable=unused-variable
+# pylint: disable=unused-argument
 # pylint: disable=too-many-locals
 
 """Train a CNN using tensorFlow
@@ -66,7 +66,6 @@ def ensemble_evaluate_testset(config, graph, sess, model, test):
 	for i in range(num_chunks):
 
 		batch_test = test.loc[chunked_test[i]]
-		batch_size = len(batch_test)
 
 		trans_test, labels_test, _ = batch_to_tensor(config, batch_test)
 		feed_dict_test = {get_tensor(graph, "x:0"): trans_test}
@@ -183,7 +182,7 @@ def mixed_batching(config, df, groups_train):
 	for index in range(half_batch):
 		label = random.randint(1, num_labels)
 		select_group = groups_train[str(label)]
-		indices_to_sample.append(np.random.choice(select_group.index, 1)[0])
+		indices_to_sample.append(np.random.choice(select_group[index], 1)[0])
 
 	random.shuffle(indices_to_sample)
 	batch = df.loc[indices_to_sample]
@@ -234,7 +233,6 @@ def evaluate_testset(config, graph, sess, model, test):
 		for i in range(num_chunks):
 
 			batch_test = test.loc[chunked_test[i]]
-			batch_size = len(batch_test)
 
 			trans_test, labels_test, _ = batch_to_tensor(config, batch_test)
 			feed_dict_test = {get_tensor(graph, "x:0"): trans_test}
@@ -324,7 +322,6 @@ def build_graph(config):
 	reshape = config["reshape"]
 	num_labels = config["num_labels"]
 	base_rate = config["base_rate"]
-	batch_size = config["batch_size"]
 	soft_target = config["soft_target"]
 	graph = tf.Graph()
 	num_cnns = config["num_cnns"]
@@ -521,7 +518,7 @@ def build_graph(config):
 
 		bn_updates = tf.group(*bn_assigns)
 		with tf.control_dependencies(optimizer):
-			bn_applier = tf.group(bn_updates, name="bn_applier")
+			_ = tf.group(bn_updates, name="bn_applier")
 
 		def get_saver(name):
 			"""return a saver for namespace name"""
