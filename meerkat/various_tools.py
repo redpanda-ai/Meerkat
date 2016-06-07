@@ -379,45 +379,6 @@ def synonyms(transaction):
 
 	return text.upper()
 
-def merge_split_files(params, split_list):
-	"""Takes a split list and merges the files back together
-	after processing is complete"""
-
-	file_name = params["output"]["file"]["name"]
-	base_path = params["output"]["file"]["processing_location"]
-	full_path = base_path + file_name
-	first_file = base_path + os.path.basename(split_list.pop(0))
-	output = open(full_path, "a", encoding="utf-8")
-
-	# Write first file with header
-	with open(first_file, "r", encoding="utf-8") as head_file:
-		for line in head_file:
-			output.write(line)
-
-	# Merge
-	for split in split_list:
-		base_file = os.path.basename(split)
-		with open(base_path + base_file, 'r', encoding="utf-8") as chunk:
-			next(chunk)
-			for line in chunk:
-				output.write(line)
-		safely_remove_file(base_path + base_file)
-
-	output.close()
-
-	# GZIP
-	unzipped = open(full_path, "rb")
-	zipped = gzip.open(full_path + ".gz", "wb")
-	zipped.writelines(unzipped)
-	zipped.close()
-	unzipped.close()
-
-	# Cleanup
-	safely_remove_file(first_file)
-	safely_remove_file(full_path)
-
-	return full_path + ".gz"
-
 #Print a warning to not execute this file as a module
 if __name__ == "__main__":
 	print("This module is a library that contains useful functions;" \
