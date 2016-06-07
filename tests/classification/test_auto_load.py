@@ -47,27 +47,6 @@ class AutoLoadTests(unittest.TestCase):
 		self.assertDictEqual(result, expected)
 
 	@parameterized.expand([
-		(["classification_report_1.csv", 0.9662985220074711])
-	])
-	def test_get_model_accuracy(self, confusion_matrix, expected):
-		"""Test the correct calculation of accuracy from the confusion matrix provided."""
-		confusion_matrix = "tests/classification/fixture/" + confusion_matrix
-		result = auto_load.get_model_accuracy(confusion_matrix)
-		self.assertEqual(result, expected)
-
-	@parameterized.expand([
-		(["tarball_4.tar.gz", "tests/classification/fixture/"] )
-	])
-	def test_set_label_map(self, tarball, output_path):
-		"""Test extraction of label_map from tarball."""
-		tarball = output_path + tarball
-		label_map = output_path + "label_map.json"
-		remove_file_if_exists(label_map)
-		result = auto_load.set_label_map_and_meta(None, "", "/label_map/", None, "", tarball, output_path)
-		self.assertTrue(isfile(result))
-		remove_file_if_exists(label_map)
-
-	@parameterized.expand([
 		(["tarball_1.tar.gz", ".*txt", True, "not a tarfile."]),
 		(["tarball_2.tar.gz", ".*csv", True, "Bad archive"]),
 		(["tarball_3.tar.gz", "foo", False, "foo.txt"])
