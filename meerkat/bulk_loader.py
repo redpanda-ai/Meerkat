@@ -16,7 +16,7 @@ Updated on July 17, 2015
 
 # Note: Experts only! Do not touch!
 
-# python3 -m meerkat.bulk_loader meerkat/config/factual_loader.json
+# python3 -m meerkat.bulk_loader config/factual_loader.json
 
 # Estimated runtime: ~40 mins / # number of cluster nodes
 
