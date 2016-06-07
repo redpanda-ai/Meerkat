@@ -205,21 +205,6 @@ def show_label_stat(results, train_or_test, label='LABEL'):
 	print("There are {0} classes".format(len(temp)))
 	pd.reset_option('display.max_rows')
 
-def get_test_and_train_dataframes(df_rich, train_size=0.90):
-	"""Produce (rich and poor) X (test and train) dataframes"""
-	logging.info("Building test and train dataframes")
-	df_poor = df_rich[['LABEL', 'DESCRIPTION_UNMASKED']]
-	msk = np.random.rand(len(df_poor)) < train_size
-	results = {
-		"df_poor_train" : df_poor[msk],
-		"df_poor_test" : df_poor[~msk],
-		# "df_rich_test" : df_rich[~msk],
-		# "df_rich_train" : df_rich[msk]
-	}
-	show_label_stat(results, 'train')
-	show_label_stat(results, 'test')
-	return results
-
 def get_json_and_csv_files(**kwargs):
 	"""This function generates CSV and JSON files"""
 	prefix = kwargs["output_path"] + kwargs["bank_or_card"] + "_" + kwargs["credit_or_debit"] + "_"
