@@ -205,30 +205,6 @@ def show_label_stat(results, train_or_test, label='LABEL'):
 	print("There are {0} classes".format(len(temp)))
 	pd.reset_option('display.max_rows')
 
-def get_json_and_csv_files(**kwargs):
-	"""This function generates CSV and JSON files"""
-	prefix = kwargs["output_path"] + kwargs["bank_or_card"] + "_" + kwargs["credit_or_debit"] + "_"
-	logging.info("Prefix is : {0}".format(prefix))
-	#set file names
-	files = {
-		"map_file" : prefix + "map.json",
-		"test_poor" : prefix + "test_poor.csv",
-		"train_poor" : prefix + "train_poor.csv"
-	}
-	#Write the JSON file
-	dict_2_json(kwargs["label_map"], files["map_file"])
-	# Write the rich CSVs
-	# rich_kwargs = {"index" : False, "sep" : "|"}
-	# kwargs["df_test"].to_csv(files["test_rich"], **rich_kwargs)
-	# kwargs["df_rich_train"].to_csv(files["train_rich"], **rich_kwargs)
-	#Write the poor CSVs
-	poor_kwargs = {"cols" : ["LABEL", "DESCRIPTION_UNMASKED"], "header": False,
-		"index" : False, "index_label": False}
-	kwargs["df_poor_test"].to_csv(files["test_poor"], **poor_kwargs)
-	kwargs["df_poor_train"].to_csv(files["train_poor"], **poor_kwargs)
-	#Return file names
-	return files
-
 def copy_file(input_file, directory):
 	"""This function moves uses Linux's 'cp' command to copy files on the local host"""
 	logging.info("Copy the file {0} to directory: {1}".format(input_file, directory))
