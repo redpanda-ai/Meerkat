@@ -140,7 +140,6 @@ def get_classification_report(confusion_matrix_file, label_map):
 	df.rename(columns=lambda x: int(x) - 1, inplace=True)
 	#First order calculations
 	true_positive = pd.DataFrame(df.iat[i, i] for i in range(rows))
-	col_sum = pd.DataFrame(df.sum(axis=1))
 	false_positive = pd.DataFrame(pd.DataFrame(df.sum(axis=0)).values - true_positive.values,
 		columns=true_positive.columns)
 	false_negative = pd.DataFrame(pd.DataFrame(df.sum(axis=1)).values - true_positive.values,
