@@ -93,14 +93,6 @@ def extract_tarball(archive, destination):
 		logging.debug("Members {0}".format(members))
 		tar.extractall(destination)
 
-def get_new_maint7b(directory, file_list):
-	"""Get the latest t7b file under directory."""
-	print("Get the latest main_*.t7b file")
-	for i in os.listdir(directory):
-		if i.startswith('main_') and i not in file_list:
-			file_list.append(i)
-			return i
-
 def get_best_error_rate(erasDict):
 	"""Get the best error rate among different eras"""
 	bestErrorRate = 1.0
