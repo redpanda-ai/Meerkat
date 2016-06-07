@@ -193,18 +193,6 @@ def load(**kwargs):
 	class_names = df["PROPOSED_SUBTYPE"].value_counts().index.tolist()
 	return df, class_names
 
-def show_label_stat(results, train_or_test, label='LABEL'):
-	"""Print count of each label"""
-	key = 'df_poor_' + train_or_test
-	print('Label counts for {0}ing set:'.format(train_or_test))
-	temp = results[key][label].value_counts()
-	temp.index = temp.index.astype(int)
-	temp = temp.sort_index()
-	pd.set_option('display.max_rows', len(temp))
-	# print(temp)
-	print("There are {0} classes".format(len(temp)))
-	pd.reset_option('display.max_rows')
-
 def copy_file(input_file, directory):
 	"""This function moves uses Linux's 'cp' command to copy files on the local host"""
 	logging.info("Copy the file {0} to directory: {1}".format(input_file, directory))
