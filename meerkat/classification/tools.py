@@ -252,28 +252,6 @@ def get_json_and_csv_files(**kwargs):
 	#Return file names
 	return files
 
-
-def slice_into_dataframes(**kwargs):
-	"""Slice into test and train dataframs, make a label map, and produce 
-	CSV files."""
-	# Create an output directory if it does not exist
-	os.makedirs(kwargs["output_path"], exist_ok=True)
-	# Load data frame and class names
-	df, class_names = load(input_file=kwargs["input_file"], credit_or_debit=kwargs["credit_or_debit"])
-	# Generate a mapping (class_name: label_number)
-	label_map = get_label_map(class_names)
-	# Reverse the mapping (label_number: class_name)
-	kwargs["label_map"] = dict(zip(label_map.values(), label_map.keys()))
-	# Clean the "DESCRIPTION_UNMASKED" values within the dataframe
-	df["DESCRIPTION_UNMASKED"] = df.apply(fill_description_unmasked, axis=1)
-	kwargs["df"] = df
-	# Make Test and Train data frames
-	kwargs.update(get_test_and_train_dataframes(**kwargs))
-	# Generate the output files (CSV and JSON) and return the file handles
-	kwargs.update(get_json_and_csv_files(**kwargs))
-	#logging.info("The kwargs dictionary contains: \n{0}".format(kwargs))
-	return kwargs["train_poor"], kwargs["test_poor"], len(class_names)
-
 def copy_file(input_file, directory):
 	"""This function moves uses Linux's 'cp' command to copy files on the local host"""
 	logging.info("Copy the file {0} to directory: {1}".format(input_file, directory))
