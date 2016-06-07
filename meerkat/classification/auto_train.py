@@ -10,6 +10,24 @@ performance matrics.
 @author: Matt Sevrens
 """
 
+import argparse
+import logging
+import os
+import shutil
+
+import tensorflow as tf
+
+from meerkat.classification.split_data import main_split_data
+from meerkat.classification.tools import (pull_from_s3, check_new_input_file,
+	push_file_to_s3, make_tarfile, copy_file, check_file_exist_in_s3, extract_tarball)
+from meerkat.classification.tensorflow_cnn import build_graph, train_model, validate_config
+from meerkat.classification.ensemble_cnns import build_graph as build_ensemble_graph
+from meerkat.classification.ensemble_cnns import train_model as train_ensemble_model
+from meerkat.classification.soft_target import main as get_soft_target
+from meerkat.various_tools import load_params, safe_input
+from meerkat.classification.auto_load import get_single_file_from_tarball
+from meerkat.classification.classification_report import main_process as apply_cnn
+
 ############################## USAGE ###############################################################
 USAGE = """
 usage: auto_train [-h] [--input_dir INPUT_DIR] [--output_dir OUTPUT_DIR]
@@ -41,24 +59,6 @@ time nohup python3 -m meerkat.classification.auto_train merchant bank -v --ensem
 """
 
 ###################################################################################################
-
-import argparse
-import logging
-import os
-import shutil
-
-import tensorflow as tf
-
-from meerkat.classification.split_data import main_split_data
-from meerkat.classification.tools import (pull_from_s3, check_new_input_file,
-	push_file_to_s3, make_tarfile, copy_file, check_file_exist_in_s3, extract_tarball)
-from meerkat.classification.tensorflow_cnn import build_graph, train_model, validate_config
-from meerkat.classification.ensemble_cnns import build_graph as build_ensemble_graph
-from meerkat.classification.ensemble_cnns import train_model as train_ensemble_model
-from meerkat.classification.soft_target import main as get_soft_target
-from meerkat.various_tools import load_params, safe_input
-from meerkat.classification.auto_load import get_single_file_from_tarball
-from meerkat.classification.classification_report import main_process as apply_cnn
 
 def parse_arguments():
 	"""This function parses arguments from our command line."""
