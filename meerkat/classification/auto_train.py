@@ -36,7 +36,8 @@ optional arguments:
   -v, --info            log at INFO leve
 """
 
-EXAMPLE = """
+"""
+EXAMPLE =
 time nohup python3 -m meerkat.classification.auto_train merchant bank -v --ensemble &
 """
 
