@@ -11,7 +11,8 @@ performance matrics.
 """
 
 ############################## USAGE ###############################################################
-USAGE = """
+"""
+USAGE =
 usage: auto_train [-h] [--input_dir INPUT_DIR] [--output_dir OUTPUT_DIR]
                   [--credit_or_debit CREDIT_OR_DEBIT] [--bucket BUCKET] [-d]
                   [-v]
