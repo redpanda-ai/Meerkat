@@ -228,24 +228,6 @@ def get_test_and_train_dataframes(df_rich, train_size=0.90):
 	show_label_stat(results, 'test')
 	return results
 
-def get_csv_files(**kwargs):
-	"""This function generates CSV and JSON files, returns paths of the files"""
-	prefix = kwargs["output_path"] +  kwargs["merchant_or_subtype"] + '_' + \
-		kwargs["bank_or_card"] + "_" * (kwargs["credit_or_debit"] != '') + \
-		kwargs["credit_or_debit"] + "_"
-	logging.info("Prefix is : {0}".format(prefix))
-	#set file names
-	files = {
-		"test_poor" : prefix + "val_poor.csv",
-		"train_poor" : prefix + "train_poor.csv"
-	}
-	#Write the poor CSVs
-	poor_kwargs = {"header" : False, "index" : False, "index_label": False}
-	kwargs["df_poor_test"].to_csv(files["test_poor"], **poor_kwargs)
-	kwargs["df_poor_train"].to_csv(files["train_poor"], **poor_kwargs)
-	#Return file names
-	return files
-
 def get_json_and_csv_files(**kwargs):
 	"""This function generates CSV and JSON files"""
 	prefix = kwargs["output_path"] + kwargs["bank_or_card"] + "_" + kwargs["credit_or_debit"] + "_"
