@@ -184,13 +184,6 @@ def get_s3_connection():
 		sys.exit()
 	return conn
 
-def post_sns(message):
-	"""Post an SNS message"""
-	region = 'us-west-2'
-	topic = 'arn:aws:sns:us-west-2:003144629351:panel_6m'
-	conn = boto.sns.connect_to_region(region)
-	_ = conn.publish(topic=topic, message=message)
-
 def get_merchant_by_id(*args, **kwargs):
 	"""Fetch the details for a single factual_id"""
 	params, factual_id, es_connection = args[:]
