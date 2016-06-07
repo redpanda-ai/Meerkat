@@ -107,13 +107,6 @@ def push_file_to_s3(source_path, bucket_name, object_prefix):
 	key.key = object_prefix + filename
 	key.set_contents_from_filename(source_path)
 
-def zip_cnn_stats_dir(file1, file2):
-	"""Copy files to Best_CNN_Statics directory and zip it"""
-	os.makedirs("Best_CNN_Statics", exist_ok=True)
-	shutil.copy(file1, "Best_CNN_Statics")
-	shutil.copy(file2, "Best_CNN_Statics")
-	make_tarfile("Best_CNN_Statics.tar.gz", "Best_CNN_Statics")
-
 def dict_2_json(obj, filename):
 	"""Saves a dict as a json file"""
 	logging.info("Generating JSON.")
