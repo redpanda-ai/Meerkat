@@ -66,7 +66,7 @@ def generate_merchant_trie():
 
 
 if __name__ == "__main__":
-	MY_MERCHANT_TRIE = generate_merchant_trie()
+	generate_merchant_trie()
 	# quick test to see if everything loaded
 	# for key in json.loads(open\
 	#("meerkat/classification/label_maps/permanent_bank_label_map.json").read()):
