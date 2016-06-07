@@ -193,14 +193,6 @@ def load(**kwargs):
 	class_names = df["PROPOSED_SUBTYPE"].value_counts().index.tolist()
 	return df, class_names
 
-def get_label_map(class_names):
-	"""Generates a label map (class_name: label number)."""
-	logging.info("Generating label map")
-	# Create a label map
-	label_numbers = list(range(1, (len(class_names) + 1)))
-	label_map = dict(zip(sorted(class_names), label_numbers))
-	return label_map
-
 def show_label_stat(results, train_or_test, label='LABEL'):
 	"""Print count of each label"""
 	key = 'df_poor_' + train_or_test
