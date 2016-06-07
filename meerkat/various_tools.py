@@ -217,12 +217,6 @@ def safely_remove_file(filename):
 		logging.critical("Unable to remove {0}".format(filename))
 	logging.info("{0} removed".format(filename))
 
-def purge(my_dir, pattern):
-	"""Cleans up processing location on System Exit"""
-	for my_file in os.listdir(my_dir):
-		if re.search(pattern, my_file):
-			os.remove(os.path.join(my_dir, my_file))
-
 def string_cleanse(original_string):
 	"""Strips out characters that might confuse ElasticSearch."""
 	bad_characters = [r"\[", r"\]", r"\{", r"\}", r'"', r"/", r"\\", r"\:", r"\(",\
