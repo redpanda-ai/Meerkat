@@ -22,7 +22,7 @@ def get_csv_path(csv_type):
 	"""Return a csv file path"""
 	csv_path = {
 		"correct_format": "tests/fixture/correct_format.csv",
-		"with_empty_transaction": "tests/fixture/with_empty_transaction.csv"
+		"with_empty_transaction": "tests/classification/fixture/with_empty_transaction.csv"
 	}
 	return csv_path[csv_type]
 

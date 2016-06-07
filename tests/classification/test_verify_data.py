@@ -5,7 +5,7 @@ import csv
 import pandas as pd
 import meerkat.classification.verify_data as verifier
 
-from tests.fixture import verify_data_fixture
+from tests.classification.fixture import verify_data_fixture
 from nose_parameterized import parameterized
 
 class VerifyDataTests(unittest.TestCase):

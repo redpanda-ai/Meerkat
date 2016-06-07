@@ -3,7 +3,7 @@ import sys
 import unittest
 
 from meerkat.web_service import web_consumer
-from tests.fixture import web_consumer_fixture
+from tests.web_service.fixture import web_consumer_fixture
 
 class WebConsumerTest(unittest.TestCase):
 	"""Our UnitTest class."""

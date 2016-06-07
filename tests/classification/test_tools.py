@@ -6,7 +6,7 @@ import unittest
 import pandas as pd
 import meerkat.classification.tools as tools
 from nose_parameterized import parameterized
-from tests.fixture import tools_fixture
+from tests.classification.fixture import tools_fixture
 
 class ToolsTests(unittest.TestCase):
 	"""Our UnitTest class."""
