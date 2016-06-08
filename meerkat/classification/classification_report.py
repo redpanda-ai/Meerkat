@@ -183,9 +183,10 @@ def get_classification_report(confusion_matrix_file, label_map):
 	classification_report.to_csv(report_path, index=False)
 
 # Main
-def main_process():
+def main_process(args=None):
 	"""This is the main stream"""
-	args = parse_arguments(sys.argv[1:])
+	if args is None:
+		args = parse_arguments(sys.argv[1:])
 	log_format = "%(asctime)s %(levelname)s: %(message)s"
 	if args.debug:
 		logging.basicConfig(format=log_format, level=logging.DEBUG)
