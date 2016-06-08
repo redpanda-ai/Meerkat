@@ -177,7 +177,7 @@ def identify_changes(params, es_connection_1, es_connection_2):
 		old_mapping = enrich_transaction(params, transaction, es_connection_1, index=params["elasticsearch"]["index"], doc_type=params["elasticsearch"]["type"])
 		new_mapping = enrich_transaction(params, transaction, es_connection_2, index=sys.argv[4], doc_type=sys.argv[5], routing=old_mapping["STATE"].upper())
 
-		if new_mapping["merchant_found"] == False:
+		if new_mapping["merchant_found"] is False:
 			params["compare_indices"]["id_changed"].append(old_mapping)
 			continue
 
@@ -389,7 +389,7 @@ def reconcile_skipped(params, es_connection):
 		name, address = skipped_details_prompt(params, transaction, es_connection)
 		extra_queries = [(["address", "locality", "region", "postcode"], address, 3), (["name"], name, 4)]
 		results = find_merchant_by_address(transaction, es_connection, additional_data=extra_queries)
-		if results == False:
+		if results is False:
 			continue
 		null_decision_boundary(params, transaction, results)
 
@@ -412,7 +412,7 @@ def reconcile_null(params, es_connection):
 		random.shuffle(null)
 		transaction = null.pop()
 		results = search_with_user_safe_input(params, es_connection, transaction)
-		if results == False:
+		if results is False:
 			params["compare_indices"]["NULL"].append(transaction)
 			continue
 		null_decision_boundary(params, transaction, results)
@@ -600,7 +600,7 @@ def decision_boundary(params, store, results):
 	score, top_hit = get_hit(results, 0)
 
 	# Add transaction back to the queue for later analysis if nothing found
-	if score == False:
+	if score is False:
 		safe_print("No matches found", "\n")
 		params["compare_indices"]["skipped"].append(store)
 		return
@@ -670,7 +670,7 @@ def enrich_transaction(*args, **kwargs):
 	with nostderr():
 		merchant = get_merchant_by_id(params, factual_id, es_connection, index=index, doc_type=doc_type, routing=routing)
 
-	if merchant == None:
+	if merchant is None:
 		merchant = {}
 		transaction["merchant_found"] = False
 

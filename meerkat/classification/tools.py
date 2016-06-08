@@ -9,7 +9,6 @@ import sys
 import tarfile
 import shutil
 
-import numpy as np
 import pandas as pd
 
 from boto.s3.key import Key

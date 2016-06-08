@@ -14,8 +14,10 @@ Created on Apr 16, 2016
 ############################################# USAGE ###############################################
 
 # python3 -m meerkat.classification.ensemble_cnns [config_file]
-# python3 -m meerkat.classification.ensemble_cnns meerkat/classification/config/ensemble_cnns_config.json
-# python3 -m meerkat.classification.ensemble_cnns meerkat/classification/config/distillation_config.json
+# python3 -m meerkat.classification.ensemble_cnns\
+# meerkat/classification/config/ensemble_cnns_config.json
+# python3 -m meerkat.classification.ensemble_cnns\
+# meerkat/classification/config/distillation_config.json
 
 # For addtional details on implementation see:
 # Character-level Convolutional Networks for Text Classification
@@ -46,7 +48,6 @@ def load_soft_target(batch, num_labels):
 	"""load soft target from training set, assuming headers have format 'class_x'"""
 	header = ["class_" + str(i) for i in range(1, num_labels+1)]
 	return  batch[header].as_matrix()
-
 
 def softmax_with_temperature(tensor, temperature):
 	return tf.div(tf.exp(tensor/temperature), tf.reduce_sum(tf.exp(tensor/temperature)), name="softmax_flat")
@@ -350,7 +351,7 @@ def build_graph(config):
 
 		def batch_normalization(batch, mean=None, var=None):
 			"""Perform batch normalization"""
-			if mean == None or var == None:
+			if mean is None or var is None:
 				axes = [0] if len(batch.get_shape()) == 2 else [0, 1, 2]
 				mean, var = tf.nn.moments(batch, axes=axes)
 			return (batch - mean) / tf.sqrt(var + tf.constant(1e-10))
@@ -411,7 +412,7 @@ def build_graph(config):
 			details = {"layer_count": 0}
 
 
-			h_conv1 = layer(inputs, details, "h_conv1", train, model_num,  weights=w_conv1, biases=b_conv1)
+			h_conv1 = layer(inputs, details, "h_conv1", train, model_num, weights=w_conv1, biases=b_conv1)
 			h_pool1 = layer(h_conv1, details, "h_pool1", train, model_num)
 
 			h_conv2 = layer(h_pool1, details, "h_conv2", train, model_num, weights=w_conv2, biases=b_conv2)
@@ -496,7 +497,7 @@ def build_graph(config):
 			if not soft_target:
 				loss = [cal_loss(softmax[i], network[i], "loss"+str(i+1)) for i in range(N)]
 			else:
-				loss = [tf.neg(0.85 * tf.reduce_mean(tf.reduce_sum(logsoftmax(softmax_flat, "network_flat") * soft_labels_placeholder, 1)) + 0.15 * tf.reduce_mean(tf.reduce_sum(network[0] * weighted_labels, 1)), name = "loss1")]
+				loss = [tf.neg(0.85 * tf.reduce_mean(tf.reduce_sum(logsoftmax(softmax_flat, "network_flat") * soft_labels_placeholder, 1)) + 0.15 * tf.reduce_mean(tf.reduce_sum(network[0] * weighted_labels, 1)), name="loss1")]
 			optimizer = [make_optimizer(loss[i], "optimizer"+str(i+1), "model"+str(i+1)) for i in range(N)]
 
 		bn_updates = tf.group(*bn_assigns)

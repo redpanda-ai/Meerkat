@@ -241,7 +241,7 @@ class WebConsumer():
 		attr_map = dict(zip(params["output"]["results"]["fields"], params["output"]["results"]["labels"]))
 
 		# Enrich with found data
-		if decision == True:
+		if decision is True:
 			transaction["match_found"] = True
 			for field in field_names:
 				if field in fields_in_hit:
@@ -256,7 +256,7 @@ class WebConsumer():
 					"Defaulting to US.").format(hit_fields["factual_id"][0]))
 				transaction["country"] = "US"
 		# Add Business Name, City and State as a fallback
-		if decision == False:
+		if decision is False:
 			for field in field_names:
 				transaction[attr_map.get(field, field)] = ""
 			transaction = self.__business_name_fallback(business_names, transaction, attr_map)
@@ -271,7 +271,7 @@ class WebConsumer():
 		# Add Source
 		index = params["elasticsearch"]["index"]
 		transaction["source"] = "FACTUAL" if (("factual" in index) and
-			(transaction["match_found"] == True)) else "OTHER"
+			(transaction["match_found"] is True)) else "OTHER"
 
 		# Add "confidence_score" to the output schema.
 		transaction["confidence_score"] = ""
@@ -316,9 +316,7 @@ class WebConsumer():
 		json_data = json.loads(json_object.read())
 
 		general_category = json_data['general_category']
-		#general_category = ['Other Income', 'Other Expenses', 'Other Bills', 'Service Charges/Fees', 'Transfers']
 		subtype_list = json_data['subtype_category']
-		#subtype_list = ['Service Charge/Fee Refund', 'Refund']
 
 		for trans in transactions:
 			subtype_category = trans.get("subtype_CNN", {}).get("category",\
@@ -328,7 +326,8 @@ class WebConsumer():
 
 			sub_type = trans.get("txn_sub_type", "")
 
-			if len(subtype_category) == 0 or subtype_category in general_category or sub_type in subtype_list:
+			if len(subtype_category) == 0 or subtype_category in general_category or\
+				sub_type in subtype_list:
 				# Regular spending transaction
 				trans["search"] = {"category_labels" : trans.get("category_labels", [])}
 
@@ -463,7 +462,7 @@ class WebConsumer():
 		results = self.__search_index(queries)
 
 		# Error Handling
-		if results == None:
+		if results is None:
 			return transactions
 
 		results = results['responses']
@@ -591,7 +590,7 @@ class WebConsumer():
 	def __apply_cpu_classifiers(self, data):
 		"""Apply all the classifiers which are CPU bound.  Written to be
 		run in parallel with GPU bound classifiers."""
-		services_list = data.get("services_list",[])
+		services_list = data.get("services_list", [])
 		if "bloom_filter" in services_list or services_list == []:
 			self.__apply_locale_bloom(data)
 		else:

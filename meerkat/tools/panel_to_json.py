@@ -10,9 +10,9 @@ with the web service."""
 
 import sys
 import re
+import json
 import pandas as pd
 import numpy as np
-import json
 
 from meerkat.various_tools import load_piped_dataframe
 
