@@ -33,7 +33,7 @@ def classify_one(transaction, max_retries=20, sleep_interval=2):
 			count += 1
 	return r_post.content
 
-def startup_helper(transaction, max_retries=100, sleep_interval=3):
+def startup_helper(transaction, max_retries=100, sleep_interval=1):
 	"""Send a single transaction to the web service for classification"""
 	count = 1
 	while count <= max_retries:
