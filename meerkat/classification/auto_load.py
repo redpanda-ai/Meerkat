@@ -195,6 +195,8 @@ def load_best_model_for_type(**kwargs):
 	if model_type.startswith("/"):
 		model_type = model_type[1:]
 
+	if kwargs["s3_prefix"].endswith("/"):
+		kwargs["s3_prefix"] = kwargs["s3_prefix"][:-1]
 	remote_file = kwargs["s3_prefix"] + "/" + model_type +\
 		kwargs["timestamp"] + "results.tar.gz"
 	logging.critical("Bucket name {0}".format(kwargs["bucket"]))
