@@ -7,6 +7,8 @@ Created on Nov 3, 2014
 @author: Matthew Sevrens
 """
 
+import queue
+import threading
 import json
 # pylint:disable=deprecated-module
 import string
@@ -27,6 +29,31 @@ from meerkat.classification.bloom_filter.find_entities import location_split
 # Enabled Models
 BANK_SWS = load_scikit_model("bank_sws")
 CARD_SWS = load_scikit_model("card_sws")
+CNNS = {}
+
+class ThreadConsumer(threading.Thread):
+	def __init__(self, thread_id, queue_params, gmf):
+		threading.Thread.__init__(self)
+		self.thread_id = thread_id
+		self.param = queue_params
+		self.data_queue = queue_params["data_queue"]
+		self.param["consumer_queue"].put(self.thread_id)
+		self.gmf = gmf
+
+	def run(self):
+		param, data_queue = self.param, self.data_queue
+		consumer_queue = param["consumer_queue"]
+		data_queue_populated = param["data_queue_populated"]
+		while True:
+			if data_queue_populated and data_queue.empty():
+				consumer_queue.get()
+				consumer_queue.task_done()
+				logging.info("Consumer thread {0} finished".format(str(self.thread_id)))
+				break
+			cnn = data_queue.get()
+			logging.info("consumer thread {0} loads {1} model, data queue size: {2}".format(str(self.thread_id), cnn, data_queue.qsize()))
+			CNNS[cnn] = get_tf_cnn_by_name(cnn, gpu_mem_fraction=self.gmf)
+			data_queue.task_done()
 
 class WebConsumer():
 	"""Acts as a web service client to process and enrich
@@ -51,6 +78,29 @@ class WebConsumer():
 		self.hyperparams = hyperparams if hyperparams else {}
 		self.cities = cities if cities else {}
 
+	def load_data_queue(self, queue_params):
+		cnns = ["bank_merchant", "card_merchant", "card_debit_subtype", "card_credit_subtype",
+			"bank_debit_subtype", "bank_credit_subtype"]
+		for cnn in cnns:
+			queue_params["data_queue"].put(cnn)
+		queue_params["data_queue_populated"] = True
+
+	def start_consumers(self, queue_params, gmf):
+		for i in range(6):
+			logging.info("start consumerer: {0} ".format(str(i)))
+			consumer = ThreadConsumer(i, queue_params, gmf)
+			consumer.start()
+
+	def load_tf_models_in_parallel(self, gmf):
+		queue_params = {}
+		queue_params["data_queue_populated"] = False
+		queue_params["data_queue"] = queue.Queue()
+		queue_params["consumer_queue"] = queue.Queue()
+		self.load_data_queue(queue_params)
+		self.start_consumers(queue_params, gmf)
+		queue_params["consumer_queue"].join()
+		queue_params["data_queue"].join()
+
 	def load_tf_models(self):
 		"""Load all tensorFlow models"""
 
@@ -69,12 +119,21 @@ class WebConsumer():
 			#Load new models from S3
 			load_models_from_s3(config=auto_load_config)
 
+		self.load_tf_models_in_parallel(gmf)
+		self.bank_merchant_cnn = CNNS["bank_merchant"]
+		self.card_merchant_cnn = CNNS["card_merchant"]
+		self.card_debit_subtype_cnn = CNNS["card_debit_subtype"]
+		self.card_credit_subtype_cnn = CNNS["card_credit_subtype"]
+		self.bank_debit_subtype_cnn = CNNS["bank_debit_subtype"]
+		self.bank_credit_subtype_cnn = CNNS["bank_credit_subtype"]
+		"""
 		self.bank_merchant_cnn = get_tf_cnn_by_name("bank_merchant", gpu_mem_fraction=gmf)
 		self.card_merchant_cnn = get_tf_cnn_by_name("card_merchant", gpu_mem_fraction=gmf)
 		self.card_debit_subtype_cnn = get_tf_cnn_by_name("card_debit_subtype", gpu_mem_fraction=gmf)
 		self.card_credit_subtype_cnn = get_tf_cnn_by_name("card_credit_subtype", gpu_mem_fraction=gmf)
 		self.bank_debit_subtype_cnn = get_tf_cnn_by_name("bank_debit_subtype", gpu_mem_fraction=gmf)
 		self.bank_credit_subtype_cnn = get_tf_cnn_by_name("bank_credit_subtype", gpu_mem_fraction=gmf)
+		"""
 
 	def update_hyperparams(self, hyperparams):
 		"""Updates a WebConsumer object's hyper-parameters"""
