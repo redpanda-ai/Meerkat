@@ -70,12 +70,19 @@ class WebConsumer():
 			#Load new models from S3
 			load_models_from_s3(config=auto_load_config)
 
+		pool = ThreadPool(processes=6)
+		types = [["bank_merchant", gmf], ["card_merchant", gmf], ["card_debit_subtype", gmf], \
+			["card_credit_subtype", gmf], ["bank_debit_subtype", gmf], ["bank_credit_subtype", gmf]]
+		self.bank_merchant_cnn, self.card_merchant_cnn, self.card_debit_subtype_cnn, \
+			self.card_credit_subtype_cnn, self.bank_debit_subtype_cnn, self.bank_credit_subtype_cnn = pool.starmap(get_tf_cnn_by_name, types)
+		'''
 		self.bank_merchant_cnn = get_tf_cnn_by_name("bank_merchant", gpu_mem_fraction=gmf)
 		self.card_merchant_cnn = get_tf_cnn_by_name("card_merchant", gpu_mem_fraction=gmf)
 		self.card_debit_subtype_cnn = get_tf_cnn_by_name("card_debit_subtype", gpu_mem_fraction=gmf)
 		self.card_credit_subtype_cnn = get_tf_cnn_by_name("card_credit_subtype", gpu_mem_fraction=gmf)
 		self.bank_debit_subtype_cnn = get_tf_cnn_by_name("bank_debit_subtype", gpu_mem_fraction=gmf)
 		self.bank_credit_subtype_cnn = get_tf_cnn_by_name("bank_credit_subtype", gpu_mem_fraction=gmf)
+		'''
 
 	def update_hyperparams(self, hyperparams):
 		"""Updates a WebConsumer object's hyper-parameters"""
