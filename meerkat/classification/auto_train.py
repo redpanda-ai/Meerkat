@@ -176,7 +176,6 @@ def auto_train():
 				os.remove(local_zip_file)
 				logging.info("Retrain the model")
 		except:
-			os.remove(local_zip_file)
 			logging.critical("results.tar.gz is invalid. Retrain the model")
 
 	if exist_new_input:
