@@ -32,6 +32,7 @@ class WebConsumer():
 	"""Acts as a web service client to process and enrich
 	transactions in real time"""
 
+	# 14 is the best thread number Andy has tried
 	__cpu_pool = ThreadPool(processes=14)
 
 	def __init__(self, params=None, hyperparams=None, cities=None):
