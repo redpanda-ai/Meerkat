@@ -53,6 +53,7 @@ def validate_config(config):
 	schema_file = "meerkat/classification/config/tensorflow_cnn_schema.json"
 	config = validate_configuration(config, schema_file)
 	logging.debug("Configuration is :\n{0}".format(pprint.pformat(config)))
+	# about this reshape size, read this wiki page 'https://github.com/joeandrewkey/Meerkat/wiki/Using-Correct-Tensor-Size'
 	reshape = ((config["doc_length"] - 96) / 27) * 256
 	config["reshape"] = int(reshape)
 	config["label_map"] = load_params(config["label_map"])
@@ -277,6 +278,7 @@ def build_graph(config):
 		test_accuracy = tf.Variable(0, trainable=False, name="test_accuracy")
 		tf.scalar_summary('test_accuracy', test_accuracy)
 
+					# [batch, height, width, channels]
 		input_shape = [None, 1, doc_length, alphabet_length]
 		output_shape = [None, num_labels]
 
@@ -284,13 +286,13 @@ def build_graph(config):
 		labels_placeholder = tf.placeholder(tf.float32, shape=output_shape, name="y")
 
 		# Encoder Weights and Biases
-		w_conv1 = weight_variable(config, [1, 7, alphabet_length, 256])
+		w_conv1 = weight_variable(config, [1, 7, alphabet_length, 256]) #  1 x 7 is kernel size
 		b_conv1 = bias_variable([256], 7 * alphabet_length)
 
 		w_conv2 = weight_variable(config, [1, 7, 256, 256])
 		b_conv2 = bias_variable([256], 7 * 256)
 
-		w_conv3 = weight_variable(config, [1, 3, 256, 256])
+		w_conv3 = weight_variable(config, [1, 3, 256, 256]) # 1 x 3 is kernel size
 		b_conv3 = bias_variable([256], 3 * 256)
 
 		w_conv4 = weight_variable(config, [1, 3, 256, 256])
@@ -402,7 +404,7 @@ def build_graph(config):
 			return network
 
 		network = encoder(trans_placeholder, "network", train=True)
-		trained_model = encoder(trans_placeholder, "model", train=False)
+		_ = encoder(trans_placeholder, "model", train=False)
 
 		# Calculate Loss and Optimize
 		with tf.name_scope('trainer'):

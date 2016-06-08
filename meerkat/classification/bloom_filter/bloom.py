@@ -147,5 +147,4 @@ def test_bloom_filter(sbf):
 
 # MAIN PROGRAM
 if __name__ == "__main__":
-	my_location_bloom = get_location_bloom()
-	
+	get_location_bloom()

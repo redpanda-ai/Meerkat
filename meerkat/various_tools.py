@@ -9,7 +9,6 @@ Created on Dec 20, 2013
 """
 
 import csv
-import gzip
 import json
 import logging
 import os
@@ -184,13 +183,6 @@ def get_s3_connection():
 		sys.exit()
 	return conn
 
-def post_sns(message):
-	"""Post an SNS message"""
-	region = 'us-west-2'
-	topic = 'arn:aws:sns:us-west-2:003144629351:panel_6m'
-	conn = boto.sns.connect_to_region(region)
-	_ = conn.publish(topic=topic, message=message)
-
 def get_merchant_by_id(*args, **kwargs):
 	"""Fetch the details for a single factual_id"""
 	params, factual_id, es_connection = args[:]
@@ -223,12 +215,6 @@ def safely_remove_file(filename):
 	except OSError:
 		logging.critical("Unable to remove {0}".format(filename))
 	logging.info("{0} removed".format(filename))
-
-def purge(my_dir, pattern):
-	"""Cleans up processing location on System Exit"""
-	for my_file in os.listdir(my_dir):
-		if re.search(pattern, my_file):
-			os.remove(os.path.join(my_dir, my_file))
 
 def string_cleanse(original_string):
 	"""Strips out characters that might confuse ElasticSearch."""
@@ -334,34 +320,6 @@ def get_us_cities():
 	cities = [city.lower().rstrip('\n') for city in cities]
 	return cities
 
-def clean_bad_escapes(filepath):
-	"""Clean a panel file of poorly escaped characters.
-	Return false if required fields not present"""
-
-	path, filename = os.path.split(filepath)
-	filename = os.path.splitext(filename)[0]
-	first_line = True
-	required_fields = ["DESCRIPTION_UNMASKED", "UNIQUE_MEM_ID", "GOOD_DESCRIPTION"]
-
-	# Clean File
-	with gzip.open(filepath, "rb") as input_file:
-		with open(path + "/" + filename, "wb") as output_file:
-			for line in input_file:
-				if first_line:
-					for field in required_fields:
-						if field not in str(line):
-							safely_remove_file(filepath)
-							safely_remove_file(path + "/" + filename)
-							return False
-					first_line = False
-				line = clean_line(line)
-				line = bytes(line + "\n", 'UTF-8')
-				output_file.write(line)
-	# Rename and Remove
-	safely_remove_file(filepath)
-
-	return filename
-
 def clean_line(line):
 	"""Strips out the part of a binary line that is not usable"""
 
@@ -419,45 +377,6 @@ def synonyms(transaction):
 	text = pattern.sub(lambda m: rep[re.escape(m.group(0))], transaction)
 
 	return text.upper()
-
-def merge_split_files(params, split_list):
-	"""Takes a split list and merges the files back together
-	after processing is complete"""
-
-	file_name = params["output"]["file"]["name"]
-	base_path = params["output"]["file"]["processing_location"]
-	full_path = base_path + file_name
-	first_file = base_path + os.path.basename(split_list.pop(0))
-	output = open(full_path, "a", encoding="utf-8")
-
-	# Write first file with header
-	with open(first_file, "r", encoding="utf-8") as head_file:
-		for line in head_file:
-			output.write(line)
-
-	# Merge
-	for split in split_list:
-		base_file = os.path.basename(split)
-		with open(base_path + base_file, 'r', encoding="utf-8") as chunk:
-			next(chunk)
-			for line in chunk:
-				output.write(line)
-		safely_remove_file(base_path + base_file)
-
-	output.close()
-
-	# GZIP
-	unzipped = open(full_path, "rb")
-	zipped = gzip.open(full_path + ".gz", "wb")
-	zipped.writelines(unzipped)
-	zipped.close()
-	unzipped.close()
-
-	# Cleanup
-	safely_remove_file(first_file)
-	safely_remove_file(full_path)
-
-	return full_path + ".gz"
 
 #Print a warning to not execute this file as a module
 if __name__ == "__main__":

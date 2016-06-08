@@ -13,8 +13,6 @@ import pandas as pd
 import csv
 import pickle
 import os
-import string
-from pprint import pprint
 
 from .bloom import *
 
@@ -136,17 +134,6 @@ def in_location_bloom(text):
 				biggest = (locality, region)
 
 		return biggest
-
-def tag_text(text):
-	for mark in string.punctuation:
-		text = text.replace(mark, " ")
-	tag = ''
-	for part in text.split():
-		tag += 'B'
-		for i in range(len(part) - 1):
-			tag += 'C'
-	tag += 'B'
-	return tag
 
 def location_split(my_text):
 	# Capitalize and remove spaces

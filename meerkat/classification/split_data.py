@@ -32,7 +32,6 @@ import argparse
 import numpy as np
 import os
 import shutil
-import sys
 
 from .verify_data import verify_data
 from .tools import (pull_from_s3, unzip_and_merge, seperate_debit_credit, 
@@ -121,7 +120,6 @@ def main_split_data(args):
 	file_name = "input.tar.gz" if args.file_name == '' else args.file_name
 	extension = ".tar.gz"
 	output_file = "preprocessed.tar.gz"
-	dir_path = "s3://s3yodlee/" + prefix
 
 	version = prefix[prefix.rfind("/", 0, len(prefix) - 1)+1:len(prefix)-1]
 	save_path = './data/input/' + data_type + '_' + version +'/'
