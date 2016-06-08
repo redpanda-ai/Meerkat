@@ -168,14 +168,16 @@ def auto_train():
 					logging.critical("Not a valid option. Valid options are: yes or no.")
 
 			if retrain_choice == "no":
+				os.remove(local_zip_file)
 				logging.info("Auto train ends")
 				shutil.rmtree(save_path)
 				return
 			else:
+				os.remove(local_zip_file)
 				logging.info("Retrain the model")
 		except:
+			os.remove(local_zip_file)
 			logging.critical("results.tar.gz is invalid. Retrain the model")
-		os.remove(local_zip_file)
 
 	if exist_new_input:
 		logging.info("There exists new input data")
