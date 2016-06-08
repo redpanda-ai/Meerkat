@@ -3,7 +3,6 @@ import os
 import json
 import csv
 import time
-from pprint import pprint
 import scipy.stats
 
 def do_query(city_state):

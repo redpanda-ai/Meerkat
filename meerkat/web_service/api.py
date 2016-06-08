@@ -1,10 +1,6 @@
 """This module defines the Meerkat web service API."""
 import concurrent.futures
 import json
-import logging
-import os
-import re
-import shutil
 
 from tornado import gen
 from tornado_json.requesthandlers import APIHandler

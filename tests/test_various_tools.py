@@ -12,9 +12,6 @@ class VariousToolsTests(unittest.TestCase):
 	strings = (("Weekend at Bernie's[]{}/:", "weekend at bernie s"),
                 ('Trans with "" quotes', 'trans with quotes'))
 
-	numbers = (("[8]6{7}5'3/0-9", "8675309"),
-				('333"6"6"6"999', '333666999'))
-
 	def test_string_cleanse(self):
 		"""string_cleanse test"""
 
