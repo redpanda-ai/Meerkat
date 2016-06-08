@@ -38,10 +38,10 @@ import sys
 import os
 import logging
 
-from scipy.stats.mstats import zscore
-from elasticsearch import Elasticsearch
 from queue import Queue
 from threading import Thread
+from scipy.stats.mstats import zscore
+from elasticsearch import Elasticsearch
 
 from meerkat.various_tools import get_bool_query, get_qs_query, string_cleanse
 
@@ -93,7 +93,7 @@ def find_merchant(store):
 	results = search_index(bool_search)
 	score, top_hit = get_hit(results, 0)
 
-	if score == False:
+	if score is False:
 		return "", "", ""
 
 	# Allow User to Verify and Return
@@ -187,7 +187,7 @@ def run(stores):
 			continue
 
 		# Save Failed Attempts
-		if status == False:
+		if status is False:
 			logging.warning("{1}Did Not Merge Store Number {0} to Index".\
 			format(store["store_number"], message))
 			not_found.append(store)
