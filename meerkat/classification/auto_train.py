@@ -11,7 +11,8 @@ performance matrics.
 """
 
 ############################## USAGE ###############################################################
-USAGE = """
+"""
+USAGE =
 usage: auto_train [-h] [--input_dir INPUT_DIR] [--output_dir OUTPUT_DIR]
                   [--credit_or_debit CREDIT_OR_DEBIT] [--bucket BUCKET] [-d]
                   [-v]
@@ -36,7 +37,8 @@ optional arguments:
   -v, --info            log at INFO leve
 """
 
-EXAMPLE = """
+"""
+EXAMPLE =
 time nohup python3 -m meerkat.classification.auto_train merchant bank -v --ensemble &
 """
 
@@ -257,7 +259,7 @@ def auto_train():
 	args.model_name = ''
 
 	logging.warning('Apply the best CNN to test data and calculate performance metrics')
-	apply_cnn(args)
+	apply_cnn(args=args)
 	copy_file(best_model_path, tarball_directory)
 	copy_file(best_model_path.replace(".ckpt", ".meta"), tarball_directory)
 	# copy_file("meerkat/classification/models/train.ckpt", tarball_directory)

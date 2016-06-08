@@ -1,6 +1,5 @@
 """Unit test for meerkat.labeling_tools.compare_indices"""
 
-import sys
 import unittest
 import meerkat.labeling_tools.compare_indices as compare_indices
 from nose_parameterized import parameterized

@@ -1,7 +1,4 @@
-import json
-import sys
 import unittest
-
 from meerkat.web_service import web_consumer
 from tests.web_service.fixture import web_consumer_fixture
 
@@ -19,7 +16,6 @@ class WebConsumerTest(unittest.TestCase):
 		cls.consumer.bank_debit_subtype_cnn = web_consumer_fixture.get_mock_cnn
 		cls.consumer.bank_merchant_cnn = web_consumer_fixture.get_mock_cnn
 		cls.consumer.card_merchant_cnn = web_consumer_fixture.get_mock_cnn
-
 
 	def setUp(self):
 		return

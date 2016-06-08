@@ -1,10 +1,6 @@
 """This module defines the Meerkat web service API."""
 import concurrent.futures
 import json
-import logging
-import os
-import re
-import shutil
 
 from tornado import gen
 from tornado_json.requesthandlers import APIHandler
@@ -21,6 +17,7 @@ class Meerkat_API(APIHandler):
 	hyperparams = load_hyperparameters(params)
 	meerkat = WebConsumer(params, hyperparams, cities)
 	#This thread pool can deal with 'blocking functions' like meerkat.classify
+	# 14 is best thread number Andy has tried.
 	thread_pool = concurrent.futures.ThreadPoolExecutor(14)
 
 	# pylint: disable=bad-continuation

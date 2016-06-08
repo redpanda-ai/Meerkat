@@ -93,25 +93,6 @@ def extract_tarball(archive, destination):
 		logging.debug("Members {0}".format(members))
 		tar.extractall(destination)
 
-def get_new_maint7b(directory, file_list):
-	"""Get the latest t7b file under directory."""
-	print("Get the latest main_*.t7b file")
-	for i in os.listdir(directory):
-		if i.startswith('main_') and i not in file_list:
-			file_list.append(i)
-			return i
-
-def get_best_error_rate(erasDict):
-	"""Get the best error rate among different eras"""
-	bestErrorRate = 1.0
-	bestEraNumber = 1
-
-	df = pd.DataFrame.from_dict(erasDict, orient="index")
-	bestErrorRate = df.min().values[0]
-	bestEraNumber = df.idxmin().values[0]
-
-	return bestErrorRate, bestEraNumber
-
 def get_utc_iso_timestamp():
 	"""Returns a 16 digit ISO timestamp, accurate to the second that is suitable for S3
 		Example: "20160403164944" (April 3, 2016, 4:49:44 PM UTC) """
@@ -125,13 +106,6 @@ def push_file_to_s3(source_path, bucket_name, object_prefix):
 	key = Key(bucket)
 	key.key = object_prefix + filename
 	key.set_contents_from_filename(source_path)
-
-def zip_cnn_stats_dir(file1, file2):
-	"""Copy files to Best_CNN_Statics directory and zip it"""
-	os.makedirs("Best_CNN_Statics", exist_ok=True)
-	shutil.copy(file1, "Best_CNN_Statics")
-	shutil.copy(file2, "Best_CNN_Statics")
-	make_tarfile("Best_CNN_Statics.tar.gz", "Best_CNN_Statics")
 
 def dict_2_json(obj, filename):
 	"""Saves a dict as a json file"""
@@ -218,105 +192,6 @@ def load(**kwargs):
 	df['PROPOSED_SUBTYPE'] = df['PROPOSED_SUBTYPE'].apply(cap_first_letter)
 	class_names = df["PROPOSED_SUBTYPE"].value_counts().index.tolist()
 	return df, class_names
-
-def get_label_map(class_names):
-	"""Generates a label map (class_name: label number)."""
-	logging.info("Generating label map")
-	# Create a label map
-	label_numbers = list(range(1, (len(class_names) + 1)))
-	label_map = dict(zip(sorted(class_names), label_numbers))
-	return label_map
-
-def show_label_stat(results, train_or_test, label='LABEL'):
-	"""Print count of each label"""
-	key = 'df_poor_' + train_or_test
-	print('Label counts for {0}ing set:'.format(train_or_test))
-	temp = results[key][label].value_counts()
-	temp.index = temp.index.astype(int)
-	temp = temp.sort_index()
-	pd.set_option('display.max_rows', len(temp))
-	# print(temp)
-	print("There are {0} classes".format(len(temp)))
-	pd.reset_option('display.max_rows')
-
-def get_test_and_train_dataframes(df_rich, train_size=0.90):
-	"""Produce (rich and poor) X (test and train) dataframes"""
-	logging.info("Building test and train dataframes")
-	df_poor = df_rich[['LABEL', 'DESCRIPTION_UNMASKED']]
-	msk = np.random.rand(len(df_poor)) < train_size
-	results = {
-		"df_poor_train" : df_poor[msk],
-		"df_poor_test" : df_poor[~msk],
-		# "df_rich_test" : df_rich[~msk],
-		# "df_rich_train" : df_rich[msk]
-	}
-	show_label_stat(results, 'train')
-	show_label_stat(results, 'test')
-	return results
-
-def get_csv_files(**kwargs):
-	"""This function generates CSV and JSON files, returns paths of the files"""
-	prefix = kwargs["output_path"] +  kwargs["merchant_or_subtype"] + '_' + \
-		kwargs["bank_or_card"] + "_" * (kwargs["credit_or_debit"] != '') + \
-		kwargs["credit_or_debit"] + "_"
-	logging.info("Prefix is : {0}".format(prefix))
-	#set file names
-	files = {
-		"test_poor" : prefix + "val_poor.csv",
-		"train_poor" : prefix + "train_poor.csv"
-	}
-	#Write the poor CSVs
-	poor_kwargs = {"header" : False, "index" : False, "index_label": False}
-	kwargs["df_poor_test"].to_csv(files["test_poor"], **poor_kwargs)
-	kwargs["df_poor_train"].to_csv(files["train_poor"], **poor_kwargs)
-	#Return file names
-	return files
-
-def get_json_and_csv_files(**kwargs):
-	"""This function generates CSV and JSON files"""
-	prefix = kwargs["output_path"] + kwargs["bank_or_card"] + "_" + kwargs["credit_or_debit"] + "_"
-	logging.info("Prefix is : {0}".format(prefix))
-	#set file names
-	files = {
-		"map_file" : prefix + "map.json",
-		"test_poor" : prefix + "test_poor.csv",
-		"train_poor" : prefix + "train_poor.csv"
-	}
-	#Write the JSON file
-	dict_2_json(kwargs["label_map"], files["map_file"])
-	# Write the rich CSVs
-	# rich_kwargs = {"index" : False, "sep" : "|"}
-	# kwargs["df_test"].to_csv(files["test_rich"], **rich_kwargs)
-	# kwargs["df_rich_train"].to_csv(files["train_rich"], **rich_kwargs)
-	#Write the poor CSVs
-	poor_kwargs = {"cols" : ["LABEL", "DESCRIPTION_UNMASKED"], "header": False,
-		"index" : False, "index_label": False}
-	kwargs["df_poor_test"].to_csv(files["test_poor"], **poor_kwargs)
-	kwargs["df_poor_train"].to_csv(files["train_poor"], **poor_kwargs)
-	#Return file names
-	return files
-
-
-def slice_into_dataframes(**kwargs):
-	"""Slice into test and train dataframs, make a label map, and produce 
-	CSV files."""
-	# Create an output directory if it does not exist
-	os.makedirs(kwargs["output_path"], exist_ok=True)
-	# Load data frame and class names
-	df, class_names = load(input_file=kwargs["input_file"], credit_or_debit=kwargs["credit_or_debit"])
-	# Generate a mapping (class_name: label_number)
-	label_map = get_label_map(class_names)
-	# Reverse the mapping (label_number: class_name)
-	kwargs["label_map"] = dict(zip(label_map.values(), label_map.keys()))
-	# Clean the "DESCRIPTION_UNMASKED" values within the dataframe
-	df["DESCRIPTION_UNMASKED"] = df.apply(fill_description_unmasked, axis=1)
-	kwargs["df"] = df
-	# Make Test and Train data frames
-	kwargs.update(get_test_and_train_dataframes(**kwargs))
-	# Generate the output files (CSV and JSON) and return the file handles
-	kwargs.update(get_json_and_csv_files(**kwargs))
-	#logging.info("The kwargs dictionary contains: \n{0}".format(kwargs))
-	return kwargs["train_poor"], kwargs["test_poor"], len(class_names)
 
 def copy_file(input_file, directory):
 	"""This function moves uses Linux's 'cp' command to copy files on the local host"""

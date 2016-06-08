@@ -3,6 +3,7 @@ Created on Jun 27, 2015
 @author: J. Andrew Key
 
 """
+import sys
 import unittest
 
 import meerkat.classification.bloom_filter.find_entities as finder
