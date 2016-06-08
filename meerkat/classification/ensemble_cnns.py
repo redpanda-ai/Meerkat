@@ -71,9 +71,9 @@ def ensemble_evaluate_testset(config, graph, sess, model, test):
 		output = [sess.run(model[j], feed_dict=feed_dict_test) for j in range(num_cnns)]
 
 		individual_batch_correct_count = [np.sum(np.argmax(output[j], 1) == np.argmax(labels_test, 1))
-										for j in range(num_cnns)]
+			for j in range(num_cnns)]
 		individual_correct_count = [sum(x) for x in
-									zip(individual_correct_count, individual_batch_correct_count)]
+			zip(individual_correct_count, individual_batch_correct_count)]
 
 		ensemble_output = sum(output) / (num_cnns + 0.0)
 		batch_correct_count = np.sum(np.argmax(ensemble_output, 1) == np.argmax(labels_test, 1))
@@ -112,7 +112,7 @@ def validate_config(config):
 		config["base_rate"] = config["base_rate"] * math.sqrt(config["batch_size"]) / math.sqrt(128)
 	else:
 		config["base_rate"] = ((config["temperature"] ** 2) * config["base_rate"]
-								* math.sqrt(config["batch_size"]) / math.sqrt(128))
+			* math.sqrt(config["batch_size"]) / math.sqrt(128))
 	config["alphabet_length"] = len(config["alphabet"])
 
 	return config
@@ -363,7 +363,7 @@ def build_graph(config):
 			assign_mean = running_mean[model_num-1][layer_num-1].assign(mean)
 			assign_var = running_var[model_num-1][layer_num-1].assign(var)
 			bn_assigns.append(ewma.apply([running_mean[model_num-1][layer_num-1],
-								running_var[model_num-1][layer_num-1]]))
+				running_var[model_num-1][layer_num-1]]))
 			with tf.control_dependencies([assign_mean, assign_var]):
 				return (batch - mean) / tf.sqrt(var + 1e-10)
 
@@ -405,11 +405,11 @@ def build_graph(config):
 
 		with tf.name_scope("running_mean"):
 			running_mean = [[tf.Variable(tf.zeros([l]), trainable=False) for l in layer_sizes]
-								for i in range(num_cnns)]
+				for i in range(num_cnns)]
 
 		with tf.name_scope("running_var"):
 			running_var = [[tf.Variable(tf.ones([l]), trainable=False) for l in layer_sizes]
-								for i in range(num_cnns)]
+				for i in range(num_cnns)]
 
 		def encoder(inputs, name, model_num, train=False, soft_target=False):
 			# Encoder Weights and Biases
@@ -483,7 +483,7 @@ def build_graph(config):
 					prob_train = encoder(trans_placeholder, "softmax", i, train=True)
 				else:
 					prob_train, softmax_flat = encoder(trans_placeholder, "softmax", i, train=True,
-													soft_target=soft_target)
+						soft_target=soft_target)
 				softmax.append(prob_train)
 				network.append(logsoftmax(softmax[i-1], "network"))
 				prob_full = encoder(trans_placeholder, "softmax_full", i, train=False)
@@ -494,13 +494,13 @@ def build_graph(config):
 
 		# Calculate Loss and Optimize
 		def cal_loss(sub_softmax, sub_network, name):
-			"""Negative correlation learning loss function"""
+			"""Returns negative correlation learning loss function"""
 			return tf.neg(tf.reduce_mean(tf.reduce_sum(sub_network * weighted_labels, 1)) +
-							0.5 * tf.reduce_mean(tf.reduce_sum((ensemble - sub_softmax) ** 2, 1)), name=name)
+				0.5 * tf.reduce_mean(tf.reduce_sum((ensemble - sub_softmax) ** 2, 1)), name=name)
 
 
 		def make_optimizer(loss, op_name, scope_name):
-			"""return a  momentumOptimizer"""
+			"""Returns a  momentumOptimizer"""
 			return tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss, name=op_name,
 						var_list=[x for x in tf.trainable_variables() if x.name.startswith(scope_name)])
 
@@ -509,11 +509,11 @@ def build_graph(config):
 				loss = [cal_loss(softmax[i], network[i], "loss"+str(i+1)) for i in range(num_cnns)]
 			else:
 				loss = [tf.neg(0.85 * tf.reduce_mean(tf.reduce_sum(logsoftmax(softmax_flat,
-							"network_flat") * soft_labels_placeholder, 1)) + 0.15 *
-							tf.reduce_mean(tf.reduce_sum(network[0] * weighted_labels, 1)),
-							name="loss1")]
+					"network_flat") * soft_labels_placeholder, 1))
+					+ 0.15 * tf.reduce_mean(tf.reduce_sum(network[0] * weighted_labels, 1)),
+					name="loss1")]
 			optimizer = [make_optimizer(loss[i], "optimizer"+str(i+1), "model"+str(i+1))
-							for i in range(num_cnns)]
+				for i in range(num_cnns)]
 
 		bn_updates = tf.group(*bn_assigns)
 		with tf.control_dependencies(optimizer):
@@ -543,10 +543,6 @@ def train_model(config, graph, sess, saver):
 	save_dir = "meerkat/classification/models/checkpoints/"
 	os.makedirs(save_dir, exist_ok=True)
 	checkpoints = {}
-
-	# Visualize Using TensorBoard
-	# merged = tf.merge_all_summaries()
-	# writer = tf.train.SummaryWriter("/home/ubuntu/tensorboard_log", graph)
 
 	for step in range(num_eras):
 
@@ -579,11 +575,9 @@ def train_model(config, graph, sess, saver):
 		# Log Loss and Update TensorBoard
 		if step % logging_interval == 0:
 			loss = [sess.run(get_tensor(graph, "trainer/loss"+str(i)+":0"), feed_dict=feed_dict)
-						for i in range(1, num_cnns+1)]
+				for i in range(1, num_cnns+1)]
 			for i in range(num_cnns):
 				logging.info("Train loss" + str(i+1) +" at epoch {0:>8}: {1:3.7f}".format(step + 1, loss[i]))
-			# summary = sess.run(merged, feed_dict=feed_dict)
-			# writer.add_summary(summary, step)
 
 		# Log Progress and Save
 		if step != 0 and step % epochs == 0:
@@ -595,9 +589,9 @@ def train_model(config, graph, sess, saver):
 			# Save Checkpoint
 			current_era = int(step / epochs)
 			meta_path = [save_dir + "era_" + str(current_era) + "_model"+str(i+1) + ".ckpt.meta"
-							for i in range(num_cnns)]
+				for i in range(num_cnns)]
 			model_path = [saver[i].save(sess, save_dir +
-							"era_" + str(current_era) + "_model"+str(i+1) + ".ckpt") for i in range(num_cnns)]
+				"era_" + str(current_era) + "_model"+str(i+1) + ".ckpt") for i in range(num_cnns)]
 			checkpoints[current_era] = model_path
 			for i in range(num_cnns):
 				logging.info("Checkpoint saved in file: %s" % model_path[i])

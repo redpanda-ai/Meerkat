@@ -32,7 +32,7 @@ def load_multiple_models(cnns_dir, label_map_path):
 		if item.endswith(".ckpt"):
 			model_name = item.split(".")[1]
 			classifier = get_tf_cnn_by_path(cnns_dir + item, label_map_path,
-												model_name=model_name+"/softmax_full:0")
+				model_name=model_name+"/softmax_full:0")
 			logging.info("Loaded model " + item)
 			models.append(classifier)
 	return models
@@ -46,7 +46,7 @@ def get_soft_target(data_path, models, output_path):
 	for trans in reader:
 		trans = trans.to_dict("records")
 		softmax = [classifier(trans, doc_key="DESCRIPTION_UNMASKED", soft_target=True)
-						for classifier in models]
+			for classifier in models]
 		ensemble_softmax = sum(softmax) / (len(softmax) + 0.0)
 		num_labels = len(ensemble_softmax[0])
 		for index, transaction in enumerate(trans):
