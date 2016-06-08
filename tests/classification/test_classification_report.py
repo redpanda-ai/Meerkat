@@ -1,6 +1,5 @@
 """Unit test for meerkat/classification/tools.py"""
 
-import argparse
 import meerkat.classification.classification_report as cr
 import unittest
 

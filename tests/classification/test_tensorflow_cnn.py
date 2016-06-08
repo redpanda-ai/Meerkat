@@ -1,7 +1,6 @@
 """Unit test for meerkat.classification.tensorflow_cnn"""
 
 import unittest
-import csv
 import pandas as pd
 import meerkat.classification.tensorflow_cnn as tf_cnn
 import jsonschema as js

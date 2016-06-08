@@ -32,7 +32,6 @@ import argparse
 import numpy as np
 import os
 import shutil
-import sys
 
 from .verify_data import verify_data
 from .tools import (pull_from_s3, unzip_and_merge, seperate_debit_credit, 

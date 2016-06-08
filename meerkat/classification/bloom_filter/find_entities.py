@@ -13,8 +13,6 @@ import pandas as pd
 import csv
 import pickle
 import os
-import string
-from pprint import pprint
 
 from .bloom import *
 
