@@ -9,7 +9,6 @@ Created on Dec 20, 2013
 """
 
 import csv
-import gzip
 import json
 import logging
 import os
