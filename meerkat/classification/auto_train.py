@@ -154,10 +154,9 @@ def auto_train():
 
 	exist_results_tarball = check_file_exist_in_s3("results.tar.gz", **s3_params)
 	if exist_results_tarball:
-		pull_from_s3(extension='.tar.gz', file_name="results.tar.gz", **s3_params)
+		local_zip_file = pull_from_s3(extension='.tar.gz', file_name="results.tar.gz", **s3_params)
 		try:
-			model_file = get_single_file_from_tarball(save_path + "results.tar.gz", ".ckpt")
-			os.remove(model_file)
+			_ = get_single_file_from_tarball(save_path, local_zip_file, ".ckpt", extract=False)
 
 			valid_options = ["yes", "no"]
 			while True:
@@ -176,7 +175,7 @@ def auto_train():
 				logging.info("Retrain the model")
 		except:
 			logging.critical("results.tar.gz is invalid. Retrain the model")
-		os.remove(save_path + "results.tar.gz")
+		os.remove(local_zip_file)
 
 	if exist_new_input:
 		logging.info("There exists new input data")
