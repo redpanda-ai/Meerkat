@@ -10,6 +10,24 @@ performance matrics.
 @author: Matt Sevrens
 """
 
+import argparse
+import logging
+import os
+import shutil
+
+import tensorflow as tf
+
+from meerkat.classification.split_data import main_split_data
+from meerkat.classification.tools import (pull_from_s3, check_new_input_file,
+	push_file_to_s3, make_tarfile, copy_file, check_file_exist_in_s3, extract_tarball)
+from meerkat.classification.tensorflow_cnn import build_graph, train_model, validate_config
+from meerkat.classification.ensemble_cnns import build_graph as build_ensemble_graph
+from meerkat.classification.ensemble_cnns import train_model as train_ensemble_model
+from meerkat.classification.soft_target import main as get_soft_target
+from meerkat.various_tools import load_params, safe_input
+from meerkat.classification.auto_load import get_single_file_from_tarball
+from meerkat.classification.classification_report import main_process as apply_cnn
+
 ############################## USAGE ###############################################################
 """
 USAGE =
@@ -43,24 +61,6 @@ time nohup python3 -m meerkat.classification.auto_train merchant bank -v --ensem
 """
 
 ###################################################################################################
-
-import argparse
-import logging
-import os
-import shutil
-
-import tensorflow as tf
-
-from meerkat.classification.split_data import main_split_data
-from meerkat.classification.tools import (pull_from_s3, check_new_input_file,
-	push_file_to_s3, make_tarfile, copy_file, check_file_exist_in_s3, extract_tarball)
-from meerkat.classification.tensorflow_cnn import build_graph, train_model, validate_config
-from meerkat.classification.ensemble_cnns import build_graph as build_ensemble_graph
-from meerkat.classification.ensemble_cnns import train_model as train_ensemble_model
-from meerkat.classification.soft_target import main as get_soft_target
-from meerkat.various_tools import load_params, safe_input
-from meerkat.classification.auto_load import get_single_file_from_tarball
-from meerkat.classification.classification_report import main_process as apply_cnn
 
 def parse_arguments():
 	"""This function parses arguments from our command line."""
@@ -156,10 +156,9 @@ def auto_train():
 
 	exist_results_tarball = check_file_exist_in_s3("results.tar.gz", **s3_params)
 	if exist_results_tarball:
-		pull_from_s3(extension='.tar.gz', file_name="results.tar.gz", **s3_params)
+		local_zip_file = pull_from_s3(extension='.tar.gz', file_name="results.tar.gz", **s3_params)
 		try:
-			model_file = get_single_file_from_tarball(save_path + "results.tar.gz", ".ckpt")
-			os.remove(model_file)
+			_ = get_single_file_from_tarball(save_path, local_zip_file, ".ckpt", extract=False)
 
 			valid_options = ["yes", "no"]
 			while True:
@@ -171,14 +170,15 @@ def auto_train():
 					logging.critical("Not a valid option. Valid options are: yes or no.")
 
 			if retrain_choice == "no":
+				os.remove(local_zip_file)
 				logging.info("Auto train ends")
 				shutil.rmtree(save_path)
 				return
 			else:
+				os.remove(local_zip_file)
 				logging.info("Retrain the model")
 		except:
 			logging.critical("results.tar.gz is invalid. Retrain the model")
-		os.remove(save_path + "results.tar.gz")
 
 	if exist_new_input:
 		logging.info("There exists new input data")
