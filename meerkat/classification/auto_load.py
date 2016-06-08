@@ -192,7 +192,7 @@ def load_best_model_for_type(**kwargs):
 	client = boto3.client('s3')
 
 	model_type = kwargs["model_type"]
-	if model_type.startsWith("/"):
+	if model_type.startswith("/"):
 		model_type = model_type[1:]
 
 	remote_file = kwargs["s3_prefix"] + "/" + model_type +\
