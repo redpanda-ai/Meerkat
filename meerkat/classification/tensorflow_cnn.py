@@ -400,6 +400,7 @@ def build_graph(config):
 			return network
 
 		network = encoder(trans_placeholder, "network", train=True)
+		_ = encoder(trans_placeholder, "model", train=False)
 
 		# Calculate Loss and Optimize
 		with tf.name_scope('trainer'):

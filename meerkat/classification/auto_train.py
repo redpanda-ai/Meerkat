@@ -259,7 +259,7 @@ def auto_train():
 	args.model_name = ''
 
 	logging.warning('Apply the best CNN to test data and calculate performance metrics')
-	apply_cnn(args)
+	apply_cnn(args=args)
 	copy_file(best_model_path, tarball_directory)
 	copy_file(best_model_path.replace(".ckpt", ".meta"), tarball_directory)
 	# copy_file("meerkat/classification/models/train.ckpt", tarball_directory)
