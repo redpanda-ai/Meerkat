@@ -10,7 +10,8 @@ Created on July 15, 2014
 #################### USAGE ##########################
 
 # Note: In Progress
-# python3.3 -m meerkat.labeling_tools.get_merchants_by_ID config/test.json data/misc/ground_truth_card.txt
+# python3.3 -m meerkat.labeling_tools.get_merchants_by_ID\
+# config/test.json data/misc/ground_truth_card.txt
 
 # Required Params:
 
@@ -33,7 +34,7 @@ def enrich_transactions(params, es_connection):
 		 transaction["FACTUAL_ID"], es_connection)
 
 		# No merchant found for factual_id
-		if merchant == None:
+		if merchant is None:
 			continue
 
 		# Enrich 
