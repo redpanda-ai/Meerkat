@@ -1,5 +1,4 @@
 #!/usr/local/bin/python3
-# pylint: disable=unused-argument
 # pylint: disable=too-many-locals
 
 """Train a CNN using tensorFlow
