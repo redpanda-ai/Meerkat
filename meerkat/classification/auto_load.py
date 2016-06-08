@@ -190,8 +190,13 @@ def get_best_models(*args):
 def load_best_model_for_type(**kwargs):
 	"""Loads the best model for a given model type from S3 to the local host."""
 	client = boto3.client('s3')
-	#Note: we removing the leading "/" from the remote_file using the number 1
-	model_type = kwargs["model_type"][1:]
+
+	model_type = kwargs["model_type"]
+	if model_type.startswith("/"):
+		model_type = model_type[1:]
+
+	if kwargs["s3_prefix"].endswith("/"):
+		kwargs["s3_prefix"] = kwargs["s3_prefix"][:-1]
 	remote_file = kwargs["s3_prefix"] + "/" + model_type +\
 		kwargs["timestamp"] + "results.tar.gz"
 	logging.critical("Bucket name {0}".format(kwargs["bucket"]))
