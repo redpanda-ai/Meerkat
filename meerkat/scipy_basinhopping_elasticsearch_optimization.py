@@ -158,6 +158,24 @@ def split_hyperparameters(hyperparameters):
 
 	return boost_vectors, boost_labels, other
 
+def get_desc_queue(dataset):
+	"""Alt version of get_desc_queue"""
+
+	transactions = [deepcopy(X) for X in dataset]
+	desc_queue = queue.Queue()
+	users = collections.defaultdict(list)
+
+	# Split into user buckets
+	for row in transactions:
+		user = row['UNIQUE_MEM_ID']
+		users[user].append(row)
+
+	# Add Users to Queue
+	for key, _ in users.items():
+		desc_queue.put(users[key])
+
+	return desc_queue
+
 def run_classifier(hyperparameters, params, dataset):
 	""" Runs the classifier with a given set of hyperparameters"""
 

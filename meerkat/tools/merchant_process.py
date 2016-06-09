@@ -1,10 +1,10 @@
 """This module preprocess data and return a 2-column csv file for the Crepe algorithm"""
 
+import sys
+import os
+import json
 import pandas as pd
 import numpy as np
-import json
-import os
-import sys
 
 from meerkat.various_tools import load_piped_dataframe
 

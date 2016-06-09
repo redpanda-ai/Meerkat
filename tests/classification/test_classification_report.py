@@ -2,6 +2,7 @@
 
 import meerkat.classification.classification_report as cr
 import unittest
+import argparse
 
 from nose_parameterized import parameterized
 
