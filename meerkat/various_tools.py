@@ -22,9 +22,6 @@ import pandas as pd
 
 from jsonschema import validate
 
-CLEAN_PATTERN = re.compile(r"\\+\|")
-QUOTE_CLEAN = re.compile(r'\"')
-
 def validate_configuration(config, schema):
 	"""validate a json config file"""
 	try:
