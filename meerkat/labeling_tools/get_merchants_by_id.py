@@ -10,7 +10,7 @@ Created on July 15, 2014
 #################### USAGE ##########################
 
 # Note: In Progress
-# python3.3 -m meerkat.labeling_tools.get_merchants_by_ID\
+# python3.3 -m meerkat.labeling_tools.get_merchants_by_id\
 # config/test.json data/misc/ground_truth_card.txt
 
 # Required Params:
