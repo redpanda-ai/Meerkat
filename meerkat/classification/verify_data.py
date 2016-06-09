@@ -170,7 +170,6 @@ def verify_csv(**kwargs):
 	csv_input = kwargs["csv_input"]
 	cnn_type = kwargs["cnn_type"]
 
-	df = []
 	if isinstance(csv_input, str):
 		df = read_csv_to_df(csv_input, cnn_type)
 	elif isinstance(csv_input, pd.core.frame.DataFrame):
@@ -273,8 +272,7 @@ def verify_numbers_in_each_class(label_names_csv, label_counts_csv, cnn_type):
 	err_msg = ""
 	if cnn_type[0] == "subtype":
 		return
-	for i in range(len(label_names_csv)):
-		label_name = label_names_csv[i]
+	for _, label_name in enumerate(label_names_csv):
 		if label_counts_csv[label_name] < 500:
 			err_msg += "{:<40}".format(label_name) + \
 				"{:<25}".format(str(label_counts_csv[label_name])) + "\n"

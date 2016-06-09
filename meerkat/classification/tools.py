@@ -30,8 +30,8 @@ def check_new_input_file(**s3_params):
 	]
 
 	version_dir_list = []
-	for i in range(len(version_object_list)):
-		full_name = version_object_list[i].name
+	for _, version_object in enumerate(version_object_list):
+		full_name = version_object.name
 		if full_name.endswith("/"):
 			dir_name = full_name[full_name.rfind("/", 0, len(full_name) - 1)+1:len(full_name)-1]
 			if dir_name.isdigit():
@@ -48,8 +48,8 @@ def check_new_input_file(**s3_params):
 	]
 
 	tar_gz_file_list = []
-	for i in range(len(tar_gz_object_list)):
-		full_name = tar_gz_object_list[i].name
+	for _, tar_gz_object in enumerate(tar_gz_object_list):
+		full_name = tar_gz_object.name
 		tar_gz_file_name = full_name[full_name.rfind("/")+1:]
 		tar_gz_file_list.append(tar_gz_file_name)
 
@@ -115,7 +115,7 @@ def dict_2_json(obj, filename):
 def cap_first_letter(label):
 	"""Make sure the first letter of each word is capitalized"""
 	temp = label.split()
-	for i in range(len(temp)):
+	for i, _ in enumerate(temp):
 		if temp[i].lower() in ['by', 'with', 'or', 'at', 'in']:
 			temp[i] = temp[i].lower()
 		else:

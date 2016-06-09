@@ -14,7 +14,6 @@ import logging
 import os
 import re
 import sys
-import queue
 
 import boto
 import numpy as np
@@ -216,14 +215,14 @@ def build_boost_vectors(hyperparams):
 	boost_row_vectors = hyperparams["boost_vectors"]
 	boost_row_labels, boost_column_vectors = sorted(boost_row_vectors.keys()), {}
 
-	for i in range(len(boost_column_labels)):
+	for i, boost_column_label in enumerate(boost_column_labels):
 
 		my_list = []
 
 		for field in boost_row_labels:
 			my_list.append(boost_row_vectors[field][i])
 
-		boost_column_vectors[boost_column_labels[i]] = np.array(my_list)
+		boost_column_vectors[boost_column_label] = np.array(my_list)
 
 	return boost_row_labels, boost_column_vectors
 
