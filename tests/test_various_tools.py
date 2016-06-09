@@ -32,14 +32,6 @@ class VariousToolsTests(unittest.TestCase):
 			self.assertRaises(SystemExit, various_tools.load_hyperparameters, params)
 
 	@parameterized.expand([
-		([various_tools_fixture.get_queue()["non_empty"], [1, 2, 3]]),
-		([various_tools_fixture.get_queue()["empty"], []])
-	])
-	def test_queue_to_list(self, result_queue, result_list):
-		"""Test queue_to_list with parameters"""
-		self.assertEqual(various_tools.queue_to_list(result_queue), result_list)
-
-	@parameterized.expand([
 		(["abcd\\|ef\"ghij", "cd efg"]),
 		(["abcd\\ef\"\"ghij", "cd\\efg"]),
 		(["abcd|efghij", "cd|efg"])
