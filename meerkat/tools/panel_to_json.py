@@ -11,7 +11,6 @@ with the web service."""
 import sys
 import re
 import json
-import pandas as pd
 import numpy as np
 
 from meerkat.various_tools import load_piped_dataframe
