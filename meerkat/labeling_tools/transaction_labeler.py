@@ -76,7 +76,7 @@ def identify_container(filename):
 		print('Please designate whether this is bank or card in params["container"]')
 		sys.exit()
 
-def move_to_s3(bucket, key_name, filepath):
+def move_to_s3(buckee):
 	"""Moves a file to S3"""
 
 	with nostdout():
@@ -277,14 +277,14 @@ def run_from_command_line():
 				dataframe.to_csv(local_filename, sep="|", mode="w", quotechar=None, \
 						  doublequote=False, quoting=csv.QUOTE_NONE, \
 						  encoding="utf-8", index=False, index_label=False)
-				move_to_s3(bucket, labeler_key, local_filename)
+				move_to_s3(bucket, labeler_key)
 		
 		# Break if User exits
 		if save_and_exit:
 			dataframe.to_csv(local_filename, sep="|", mode="w", quotechar=None, \
 					  doublequote=False, quoting=csv.QUOTE_NONE, \
 					  encoding="utf-8", index=False, index_label=False)
-			move_to_s3(bucket, labeler_key, local_filename)
+			move_to_s3(bucket, labeler_key)
 			break
 	
 if __name__ == "__main__":
