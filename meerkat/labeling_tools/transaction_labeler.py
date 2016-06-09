@@ -11,7 +11,7 @@ Created on Jan 5, 2015
 
 # Note: In Progress
 # python3.3 -m meerkat.labeling_tools.transaction_labeler [config_file]
-# python3.3 -m meerkat.labeling_tools.transaction_labeler config/transaction_origin_labeling.json
+# python3.3 -m meerkat.labeling_tools.transaction_labeler meerkat/labeling_tools/config/transaction_origin_labeling.json
 
 # Required Columns: 
 # DESCRIPTION_UNMASKED

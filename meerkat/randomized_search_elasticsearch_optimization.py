@@ -23,7 +23,7 @@ Created on Feb 26, 2014
 
 #################### USAGE ##########################
 
-# python3.3 -m meerkat.randomized_search_elasticsearch_optimization config/train.json
+# python3.3 -m meerkat.randomized_search_elasticsearch_optimization meerkat/config/train.json
 # Note: Experts only! Do not touch!
 
 #####################################################
