@@ -127,19 +127,6 @@ def progress(i, my_list, message=""):
 	sys.stdout.write(my_progress)
 	sys.stdout.flush()
 
-def queue_to_list(result_queue):
-	"""Converts queue to list"""
-	result_list = []
-	while result_queue.qsize() > 0:
-		try:
-			result_list.append(result_queue.get())
-			result_queue.task_done()
-
-		except queue.Empty:
-			break
-	result_queue.join()
-	return result_list
-
 def load_params(filename):
 	"""Load a set of parameters provided a filename"""
 	if isinstance(filename, str):
