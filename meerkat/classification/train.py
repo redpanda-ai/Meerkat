@@ -65,7 +65,7 @@ def load_data(trans, labels, file_name, test_size=1):
 	human_labeled = list(csv.DictReader(human_labeled_file, delimiter='|'))
 	human_labeled_file.close()
 
-	for label in human_labeled:
+	for _, label in enumerate(human_labeled):
 		if label[sys.argv[2]] != "" and random() < test_size:
 			trans.append(label["DESCRIPTION_UNMASKED"])
 			labels.append(label[sys.argv[2]])

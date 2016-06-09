@@ -82,7 +82,7 @@ def load_dataset(params):
 	verified_transactions = load_dict_list(verification_source)
 
 	# Filter Verification File
-	for curr in verified_transactions:
+	for _, curr in enumerate(verified_transactions):
 		for field in params["output"]["results"]["labels"]:
 			curr[field] = ""
 
