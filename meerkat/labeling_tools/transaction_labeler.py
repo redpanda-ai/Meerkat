@@ -76,7 +76,7 @@ def identify_container(filename):
 		print('Please designate whether this is bank or card in params["container"]')
 		sys.exit()
 
-def move_to_s3(buckee):
+def move_to_s3(bucket, key_name):
 	"""Moves a file to S3"""
 
 	with nostdout():

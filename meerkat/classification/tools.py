@@ -115,11 +115,11 @@ def dict_2_json(obj, filename):
 def cap_first_letter(label):
 	"""Make sure the first letter of each word is capitalized"""
 	temp = label.split()
-	for i in range(len(temp)):
-		if temp[i].lower() in ['by', 'with', 'or', 'at', 'in']:
-			temp[i] = temp[i].lower()
+	for word in temp:
+		if word.lower() in ['by', 'with', 'or', 'at', 'in']:
+			word = word.lower()
 		else:
-			temp[i] = temp[i][0].upper() + temp[i][1:]
+			word = word[0].upper() + word[1:]
 	return ' '.join(word for word in temp)
 
 def pull_from_s3(**kwargs):
