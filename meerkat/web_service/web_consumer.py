@@ -316,7 +316,10 @@ class WebConsumer():
 		json_data = json.loads(json_object.read())
 
 		general_category = json_data['general_category']
+		#general_category = ['Other Income', 'Other Expenses', \
+		#'Other Bills', 'Service Charges/Fees', 'Transfers']
 		subtype_list = json_data['subtype_category']
+		#subtype_list = ['Service Charge/Fee Refund', 'Refund']
 
 		for trans in transactions:
 			subtype_category = trans.get("subtype_CNN", {}).get("category",\
@@ -326,8 +329,8 @@ class WebConsumer():
 
 			sub_type = trans.get("txn_sub_type", "")
 
-			if len(subtype_category) == 0 or subtype_category in general_category or\
-				sub_type in subtype_list:
+			if len(subtype_category) == 0 \
+				or subtype_category in general_category or sub_type in subtype_list:
 				# Regular spending transaction
 				trans["search"] = {"category_labels" : trans.get("category_labels", [])}
 
@@ -351,7 +354,7 @@ class WebConsumer():
 				trans["CNN"] = trans.get("CNN", {}).get("label", "")
 				trans.pop("subtype_CNN", None)
 
-	def ensure_output_schema(self, transactions, debug, services_list):
+	def ensure_output_schema(self, transactions, debug):
 		"""Clean output to proper schema"""
 
 		# Collect Mapping Details
@@ -629,8 +632,7 @@ class WebConsumer():
 		if not optimizing:
 			self.__apply_missing_categories(data["transaction_list"])
 
-		self.ensure_output_schema(data["transaction_list"], debug,
-			services_list)
+		self.ensure_output_schema(data["transaction_list"], debug)
 
 		return data
 

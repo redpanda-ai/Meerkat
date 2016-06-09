@@ -1,5 +1,6 @@
 #!/usr/local/bin/python3
 # pylint: disable=unused-variable
+# pylint: disable=unused-argument
 # pylint: disable=too-many-locals
 
 """Train a CNN using tensorFlow
@@ -319,8 +320,11 @@ def build_graph(config):
 		with tf.name_scope("running_var"):
 			running_var = [tf.Variable(tf.ones([l]), trainable=False) for l in layer_sizes]
 
-		def layer(input_h, details, layer_name, train, weights=None, biases=None):
+		def layer(*args, **kwargs):
 			"""Apply all necessary steps in a ladder layer"""
+			input_h, details, layer_name, train = args[:]
+			weights = kwargs.get('weights', None)
+			biases = kwargs.get('biases', None)
 
 			# Scope for Visualization with TensorBoard
 			with tf.name_scope(layer_name):
@@ -337,17 +341,17 @@ def build_graph(config):
 				layer_n = details["layer_count"]
 
 				if train:
-					z = update_batch_normalization(z_pre, layer_n)
+					normalized_layer = update_batch_normalization(z_pre, layer_n)
 				else:
 					mean = ewma.average(running_mean[layer_n-1])
 					var = ewma.average(running_var[layer_n-1])
-					z = batch_normalization(z_pre, mean=mean, var=var)
+					normalized_layer = batch_normalization(z_pre, mean=mean, var=var)
 
 				# Apply Activation
 				if "conv" in layer_name or "fc" in layer_name:
-					layer = threshold(z + biases)
+					layer = threshold(normalized_layer + biases)
 				else:
-					layer = z
+					layer = normalized_layer
 
 			return layer
 
@@ -358,13 +362,13 @@ def build_graph(config):
 				mean, var = tf.nn.moments(batch, axes=axes)
 			return (batch - mean) / tf.sqrt(var + tf.constant(1e-10))
 
-		def update_batch_normalization(batch, l):
+		def update_batch_normalization(batch, layer_n):
 			"batch normalize + update average mean and variance of layer l"
 			axes = [0] if len(batch.get_shape()) == 2 else [0, 1, 2]
 			mean, var = tf.nn.moments(batch, axes=axes)
-			assign_mean = running_mean[l-1].assign(mean)
-			assign_var = running_var[l-1].assign(var)
-			bn_assigns.append(ewma.apply([running_mean[l-1], running_var[l-1]]))
+			assign_mean = running_mean[layer_n-1].assign(mean)
+			assign_var = running_var[layer_n-1].assign(var)
+			bn_assigns.append(ewma.apply([running_mean[layer_n-1], running_var[layer_n-1]]))
 			with tf.control_dependencies([assign_mean, assign_var]):
 				return (batch - mean) / tf.sqrt(var + 1e-10)
 

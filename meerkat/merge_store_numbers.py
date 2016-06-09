@@ -14,14 +14,13 @@ Created on Mar 25, 2014
 #################### USAGE ##########################
 
 # Note: Store numbers must be comma delimited
-"""
-python3 -m meerkat.merge_store_numbers [store_numbers_file] \
-[cluster_address] [index] [doc_type]
-python3 -m meerkat.merge_store_numbers [store_numbers_directory] \
-[cluster_address] [index] [doc_type]
-python3 -m meerkat.merge_store_numbers data/misc/Store\ Numbers/Clean/IAE \
-127.0.0.1 factual_index factual_type
-"""
+
+# python3 -m meerkat.merge_store_numbers [store_numbers_file] \
+# [cluster_address] [index] [doc_type]
+# python3 -m meerkat.merge_store_numbers [store_numbers_directory] \
+# [cluster_address] [index] [doc_type]
+# python3 -m meerkat.merge_store_numbers data/misc/Store\ Numbers/Clean/IAE \
+# 127.0.0.1 factual_index factual_type
 
 # Required Columns:
 # keywords: Name found in factual
@@ -85,8 +84,8 @@ def find_merchant(store):
 	should_clauses = bool_search["query"]["bool"]["should"]
 
 	# Multi Field
-	for i in range(len(fields)):
-		sub_query = get_qs_query(search_parts[i], [fields[i]])
+	for idx, field in enumerate(fields):
+		sub_query = get_qs_query(search_parts[idx], [field])
 		should_clauses.append(sub_query)
 
 	# Search Index
@@ -97,10 +96,10 @@ def find_merchant(store):
 		return "", "", ""
 
 	# Allow User to Verify and Return
-	formatted = [top_hit.get("name", ""), top_hit.get("address", ""),\
+	formatt = [top_hit.get("name", ""), top_hit.get("address", ""),\
 	 top_hit.get("postcode", ""), top_hit.get("locality", ""), \
 	 top_hit.get("region", ""),]
-	formatted = ", ".join(formatted)
+	formatted = ", ".join(formatt)
 
 	message = """
 		File: {0}
@@ -153,7 +152,7 @@ def update_merchant(factual_id, store):
 def search_index(query):
 	"""Searches the merchants index and the merchant mapping"""
 
-	output_data = ""
+	output_data = {}
 
 	try:
 		output_data = get_es_connection().search(index=sys.argv[3], body=query)
@@ -169,10 +168,9 @@ def run(stores):
 	total = len(stores)
 
 	# Run Search
-	for i in range(len(stores)):
+	for store in stores:
 
 		# Find Most Likely Merchant
-		store = stores[i]
 		factual_id, top_result, message = find_merchant(store)
 		store['factual_id'] = factual_id
 		store['top_result'] = top_result

@@ -675,8 +675,8 @@ def enrich_transaction(*args, **kwargs):
 		transaction["merchant_found"] = False
 
 	# Enrich the transaction
-	for i in range(len(fields_to_get)):
-		transaction[fields_to_fill[i]] = merchant.get(fields_to_get[i], "")
+	for idx, field_to_get in enumerate(fields_to_get):
+		transaction[fields_to_fill[idx]] = merchant.get(field_to_get, "")
 
 	# Add Geo
 	if merchant.get("pin", "") != "":
@@ -698,7 +698,7 @@ def find_merchant_by_address(store, es_connection, additional_data=[]):
 				   string_cleanse(store.get("STATE", "")),
 				   store.get("ZIP_CODE", "")]
 	index = sys.argv[4]
-	results = ""
+	results = {}
 
 	# Generate Query
 	bool_search = get_bool_query(size=45)
@@ -712,8 +712,8 @@ def find_merchant_by_address(store, es_connection, additional_data=[]):
 				should_clauses.append(additional_query)
 
 	# Multi Field
-	for i in range(len(fields)):
-		sub_query = get_qs_query(old_details[i], [fields[i]])
+	for idx, field in enumerate(fields):
+		sub_query = get_qs_query(old_details[idx], [field])
 		should_clauses.append(sub_query)
 
 	# Search
