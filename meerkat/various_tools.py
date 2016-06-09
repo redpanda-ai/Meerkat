@@ -307,14 +307,6 @@ def get_us_cities():
 	cities = [city.lower().rstrip('\n') for city in cities]
 	return cities
 
-def clean_line(line):
-	"""Strips out the part of a binary line that is not usable"""
-
-	line = CLEAN_PATTERN.sub(" ", str(line)[2:-3])
-	line = QUOTE_CLEAN.sub("", line)
-
-	return line
-
 def stopwords(transaction):
 	"""Remove stopwords"""
 	patterns = [
