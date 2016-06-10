@@ -18,3 +18,50 @@ def get_elasticsearch_result():
 			}
 		}
 	}
+
+def get_transaction():
+	"""Return a transaction"""
+	return {
+		"CITY": "Scarsdale",
+		"STATE": "NY",
+		"LATITUDE": "234",
+		"LONGITUDE": "123",
+		"PHYSICAL_MERCHANT": "7 Eleven",
+		"STORE_NUMBER": "00234",
+		"STREET": "1212 MAY ST",
+		"ZIP_CODE": "95048",
+		"TRANSACTION_ID": 5024853,
+		"TXN_TYPE": "Purchase",
+		"TXN_SUB_TYPE": "Purchase",
+		"WEBSITE": "",
+		"PHONE_NUMBER": "",
+		"COUNTRY": "US"
+	}
+
+def get_cleaned_transaction():
+	"""Return a cleaned transaction"""
+	return {
+		"CITY": "",
+		"STATE": "",
+		"LATITUDE": "",
+		"LONGITUDE": "",
+		"PHYSICAL_MERCHANT": "",
+		"STORE_NUMBER": "",
+		"STREET": "",
+		"ZIP_CODE": "",
+		"TRANSACTION_ID": 5024853,
+		"TXN_TYPE": "Purchase",
+		"TXN_SUB_TYPE": "Purchase",
+		"WEBSITE": "",
+		"PHONE_NUMBER": "",
+		"COUNTRY": "US"
+	}
+
+def get_args():
+	return {
+		"one": ["argv_0"],
+		"two": ["argv_0", "argv_1"]
+	}
+
+
+
