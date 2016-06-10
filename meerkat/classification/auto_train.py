@@ -189,10 +189,11 @@ def auto_train():
 	shutil.copyfile(label_map, tarball_directory + "label_map.json")
 
 	# Load and Modify Config
+	config_dir = "meerkat/classification/config/"
 	if args.ensemble:
-		config = load_params("meerkat/classification/config/ensemble_cnns_config.json")
+		config = load_params(config_dir + "ensemble_cnns_config.json")
 	else:
-		config = load_params("meerkat/classification/config/default_tf_config.json")
+		config = load_params(config_dir + "default_tf_config.json")
 	config["label_map"] = label_map
 	config["dataset"] = train_file
 	config["ledger_entry"] = args.credit_or_debit
