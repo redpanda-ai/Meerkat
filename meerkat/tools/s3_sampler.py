@@ -91,18 +91,15 @@ def run_from_command_line():
 	# Create Output Folder if it doesn't exist
 	os.makedirs("data/output/s3_sample", exist_ok=True)
 
+	base_dir = "meerkat/classification/label_maps/"
 	if sys.argv[1] == "bank":
 		regex = re.compile("panels/meerkat_split/bank/")
-		label_map = load_params("meerkat/classification/label_maps/"
-			"expanded_permanent_bank_label_map.json")
-		reverse_label_map = load_params("meerkat/classification/label_maps/"
-			"expanded_reverse_bank_label_map.json")
+		label_map = load_params(base_dir + "expanded_permanent_bank_label_map.json")
+		reverse_label_map = load_params(base_dir + "expanded_reverse_bank_label_map.json")
 	elif sys.argv[1] == "card":
 		regex = re.compile("ctprocessed/gpanel/card/")
-		label_map = load_params("meerkat/classification/label_maps/"
-			"expanded_permanent_card_label_map.json")
-		reverse_label_map = load_params("meerkat/classification/label_maps/"
-			"expanded_reverse_card_label_map.json")
+		label_map = load_params(base_dir + "expanded_permanent_card_label_map.json")
+		reverse_label_map = load_params(base_dir + "expanded_reverse_card_label_map.json")
 	else: 
 		print("Please select bank or card for container")
 		sys.exit()
