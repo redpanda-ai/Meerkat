@@ -3,7 +3,7 @@
 	"verification_source" : "data/misc/ground_truth_card.csv",
 	"mode" : "training",
 	"input" : {
-		"hyperparameters" : "config/hyperparameters/default.json",
+		"hyperparameters" : "meerkat/web_service/config/hyperparameters/default.json",
 		"filename" : "/mnt/ephemeral/training_data/card_sample/card_sample_physical.txt",
 		"delimiter" : "|",
 		"encoding" : "utf-8",

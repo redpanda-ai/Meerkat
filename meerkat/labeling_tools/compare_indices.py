@@ -14,7 +14,7 @@ Created on July 21, 2014
 
 # Note: In Progress
 # python3.3 -m meerkat.labeling_tools.compare_indices [config_file] [labeled_transactions] [new_ip] [new_index] [new_type] 
-# python3.3 -m meerkat.labeling_tools.compare_indices config/test.json data/misc/ground_truth_card.txt 172.31.41.93 routed_index routed_type
+# python3.3 -m meerkat.labeling_tools.compare_indices meerkat/config/test.json data/misc/ground_truth_card.txt 172.31.41.93 routed_index routed_type
 
 # Required Columns: 
 # DESCRIPTION_UNMASKED
