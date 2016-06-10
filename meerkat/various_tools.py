@@ -14,16 +14,12 @@ import logging
 import os
 import re
 import sys
-import queue
 
 import boto
 import numpy as np
 import pandas as pd
 
 from jsonschema import validate
-
-CLEAN_PATTERN = re.compile(r"\\+\|")
-QUOTE_CLEAN = re.compile(r'\"')
 
 def validate_configuration(config, schema):
 	"""validate a json config file"""
@@ -127,19 +123,6 @@ def progress(i, my_list, message=""):
 	sys.stdout.write(my_progress)
 	sys.stdout.flush()
 
-def queue_to_list(result_queue):
-	"""Converts queue to list"""
-	result_list = []
-	while result_queue.qsize() > 0:
-		try:
-			result_list.append(result_queue.get())
-			result_queue.task_done()
-
-		except queue.Empty:
-			break
-	result_queue.join()
-	return result_list
-
 def load_params(filename):
 	"""Load a set of parameters provided a filename"""
 	if isinstance(filename, str):
@@ -232,14 +215,14 @@ def build_boost_vectors(hyperparams):
 	boost_row_vectors = hyperparams["boost_vectors"]
 	boost_row_labels, boost_column_vectors = sorted(boost_row_vectors.keys()), {}
 
-	for i in range(len(boost_column_labels)):
+	for i, boost_column_label in enumerate(boost_column_labels):
 
 		my_list = []
 
 		for field in boost_row_labels:
 			my_list.append(boost_row_vectors[field][i])
 
-		boost_column_vectors[boost_column_labels[i]] = np.array(my_list)
+		boost_column_vectors[boost_column_label] = np.array(my_list)
 
 	return boost_row_labels, boost_column_vectors
 
@@ -319,14 +302,6 @@ def get_us_cities():
 		cities = city_file.readlines()
 	cities = [city.lower().rstrip('\n') for city in cities]
 	return cities
-
-def clean_line(line):
-	"""Strips out the part of a binary line that is not usable"""
-
-	line = CLEAN_PATTERN.sub(" ", str(line)[2:-3])
-	line = QUOTE_CLEAN.sub("", line)
-
-	return line
 
 def stopwords(transaction):
 	"""Remove stopwords"""

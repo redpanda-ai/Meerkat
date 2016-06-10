@@ -22,7 +22,7 @@ Created on Feb 26, 2014
 
 #################### USAGE ##########################
 
-# python3.3 -m meerkat.scipy_basinhopping_elasticsearch_optimization config/train.json
+# python3.3 -m meerkat.scipy_basinhopping_elasticsearch_optimization meerkat/config/train.json
 # Note: Experts only! Do not touch!
 
 #####################################################
@@ -52,7 +52,7 @@ CITIES = get_us_cities()
 #CONSTANTS
 USED_IN_HEADER, ORIGIN, NAME_IN_MEERKAT, NAME_IN_ORIGIN = 0, 1, 2, 3
 BATCH_SIZE = 1000
-consumer = WebConsumer()
+CONSUMER = WebConsumer()
 
 class RandomDisplacementBounds(object):
 	"""random displacement with bounds"""
@@ -102,7 +102,7 @@ def run_meerkat(params, dataset):
 
 		print("Batch number: {0}".format(x))
 		batch_in = format_web_consumer(batch)
-		batch_result = consumer.classify(batch_in)
+		batch_result = CONSUMER.classify(batch_in)
 		result_list.extend(batch_result["transaction_list"])
 
 	# Test Accuracy
@@ -122,9 +122,7 @@ def load_dataset(params):
 	verified_transactions = load_dict_list(verification_source)
 
 	# Filter Verification File
-	for i in range(len(verified_transactions)):
-		curr = verified_transactions[i]
-
+	for _, curr in enumerate(verified_transactions):
 		for field in params["output"]["results"]["labels"]:
 			curr[field] = ""
 
@@ -158,6 +156,24 @@ def split_hyperparameters(hyperparameters):
 
 	return boost_vectors, boost_labels, other
 
+def get_desc_queue(dataset):
+	"""Alt version of get_desc_queue"""
+
+	transactions = [deepcopy(X) for X in dataset]
+	desc_queue = queue.Queue()
+	users = collections.defaultdict(list)
+
+	# Split into user buckets
+	for row in transactions:
+		user = row['UNIQUE_MEM_ID']
+		users[user].append(row)
+
+	# Add Users to Queue
+	for key, _ in users.items():
+		desc_queue.put(users[key])
+
+	return desc_queue
+
 def run_classifier(hyperparameters, params, dataset):
 	""" Runs the classifier with a given set of hyperparameters"""
 
@@ -170,7 +186,7 @@ def run_classifier(hyperparameters, params, dataset):
 	hyperparameters["boost_vectors"] = boost_vectors
 
 	# Run Classifier with new Hyperparameters. Suppress Output
-	consumer.update_hyperparams(hyperparameters)
+	CONSUMER.update_hyperparams(hyperparameters)
 	accuracy = run_meerkat(params, dataset)
 
 	return accuracy
@@ -297,8 +313,8 @@ def run_from_command_line():
 		x = [str(n) for n in x]
 		hyperparam = dict(zip(param_names, list(x)))
 		hyperparam['es_result_size'] = "45"
-		consumer.update_params(params)
-		consumer.update_cities(CITIES)
+		CONSUMER.update_params(params)
+		CONSUMER.update_cities(CITIES)
 		accuracy = run_classifier(hyperparam, params, dataset)
 		error = (100 - accuracy['precictive_accuracy']) / 100
 

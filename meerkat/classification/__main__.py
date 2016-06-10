@@ -2,9 +2,9 @@
 
 """This file is run first when executing binary_classifier as a subpackage"""
 
+import sys
+import logging
 from meerkat.custom_exceptions import InvalidArguments
-
-import sys, logging
 
 def start(arguments):
 	"""This function does everything."""

@@ -15,8 +15,8 @@ VERIZON         | VERIZON         | VERIZON WRLS MYACCT VE   FOLSOM       CA
 VICTORIASSECRET | VICTORIASSECRET | VICTORIA'S SECRET 0020   FAIRFAX      VA 
 """
 
-from .merchant_trie import generate_merchant_trie, standardize
 import csv
+from .merchant_trie import generate_merchant_trie, standardize
 
 MERCHANT_TRIE = generate_merchant_trie()
 
@@ -31,7 +31,7 @@ def find_merchant(transaction):
 			for end in range(start, len(transaction) + 1):
 				if transaction[start:end] in MERCHANT_TRIE and \
 				   len(transaction[start:end]) > 3 and \
-				   (longest == None or len(longest) < len(transaction[start:end])):
+				   (longest is None or len(longest) < len(transaction[start:end])):
 					longest = transaction[start:end]
 	return longest
 

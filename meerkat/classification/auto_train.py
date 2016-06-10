@@ -53,13 +53,10 @@ optional arguments:
   --bucket BUCKET       Input bucket name, default is s3yodlee
   -d, --debug           log at DEBUG level
   -v, --info            log at INFO leve
-"""
 
-"""
 EXAMPLE =
 time nohup python3 -m meerkat.classification.auto_train merchant bank -v --ensemble &
 """
-
 ###################################################################################################
 
 def parse_arguments():
