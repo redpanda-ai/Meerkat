@@ -3,6 +3,7 @@
 import unittest
 import meerkat.labeling_tools.compare_indices as compare_indices
 from nose_parameterized import parameterized
+from tests.labeling_tools.fixture import compare_indices_fixture
 
 class CompareIndicesTests(unittest.TestCase):
 	"""Our UnitTest class."""
@@ -22,7 +23,16 @@ class CompareIndicesTests(unittest.TestCase):
 		([[1.0], None])
 	])
 	def test_z_score_delta(self, scores, z_score_delta):
+		"""Test z_score_delta with parameters"""
 		self.assertEqual(compare_indices.z_score_delta(scores), z_score_delta)
+
+	@parameterized.expand([
+		([compare_indices_fixture.get_elasticsearch_result()["non_hits"], 0, (False, False)]),
+		([compare_indices_fixture.get_elasticsearch_result()["has_hits"], 0, (2.0, "result_0")])
+	])
+	def test_get_hit(self, elasticsearch_result, index, expected_result):
+		"""Test get_hit with parameters"""
+		self.assertEqual(compare_indices.get_hit(elasticsearch_result, index), expected_result)
 
 if __name__ == '__main__':
 	unittest.main()
