@@ -433,7 +433,8 @@ def train_model(config, graph, sess, saver):
 	learning_rate_interval = 15000
 
 	best_accuracy, best_era = 0, 0
-	save_dir = "meerkat/classification/models/checkpoints/"
+	base = "meerkat/classification/models/"
+	save_dir = base + "checkpoints/"
 	os.makedirs(save_dir, exist_ok=True)
 	checkpoints = {}
 
@@ -501,8 +502,8 @@ def train_model(config, graph, sess, saver):
 
 	# Clean Up Directory
 	dataset_path = os.path.basename(dataset).split(".")[0]
-	final_model_path = "meerkat/classification/models/" + dataset_path + ".ckpt"
-	final_meta_path = "meerkat/classification/models/" + dataset_path + ".meta"
+	final_model_path = base + dataset_path + ".ckpt"
+	final_meta_path = base + dataset_path + ".meta"
 	logging.info("Moving final model from {0} to {1}.".format(model_path, final_model_path))
 	os.rename(model_path, final_model_path)
 	os.rename(meta_path, final_meta_path)
