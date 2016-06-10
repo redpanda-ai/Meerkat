@@ -69,6 +69,9 @@ class WebServiceTest(unittest.TestCase):
 
 	@classmethod
 	def setUpClass(cls):
+		log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+		logging.basicConfig(level=logging.INFO, format=log_format)
+		logging.warning("Restarting Meerkat.")
 		sudo[local["supervisorctl"]["restart"]["meerkat"]]()
 		trans_text = get_trans_text('./web_service_tester/one_ledger.json')
 		_ = startup_helper(trans_text)
