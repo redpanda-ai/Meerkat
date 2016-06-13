@@ -1,5 +1,4 @@
 #!/usr/local/bin/python3.3
-# pylint: disable=line-too-long,invalid-name
 
 """This script is aimed at testing the accuracy of the Meerkat Classifier.
 We iteratively use this accuracy as a feedback score to tune and optimize
@@ -46,8 +45,8 @@ from meerkat.various_tools import load_dict_list, safely_remove_file, load_param
 from meerkat.various_tools import load_piped_dataframe
 from meerkat.classification.load_model import get_tf_cnn_by_name
 
-default_doc_key = "DESCRIPTION_UNMASKED"
-default_label_key = "GOOD_DESCRIPTION"
+DEFAULT_DOC_KEY = "DESCRIPTION_UNMASKED"
+DEFAULT_LABEL_KEY = "GOOD_DESCRIPTION"
 
 class DummyFile(object):
 	"""Resemble the stdout/stderr object but it prints nothing to screen"""
@@ -98,8 +97,8 @@ def test_bulk_classifier(human_labeled, non_physical_trans, my_lists):
 def generic_test(*args, **kwargs):
 	"""Finds both the percent labeled and predictive accuracy of the pinpoint classifier against
 	human-labeled training data."""
-	machine, human, cnn_column, human_column, human_map, machine_map = args[:]	
-	doc_key = kwargs.get("doc_key", default_doc_key)
+	machine, human, cnn_column, human_column, human_map, machine_map = args[:]
+	doc_key = kwargs.get("doc_key", DEFAULT_DOC_KEY)
 
 	# Create Quicker Lookup
 	index_lookup = {row["UNIQUE_TRANSACTION_ID"]: row for row in human}
@@ -132,18 +131,19 @@ def generic_test(*args, **kwargs):
 			" (ACTUAL:" + human_row[human_column] + ")")
 			continue
 
-		mislabeled.append(human_row[doc_key] + " (ACTUAL: " + human_row[human_column] + ")" + " (FOUND: " + machine_row[cnn_column] + ")")
+		mislabeled.append(human_row[doc_key] + " (ACTUAL: " + human_row[human_column] +
+			")" + " (FOUND: " + machine_row[cnn_column] + ")")
 
 	return len(machine), needs_hand_labeling, mislabeled, unlabeled, correct
 
-def CNN_accuracy(*args, **kwargs):
+def cnn_accuracy(*args, **kwargs):
 	"""Run given CNN over a given input file and return some stats"""
 	# Load Classifier, and transactions
 	test_file, classifier = args[:]
 	model_dict = kwargs.get("model_dict", None)
 	human_dict = kwargs.get("human_dict", None)
-	label_key = kwargs.get("label_key", default_label_key)
-	doc_key = kwargs.get("doc_key", default_doc_key)
+	label_key = kwargs.get("label_key", DEFAULT_LABEL_KEY)
+	doc_key = kwargs.get("doc_key", DEFAULT_DOC_KEY)
 
 	human_map = __load_label_map(human_dict)
 	machine_map = __load_label_map(model_dict)
@@ -160,14 +160,16 @@ def CNN_accuracy(*args, **kwargs):
 		# Label the points using the classifier and report accuracy
 		machine_labeled = classifier(transactions, doc_key=doc_key, label_key="CNN_output")
 
-		total, needs_hand_labeling, mislabeled, unlabeled, correct = generic_test(machine_labeled, transactions, "CNN_output", label_key, human_map, machine_map, doc_key=doc_key)
+		total, needs_hand_labeling, mislabeled, unlabeled, correct = generic_test(machine_labeled,
+			transactions, "CNN_output", label_key, human_map, machine_map, doc_key=doc_key)
 		bulk_total += total
 		bulk_needs_hand_labeling += len(needs_hand_labeling)
 		bulk_mislabeled += len(mislabeled)
 		bulk_unlabeled += len(unlabeled)
 		bulk_correct += len(correct)
 
-	return enhance_results(bulk_total, bulk_needs_hand_labeling, bulk_mislabeled, bulk_unlabeled, bulk_correct)
+	return enhance_results(bulk_total, bulk_needs_hand_labeling, bulk_mislabeled, bulk_unlabeled,
+		bulk_correct)
 	# results = open("data/output/single_test.csv", "a")
 	# writer = csv.writer(results, delimiter=',', quotechar='"')
 	# writer.writerow([merchant["name"], merchant['percent_labeled'], merchant["predictive_accuracy"]])
@@ -236,8 +238,10 @@ def vest_accuracy(params, file_path=None, non_physical_trans=[], result_list=[])
 
 	# Test Classifier for percent labeled and predictive accuracy
 	label_key = params.get("label_key", "FACTUAL_ID")
-	total, needs_hand_labeling, mislabeled, unlabeled, correct = generic_test(machine_labeled, human_labeled, label_key, label_key, None, None)
-	results = enhance_results(total, len(needs_hand_labeling), len(mislabeled), len(unlabeled), len(correct))
+	total, needs_hand_labeling, mislabeled, unlabeled, correct = generic_test(machine_labeled,
+		human_labeled, label_key, label_key, None, None)
+	results = enhance_results(total, len(needs_hand_labeling), len(mislabeled),
+		len(unlabeled), len(correct))
 
 	total_processed = len(machine_labeled) + len(non_physical_trans)
 	results["total_processed"] = total_processed
@@ -263,12 +267,12 @@ def speed_vests(start_time, accuracy_results):
 			'time_per_transaction': time_per_transaction,
 			'transactions_per_minute': transactions_per_minute}
 
-def all_CNN_accuracy():
+def all_cnn_accuracy():
 	"""Run merchant CNN on a directory of Merchant Samples"""
 
 	# Load Classifiers
-	BANK_CNN = get_tf_cnn_by_name("bank_merchant")
-	CARD_CNN = get_tf_cnn_by_name("card_merchant")
+	bank_cnn = get_tf_cnn_by_name("bank_merchant")
+	card_cnn = get_tf_cnn_by_name("card_merchant")
 
 	# Connect to S3
 	with nostdout():
@@ -277,10 +281,14 @@ def all_CNN_accuracy():
 	bucket = conn.get_bucket("yodleemisc", Location.USWest2)
 
 	# Test Bank CNN
-	process_file_collection(bucket, "/vumashankar/CNN/bank/", BANK_CNN, "meerkat/classification/label_maps/reverse_bank_label_map.json")
-
+	prefix = "/vumashankar/CNN/"
+	container = "bank"
+	process_file_collection(bucket, prefix + container + "/", bank_cnn,
+		"meerkat/classification/label_maps/reverse_" + container + "_label_map.json")
 	# Test Card CNN
-	process_file_collection(bucket, "/vumashankar/CNN/card/", CARD_CNN, "meerkat/classification/label_maps/reverse_card_label_map.json")
+	container = "card"
+	process_file_collection(bucket, prefix + container + "/", card_cnn,
+		"meerkat/classification/label_maps/reverse_" + container + "_label_map.json")
 
 def process_file_collection(bucket, prefix, classifier, classifier_id_map):
 	"""Test a list of files"""
@@ -301,19 +309,22 @@ def process_file_collection(bucket, prefix, classifier, classifier_id_map):
 		file_name = "data/input/" + os.path.basename(sample.key)
 		sample.get_contents_to_filename(file_name)
 
-		df = pd.read_csv(file_name, na_filter=False, compression="gzip", quoting=csv.QUOTE_NONE, encoding="utf-8", sep='|', error_bad_lines=False)
+		df = pd.read_csv(file_name, na_filter=False, compression="gzip", quoting=csv.QUOTE_NONE,
+			encoding="utf-8", sep='|', error_bad_lines=False)
 		df.rename(columns={"DESCRIPTION": "DESCRIPTION_UNMASKED"}, inplace=True)
 		df["MERCHANT_NAME"] = merchant_name
 		df["GOOD_DESCRIPTION"] = merchant_name
 		unzipped_file_name = "data/misc/Merchant Samples/" + label_num + ".txt"
-		df.to_csv(unzipped_file_name, sep="|", mode="w", encoding="utf-8", index=False, index_label=False)
+		df.to_csv(unzipped_file_name, sep="|", mode="w", encoding="utf-8", index=False,
+			index_label=False)
 		safely_remove_file(file_name)
 
 		params["verification_source"] = unzipped_file_name
 		print("Testing Merchant: " + merchant_name)
-		accuracy_results = CNN_accuracy(unzipped_file_name, classifier, classifier_id_map, label_map)
+		accuracy_results = cnn_accuracy(unzipped_file_name, classifier, classifier_id_map, label_map)
 		print_results(accuracy_results)
-		writer.writerow([merchant_name, accuracy_results["percent_labeled"], accuracy_results["predictive_accuracy"]])
+		writer.writerow([merchant_name, accuracy_results["percent_labeled"],
+			accuracy_results["predictive_accuracy"]])
 		safely_remove_file(unzipped_file_name)
 
 	results.close()
@@ -322,7 +333,7 @@ def run_from_command_line():
 	"""Runs these commands if the module is invoked from the command line"""
 
 	#print_results(vest_accuracy(params=None))
-	all_CNN_accuracy()
+	all_cnn_accuracy()
 
 if __name__ == "__main__":
 	run_from_command_line()
