@@ -18,21 +18,13 @@ def get_params_dict():
 		}
 	}
 
-def get_queue():
-	"""Return a queue"""
-	non_empty_queue = Queue()
-	non_empty_queue.put(1)
-	non_empty_queue.put(2)
-	non_empty_queue.put(3)
-
-	empty_queue = Queue()
-
-	return {
-		"non_empty": non_empty_queue,
-		"empty": empty_queue
-	}
-
 def get_es_connection(cluster):
 	"""Return an es connection"""
 	es_connection = Elasticsearch([cluster])
 	return es_connection
+
+def get_dict_list():
+	dict_list = [{'first_name,last_name,address,city,state,zip_code': 'Tyrese,Hirthe,1404 Turner Ville,Strackeport,NY,19106-8813'},\
+				 {'first_name,last_name,address,city,state,zip_code': 'Jules,Dicki,2410 Estella Cape Suite 061,Lake Nickolasville,ME,00621-7435'},\
+				 {'first_name,last_name,address,city,state,zip_code': 'Dedric,Medhurst,6912 Dayna Shoal,Stiedemannberg,SC,43259-2273'}]
+	return dict_list

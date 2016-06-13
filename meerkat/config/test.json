@@ -4,7 +4,7 @@
 	"container" : "card",
 	"mode" : "test",
 	"input" : {
-		"hyperparameters" : "config/hyperparameters/new.json",
+		"hyperparameters" : "meerkat/web_service/config/hyperparameters/new.json",
 		"filename" : "/mnt/ephemeral/input/100000_CARD.txt",
 		"delimiter" : "|",
 		"encoding" : "utf-8",

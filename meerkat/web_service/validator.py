@@ -1,13 +1,12 @@
-# pylint: disable=pointless-string-statement
-
 """A simple json schema validator, use schema.py for a more complete check"""
-import json, sys
+
+import json
+import sys
 from jsonschema import validate
 
 #Usage:   python3.3 validator.py <schema_file> <example_file>
 #Example: python3.3 validator.py schema_output.json example_output.json
 
-"""Main program"""
 def main_process():
 	"""simple json schema validation"""
 	schema_file, example_file = sys.argv[1], sys.argv[2]

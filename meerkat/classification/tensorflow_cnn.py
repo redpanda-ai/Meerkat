@@ -53,7 +53,8 @@ def validate_config(config):
 	schema_file = "meerkat/classification/config/tensorflow_cnn_schema.json"
 	config = validate_configuration(config, schema_file)
 	logging.debug("Configuration is :\n{0}".format(pprint.pformat(config)))
-	# about this reshape size, read this wiki page 'https://github.com/joeandrewkey/Meerkat/wiki/Using-Correct-Tensor-Size'
+	# about this reshape size, read this wiki page below.
+	# https://github.com/joeandrewkey/Meerkat/wiki/Using-Correct-Tensor-Size
 	reshape = ((config["doc_length"] - 96) / 27) * 256
 	config["reshape"] = int(reshape)
 	config["label_map"] = load_params(config["label_map"])

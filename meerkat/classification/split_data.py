@@ -27,15 +27,15 @@ python3 -m meerkat.classification.split_data subtype bank \
 """
 ################################################################
 
+import os
+import shutil
 import logging
 import argparse
 import numpy as np
-import os
-import shutil
 
 from .verify_data import verify_data
 from .tools import (pull_from_s3, unzip_and_merge, seperate_debit_credit, 
-	copy_file, extract_tarball, make_tarfile, push_file_to_s3)
+	extract_tarball, make_tarfile, push_file_to_s3)
 
 def parse_arguments():
 	"""This function parses arguments from our command line."""

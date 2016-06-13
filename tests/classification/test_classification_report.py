@@ -2,8 +2,10 @@
 
 import meerkat.classification.classification_report as cr
 import unittest
+import argparse
 
 from nose_parameterized import parameterized
+from tests.classification.fixture import classification_report_fixture
 
 class ClassifcationReportTests(unittest.TestCase):
 	"""Unit tests for meerkat.classification.auto_load."""
@@ -19,6 +21,13 @@ class ClassifcationReportTests(unittest.TestCase):
 			self.assertEqual(parser.label_map, "label_map")
 			self.assertEqual(parser.label, "label".upper())
 			self.assertEqual(parser.doc_key, "SNOZ")
+
+	@parameterized.expand([
+		([classification_report_fixture.get_csv(), 18])
+	])
+	def test_count_transactions(self, filename, num_of_trans):
+		"""Test count_transactions with parameters"""
+		self.assertEqual(cr.count_transactions(filename), num_of_trans)
 
 if __name__ == '__main__':
 	unittest.main()
