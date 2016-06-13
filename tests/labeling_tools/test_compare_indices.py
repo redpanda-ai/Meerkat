@@ -45,19 +45,5 @@ class CompareIndicesTests(unittest.TestCase):
 		cleaned_transaction = compare_indices_fixture.get_cleaned_transaction()
 		self.assertEqual(compare_indices.clean_transaction(transaction), cleaned_transaction)
 
-'''
-	@parameterized.expand([
-		(["one", compare_indices_fixture.get_args()["one"]]),
-		(["two", compare_indices_fixture.get_args()["two"]])
-	])
-	def test_verify_arguments(self, case_type, input_argv):
-		"""Test verify_arguments with parameters"""
-		sys.argv = input_argv
-		if case_type == "one" or case_type == "two":
-			self.assertRaises(SystemExit, compare_indices.verify_arguments)
-		else:
-			compare_indices.verify_arguments()
-'''
-
 if __name__ == '__main__':
 	unittest.main()

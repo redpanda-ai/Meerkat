@@ -56,12 +56,3 @@ def get_cleaned_transaction():
 		"PHONE_NUMBER": "",
 		"COUNTRY": "US"
 	}
-
-def get_args():
-	return {
-		"one": ["argv_0"],
-		"two": ["argv_0", "argv_1"]
-	}
-
-
-
