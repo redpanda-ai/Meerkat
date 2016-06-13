@@ -93,7 +93,7 @@ def run_from_command_line():
 
 	base_dir = "meerkat/classification/label_maps/"
 	bank_or_card = sys.argv[1]
-	if bank_or_card == "bank" or bank_or_card == "card":
+	if bank_or_card in ["bank", "card"]:
 		regex = re.compile("panels/meerkat_split/" + bank_or_card + "/")
 		label_map = load_params(base_dir + "expanded_permanent_" + bank_or_card + "_label_map.json")
 		reverse_label_map = load_params(base_dir + "expanded_reverse_" + bank_or_card + "_label_map.json")
