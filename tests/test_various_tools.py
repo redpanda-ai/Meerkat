@@ -44,5 +44,24 @@ class VariousToolsTests(unittest.TestCase):
 		"""Test get_merchant_by_id with parameters"""
 		self.assertEqual(various_tools.get_merchant_by_id(*args), result)
 
+	@parameterized.expand([
+		(["wal-mart", " WALMART "]),
+		(["wal mart", " WALMART "]),
+		(["samsclub", " SAM'S CLUB "]),
+		(["usps", " US POST OFFICE "]),
+		(["lowes", " LOWE'S "]),
+		(["wholefds", " WHOLE FOODS "]),
+		(["shell oil", " SHELL GAS "]),
+		(["wm supercenter", " WALMART "]),
+		(["exxonmobil", " EXXONMOBIL EXXON MOBIL "]),
+		(["mcdonalds", " MCDONALD'S "]),
+		(["costco whse", " COSTCO "]),
+		(["franciscoca", " FRANCISCO CA "]),
+		(["qt", " QUICKTRIP "]),
+		(["macy's east", " MACY'S "])
+	])
+	def test_synonyms(self, input_str, expected_str):
+		self.assertEqual(various_tools.synonyms(input_str), expected_str)
+
 if __name__ == '__main__':
 	unittest.main()
