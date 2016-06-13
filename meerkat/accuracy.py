@@ -42,7 +42,7 @@ from boto.s3.connection import Location
 import pandas as pd
 
 from meerkat.various_tools import load_dict_list, safely_remove_file, load_params
-from meerkat.various_tools import load_piped_dataframe
+from meerkat.various_tools import load_piped_dataframe, get_s3_connection
 from meerkat.classification.load_model import get_tf_cnn_by_name
 
 DEFAULT_DOC_KEY = "DESCRIPTION_UNMASKED"
@@ -68,15 +68,6 @@ def nostdout():
 	yield
 	sys.stderr = save_stderr
 	sys.stdout = save_stdout
-
-def get_s3_connection():
-	"""Returns a connection to S3"""
-	try:
-		conn = boto.connect_s3()
-	except boto.s3.connection.HostRequiredError:
-		print("Error connecting to S3, check your credentials")
-		sys.exit()
-	return conn
 
 def test_bulk_classifier(human_labeled, non_physical_trans, my_lists):
 	"""Tests for accuracy of the bulk (binary) classifier"""
