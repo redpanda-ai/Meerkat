@@ -33,7 +33,6 @@ class CompareIndicesTests(unittest.TestCase):
 	])
 	def test_get_hit(self, elasticsearch_result, index, expected_result):
 		"""Test get_hit with parameters"""
-		print('-------Testing get_hit by jie')
 		self.assertEqual(compare_indices.get_hit(elasticsearch_result, index), expected_result)
 
 	@parameterized.expand([
