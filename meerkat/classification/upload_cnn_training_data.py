@@ -18,21 +18,12 @@ from meerkat.classification.tools import push_file_to_s3, get_utc_iso_timestamp,
 def main_process():
 	"""This is the whole process"""
 	bucket = 's3yodlee'
+	default_prefix = 'meerkat/cnn/data/'
+
 	# upload the tar.gz file to s3
-	default_dir_paths = {
-			'merchant_card' : "meerkat/cnn/data/merchant/card/",
-			'merchant_bank' : "meerkat/cnn/data/merchant/bank/",
-			'subtype_card_debit' : "meerkat/cnn/data/subtype/card/debit/",
-			'subtype_card_credit' : "meerkat/cnn/data/subtype/card/credit/",
-			'subtype_bank_debit' : "meerkat/cnn/data/subtype/bank/debit",
-			'subtype_bank_credit' : "meerkat/cnn/data/subtype/bank/credit/",
-			'category_bank_debit': "meerkat/cnn/data/category/bank/debit/",
-			'category_bank_credit': "meerkat/cnn/data/category/bank/credit/",
-			'category_card_debit': "meerkat/cnn/data/category/card/debit/",
-			'category_card_credit': "meerkat/cnn/data/category/card/credit/",
-		}
 	dtime = get_utc_iso_timestamp()
-	prefix = default_dir_paths[sys.argv[2]] + dtime + '/'
+	data_type = sys.argv[2].replace("_", "/")
+	prefix = default_prefix + data_type + '/' + dtime + '/'
 
 	csv_num, json_exit = 0, False
 	for filename in os.listdir(sys.argv[1]):

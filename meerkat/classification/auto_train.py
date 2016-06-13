@@ -115,24 +115,12 @@ def auto_train():
 	bank_or_card = args.bank_or_card
 	credit_or_debit = args.credit_or_debit
 	model_type = args.model_type
-	data_type = model_type + '_' + bank_or_card
+	data_type = model_type + '/' + bank_or_card
 	if model_type != "merchant":
-		data_type = data_type + '_' + credit_or_debit
+		data_type = data_type + '/' + credit_or_debit
 
-	dir_paths = {
-		'subtype_card_debit': 'meerkat/cnn/data/subtype/card/debit/',
-		'subtype_card_credit': 'meerkat/cnn/data/subtype/card/credit/',
-		'subtype_bank_debit': 'meerkat/cnn/data/subtype/bank/debit/',
-		'subtype_bank_credit': 'meerkat/cnn/data/subtype/bank/credit/',
-		'merchant_bank': 'meerkat/cnn/data/merchant/bank/',
-		'merchant_card': 'meerkat/cnn/data/merchant/card/',
-		'category_bank_debit': 'meerkat/cnn/data/category/bank/debit/',
-		'category_bank_credit': 'meerkat/cnn/data/category/bank/credit/',
-		'category_card_debit': 'meerkat/cnn/data/category/card/debit/',
-		'category_card_credit': 'meerkat/cnn/data/category/card/credit/'
-	}
-
-	prefix = dir_paths[data_type] if args.input_dir == '' else args.input_dir
+	default_prefix = 'meerkat/cnn/data/'
+	prefix = default_prefix + data_type + '/' if args.input_dir == '' else args.input_dir
 	prefix = prefix + '/' * (prefix[-1] != '/')
 
 	if args.output_dir == '':
@@ -198,10 +186,11 @@ def auto_train():
 	shutil.copyfile(label_map, tarball_directory + "label_map.json")
 
 	# Load and Modify Config
+	config_dir = "meerkat/classification/config/"
 	if args.ensemble:
-		config = load_params("meerkat/classification/config/ensemble_cnns_config.json")
+		config = load_params(config_dir + "ensemble_cnns_config.json")
 	else:
-		config = load_params("meerkat/classification/config/default_tf_config.json")
+		config = load_params(config_dir + "default_tf_config.json")
 	config["label_map"] = label_map
 	config["dataset"] = train_file
 	config["ledger_entry"] = args.credit_or_debit

@@ -89,34 +89,15 @@ def main_split_data(args):
 	"""Loads, splits and uploads data according to args"""
 	model_type = args.model_type
 	bank_or_card = args.bank_or_card
-	data_type = model_type + "_" + bank_or_card
+	data_type = model_type + "/" + bank_or_card
 	credit_or_debit = args.credit_or_debit
 	if model_type != "merchant":
-		data_type = data_type + '_' + credit_or_debit
-
-	default_dir_paths = {
-		'merchant_card' : "meerkat/cnn/data/merchant/card/",
-		'merchant_bank' : "meerkat/cnn/data/merchant/bank/",
-		'subtype_card_debit' : "meerkat/cnn/data/subtype/card/debit/",
-		'subtype_card_credit' : "meerkat/cnn/data/subtype/card/credit/",
-		'subtype_bank_debit' : "meerkat/cnn/data/subtype/bank/debit",
-		'subtype_bank_credit' : "meerkat/cnn/data/subtype/bank/credit/",
-		'category_bank_debit': 'meerkat/cnn/data/category/bank/debit/',
-		'category_bank_credit': 'meerkat/cnn/data/category/bank/credit/',
-		'category_card_debit': 'meerkat/cnn/data/category/card/debit/',
-		'category_card_credit': 'meerkat/cnn/data/category/card/credit/'
-	}
-
-	"""
-	ground_truth_labels = {
-		'category' : 'PROPOSED_CATEGORY',
-		'merchant' : 'MERCHANT_NAME',
-		'subtype' : 'PROPOSED_SUBTYPE'
-	}
-	"""
+		data_type = data_type + '/' + credit_or_debit
 
 	bucket = "s3yodlee" if args.bucket == '' else args.bucket
-	prefix = default_dir_paths[data_type] if args.input_dir == '' else args.input_dir
+	default_prefix = 'meerkat/cnn/data/'
+	prefix = default_prefix + data_type + '/' if args.input_dir == '' else args.input_dir
+
 	file_name = "input.tar.gz" if args.file_name == '' else args.file_name
 	extension = ".tar.gz"
 	output_file = "preprocessed.tar.gz"
