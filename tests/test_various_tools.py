@@ -61,7 +61,13 @@ class VariousToolsTests(unittest.TestCase):
 		(["macy's east", " MACY'S "])
 	])
 	def test_synonyms(self, input_str, expected_str):
+		"""Test synonyms with parameters"""
 		self.assertEqual(various_tools.synonyms(input_str), expected_str)
+
+	def test_load_dict_list(self):
+		"""Test load_dict_list"""
+		expected = [{'{"cobrand_id": 99,': '"status": "success"}'}]
+		self.assertEqual(various_tools.load_dict_list("tests/fixture/dict_example.json"), expected)
 
 if __name__ == '__main__':
 	unittest.main()
