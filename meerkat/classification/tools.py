@@ -10,6 +10,8 @@ import tarfile
 import shutil
 
 import pandas as pd
+import numpy as np
+import tensorflow at tf
 
 from boto.s3.key import Key
 from boto.s3.connection import Location
