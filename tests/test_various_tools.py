@@ -6,18 +6,15 @@ from nose_parameterized import parameterized
 from tests.fixture import various_tools_fixture
 
 class VariousToolsTests(unittest.TestCase):
-
 	"""Our UnitTest class."""
 
-	strings = (("Weekend at Bernie's[]{}/:", "weekend at bernie s"),
-                ('Trans with "" quotes', 'trans with quotes'))
-
-	def test_string_cleanse(self):
-		"""string_cleanse test"""
-
-		for chars, no_chars in self.strings:
-			result = various_tools.string_cleanse(chars)
-			self.assertEqual(no_chars, result)
+	@parameterized.expand([
+		(["Weekend at Bernie's[]{}/:", "weekend at bernie s"]),
+		(['Trans with "" quotes', 'trans with quotes'])
+	])
+	def test_string_cleanse(self, input_str, expected_str):
+		"""Test string_cleanse with parameters"""
+		self.assertEqual(various_tools.string_cleanse(input_str), expected_str)
 
 	@parameterized.expand([
 		(["normal", various_tools_fixture.get_params_dict()["correct_format"]]),
