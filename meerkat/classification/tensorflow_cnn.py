@@ -36,7 +36,7 @@ import sys
 import numpy as np
 import tensorflow as tf
 
-from meerkat.classification.tools import fill_description_unmasked, reverse_map
+from meerkat.classification.tools import fill_description_unmasked, reverse_map, batch_normalization
 from meerkat.various_tools import load_params, load_piped_dataframe, validate_configuration
 
 logging.basicConfig(level=logging.INFO)
@@ -354,13 +354,6 @@ def build_graph(config):
 					layer = normalized_layer
 
 			return layer
-
-		def batch_normalization(batch, mean=None, var=None):
-			"""Perform batch normalization"""
-			if mean is None or var is None:
-				axes = [0] if len(batch.get_shape()) == 2 else [0, 1, 2]
-				mean, var = tf.nn.moments(batch, axes=axes)
-			return (batch - mean) / tf.sqrt(var + tf.constant(1e-10))
 
 		def update_batch_normalization(batch, layer_n):
 			"batch normalize + update average mean and variance of layer l"

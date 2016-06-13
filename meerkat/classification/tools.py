@@ -16,6 +16,13 @@ from boto.s3.connection import Location
 from boto import connect_s3
 from meerkat.various_tools import load_piped_dataframe
 
+def batch_normalization(batch, mean=None, var=None):
+	"""Perform batch normalization"""
+	if mean is None or var is None:
+		axes = [0] if len(batch.get_shape()) == 2 else [0, 1, 2]
+		mean, var = tf.nn.moments(batch, axes=axes)
+	return (batch - mean) / tf.sqrt(var + tf.constant(1e-10))
+
 def check_new_input_file(**s3_params):
 	"""Check the existence of a new input.tar.gz file"""
 	prefix = s3_params["prefix"]
