@@ -6,18 +6,15 @@ from nose_parameterized import parameterized
 from tests.fixture import various_tools_fixture
 
 class VariousToolsTests(unittest.TestCase):
+	"""UnitTest class for various_tools."""
 
-	"""Our UnitTest class."""
-
-	strings = (("Weekend at Bernie's[]{}/:", "weekend at bernie s"),
-                ('Trans with "" quotes', 'trans with quotes'))
-
-	def test_string_cleanse(self):
-		"""string_cleanse test"""
-
-		for chars, no_chars in self.strings:
-			result = various_tools.string_cleanse(chars)
-			self.assertEqual(no_chars, result)
+	@parameterized.expand([
+		(["Weekend at Bernie's[]{}/:", "weekend at bernie s"]),
+		(['Trans with "" quotes', 'trans with quotes'])
+	])
+	def test_string_cleanse(self, input_str, expected_str):
+		"""Test string_cleanse with parameters"""
+		self.assertEqual(various_tools.string_cleanse(input_str), expected_str)
 
 	@parameterized.expand([
 		(["normal", various_tools_fixture.get_params_dict()["correct_format"]]),
@@ -46,6 +43,37 @@ class VariousToolsTests(unittest.TestCase):
 	def test_get_merchant_by_id(self, args, result):
 		"""Test get_merchant_by_id with parameters"""
 		self.assertEqual(various_tools.get_merchant_by_id(*args), result)
+
+	@parameterized.expand([
+		(["wal-mart", " WALMART "]),
+		(["wal mart", " WALMART "]),
+		(["samsclub", " SAM'S CLUB "]),
+		(["usps", " US POST OFFICE "]),
+		(["lowes", " LOWE'S "]),
+		(["wholefds", " WHOLE FOODS "]),
+		(["shell oil", " SHELL GAS "]),
+		(["wm supercenter", " WALMART "]),
+		(["exxonmobil", " EXXONMOBIL EXXON MOBIL "]),
+		(["mcdonalds", " MCDONALD'S "]),
+		(["costco whse", " COSTCO "]),
+		(["franciscoca", " FRANCISCO CA "]),
+		(["qt", " QUICKTRIP "]),
+		(["macy's east", " MACY'S "])
+	])
+	def test_synonyms(self, input_str, expected_str):
+		"""Test synonyms with parameters"""
+		self.assertEqual(various_tools.synonyms(input_str), expected_str)
+
+	def test_load_dict_list(self):
+		"""Test load_dict_list"""
+		dict_list = various_tools_fixture.get_dict_list()
+		self.assertEqual(various_tools.load_dict_list("tests/fixture/dict_example.csv"), dict_list)
+
+	def test_load_dict_ordered(self):
+		"""Test load_dict_ordered"""
+		expected_fieldnames = ['first_name,last_name,address,city,state,zip_code']
+		dict_list, fieldnames = various_tools.load_dict_ordered("tests/fixture/dict_example.csv")
+		self.assertEqual(expected_fieldnames, fieldnames)
 
 if __name__ == '__main__':
 	unittest.main()
