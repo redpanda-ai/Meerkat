@@ -6,7 +6,7 @@ from nose_parameterized import parameterized
 from tests.fixture import various_tools_fixture
 
 class VariousToolsTests(unittest.TestCase):
-	"""Our UnitTest class."""
+	"""UnitTest class for various_tools."""
 
 	@parameterized.expand([
 		(["Weekend at Bernie's[]{}/:", "weekend at bernie s"]),
@@ -66,8 +66,14 @@ class VariousToolsTests(unittest.TestCase):
 
 	def test_load_dict_list(self):
 		"""Test load_dict_list"""
-		expected = [{'{"cobrand_id": 99,': '"status": "success"}'}]
-		self.assertEqual(various_tools.load_dict_list("tests/fixture/dict_example.json"), expected)
+		dict_list = various_tools_fixture.get_dict_list()
+		self.assertEqual(various_tools.load_dict_list("tests/fixture/dict_example.csv"), dict_list)
+
+	def test_load_dict_ordered(self):
+		"""Test load_dict_ordered"""
+		expected_fieldnames = ['first_name,last_name,address,city,state,zip_code']
+		dict_list, fieldnames = various_tools.load_dict_ordered("tests/fixture/dict_example.csv")
+		self.assertEqual(expected_fieldnames, fieldnames)
 
 if __name__ == '__main__':
 	unittest.main()
