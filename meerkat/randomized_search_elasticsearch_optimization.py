@@ -38,7 +38,7 @@ from pprint import pprint
 
 from meerkat.accuracy import print_results, vest_accuracy
 from meerkat.various_tools import load_dict_list, safe_print, get_us_cities
-from meerkat.various_tools import load_params, format_web_consumer
+from meerkat.various_tools import load_params, format_web_consumer, split_hyperparameters
 from meerkat.web_service.web_consumer import WebConsumer
 
 PARAMS = load_params(sys.argv[1])
@@ -269,20 +269,6 @@ def save_top_score(top_score):
 	pprint(other, record)
 	record.close()
 
-def split_hyperparameters(hyperparameters):
-	"""partition hyperparameters into 2 parts based on keys and non_boost list"""
-	boost_vectors = {}
-	boost_labels = ["standard_fields"]
-	non_boost = ["es_result_size", "z_score_threshold", "good_description"]
-	other = {}
-
-	for key, value in hyperparameters.items():
-		if key in non_boost:
-			other[key] = value
-		else:
-			boost_vectors[key] = [value]
-
-	return boost_vectors, boost_labels, other
 
 def run_classifier(hyperparameters, params, dataset):
 	""" Runs the classifier with a given set of hyperparameters"""

@@ -21,6 +21,20 @@ import pandas as pd
 
 from jsonschema import validate
 
+def split_hyperparameters(hyperparameters):
+	"""partition hyperparameters into 2 parts based on keys and non_boost list"""
+	boost_vectors = {}
+	boost_labels = ["standard_fields"]
+	non_boost = ["es_result_size", "z_score_threshold", "good_description"]
+	other = {}
+
+	for key, value in hyperparameters.items():
+		if key in non_boost:
+			other[key] = value
+		else:
+			boost_vectors[key] = [value]
+
+	return boost_vectors, boost_labels, other
 def format_web_consumer(dataset):
 	"""Provide formatted dataset"""
 	formatted = json.load(open("meerkat/web_service/example_input.json", "r"))

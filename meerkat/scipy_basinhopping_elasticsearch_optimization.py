@@ -45,7 +45,7 @@ from meerkat.web_service.web_consumer import WebConsumer
 from meerkat.accuracy import print_results, vest_accuracy
 from meerkat.various_tools \
 import load_dict_list, safe_print, get_us_cities, format_web_consumer
-from meerkat.various_tools import load_params
+from meerkat.various_tools import load_params, split_hyperparameters
 
 CITIES = get_us_cities()
 
@@ -140,21 +140,6 @@ def save_top_score(top_score):
 	pprint(boost_vectors, record)
 	pprint(other, record)
 	record.close()
-
-def split_hyperparameters(hyperparameters):
-	""" Split a given set of hyperparameters """
-	boost_vectors = {}
-	boost_labels = ["standard_fields"]
-	non_boost = ["es_result_size", "z_score_threshold", "good_description"]
-	other = {}
-
-	for key, value in hyperparameters.items():
-		if key in non_boost:
-			other[key] = value
-		else:
-			boost_vectors[key] = [value]
-
-	return boost_vectors, boost_labels, other
 
 def get_desc_queue(dataset):
 	"""Alt version of get_desc_queue"""
