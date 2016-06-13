@@ -21,6 +21,20 @@ import pandas as pd
 
 from jsonschema import validate
 
+def format_web_consumer(dataset):
+	"""Provide formatted dataset"""
+	formatted = json.load(open("meerkat/web_service/example_input.json", "r"))
+	formatted["transaction_list"] = dataset
+	trans_id = 1
+	for trans in formatted["transaction_list"]:
+		trans["transaction_id"] = trans_id
+		trans_id = trans_id +1
+		trans["description"] = trans["DESCRIPTION_UNMASKED"]
+		trans["amount"] = trans["AMOUNT"]
+		trans["date"] = trans["TRANSACTION_DATE"]
+		trans["ledger_entry"] = "credit"
+
+	return formatted
 def validate_configuration(config, schema):
 	"""validate a json config file"""
 	try:

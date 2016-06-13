@@ -38,7 +38,7 @@ from pprint import pprint
 
 from meerkat.accuracy import print_results, vest_accuracy
 from meerkat.various_tools import load_dict_list, safe_print, get_us_cities
-from meerkat.various_tools import load_params
+from meerkat.various_tools import load_params, format_web_consumer
 from meerkat.web_service.web_consumer import WebConsumer
 
 PARAMS = load_params(sys.argv[1])
@@ -331,20 +331,6 @@ def verify_arguments():
 	if os.path.isfile(previous_scores):
 		open(previous_scores, 'w').close()
 
-def format_web_consumer(dataset):
-	"""Provide formatted dataset"""
-	formatted = json.load(open("meerkat/web_service/example_input.json", "r"))
-	formatted["transaction_list"] = dataset
-	trans_id = 1
-	for trans in formatted["transaction_list"]:
-		trans["transaction_id"] = trans_id
-		trans_id = trans_id +1
-		trans["description"] = trans["DESCRIPTION_UNMASKED"]
-		trans["amount"] = trans["AMOUNT"]
-		trans["date"] = trans["TRANSACTION_DATE"]
-		trans["ledger_entry"] = "credit"
-
-	return formatted
 
 def run_from_command_line():
 	"""Runs these commands if the module is invoked from the command line"""
