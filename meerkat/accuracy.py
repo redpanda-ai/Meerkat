@@ -35,7 +35,6 @@ import logging
 import os
 import sys
 import contextlib
-import boto
 
 from boto.s3.connection import Location
 
