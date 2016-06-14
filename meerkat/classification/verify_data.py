@@ -54,6 +54,7 @@ import argparse
 import pandas as pd
 
 from meerkat.various_tools import load_piped_dataframe
+from meerkat.classification.tools import seperate_debit_credit
 
 WARNING_THRESHOLD = 0.01
 CRITICAL_THRESHOLD = 0.05
@@ -141,29 +142,12 @@ def parse_arguments():
 def read_csv_to_df(csv_input, cnn_type):
 	"""Read csv file into pandas data frames"""
 
-	df = []
-	cols = ["DESCRIPTION", "DESCRIPTION_UNMASKED", "MERCHANT_NAME"]
-
-	if os.path.isdir(csv_input):
-		samples = []
-		for i in os.listdir(csv_input):
-			if i.endswith(".csv"):
-				samples.append(i)
-
-		for sample in samples:
-			df_one_sample = load_piped_dataframe(csv_input + "/" + sample, usecols=cols)
-			df.append(df_one_sample)
-		merged = pd.concat(df, ignore_index=True)
-		return merged
+	if cnn_type[0] == "merchant":
+		cols = ["DESCRIPTION", "DESCRIPTION_UNMASKED", "MERCHANT_NAME"]
+		return load_piped_dataframe(csv_input, usecols=cols)
 
 	else:
-		df = load_piped_dataframe(csv_input)
-		df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
-		grouped = df.groupby('LEDGER_ENTRY', as_index=False)
-		groups = dict(list(grouped))
-		df = groups[cnn_type[2]]
-		df["PROPOSED_SUBTYPE"] = df["PROPOSED_SUBTYPE"].str.strip()
-		return df
+		return seperate_debit_credit(csv_input, cnn_type[2], cnn_type[0])
 
 def verify_csv(**kwargs):
 	"""Verify csv data"""
