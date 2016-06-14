@@ -19,6 +19,17 @@ from boto.s3.connection import Location
 from boto import connect_s3
 from meerkat.various_tools import load_piped_dataframe
 
+def string_to_tensor(config, doc, length):
+	"""Convert transaction to tensor format"""
+	alphabet = config["alphabet"]
+	alpha_dict = config["alpha_dict"]
+	doc = doc.lower()[0:length]
+	tensor = np.zeros((len(alphabet), length), dtype=np.float32)
+	for index, char in reversed(list(enumerate(doc))):
+		if char in alphabet:
+			tensor[alpha_dict[char]][len(doc) - index - 1] = 1
+	return tensor
+
 def accuracy(predictions, labels):
 	"""Return accuracy for a batch"""
 	return 100.0 * np.sum(np.argmax(predictions, 1) == np.argmax(labels, 1)) / predictions.shape[0]

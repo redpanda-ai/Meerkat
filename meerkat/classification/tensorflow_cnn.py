@@ -38,7 +38,7 @@ import tensorflow as tf
 
 from .tools import (fill_description_unmasked, reverse_map, batch_normalization,
 	accuracy, get_tensor, get_op, get_variable, threshold, bias_variable, weight_variable, conv2d,
-	max_pool, get_cost_list)
+	max_pool, get_cost_list, string_to_tensor)
 from meerkat.various_tools import load_params, load_piped_dataframe, validate_configuration
 
 logging.basicConfig(level=logging.INFO)
@@ -155,17 +155,6 @@ def batch_to_tensor(config, batch):
 
 	transactions = np.transpose(transactions, (0, 1, 3, 2))
 	return transactions, labels
-
-def string_to_tensor(config, doc, length):
-	"""Convert transaction to tensor format"""
-	alphabet = config["alphabet"]
-	alpha_dict = config["alpha_dict"]
-	doc = doc.lower()[0:length]
-	tensor = np.zeros((len(alphabet), length), dtype=np.float32)
-	for index, char in reversed(list(enumerate(doc))):
-		if char in alphabet:
-			tensor[alpha_dict[char]][len(doc) - index - 1] = 1
-	return tensor
 
 def evaluate_testset(config, graph, sess, model, test):
 	"""Check error on test set"""
