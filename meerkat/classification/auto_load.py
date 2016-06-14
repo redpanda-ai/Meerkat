@@ -1,6 +1,7 @@
 """This module will update Meerkat's models from S3"""
 
 import argparse
+import json
 import logging
 import re
 import tarfile
@@ -12,7 +13,7 @@ from boto.s3 import connect_to_region
 from boto.s3.key import Key
 import boto3
 
-from meerkat.various_tools import safely_remove_file, validate_configuration
+from meerkat.various_tools import safely_remove_file, validate_configuration, load_params
 from meerkat.classification.tools import push_file_to_s3
 
 def find_s3_objects_recursively(conn, bucket, my_results, prefix=None, target=None):
@@ -95,11 +96,11 @@ def fetch_tarball_and_extract(timestamp, target, **kwargs):
 	_ = get_single_file_from_tarball(timestamp, target, "confusion_matrix.csv")
 	classification_report = get_single_file_from_tarball(timestamp, target,
 		"classification_report.csv")
-	logging.warning("Tarball fetched and classification_report.csv extracted.")
+	logging.info("Tarball fetched and classification_report.csv extracted.")
 	upload_path = kwargs["prefix"] + kwargs["key"] + timestamp
 	push_file_to_s3("confusion_matrix.csv", kwargs["bucket"], upload_path)
 	push_file_to_s3("classification_report.csv", kwargs["bucket"], upload_path)
-	logging.warning("Classification_report.csv pushed to S3.")
+	logging.info("Classification_report.csv pushed to S3.")
 	return classification_report
 
 def get_best_model_of_class(target, **kwargs):
@@ -122,7 +123,7 @@ def get_best_model_of_class(target, **kwargs):
 			target_file = "classification_report.csv"
 			s3_client.download_file(kwargs['bucket'].name, long_key, target_file)
 			classification_report = target_file
-			logging.critical("Classification Report fetched from S3 at {0}.".format(long_key))
+			logging.info("Classification Report fetched from S3 at {0}.".format(long_key))
 		else:
 			logging.critical("Didn't find {0}".format(long_key))
 			classification_report = fetch_tarball_and_extract(timestamp, target, **kwargs)
@@ -131,18 +132,18 @@ def get_best_model_of_class(target, **kwargs):
 		if score == 0.0:
 			files_to_nuke = ["results.tar.gz", "classification_report.csv", "confusion_matrix.csv"]
 			for item in files_to_nuke:
-				logging.warning("Removing {0} from {1}/{2}".format(item,
+				logging.info("Removing {0} from {1}/{2}".format(item,
 					kwargs["bucket"].name, short_key))
 				s3_client.delete_object(Bucket=kwargs["bucket"].name, Key=short_key + item)
 
-		logging.warning("Score :{0}".format(score))
+		logging.info("Score :{0}".format(score))
 
 		if score > highest_score:
 			highest_score = score
 			winner = timestamp
 			kwargs["best_models"][kwargs["key"]] = timestamp
 			winner_count = candidate_count
-		logging.warning("\t{0:<14}{1:>2}: {2:16}, Score: {3:0.5f}".format("Candidate",
+		logging.info("\t{0:<14}{1:>2}: {2:16}, Score: {3:0.5f}".format("Candidate",
 			candidate_count, timestamp, score))
 		candidate_count += 1
 	return winner_count, winner
@@ -159,34 +160,50 @@ def get_best_models(*args):
 		if "category" in key:
 			continue
 
-		logging.warning("Evaluating '{0}'".format(key))
+		logging.info("Evaluating '{0}'".format(key))
 		aspirant = None
 		if key in aspirants:
-			logging.warning("Aspirant model for {0} is {1}".format(key, aspirants[key]))
+			logging.info("Aspirant model for {0} is {1}".format(key, aspirants[key]))
 			aspirant = aspirants[key]
 		else:
-			logging.warning("No aspirant model, evaluating based on accuracy")
+			logging.info("No aspirant model, evaluating based on accuracy")
 
 		winner_count, winner = get_best_model_of_class(target, bucket=bucket,
 			prefix=prefix, results=results, key=key, suffix=suffix, aspirant=aspirant,
 			best_models=best_models)
 
 		args = [bucket, prefix, key, winner, s3_base, "results.tar.gz", "meerkat/classification/"]
-		logging.warning("\t{0:<14}{1:>2}".format("Winner", winner_count))
+		logging.info("\t{0:<14}{1:>2}".format("Winner", winner_count))
 
 	#log the winners
-	logging.warning("The best models are:\n{0}".format(best_models))
-	#Process the winners
+	logging.debug("The best models are:\n{0}".format(best_models))
+	#Load the winners
+	etags, etags_file = get_etags()
 	for key in sorted(best_models.keys()):
 		timestamp = best_models[key]
-		logging.warning("Processing {0} for {1}".format(timestamp, key))
+		logging.info("Loading {0} for {1}".format(timestamp, key))
 		load_best_model_for_type(bucket=bucket.name, model_type=key, timestamp=best_models[key],
-			s3_prefix=prefix)
+			s3_prefix=prefix, etags=etags)
+
+	with open(etags_file, "w") as outfile:
+		logging.info("Writing {0}".format(etags_file))
+		json.dump(etags, outfile)
+	
 		#Get the results.tar.gz file from the path in S3
 		#Get the meta and json from the tarball and move to the correct path locally.
 	# Cleanup
 	safely_remove_file("confusion_matrix.csv")
 	safely_remove_file(target)
+
+def get_etags():
+	etags = {}
+	etags_file = "meerkat/classification/etags.json"
+	if os.path.isfile(etags_file):
+		logging.info("ETags found.")
+		etags = load_params(etags_file)
+	else:
+		logging.info("Etags not found, all models will be downloaded.")
+	return etags, etags_file
 
 def load_best_model_for_type(**kwargs):
 	"""Loads the best model for a given model type from S3 to the local host."""
@@ -200,35 +217,47 @@ def load_best_model_for_type(**kwargs):
 		kwargs["s3_prefix"] = kwargs["s3_prefix"][:-1]
 	remote_file = kwargs["s3_prefix"] + "/" + model_type +\
 		kwargs["timestamp"] + "results.tar.gz"
-	logging.critical("Bucket name {0}".format(kwargs["bucket"]))
-	logging.critical("Remote file is {0}".format(remote_file))
+	logging.debug("Bucket name {0}".format(kwargs["bucket"]))
+	logging.debug("Remote file is {0}".format(remote_file))
 
-	etag = client.list_objects(Bucket=kwargs["bucket"], Prefix=remote_file)["Contents"][0]["ETag"]
-	logging.critical("ETag is : {0}".format(etag))
+	remote_etag = client.list_objects(Bucket=kwargs["bucket"],
+		Prefix=remote_file)["Contents"][0]["ETag"]
+	local_etag = None
+	if remote_file in kwargs["etags"]:
+		local_etag = kwargs["etags"][remote_file]
+
+	logging.debug("{0: <6} ETag is : {1}".format("Remote", remote_etag))
+	logging.debug("{0: <6} ETag is : {1}".format("Local", local_etag))
+
+	#If the file is already local, skip downloading
+	if local_etag == remote_etag:
+		logging.info("Model exists locally no need to download")
+		return
 
 	client.download_file(kwargs["bucket"], remote_file, "results.tar.gz")
 	if not tarfile.is_tarfile("results.tar.gz"):
 		logging.critical("Tarball is invalid, aborting")
 		sys.exit()
-	logging.warning("Tarball is valid, continuing")
+	logging.info("Tarball is valid, continuing")
 	#Extract everything
 	with tarfile.open(name="results.tar.gz", mode="r:gz") as tar:
 		tar.extractall()
-	logging.warning("Tarball contents extracted.")
+	logging.info("Tarball contents extracted.")
 	output_path = "meerkat/classification/"
 	#Move label_map
 	new_path = output_path + "label_maps/" + get_asset_name(model_type, "", "json")
-	logging.warning("Moving label_map to: {0}".format(new_path))
+	logging.info("Moving label_map to: {0}".format(new_path))
 	os.rename("label_map.json", new_path)
 	#Move graph
 	new_path = output_path + "models/" + get_asset_name(model_type, "", "meta")
-	logging.warning("Moving graph to: {0}".format(new_path))
+	logging.info("Moving graph to: {0}".format(new_path))
 	os.rename("train.meta", new_path)
 	#Move checkpoint
 	new_path = output_path + "models/" + get_asset_name(model_type, "", "ckpt")
-	logging.warning("Moving model to: {0}".format(new_path))
+	logging.info("Moving model to: {0}".format(new_path))
 	os.rename("train.ckpt", new_path)
 
+	kwargs["etags"][remote_file] = remote_etag
 
 def get_asset_name(suffix, key, extension):
 	"""Cleans up the name of a meta, json, or ckpt file, which may
