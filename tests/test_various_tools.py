@@ -79,5 +79,10 @@ class VariousToolsTests(unittest.TestCase):
 		self.assertEqual(expected_fieldnames, fieldnames)
 		self.assertEqual(expected_dict_list, dict_list)
 
+	def test_get_us_cities(self):
+		"""Test get_us_cities"""
+		expected = various_tools_fixture.get_cities()
+		self.assertEqual(various_tools.get_us_cities()[0:10], expected)
+
 if __name__ == '__main__':
 	unittest.main()
