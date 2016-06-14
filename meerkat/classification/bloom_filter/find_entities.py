@@ -139,16 +139,18 @@ def location_split(my_text):
 	# Capitalize and remove spaces
 #	tag = tag_text(my_text)
 	my_text = standardize(my_text)
-
+	result = None
 	for i in range(len(my_text) - 1, -1, -1):
 		if my_text[i:i+2] in STATES:
 			place = in_location_bloom(my_text[:i+2])
 			if place:
 				key = place[0] + place[1]
-				try: return CITY_SUBS[key]
-				except: pass
+				try:
+					result = CITY_SUBS[key]
+				except:
+					pass
 				# return place
-	return None
+	return result
 
 ##THINK!
 #Red Roof Inn, a three term bloom filter.
