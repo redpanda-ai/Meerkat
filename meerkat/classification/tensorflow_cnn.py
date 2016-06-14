@@ -38,7 +38,7 @@ import tensorflow as tf
 
 from .tools import (fill_description_unmasked, reverse_map, batch_normalization,
 	accuracy, get_tensor, get_op, get_variable, threshold, bias_variable, weight_variable, conv2d,
-	max_pol, get_cost_list)
+	max_pool, get_cost_list)
 from meerkat.various_tools import load_params, load_piped_dataframe, validate_configuration
 
 logging.basicConfig(level=logging.INFO)
