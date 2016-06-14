@@ -31,7 +31,6 @@ Created on Feb 26, 2014
 import sys
 import datetime
 import os
-import json
 from random import uniform
 
 from pprint import pprint
