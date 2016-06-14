@@ -36,7 +36,9 @@ import sys
 import numpy as np
 import tensorflow as tf
 
-from meerkat.classification.tools import fill_description_unmasked, reverse_map
+from .tools import (fill_description_unmasked, reverse_map, batch_normalization,
+	accuracy, get_tensor, get_op, get_variable, threshold, bias_variable, weight_variable, conv2d,
+	max_pool, get_cost_list, string_to_tensor)
 from meerkat.various_tools import load_params, load_piped_dataframe, validate_configuration
 
 logging.basicConfig(level=logging.INFO)
@@ -154,17 +156,6 @@ def batch_to_tensor(config, batch):
 	transactions = np.transpose(transactions, (0, 1, 3, 2))
 	return transactions, labels
 
-def string_to_tensor(config, doc, length):
-	"""Convert transaction to tensor format"""
-	alphabet = config["alphabet"]
-	alpha_dict = config["alpha_dict"]
-	doc = doc.lower()[0:length]
-	tensor = np.zeros((len(alphabet), length), dtype=np.float32)
-	for index, char in reversed(list(enumerate(doc))):
-		if char in alphabet:
-			tensor[alpha_dict[char]][len(doc) - index - 1] = 1
-	return tensor
-
 def evaluate_testset(config, graph, sess, model, test):
 	"""Check error on test set"""
 
@@ -197,64 +188,6 @@ def evaluate_testset(config, graph, sess, model, test):
 		sess.run(accuracy.assign(test_accuracy))
 
 	return test_accuracy
-	
-def accuracy(predictions, labels):
-	"""Return accuracy for a batch"""
-	return 100.0 * np.sum(np.argmax(predictions, 1) == np.argmax(labels, 1)) / predictions.shape[0]
-
-def get_tensor(graph, name):
-	"""Get tensor by name"""
-	return graph.get_tensor_by_name(name)
-
-def get_op(graph, name):
-	"""Get operation by name"""
-	return graph.get_operation_by_name(name)
-
-def get_variable(graph, name):
-	"""Get variable by name"""
-	with graph.as_default():
-		variable = [v for v in tf.all_variables() if v.name == name][0]
-		return variable
-
-def threshold(tensor):
-	"""ReLU with threshold at 1e-6"""
-	return tf.mul(tf.to_float(tf.greater_equal(tensor, 1e-6)), tensor)
-
-def bias_variable(shape, flat_input_shape):
-	"""Initialize biases"""
-	stdv = 1 / math.sqrt(flat_input_shape)
-	bias = tf.Variable(tf.random_uniform(shape, minval=-stdv, maxval=stdv), name="B")
-	return bias
-
-def weight_variable(config, shape):
-	"""Initialize weights"""
-	weight = tf.Variable(tf.mul(tf.random_normal(shape), config["randomize"]), name="W")
-	return weight
-
-def conv2d(input_x, weights):
-	"""Create convolutional layer"""
-	layer = tf.nn.conv2d(input_x, weights, strides=[1, 1, 1, 1], padding='VALID')
-	return layer
-
-def max_pool(tensor):
-	"""Create max pooling layer"""
-	layer = tf.nn.max_pool(tensor, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
-	return layer
-
-def get_cost_list(config):
-	"""Retrieve a cost matrix"""
-
-	# Get the class numbers sorted numerically
-	label_map = config["label_map"]
-	keys = sorted([int(x) for x in label_map.keys()])
-
-	# Produce an ordered list of cost values
-	cost_list = []
-	for key in keys:
-		cost = label_map[str(key)].get("cost", 1.0)
-		cost_list.append(cost)
-
-	return cost_list
 
 def build_graph(config):
 	"""Build CNN"""
@@ -355,13 +288,6 @@ def build_graph(config):
 
 			return layer
 
-		def batch_normalization(batch, mean=None, var=None):
-			"""Perform batch normalization"""
-			if mean is None or var is None:
-				axes = [0] if len(batch.get_shape()) == 2 else [0, 1, 2]
-				mean, var = tf.nn.moments(batch, axes=axes)
-			return (batch - mean) / tf.sqrt(var + tf.constant(1e-10))
-
 		def update_batch_normalization(batch, layer_n):
 			"batch normalize + update average mean and variance of layer l"
 			axes = [0] if len(batch.get_shape()) == 2 else [0, 1, 2]
@@ -434,7 +360,8 @@ def train_model(config, graph, sess, saver):
 	learning_rate_interval = 15000
 
 	best_accuracy, best_era = 0, 0
-	save_dir = "meerkat/classification/models/checkpoints/"
+	base = "meerkat/classification/models/"
+	save_dir = base + "checkpoints/"
 	os.makedirs(save_dir, exist_ok=True)
 	checkpoints = {}
 
@@ -502,8 +429,8 @@ def train_model(config, graph, sess, saver):
 
 	# Clean Up Directory
 	dataset_path = os.path.basename(dataset).split(".")[0]
-	final_model_path = "meerkat/classification/models/" + dataset_path + ".ckpt"
-	final_meta_path = "meerkat/classification/models/" + dataset_path + ".meta"
+	final_model_path = base + dataset_path + ".ckpt"
+	final_meta_path = base + dataset_path + ".meta"
 	logging.info("Moving final model from {0} to {1}.".format(model_path, final_model_path))
 	os.rename(model_path, final_model_path)
 	os.rename(meta_path, final_meta_path)
