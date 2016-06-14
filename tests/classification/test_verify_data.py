@@ -105,8 +105,10 @@ class VerifyDataTests(unittest.TestCase):
 				label_names_csv, label_counts_csv, cnn_type)
 
 	@parameterized.expand([
-		(["edge", verify_data_fixture.get_csv_input_path()["correct_format"],
-			["subtype", "bank", "debit"]])
+		(["edge", verify_data_fixture.get_csv_input_path()["subtype"],
+			["subtype", "bank", "debit"]]),
+		(["edge", verify_data_fixture.get_csv_input_path()["merchant"],
+			["merchant", "card"]])
 	])
 	def test_verify_total_numbers(self, case_type, csv_input, cnn_type):
 		"""Test verify_total_numbers with parameters"""
