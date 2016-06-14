@@ -22,7 +22,8 @@ class ToolsTests(unittest.TestCase):
 		if case_type == "invalid_tarfile":
 			self.assertRaises(Exception, tools.extract_tarball, archive, des)
 		else:
-			self.assertTrue(os.exist(archive + "foo.txt")
+			self.assertTrue(os.path.isfile(archive + "foo.txt")
+			os.remove(archive + "foo.txt")
 
 	@parameterized.expand([
 		(["with_file_name", tools_fixture.get_s3_params("with_file_name")]),
