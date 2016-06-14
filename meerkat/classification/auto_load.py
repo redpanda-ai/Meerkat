@@ -131,7 +131,8 @@ def get_best_model_of_class(target, **kwargs):
 		if score == 0.0:
 			files_to_nuke = ["results.tar.gz", "classification_report.csv", "confusion_matrix.csv"]
 			for item in files_to_nuke:
-				logging.warning("Removing {0} from {1}/{2}".format(item, kwargs["bucket"].name, short_key))
+				logging.warning("Removing {0} from {1}/{2}".format(item,
+					kwargs["bucket"].name, short_key))
 				s3_client.delete_object(Bucket=kwargs["bucket"].name, Key=short_key + item)
 
 		logging.warning("Score :{0}".format(score))
@@ -201,6 +202,10 @@ def load_best_model_for_type(**kwargs):
 		kwargs["timestamp"] + "results.tar.gz"
 	logging.critical("Bucket name {0}".format(kwargs["bucket"]))
 	logging.critical("Remote file is {0}".format(remote_file))
+
+	etag = client.list_objects(Bucket=kwargs["bucket"], Prefix=remote_file)["Contents"][0]["ETag"]
+	logging.critical("ETag is : {0}".format(etag))
+
 	client.download_file(kwargs["bucket"], remote_file, "results.tar.gz")
 	if not tarfile.is_tarfile("results.tar.gz"):
 		logging.critical("Tarball is invalid, aborting")
