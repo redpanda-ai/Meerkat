@@ -29,6 +29,3 @@ def get_dict_list():
 				 {'first_name,last_name,address,city,state,zip_code': 'Dedric,Medhurst,6912 Dayna Shoal,Stiedemannberg,SC,43259-2273'}]
 	return dict_list
 
-def get_cities():
-	cities = ['aaron', 'aaronsburg', 'abbeville', 'abbot', 'abbotsford', 'abbott', 'abbottstown', 'abbyville', 'abell', 'abercrombie']
-	return cities

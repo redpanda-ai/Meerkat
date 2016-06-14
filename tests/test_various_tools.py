@@ -81,8 +81,8 @@ class VariousToolsTests(unittest.TestCase):
 
 	def test_get_us_cities(self):
 		"""Test get_us_cities"""
-		expected = various_tools_fixture.get_cities()
-		self.assertEqual(various_tools.get_us_cities()[0:10], expected)
+		expected = various_tools.get_us_cities(testing=True)
+		self.assertLessEqual(10000, expected)
 
 if __name__ == '__main__':
 	unittest.main()
