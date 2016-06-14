@@ -6,11 +6,11 @@ def get_archive_path(case_type):
 		"invalid_tarfile": "tarball_1.tar.gz",
 		"valid_tarfile": "tarball_5.tar.gz"
 	}
-	return archive_paths[case_type]
+	return "tests/classification/fixture/" + archive_paths[case_type]
 
 def get_des_path():
 	"Return the destination path"
-	return "extracted_tarballs/"
+	return "tests/classification/fixture/extracted_tarballs/"
 
 def get_dict():
 	"""Return a dictionary"""

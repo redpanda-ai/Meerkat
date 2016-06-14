@@ -14,16 +14,17 @@ class ToolsTests(unittest.TestCase):
 	@parameterized.expand([
 		(["invalid_tarfile", tools_fixture.get_archive_path("invalid_tarfile"),
 			tools_fixture.get_des_path()]),
-		(["valid_tarfile"), tools_fixture.get_archive_path("valid_tarfile"),
+		(["valid_tarfile", tools_fixture.get_archive_path("valid_tarfile"),
 			tools_fixture.get_des_path()])
 	])
-	def test_extract_tarball(self, case_type, archive):
+	def test_extract_tarball(self, case_type, archive, des):
 		"""Test extract_tarball with parameters"""
 		if case_type == "invalid_tarfile":
 			self.assertRaises(Exception, tools.extract_tarball, archive, des)
 		else:
-			self.assertTrue(os.path.isfile(archive + "foo.txt")
-			os.remove(archive + "foo.txt")
+			tools.extract_tarball(archive, des)
+			self.assertTrue(os.path.isfile(des + "foo.txt"))
+			os.remove(des + "foo.txt")
 
 	@parameterized.expand([
 		(["with_file_name", tools_fixture.get_s3_params("with_file_name")]),
