@@ -47,8 +47,8 @@ class VerifyDataTests(unittest.TestCase):
 			self.assertRaises(SystemExit, verifier.load_json, json_input)
 
 	@parameterized.expand([
-		([verify_data_fixture.get_csv_input_path()["correct_format"], ["subtype", "bank", "credit"], 3]),
-		([verify_data_fixture.get_csvs_directory(), ["merchant", "card"], 2])
+		([verify_data_fixture.get_csv_input_path()["subtype"], ["subtype", "bank", "credit"], 3]),
+		([verify_data_fixture.get_csv_input_path()["merchant"], ["merchant", "card"], 2])
 	])
 	def test_read_csv_to_df(self, csv_input, cnn_type, df_len):
 		"""Test read_csv_to_df with parameters"""

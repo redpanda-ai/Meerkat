@@ -116,35 +116,6 @@ def get_location_bloom():
 		sbf = create_location_bloom("meerkat/classification/bloom_filter/assets/locations.json", "meerkat/classification/bloom_filter/assets/location_bloom")
 	return sbf
 
-def test_bloom_filter(sbf):
-	"""Does a basic run through US and Canadian locations, looking for probable
-	membership."""
-	canadian_locations = [
-		("TORONTO", "ON"),
-		("MONTREAL", "QB"),
-		("CALGARY", "AB"),
-		("OTTOWA", "ON"),
-		("EDMONTON", "AB")
-	]
-	us_locations = [
-		("BOISE", "ID"),
-		("HIGHGATE FALLS", "VT"),
-		("SAN JOSE", "CA"),
-		("WEST MONROE", "LA"),
-		("DILLARD", "GA"),
-		("FAKE CITY", "CA"),
-		("CARSON CITY", "NV"),
-		("SAINT LOUIS", "MO"),
-		("SUNNYVALE", "CA")
-	]
-	print("Touring Canada")
-	line = "{0} in bloom filter: {1}"
-	for location in canadian_locations:
-		print(line.format(location, location in sbf))
-	print("Touring United States")
-	for location in us_locations:
-		print(line.format(location, location in sbf))
-
 # MAIN PROGRAM
 if __name__ == "__main__":
 	get_location_bloom()
