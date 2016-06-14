@@ -303,13 +303,13 @@ def verify_total_numbers(df, cnn_type):
 		logging.info("Data set size of csv is verified: {0:>15,}".format(len(df)))
 
 	# Generate count numbers for labels in csv
-	label_key_csv = ""
-	if cnn_type[0] == "merchant":
-		label_key_csv = "MERCHANT_NAME"
-	elif cnn_type[0] == "subtype":
-		label_key_csv = "PROPOSED_SUBTYPE"
-	else:
-		label_key_csv = "PROPOSED_CATEGORY"
+	ground_truth_labels = {
+		'merchant': 'MERCHANT_NAME',
+		'subtype': 'PROPOSED_SUBTYPE',
+		'category': 'PROPOSED_CATEGORY'
+	}
+	label_key_csv = ground_truth_labels[cnn_type[0]]
+
 	label_names_csv = sorted(df[label_key_csv].value_counts().index.tolist())
 	label_counts_csv = df[label_key_csv].value_counts()
 
