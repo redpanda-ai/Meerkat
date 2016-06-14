@@ -1,5 +1,19 @@
 """Fixtures for test_tools"""
 
+BASE_DIR = "tests/classification/fixture/"
+
+def get_archive_path(case_type):
+	"""Return the archive path"""
+	archive_paths = {
+		"invalid_tarfile": "tarball_1.tar.gz",
+		"valid_tarfile": "tarball_5.tar.gz"
+	}
+	return BASE_DIR + archive_paths[case_type]
+
+def get_des_path():
+	"Return the destination path"
+	return BASE_DIR + "extracted_tarballs/"
+
 def get_dict():
 	"""Return a dictionary"""
 	return {
@@ -22,7 +36,7 @@ def get_csv_path(csv_type):
 	"""Return a csv file path"""
 	csv_path = {
 		"correct_format": "tests/fixture/correct_format.csv",
-		"with_empty_transaction": "tests/classification/fixture/with_empty_transaction.csv"
+		"with_empty_transaction": BASE_DIR + "with_empty_transaction.csv"
 	}
 	return csv_path[csv_type]
 

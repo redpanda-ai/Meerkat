@@ -329,12 +329,16 @@ def seperate_debit_credit(csv_file, credit_or_debit, model_type):
 	df = check_empty_transaction(df)
 	df['UNIQUE_TRANSACTION_ID'] = df.index
 	df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
-	if model_type == 'subtype':
-		df["PROPOSED_SUBTYPE"] = df["PROPOSED_SUBTYPE"].str.strip()
-		df['PROPOSED_SUBTYPE'] = df['PROPOSED_SUBTYPE'].apply(cap_first_letter)
-	if model_type == 'category':
-		df["PROPOSED_CATEGORY"] = df["PROPOSED_CATEGORY"].str.strip()
-		df['PROPOSED_CATEGORY'] = df['PROPOSED_CATEGORY'].apply(cap_first_letter)
+
+	ground_truth_labels = {
+		'subtype': 'PROPOSED_SUBTYPE',
+		'category': 'PROPOSED_CATEGORY'
+	}
+
+	label = ground_truth_labels[model_type]
+	df[label] = df[label].str.strip()
+	df[label] = df[label].apply(cap_first_letter)
+
 	grouped = df.groupby('LEDGER_ENTRY', as_index=False)
 	groups = dict(list(grouped))
 	return groups[credit_or_debit]

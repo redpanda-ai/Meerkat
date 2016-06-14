@@ -12,9 +12,7 @@ def get_csv_input_path():
 	"""Return csv file paths"""
 	return {
 		"correct_format": "tests/fixture/correct_format.csv",
-		"mal_format": "tests/classification/fixture/mal_format.csv"
+		"mal_format": "tests/classification/fixture/mal_format.csv",
+		"subtype": "tests/classification/fixture/subtype.csv",
+		"merchant": "tests/classification/fixture/merchant.csv"
 	}
-
-def get_csvs_directory():
-	"""Return a directory contains several csv files"""
-	return "tests/fixture/csvs/"
