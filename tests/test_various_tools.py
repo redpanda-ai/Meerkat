@@ -78,5 +78,12 @@ class VariousToolsTests(unittest.TestCase):
 
 		self.assertEqual(expected_dict_list, dict_list)
 		self.assertEqual(expected_fieldnames, fieldnames)
+
+	def test_get_us_cities(self):
+		"""Test get_us_cities"""
+		expected = various_tools.get_us_cities(testing=True)
+		num_of_cities = 10000
+		self.assertLessEqual(num_of_cities, expected)
+
 if __name__ == '__main__':
 	unittest.main()
