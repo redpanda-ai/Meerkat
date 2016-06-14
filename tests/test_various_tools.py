@@ -1,8 +1,8 @@
 """Unit test for meerkat.various_tools"""
 
 import unittest
-import meerkat.various_tools as various_tools
 from nose_parameterized import parameterized
+import meerkat.various_tools as various_tools
 from tests.fixture import various_tools_fixture
 
 class VariousToolsTests(unittest.TestCase):
