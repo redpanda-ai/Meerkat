@@ -35,6 +35,7 @@ def split_hyperparameters(hyperparameters):
 			boost_vectors[key] = [value]
 
 	return boost_vectors, boost_labels, other
+
 def format_web_consumer(dataset):
 	"""Provide formatted dataset"""
 	formatted = json.load(open("meerkat/web_service/example_input.json", "r"))
