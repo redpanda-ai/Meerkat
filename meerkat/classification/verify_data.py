@@ -172,20 +172,16 @@ def verify_csv_format(df, cnn_type):
 	"""Verify csv data format is correct for the type of CNN being trained"""
 	column_header = list(df.columns.values)
 	column_header.sort()
-	
-	merchant_header = ['DESCRIPTION', 'DESCRIPTION_UNMASKED', 'MERCHANT_NAME']
-	subtype_header = ['AMOUNT', 'DESCRIPTION', 'DESCRIPTION_UNMASKED', 'LEDGER_ENTRY',
-		'PROPOSED_SUBTYPE', 'TRANSACTION_DATE', 'UNIQUE_TRANSACTION_ID']
-	category_header = ['UNIQUE_TRANSACTION_ID', 'AMOUNT', 'DESCRIPTION',\
-		'DESCRIPTION_UNMASKED', 'LEDGER_ENTRY', 'TRANSACTION_DATE', 'PROPOSED_CATEGORY']
 
-	cnn_column_header = []
-	if cnn_type[0] == "merchant":
-		cnn_column_header = merchant_header
-	elif cnn_type[0] == "subtype":
-		cnn_column_header = subtype_header
-	else:
-		cnn_column_header = category_header
+	headers = {
+		"merchant": ['DESCRIPTION', 'DESCRIPTION_UNMASKED', 'MERCHANT_NAME'],
+		"subtype": ['AMOUNT', 'DESCRIPTION', 'DESCRIPTION_UNMASKED', 'LEDGER_ENTRY',
+			'PROPOSED_SUBTYPE', 'TRANSACTION_DATE', 'UNIQUE_TRANSACTION_ID'],
+		"category": ['UNIQUE_TRANSACTION_ID', 'AMOUNT', 'DESCRIPTION',
+			'DESCRIPTION_UNMASKED', 'LEDGER_ENTRY', 'TRANSACTION_DATE', 'PROPOSED_CATEGORY']
+	}
+
+	cnn_column_header = headers[cnn_type[0]]
 
 	if sorted(column_header) != sorted(cnn_column_header):
 		logging.critical("csv data format is incorrect")
