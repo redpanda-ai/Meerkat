@@ -12,13 +12,26 @@ class ToolsTests(unittest.TestCase):
 	"""Our UnitTest class."""
 
 	@parameterized.expand([
+		(["invalid_tarfile", tools_fixture.get_archive_path("invalid_tarfile"),
+			tools_fixture.get_des_path()]),
+		(["valid_tarfile"), tools_fixture.get_archive_path("valid_tarfile"),
+			tools_fixture.get_des_path()])
+	])
+	def test_extract_tarball(self, case_type, archive):
+		"""Test extract_tarball with parameters"""
+		if case_type == "invalid_tarfile":
+			self.assertRaises(Exception, tools.extract_tarball, archive, des)
+		else:
+			self.assertTrue(os.exist(archive + "foo.txt")
+
+	@parameterized.expand([
 		(["with_file_name", tools_fixture.get_s3_params("with_file_name")]),
 		(["found_multiple_files", tools_fixture.get_s3_params("found_multiple_files")]),
 		(["file_not_found", tools_fixture.get_s3_params("file_not_found")])
 	])
 	def test_pull_from_s3(self, case_type, inputs):
 		"""Test pull_from_s3 with parameters"""
-		if case_type == "found_multiple_files" or case_type == "file_not_found":
+		if case_type in ["found_multiple_files", "file_not_found"]:
 			self.assertRaises(Exception, tools.pull_from_s3, **inputs)
 		else:
 			self.assertEqual(tools.pull_from_s3(**inputs), "tests/fixture/csv_file_1.csv")

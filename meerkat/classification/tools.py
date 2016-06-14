@@ -252,7 +252,7 @@ def seperate_debit_credit(csv_file, credit_or_debit, model_type):
 	df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
 
 	ground_truth_labels = {
-		'subtype': 'PROPOSED_SUBTYPE'
+		'subtype': 'PROPOSED_SUBTYPE',
 		'category': 'PROPOSED_CATEGORY'
 	}
 
