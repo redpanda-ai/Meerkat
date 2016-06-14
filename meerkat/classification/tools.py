@@ -8,13 +8,92 @@ import os
 import sys
 import tarfile
 import shutil
+import math
 
 import pandas as pd
+import numpy as np
+import tensorflow as tf
 
 from boto.s3.key import Key
 from boto.s3.connection import Location
 from boto import connect_s3
 from meerkat.various_tools import load_piped_dataframe
+
+def string_to_tensor(config, doc, length):
+	"""Convert transaction to tensor format"""
+	alphabet = config["alphabet"]
+	alpha_dict = config["alpha_dict"]
+	doc = doc.lower()[0:length]
+	tensor = np.zeros((len(alphabet), length), dtype=np.float32)
+	for index, char in reversed(list(enumerate(doc))):
+		if char in alphabet:
+			tensor[alpha_dict[char]][len(doc) - index - 1] = 1
+	return tensor
+
+def accuracy(predictions, labels):
+	"""Return accuracy for a batch"""
+	return 100.0 * np.sum(np.argmax(predictions, 1) == np.argmax(labels, 1)) / predictions.shape[0]
+
+def get_tensor(graph, name):
+	"""Get tensor by name"""
+	return graph.get_tensor_by_name(name)
+
+def get_op(graph, name):
+	"""Get operation by name"""
+	return graph.get_operation_by_name(name)
+
+def get_variable(graph, name):
+	"""Get variable by name"""
+	with graph.as_default():
+		variable = [v for v in tf.all_variables() if v.name == name][0]
+		return variable
+
+def threshold(tensor):
+	"""ReLU with threshold at 1e-6"""
+	return tf.mul(tf.to_float(tf.greater_equal(tensor, 1e-6)), tensor)
+
+def bias_variable(shape, flat_input_shape):
+	"""Initialize biases"""
+	stdv = 1 / math.sqrt(flat_input_shape)
+	bias = tf.Variable(tf.random_uniform(shape, minval=-stdv, maxval=stdv), name="B")
+	return bias
+
+def weight_variable(config, shape):
+	"""Initialize weights"""
+	weight = tf.Variable(tf.mul(tf.random_normal(shape), config["randomize"]), name="W")
+	return weight
+
+def conv2d(input_x, weights):
+	"""Create convolutional layer"""
+	layer = tf.nn.conv2d(input_x, weights, strides=[1, 1, 1, 1], padding='VALID')
+	return layer
+
+def max_pool(tensor):
+	"""Create max pooling layer"""
+	layer = tf.nn.max_pool(tensor, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
+	return layer
+
+def get_cost_list(config):
+	"""Retrieve a cost matrix"""
+
+	# Get the class numbers sorted numerically
+	label_map = config["label_map"]
+	keys = sorted([int(x) for x in label_map.keys()])
+
+	# Produce an ordered list of cost values
+	cost_list = []
+	for key in keys:
+		cost = label_map[str(key)].get("cost", 1.0)
+		cost_list.append(cost)
+
+	return cost_list
+
+def batch_normalization(batch, mean=None, var=None):
+	"""Perform batch normalization"""
+	if mean is None or var is None:
+		axes = [0] if len(batch.get_shape()) == 2 else [0, 1, 2]
+		mean, var = tf.nn.moments(batch, axes=axes)
+	return (batch - mean) / tf.sqrt(var + tf.constant(1e-10))
 
 def check_new_input_file(**s3_params):
 	"""Check the existence of a new input.tar.gz file"""
