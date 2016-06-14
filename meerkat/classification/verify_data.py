@@ -29,10 +29,9 @@ verify_data.py [-h] [--credit_or_debit CREDIT_OR_DEBIT]
                       csv_input json_input merchant_or_subtype bank_or_card
 
 positional arguments:
-  csv_input             what is the csv data, allowed format: a directory path
-                        containing all csv files; a csv file path; pandas data
-                        frame
-  json_input            where is the json file
+  csv_input             what is the csv data, allowed format: csv file path;
+                        pandas data frame
+  json_input            json file path
   merchant_or_subtype   What kind of dataset do you want to process, subtype
                         or merchant
   bank_or_card          Whether we are processing card or bank transactions
@@ -121,9 +120,9 @@ def parse_arguments():
 	parser = argparse.ArgumentParser()
 
 	# Required arugments
-	parser.add_argument("csv_input", help="what is the csv data, allowed format: a directory path \
-		containing all csv files; a csv file path; pandas data frame")
-	parser.add_argument("json_input", help="where is the json file")
+	parser.add_argument("csv_input", help="what is the csv data, allowed format: \
+		csv file path; pandas data frame")
+	parser.add_argument("json_input", help="json file path")
 	parser.add_argument("merchant_or_subtype",
 		help="What kind of dataset do you want to process, subtype or merchant")
 	parser.add_argument("bank_or_card", help="Whether we are processing card or \
