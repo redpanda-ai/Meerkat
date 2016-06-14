@@ -27,7 +27,6 @@ Created on Feb 26, 2014
 
 #####################################################
 
-import json
 import sys
 import os
 import queue
