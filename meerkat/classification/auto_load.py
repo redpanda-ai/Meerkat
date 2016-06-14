@@ -196,6 +196,7 @@ def get_best_models(*args):
 	safely_remove_file(target)
 
 def get_etags():
+	"""Fetches local ETag values from a local file."""
 	etags = {}
 	etags_file = "meerkat/classification/etags.json"
 	if os.path.isfile(etags_file):
