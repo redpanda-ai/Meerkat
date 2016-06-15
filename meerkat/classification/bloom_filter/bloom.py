@@ -48,7 +48,6 @@ def create_location_bloom(src_filename, dst_filename):
 			location = (city_name, state_name)
 			sbf.add(location)
 
-	'''
 	try:
 		open('meerkat/classification/bloom_filter/assets/csv_not_json')
 	except:
@@ -61,14 +60,12 @@ def create_location_bloom(src_filename, dst_filename):
 			state_name = state.upper()
 			location = (city_name, state_name)
 			sbf.add(location)
-	'''
 
 	with open(dst_filename, "bw+") as location_bloom:
 		sbf.tofile(location_bloom)
 
 	return sbf
 
-'''
 def get_diff_json_csv():
 	dict_json = dict()
 	locations = get_json_from_file('meerkat/classification/bloom_filter/assets/locations.json')
@@ -102,7 +99,6 @@ def get_diff_json_csv():
 			if key not in dict_csv:
 				tup = dict_json[key]
 				f.write('{0}	{1}'.format(tup[0], tup[1]) + '\n')
-'''
 
 def get_location_bloom():
 	"""Attempts to fetch a bloom filter from a file, making a new bloom filter
