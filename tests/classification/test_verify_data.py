@@ -1,5 +1,6 @@
 """Unit tests for meerkat.classification.verify_data"""
 
+import sys
 import unittest
 import csv
 import pandas as pd

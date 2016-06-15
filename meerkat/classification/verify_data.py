@@ -132,10 +132,16 @@ def parse_arguments():
 	parser.add_argument("--credit_or_debit", default='',
 		help="What kind of transactions do you wanna process, debit or credit")
 
-	args = parser.parse_args()
+	return parser.parse_args()
+
+def process_arguments(args):
+	"""This function processes arguments"""
 	if args.merchant_or_subtype == 'subtype' and args.credit_or_debit == '':
 		raise Exception('For subtype data you need to declare debit or credit')
-	return args
+	cnn_type = [args.merchant_or_subtype, args.bank_or_card]
+	if args.credit_or_debit != "":
+		cnn_type.append(args.credit_or_debit)
+	return cnn_type
 
 def read_csv_to_df(csv_input, cnn_type):
 	"""Read csv file into pandas data frames"""
@@ -344,8 +350,6 @@ def verify_total_numbers(df, cnn_type):
 
 if __name__ == "__main__":
 	ARGS = parse_arguments()
-	CNNTYPE = [ARGS.merchant_or_subtype, ARGS.bank_or_card]
-	if ARGS.credit_or_debit != "":
-		CNNTYPE.append(ARGS.credit_or_debit)
+	CNN_TYPE = process_arguments(ARGS)
 
-	verify_data(csv_input=ARGS.csv_input, json_input=ARGS.json_input, cnn_type=CNNTYPE)
+	verify_data(csv_input=ARGS.csv_input, json_input=ARGS.json_input, cnn_type=CNN_TYPE)
