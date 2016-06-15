@@ -9,7 +9,7 @@ class MerchantProcessTests(unittest.TestCase):
 	"""Unit test for merchant_process.py"""
 
 	def test_dict_2_json(self):
-	"""Test dict_2_json"""
+		"""Test dict_2_json"""
 		dict_example = {'a': 1, 'bb': {'ccc': 222, 'ddd': 333}}
 		filename = 'tests/tools/fixture/dict_example.json'
 		mp.dict_2_json(dict_example, filename)
