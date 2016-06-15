@@ -34,13 +34,13 @@ from elasticsearch import Elasticsearch, helpers
 
 from meerkat.custom_exceptions import InvalidArguments, Misconfiguration
 
-def initialize():
+def initialize(testing=False):
 	"""Validates the command line arguments."""
 	input_file, params = None, None
 
 	if len(sys.argv) != 3:
 		#usage()
-		raise InvalidArguments(msg="Supply a single argument for the json"\
+		raise InvalidArguments(msg="Supply a single argument for the json "\
 		+ "formatted configuration file.", expr=None)
 
 	try:
@@ -51,8 +51,9 @@ def initialize():
 		logging.error(sys.argv[1] + " not found, aborting.")
 		sys.exit()
 
-	if validate_params(params):
-		logging.warning("Parameters are valid, proceeding.")
+	if not testing:
+		if validate_params(params):
+			logging.warning("Parameters are valid, proceeding.")
 
 	return params
 
