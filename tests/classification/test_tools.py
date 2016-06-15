@@ -93,6 +93,13 @@ class ToolsTests(unittest.TestCase):
 		else:
 			self.assertEqual(tools.check_new_input_file(**s3params), result)
 
+	@parameterized.expand([
+		(["tests/fixture/csvs/", 2])
+	])
+	def test_merge_csvs(self, directory, expected_len):
+		"""Test merge_csvs with parameters"""
+		self.assertEqual(len(tools.merge_csvs(directory)), expected_len)
+
 if __name__ == '__main__':
 	unittest.main()
 
