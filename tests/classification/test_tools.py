@@ -37,13 +37,13 @@ class ToolsTests(unittest.TestCase):
 			self.assertTrue(os.path.isfile(extracted_file))
 			os.remove(extracted_file)
 
-	#@parameterized.expand([
-	#	(["csv_file_1.csv", tools_fixture.get_s3_params_to_check_file_existence(), True]),
-	#	(["missing.csv", tools_fixture.get_s3_params_to_check_file_existence(), False])
-	#])
-	#def test_check_file_exist_in_s3(self, target_file_name, params, expected):
-	#	"""Test check_file_exist_in_s3 with parameters"""
-	#	self.assertTrue(tools.check_file_exist_in_s3(target_file_name, **params), expected)
+	@parameterized.expand([
+		(["foo.csv", tools_fixture.get_s3_params_to_check_file_existence(), True]),
+		(["missing.csv", tools_fixture.get_s3_params_to_check_file_existence(), False])
+	])
+	def test_check_file_exist_in_s3(self, target_file_name, params, expected):
+		"""Test check_file_exist_in_s3 with parameters"""
+		self.assertEqual(tools.check_file_exist_in_s3(target_file_name, **params), expected)
 
 	@parameterized.expand([
 		(["with_file_name", tools_fixture.get_s3_params_to_pull_from_s3("with_file_name")]),

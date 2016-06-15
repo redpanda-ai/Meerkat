@@ -52,7 +52,7 @@ def get_s3_params_to_check_file_existence():
 	"""Return a dictionary of s3 params"""
 	return {
 		"bucket": "s3yodlee",
-		"prefix": "Meerkat_tests_fixture"
+		"prefix": "Meerkat_tests_fixture/check_existence/"
 	}
 
 def get_s3_params_to_pull_from_s3(case_type):
