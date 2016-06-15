@@ -35,9 +35,9 @@ class VerifyDataTests(unittest.TestCase):
 				label_names_csv, label_names_json, label_numbers_json)
 
 	@parameterized.expand([
-		(["normal", verify_data_fixture.get_json_input_path()["correct_format"]]),
-		(["edge", verify_data_fixture.get_json_input_path()["dup_key"]]),
-		(["edge", verify_data_fixture.get_json_input_path()["not_found"]])
+		(["normal", verify_data_fixture.get_json_input_path("correct_format")]),
+		(["edge", verify_data_fixture.get_json_input_path("dup_key")]),
+		(["edge", verify_data_fixture.get_json_input_path("not_found")])
 	])
 	def test_load_json(self, case_type, json_input):
 		"""Test load_json edge cases with parameters"""
@@ -47,17 +47,17 @@ class VerifyDataTests(unittest.TestCase):
 			self.assertRaises(SystemExit, verifier.load_json, json_input)
 
 	@parameterized.expand([
-		([verify_data_fixture.get_csv_input_path()["subtype"], ["subtype", "bank", "credit"], 3]),
-		([verify_data_fixture.get_csv_input_path()["merchant"], ["merchant", "card"], 2])
+		([verify_data_fixture.get_csv_input_path("subtype"), ["subtype", "bank", "credit"], 3]),
+		([verify_data_fixture.get_csv_input_path("merchant"), ["merchant", "card"], 2])
 	])
 	def test_read_csv_to_df(self, csv_input, cnn_type, df_len):
 		"""Test read_csv_to_df with parameters"""
 		self.assertEqual(len(verifier.read_csv_to_df(csv_input, cnn_type)), df_len)
 
 	@parameterized.expand([
-		(["normal", verify_data_fixture.get_csv_input_path()["correct_format"],
+		(["normal", verify_data_fixture.get_csv_input_path("correct_format"),
 			["subtype", "bank", "debit"]]),
-		(["edge", verify_data_fixture.get_csv_input_path()["mal_format"],
+		(["edge", verify_data_fixture.get_csv_input_path("mal_format"),
 			["subtype", "bank", "debit"]])
 	])
 	def test_verify_csv_format(self, case_type, csv_input, cnn_type):
@@ -105,9 +105,9 @@ class VerifyDataTests(unittest.TestCase):
 				label_names_csv, label_counts_csv, cnn_type)
 
 	@parameterized.expand([
-		(["edge", verify_data_fixture.get_csv_input_path()["subtype"],
+		(["edge", verify_data_fixture.get_csv_input_path("subtype"),
 			["subtype", "bank", "debit"]]),
-		(["edge", verify_data_fixture.get_csv_input_path()["merchant"],
+		(["edge", verify_data_fixture.get_csv_input_path("merchant"),
 			["merchant", "card"]])
 	])
 	def test_verify_total_numbers(self, case_type, csv_input, cnn_type):
