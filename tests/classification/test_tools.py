@@ -3,6 +3,7 @@
 import os
 import csv
 import unittest
+import shutil
 import pandas as pd
 import meerkat.classification.tools as tools
 from nose_parameterized import parameterized
@@ -99,6 +100,22 @@ class ToolsTests(unittest.TestCase):
 	def test_merge_csvs(self, directory, expected_len):
 		"""Test merge_csvs with parameters"""
 		self.assertEqual(len(tools.merge_csvs(directory)), expected_len)
+
+	@parameterized.expand([
+		([tools_fixture.get_gz_file("no_json"), "card", (), True])
+		#([tools_fixture.get_gz_file("two_jsons"), "card", (), True]),
+		#([tools_fixture.get_gz_file("valid"), "card",
+		#	tools_fixture.get_unzip_and_merge_result(), False])
+	])
+	def test_unzip_and_merge(self, gz_file, bank_or_card, expected, exception):
+		"""Test unzip_and_merge with parameters"""
+		if exception:
+			self.assertRaises(Exception, tools.unzip_and_merge, gz_file, bank_or_card)
+		else:
+			result = tools.unzip_and_merge(gz_file, bank_or_card)
+			self.assertEqual(len(result[0]), expected[0])
+			self.assertEqual(result[1], expected[1])
+		shutil.rmtree("./merchant_card_unzip/")
 
 if __name__ == '__main__':
 	unittest.main()

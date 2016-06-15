@@ -80,3 +80,16 @@ def get_result(case_type):
 		return (True, newest_version_dir_unprocessed, newest_version)
 	else:
 		return (False, newest_version_dir_processed, newest_version)
+
+def get_gz_file(case_type):
+	"""Return gz file path"""
+	paths = {
+		"no_json": BASE_DIR + "no_json.tar.gz",
+		"two_jsons": BASE_DIR + "two_jsons.tar.gz",
+		"valid": BASE_DIR + "valid_merchant_input.tar.gz"
+	}
+	return paths[case_type]
+
+def get_unzip_and_merge_result():
+	"""Return a turple of results"""
+	return (2, "./merchant_card_unzip/foo.json")
