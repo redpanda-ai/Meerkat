@@ -10,7 +10,8 @@ dictionary = {
 	'AR': [
 	],
 	'CA': [
-		'CARD'
+		'CARD',
+		'CAR'
 	],
 	'CO': [
 		'COMPANY'
@@ -45,6 +46,7 @@ dictionary = {
 	'ME': [
 	],
 	'MD': [
+		'MDEBIT'
 	],
 	'MA': [
 	],
@@ -82,6 +84,7 @@ dictionary = {
 	],
 	'PA': [
 		'PAR',
+		'PARDEBIT',
 		'PARK',
 		'PACIFIC'
 	],
@@ -107,6 +110,7 @@ dictionary = {
 	'WV': [
 	],
 	'WI': [
+		'WILD'
 	],
 	'WY': [
 	],
