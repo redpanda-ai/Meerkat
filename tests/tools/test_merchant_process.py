@@ -10,9 +10,10 @@ class MerchantProcessTests(unittest.TestCase):
 
 	def test_dict_2_json(self):
 		dict_example = {'a': 1, 'bb': {'ccc': 222, 'ddd': 333}}
-		mp.dict_2_json(dict_example, 'dict_example.json')
+		filename = 'tests/tools/fixture/dict_example.json'
+		mp.dict_2_json(dict_example, filename)
 
-		json_obj = open('dict_example.json')
+		json_obj = open(filename)
 		json_str = json_obj.read()
 		dict_expected = json.loads(json_str)
 
