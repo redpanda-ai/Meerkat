@@ -52,7 +52,7 @@ def get_s3_params_to_check_file_existence():
 	"""Return a dictionary of s3 params"""
 	return {
 		"bucket": "s3yodlee",
-		"prefix": "Meerkat_tests_fixture/check_existence/"
+		"prefix": "meerkat/Meerkat_tests_fixture/check_existence/"
 	}
 
 def get_s3_params_to_pull_from_s3(case_type):
@@ -63,7 +63,7 @@ def get_s3_params_to_pull_from_s3(case_type):
 	}
 	s3_params = {
 			"bucket": "s3yodlee",
-			"prefix": "Meerkat_tests_fixture",
+			"prefix": "meerkat/Meerkat_tests_fixture",
 			"extension": "csv",
 			"save_path": "tests/fixture/"
 		}
@@ -81,13 +81,13 @@ def get_s3params(case_type):
 	}
 	return {
 		"bucket": "s3yodlee",
-		"prefix": prefix[case_type]
+		"prefix": "meerkat/" + prefix[case_type]
 	}
 
 def get_result(case_type):
 	"""Return a tuple of result"""
-	newest_version_dir_unprocessed = "Meerkat_tests_fixture/unpreprocessed/201604011500"
-	newest_version_dir_processed = "Meerkat_tests_fixture/preprocessed/201604011500"
+	newest_version_dir_unprocessed = "meerkat/Meerkat_tests_fixture/unpreprocessed/201604011500"
+	newest_version_dir_processed = "meerkat/Meerkat_tests_fixture/preprocessed/201604011500"
 	newest_version = "201604011500"
 	if case_type == "missing_input":
 		return ()
