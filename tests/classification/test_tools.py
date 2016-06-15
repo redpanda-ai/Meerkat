@@ -117,6 +117,14 @@ class ToolsTests(unittest.TestCase):
 			self.assertEqual(result[1], expected[1])
 		shutil.rmtree("./merchant_card_unzip/")
 
+	@parameterized.expand([
+		(["ab cd", "Ab Cd"]),
+		(["ab in cd", "Ab in Cd"])
+	])
+	def test_cap_first_letter(self, label, expected):
+		"""Test cap_first_letter with parameters"""
+		self.assertEqual(tools.cap_first_letter(label), expected)
+
 if __name__ == '__main__':
 	unittest.main()
 
