@@ -110,7 +110,8 @@ dictionary = {
 	'WV': [
 	],
 	'WI': [
-		'WILD'
+		'WILD',
+		'WINGS'
 	],
 	'WY': [
 	],
