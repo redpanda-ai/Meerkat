@@ -125,6 +125,15 @@ class ToolsTests(unittest.TestCase):
 		"""Test cap_first_letter with parameters"""
 		self.assertEqual(tools.cap_first_letter(label), expected)
 
+	@parameterized.expand([
+		([tools_fixture.get_dict(), "tests/classification/fixture/bar.json"])
+	])
+	def test_dict_2_json(self, obj, filename):
+		"""Test dict_2_json with parameters"""
+		tools.dict_2_json(obj, filename)
+		self.assertTrue(os.path.isfile(filename))
+		os.remove(filename)
+
 if __name__ == '__main__':
 	unittest.main()
 
