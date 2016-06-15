@@ -16,5 +16,14 @@ class BloomTests(unittest.TestCase):
 		result = location in sbf
 		self.assertEqual(expect, result)
 
+	def test_get_json_from_file_exist(self):
+		filename = 'tests/classification/bloom_filter/fixture/get_json.json'
+		result = bloom.get_json_from_file(filename)
+		self.assertEqual(isinstance(result, dict), True)
+
+	def test_get_json_from_file_not_exist(self):
+		filename = 'tests/classification/bloom_filter/fixture/not_exist.json'
+		self.assertRaises(SystemExit, bloom.get_json_from_file, filename)
+
 if __name__ == "__main__":
 	unittest.main()

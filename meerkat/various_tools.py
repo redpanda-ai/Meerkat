@@ -325,11 +325,13 @@ def get_qs_query(term, field_list=None, boost=1.0):
 		}
 	}
 
-def get_us_cities():
+def get_us_cities(testing=False):
 	"""Load an array of US cities"""
 	with open("data/misc/US_Cities.txt") as city_file:
 		cities = city_file.readlines()
 	cities = [city.lower().rstrip('\n') for city in cities]
+	if testing: # Return the length for testing purposes
+		return len(cities)
 	return cities
 
 def stopwords(transaction):

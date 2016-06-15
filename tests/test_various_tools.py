@@ -1,8 +1,8 @@
 """Unit test for meerkat.various_tools"""
 
 import unittest
-import meerkat.various_tools as various_tools
 from nose_parameterized import parameterized
+import meerkat.various_tools as various_tools
 from tests.fixture import various_tools_fixture
 
 class VariousToolsTests(unittest.TestCase):
@@ -71,9 +71,19 @@ class VariousToolsTests(unittest.TestCase):
 
 	def test_load_dict_ordered(self):
 		"""Test load_dict_ordered"""
+		expected_dict_list = various_tools_fixture.get_dict_list()
 		expected_fieldnames = ['first_name,last_name,address,city,state,zip_code']
+
 		dict_list, fieldnames = various_tools.load_dict_ordered("tests/fixture/dict_example.csv")
+
+		self.assertEqual(expected_dict_list, dict_list)
 		self.assertEqual(expected_fieldnames, fieldnames)
+
+	def test_get_us_cities(self):
+		"""Test get_us_cities"""
+		expected = various_tools.get_us_cities(testing=True)
+		num_of_cities = 10000
+		self.assertLessEqual(num_of_cities, expected)
 
 if __name__ == '__main__':
 	unittest.main()
