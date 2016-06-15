@@ -102,10 +102,10 @@ class ToolsTests(unittest.TestCase):
 		self.assertEqual(len(tools.merge_csvs(directory)), expected_len)
 
 	@parameterized.expand([
-		([tools_fixture.get_gz_file("no_json"), "card", (), True])
-		#([tools_fixture.get_gz_file("two_jsons"), "card", (), True]),
-		#([tools_fixture.get_gz_file("valid"), "card",
-		#	tools_fixture.get_unzip_and_merge_result(), False])
+		([tools_fixture.get_gz_file("no_json"), "card", (), True]),
+		([tools_fixture.get_gz_file("two_jsons"), "card", (), True]),
+		([tools_fixture.get_gz_file("valid"), "card",
+			tools_fixture.get_unzip_and_merge_result(), False])
 	])
 	def test_unzip_and_merge(self, gz_file, bank_or_card, expected, exception):
 		"""Test unzip_and_merge with parameters"""
