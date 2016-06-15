@@ -7,6 +7,8 @@ import re
 import tarfile
 import os
 import sys
+import threading
+from queue import Queue
 import pandas as pd
 
 from boto.s3 import connect_to_region
@@ -114,14 +116,13 @@ def get_best_model_of_class(target, **kwargs):
 	else:
 		timestamps = [kwargs["aspirant"]]
 
-	s3_client = boto3.client('s3')
 	for timestamp in timestamps:
 		short_key = kwargs["prefix"] + kwargs["key"] + timestamp
 		long_key = short_key + "classification_report.csv"
 		classification_report = None
 		if s3_key_exists(kwargs["bucket"], long_key):
 			target_file = "classification_report.csv"
-			s3_client.download_file(kwargs['bucket'].name, long_key, target_file)
+			S3_CLIENT.download_file(kwargs['bucket'].name, long_key, target_file)
 			classification_report = target_file
 			logging.info("Classification Report fetched from S3 at {0}.".format(long_key))
 		else:
@@ -134,7 +135,7 @@ def get_best_model_of_class(target, **kwargs):
 			for item in files_to_nuke:
 				logging.info("Removing {0} from {1}/{2}".format(item,
 					kwargs["bucket"].name, short_key))
-				s3_client.delete_object(Bucket=kwargs["bucket"].name, Key=short_key + item)
+				S3_CLIENT.delete_object(Bucket=kwargs["bucket"].name, Key=short_key + item)
 
 		logging.info("Score :{0}".format(score))
 
@@ -148,32 +149,78 @@ def get_best_model_of_class(target, **kwargs):
 		candidate_count += 1
 	return winner_count, winner
 
+def threaded_thing(**kwargs):
+	"""This will be threaded"""
+	# Ignore category models for now
+	if "category" in kwargs["key"]:
+		return
+
+	logging.info("Evaluating '{0}'".format(kwargs["key"]))
+	kwargs["aspirant"] = None
+	if kwargs["key"] in kwargs["aspirants"]:
+		logging.info("Aspirant model for {0} is {1}".format(kwargs["key"],
+			kwargs["aspirants"][kwargs["key"]]))
+		kwargs["aspirant"] = kwargs["aspirants"][kwargs["key"]]
+	else:
+		logging.info("No aspirant model, evaluating based on accuracy")
+
+	target = kwargs["target"]
+	del kwargs["target"]
+	winner_count, winner = get_best_model_of_class(target, **kwargs)
+
+#	winner_count, winner = get_best_model_of_class(target, bucket=bucket,
+#		prefix=prefix, results=results, key=key, suffix=suffix, aspirant=aspirant,
+#		best_models=best_models)
+
+	logging.info("\t{0:<14}{1:>2}".format("Winner", winner_count))
+
+def worker(*args, **kwargs):
+	"""Does work"""
+	while True:
+		item = kwargs["q"].get()
+		threaded_thing(**kwargs)
+		kwargs["q"].task_done()
+
 def get_best_models(*args):
 	"""Gets the best model for a particular model type."""
 	bucket, prefix, results, target, s3_base, aspirants = args[:]
 	suffix = prefix[len(s3_base):]
 
 	best_models = {}
-	for key in sorted(results.keys()):
+	#make threads here
+	sorted_keys = sorted(results.keys())
+	logging.critical("Sorted keys: {0}".format(sorted_keys))
+	#make an empty queue
+	q = Queue()
+	kwargs = {
+		"q": q,
+		"bucket": args[0],
+		"prefix": args[1],
+		"results": args[2],
+		"target": args[3],
+		"s3_base": args[4],
+		"aspirants": args[5],
+		"best_models": best_models
+	}
+	#start your threads
+	for i in range(len(sorted_keys)):
+		my_kwargs = {}
+		for key in kwargs:
+			my_kwargs[key] = kwargs[key]
 
-		# Ignore category models for now
-		if "category" in key:
-			continue
+		my_kwargs["key"] = sorted_keys[i]
+		t = threading.Thread(target=worker, args=args, kwargs=my_kwargs)
+		t.daemon = True
+		t.start()
+	#fill your queue
+	for key in sorted_keys:
+		logging.critical("Key placed")
+		q.put(key)
+	#block until all tasks are done
+	q.join()
 
-		logging.info("Evaluating '{0}'".format(key))
-		aspirant = None
-		if key in aspirants:
-			logging.info("Aspirant model for {0} is {1}".format(key, aspirants[key]))
-			aspirant = aspirants[key]
-		else:
-			logging.info("No aspirant model, evaluating based on accuracy")
-
-		winner_count, winner = get_best_model_of_class(target, bucket=bucket,
-			prefix=prefix, results=results, key=key, suffix=suffix, aspirant=aspirant,
-			best_models=best_models)
-
-		args = [bucket, prefix, key, winner, s3_base, "results.tar.gz", "meerkat/classification/"]
-		logging.info("\t{0:<14}{1:>2}".format("Winner", winner_count))
+#	for key in sorted_keys:
+#		threaded_thing(key, aspirants, target, bucket, prefix, results, suffix, best_models)
 
 	#log the winners
 	logging.debug("The best models are:\n{0}".format(best_models))
@@ -315,4 +362,5 @@ def main_program(bucket="s3yodlee", region="us-west-2", prefix="meerkat/cnn/data
 
 if __name__ == "__main__":
 	#Execute the main program
+	S3_CLIENT = boto3.client('s3')
 	main_program()
