@@ -13,8 +13,10 @@ import pandas as pd
 import csv
 import pickle
 import os
+import string
 
 from .bloom import *
+from .generate_json import generate_js
 
 STATES = [
 	"AL", "AK", "AZ", "AR", "CA", \
@@ -70,7 +72,6 @@ def generate_city_map():
 
 	data = {}
 
-	'''
 	try:
 		open("meerkat/classification/bloom_filter/assets/json_not_csv")
 	except:
@@ -80,7 +81,6 @@ def generate_city_map():
 		for line in f:
 			city, state = line.strip().split('\t')
 			add_with_subs(data, city, state)
-	'''
 
 	csv_file = csv.reader(open("meerkat/classification/bloom_filter/assets/us_cities_larger.csv", encoding="utf-8"), delimiter="\t")
 
@@ -137,11 +137,18 @@ def in_location_bloom(text):
 
 def location_split(my_text):
 	# Capitalize and remove spaces
-#	tag = tag_text(my_text)
+	tag = tag_text(my_text)
 	my_text = standardize(my_text)
 
-	for i in range(len(my_text) - 1, -1, -1):
-		if my_text[i:i+2] in STATES:
+	try:
+		open('meerkat/classification/bloom_filter/assets/words_start_with_states.json')
+	except:
+		generate_js()
+
+	words = get_json_from_file('meerkat/classification/bloom_filter/assets/words_start_with_states.json')
+	length = len(my_text)
+	for i in range(length - 2, -1, -1):
+		if my_text[i:i+2] in STATES and (i == length - 2 or tag[i + 2] == 'B' or get_word(tag, my_text, i) not in words[my_text[i:i+2]]):
 			place = in_location_bloom(my_text[:i+2])
 			if place:
 				key = place[0] + place[1]
@@ -149,6 +156,29 @@ def location_split(my_text):
 				except: pass
 				# return place
 	return None
+
+def get_word(tag, text, index):
+	end = index + 2
+	for ch in tag[index + 2:]:
+		if ch == 'C':
+			end += 1
+		else:
+			break
+	return text[index:end]
+
+def tag_text(text):
+	for mark in string.punctuation:
+		text = text.replace(mark, "")
+	text = text.strip()
+	tag = ''
+	for i in range(len(text)):
+		if text[i] == ' ':
+			continue
+		elif i == 0 or text[i - 1] == ' ':
+			tag += 'B'
+		else:
+			tag += 'C'
+	return tag
 
 ##THINK!
 #Red Roof Inn, a three term bloom filter.
@@ -183,4 +213,4 @@ def main():
 
 if __name__ == "__main__":
 #	main()
-	print(location_split('KROGER #0224FTWORTHTXDEBIT FOR CHEC...'))
+	print(location_split('BARCLAYCARD US                  CREDITCARD CO ...'))
