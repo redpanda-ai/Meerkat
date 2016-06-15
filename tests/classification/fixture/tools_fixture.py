@@ -48,7 +48,14 @@ def get_csv_path(csv_type):
 	}
 	return csv_path[csv_type]
 
-def get_s3_params(case_type):
+def get_s3_params_to_check_file_existence():
+	"""Return a dictionary of s3 params"""
+	return {
+		"bucket": "s3yodlee",
+		"prefix": "Meerkat_tests_fixture"
+	}
+
+def get_s3_params_to_pull_from_s3(case_type):
 	"""Return a dictionary of s3 params"""
 	file_names = {
 		"with_file_name": "csv_file_1.csv",
