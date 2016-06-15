@@ -13,6 +13,15 @@ class ToolsTests(unittest.TestCase):
 	"""Our UnitTest class."""
 
 	@parameterized.expand([
+		([tools_fixture.get_output_filename(), tools_fixture.get_source_dir()])
+	])
+	def test_make_tarfile(self, output_filename, source_dir):
+		"""Test make_tarfile with parameters"""
+		tools.make_tarfile(output_filename, source_dir)
+		self.assertTrue(os.path.isfile(output_filename))
+		os.remove(output_filename)
+
+	@parameterized.expand([
 		(["invalid_tarfile", tools_fixture.get_archive_path("invalid_tarfile"),
 			tools_fixture.get_des_path(), ""]),
 		(["valid_tarfile", tools_fixture.get_archive_path("valid_tarfile"),

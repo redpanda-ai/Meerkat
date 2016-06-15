@@ -2,6 +2,14 @@
 
 BASE_DIR = "tests/classification/fixture/"
 
+def get_output_filename():
+	"""Return a output filename for tarball"""
+	return "tests/classification/fixture/made_tarball.tar.gz"
+
+def get_source_dir():
+	"""Return a source directory"""
+	return "tests/classification/fixture/to_make_tarball/"
+
 def get_archive_path(case_type):
 	"""Return the archive path"""
 	archive_paths = {
@@ -12,7 +20,7 @@ def get_archive_path(case_type):
 
 def get_des_path():
 	"Return the destination path"
-	return BASE_DIR + "extracted_tarballs/"
+	return BASE_DIR + "extracted_tarball/"
 
 def get_dict():
 	"""Return a dictionary"""
