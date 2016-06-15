@@ -1,5 +1,6 @@
 """Unit test for meerkat.panel_to_json"""
 
+import os
 import json
 import unittest
 import meerkat.tools.panel_to_json as panel_to_json
@@ -27,6 +28,7 @@ class PaneltoJsonTests(unittest.TestCase):
 		dict_expected = json.loads(json_str)
 
 		self.assertEqual(dict_example, dict_expected)
+		os.remove(filename)
 
 if __name__ == '__main__':
 	unittest.main()

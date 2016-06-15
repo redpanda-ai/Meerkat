@@ -1,5 +1,6 @@
 """Unit test for meerkat.tools.merchant_process"""
 
+import os
 import json
 import unittest
 import meerkat.tools.merchant_process as mp
@@ -19,6 +20,7 @@ class MerchantProcessTests(unittest.TestCase):
 		dict_expected = json.loads(json_str)
 
 		self.assertEqual(dict_example, dict_expected)
+		os.remove(filename)
 
 if __name__ == '__main__':
 	unittest.main()
