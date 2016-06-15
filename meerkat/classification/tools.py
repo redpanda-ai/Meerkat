@@ -255,22 +255,6 @@ def pull_from_s3(**kwargs):
 			" S3 location provided.")
 """
 
-def load(**kwargs):
-	"""Load the CSV into a pandas data frame"""
-	filename, credit_or_debit = kwargs["input_file"], kwargs["credit_or_debit"]
-	logging.info("Loading csv file and slicing by '{0}' ".format(credit_or_debit))
-	df = pd.read_csv(filename, quoting=csv.QUOTE_NONE, na_filter=False,
-		encoding="utf-8", sep='|', error_bad_lines=False, low_memory=False)
-	df['UNIQUE_TRANSACTION_ID'] = df.index
-	df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
-	grouped = df.groupby('LEDGER_ENTRY', as_index=False)
-	groups = dict(list(grouped))
-	df = groups[credit_or_debit]
-	df["PROPOSED_SUBTYPE"] = df["PROPOSED_SUBTYPE"].str.strip()
-	df['PROPOSED_SUBTYPE'] = df['PROPOSED_SUBTYPE'].apply(cap_first_letter)
-	class_names = df["PROPOSED_SUBTYPE"].value_counts().index.tolist()
-	return df, class_names
-
 def copy_file(input_file, directory):
 	"""This function moves uses Linux's 'cp' command to copy files on the local host"""
 	logging.info("Copy the file {0} to directory: {1}".format(input_file, directory))

@@ -29,10 +29,9 @@ verify_data.py [-h] [--credit_or_debit CREDIT_OR_DEBIT]
                       csv_input json_input merchant_or_subtype bank_or_card
 
 positional arguments:
-  csv_input             what is the csv data, allowed format: a directory path
-                        containing all csv files; a csv file path; pandas data
-                        frame
-  json_input            where is the json file
+  csv_input             what is the csv data, allowed format: csv file path;
+                        pandas data frame
+  json_input            json file path
   merchant_or_subtype   What kind of dataset do you want to process, subtype
                         or merchant
   bank_or_card          Whether we are processing card or bank transactions
@@ -45,7 +44,6 @@ optional arguments:
 """
 #####################################################
 
-import os
 import json
 import logging
 import sys
@@ -122,9 +120,9 @@ def parse_arguments():
 	parser = argparse.ArgumentParser()
 
 	# Required arugments
-	parser.add_argument("csv_input", help="what is the csv data, allowed format: a directory path \
-		containing all csv files; a csv file path; pandas data frame")
-	parser.add_argument("json_input", help="where is the json file")
+	parser.add_argument("csv_input", help="what is the csv data, allowed format: \
+		csv file path; pandas data frame")
+	parser.add_argument("json_input", help="json file path")
 	parser.add_argument("merchant_or_subtype",
 		help="What kind of dataset do you want to process, subtype or merchant")
 	parser.add_argument("bank_or_card", help="Whether we are processing card or \
@@ -134,10 +132,16 @@ def parse_arguments():
 	parser.add_argument("--credit_or_debit", default='',
 		help="What kind of transactions do you wanna process, debit or credit")
 
-	args = parser.parse_args()
+	return parser.parse_args()
+
+def process_arguments(args):
+	"""This function processes arguments"""
 	if args.merchant_or_subtype == 'subtype' and args.credit_or_debit == '':
 		raise Exception('For subtype data you need to declare debit or credit')
-	return args
+	cnn_type = [args.merchant_or_subtype, args.bank_or_card]
+	if args.credit_or_debit != "":
+		cnn_type.append(args.credit_or_debit)
+	return cnn_type
 
 def read_csv_to_df(csv_input, cnn_type):
 	"""Read csv file into pandas data frames"""
@@ -173,20 +177,16 @@ def verify_csv_format(df, cnn_type):
 	"""Verify csv data format is correct for the type of CNN being trained"""
 	column_header = list(df.columns.values)
 	column_header.sort()
-	
-	merchant_header = ['DESCRIPTION', 'DESCRIPTION_UNMASKED', 'MERCHANT_NAME']
-	subtype_header = ['AMOUNT', 'DESCRIPTION', 'DESCRIPTION_UNMASKED', 'LEDGER_ENTRY',
-		'PROPOSED_SUBTYPE', 'TRANSACTION_DATE', 'UNIQUE_TRANSACTION_ID']
-	category_header = ['UNIQUE_TRANSACTION_ID', 'AMOUNT', 'DESCRIPTION',\
-		'DESCRIPTION_UNMASKED', 'LEDGER_ENTRY', 'TRANSACTION_DATE', 'PROPOSED_CATEGORY']
 
-	cnn_column_header = []
-	if cnn_type[0] == "merchant":
-		cnn_column_header = merchant_header
-	elif cnn_type[0] == "subtype":
-		cnn_column_header = subtype_header
-	else:
-		cnn_column_header = category_header
+	headers = {
+		"merchant": ['DESCRIPTION', 'DESCRIPTION_UNMASKED', 'MERCHANT_NAME'],
+		"subtype": ['AMOUNT', 'DESCRIPTION', 'DESCRIPTION_UNMASKED', 'LEDGER_ENTRY',
+			'PROPOSED_SUBTYPE', 'TRANSACTION_DATE', 'UNIQUE_TRANSACTION_ID'],
+		"category": ['UNIQUE_TRANSACTION_ID', 'AMOUNT', 'DESCRIPTION',
+			'DESCRIPTION_UNMASKED', 'LEDGER_ENTRY', 'TRANSACTION_DATE', 'PROPOSED_CATEGORY']
+	}
+
+	cnn_column_header = headers[cnn_type[0]]
 
 	if sorted(column_header) != sorted(cnn_column_header):
 		logging.critical("csv data format is incorrect")
@@ -308,13 +308,13 @@ def verify_total_numbers(df, cnn_type):
 		logging.info("Data set size of csv is verified: {0:>15,}".format(len(df)))
 
 	# Generate count numbers for labels in csv
-	label_key_csv = ""
-	if cnn_type[0] == "merchant":
-		label_key_csv = "MERCHANT_NAME"
-	elif cnn_type[0] == "subtype":
-		label_key_csv = "PROPOSED_SUBTYPE"
-	else:
-		label_key_csv = "PROPOSED_CATEGORY"
+	ground_truth_labels = {
+		'merchant': 'MERCHANT_NAME',
+		'subtype': 'PROPOSED_SUBTYPE',
+		'category': 'PROPOSED_CATEGORY'
+	}
+	label_key_csv = ground_truth_labels[cnn_type[0]]
+
 	label_names_csv = sorted(df[label_key_csv].value_counts().index.tolist())
 	label_counts_csv = df[label_key_csv].value_counts()
 
@@ -350,8 +350,6 @@ def verify_total_numbers(df, cnn_type):
 
 if __name__ == "__main__":
 	ARGS = parse_arguments()
-	CNNTYPE = [ARGS.merchant_or_subtype, ARGS.bank_or_card]
-	if ARGS.credit_or_debit != "":
-		CNNTYPE.append(ARGS.credit_or_debit)
+	CNN_TYPE = process_arguments(ARGS)
 
-	verify_data(csv_input=ARGS.csv_input, json_input=ARGS.json_input, cnn_type=CNNTYPE)
+	verify_data(csv_input=ARGS.csv_input, json_input=ARGS.json_input, cnn_type=CNN_TYPE)
