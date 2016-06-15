@@ -14,3 +14,6 @@ class TransactionLabelerTests(unittest.TestCase):
 	def test_identify_container(self, filename, expected_container):
 		"""Test for identify_container"""
 		self.assertEqual(tl.identify_container(filename), expected_container)
+
+if __name__ == '__main__':
+	unittest.main()
