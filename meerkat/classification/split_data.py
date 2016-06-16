@@ -28,6 +28,7 @@ python3 -m meerkat.classification.split_data subtype bank \
 ################################################################
 
 import os
+import sys
 import shutil
 import logging
 import argparse
@@ -37,7 +38,7 @@ from .verify_data import verify_data
 from .tools import (pull_from_s3, unzip_and_merge, seperate_debit_credit, 
 	extract_tarball, make_tarfile, push_file_to_s3)
 
-def parse_arguments():
+def parse_arguments(args):
 	"""This function parses arguments from our command line."""
 	parser = argparse.ArgumentParser("split_data")
 	# Required arguments
@@ -60,7 +61,7 @@ def parse_arguments():
 	parser.add_argument("-v", "--info", help="log at INFO level",
 		action="store_true")
 
-	args = parser.parse_args()
+	args = parser.parse_args(args)
 
 	if args.model_type == 'subtype' and args.credit_or_debit == '':
 		raise Exception('For subtype data you need to declare debit or credit.')
@@ -167,5 +168,5 @@ def main_split_data(args):
 	logging.info('{0} uploaded to {1}'.format(output_file, bucket + '/' + prefix))
 
 if __name__ == "__main__":
-	ARGS = parse_arguments()
+	ARGS = parse_arguments(sys.argv[1:])
 	main_split_data(ARGS)
