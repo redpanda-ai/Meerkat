@@ -12,47 +12,58 @@ created on April 4, 2016
 
 import os
 import sys
+import logging
+
 from meerkat.classification.tools import push_file_to_s3, get_utc_iso_timestamp, make_tarfile
 
-# check files
-def main_process():
-	"""This is the whole process"""
-	bucket = 's3yodlee'
+def get_prefix():
+	"""Get the prefix directory"""
 	default_prefix = 'meerkat/cnn/data/'
+	data_type = sys.argv[2]
+	return default_prefix + data_type.replace("_", "/") + "/"
 
-	# upload the tar.gz file to s3
-	dtime = get_utc_iso_timestamp()
-	data_type = sys.argv[2].replace("_", "/")
-	prefix = default_prefix + data_type + '/' + dtime + '/'
-
+def check_file_existence():
+	"""Check that there should be at lease one csv file and exactly one json file"""
+	source_dir = sys.argv[1]
 	csv_num, json_exit = 0, False
-	for filename in os.listdir(sys.argv[1]):
+	for filename in os.listdir(source_dir):
 		if filename.endswith('.csv'):
 			csv_num += 1
 		elif filename.endswith('.json'):
 			if json_exit:
-				print("should only have one json file")
+				logging.error("should only have one json file")
 				sys.exit()
 			json_exit = True
 		else:
-			print("file %s is not csv or json file" %filename)
+			logging.error("file %s is not csv or json file" %filename)
 			sys.exit()
 	if csv_num == 0:
-		print("should at least one csv file")
+		logging.error("should at least one csv file")
 		sys.exit()
 	if not json_exit:
-		print("should have one json file")
+		logging.error("should have one json file")
 		sys.exit()
-	print("files checking finished")
+	logging.info("files checking finished")
+
+def main_process():
+	"""This is the whole process"""
+
+	logging.basicConfig(level=logging.INFO)
+	bucket = 's3yodlee'
+	dtime = get_utc_iso_timestamp()
+	prefix = get_prefix() + dtime + '/'
+
+	check_file_existence()
 
 	# tar gz the files
-	print("processing...")
+	logging.info("processing...")
 	make_tarfile("input.tar.gz", sys.argv[1])
-	print("files gziped")
+	logging.info("files gziped")
 
-	print("uploading to s3")
+	# upload the tar.gz file to s3
+	logging.info("uploading to s3")
 	push_file_to_s3('input.tar.gz', bucket, prefix)
-	print("uploaded to s3")
+	logging.info("uploaded to s3")
 
 	#remove the tar.gz file in local
 	os.remove("input.tar.gz")

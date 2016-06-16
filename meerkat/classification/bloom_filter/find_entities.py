@@ -93,14 +93,14 @@ def generate_city_map():
 			# state = row[1] # for small.csv
 			add_with_subs(data, city, state)
 
-	pickle.dump(data, open("meerkat/classification/bloom_filter/assets/CITY_SUBS.log", 'wb'))
+	pickle.dump(data, open("meerkat/classification/bloom_filter/assets/CITY_SUBS", 'wb'))
 
 	return data
 
 CITY_SUBS = {}
 
-if os.path.isfile("meerkat/classification/bloom_filter/assets/CITY_SUBS.log"):
-	with open("meerkat/classification/bloom_filter/assets/CITY_SUBS.log", 'rb') as fp:
+if os.path.isfile("meerkat/classification/bloom_filter/assets/CITY_SUBS"):
+	with open("meerkat/classification/bloom_filter/assets/CITY_SUBS", 'rb') as fp:
 	    CITY_SUBS = pickle.load(fp)
 else:
 	CITY_SUBS = generate_city_map()
