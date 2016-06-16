@@ -1,6 +1,5 @@
 """The place where you put frequently used functions"""
 
-import csv
 import datetime
 import json
 import logging
