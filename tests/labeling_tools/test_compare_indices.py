@@ -19,15 +19,6 @@ class CompareIndicesTests(unittest.TestCase):
 		self.assertEqual(compare_indices.has_mapping_changed(old_mapping, new_mapping), result)
 
 	@parameterized.expand([
-		([[8.0, 4.0, 2.0, 1.0], 1.492]),
-		([[2.0, 1.0], 2.0]),
-		([[1.0], None])
-	])
-	def test_z_score_delta(self, scores, z_score_delta):
-		"""Test z_score_delta with parameters"""
-		self.assertEqual(compare_indices.z_score_delta(scores), z_score_delta)
-
-	@parameterized.expand([
 		([compare_indices_fixture.get_elasticsearch_result()["non_hits"], 0, (False, False)]),
 		([compare_indices_fixture.get_elasticsearch_result()["has_hits"], 0, (2.0, "result_0")])
 	])

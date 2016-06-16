@@ -1,6 +1,5 @@
 """The place where you put frequently used functions"""
 
-import csv
 import datetime
 import json
 import logging
@@ -18,6 +17,11 @@ from boto.s3.key import Key
 from boto.s3.connection import Location
 from boto import connect_s3
 from meerkat.various_tools import load_piped_dataframe
+
+def chunks(array, num):
+	"""Chunk array into equal sized parts"""
+	num = max(1, num)
+	return [array[i:i + num] for i in range(0, len(array), num)]
 
 def string_to_tensor(config, doc, length):
 	"""Convert transaction to tensor format"""
