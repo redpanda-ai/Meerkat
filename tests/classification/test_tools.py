@@ -6,6 +6,7 @@ import unittest
 import shutil
 import pandas as pd
 import meerkat.classification.tools as tools
+from meerkat.various_tools import load_params
 from nose_parameterized import parameterized
 from tests.classification.fixture import tools_fixture
 
@@ -120,6 +121,25 @@ class ToolsTests(unittest.TestCase):
 			self.assertRaises(SystemExit, tools.check_new_input_file, **s3params)
 		else:
 			self.assertEqual(tools.check_new_input_file(**s3params), result)
+
+	@parameterized.expand([
+		([tools_fixture.get_predictions("all_correct"), tools_fixture.get_labels(), 100.0]),
+		([tools_fixture.get_predictions("all_wrong"), tools_fixture.get_labels(), 0.0]),
+		([tools_fixture.get_predictions("half_correct"), tools_fixture.get_labels(), 50.0])
+	])
+	def test_accuracy(self, predictions, labels, expected_accuracy):
+		"""Test accuracy with parameters"""
+		result = tools.accuracy(predictions, labels)
+		self.assertEqual(result, expected_accuracy)
+
+	@parameterized.expand([
+		(["tests/classification/fixture/cost_matrix.json", [1.3, 0.8, 1.1]])
+	])
+	def test_get_cost_list(self, label_map_path, expected):
+		"""Confirm that you can load a cost matrix from a proper label_map"""
+		config = {"label_map": load_params(label_map_path)}
+		results = tools.get_cost_list(config)
+		self.assertTrue(sorted(results) == sorted(expected))
 
 	@parameterized.expand([
 		(["tests/fixture/csvs/", 2])
