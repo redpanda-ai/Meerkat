@@ -115,7 +115,7 @@ def load_json(json_input):
 		logging.critical("json file not found")
 		sys.exit()
 
-def parse_arguments():
+def parse_arguments(args):
 	"""This function parses arguments from our command line."""
 	parser = argparse.ArgumentParser()
 
@@ -132,7 +132,7 @@ def parse_arguments():
 	parser.add_argument("--credit_or_debit", default='',
 		help="What kind of transactions do you wanna process, debit or credit")
 
-	return parser.parse_args()
+	return parser.parse_args(args)
 
 def process_arguments(args):
 	"""This function processes arguments"""
@@ -349,7 +349,7 @@ def verify_total_numbers(df, cnn_type):
 	return label_names_csv, label_counts_csv
 
 if __name__ == "__main__":
-	ARGS = parse_arguments()
+	ARGS = parse_arguments(sys.argv[1:])
 	CNN_TYPE = process_arguments(ARGS)
 
 	verify_data(csv_input=ARGS.csv_input, json_input=ARGS.json_input, cnn_type=CNN_TYPE)
