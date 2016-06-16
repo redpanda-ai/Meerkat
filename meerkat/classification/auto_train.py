@@ -13,6 +13,7 @@ performance matrics.
 import argparse
 import logging
 import os
+import sys
 import shutil
 
 import tensorflow as tf
@@ -59,7 +60,7 @@ time nohup python3 -m meerkat.classification.auto_train merchant bank -v --ensem
 """
 ###################################################################################################
 
-def parse_arguments():
+def parse_arguments(args):
 	"""This function parses arguments from our command line."""
 
 	parser = argparse.ArgumentParser("auto_train")
@@ -96,7 +97,7 @@ def parse_arguments():
 	parser.add_argument("-d", "--debug", help=help_text["debug"], action="store_true")
 	parser.add_argument("-v", "--info", help=help_text["info"], action="store_true")
 
-	args = parser.parse_args()
+	args = parser.parse_args(args)
 
 	if args.model_type == 'subtype' and args.credit_or_debit == '':
 		raise Exception('For subtype data you need to declare debit or credit.')
@@ -110,7 +111,7 @@ def parse_arguments():
 def auto_train():
 	"""Run the automated training process"""
 
-	args = parse_arguments()
+	args = parse_arguments(sys.argv[1:])
 	bucket = args.bucket
 	bank_or_card = args.bank_or_card
 	credit_or_debit = args.credit_or_debit
