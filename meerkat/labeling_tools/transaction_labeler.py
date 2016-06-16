@@ -28,6 +28,7 @@ import csv
 import sys
 import os
 import re
+import logging
 
 import numpy as np
 import pandas as pd
@@ -63,7 +64,8 @@ def verify_arguments():
 	sufficient_arguments = (len(sys.argv) == 2)
 
 	if not sufficient_arguments:
-		safe_print("Insufficient arguments. Please provide a config file")
+		#safe_print("Insufficient arguments. Please provide a config file")
+		logging.warning("Insufficient arguments. Please provide a config file")
 		sys.exit()
 
 def identify_container(filename):

@@ -19,6 +19,7 @@ Created on July 15, 2014
 
 import os
 import sys
+import logging
 
 from meerkat.various_tools import (load_params, get_es_connection, \
 get_merchant_by_id, load_dict_list, write_dict_list)
@@ -60,7 +61,8 @@ def verify_arguments():
 	sufficient_arguments = (len(sys.argv) == 3)
 
 	if not sufficient_arguments:
-		print("Insufficient arguments. Please see usage")
+		#print("Insufficient arguments. Please see usage")
+		logging.warning("Insufficient arguments. Please see usage")
 		sys.exit()
 
 	config = sys.argv[1]
@@ -70,7 +72,8 @@ def verify_arguments():
 	factual_list_included = factual_list.endswith('.txt')
 
 	if not config_included  or not factual_list_included:
-		print("Erroneous arguments. Please see usage")
+		#print("Erroneous arguments. Please see usage")
+		logging.warning("Erroneous arguments. Please see usage")
 		sys.exit()
 
 def run_from_command_line():
