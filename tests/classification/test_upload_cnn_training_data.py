@@ -1,12 +1,10 @@
 """Unit test for meerkat/classification/upload_cnn_training_data.py"""
 
-#import os
 import sys
 import unittest
 import meerkat.classification.upload_cnn_training_data as uploader
 
 from nose_parameterized import parameterized
-#from tests.classification.fixture import tools_fixture
 
 class UploaderTests(unittest.TestCase):
 	"""Our UnitTest class."""
