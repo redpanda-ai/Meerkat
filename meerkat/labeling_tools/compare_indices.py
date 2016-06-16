@@ -28,6 +28,7 @@ Created on July 21, 2014
 
 import sys
 import random
+import logging
 import contextlib
 import collections
 
@@ -786,7 +787,8 @@ def verify_arguments():
 	sufficient_arguments = (len(sys.argv) == 6)
 
 	if not sufficient_arguments:
-		safe_print("Insufficient arguments. Please see usage")
+		#safe_print("Insufficient arguments. Please see usage")
+		logging.warning("Insufficient arguments. Please see usage")
 		sys.exit()
 
 	config = sys.argv[1]
@@ -796,7 +798,8 @@ def verify_arguments():
 	factual_list_included = factual_list.endswith('.txt')
 
 	if not config_included  or not factual_list_included:
-		safe_print("Erroneous arguments. Please see usage")
+		#safe_print("Erroneous arguments. Please see usage")
+		logging.warning("Erroneous arguments. Please see usage")
 		sys.exit()
 
 def add_local_params(params):
