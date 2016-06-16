@@ -37,13 +37,6 @@ class MergeStoreNumbersTests(unittest.TestCase):
 		result = merger.load_store_numbers(file_name)
 		self.assertEqual(result, expected)
 
-	@parameterized.expand([
-		([[2.0, 1.0], 2.0]),
-		([[1.0], None])
-	])
-	def test_z_score_delta(self, scores, z_score_delta):
-		"""Test z_score_delta with parameters"""
-		self.assertEqual(merger.z_score_delta(scores), z_score_delta)
 
 	@parameterized.expand([
 		([merge_store_numbers_fixture.get_result_dict()["empty_result"], 0, (False, False)]),

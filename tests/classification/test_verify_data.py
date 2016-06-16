@@ -13,6 +13,29 @@ class VerifyDataTests(unittest.TestCase):
 	"""Unit tests for meerkat.classification.verify_data"""
 
 	@parameterized.expand([
+		([["csv_input", "json_input", "subtype", "bank", "--credit_or_debit", "credit"]]),
+	])
+	def test_parse_arguments(self, arguments):
+		"""Test parse_arguments with parameters"""
+		parser = verifier.parse_arguments(arguments)
+		self.assertEqual(parser.csv_input, "csv_input")
+		self.assertEqual(parser.json_input, "json_input")
+		self.assertEqual(parser.merchant_or_subtype, "subtype")
+		self.assertEqual(parser.bank_or_card, "bank")
+		self.assertEqual(parser.credit_or_debit, "credit")
+
+	@parameterized.expand([
+		([verify_data_fixture.get_args("valid"), ["subtype", "bank", "credit"], False]),
+		([verify_data_fixture.get_args("invalid"), [], True])
+	])
+	def test_process_arguments(self, arguments, expected, exception):
+		"""Test process_arguments with parameters"""
+		if exception:
+			self.assertRaises(Exception, verifier.process_arguments, arguments)
+		else:
+			self.assertEqual(verifier.process_arguments(arguments), expected)
+
+	@parameterized.expand([
 		([["AA", "BB"], ["AA", "BB"], "names", ""]),
 		([[1, 2], [1, 2], "numbers", ""]),
 		([[1, 2], [2, 3, 4], "numbers", "There are missing class numbers in json: " \

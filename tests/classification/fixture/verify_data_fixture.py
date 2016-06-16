@@ -1,5 +1,15 @@
 """Fixtures for test_verify_data"""
 
+from meerkat.classification.verify_data import parse_arguments
+
+def get_args(case_type):
+	"""Return arguments"""
+	arguments = ["csv_input", "json_input", "subtype", "bank"]
+	if case_type == "valid":
+		arguments.append("--credit_or_debit")
+		arguments.append("credit")
+	return parse_arguments(arguments)
+
 def get_json_input_path(case_type):
 	"""Return json file paths"""
 	paths = {
