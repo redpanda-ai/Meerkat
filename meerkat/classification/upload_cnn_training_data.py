@@ -14,19 +14,17 @@ import os
 import sys
 from meerkat.classification.tools import push_file_to_s3, get_utc_iso_timestamp, make_tarfile
 
-# check files
-def main_process():
-	"""This is the whole process"""
-	bucket = 's3yodlee'
+def get_prefix():
+	"""Get the prefix directory"""
 	default_prefix = 'meerkat/cnn/data/'
+	data_type = sys.argv[2]
+	return default_prefix + data_type.replace("_", "/") + "/"
 
-	# upload the tar.gz file to s3
-	dtime = get_utc_iso_timestamp()
-	data_type = sys.argv[2].replace("_", "/")
-	prefix = default_prefix + data_type + '/' + dtime + '/'
-
+def check_file_existence():
+	"""Check that there should be at lease one csv file and exactly one json file"""
+	source_dir = sys.argv[1]
 	csv_num, json_exit = 0, False
-	for filename in os.listdir(sys.argv[1]):
+	for filename in os.listdir(source_dir):
 		if filename.endswith('.csv'):
 			csv_num += 1
 		elif filename.endswith('.json'):
@@ -45,11 +43,21 @@ def main_process():
 		sys.exit()
 	print("files checking finished")
 
+def main_process():
+	"""This is the whole process"""
+
+	bucket = 's3yodlee'
+	dtime = get_utc_iso_timestamp()
+	prefix = get_prefix() + dtime + '/'
+
+	check_file_existence()
+
 	# tar gz the files
 	print("processing...")
 	make_tarfile("input.tar.gz", sys.argv[1])
 	print("files gziped")
 
+	# upload the tar.gz file to s3
 	print("uploading to s3")
 	push_file_to_s3('input.tar.gz', bucket, prefix)
 	print("uploaded to s3")
