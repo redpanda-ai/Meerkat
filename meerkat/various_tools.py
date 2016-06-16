@@ -21,6 +21,15 @@ import pandas as pd
 
 from jsonschema import validate
 
+def push_file_to_s3(source_path, bucket_name, object_prefix):
+	"""Pushes an object to S3"""
+	conn = connect_s3()
+	bucket = conn.get_bucket(bucket_name, Location.USWest2)
+	filename = os.path.basename(source_path)
+	key = Key(bucket)
+	key.key = object_prefix + filename
+	key.set_contents_from_filename(source_path)
+
 def split_hyperparameters(hyperparameters):
 	"""partition hyperparameters into 2 parts based on keys and non_boost list"""
 	boost_vectors = {}

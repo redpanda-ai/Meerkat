@@ -15,22 +15,7 @@ from boto.s3 import connect_to_region
 from boto.s3.key import Key
 import boto3
 
-from meerkat.various_tools import safely_remove_file, validate_configuration, load_params
-from meerkat.classification.tools import push_file_to_s3
-
-def find_s3_objects_recursively(conn, bucket, my_results, prefix=None, target=None):
-	"""Find all S3 target objects and their locations recursively"""
-	folders = bucket.list(prefix=prefix, delimiter="/")
-	for s3_object in folders:
-		if s3_object.name != prefix:
-			last_slash = s3_object.name[-len(target) - 1] == "/"
-			if s3_object.name[-len(target):] == target and last_slash:
-				my_results[prefix] = target
-				logging.debug("name is {0}".format(s3_object.name))
-				return s3_object.name
-			elif s3_object.name[-1:] == "/":
-				find_s3_objects_recursively(conn, bucket, my_results, prefix=s3_object.name,
-					target=target)
+from meerkat.various_tools import safely_remove_file, validate_configuration, load_params, push_file_to_s3
 
 def s3_key_exists(bucket, key):
 	"""Determine whether object in S3 exists"""
@@ -315,6 +300,16 @@ def get_asset_name(suffix, key, extension):
 		result = result[1:]
 	return result
 
+def find_s3_objects(args, target=None):
+	"""Doesn't use recursion, but finds all objects simply."""
+	simple_results = {}
+	object_names = S3_CLIENT.list_objects(Bucket=args.bucket, Prefix=args.prefix)["Contents"]
+	for s3_object in object_names:
+		key = s3_object["Key"]
+		if key.endswith("/" + target):
+			simple_results[key] = target
+	return simple_results
+
 def main_program(bucket="s3yodlee", region="us-west-2", prefix="meerkat/cnn/data",
 	config=None):
 	"""Execute the main program"""
@@ -353,8 +348,10 @@ def main_program(bucket="s3yodlee", region="us-west-2", prefix="meerkat/cnn/data
 	logging.warning("Starting main program")
 	conn = connect_to_region(args.region)
 	bucket = conn.get_bucket(args.bucket)
-	my_results, target = {}, "results.tar.gz",
-	find_s3_objects_recursively(conn, bucket, my_results, prefix=args.prefix, target=target)
+	target = "results.tar.gz"
+
+	my_results = find_s3_objects(args, target="results.tar.gz")
+
 	results = get_peer_models(my_results, prefix=args.prefix)
 	logging.debug("Results: {0}".format(results))
 	get_best_models(bucket, args.prefix, results, target, args.prefix, aspirants)

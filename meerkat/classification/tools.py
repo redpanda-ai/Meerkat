@@ -176,14 +176,6 @@ def get_utc_iso_timestamp():
 		Example: "20160403164944" (April 3, 2016, 4:49:44 PM UTC) """
 	return datetime.datetime.utcnow().strftime("%Y%m%d%H%M%S")
 
-def push_file_to_s3(source_path, bucket_name, object_prefix):
-	"""Pushes an object to S3"""
-	conn = connect_s3()
-	bucket = conn.get_bucket(bucket_name, Location.USWest2)
-	filename = os.path.basename(source_path)
-	key = Key(bucket)
-	key.key = object_prefix + filename
-	key.set_contents_from_filename(source_path)
 
 def dict_2_json(obj, filename):
 	"""Saves a dict as a json file"""

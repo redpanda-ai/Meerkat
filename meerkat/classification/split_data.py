@@ -34,8 +34,9 @@ import argparse
 import numpy as np
 
 from .verify_data import verify_data
-from .tools import (pull_from_s3, unzip_and_merge, seperate_debit_credit, 
-	extract_tarball, make_tarfile, push_file_to_s3)
+from .tools import (pull_from_s3, unzip_and_merge, seperate_debit_credit,
+	extract_tarball, make_tarfile)
+from meerkat.various_tools import push_file_to_s3
 
 def parse_arguments():
 	"""This function parses arguments from our command line."""
