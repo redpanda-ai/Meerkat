@@ -62,7 +62,7 @@ def validate_config(config):
 	config["base_rate"] = config["base_rate"] * math.sqrt(config["batch_size"]) / math.sqrt(128)
 	if config.get("soft_target", False):
 		# This is used when training with soft targets
-		config["base_rate"] = ((config.get("temperature", 1) ** 2) * config["base_rate"]
+		config["base_rate"] = (config.get("temperature", 1) ** 2) * config["base_rate"]
 	config["alphabet_length"] = len(config["alphabet"])
 
 	return config

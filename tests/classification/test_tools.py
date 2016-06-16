@@ -190,15 +190,15 @@ class ToolsTests(unittest.TestCase):
 	def test_string_to_tensor_1(self, config, doc, length, expected):
 		"""Test string_to_tensor with parameters"""
 		config = load_params(config)
-		np.testing.assert_array_equal(list(tf_cnn.string_to_tensor(config, doc, length)), expected)
+		np.testing.assert_array_equal(list(tools.string_to_tensor(config, doc, length)), expected)
 
 	@parameterized.expand([
-		([tf_cnn_fixture.get_config(), "aab", 4, tf_cnn_fixture.get_tensor("short_doc")]),
-		([tf_cnn_fixture.get_config(), "aab", 2, tf_cnn_fixture.get_tensor("truncated_doc")])
+		([tools_fixture.get_config(), "aab", 4, tools_fixture.get_tensor("short_doc")]),
+		([tools_fixture.get_config(), "aab", 2, tools_fixture.get_tensor("truncated_doc")])
 	])
 	def test_string_to_tensor_2(self, config, doc, length, expected_tensor):
 		"""Test string_to_tensor with parameters"""
-		result = tf_cnn.string_to_tensor(config, doc, length)
+		result = tools.string_to_tensor(config, doc, length)
 		np.testing.assert_array_equal(result, expected_tensor)
 
 if __name__ == '__main__':
