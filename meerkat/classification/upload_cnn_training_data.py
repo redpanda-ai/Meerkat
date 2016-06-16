@@ -12,6 +12,8 @@ created on April 4, 2016
 
 import os
 import sys
+import logging
+
 from meerkat.classification.tools import push_file_to_s3, get_utc_iso_timestamp, make_tarfile
 
 def get_prefix():
@@ -29,23 +31,24 @@ def check_file_existence():
 			csv_num += 1
 		elif filename.endswith('.json'):
 			if json_exit:
-				print("should only have one json file")
+				logging.error("should only have one json file")
 				sys.exit()
 			json_exit = True
 		else:
-			print("file %s is not csv or json file" %filename)
+			logging.error("file %s is not csv or json file" %filename)
 			sys.exit()
 	if csv_num == 0:
-		print("should at least one csv file")
+		logging.error("should at least one csv file")
 		sys.exit()
 	if not json_exit:
-		print("should have one json file")
+		logging.error("should have one json file")
 		sys.exit()
-	print("files checking finished")
+	logging.info("files checking finished")
 
 def main_process():
 	"""This is the whole process"""
 
+	logging.basicConfig(level=logging.INFO)
 	bucket = 's3yodlee'
 	dtime = get_utc_iso_timestamp()
 	prefix = get_prefix() + dtime + '/'
@@ -53,14 +56,14 @@ def main_process():
 	check_file_existence()
 
 	# tar gz the files
-	print("processing...")
+	logging.info("processing...")
 	make_tarfile("input.tar.gz", sys.argv[1])
-	print("files gziped")
+	logging.info("files gziped")
 
 	# upload the tar.gz file to s3
-	print("uploading to s3")
+	logging.info("uploading to s3")
 	push_file_to_s3('input.tar.gz', bucket, prefix)
-	print("uploaded to s3")
+	logging.info("uploaded to s3")
 
 	#remove the tar.gz file in local
 	os.remove("input.tar.gz")
