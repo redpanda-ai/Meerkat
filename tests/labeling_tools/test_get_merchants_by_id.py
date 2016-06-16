@@ -2,8 +2,8 @@
 
 import sys
 import unittest
-import meerkat.labeling_tools.get_merchants_by_id as getid
 from nose_parameterized import parameterized
+import meerkat.labeling_tools.get_merchants_by_id as getid
 from tests.labeling_tools.fixture import get_merchants_by_id_fixture
 
 class GetMerchantsByIdTests(unittest.TestCase):

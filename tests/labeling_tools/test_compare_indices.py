@@ -2,8 +2,8 @@
 
 import sys
 import unittest
-import meerkat.labeling_tools.compare_indices as compare_indices
 from nose_parameterized import parameterized
+import meerkat.labeling_tools.compare_indices as compare_indices
 from tests.labeling_tools.fixture import compare_indices_fixture
 
 class CompareIndicesTests(unittest.TestCase):

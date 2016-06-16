@@ -2,8 +2,8 @@
 
 import sys
 import unittest
-import meerkat.labeling_tools.transaction_labeler as tl
 from nose_parameterized import parameterized
+import meerkat.labeling_tools.transaction_labeler as tl
 from tests.labeling_tools.fixture import transaction_labeler_fixture
 
 class TransactionLabelerTests(unittest.TestCase):
