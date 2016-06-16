@@ -28,6 +28,7 @@ python3 -m meerkat.classification.split_data subtype bank \
 ################################################################
 
 import os
+import sys
 import shutil
 import logging
 import argparse
