@@ -5,6 +5,7 @@ import csv
 import unittest
 import shutil
 import pandas as pd
+import numpy as np
 import meerkat.classification.tools as tools
 from meerkat.various_tools import load_params
 from nose_parameterized import parameterized
