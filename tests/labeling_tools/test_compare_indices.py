@@ -44,5 +44,20 @@ class CompareIndicesTests(unittest.TestCase):
 		cleaned_transaction = compare_indices_fixture.get_cleaned_transaction()
 		self.assertEqual(compare_indices.clean_transaction(transaction), cleaned_transaction)
 
+	@parameterized.expand([
+		(["not_enough", compare_indices_fixture.get_args()["not_enough"]]),
+		(["no_json", compare_indices_fixture.get_args()["no_json"]]),
+		(["no_txt", compare_indices_fixture.get_args()["no_txt"]]),
+		(["not_correct", compare_indices_fixture.get_args()["not_correct"]]),
+		(["correct", compare_indices_fixture.get_args()["correct"]])
+	])
+	def test_verify_arguments(self, case, args):
+		"""Test verify_arguments with parameters"""
+		sys.argv = args
+		if case == "not_enough" or case == "no_json" or case == "no_txt" or case == "not_correct":
+			self.assertRaises(SystemExit, compare_indices.verify_arguments)
+		else:
+			compare_indices.verify_arguments()
+
 if __name__ == '__main__':
 	unittest.main()

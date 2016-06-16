@@ -56,3 +56,13 @@ def get_cleaned_transaction():
 		"PHONE_NUMBER": "",
 		"COUNTRY": "US"
 	}
+
+def get_args():
+	"""Return different arguments"""
+	return {
+		"not_enough": ["arg_0", "arg_1"],
+		"no_json": ["arg_0", "arg_1.notjson"],
+		"no_txt": ["arg_0", "arg_1.json", "arg_2.nottxt"],
+		"not_correct": ["arg_0", "arg_1.json", "arg_2.nottxt", "arg_3", "arg_4", "arg_5"],
+		"correct": ["arg_0", "arg_1.json", "arg_2.txt", "arg_3", "arg_4", "arg_5"]
+	}
