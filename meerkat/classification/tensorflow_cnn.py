@@ -58,7 +58,11 @@ def validate_config(config):
 	config["label_map"] = load_params(config["label_map"])
 	config["num_labels"] = len(config["label_map"].keys())
 	config["alpha_dict"] = {a : i for i, a in enumerate(config["alphabet"])}
+	# This is the base_rate for a normal CNN
 	config["base_rate"] = config["base_rate"] * math.sqrt(config["batch_size"]) / math.sqrt(128)
+	if config.get("soft_target", False):
+		# This is used when training with soft targets
+		config["base_rate"] = ((config.get("temperature", 1) ** 2) * config["base_rate"]
 	config["alphabet_length"] = len(config["alphabet"])
 
 	return config

@@ -37,7 +37,8 @@ import tensorflow as tf
 
 from .tools import (batch_normalization, chunks, max_pool, get_cost_list, string_to_tensor,
 	accuracy, get_tensor, get_op, get_variable, threshold, bias_variable, weight_variable, conv2d)
-from meerkat.classification.tensorflow_cnn import run_session, mixed_batching, load_data
+from meerkat.classification.tensorflow_cnn import (run_session, mixed_batching, load_data,
+	validate_config)
 from meerkat.various_tools import load_params, validate_configuration
 
 logging.basicConfig(level=logging.INFO)
@@ -91,27 +92,6 @@ def ensemble_evaluate_testset(config, graph, sess, model, test):
 	logging.info("Total count: " + str(total_count))
 
 	return test_accuracy
-
-def validate_config(config):
-	"""Validate input configuration"""
-
-	config = load_params(config)
-	schema_file = "meerkat/classification/config/tensorflow_cnn_schema.json"
-	config = validate_configuration(config, schema_file)
-	logging.debug("Configuration is :\n{0}".format(pprint.pformat(config)))
-	reshape = ((config["doc_length"] - 96) / 27) * 256
-	config["reshape"] = int(reshape)
-	config["label_map"] = load_params(config["label_map"])
-	config["num_labels"] = len(config["label_map"].keys())
-	config["alpha_dict"] = {a : i for i, a in enumerate(config["alphabet"])}
-	if not config["soft_target"]:
-		config["base_rate"] = config["base_rate"] * math.sqrt(config["batch_size"]) / math.sqrt(128)
-	else:
-		config["base_rate"] = ((config["temperature"] ** 2) * config["base_rate"]
-			* math.sqrt(config["batch_size"]) / math.sqrt(128))
-	config["alphabet_length"] = len(config["alphabet"])
-
-	return config
 
 def batch_to_tensor(config, batch, soft_target=False):
 	"""Convert a batch to a tensor representation"""
