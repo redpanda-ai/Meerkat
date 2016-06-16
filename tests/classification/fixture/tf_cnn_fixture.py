@@ -14,19 +14,20 @@ def get_config_for_batch_to_tensor():
 	"""Return a config dictionary for batch_to_tensor"""
 	return {
 		"doc_length": 3,
-		"alphahbet_length": 3,
+		"alphabet": "abc",
+		"alphabet_length": 3,
 		"num_labels": 2,
 		"alpha_dict": {'a': 0, 'b': 1, 'c': 2}
 	}
 
 def get_trans_and_labels():
 	"""Return result for batch_to_tensor"""
-	labels = ['abc', 'aaa']
+	labels = np.array([[1., 0.], [0., 1.]])
 	trans = np.zeros((2, 1, 3, 3))
-	for i in range(2):
+	for i in range(3):
 		trans[0][0][i][2 - i] = 1
 	trans[1][0][:,0] = 1
-	return labels, trans
+	return trans, labels
 
 def get_predictions(case_type):
 	"""Return a numpy array of predictions"""
