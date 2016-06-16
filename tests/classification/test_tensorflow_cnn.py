@@ -11,6 +11,15 @@ from nose_parameterized import parameterized
 
 class TfcnnTest(unittest.TestCase):
 	"""Unit tests for meerkat.classification.tensorflow_cnn"""
+
+	@parameterized.expand([
+		([tf_cnn_fixture.get_config_for_batch_to_tensor(), tf_cnn_fixture.get_batch(),
+			tf_cnn_fixture.get_trans_and_labels()])
+	])
+	def batch_to_tensor(self, config, batch, expected):
+		"""Test batch_to_tensor with parameters"""
+		self.assertEqual(tf_cnn.batch_to_tensor(config, batch), expected)
+
 	@parameterized.expand([
 		([[], 3, []]),
 		([[1], 3, [[1]]]),
