@@ -32,12 +32,11 @@ import contextlib
 import collections
 
 from copy import deepcopy
-from scipy.stats.mstats import zscore
 
 from meerkat.various_tools import get_qs_query, get_bool_query, safe_input
 from meerkat.various_tools import load_params, get_es_connection, string_cleanse
 from meerkat.various_tools import get_merchant_by_id, load_dict_ordered, write_dict_list
-from meerkat.various_tools import safe_print, synonyms, get_magic_query, stopwords
+from meerkat.various_tools import safe_print, synonyms, get_magic_query, stopwords, z_score_delta
 
 class DummyFile(object):
 	"""Resemble the stdout/stderr object but it prints nothing to screen"""
@@ -768,17 +767,6 @@ def get_hit(search_results, index):
 
 	return z_score, hit["_source"]
 
-def z_score_delta(scores):
-	"""Find the Z-Score Delta"""
-
-	if len(scores) < 2:
-		return None
-
-	z_scores = zscore(scores)
-	first_score, second_score = z_scores[0:2]
-	z_score_delta = round(first_score - second_score, 3)
-
-	return z_score_delta
 
 def verify_arguments():
 	"""Verify Usage"""
