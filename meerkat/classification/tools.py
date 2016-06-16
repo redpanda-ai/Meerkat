@@ -18,6 +18,11 @@ from boto.s3.connection import Location
 from boto import connect_s3
 from meerkat.various_tools import load_piped_dataframe
 
+def chunks(array, num):
+	"""Chunk array into equal sized parts"""
+	num = max(1, num)
+	return [array[i:i + num] for i in range(0, len(array), num)]
+
 def string_to_tensor(config, doc, length):
 	"""Convert transaction to tensor format"""
 	alphabet = config["alphabet"]
