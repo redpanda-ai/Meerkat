@@ -16,9 +16,11 @@ class TfcnnTest(unittest.TestCase):
 		([tf_cnn_fixture.get_config_for_batch_to_tensor(), tf_cnn_fixture.get_batch(),
 			tf_cnn_fixture.get_trans_and_labels()])
 	])
-	def batch_to_tensor(self, config, batch, expected):
+	def test_batch_to_tensor(self, config, batch, expected):
 		"""Test batch_to_tensor with parameters"""
-		self.assertEqual(tf_cnn.batch_to_tensor(config, batch), expected)
+		result = tf_cnn.batch_to_tensor(config, batch)
+		self.assertTrue((result[0]==expected[0]).all())
+		self.assertTrue((result[1]==expected[1]).all())
 
 	@parameterized.expand([
 		([[], 3, []]),
