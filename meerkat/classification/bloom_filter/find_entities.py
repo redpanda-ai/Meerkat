@@ -213,4 +213,4 @@ def main():
 
 if __name__ == "__main__":
 #	main()
-	print(location_split('BARCLAYCARD US                  CREDITCARD CO ...'))
+	print(location_split('BARCLAYCARD US   PLANTATION FL               CREDITCARD CO ...'))
