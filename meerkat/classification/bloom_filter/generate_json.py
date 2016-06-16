@@ -14,7 +14,8 @@ dictionary = {
 		'CAR'
 	],
 	'CO': [
-		'COMPANY'
+		'COMPANY',
+		'COUNTY'
 	],
 	'CT': [
 		'CTDI'
