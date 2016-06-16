@@ -1,4 +1,4 @@
-"""Unit test for meerkat/classification/tools.py"""
+"""Unit test for meerkat/classification/classification_report.py"""
 
 import meerkat.classification.classification_report as cr
 import unittest
