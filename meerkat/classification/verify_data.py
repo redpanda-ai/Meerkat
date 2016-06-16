@@ -29,10 +29,9 @@ verify_data.py [-h] [--credit_or_debit CREDIT_OR_DEBIT]
                       csv_input json_input merchant_or_subtype bank_or_card
 
 positional arguments:
-  csv_input             what is the csv data, allowed format: a directory path
-                        containing all csv files; a csv file path; pandas data
-                        frame
-  json_input            where is the json file
+  csv_input             what is the csv data, allowed format: csv file path;
+                        pandas data frame
+  json_input            json file path
   merchant_or_subtype   What kind of dataset do you want to process, subtype
                         or merchant
   bank_or_card          Whether we are processing card or bank transactions
@@ -45,7 +44,6 @@ optional arguments:
 """
 #####################################################
 
-import os
 import json
 import logging
 import sys
@@ -54,6 +52,7 @@ import argparse
 import pandas as pd
 
 from meerkat.various_tools import load_piped_dataframe
+from meerkat.classification.tools import seperate_debit_credit
 
 WARNING_THRESHOLD = 0.01
 CRITICAL_THRESHOLD = 0.05
@@ -116,14 +115,14 @@ def load_json(json_input):
 		logging.critical("json file not found")
 		sys.exit()
 
-def parse_arguments():
+def parse_arguments(args):
 	"""This function parses arguments from our command line."""
 	parser = argparse.ArgumentParser()
 
 	# Required arugments
-	parser.add_argument("csv_input", help="what is the csv data, allowed format: a directory path \
-		containing all csv files; a csv file path; pandas data frame")
-	parser.add_argument("json_input", help="where is the json file")
+	parser.add_argument("csv_input", help="what is the csv data, allowed format: \
+		csv file path; pandas data frame")
+	parser.add_argument("json_input", help="json file path")
 	parser.add_argument("merchant_or_subtype",
 		help="What kind of dataset do you want to process, subtype or merchant")
 	parser.add_argument("bank_or_card", help="Whether we are processing card or \
@@ -133,37 +132,26 @@ def parse_arguments():
 	parser.add_argument("--credit_or_debit", default='',
 		help="What kind of transactions do you wanna process, debit or credit")
 
-	args = parser.parse_args()
+	return parser.parse_args(args)
+
+def process_arguments(args):
+	"""This function processes arguments"""
 	if args.merchant_or_subtype == 'subtype' and args.credit_or_debit == '':
 		raise Exception('For subtype data you need to declare debit or credit')
-	return args
+	cnn_type = [args.merchant_or_subtype, args.bank_or_card]
+	if args.credit_or_debit != "":
+		cnn_type.append(args.credit_or_debit)
+	return cnn_type
 
 def read_csv_to_df(csv_input, cnn_type):
 	"""Read csv file into pandas data frames"""
 
-	df = []
-	cols = ["DESCRIPTION", "DESCRIPTION_UNMASKED", "MERCHANT_NAME"]
-
-	if os.path.isdir(csv_input):
-		samples = []
-		for i in os.listdir(csv_input):
-			if i.endswith(".csv"):
-				samples.append(i)
-
-		for sample in samples:
-			df_one_sample = load_piped_dataframe(csv_input + "/" + sample, usecols=cols)
-			df.append(df_one_sample)
-		merged = pd.concat(df, ignore_index=True)
-		return merged
+	if cnn_type[0] == "merchant":
+		cols = ["DESCRIPTION", "DESCRIPTION_UNMASKED", "MERCHANT_NAME"]
+		return load_piped_dataframe(csv_input, usecols=cols)
 
 	else:
-		df = load_piped_dataframe(csv_input)
-		df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
-		grouped = df.groupby('LEDGER_ENTRY', as_index=False)
-		groups = dict(list(grouped))
-		df = groups[cnn_type[2]]
-		df["PROPOSED_SUBTYPE"] = df["PROPOSED_SUBTYPE"].str.strip()
-		return df
+		return seperate_debit_credit(csv_input, cnn_type[2], cnn_type[0])
 
 def verify_csv(**kwargs):
 	"""Verify csv data"""
@@ -189,20 +177,16 @@ def verify_csv_format(df, cnn_type):
 	"""Verify csv data format is correct for the type of CNN being trained"""
 	column_header = list(df.columns.values)
 	column_header.sort()
-	
-	merchant_header = ['DESCRIPTION', 'DESCRIPTION_UNMASKED', 'MERCHANT_NAME']
-	subtype_header = ['AMOUNT', 'DESCRIPTION', 'DESCRIPTION_UNMASKED', 'LEDGER_ENTRY',
-		'PROPOSED_SUBTYPE', 'TRANSACTION_DATE', 'UNIQUE_TRANSACTION_ID']
-	category_header = ['UNIQUE_TRANSACTION_ID', 'AMOUNT', 'DESCRIPTION',\
-		'DESCRIPTION_UNMASKED', 'LEDGER_ENTRY', 'TRANSACTION_DATE', 'PROPOSED_CATEGORY']
 
-	cnn_column_header = []
-	if cnn_type[0] == "merchant":
-		cnn_column_header = merchant_header
-	elif cnn_type[0] == "subtype":
-		cnn_column_header = subtype_header
-	else:
-		cnn_column_header = category_header
+	headers = {
+		"merchant": ['DESCRIPTION', 'DESCRIPTION_UNMASKED', 'MERCHANT_NAME'],
+		"subtype": ['AMOUNT', 'DESCRIPTION', 'DESCRIPTION_UNMASKED', 'LEDGER_ENTRY',
+			'PROPOSED_SUBTYPE', 'TRANSACTION_DATE', 'UNIQUE_TRANSACTION_ID'],
+		"category": ['UNIQUE_TRANSACTION_ID', 'AMOUNT', 'DESCRIPTION',
+			'DESCRIPTION_UNMASKED', 'LEDGER_ENTRY', 'TRANSACTION_DATE', 'PROPOSED_CATEGORY']
+	}
+
+	cnn_column_header = headers[cnn_type[0]]
 
 	if sorted(column_header) != sorted(cnn_column_header):
 		logging.critical("csv data format is incorrect")
@@ -324,13 +308,13 @@ def verify_total_numbers(df, cnn_type):
 		logging.info("Data set size of csv is verified: {0:>15,}".format(len(df)))
 
 	# Generate count numbers for labels in csv
-	label_key_csv = ""
-	if cnn_type[0] == "merchant":
-		label_key_csv = "MERCHANT_NAME"
-	elif cnn_type[0] == "subtype":
-		label_key_csv = "PROPOSED_SUBTYPE"
-	else:
-		label_key_csv = "PROPOSED_CATEGORY"
+	ground_truth_labels = {
+		'merchant': 'MERCHANT_NAME',
+		'subtype': 'PROPOSED_SUBTYPE',
+		'category': 'PROPOSED_CATEGORY'
+	}
+	label_key_csv = ground_truth_labels[cnn_type[0]]
+
 	label_names_csv = sorted(df[label_key_csv].value_counts().index.tolist())
 	label_counts_csv = df[label_key_csv].value_counts()
 
@@ -365,9 +349,7 @@ def verify_total_numbers(df, cnn_type):
 	return label_names_csv, label_counts_csv
 
 if __name__ == "__main__":
-	ARGS = parse_arguments()
-	CNNTYPE = [ARGS.merchant_or_subtype, ARGS.bank_or_card]
-	if ARGS.credit_or_debit != "":
-		CNNTYPE.append(ARGS.credit_or_debit)
+	ARGS = parse_arguments(sys.argv[1:])
+	CNN_TYPE = process_arguments(ARGS)
 
-	verify_data(csv_input=ARGS.csv_input, json_input=ARGS.json_input, cnn_type=CNNTYPE)
+	verify_data(csv_input=ARGS.csv_input, json_input=ARGS.json_input, cnn_type=CNN_TYPE)

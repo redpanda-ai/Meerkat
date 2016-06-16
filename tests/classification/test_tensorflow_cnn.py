@@ -11,15 +11,16 @@ from nose_parameterized import parameterized
 
 class TfcnnTest(unittest.TestCase):
 	"""Unit tests for meerkat.classification.tensorflow_cnn"""
+
 	@parameterized.expand([
-		([[], 3, []]),
-		([[1], 3, [[1]]]),
-		([[1,2,3], 2, [[1,2],[3]]]),
-		([[1,2], -9, [[1],[2]]])
+		([tf_cnn_fixture.get_config_for_batch_to_tensor(), tf_cnn_fixture.get_batch(),
+			tf_cnn_fixture.get_trans_and_labels()])
 	])
-	def test_chunks(self, array, num, expected):
-		"""Ensure that numpy arrays are properly sub-divided into chunks."""
-		self.assertEqual(tf_cnn.chunks(array, num), expected)
+	def test_batch_to_tensor(self, config, batch, expected):
+		"""Test batch_to_tensor with parameters"""
+		result = tf_cnn.batch_to_tensor(config, batch)
+		self.assertTrue((result[0]==expected[0]).all())
+		self.assertTrue((result[1]==expected[1]).all())
 
 	@parameterized.expand([
 		([['invalid', 'tests/classification/fixture/missing_entry_tf_config.json']]),

@@ -93,14 +93,14 @@ def generate_city_map():
 			# state = row[1] # for small.csv
 			add_with_subs(data, city, state)
 
-	pickle.dump(data, open("meerkat/classification/bloom_filter/assets/CITY_SUBS.log", 'wb'))
+	pickle.dump(data, open("meerkat/classification/bloom_filter/assets/CITY_SUBS", 'wb'))
 
 	return data
 
 CITY_SUBS = {}
 
-if os.path.isfile("meerkat/classification/bloom_filter/assets/CITY_SUBS.log"):
-	with open("meerkat/classification/bloom_filter/assets/CITY_SUBS.log", 'rb') as fp:
+if os.path.isfile("meerkat/classification/bloom_filter/assets/CITY_SUBS"):
+	with open("meerkat/classification/bloom_filter/assets/CITY_SUBS", 'rb') as fp:
 	    CITY_SUBS = pickle.load(fp)
 else:
 	CITY_SUBS = generate_city_map()
@@ -139,18 +139,16 @@ def location_split(my_text):
 	# Capitalize and remove spaces
 #	tag = tag_text(my_text)
 	my_text = standardize(my_text)
-	result = None
+
 	for i in range(len(my_text) - 1, -1, -1):
 		if my_text[i:i+2] in STATES:
 			place = in_location_bloom(my_text[:i+2])
 			if place:
 				key = place[0] + place[1]
-				try:
-					result = CITY_SUBS[key]
-				except:
-					pass
+				try: return CITY_SUBS[key]
+				except: pass
 				# return place
-	return result
+	return None
 
 ##THINK!
 #Red Roof Inn, a three term bloom filter.

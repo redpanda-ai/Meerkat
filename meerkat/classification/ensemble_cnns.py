@@ -35,10 +35,9 @@ import sys
 import numpy as np
 import tensorflow as tf
 
-from .tools import (batch_normalization,
-	accuracy, get_tensor, get_op, get_variable, threshold, bias_variable, weight_variable, conv2d,
-	max_pool, get_cost_list, string_to_tensor)
-from meerkat.classification.tensorflow_cnn import run_session, chunks, mixed_batching, load_data
+from .tools import (batch_normalization, chunks, max_pool, get_cost_list, string_to_tensor,
+	accuracy, get_tensor, get_op, get_variable, threshold, bias_variable, weight_variable, conv2d)
+from meerkat.classification.tensorflow_cnn import run_session, mixed_batching, load_data
 from meerkat.various_tools import load_params, validate_configuration
 
 logging.basicConfig(level=logging.INFO)
