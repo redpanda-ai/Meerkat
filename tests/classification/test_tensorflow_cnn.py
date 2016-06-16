@@ -23,16 +23,6 @@ class TfcnnTest(unittest.TestCase):
 		self.assertTrue((result[1]==expected[1]).all())
 
 	@parameterized.expand([
-		([[], 3, []]),
-		([[1], 3, [[1]]]),
-		([[1,2,3], 2, [[1,2],[3]]]),
-		([[1,2], -9, [[1],[2]]])
-	])
-	def test_chunks(self, array, num, expected):
-		"""Ensure that numpy arrays are properly sub-divided into chunks."""
-		self.assertEqual(tf_cnn.chunks(array, num), expected)
-
-	@parameterized.expand([
 		([['invalid', 'tests/classification/fixture/missing_entry_tf_config.json']]),
 		([['valid', 'tests/classification/fixture/valid_tf_config.json']]),
 		([['invalid', 'tests/classification/fixture/wrong_doc_length_tf_config.json']])

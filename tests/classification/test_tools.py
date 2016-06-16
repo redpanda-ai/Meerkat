@@ -13,6 +13,16 @@ class ToolsTests(unittest.TestCase):
 	"""Our UnitTest class."""
 
 	@parameterized.expand([
+		([[], 3, []]),
+		([[1], 3, [[1]]]),
+		([[1,2,3], 2, [[1,2],[3]]]),
+		([[1,2], -9, [[1],[2]]])
+	])
+	def test_chunks(self, array, num, expected):
+		"""Ensure that numpy arrays are properly sub-divided into chunks."""
+		self.assertEqual(tools.chunks(array, num), expected)
+
+	@parameterized.expand([
 		([tools_fixture.get_output_filename(), tools_fixture.get_source_dir()])
 	])
 	def test_make_tarfile(self, output_filename, source_dir):
