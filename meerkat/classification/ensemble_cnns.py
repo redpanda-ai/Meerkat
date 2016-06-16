@@ -29,17 +29,17 @@ import logging
 import math
 import os
 import pprint
-import random
 import shutil
 import sys
 
 import numpy as np
 import tensorflow as tf
 
-from .tools import (fill_description_unmasked, reverse_map, batch_normalization,
+from .tools import (batch_normalization,
 	accuracy, get_tensor, get_op, get_variable, threshold, bias_variable, weight_variable, conv2d,
 	max_pool, get_cost_list, string_to_tensor)
-from meerkat.various_tools import load_params, load_piped_dataframe, validate_configuration
+from meerkat.classification.tensorflow_cnn import run_session, chunks, mixed_batching, load_data
+from meerkat.various_tools import load_params, validate_configuration
 
 logging.basicConfig(level=logging.INFO)
 
@@ -93,11 +93,6 @@ def ensemble_evaluate_testset(config, graph, sess, model, test):
 
 	return test_accuracy
 
-def chunks(array, num):
-	"""Chunk array into equal sized parts"""
-	num = max(1, num)
-	return [array[i:i + num] for i in range(0, len(array), num)]
-
 def validate_config(config):
 	"""Validate input configuration"""
 
@@ -119,77 +114,6 @@ def validate_config(config):
 
 	return config
 
-def load_data(config):
-	"""Load labeled data and label map"""
-
-	model_type = config["model_type"]
-	dataset = config["dataset"]
-	label_map = config["label_map"]
-	ledger_entry = config["ledger_entry"]
-
-	ground_truth_labels = {
-		'category' : 'PROPOSED_CATEGORY',
-		'merchant' : 'MERCHANT_NAME',
-		'subtype' : 'PROPOSED_SUBTYPE'
-	}
-
-	label_key = ground_truth_labels[model_type]
-	reversed_map = reverse_map(label_map)
-	map_labels = lambda x: reversed_map.get(str(x[label_key]), "")
-
-	df = load_piped_dataframe(dataset)
-
-	# Verify number of labels
-	if not len(reversed_map) == len(df[label_key].value_counts()):
-		logging.critical("Reversed Map :\n{0}".format(pprint.pformat(reversed_map)))
-		logging.critical("df[label_key].value_counts(): {0}".format(df[label_key].value_counts()))
-		map_keys = reversed_map.keys()
-		keys_in_dataframe = df[label_key].value_counts().index.get_values()
-		missing_keys = map_keys - keys_in_dataframe
-		logging.critical("The dataframe label counts index is missing these {0} items:\n{1}"\
-			.format(len(missing_keys), pprint.pformat(missing_keys)))
-
-		raise Exception('Number of indexes does not match number of labels')
-
-	if model_type != "merchant":
-		df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
-		grouped = df.groupby('LEDGER_ENTRY', as_index=False)
-		groups = dict(list(grouped))
-		df = groups[ledger_entry]
-
-	df["DESCRIPTION_UNMASKED"] = df.apply(fill_description_unmasked, axis=1)
-	df = df.reindex(np.random.permutation(df.index))
-	df["LABEL_NUM"] = df.apply(map_labels, axis=1)
-	df = df[df["LABEL_NUM"] != ""]
-
-	msk = np.random.rand(len(df)) < 0.90
-	train = df[msk]
-	test = df[~msk]
-
-	grouped_train = train.groupby('LABEL_NUM', as_index=False)
-	groups_train = dict(list(grouped_train))
-
-	return train, test, groups_train
-
-def mixed_batching(config, df, groups_train):
-	"""Batch from train data using equal class batching"""
-
-	num_labels = config["num_labels"]
-	batch_size = config["batch_size"]
-	half_batch = int(batch_size / 2)
-	# indices_to_sample = list(np.random.choice(df.index, half_batch, replace=False))
-	indices_to_sample = list(np.random.choice(df.index, half_batch))
-
-	for index in range(half_batch):
-		label = random.randint(1, num_labels)
-		select_group = groups_train[str(label)]
-		indices_to_sample.append(np.random.choice(select_group[index], 1)[0])
-
-	random.shuffle(indices_to_sample)
-	batch = df.loc[indices_to_sample]
-
-	return batch
-
 def batch_to_tensor(config, batch, soft_target=False):
 	"""Convert a batch to a tensor representation"""
 
@@ -209,38 +133,6 @@ def batch_to_tensor(config, batch, soft_target=False):
 
 	transactions = np.transpose(transactions, (0, 1, 3, 2))
 	return transactions, labels, labels_soft
-
-def evaluate_testset(config, graph, sess, model, test):
-	"""Check error on test set"""
-
-	with tf.name_scope('accuracy'):
-
-		total_count = len(test.index)
-		correct_count = 0
-		chunked_test = chunks(np.array(test.index), 128)
-		num_chunks = len(chunked_test)
-
-		for i in range(num_chunks):
-
-			batch_test = test.loc[chunked_test[i]]
-
-			trans_test, labels_test, _ = batch_to_tensor(config, batch_test)
-			feed_dict_test = {get_tensor(graph, "x:0"): trans_test}
-			output = sess.run(model, feed_dict=feed_dict_test)
-
-			batch_correct_count = np.sum(np.argmax(output, 1) == np.argmax(labels_test, 1))
-
-			correct_count += batch_correct_count
-		
-		test_accuracy = 100.0 * (correct_count / total_count)
-		logging.info("Test accuracy: %.2f%%" % test_accuracy)
-		logging.info("Correct count: " + str(correct_count))
-		logging.info("Total count: " + str(total_count))
-
-		accuracy = get_variable(graph, "test_accuracy:0")
-		sess.run(accuracy.assign(test_accuracy))
-
-	return test_accuracy
 
 def logsoftmax(softmax, name):
 	"""Return log of the softmax"""
@@ -419,12 +311,10 @@ def build_graph(config):
 		ensemble = sum(softmax) / (num_cnns + 0.0)
 		weighted_labels = cost_list * labels_placeholder
 
-		# Calculate Loss and Optimize
 		def cal_loss(sub_softmax, sub_network, name):
 			"""Returns negative correlation learning loss function"""
 			return tf.neg(tf.reduce_mean(tf.reduce_sum(sub_network * weighted_labels, 1)) +
 				0.5 * tf.reduce_mean(tf.reduce_sum((ensemble - sub_softmax) ** 2, 1)), name=name)
-
 
 		def make_optimizer(loss, op_name, scope_name):
 			"""Returns a  momentumOptimizer"""
@@ -565,24 +455,6 @@ def train_model(config, graph, sess, saver):
 
 	if config["soft_target"]:
 		return final_model_path
-
-def run_session(config, graph, saver):
-	"""Run Session"""
-
-	with tf.Session(graph=graph) as sess:
-
-		mode = config["mode"]
-		model_path = config["model_path"]
-
-		tf.initialize_all_variables().run()
-
-		if mode == "train":
-			train_model(config, graph, sess, saver)
-		elif mode == "test":
-			saver.restore(sess, model_path)
-			model = get_tensor(graph, "model:0")
-			_, test, _ = load_data(config)
-			evaluate_testset(config, graph, sess, model, test)
 
 def run_from_command_line():
 	"""Run module from command line"""
