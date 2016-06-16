@@ -42,7 +42,7 @@ from threading import Thread
 from scipy.stats.mstats import zscore
 from elasticsearch import Elasticsearch
 
-from meerkat.various_tools import get_bool_query, get_qs_query, string_cleanse
+from meerkat.various_tools import get_bool_query, get_qs_query, string_cleanse, z_score_delta
 
 def load_store_numbers(file_name):
 	"""Load Store Numbers from provided file"""
@@ -58,18 +58,6 @@ def load_store_numbers(file_name):
 			store['keywords'] = store.pop('Keywords')
 
 	return stores
-
-def z_score_delta(scores):
-	"""Find the Z-Score Delta"""
-
-	if len(scores) < 2:
-		return None
-
-	z_scores = zscore(scores)
-	first_score, second_score = z_scores[0:2]
-	z_score_delta = round(first_score - second_score, 3)
-
-	return z_score_delta
 
 def find_merchant(store):
 	"""Match document with store number to factual document"""

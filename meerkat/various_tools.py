@@ -21,6 +21,18 @@ import pandas as pd
 
 from jsonschema import validate
 
+def z_score_delta(scores):
+	"""Find the Z-Score Delta"""
+
+	if len(scores) < 2:
+		return None
+
+	z_scores = zscore(scores)
+	first_score, second_score = z_scores[0:2]
+	z_score_delta = round(first_score - second_score, 3)
+
+	return z_score_delta
+
 def split_hyperparameters(hyperparameters):
 	"""partition hyperparameters into 2 parts based on keys and non_boost list"""
 	boost_vectors = {}
