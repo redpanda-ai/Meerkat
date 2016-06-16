@@ -32,7 +32,6 @@ import contextlib
 import collections
 
 from copy import deepcopy
-from scipy.stats.mstats import zscore
 
 from meerkat.various_tools import get_qs_query, get_bool_query, safe_input
 from meerkat.various_tools import load_params, get_es_connection, string_cleanse

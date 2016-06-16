@@ -39,7 +39,6 @@ import logging
 
 from queue import Queue
 from threading import Thread
-from scipy.stats.mstats import zscore
 from elasticsearch import Elasticsearch
 
 from meerkat.various_tools import get_bool_query, get_qs_query, string_cleanse, z_score_delta
