@@ -25,13 +25,14 @@ class WebConsumerTest(unittest.TestCase):
 		return
 
 	@parameterized.expand([
+		([[{'category_labels': '[["a", "b"], ["c"]]'}], [{'category_labels': ['a', 'b', 'c']}]]),
 		([[{'category_labels': ''}], [{'category_labels': []}]])
 	])
 	def test__apply_category_labels(self, physical, expected):
 		"""Test apply_category_labels with parameters"""
 		self.consumer._WebConsumer__apply_category_labels(physical)
 		for i, trans in enumerate(physical):
-			self.assertEqual(trans, expected[i])
+			self.assertEqual(sorted(trans), sorted(expected[i]))
 
 	@parameterized.expand([
 		([[{}], [{'merchant_name': '', 'source': 'OTHER', 'match_found': False}]])
