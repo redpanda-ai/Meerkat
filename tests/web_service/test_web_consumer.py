@@ -25,6 +25,19 @@ class WebConsumerTest(unittest.TestCase):
 		return
 
 	@parameterized.expand([
+		([['Abc', 'Abc'], {'merchant_name': 'm'}, {'merchant_name': 'Abc'}]),
+		([['Xyz', 'Xyz'], {'merchant_name': 'm'}, {'merchant_name': 'm'}])
+	])
+	def test_business_name_fallback(self, business_names, transaction, expected):
+		"""Test business_name_fallback with parameters"""
+		attr_map = {
+			'name': 'merchant_name'
+		}
+		self.consumer.cities = ['xyz', 'hij']
+		self.assertEqual(self.consumer._WebConsumer__business_name_fallback(business_names,
+			transaction, attr_map), expected)
+
+	@parameterized.expand([
 		([['Hum', 'Pro', 'Gold'], ['TX', 'TX', 'CO'],
 			{'description': 'Abc TX', 'city': 'c', 'state': 's'},
 			{'description': 'Abc TX', 'city': 'c', 'state': 'TX'}]),
