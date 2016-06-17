@@ -43,6 +43,11 @@ from meerkat.various_tools import load_params, load_piped_dataframe, validate_co
 
 logging.basicConfig(level=logging.INFO)
 
+def load_soft_target(batch, num_labels):
+	"""load soft target from training set, assuming headers have format 'class_x'"""
+	header = ["class_" + str(i) for i in range(1, num_labels+1)]
+	return  batch[header].as_matrix()
+
 
 def validate_config(config):
 	"""Validate input configuration"""
@@ -137,7 +142,7 @@ def mixed_batching(config, df, groups_train):
 
 	return batch
 
-def batch_to_tensor(config, batch):
+def batch_to_tensor(config, batch, soft_target=False):
 	"""Convert a batch to a tensor representation"""
 
 	doc_length = config["doc_length"]
@@ -154,6 +159,9 @@ def batch_to_tensor(config, batch):
 		transactions[index][0] = string_to_tensor(config, trans, doc_length)
 
 	transactions = np.transpose(transactions, (0, 1, 3, 2))
+	if soft_target:
+		soft_labels = load_soft_target(batch, num_labels)
+		return transactions, labels, soft_labels
 	return transactions, labels
 
 def evaluate_testset(config, graph, sess, model, test):

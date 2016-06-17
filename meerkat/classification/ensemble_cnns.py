@@ -43,12 +43,6 @@ from meerkat.various_tools import load_params, validate_configuration
 
 logging.basicConfig(level=logging.INFO)
 
-def load_soft_target(batch, num_labels):
-	"""load soft target from training set, assuming headers have format 'class_x'"""
-	header = ["class_" + str(i) for i in range(1, num_labels+1)]
-	return  batch[header].as_matrix()
-
-
 def softmax_with_temperature(tensor, temperature):
 	"""return a probability array derived by its logit/temperature"""
 	return tf.div(tf.exp(tensor/temperature),
@@ -92,26 +86,6 @@ def ensemble_evaluate_testset(config, graph, sess, model, test):
 	logging.info("Total count: " + str(total_count))
 
 	return test_accuracy
-
-def batch_to_tensor(config, batch, soft_target=False):
-	"""Convert a batch to a tensor representation"""
-
-	doc_length = config["doc_length"]
-	alphabet_length = config["alphabet_length"]
-	num_labels = config["num_labels"]
-	batch_size = len(batch.index)
-
-	labels = np.array(batch["LABEL_NUM"].astype(int)) - 1
-	labels = (np.arange(num_labels) == labels[:, None]).astype(np.float32)
-	labels_soft = load_soft_target(batch, num_labels) if soft_target else None
-	docs = batch["DESCRIPTION_UNMASKED"].tolist()
-	transactions = np.zeros(shape=(batch_size, 1, alphabet_length, doc_length))
-
-	for index, trans in enumerate(docs):
-		transactions[index][0] = string_to_tensor(config, trans, doc_length)
-
-	transactions = np.transpose(transactions, (0, 1, 3, 2))
-	return transactions, labels, labels_soft
 
 def logsoftmax(softmax, name):
 	"""Return log of the softmax"""
@@ -252,7 +226,7 @@ def build_graph(config):
 		cnn = []
 
 		for i in range(1, num_cnns+1):
-			scope_name = "model" + str(i)
+			scope_name = "model" + str(i) * (num_cnns > 1)
 			with tf.variable_scope(scope_name):
 				bn_scaler = tf.Variable(1.0 * tf.ones([num_labels]))
 
@@ -285,7 +259,7 @@ def build_graph(config):
 				softmax.append(prob_train)
 				network.append(logsoftmax(softmax[i-1], "network"))
 				prob_full = encoder(trans_placeholder, "softmax_full", i, train=False)
-				cnn.append(logsoftmax(prob_full, "cnn"))
+				cnn.append(logsoftmax(prob_full, "cnn"*(num_cnns>1)))
 
 		ensemble = sum(softmax) / (num_cnns + 0.0)
 		weighted_labels = cost_list * labels_placeholder
@@ -308,7 +282,7 @@ def build_graph(config):
 					"network_flat") * soft_labels_placeholder, 1))
 					+ 0.15 * tf.reduce_mean(tf.reduce_sum(network[0] * weighted_labels, 1)),
 					name="loss1")]
-			optimizer = [make_optimizer(loss[i], "optimizer"+str(i+1), "model"+str(i+1))
+			optimizer = [make_optimizer(loss[i], "optimizer"+str(i+1), "model"+str(i+1)*(num_cnns>1))
 				for i in range(num_cnns)]
 
 		bn_updates = tf.group(*bn_assigns)
@@ -319,7 +293,7 @@ def build_graph(config):
 			"""return a saver for namespace name"""
 			return tf.train.Saver([x for x in tf.all_variables() if x.name.startswith(name)])
 
-		saver = [get_saver("model"+str(i+1)) for i in range(num_cnns)]
+		saver = [get_saver("model"+str(i+1)*(num_cnns>1)) for i in range(num_cnns)]
 
 	return graph, saver
 
@@ -362,10 +336,10 @@ def train_model(config, graph, sess, saver):
 		if step % 1000 == 0:
 			# Calculate Batch Accuracy
 			for i in range(1, num_cnns+1):
-				predictions = sess.run(get_tensor(graph, "model"+str(i)+"/cnn:0"), feed_dict=feed_dict)
+				predictions = sess.run(get_tensor(graph, "model"+(str(i)+"/cnn")*(num_cnns>1)+":0"), feed_dict=feed_dict)
 				logging.info("Minibatch accuracy for cnn" + str(i) + ": %.1f%%" % accuracy(predictions, labels))
 			# Estimate Accuracy for Visualization
-			model = [get_tensor(graph, "model"+str(i+1)+"/cnn:0") for i in range(num_cnns)]
+			model = [get_tensor(graph, "model"+(str(i)+"/cnn")*(num_cnns>1)+":0") for i in range(num_cnns)]
 			ensemble_accuracy = ensemble_evaluate_testset(config, graph, sess, model, test)
 
 		# Log Loss and Update TensorBoard
@@ -415,17 +389,6 @@ def train_model(config, graph, sess, saver):
 		final_model_path = save_path + dataset_path + ".model" + str(i+1) + ".ckpt"
 		final_meta_path = save_path + dataset_path + ".model" + str(i+1) + ".meta"
 		logging.info("Moving final model from {0} to {1}.".format(model_path[i], final_model_path))
-
-	#rename cnn tensor name
-		if config["soft_target"]:
-			saver = tf.train.import_meta_graph(meta_path[i])
-			sess = tf.Session()
-			saver.restore(sess, model_path[i])
-			graph = sess.graph
-			models = get_tensor(graph, "model1/cnn:0")
-			with graph.as_default():
-				model = tf.identity(models, "model")
-			_ = saver.save(sess, model_path[i])
 
 		os.rename(model_path[i], final_model_path)
 		os.rename(meta_path[i], final_meta_path)
