@@ -25,9 +25,12 @@ class WebConsumerTest(unittest.TestCase):
 		return
 
 	@parameterized.expand([
-		([['Humble', 'Bronx', 'Golden'], ['TX', 'TX', 'CO'],
+		([['Hum', 'Pro', 'Gold'], ['TX', 'TX', 'CO'],
 			{'description': 'Abc TX', 'city': 'c', 'state': 's'},
-			{'description': 'Abc TX', 'city': 'c', 'state': 'TX'}])
+			{'description': 'Abc TX', 'city': 'c', 'state': 'TX'}]),
+		([['Abc', 'Pro', 'Gold'], ['TX', 'CA', 'CO'],
+			{'description': 'Abc TX', 'city': 'c', 'state': 's'},
+			{'description': 'Abc TX', 'city': 'Abc', 'state': 's'}])
 	])
 	def test_geo_fallback(self, city_names, state_names, transaction, expected):
 		"""Test geo_fallback with parameters"""
@@ -35,7 +38,8 @@ class WebConsumerTest(unittest.TestCase):
 			'locality': 'city',
 			'region': 'state'
 		}
-		self.assertEqual(self.consumer._WebConsumer__geo_fallback(city_names, state_names, transaction, attr_map), expected)
+		self.assertEqual(self.consumer._WebConsumer__geo_fallback(city_names,
+			state_names, transaction, attr_map), expected)
 
 	def test_static_bank_category_map(self):
 		"""Assert that the correct static category label has been applied from the bank map"""
