@@ -1,16 +1,5 @@
 import uuid
 
-def get_params_for_mapping():
-    """Return a dictionary of mapping details"""
-    return {
-        "output": {
-            "results": {
-                "fields": ["name"],
-                "labels": ["merchant_name"]
-            }
-        }
-    }
-
 def get_transactions_to_clean(case_type):
     """Return an array of transactions to be cleaned fo proper schema"""
     if case_type == "non_physical_no_debug":
