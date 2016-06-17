@@ -25,9 +25,18 @@ class WebConsumerTest(unittest.TestCase):
 		return
 
 	@parameterized.expand([
+		([[{'category_labels': ''}], [{'category_labels': []}]])
+	])
+	def test__apply_category_labels(self, physical, expected):
+		"""Test apply_category_labels with parameters"""
+		self.consumer._WebConsumer__apply_category_labels(physical)
+		for i, trans in enumerate(physical):
+			self.assertEqual(trans, expected[i])
+
+	@parameterized.expand([
 		([[{}], [{'merchant_name': '', 'source': 'OTHER', 'match_found': False}]])
 	])
-	def test_enrich_physical_no_search(self, transaction, expected):
+	def test__enrich_physical_no_search(self, transaction, expected):
 		"""Test enrich_physical_no_search with parameters"""
 		self.assertEqual(self.consumer._WebConsumer__enrich_physical_no_search(transaction),
 			expected)
@@ -36,7 +45,7 @@ class WebConsumerTest(unittest.TestCase):
 		([['Abc', 'Abc'], {'merchant_name': 'm'}, {'merchant_name': 'Abc'}]),
 		([['Xyz', 'Xyz'], {'merchant_name': 'm'}, {'merchant_name': 'm'}])
 	])
-	def test_business_name_fallback(self, business_names, transaction, expected):
+	def test__business_name_fallback(self, business_names, transaction, expected):
 		"""Test business_name_fallback with parameters"""
 		attr_map = {
 			'name': 'merchant_name'
@@ -53,7 +62,7 @@ class WebConsumerTest(unittest.TestCase):
 			{'description': 'Abc TX', 'city': 'c', 'state': 's'},
 			{'description': 'Abc TX', 'city': 'Abc', 'state': 's'}])
 	])
-	def test_geo_fallback(self, city_names, state_names, transaction, expected):
+	def test__geo_fallback(self, city_names, state_names, transaction, expected):
 		"""Test geo_fallback with parameters"""
 		attr_map = {
 			'locality': 'city',
