@@ -7,28 +7,18 @@ import re
 import tarfile
 import os
 import sys
+import threading
+from queue import Queue
 import pandas as pd
 
 from boto.s3 import connect_to_region
 from boto.s3.key import Key
 import boto3
 
-from meerkat.various_tools import safely_remove_file, validate_configuration, load_params
-from meerkat.classification.tools import push_file_to_s3
+from meerkat.various_tools import (safely_remove_file, validate_configuration
+	, load_params, push_file_to_s3)
 
-def find_s3_objects_recursively(conn, bucket, my_results, prefix=None, target=None):
-	"""Find all S3 target objects and their locations recursively"""
-	folders = bucket.list(prefix=prefix, delimiter="/")
-	for s3_object in folders:
-		if s3_object.name != prefix:
-			last_slash = s3_object.name[-len(target) - 1] == "/"
-			if s3_object.name[-len(target):] == target and last_slash:
-				my_results[prefix] = target
-				logging.debug("name is {0}".format(s3_object.name))
-				return s3_object.name
-			elif s3_object.name[-1:] == "/":
-				find_s3_objects_recursively(conn, bucket, my_results, prefix=s3_object.name,
-					target=target)
+S3_CLIENT = boto3.client('s3')
 
 def s3_key_exists(bucket, key):
 	"""Determine whether object in S3 exists"""
@@ -91,7 +81,7 @@ def fetch_tarball_and_extract(timestamp, target, **kwargs):
 	try:
 		meta = get_single_file_from_tarball(timestamp, target, ".*meta")
 		safely_remove_file(meta)
-	except:
+	except Exception:
 		pass
 	_ = get_single_file_from_tarball(timestamp, target, "confusion_matrix.csv")
 	classification_report = get_single_file_from_tarball(timestamp, target,
@@ -105,7 +95,7 @@ def fetch_tarball_and_extract(timestamp, target, **kwargs):
 
 def get_best_model_of_class(target, **kwargs):
 	"""Finds the best candidate model of all contenders."""
-	highest_score, winner, candidate_count = 0.0, None, 1
+	highest_score, candidate_count = 0.0, 1
 	winner_count = candidate_count
 
 	timestamps = None
@@ -114,14 +104,13 @@ def get_best_model_of_class(target, **kwargs):
 	else:
 		timestamps = [kwargs["aspirant"]]
 
-	s3_client = boto3.client('s3')
 	for timestamp in timestamps:
 		short_key = kwargs["prefix"] + kwargs["key"] + timestamp
 		long_key = short_key + "classification_report.csv"
 		classification_report = None
 		if s3_key_exists(kwargs["bucket"], long_key):
 			target_file = "classification_report.csv"
-			s3_client.download_file(kwargs['bucket'].name, long_key, target_file)
+			S3_CLIENT.download_file(kwargs['bucket'].name, long_key, target_file)
 			classification_report = target_file
 			logging.info("Classification Report fetched from S3 at {0}.".format(long_key))
 		else:
@@ -134,56 +123,97 @@ def get_best_model_of_class(target, **kwargs):
 			for item in files_to_nuke:
 				logging.info("Removing {0} from {1}/{2}".format(item,
 					kwargs["bucket"].name, short_key))
-				s3_client.delete_object(Bucket=kwargs["bucket"].name, Key=short_key + item)
+				S3_CLIENT.delete_object(Bucket=kwargs["bucket"].name, Key=short_key + item)
 
 		logging.info("Score :{0}".format(score))
 
 		if score > highest_score:
 			highest_score = score
-			winner = timestamp
 			kwargs["best_models"][kwargs["key"]] = timestamp
 			winner_count = candidate_count
 		logging.info("\t{0:<14}{1:>2}: {2:16}, Score: {3:0.5f}".format("Candidate",
 			candidate_count, timestamp, score))
 		candidate_count += 1
-	return winner_count, winner
+	return winner_count
+
+def threaded_thing(**kwargs):
+	"""This will be threaded"""
+	# Ignore category models for now
+	if "category" in kwargs["key"]:
+		return
+
+	logging.info("Evaluating '{0}'".format(kwargs["key"]))
+	kwargs["aspirant"] = None
+	if kwargs["key"] in kwargs["aspirants"]:
+		logging.info("Aspirant model for {0} is {1}".format(kwargs["key"],
+			kwargs["aspirants"][kwargs["key"]]))
+		kwargs["aspirant"] = kwargs["aspirants"][kwargs["key"]]
+	else:
+		logging.info("No aspirant model, evaluating based on accuracy")
+
+	target = kwargs["target"]
+	del kwargs["target"]
+	winner_count = get_best_model_of_class(target, **kwargs)
+
+	logging.info("\t{0:<14}{1:>2}".format("Winner", winner_count))
+
+def worker(**kwargs):
+	"""Does work"""
+	while True:
+		_ = kwargs["q"].get()
+		threaded_thing(**kwargs)
+		kwargs["q"].task_done()
 
 def get_best_models(*args):
 	"""Gets the best model for a particular model type."""
-	bucket, prefix, results, target, s3_base, aspirants = args[:]
-	suffix = prefix[len(s3_base):]
-
 	best_models = {}
-	for key in sorted(results.keys()):
+	#make threads here
+	#make an empty queue
+	my_queue = Queue()
+	kwargs = {
+		"q": my_queue,
+		"bucket": args[0],
+		"prefix": args[1],
+		"results": args[2],
+		"target": args[3],
+		"s3_base": args[4],
+		"aspirants": args[5],
+		"best_models": best_models
+	}
+	#start your threads
+	sorted_keys = sorted(kwargs["results"].keys())
+	logging.critical("Sorted keys: {0}".format(sorted_keys))
+	for i, _ in enumerate(sorted_keys):
+		my_kwargs = {}
+		for key in kwargs:
+			my_kwargs[key] = kwargs[key]
 
-		# Ignore category models for now
-		if "category" in key:
-			continue
-
-		logging.info("Evaluating '{0}'".format(key))
-		aspirant = None
-		if key in aspirants:
-			logging.info("Aspirant model for {0} is {1}".format(key, aspirants[key]))
-			aspirant = aspirants[key]
-		else:
-			logging.info("No aspirant model, evaluating based on accuracy")
-
-		winner_count, winner = get_best_model_of_class(target, bucket=bucket,
-			prefix=prefix, results=results, key=key, suffix=suffix, aspirant=aspirant,
-			best_models=best_models)
-
-		args = [bucket, prefix, key, winner, s3_base, "results.tar.gz", "meerkat/classification/"]
-		logging.info("\t{0:<14}{1:>2}".format("Winner", winner_count))
+		my_kwargs["key"] = sorted_keys[i]
+		my_thread = threading.Thread(target=worker, kwargs=my_kwargs)
+		my_thread.daemon = True
+		my_thread.start()
+	#fill your queue
+	for key in sorted_keys:
+		logging.critical("Key placed")
+		my_queue.put(key)
+	#block until all tasks are done
+	my_queue.join()
 
 	#log the winners
 	logging.debug("The best models are:\n{0}".format(best_models))
+	load_winning_models(**kwargs)
+
+def load_winning_models(**kwargs):
+	"""Load the best models locally"""
 	#Load the winners
+	best_models, bucket = kwargs["best_models"], kwargs["bucket"].name
+	prefix, target = kwargs["prefix"], kwargs["target"]
 	etags, etags_file = get_etags()
 	for key in sorted(best_models.keys()):
 		timestamp = best_models[key]
 		logging.info("Loading {0} for {1}".format(timestamp, key))
-		load_best_model_for_type(bucket=bucket.name, model_type=key, timestamp=best_models[key],
-			s3_prefix=prefix, etags=etags)
+		load_best_model_for_type(bucket=bucket, model_type=key,
+			timestamp=best_models[key], s3_prefix=prefix, etags=etags)
 
 	with open(etags_file, "w") as outfile:
 		logging.info("Writing {0}".format(etags_file))
@@ -194,6 +224,7 @@ def get_best_models(*args):
 	# Cleanup
 	safely_remove_file("confusion_matrix.csv")
 	safely_remove_file(target)
+
 
 def get_etags():
 	"""Fetches local ETag values from a local file."""
@@ -268,8 +299,18 @@ def get_asset_name(suffix, key, extension):
 		result = result[1:]
 	return result
 
-def main_program(bucket="s3yodlee", region="us-west-2", prefix="meerkat/cnn/data",
-	config=None):
+def find_s3_objects(s3_client=None, bucket=None, prefix=None, target=None):
+	"""Doesn't use recursion, but finds all objects simply."""
+	simple_results = {}
+	object_names = s3_client.list_objects(Bucket=bucket, Prefix=prefix)["Contents"]
+	for s3_object in object_names:
+		key = s3_object["Key"]
+		if key.endswith("/" + target):
+			simple_results[key] = target
+	return simple_results
+
+def main_program(bucket="s3yodlee", region="us-west-2",
+	prefix="meerkat/cnn/data", config=None):
 	"""Execute the main program"""
 	parser = argparse.ArgumentParser("auto_load")
 	parser.add_argument("-l", "--log_level", default="warning",
@@ -306,8 +347,11 @@ def main_program(bucket="s3yodlee", region="us-west-2", prefix="meerkat/cnn/data
 	logging.warning("Starting main program")
 	conn = connect_to_region(args.region)
 	bucket = conn.get_bucket(args.bucket)
-	my_results, target = {}, "results.tar.gz",
-	find_s3_objects_recursively(conn, bucket, my_results, prefix=args.prefix, target=target)
+	target = "results.tar.gz"
+
+	my_results = find_s3_objects(s3_client=S3_CLIENT, bucket=args.bucket,
+		prefix=args.prefix, target="results.tar.gz")
+
 	results = get_peer_models(my_results, prefix=args.prefix)
 	logging.debug("Results: {0}".format(results))
 	get_best_models(bucket, args.prefix, results, target, args.prefix, aspirants)
