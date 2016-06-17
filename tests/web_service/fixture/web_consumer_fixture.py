@@ -1,5 +1,35 @@
 import uuid
 
+def get_params_for_mapping():
+    """Return a dictionary of mapping details"""
+    return {
+        "output": {
+            "results": {
+                "fields": ["name"],
+                "labels": ["merchant_name"]
+            }
+        }
+    }
+
+def get_transactions_to_clean():
+    """Return an array of transactions to be cleaned fo proper schema"""
+    return [{
+        "is_physical_merchant": False,
+        "transaction_id": 123
+    }]
+
+def get_proper_output():
+    """Return an array of proper output"""
+    return [{
+        "city": "",
+        "state": "",
+        "transaction_id": 123,
+        "is_physical_merchant": False,
+        "merchant_name": "",
+        "txn_sub_type": "",
+        "txn_type": ""
+    }]
+
 def get_transaction():
     """Create and return an array containing a single transaction"""
     return [{
