@@ -25,6 +25,16 @@ class WebConsumerTest(unittest.TestCase):
 		return
 
 	@parameterized.expand([
+		([web_consumer_fixture.get_transactions_to_clean(), False, web_consumer_fixture.get_proper_output()])
+	])
+	def test_ensure_output_schema(self, transactions, debug, expected):
+		"""Test ensure_output_schema with parameters"""
+		self.consumer.params = web_consumer_fixture.get_params_for_mapping()
+		self.consumer.ensure_output_schema(transactions, debug)
+		for i, trans in enumerate(transactions):
+			self.assertEqual(trans, expected[i])
+
+	@parameterized.expand([
 		([[{'category_labels': '[["a", "b"], ["c"]]'}], [{'category_labels': ['a', 'b', 'c']}]]),
 		([[{'category_labels': ''}], [{'category_labels': []}]])
 	])
