@@ -18,6 +18,8 @@ import boto3
 from meerkat.various_tools import (safely_remove_file, validate_configuration
 	, load_params, push_file_to_s3)
 
+S3_CLIENT = boto3.client('s3')
+
 def s3_key_exists(bucket, key):
 	"""Determine whether object in S3 exists"""
 	client = boto3.client('s3')
@@ -357,5 +359,4 @@ def main_program(bucket="s3yodlee", region="us-west-2",
 
 if __name__ == "__main__":
 	#Execute the main program
-	S3_CLIENT = boto3.client('s3')
 	main_program()
