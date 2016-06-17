@@ -226,7 +226,7 @@ def load_winning_models(**kwargs):
 
 def get_etags():
 	"""Fetches local ETag values from a local file."""
-	etags = None
+	etags = {}
 	etags_file = "meerkat/classification/etags.json"
 	if os.path.isfile(etags_file):
 		logging.info("ETags found.")
