@@ -2,7 +2,7 @@
 
 import sys
 import unittest
-import meerkat.merge_store_numbers as merger
+import meerkat.elasticsearch.merge_store_numbers as merger
 from nose_parameterized import parameterized
 from tests.fixture import merge_store_numbers_fixture
 
