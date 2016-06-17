@@ -11,15 +11,16 @@ from nose_parameterized import parameterized
 
 class TfcnnTest(unittest.TestCase):
 	"""Unit tests for meerkat.classification.tensorflow_cnn"""
+
 	@parameterized.expand([
-		([[], 3, []]),
-		([[1], 3, [[1]]]),
-		([[1,2,3], 2, [[1,2],[3]]]),
-		([[1,2], -9, [[1],[2]]])
+		([tf_cnn_fixture.get_config_for_batch_to_tensor(), tf_cnn_fixture.get_batch(),
+			tf_cnn_fixture.get_trans_and_labels()])
 	])
-	def test_chunks(self, array, num, expected):
-		"""Ensure that numpy arrays are properly sub-divided into chunks."""
-		self.assertEqual(tf_cnn.chunks(array, num), expected)
+	def test_batch_to_tensor(self, config, batch, expected):
+		"""Test batch_to_tensor with parameters"""
+		result = tf_cnn.batch_to_tensor(config, batch)
+		self.assertTrue((result[0]==expected[0]).all())
+		self.assertTrue((result[1]==expected[1]).all())
 
 	@parameterized.expand([
 		([['invalid', 'tests/classification/fixture/missing_entry_tf_config.json']]),
@@ -40,25 +41,16 @@ class TfcnnTest(unittest.TestCase):
 		(['tests/classification/fixture/tf_config_with_alpha_dict.json', 'abccccccccc', 3, [[0,0,1],[0,1,0],[1,0,0]]]),
 		(['tests/classification/fixture/tf_config_with_alpha_dict.json', 'a', 3, [[1,0,0],[0,0,0],[0,0,0]]])
 	])
-	def test_string_to_tensor(self, config, doc, length, expected):
+	def test_string_to_tensor_1(self, config, doc, length, expected):
+		"""Test string_to_tensor with parameters"""
 		config = load_params(config)
 		np.testing.assert_array_equal(list(tf_cnn.string_to_tensor(config, doc, length)), expected)
-
-	@parameterized.expand([
-		([tf_cnn_fixture.get_predictions("all_correct"), tf_cnn_fixture.get_labels(), 100.0]),
-		([tf_cnn_fixture.get_predictions("all_wrong"), tf_cnn_fixture.get_labels(), 0.0]),
-		([tf_cnn_fixture.get_predictions("half_correct"), tf_cnn_fixture.get_labels(), 50.0])
-	])
-	def test_accuracy(self, predictions, labels, expected_accuracy):
-		"""Test accuracy with parameters"""
-		result = tf_cnn.accuracy(predictions, labels)
-		self.assertEqual(result, expected_accuracy)
 
 	@parameterized.expand([
 		([tf_cnn_fixture.get_config(), "aab", 4, tf_cnn_fixture.get_tensor("short_doc")]),
 		([tf_cnn_fixture.get_config(), "aab", 2, tf_cnn_fixture.get_tensor("truncated_doc")])
 	])
-	def test_string_to_tensor(self, config, doc, length, expected_tensor):
+	def test_string_to_tensor_2(self, config, doc, length, expected_tensor):
 		"""Test string_to_tensor with parameters"""
 		result = tf_cnn.string_to_tensor(config, doc, length)
 		np.testing.assert_array_equal(result, expected_tensor)
@@ -85,15 +77,6 @@ class TfcnnTest(unittest.TestCase):
 		results = tf_cnn.chunks(array, chunk_size)
 		for chunk in results:
 			self.assertTrue(np.allclose(chunk, expected, rtol=1e-05, atol=1e-08))
-
-	@parameterized.expand([
-		(["tests/classification/fixture/cost_matrix.json", [1.3, 0.8, 1.1]])
-	])
-	def test_get_cost_list(self, label_map_path, expected):
-		"""Confirm that you can load a cost matrix from a proper label_map"""
-		config = {"label_map": load_params(label_map_path)}
-		results = tf_cnn.get_cost_list(config)
-		self.assertTrue(sorted(results) == sorted(expected))
 
 	def test_load_data__number_of_labels_exception(self):
 		"""Confirm that we throw an informative Exception when the number of labels
