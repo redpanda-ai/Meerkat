@@ -36,26 +36,6 @@ class TfcnnTest(unittest.TestCase):
 			self.assertEqual(type(tf_cnn.validate_config(config)), dict)
 
 	@parameterized.expand([
-		(['tests/classification/fixture/tf_config_with_alpha_dict.json', 'kkk', 3, [[0,0,0],[0,0,0],[0,0,0]]]),
-		(['tests/classification/fixture/tf_config_with_alpha_dict.json', 'abc', 3, [[0,0,1],[0,1,0],[1,0,0]]]),
-		(['tests/classification/fixture/tf_config_with_alpha_dict.json', 'abccccccccc', 3, [[0,0,1],[0,1,0],[1,0,0]]]),
-		(['tests/classification/fixture/tf_config_with_alpha_dict.json', 'a', 3, [[1,0,0],[0,0,0],[0,0,0]]])
-	])
-	def test_string_to_tensor_1(self, config, doc, length, expected):
-		"""Test string_to_tensor with parameters"""
-		config = load_params(config)
-		np.testing.assert_array_equal(list(tf_cnn.string_to_tensor(config, doc, length)), expected)
-
-	@parameterized.expand([
-		([tf_cnn_fixture.get_config(), "aab", 4, tf_cnn_fixture.get_tensor("short_doc")]),
-		([tf_cnn_fixture.get_config(), "aab", 2, tf_cnn_fixture.get_tensor("truncated_doc")])
-	])
-	def test_string_to_tensor_2(self, config, doc, length, expected_tensor):
-		"""Test string_to_tensor with parameters"""
-		result = tf_cnn.string_to_tensor(config, doc, length)
-		np.testing.assert_array_equal(result, expected_tensor)
-
-	@parameterized.expand([
 		([100, 10]),
 		([10, 2])
 	])
