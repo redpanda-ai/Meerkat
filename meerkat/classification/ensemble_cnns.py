@@ -26,20 +26,17 @@ Created on Apr 16, 2016
 ###################################################################################################
 
 import logging
-import math
 import os
-import pprint
 import shutil
 import sys
 
 import numpy as np
 import tensorflow as tf
 
-from .tools import (batch_normalization, chunks, max_pool, get_cost_list, string_to_tensor,
+from .tools import (batch_normalization, chunks, max_pool, get_cost_list,
 	accuracy, get_tensor, get_op, get_variable, threshold, bias_variable, weight_variable, conv2d)
 from meerkat.classification.tensorflow_cnn import (run_session, mixed_batching, load_data,
-	validate_config)
-from meerkat.various_tools import load_params, validate_configuration
+	validate_config, batch_to_tensor)
 
 logging.basicConfig(level=logging.INFO)
 
@@ -259,7 +256,7 @@ def build_graph(config):
 				softmax.append(prob_train)
 				network.append(logsoftmax(softmax[i-1], "network"))
 				prob_full = encoder(trans_placeholder, "softmax_full", i, train=False)
-				cnn.append(logsoftmax(prob_full, "cnn"*(num_cnns>1)))
+				cnn.append(logsoftmax(prob_full, "cnn"*(num_cnns > 1)))
 
 		ensemble = sum(softmax) / (num_cnns + 0.0)
 		weighted_labels = cost_list * labels_placeholder
@@ -282,7 +279,7 @@ def build_graph(config):
 					"network_flat") * soft_labels_placeholder, 1))
 					+ 0.15 * tf.reduce_mean(tf.reduce_sum(network[0] * weighted_labels, 1)),
 					name="loss1")]
-			optimizer = [make_optimizer(loss[i], "optimizer"+str(i+1), "model"+str(i+1)*(num_cnns>1))
+			optimizer = [make_optimizer(loss[i], "optimizer"+str(i+1), "model"+str(i+1)*(num_cnns > 1))
 				for i in range(num_cnns)]
 
 		bn_updates = tf.group(*bn_assigns)
@@ -293,7 +290,7 @@ def build_graph(config):
 			"""return a saver for namespace name"""
 			return tf.train.Saver([x for x in tf.all_variables() if x.name.startswith(name)])
 
-		saver = [get_saver("model"+str(i+1)*(num_cnns>1)) for i in range(num_cnns)]
+		saver = [get_saver("model"+str(i+1)*(num_cnns > 1)) for i in range(num_cnns)]
 
 	return graph, saver
 
@@ -336,10 +333,11 @@ def train_model(config, graph, sess, saver):
 		if step % 1000 == 0:
 			# Calculate Batch Accuracy
 			for i in range(1, num_cnns+1):
-				predictions = sess.run(get_tensor(graph, "model"+(str(i)+"/cnn")*(num_cnns>1)+":0"), feed_dict=feed_dict)
+				predictions = sess.run(get_tensor(graph, "model"+(str(i)+"/cnn")*(num_cnns > 1)+":0"),
+					feed_dict=feed_dict)
 				logging.info("Minibatch accuracy for cnn" + str(i) + ": %.1f%%" % accuracy(predictions, labels))
 			# Estimate Accuracy for Visualization
-			model = [get_tensor(graph, "model"+(str(i)+"/cnn")*(num_cnns>1)+":0") for i in range(num_cnns)]
+			model = [get_tensor(graph, "model"+(str(i)+"/cnn")*(num_cnns > 1)+":0") for i in range(num_cnns)]
 			ensemble_accuracy = ensemble_evaluate_testset(config, graph, sess, model, test)
 
 		# Log Loss and Update TensorBoard
