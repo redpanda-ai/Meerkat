@@ -11,24 +11,62 @@ def get_params_for_mapping():
         }
     }
 
-def get_transactions_to_clean():
+def get_transactions_to_clean(case_type):
     """Return an array of transactions to be cleaned fo proper schema"""
-    return [{
-        "is_physical_merchant": False,
-        "transaction_id": 123
-    }]
+    if case_type == "non_physical_no_debug":
+        return [{
+            "is_physical_merchant": False,
+            "transaction_id": 123,
+            "txn_sub_type": "sub",
+            "txn_type": "type"
+        }]
+    elif case_type == "physical_no_debug":
+        return [{
+           "is_physical_merchant": True,
+            "transaction_id": 123,
+            "txn_sub_type": "sub",
+            "txn_type": "type"
+        }]
 
-def get_proper_output():
+def get_proper_output(case_type):
     """Return an array of proper output"""
-    return [{
-        "city": "",
-        "state": "",
-        "transaction_id": 123,
-        "is_physical_merchant": False,
-        "merchant_name": "",
-        "txn_sub_type": "",
-        "txn_type": ""
-    }]
+    if case_type == "non_physical_no_debug":
+        return [{
+            "city": "",
+            "state": "",
+            "transaction_id": 123,
+            "is_physical_merchant": False,
+            "merchant_name": "",
+            "txn_sub_type": "sub",
+            "txn_type": "type"
+        }]
+    elif case_type == "physical_no_debug":
+        return [{
+            "city": "",
+            "state": "",
+            "transaction_id": 123,
+            "is_physical_merchant": True,
+            "merchant_name": "",
+            "txn_sub_type": "sub",
+            "txn_type": "type",
+            "chain_name": "",
+            "confidence_score": "",
+            "country": "",
+            "fax_number": "",
+            "latitude": "",
+            "longitude": "",
+            "match_found": False,
+            "neighbourhood": "",
+            "phone_number": "",
+            "postal_code": "",
+            "source": "OTHER",
+            "source_merchant_id": "",
+            "store_id": "",
+            "street": "",
+            "txn_sub_type": "sub",
+            "txn_type": "type",
+            "website": ""
+        }]
 
 def get_transaction():
     """Create and return an array containing a single transaction"""
