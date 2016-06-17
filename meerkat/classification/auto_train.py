@@ -13,18 +13,19 @@ performance matrics.
 import argparse
 import logging
 import os
+import sys
 import shutil
 
 import tensorflow as tf
 
 from meerkat.classification.split_data import main_split_data
 from meerkat.classification.tools import (pull_from_s3, check_new_input_file,
-	push_file_to_s3, make_tarfile, copy_file, check_file_exist_in_s3, extract_tarball)
+	make_tarfile, copy_file, check_file_exist_in_s3, extract_tarball)
 from meerkat.classification.tensorflow_cnn import build_graph, train_model, validate_config
 from meerkat.classification.ensemble_cnns import build_graph as build_ensemble_graph
 from meerkat.classification.ensemble_cnns import train_model as train_ensemble_model
 from meerkat.classification.soft_target import main as get_soft_target
-from meerkat.various_tools import load_params, safe_input
+from meerkat.various_tools import load_params, safe_input, push_file_to_s3
 from meerkat.classification.auto_load import get_single_file_from_tarball
 from meerkat.classification.classification_report import main_process as apply_cnn
 
@@ -59,7 +60,7 @@ time nohup python3 -m meerkat.classification.auto_train merchant bank -v --ensem
 """
 ###################################################################################################
 
-def parse_arguments():
+def parse_arguments(args):
 	"""This function parses arguments from our command line."""
 
 	parser = argparse.ArgumentParser("auto_train")
@@ -96,7 +97,7 @@ def parse_arguments():
 	parser.add_argument("-d", "--debug", help=help_text["debug"], action="store_true")
 	parser.add_argument("-v", "--info", help=help_text["info"], action="store_true")
 
-	args = parser.parse_args()
+	args = parser.parse_args(args)
 
 	if args.model_type == 'subtype' and args.credit_or_debit == '':
 		raise Exception('For subtype data you need to declare debit or credit.')
@@ -110,7 +111,7 @@ def parse_arguments():
 def auto_train():
 	"""Run the automated training process"""
 
-	args = parse_arguments()
+	args = parse_arguments(sys.argv[1:])
 	bucket = args.bucket
 	bank_or_card = args.bank_or_card
 	credit_or_debit = args.credit_or_debit
