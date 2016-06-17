@@ -20,6 +20,13 @@ def remove_file_if_exists(path):
 class AutoLoadTests(unittest.TestCase):
 	"""Unit tests for meerkat.classification.auto_load."""
 
+	@classmethod
+	def tearDownClass(cls):
+		try:
+			os.remove("./foo.txt")
+		except OSError:
+			pass
+
 	@parameterized.expand([
 		(["s3yodlee", "meerkat/cnn/data", "results.tar.gz"]),
 		([ "s3yodlee", "meerkat/cnn/data", "input.tar.gz"])

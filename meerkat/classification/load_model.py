@@ -11,9 +11,9 @@ Created on Feb 25, 2014
 from os.path import isfile
 import sys
 import logging
-
 import numpy as np
 import tensorflow as tf
+
 from tensorflow.python.framework import ops
 from sklearn.externals import joblib
 from meerkat.various_tools import load_params
@@ -106,14 +106,10 @@ def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=False, model
 	def apply_cnn(trans, doc_key="description", label_key="CNN", label_only=True, soft_target=False):
 		"""Apply CNN to transactions"""
 
-		alphabet_length = config["alphabet_length"]
-		if "merchant" not in config["model_path"]:
-			doc_length = config["doc_length"]
-		else:
-			doc_length = 123
+		doc_length = config["doc_length"]
 		batch_size = len(trans)
 
-		tensor = np.zeros(shape=(batch_size, 1, alphabet_length, doc_length))
+		tensor = np.zeros(shape=(batch_size, 1, config["alphabet_length"], doc_length))
 
 		for index, doc in enumerate(trans):
 			tensor[index][0] = string_to_tensor(config, doc[doc_key], doc_length)
