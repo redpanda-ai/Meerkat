@@ -25,6 +25,14 @@ class WebConsumerTest(unittest.TestCase):
 		return
 
 	@parameterized.expand([
+		([[{}], [{'merchant_name': '', 'source': 'OTHER', 'match_found': False}]])
+	])
+	def test_enrich_physical_no_search(self, transaction, expected):
+		"""Test enrich_physical_no_search with parameters"""
+		self.assertEqual(self.consumer._WebConsumer__enrich_physical_no_search(transaction),
+			expected)
+
+	@parameterized.expand([
 		([['Abc', 'Abc'], {'merchant_name': 'm'}, {'merchant_name': 'Abc'}]),
 		([['Xyz', 'Xyz'], {'merchant_name': 'm'}, {'merchant_name': 'm'}])
 	])
