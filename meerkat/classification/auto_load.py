@@ -15,7 +15,8 @@ from boto.s3 import connect_to_region
 from boto.s3.key import Key
 import boto3
 
-from meerkat.various_tools import safely_remove_file, validate_configuration, load_params, push_file_to_s3
+from meerkat.various_tools import (safely_remove_file, validate_configuration
+	, load_params, push_file_to_s3)
 
 def s3_key_exists(bucket, key):
 	"""Determine whether object in S3 exists"""
@@ -78,7 +79,7 @@ def fetch_tarball_and_extract(timestamp, target, **kwargs):
 	try:
 		meta = get_single_file_from_tarball(timestamp, target, ".*meta")
 		safely_remove_file(meta)
-	except:
+	except Exception:
 		pass
 	_ = get_single_file_from_tarball(timestamp, target, "confusion_matrix.csv")
 	classification_report = get_single_file_from_tarball(timestamp, target,
@@ -92,7 +93,7 @@ def fetch_tarball_and_extract(timestamp, target, **kwargs):
 
 def get_best_model_of_class(target, **kwargs):
 	"""Finds the best candidate model of all contenders."""
-	highest_score, winner, candidate_count = 0.0, None, 1
+	highest_score, candidate_count = 0.0, 1
 	winner_count = candidate_count
 
 	timestamps = None
@@ -126,13 +127,12 @@ def get_best_model_of_class(target, **kwargs):
 
 		if score > highest_score:
 			highest_score = score
-			winner = timestamp
 			kwargs["best_models"][kwargs["key"]] = timestamp
 			winner_count = candidate_count
 		logging.info("\t{0:<14}{1:>2}: {2:16}, Score: {3:0.5f}".format("Candidate",
 			candidate_count, timestamp, score))
 		candidate_count += 1
-	return winner_count, winner
+	return winner_count
 
 def threaded_thing(**kwargs):
 	"""This will be threaded"""
@@ -151,34 +151,25 @@ def threaded_thing(**kwargs):
 
 	target = kwargs["target"]
 	del kwargs["target"]
-	winner_count, winner = get_best_model_of_class(target, **kwargs)
-
-#	winner_count, winner = get_best_model_of_class(target, bucket=bucket,
-#		prefix=prefix, results=results, key=key, suffix=suffix, aspirant=aspirant,
-#		best_models=best_models)
+	winner_count = get_best_model_of_class(target, **kwargs)
 
 	logging.info("\t{0:<14}{1:>2}".format("Winner", winner_count))
 
-def worker(*args, **kwargs):
+def worker(**kwargs):
 	"""Does work"""
 	while True:
-		item = kwargs["q"].get()
+		_ = kwargs["q"].get()
 		threaded_thing(**kwargs)
 		kwargs["q"].task_done()
 
 def get_best_models(*args):
 	"""Gets the best model for a particular model type."""
-	bucket, prefix, results, target, s3_base, aspirants = args[:]
-	suffix = prefix[len(s3_base):]
-
 	best_models = {}
 	#make threads here
-	sorted_keys = sorted(results.keys())
-	logging.critical("Sorted keys: {0}".format(sorted_keys))
 	#make an empty queue
-	q = Queue()
+	my_queue = Queue()
 	kwargs = {
-		"q": q,
+		"q": my_queue,
 		"bucket": args[0],
 		"prefix": args[1],
 		"results": args[2],
@@ -188,34 +179,39 @@ def get_best_models(*args):
 		"best_models": best_models
 	}
 	#start your threads
-	for i in range(len(sorted_keys)):
+	sorted_keys = sorted(kwargs["results"].keys())
+	logging.critical("Sorted keys: {0}".format(sorted_keys))
+	for i, _ in enumerate(sorted_keys):
 		my_kwargs = {}
 		for key in kwargs:
 			my_kwargs[key] = kwargs[key]
 
 		my_kwargs["key"] = sorted_keys[i]
-		t = threading.Thread(target=worker, args=args, kwargs=my_kwargs)
-		t.daemon = True
-		t.start()
+		my_thread = threading.Thread(target=worker, kwargs=my_kwargs)
+		my_thread.daemon = True
+		my_thread.start()
 	#fill your queue
 	for key in sorted_keys:
 		logging.critical("Key placed")
-		q.put(key)
+		my_queue.put(key)
 	#block until all tasks are done
-	q.join()
-
-#	for key in sorted_keys:
-#		threaded_thing(key, aspirants, target, bucket, prefix, results, suffix, best_models)
+	my_queue.join()
 
 	#log the winners
 	logging.debug("The best models are:\n{0}".format(best_models))
+	load_winning_models(**kwargs)
+
+def load_winning_models(**kwargs):
+	"""Load the best models locally"""
 	#Load the winners
+	best_models, bucket = kwargs["best_models"], kwargs["bucket"].name
+	prefix, target = kwargs["prefix"], kwargs["target"]
 	etags, etags_file = get_etags()
 	for key in sorted(best_models.keys()):
 		timestamp = best_models[key]
 		logging.info("Loading {0} for {1}".format(timestamp, key))
-		load_best_model_for_type(bucket=bucket.name, model_type=key, timestamp=best_models[key],
-			s3_prefix=prefix, etags=etags)
+		load_best_model_for_type(bucket=bucket, model_type=key,
+			timestamp=best_models[key], s3_prefix=prefix, etags=etags)
 
 	with open(etags_file, "w") as outfile:
 		logging.info("Writing {0}".format(etags_file))
@@ -227,9 +223,10 @@ def get_best_models(*args):
 	safely_remove_file("confusion_matrix.csv")
 	safely_remove_file(target)
 
+
 def get_etags():
 	"""Fetches local ETag values from a local file."""
-	etags = {}
+	etags = None
 	etags_file = "meerkat/classification/etags.json"
 	if os.path.isfile(etags_file):
 		logging.info("ETags found.")
@@ -300,18 +297,18 @@ def get_asset_name(suffix, key, extension):
 		result = result[1:]
 	return result
 
-def find_s3_objects(args, target=None):
+def find_s3_objects(s3_client=None, bucket=None, prefix=None, target=None):
 	"""Doesn't use recursion, but finds all objects simply."""
 	simple_results = {}
-	object_names = S3_CLIENT.list_objects(Bucket=args.bucket, Prefix=args.prefix)["Contents"]
+	object_names = s3_client.list_objects(Bucket=bucket, Prefix=prefix)["Contents"]
 	for s3_object in object_names:
 		key = s3_object["Key"]
 		if key.endswith("/" + target):
 			simple_results[key] = target
 	return simple_results
 
-def main_program(bucket="s3yodlee", region="us-west-2", prefix="meerkat/cnn/data",
-	config=None):
+def main_program(bucket="s3yodlee", region="us-west-2",
+	prefix="meerkat/cnn/data", config=None):
 	"""Execute the main program"""
 	parser = argparse.ArgumentParser("auto_load")
 	parser.add_argument("-l", "--log_level", default="warning",
@@ -350,7 +347,8 @@ def main_program(bucket="s3yodlee", region="us-west-2", prefix="meerkat/cnn/data
 	bucket = conn.get_bucket(args.bucket)
 	target = "results.tar.gz"
 
-	my_results = find_s3_objects(args, target="results.tar.gz")
+	my_results = find_s3_objects(s3_client=S3_CLIENT, bucket=args.bucket,
+		prefix=args.prefix, target="results.tar.gz")
 
 	results = get_peer_models(my_results, prefix=args.prefix)
 	logging.debug("Results: {0}".format(results))
