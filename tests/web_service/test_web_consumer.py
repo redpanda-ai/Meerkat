@@ -31,16 +31,16 @@ class WebConsumerTest(unittest.TestCase):
 	def test___no_result(self, transaction, expected):
 		"""Test no_result with parameters"""
 		self.consumer._WebConsumer__no_result(transaction)
-		self.assertEqual(transaction["match_found"], expected["match_found"])
-		self.assertEqual(transaction["country"], expected["country"])
-		self.assertEqual(transaction["source"], expected["source"])
-		self.assertEqual(transaction["confidence_score"], expected["confidence_score"])
+		for field in ["match_found", "country", "source", "confidence_score"]:
+			self.assertEqual(transaction[field], expected[field])
 
 	@parameterized.expand([
 		([web_consumer_fixture.get_transactions_to_clean("non_physical_no_debug"),
 			False, web_consumer_fixture.get_proper_output("non_physical_no_debug")]),
 		([web_consumer_fixture.get_transactions_to_clean("physical_no_debug"),
-			False, web_consumer_fixture.get_proper_output("physical_no_debug")])
+			False, web_consumer_fixture.get_proper_output("physical_no_debug")]),
+		([web_consumer_fixture.get_transaction_to_clean("physical_debug"),
+			True, web_consumer_fixture.get_proper_output("physical_debug")])
 	])
 	def test_ensure_output_schema(self, transactions, debug, expected):
 		"""Test ensure_output_schema with parameters"""

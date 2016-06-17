@@ -14,7 +14,8 @@ def get_transactions_to_clean(case_type):
            "is_physical_merchant": True,
             "transaction_id": 123,
             "txn_sub_type": "sub",
-            "txn_type": "type"
+            "txn_type": "type",
+            "CNN": "Ikea"
         }]
 
 def get_proper_output(case_type):
@@ -35,7 +36,7 @@ def get_proper_output(case_type):
             "state": "",
             "transaction_id": 123,
             "is_physical_merchant": True,
-            "merchant_name": "",
+            "merchant_name": "Ikea",
             "txn_sub_type": "sub",
             "txn_type": "type",
             "chain_name": "",
