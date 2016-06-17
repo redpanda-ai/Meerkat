@@ -25,7 +25,10 @@ class WebConsumerTest(unittest.TestCase):
 		return
 
 	@parameterized.expand([
-		([web_consumer_fixture.get_transactions_to_clean(), False, web_consumer_fixture.get_proper_output()])
+		([web_consumer_fixture.get_transactions_to_clean("non_physical_no_debug"),
+			False, web_consumer_fixture.get_proper_output("non_physical_no_debug")]),
+		([web_consumer_fixture.get_transactions_to_clean("physical_no_debug"),
+			False, web_consumer_fixture.get_proper_output("physical_no_debug")])
 	])
 	def test_ensure_output_schema(self, transactions, debug, expected):
 		"""Test ensure_output_schema with parameters"""
