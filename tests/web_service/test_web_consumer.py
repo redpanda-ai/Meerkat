@@ -1,6 +1,7 @@
 import unittest
 from meerkat.web_service import web_consumer
 from tests.web_service.fixture import web_consumer_fixture
+from nose_parameterized import parameterized
 
 class WebConsumerTest(unittest.TestCase):
 	"""Our UnitTest class."""
@@ -22,7 +23,20 @@ class WebConsumerTest(unittest.TestCase):
 
 	def tearDown(self):
 		return
- 
+
+	@parameterized.expand([
+		([['Humble', 'Bronx', 'Golden'], ['TX', 'TX', 'CO'],
+			{'description': 'Abc TX', 'city': 'c', 'state': 's'},
+			{'description': 'Abc TX', 'city': 'c', 'state': 'TX'}])
+	])
+	def test_geo_fallback(self, city_names, state_names, transaction, expected):
+		"""Test geo_fallback with parameters"""
+		attr_map = {
+			'locality': 'city',
+			'region': 'state'
+		}
+		self.assertEqual(self.consumer._WebConsumer__geo_fallback(city_names, state_names, transaction, attr_map), expected)
+
 	def test_static_bank_category_map(self):
 		"""Assert that the correct static category label has been applied from the bank map"""
 		transactions = web_consumer_fixture.get_transaction_bank_fallback_classifiable()
