@@ -127,27 +127,31 @@ def in_location_bloom(text):
 	else:
 		region = text[-2:]
 		biggest = None
+
 		for i in range(len(text) - 3, -1, -1):
-			locality = text[i:- 2]
+			locality = text[i:-2]
 			if (locality, region) in LOCATION_BLOOM:
 				biggest = (locality, region)
+		if biggest: return biggest
+		'''
+		for i in range(len(text) - 5, -1, -1):
+			locality = text[i:-2]
+			for ch in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
+				loc = locality + ch
+				if (loc, region) in LOCATION_BLOOM:
+					biggest = (loc, region)
+					break
+		if biggest: return biggest
 
-		if not biggest:
-			for i in range(len(text) - 5, -1, -1):
-				locality = text[i:- 2]
-				for ch in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
-					loc = locality + ch
+		for i in range(len(text) - 5, -1, -1):
+			locality = text[i:-2]
+			for ch1 in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
+				for ch2 in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
+					loc = locality + ch1 + ch2
 					if (loc, region) in LOCATION_BLOOM:
 						biggest = (loc, region)
 						break
-				if not biggest:
-					for ch1 in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
-						for ch2 in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
-							loc = locality + ch1 + ch2
-							if (loc, region) in LOCATION_BLOOM:
-								biggest = (loc, region)
-								break
-
+		'''
 		return biggest
 
 def location_split(my_text):
