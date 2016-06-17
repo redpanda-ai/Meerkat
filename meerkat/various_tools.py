@@ -20,6 +20,19 @@ import numpy as np
 import pandas as pd
 
 from jsonschema import validate
+from scipy.stats.mstats import zscore
+
+def z_score_delta(scores):
+	"""Find the Z-Score Delta"""
+
+	if len(scores) < 2:
+		return None
+
+	z_scores = zscore(scores)
+	first_score, second_score = z_scores[0:2]
+	z_score_delta = round(first_score - second_score, 3)
+
+	return z_score_delta
 
 def push_file_to_s3(source_path, bucket_name, object_prefix):
 	"""Pushes an object to S3"""
@@ -334,11 +347,13 @@ def get_qs_query(term, field_list=None, boost=1.0):
 		}
 	}
 
-def get_us_cities():
+def get_us_cities(testing=False):
 	"""Load an array of US cities"""
 	with open("data/misc/US_Cities.txt") as city_file:
 		cities = city_file.readlines()
 	cities = [city.lower().rstrip('\n') for city in cities]
+	if testing: # Return the length for testing purposes
+		return len(cities)
 	return cities
 
 def stopwords(transaction):

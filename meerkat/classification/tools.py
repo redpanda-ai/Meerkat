@@ -1,6 +1,5 @@
 """The place where you put frequently used functions"""
 
-import csv
 import datetime
 import json
 import logging
@@ -18,6 +17,11 @@ from boto.s3.key import Key
 from boto.s3.connection import Location
 from boto import connect_s3
 from meerkat.various_tools import load_piped_dataframe
+
+def chunks(array, num):
+	"""Chunk array into equal sized parts"""
+	num = max(1, num)
+	return [array[i:i + num] for i in range(0, len(array), num)]
 
 def string_to_tensor(config, doc, length):
 	"""Convert transaction to tensor format"""
@@ -246,22 +250,6 @@ def pull_from_s3(**kwargs):
 		raise Exception("Cannot proceed, there must be at least one file at the"
 			" S3 location provided.")
 """
-
-def load(**kwargs):
-	"""Load the CSV into a pandas data frame"""
-	filename, credit_or_debit = kwargs["input_file"], kwargs["credit_or_debit"]
-	logging.info("Loading csv file and slicing by '{0}' ".format(credit_or_debit))
-	df = pd.read_csv(filename, quoting=csv.QUOTE_NONE, na_filter=False,
-		encoding="utf-8", sep='|', error_bad_lines=False, low_memory=False)
-	df['UNIQUE_TRANSACTION_ID'] = df.index
-	df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
-	grouped = df.groupby('LEDGER_ENTRY', as_index=False)
-	groups = dict(list(grouped))
-	df = groups[credit_or_debit]
-	df["PROPOSED_SUBTYPE"] = df["PROPOSED_SUBTYPE"].str.strip()
-	df['PROPOSED_SUBTYPE'] = df['PROPOSED_SUBTYPE'].apply(cap_first_letter)
-	class_names = df["PROPOSED_SUBTYPE"].value_counts().index.tolist()
-	return df, class_names
 
 def copy_file(input_file, directory):
 	"""This function moves uses Linux's 'cp' command to copy files on the local host"""

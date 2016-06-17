@@ -2,8 +2,8 @@
 
 import sys
 import unittest
-import meerkat.labeling_tools.compare_indices as compare_indices
 from nose_parameterized import parameterized
+import meerkat.labeling_tools.compare_indices as compare_indices
 from tests.labeling_tools.fixture import compare_indices_fixture
 
 class CompareIndicesTests(unittest.TestCase):
@@ -17,15 +17,6 @@ class CompareIndicesTests(unittest.TestCase):
 	def test_has_mapping_changed(self, old_mapping, new_mapping, result):
 		"""Test for has_mapping_changed"""
 		self.assertEqual(compare_indices.has_mapping_changed(old_mapping, new_mapping), result)
-
-	@parameterized.expand([
-		([[8.0, 4.0, 2.0, 1.0], 1.492]),
-		([[2.0, 1.0], 2.0]),
-		([[1.0], None])
-	])
-	def test_z_score_delta(self, scores, z_score_delta):
-		"""Test z_score_delta with parameters"""
-		self.assertEqual(compare_indices.z_score_delta(scores), z_score_delta)
 
 	@parameterized.expand([
 		([compare_indices_fixture.get_elasticsearch_result()["non_hits"], 0, (False, False)]),
@@ -43,6 +34,21 @@ class CompareIndicesTests(unittest.TestCase):
 		transaction = compare_indices_fixture.get_transaction()
 		cleaned_transaction = compare_indices_fixture.get_cleaned_transaction()
 		self.assertEqual(compare_indices.clean_transaction(transaction), cleaned_transaction)
+
+	@parameterized.expand([
+		(["not_enough", compare_indices_fixture.get_args()["not_enough"]]),
+		(["no_json", compare_indices_fixture.get_args()["no_json"]]),
+		(["no_txt", compare_indices_fixture.get_args()["no_txt"]]),
+		(["not_correct", compare_indices_fixture.get_args()["not_correct"]]),
+		(["correct", compare_indices_fixture.get_args()["correct"]])
+	])
+	def test_verify_arguments(self, case, args):
+		"""Test verify_arguments with parameters"""
+		sys.argv = args
+		if case == "not_enough" or case == "no_json" or case == "no_txt" or case == "not_correct":
+			self.assertRaises(SystemExit, compare_indices.verify_arguments)
+		else:
+			compare_indices.verify_arguments()
 
 if __name__ == '__main__':
 	unittest.main()

@@ -36,7 +36,7 @@ import sys
 import numpy as np
 import tensorflow as tf
 
-from .tools import (fill_description_unmasked, reverse_map, batch_normalization,
+from .tools import (fill_description_unmasked, reverse_map, batch_normalization, chunks,
 	accuracy, get_tensor, get_op, get_variable, threshold, bias_variable, weight_variable, conv2d,
 	max_pool, get_cost_list, string_to_tensor)
 from meerkat.various_tools import load_params, load_piped_dataframe, validate_configuration
@@ -92,11 +92,6 @@ def ensemble_evaluate_testset(config, graph, sess, model, test):
 	logging.info("Total count: " + str(total_count))
 
 	return test_accuracy
-
-def chunks(array, num):
-	"""Chunk array into equal sized parts"""
-	num = max(1, num)
-	return [array[i:i + num] for i in range(0, len(array), num)]
 
 def validate_config(config):
 	"""Validate input configuration"""
