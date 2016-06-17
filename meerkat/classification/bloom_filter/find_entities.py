@@ -122,16 +122,31 @@ def in_location_bloom(text):
 		el paso tx ==> Known town, return all known information
 		^^^^^^^^^^
 	"""
-	if len(text) == 1:
+	if len(text) <= 2:
 		return False
 	else:
 		region = text[-2:]
 		biggest = None
-		for i in range(len(text) -1, -1, -1):
+		for i in range(len(text) - 3, -1, -1):
 			locality = text[i:- 2]
 			if (locality, region) in LOCATION_BLOOM:
-				# print("matched (%s, %s)" % (locality, region))
 				biggest = (locality, region)
+
+		if not biggest:
+			for i in range(len(text) - 5, -1, -1):
+				locality = text[i:- 2]
+				for ch in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
+					loc = locality + ch
+					if (loc, region) in LOCATION_BLOOM:
+						biggest = (loc, region)
+						break
+				if not biggest:
+					for ch1 in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
+						for ch2 in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
+							loc = locality + ch1 + ch2
+							if (loc, region) in LOCATION_BLOOM:
+								biggest = (loc, region)
+								break
 
 		return biggest
 
@@ -213,4 +228,4 @@ def main():
 
 if __name__ == "__main__":
 #	main()
-	print(location_split('BARCLAYCARD US   PLANTATION FL               CREDITCARD CO ...'))
+	print(location_split('DEBIT CARD PURCHASE   XXXXX9116     TERRAIN 3001             CONCORDVILL PA'))
