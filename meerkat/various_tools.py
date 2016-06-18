@@ -19,6 +19,8 @@ import boto
 import numpy as np
 import pandas as pd
 
+from boto.s3.key import Key
+from boto.s3.connection import Location
 from jsonschema import validate
 from scipy.stats.mstats import zscore
 
