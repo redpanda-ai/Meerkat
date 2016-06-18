@@ -21,6 +21,7 @@ import pandas as pd
 
 from jsonschema import validate
 from scipy.stats.mstats import zscore
+from boto import connect_s3
 
 def z_score_delta(scores):
 	"""Find the Z-Score Delta"""

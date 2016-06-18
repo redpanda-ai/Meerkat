@@ -16,7 +16,7 @@ from boto.s3.key import Key
 import boto3
 
 from meerkat.various_tools import (safely_remove_file, validate_configuration
-	, load_params)
+	, load_params, push_file_to_s3)
 
 S3_CLIENT = boto3.client('s3')
 
