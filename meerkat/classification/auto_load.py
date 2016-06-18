@@ -272,7 +272,22 @@ def load_best_model_for_type(**kwargs):
 		sys.exit()
 	logging.info("Tarball is valid, continuing")
 	#Extract everything
+	necessary_files = ["train.ckpt", "train.meta", "label_map.json", "classification_report.csv"]
 	with tarfile.open(name="results.tar.gz", mode="r:gz") as tar:
+		members = tar.getmembers()
+		member_names = [member.name for member in members]
+		for name in member_names:
+			logging.debug("Member is {0}".format(name))
+		for needed_file in necessary_files:
+			if needed_file not in member_names:
+				logging.critical("Archive does not contain {0}, aborting".format(needed_file))
+				files_to_nuke = ["results.tar.gz", "classification_report.csv", "confusion_matrix.csv"]
+				remote_base = kwargs["s3_prefix"] + "/" + model_type + kwargs["timestamp"]
+				for item in files_to_nuke:
+					logging.info("Removing {0} from {1}/{2}".format(item,
+						kwargs["bucket"], remote_base))
+					client.delete_object(Bucket=kwargs["bucket"], Key=remote_base + item)
+				sys.exit()
 		tar.extractall()
 	logging.info("Tarball contents extracted.")
 	output_path = "meerkat/classification/"
