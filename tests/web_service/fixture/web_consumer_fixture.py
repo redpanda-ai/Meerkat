@@ -17,6 +17,14 @@ def get_transactions_to_clean(case_type):
             "txn_type": "type",
             "CNN": "Ikea"
         }]
+    elif case_type == "physical_debug":
+        return [{
+           "is_physical_merchant": True,
+            "transaction_id": 123,
+            "txn_sub_type": "sub",
+            "txn_type": "type",
+            "CNN": "Ikea"
+        }]
 
 def get_proper_output(case_type):
     """Return an array of proper output"""
