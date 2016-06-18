@@ -75,6 +75,8 @@ def fetch_tarball_and_extract(timestamp, target, **kwargs):
 	"""Fetches a tarball from S3, pulls two csv files and uploads them back to S3"""
 	k = Key(kwargs["bucket"])
 	k.key = kwargs["prefix"] + kwargs["key"] + timestamp + target
+	#Here
+	target = kwargs["local_path"] + target
 	k.get_contents_to_filename(target)
 	# Require Meta
 	# Fixme, pretty sure we can just check the tarball for the meta file instead of extracting
@@ -88,8 +90,16 @@ def fetch_tarball_and_extract(timestamp, target, **kwargs):
 		"classification_report.csv")
 	logging.info("Tarball fetched and classification_report.csv extracted.")
 	upload_path = kwargs["prefix"] + kwargs["key"] + timestamp
-	push_file_to_s3("confusion_matrix.csv", kwargs["bucket"], upload_path)
-	push_file_to_s3("classification_report.csv", kwargs["bucket"], upload_path)
+
+	s3 = boto3.resource("s3")
+	s3_path = upload_path + "confusion_matrix.csv"
+	logging.warning("Uploading {0}".format(s3_path))
+	s3.meta.client.upload_file("confusion_matrix.csv", kwargs["bucket"].name, upload_path)
+	s3_path = upload_path + "classification_report.csv"
+	logging.warning("Uploading {0}".format(s3_path))
+	s3.meta.client.upload_file("confusion_matrix.csv", kwargs["bucket"].name, upload_path)
+	#push_file_to_s3("confusion_matrix.csv", kwargs["bucket"], upload_path)
+	#push_file_to_s3("classification_report.csv", kwargs["bucket"], upload_path)
 	logging.info("Classification_report.csv pushed to S3.")
 	return classification_report
 
@@ -109,7 +119,7 @@ def get_best_model_of_class(target, **kwargs):
 		long_key = short_key + "classification_report.csv"
 		classification_report = None
 		if s3_key_exists(kwargs["bucket"], long_key):
-			target_file = "classification_report.csv"
+			target_file = kwargs["local_path"] + "classification_report.csv"
 			S3_CLIENT.download_file(kwargs['bucket'].name, long_key, target_file)
 			classification_report = target_file
 			logging.info("Classification Report fetched from S3 at {0}.".format(long_key))
@@ -189,6 +199,9 @@ def get_best_models(*args):
 			my_kwargs[key] = kwargs[key]
 
 		my_kwargs["key"] = sorted_keys[i]
+		my_kwargs["local_path"] = "/tmp" + my_kwargs["key"]
+		logging.info("Making {0} directory".format(my_kwargs["local_path"]))
+		os.makedirs(my_kwargs["local_path"], exist_ok=True)
 		my_thread = threading.Thread(target=worker, kwargs=my_kwargs)
 		my_thread.daemon = True
 		my_thread.start()
