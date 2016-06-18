@@ -36,7 +36,7 @@ def z_score_delta(scores):
 
 def push_file_to_s3(source_path, bucket_name, object_prefix):
 	"""Pushes an object to S3"""
-	conn = connect_s3()
+	conn = boto.connect_s3()
 	bucket = conn.get_bucket(bucket_name, Location.USWest2)
 	filename = os.path.basename(source_path)
 	key = Key(bucket)
