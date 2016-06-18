@@ -65,6 +65,34 @@ def get_proper_output(case_type):
             "txn_type": "type",
             "website": ""
         }]
+    elif case_type == "physical_debug":
+        return [{
+            "city": "",
+            "state": "",
+            "transaction_id": 123,
+            "is_physical_merchant": True,
+            "merchant_name": "Ikea",
+            "txn_sub_type": "sub",
+            "txn_type": "type",
+            "chain_name": "",
+            "confidence_score": "",
+            "country": "",
+            "fax_number": "",
+            "latitude": "",
+            "longitude": "",
+            "match_found": False,
+            "neighbourhood": "",
+            "phone_number": "",
+            "postal_code": "",
+            "source": "OTHER",
+            "source_merchant_id": "",
+            "store_id": "",
+            "street": "",
+            "txn_sub_type": "sub",
+            "txn_type": "type",
+            "website": ""
+
+        ]}
 
 def get_transaction():
     """Create and return an array containing a single transaction"""
