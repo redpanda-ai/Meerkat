@@ -75,6 +75,8 @@ def fetch_tarball_and_extract(timestamp, target, **kwargs):
 	"""Fetches a tarball from S3, pulls two csv files and uploads them back to S3"""
 	k = Key(kwargs["bucket"])
 	k.key = kwargs["prefix"] + kwargs["key"] + timestamp + target
+	#Here
+	target = kwargs["local_path"] + target
 	k.get_contents_to_filename(target)
 	# Require Meta
 	# Fixme, pretty sure we can just check the tarball for the meta file instead of extracting
@@ -117,8 +119,8 @@ def get_best_model_of_class(target, **kwargs):
 		long_key = short_key + "classification_report.csv"
 		classification_report = None
 		if s3_key_exists(kwargs["bucket"], long_key):
-			target_file = "classification_report.csv"
-			S3_CLIENT.download_file(kwargs['bucket'].name, long_key, kwargs["local_path"] + target_file)
+			target_file = kwargs["local_path"] + "classification_report.csv"
+			S3_CLIENT.download_file(kwargs['bucket'].name, long_key, target_file)
 			classification_report = target_file
 			logging.info("Classification Report fetched from S3 at {0}.".format(long_key))
 		else:
