@@ -5,6 +5,7 @@ import csv
 import unittest
 import shutil
 import pandas as pd
+import numpy as np
 import meerkat.classification.tools as tools
 from meerkat.various_tools import load_params
 from nose_parameterized import parameterized
@@ -180,6 +181,26 @@ class ToolsTests(unittest.TestCase):
 		tools.dict_2_json(obj, filename)
 		self.assertTrue(os.path.isfile(filename))
 		os.remove(filename)
+
+	@parameterized.expand([
+		(['tests/classification/fixture/tf_config_with_alpha_dict.json', 'kkk', 3, [[0,0,0],[0,0,0],[0,0,0]]]),
+		(['tests/classification/fixture/tf_config_with_alpha_dict.json', 'abc', 3, [[0,0,1],[0,1,0],[1,0,0]]]),
+		(['tests/classification/fixture/tf_config_with_alpha_dict.json', 'abccccccccc', 3, [[0,0,1],[0,1,0],[1,0,0]]]),
+		(['tests/classification/fixture/tf_config_with_alpha_dict.json', 'a', 3, [[1,0,0],[0,0,0],[0,0,0]]])
+	])
+	def test_string_to_tensor_1(self, config, doc, length, expected):
+		"""Test string_to_tensor with parameters"""
+		config = load_params(config)
+		np.testing.assert_array_equal(list(tools.string_to_tensor(config, doc, length)), expected)
+
+	@parameterized.expand([
+		([tools_fixture.get_config(), "aab", 4, tools_fixture.get_tensor("short_doc")]),
+		([tools_fixture.get_config(), "aab", 2, tools_fixture.get_tensor("truncated_doc")])
+	])
+	def test_string_to_tensor_2(self, config, doc, length, expected_tensor):
+		"""Test string_to_tensor with parameters"""
+		result = tools.string_to_tensor(config, doc, length)
+		np.testing.assert_array_equal(result, expected_tensor)
 
 if __name__ == '__main__':
 	unittest.main()

@@ -43,6 +43,11 @@ from meerkat.various_tools import load_params, load_piped_dataframe, validate_co
 
 logging.basicConfig(level=logging.INFO)
 
+def load_soft_target(batch, num_labels):
+	"""load soft target from training set, assuming headers have format 'class_x'"""
+	header = ["class_" + str(i) for i in range(1, num_labels+1)]
+	return  batch[header].as_matrix()
+
 
 def validate_config(config):
 	"""Validate input configuration"""
@@ -58,7 +63,11 @@ def validate_config(config):
 	config["label_map"] = load_params(config["label_map"])
 	config["num_labels"] = len(config["label_map"].keys())
 	config["alpha_dict"] = {a : i for i, a in enumerate(config["alphabet"])}
+	# This is the base_rate for a normal CNN
 	config["base_rate"] = config["base_rate"] * math.sqrt(config["batch_size"]) / math.sqrt(128)
+	if config.get("soft_target", False):
+		# This is used when training with soft targets
+		config["base_rate"] = (config.get("temperature", 1) ** 2) * config["base_rate"]
 	config["alphabet_length"] = len(config["alphabet"])
 
 	return config
@@ -133,7 +142,7 @@ def mixed_batching(config, df, groups_train):
 
 	return batch
 
-def batch_to_tensor(config, batch):
+def batch_to_tensor(config, batch, soft_target=False):
 	"""Convert a batch to a tensor representation"""
 
 	doc_length = config["doc_length"]
@@ -150,6 +159,9 @@ def batch_to_tensor(config, batch):
 		transactions[index][0] = string_to_tensor(config, trans, doc_length)
 
 	transactions = np.transpose(transactions, (0, 1, 3, 2))
+	if soft_target:
+		soft_labels = load_soft_target(batch, num_labels)
+		return transactions, labels, soft_labels
 	return transactions, labels
 
 def evaluate_testset(config, graph, sess, model, test):

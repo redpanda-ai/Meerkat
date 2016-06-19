@@ -75,6 +75,8 @@ def fetch_tarball_and_extract(timestamp, target, **kwargs):
 	"""Fetches a tarball from S3, pulls two csv files and uploads them back to S3"""
 	k = Key(kwargs["bucket"])
 	k.key = kwargs["prefix"] + kwargs["key"] + timestamp + target
+	#Here
+	target = kwargs["local_path"] + target
 	k.get_contents_to_filename(target)
 	# Require Meta
 	# Fixme, pretty sure we can just check the tarball for the meta file instead of extracting
@@ -88,8 +90,16 @@ def fetch_tarball_and_extract(timestamp, target, **kwargs):
 		"classification_report.csv")
 	logging.info("Tarball fetched and classification_report.csv extracted.")
 	upload_path = kwargs["prefix"] + kwargs["key"] + timestamp
-	push_file_to_s3("confusion_matrix.csv", kwargs["bucket"], upload_path)
-	push_file_to_s3("classification_report.csv", kwargs["bucket"], upload_path)
+
+	s3 = boto3.resource("s3")
+	s3_path = upload_path + "confusion_matrix.csv"
+	logging.warning("Uploading {0}".format(s3_path))
+	s3.meta.client.upload_file("confusion_matrix.csv", kwargs["bucket"].name, upload_path)
+	s3_path = upload_path + "classification_report.csv"
+	logging.warning("Uploading {0}".format(s3_path))
+	s3.meta.client.upload_file("confusion_matrix.csv", kwargs["bucket"].name, upload_path)
+	#push_file_to_s3("confusion_matrix.csv", kwargs["bucket"], upload_path)
+	#push_file_to_s3("classification_report.csv", kwargs["bucket"], upload_path)
 	logging.info("Classification_report.csv pushed to S3.")
 	return classification_report
 
@@ -109,7 +119,7 @@ def get_best_model_of_class(target, **kwargs):
 		long_key = short_key + "classification_report.csv"
 		classification_report = None
 		if s3_key_exists(kwargs["bucket"], long_key):
-			target_file = "classification_report.csv"
+			target_file = kwargs["local_path"] + "classification_report.csv"
 			S3_CLIENT.download_file(kwargs['bucket'].name, long_key, target_file)
 			classification_report = target_file
 			logging.info("Classification Report fetched from S3 at {0}.".format(long_key))
@@ -189,6 +199,9 @@ def get_best_models(*args):
 			my_kwargs[key] = kwargs[key]
 
 		my_kwargs["key"] = sorted_keys[i]
+		my_kwargs["local_path"] = "/tmp" + my_kwargs["key"]
+		logging.info("Making {0} directory".format(my_kwargs["local_path"]))
+		os.makedirs(my_kwargs["local_path"], exist_ok=True)
 		my_thread = threading.Thread(target=worker, kwargs=my_kwargs)
 		my_thread.daemon = True
 		my_thread.start()
@@ -272,7 +285,22 @@ def load_best_model_for_type(**kwargs):
 		sys.exit()
 	logging.info("Tarball is valid, continuing")
 	#Extract everything
+	necessary_files = ["train.ckpt", "train.meta", "label_map.json", "classification_report.csv"]
 	with tarfile.open(name="results.tar.gz", mode="r:gz") as tar:
+		members = tar.getmembers()
+		member_names = [member.name for member in members]
+		for name in member_names:
+			logging.debug("Member is {0}".format(name))
+		for needed_file in necessary_files:
+			if needed_file not in member_names:
+				logging.critical("Archive does not contain {0}, aborting".format(needed_file))
+				files_to_nuke = ["results.tar.gz", "classification_report.csv", "confusion_matrix.csv"]
+				remote_base = kwargs["s3_prefix"] + "/" + model_type + kwargs["timestamp"]
+				for item in files_to_nuke:
+					logging.info("Removing {0} from {1}/{2}".format(item,
+						kwargs["bucket"], remote_base))
+					client.delete_object(Bucket=kwargs["bucket"], Key=remote_base + item)
+				sys.exit()
 		tar.extractall()
 	logging.info("Tarball contents extracted.")
 	output_path = "meerkat/classification/"

@@ -26,28 +26,19 @@ Created on Apr 16, 2016
 ###################################################################################################
 
 import logging
-import math
 import os
-import pprint
-import random
 import shutil
 import sys
 
 import numpy as np
 import tensorflow as tf
 
-from .tools import (fill_description_unmasked, reverse_map, batch_normalization, chunks,
-	accuracy, get_tensor, get_op, get_variable, threshold, bias_variable, weight_variable, conv2d,
-	max_pool, get_cost_list, string_to_tensor)
-from meerkat.various_tools import load_params, load_piped_dataframe, validate_configuration
+from .tools import (batch_normalization, chunks, max_pool, get_cost_list,
+	accuracy, get_tensor, get_op, get_variable, threshold, bias_variable, weight_variable, conv2d)
+from meerkat.classification.tensorflow_cnn import (run_session, mixed_batching, load_data,
+	validate_config, batch_to_tensor)
 
 logging.basicConfig(level=logging.INFO)
-
-def load_soft_target(batch, num_labels):
-	"""load soft target from training set, assuming headers have format 'class_x'"""
-	header = ["class_" + str(i) for i in range(1, num_labels+1)]
-	return  batch[header].as_matrix()
-
 
 def softmax_with_temperature(tensor, temperature):
 	"""return a probability array derived by its logit/temperature"""
@@ -90,150 +81,6 @@ def ensemble_evaluate_testset(config, graph, sess, model, test):
 	logging.info("Average Ensemble test accuracy: %.2f%%" % test_accuracy)
 	logging.info("Correct count: " + str(correct_count))
 	logging.info("Total count: " + str(total_count))
-
-	return test_accuracy
-
-def validate_config(config):
-	"""Validate input configuration"""
-
-	config = load_params(config)
-	schema_file = "meerkat/classification/config/tensorflow_cnn_schema.json"
-	config = validate_configuration(config, schema_file)
-	logging.debug("Configuration is :\n{0}".format(pprint.pformat(config)))
-	reshape = ((config["doc_length"] - 96) / 27) * 256
-	config["reshape"] = int(reshape)
-	config["label_map"] = load_params(config["label_map"])
-	config["num_labels"] = len(config["label_map"].keys())
-	config["alpha_dict"] = {a : i for i, a in enumerate(config["alphabet"])}
-	if not config["soft_target"]:
-		config["base_rate"] = config["base_rate"] * math.sqrt(config["batch_size"]) / math.sqrt(128)
-	else:
-		config["base_rate"] = ((config["temperature"] ** 2) * config["base_rate"]
-			* math.sqrt(config["batch_size"]) / math.sqrt(128))
-	config["alphabet_length"] = len(config["alphabet"])
-
-	return config
-
-def load_data(config):
-	"""Load labeled data and label map"""
-
-	model_type = config["model_type"]
-	dataset = config["dataset"]
-	label_map = config["label_map"]
-	ledger_entry = config["ledger_entry"]
-
-	ground_truth_labels = {
-		'category' : 'PROPOSED_CATEGORY',
-		'merchant' : 'MERCHANT_NAME',
-		'subtype' : 'PROPOSED_SUBTYPE'
-	}
-
-	label_key = ground_truth_labels[model_type]
-	reversed_map = reverse_map(label_map)
-	map_labels = lambda x: reversed_map.get(str(x[label_key]), "")
-
-	df = load_piped_dataframe(dataset)
-
-	# Verify number of labels
-	if not len(reversed_map) == len(df[label_key].value_counts()):
-		logging.critical("Reversed Map :\n{0}".format(pprint.pformat(reversed_map)))
-		logging.critical("df[label_key].value_counts(): {0}".format(df[label_key].value_counts()))
-		map_keys = reversed_map.keys()
-		keys_in_dataframe = df[label_key].value_counts().index.get_values()
-		missing_keys = map_keys - keys_in_dataframe
-		logging.critical("The dataframe label counts index is missing these {0} items:\n{1}"\
-			.format(len(missing_keys), pprint.pformat(missing_keys)))
-
-		raise Exception('Number of indexes does not match number of labels')
-
-	if model_type != "merchant":
-		df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
-		grouped = df.groupby('LEDGER_ENTRY', as_index=False)
-		groups = dict(list(grouped))
-		df = groups[ledger_entry]
-
-	df["DESCRIPTION_UNMASKED"] = df.apply(fill_description_unmasked, axis=1)
-	df = df.reindex(np.random.permutation(df.index))
-	df["LABEL_NUM"] = df.apply(map_labels, axis=1)
-	df = df[df["LABEL_NUM"] != ""]
-
-	msk = np.random.rand(len(df)) < 0.90
-	train = df[msk]
-	test = df[~msk]
-
-	grouped_train = train.groupby('LABEL_NUM', as_index=False)
-	groups_train = dict(list(grouped_train))
-
-	return train, test, groups_train
-
-def mixed_batching(config, df, groups_train):
-	"""Batch from train data using equal class batching"""
-
-	num_labels = config["num_labels"]
-	batch_size = config["batch_size"]
-	half_batch = int(batch_size / 2)
-	# indices_to_sample = list(np.random.choice(df.index, half_batch, replace=False))
-	indices_to_sample = list(np.random.choice(df.index, half_batch))
-
-	for index in range(half_batch):
-		label = random.randint(1, num_labels)
-		select_group = groups_train[str(label)]
-		indices_to_sample.append(np.random.choice(select_group[index], 1)[0])
-
-	random.shuffle(indices_to_sample)
-	batch = df.loc[indices_to_sample]
-
-	return batch
-
-def batch_to_tensor(config, batch, soft_target=False):
-	"""Convert a batch to a tensor representation"""
-
-	doc_length = config["doc_length"]
-	alphabet_length = config["alphabet_length"]
-	num_labels = config["num_labels"]
-	batch_size = len(batch.index)
-
-	labels = np.array(batch["LABEL_NUM"].astype(int)) - 1
-	labels = (np.arange(num_labels) == labels[:, None]).astype(np.float32)
-	labels_soft = load_soft_target(batch, num_labels) if soft_target else None
-	docs = batch["DESCRIPTION_UNMASKED"].tolist()
-	transactions = np.zeros(shape=(batch_size, 1, alphabet_length, doc_length))
-
-	for index, trans in enumerate(docs):
-		transactions[index][0] = string_to_tensor(config, trans, doc_length)
-
-	transactions = np.transpose(transactions, (0, 1, 3, 2))
-	return transactions, labels, labels_soft
-
-def evaluate_testset(config, graph, sess, model, test):
-	"""Check error on test set"""
-
-	with tf.name_scope('accuracy'):
-
-		total_count = len(test.index)
-		correct_count = 0
-		chunked_test = chunks(np.array(test.index), 128)
-		num_chunks = len(chunked_test)
-
-		for i in range(num_chunks):
-
-			batch_test = test.loc[chunked_test[i]]
-
-			trans_test, labels_test, _ = batch_to_tensor(config, batch_test)
-			feed_dict_test = {get_tensor(graph, "x:0"): trans_test}
-			output = sess.run(model, feed_dict=feed_dict_test)
-
-			batch_correct_count = np.sum(np.argmax(output, 1) == np.argmax(labels_test, 1))
-
-			correct_count += batch_correct_count
-		
-		test_accuracy = 100.0 * (correct_count / total_count)
-		logging.info("Test accuracy: %.2f%%" % test_accuracy)
-		logging.info("Correct count: " + str(correct_count))
-		logging.info("Total count: " + str(total_count))
-
-		accuracy = get_variable(graph, "test_accuracy:0")
-		sess.run(accuracy.assign(test_accuracy))
 
 	return test_accuracy
 
@@ -376,7 +223,7 @@ def build_graph(config):
 		cnn = []
 
 		for i in range(1, num_cnns+1):
-			scope_name = "model" + str(i)
+			scope_name = "model" + str(i) * (num_cnns > 1)
 			with tf.variable_scope(scope_name):
 				bn_scaler = tf.Variable(1.0 * tf.ones([num_labels]))
 
@@ -409,17 +256,15 @@ def build_graph(config):
 				softmax.append(prob_train)
 				network.append(logsoftmax(softmax[i-1], "network"))
 				prob_full = encoder(trans_placeholder, "softmax_full", i, train=False)
-				cnn.append(logsoftmax(prob_full, "cnn"))
+				cnn.append(logsoftmax(prob_full, "cnn"*(num_cnns > 1)))
 
 		ensemble = sum(softmax) / (num_cnns + 0.0)
 		weighted_labels = cost_list * labels_placeholder
 
-		# Calculate Loss and Optimize
 		def cal_loss(sub_softmax, sub_network, name):
 			"""Returns negative correlation learning loss function"""
 			return tf.neg(tf.reduce_mean(tf.reduce_sum(sub_network * weighted_labels, 1)) +
 				0.5 * tf.reduce_mean(tf.reduce_sum((ensemble - sub_softmax) ** 2, 1)), name=name)
-
 
 		def make_optimizer(loss, op_name, scope_name):
 			"""Returns a  momentumOptimizer"""
@@ -434,7 +279,7 @@ def build_graph(config):
 					"network_flat") * soft_labels_placeholder, 1))
 					+ 0.15 * tf.reduce_mean(tf.reduce_sum(network[0] * weighted_labels, 1)),
 					name="loss1")]
-			optimizer = [make_optimizer(loss[i], "optimizer"+str(i+1), "model"+str(i+1))
+			optimizer = [make_optimizer(loss[i], "optimizer"+str(i+1), "model"+str(i+1)*(num_cnns > 1))
 				for i in range(num_cnns)]
 
 		bn_updates = tf.group(*bn_assigns)
@@ -445,7 +290,7 @@ def build_graph(config):
 			"""return a saver for namespace name"""
 			return tf.train.Saver([x for x in tf.all_variables() if x.name.startswith(name)])
 
-		saver = [get_saver("model"+str(i+1)) for i in range(num_cnns)]
+		saver = [get_saver("model"+str(i+1)*(num_cnns > 1)) for i in range(num_cnns)]
 
 	return graph, saver
 
@@ -488,10 +333,11 @@ def train_model(config, graph, sess, saver):
 		if step % 1000 == 0:
 			# Calculate Batch Accuracy
 			for i in range(1, num_cnns+1):
-				predictions = sess.run(get_tensor(graph, "model"+str(i)+"/cnn:0"), feed_dict=feed_dict)
+				predictions = sess.run(get_tensor(graph, "model"+(str(i)+"/cnn")*(num_cnns > 1)+":0"),
+					feed_dict=feed_dict)
 				logging.info("Minibatch accuracy for cnn" + str(i) + ": %.1f%%" % accuracy(predictions, labels))
 			# Estimate Accuracy for Visualization
-			model = [get_tensor(graph, "model"+str(i+1)+"/cnn:0") for i in range(num_cnns)]
+			model = [get_tensor(graph, "model"+(str(i)+"/cnn")*(num_cnns > 1)+":0") for i in range(num_cnns)]
 			ensemble_accuracy = ensemble_evaluate_testset(config, graph, sess, model, test)
 
 		# Log Loss and Update TensorBoard
@@ -542,17 +388,6 @@ def train_model(config, graph, sess, saver):
 		final_meta_path = save_path + dataset_path + ".model" + str(i+1) + ".meta"
 		logging.info("Moving final model from {0} to {1}.".format(model_path[i], final_model_path))
 
-	#rename cnn tensor name
-		if config["soft_target"]:
-			saver = tf.train.import_meta_graph(meta_path[i])
-			sess = tf.Session()
-			saver.restore(sess, model_path[i])
-			graph = sess.graph
-			models = get_tensor(graph, "model1/cnn:0")
-			with graph.as_default():
-				model = tf.identity(models, "model")
-			_ = saver.save(sess, model_path[i])
-
 		os.rename(model_path[i], final_model_path)
 		os.rename(meta_path[i], final_meta_path)
 	logging.info("Deleting unneeded directory of checkpoints at {0}".format(save_dir))
@@ -560,24 +395,6 @@ def train_model(config, graph, sess, saver):
 
 	if config["soft_target"]:
 		return final_model_path
-
-def run_session(config, graph, saver):
-	"""Run Session"""
-
-	with tf.Session(graph=graph) as sess:
-
-		mode = config["mode"]
-		model_path = config["model_path"]
-
-		tf.initialize_all_variables().run()
-
-		if mode == "train":
-			train_model(config, graph, sess, saver)
-		elif mode == "test":
-			saver.restore(sess, model_path)
-			model = get_tensor(graph, "model:0")
-			_, test, _ = load_data(config)
-			evaluate_testset(config, graph, sess, model, test)
 
 def run_from_command_line():
 	"""Run module from command line"""
