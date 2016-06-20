@@ -152,6 +152,7 @@ def in_location_bloom(text):
 					if (loc, region) in LOCATION_BLOOM:
 						biggest = (loc, region)
 						break
+				if biggest: break
 		'''
 		return biggest
 
@@ -168,14 +169,13 @@ def location_split(my_text):
 	words = get_json_from_file('meerkat/classification/bloom_filter/assets/words_start_with_states.json')
 	length = len(my_text)
 	for i in range(length - 2, -1, -1):
-		if my_text[i:i+2] in STATES and (i == length - 2 or tag[i + 2] == 'B' or \
+		if my_text[i:i+2] in STATES and tag[i+1] == 'C' and (i == length - 2 or tag[i + 2] == 'B' or \
 		get_word(tag, my_text, i) not in words[my_text[i:i+2]]):
 			place = in_location_bloom(my_text[:i+2])
 			if place:
 				key = place[0] + place[1]
 				try: return CITY_SUBS[key]
 				except: pass
-				# return place
 	return None
 
 def get_word(tag, text, index):
@@ -191,7 +191,7 @@ def get_word(tag, text, index):
 def tag_text(text):
 	'''make tag for text'''
 	for mark in string.punctuation:
-		text = text.replace(mark, "")
+		text = text.replace(mark, ' ')
 	text = text.strip()
 	tag = ''
 	for i in range(len(text)):
@@ -235,5 +235,5 @@ def main():
 	print(location_bloom_results.describe())
 
 if __name__ == "__main__":
-#	main()
-	print(location_split('FTWORTHTX'))
+	main()
+#	print(location_split('DEBIT CARD PURCHASE   XXXXX8363     MEIJER 222        Q01    MADISON HEIGHT MI'))
