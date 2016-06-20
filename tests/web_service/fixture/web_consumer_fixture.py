@@ -24,17 +24,14 @@ def get_transactions_to_clean(case_type):
             "transaction_id": 123,
             "txn_sub_type": "sub",
             "txn_type": "type",
-            "CNN": "Ikea"
+            "CNN": "Ikea",
+            "country": "US",
+            "search": {}
         }]
 
 def get_proper_output(case_type):
     """Return an array of proper output"""
     base_dir = "tests/web_service/fixture/"
-    #if case_type == "non_physical_no_debug":
-    #    file_path = base_dir + "non_physical_no_debug.json"
-    #elif case_type == "physical_no_debug":
-    #    file_path = base_dir + "physical_no_debug.json"
-    #elif case_type == "physical_debug":
     file_path = base_dir + case_type + ".json"
     json_file = open(file_path, encoding='utf-8')
     return [json.load(json_file)]
