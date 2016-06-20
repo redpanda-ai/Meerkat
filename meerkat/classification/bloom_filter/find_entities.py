@@ -9,12 +9,12 @@ Modified on June 29, 2015
 @author: Sivan Mehta
 """
 
-import pandas as pd
 import csv
 import pickle
 import os
 import string
 
+import pandas as pd
 from .bloom import *
 from .generate_json import generate_js
 
