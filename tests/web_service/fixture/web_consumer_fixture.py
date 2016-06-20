@@ -1,4 +1,5 @@
 import uuid
+import json
 
 def get_transactions_to_clean(case_type):
     """Return an array of transactions to be cleaned fo proper schema"""
@@ -28,71 +29,15 @@ def get_transactions_to_clean(case_type):
 
 def get_proper_output(case_type):
     """Return an array of proper output"""
-    if case_type == "non_physical_no_debug":
-        return [{
-            "city": "",
-            "state": "",
-            "transaction_id": 123,
-            "is_physical_merchant": False,
-            "merchant_name": "",
-            "txn_sub_type": "sub",
-            "txn_type": "type"
-        }]
-    elif case_type == "physical_no_debug":
-        return [{
-            "city": "",
-            "state": "",
-            "transaction_id": 123,
-            "is_physical_merchant": True,
-            "merchant_name": "Ikea",
-            "txn_sub_type": "sub",
-            "txn_type": "type",
-            "chain_name": "",
-            "confidence_score": "",
-            "country": "",
-            "fax_number": "",
-            "latitude": "",
-            "longitude": "",
-            "match_found": False,
-            "neighbourhood": "",
-            "phone_number": "",
-            "postal_code": "",
-            "source": "OTHER",
-            "source_merchant_id": "",
-            "store_id": "",
-            "street": "",
-            "txn_sub_type": "sub",
-            "txn_type": "type",
-            "website": ""
-        }]
-    elif case_type == "physical_debug":
-        return [{
-            "city": "",
-            "state": "",
-            "transaction_id": 123,
-            "is_physical_merchant": True,
-            "merchant_name": "Ikea",
-            "txn_sub_type": "sub",
-            "txn_type": "type",
-            "chain_name": "",
-            "confidence_score": "",
-            "country": "",
-            "fax_number": "",
-            "latitude": "",
-            "longitude": "",
-            "match_found": False,
-            "neighbourhood": "",
-            "phone_number": "",
-            "postal_code": "",
-            "source": "OTHER",
-            "source_merchant_id": "",
-            "store_id": "",
-            "street": "",
-            "txn_sub_type": "sub",
-            "txn_type": "type",
-            "website": ""
-
-        ]}
+    base_dir = "tests/web_service/fixture/"
+    #if case_type == "non_physical_no_debug":
+    #    file_path = base_dir + "non_physical_no_debug.json"
+    #elif case_type == "physical_no_debug":
+    #    file_path = base_dir + "physical_no_debug.json"
+    #elif case_type == "physical_debug":
+    file_path = base_dir + case_type + ".json"
+    json_file = open(file_path, encoding='utf-8')
+    return [json.load(json_file)]
 
 def get_transaction():
     """Create and return an array containing a single transaction"""

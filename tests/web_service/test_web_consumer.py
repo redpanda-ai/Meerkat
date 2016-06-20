@@ -38,9 +38,9 @@ class WebConsumerTest(unittest.TestCase):
 		([web_consumer_fixture.get_transactions_to_clean("non_physical_no_debug"),
 			False, web_consumer_fixture.get_proper_output("non_physical_no_debug")]),
 		([web_consumer_fixture.get_transactions_to_clean("physical_no_debug"),
-			False, web_consumer_fixture.get_proper_output("physical_no_debug")]),
-		([web_consumer_fixture.get_transaction_to_clean("physical_debug"),
-			True, web_consumer_fixture.get_proper_output("physical_debug")])
+			False, web_consumer_fixture.get_proper_output("physical_no_debug")])
+		#([web_consumer_fixture.get_transaction_to_clean("physical_debug"),
+		#	True, web_consumer_fixture.get_proper_output("physical_debug")])
 	])
 	def test_ensure_output_schema(self, transactions, debug, expected):
 		"""Test ensure_output_schema with parameters"""
