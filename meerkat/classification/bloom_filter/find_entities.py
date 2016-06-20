@@ -28,7 +28,7 @@ STATES = [
 	"NM", "NY", "NC", "ND", "OH", \
 	"OK", "OR", "PA", "RI", "SC", \
 	"SD", "TN", "TX", "UT", "VT", \
-	"VA", "WA", "WV", "WI", "WY" ]
+	"VA", "WA", "WV", "WI", "WY"]
 
 LOCATION_BLOOM = get_location_bloom()
 
@@ -82,7 +82,8 @@ def generate_city_map():
 			city, state = line.strip().split('\t')
 			add_with_subs(data, city, state)
 
-	csv_file = csv.reader(open("meerkat/classification/bloom_filter/assets/us_cities_larger.csv", encoding="utf-8"), delimiter="\t")
+	csv_file = csv.reader(open("meerkat/classification/bloom_filter/assets/us_cities_larger.csv", \
+		encoding="utf-8"), delimiter="\t")
 
 	for row in csv_file:
 		try:
@@ -167,7 +168,8 @@ def location_split(my_text):
 	words = get_json_from_file('meerkat/classification/bloom_filter/assets/words_start_with_states.json')
 	length = len(my_text)
 	for i in range(length - 2, -1, -1):
-		if my_text[i:i+2] in STATES and (i == length - 2 or tag[i + 2] == 'B' or get_word(tag, my_text, i) not in words[my_text[i:i+2]]):
+		if my_text[i:i+2] in STATES and (i == length - 2 or tag[i + 2] == 'B' or \
+		get_word(tag, my_text, i) not in words[my_text[i:i+2]]):
 			place = in_location_bloom(my_text[:i+2])
 			if place:
 				key = place[0] + place[1]
@@ -177,6 +179,7 @@ def location_split(my_text):
 	return None
 
 def get_word(tag, text, index):
+	'''get the word concact with state'''
 	end = index + 2
 	for ch in tag[index + 2:]:
 		if ch == 'C':
@@ -186,6 +189,7 @@ def get_word(tag, text, index):
 	return text[index:end]
 
 def tag_text(text):
+	'''make tag for text'''
 	for mark in string.punctuation:
 		text = text.replace(mark, "")
 	text = text.strip()
@@ -232,4 +236,4 @@ def main():
 
 if __name__ == "__main__":
 #	main()
-	print(location_split('DEBIT CARD PURCHASE   XXXXX9116     TERRAIN 3001             CONCORDVILL PA'))
+	print(location_split('FTWORTHTX'))
