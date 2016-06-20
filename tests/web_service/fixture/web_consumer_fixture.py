@@ -8,7 +8,8 @@ def get_transactions_to_clean(case_type):
             "is_physical_merchant": False,
             "transaction_id": 123,
             "txn_sub_type": "Purchase",
-            "txn_type": "Purchase"
+            "txn_type": "Purchase",
+            "locale_bloom": None
         }]
     elif case_type == "physical_no_debug":
         return [{
@@ -17,7 +18,8 @@ def get_transactions_to_clean(case_type):
             "txn_sub_type": "Purchase",
             "txn_type": "Purchase",
             "CNN": "Ikea",
-            "country": "US"
+            "country": "US",
+            "locale_bloom": None
         }]
     elif case_type == "physical_debug":
         return [{
