@@ -7,25 +7,28 @@ def get_transactions_to_clean(case_type):
         return [{
             "is_physical_merchant": False,
             "transaction_id": 123,
-            "txn_sub_type": "sub",
-            "txn_type": "type"
+            "txn_sub_type": "Purchase",
+            "txn_type": "Purchase"
         }]
     elif case_type == "physical_no_debug":
         return [{
            "is_physical_merchant": True,
             "transaction_id": 123,
-            "txn_sub_type": "sub",
-            "txn_type": "type",
-            "CNN": "Ikea"
+            "txn_sub_type": "Purchase",
+            "txn_type": "Purchase",
+            "CNN": "Ikea",
+            "country": "US"
         }]
     elif case_type == "physical_debug":
         return [{
            "is_physical_merchant": True,
             "transaction_id": 123,
-            "txn_sub_type": "sub",
-            "txn_type": "type",
+            "txn_sub_type": "Purchase",
+            "txn_type": "Purchase",
             "CNN": "Ikea",
             "country": "US",
+            "state": "NY",
+            "city": "Scars",
             "search": {}
         }]
 

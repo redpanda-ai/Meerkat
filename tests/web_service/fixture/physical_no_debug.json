@@ -4,11 +4,11 @@
     "transaction_id": 123,
     "is_physical_merchant": true,
     "merchant_name": "Ikea",
-    "txn_sub_type": "sub",
-    "txn_type": "type",
+    "txn_sub_type": "Purchase",
+    "txn_type": "Purchase",
     "chain_name": "",
     "confidence_score": "",
-    "country": "",
+    "country": "US",
     "fax_number": "",
     "latitude": "",
     "longitude": "",
@@ -20,7 +20,5 @@
     "source_merchant_id": "",
     "store_id": "",
     "street": "",
-    "txn_sub_type": "sub",
-    "txn_type": "type",
     "website": ""
 }
