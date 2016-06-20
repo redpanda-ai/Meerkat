@@ -1,6 +1,6 @@
 {
-    "city": "",
-    "state": "",
+    "city": "Scars",
+    "state": "NY",
     "transaction_id": 123,
     "is_physical_merchant": true,
     "merchant_name": "Ikea",

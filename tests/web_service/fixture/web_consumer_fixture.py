@@ -12,7 +12,7 @@ def get_transactions_to_clean(case_type):
         }]
     elif case_type == "physical_no_debug":
         return [{
-           "is_physical_merchant": True,
+            "is_physical_merchant": True,
             "transaction_id": 123,
             "txn_sub_type": "Purchase",
             "txn_type": "Purchase",
@@ -21,7 +21,7 @@ def get_transactions_to_clean(case_type):
         }]
     elif case_type == "physical_debug":
         return [{
-           "is_physical_merchant": True,
+            "is_physical_merchant": True,
             "transaction_id": 123,
             "txn_sub_type": "Purchase",
             "txn_type": "Purchase",
@@ -29,7 +29,8 @@ def get_transactions_to_clean(case_type):
             "country": "US",
             "state": "NY",
             "city": "Scars",
-            "search": {}
+            "search": {},
+            "locale_bloom": ["Scars", "NY"]
         }]
 
 def get_proper_output(case_type):
