@@ -28,16 +28,17 @@ class AutoLoadTests(unittest.TestCase):
 			pass
 
 	@parameterized.expand([
-		(["s3yodlee", "meerkat/cnn/data", "results.tar.gz"]),
-		([ "s3yodlee", "meerkat/cnn/data", "input.tar.gz"])
+		(["us-west-2", "s3yodlee", "meerkat/cnn/data", "results.tar.gz"]),
+		(["us-west-2", "s3yodlee", "meerkat/cnn/data", "input.tar.gz"])
 	])
-	def test_find_s3_objects(self, bucket, prefix, target):
+	def test_find_s3_objects_recursively(self, region, bucket, prefix, target):
 		"""Test the ability to find all candidate models in S3"""
-		client = boto3.client("s3")
-		my_results = auto_load.find_s3_objects(s3_client=client, bucket=bucket,
+		conn = boto.s3.connect_to_region(region)
+		bucket = conn.get_bucket(bucket)
+		my_results = {}
+		auto_load.find_s3_objects_recursively(conn, bucket, my_results,
 			prefix=prefix, target=target)
-		self.assertTrue(isinstance(my_results, dict))
-		self.assertTrue(bool(my_results))
+		self.assertTrue(my_results)
 
 	@parameterized.expand([
 		(["prefix", "/model_type/", ["20160413000000/", "20160413000001/"],
