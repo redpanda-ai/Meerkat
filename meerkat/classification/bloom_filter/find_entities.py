@@ -152,6 +152,7 @@ def in_location_bloom(text):
 					if (loc, region) in LOCATION_BLOOM:
 						biggest = (loc, region)
 						break
+				if biggest: break
 		'''
 		return biggest
 
@@ -236,4 +237,4 @@ def main():
 
 if __name__ == "__main__":
 #	main()
-	print(location_split('FTWORTHTX'))
+	print(location_split('DEBIT CARD PURCHASE   XXXXX8363     MEIJER 222        Q01    MADISON HEI MI'))
