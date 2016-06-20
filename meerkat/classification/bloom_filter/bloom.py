@@ -10,7 +10,7 @@ Updated on June 29, 2015
 @author: Sivan Mehta
 """
 
-import json, sys, os, string, csv
+import json, sys, string, csv
 from pybloom import ScalableBloomFilter
 
 def standardize(text):
@@ -53,8 +53,8 @@ def create_location_bloom(src_filename, dst_filename):
 	except:
 		get_diff_json_csv()
 
-	with open('meerkat/classification/bloom_filter/assets/csv_not_json') as f:
-		for line in f:
+	with open('meerkat/classification/bloom_filter/assets/csv_not_json') as frd:
+		for line in frd:
 			city, state = line.strip().split('\t')
 			city_name = standardize(city)
 			state_name = state.upper()
@@ -67,6 +67,7 @@ def create_location_bloom(src_filename, dst_filename):
 	return sbf
 
 def get_diff_json_csv():
+	'''get the difference between json and csv file about city and state'''
 	dict_json = dict()
 	locations = get_json_from_file('meerkat/classification/bloom_filter/assets/locations.json')
 	states = locations["aggregations"]["states"]["buckets"]
@@ -78,7 +79,8 @@ def get_diff_json_csv():
 			dict_json[location] = (city["key"], state_name)
 
 	dict_csv = dict()
-	csv_file = csv.reader(open("meerkat/classification/bloom_filter/assets/us_cities_larger.csv", encoding="utf-8"), delimiter="\t")
+	csv_file = csv.reader(open("meerkat/classification/bloom_filter/assets/us_cities_larger.csv", \
+		encoding="utf-8"), delimiter="\t")
 	for row in csv_file:
 		try:
 			int(row[2])
@@ -88,28 +90,30 @@ def get_diff_json_csv():
 			location = (standardize(city), state)
 			dict_csv[location] = (city, state)
 
-	with open('meerkat/classification/bloom_filter/assets/csv_not_json', 'w') as f:
+	with open('meerkat/classification/bloom_filter/assets/csv_not_json', 'w') as fwt:
 		for key in dict_csv.keys():
 			if key not in dict_json:
 				tup = dict_csv[key]
-				f.write('{0}	{1}'.format(tup[0], tup[1]) + '\n')
+				fwt.write('{0}	{1}'.format(tup[0], tup[1]) + '\n')
 
-	with open('meerkat/classification/bloom_filter/assets/json_not_csv', 'w') as f:
+	with open('meerkat/classification/bloom_filter/assets/json_not_csv', 'w') as fwt:
 		for key in dict_json.keys():
 			if key not in dict_csv:
 				tup = dict_json[key]
-				f.write('{0}	{1}'.format(tup[0], tup[1]) + '\n')
+				fwt.write('{0}	{1}'.format(tup[0], tup[1]) + '\n')
 
 def get_location_bloom():
 	"""Attempts to fetch a bloom filter from a file, making a new bloom filter
 	if that is not possible."""
 	sbf = None
 	try:
-		sbf = ScalableBloomFilter.fromfile(open("meerkat/classification/bloom_filter/assets/location_bloom", "br"))
+		sbf = ScalableBloomFilter.fromfile(\
+			open("meerkat/classification/bloom_filter/assets/location_bloom", "br"))
 		print("Location bloom filter loaded from file.")
 	except:
 		print("Creating new bloom filter")
-		sbf = create_location_bloom("meerkat/classification/bloom_filter/assets/locations.json", "meerkat/classification/bloom_filter/assets/location_bloom")
+		sbf = create_location_bloom("meerkat/classification/bloom_filter/assets/locations.json", \
+			"meerkat/classification/bloom_filter/assets/location_bloom")
 	return sbf
 
 # MAIN PROGRAM
