@@ -38,13 +38,14 @@ class ClassifcationReportTests(unittest.TestCase):
 	])
 	def test_get_classification_report(self, cm_file, label_map, exception):
 		"""Test get_classification_report with parameters"""
-		report_path = "tests/classification/fixture/result_classification_report.csv"
+		base_dir = "tests/classification/fixture/"
+		report_path = base_dir + "result_classification_report.csv"
 		if exception:
 			self.assertRaises(Exception, cr.get_classification_report,
 				cm_file, label_map, report_path)
 		else:
 			cr.get_classification_report(cm_file, label_map, report_path)
-			expected_path = "tests/classification/fixture/expected_classification_report.csv"
+			expected_path = base_dir + "expected_classification_report.csv"
 			df_result = load_piped_dataframe(report_path)
 			df_expected = load_piped_dataframe(expected_path)
 			self.assertTrue(df_result.equals(df_expected))
