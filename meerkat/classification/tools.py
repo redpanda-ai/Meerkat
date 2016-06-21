@@ -13,7 +13,6 @@ import pandas as pd
 import numpy as np
 import tensorflow as tf
 
-from boto.s3.key import Key
 from boto.s3.connection import Location
 from boto import connect_s3
 from meerkat.various_tools import load_piped_dataframe

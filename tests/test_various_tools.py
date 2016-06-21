@@ -1,5 +1,6 @@
 """Unit test for meerkat.various_tools"""
 
+import sys
 import unittest
 from nose_parameterized import parameterized
 import meerkat.various_tools as various_tools
@@ -93,6 +94,14 @@ class VariousToolsTests(unittest.TestCase):
 		expected = various_tools.get_us_cities(testing=True)
 		num_of_cities = 10000
 		self.assertLessEqual(num_of_cities, expected)
+
+	def test_split_hyperparameters(self):
+		"""Test split_hyperparameters"""
+		param = various_tools_fixture.get_hyperparameters()
+		boost_vectors, boost_labels, other_vectors = various_tools.split_hyperparameters(param)
+		self.assertEqual(boost_vectors, various_tools_fixture.get_boost())
+		self.assertEqual(boost_labels, various_tools_fixture.get_boost_labels())
+		self.assertEqual(other_vectors, various_tools_fixture.get_non_boost())
 
 if __name__ == '__main__':
 	unittest.main()
