@@ -63,6 +63,16 @@ class AutoLoadTests(unittest.TestCase):
 		else:
 			result = auto_load.get_single_file_from_tarball("", tarball, pattern)
 			self.assertEqual(result, expected)
+
+	def test_get_model_accuracy(self):
+		"""Test get_model_accuracy"""
+		accuracy = auto_load.get_model_accuracy("tests/classification/fixture/classification_report_sample.csv")
+		expected = 0.966298522007
+		self.assertEqual(accuracy, expected)
+
+		none_accuracy = auto_load.get_model_accuracy("tests/classification/fixture/classification_report_sample_incorrect.csv")
+		self.assertEqual(none_accuracy, 0.0)
+
 if __name__ == '__main__':
 	unittest.main()
 
