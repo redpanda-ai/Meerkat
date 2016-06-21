@@ -51,5 +51,15 @@ class ClassifcationReportTests(unittest.TestCase):
 			self.assertTrue(df_result.equals(df_expected))
 			os.remove(report_path)
 
+	@parameterized.expand([
+		(['tests/classification/fixture/test_get_write_func.csv', ['TRANSACTION_DESCRIPTION', 'ACTUAL']])
+	])
+	def test_get_write_func(self, filename, header):
+		write_correct = cr.get_write_func(filename, header)
+		correct = [['NEWTON GRV BST NEWTON GROVE NC', 'Abc']]
+		write_correct(correct)
+		self.assertTrue(os.path.isfile(filename), True)
+		os.remove(filename)
+
 if __name__ == '__main__':
 	unittest.main()
