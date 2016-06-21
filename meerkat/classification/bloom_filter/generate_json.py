@@ -37,6 +37,7 @@ dictionary = {
 		'INN'
 	],
 	'IA': [
+		'IAS'
 	],
 	'KS': [
 	],
