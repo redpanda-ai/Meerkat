@@ -1,12 +1,15 @@
-"""Unit test for meerkat.merge_store_numbers"""
+"""Unit test for meerkat.elasticsearch.load_index_from_file"""
 
-import sys
 import argparse
+import sys
 import unittest
+
 import meerkat.elasticsearch.load_index_from_file as loader
+
 from nose_parameterized import parameterized
 
 def create_parser():
+	"""Creates an argparse parser."""
 	parser = argparse.ArgumentParser()
 	parser.add_argument("configuration_file")
 	return parser
