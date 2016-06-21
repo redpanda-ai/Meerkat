@@ -108,6 +108,7 @@ class VariousToolsTests(unittest.TestCase):
 		(various_tools_fixture.get_magic_query_params(), various_tools_fixture.get_magic_query_trans(2), None, True)
 	])
 	def test_get_magic_query(self, params, transaction, expected, exception):
+		"""Test get_magic_query"""
 		result = various_tools.get_magic_query(params, transaction, boost=1.0)
 		if exception:
 			self.assertEqual(result, expected)
