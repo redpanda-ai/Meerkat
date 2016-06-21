@@ -29,5 +29,13 @@ class ClassifcationReportTests(unittest.TestCase):
 		"""Test count_transactions with parameters"""
 		self.assertEqual(cr.count_transactions(filename), num_of_trans)
 
+	@parameterized.expand([
+		([classification_report_fixture.get_confusion_matrix("invalid_cf"), {}, True])
+	])
+	def test_get_classification_report(self, cm_file, label_map, exception):
+		"""Test get_classification_report with parameters"""
+		if exception:
+			self.assertRaises(Exception, cr.get_classification_report, cm_file, label_map)
+
 if __name__ == '__main__':
 	unittest.main()
