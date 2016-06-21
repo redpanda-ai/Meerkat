@@ -1,6 +1,7 @@
 '''unit tests for meerkat.classification.bloom_filter.bloom'''
 
 import unittest
+import os
 
 from nose_parameterized import parameterized
 import meerkat.classification.bloom_filter.bloom as bloom
@@ -32,6 +33,7 @@ class BloomTests(unittest.TestCase):
 		sbf = bloom.create_location_bloom(src_filename, dst_filename, False)
 		result = case in sbf
 		self.assertEqual(expected, result)
+		os.remove(dst_filename)
 
 if __name__ == "__main__":
 	unittest.main()
