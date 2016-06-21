@@ -1,9 +1,9 @@
 """Unit test for meerkat/classification/classification_report.py"""
 
+import os
 import meerkat.classification.classification_report as cr
 import unittest
 import argparse
-import csv
 
 from nose_parameterized import parameterized
 from tests.classification.fixture import classification_report_fixture
@@ -38,7 +38,7 @@ class ClassifcationReportTests(unittest.TestCase):
 	])
 	def test_get_classification_report(self, cm_file, label_map, exception):
 		"""Test get_classification_report with parameters"""
-		report_path = "tests/classification/fixture/classification_report_for_test.csv"
+		report_path = "tests/classification/fixture/result_classification_report.csv"
 		if exception:
 			self.assertRaises(Exception, cr.get_classification_report,
 				cm_file, label_map, report_path)
@@ -47,8 +47,8 @@ class ClassifcationReportTests(unittest.TestCase):
 			expected_path = "tests/classification/fixture/expected_classification_report.csv"
 			df_result = load_piped_dataframe(report_path)
 			df_expected = load_piped_dataframe(expected_path)
-			#self.assertTrue((df_result==df_expected).all())
 			self.assertTrue(df_result.equals(df_expected))
+			os.remove(report_path)
 
 if __name__ == '__main__':
 	unittest.main()
