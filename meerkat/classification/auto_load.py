@@ -13,8 +13,7 @@ from boto.s3 import connect_to_region
 from boto.s3.key import Key
 import boto3
 
-from meerkat.various_tools import safely_remove_file, validate_configuration, load_params
-from meerkat.classification.tools import push_file_to_s3
+from meerkat.various_tools import safely_remove_file, validate_configuration, load_params, push_file_to_s3
 
 def find_s3_objects_recursively(conn, bucket, my_results, prefix=None, target=None):
 	"""Find all S3 target objects and their locations recursively"""

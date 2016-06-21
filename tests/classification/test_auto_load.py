@@ -1,9 +1,12 @@
 """Unit test for meerkat/classification/tools.py"""
 
 import boto
+import boto3
 import meerkat.classification.auto_load as auto_load
 import os
+import sys
 import unittest
+from argparse import ArgumentParser
 
 from nose_parameterized import parameterized
 from os.path import isfile

@@ -19,8 +19,11 @@ import boto
 import numpy as np
 import pandas as pd
 
+from boto.s3.key import Key
+from boto.s3.connection import Location
 from jsonschema import validate
 from scipy.stats.mstats import zscore
+from boto import connect_s3
 
 def z_score_delta(scores):
 	"""Find the Z-Score Delta"""
@@ -33,6 +36,15 @@ def z_score_delta(scores):
 	z_score_delta = round(first_score - second_score, 3)
 
 	return z_score_delta
+
+def push_file_to_s3(source_path, bucket_name, object_prefix):
+	"""Pushes an object to S3"""
+	conn = boto.connect_s3()
+	bucket = conn.get_bucket(bucket_name, Location.USWest2)
+	filename = os.path.basename(source_path)
+	key = Key(bucket)
+	key.key = object_prefix + filename
+	key.set_contents_from_filename(source_path)
 
 def split_hyperparameters(hyperparameters):
 	"""partition hyperparameters into 2 parts based on keys and non_boost list"""
