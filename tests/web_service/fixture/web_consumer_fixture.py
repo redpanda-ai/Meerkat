@@ -1,4 +1,46 @@
 import uuid
+import json
+
+def get_transactions_to_clean(case_type):
+    """Return an array of transactions to be cleaned fo proper schema"""
+    if case_type == "non_physical_no_debug":
+        return [{
+            "is_physical_merchant": False,
+            "transaction_id": 123,
+            "txn_sub_type": "Purchase",
+            "txn_type": "Purchase",
+            "locale_bloom": None
+        }]
+    elif case_type == "physical_no_debug":
+        return [{
+            "is_physical_merchant": True,
+            "transaction_id": 123,
+            "txn_sub_type": "Purchase",
+            "txn_type": "Purchase",
+            "CNN": "Ikea",
+            "country": "US",
+            "locale_bloom": None
+        }]
+    elif case_type == "physical_debug":
+        return [{
+            "is_physical_merchant": True,
+            "transaction_id": 123,
+            "txn_sub_type": "Purchase",
+            "txn_type": "Purchase",
+            "CNN": "Ikea",
+            "country": "US",
+            "state": "NY",
+            "city": "Scars",
+            "search": {},
+            "locale_bloom": ["Scars", "NY"]
+        }]
+
+def get_proper_output(case_type):
+    """Return an array of proper output"""
+    base_dir = "tests/web_service/fixture/"
+    file_path = base_dir + case_type + ".json"
+    json_file = open(file_path, encoding='utf-8')
+    return [json.load(json_file)]
 
 def get_transaction():
     """Create and return an array containing a single transaction"""
