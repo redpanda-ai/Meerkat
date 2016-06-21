@@ -1,0 +1,81 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "Input schema for meerkat.elasticsearch.load_index_from_file",
+	"description": "Input schema for meerkat.elasticsearch.load_index_from_file",
+	"type": "object",
+	"properties": {
+		"batch_size": { "type": "integer", "minimum": 10},
+		"concurrency": { "type": "integer", "minimum" : 1},
+		"elasticsearch": { "$ref": "#/definitions/elasticsearch"},
+		"input": { "$ref": "#/definitions/input"},
+		"logging": { "$ref": "#/definitions/logging"}
+	},
+	"required" : ["batch_size", "concurrency", "elasticsearch", "input", "logging"],
+	"definitions": {
+		"elasticsearch": {
+			"properties": {
+				"boost_labels": {
+					"type": "array",
+					"minItems": 1,
+					"items": { "type": "string" }
+				},
+				"boost_vectors": { "type": "object" },
+				"cluster_nodes" : {
+					"type": "array",
+					"minItems": 1,
+					"items": { "type": "string"},
+					"uniqueItems": true
+				},
+				"comment": { "type": "object" },
+				"composite_fields": {
+					"type": "array",
+					"items": { "type": "object"}
+				},
+				"dispersed_fields": {
+					"type": "array",
+					"items": { "type": "object"}
+				},
+				"index": {"type": "string"},
+				"type": {"type": "string"},
+				"type_mapping": {
+					"type": "object",
+					"properties": {
+						"mappings": {"type": "object"},
+						"settings": {
+							"type": "object",
+							"properties": {
+								"number_of_replicas": {
+									"type": "integer",
+									"minimum": 0
+								},
+								"number_of_shards": {
+									"type": "integer",
+									"minimum": 1
+								}
+							},
+							"required": ["number_of_replicas", "number_of_shards"]
+						}
+					},
+					"required" : ["mappings", "settings"]
+				}
+			},
+			"required" : ["boost_labels", "boost_vectors", "cluster_nodes", "index", "type"]
+		},
+		"input": {
+			"properties": {
+				"encoding" : { "enum": ["utf-8"] },
+				"filename" : { "type": "string" }
+			},
+			"required": ["encoding", "filename"]
+		},
+		"logging": {
+			"properties": {
+				"console": { "enum": [true, false] },
+				"formatter": { "type": "string" },
+				"level": { "enum": ["debug", "info", "warning", "critical", "error"] },
+				"path": { "type": "string" }
+			},
+			"required": ["console", "formatter", "level", "path"]
+		}
+	}
+}
