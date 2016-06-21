@@ -3,9 +3,11 @@
 import meerkat.classification.classification_report as cr
 import unittest
 import argparse
+import csv
 
 from nose_parameterized import parameterized
 from tests.classification.fixture import classification_report_fixture
+from meerkat.various_tools import load_piped_dataframe
 
 class ClassifcationReportTests(unittest.TestCase):
 	"""Unit tests for meerkat.classification.auto_load."""
@@ -30,16 +32,23 @@ class ClassifcationReportTests(unittest.TestCase):
 		self.assertEqual(cr.count_transactions(filename), num_of_trans)
 
 	@parameterized.expand([
-		#([classification_report_fixture.get_confusion_matrix("valid_cf"), {}, False]),
+		([classification_report_fixture.get_confusion_matrix("valid_cf"),
+			classification_report_fixture.get_label_map(), False]),
 		([classification_report_fixture.get_confusion_matrix("invalid_cf"), {}, True])
 	])
 	def test_get_classification_report(self, cm_file, label_map, exception):
 		"""Test get_classification_report with parameters"""
+		report_path = "tests/classification/fixture/classification_report_for_test.csv"
 		if exception:
-			self.assertRaises(Exception, cr.get_classification_report, cm_file, label_map)
+			self.assertRaises(Exception, cr.get_classification_report,
+				cm_file, label_map, report_path)
 		else:
-			cr.get_classification_report(cm_file, label_map)
-			
+			cr.get_classification_report(cm_file, label_map, report_path)
+			expected_path = "tests/classification/fixture/expected_classification_report.csv"
+			df_result = load_piped_dataframe(report_path)
+			df_expected = load_piped_dataframe(expected_path)
+			#self.assertTrue((df_result==df_expected).all())
+			self.assertTrue(df_result.equals(df_expected))
 
 if __name__ == '__main__':
 	unittest.main()
