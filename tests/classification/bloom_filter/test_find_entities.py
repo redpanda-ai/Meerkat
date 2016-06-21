@@ -7,9 +7,15 @@ import sys
 import unittest
 
 import meerkat.classification.bloom_filter.find_entities as finder
+from tests.classification.bloom_filter.fixture import find_entities_fixture
 
 class VariousToolsTests(unittest.TestCase):
 	"""Our UnitTest class."""
+
+	def test_add_with_subs(self):
+		data, city, state = {}, 'New York City', 'NY'
+		finder.add_with_subs(data, city, state)
+		self.assertEqual(len(data), 2)
 
 	def test_location_split__no_commas(self):
 		"""location_split test that it finds San Francisco, CA when there
@@ -80,6 +86,15 @@ class VariousToolsTests(unittest.TestCase):
 		expected = ("Irving", "TX")
 		result = finder.location_split(my_text)
 		self.assertEqual(expected, result)
+
+	def test_generate_city_map(self):
+		"""Test generate_city_map"""
+		city_map = finder.generate_city_map()
+		expected = find_entities_fixture.get_city_map()
+		selected = {}
+		for key in expected:
+			selected[key] = city_map[key]
+		self.assertEqual(expected, selected)
 
 if __name__ == "__main__":
 	unittest.main()
