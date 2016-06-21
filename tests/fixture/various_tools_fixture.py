@@ -115,7 +115,3 @@ def get_magic_query_params():
 			}
 		}
 	}
-
-def get_expected_magic_query():
-	return {'size': '45', 'from': 0, 'fields': ['standard fields'], 'query': {'bool': {'minimum_number_should_match': 1, 'should': [{'query_string': {'boost': 1.0, 'fields': ['address^0.541', 'address_extended^1.282', 'admin_region^0.69', 'category_labels^1.319', 'chain_name^0.999', 'email^0.516', 'internal_store_number^1.9', 'locality^1.367', 'name^2.781', 'neighborhood^0.801', 'po_box^1.292', 'post_town^0.577', 'postcode^0.914', 'region^1.685', 'tel^0.597'], 'query': 'walmart sunnyvale ca credit ach'}}, {'query_string': {'boost': '2', 'fields': ['name'], 'query': 'walmart'}}]}}, '_source': '*'}
-

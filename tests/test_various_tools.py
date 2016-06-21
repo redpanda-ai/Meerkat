@@ -104,13 +104,15 @@ class VariousToolsTests(unittest.TestCase):
 		self.assertEqual(other_vectors, various_tools_fixture.get_non_boost())
 
 	@parameterized.expand([
-		(various_tools_fixture.get_magic_query_params(), various_tools_fixture.get_magic_query_trans(1),
-			various_tools_fixture.get_expected_magic_query()),
-		(various_tools_fixture.get_magic_query_params(), various_tools_fixture.get_magic_query_trans(2), None)
+		(various_tools_fixture.get_magic_query_params(), various_tools_fixture.get_magic_query_trans(1), "45", False),
+		(various_tools_fixture.get_magic_query_params(), various_tools_fixture.get_magic_query_trans(2), None, True)
 	])
-	def test_get_magic_query(self, params, transaction, expected):
+	def test_get_magic_query(self, params, transaction, expected, exception):
 		result = various_tools.get_magic_query(params, transaction, boost=1.0)
-		self.assertEqual(result, expected)
+		if exception:
+			self.assertEqual(result, expected)
+		else:
+			self.assertEqual(result["size"], expected)
 
 
 if __name__ == '__main__':
