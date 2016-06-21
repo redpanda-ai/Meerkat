@@ -235,5 +235,5 @@ def main():
 	print(location_bloom_results.describe())
 
 if __name__ == "__main__":
-	main()
-#	print(location_split('DEBIT CARD PURCHASE   XXXXX8363     MEIJER 222        Q01    MADISON HEIGHT MI'))
+#	main()
+	print(location_split('VICTORIAS'))
