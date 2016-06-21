@@ -34,14 +34,15 @@ from datetime import datetime
 from elasticsearch import Elasticsearch, helpers
 
 from meerkat.custom_exceptions import InvalidArguments, Misconfiguration
+from meerkat.various_tools import validate_configuration
 
-def parse_arguments(args):
+def parse_arguments():
 	parser = argparse.ArgumentParser()
 
 	parser.add_argument("configuration_file",
 		help="Location on the local drive where the configuration file can be found")
 
-	return parser.parse_args(args)
+	return parser.parse_args()
 
 def initialize():
 	"""Validates the command line arguments."""
@@ -449,7 +450,11 @@ def guarantee_index_and_doc_type(params):
 def run_from_command_line():
 	"""Runs these commands if the module is invoked from the command line"""
 
-	args = parse_arguments(sys.argv)
+	args = parse_arguments()
+	my_params = validate_configuration(args.configuration_file,
+		"meerkat/elasticsearch/config/load_index_schema.json")
+	logging.warning(my_params)
+	sys.exit()
 	my_params = initialize()
 	logging.warning(json.dumps(my_params, sort_keys=True,
 		indent=4, separators=(',', ':')))
