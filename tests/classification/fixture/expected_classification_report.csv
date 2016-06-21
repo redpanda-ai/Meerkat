@@ -1,0 +1,4 @@
+Accuracy,Class,True Positive,False Positive,False Negative,True Negative,Precision,Recall,Specificity,F Measure
+0.9973579920739762,Bank Adjustment - Adjustment,344,1,0,412,0.9971014492753624,1.0,0.9975786924939467,0.9985486211901305
+,Deposits & Credits - Rewards,232,1,0,524,0.9957081545064378,1.0,0.9980952380952381,0.9978494623655914
+,Other Deposits - Credit,179,0,2,576,1.0,0.988950276243094,1.0,0.9944444444444445
