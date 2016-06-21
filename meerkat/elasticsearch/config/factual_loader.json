@@ -2,7 +2,7 @@
 	"concurrency" : 8,
 	"batch_size" : 500,
 	"input" : {
-		"filename" : "/data/2/smaller_100000.tab",
+		"filename" : "data/input/smaller_100000.tab",
 		"encoding" : "utf-8"
 	},
 	"logging" : {
@@ -13,10 +13,10 @@
 	},
 	"elasticsearch" : {
 		"cluster_nodes" : [
-			"127.0.0.1"
+			"172.31.19.192:9200"
         ],
-		"index" : "factual_index",
-		"type" : "factual_type",
+		"index" : "dev_test_index",
+		"type" : "dev_test_type",
 		"boost_labels" : [ "query_string", "composite.address" ],
 		"boost_vectors" : {
 			"factual_id" :        [ 0.0, 0.0 ],
@@ -74,7 +74,7 @@
 		],
 		"type_mapping" : {
 			"mappings" : {
-				"factual_type" : {
+				"dev_test_type" : {
 					"_source" : {
 						"enabled" : true
 					},

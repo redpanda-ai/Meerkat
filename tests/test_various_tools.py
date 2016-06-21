@@ -10,6 +10,18 @@ class VariousToolsTests(unittest.TestCase):
 	"""UnitTest class for various_tools."""
 
 	@parameterized.expand([
+		(['term', None, { "query_string": { "query": 'term', "fields": [], "boost": 1.0 } }]),
+		(['term', ['city'], { "query_string": { "query": 'term', "fields": ['city'], "boost": 1.0 } }])
+	])
+	def test_get_qs_query(self, term, field_list, expected):
+		result = various_tools.get_qs_query(term, field_list)
+		self.assertEqual(result, expected)
+
+	def test_get_bool_query(self):
+		result = various_tools.get_bool_query()
+		self.assertEqual(result, { "from" : 0, "size" : 0, "query" : { "bool": { "minimum_number_should_match": 1, "should": [] } } })
+
+	@parameterized.expand([
 		([[8.0, 4.0, 2.0, 1.0], 1.492]),
 		([[2.0, 1.0], 2.0]),
 		([[1.0], None])

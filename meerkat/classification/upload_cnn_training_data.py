@@ -12,9 +12,9 @@ created on April 4, 2016
 
 import os
 import sys
+import logging
 from meerkat.classification.tools import get_utc_iso_timestamp, make_tarfile
 from meerkat.various_tools import push_file_to_s3
-import logging
 
 def get_prefix():
 	"""Get the prefix directory"""
