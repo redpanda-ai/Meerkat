@@ -1,0 +1,14 @@
+{
+	"aggregations": {
+		"states": {
+			"buckets": [{
+				"key": "ca",
+				"localities": {
+					"buckets": [{
+						"key": "San Francisco"
+					}]
+				}
+			}]
+		}
+	}
+}
