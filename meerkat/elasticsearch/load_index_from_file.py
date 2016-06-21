@@ -22,6 +22,7 @@ Updated on July 17, 2015
 
 #####################################################
 
+import argparse
 import json
 import logging
 import queue
@@ -34,15 +35,17 @@ from elasticsearch import Elasticsearch, helpers
 
 from meerkat.custom_exceptions import InvalidArguments, Misconfiguration
 
+def parse_arguments(args):
+	parser = argparse.ArgumentParser()
+
+	parser.add_argument("configuration_file",
+		help="Location on the local drive where the configuration file can be found")
+
+	return parser.parse_args(args)
+
 def initialize():
 	"""Validates the command line arguments."""
 	input_file, params = None, None
-
-	if len(sys.argv) != 3:
-		#usage()
-		raise InvalidArguments(msg="Supply a single argument for the json"\
-		+ "formatted configuration file.", expr=None)
-
 	try:
 		input_file = open(sys.argv[1], encoding='utf-8')
 		params = json.loads(input_file.read())
@@ -446,6 +449,7 @@ def guarantee_index_and_doc_type(params):
 def run_from_command_line():
 	"""Runs these commands if the module is invoked from the command line"""
 
+	args = parse_arguments(sys.argv)
 	my_params = initialize()
 	logging.warning(json.dumps(my_params, sort_keys=True,
 		indent=4, separators=(',', ':')))
