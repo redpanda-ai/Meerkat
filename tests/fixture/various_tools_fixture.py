@@ -90,3 +90,32 @@ def get_non_boost():
 
 def get_boost_labels():
 	return ["standard_fields"]
+
+def get_magic_query_trans(sample_num):
+	if sample_num == 1:
+		return {
+			"GOOD_DESCRIPTION": "walmart",
+			"DESCRIPTION_UNMASKED": "wal-mart SUNNYVALE CA credit card purchase ACH"
+		}
+	elif sample_num == 2:
+		return {
+			"GOOD_DESCRIPTION": "walmart",
+			"DESCRIPTION_UNMASKED": "8"
+		}
+
+
+def get_magic_query_params():
+	return {
+		"input": {
+			"hyperparameters": "tests/fixture/get_magic_query_params.json"
+		},
+		"output":{
+			"results": {
+				"fields": ["standard fields"]
+			}
+		}
+	}
+
+def get_expected_magic_query():
+	return {'size': '45', 'from': 0, 'fields': ['standard fields'], 'query': {'bool': {'minimum_number_should_match': 1, 'should': [{'query_string': {'boost': 1.0, 'fields': ['address^0.541', 'address_extended^1.282', 'admin_region^0.69', 'category_labels^1.319', 'chain_name^0.999', 'email^0.516', 'internal_store_number^1.9', 'locality^1.367', 'name^2.781', 'neighborhood^0.801', 'po_box^1.292', 'post_town^0.577', 'postcode^0.914', 'region^1.685', 'tel^0.597'], 'query': 'walmart sunnyvale ca credit ach'}}, {'query_string': {'boost': '2', 'fields': ['name'], 'query': 'walmart'}}]}}, '_source': '*'}
+

@@ -103,5 +103,15 @@ class VariousToolsTests(unittest.TestCase):
 		self.assertEqual(boost_labels, various_tools_fixture.get_boost_labels())
 		self.assertEqual(other_vectors, various_tools_fixture.get_non_boost())
 
+	@parameterized.expand([
+		(various_tools_fixture.get_magic_query_params(), various_tools_fixture.get_magic_query_trans(1),
+			various_tools_fixture.get_expected_magic_query()),
+		(various_tools_fixture.get_magic_query_params(), various_tools_fixture.get_magic_query_trans(2), None)
+	])
+	def test_get_magic_query(self, params, transaction, expected):
+		result = various_tools.get_magic_query(params, transaction, boost=1.0)
+		self.assertEqual(result, expected)
+
+
 if __name__ == '__main__':
 	unittest.main()
