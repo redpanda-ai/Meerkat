@@ -20,3 +20,22 @@ def get_label_map():
 		"2": "Deposits & Credits - Rewards",
 		"3": "Other Deposits - Credit"
 	}
+
+def get_machine_result():
+	"""Return predicted result"""
+	return [
+		{
+			'PROPOSED_SUBTYPE': 'Abc',
+			'PREDICTED_CLASS': 'Abc',
+			'PREDICTED_INDEX': '1',
+			'DESCRIPTION_UNMASKED': 'NEWTON GRV BST NEWTON GROVE NC',
+			'ACTUAL_INDEX': '1'
+		},
+		{
+			'PROPOSED_SUBTYPE': 'Xyz',
+			'PREDICTED_CLASS': 'Abc',
+			'PREDICTED_INDEX': '1',
+			'DESCRIPTION_UNMASKED': 'XXXX YYY ZZZZ',
+			'ACTUAL_INDEX': '2'
+		}
+	]
