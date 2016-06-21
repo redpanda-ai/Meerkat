@@ -11,6 +11,20 @@ from meerkat.various_tools import load_piped_dataframe
 
 class ClassifcationReportTests(unittest.TestCase):
 	"""Unit tests for meerkat.classification.auto_load."""
+
+	@parameterized.expand([
+		([classification_report_fixture.get_machine_result(), False,
+			classification_report_fixture.get_compare_label_result_non_fast()]),
+		([classification_report_fixture.get_machine_result(), True,
+			classification_report_fixture.get_compare_label_result_fast()])
+	])
+	def test_compare_label(self, machine, fast, expected):
+		"""Test compare_label with parameters"""
+		cf = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
+		kwargs = {"doc_key": "DESCRIPTION_UNMASKED", "fast_mode": fast}
+		self.assertEqual(cr.compare_label(machine, 'PREDICTED_CLASS', 'PROPOSED_SUBTYPE', cf, 3,
+			**kwargs), expected)
+
 	@parameterized.expand([
 		(False, ["model", "data", "label_map", "label",  "--doc_key", "SNOZ"])
 	])

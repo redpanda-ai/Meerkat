@@ -39,3 +39,17 @@ def get_machine_result():
 			'ACTUAL_INDEX': '2'
 		}
 	]
+
+def get_compare_label_result_non_fast():
+	"""Retrun result of compare_label of non_fast mode"""
+	mislabeled = [['XXXX YYY ZZZZ', 'Xyz', 'Abc']]
+	correct = [['NEWTON GRV BST NEWTON GROVE NC', 'Abc']]
+	conf_mat = [[1, 0, 0, 0], [1, 0, 0, 0], [0, 0, 0, 0]]
+	return mislabeled, correct, conf_mat
+
+def get_compare_label_result_fast():
+	"""Retrun result of compare_label of fast mode"""
+	mislabeled = []
+	correct = []
+	conf_mat = [[1, 0, 0, 0], [1, 0, 0, 0], [0, 0, 0, 0]]
+	return mislabeled, correct, conf_mat
