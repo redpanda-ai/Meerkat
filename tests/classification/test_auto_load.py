@@ -11,13 +11,6 @@ from argparse import ArgumentParser
 from nose_parameterized import parameterized
 from os.path import isfile
 
-def remove_file_if_exists(path):
-	"""Helper function"""
-	try:
-		os.remove(path)
-	except FileNotFoundError:
-		pass
-
 class AutoLoadTests(unittest.TestCase):
 	"""Unit tests for meerkat.classification.auto_load."""
 
