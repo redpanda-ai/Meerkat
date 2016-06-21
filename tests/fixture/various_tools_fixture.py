@@ -90,3 +90,28 @@ def get_non_boost():
 
 def get_boost_labels():
 	return ["standard_fields"]
+
+def get_magic_query_trans(sample_num):
+	if sample_num == 1:
+		return {
+			"GOOD_DESCRIPTION": "walmart",
+			"DESCRIPTION_UNMASKED": "wal-mart SUNNYVALE CA credit card purchase ACH"
+		}
+	elif sample_num == 2:
+		return {
+			"GOOD_DESCRIPTION": "walmart",
+			"DESCRIPTION_UNMASKED": "8"
+		}
+
+
+def get_magic_query_params():
+	return {
+		"input": {
+			"hyperparameters": "tests/fixture/get_magic_query_params.json"
+		},
+		"output":{
+			"results": {
+				"fields": ["standard fields"]
+			}
+		}
+	}
