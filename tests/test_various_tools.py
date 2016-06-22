@@ -1,5 +1,6 @@
 """Unit test for meerkat.various_tools"""
 
+import sys
 import unittest
 from nose_parameterized import parameterized
 import meerkat.various_tools as various_tools
@@ -7,6 +8,18 @@ from tests.fixture import various_tools_fixture
 
 class VariousToolsTests(unittest.TestCase):
 	"""UnitTest class for various_tools."""
+
+	@parameterized.expand([
+		(['term', None, { "query_string": { "query": 'term', "fields": [], "boost": 1.0 } }]),
+		(['term', ['city'], { "query_string": { "query": 'term', "fields": ['city'], "boost": 1.0 } }])
+	])
+	def test_get_qs_query(self, term, field_list, expected):
+		result = various_tools.get_qs_query(term, field_list)
+		self.assertEqual(result, expected)
+
+	def test_get_bool_query(self):
+		result = various_tools.get_bool_query()
+		self.assertEqual(result, { "from" : 0, "size" : 0, "query" : { "bool": { "minimum_number_should_match": 1, "should": [] } } })
 
 	@parameterized.expand([
 		([[8.0, 4.0, 2.0, 1.0], 1.492]),
@@ -93,6 +106,27 @@ class VariousToolsTests(unittest.TestCase):
 		expected = various_tools.get_us_cities(testing=True)
 		num_of_cities = 10000
 		self.assertLessEqual(num_of_cities, expected)
+
+	def test_split_hyperparameters(self):
+		"""Test split_hyperparameters"""
+		param = various_tools_fixture.get_hyperparameters()
+		boost_vectors, boost_labels, other_vectors = various_tools.split_hyperparameters(param)
+		self.assertEqual(boost_vectors, various_tools_fixture.get_boost())
+		self.assertEqual(boost_labels, various_tools_fixture.get_boost_labels())
+		self.assertEqual(other_vectors, various_tools_fixture.get_non_boost())
+
+	@parameterized.expand([
+		(various_tools_fixture.get_magic_query_params(), various_tools_fixture.get_magic_query_trans(1), "45", False),
+		(various_tools_fixture.get_magic_query_params(), various_tools_fixture.get_magic_query_trans(2), None, True)
+	])
+	def test_get_magic_query(self, params, transaction, expected, exception):
+		"""Test get_magic_query"""
+		result = various_tools.get_magic_query(params, transaction, boost=1.0)
+		if exception:
+			self.assertEqual(result, expected)
+		else:
+			self.assertEqual(result["size"], expected)
+
 
 if __name__ == '__main__':
 	unittest.main()

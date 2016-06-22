@@ -34,7 +34,7 @@ def get_json_from_file(input_filename):
 		sys.exit()
 	return None
 
-def create_location_bloom(src_filename, dst_filename):
+def create_location_bloom(src_filename, dst_filename, enrich=True):
 	"""Creates a bloom filter from the provided input file."""
 	sbf = ScalableBloomFilter(initial_capacity=100000, error_rate=0.001,\
 		mode=ScalableBloomFilter.SMALL_SET_GROWTH)
@@ -48,18 +48,19 @@ def create_location_bloom(src_filename, dst_filename):
 			location = (city_name, state_name)
 			sbf.add(location)
 
-	try:
-		open('meerkat/classification/bloom_filter/assets/csv_not_json')
-	except:
-		get_diff_json_csv()
+	if enrich:
+		try:
+			open('meerkat/classification/bloom_filter/assets/csv_not_json')
+		except:
+			get_diff_json_csv()
 
-	with open('meerkat/classification/bloom_filter/assets/csv_not_json') as frd:
-		for line in frd:
-			city, state = line.strip().split('\t')
-			city_name = standardize(city)
-			state_name = state.upper()
-			location = (city_name, state_name)
-			sbf.add(location)
+		with open('meerkat/classification/bloom_filter/assets/csv_not_json') as frd:
+			for line in frd:
+				city, state = line.strip().split('\t')
+				city_name = standardize(city)
+				state_name = state.upper()
+				location = (city_name, state_name)
+				sbf.add(location)
 
 	with open(dst_filename, "bw+") as location_bloom:
 		sbf.tofile(location_bloom)

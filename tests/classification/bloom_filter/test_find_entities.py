@@ -11,6 +11,11 @@ import meerkat.classification.bloom_filter.find_entities as finder
 class VariousToolsTests(unittest.TestCase):
 	"""Our UnitTest class."""
 
+	def test_add_with_subs(self):
+		data, city, state = {}, 'New York City', 'NY'
+		finder.add_with_subs(data, city, state)
+		self.assertEqual(len(data), 2)
+
 	def test_location_split__no_commas(self):
 		"""location_split test that it finds San Francisco, CA when there
 		are no commas"""

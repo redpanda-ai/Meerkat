@@ -125,7 +125,7 @@ def count_transactions(csv_file):
 		_ = reader.__next__()
 		return sum([1 for i in reader])
 
-def get_classification_report(confusion_matrix_file, label_map):
+def get_classification_report(confusion_matrix_file, label_map, report_path):
 	"""Produce a classification report for a particular confusion matrix"""
 	df = pd.read_csv(confusion_matrix_file)
 	rows, cols = df.shape
@@ -178,7 +178,6 @@ def get_classification_report(confusion_matrix_file, label_map):
 
 	logging.debug("Classification Report:\n{0}".format(classification_report))
 	logging.info("Accuracy is: {0}".format(classification_report.iloc[0]["Accuracy"]))
-	report_path = 'data/CNN_stats/classification_report.csv'
 	logging.info("Classification Report saved to: {0}".format(report_path))
 	classification_report.to_csv(report_path, index=False)
 
@@ -273,7 +272,8 @@ def main_process(args=None):
 	logging.debug("Rows: {0}, Columns {1}".format(rows, cols))
 	df.to_csv('data/CNN_stats/confusion_matrix.csv', index=False)
 	logging.info("Confusion matrix saved to: {0}".format(confusion_matrix_path))
-	get_classification_report(confusion_matrix_path, label_map)
+	report_path = 'data/CNN_stats/classification_report.csv'
+	get_classification_report(confusion_matrix_path, label_map, report_path)
 
 
 if __name__ == "__main__":
