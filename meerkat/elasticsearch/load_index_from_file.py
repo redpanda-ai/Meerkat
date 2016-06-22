@@ -391,7 +391,8 @@ def guarantee_index_and_doc_type(es_params):
 	"""Ensure that the index and document type mapping are as they should be"""
 	es_connection = Elasticsearch(es_params["cluster_nodes"], sniff_on_start=False,
 		sniff_on_connection_fail=True, sniffer_timeout=5, sniff_timeout=5)
-	_ = es_connection.indices.create(index=es_params["index"], body=es_params["type_mapping"], ignore=400)
+	_ = es_connection.indices.create(index=es_params["index"], body=es_params["type_mapping"],
+		ignore=400)
 	es_index_status, es_type_status = "created", "created"
 	return es_index_status, es_type_status
 
