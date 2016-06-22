@@ -33,7 +33,7 @@ import threading
 from datetime import datetime
 from elasticsearch import Elasticsearch, helpers
 
-from meerkat.custom_exceptions import InvalidArguments, Misconfiguration
+from meerkat.custom_exceptions import Misconfiguration
 from meerkat.various_tools import validate_configuration
 
 def parse_arguments(args):
@@ -48,7 +48,6 @@ def load_document_queue(params):
 	filename, encoding = None, None
 	document_queue = queue.Queue()
 	try:
-		#filename = params["input"]["filename"]
 		filename = params["input"]["filename"]
 		encoding = params["input"]["encoding"]
 		with open(filename, 'r', encoding=encoding) as inputfile:

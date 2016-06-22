@@ -36,5 +36,21 @@ class LoadIndexFromFileTests (unittest.TestCase):
 			expected = create_parser().parse_args(arguments)
 			self.assertEqual(results, expected)
 
+	@parameterized.expand([
+		(None, "tests/elasticsearch/fixtures/small_doc.tab"),
+	])
+	def test_load_document_queue(self, exception_test, filename):
+		params = {
+			"input" : {
+				"filename": filename,
+				"encoding": "utf-8"
+			}
+		}
+		if not exception_test:
+			header, document_queue, document_queue_populated = loader.load_document_queue(params)
+			self.assertEqual(header, ['ONE', 'TWO', 'THREE'])
+			self.assertEqual(document_queue.qsize(), 2)
+			self.assertTrue(document_queue_populated)
+
 if __name__ == '__main__':
 	unittest.main()
