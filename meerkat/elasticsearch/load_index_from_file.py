@@ -48,7 +48,6 @@ def load_document_queue(params):
 	filename, encoding = None, None
 	document_queue = queue.Queue()
 	try:
-		#filename = params["input"]["filename"]
 		filename = params["input"]["filename"]
 		encoding = params["input"]["encoding"]
 		with open(filename, 'r', encoding=encoding) as inputfile:
