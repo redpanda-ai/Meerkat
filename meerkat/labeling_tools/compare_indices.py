@@ -14,7 +14,7 @@ Created on July 21, 2014
 
 # Note: In Progress
 # python3.3 -m meerkat.labeling_tools.compare_indices [config_file] [labeled_transactions] [new_ip] [new_index] [new_type] 
-# python3.3 -m meerkat.labeling_tools.compare_indices config/test.json data/misc/ground_truth_card.txt 172.31.41.93 routed_index routed_type
+# python3.3 -m meerkat.labeling_tools.compare_indices meerkat/config/test.json data/misc/ground_truth_card.txt 172.31.41.93 routed_index routed_type
 
 # Required Columns: 
 # DESCRIPTION_UNMASKED
@@ -28,16 +28,16 @@ Created on July 21, 2014
 
 import sys
 import random
+import logging
 import contextlib
 import collections
 
 from copy import deepcopy
-from scipy.stats.mstats import zscore
 
 from meerkat.various_tools import get_qs_query, get_bool_query, safe_input
 from meerkat.various_tools import load_params, get_es_connection, string_cleanse
 from meerkat.various_tools import get_merchant_by_id, load_dict_ordered, write_dict_list
-from meerkat.various_tools import safe_print, synonyms, get_magic_query, stopwords
+from meerkat.various_tools import safe_print, synonyms, get_magic_query, stopwords, z_score_delta
 
 class DummyFile(object):
 	"""Resemble the stdout/stderr object but it prints nothing to screen"""
@@ -177,7 +177,7 @@ def identify_changes(params, es_connection_1, es_connection_2):
 		old_mapping = enrich_transaction(params, transaction, es_connection_1, index=params["elasticsearch"]["index"], doc_type=params["elasticsearch"]["type"])
 		new_mapping = enrich_transaction(params, transaction, es_connection_2, index=sys.argv[4], doc_type=sys.argv[5], routing=old_mapping["STATE"].upper())
 
-		if new_mapping["merchant_found"] == False:
+		if new_mapping["merchant_found"] is False:
 			params["compare_indices"]["id_changed"].append(old_mapping)
 			continue
 
@@ -389,7 +389,7 @@ def reconcile_skipped(params, es_connection):
 		name, address = skipped_details_prompt(params, transaction, es_connection)
 		extra_queries = [(["address", "locality", "region", "postcode"], address, 3), (["name"], name, 4)]
 		results = find_merchant_by_address(transaction, es_connection, additional_data=extra_queries)
-		if results == False:
+		if results is False:
 			continue
 		null_decision_boundary(params, transaction, results)
 
@@ -412,7 +412,7 @@ def reconcile_null(params, es_connection):
 		random.shuffle(null)
 		transaction = null.pop()
 		results = search_with_user_safe_input(params, es_connection, transaction)
-		if results == False:
+		if results is False:
 			params["compare_indices"]["NULL"].append(transaction)
 			continue
 		null_decision_boundary(params, transaction, results)
@@ -600,7 +600,7 @@ def decision_boundary(params, store, results):
 	score, top_hit = get_hit(results, 0)
 
 	# Add transaction back to the queue for later analysis if nothing found
-	if score == False:
+	if score is False:
 		safe_print("No matches found", "\n")
 		params["compare_indices"]["skipped"].append(store)
 		return
@@ -670,13 +670,13 @@ def enrich_transaction(*args, **kwargs):
 	with nostderr():
 		merchant = get_merchant_by_id(params, factual_id, es_connection, index=index, doc_type=doc_type, routing=routing)
 
-	if merchant == None:
+	if merchant is None:
 		merchant = {}
 		transaction["merchant_found"] = False
 
 	# Enrich the transaction
-	for i in range(len(fields_to_get)):
-		transaction[fields_to_fill[i]] = merchant.get(fields_to_get[i], "")
+	for idx, field_to_get in enumerate(fields_to_get):
+		transaction[fields_to_fill[idx]] = merchant.get(field_to_get, "")
 
 	# Add Geo
 	if merchant.get("pin", "") != "":
@@ -698,7 +698,7 @@ def find_merchant_by_address(store, es_connection, additional_data=[]):
 				   string_cleanse(store.get("STATE", "")),
 				   store.get("ZIP_CODE", "")]
 	index = sys.argv[4]
-	results = ""
+	results = {}
 
 	# Generate Query
 	bool_search = get_bool_query(size=45)
@@ -712,8 +712,8 @@ def find_merchant_by_address(store, es_connection, additional_data=[]):
 				should_clauses.append(additional_query)
 
 	# Multi Field
-	for i in range(len(fields)):
-		sub_query = get_qs_query(old_details[i], [fields[i]])
+	for idx, field in enumerate(fields):
+		sub_query = get_qs_query(old_details[idx], [field])
 		should_clauses.append(sub_query)
 
 	# Search
@@ -768,17 +768,6 @@ def get_hit(search_results, index):
 
 	return z_score, hit["_source"]
 
-def z_score_delta(scores):
-	"""Find the Z-Score Delta"""
-
-	if len(scores) < 2:
-		return None
-
-	z_scores = zscore(scores)
-	first_score, second_score = z_scores[0:2]
-	z_score_delta = round(first_score - second_score, 3)
-
-	return z_score_delta
 
 def verify_arguments():
 	"""Verify Usage"""
@@ -786,7 +775,8 @@ def verify_arguments():
 	sufficient_arguments = (len(sys.argv) == 6)
 
 	if not sufficient_arguments:
-		safe_print("Insufficient arguments. Please see usage")
+		#safe_print("Insufficient arguments. Please see usage")
+		logging.warning("Insufficient arguments. Please see usage")
 		sys.exit()
 
 	config = sys.argv[1]
@@ -796,7 +786,8 @@ def verify_arguments():
 	factual_list_included = factual_list.endswith('.txt')
 
 	if not config_included  or not factual_list_included:
-		safe_print("Erroneous arguments. Please see usage")
+		#safe_print("Erroneous arguments. Please see usage")
+		logging.warning("Erroneous arguments. Please see usage")
 		sys.exit()
 
 def add_local_params(params):

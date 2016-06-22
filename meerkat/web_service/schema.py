@@ -1,8 +1,8 @@
 """Process and validate the schema"""
 import json
+from functools import wraps
 import jsonschema
 
-from functools import wraps
 from tornado import gen
 from tornado.concurrent import Future
 
@@ -88,7 +88,7 @@ def validate(input_schema=None, output_schema=None,\
 			if isinstance(output, Future):
 				output = yield output
 
-			if "debug" not in input_ or input_["debug"] == False:
+			if "debug" not in input_ or input_["debug"] is False:
 				if output_schema is not None:
 					# We wrap output in an object before validating in case
 					#  output is a string (and ergo not a validatable JSON object)
@@ -103,7 +103,7 @@ def validate(input_schema=None, output_schema=None,\
 						#  because it's a fault on our end. The client should
 						#  only see a 500 - Internal Server Error.
 						raise TypeError(str(err))
-			elif input_["debug"] == True:
+			elif input_["debug"] is True:
 				if debug_output_schema is not None:
 					# We wrap output in an object before validating in case
 					#  output is a string (and ergo not a validatable JSON object)

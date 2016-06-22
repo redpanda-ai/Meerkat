@@ -9,23 +9,71 @@ Created on Dec 20, 2013
 """
 
 import csv
-import gzip
 import json
 import logging
 import os
 import re
 import sys
-import queue
 
 import boto
 import numpy as np
 import pandas as pd
 
+from boto.s3.key import Key
+from boto.s3.connection import Location
 from jsonschema import validate
+from scipy.stats.mstats import zscore
 
-CLEAN_PATTERN = re.compile(r"\\+\|")
-QUOTE_CLEAN = re.compile(r'\"')
+def z_score_delta(scores):
+	"""Find the Z-Score Delta"""
 
+	if len(scores) < 2:
+		return None
+
+	z_scores = zscore(scores)
+	first_score, second_score = z_scores[0:2]
+	z_score_delta = round(first_score - second_score, 3)
+
+	return z_score_delta
+
+def push_file_to_s3(source_path, bucket_name, object_prefix):
+	"""Pushes an object to S3"""
+	conn = boto.connect_s3()
+	bucket = conn.get_bucket(bucket_name, Location.USWest2)
+	filename = os.path.basename(source_path)
+	key = Key(bucket)
+	key.key = object_prefix + filename
+	key.set_contents_from_filename(source_path)
+
+def split_hyperparameters(hyperparameters):
+	"""partition hyperparameters into 2 parts based on keys and non_boost list"""
+	boost_vectors = {}
+	boost_labels = ["standard_fields"]
+	non_boost = ["es_result_size", "z_score_threshold", "good_description"]
+	other = {}
+
+	for key, value in hyperparameters.items():
+		if key in non_boost:
+			other[key] = value
+		else:
+			boost_vectors[key] = [value]
+
+	return boost_vectors, boost_labels, other
+
+def format_web_consumer(dataset):
+	"""Provide formatted dataset"""
+	formatted = json.load(open("meerkat/web_service/example_input.json", "r"))
+	formatted["transaction_list"] = dataset
+	trans_id = 1
+	for trans in formatted["transaction_list"]:
+		trans["transaction_id"] = trans_id
+		trans_id = trans_id +1
+		trans["description"] = trans["DESCRIPTION_UNMASKED"]
+		trans["amount"] = trans["AMOUNT"]
+		trans["date"] = trans["TRANSACTION_DATE"]
+		trans["ledger_entry"] = "credit"
+
+	return formatted
 def validate_configuration(config, schema):
 	"""validate a json config file"""
 	try:
@@ -128,19 +176,6 @@ def progress(i, my_list, message=""):
 	sys.stdout.write(my_progress)
 	sys.stdout.flush()
 
-def queue_to_list(result_queue):
-	"""Converts queue to list"""
-	result_list = []
-	while result_queue.qsize() > 0:
-		try:
-			result_list.append(result_queue.get())
-			result_queue.task_done()
-
-		except queue.Empty:
-			break
-	result_queue.join()
-	return result_list
-
 def load_params(filename):
 	"""Load a set of parameters provided a filename"""
 	if isinstance(filename, str):
@@ -184,13 +219,6 @@ def get_s3_connection():
 		sys.exit()
 	return conn
 
-def post_sns(message):
-	"""Post an SNS message"""
-	region = 'us-west-2'
-	topic = 'arn:aws:sns:us-west-2:003144629351:panel_6m'
-	conn = boto.sns.connect_to_region(region)
-	_ = conn.publish(topic=topic, message=message)
-
 def get_merchant_by_id(*args, **kwargs):
 	"""Fetch the details for a single factual_id"""
 	params, factual_id, es_connection = args[:]
@@ -224,12 +252,6 @@ def safely_remove_file(filename):
 		logging.critical("Unable to remove {0}".format(filename))
 	logging.info("{0} removed".format(filename))
 
-def purge(my_dir, pattern):
-	"""Cleans up processing location on System Exit"""
-	for my_file in os.listdir(my_dir):
-		if re.search(pattern, my_file):
-			os.remove(os.path.join(my_dir, my_file))
-
 def string_cleanse(original_string):
 	"""Strips out characters that might confuse ElasticSearch."""
 	bad_characters = [r"\[", r"\]", r"\{", r"\}", r'"', r"/", r"\\", r"\:", r"\(",\
@@ -246,14 +268,14 @@ def build_boost_vectors(hyperparams):
 	boost_row_vectors = hyperparams["boost_vectors"]
 	boost_row_labels, boost_column_vectors = sorted(boost_row_vectors.keys()), {}
 
-	for i in range(len(boost_column_labels)):
+	for i, boost_column_label in enumerate(boost_column_labels):
 
 		my_list = []
 
 		for field in boost_row_labels:
 			my_list.append(boost_row_vectors[field][i])
 
-		boost_column_vectors[boost_column_labels[i]] = np.array(my_list)
+		boost_column_vectors[boost_column_label] = np.array(my_list)
 
 	return boost_row_labels, boost_column_vectors
 
@@ -327,48 +349,14 @@ def get_qs_query(term, field_list=None, boost=1.0):
 		}
 	}
 
-def get_us_cities():
+def get_us_cities(testing=False):
 	"""Load an array of US cities"""
 	with open("data/misc/US_Cities.txt") as city_file:
 		cities = city_file.readlines()
 	cities = [city.lower().rstrip('\n') for city in cities]
+	if testing: # Return the length for testing purposes
+		return len(cities)
 	return cities
-
-def clean_bad_escapes(filepath):
-	"""Clean a panel file of poorly escaped characters.
-	Return false if required fields not present"""
-
-	path, filename = os.path.split(filepath)
-	filename = os.path.splitext(filename)[0]
-	first_line = True
-	required_fields = ["DESCRIPTION_UNMASKED", "UNIQUE_MEM_ID", "GOOD_DESCRIPTION"]
-
-	# Clean File
-	with gzip.open(filepath, "rb") as input_file:
-		with open(path + "/" + filename, "wb") as output_file:
-			for line in input_file:
-				if first_line:
-					for field in required_fields:
-						if field not in str(line):
-							safely_remove_file(filepath)
-							safely_remove_file(path + "/" + filename)
-							return False
-					first_line = False
-				line = clean_line(line)
-				line = bytes(line + "\n", 'UTF-8')
-				output_file.write(line)
-	# Rename and Remove
-	safely_remove_file(filepath)
-
-	return filename
-
-def clean_line(line):
-	"""Strips out the part of a binary line that is not usable"""
-
-	line = CLEAN_PATTERN.sub(" ", str(line)[2:-3])
-	line = QUOTE_CLEAN.sub("", line)
-
-	return line
 
 def stopwords(transaction):
 	"""Remove stopwords"""
@@ -419,45 +407,6 @@ def synonyms(transaction):
 	text = pattern.sub(lambda m: rep[re.escape(m.group(0))], transaction)
 
 	return text.upper()
-
-def merge_split_files(params, split_list):
-	"""Takes a split list and merges the files back together
-	after processing is complete"""
-
-	file_name = params["output"]["file"]["name"]
-	base_path = params["output"]["file"]["processing_location"]
-	full_path = base_path + file_name
-	first_file = base_path + os.path.basename(split_list.pop(0))
-	output = open(full_path, "a", encoding="utf-8")
-
-	# Write first file with header
-	with open(first_file, "r", encoding="utf-8") as head_file:
-		for line in head_file:
-			output.write(line)
-
-	# Merge
-	for split in split_list:
-		base_file = os.path.basename(split)
-		with open(base_path + base_file, 'r', encoding="utf-8") as chunk:
-			next(chunk)
-			for line in chunk:
-				output.write(line)
-		safely_remove_file(base_path + base_file)
-
-	output.close()
-
-	# GZIP
-	unzipped = open(full_path, "rb")
-	zipped = gzip.open(full_path + ".gz", "wb")
-	zipped.writelines(unzipped)
-	zipped.close()
-	unzipped.close()
-
-	# Cleanup
-	safely_remove_file(first_file)
-	safely_remove_file(full_path)
-
-	return full_path + ".gz"
 
 #Print a warning to not execute this file as a module
 if __name__ == "__main__":

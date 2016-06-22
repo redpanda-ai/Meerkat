@@ -42,10 +42,9 @@ An entry of machine_labeled has such format:
 import argparse
 import csv
 import logging
-import numpy as np
 import os
-import pandas as pd
 import sys
+import pandas as pd
 
 from meerkat.classification.load_model import get_tf_cnn_by_path
 from meerkat.various_tools import load_params, load_piped_dataframe
@@ -59,9 +58,10 @@ def parse_arguments(args):
 	parser.add_argument('model', help='Path to the model under test')
 	parser.add_argument('data', help='Path to the test data')
 	parser.add_argument('label_map', help='Path to a label map')
-	parser.add_argument('label', type=lambda x: x.upper(), help="Header name of the ground truth label column")
+	parser.add_argument('label', type=lambda x: x.upper(),
+		help="Header name of the ground truth label column")
 	# Optional arguments
-	parser.add_argument('--model_name', default = '', help='Name of the tensor stored in graph.')
+	parser.add_argument('--model_name', default='', help='Name of the tensor stored in graph.')
 	parser.add_argument('--doc_key', type=lambda x: x.upper(), default='DESCRIPTION_UNMASKED',
 		help='Header name of primary transaction description column')
 	parser.add_argument('--secdoc_key', default='DESCRIPTION', type=lambda x: x.upper(),
@@ -75,7 +75,7 @@ def parse_arguments(args):
 
 def compare_label(*args, **kwargs):
 	"""similar to generic_test in accuracy.py, with unnecessary items dropped"""
-	machine, cnn_column, human_column, conf_mat, num_labels = args[:]
+	machine, cnn_column, human_column, conf_mat, _ = args[:]
 	doc_key = kwargs.get("doc_key")
 	correct = []
 	mislabeled = []
@@ -125,7 +125,7 @@ def count_transactions(csv_file):
 		_ = reader.__next__()
 		return sum([1 for i in reader])
 
-def get_classification_report(confusion_matrix_file, label_map):
+def get_classification_report(confusion_matrix_file, label_map, report_path):
 	"""Produce a classification report for a particular confusion matrix"""
 	df = pd.read_csv(confusion_matrix_file)
 	rows, cols = df.shape
@@ -140,7 +140,6 @@ def get_classification_report(confusion_matrix_file, label_map):
 	df.rename(columns=lambda x: int(x) - 1, inplace=True)
 	#First order calculations
 	true_positive = pd.DataFrame(df.iat[i, i] for i in range(rows))
-	col_sum = pd.DataFrame(df.sum(axis=1))
 	false_positive = pd.DataFrame(pd.DataFrame(df.sum(axis=0)).values - true_positive.values,
 		columns=true_positive.columns)
 	false_negative = pd.DataFrame(pd.DataFrame(df.sum(axis=1)).values - true_positive.values,
@@ -172,20 +171,28 @@ def get_classification_report(confusion_matrix_file, label_map):
 		"False Negative", "True Negative", "Precision", "Recall", "Specificity",
 		"F Measure"]
 	#Craft the report
-	classification_report = pd.concat(feature_list, axis = 1)
+	classification_report = pd.concat(feature_list, axis=1)
 	classification_report.columns = feature_labels
 	#Setting rows to be 1-indexed
 	classification_report.index = range(1, rows + 1)
 
 	logging.debug("Classification Report:\n{0}".format(classification_report))
 	logging.info("Accuracy is: {0}".format(classification_report.iloc[0]["Accuracy"]))
-	report_path = 'data/CNN_stats/classification_report.csv'
 	logging.info("Classification Report saved to: {0}".format(report_path))
 	classification_report.to_csv(report_path, index=False)
 
 # Main
-def main_process(args):
+def main_process(args=None):
 	"""This is the main stream"""
+	if args is None:
+		args = parse_arguments(sys.argv[1:])
+	log_format = "%(asctime)s %(levelname)s: %(message)s"
+	if args.debug:
+		logging.basicConfig(format=log_format, level=logging.DEBUG)
+	elif args.info:
+		logging.basicConfig(format=log_format, level=logging.INFO)
+	else:
+		logging.basicConfig(format=log_format, level=logging.WARNING)
 	doc_key = args.doc_key
 	sec_doc_key = args.secdoc_key
 	machine_label_key = args.predict_key
@@ -201,18 +208,7 @@ def main_process(args):
 	label_map = dict(zip(label_map.keys(), map(get_key, label_map.values())))
 	reversed_label_map = reverse_map(label_map)
 	num_labels = len(label_map)
-	class_names = list(label_map.values())
-
-	"""
-	# Create reversed label map and check if there are duplicate keys
-	reversed_label_map = {}
-	for key, value in label_map.items():
-		if class_names.count(value) > 1:
-			reversed_label_map[value] =\
-				 sorted(reversed_label_map.get(value, []) + [int(key)])
-		else:
-			reversed_label_map[value] = int(key)
-	"""
+	#class_names = list(label_map.values())
 
 	confusion_matrix = [[0 for i in range(num_labels + 1)] for j in range(num_labels)]
 	classifier = get_tf_cnn_by_path(args.model, args.label_map, model_name=model_name)
@@ -276,15 +272,9 @@ def main_process(args):
 	logging.debug("Rows: {0}, Columns {1}".format(rows, cols))
 	df.to_csv('data/CNN_stats/confusion_matrix.csv', index=False)
 	logging.info("Confusion matrix saved to: {0}".format(confusion_matrix_path))
-	get_classification_report(confusion_matrix_path, label_map)
+	report_path = 'data/CNN_stats/classification_report.csv'
+	get_classification_report(confusion_matrix_path, label_map, report_path)
+
 
 if __name__ == "__main__":
-	args = parse_arguments(sys.argv[1:])
-	log_format = "%(asctime)s %(levelname)s: %(message)s"
-	if args.debug:
-		logging.basicConfig(format=log_format, level=logging.DEBUG)
-	elif args.info:
-		logging.basicConfig(format=log_format, level=logging.INFO)
-	else:
-		logging.basicConfig(format=log_format, level=logging.WARNING)
-	main_process(args)
+	main_process()

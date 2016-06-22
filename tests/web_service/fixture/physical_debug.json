@@ -1,0 +1,50 @@
+{
+    "city": "Scars",
+    "state": "NY",
+    "transaction_id": 123,
+    "is_physical_merchant": true,
+    "merchant_name": "Ikea",
+    "txn_sub_type": "Purchase",
+    "txn_type": "Purchase",
+    "chain_name": "",
+    "confidence_score": "",
+    "country": "US",
+    "fax_number": "",
+    "latitude": "",
+    "longitude": "",
+    "match_found": false,
+    "neighbourhood": "",
+    "phone_number": "",
+    "postal_code": "",
+    "source": "OTHER",
+    "source_merchant_id": "",
+    "store_id": "",
+    "street": "",
+    "website": "",
+    "search": {
+        "merchant_name": "",
+        "street": "",
+        "city": "Scars",
+        "country": "US",
+        "state": "NY",
+        "postal_code": "",
+        "source_merchant_id": "",
+        "store_id": "",
+        "latitude": "",
+        "longitude": "",
+        "website": "",
+        "phone_number": "",
+        "fax_number": "",
+        "chain_name": "",
+        "neighbourhood": ""
+    },
+    "bloom_filter": {
+        "city": "Scars",
+        "state": "NY"
+    },
+    "cnn": {
+        "txn_type": "Purchase",
+        "txn_sub_type": "Purchase",
+        "merchant_name": "Ikea"
+    }
+}

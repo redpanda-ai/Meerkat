@@ -9,3 +9,5 @@ API_Documentation.md
 *.meta
 *.swp
 meerkat/classification/label_maps/*.json
+meerkat/classification/etags.json
+

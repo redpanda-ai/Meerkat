@@ -9,14 +9,14 @@ Modified on June 29, 2015
 @author: Sivan Mehta
 """
 
-import pandas as pd
 import csv
 import pickle
 import os
 import string
-from pprint import pprint
 
+import pandas as pd
 from .bloom import *
+from .generate_json import generate_js
 
 STATES = [
 	"AL", "AK", "AZ", "AR", "CA", \
@@ -28,7 +28,7 @@ STATES = [
 	"NM", "NY", "NC", "ND", "OH", \
 	"OK", "OR", "PA", "RI", "SC", \
 	"SD", "TN", "TX", "UT", "VT", \
-	"VA", "WA", "WV", "WI", "WY" ]
+	"VA", "WA", "WV", "WI", "WY"]
 
 LOCATION_BLOOM = get_location_bloom()
 
@@ -41,6 +41,7 @@ SUBS = {
 
 	# Abbreviations
 	"SAINT": "ST",
+	"FORT": "FT",
 	"CITY" : ""
 
 	# can get more in the future
@@ -70,6 +71,7 @@ def generate_city_map():
 	print("generate location map")
 
 	data = {}
+
 	try:
 		open("meerkat/classification/bloom_filter/assets/json_not_csv")
 	except:
@@ -80,8 +82,8 @@ def generate_city_map():
 			city, state = line.strip().split('\t')
 			add_with_subs(data, city, state)
 
-	csv_file = csv.reader(open("meerkat/classification/bloom_filter/assets/us_cities_larger.csv", encoding="utf-8"), \
-		delimiter="\t")
+	csv_file = csv.reader(open("meerkat/classification/bloom_filter/assets/us_cities_larger.csv", \
+		encoding="utf-8"), delimiter="\t")
 
 	for row in csv_file:
 		try:
@@ -92,14 +94,14 @@ def generate_city_map():
 			# state = row[1] # for small.csv
 			add_with_subs(data, city, state)
 
-	pickle.dump(data, open("meerkat/classification/bloom_filter/assets/CITY_SUBS.log", 'wb'))
+	pickle.dump(data, open("meerkat/classification/bloom_filter/assets/CITY_SUBS", 'wb'))
 
 	return data
 
 CITY_SUBS = {}
 
-if os.path.isfile("meerkat/classification/bloom_filter/assets/CITY_SUBS.log"):
-	with open("meerkat/classification/bloom_filter/assets/CITY_SUBS.log", 'rb') as fp:
+if os.path.isfile("meerkat/classification/bloom_filter/assets/CITY_SUBS"):
+	with open("meerkat/classification/bloom_filter/assets/CITY_SUBS", 'rb') as fp:
 	    CITY_SUBS = pickle.load(fp)
 else:
 	CITY_SUBS = generate_city_map()
@@ -121,32 +123,85 @@ def in_location_bloom(text):
 		el paso tx ==> Known town, return all known information
 		^^^^^^^^^^
 	"""
-	if len(text) == 1:
+	if len(text) <= 2:
 		return False
 	else:
 		region = text[-2:]
 		biggest = None
-		for i in range(len(text) -1, -1, -1):
-			locality = text[i:- 2]
-			if (locality, region) in LOCATION_BLOOM:
-				# print("matched (%s, %s)" % (locality, region))
-				biggest = (locality, region)
 
+		for i in range(len(text) - 3, -1, -1):
+			locality = text[i:-2]
+			if (locality, region) in LOCATION_BLOOM:
+				biggest = (locality, region)
+		if biggest: return biggest
+		'''
+		for i in range(len(text) - 5, -1, -1):
+			locality = text[i:-2]
+			for ch in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
+				loc = locality + ch
+				if (loc, region) in LOCATION_BLOOM:
+					biggest = (loc, region)
+					break
+		if biggest: return biggest
+
+		for i in range(len(text) - 5, -1, -1):
+			locality = text[i:-2]
+			for ch1 in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
+				for ch2 in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
+					loc = locality + ch1 + ch2
+					if (loc, region) in LOCATION_BLOOM:
+						biggest = (loc, region)
+						break
+				if biggest: break
+		'''
 		return biggest
 
 def location_split(my_text):
 	# Capitalize and remove spaces
+	tag = tag_text(my_text)
 	my_text = standardize(my_text)
 
-	for i in range(len(my_text) - 1, -1, -1):
-		if my_text[i:i+2] in STATES:
+	try:
+		open('meerkat/classification/bloom_filter/assets/words_start_with_states.json')
+	except:
+		generate_js()
+
+	words = get_json_from_file('meerkat/classification/bloom_filter/assets/words_start_with_states.json')
+	length = len(my_text)
+	for i in range(length - 2, -1, -1):
+		if my_text[i:i+2] in STATES and tag[i+1] == 'C' and (i == length - 2 or tag[i + 2] == 'B' or \
+		get_word(tag, my_text, i) not in words[my_text[i:i+2]]):
 			place = in_location_bloom(my_text[:i+2])
 			if place:
 				key = place[0] + place[1]
 				try: return CITY_SUBS[key]
 				except: pass
-				# return place
 	return None
+
+def get_word(tag, text, index):
+	'''get the word concact with state'''
+	end = index + 2
+	for ch in tag[index + 2:]:
+		if ch == 'C':
+			end += 1
+		else:
+			break
+	return text[index:end]
+
+def tag_text(text):
+	'''make tag for text'''
+	for mark in string.punctuation:
+		text = text.replace(mark, ' ')
+	text = text.strip()
+	tag = ''
+	for i in range(len(text)):
+		if text[i] == ' ':
+			continue
+		elif i == 0 or text[i - 1] == ' ':
+			tag += 'B'
+		else:
+			tag += 'C'
+	return tag
 
 ##THINK!
 #Red Roof Inn, a three term bloom filter.
@@ -161,9 +216,9 @@ def location_split(my_text):
 def main():
 	"""runs the file"""
 	print("find_entities")
-	# input_file = "meerkat/classification/bloom_filter/input_file.txt.gz"
+	input_file = "meerkat/classification/bloom_filter/input_file.txt.gz"
 	# input_file = "data/input/should_search_labels.csv.gz"
-	input_file = sys.argv[1]
+#	input_file = sys.argv[1]
 	data_frame = pd.io.parsers.read_csv(input_file, sep="|", compression="gzip")
 	descriptions = data_frame['DESCRIPTION_UNMASKED']
 	location_bloom_results = descriptions.apply(location_split)
@@ -181,4 +236,4 @@ def main():
 
 if __name__ == "__main__":
 #	main()
-	print(location_split('DEBIT CARD PURCHASE XXXXX7106 VENETIAN NAIL SPA PLANTATION FL'))
+	print(location_split('VICTORIAS'))
