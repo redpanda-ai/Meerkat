@@ -7,6 +7,7 @@ import unittest
 import meerkat.elasticsearch.load_index_from_file as loader
 
 from nose_parameterized import parameterized
+from elasticsearch import Elasticsearch
 
 def create_parser():
 	"""Creates an argparse parser."""
@@ -19,7 +20,8 @@ class LoadIndexFromFileTests (unittest.TestCase):
 
 	@classmethod
 	def setUpClass(cls):
-		pass
+		cls._es = Elasticsearch("172.31.19.192:9200" , sniff_on_start=False,
+			sniff_on_connection_fail=True, sniffer_timeout=5, sniff_timeout=5)
 
 	def test_foo(self):
 		"""Sample unit test."""
@@ -51,6 +53,22 @@ class LoadIndexFromFileTests (unittest.TestCase):
 			self.assertEqual(header, ['ONE', 'TWO', 'THREE'])
 			self.assertEqual(document_queue.qsize(), 2)
 			self.assertTrue(document_queue_populated)
+
+	def test_guarantee_index_and_doc_type(self):
+		#Data fixture
+		params = { "elasticsearch" : {
+			"cluster_nodes" : [ "172.31.19.192:9200" ],
+			"index" : "dev_index",
+			"type" : "dev_type",
+			"type_mapping" : {} } }
+		#Clean up pre-existing index
+		self._es.indices.delete(index=params["elasticsearch"]["index"], ignore=[400, 404])
+		#Test
+		expected = ("created", "created")
+		result = loader.guarantee_index_and_doc_type(params)
+		self.assertEqual(expected, result)
+		#Clean up pre-existing index
+		self._es.indices.delete(index=params["elasticsearch"]["index"], ignore=[400, 404])
 
 if __name__ == '__main__':
 	unittest.main()
