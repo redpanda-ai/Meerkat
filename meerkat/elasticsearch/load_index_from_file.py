@@ -33,7 +33,7 @@ import threading
 from datetime import datetime
 from elasticsearch import Elasticsearch, helpers
 
-from meerkat.custom_exceptions import InvalidArguments, Misconfiguration
+from meerkat.custom_exceptions import Misconfiguration
 from meerkat.various_tools import validate_configuration
 
 def parse_arguments(args):
