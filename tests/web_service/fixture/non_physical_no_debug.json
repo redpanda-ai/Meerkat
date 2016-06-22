@@ -1,0 +1,9 @@
+{
+    "city": "",
+    "state": "",
+    "transaction_id": 123,
+    "is_physical_merchant": false,
+    "merchant_name": "",
+    "txn_sub_type": "Purchase",
+    "txn_type": "Purchase"
+}
