@@ -387,32 +387,13 @@ def add_dispersed_type_mappings(params):
 	logging.critical(json.dumps(params, sort_keys=True,
 		indent=4, separators=(',', ':')))
 
-def guarantee_index_and_doc_type(params):
+def guarantee_index_and_doc_type(es_params):
 	"""Ensure that the index and document type mapping are as they should be"""
-	es_index_status, es_type_status = None, None
-	cluster_nodes = params["elasticsearch"]["cluster_nodes"]
-	es_index = params["elasticsearch"]["index"]
-	doc_type = params["elasticsearch"]["type"]
-	es_connection = Elasticsearch(cluster_nodes, sniff_on_start=False,
+	es_connection = Elasticsearch(es_params["cluster_nodes"], sniff_on_start=False,
 		sniff_on_connection_fail=True, sniffer_timeout=5, sniff_timeout=5)
-	if es_connection.indices.exists(index=es_index):
-		es_index_status = "found"
-		logging.critical("Index exists, continuing")
-		if es_connection.indices.exists_type(index=es_index, doc_type=doc_type):
-			logging.critical("Doc type exists, continuing")
-			es_type_status = "found"
-	else:
-		logging.warning("Index does not exist, creating")
-		index_body = params["elasticsearch"]["type_mapping"]
-		_ = es_connection.indices.create(index=es_index, body=index_body)
-		es_index_status, es_type_status = "created", "created"
-		# okay, acknowledged = result["ok"], result["acknowledged"]
-		# try:
-		# 	result["ok"] and result["acknowledged"]
-		# 	logging.critical("Index created successfully.")
-		# except KeyError:
-		# 	logging.error("Failed to create index, aborting.")
-		# 	sys.exit()
+	_ = es_connection.indices.create(index=es_params["index"], body=es_params["type_mapping"],
+		ignore=400)
+	es_index_status, es_type_status = "created", "created"
 	return es_index_status, es_type_status
 
 def run_from_command_line():
@@ -429,7 +410,7 @@ def run_from_command_line():
 
 	logging.warning(json.dumps(my_params, sort_keys=True,
 		indent=4, separators=(',', ':')))
-	guarantee_index_and_doc_type(my_params)
+	guarantee_index_and_doc_type(my_params["elasticsearch"])
 	my_params["document_queue_populated"] = False
 	my_params["concurrency_queue"] = queue.Queue()
 	my_params["header"], my_params["document_queue"],\

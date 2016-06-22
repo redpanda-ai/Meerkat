@@ -8,6 +8,7 @@ import meerkat.elasticsearch.load_index_from_file as loader
 
 from nose_parameterized import parameterized
 from elasticsearch import Elasticsearch
+from meerkat.various_tools import load_params
 
 def create_parser():
 	"""Creates an argparse parser."""
@@ -54,18 +55,23 @@ class LoadIndexFromFileTests (unittest.TestCase):
 			self.assertEqual(document_queue.qsize(), 2)
 			self.assertTrue(document_queue_populated)
 
-	def test_guarantee_index_and_doc_type(self):
+	@parameterized.expand([
+		([True, "created", "created"]),
+		([False, "created", "created"])
+	])
+	def test_guarantee_index_and_doc_type(self, preexisting_index, index_found, type_found):
+		"""Ensure that index and type exist before adding records."""
 		#Data fixture
-		params = { "elasticsearch" : {
-			"cluster_nodes" : [ "172.31.19.192:9200" ],
-			"index" : "dev_index",
-			"type" : "dev_type",
-			"type_mapping" : {} } }
+		params = load_params("tests/elasticsearch/fixtures/guarantee_index_and_type.json")
 		#Clean up pre-existing index
-		self._es.indices.delete(index=params["elasticsearch"]["index"], ignore=[400, 404])
+		if preexisting_index:
+			self._es.indices.create(index=params["elasticsearch"]["index"],
+				body=params["elasticsearch"]["type_mapping"], ignore=400)
+		else:
+			self._es.indices.delete(index=params["elasticsearch"]["index"], ignore=[400, 404])
 		#Test
-		expected = ("created", "created")
-		result = loader.guarantee_index_and_doc_type(params)
+		expected = (index_found, type_found)
+		result = loader.guarantee_index_and_doc_type(params["elasticsearch"])
 		self.assertEqual(expected, result)
 		#Clean up pre-existing index
 		self._es.indices.delete(index=params["elasticsearch"]["index"], ignore=[400, 404])
