@@ -10,8 +10,28 @@ performance matrics.
 @author: Matt Sevrens
 """
 
+import argparse
+import logging
+import os
+import sys
+import shutil
+
+import tensorflow as tf
+
+from meerkat.classification.split_data import main_split_data
+from meerkat.classification.tools import (pull_from_s3, check_new_input_file,
+	make_tarfile, copy_file, check_file_exist_in_s3, extract_tarball)
+from meerkat.classification.tensorflow_cnn import build_graph, train_model, validate_config
+from meerkat.classification.ensemble_cnns import build_graph as build_ensemble_graph
+from meerkat.classification.ensemble_cnns import train_model as train_ensemble_model
+from meerkat.classification.soft_target import main as get_soft_target
+from meerkat.various_tools import load_params, safe_input, push_file_to_s3
+from meerkat.classification.auto_load import get_single_file_from_tarball
+from meerkat.classification.classification_report import main_process as apply_cnn
+
 ############################## USAGE ###############################################################
-USAGE = """
+"""
+USAGE =
 usage: auto_train [-h] [--input_dir INPUT_DIR] [--output_dir OUTPUT_DIR]
                   [--credit_or_debit CREDIT_OR_DEBIT] [--bucket BUCKET] [-d]
                   [-v]
@@ -34,33 +54,13 @@ optional arguments:
   --bucket BUCKET       Input bucket name, default is s3yodlee
   -d, --debug           log at DEBUG level
   -v, --info            log at INFO leve
-"""
 
-EXAMPLE = """
+EXAMPLE =
 time nohup python3 -m meerkat.classification.auto_train merchant bank -v --ensemble &
 """
-
 ###################################################################################################
 
-import argparse
-import logging
-import os
-import shutil
-
-import tensorflow as tf
-
-from meerkat.classification.split_data import main_split_data
-from meerkat.classification.tools import (pull_from_s3, check_new_input_file,
-	push_file_to_s3, make_tarfile, copy_file, check_file_exist_in_s3, extract_tarball)
-from meerkat.classification.tensorflow_cnn import build_graph, train_model, validate_config
-from meerkat.classification.ensemble_cnns import build_graph as build_ensemble_graph
-from meerkat.classification.ensemble_cnns import train_model as train_ensemble_model
-from meerkat.classification.soft_target import main as get_soft_target
-from meerkat.various_tools import load_params, safe_input
-from meerkat.classification.auto_load import get_single_file_from_tarball
-from meerkat.classification.classification_report import main_process as apply_cnn
-
-def parse_arguments():
+def parse_arguments(args):
 	"""This function parses arguments from our command line."""
 
 	parser = argparse.ArgumentParser("auto_train")
@@ -97,7 +97,7 @@ def parse_arguments():
 	parser.add_argument("-d", "--debug", help=help_text["debug"], action="store_true")
 	parser.add_argument("-v", "--info", help=help_text["info"], action="store_true")
 
-	args = parser.parse_args()
+	args = parser.parse_args(args)
 
 	if args.model_type == 'subtype' and args.credit_or_debit == '':
 		raise Exception('For subtype data you need to declare debit or credit.')
@@ -111,29 +111,17 @@ def parse_arguments():
 def auto_train():
 	"""Run the automated training process"""
 
-	args = parse_arguments()
+	args = parse_arguments(sys.argv[1:])
 	bucket = args.bucket
 	bank_or_card = args.bank_or_card
 	credit_or_debit = args.credit_or_debit
 	model_type = args.model_type
-	data_type = model_type + '_' + bank_or_card
+	data_type = model_type + '/' + bank_or_card
 	if model_type != "merchant":
-		data_type = data_type + '_' + credit_or_debit
+		data_type = data_type + '/' + credit_or_debit
 
-	dir_paths = {
-		'subtype_card_debit': 'meerkat/cnn/data/subtype/card/debit/',
-		'subtype_card_credit': 'meerkat/cnn/data/subtype/card/credit/',
-		'subtype_bank_debit': 'meerkat/cnn/data/subtype/bank/debit/',
-		'subtype_bank_credit': 'meerkat/cnn/data/subtype/bank/credit/',
-		'merchant_bank': 'meerkat/cnn/data/merchant/bank/',
-		'merchant_card': 'meerkat/cnn/data/merchant/card/',
-		'category_bank_debit': 'meerkat/cnn/data/category/bank/debit/',
-		'category_bank_credit': 'meerkat/cnn/data/category/bank/credit/',
-		'category_card_debit': 'meerkat/cnn/data/category/card/debit/',
-		'category_card_credit': 'meerkat/cnn/data/category/card/credit/'
-	}
-
-	prefix = dir_paths[data_type] if args.input_dir == '' else args.input_dir
+	default_prefix = 'meerkat/cnn/data/'
+	prefix = default_prefix + data_type + '/' if args.input_dir == '' else args.input_dir
 	prefix = prefix + '/' * (prefix[-1] != '/')
 
 	if args.output_dir == '':
@@ -154,10 +142,9 @@ def auto_train():
 
 	exist_results_tarball = check_file_exist_in_s3("results.tar.gz", **s3_params)
 	if exist_results_tarball:
-		pull_from_s3(extension='.tar.gz', file_name="results.tar.gz", **s3_params)
+		local_zip_file = pull_from_s3(extension='.tar.gz', file_name="results.tar.gz", **s3_params)
 		try:
-			model_file = get_single_file_from_tarball(save_path + "results.tar.gz", ".ckpt")
-			os.remove(model_file)
+			_ = get_single_file_from_tarball(save_path, local_zip_file, ".ckpt", extract=False)
 
 			valid_options = ["yes", "no"]
 			while True:
@@ -169,14 +156,15 @@ def auto_train():
 					logging.critical("Not a valid option. Valid options are: yes or no.")
 
 			if retrain_choice == "no":
+				os.remove(local_zip_file)
 				logging.info("Auto train ends")
 				shutil.rmtree(save_path)
 				return
 			else:
+				os.remove(local_zip_file)
 				logging.info("Retrain the model")
 		except:
 			logging.critical("results.tar.gz is invalid. Retrain the model")
-		os.remove(save_path + "results.tar.gz")
 
 	if exist_new_input:
 		logging.info("There exists new input data")
@@ -199,10 +187,11 @@ def auto_train():
 	shutil.copyfile(label_map, tarball_directory + "label_map.json")
 
 	# Load and Modify Config
+	config_dir = "meerkat/classification/config/"
 	if args.ensemble:
-		config = load_params("meerkat/classification/config/ensemble_cnns_config.json")
+		config = load_params(config_dir + "ensemble_cnns_config.json")
 	else:
-		config = load_params("meerkat/classification/config/default_tf_config.json")
+		config = load_params(config_dir + "default_tf_config.json")
 	config["label_map"] = label_map
 	config["dataset"] = train_file
 	config["ledger_entry"] = args.credit_or_debit
@@ -257,7 +246,7 @@ def auto_train():
 	args.model_name = ''
 
 	logging.warning('Apply the best CNN to test data and calculate performance metrics')
-	apply_cnn(args)
+	apply_cnn(args=args)
 	copy_file(best_model_path, tarball_directory)
 	copy_file(best_model_path.replace(".ckpt", ".meta"), tarball_directory)
 	# copy_file("meerkat/classification/models/train.ckpt", tarball_directory)

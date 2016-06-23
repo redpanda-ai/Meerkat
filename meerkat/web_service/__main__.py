@@ -13,10 +13,10 @@ EXAMPLE CURL COMMAND TO TEST WEB SERVICE:
 """
 import logging
 import os
+import sys
 import tornado.httpserver
 import tornado.ioloop
 import yaml
-import sys
 
 from tornado_json.application import Application
 from tornado.options import define, options

@@ -1,0 +1,21 @@
+{
+	"elasticsearch" : {
+		"cluster_nodes" : [ "172.31.19.192:9200" ],
+			"index" : "dev_index",
+			"type" : "dev_type",
+			"type_mapping" : {
+				"mappings" : {
+					"dev_test_type" : {
+						"_source" : {
+							"enabled" : true
+						},
+						"properties" : {
+							"factual_id" : { "index" : "analyzed", "type" : "string" }
+						}
+					}
+				}
+			},
+		"type_mapping" : {}
+	}
+}
+

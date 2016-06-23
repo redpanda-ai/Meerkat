@@ -24,12 +24,11 @@ def get_trans_text(path):
 	transFile.close()
 	return transaction_text
 
-def classify_one(self, transaction, max_retries=20, sleep_interval=2):
+def classify_one(self, transaction, max_retries=30):
 	"""Send a single transaction to the web service for classification"""
 	count = 1
 	while count <= max_retries:
 		try:
-			sleep(sleep_interval)
 			r_post = requests.post(
 				"https://localhost/meerkat/v2.2",
 				data=transaction,
@@ -70,6 +69,9 @@ class WebServiceTest(unittest.TestCase):
 
 	@classmethod
 	def setUpClass(cls):
+		log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+		logging.basicConfig(level=logging.INFO, format=log_format)
+		logging.warning("Restarting Meerkat.")
 		sudo[local["supervisorctl"]["restart"]["meerkat"]]()
 		trans_text = get_trans_text('./web_service_tester/one_ledger.json')
 		_ = startup_helper(trans_text)
@@ -88,11 +90,11 @@ class WebServiceTest(unittest.TestCase):
 		# max_retries times
 		while count <= max_retries:
 			try:
-				sleep(sleep_interval)
 				status = check_status()
 				self.assertTrue(status == 200)
 				return
 			except ConnectionError:
+				sleep(sleep_interval)
 				count += 1
 		self.assertTrue(0 == 1, "Failed to connect to Meerkat service")
 		return

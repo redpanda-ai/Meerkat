@@ -3,7 +3,6 @@ import csv
 
 def main():
 	classifier = load_scikit_model("bank_sws")
-	counts = [0,0,0]
 	with open("data/input/merchant_labels.csv", encoding = "latin-1") as f:
 		data = csv.reader(f, delimiter = ",")
 		for row in data:

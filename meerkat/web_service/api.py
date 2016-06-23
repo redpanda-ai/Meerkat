@@ -1,10 +1,6 @@
 """This module defines the Meerkat web service API."""
 import concurrent.futures
 import json
-import logging
-import os
-import re
-import shutil
 
 from tornado import gen
 from tornado_json.requesthandlers import APIHandler
@@ -17,29 +13,31 @@ from meerkat.various_tools import (load_params, get_us_cities,\
 class Meerkat_API(APIHandler):
 	"""This class is the Meerkat API."""
 	cities = get_us_cities()
-	params = load_params("meerkat/web_service/config/web_service.json")
+	base_dir = "meerkat/web_service/"
+	params = load_params(base_dir + "config/web_service.json")
 	hyperparams = load_hyperparameters(params)
 	meerkat = WebConsumer(params, hyperparams, cities)
 	#This thread pool can deal with 'blocking functions' like meerkat.classify
+	# 14 is best thread number Andy has tried.
 	thread_pool = concurrent.futures.ThreadPoolExecutor(14)
 
 	# pylint: disable=bad-continuation
-	with open("meerkat/web_service/schema_input.json") as data_file:
+	with open(base_dir + "schema_input.json") as data_file:
 		schema_input = json.load(data_file)
 
-	with open("meerkat/web_service/example_input.json") as data_file:
+	with open(base_dir + "example_input.json") as data_file:
 		example_input = json.load(data_file)
 
-	with open("meerkat/web_service/schema_output.json") as data_file:
+	with open(base_dir + "schema_output.json") as data_file:
 		schema_output = json.load(data_file)
 
-	with open("meerkat/web_service/example_output.json") as data_file:
+	with open(base_dir + "example_output.json") as data_file:
 		example_output = json.load(data_file)
 
-	with open("meerkat/web_service/schema_debug_output.json") as data_file:
+	with open(base_dir + "schema_debug_output.json") as data_file:
 		schema_debug_output = json.load(data_file)
 
-	with open("meerkat/web_service/example_debug_output.json") as data_file:
+	with open(base_dir + "example_debug_output.json") as data_file:
 		example_debug_output = json.load(data_file)
 
 	@schema.validate(

@@ -1,9 +1,7 @@
-import json
-import sys
 import unittest
-
 from meerkat.web_service import web_consumer
 from tests.web_service.fixture import web_consumer_fixture
+from nose_parameterized import parameterized
 
 class WebConsumerTest(unittest.TestCase):
 	"""Our UnitTest class."""
@@ -20,13 +18,84 @@ class WebConsumerTest(unittest.TestCase):
 		cls.consumer.bank_merchant_cnn = web_consumer_fixture.get_mock_cnn
 		cls.consumer.card_merchant_cnn = web_consumer_fixture.get_mock_cnn
 
-
 	def setUp(self):
 		return
 
 	def tearDown(self):
 		return
- 
+
+	@parameterized.expand([
+		([{"country": ""}, {"match_found": False, "country": 'US',
+			"source": "FACTUAL", "confidence_score": ""}])
+	])
+	def test___no_result(self, transaction, expected):
+		"""Test no_result with parameters"""
+		self.consumer._WebConsumer__no_result(transaction)
+		for field in ["match_found", "country", "source", "confidence_score"]:
+			self.assertEqual(transaction[field], expected[field])
+
+	@parameterized.expand([
+		([web_consumer_fixture.get_transactions_to_clean("non_physical_no_debug"),
+			False, web_consumer_fixture.get_proper_output("non_physical_no_debug")]),
+		([web_consumer_fixture.get_transactions_to_clean("physical_no_debug"),
+			False, web_consumer_fixture.get_proper_output("physical_no_debug")]),
+		([web_consumer_fixture.get_transactions_to_clean("physical_debug"),
+			True, web_consumer_fixture.get_proper_output("physical_debug")])
+	])
+	def test_ensure_output_schema(self, transactions, debug, expected):
+		"""Test ensure_output_schema with parameters"""
+		self.consumer.ensure_output_schema(transactions, debug)
+		for i, trans in enumerate(transactions):
+			self.assertEqual(trans, expected[i])
+
+	@parameterized.expand([
+		([[{'category_labels': '[["a", "b"], ["c"]]'}], [{'category_labels': ['a', 'b', 'c']}]]),
+		([[{'category_labels': ''}], [{'category_labels': []}]])
+	])
+	def test__apply_category_labels(self, physical, expected):
+		"""Test __apply_category_labels with parameters"""
+		self.consumer._WebConsumer__apply_category_labels(physical)
+		for i, trans in enumerate(physical):
+			self.assertEqual(sorted(trans), sorted(expected[i]))
+
+	@parameterized.expand([
+		([[{}], [{'merchant_name': '', 'source': 'OTHER', 'match_found': False}]])
+	])
+	def test__enrich_physical_no_search(self, transaction, expected):
+		"""Test __enrich_physical_no_search with parameters"""
+		self.assertEqual(self.consumer._WebConsumer__enrich_physical_no_search(transaction),
+			expected)
+
+	@parameterized.expand([
+		([['Abc', 'Abc'], {'merchant_name': 'm'}, {'merchant_name': 'Abc'}]),
+		([['Xyz', 'Xyz'], {'merchant_name': 'm'}, {'merchant_name': 'm'}])
+	])
+	def test__business_name_fallback(self, business_names, transaction, expected):
+		"""Test __business_name_fallback with parameters"""
+		attr_map = {
+			'name': 'merchant_name'
+		}
+		self.consumer.cities = ['xyz', 'hij']
+		self.assertEqual(self.consumer._WebConsumer__business_name_fallback(business_names,
+			transaction, attr_map), expected)
+
+	@parameterized.expand([
+		([['Hum', 'Pro', 'Gold'], ['TX', 'TX', 'CO'],
+			{'description': 'Abc TX', 'city': 'c', 'state': 's'},
+			{'description': 'Abc TX', 'city': 'c', 'state': 'TX'}]),
+		([['Abc', 'Pro', 'Gold'], ['TX', 'CA', 'CO'],
+			{'description': 'Abc TX', 'city': 'c', 'state': 's'},
+			{'description': 'Abc TX', 'city': 'Abc', 'state': 's'}])
+	])
+	def test__geo_fallback(self, city_names, state_names, transaction, expected):
+		"""Test __geo_fallback with parameters"""
+		attr_map = {
+			'locality': 'city',
+			'region': 'state'
+		}
+		self.assertEqual(self.consumer._WebConsumer__geo_fallback(city_names,
+			state_names, transaction, attr_map), expected)
+
 	def test_static_bank_category_map(self):
 		"""Assert that the correct static category label has been applied from the bank map"""
 		transactions = web_consumer_fixture.get_transaction_bank_fallback_classifiable()

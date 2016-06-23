@@ -1,6 +1,6 @@
 {
     "input" : {
-        "hyperparameters" : "config/hyperparameters/default.json",
+        "hyperparameters" : "meerkat/web_service/config/hyperparameters/default.json",
         "encoding" : "utf-8"
     },
     "output" : {
