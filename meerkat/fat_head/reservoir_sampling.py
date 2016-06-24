@@ -6,8 +6,8 @@ def reservoir_sampling(items, k):
 
 	for i in range(k, len(items)):
 		print("Looping")
-		j = randrange(0, i)
-		if j <= k:
+		j = randrange(0, i + 1)
+		if j < k:
 			print("I {0}".format(i))
 			print("J {0}".format(j))
 			sample[j] = items[i]
