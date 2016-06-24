@@ -16,11 +16,12 @@ def reservoir_sampling(items, k):
 
 	return sample
 
-def df_reservoir_sampling(input_file, k, chunksize, compression='infer'):
+def df_reservoir_sampling(my_args, compression='infer'):
 	first_chunk = True
 	sample = None
 	last_i = 0
-	for chunk in pd.read_csv(input_file, chunksize=chunksize, compression=compression):
+	k = my_args.sample_size
+	for chunk in pd.read_csv(my_args.input_file, chunksize=my_args.chunksize, compression=compression):
 		print("Last I :{0}".format(last_i))
 		if first_chunk:
 			sample = chunk[0:k]
@@ -43,7 +44,9 @@ def df_reservoir_sampling(input_file, k, chunksize, compression='infer'):
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
 	parser.add_argument("input_file")
+	parser.add_argument("sample_size", type=int)
+	parser.add_argument("chunksize", type=int)
 	my_args = parser.parse_args()
-	sample = df_reservoir_sampling(my_args.input_file, 2, 6)
+	sample = df_reservoir_sampling(my_args)
 	print("Final Sample:\n{0}".format(sample))
 
