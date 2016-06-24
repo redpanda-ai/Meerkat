@@ -1,5 +1,6 @@
 from random import randrange
 import pandas as pd
+import argparse
 
 def reservoir_sampling(items, k):
 	"""Reservoir Sampling"""
@@ -15,11 +16,11 @@ def reservoir_sampling(items, k):
 
 	return sample
 
-def df_reservoir_sampling(input_file, k, chunksize):
+def df_reservoir_sampling(input_file, k, chunksize, compression='infer'):
 	first_chunk = True
 	sample = None
 	last_i = 0
-	for chunk in pd.read_csv(input_file, chunksize=chunksize):
+	for chunk in pd.read_csv(input_file, chunksize=chunksize, compression=compression):
 		print("Last I :{0}".format(last_i))
 		if first_chunk:
 			sample = chunk[0:k]
@@ -39,6 +40,10 @@ def df_reservoir_sampling(input_file, k, chunksize):
 		last_i += this_i + 1
 	return sample
 
-sample = df_reservoir_sampling("meerkat/fat_head/input.tab", 2, 6)
-print("Final Sample:\n{0}".format(sample))
+if __name__ == "__main__":
+	parser = argparse.ArgumentParser()
+	parser.add_argument("input_file")
+	my_args = parser.parse_args()
+	sample = df_reservoir_sampling(my_args.input_file, 2, 6)
+	print("Final Sample:\n{0}".format(sample))
 
