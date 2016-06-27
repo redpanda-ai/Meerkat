@@ -117,6 +117,8 @@ dictionary = {
 	],
 	'WY': [
 	],
+	'DC': [
+	]
 }
 
 def generate_js():
