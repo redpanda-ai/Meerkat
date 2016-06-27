@@ -53,12 +53,16 @@ dictionary = {
 	'MA': [
 	],
 	'MI': [
+		'MINEDEBIT'
 	],
 	'MN': [
 	],
 	'MS': [
 	],
 	'MO': [
+		'MONTHLY',
+		'MONTH',
+		'MOUNTAIN'
 	],
 	'MT': [
 	],
@@ -117,6 +121,8 @@ dictionary = {
 	],
 	'WY': [
 	],
+	'DC': [
+	]
 }
 
 def generate_js():
