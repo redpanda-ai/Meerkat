@@ -216,7 +216,10 @@ def location_split(text):
 		if text[i:i+2] in STATES and tag[i+1] == 'C' and get_word(tag, text, i) not in words[text[i:i+2]]:
 			place = in_trie(text[:i+2])
 			if place:
-				if place[2] in 'EWSN' and tag[i - (len(place) - 2)] == 'C': place = place[:2] + place[3:]
+				if place[2] in 'EWSN' and tag[i - (len(place) - 2)] == 'C': 
+					plc = place[:2] + place[3:]
+					if plc == TRIE.search(plc):
+						place = plc
 				try: return MAP[place]
 				except: pass
 
@@ -278,4 +281,4 @@ def main():
 
 if __name__ == "__main__":
 #	main()
-	print(location_split('Philadelphi PA'))
+	print(location_split('CSAN JOSE CA'))
