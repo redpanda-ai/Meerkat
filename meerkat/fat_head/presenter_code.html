@@ -4,54 +4,54 @@
 
 <p>DESCRIPTION_UNMASKED : <span id="question_holder"></span></p>
 
-<p>Answer : 
-  <input type="text" id="answerBoxCity" placeholder="type city here">
-  <input type="text" id="answerBoxState" placeholder="type state here">
-  <input type="text" id="answerBoxZipcode" placeholder="type zipcode here">
-</p> 
+<p>Answer :
+	<input type="text" id="answerBoxCity" placeholder="type city here">
+	<input type="text" id="answerBoxState" placeholder="type state here">
+	<input type="text" id="answerBoxZipcode" placeholder="type zipcode here">
+</p>
 
 <p><button id="save" class="btn btn-primary">Save Answer</button> </p>
 <p><button id="idk" class="btn btn-primary">I don't know</button> </p>
-  
+
 </div>
 <div id="finish" class="alert alert-success" style="display:none;">
   <p>Congratulations! You have participated in all available tasks!</p>
-</div>  
+</div>
 </div>
 <script type="text/javascript">
 pybossa.taskLoaded(function(task, deferred){
 	deferred.resolve(task);
 });
 pybossa.presentTask(function(task, deferred){
-    if (!$.isEmptyObject(task)) {
-	    $("#answerBoxCity").val("");
-        $("#answerBoxState").val("");
-        $("#answerBoxZipcode").val("");
-	    $("#question_holder").text(task.info['question']);
-	    $("#save").off('click').on('click', function(evt) {
-            var answer = {}
-            answer["city"] = $("#answerBoxCity").val();
-            answer["state"] = $("#answerBoxState").val();
-            answer["zipcode"] = $("#answerBoxZipcode").val();
-     
-		    pybossa.saveTask(task.id, answer).done(function() {
-			    deferred.resolve(task);
-		    });
-	    });
-        $("#idk").off('click').on('click', function(evt) {
-            var answer = {}
-            answer["city"] = "";
-            answer["state"] = "";
-            answer["zipcode"] = "";
-      
-		    pybossa.saveTask(task.id, answer).done(function() {
-			    deferred.resolve(task);
-		    });
-	    });
-    } else {
-        $("#skeleton").hide();
-        $("#finish").fadeIn(100);
-    }
+	if (!$.isEmptyObject(task)) {
+		$("#answerBoxCity").val("");
+		$("#answerBoxState").val("");
+		$("#answerBoxZipcode").val("");
+		$("#question_holder").text(task.info['question']);
+		$("#save").off('click').on('click', function(evt) {
+			var answer = {}
+			answer["city"] = $("#answerBoxCity").val();
+			answer["state"] = $("#answerBoxState").val();
+			answer["zipcode"] = $("#answerBoxZipcode").val();
+
+			pybossa.saveTask(task.id, answer).done(function() {
+				deferred.resolve(task);
+			});
+		});
+		$("#idk").off('click').on('click', function(evt) {
+			var answer = {}
+			answer["city"] = "";
+			answer["state"] = "";
+			answer["zipcode"] = "";
+
+			pybossa.saveTask(task.id, answer).done(function() {
+				deferred.resolve(task);
+			});
+		});
+	} else {
+		$("#skeleton").hide();
+		$("#finish").fadeIn(100);
+	}
 });
 pybossa.run('FatHead');	
 </script>
