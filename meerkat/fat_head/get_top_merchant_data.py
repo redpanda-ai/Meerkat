@@ -21,7 +21,7 @@ def select_merchant(input_file, chunksize, bank_or_card, merchant):
 	logging.info("start merging dataframes")
 	merged = pd.concat(dfs, ignore_index=True)
 	logging.info("finish merging dataframes")
-	merged.to_csv(merchant + '_' + bank_or_card + '.csv', sep=',', index=False)
+	merged.to_csv(merchant + '_' + bank_or_card + '.csv', sep=',', index=False, quoting=csv.QUOTE_ALL)
 
 def parse_arguments(args):
 	parser = argparse.ArgumentParser()
