@@ -8,25 +8,26 @@ import pandas as pd
 from meerkat.classification.tools import (pull_from_s3, extract_tarball,
 	check_new_input_file)
 
-def select_merchant(input_file, chunksize, bank_or_card):
+def select_merchant(input_file, chunksize, bank_or_card, merchant):
 	dfs = []
 	for chunk in pd.read_csv(input_file, chunksize=chunksize, error_bad_lines=False,
 		encoding='utf-8', quoting=csv.QUOTE_NONE, na_filter=False, sep='|'):
 		grouped = chunk.groupby('MERCHANT_NAME', as_index=False)
 		groups = dict(list(grouped))
-		if 'Starbucks' in groups.keys():
-			dfs.append(groups['Starbucks'])
-			logging.info(str(len(groups['Starbucks'])) + " transactions in current chunk")
+		if merchant in groups.keys():
+			dfs.append(groups[merchant])
+			logging.info(str(len(groups[merchant])) + " transactions in current chunk")
 
 	logging.info("start merging dataframes")
 	merged = pd.concat(dfs, ignore_index=True)
 	logging.info("finish merging dataframes")
-	merged.to_csv('Starbucks_' + bank_or_card + '.csv', sep='|', index=False)
+	merged.to_csv(merchant + '_' + bank_or_card + '.csv', sep=',', index=False, quoting=csv.QUOTE_ALL)
 
 def parse_arguments(args):
 	parser = argparse.ArgumentParser()
 	parser.add_argument("bank_or_card")
 	parser.add_argument("version_dir")
+	parser.add_argument("merchant")
 	parser.add_argument("--bucket", default="s3yodlee")
 	args = parser.parse_args(args)
 	return args
@@ -50,7 +51,7 @@ def main_process():
 	for file_name in os.listdir(save_path):
 		if file_name.endswith(".csv"):
 			logging.info("csv file at: " + save_path + file_name)
-			selected_merchant_file = select_merchant(save_path + file_name, 1000000, bank_or_card)
+			selected_merchant_file = select_merchant(save_path + file_name, 1000000, bank_or_card, args.merchant)
 
 	shutil.rmtree(save_path)
 

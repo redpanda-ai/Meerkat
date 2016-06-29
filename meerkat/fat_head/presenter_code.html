@@ -28,7 +28,7 @@ pybossa.presentTask(function(task, deferred){
 	$("#answerBoxCity").val("");
     $("#answerBoxState").val("");
     $("#answerBoxZipcode").val("");
-	$("#question_holder").text(task.info['question']);
+	$("#question_holder").text(task.info['DESCRIPTION_UNMASKED']);
 	$("#save").off('click').on('click', function(evt) {
         var answer = {}
         answer["city"] = $("#answerBoxCity").val();
