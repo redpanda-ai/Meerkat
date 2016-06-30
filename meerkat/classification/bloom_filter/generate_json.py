@@ -92,7 +92,9 @@ dictionary = {
 		'PAR',
 		'PARDEBIT',
 		'PARK',
-		'PACIFIC'
+		'PACIFIC',
+		'PAYMENT',
+		'PAY'
 	],
 	'RI': [
 		'RIVER'
