@@ -22,7 +22,8 @@ from meerkat.classification.load_model import load_scikit_model, get_tf_cnn_by_n
 from meerkat.classification.auto_load import main_program as load_models_from_s3
 
 # pylint:disable=no-name-in-module
-from meerkat.classification.bloom_filter.find_entities import location_split
+#from meerkat.classification.bloom_filter.find_entities import location_split
+from meerkat.classification.bloom_filter.trie import location_split
 
 # Enabled Models
 BANK_SWS = load_scikit_model("bank_sws")
