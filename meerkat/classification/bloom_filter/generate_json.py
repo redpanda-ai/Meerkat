@@ -51,6 +51,7 @@ dictionary = {
 		'MDEBIT'
 	],
 	'MA': [
+		'MAIL'
 	],
 	'MI': [
 		'MINEDEBIT'

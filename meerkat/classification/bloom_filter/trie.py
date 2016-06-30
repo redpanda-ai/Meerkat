@@ -31,9 +31,10 @@ SUBS = {
 	"SOUTH": "S",
 
 	# Abbreviations
+	"CITY" : "",
 	"SAINT": "ST",
 	"FORT": "FT",
-	"CITY" : ""
+	"BEACH": "BCH"
 
 	# can get more in the future
 }
@@ -45,7 +46,8 @@ FORMAT = {
 	"S": "SOUTH",
 
 	"ST": "SAINT",
-	"FT": "FORT"
+	"FT": "FORT",
+	"BCH": "BEACH"
 }
 
 class TrieNode():
@@ -258,6 +260,7 @@ def get_word(tag, text, index):
 			break
 	return text[index:end]
 
+'''
 def main():
 	"""runs the file"""
 	print("find_entities")
@@ -279,11 +282,52 @@ def main():
 	print(combined)
 	print(location_bloom_results.describe())
 
+def onetest():
+	import collections
+	counter = collections.defaultdict(int)
+	with open('20160101_MPANEL_BANK1.6.3.txt') as f:
+		for line in f:
+			des = line.split('|')[-1].rstrip('\n')
+			place = location_split(des)
+			if place: counter[place] += 1
+			print('{0} <====== {1}'.format(place, des))
+
+	print('')
+	print('total transactions: 1000000')
+	print('find location transactions: {0}'.format(sum(counter.values())))
+	print('distinct cities: {0}'.format(len(counter)))
+	sorted_counter = sorted(counter.items(), key=lambda item: item[1], reverse=True)
+	print('city ranking')
+	for x in sorted_counter:
+		print(x)
+
+def twotest():
+	count = 0
+	csv_file = csv.reader(open('GeoGroundTruthValidated.csv', encoding="utf-8"))
+	for row in csv_file:
+		des = row[11]
+		city = row[13]
+		state = row[14]
+		expected = (city, state)
+		result = location_split(des)
+		if result != expected:
+			count += 1
+			print('{0} | {1} <====== {2}'.format(result, expected, des))
+
+	print('accuracy: {0}'.format( (2652 - count) / 2652))
+'''
+
 if __name__ == "__main__":
 #	main()
 	print(location_split('altamonte spg fl'))
-#	with open('card_tde_input_final.txt') as f:
-#		for line in f:
-#			des = line.split('|')[-1].rstrip('\n')
-#			place = location_split(des)
-#			print('{0} <====== {1}'.format(place, des))
+
+#	count = 0
+#	csv_file = csv.reader(open('NoGeo.csv', encoding="utf-8"))
+#	for row in csv_file:
+#		des = row[11]
+#		result = location_split(des)
+#		if result: count += 1
+#		print('{0} <====== {1}'.format(result, des))
+
+#	print(count)
+

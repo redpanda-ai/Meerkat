@@ -34,9 +34,10 @@ SUBS = {
 	"SOUTH": "S",
 
 	# Abbreviations
+	"CITY" : "",
 	"SAINT": "ST",
 	"FORT": "FT",
-	"CITY" : ""
+	"BEACH": "BCH"
 
 	# can get more in the future
 }
@@ -48,7 +49,8 @@ FORMAT = {
 	"S": "SOUTH",
 
 	"ST": "SAINT",
-	"FT": "FORT"
+	"FT": "FORT",
+	"BCH": "BEACH"
 }
 
 
