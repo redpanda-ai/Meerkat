@@ -65,17 +65,17 @@ pybossa.presentTask(function(task, deferred){
 			var isValidZipcode = true;
 			$('#answerBoxZipcode').each(function () {
 				var zipcode = $.trim($(this).val())
-				if(zipcode.length != 5) {
+				if((zipcode.length == 5) || (zipcode.length == 0))  {
+					$(this).css({
+						"border": "",
+						"background": ""
+					});
+				}
+				else {
 					isValidZipcode = false;
 					$(this).css({
 						"border": "1px solid red",
 						"background": "#FFCECE"
-					});
-				}
-				else {
-					$(this).css({
-						"border": "",
-						"background": ""
 					});
 				}
 			});
