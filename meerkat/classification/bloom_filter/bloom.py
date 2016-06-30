@@ -10,15 +10,53 @@ Updated on June 29, 2015
 @author: Sivan Mehta
 """
 
-import json, sys, string, csv
+import json, sys, csv
 from pybloom import ScalableBloomFilter
+
+STATES = [
+	"AL", "AK", "AZ", "AR", "CA", \
+	"CO", "CT", "DE", "FL", "GA", \
+	"HI", "ID", "IL", "IN", "IA", \
+	"KS", "KY", "LA", "ME", "MD", \
+	"MA", "MI", "MN", "MS", "MO", \
+	"MT", "NE", "NV", "NH", "NJ", \
+	"NM", "NY", "NC", "ND", "OH", \
+	"OK", "OR", "PA", "RI", "SC", \
+	"SD", "TN", "TX", "UT", "VT", \
+	"VA", "WA", "WV", "WI", "WY", \
+	"DC"]
+
+SUBS = {
+	# Directions
+	"EAST": "E",
+	"WEST": "W",
+	"NORTH": "N",
+	"SOUTH": "S",
+
+	# Abbreviations
+	"SAINT": "ST",
+	"FORT": "FT",
+	"CITY" : ""
+
+	# can get more in the future
+}
+
+FORMAT = {
+	"E": "EAST",
+	"W": "WEST",
+	"N": "NORTH",
+	"S": "SOUTH",
+
+	"ST": "SAINT",
+	"FT": "FORT"
+}
+
 
 def standardize(text):
 	"""converts text to all caps, no punctuation, and no whitespace"""
 	text = text.upper()
-	for space in string.whitespace:
-		text = text.replace(space, "")
-	for mark in string.punctuation:
+	text = ''.join(text.split())
+	for mark in '!"#$%&\'()*+,-./:;<=>?@[\]^_`{|}~':
 		text = text.replace(mark, "")
 	return text
 
@@ -34,32 +72,63 @@ def get_json_from_file(input_filename):
 		sys.exit()
 	return None
 
-def create_location_bloom(src_filename, dst_filename, enrich=True):
+def get_city_subs(city):
+	city = city.upper()
+	city = city.replace('.', '')
+	parts = city.split()
+	length = len(parts)
+	def dfs(step, path):
+		if step == length:
+			subs.append(path)
+			return
+		if parts[step] not in SUBS:
+			dfs(step + 1, path + [parts[step]])
+		else:
+			dfs(step + 1, path + [parts[step]])
+			dfs(step + 1, path + [SUBS[parts[step]]])
+	subs = []
+	dfs(0, [])
+	subs = [''.join(sub) for sub in subs]
+	return subs
+
+def format_city_name(city):
+	city = city.upper()
+	city = city.replace('.', '')
+	parts = city.split()
+	for i in range(len(parts)):
+		if parts[i] in FORMAT: parts[i] = FORMAT[parts[i]]
+		parts[i] = parts[i][0] + parts[i][1:].lower() if len(parts[i]) > 1 else parts[i]
+	return ' '.join(parts)
+
+def create_location_bloom(csv_filename, json_filename, dst_filename):
 	"""Creates a bloom filter from the provided input file."""
 	sbf = ScalableBloomFilter(initial_capacity=100000, error_rate=0.001,\
 		mode=ScalableBloomFilter.SMALL_SET_GROWTH)
-	locations = get_json_from_file(src_filename)
 
+	# add us_cities_larger.csv file
+	csv_file = csv.reader(open(csv_filename, encoding="utf-8"), delimiter="\t")
+	for row in csv_file:
+		try:
+			int(row[2]) # some of the rows don't acually record a state name
+		except ValueError:
+			city = row[2]
+			state = row[4].upper()
+			if state in STATES:
+				subs = get_city_subs(city)
+				for sub in subs:
+					location = (standardize(sub), state)
+					sbf.add(location)
+
+	# add locations.json file
+	locations = get_json_from_file(json_filename)
 	states = locations["aggregations"]["states"]["buckets"]
 	for state in states:
 		state_name = state["key"].upper()
 		for city in state["localities"]["buckets"]:
-			city_name = standardize(city["key"])
-			location = (city_name, state_name)
-			sbf.add(location)
-
-	if enrich:
-		try:
-			open('meerkat/classification/bloom_filter/assets/csv_not_json')
-		except:
-			get_diff_json_csv()
-
-		with open('meerkat/classification/bloom_filter/assets/csv_not_json') as frd:
-			for line in frd:
-				city, state = line.strip().split('\t')
-				city_name = standardize(city)
-				state_name = state.upper()
-				location = (city_name, state_name)
+			city_name = format_city_name(city["key"])
+			subs = get_city_subs(city_name)
+			for sub in subs:
+				location = (standardize(sub), state_name)
 				sbf.add(location)
 
 	with open(dst_filename, "bw+") as location_bloom:
@@ -67,54 +136,18 @@ def create_location_bloom(src_filename, dst_filename, enrich=True):
 
 	return sbf
 
-def get_diff_json_csv():
-	'''get the difference between json and csv file about city and state'''
-	dict_json = dict()
-	locations = get_json_from_file('meerkat/classification/bloom_filter/assets/locations.json')
-	states = locations["aggregations"]["states"]["buckets"]
-	for state in states:
-		state_name = state["key"].upper()
-		for city in state["localities"]["buckets"]:
-			city_name = standardize(city["key"])
-			location = (city_name, state_name)
-			dict_json[location] = (city["key"], state_name)
-
-	dict_csv = dict()
-	csv_file = csv.reader(open("meerkat/classification/bloom_filter/assets/us_cities_larger.csv", \
-		encoding="utf-8"), delimiter="\t")
-	for row in csv_file:
-		try:
-			int(row[2])
-		except ValueError:
-			city = row[2]
-			state = row[4]
-			location = (standardize(city), state)
-			dict_csv[location] = (city, state)
-
-	with open('meerkat/classification/bloom_filter/assets/csv_not_json', 'w') as fwt:
-		for key in dict_csv.keys():
-			if key not in dict_json:
-				tup = dict_csv[key]
-				fwt.write('{0}	{1}'.format(tup[0], tup[1]) + '\n')
-
-	with open('meerkat/classification/bloom_filter/assets/json_not_csv', 'w') as fwt:
-		for key in dict_json.keys():
-			if key not in dict_csv:
-				tup = dict_json[key]
-				fwt.write('{0}	{1}'.format(tup[0], tup[1]) + '\n')
-
-def get_location_bloom():
+def get_location_bloom(filename):
 	"""Attempts to fetch a bloom filter from a file, making a new bloom filter
 	if that is not possible."""
 	sbf = None
 	try:
 		sbf = ScalableBloomFilter.fromfile(\
-			open("meerkat/classification/bloom_filter/assets/location_bloom", "br"))
+			open(filename, "br"))
 		print("Location bloom filter loaded from file.")
 	except:
 		print("Creating new bloom filter")
-		sbf = create_location_bloom("meerkat/classification/bloom_filter/assets/locations.json", \
-			"meerkat/classification/bloom_filter/assets/location_bloom")
+		sbf = create_location_bloom('meerkat/classification/bloom_filter/assets/us_cities_larger.csv', \
+			"meerkat/classification/bloom_filter/assets/locations.json", filename)
 	return sbf
 
 # MAIN PROGRAM
