@@ -4,8 +4,8 @@
 		<p>DESCRIPTION_UNMASKED : <span id="question_holder"></span></p>
 		<p>Answer :
 			<input type="text" id="answerBoxCity" placeholder="type city here">
-			<input type="text" id="answerBoxState" placeholder="type state here">
-			<input type="text" id="answerBoxZipcode" placeholder="type zipcode here">
+			<input type="text" id="answerBoxState" placeholder="type state here" maxlength="2">
+			<input type="text" id="answerBoxZipcode" placeholder="type zipcode here" maxlength="5">
 		</p>
 		<p><button id="save" class="btn btn-primary">Save Answer</button> </p>
 		<p><button id="idk" class="btn btn-primary">I don't know</button> </p>
@@ -33,7 +33,7 @@ pybossa.presentTask(function(task, deferred){
 			answer["state"] = $("#answerBoxState").val();
 			answer["zipcode"] = $("#answerBoxZipcode").val();
 
-			var isValid = true;
+			var isValidState = true;
 			$('#answerBoxState').each(function () {
 				var states = [
 					"AL", "AK", "AZ", "AR", "CA", 
@@ -48,7 +48,7 @@ pybossa.presentTask(function(task, deferred){
 					"VA", "WA", "WV", "WI", "WY", 
 					"DC"];
 				if($.inArray($.trim($(this).val()), states) == -1) {
-					isValid = false;
+					isValidState = false;
 					$(this).css({
 						"border": "1px solid red",
 						"background": "#FFCECE"
@@ -61,7 +61,26 @@ pybossa.presentTask(function(task, deferred){
 					});
 				}
 			});
-			if (isValid == false) {
+
+			var isValidZipcode = true;
+			$('#answerBoxZipcode').each(function () {
+				var zipcode = $.trim($(this).val())
+				if(zipcode.length != 5) {
+					isValidZipcode = false;
+					$(this).css({
+						"border": "1px solid red",
+						"background": "#FFCECE"
+					});
+				}
+				else {
+					$(this).css({
+						"border": "",
+						"background": ""
+					});
+				}
+			});
+
+			if (isValidState == false || isValidZipcode == false) {
 				evt.preventDefault();
 			} else {
 				pybossa.saveTask(task.id, answer).done(function() {
@@ -78,7 +97,6 @@ pybossa.presentTask(function(task, deferred){
 			answer["city"] = "";
 			answer["state"] = "";
 			answer["zipcode"] = "";
-
 			pybossa.saveTask(task.id, answer).done(function() {
 				$("#success").fadeIn();
 					setTimeout(function() {
