@@ -281,7 +281,7 @@ def main():
 
 if __name__ == "__main__":
 #	main()
-	print(location_split('CN San Jose, CA'))
+	print(location_split('altamonte spg fl'))
 #	with open('card_tde_input_final.txt') as f:
 #		for line in f:
 #			des = line.split('|')[-1].rstrip('\n')

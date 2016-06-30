@@ -183,5 +183,10 @@ def main():
 	print(location_bloom_results.describe())
 
 if __name__ == "__main__":
-	main()
+#	main()
 #	print(location_split('NS Houston, TX'))
+	with open('card_tde_input_final.txt') as f:
+		for line in f:
+			des = line.split('|')[-1].rstrip('\n')
+			place = location_split(des)
+			print('{0} <====== {1}'.format(place, des))
