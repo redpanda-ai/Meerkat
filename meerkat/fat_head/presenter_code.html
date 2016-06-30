@@ -1,56 +1,114 @@
 <div class="row">
-<div class="col-md-12">
-<h2>Fat Head Project</h2>
-
-<p>Transaction : <span id="question_holder"></span></p>
-
-<p>Answer : 
-  <input type="text" id="answerBoxCity" placeholder="type city here">
-  <input type="text" id="answerBoxState" placeholder="type state here">
-  <input type="text" id="answerBoxZipcode" placeholder="type zipcode here">
-</p> 
-
-<p><button id="save" class="btn btn-primary">Save Answer</button> </p>
-<p><button id="idk" class="btn btn-primary">I don't know</button> </p>
-<p><button id="skip" class="btn btn-primary">Skip</button> </p>
-
-</div>
+	<div id="skeleton" class="col-md-12">
+		<h2>Fat Head Project</h2>
+		<p>DESCRIPTION_UNMASKED : <span id="question_holder"></span></p>
+		<p>Answer :
+			<input type="text" id="answerBoxCity" placeholder="type city here">
+			<input type="text" id="answerBoxState" placeholder="type state here" maxlength="2">
+			<input type="text" id="answerBoxZipcode" placeholder="type zipcode here" maxlength="5">
+		</p>
+		<p><button id="save" class="btn btn-primary">Save Answer</button> </p>
+		<p><button id="idk" class="btn btn-primary">I don't know</button> </p>
+	</div>
+	<div id="finish" class="alert alert-success" style="display:none;">
+		<p>Congratulations! You have participated in all available tasks!</p>
+	</div>
+	<div id="success" style="display:none;">
+		<p>Well done! Your answer has been saved</p>
+	</div>
 </div>
 <script type="text/javascript">
-	// Your JavaScript code
 pybossa.taskLoaded(function(task, deferred){
-	      // you don't need to do much here, as you don't want to load any assets, so just go on
 	deferred.resolve(task);
 });
 pybossa.presentTask(function(task, deferred){
-	      // Present the current task to the user
-	      // Load the task data into the HTML DOM
-	$("#answerBoxCity").val("");
-    $("#answerBoxState").val("");
-    $("#answerBoxZipcode").val("");
-	$("#question_holder").text(task.info['DESCRIPTION_UNMASKED']);
-	$("#save").off('click').on('click', function(evt) {
-        var answer = {}
-        answer["city"] = $("#answerBoxCity").val();
-        answer["state"] = $("#answerBoxState").val();
-        answer["zipcode"] = $("#answerBoxZipcode").val();
-		pybossa.saveTask(task.id, answer).done(function() {
-			deferred.resolve(task);
+	if (!$.isEmptyObject(task)) {
+		$("#answerBoxCity").val("");
+		$("#answerBoxState").val("");
+		$("#answerBoxZipcode").val("");
+		$("#question_holder").text(task.info['question']);
+		$("#save").off('click').on('click', function(evt) {
+			var answer = {}
+			answer["city"] = $("#answerBoxCity").val();
+			answer["state"] = $("#answerBoxState").val();
+			answer["zipcode"] = $("#answerBoxZipcode").val();
+
+			var isValidState = true;
+			$('#answerBoxState').each(function () {
+				var states = [
+					"AL", "AK", "AZ", "AR", "CA", 
+					"CO", "CT", "DE", "FL", "GA", 
+					"HI", "ID", "IL", "IN", "IA", 
+					"KS", "KY", "LA", "ME", "MD", 
+					"MA", "MI", "MN", "MS", "MO", 
+					"MT", "NE", "NV", "NH", "NJ", 
+					"NM", "NY", "NC", "ND", "OH", 
+					"OK", "OR", "PA", "RI", "SC", 
+					"SD", "TN", "TX", "UT", "VT", 
+					"VA", "WA", "WV", "WI", "WY", 
+					"DC"];
+				if($.inArray($.trim($(this).val()), states) == -1) {
+					isValidState = false;
+					$(this).css({
+						"border": "1px solid red",
+						"background": "#FFCECE"
+					});
+				}
+				else {
+					$(this).css({
+						"border": "",
+						"background": ""
+					});
+				}
+			});
+
+			var isValidZipcode = true;
+			$('#answerBoxZipcode').each(function () {
+				var zipcode = $.trim($(this).val())
+				if(zipcode.length != 5) {
+					isValidZipcode = false;
+					$(this).css({
+						"border": "1px solid red",
+						"background": "#FFCECE"
+					});
+				}
+				else {
+					$(this).css({
+						"border": "",
+						"background": ""
+					});
+				}
+			});
+
+			if (isValidState == false || isValidZipcode == false) {
+				evt.preventDefault();
+			} else {
+				pybossa.saveTask(task.id, answer).done(function() {
+					$("#success").fadeIn();
+					setTimeout(function() {
+						$("#success").hide();
+						deferred.resolve(task);
+					}, 1500);
+				});
+			}
 		});
-	});
-    $("#idk").off('click').on('click', function(evt) {
-        var answer = {}
-        answer["city"] = "";
-        answer["state"] = "";
-        answer["zipcode"] = "";
-		pybossa.saveTask(task.id, answer).done(function() {
-			deferred.resolve(task);
+		$("#idk").off('click').on('click', function(evt) {
+			var answer = {}
+			answer["city"] = "";
+			answer["state"] = "";
+			answer["zipcode"] = "";
+			pybossa.saveTask(task.id, answer).done(function() {
+				$("#success").fadeIn();
+					setTimeout(function() {
+						$("#success").hide();
+						deferred.resolve(task);
+					}, 1500);
+			});
 		});
-	});
-    $("#skip").off('click').on('click', function(evt) {
-            deferred.resolve(task);
-	});
+	} else {
+		$("#skeleton").hide();
+		$("#finish").fadeIn(100);
+	}
 });
-pybossa.run('head');	
-// this should be your crowdcrafting project id. Make sure there's no plus (+) sign in it
+pybossa.run('FatHead');	
 </script>
