@@ -12,7 +12,6 @@ Modified on June 29, 2015
 import csv
 import pickle
 import os
-import string
 
 import pandas as pd
 from .bloom import *
@@ -28,7 +27,8 @@ STATES = [
 	"NM", "NY", "NC", "ND", "OH", \
 	"OK", "OR", "PA", "RI", "SC", \
 	"SD", "TN", "TX", "UT", "VT", \
-	"VA", "WA", "WV", "WI", "WY"]
+	"VA", "WA", "WV", "WI", "WY", \
+	"DC"]
 
 LOCATION_BLOOM = get_location_bloom()
 
@@ -133,27 +133,7 @@ def in_location_bloom(text):
 			locality = text[i:-2]
 			if (locality, region) in LOCATION_BLOOM:
 				biggest = (locality, region)
-		if biggest: return biggest
-		'''
-		for i in range(len(text) - 5, -1, -1):
-			locality = text[i:-2]
-			for ch in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
-				loc = locality + ch
-				if (loc, region) in LOCATION_BLOOM:
-					biggest = (loc, region)
-					break
-		if biggest: return biggest
 
-		for i in range(len(text) - 5, -1, -1):
-			locality = text[i:-2]
-			for ch1 in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
-				for ch2 in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
-					loc = locality + ch1 + ch2
-					if (loc, region) in LOCATION_BLOOM:
-						biggest = (loc, region)
-						break
-				if biggest: break
-		'''
 		return biggest
 
 def location_split(my_text):
@@ -169,8 +149,7 @@ def location_split(my_text):
 	words = get_json_from_file('meerkat/classification/bloom_filter/assets/words_start_with_states.json')
 	length = len(my_text)
 	for i in range(length - 2, -1, -1):
-		if my_text[i:i+2] in STATES and tag[i+1] == 'C' and (i == length - 2 or tag[i + 2] == 'B' or \
-		get_word(tag, my_text, i) not in words[my_text[i:i+2]]):
+		if my_text[i:i+2] in STATES and tag[i+1] == 'C' and get_word(tag, my_text, i) not in words[my_text[i:i+2]]:
 			place = in_location_bloom(my_text[:i+2])
 			if place:
 				key = place[0] + place[1]
@@ -190,7 +169,8 @@ def get_word(tag, text, index):
 
 def tag_text(text):
 	'''make tag for text'''
-	for mark in string.punctuation:
+	text = text.replace('\'', '')
+	for mark in '!"#$%&\'()*+,-./:;<=>?@[\]^_`{|}~':
 		text = text.replace(mark, ' ')
 	text = text.strip()
 	tag = ''
@@ -203,27 +183,14 @@ def tag_text(text):
 			tag += 'C'
 	return tag
 
-##THINK!
-#Red Roof Inn, a three term bloom filter.
-# We should know if Red leads to Red Roof which in term leads to Red Roof Inn.
-# If each merchant stored its partials, the logic should be:
-# 1. Store each partial, including the entire term in partials.
-# 2. When scanning, start at first term and scan partials,
-#    find the longest partial you can and then check full merchant bloom
-# 3. Note that you may wish to remove tokens that have
-#    already been found as locations (could be important)
-
 def main():
 	"""runs the file"""
 	print("find_entities")
 	input_file = "meerkat/classification/bloom_filter/input_file.txt.gz"
 	# input_file = "data/input/should_search_labels.csv.gz"
-#	input_file = sys.argv[1]
 	data_frame = pd.io.parsers.read_csv(input_file, sep="|", compression="gzip")
 	descriptions = data_frame['DESCRIPTION_UNMASKED']
 	location_bloom_results = descriptions.apply(location_split)
-	#TODO: add merchant results
-	#merchant_bloom_results = descriptions.apply(merchant_split, axis=0)
 
 	combined = pd.concat([location_bloom_results, descriptions], axis=1)
 	combined.columns = ['LOCATION', 'DESCRIPTION_UNMASKED']

@@ -22,6 +22,7 @@ Updated on July 17, 2015
 
 #####################################################
 
+import argparse
 import json
 import logging
 import queue
@@ -32,39 +33,22 @@ import threading
 from datetime import datetime
 from elasticsearch import Elasticsearch, helpers
 
-from meerkat.custom_exceptions import InvalidArguments, Misconfiguration
+from meerkat.custom_exceptions import Misconfiguration
+from meerkat.various_tools import validate_configuration
 
-def initialize():
-	"""Validates the command line arguments."""
-	input_file, params = None, None
-
-	if len(sys.argv) != 3:
-		#usage()
-		raise InvalidArguments(msg="Supply a single argument for the json"\
-		+ "formatted configuration file.", expr=None)
-
-	try:
-		input_file = open(sys.argv[1], encoding='utf-8')
-		params = json.loads(input_file.read())
-		input_file.close()
-	except IOError:
-		logging.error(sys.argv[1] + " not found, aborting.")
-		sys.exit()
-
-	if validate_params(params):
-		logging.warning("Parameters are valid, proceeding.")
-
-	return params
+def parse_arguments(args):
+	"""Parse command line arguments"""
+	parser = argparse.ArgumentParser()
+	parser.add_argument("configuration_file",
+		help="Location on the local drive where the configuration file can be found")
+	return parser.parse_args(args)
 
 def load_document_queue(params):
 	"""Opens a file of merchants, one per line, and loads a document queue."""
-
 	filename, encoding = None, None
 	document_queue = queue.Queue()
-
 	try:
-		#filename = params["input"]["filename"]
-		filename = sys.argv[2]
+		filename = params["input"]["filename"]
 		encoding = params["input"]["encoding"]
 		with open(filename, 'r', encoding=encoding) as inputfile:
 			records = [line.rstrip('\n') for line in inputfile]
@@ -336,23 +320,6 @@ def validate_boost_vectors(params, my_type, boost_vectors):
 
 def validate_params(params):
 	"""Ensures that the correct parameters are supplied."""
-	my_keys = ["elasticsearch", "concurrency", "input", "logging", "batch_size"]
-	ensure_keys_in_dictionary(params, my_keys)
-
-	my_keys = ["index", "type_mapping", "type", "cluster_nodes",
-		"boost_labels", "boost_vectors", "composite_fields", "dispersed_fields"]
-	ensure_keys_in_dictionary(params["elasticsearch"], my_keys,
-		prefix="elasticsearch.")
-
-	my_keys = ["filename", "encoding"]
-	ensure_keys_in_dictionary(params["input"], my_keys, prefix="input.")
-
-	my_keys = ["path", "level", "formatter", "console"]
-	ensure_keys_in_dictionary(params["logging"], my_keys, prefix="logging.")
-
-	if params["concurrency"] <= 0:
-		raise Misconfiguration(msg="'concurrency' must be a "\
-			+ "positive integer", expr=None)
 
 	my_type = params["elasticsearch"]["type"]
 	my_props = params["elasticsearch"]["type_mapping"]["mappings"]\
@@ -420,36 +387,30 @@ def add_dispersed_type_mappings(params):
 	logging.critical(json.dumps(params, sort_keys=True,
 		indent=4, separators=(',', ':')))
 
-def guarantee_index_and_doc_type(params):
+def guarantee_index_and_doc_type(es_params):
 	"""Ensure that the index and document type mapping are as they should be"""
-	cluster_nodes = params["elasticsearch"]["cluster_nodes"]
-	es_index = params["elasticsearch"]["index"]
-	doc_type = params["elasticsearch"]["type"]
-	es_connection = Elasticsearch(cluster_nodes, sniff_on_start=False,
+	es_connection = Elasticsearch(es_params["cluster_nodes"], sniff_on_start=False,
 		sniff_on_connection_fail=True, sniffer_timeout=5, sniff_timeout=5)
-	if es_connection.indices.exists(index=es_index):
-		logging.critical("Index exists, continuing")
-		if es_connection.indices.exists_type(index=es_index, doc_type=doc_type):
-			logging.critical("Doc type exists, continuing")
-	else:
-		logging.warning("Index does not exist, creating")
-		index_body = params["elasticsearch"]["type_mapping"]
-		_ = es_connection.indices.create(index=es_index, body=index_body)
-		# okay, acknowledged = result["ok"], result["acknowledged"]
-		# try:
-		# 	result["ok"] and result["acknowledged"]
-		# 	logging.critical("Index created successfully.")
-		# except KeyError:
-		# 	logging.error("Failed to create index, aborting.")
-		# 	sys.exit()
+	_ = es_connection.indices.create(index=es_params["index"], body=es_params["type_mapping"],
+		ignore=400)
+	es_index_status, es_type_status = "created", "created"
+	return es_index_status, es_type_status
 
 def run_from_command_line():
 	"""Runs these commands if the module is invoked from the command line"""
 
-	my_params = initialize()
+	args = parse_arguments(sys.argv[1:])
+	my_params = validate_configuration(args.configuration_file,
+		"meerkat/elasticsearch/config/load_index_schema.json")
+	if validate_params(my_params):
+		logging.warning("Parameters are valid, proceeding.")
+	else:
+		logging.error("Parameters are invalid, aborting.")
+		sys.exit()
+
 	logging.warning(json.dumps(my_params, sort_keys=True,
 		indent=4, separators=(',', ':')))
-	guarantee_index_and_doc_type(my_params)
+	guarantee_index_and_doc_type(my_params["elasticsearch"])
 	my_params["document_queue_populated"] = False
 	my_params["concurrency_queue"] = queue.Queue()
 	my_params["header"], my_params["document_queue"],\

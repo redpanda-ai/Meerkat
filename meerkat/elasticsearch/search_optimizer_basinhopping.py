@@ -32,12 +32,10 @@ import os
 import queue
 import collections
 from copy import deepcopy
-from random import shuffle
 
 from pprint import pprint
 import numpy as np
 #pylint:disable=no-name-in-module
-from numpy import array, array_split
 from scipy.optimize import basinhopping
 
 from meerkat.web_service.web_consumer import WebConsumer
@@ -71,35 +69,21 @@ class RandomDisplacementBounds(object):
 
 		return xnew
 
-
-def test_train_split(dataset):
-	"""Load the verification source, and split the
-	data into a test and training set"""
-
-	# Shuffle/Split Data
-	test, train = [], []
-	shuffle(dataset)
-	split_arr = array_split(array(dataset), 2)
-	test = list(split_arr[0])
-	train = list(split_arr[1])
-
-	return test, train
-
 def run_meerkat(params, dataset):
 	"""Run meerkat on a set of transactions"""
 
 	result_list = []
 	number = (len(dataset))/BATCH_SIZE
 	number = int(number - (number%1))
-	for x in range(0, number+1):
+	for num in range(0, number+1):
 		batch = []
-		for i in range(x*BATCH_SIZE, (x+1)*BATCH_SIZE):
+		for i in range(num*BATCH_SIZE, (num+1)*BATCH_SIZE):
 			try:
 				batch.append(dataset[i])
 			except IndexError:
 				break
 
-		print("Batch number: {0}".format(x))
+		print("Batch number: {0}".format(num))
 		batch_in = format_web_consumer(batch)
 		batch_result = CONSUMER.classify(batch_in)
 		result_list.extend(batch_result["transaction_list"])

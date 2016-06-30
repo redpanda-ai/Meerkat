@@ -23,7 +23,6 @@ from boto.s3.key import Key
 from boto.s3.connection import Location
 from jsonschema import validate
 from scipy.stats.mstats import zscore
-from boto import connect_s3
 
 def z_score_delta(scores):
 	"""Find the Z-Score Delta"""
@@ -146,6 +145,9 @@ def write_dict_list(dict_list, file_name, encoding="utf-8", delimiter="|",\
 			fieldnames=column_order, extrasaction='ignore')
 		dict_w.writeheader()
 		dict_w.writerows(dict_list)
+		
+def grouper(n, iterable):
+    return [iterable[i:i+n] for i in range(0, len(iterable), n)]
 
 def to_stdout(string, errors="replace"):
 	"""Converts a string to stdout compatible encoding"""
