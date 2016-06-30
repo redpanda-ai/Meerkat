@@ -11,11 +11,6 @@ import meerkat.classification.bloom_filter.find_entities as finder
 class VariousToolsTests(unittest.TestCase):
 	"""Our UnitTest class."""
 
-	def test_add_with_subs(self):
-		data, city, state = {}, 'New York City', 'NY'
-		finder.add_with_subs(data, city, state)
-		self.assertEqual(len(data), 2)
-
 	def test_location_split__no_commas(self):
 		"""location_split test that it finds San Francisco, CA when there
 		are no commas"""
@@ -58,7 +53,7 @@ class VariousToolsTests(unittest.TestCase):
 	def test_location_split_without_spaces(self):
 		"""location_split test to find new york regardless of spaces"""
 		my_text = "New York, NY is the most populous city in the US"
-		expected = ("New York City", "NY")
+		expected = ("New York", "NY")
 		result = finder.location_split(my_text)
 		self.assertEqual(expected, result)
 
@@ -74,7 +69,7 @@ class VariousToolsTests(unittest.TestCase):
 		"""location_split test to find new york ny in string that is 
 		'smushed' to be without spaces"""
 		my_text = "NewYork,NYisthemostpopulouscityintheUS"
-		expected = ("New York City", "NY")
+		expected = ("New York", "NY")
 		result = finder.location_split(my_text)
 		self.assertEqual(expected, result)
 
