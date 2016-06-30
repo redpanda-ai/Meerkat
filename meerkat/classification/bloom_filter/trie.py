@@ -121,7 +121,7 @@ def standardize(text):
 
 def get_city_subs(city):
 	city = city.upper()
-#	if '.' in city: city = city.replace('.', '')
+	city = city.replace('.', '')
 	parts = city.split()
 	length = len(parts)
 	def dfs(step, path):
@@ -151,7 +151,7 @@ def build_trie(csv_filename, json_filename):
 	trie = Trie()
 	city_map = dict()
 
-	# add us_cities_larger.cvs file
+	# add us_cities_larger.csv file
 	csv_file = csv.reader(open(csv_filename, encoding="utf-8"), delimiter="\t")
 	for row in csv_file:
 		try:
@@ -281,4 +281,9 @@ def main():
 
 if __name__ == "__main__":
 #	main()
-	print(location_split('CSAN JOSE CA'))
+	print(location_split('CN San Jose, CA'))
+#	with open('card_tde_input_final.txt') as f:
+#		for line in f:
+#			des = line.split('|')[-1].rstrip('\n')
+#			place = location_split(des)
+#			print('{0} <====== {1}'.format(place, des))
