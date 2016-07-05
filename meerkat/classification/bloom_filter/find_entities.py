@@ -30,35 +30,9 @@ STATES = [
 	"VA", "WA", "WV", "WI", "WY", \
 	"DC"]
 
-LOCATION_BLOOM = get_location_bloom()
+LOCATION_BLOOM = get_location_bloom('meerkat/classification/bloom_filter/assets/location_bloom')
 
-SUBS = {
-	# Directions
-	"EAST": "E",
-	"WEST": "W",
-	"NORTH": "N",
-	"SOUTH": "S",
-
-	# Abbreviations
-	"SAINT": "ST",
-	"FORT": "FT",
-	"CITY" : ""
-
-	# can get more in the future
-}
-
-def add_with_subs(data, city, state):
-	proper = "%s%s" % (city, state)
-	standard = standardize(proper)
-	proper = (city, state)
-	data[standard] = proper
-	for sub in SUBS.keys():
-		if sub in standard:
-			standard = standard.replace(sub, SUBS[sub])
-			# sys.stdout.write(("\tinserting %s" % standard) + "\n")
-			data[standard] = proper
-
-def generate_city_map():
+def generate_city_map(csv_filename, json_filename, dst_filename):
 	"""
 		generates a dictionary with the following structure
 
@@ -72,29 +46,31 @@ def generate_city_map():
 
 	data = {}
 
-	try:
-		open("meerkat/classification/bloom_filter/assets/json_not_csv")
-	except:
-		get_diff_json_csv()
-
-	with open("meerkat/classification/bloom_filter/assets/json_not_csv") as f:
-		for line in f:
-			city, state = line.strip().split('\t')
-			add_with_subs(data, city, state)
-
-	csv_file = csv.reader(open("meerkat/classification/bloom_filter/assets/us_cities_larger.csv", \
-		encoding="utf-8"), delimiter="\t")
-
+	# add us_cities_larger.csv file
+	csv_file = csv.reader(open(csv_filename, encoding="utf-8"), delimiter="\t")
 	for row in csv_file:
 		try:
 			int(row[2]) # some of the rows don't acually record a state name
 		except ValueError:
 			city = row[2]
-			state = row[4] # for larger.csv
-			# state = row[1] # for small.csv
-			add_with_subs(data, city, state)
+			state = row[4].upper()
+			if state in STATES:
+				subs = get_city_subs(city)
+				for sub in subs:
+					data[sub + state] = (city, state)
 
-	pickle.dump(data, open("meerkat/classification/bloom_filter/assets/CITY_SUBS", 'wb'))
+	# add locations.json file
+	locations = get_json_from_file(json_filename)
+	states = locations["aggregations"]["states"]["buckets"]
+	for state in states:
+		state_name = state["key"].upper()
+		for city in state["localities"]["buckets"]:
+			city_name = format_city_name(city["key"])
+			subs = get_city_subs(city_name)
+			for sub in subs:
+					data[sub + state_name] = (city_name, state_name)
+
+	pickle.dump(data, open(dst_filename, 'wb'))
 
 	return data
 
@@ -104,7 +80,9 @@ if os.path.isfile("meerkat/classification/bloom_filter/assets/CITY_SUBS"):
 	with open("meerkat/classification/bloom_filter/assets/CITY_SUBS", 'rb') as fp:
 	    CITY_SUBS = pickle.load(fp)
 else:
-	CITY_SUBS = generate_city_map()
+	CITY_SUBS = generate_city_map('meerkat/classification/bloom_filter/assets/us_cities_larger.csv', \
+	'meerkat/classification/bloom_filter/assets/locations.json', \
+	'meerkat/classification/bloom_filter/assets/CITY_SUBS')
 
 def in_location_bloom(text):
 	"""
@@ -129,7 +107,7 @@ def in_location_bloom(text):
 		region = text[-2:]
 		biggest = None
 
-		for i in range(len(text) - 3, -1, -1):
+		for i in range(len(text) - 5, -1, -1):
 			locality = text[i:-2]
 			if (locality, region) in LOCATION_BLOOM:
 				biggest = (locality, region)
@@ -152,6 +130,9 @@ def location_split(my_text):
 		if my_text[i:i+2] in STATES and tag[i+1] == 'C' and get_word(tag, my_text, i) not in words[my_text[i:i+2]]:
 			place = in_location_bloom(my_text[:i+2])
 			if place:
+				if place[0][0] in 'EWSN' and tag[i - (len(place[0]))] == 'C':
+					if (place[0][1:], place[1]) in LOCATION_BLOOM:
+						place = (place[0][1:], place[1])
 				key = place[0] + place[1]
 				try: return CITY_SUBS[key]
 				except: pass
@@ -183,6 +164,7 @@ def tag_text(text):
 			tag += 'C'
 	return tag
 
+'''
 def main():
 	"""runs the file"""
 	print("find_entities")
@@ -200,7 +182,8 @@ def main():
 		mode="w", sep="|", encoding="utf-8")
 	print(combined)
 	print(location_bloom_results.describe())
+'''
 
 if __name__ == "__main__":
 #	main()
-	print(location_split('VICTORIAS'))
+	print(location_split('NS Houston, TX'))
