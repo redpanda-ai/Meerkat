@@ -1,4 +1,4 @@
-<div class="row">
+v class="row">
 	<div id="skeleton" class="col-md-12">
 		<h2>Fat Head Project</h2>
     
@@ -8,8 +8,15 @@
 			<input type="text" id="answerBoxState" placeholder="type state here" maxlength="2">
 			<input type="text" id="answerBoxZipcode" placeholder="type zipcode here" maxlength="5">
 		</p>
-		<p><button id="save" class="btn btn-primary">Save Answer</button> </p>
-		<p><button id="idk" class="btn btn-primary">I don't know</button> </p>
+     
+		<p><button id="save" class="btn btn-primary">Save Answer</button>
+           <button id="idk" class="btn btn-primary">I don't know</button> </p>
+	</div>
+    <div id="finish" class="alert alert-success" style="display:none;">
+		<p>Congratulations! You have participated in all available tasks!</p>
+	</div>
+	<div id="success" style="display:none;">
+		<p>Well done! Your answer has been saved</p>
 	</div>
     <div>
   <table id="t01" style= "width: 100%;background-color: #f1f1c1;border: 1px solid black;
@@ -83,12 +90,7 @@
   </tr>
 </table>
         </div>
-	<div id="finish" class="alert alert-success" style="display:none;">
-		<p>Congratulations! You have participated in all available tasks!</p>
-	</div>
-	<div id="success" style="display:none;">
-		<p>Well done! Your answer has been saved</p>
-	</div>
+	
 </div>
 <script type="text/javascript">
 
