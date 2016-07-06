@@ -21,19 +21,19 @@ def df_reservoir_sampling(my_args, compression='infer'):
 	sample = None
 	last_i = 0
 	k = my_args.sample_size
-	for chunk in pd.read_csv(my_args.input_file, chunksize=my_args.chunksize, compression=compression):
+	for chunk in pd.read_csv(my_args.input_file, chunksize=my_args.chunksize, compression=compression, error_bad_lines=False):
 		print("Last I :{0}".format(last_i))
 		if first_chunk:
 			sample = chunk[0:k]
 			chunk = chunk[k:]
 			first_chunk = False
 
-		print("Sample:\n{0}".format(sample))
-		print("Chunk:\n{0}".format(chunk))
+		#print("Sample:\n{0}".format(sample))
+		#print("Chunk:\n{0}".format(chunk))
 
 		row_iterator = chunk.iterrows()
 		for i, row in row_iterator:
-			print("I {0}".format(i))
+			#print("I {0}".format(i))
 			j = randrange(0, last_i + i + 1)
 			if j < k:
 				sample.iloc[j] = row

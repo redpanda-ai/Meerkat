@@ -1,21 +1,96 @@
-<div class="row">
+v class="row">
 	<div id="skeleton" class="col-md-12">
 		<h2>Fat Head Project</h2>
-		<p>DESCRIPTION_UNMASKED : <span id="question_holder"></span></p>
+    
+      <p>DESCRIPTION_MASKED : <b><span id="question_holder"></span></b></p>
 		<p>Answer :
 			<input type="text" id="answerBoxCity" placeholder="type city here">
 			<input type="text" id="answerBoxState" placeholder="type state here" maxlength="2">
 			<input type="text" id="answerBoxZipcode" placeholder="type zipcode here" maxlength="5">
 		</p>
-		<p><button id="save" class="btn btn-primary">Save Answer</button> </p>
-		<p><button id="idk" class="btn btn-primary">I don't know</button> </p>
+     
+		<p><button id="save" class="btn btn-primary">Save Answer</button>
+           <button id="idk" class="btn btn-primary">I don't know</button> </p>
 	</div>
-	<div id="finish" class="alert alert-success" style="display:none;">
+    <div id="finish" class="alert alert-success" style="display:none;">
 		<p>Congratulations! You have participated in all available tasks!</p>
 	</div>
 	<div id="success" style="display:none;">
 		<p>Well done! Your answer has been saved</p>
 	</div>
+    <div>
+  <table id="t01" style= "width: 100%;background-color: #f1f1c1;border: 1px solid black;
+    border-collapse: collapse;">
+  <tr>
+    <caption style = "color: #546e7a;"><b>REMEMBER: Always spell out abbreviations</b></caption>
+    <th style = "border: 1px solid black;
+    border-collapse: collapse;padding: 5px;
+    text-align: left;">Instead of</th>
+    <th style = "border: 1px solid black;
+    border-collapse: collapse;padding: 5px;
+    text-align: left;">Use</th>
+    <th style = "border: 1px solid black;
+    border-collapse: collapse;padding: 5px;
+    text-align: left;">Example</th>
+  </tr>
+  <tr>
+    <td style = "border: 1px solid black;
+    border-collapse: collapse;padding: 5px;
+    text-align: left;">E.</td>
+    <td style = "border: 1px solid black;
+    border-collapse: collapse;padding: 5px;
+    text-align: left;">East</td>
+    <td style = "border: 1px solid black;
+    border-collapse: collapse;padding: 5px;
+    text-align: left;">East Saint Louis, MO</td>
+  </tr>
+  <tr>
+    <td style = "border: 1px solid black;
+    border-collapse: collapse;padding: 5px;
+    text-align: left;">St.</td>
+    <td style = "border: 1px solid black;
+    border-collapse: collapse;padding: 5px;
+    text-align: left;">Saint</td>
+    <td style = "border: 1px solid black;
+    border-collapse: collapse;padding: 5px;
+    text-align: left;">Saint Louis, MO</td>
+  </tr>
+  <tr>
+    <td style = "border: 1px solid black;
+    border-collapse: collapse;padding: 5px;
+    text-align: left;">Ft.</td>
+    <td style = "border: 1px solid black;
+    border-collapse: collapse;padding: 5px;
+    text-align: left;">Fort</td>
+    <td style = "border: 1px solid black;
+    border-collapse: collapse;padding: 5px;
+    text-align: left;">Fort Lauderdale, FL</td>
+  </tr>   
+  <tr>
+    <td style = "border: 1px solid black;
+    border-collapse: collapse;padding: 5px;
+    text-align: left;">Bch.</td>
+    <td style = "border: 1px solid black;
+    border-collapse: collapse;padding: 5px;
+    text-align: left;">Beach</td>
+    <td style = "border: 1px solid black;
+    border-collapse: collapse;padding: 5px;
+    text-align: left;">Miami Beach, FL</td>
+  </tr>
+  <tr>
+    <td style = "border: 1px solid black;
+    border-collapse: collapse;padding: 5px;
+    text-align: left;">New York</td>
+    <td style = "border: 1px solid black;
+    border-collapse: collapse;padding: 5px;
+    text-align: left;">New York City</td>
+    <td style = "border: 1px solid black;
+    border-collapse: collapse;padding: 5px;
+    text-align: left;">New York City, NY</td>
+  </tr>
+</table>
+        </div>
+	
 </div>
 <script type="text/javascript">
 
@@ -105115,9 +105190,9 @@ pybossa.presentTask(function(task, deferred){
 		$("#question_holder").text(task.info['question']);
 		$("#save").off('click').on('click', function(evt) {
 			var answer = {}
-			answer["city"] = $("#answerBoxCity").val().toUpperCase();;
-			answer["state"] = $("#answerBoxState").val().toUpperCase();;
-			answer["zipcode"] = $("#answerBoxZipcode").val().toUpperCase();;
+			answer["city"] = $.trim($("#answerBoxCity").val().toUpperCase());
+			answer["state"] = $("#answerBoxState").val().toUpperCase();
+			answer["zipcode"] = $("#answerBoxZipcode").val().toUpperCase();
 
 			var isValidState = true;
             var isValidCity = true;
@@ -105189,5 +105264,5 @@ pybossa.presentTask(function(task, deferred){
 		$("#finish").fadeIn(100);
 	}
 });
-pybossa.run('FatHead');	
+pybossa.run('FatHeadProject');	
 </script>
