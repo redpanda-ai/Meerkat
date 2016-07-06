@@ -1,4 +1,4 @@
-v class="row">
+<div class="row">
 	<div id="skeleton" class="col-md-12">
 		<h2>Fat Head Project</h2>
     
@@ -105187,6 +105187,18 @@ pybossa.presentTask(function(task, deferred){
 		$("#answerBoxCity").val("");
 		$("#answerBoxState").val("");
 		$("#answerBoxZipcode").val("");
+        $("#answerBoxCity").css({
+			"border": "",
+			"background": ""
+		});
+        $("#answerBoxState").css({
+			"border": "",
+			"background": ""
+		});
+        $("#answerBoxZipcode").css({
+			"border": "",
+			"background": ""
+		});
 		$("#question_holder").text(task.info['question']);
 		$("#save").off('click').on('click', function(evt) {
 			var answer = {}
@@ -105264,5 +105276,5 @@ pybossa.presentTask(function(task, deferred){
 		$("#finish").fadeIn(100);
 	}
 });
-pybossa.run('FatHeadProject');	
+pybossa.run('FatHead');	
 </script>
