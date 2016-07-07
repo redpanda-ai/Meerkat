@@ -78,6 +78,8 @@ class WebConsumer():
 		self.bank_debit_subtype_cnn = get_tf_cnn_by_name("bank_debit_subtype", gpu_mem_fraction=gmf)
 		self.bank_credit_subtype_cnn = get_tf_cnn_by_name("bank_credit_subtype", gpu_mem_fraction=gmf)
 
+		self.bank_credit_category_cnn = get_tf_cnn_by_name("bank_credit_category", gpu_mem_fraction=gmf)
+
 	def update_hyperparams(self, hyperparams):
 		"""Updates a WebConsumer object's hyper-parameters"""
 		self.hyperparams = hyperparams
@@ -550,6 +552,40 @@ class WebConsumer():
 
 		return data["transaction_list"]
 
+	def __apply_category_cnn(self, data):
+		"""Apply the category CNN to transactions"""
+
+		if len(data["transaction_list"]) == 0:
+			return data["transaction_list"]
+
+		if data["container"] == "card":
+			credit_category_classifer = self.card_credit_category_cnn
+			debit_category_classifer = self.card_debit_category_cnn
+		elif data["container"] == "bank":
+			credit_category_classifer = self.bank_credit_category_cnn
+			debit_category_classifer = self.bank_debit_category_cnn
+
+		# Split transactions into groups
+		credit, debit = [], []
+
+		for transaction in data["transaction_list"]:
+			if transaction["ledger_entry"] == "credit":
+				credit.append(transaction)
+			if transaction["ledger_entry"] == "debit":
+				debit.append(transaction)
+
+		# Apply classifiers
+		if len(credit) > 0:
+			credit_category_classifer(credit, label_key="category_CNN", label_only=False)
+		if len(debit) > 0:
+			debit_category_classifer(debit, label_key="category_CNN", label_only=False)
+
+		for transaction in data["transaction_list"]:
+			category = transaction["category_CNN"].get("label", "")
+			transaction["category"] = category
+
+		return data["transaction_list"]
+
 	@staticmethod
 	def __apply_locale_bloom(data):
 		""" Apply the locale bloom filter to transactions"""
@@ -620,6 +656,7 @@ class WebConsumer():
 		if not optimizing:
 			if "cnn_subtype" in services_list or services_list == []:
 				self.__apply_subtype_cnn(data)
+				#self.__apply_category_cnn(data)
 			else:
 				# Add the filed to ensure output schema pass
 				for transaction in data["transaction_list"]:
