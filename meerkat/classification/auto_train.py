@@ -168,6 +168,7 @@ def auto_train():
 
 	if exist_new_input:
 		logging.info("There exists new input data")
+		args.bucket = s3_params["bucket"]
 		args.input_dir = s3_params["prefix"]
 		args.file_name = "input.tar.gz"
 		args.train_size = 0.9
