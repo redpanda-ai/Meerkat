@@ -11,6 +11,7 @@
 						"type": "string"
 					}
 				},
+				"category" : { "type" : "string"},
 				"chain_name" : { "type" : "string"},
 				"city" : { "type" : "string" },
 				"confidence_score" : { "type" : "string" },
@@ -51,6 +52,7 @@
 				"merchant_name" : { "type" : "string" },
 				"txn_sub_type" : { "type" : "string" },
 				"txn_type" : { "type" : "string" },
+				"category" : { "type" : "string"},
 				"category_labels" : {
 					"type" : "array",
 					"items" : {
@@ -70,6 +72,7 @@
 				"is_physical_merchant" : { "enum" : [ false ] },
 				"txn_sub_type" : { "type" : "string" },
 				"txn_type" : { "type" : "string" },
+				"category" : { "type" : "string"},
 				"category_labels" : {
 					"type" : "array",
 					"items" : {
