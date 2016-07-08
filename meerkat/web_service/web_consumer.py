@@ -662,9 +662,10 @@ class WebConsumer():
 		cpu_result = self.__cpu_pool.apply_async(self.__apply_cpu_classifiers, (data, ))
 
 		if not optimizing:
-			"""Apply Subtype CNN"""
+			"""Apply Subtype CNN And Category CNN"""
 			if "cnn_subtype" in services_list or services_list == []:
 				self.__apply_subtype_cnn(data)
+				self.__apply_category_cnn(data)
 			else:
 				# Add the filed to ensure output schema pass
 				for transaction in data["transaction_list"]:
@@ -674,10 +675,6 @@ class WebConsumer():
 			"""Apply Merchant CNN"""
 			if "cnn_merchant" in services_list or services_list == []:
 				self.__apply_merchant_cnn(data)
-
-			"""Apply Category CNN"""
-			if "cnn_category" in services_list or services_list == []:
-				self.__apply_category_cnn(data)
 
 		cpu_result.get() # Wait for CPU bound classifiers to finish
 
