@@ -71,13 +71,20 @@ class WebConsumer():
 			#Load new models from S3
 			load_models_from_s3(config=auto_load_config)
 
+		"""Get Merchant CNN Model"""
 		self.bank_merchant_cnn = get_tf_cnn_by_name("bank_merchant", gpu_mem_fraction=gmf)
 		self.card_merchant_cnn = get_tf_cnn_by_name("card_merchant", gpu_mem_fraction=gmf)
+
+		"""Get Subtype CNN Model"""
 		self.card_debit_subtype_cnn = get_tf_cnn_by_name("card_debit_subtype", gpu_mem_fraction=gmf)
 		self.card_credit_subtype_cnn = get_tf_cnn_by_name("card_credit_subtype", gpu_mem_fraction=gmf)
 		self.bank_debit_subtype_cnn = get_tf_cnn_by_name("bank_debit_subtype", gpu_mem_fraction=gmf)
 		self.bank_credit_subtype_cnn = get_tf_cnn_by_name("bank_credit_subtype", gpu_mem_fraction=gmf)
 
+		"""Get Category CNN Model"""
+		self.card_debit_category_cnn = get_tf_cnn_by_name("card_debit_category", gpu_mem_fraction=gmf)
+		self.card_credit_category_cnn = get_tf_cnn_by_name("card_credit_category", gpu_mem_fraction=gmf)
+		self.bank_debit_category_cnn = get_tf_cnn_by_name("bank_debit_category", gpu_mem_fraction=gmf)
 		self.bank_credit_category_cnn = get_tf_cnn_by_name("bank_credit_category", gpu_mem_fraction=gmf)
 
 	def update_hyperparams(self, hyperparams):
@@ -654,16 +661,22 @@ class WebConsumer():
 		cpu_result = self.__cpu_pool.apply_async(self.__apply_cpu_classifiers, (data, ))
 
 		if not optimizing:
+			"""Apply Subtype CNN"""
 			if "cnn_subtype" in services_list or services_list == []:
 				self.__apply_subtype_cnn(data)
-				#self.__apply_category_cnn(data)
 			else:
 				# Add the filed to ensure output schema pass
 				for transaction in data["transaction_list"]:
 					transaction["txn_sub_type"] = ""
 					transaction["txn_type"] = ""
+
+			"""Apply Merchant CNN"""
 			if "cnn_merchant" in services_list or services_list == []:
 				self.__apply_merchant_cnn(data)
+
+			"""Apply Category CNN"""
+			if "cnn_category" in services_list or services_list == []:
+				self.__apply_category_cnn(data)
 
 		cpu_result.get() # Wait for CPU bound classifiers to finish
 
