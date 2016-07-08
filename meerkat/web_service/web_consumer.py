@@ -82,9 +82,9 @@ class WebConsumer():
 		self.bank_credit_subtype_cnn = get_tf_cnn_by_name("bank_credit_subtype", gpu_mem_fraction=gmf)
 
 		"""Get Category CNN Model"""
-		self.card_debit_category_cnn = get_tf_cnn_by_name("card_debit_category", gpu_mem_fraction=gmf)
-		self.card_credit_category_cnn = get_tf_cnn_by_name("card_credit_category", gpu_mem_fraction=gmf)
-		self.bank_debit_category_cnn = get_tf_cnn_by_name("bank_debit_category", gpu_mem_fraction=gmf)
+		#self.card_debit_category_cnn = get_tf_cnn_by_name("card_debit_category", gpu_mem_fraction=gmf)
+		#self.card_credit_category_cnn = get_tf_cnn_by_name("card_credit_category", gpu_mem_fraction=gmf)
+		#self.bank_debit_category_cnn = get_tf_cnn_by_name("bank_debit_category", gpu_mem_fraction=gmf)
 		self.bank_credit_category_cnn = get_tf_cnn_by_name("bank_credit_category", gpu_mem_fraction=gmf)
 
 	def update_hyperparams(self, hyperparams):
@@ -566,11 +566,12 @@ class WebConsumer():
 			return data["transaction_list"]
 
 		if data["container"] == "card":
-			credit_category_classifer = self.card_credit_category_cnn
-			debit_category_classifer = self.card_debit_category_cnn
+			pass
+			#credit_category_classifer = self.card_credit_category_cnn
+			#debit_category_classifer = self.card_debit_category_cnn
 		elif data["container"] == "bank":
 			credit_category_classifer = self.bank_credit_category_cnn
-			debit_category_classifer = self.bank_debit_category_cnn
+			#debit_category_classifer = self.bank_debit_category_cnn
 
 		# Split transactions into groups
 		credit, debit = [], []
