@@ -448,6 +448,7 @@ class WebConsumer():
 			trans.pop("date", None)
 			trans.pop("ledger_entry", None)
 			trans.pop("CNN", None)
+			trans.pop("category_CNN", None)
 
 		# return transactions
 
