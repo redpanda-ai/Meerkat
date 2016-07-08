@@ -584,8 +584,8 @@ class WebConsumer():
 		# Apply classifiers
 		if len(credit) > 0:
 			credit_category_classifer(credit, label_key="category_CNN", label_only=False)
-		if len(debit) > 0:
-			debit_category_classifer(debit, label_key="category_CNN", label_only=False)
+		#if len(debit) > 0:
+			#debit_category_classifer(debit, label_key="category_CNN", label_only=False)
 
 		for transaction in data["transaction_list"]:
 			category = transaction["category_CNN"].get("label", "")
