@@ -120,9 +120,12 @@ def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=False, model
 		output = sess.run(model, feed_dict=feed_dict_test)
 		if not soft_target:
 			labels = np.argmax(output, 1) + 1
+			scores = np.amax(output, 1)
 
 			for index, transaction in enumerate(trans):
 				label = label_map.get(str(labels[index]), "")
+				if 'threshold' in label and scores[index] < float(label["threshold"]):
+					label = label_map.get('1', '') # first class is always the default one
 				if isinstance(label, dict) and label_only:
 					label = label["label"]
 				transaction[label_key] = label
