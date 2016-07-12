@@ -156,7 +156,7 @@ def main_split_data(args):
 	shutil.copyfile(label_map_path, stats_path + "/" + "label_map.json")
 	logging.info("label_map.json moved")
 	make_tarfile(output_file, save_path_preprocessed)
-	push_file_to_s3(output_file, "s3yodlee", prefix)
+	push_file_to_s3(output_file, bucket, prefix)
 
 	shutil.rmtree(save_path_input)
 	logging.info("remove directory of input files at: {0}".format(save_path_input))
