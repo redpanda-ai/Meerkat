@@ -1,0 +1,215 @@
+<div class="row">
+    <div id="skeleton" class="col-md-12">
+        <h2>Fat Head Project</h2>
+    
+      <p>DESCRIPTION_MASKED : <b><span id="question_holder"></span></b></p>
+        <p>Geo :
+            <input type="text" id="answerBoxCity" placeholder="type city here">
+            <input type="text" id="answerBoxState" placeholder="type state here" maxlength="2">
+            <input type="text" id="answerBoxZipcode" placeholder="type zipcode here" maxlength="5">
+        </p>
+        <p>Store Number :
+            <input type="number" id="answerBoxStoreNumber" placeholder="type store number here" min="0" step="1" style="width: 200px;">
+        </p>
+     
+        <p>
+            <button id="save" class="btn btn-primary">Save Answer</button>
+            <button id="idk" class="btn btn-primary">I don't know</button>
+        </p>
+    </div>
+    <div id="finish" class="alert alert-success" style="display:none;">
+        <p>Congratulations! You have participated in all available tasks!</p>
+    </div>
+    <div id="success" style="display:none;">
+        <p>Well done! Your answer has been saved</p>
+    </div>
+    <div>
+        <table id="t01" style= "width: 100%;background-color: #f1f1c1;border: 1px solid black;
+            border-collapse: collapse;">
+        <tr>
+            <caption style = "color: #546e7a;"><b>REMEMBER: Always spell out abbreviations</b></caption>
+            <th style = "border: 1px solid black;border-collapse: collapse;padding: 5px;
+                text-align: left;">Instead of</th>
+            <th style = "border: 1px solid black;border-collapse: collapse;padding: 5px;
+                text-align: left;">Use</th>
+            <th style = "border: 1px solid black;border-collapse: collapse;padding: 5px;
+                text-align: left;">Example</th>
+        </tr>
+        <tr>
+            <td style = "border: 1px solid black;border-collapse: collapse;padding: 5px;
+                text-align: left;">E.</td>
+            <td style = "border: 1px solid black;border-collapse: collapse;padding: 5px;
+                text-align: left;">East</td>
+            <td style = "border: 1px solid black;border-collapse: collapse;padding: 5px;
+                text-align: left;">East Saint Louis, MO</td>
+        </tr>
+        <tr>
+            <td style = "border: 1px solid black;border-collapse: collapse;padding: 5px;
+                text-align: left;">St.</td>
+            <td style = "border: 1px solid black;border-collapse: collapse;padding: 5px;
+                text-align: left;">Saint</td>
+            <td style = "border: 1px solid black;border-collapse: collapse;padding: 5px;
+                text-align: left;">Saint Louis, MO</td>
+        </tr>
+        <tr>
+            <td style = "border: 1px solid black;border-collapse: collapse;padding: 5px;
+                text-align: left;">Ft.</td>
+            <td style = "border: 1px solid black;border-collapse: collapse;padding: 5px;
+                text-align: left;">Fort</td>
+            <td style = "border: 1px solid black;border-collapse: collapse;padding: 5px;
+                text-align: left;">Fort Lauderdale, FL</td>
+        </tr>
+        <tr>
+            <td style = "border: 1px solid black;border-collapse: collapse;padding: 5px;
+                text-align: left;">Bch.</td>
+            <td style = "border: 1px solid black;border-collapse: collapse;padding: 5px;
+                text-align: left;">Beach</td>
+            <td style = "border: 1px solid black;border-collapse: collapse;padding: 5px;
+                text-align: left;">Miami Beach, FL</td>
+        </tr>
+        <tr>
+            <td style = "border: 1px solid black;border-collapse: collapse;padding: 5px;
+                text-align: left;">New York</td>
+            <td style = "border: 1px solid black;border-collapse: collapse;padding: 5px;
+                text-align: left;">New York City</td>
+            <td style = "border: 1px solid black;border-collapse: collapse;padding: 5px;
+                text-align: left;">New York City, NY</td>
+        </tr>
+        </table>
+    </div>
+</div>
+<script type="text/javascript">
+
+var maps = {};
+$.ajax({
+    url: "http://52.26.175.156/state_city_zip.json",
+    dataType: 'jsonp',
+    jsonpCallback: 'callback',
+    success: function(data) {
+        maps = data;
+    }
+});
+
+var json1 = {}
+$.ajax({
+    url: "http://52.26.175.156/store_number_to_city_state1.json",
+    dataType: 'jsonp',
+    jsonpCallback: 'callback',
+    success: function(data) {
+        json1 = data;
+    }
+});
+
+var json2 = {}
+$.ajax({
+    url: "http://52.26.175.156/store_number_to_city_state2.json",
+    dataType: 'jsonp',
+    jsonpCallback: 'callback',
+    success: function(data) {
+        json2 = data;
+    }
+});
+
+pybossa.taskLoaded(function(task, deferred){
+    deferred.resolve(task);
+});
+pybossa.presentTask(function(task, deferred){
+    if (!$.isEmptyObject(task)) {
+        $("#answerBoxCity").val("");
+        $("#answerBoxState").val("");
+        $("#answerBoxZipcode").val("");
+        $("#answerBoxStoreNumber").val("");
+        $("#answerBoxCity").css({
+            "border": "",
+            "background": ""
+        });
+        $("#answerBoxState").css({
+            "border": "",
+            "background": ""
+        });
+        $("#answerBoxZipcode").css({
+            "border": "",
+            "background": ""
+        });
+        $("#question_holder").text(task.info['question']);
+        $("#save").off('click').on('click', function(evt) {
+            var answer = {}
+            answer["city"] = $.trim($("#answerBoxCity").val().toUpperCase());
+            answer["state"] = $("#answerBoxState").val().toUpperCase();
+            answer["zipcode"] = $("#answerBoxZipcode").val();
+            answer["storenumber"] = $("#answerBoxStoreNumber").val();
+
+            var isValidState = true;
+            var isValidCity = true;
+            var isValidZipcode = true;
+
+            $('#answerBoxState').each(function () {
+              if (!(answer["state"] in maps)) {
+                    isValidState = false;
+                    $("#answerBoxState").css({
+                        "border": "1px solid red",
+                        "background": "#FFCECE"
+                    });
+              } else if (!(answer["city"] in maps[answer["state"]])) {
+                    isValidCity = false;
+                    $("#answerBoxCity").css({
+                        "border": "1px solid red",
+                        "background": "#FFCECE"
+                    });
+              } else if ((maps[answer["state"]][answer["city"]].indexOf(answer["zipcode"]) == -1) && (answer["zipcode"].length != 0)) {
+                    isValidZipcode = false;
+                    $("#answerBoxZipcode").css({
+                        "border": "1px solid red",
+                        "background": "#FFCECE"
+                    });
+
+              } else {
+                    $("#answerBoxState").css({
+                        "border": "",
+                        "background": ""
+                    });
+                    $("#answerBoxCity").css({
+                        "border": "",
+                        "background": ""
+                    });
+                    $("#answerBoxZipcode").css({
+                        "border": "",
+                        "background": ""
+                    });
+              }
+
+            });
+
+            if (isValidState == false || isValidCity == false|| isValidZipcode == false) {
+                evt.preventDefault();
+            } else {
+                pybossa.saveTask(task.id, answer).done(function() {
+                    $("#success").fadeIn();
+                    setTimeout(function() {
+                        $("#success").hide();
+                        deferred.resolve(task);
+                    }, 1500);
+                });
+            }
+        });
+        $("#idk").off('click').on('click', function(evt) {
+            var answer = {}
+            answer["city"] = "";
+            answer["state"] = "";
+            answer["zipcode"] = "";
+            answer["storenumber"] = "";
+            pybossa.saveTask(task.id, answer).done(function() {
+                $("#success").fadeIn();
+                    setTimeout(function() {
+                        $("#success").hide();
+                        deferred.resolve(task);
+                    }, 1500);
+            });
+        });
+    } else {
+        $("#skeleton").hide();
+        $("#finish").fadeIn(100);
+    }
+});
+pybossa.run('fathead_from_pbs');
+</script>
