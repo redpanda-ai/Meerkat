@@ -1,0 +1,6 @@
+{
+    "bank_credit" : ["Refund"],
+    "card_credit" : ["Refund"],
+    "bank_debit" : ["Other Income", "Other Expenses", "Other Bills", "Service Charges/Fees", "Transfers", "Checks"],
+    "card_debit" : ["Refund"]
+}
