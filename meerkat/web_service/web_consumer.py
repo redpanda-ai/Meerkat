@@ -364,6 +364,47 @@ class WebConsumer():
 				trans["CNN"] = trans.get("CNN", {}).get("label", "")
 				trans.pop("subtype_CNN", None)
 
+	def __search_category(self, trans):
+		"""Get category based on elastic search and subtype"""
+		trans["search"] = {"category_labels" : trans.get("category_labels", [])} # Elasticsearch for category
+
+		if trans.get("category_labels"):
+			trans["CNN"] = trans.get("CNN", {}).get("label", "")
+				if "subtype_CNN" in trans:
+					del trans["subtype_CNN"]
+
+		fallback = trans.get("CNN", {}).get("category", "").strip() # Merchant name
+		if fallback == "Use Subtype Rules for Categories" or fallback == "":
+			subtype_category = trans.get("subtype_CNN", {}).get("category", trans.get("subtype_CNN", {}).get("label", ""))
+			if isinstance(subtype_category, dict):
+				subtype_category = subtype_category[trans["ledger_entry"].lower()]
+			fallback = subtype_category
+
+		trans["category_labels"] = [fallback]
+		trans["category"] = fallback
+		trans["CNN"] = trans.get("CNN", {}).get("label", "")
+		trans.pop("subtype_CNN", None)
+
+	def __apply_missing_categories_2(self, transactions):
+		json_obj = open('meerkat/web_service/config/category.json')
+		json_data = json.loads(json_obj.read())
+		bank_credit = json_data['bank_credit']
+		card_credit = json_data['card_credit']
+		bank_debit = json_data['bank_debit']
+		card_debit = json_data['card_debit']
+
+		for trans in transactions:
+			category = trans['category'] # Category CNN
+
+			if trans['ledger_entry'] = 'credit' and trans['container'] = 'bank' and category in bank_credit:
+				self.__search_category(trans)
+			if trans['ledger_entry'] = 'credit' and trans['container'] = 'card' and category in card_credit:
+				self.__search_category(trans)
+			if trans['ledger_entry'] = 'debit' and trans['container'] = 'bank' and category not in bank_debit:
+				self.__search_category(trans)
+			if trans['ledger_entry'] = 'debit' and trans['container'] = 'card' and category not in card_debit:
+				self.__search_category(trans)
+
 	def ensure_output_schema(self, transactions, debug):
 		"""Clean output to proper schema"""
 
@@ -681,6 +722,7 @@ class WebConsumer():
 
 		if not optimizing:
 			self.__apply_missing_categories(data["transaction_list"])
+			#self.__apply_missing_categories_2(data["transaction_list"])
 
 		self.ensure_output_schema(data["transaction_list"], debug)
 
