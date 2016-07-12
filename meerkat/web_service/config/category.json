@@ -1,5 +1,5 @@
 {
-    "bank_credit" : ["Refund"],
+    "bank_credit" : ["Other Income"],
     "card_credit" : ["Refund"],
     "bank_debit" : ["Other Income", "Other Expenses", "Other Bills", "Service Charges/Fees", "Transfers", "Checks"],
     "card_debit" : ["Refund"]

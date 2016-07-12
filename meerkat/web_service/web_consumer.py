@@ -370,8 +370,8 @@ class WebConsumer():
 
 		if trans.get("category_labels"):
 			trans["CNN"] = trans.get("CNN", {}).get("label", "")
-				if "subtype_CNN" in trans:
-					del trans["subtype_CNN"]
+			if "subtype_CNN" in trans:
+				del trans["subtype_CNN"]
 
 		fallback = trans.get("CNN", {}).get("category", "").strip() # Merchant name
 		if fallback == "Use Subtype Rules for Categories" or fallback == "":
@@ -393,16 +393,21 @@ class WebConsumer():
 		bank_debit = json_data['bank_debit']
 		card_debit = json_data['card_debit']
 
+		print('__apply_missing_categories_2 has been called')
 		for trans in transactions:
 			category = trans['category'] # Category CNN
 
-			if trans['ledger_entry'] = 'credit' and trans['container'] = 'bank' and category in bank_credit:
+			if trans['ledger_entry'] == 'credit' and trans['container'] == 'bank' and category in bank_credit:
+				print('------1')
 				self.__search_category(trans)
-			if trans['ledger_entry'] = 'credit' and trans['container'] = 'card' and category in card_credit:
+			if trans['ledger_entry'] == 'credit' and trans['container'] == 'card' and category in card_credit:
+				print('------2')
 				self.__search_category(trans)
-			if trans['ledger_entry'] = 'debit' and trans['container'] = 'bank' and category not in bank_debit:
+			if trans['ledger_entry'] == 'debit' and trans['container'] == 'bank' and category not in bank_debit:
+				print('-------3')
 				self.__search_category(trans)
-			if trans['ledger_entry'] = 'debit' and trans['container'] = 'card' and category not in card_debit:
+			if trans['ledger_entry'] == 'debit' and trans['container'] == 'card' and category not in card_debit:
+				print('-----4')
 				self.__search_category(trans)
 
 	def ensure_output_schema(self, transactions, debug):
@@ -489,6 +494,7 @@ class WebConsumer():
 			trans.pop("date", None)
 			trans.pop("ledger_entry", None)
 			trans.pop("CNN", None)
+			trans.pop("container", None)
 			trans.pop("category_CNN", None)
 
 		# return transactions
@@ -680,6 +686,9 @@ class WebConsumer():
 	def __apply_cpu_classifiers(self, data):
 		"""Apply all the classifiers which are CPU bound.  Written to be
 		run in parallel with GPU bound classifiers."""
+		for transaction in data["transaction_list"]:
+			transaction["container"] = data["container"]
+
 		services_list = data.get("services_list", [])
 		if "bloom_filter" in services_list or services_list == []:
 			self.__apply_locale_bloom(data)
@@ -722,7 +731,7 @@ class WebConsumer():
 
 		if not optimizing:
 			self.__apply_missing_categories(data["transaction_list"])
-			#self.__apply_missing_categories_2(data["transaction_list"])
+			self.__apply_missing_categories_2(data["transaction_list"])
 
 		self.ensure_output_schema(data["transaction_list"], debug)
 
