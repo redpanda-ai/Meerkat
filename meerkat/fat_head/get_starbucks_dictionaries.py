@@ -5,7 +5,10 @@ import logging
 import pandas as pd
 import json
 
-def select_merchant_with_store(input_file, chunksize, merchant):
+def generate_merchant_dictionaries(input_file, chunksize, merchant):
+	"""Generates three merchant dictionaries and writes them as JSON files"""
+	#create a list of dataframe groups, filtered by merchant name
+	logging.warning("Processing CSV file.")
 	dfs = []
 	for chunk in pd.read_csv(input_file, chunksize=chunksize, error_bad_lines=False, warn_bad_lines=True,
 		encoding='utf-8', quotechar='"', na_filter=False, sep=','):
@@ -14,20 +17,48 @@ def select_merchant_with_store(input_file, chunksize, merchant):
 		if merchant in groups.keys():
 			dfs.append(groups[merchant])
 
-	logging.info("start merging dataframes")
+	logging.warning("start merging dataframes")
+	#Merge them together
 	merged = pd.concat(dfs, ignore_index=True)
-	logging.info("finish merging dataframes")
+	logging.warning("finish merging dataframes")
+	#Use only the "store_number", "city", and "state" columns
 	slender_df = merged[["store_number", "city", "state"]]
 	first_dict, second_dict = {}, {}
 	my_stores = slender_df.set_index("store_number").T.to_dict('list')
+
+	#Split the store_id dicts
 	for key in my_stores.keys():
 		key_1, key_2 = key.split("-")
 		first_dict[key_1] = my_stores[key]
 		second_dict[key_2] = my_stores[key]
 
-	first_json = json.dumps(first_dict, sort_keys=True, indent=4, separators=(',', ': '))
-	second_json = json.dumps(second_dict, sort_keys=True, indent=4, separators=(',', ': '))
-	print("First JSON:\n{0}".format(first_json))
-	print("Second JSON:\n{0}".format(second_json))
+	#Dump the store_id dictionaries
+	logging.warning("Dumping store_id_*.json files.")
+	with open(merchant + "_store_id_1.json", "w") as outfile:
+		json.dump(first_dict, outfile, sort_keys=True, indent=4, separators=(',', ': '))
+	with open(merchant + "_store_id_2.json", "w") as outfile:
+		json.dump(second_dict, outfile, sort_keys=True, indent=4, separators=(',', ': '))
 
-select_merchant_with_store("All_Merchants.csv", 1000, "Starbucks")
+	#Create a geo-dictionary, using only "state", "city", and "zip_code"
+	geo_df = merged[["state", "city", "zip_code"]]
+	grouped = geo_df.groupby(['state', 'city'], as_index=True)
+	geo_dict = {}
+	for name, group in grouped:
+		state, city = name
+		if state not in geo_dict:
+			geo_dict[state] = {}
+		if city not in geo_dict[state]:
+			geo_dict[state][city] = []
+		for item in group["zip_code"]:
+			item = item[:5]
+			if item not in geo_dict[state][city]:
+				geo_dict[state][city].append(item)
+
+	#Write the geo-dictionary
+	logging.warning("Dumping _geo.json files.")
+	with open(merchant + "_geo.json", "w") as outfile:
+		json.dump(geo_dict, outfile, sort_keys=True, indent=4, separators=(',', ': '))
+	first_json = json.dumps(first_dict, sort_keys=True, indent=4, separators=(',', ': '))
+
+
+generate_merchant_dictionaries("All_Merchants.csv", 1000, "Starbucks")
