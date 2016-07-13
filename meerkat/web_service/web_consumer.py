@@ -374,12 +374,12 @@ class WebConsumer():
 			fallback = ""
 
 		if fallback == "Use Subtype Rules for Categories" or fallback == "":
-			subtype = trans.get("subtype_CNN", {}).get("category", trans.get("subtype_CNN", {}).get("label", ""))
-			if isinstance(subtype, dict):
-				subtype = subtype[trans["ledger_entry"].lower()]
-			fallback = subtype
+			"""No merchant category"""
+			pass
+		else:
+			"""Has merchant category"""
+			trans["category_labels"] = [fallback]
 
-		trans["category_labels"] = [fallback]
 		trans["CNN"] = trans.get("CNN", {}).get("label", "")
 		trans.pop("subtype_CNN", None)
 
@@ -394,10 +394,6 @@ class WebConsumer():
 		card_debit = json_data['card_debit']
 
 		for trans in transactions:
-			if trans.get("category_labels"):
-				trans["CNN"] = trans.get("CNN", {}).get("label", "")
-				if "subtype_CNN" in trans:
-					del trans["subtype_CNN"]
 
 			try:
 				category = trans['category_labels'][0]
@@ -406,12 +402,15 @@ class WebConsumer():
 
 			if trans['ledger_entry'] == 'credit' and trans['container'] == 'bank' and category in bank_credit:
 				self.__search_category(trans)
-			if trans['ledger_entry'] == 'credit' and trans['container'] == 'card' and category in card_credit:
+			elif trans['ledger_entry'] == 'credit' and trans['container'] == 'card' and category in card_credit:
 				self.__search_category(trans)
-			if trans['ledger_entry'] == 'debit' and trans['container'] == 'bank' and category not in bank_debit:
+			elif trans['ledger_entry'] == 'debit' and trans['container'] == 'bank' and category not in bank_debit:
 				self.__search_category(trans)
-			if trans['ledger_entry'] == 'debit' and trans['container'] == 'card' and category not in card_debit:
+			elif trans['ledger_entry'] == 'debit' and trans['container'] == 'card' and category not in card_debit:
 				self.__search_category(trans)
+			else:
+				trans["CNN"] = trans.get("CNN", {}).get("label", "")
+				trans.pop("subtype_CNN", None)
 
 	def ensure_output_schema(self, transactions, debug):
 		"""Clean output to proper schema"""
