@@ -1,6 +1,0 @@
-{
-    "bank_credit" : ["Other Income"],
-    "card_credit" : ["Other Income"],
-    "bank_debit" : ["Other Expenses"],
-    "card_debit" : ["Other Expenses"]
-}
