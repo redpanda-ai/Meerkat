@@ -9,8 +9,11 @@
 			<input type="text" id="answerBoxZipcode" placeholder="type zipcode here" maxlength="5">
 		</p>
      
-		<p><button id="save" class="btn btn-primary">Save Answer</button>
-           <button id="idk" class="btn btn-primary">I don't know</button> </p>
+		<p>
+			<button id="save" class="btn btn-primary">Save Answer</button>
+            <button id="idk" class="btn btn-primary">I don't know</button>
+            <button id="not_in_us" class="btn btn-primary">Not in US</button>
+		</p>
 	</div>
     <div id="finish" class="alert alert-success" style="display:none;">
 		<p>Congratulations! You have participated in all available tasks!</p>
@@ -96,7 +99,7 @@
 
 var maps = {};
 $.ajax({
-    url: "http://52.26.175.156/state_city_zip.json",
+    url: "http://52.26.175.156/Starbucks_geo.json",
     dataType: 'jsonp',
     jsonpCallback: 'callback',
     success: function(data) {
@@ -131,6 +134,7 @@ pybossa.presentTask(function(task, deferred){
 			answer["city"] = $.trim($("#answerBoxCity").val().toUpperCase());
 			answer["state"] = $("#answerBoxState").val().toUpperCase();
 			answer["zipcode"] = $("#answerBoxZipcode").val().toUpperCase();
+			answer["not_in_us"] = false;
 
 			var isValidState = true;
             var isValidCity = true;
@@ -184,11 +188,28 @@ pybossa.presentTask(function(task, deferred){
 				});
 			}
 		});
-		$("#idk").off('click').on('click', function(evt) {
-			var answer = {}
+
+		$("#not_in_us").off('click').on('click', function(evt) {
+			var answer = {};
 			answer["city"] = "";
 			answer["state"] = "";
 			answer["zipcode"] = "";
+			answer["not_in_us"] = true;
+			pybossa.saveTask(task.id, answer).done(function() {
+				$("#success").fadeIn();
+					setTimeout(function() {
+						$("#success").hide();
+						deferred.resolve(task);
+					}, 1500);
+			});
+		});
+
+		$("#idk").off('click').on('click', function(evt) {
+			var answer = {};
+			answer["city"] = "";
+			answer["state"] = "";
+			answer["zipcode"] = "";
+			answer["not_in_us"] = "";
 			pybossa.saveTask(task.id, answer).done(function() {
 				$("#success").fadeIn();
 					setTimeout(function() {
@@ -202,5 +223,5 @@ pybossa.presentTask(function(task, deferred){
 		$("#finish").fadeIn(100);
 	}
 });
-pybossa.run('FatHead');	
+pybossa.run('geomancer');	
 </script>
