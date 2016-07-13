@@ -368,12 +368,17 @@ class WebConsumer():
 		"""Get category based on elastic search and subtype"""
 		trans["search"] = {"category_labels" : trans.get("category_labels", [])} # Elasticsearch for category
 
+		'''
 		if trans.get("category_labels"):
 			trans["CNN"] = trans.get("CNN", {}).get("label", "")
 			if "subtype_CNN" in trans:
 				del trans["subtype_CNN"]
+			continue
+		'''
 
-		fallback = trans.get("CNN", {}).get("category", "").strip() # Merchant name
+		#fallback = trans.get("CNN", {}).get("category", "").strip() # Merchant name
+		fallback = trans.get("CNN", "")
+		print(fallback)
 		if fallback == "Use Subtype Rules for Categories" or fallback == "":
 			subtype_category = trans.get("subtype_CNN", {}).get("category", trans.get("subtype_CNN", {}).get("label", ""))
 			if isinstance(subtype_category, dict):
@@ -382,7 +387,7 @@ class WebConsumer():
 
 		trans["category_labels"] = [fallback]
 		trans["category"] = fallback
-		trans["CNN"] = trans.get("CNN", {}).get("label", "")
+		#trans["CNN"] = trans.get("CNN", {}).get("label", "")
 		trans.pop("subtype_CNN", None)
 
 	def __apply_missing_categories_2(self, transactions):
@@ -404,10 +409,10 @@ class WebConsumer():
 				print('------2')
 				self.__elastic_search_category(trans)
 			if trans['ledger_entry'] == 'debit' and trans['container'] == 'bank' and category not in bank_debit:
-				print('-------3')
+				print('------3')
 				self.__elastic_search_category(trans)
 			if trans['ledger_entry'] == 'debit' and trans['container'] == 'card' and category not in card_debit:
-				print('-----4')
+				print('------4')
 				self.__elastic_search_category(trans)
 
 	def ensure_output_schema(self, transactions, debug):
