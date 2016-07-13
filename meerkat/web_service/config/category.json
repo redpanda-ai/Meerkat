@@ -1,6 +1,6 @@
 {
-    "bank_credit" : ["Other Income"],
-    "card_credit" : ["Refund"],
-    "bank_debit" : ["Other Income", "Other Expenses", "Other Bills", "Service Charges/Fees", "Transfers", "Checks"],
-    "card_debit" : ["Refund"]
+    "bank_credit" : ["Other Income", "Refunds/Adjustments"],
+    "card_credit" : ["Other Income", "Refunds/Adjustments"],
+    "bank_debit" : ["Credit Card Payments", "Other Expenses", "Insurance", "Utilities", "Retirement Contributions", "Savings", "Loans", "Mortgage"],
+    "card_debit" : ["Other Expenses", "Insurance", "Utilities"]
 }
