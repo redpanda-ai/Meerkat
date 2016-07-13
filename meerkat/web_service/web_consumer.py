@@ -368,12 +368,11 @@ class WebConsumer():
 		"""Get category based on subtype"""
 		trans["search"] = {"category_labels" : trans.get("category_labels", [])}
 
-		if trans.get("category_labels"):
-			trans["CNN"] = trans.get("CNN", {}).get("label", "")
-			if "subtype_CNN" in trans:
-				del trans["subtype_CNN"]
+		try:
+			fallback = trans.get("CNN", {}).get("category", "").strip()
+		except AttributeError:
+			fallback = ""
 
-		fallback = trans.get("CNN", {}).get("category", "").strip()
 		if fallback == "Use Subtype Rules for Categories" or fallback == "":
 			subtype = trans.get("subtype_CNN", {}).get("category", trans.get("subtype_CNN", {}).get("label", ""))
 			if isinstance(subtype, dict):
@@ -384,6 +383,8 @@ class WebConsumer():
 		trans["CNN"] = trans.get("CNN", {}).get("label", "")
 		trans.pop("subtype_CNN", None)
 
+		return trans
+
 	def __apply_missing_categories_2(self, transactions):
 		json_obj = open('meerkat/web_service/config/category.json')
 		json_data = json.loads(json_obj.read())
@@ -392,27 +393,24 @@ class WebConsumer():
 		bank_debit = json_data['bank_debit']
 		card_debit = json_data['card_debit']
 
-		print('__apply_missing_categories_2 has been called')
-
 		for trans in transactions:
-			if len(trans['category_labels']) == 0:
-				print('------0')
-				print(trans['category_labels'])
-				self.__search_category(trans)
-				continue
+			if trans.get("category_labels"):
+				trans["CNN"] = trans.get("CNN", {}).get("label", "")
+				if "subtype_CNN" in trans:
+					del trans["subtype_CNN"]
 
-			category = trans['category_labels'][0]
+			try:
+				category = trans['category_labels'][0]
+			except IndexError:
+				category = 'Other Income'
+
 			if trans['ledger_entry'] == 'credit' and trans['container'] == 'bank' and category in bank_credit:
-				print('------1')
 				self.__search_category(trans)
 			if trans['ledger_entry'] == 'credit' and trans['container'] == 'card' and category in card_credit:
-				print('------2')
 				self.__search_category(trans)
 			if trans['ledger_entry'] == 'debit' and trans['container'] == 'bank' and category not in bank_debit:
-				print('------3')
 				self.__search_category(trans)
 			if trans['ledger_entry'] == 'debit' and trans['container'] == 'card' and category not in card_debit:
-				print('------4')
 				self.__search_category(trans)
 
 	def ensure_output_schema(self, transactions, debug):
@@ -643,7 +641,13 @@ class WebConsumer():
 
 		for transaction in data["transaction_list"]:
 			category = transaction["category_CNN"].get("label", "")
-			transaction["category_labels"] = [category]
+			if category == "":
+				if transaction["ledger_entry"] == "credit":
+					transaction["category_labels"] = ["Other Income XXX"]
+				else:
+					transaction["category_labels"] = ["Other Expenses"]
+			else:
+				transaction["category_labels"] = [category]
 
 		return data["transaction_list"]
 
@@ -711,7 +715,6 @@ class WebConsumer():
 
 	def classify(self, data, optimizing=False):
 		"""Classify a set of transactions"""
-
 		services_list = data.get("services_list", [])
 		debug = data.get("debug", False)
 
