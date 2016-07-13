@@ -273,6 +273,13 @@ def auto_train():
 		shutil.rmtree(save_path)
 	logging.info("remove directory of preprocessed files at: {0}".format(save_path))
 
+	if args.ensemble:
+		ensemble_dir = "meerkat/classification/models/ensemble_cnns/"
+		shutil.rmtree(ensemble_dir)
+		logging.info("remove constituent CNNs at: {0}".format(ensemble_dir))
+		os.remove(config["dataset"])
+		logging.info("remove soft target training data at: "+config["dataset"])
+
 	logging.warning('The whole streamline process has finished')
 
 # The main program starts here if run from the command line.
