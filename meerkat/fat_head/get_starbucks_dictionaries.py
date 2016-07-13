@@ -45,6 +45,7 @@ def generate_merchant_dictionaries(input_file, chunksize, merchant):
 	geo_dict = {}
 	for name, group in grouped:
 		state, city = name
+		state, city = state.upper(), city.upper()
 		if state not in geo_dict:
 			geo_dict[state] = {}
 		if city not in geo_dict[state]:
