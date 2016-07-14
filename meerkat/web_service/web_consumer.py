@@ -82,9 +82,9 @@ class WebConsumer():
 		self.bank_credit_subtype_cnn = get_tf_cnn_by_name("bank_credit_subtype", gpu_mem_fraction=gmf)
 
 		"""Get Category CNN Model"""
-		#self.card_debit_category_cnn = get_tf_cnn_by_name("card_debit_category", gpu_mem_fraction=gmf)
-		#self.card_credit_category_cnn = get_tf_cnn_by_name("card_credit_category", gpu_mem_fraction=gmf)
-		#self.bank_debit_category_cnn = get_tf_cnn_by_name("bank_debit_category", gpu_mem_fraction=gmf)
+		self.card_debit_category_cnn = get_tf_cnn_by_name("card_debit_category", gpu_mem_fraction=gmf)
+		self.card_credit_category_cnn = get_tf_cnn_by_name("card_credit_category", gpu_mem_fraction=gmf)
+		self.bank_debit_category_cnn = get_tf_cnn_by_name("bank_debit_category", gpu_mem_fraction=gmf)
 		self.bank_credit_category_cnn = get_tf_cnn_by_name("bank_credit_category", gpu_mem_fraction=gmf)
 
 	def update_hyperparams(self, hyperparams):
@@ -365,20 +365,20 @@ class WebConsumer():
 				trans.pop("subtype_CNN", None)
 
 	def __search_category(self, trans):
-		"""Get category based on subtype"""
-		trans["search"] = {"category_labels" : trans.get("category_labels", [])}
+		"""Get category_labels based on merchant_category and subtype_category"""
+		merchant_category = trans.get("CNN", {}).get("category", "").strip()
 
-		try:
-			fallback = trans.get("CNN", {}).get("category", "").strip()
-		except AttributeError:
-			fallback = ""
-
-		if fallback == "Use Subtype Rules for Categories" or fallback == "":
-			"""No merchant category"""
-			pass
+		if merchant_category == "Use Subtype Rules for Categories" or merchant_category == "":
+			"""No valid merchant_category"""
+			if trans["category_labels"] == ["Other Income"] or trans["category_labels"] == ["Other Expenses"]:
+				subtype_category = trans.get("subtype_CNN", {}).get("category", trans.get("subtype_CNN", {}).get("label", ""))
+				if isinstance(subtype_category, dict):
+					subtype_category = subtype_category[trans["ledger_entry"].lower()]
+				if subtype_category != "":
+					trans["category_labels"] = [subtype_category]
 		else:
-			"""Has merchant category"""
-			trans["category_labels"] = [fallback]
+			"""Has valid merchant_category"""
+			trans["category_labels"] = [merchant_category]
 
 		trans["CNN"] = trans.get("CNN", {}).get("label", "")
 		trans.pop("subtype_CNN", None)
@@ -386,6 +386,7 @@ class WebConsumer():
 		return trans
 
 	def __apply_missing_categories_2(self, transactions):
+		"""Fix category_labels with category_cnn"""
 		json_obj = open('meerkat/web_service/config/category.json')
 		json_data = json.loads(json_obj.read())
 		bank_credit = json_data['bank_credit']
@@ -394,11 +395,13 @@ class WebConsumer():
 		card_debit = json_data['card_debit']
 
 		for trans in transactions:
-
 			try:
 				category = trans['category_labels'][0]
 			except IndexError:
-				category = 'Other Income'
+				if trans['ledger_entry'] == 'credit':
+					category = 'Other Income'
+				else:
+					category = 'Other Expenses'
 
 			if trans['ledger_entry'] == 'credit' and trans['container'] == 'bank' and category in bank_credit:
 				self.__search_category(trans)
@@ -411,6 +414,8 @@ class WebConsumer():
 			else:
 				trans["CNN"] = trans.get("CNN", {}).get("label", "")
 				trans.pop("subtype_CNN", None)
+
+		return transactions
 
 	def ensure_output_schema(self, transactions, debug):
 		"""Clean output to proper schema"""
@@ -617,11 +622,11 @@ class WebConsumer():
 
 		if data["container"] == "card":
 			pass
-			#credit_category_classifer = self.card_credit_category_cnn
-			#debit_category_classifer = self.card_debit_category_cnn
+			credit_category_classifer = self.card_credit_category_cnn
+			debit_category_classifer = self.card_debit_category_cnn
 		elif data["container"] == "bank":
 			credit_category_classifer = self.bank_credit_category_cnn
-			#debit_category_classifer = self.bank_debit_category_cnn
+			debit_category_classifer = self.bank_debit_category_cnn
 
 		# Split transactions into groups
 		credit, debit = [], []
@@ -636,13 +641,13 @@ class WebConsumer():
 		if len(credit) > 0:
 			credit_category_classifer(credit, label_key="category_CNN", label_only=False)
 		#if len(debit) > 0:
-			#debit_category_classifer(debit, label_key="category_CNN", label_only=False)
+			debit_category_classifer(debit, label_key="category_CNN", label_only=False)
 
 		for transaction in data["transaction_list"]:
 			category = transaction["category_CNN"].get("label", "")
 			if category == "":
 				if transaction["ledger_entry"] == "credit":
-					transaction["category_labels"] = ["Other Income XXX"]
+					transaction["category_labels"] = ["Other Income"]
 				else:
 					transaction["category_labels"] = ["Other Expenses"]
 			else:
