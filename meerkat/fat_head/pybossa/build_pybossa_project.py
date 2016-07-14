@@ -48,9 +48,6 @@ def main_process():
 		os.system("pbs --server http://" + server + ":12000 --api-key " +
 			apikey + " --project " + project_json + " add_tasks --tasks-file " +
 			tasks_file)
-		os.system("pbs --server http://" + server + ":12000 --api-key " +
-			apikey + " --project " + project_json + " update-task-redundancy --redundancy 2")
-
 
 if __name__ == "__main__":
 	main_process()
