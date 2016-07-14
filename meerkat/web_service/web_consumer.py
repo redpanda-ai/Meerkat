@@ -71,17 +71,17 @@ class WebConsumer():
 			#Load new models from S3
 			load_models_from_s3(config=auto_load_config)
 
-		"""Get Merchant CNN Model"""
+		"""Get Merchant CNN Models"""
 		self.bank_merchant_cnn = get_tf_cnn_by_name("bank_merchant", gpu_mem_fraction=gmf)
 		self.card_merchant_cnn = get_tf_cnn_by_name("card_merchant", gpu_mem_fraction=gmf)
 
-		"""Get Subtype CNN Model"""
+		"""Get Subtype CNN Models"""
 		self.card_debit_subtype_cnn = get_tf_cnn_by_name("card_debit_subtype", gpu_mem_fraction=gmf)
 		self.card_credit_subtype_cnn = get_tf_cnn_by_name("card_credit_subtype", gpu_mem_fraction=gmf)
 		self.bank_debit_subtype_cnn = get_tf_cnn_by_name("bank_debit_subtype", gpu_mem_fraction=gmf)
 		self.bank_credit_subtype_cnn = get_tf_cnn_by_name("bank_credit_subtype", gpu_mem_fraction=gmf)
 
-		"""Get Category CNN Model"""
+		"""Get Category CNN Models"""
 		self.card_debit_category_cnn = get_tf_cnn_by_name("card_debit_category", gpu_mem_fraction=gmf)
 		self.card_credit_category_cnn = get_tf_cnn_by_name("card_credit_category", gpu_mem_fraction=gmf)
 		self.bank_debit_category_cnn = get_tf_cnn_by_name("bank_debit_category", gpu_mem_fraction=gmf)
@@ -364,8 +364,8 @@ class WebConsumer():
 				trans["CNN"] = trans.get("CNN", {}).get("label", "")
 				trans.pop("subtype_CNN", None)
 
-	def __search_category(self, trans):
-		"""Get category_labels based on merchant_category and subtype_category"""
+	def __apply_category_with_merchant_and_subtype(self, trans):
+		"""Fix category_labels based on merchant_category and subtype_category"""
 		merchant_category = trans.get("CNN", {}).get("category", "").strip()
 
 		if merchant_category == "Use Subtype Rules for Categories" or merchant_category == "":
@@ -377,7 +377,7 @@ class WebConsumer():
 				if subtype_category != "":
 					trans["category_labels"] = [subtype_category]
 		else:
-			"""Has valid merchant_category"""
+			"""Has an valid merchant_category"""
 			trans["category_labels"] = [merchant_category]
 
 		trans["CNN"] = trans.get("CNN", {}).get("label", "")
@@ -385,7 +385,7 @@ class WebConsumer():
 
 		return trans
 
-	def __apply_missing_categories_2(self, transactions):
+	def __apply_category_with_category_cnn(self, transactions):
 		"""Fix category_labels with category_cnn"""
 		json_obj = open('meerkat/web_service/config/category.json')
 		json_data = json.loads(json_obj.read())
@@ -404,13 +404,13 @@ class WebConsumer():
 					category = 'Other Expenses'
 
 			if trans['ledger_entry'] == 'credit' and trans['container'] == 'bank' and category in bank_credit:
-				self.__search_category(trans)
+				self.__apply_category_with_merchant_and_subtype(trans)
 			elif trans['ledger_entry'] == 'credit' and trans['container'] == 'card' and category in card_credit:
-				self.__search_category(trans)
+				self.__apply_category_with_merchant_and_subtype(trans)
 			elif trans['ledger_entry'] == 'debit' and trans['container'] == 'bank' and category not in bank_debit:
-				self.__search_category(trans)
+				self.__apply_category_with_merchant_and_subtype(trans)
 			elif trans['ledger_entry'] == 'debit' and trans['container'] == 'card' and category not in card_debit:
-				self.__search_category(trans)
+				self.__apply_category_with_merchant_and_subtype(trans)
 			else:
 				trans["CNN"] = trans.get("CNN", {}).get("label", "")
 				trans.pop("subtype_CNN", None)
@@ -741,7 +741,7 @@ class WebConsumer():
 		cpu_result.get() # Wait for CPU bound classifiers to finish
 
 		if not optimizing:
-			self.__apply_missing_categories_2(data["transaction_list"])
+			self.__apply_category_with_category_cnn(data["transaction_list"])
 
 		self.ensure_output_schema(data["transaction_list"], debug)
 
