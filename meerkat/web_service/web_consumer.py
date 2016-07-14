@@ -621,7 +621,6 @@ class WebConsumer():
 			return data["transaction_list"]
 
 		if data["container"] == "card":
-			pass
 			credit_category_classifer = self.card_credit_category_cnn
 			debit_category_classifer = self.card_debit_category_cnn
 		elif data["container"] == "bank":
@@ -640,7 +639,7 @@ class WebConsumer():
 		# Apply classifiers
 		if len(credit) > 0:
 			credit_category_classifer(credit, label_key="category_CNN", label_only=False)
-		#if len(debit) > 0:
+		if len(debit) > 0:
 			debit_category_classifer(debit, label_key="category_CNN", label_only=False)
 
 		for transaction in data["transaction_list"]:
