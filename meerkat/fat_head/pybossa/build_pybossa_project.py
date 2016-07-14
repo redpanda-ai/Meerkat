@@ -8,7 +8,6 @@ python3 -m meerkat.fat_head.pybossa.build_pybossa_project \
 
 import os
 import sys
-import logging
 import argparse
 
 def parse_arguments(args):
@@ -22,7 +21,6 @@ def parse_arguments(args):
 	return args
 
 def main_process():
-	logging.basicConfig(level=logging.INFO)
 	args = parse_arguments(sys.argv[1:])
 	server = args.server
 	apikey = args.apikey
