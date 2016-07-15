@@ -77,7 +77,6 @@ if __name__ == "__main__":
 
 	grouped = slim_df.groupby(["task_id"], as_index=True)
 
-	aligned_df = None
 	redundancy = 2
 	component_dataframes = []
 	for name, group in grouped:
