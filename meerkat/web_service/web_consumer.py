@@ -22,7 +22,6 @@ from meerkat.classification.load_model import load_scikit_model, get_tf_cnn_by_n
 from meerkat.classification.auto_load import main_program as load_models_from_s3
 
 # pylint:disable=no-name-in-module
-#from meerkat.classification.bloom_filter.find_entities import location_split
 from meerkat.classification.bloom_filter.trie import location_split
 
 # Enabled Models
@@ -71,17 +70,17 @@ class WebConsumer():
 			#Load new models from S3
 			load_models_from_s3(config=auto_load_config)
 
-		"""Get Merchant CNN Models"""
+		# Get Merchant CNN Models
 		self.bank_merchant_cnn = get_tf_cnn_by_name("bank_merchant", gpu_mem_fraction=gmf)
 		self.card_merchant_cnn = get_tf_cnn_by_name("card_merchant", gpu_mem_fraction=gmf)
 
-		"""Get Subtype CNN Models"""
+		# Get Subtype CNN Models
 		self.card_debit_subtype_cnn = get_tf_cnn_by_name("card_debit_subtype", gpu_mem_fraction=gmf)
 		self.card_credit_subtype_cnn = get_tf_cnn_by_name("card_credit_subtype", gpu_mem_fraction=gmf)
 		self.bank_debit_subtype_cnn = get_tf_cnn_by_name("bank_debit_subtype", gpu_mem_fraction=gmf)
 		self.bank_credit_subtype_cnn = get_tf_cnn_by_name("bank_credit_subtype", gpu_mem_fraction=gmf)
 
-		"""Get Category CNN Models"""
+		# Get Category CNN Models
 		self.card_debit_category_cnn = get_tf_cnn_by_name("card_debit_category", gpu_mem_fraction=gmf)
 		self.card_credit_category_cnn = get_tf_cnn_by_name("card_credit_category", gpu_mem_fraction=gmf)
 		self.bank_debit_category_cnn = get_tf_cnn_by_name("bank_debit_category", gpu_mem_fraction=gmf)
@@ -319,65 +318,22 @@ class WebConsumer():
 
 		return transaction
 
-	def __apply_missing_categories(self, transactions):
-		"""If the factual search fails to find categories do a static lookup
-		on the merchant name"""
-		json_object = open('meerkat/web_service/config/web_service.json')
-		json_data = json.loads(json_object.read())
-
-		general_category = json_data['general_category']
-		#general_category = ['Other Income', 'Other Expenses', \
-		#'Other Bills', 'Service Charges/Fees', 'Transfers']
-		subtype_list = json_data['subtype_category']
-		#subtype_list = ['Service Charge/Fee Refund', 'Refund']
-
-		for trans in transactions:
-			subtype_category = trans.get("subtype_CNN", {}).get("category",\
-				 trans.get("subtype_CNN", {}).get("label", ""))
-			if isinstance(subtype_category, dict):
-				subtype_category = subtype_category[trans["ledger_entry"].lower()]
-
-			sub_type = trans.get("txn_sub_type", "")
-
-			if len(subtype_category) == 0 \
-				or subtype_category in general_category or sub_type in subtype_list:
-				# Regular spending transaction
-				trans["search"] = {"category_labels" : trans.get("category_labels", [])}
-
-				if trans.get("category_labels"):
-					trans["CNN"] = trans.get("CNN", {}).get("label", "")
-					if "subtype_CNN" in trans:
-						del trans["subtype_CNN"]
-					continue
-
-				fallback = trans.get("CNN", {}).get("category", "").strip()
-
-				if fallback == "Use Subtype Rules for Categories" or fallback == "":
-					fallback = subtype_category
-
-				trans["category_labels"] = [fallback]
-				trans["CNN"] = trans.get("CNN", {}).get("label", "")
-				trans.pop("subtype_CNN", None)
-			else:
-				# Payroll transaction
-				trans["category_labels"] = [subtype_category]
-				trans["CNN"] = trans.get("CNN", {}).get("label", "")
-				trans.pop("subtype_CNN", None)
-
-	def __apply_category_with_merchant_and_subtype(self, trans):
+	def __apply_category_with_merchant(self, trans):
 		"""Fix category_labels based on merchant_category and subtype_category"""
 		merchant_category = trans.get("CNN", {}).get("category", "").strip()
 
 		if merchant_category == "Use Subtype Rules for Categories" or merchant_category == "":
-			"""No valid merchant_category"""
-			if trans["category_labels"] == ["Other Income"] or trans["category_labels"] == ["Other Expenses"]:
-				subtype_category = trans.get("subtype_CNN", {}).get("category", trans.get("subtype_CNN", {}).get("label", ""))
+			# No valid merchant_category
+			if trans["category_labels"] == ["Other Income"] or \
+			   trans["category_labels"] == ["Other Expenses"]:
+				subtype_category = trans.get("subtype_CNN", {}).get("category", \
+								   trans.get("subtype_CNN", {}).get("label", ""))
 				if isinstance(subtype_category, dict):
 					subtype_category = subtype_category[trans["ledger_entry"].lower()]
 				if subtype_category != "":
 					trans["category_labels"] = [subtype_category]
 		else:
-			"""Has an valid merchant_category"""
+			# Has an valid merchant_category
 			trans["category_labels"] = [merchant_category]
 
 		trans["CNN"] = trans.get("CNN", {}).get("label", "")
@@ -385,7 +341,7 @@ class WebConsumer():
 
 		return trans
 
-	def __apply_category_with_category_cnn(self, transactions):
+	def __apply_category(self, transactions):
 		"""Fix category_labels with category_cnn"""
 		json_obj = open('meerkat/web_service/config/category.json')
 		json_data = json.loads(json_obj.read())
@@ -403,14 +359,18 @@ class WebConsumer():
 				else:
 					category = 'Other Expenses'
 
-			if trans['ledger_entry'] == 'credit' and trans['container'] == 'bank' and category in bank_credit:
-				self.__apply_category_with_merchant_and_subtype(trans)
-			elif trans['ledger_entry'] == 'credit' and trans['container'] == 'card' and category in card_credit:
-				self.__apply_category_with_merchant_and_subtype(trans)
-			elif trans['ledger_entry'] == 'debit' and trans['container'] == 'bank' and category not in bank_debit:
-				self.__apply_category_with_merchant_and_subtype(trans)
-			elif trans['ledger_entry'] == 'debit' and trans['container'] == 'card' and category not in card_debit:
-				self.__apply_category_with_merchant_and_subtype(trans)
+			if trans['ledger_entry'] == 'credit' and trans['container'] == 'bank' and \
+				category in bank_credit:
+				self.__apply_category_with_merchant(trans)
+			elif trans['ledger_entry'] == 'credit' and trans['container'] == 'card' and \
+				category in card_credit:
+				self.__apply_category_with_merchant(trans)
+			elif trans['ledger_entry'] == 'debit' and trans['container'] == 'bank' and \
+				category not in bank_debit:
+				self.__apply_category_with_merchant(trans)
+			elif trans['ledger_entry'] == 'debit' and trans['container'] == 'card' and \
+				category not in card_debit:
+				self.__apply_category_with_merchant(trans)
 			else:
 				trans["CNN"] = trans.get("CNN", {}).get("label", "")
 				trans.pop("subtype_CNN", None)
@@ -644,13 +604,12 @@ class WebConsumer():
 
 		for transaction in data["transaction_list"]:
 			category = transaction["category_CNN"].get("label", "")
+			transaction["category_labels"] = [category]
+
 			if category == "":
+				transaction["category_labels"] = ["Other Expenses"]
 				if transaction["ledger_entry"] == "credit":
 					transaction["category_labels"] = ["Other Income"]
-				else:
-					transaction["category_labels"] = ["Other Expenses"]
-			else:
-				transaction["category_labels"] = [category]
 
 		return data["transaction_list"]
 
@@ -724,7 +683,7 @@ class WebConsumer():
 		cpu_result = self.__cpu_pool.apply_async(self.__apply_cpu_classifiers, (data, ))
 
 		if not optimizing:
-			"""Apply Subtype CNN And Category CNN"""
+			# Apply Subtype CNN And Category CNN
 			if "cnn_subtype" in services_list or services_list == []:
 				self.__apply_subtype_cnn(data)
 				self.__apply_category_cnn(data)
@@ -734,20 +693,19 @@ class WebConsumer():
 					transaction["txn_sub_type"] = ""
 					transaction["txn_type"] = ""
 
-			"""Apply Merchant CNN"""
+			# Apply Merchant CNN
 			if "cnn_merchant" in services_list or services_list == []:
 				self.__apply_merchant_cnn(data)
 
 		cpu_result.get() # Wait for CPU bound classifiers to finish
 
 		if not optimizing:
-			self.__apply_category_with_category_cnn(data["transaction_list"])
+			self.__apply_category(data["transaction_list"])
 
 		self.ensure_output_schema(data["transaction_list"], debug)
 
 		return data
 
 if __name__ == "__main__":
-	# pylint: disable=pointless-string-statement
-	"""Print a warning to not execute this file as a module"""
+	# Print a warning to not execute this file as a module
 	print("This module is a Class; it should not be run from the console.")
