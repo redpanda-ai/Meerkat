@@ -16,6 +16,7 @@
         }
     },
     "elasticsearch" : {
+		"skip_es": false,
         "cluster_nodes" : [
             "internal-default-vpc-meerkat-lb-2028162053.us-west-2.elb.amazonaws.com"
         ],
