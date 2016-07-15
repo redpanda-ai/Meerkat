@@ -193,6 +193,7 @@ def get_mock_params():
             }
         },
         "elasticsearch": {
+			"skip_es": True,
             "cluster_nodes": [
                 "test"
             ],
