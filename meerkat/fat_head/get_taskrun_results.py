@@ -1,4 +1,5 @@
 import argparse
+import csv
 import json
 import logging
 import numpy as np
@@ -11,6 +12,7 @@ def parse_arguments():
 	parser = argparse.ArgumentParser()
 	parser.add_argument("host", help="IP or name of the server hosting the PyBossa project")
 	parser.add_argument("short_name", help="Short name for the project")
+	parser.add_argument("offset", help="Task id offset", type=int, default=1)
 	return parser.parse_args()
 
 def get_project_id(args):
@@ -52,10 +54,39 @@ def get_task_run_df(args, project_id):
 				for key in item["info"]:
 					data[key].append(item["info"][key])
 
+def get_task_df(input_file):
+	df = pd.read_csv(input_file, error_bad_lines=False,
+		encoding='utf-8', na_filter=False, sep=',')
+	return df
+
 if __name__ == "__main__":
 	logging.warning("Starting program")
 	args = parse_arguments()
 	project_id = get_project_id(args)
 	logging.warning("Project ID is: {0}".format(project_id))
 	df = get_task_run_df(args, project_id)
-	logging.warning("Results dataframe is \n{0}".format(df))
+	idk = df
+	idk_2 = get_task_df("meerkat/fat_head/pybossa/question_Starbucks_bank.csv")
+	rows, _ = idk_2.shape
+	idk_2.index = range(args.offset, rows + args.offset)
+	idk_2["task_id"] = idk_2.index
+	idk_3 = idk.join(idk_2, on="task_id", how="inner", lsuffix="left", rsuffix="right")
+	slim_df = pd.DataFrame(idk_3, columns=["task_id", "user_id", "question", "city", "state",
+		"zipcode", "not_in_us"])
+	slim_df.to_csv("labeled_tasks.csv", sep="\t", index=False, quoting=csv.QUOTE_ALL)
+
+	grouped = slim_df.groupby(["task_id"], as_index=True)
+
+	aligned_df = None
+	redundancy = 2
+	component_dataframes = []
+	for name, group in grouped:
+		original_count = len(group)
+		dedup = group.drop_duplicates(subset=["city", "state", "zipcode", "not_in_us"])
+		if len(dedup) == 1 and original_count == redundancy:
+			component_dataframes.append(dedup)
+
+	aligned_df = pd.concat(component_dataframes, axis=0)
+	del aligned_df["user_id"]
+	logging.warning("Found {0} unanimously labeled tasks".format(aligned_df.shape[0]))
+	aligned_df.to_csv("aligned.csv", sep="\t", index=False, quoting=csv.QUOTE_ALL)
