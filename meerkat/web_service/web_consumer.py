@@ -669,7 +669,8 @@ class WebConsumer():
 				transaction["locale_bloom"] = None
 		physical, non_physical = self.__sws(data)
 
-		if "search" in services_list or services_list == [] and not self.params["elasticsearch"]["skip_es"]:
+		if "search" in services_list or services_list == [] and \
+		not self.params["elasticsearch"]["skip_es"]:
 			physical = self.__enrich_physical(physical)
 			self.__apply_category_labels(physical)
 		else:
