@@ -43,11 +43,12 @@ class WebConsumer():
 			self.params = dict()
 		else:
 			self.params = params
-			self.elastic_search = get_es_connection(params)
-			mapping = self.elastic_search.indices.get_mapping()
-			index = params["elasticsearch"]["index"]
-			index_type = params["elasticsearch"]["type"]
-			self.params["routed"] = "_routing" in mapping[index]["mappings"][index_type]
+			if not params["elasticsearch"]["skip_es"]:
+				self.elastic_search = get_es_connection(params)
+				mapping = self.elastic_search.indices.get_mapping()
+				index = params["elasticsearch"]["index"]
+				index_type = params["elasticsearch"]["type"]
+				self.params["routed"] = "_routing" in mapping[index]["mappings"][index_type]
 
 		self.load_tf_models()
 		self.hyperparams = hyperparams if hyperparams else {}
@@ -602,7 +603,7 @@ class WebConsumer():
 				transaction["locale_bloom"] = None
 		physical, non_physical = self.__sws(data)
 
-		if "search" in services_list or services_list == []:
+		if "search" in services_list or services_list == [] and not self.params["elasticsearch"]["skip_es"]:
 			physical = self.__enrich_physical(physical)
 			self.__apply_category_labels(physical)
 		else:
