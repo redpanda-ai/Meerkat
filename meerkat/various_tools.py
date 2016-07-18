@@ -145,6 +145,9 @@ def write_dict_list(dict_list, file_name, encoding="utf-8", delimiter="|",\
 			fieldnames=column_order, extrasaction='ignore')
 		dict_w.writeheader()
 		dict_w.writerows(dict_list)
+		
+def grouper(n, iterable):
+    return [iterable[i:i+n] for i in range(0, len(iterable), n)]
 
 def to_stdout(string, errors="replace"):
 	"""Converts a string to stdout compatible encoding"""

@@ -59,7 +59,7 @@ def ensemble_evaluate_testset(config, graph, sess, model, test):
 
 		batch_test = test.loc[chunked_test[i]]
 
-		trans_test, labels_test, _ = batch_to_tensor(config, batch_test)
+		trans_test, labels_test = batch_to_tensor(config, batch_test)
 		feed_dict_test = {get_tensor(graph, "x:0"): trans_test}
 		output = [sess.run(model[j], feed_dict=feed_dict_test) for j in range(num_cnns)]
 
@@ -223,7 +223,7 @@ def build_graph(config):
 		cnn = []
 
 		for i in range(1, num_cnns+1):
-			scope_name = "model" + str(i) * (num_cnns > 1)
+			scope_name = ("model" + str(i)) * (num_cnns > 1)
 			with tf.variable_scope(scope_name):
 				bn_scaler = tf.Variable(1.0 * tf.ones([num_labels]))
 
@@ -256,7 +256,10 @@ def build_graph(config):
 				softmax.append(prob_train)
 				network.append(logsoftmax(softmax[i-1], "network"))
 				prob_full = encoder(trans_placeholder, "softmax_full", i, train=False)
-				cnn.append(logsoftmax(prob_full, "cnn"*(num_cnns > 1)))
+				if soft_target:
+					cnn.append(logsoftmax(prob_full, "model"))
+				else:
+					cnn.append(logsoftmax(prob_full, "cnn"*(num_cnns > 1)))
 
 		ensemble = sum(softmax) / (num_cnns + 0.0)
 		weighted_labels = cost_list * labels_placeholder
@@ -279,7 +282,7 @@ def build_graph(config):
 					"network_flat") * soft_labels_placeholder, 1))
 					+ 0.15 * tf.reduce_mean(tf.reduce_sum(network[0] * weighted_labels, 1)),
 					name="loss1")]
-			optimizer = [make_optimizer(loss[i], "optimizer"+str(i+1), "model"+str(i+1)*(num_cnns > 1))
+			optimizer = [make_optimizer(loss[i], "optimizer"+str(i+1), ("model"+str(i+1))*(num_cnns > 1))
 				for i in range(num_cnns)]
 
 		bn_updates = tf.group(*bn_assigns)
@@ -290,7 +293,7 @@ def build_graph(config):
 			"""return a saver for namespace name"""
 			return tf.train.Saver([x for x in tf.all_variables() if x.name.startswith(name)])
 
-		saver = [get_saver("model"+str(i+1)*(num_cnns > 1)) for i in range(num_cnns)]
+		saver = [get_saver(("model"+str(i+1))*(num_cnns > 1)) for i in range(num_cnns)]
 
 	return graph, saver
 
@@ -315,7 +318,11 @@ def train_model(config, graph, sess, saver):
 
 		# Prepare Data for Training
 		batch = mixed_batching(config, train, groups_train)
-		trans, labels, labels_soft = batch_to_tensor(config, batch, soft_target=config["soft_target"])
+		temp = batch_to_tensor(config, batch, soft_target=config["soft_target"])
+		if config["soft_target"]:
+			trans, labels, labels_soft = temp[:]
+		else:
+			trans, labels = temp[:]
 		feed_dict = {
 			get_tensor(graph, "x:0") : trans,
 			get_tensor(graph, "y:0") : labels
@@ -337,7 +344,7 @@ def train_model(config, graph, sess, saver):
 					feed_dict=feed_dict)
 				logging.info("Minibatch accuracy for cnn" + str(i) + ": %.1f%%" % accuracy(predictions, labels))
 			# Estimate Accuracy for Visualization
-			model = [get_tensor(graph, "model"+(str(i)+"/cnn")*(num_cnns > 1)+":0") for i in range(num_cnns)]
+			model = [get_tensor(graph, "model"+(str(i+1)+"/cnn")*(num_cnns > 1)+":0") for i in range(num_cnns)]
 			ensemble_accuracy = ensemble_evaluate_testset(config, graph, sess, model, test)
 
 		# Log Loss and Update TensorBoard
@@ -384,8 +391,12 @@ def train_model(config, graph, sess, saver):
 	save_path = "meerkat/classification/models/ensemble_cnns/"
 	os.makedirs(save_path, exist_ok=True)
 	for i in range(num_cnns):
-		final_model_path = save_path + dataset_path + ".model" + str(i+1) + ".ckpt"
-		final_meta_path = save_path + dataset_path + ".model" + str(i+1) + ".meta"
+		if config["soft_target"]:
+			final_model_path = save_path + "train.ckpt"
+			final_meta_path = save_path + "train.meta"
+		else:
+			final_model_path = save_path + dataset_path + ".model" + str(i+1) + ".ckpt"
+			final_meta_path = save_path + dataset_path + ".model" + str(i+1) + ".meta"
 		logging.info("Moving final model from {0} to {1}.".format(model_path[i], final_model_path))
 
 		os.rename(model_path[i], final_model_path)
@@ -395,6 +406,24 @@ def train_model(config, graph, sess, saver):
 
 	if config["soft_target"]:
 		return final_model_path
+
+def run_session(config, graph, saver):
+	"""Run Session"""
+
+	with tf.Session(graph=graph) as sess:
+
+		mode = config["mode"]
+		model_path = config["model_path"]
+
+		tf.initialize_all_variables().run()
+
+		if mode == "train":
+			train_model(config, graph, sess, saver)
+		elif mode == "test":
+			saver.restore(sess, model_path)
+			model = get_tensor(graph, "model:0")
+			_, test, _ = load_data(config)
+			evaluate_testset(config, graph, sess, model, test)
 
 def run_from_command_line():
 	"""Run module from command line"""

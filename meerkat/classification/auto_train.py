@@ -168,6 +168,7 @@ def auto_train():
 
 	if exist_new_input:
 		logging.info("There exists new input data")
+		args.bucket = s3_params["bucket"]
 		args.input_dir = s3_params["prefix"]
 		args.file_name = "input.tar.gz"
 		args.train_size = 0.9
@@ -253,7 +254,7 @@ def auto_train():
 	# copy_file("meerkat/classification/models/train.meta", tarball_directory)
 	make_tarfile("results.tar.gz", tarball_directory)
 	logging.info("Uploading results.tar.gz to S3 {0}".format(s3_params["prefix"]))
-	push_file_to_s3("results.tar.gz", "s3yodlee", s3_params["prefix"])
+	push_file_to_s3("results.tar.gz", bucket, s3_params["prefix"])
 	logging.info("Upload results.tar.gz to S3 sucessfully.")
 
 	#Clean up dirty files
@@ -271,6 +272,13 @@ def auto_train():
 	else:
 		shutil.rmtree(save_path)
 	logging.info("remove directory of preprocessed files at: {0}".format(save_path))
+
+	if args.ensemble:
+		ensemble_dir = "meerkat/classification/models/ensemble_cnns/"
+		shutil.rmtree(ensemble_dir)
+		logging.info("remove constituent CNNs at: {0}".format(ensemble_dir))
+		os.remove(config["dataset"])
+		logging.info("remove soft target training data at: "+config["dataset"])
 
 	logging.warning('The whole streamline process has finished')
 

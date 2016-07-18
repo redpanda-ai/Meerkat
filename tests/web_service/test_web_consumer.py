@@ -184,6 +184,8 @@ class WebConsumerTest(unittest.TestCase):
 		self.consumer._WebConsumer__search_index = web_consumer_fixture.get_mock_msearch
 		transactions = web_consumer_fixture.get_test_transaction_list()
 		# request_len = len(transactions)
+		skip_es = web_consumer_fixture.get_mock_params()['elasticsearch']['skip_es']
+		if skip_es: return
 
 		self.consumer._WebConsumer__enrich_physical(transactions)
 		for trans in transactions:
