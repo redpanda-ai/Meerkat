@@ -88,4 +88,4 @@ if __name__ == "__main__":
 	aligned_df = pd.concat(component_dataframes, axis=0)
 	del aligned_df["user_id"]
 	logging.warning("Found {0} unanimously labeled tasks".format(aligned_df.shape[0]))
-	aligned_df.to_csv("aligned.csv", sep="\t", index=False, quoting=csv.QUOTE_ALL)
+	aligned_df.to_csv("aligned.csv", sep="\t", index=False)
