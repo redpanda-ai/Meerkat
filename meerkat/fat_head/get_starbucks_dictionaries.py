@@ -1,4 +1,5 @@
 import sys
+import re
 import os
 import csv
 import logging
@@ -21,6 +22,7 @@ def generate_merchant_dictionaries(input_file, chunksize, merchant):
 	#Merge them together
 	merged = pd.concat(dfs, ignore_index=True)
 	logging.warning("finish merging dataframes")
+
 	#Use only the "store_number", "city", and "state" columns
 	slender_df = merged[["store_number", "city", "state"]]
 	first_dict, second_dict = {}, {}
@@ -61,5 +63,18 @@ def generate_merchant_dictionaries(input_file, chunksize, merchant):
 		json.dump(geo_dict, outfile, sort_keys=True, indent=4, separators=(',', ': '))
 	first_json = json.dumps(first_dict, sort_keys=True, indent=4, separators=(',', ': '))
 
+	# Create the unique_city_state dictionary
+	grouped_city = geo_df.groupby('city', as_index=True)
+	groups_city = dict(list(grouped_city))
+	unique_city_state = {}
+	for city, group in groups_city.items():
+		states = group.state.unique()
+		if len(states) == 1:
+			unique_city_state[city.upper()] = states[0].upper()
+
+	#Write the unique_city_state dictionary
+	logging.warning("Dumping unique_city_state.json files.")
+	with open(merchant + "_unique_city_state.json", "w") as outfile:
+		json.dump(unique_city_state, outfile, sort_keys=True, indent=4, separators=(',', ': '))
 
 generate_merchant_dictionaries("All_Merchants.csv", 1000, "Starbucks")
