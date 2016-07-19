@@ -84,9 +84,17 @@ def generate_merchant_dictionaries(input_file, chunksize, merchant):
 		if len(states) == 1:
 			unique_city_state[city.upper()] = states[0].upper()
 
-	#Write the unique_city_state dictionary
+	# Write the unique_city_state dictionary to json file
 	logging.warning("Dumping unique_city_state.json files.")
 	with open(merchant + "_unique_city_state.json", "w") as outfile:
 		json.dump(unique_city_state, outfile, sort_keys=True, indent=4, separators=(',', ': '))
+
+	# Create the unique_city list
+	unique_city = list(unique_city_state.keys())
+
+	# Write the unique_city list to json file
+	logging.warning("Dumping unique_city.json files.")
+	with open(merchant + "_unique_city.json", "w") as outfile:
+		json.dump(unique_city, outfile, sort_keys=True, indent=4, separators=(',', ': '))
 
 generate_merchant_dictionaries("All_Merchants.csv", 1000, "Starbucks")
