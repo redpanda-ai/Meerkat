@@ -6,6 +6,14 @@ import logging
 import pandas as pd
 import json
 
+def get_city_extension(city):
+	city_extension = re.sub('^ST\. |^ST ', 'SAINT ', city)
+	city_extension = re.sub('^FT\. |^FT ', 'FORT ', city_extension)
+	return city_extension
+
+def capitalize_word(word):
+	return word.upper()
+
 def generate_merchant_dictionaries(input_file, chunksize, merchant):
 	"""Generates three merchant dictionaries and writes them as JSON files"""
 	#create a list of dataframe groups, filtered by merchant name
@@ -22,6 +30,10 @@ def generate_merchant_dictionaries(input_file, chunksize, merchant):
 	#Merge them together
 	merged = pd.concat(dfs, ignore_index=True)
 	logging.warning("finish merging dataframes")
+
+	merged["state"] = merged["state"].apply(capitalize_word)
+	merged["city"] = merged["city"].apply(capitalize_word)
+	merged["city"] = merged["city"].apply(get_city_extension)
 
 	#Use only the "store_number", "city", and "state" columns
 	slender_df = merged[["store_number", "city", "state"]]
