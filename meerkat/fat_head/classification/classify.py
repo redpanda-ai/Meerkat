@@ -42,6 +42,8 @@ def main_process():
 		encoding='utf-8', quoting=csv.QUOTE_NONE, na_filter=False, sep='\t')
 
 	df['city_state'] = df[['city', 'state']].apply(lambda x: ','.join(x), axis=1)
+
+	# fit
 	msk = np.random.rand(len(df)) < 0.80
 	train = df[msk]
 	test = df[~msk]
@@ -53,6 +55,7 @@ def main_process():
 
 	classifier.fit(X_train, y_train)
 
+	# predict
 	X = df['question']
 	y_predict = classifier.predict(X)
 
@@ -69,9 +72,11 @@ def main_process():
 		if y_predict[i] == y_true[i]:
 			true_positives += 1
 
+	# generate classification report
 	report = classification_report(y_true, y_predict)
 	logging.info(report)
 
+	# calculate accuracy
 	accuracy = true_positives / len(y_predict)
 	logging.info("Accuray is: {:.2%}".format(accuracy))
 
