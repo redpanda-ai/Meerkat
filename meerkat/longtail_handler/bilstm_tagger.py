@@ -13,9 +13,20 @@ Created on July 20, 2016
 # meerkat.longtail_handler.bilstm_tagger bilstm_config.json
 
 # For addtional details on implementation see:
+#
 # Multilingual Part-of-Speech Tagging with Bidirectional Long Short-Term Memory Models and Auxiliary Loss
 # http://arxiv.org/pdf/1604.05529v2.pdf
 # https://github.com/bplank/bilstm-aux
+# https://github.com/KnHuq/Tensorflow-tutorial/blob/master/BiDirectional%20LSTM/bi_directional_lstm.ipynb
+#
+# Deep Learning for Character-based Information Extraction
+# http://www.cs.cmu.edu/~qyj/zhSenna/2014_ecir2014_full.pdf
+#
+# Part-of-Speech Tagging with Bidirectional Long Short-Term Memory Recurrent Neural Network
+# http://arxiv.org/pdf/1510.06168v1.pdf
+#
+# Finding Function in Form: Compositional Character Models for Open Vocabulary Word Representation
+# http://arxiv.org/pdf/1508.02096v2.pdf
 
 ###################################################################################################
 
