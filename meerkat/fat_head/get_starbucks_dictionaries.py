@@ -1,5 +1,4 @@
 import sys
-import re
 import os
 import csv
 import logging
@@ -7,9 +6,22 @@ import pandas as pd
 import json
 
 def get_city_extension(city):
-	city_extension = re.sub('^ST\. |^ST ', 'SAINT ', city)
-	city_extension = re.sub('^FT\. |^FT ', 'FORT ', city_extension)
-	return city_extension
+	maps = {
+		"E. ": "EAST ",
+		"W. ": "WEST ",
+		"N. ": "NORTH ",
+		"S. ": "SOUTH ",
+
+		"ST. ": "SAINT ",
+		"ST ": "SAINT ",
+		"FT. ": "FORT ",
+		"FT ": "FORT "
+	}
+	for abbr in maps:
+		if city.startswith(abbr):
+			city = city.replace(abbr, maps[abbr])
+			break
+	return city
 
 def capitalize_word(word):
 	return word.upper()
