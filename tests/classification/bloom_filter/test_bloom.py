@@ -13,7 +13,7 @@ class BloomTests(unittest.TestCase):
 		([("DALLAS", "TX"), True])
 	])
 	def test_bloom_filter(self, location, expected):
-		sbf = bloom.get_location_bloom()
+		sbf = bloom.get_location_bloom('meerkat/classification/bloom_filter/assets/location_bloom')
 		result = location in sbf
 		self.assertEqual(expected, result)
 
@@ -27,10 +27,11 @@ class BloomTests(unittest.TestCase):
 		self.assertRaises(SystemExit, bloom.get_json_from_file, filename)
 
 	@parameterized.expand([
-		(["tests/classification/bloom_filter/fixture/create_bloom.json", "tests/classification/bloom_filter/fixture/location_bloom", False, ("SANFRANCISCO", "CA"), True]),
+		(["tests/classification/bloom_filter/fixture/create_bloom.csv", "tests/classification/bloom_filter/fixture/create_bloom.json", \
+			"tests/classification/bloom_filter/fixture/location_bloom", ("SANFRANCISCO", "CA"), True]),
 	])
-	def test_create_bloom(self, src_filename, dst_filename, enrich, case, expected):
-		sbf = bloom.create_location_bloom(src_filename, dst_filename, False)
+	def test_create_bloom(self, csv_filename, json_filename, dst_filename, case, expected):
+		sbf = bloom.create_location_bloom(csv_filename, json_filename, dst_filename)
 		result = case in sbf
 		self.assertEqual(expected, result)
 		os.remove(dst_filename)

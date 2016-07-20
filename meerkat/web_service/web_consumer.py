@@ -22,7 +22,8 @@ from meerkat.classification.load_model import load_scikit_model, get_tf_cnn_by_n
 from meerkat.classification.auto_load import main_program as load_models_from_s3
 
 # pylint:disable=no-name-in-module
-from meerkat.classification.bloom_filter.find_entities import location_split
+#from meerkat.classification.bloom_filter.find_entities import location_split
+from meerkat.classification.bloom_filter.trie import location_split
 
 # Enabled Models
 BANK_SWS = load_scikit_model("bank_sws")
@@ -42,11 +43,12 @@ class WebConsumer():
 			self.params = dict()
 		else:
 			self.params = params
-			self.elastic_search = get_es_connection(params)
-			mapping = self.elastic_search.indices.get_mapping()
-			index = params["elasticsearch"]["index"]
-			index_type = params["elasticsearch"]["type"]
-			self.params["routed"] = "_routing" in mapping[index]["mappings"][index_type]
+			if not params["elasticsearch"]["skip_es"]:
+				self.elastic_search = get_es_connection(params)
+				mapping = self.elastic_search.indices.get_mapping()
+				index = params["elasticsearch"]["index"]
+				index_type = params["elasticsearch"]["type"]
+				self.params["routed"] = "_routing" in mapping[index]["mappings"][index_type]
 
 		self.load_tf_models()
 		self.hyperparams = hyperparams if hyperparams else {}
@@ -601,7 +603,8 @@ class WebConsumer():
 				transaction["locale_bloom"] = None
 		physical, non_physical = self.__sws(data)
 
-		if "search" in services_list or services_list == []:
+		if "search" in services_list or services_list == [] and \
+		not self.params["elasticsearch"]["skip_es"]:
 			physical = self.__enrich_physical(physical)
 			self.__apply_category_labels(physical)
 		else:

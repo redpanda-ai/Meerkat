@@ -59,6 +59,7 @@ def get_soft_target(data_path, models, output_path):
 		logging.info("Saving soft targets to {0}".format(output_path + "soft_target.csv"))
 		trans.to_csv(output_path + "soft_target.csv", mode=mode, index=False, header=add_header, sep='|')
 		file_exist = True
+	logging.info("Soft target production is finished.")
 	return output_path + "soft_target.csv"
 
 def main(cnns_dir, data_path, label_map_path):

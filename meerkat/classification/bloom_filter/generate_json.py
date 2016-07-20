@@ -51,14 +51,19 @@ dictionary = {
 		'MDEBIT'
 	],
 	'MA': [
+		'MAIL'
 	],
 	'MI': [
+		'MINEDEBIT'
 	],
 	'MN': [
 	],
 	'MS': [
 	],
 	'MO': [
+		'MONTHLY',
+		'MONTH',
+		'MOUNTAIN'
 	],
 	'MT': [
 	],
@@ -88,7 +93,9 @@ dictionary = {
 		'PAR',
 		'PARDEBIT',
 		'PARK',
-		'PACIFIC'
+		'PACIFIC',
+		'PAYMENT',
+		'PAY'
 	],
 	'RI': [
 		'RIVER'
@@ -117,6 +124,8 @@ dictionary = {
 	],
 	'WY': [
 	],
+	'DC': [
+	]
 }
 
 def generate_js():
