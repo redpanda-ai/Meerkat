@@ -5,7 +5,7 @@ import logging
 import pandas as pd
 import json
 
-def get_city_extension(city):
+def expand_abbreviations(city):
 	maps = {
 		"E. ": "EAST ",
 		"W. ": "WEST ",
@@ -23,16 +23,13 @@ def get_city_extension(city):
 			break
 	return city
 
-def capitalize_word(word):
-	return word.upper()
-
 def generate_merchant_dictionaries(input_file, chunksize, merchant):
 	"""Generates three merchant dictionaries and writes them as JSON files"""
 	#create a list of dataframe groups, filtered by merchant name
 	logging.warning("Processing CSV file.")
 	dfs = []
-	for chunk in pd.read_csv(input_file, chunksize=chunksize, error_bad_lines=False, warn_bad_lines=True,
-		encoding='utf-8', quotechar='"', na_filter=False, sep=','):
+	for chunk in pd.read_csv(input_file, chunksize=chunksize, error_bad_lines=False,
+		warn_bad_lines=True, encoding='utf-8', quotechar='"', na_filter=False, sep=','):
 		grouped = chunk.groupby('list_name', as_index=False)
 		groups = dict(list(grouped))
 		if merchant in groups.keys():
@@ -43,9 +40,10 @@ def generate_merchant_dictionaries(input_file, chunksize, merchant):
 	merged = pd.concat(dfs, ignore_index=True)
 	logging.warning("finish merging dataframes")
 
+	capitalize_word = lambda x: x.upper()
 	merged["state"] = merged["state"].apply(capitalize_word)
 	merged["city"] = merged["city"].apply(capitalize_word)
-	merged["city"] = merged["city"].apply(get_city_extension)
+	merged["city"] = merged["city"].apply(expand_abbreviations)
 
 	#Use only the "store_number", "city", and "state" columns
 	slender_df = merged[["store_number", "city", "state"]]
