@@ -154,6 +154,11 @@ def get_best_models(*args):
 
 	best_models = {}
 	for key in sorted(results.keys()):
+
+		# Ignore category models for now
+		if "category" in key:
+			continue
+
 		logging.info("Evaluating '{0}'".format(key))
 		aspirant = None
 		if key in aspirants:
