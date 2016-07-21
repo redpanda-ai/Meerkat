@@ -11,9 +11,14 @@ import os
 import pickle
 import pycnn
 
-from src.lib.mnnl import FFSequencePredictor, Layer, RNNSequencePredictor, BiRNNSequencePredictor
-from src.lib.mio import read_conll_file, load_embeddings_file
+from meerkat.longtail_handler.mnnl import FFSequencePredictor, Layer, RNNSequencePredictor, BiRNNSequencePredictor
+from meerkat.longtail_handler.mio import read_conll_file, load_embeddings_file
 
+############################################# USAGE ###############################################
+
+# python3 meerkat.longtail_handler.bilty --cnn-seed 1512141834 --cnn-mem 1500 --train meerkat/longtail_handler/train.csv --test meerkat/longtail_handler/test.csv --dev meerkat/longtail_handler/test.csv --output bilstm_output --in_dim 64 --c_in_dim 100 --trainer sgd --iters 20 --sigma 0.2 --save output/en-ud.model --embeds embeds/poly_a/en.polyglot.txt --h_layers 1 --pred_layer 1
+
+###################################################################################################
 
 def main():
 	parser = argparse.ArgumentParser(description="""Run the NN tagger""")
