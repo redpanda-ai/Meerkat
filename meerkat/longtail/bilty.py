@@ -11,12 +11,12 @@ import os
 import pickle
 import pycnn
 
-from meerkat.longtail_handler.mnnl import FFSequencePredictor, Layer, RNNSequencePredictor, BiRNNSequencePredictor
-from meerkat.longtail_handler.mio import read_conll_file, load_embeddings_file
+from meerkat.longtail.mnnl import FFSequencePredictor, Layer, RNNSequencePredictor, BiRNNSequencePredictor
+from meerkat.longtail.mio import read_conll_file, load_embeddings_file
 
 ############################################# USAGE ###############################################
 
-# nohup python3 -m meerkat.longtail_handler.bilty --cnn-seed 1512141834 --cnn-mem 1500 --train meerkat/longtail_handler/train.csv --test meerkat/longtail_handler/test.csv --dev meerkat/longtail_handler/test.csv --output bilstm_output/trans --in_dim 64 --c_in_dim 100 --trainer sgd --iters 20 --sigma 0.2 --save bilstm_output/trans.model --embeds ../bilstm-aux/embeds/poly_a/en.polyglot.txt --h_layers 1 --pred_layer 1 > bilstm_output/trans.out 2> bilstm_output/trans.out2 & 
+# nohup python3 -m meerkat.longtail.bilty --cnn-seed 1512141834 --cnn-mem 1500 --train meerkat/longtail/train.csv --test meerkat/longtail/test.csv --dev meerkat/longtail/test.csv --output bilstm_output/trans --in_dim 64 --c_in_dim 100 --trainer sgd --iters 20 --sigma 0.2 --save bilstm_output/trans.model --embeds ../bilstm-aux/embeds/poly_a/en.polyglot.txt --h_layers 1 --pred_layer 1 &
 
 ###################################################################################################
 
@@ -524,12 +524,12 @@ class NNTagger(object):
 
 					instance_tags_indices.append(task2tag2idx[task_id].get(tag))
 
+				print(words)
+				print(instance_char_indices)
+
 				X.append((instance_word_indices, instance_char_indices)) # list of word indices, for every word list of char indices
 				Y.append(instance_tags_indices)
 				task_labels.append(task_id)
-
-			print(X)
-			print(Y)
 
 			#self.num_labels[task_id] = len( task2tag2idx[task_id] )
 

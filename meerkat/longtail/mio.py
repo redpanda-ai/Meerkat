@@ -22,8 +22,6 @@ def load_embeddings_file(file_name, sep=" ",lower=False):
 def get_tags(line):
 	tokens = line[0].split()
 	tag = line[1].split()
-
-	print(tag)
 	tags = []
 	for token in tokens:
 		found = False
