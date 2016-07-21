@@ -40,7 +40,7 @@ def read_conll_file(file_name):
 	header = next(f)
 	for line in f:
 		tokens, tags = get_tags(line)
-		yield (toekns, tags)
+		yield (tokens, tags)
 
 """
 def read_conll_file(file_name):
