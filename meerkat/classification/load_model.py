@@ -53,7 +53,8 @@ def get_tf_cnn_by_name(model_name, gpu_mem_fraction=False):
 	label_map_base = "meerkat/classification/label_maps/"
 
 	model_names = ["bank_merchant", "card_merchant", "bank_debit_subtype", "bank_credit_subtype",
-		"card_debit_subtype", "card_credit_subtype"]
+		"card_debit_subtype", "card_credit_subtype", "bank_debit_category", "bank_credit_category",
+		"card_debit_category", "card_credit_category"]
 	if model_name in model_names:
 		temp = model_name.split("_")
 		model_type = temp[-1] + '.' + '.'.join(temp[:-1])
