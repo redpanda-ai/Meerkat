@@ -81,11 +81,11 @@ def load_data(config):
 
 	return test, train
 
-def df_to_tensor(df):
-	"""Convert a dataframe to a tensor representation of documents
+def trans_to_tensor(trans):
+	"""Convert a transaction to a tensor representation of documents
 	and labels"""
 
-	parsed_transaction = []
+	tensor = []
 
 	return 
 
