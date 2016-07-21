@@ -19,24 +19,29 @@ def load_embeddings_file(file_name, sep=" ",lower=False):
 	print("loaded pre-trained embeddings (word->emb_vec) size: {} (lower: {})".format(len(emb.keys()), lower))
 	return emb, len(emb[word])
 
+def get_tags(line):
+	tokens = line[0].split()
+	tag = line[1].split()
+	tags = []
+	for token in tokens:
+		found = False
+		for word in tag:
+			if word in token and tag.index(word) == 0:
+				tags.append("merchant")
+				tag = tag[1:]
+				found = True
+				break
+		if not found:
+			tags.append("background")
+	return (tokens, tags)
+
 def read_conll_file(file_name):
 	f = csv.reader(open(file_name), delimiter="|")
 	header = next(f)
 	for line in f:
-		tokens = line[0].split()
-		tag = line[1].split()
-		tags = []
-		for token in tokens:
-			found = False
-			for word in tag:
-				if word in token and tag.index(word) == 0:
-					tags.append("merchant")
-					tag = tag[1:]
-					found = True
-					break
-			if not found:
-				tags.append("background")
-		yield (tokens, tags)
+		tokens, tags = get_tags(line)
+		yield (toekns, tags)
+
 """
 def read_conll_file(file_name):
 	read in conll file
