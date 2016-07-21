@@ -1,12 +1,12 @@
-"""Unit test for meerkat/longtail_handler/mio.py"""
+"""Unit test for meerkat/longtail_handler/bilstm_tagger.py"""
 
 import unittest
 from nose_parameterized import parameterized
 
-from meerkat.longtail_handler import mio
+from meerkat.longtail_handler import bilstm_tagger as bilstm
 
 class MioTests(unittest.TestCase):
-	"""Unittest class for mio"""
+	"""Unittest class for bilstm_tagger"""
 
 	@parameterized.expand([
 		(["Debit PIN Purchase ISLAND OF GOLD SUPERMARFRESH MEADOWSNY", "ISLAND OF GOLD SUPERMAR"],
@@ -19,5 +19,5 @@ class MioTests(unittest.TestCase):
 			["merchant", "merchant", "merchant", "background", "background", "background"])
 	])
 	def test_get_tags(self, description, expected_tags):
-		tokens, tags = mio.get_tags(description)
+		tokens, tags = bilstm.get_tags(description)
 		self.assertEqual(tags, expected_tags)
