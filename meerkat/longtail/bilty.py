@@ -231,7 +231,7 @@ class NNTagger(object):
 		elif train_algo == "adam":
 			trainer = pycnn.AdamTrainer(self.model)
 
-		train_data = list(zip(train_X,train_Y, task_labels))
+		train_data = list(zip(train_X, train_Y, task_labels))
 
 		for iter in range(num_iterations):
 			total_loss=0.0
@@ -527,6 +527,9 @@ class NNTagger(object):
 				X.append((instance_word_indices, instance_char_indices)) # list of word indices, for every word list of char indices
 				Y.append(instance_tags_indices)
 				task_labels.append(task_id)
+
+			print(X)
+			print(Y)
 
 			#self.num_labels[task_id] = len( task2tag2idx[task_id] )
 

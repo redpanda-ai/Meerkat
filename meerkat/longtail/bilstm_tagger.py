@@ -9,8 +9,8 @@ Created on July 20, 2016
 
 ############################################# USAGE ###############################################
 
-# meerkat.longtail_handler.bilstm_tagger [config_file]
-# meerkat.longtail_handler.bilstm_tagger bilstm_config.json
+# python3 -m meerkat.longtail.bilstm_tagger [config_file]
+# python3 -m meerkat.longtail.bilstm_tagger meerkat/longtail/bilstm_config.json
 
 # For addtional details on implementation see:
 #
@@ -40,12 +40,17 @@ import sys
 import numpy as np
 import tensorflow as tf
 
+from meerkat.various_tools import load_params, load_piped_dataframe
+
 logging.basicConfig(level=logging.INFO)
 
-def get_tags(line):
-	tokens = line[0].split()
-	tag = line[1].split()
+def get_tags(trans):
+	"""Convert df row to list of tags and tokens"""
+
+	tokens = trans["Description"].split()
+	tag = trans["Tagged_merchant_string"].split()
 	tags = []
+
 	for token in tokens:
 		found = False
 		for word in tag:
@@ -56,14 +61,8 @@ def get_tags(line):
 				break
 		if not found:
 			tags.append("background")
-	return (tokens, tags)
 
-def tag_piped_csv_file(file_name):
-	reader = csv.reader(open(file_name), delimiter="|")
-	header = next(reader)
-	for line in reader:
-		tokens, tags = get_tags(line)
-		yield (tokens, tags)
+	return (tokens, tags)
 
 def validate_config(config):
 	"""Validate input configuration"""
@@ -75,16 +74,20 @@ def validate_config(config):
 def load_data(config):
 	"""Load labeled data"""
 
-	data = ""
+	df = load_piped_dataframe(config["dataset"])
+	msk = np.random.rand(len(df)) < 0.90
+	train = df[msk]
+	test = df[~msk]
 
-	return data
+	return test, train
 
-def trans_to_tensor(trans):
-	"""Convert a transaction to a tensor representation"""
+def df_to_tensor(df):
+	"""Convert a dataframe to a tensor representation of documents
+	and labels"""
 
 	parsed_transaction = []
 
-	return parsed_transaction
+	return 
 
 def evaluate_testset(config, graph, sess, model, test):
 	"""Check error on test set"""
@@ -97,12 +100,28 @@ def build_graph(config):
 	"""Build CNN"""
 
 	graph = tf.Graph()
-	saver = tf.train.Saver()
+	# saver = tf.train.Saver()
+	saver = {}
 
 	return graph, saver
 
-def train_model(config, graph, sess):
+def train_model(config, graph, sess, saver):
 	"""Train the model"""
+
+	eras = config["eras"]
+	dataset = config["dataset"]
+	train, test = load_data(config)
+	train_index = list(train.index)
+
+	# Train the Model
+	for step in range(eras):
+		random.shuffle(train_index)
+		for t_index in train_index:
+			trans = train.loc[t_index]
+			tokens, tags = get_tags(trans)
+			print(tokens)
+			print(tags)
+			sys.exit()
 
 	final_model_path = ""
 
@@ -111,9 +130,12 @@ def train_model(config, graph, sess):
 def run_session(config, graph, saver):
 	"""Run Session"""
 
+	model_path = config["model_path"]
+
 	with tf.Session(graph=graph) as sess:
 
-		model_path = config["model_path"]
+		tf.initialize_all_variables().run()
+		train_model(config, graph, sess, saver)
 
 def run_from_command_line():
 	"""Run module from command line"""
