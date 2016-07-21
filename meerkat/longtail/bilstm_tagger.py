@@ -81,13 +81,16 @@ def load_data(config):
 
 	return test, train
 
-def trans_to_tensor(trans):
+def trans_to_tensor(tokens, tags):
 	"""Convert a transaction to a tensor representation of documents
 	and labels"""
 
+	print(tokens)
+	print(tags)
+	sys.exit()
 	tensor = []
 
-	return 
+	return tensor
 
 def evaluate_testset(config, graph, sess, model, test):
 	"""Check error on test set"""
@@ -119,9 +122,7 @@ def train_model(config, graph, sess, saver):
 		for t_index in train_index:
 			trans = train.loc[t_index]
 			tokens, tags = get_tags(trans)
-			print(tokens)
-			print(tags)
-			sys.exit()
+			trans, labels = trans_to_tensor(tokens, tags)
 
 	final_model_path = ""
 
