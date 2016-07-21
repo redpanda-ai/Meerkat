@@ -1,0 +1,8 @@
+{
+	"model_path": "",
+	"dataset": "meerkat/longtail/String_based_merchant_identification_1.csv",
+	"alphabet": "abcdefghijklmnopqrstuvwxyz0123456789,;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}",
+	"noise_sigma": "0.2",
+	"activation": "tanh",
+	"eras": 30
+}
