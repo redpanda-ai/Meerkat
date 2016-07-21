@@ -42,6 +42,29 @@ import tensorflow as tf
 
 logging.basicConfig(level=logging.INFO)
 
+def get_tags(line):
+	tokens = line[0].split()
+	tag = line[1].split()
+	tags = []
+	for token in tokens:
+		found = False
+		for word in tag:
+			if word in token and tag.index(word) == 0:
+				tags.append("merchant")
+				tag = tag[1:]
+				found = True
+				break
+		if not found:
+			tags.append("background")
+	return (tokens, tags)
+
+def tag_piped_csv_file(file_name):
+	reader = csv.reader(open(file_name), delimiter="|")
+	header = next(reader)
+	for line in reader:
+		tokens, tags = get_tags(line)
+		yield (tokens, tags)
+
 def validate_config(config):
 	"""Validate input configuration"""
 
