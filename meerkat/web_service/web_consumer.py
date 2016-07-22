@@ -626,7 +626,7 @@ class WebConsumer():
 			except KeyError:
 				pass
 
-		# return data["transaction_list"]
+		return data["transaction_list"]
 
 	@staticmethod
 	def __apply_category_labels(physical):
