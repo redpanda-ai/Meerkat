@@ -41,6 +41,7 @@ import numpy as np
 import tensorflow as tf
 
 from meerkat.various_tools import load_params, load_piped_dataframe
+from meerkat.longtail.tools import get_tensor, get_op, get_variable
 
 logging.basicConfig(level=logging.INFO)
 
@@ -85,12 +86,15 @@ def load_data(config):
 
 	return test, train
 
-def trans_to_tensor(tokens, tags):
+def trans_to_tensor(config, sess, graph, tokens, tags):
 	"""Convert a transaction to a tensor representation of documents
 	and labels"""
 
-	print(tokens)
-	print(tags)
+	c2i = config["c2i"]
+	feed_dict = {get_tensor(graph, "char_inputs:0") : [c2i[c] for c in tokens[0]]}
+	embedded_chars = sess.run(get_op(graph, "cembeds"), feed_dict=feed_dict)
+
+	print(embedded_chars)
 	sys.exit()
 	tensor = []
 
@@ -113,7 +117,7 @@ def build_graph(config):
 	with graph.as_default():
 
 		# Trainable Parameters
-		char_inputs = tf.placeholder(tf.int32)
+		char_inputs = tf.placeholder(tf.int32, [None], name="char_inputs")
 		cembed_matrix = tf.Variable(tf.random_uniform([len(c2i.keys()), config["ce_dim"]], -1.0, 1.0), name="cembeds")
 		cembeds = tf.nn.embedding_lookup(cembed_matrix, char_inputs, name="ce_lookup")
 
@@ -135,7 +139,7 @@ def train_model(config, graph, sess, saver):
 		for t_index in train_index:
 			trans = train.loc[t_index]
 			tokens, tags = get_tags(trans)
-			trans, labels = trans_to_tensor(tokens, tags)
+			trans, labels = trans_to_tensor(config, sess, graph, tokens, tags)
 
 	final_model_path = ""
 
