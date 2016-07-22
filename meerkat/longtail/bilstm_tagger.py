@@ -100,7 +100,8 @@ def load_embeddings_file(file_name, sep=" ",lower=False):
 def trans_to_tensor(tokens, tags, embedding):
 	"""Convert a transaction to a tensor representation of documents
 	and labels"""
-	tensor = [np.asarray(embedding.get(word, [0]*64)) for word in tokens]
+	tensor = [np.asarray(embedding.get(word, np.random.uniform(-1, 1, 64))) for word in tokens]
+	tensor = [tf.Variable(array) for array in tensor]
 	return tensor
 
 def evaluate_testset(config, graph, sess, model, test):
