@@ -92,9 +92,11 @@ def trans_to_tensor(config, sess, graph, tokens, tags):
 
 	c2i = config["c2i"]
 	feed_dict = {get_tensor(graph, "char_inputs:0") : [c2i[c] for c in tokens[0]]}
-	embedded_chars = sess.run(get_op(graph, "cembeds"), feed_dict=feed_dict)
+	embedded_chars = sess.run(get_tensor(graph, "identity:0"), feed_dict=feed_dict)
 
-	print(embedded_chars)
+	print(tokens[0])
+	print([c2i[c] for c in tokens[0]])
+	print(embedded_chars.shape)
 	sys.exit()
 	tensor = []
 
@@ -120,6 +122,7 @@ def build_graph(config):
 		char_inputs = tf.placeholder(tf.int32, [None], name="char_inputs")
 		cembed_matrix = tf.Variable(tf.random_uniform([len(c2i.keys()), config["ce_dim"]], -1.0, 1.0), name="cembeds")
 		cembeds = tf.nn.embedding_lookup(cembed_matrix, char_inputs, name="ce_lookup")
+		identity = tf.identity(cembeds, name="identity")
 
 		saver = tf.train.Saver()
 
