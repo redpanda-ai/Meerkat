@@ -47,7 +47,7 @@ logging.basicConfig(level=logging.INFO)
 def get_tags(trans):
 	"""Convert df row to list of tags and tokens"""
 
-	tokens = trans["Description"].split()
+	tokens = trans["Description"].lower().split()
 	tag = trans["Tagged_merchant_string"].split()
 	tags = []
 
@@ -68,6 +68,10 @@ def validate_config(config):
 	"""Validate input configuration"""
 
 	config = load_params(config)
+	config["c2i"] = {a : i + 3 for i, a in enumerate(config["alphabet"])}
+	config["c2i"]["_UNK"] = 0
+	config["c2i"]["<w>"] = 1
+	config["c2i"]["</w>"] = 2
 
 	return config
 
