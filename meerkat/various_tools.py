@@ -146,8 +146,9 @@ def write_dict_list(dict_list, file_name, encoding="utf-8", delimiter="|",\
 		dict_w.writeheader()
 		dict_w.writerows(dict_list)
 		
-def grouper(n, iterable):
-    return [iterable[i:i+n] for i in range(0, len(iterable), n)]
+def grouper(num, iterable):
+	"""Group iterable items"""
+	return [iterable[i:i+num] for i in range(0, len(iterable), num)]
 
 def to_stdout(string, errors="replace"):
 	"""Converts a string to stdout compatible encoding"""
