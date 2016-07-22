@@ -38,6 +38,7 @@ def main():
 
 	# Define valid routes
 	routes = [
+		("/meerkat/v2.4/?", Meerkat_API),
 		("/meerkat/v2.3/?", Meerkat_API),
 		("/meerkat/v2.2/?", Meerkat_API),
 		("/meerkat/v2.1/?", Meerkat_API),
