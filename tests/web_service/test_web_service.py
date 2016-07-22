@@ -30,7 +30,7 @@ def classify_one(self, transaction, max_retries=30):
 	while count <= max_retries:
 		try:
 			r_post = requests.post(
-				"https://localhost/meerkat/v2.2",
+				"https://localhost/meerkat/v2.3",
 				data=transaction,
 				verify=False)
 
