@@ -373,8 +373,10 @@ class WebConsumer():
 				category not in card_debit:
 				self.__apply_category_with_merchant(trans)
 			else:
-				trans["CNN"] = trans.get("CNN", {}).get("label", "")
-				trans.pop("subtype_CNN", None)
+				trans['CNN'] = trans.get('CNN', {}).get('label', '')
+				trans.pop('subtype_CNN', None)
+
+			trans['search'] = {'category_labels': trans.get('category_labels', [])}
 
 		return transactions
 
@@ -624,7 +626,7 @@ class WebConsumer():
 			except KeyError:
 				pass
 
-		return data["transaction_list"]
+		# return data["transaction_list"]
 
 	@staticmethod
 	def __apply_category_labels(physical):
