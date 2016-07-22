@@ -107,8 +107,17 @@ def build_graph(config):
 	"""Build CNN"""
 
 	graph = tf.Graph()
-	# saver = tf.train.Saver()
-	saver = {}
+	c2i = config["c2i"]
+
+	# Create Graph
+	with graph.as_default():
+
+		# Trainable Parameters
+		char_inputs = tf.placeholder(tf.int32)
+		cembed_matrix = tf.Variable(tf.random_uniform([len(c2i.keys()), config["ce_dim"]], -1.0, 1.0), name="cembeds")
+		cembeds = tf.nn.embedding_lookup(cembed_matrix, char_inputs, name="ce_lookup")
+
+		saver = tf.train.Saver()
 
 	return graph, saver
 
