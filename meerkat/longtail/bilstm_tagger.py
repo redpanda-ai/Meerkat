@@ -86,6 +86,21 @@ def load_data(config):
 
 	return test, train
 
+def load_embeddings_file(file_name, sep=" ",lower=False):
+	"""Load embeddings file"""
+
+	emb = {}
+
+	for line in open(file_name):
+		fields = line.split(sep)
+		word = fields[0]
+		if lower:
+			word = word.lower()
+		emb[word] = [float(x) for x in fields[1:]]
+
+	print("loaded pre-trained embeddings (word->emb_vec) size: {} (lower: {})".format(len(emb.keys()), lower))
+	return emb, len(emb[word])
+
 def trans_to_tensor(config, sess, graph, tokens, tags):
 	"""Convert a transaction to a tensor representation of documents
 	and labels"""
@@ -135,6 +150,7 @@ def train_model(config, graph, sess, saver):
 	dataset = config["dataset"]
 	train, test = load_data(config)
 	train_index = list(train.index)
+	embedding, num_word = load_embeddings_file("./meerkat/longtail/embeddings/en.polyglot.txt")
 
 	# Train the Model
 	for step in range(eras):
