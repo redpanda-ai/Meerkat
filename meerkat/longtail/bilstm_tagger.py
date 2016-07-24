@@ -41,13 +41,14 @@ import numpy as np
 import tensorflow as tf
 
 from meerkat.various_tools import load_params, load_piped_dataframe
+from meerkat.longtail.tools import get_tensor, get_op, get_variable
 
 logging.basicConfig(level=logging.INFO)
 
 def get_tags(trans):
 	"""Convert df row to list of tags and tokens"""
 
-	tokens = trans["Description"].split()
+	tokens = trans["Description"].lower().split()
 	tag = trans["Tagged_merchant_string"].split()
 	tags = []
 
@@ -68,6 +69,10 @@ def validate_config(config):
 	"""Validate input configuration"""
 
 	config = load_params(config)
+	config["c2i"] = {a : i + 3 for i, a in enumerate(config["alphabet"])}
+	config["c2i"]["_UNK"] = 0
+	config["c2i"]["<w>"] = 1
+	config["c2i"]["</w>"] = 2
 
 	return config
 
@@ -96,12 +101,30 @@ def load_embeddings_file(file_name, sep=" ",lower=False):
 	print("loaded pre-trained embeddings (word->emb_vec) size: {} (lower: {})".format(len(emb.keys()), lower))
 	return emb, len(emb[word])
 
-
-def trans_to_tensor(tokens, tags, embedding):
+def trans_to_tensor(config, sess, graph, tokens, tags):
 	"""Convert a transaction to a tensor representation of documents
 	and labels"""
+
+	# one-hot encode labels
+	tag2id = {"background": 1, "merchant": 2}
+	tags = np.array([tag2id[tag] for tag in tags])
+	encoded_tags = (np.arange(len(tag2id)) == tags[:, None]).astype(np.float32)
+
+	# encode words through embeddings
 	tensor = [np.asarray(embedding.get(word, np.random.uniform(-1, 1, 64))) for word in tokens]
 	tensor = [tf.Variable(array) for array in tensor]
+
+	# encode chars of words through embedded_chars
+	c2i = config["c2i"]
+	feed_dict = {get_tensor(graph, "char_inputs:0") : [c2i[c] for c in tokens[0]]}
+	embedded_chars = sess.run(get_tensor(graph, "identity:0"), feed_dict=feed_dict)
+
+	print(tokens[0])
+	print([c2i[c] for c in tokens[0]])
+	print(embedded_chars.shape)
+	sys.exit()
+	tensor = []
+
 	return tensor
 
 def evaluate_testset(config, graph, sess, model, test):
@@ -115,8 +138,18 @@ def build_graph(config):
 	"""Build CNN"""
 
 	graph = tf.Graph()
-	# saver = tf.train.Saver()
-	saver = {}
+	c2i = config["c2i"]
+
+	# Create Graph
+	with graph.as_default():
+
+		# Trainable Parameters
+		char_inputs = tf.placeholder(tf.int32, [None], name="char_inputs")
+		cembed_matrix = tf.Variable(tf.random_uniform([len(c2i.keys()), config["ce_dim"]], -1.0, 1.0), name="cembeds")
+		cembeds = tf.nn.embedding_lookup(cembed_matrix, char_inputs, name="ce_lookup")
+		identity = tf.identity(cembeds, name="identity")
+
+		saver = tf.train.Saver()
 
 	return graph, saver
 
@@ -135,7 +168,11 @@ def train_model(config, graph, sess, saver):
 		for t_index in train_index:
 			trans = train.loc[t_index]
 			tokens, tags = get_tags(trans)
+<<<<<<< HEAD
 			trans, labels = trans_to_tensor(tokens, tags, embedding)
+=======
+			trans, labels = trans_to_tensor(config, sess, graph, tokens, tags)
+>>>>>>> longtail
 
 	final_model_path = ""
 
