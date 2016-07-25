@@ -166,13 +166,14 @@ def build_graph(config):
 
 	return graph, saver
 
-def get_words_as_indices(config, data, existing_embedding):
+def get_words_as_indices(config, existing_embedding):
 	"""convert tokens to int, assuming data is a df"""
+	data = config["train"]
 	w2i = {}
 	w2i["_UNK"] = 0
 	temp = [[0.0]*64]
 	for row_num, row in enumerate(data.values):
-		tokens = row[0].split()
+		tokens = row[0].lower().split()
 		# there are too many unique tokens in description, better to shrink the size
 		for token in tokens:
 			if token not in w2i:
@@ -200,7 +201,7 @@ def train_model(config, graph, sess, saver):
 		for t_index in train_index:
 			trans = config["train"].loc[t_index]
 			tokens, tags = get_tags(trans)
-			trans, labels = trans_to_tensor(config, sess, graph, tokens, tags)
+			embedded_words, embedded_chars, tags = trans_to_tensor(config, sess, graph, tokens, tags)
 
 	final_model_path = ""
 
@@ -208,10 +209,10 @@ def train_model(config, graph, sess, saver):
 
 def preprocess(config):
 	config["train"], config["test"] = load_data(config)
-	embedding, emb_dim = load_embeddings_file("./meerkat/longtail/embeddings/en.polyglot.txt")
+	embedding, emb_dim = load_embeddings_file("./meerkat/longtail/embeddings/en.polyglot.txt", lower=True)
 	# Assert that emb_dim is equal to we_dim
 	assert(emb_dim == config["we_dim"])
-	config["w2i"], config["embedding"] = get_words_as_indices(config, config["train"], embedding)
+	config["w2i"], config["embedding"] = get_words_as_indices(config, embedding)
 	config["vocab_size"] = len(config["embedding"])
 	return config
 
