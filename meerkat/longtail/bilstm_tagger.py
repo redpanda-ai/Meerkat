@@ -116,7 +116,7 @@ def trans_to_tensor(config, sess, graph, tokens, tags):
 
 	print(tokens[0])
 	print([c2i[c] for c in tokens[0]])
-	print(embedded_chars)
+	print(embedded_chars.shape)
 	sys.exit()
 	tensor = []
 
@@ -146,10 +146,17 @@ def build_graph(config):
 
 		lstm = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"])
 		initial_state = lstm.zero_state(word_length, tf.float32)
-		output, last_state = lstm(cembeds, initial_state)
-		embedded_characters = output[0, :]	
-		
-		identity = tf.identity(embedded_characters, name="identity")
+		output, state = lstm(cembeds, initial_state)
+		last_state = tf.reverse(output, [True, False])[0,:]
+
+		rev_cembeds = tf.reverse(cembeds, [True, False])
+		output, state = lstm(rev_cembeds, initial_state, scope="rev")
+		rev_last_state = tf.reverse(output, [True, False])[0,:]
+
+		# Combine Embeddings
+		combinded_embeddings = tf.concat(0, [last_state, rev_last_state])
+		identity = tf.identity(combinded_embeddings, name="identity")
+
 		saver = tf.train.Saver()
 
 	return graph, saver
