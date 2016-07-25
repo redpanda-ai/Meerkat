@@ -22,7 +22,5 @@
         "index" : "factual_index",
         "type" : "factual_type"
     },
-	"auto_load_config": "meerkat/classification/config/aspirants_test.json",
-    "general_category" : ["Other Income", "Other Expenses", "Other Bills", "Service Charges/Fees", "Transfers", "Checks"],
-    "subtype_category" : ["Service Charge/Fee Refund", "Refund"]
+	"auto_load_config": "meerkat/classification/config/aspirants_test.json"
 }
