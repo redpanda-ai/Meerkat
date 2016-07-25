@@ -88,10 +88,8 @@ def load_data(config):
 	return test, train
 
 def load_embeddings_file(file_name, sep=" ",lower=False):
-	"""
-	load embeddings file
-	"""
-	emb={}
+	"""Load embeddings file"""
+	emb = {}
 	for line in open(file_name):
 		fields = line.split(sep)
 		word = fields[0]
