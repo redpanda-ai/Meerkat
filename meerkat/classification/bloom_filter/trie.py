@@ -6,6 +6,8 @@ Created on Jun 26, 2016
 
 import json
 import csv
+import os
+import pickle
 import pandas as pd
 
 from .generate_json import generate_js
@@ -179,9 +181,14 @@ def build_trie(csv_filename, json_filename):
 				trie.add(state_name + sub)
 				city_map[state_name + sub] = (city_name, state_name)
 
+	pickle.dump(trie, open('meerkat/classification/bloom_filter/assets/location_trie', 'wb'))
+	pickle.dump(city_map, open('meerkat/classification/bloom_filter/assets/city_map', 'wb'))
+
 	return trie, city_map
 
-TRIE, MAP = build_trie("meerkat/classification/bloom_filter/assets/us_cities_larger.csv", 'meerkat/classification/bloom_filter/assets/locations.json')
+if os.path.isfile('meerkat/classification/bloom_filter/assets/location_trie') and os.path.isfile('meerkat/classification/bloom_filter/assets/city_map'):
+	TRIE, MAP = pickle.load(open('meerkat/classification/bloom_filter/assets/location_trie', 'rb')), pickle.load(open('meerkat/classification/bloom_filter/assets/city_map', 'rb'))
+else: TRIE, MAP = build_trie("meerkat/classification/bloom_filter/assets/us_cities_larger.csv", 'meerkat/classification/bloom_filter/assets/locations.json')
 
 def in_trie(text, enrich=False):
 	if len(text) < 5:
@@ -260,7 +267,6 @@ def get_word(tag, text, index):
 			break
 	return text[index:end]
 
-'''
 def main():
 	"""runs the file"""
 	print("find_entities")
@@ -277,57 +283,12 @@ def main():
 	combined.columns = ['LOCATION', 'DESCRIPTION_UNMASKED']
 
 	pd.set_option('max_rows', 10000)
-	combined.to_csv("meerkat/classification/bloom_filter/entities1.csv", \
+	combined.to_csv("meerkat/classification/bloom_filter/entities.csv", \
 		mode="w", sep="|", encoding="utf-8")
 	print(combined)
 	print(location_bloom_results.describe())
 
-def onetest():
-	import collections
-	counter = collections.defaultdict(int)
-	with open('20160101_MPANEL_BANK1.6.3.txt') as f:
-		for line in f:
-			des = line.split('|')[-1].rstrip('\n')
-			place = location_split(des)
-			if place: counter[place] += 1
-			print('{0} <====== {1}'.format(place, des))
-
-	print('')
-	print('total transactions: 1000000')
-	print('find location transactions: {0}'.format(sum(counter.values())))
-	print('distinct cities: {0}'.format(len(counter)))
-	sorted_counter = sorted(counter.items(), key=lambda item: item[1], reverse=True)
-	print('city ranking')
-	for x in sorted_counter:
-		print(x)
-
-def twotest():
-	count = 0
-	csv_file = csv.reader(open('GeoGroundTruthValidated.csv', encoding="utf-8"))
-	for row in csv_file:
-		des = row[11]
-		city = row[13]
-		state = row[14]
-		expected = (city, state)
-		result = location_split(des)
-		if result != expected:
-			count += 1
-			print('{0} | {1} <====== {2}'.format(result, expected, des))
-
-	print('accuracy: {0}'.format( (2652 - count) / 2652))
-'''
-
 if __name__ == "__main__":
-#	main()
-	print(location_split('altamonte spg fl'))
-
-#	count = 0
-#	csv_file = csv.reader(open('NoGeo.csv', encoding="utf-8"))
-#	for row in csv_file:
-#		des = row[11]
-#		result = location_split(des)
-#		if result: count += 1
-#		print('{0} <====== {1}'.format(result, des))
-
-#	print(count)
+	main()
+#	print(location_split('PHILADELPHI PA'))
 
