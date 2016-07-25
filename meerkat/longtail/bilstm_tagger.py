@@ -40,7 +40,7 @@ import sys
 import numpy as np
 import tensorflow as tf
 
-from .tools import reverse_map
+from meerkat.classification.tools import reverse_map
 from meerkat.various_tools import load_params, load_piped_dataframe
 from meerkat.longtail.tools import get_tensor, get_op, get_variable
 
@@ -107,7 +107,7 @@ def encode_tags(config, tags):
 	encoded_tags = (np.arange(len(tag2id)) == tags[:, None]).astype(np.float32)
 	return encoded_tags
 
-def trans_to_tensor(config, sess, graph, tokens, tags, embedding, w2i):
+def trans_to_tensor(config, sess, graph, tokens, tags):
 	"""Convert a transaction to a tensor representation of documents
 	and labels"""
 
@@ -117,7 +117,7 @@ def trans_to_tensor(config, sess, graph, tokens, tags, embedding, w2i):
 	# encode words through embeddings
 	w2i = config["w2i"]
 	word_feed_dict = {get_tensor(graph, "word_inputs:0"): [w2i[w] for w in tokens]}
-	embedded_words = sess.run(get_tensor(graph, "word_identity:0") feed_dict=word_feed_dict)
+	embedded_words = sess.run(get_tensor(graph, "word_identity:0"), feed_dict=word_feed_dict)
 
 	# encode chars of words through embedded_chars
 	c2i = config["c2i"]
@@ -156,23 +156,23 @@ def build_graph(config):
 
 		# Word embedding
 		word_inputs = tf.placeholder(tf.int32, [None], name="word_inputs")
-		wembed_matrix = tf.Variable(tf.constant(0.0, shape=[vocab_size, config["we_dim"]), trainable=False, name="wembed_matrix")
-		embedding_placeholder = tf.placeholder(tf.int32, [vocab_size, config["we_dim"]])
-		assign_wembedding = tf.assign(wembed_matrix, embedding_placeholder, name="assign_embedding")
-		wembeds = tf.nn.embedding_lookup(wembed_matrix, word_input, name="we_lookup")
+		wembed_matrix = tf.Variable(tf.constant(0.0, shape=[config["vocab_size"], config["we_dim"]]), trainable=False, name="wembed_matrix")
+		embedding_placeholder = tf.placeholder(tf.float32, [config["vocab_size"], config["we_dim"]], name="embedding_placeholder")
+		assign_wembedding = tf.assign(wembed_matrix, embedding_placeholder, name="assign_wembedding")
+		wembeds = tf.nn.embedding_lookup(wembed_matrix, word_inputs, name="we_lookup")
 		identity = tf.identity(wembeds, name="word_identity")
 
 		saver = tf.train.Saver()
 
 	return graph, saver
 
-def get_words_as_indices(data, existing_embedding):
+def get_words_as_indices(config, data, existing_embedding):
 	"""convert tokens to int, assuming data is a df"""
 	w2i = {}
 	w2i["_UNK"] = 0
 	temp = [[0.0]*64]
 	for row_num, row in enumerate(data.values):
-		tokens = row[0]
+		tokens = row[0].split()
 		# there are too many unique tokens in description, better to shrink the size
 		for token in tokens:
 			if token not in w2i:
@@ -182,6 +182,7 @@ def get_words_as_indices(data, existing_embedding):
 					temp.append(existing_embedding[token])
 				else: # assgin a random vec
 					temp.append(np.random.uniform(-1, 1, config["we_dim"]))
+	temp = np.asarray(temp)
 	return w2i, temp
 
 def train_model(config, graph, sess, saver):
@@ -192,11 +193,7 @@ def train_model(config, graph, sess, saver):
 	config["tag_map"] = load_params(config["tag_map"])
 	train, test = load_data(config)
 	train_index = list(train.index)
-	embedding, emb_dim = load_embeddings_file("./meerkat/longtail/embeddings/en.polyglot.txt")
-	# Assert that emb_dim is equal to we_dim
-	eassert(emb_dim == config["we_dim"])
-	config["w2i"], embedding = get_words_as_indices(train, embedding)
-	sess.run(get_op(graph, "assign_wembedding"), feed_dict={embedding_placeholder: embedding})
+	sess.run(get_op(graph, "assign_wembedding"), feed_dict={get_tensor(graph, "embedding_placeholder:0"): config["embedding"]})
 
 	# Train the Model
 	for step in range(eras):
@@ -204,7 +201,7 @@ def train_model(config, graph, sess, saver):
 		for t_index in train_index:
 			trans = train.loc[t_index]
 			tokens, tags = get_tags(trans)
-			trans, labels = trans_to_tensor(config, sess, graph, tokens, tags, embedding, w2i)
+			trans, labels = trans_to_tensor(config, sess, graph, tokens, tags)
 
 	final_model_path = ""
 
@@ -224,6 +221,15 @@ def run_from_command_line():
 	"""Run module from command line"""
 	logging.basicConfig(level=logging.INFO)
 	config = validate_config(sys.argv[1])
+
+	train, test = load_data(config)
+	embedding, emb_dim = load_embeddings_file("./meerkat/longtail/embeddings/en.polyglot.txt")
+	# Assert that emb_dim is equal to we_dim
+	assert(emb_dim == config["we_dim"])
+	config["w2i"], config["embedding"] = get_words_as_indices(config, train, embedding)
+	config["vocab_size"] = len(config["embedding"])
+	del embedding
+
 	graph, saver = build_graph(config)
 	run_session(config, graph, saver)
 
