@@ -34,7 +34,8 @@
 			"cnn" : {
 				"merchant_name" : "",
 				"txn_type" : "",
-				"txn_sub_type" : ""
+				"txn_sub_type" : "",
+				"category_labels" : ["Grocery"]
 			},
 			"search" : {
 				"merchant_name" : "",
@@ -69,7 +70,8 @@
 			},
 			"cnn" : {
 				"txn_type" : "",
-				"txn_sub_type" : ""
+				"txn_sub_type" : "",
+				"category_labels" : ["Other Expenses"]
 			}
 		},
 		{
@@ -86,7 +88,8 @@
 			"cnn" : {
 				"merchant_name" : "",
 				"txn_type" : "",
-				"txn_sub_type" : ""
+				"txn_sub_type" : "",
+				"category_labels": ["General Merchandise"]
 			}
 		}
 	]

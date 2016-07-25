@@ -455,7 +455,8 @@ class WebConsumer():
 				trans["bloom_filter"] = {"city": trans["city"], "state": trans["state"]}
 				trans["cnn"] = {"txn_type" : trans.get("txn_type", ""),
 					"txn_sub_type" : trans.get("txn_sub_type", ""),
-					"merchant_name" : trans.pop("CNN", "")
+					"merchant_name" : trans.pop("CNN", ""),
+					"category_labels" : [trans["category_CNN"].get("label", "")]
 					}
 
 			trans.pop("locale_bloom", None)
@@ -687,15 +688,18 @@ class WebConsumer():
 		cpu_result = self.__cpu_pool.apply_async(self.__apply_cpu_classifiers, (data, ))
 
 		if not optimizing:
-			# Apply Subtype CNN And Category CNN
+			# Apply Subtype CNN
 			if "cnn_subtype" in services_list or services_list == []:
 				self.__apply_subtype_cnn(data)
-				self.__apply_category_cnn(data)
 			else:
 				# Add the filed to ensure output schema pass
 				for transaction in data["transaction_list"]:
 					transaction["txn_sub_type"] = ""
 					transaction["txn_type"] = ""
+
+			# Apply Category CNN
+			if "cnn_category" in services_list or "cnn_subtype" in services_list or services_list == []:
+				self.__apply_category_cnn(data)
 
 			# Apply Merchant CNN
 			if "cnn_merchant" in services_list or services_list == []:

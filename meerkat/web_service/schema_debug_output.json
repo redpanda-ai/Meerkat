@@ -40,7 +40,13 @@
 				"cnn" : {
 					"merchant_name" : { "type" : "string" },
 					"txn_type" : { "type" : "string" },
-					"txn_sub_type" : { "type" : "string"}
+					"txn_sub_type" : { "type" : "string"},
+					"category_labels" : {
+						"type" : "array",
+						"items" : {
+							"type": "string"
+						}
+					}
 				},
 				"search" : {
 					"merchant_name" : { "type" : "string" },
@@ -96,7 +102,13 @@
 				"cnn" : {
 					"merchant_name" : { "type" : "string" },
 					"txn_type" : { "type" : "string" },
-					"txn_sub_type" : { "type" : "string"}
+					"txn_sub_type" : { "type" : "string"},
+					"category_labels" : {
+						"type" : "array",
+						"items" : {
+							"type": "string"
+						}
+					}
 				}
 			},
 			"required": [ "city", "state", "transaction_id", "is_physical_merchant", "merchant_name", "category_labels", "bloom_filter", "cnn"],
@@ -124,7 +136,13 @@
 				"cnn" : {
 					"txn_type" : { "type" : "string"},
 					"txn_sub_type" : { "type" : "string" },
-					"merchant_name" : {"type" : "string"}
+					"merchant_name" : {"type" : "string"},
+					"category_labels" : {
+						"type" : "array",
+						"items" : {
+							"type": "string"
+						}
+					}
 				}
 			},
 			"required": [ "city", "state", "transaction_id", "is_physical_merchant", "txn_type", "txn_sub_type", "category_labels", "cnn", "bloom_filter"],
