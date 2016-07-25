@@ -85,7 +85,7 @@ def load_data(config):
 	train = df[msk]
 	test = df[~msk]
 
-	return test, train
+	return train, test
 
 def load_embeddings_file(file_name, sep=" ",lower=False):
 	"""Load embeddings file"""
@@ -191,21 +191,30 @@ def train_model(config, graph, sess, saver):
 	eras = config["eras"]
 	dataset = config["dataset"]
 	config["tag_map"] = load_params(config["tag_map"])
-	train, test = load_data(config)
-	train_index = list(train.index)
+	train_index = list(config["train"].index)
 	sess.run(get_op(graph, "assign_wembedding"), feed_dict={get_tensor(graph, "embedding_placeholder:0"): config["embedding"]})
 
 	# Train the Model
 	for step in range(eras):
 		random.shuffle(train_index)
 		for t_index in train_index:
-			trans = train.loc[t_index]
+			trans = config["train"].loc[t_index]
 			tokens, tags = get_tags(trans)
 			trans, labels = trans_to_tensor(config, sess, graph, tokens, tags)
 
 	final_model_path = ""
 
 	return final_model_path
+
+def preprocess(config):
+	config["train"], config["test"] = load_data(config)
+	embedding, emb_dim = load_embeddings_file("./meerkat/longtail/embeddings/en.polyglot.txt")
+	# Assert that emb_dim is equal to we_dim
+	assert(emb_dim == config["we_dim"])
+	config["w2i"], config["embedding"] = get_words_as_indices(config, config["train"], embedding)
+	config["vocab_size"] = len(config["embedding"])
+	return config
+
 
 def run_session(config, graph, saver):
 	"""Run Session"""
@@ -221,14 +230,7 @@ def run_from_command_line():
 	"""Run module from command line"""
 	logging.basicConfig(level=logging.INFO)
 	config = validate_config(sys.argv[1])
-
-	train, test = load_data(config)
-	embedding, emb_dim = load_embeddings_file("./meerkat/longtail/embeddings/en.polyglot.txt")
-	# Assert that emb_dim is equal to we_dim
-	assert(emb_dim == config["we_dim"])
-	config["w2i"], config["embedding"] = get_words_as_indices(config, train, embedding)
-	config["vocab_size"] = len(config["embedding"])
-	del embedding
+	config = preprocess(config)
 
 	graph, saver = build_graph(config)
 	run_session(config, graph, saver)
