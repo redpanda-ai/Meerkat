@@ -164,7 +164,6 @@ def tag_text(text):
 			tag += 'C'
 	return tag
 
-'''
 def main():
 	"""runs the file"""
 	print("find_entities")
@@ -182,8 +181,7 @@ def main():
 		mode="w", sep="|", encoding="utf-8")
 	print(combined)
 	print(location_bloom_results.describe())
-'''
 
 if __name__ == "__main__":
-#	main()
-	print(location_split('NS Houston, TX'))
+	main()
+#	print(location_split('NS Houston, TX'))
