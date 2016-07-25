@@ -106,12 +106,17 @@ def trans_to_tensor(config, sess, graph, tokens, tags):
 	and labels"""
 
 	c2i = config["c2i"]
-	feed_dict = {get_tensor(graph, "char_inputs:0") : [c2i[c] for c in tokens[0]]}
+
+	feed_dict = {
+		get_tensor(graph, "char_inputs:0") : [c2i[c] for c in tokens[0]],
+		get_tensor(graph, "word_length:0") : len(tokens[0]) 
+	}
+
 	embedded_chars = sess.run(get_tensor(graph, "identity:0"), feed_dict=feed_dict)
 
 	print(tokens[0])
 	print([c2i[c] for c in tokens[0]])
-	print(embedded_chars.shape)
+	print(embedded_chars)
 	sys.exit()
 	tensor = []
 
@@ -133,12 +138,18 @@ def build_graph(config):
 	# Create Graph
 	with graph.as_default():
 
-		# Trainable Parameters
+		# Character Embedding
+		word_length = tf.placeholder(tf.int32, name="word_length")
 		char_inputs = tf.placeholder(tf.int32, [None], name="char_inputs")
 		cembed_matrix = tf.Variable(tf.random_uniform([len(c2i.keys()), config["ce_dim"]], -1.0, 1.0), name="cembeds")
 		cembeds = tf.nn.embedding_lookup(cembed_matrix, char_inputs, name="ce_lookup")
-		identity = tf.identity(cembeds, name="identity")
 
+		lstm = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"])
+		initial_state = lstm.zero_state(word_length, tf.float32)
+		output, last_state = lstm(cembeds, initial_state)
+		embedded_characters = output[0, :]	
+		
+		identity = tf.identity(embedded_characters, name="identity")
 		saver = tf.train.Saver()
 
 	return graph, saver
@@ -150,7 +161,7 @@ def train_model(config, graph, sess, saver):
 	dataset = config["dataset"]
 	train, test = load_data(config)
 	train_index = list(train.index)
-	embedding, num_word = load_embeddings_file("./meerkat/longtail/embeddings/en.polyglot.txt")
+	# embedding, num_word = load_embeddings_file("./meerkat/longtail/embeddings/en.polyglot.txt")
 
 	# Train the Model
 	for step in range(eras):
