@@ -376,8 +376,6 @@ class WebConsumer():
 				trans['CNN'] = trans.get('CNN', {}).get('label', '')
 				trans.pop('subtype_CNN', None)
 
-			trans['search'] = {'category_labels': trans.get('category_labels', [])}
-
 		return transactions
 
 	def ensure_output_schema(self, transactions, debug):
@@ -607,7 +605,7 @@ class WebConsumer():
 			debit_category_classifer(debit, label_key="category_CNN", label_only=False)
 
 		for transaction in data["transaction_list"]:
-			category = transaction["category_CNN"].get("label", "")
+			category = transaction["category_CNN"].get("label", "").strip()
 			transaction["category_labels"] = [category]
 
 			if category == "":
@@ -648,6 +646,8 @@ class WebConsumer():
 				categories = list(set([item for sublist in categories for item in sublist]))
 
 			trans["category_labels"] = categories
+
+			trans['search'] = {'category_labels': trans.get('category_labels', [])}
 
 	@staticmethod
 	def __enrich_physical_no_search(transactions):
