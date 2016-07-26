@@ -166,18 +166,21 @@ def build_graph(config):
 
 	return graph, saver
 
-def get_words_as_indices(config, existing_embedding):
+def get_words_as_indices(data):
 	"""convert tokens to int, assuming data is a df"""
-	data = config["train"]
 	w2i = {}
 	w2i["_UNK"] = 0
-	temp = [[0.0]*64]
+	temp = [np.random.uniform(-1,1, config["we_dim"])]
 	for row_num, row in enumerate(data.values):
 		tokens = row[0].lower().split()
 		# there are too many unique tokens in description, better to shrink the size
 		for token in tokens:
 			if token not in w2i:
 				w2i[token] = len(w2i)
+	return w2i
+
+
+
 				# add token's embedding to temp only after w2i registers the token
 				if token in existing_embedding:
 					temp.append(existing_embedding[token])
@@ -212,7 +215,8 @@ def preprocess(config):
 	embedding, emb_dim = load_embeddings_file("./meerkat/longtail/embeddings/en.polyglot.txt", lower=True)
 	# Assert that emb_dim is equal to we_dim
 	assert(emb_dim == config["we_dim"])
-	config["w2i"], config["embedding"] = get_words_as_indices(config, embedding)
+	config["w2i"] = get_words_as_indices(config["train"])
+	config["wembedding"] = construct_embedding(config["w2i"], embedding)
 	config["vocab_size"] = len(config["embedding"])
 	return config
 
