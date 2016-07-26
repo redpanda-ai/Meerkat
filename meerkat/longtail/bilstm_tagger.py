@@ -106,17 +106,54 @@ def trans_to_tensor(config, sess, graph, tokens, tags):
 	and labels"""
 
 	c2i = config["c2i"]
+	char_inputs = np.zeros(len(tokens), dtype=object)
+
+	for i, token in enumerate(tokens):
+		char_inputs[i] = np.zeros(len(token), dtype=int)
+		for ii, c in enumerate(token):
+			char_inputs[i][ii] = c2i[c]
 
 	feed_dict = {
-		get_tensor(graph, "char_inputs:0") : [c2i[c] for c in tokens[0]],
-		get_tensor(graph, "word_length:0") : len(tokens[0]) 
+		get_tensor(graph, "char_inputs:0") : char_inputs
 	}
 
-	embedded_chars = sess.run(get_tensor(graph, "identity:0"), feed_dict=feed_dict)
+	print(char_inputs)
+	print(char_inputs.shape)
+	embedded_chars = sess.run(get_tensor(graph, "char_inputs:0"), feed_dict=feed_dict)
 
-	print(tokens[0])
-	print([c2i[c] for c in tokens[0]])
 	print(embedded_chars.shape)
+	sys.exit()
+	tensor = []
+
+	return tensor
+
+def trans_to_tensor(config, sess, graph, tokens, tags):
+	"""Convert a transaction to a tensor representation of documents
+	and labels"""
+
+	c2i = config["c2i"]
+	char_embed, rev_char_embed = [], []
+	rev_lst = get_tensor(graph, "rev_last_state:0")
+	lst = get_tensor(graph, "last_state:0")
+
+	# Encode Characters
+	for token in tokens:
+
+		feed_dict = {
+			get_tensor(graph, "char_inputs:0") : [c2i[c] for c in token],
+			get_tensor(graph, "word_length:0") : len(token)
+		}
+
+		last_state, rev_last_state = sess.run([lst, rev_lst], feed_dict=feed_dict)
+		char_embed.append(last_state)
+		rev_char_embed.append(rev_last_state)
+
+	# Encode Words
+
+	# Merge Encodings
+
+	print(tokens)
+	print(len(char_embed))
 	sys.exit()
 	tensor = []
 
@@ -148,14 +185,12 @@ def build_graph(config):
 		initial_state = lstm.zero_state(word_length, tf.float32)
 		output, state = lstm(cembeds, initial_state)
 		last_state = tf.reverse(output, [True, False])[0,:]
+		tf.identity(last_state, name="last_state")
 
 		rev_cembeds = tf.reverse(cembeds, [True, False])
 		output, state = lstm(rev_cembeds, initial_state, scope="rev")
 		rev_last_state = tf.reverse(output, [True, False])[0,:]
-
-		# Combine Embeddings
-		combinded_embeddings = tf.concat(0, [last_state, rev_last_state])
-		identity = tf.identity(combinded_embeddings, name="identity")
+		tf.identity(rev_last_state, name="rev_last_state")
 
 		saver = tf.train.Saver()
 
