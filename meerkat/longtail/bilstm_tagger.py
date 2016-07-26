@@ -192,6 +192,10 @@ def build_graph(config):
 		rev_last_state = tf.reverse(output, [True, False])[0,:]
 		tf.identity(rev_last_state, name="rev_last_state")
 
+		# Input
+		input_shape = (None, config["ce_dim"] * 2 + config["we_dim"])
+		combined_embeddings = tf.placeholder(tf.float32, shape=input_shape, name="x")
+
 		saver = tf.train.Saver()
 
 	return graph, saver
