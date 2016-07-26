@@ -139,7 +139,7 @@ def evaluate_testset(config, graph, sess, model, test):
 	return test_accuracy
 
 def build_graph(config):
-	"""Build CNN"""
+	"""Build RNN"""
 
 	graph = tf.Graph()
 	c2i = config["c2i"]
@@ -178,13 +178,12 @@ def get_words_as_indices(config, existing_embedding):
 		for token in tokens:
 			if token not in w2i:
 				w2i[token] = len(w2i)
-				# add token's embedding to temp only after w2i registers the token 
+				# add token's embedding to temp only after w2i registers the token
 				if token in existing_embedding:
 					temp.append(existing_embedding[token])
 				else: # assgin a random vec
 					temp.append(np.random.uniform(-1, 1, config["we_dim"]))
-	temp = np.asarray(temp)
-	return w2i, temp
+	return w2i, np.asarray(temp)
 
 def train_model(config, graph, sess, saver):
 	"""Train the model"""
@@ -208,6 +207,7 @@ def train_model(config, graph, sess, saver):
 	return final_model_path
 
 def preprocess(config):
+	"Split data into training and test, return w2i for data in training, return training data's embedding matrix"""
 	config["train"], config["test"] = load_data(config)
 	embedding, emb_dim = load_embeddings_file("./meerkat/longtail/embeddings/en.polyglot.txt", lower=True)
 	# Assert that emb_dim is equal to we_dim
@@ -232,7 +232,6 @@ def run_from_command_line():
 	logging.basicConfig(level=logging.INFO)
 	config = validate_config(sys.argv[1])
 	config = preprocess(config)
-
 	graph, saver = build_graph(config)
 	run_session(config, graph, saver)
 
