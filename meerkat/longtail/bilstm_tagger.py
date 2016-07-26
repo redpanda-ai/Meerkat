@@ -170,7 +170,6 @@ def get_words_as_indices(data):
 	"""convert tokens to int, assuming data is a df"""
 	w2i = {}
 	w2i["_UNK"] = 0
-	temp = [np.random.uniform(-1,1, config["we_dim"])]
 	for row_num, row in enumerate(data.values):
 		tokens = row[0].lower().split()
 		# there are too many unique tokens in description, better to shrink the size
@@ -180,12 +179,15 @@ def get_words_as_indices(data):
 	return w2i
 
 
-
-				# add token's embedding to temp only after w2i registers the token
-				if token in existing_embedding:
-					temp.append(existing_embedding[token])
-				else: # assgin a random vec
-					temp.append(np.random.uniform(-1, 1, config["we_dim"]))
+def construct_embedding(w2i, loaded_embedding)
+	"""construct an embedding contains all words in loaded_embedding and w2i"""
+	num_words = len(set(loaded_embedding.keys()).union(set(w2i.keys())))
+	# initialize a num_words * we_dim embedding table
+	temp = np.random.uniform(-1,1, (num_words, config["we_dim"]))
+	if token in existing_embedding:
+		temp.append(existing_embedding[token])
+	else: # assgin a random vec
+		temp.append(np.random.uniform(-1, 1, config["we_dim"]))
 	return w2i, np.asarray(temp)
 
 def train_model(config, graph, sess, saver):
