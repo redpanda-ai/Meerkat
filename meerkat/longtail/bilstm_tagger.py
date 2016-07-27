@@ -181,17 +181,15 @@ def trans_to_tensor(config, sess, graph, tokens, tags, train=False):
 	# Merge Encodings
 	char_features = [np.concatenate([c, rc], axis=0) for c, rc in zip(char_embed, reversed(rev_char_embed))]
 	char_features = np.array(char_features)
-	features = np.concatenate([embedded_words, char_features], axis=1)
+	tensor = np.concatenate([embedded_words, char_features], axis=1)
 
 	# Encode Tags
 	encoded_tags = encode_tags(config, tags)
 
 	print(tokens)
-	print(features.shape)
-	sys.exit()
-	tensor = []
+	print(tensor.shape)
 
-	return tensor
+	return tensor, tags
 
 def build_graph(config):
 	"""Build CNN"""
