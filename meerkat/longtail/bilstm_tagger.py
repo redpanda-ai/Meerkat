@@ -114,6 +114,8 @@ def trans_to_tensor(config, sess, graph, tokens, tags):
 	# Encode Characters
 	for token in tokens:
 
+		# TODO add <w> and </w>
+
 		feed_dict = {
 			get_tensor(graph, "char_inputs:0") : [c2i[c] for c in token],
 			get_tensor(graph, "word_length:0") : len(token),
@@ -159,6 +161,8 @@ def build_graph(config):
 		char_inputs = tf.placeholder(tf.int32, [None], name="char_inputs")
 		cembed_matrix = tf.Variable(tf.random_uniform([len(c2i.keys()), config["ce_dim"]], -1.0, 1.0), name="cembeds")
 		cembeds = tf.nn.embedding_lookup(cembed_matrix, char_inputs, name="ce_lookup")
+
+		# TODO: Simplify Zero filling
 
 		# Fill cembeds with zeroes up to max_word_length
 		zeros = tf.placeholder(tf.float32, shape=[None, 100], name="zeros")
