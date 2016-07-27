@@ -39,6 +39,7 @@ import sys
 
 import numpy as np
 import tensorflow as tf
+from tensorflow.models.rnn import rnn
 
 from meerkat.various_tools import load_params, load_piped_dataframe
 from meerkat.longtail.tools import get_tensor, get_op, get_variable
@@ -106,32 +107,6 @@ def trans_to_tensor(config, sess, graph, tokens, tags):
 	and labels"""
 
 	c2i = config["c2i"]
-	char_inputs = np.zeros(len(tokens), dtype=object)
-
-	for i, token in enumerate(tokens):
-		char_inputs[i] = np.zeros(len(token), dtype=int)
-		for ii, c in enumerate(token):
-			char_inputs[i][ii] = c2i[c]
-
-	feed_dict = {
-		get_tensor(graph, "char_inputs:0") : char_inputs
-	}
-
-	print(char_inputs)
-	print(char_inputs.shape)
-	embedded_chars = sess.run(get_tensor(graph, "char_inputs:0"), feed_dict=feed_dict)
-
-	print(embedded_chars.shape)
-	sys.exit()
-	tensor = []
-
-	return tensor
-
-def trans_to_tensor(config, sess, graph, tokens, tags):
-	"""Convert a transaction to a tensor representation of documents
-	and labels"""
-
-	c2i = config["c2i"]
 	char_embed, rev_char_embed = [], []
 	rev_lst = get_tensor(graph, "rev_last_state:0")
 	lst = get_tensor(graph, "last_state:0")
@@ -141,19 +116,22 @@ def trans_to_tensor(config, sess, graph, tokens, tags):
 
 		feed_dict = {
 			get_tensor(graph, "char_inputs:0") : [c2i[c] for c in token],
-			get_tensor(graph, "word_length:0") : len(token)
+			get_tensor(graph, "word_length:0") : len(token),
+			get_tensor(graph, "zeros:0") : np.random.rand(config["max_word_length"] - len(token), config["ce_dim"])
 		}
 
 		last_state, rev_last_state = sess.run([lst, rev_lst], feed_dict=feed_dict)
-		char_embed.append(last_state)
-		rev_char_embed.append(rev_last_state)
+		char_embed.append(last_state[0][len(token)-1])
+		rev_char_embed.append(rev_last_state[0][len(token)-1])
 
 	# Encode Words
 
 	# Merge Encodings
+	features = [np.concatenate([c, rc], axis=0) for c, rc in zip(char_embed, reversed(rev_char_embed))]
+	features = np.array(features)
 
 	print(tokens)
-	print(len(char_embed))
+	print(features.shape)
 	sys.exit()
 	tensor = []
 
@@ -171,6 +149,7 @@ def build_graph(config):
 
 	graph = tf.Graph()
 	c2i = config["c2i"]
+	max_wl = config["max_word_length"]
 
 	# Create Graph
 	with graph.as_default():
@@ -181,17 +160,26 @@ def build_graph(config):
 		cembed_matrix = tf.Variable(tf.random_uniform([len(c2i.keys()), config["ce_dim"]], -1.0, 1.0), name="cembeds")
 		cembeds = tf.nn.embedding_lookup(cembed_matrix, char_inputs, name="ce_lookup")
 
-		lstm = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"])
-		initial_state = lstm.zero_state(word_length, tf.float32)
-		output, state = lstm(cembeds, initial_state)
-		last_state = tf.reverse(output, [True, False])[0,:]
-		tf.identity(last_state, name="last_state")
-
+		# Fill cembeds with zeroes up to max_word_length
+		zeros = tf.placeholder(tf.float32, shape=[None, 100], name="zeros")
+		cembed_filler = tf.zeros_like(zeros)
+		cembed_filled = tf.concat(0, [cembeds, cembed_filler])
+		ce_fixed_size = tf.expand_dims(cembed_filled, 0)
 		rev_cembeds = tf.reverse(cembeds, [True, False])
-		output, state = lstm(rev_cembeds, initial_state, scope="rev")
-		rev_last_state = tf.reverse(output, [True, False])[0,:]
-		tf.identity(rev_last_state, name="rev_last_state")
+		rev_cembed_filled = tf.concat(0, [rev_cembeds, cembed_filler])
+		rev_ce_fixed_size = tf.expand_dims(rev_cembed_filled, 0)
 
+		# Create LSTM for Character Encoding
+		lstm = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"])
+		initial_state = lstm.zero_state(1, tf.float32)
+
+		# Produce input for characters
+		output, state = rnn.dynamic_rnn(lstm, ce_fixed_size, dtype=tf.float32, sequence_length=tf.expand_dims(word_length, 0), initial_state=initial_state)
+		last_state = tf.identity(output, name="last_state")
+		
+		output, state = rnn.dynamic_rnn(lstm, rev_ce_fixed_size, dtype=tf.float32, sequence_length=tf.expand_dims(word_length, 0), initial_state=initial_state, scope="rev")
+		rev_last_state = tf.identity(output, name="rev_last_state")
+		
 		# Input
 		input_shape = (None, config["ce_dim"] * 2 + config["we_dim"])
 		combined_embeddings = tf.placeholder(tf.float32, shape=input_shape, name="x")
