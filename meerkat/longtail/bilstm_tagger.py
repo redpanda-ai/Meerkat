@@ -107,8 +107,8 @@ def encode_tags(config, tags):
 	encoded_tags = (np.arange(len(tag2id)) == tags[:, None]).astype(np.float32)
 	return encoded_tags
 
-def trans_to_tensor(config, sess, graph, tokens, tags):
-	"""Convert a transaction to a tensor representation of documents
+def trans_to_tensor(config, sess, graph, tokens, tags, train=False):
+	"""Convert a list of tokens to a tensor representation of documents
 	and labels"""
 
 	# one-hot encode labels
@@ -116,7 +116,10 @@ def trans_to_tensor(config, sess, graph, tokens, tags):
 
 	# encode words through embeddings
 	w2i = config["w2i"]
-	word_feed_dict = {get_tensor(graph, "word_inputs:0"): [w2i[w] for w in tokens]}
+	if train:
+		word_feed_dict = {get_tensor(graph, "word_inputs:0"): [w2i[w] for w in tokens]}
+	else:
+		word_feed_dict = {get_tensor(graph, "word_inputs:0"): [w2i.get(w, w2i["_UKN"]) for w in tokens]}
 	embedded_words = sess.run(get_tensor(graph, "word_identity:0"), feed_dict=word_feed_dict)
 
 	# encode chars of words through embedded_chars
@@ -166,7 +169,7 @@ def build_graph(config):
 
 	return graph, saver
 
-def get_words_as_indices(data):
+def words_to_indices(data):
 	"""convert tokens to int, assuming data is a df"""
 	w2i = {}
 	w2i["_UNK"] = 0
@@ -180,15 +183,26 @@ def get_words_as_indices(data):
 
 
 def construct_embedding(w2i, loaded_embedding)
-	"""construct an embedding contains all words in loaded_embedding and w2i"""
+	"""construct an embedding that contains all words in loaded_embedding and w2i"""
 	num_words = len(set(loaded_embedding.keys()).union(set(w2i.keys())))
 	# initialize a num_words * we_dim embedding table
 	temp = np.random.uniform(-1,1, (num_words, config["we_dim"]))
-	if token in existing_embedding:
-		temp.append(existing_embedding[token])
-	else: # assgin a random vec
-		temp.append(np.random.uniform(-1, 1, config["we_dim"]))
-	return w2i, np.asarray(temp)
+	for word in loaded_embedding.keys():
+		if word not in w2i:
+			w2i[word] = len(w2i)
+		temp[w2i[word]] = loaded_embedding[word]
+	return w2i, temp
+
+def preprocess(config):
+	"Split data into training and test, return w2i for data in training, return training data's embedding matrix"""
+	config["train"], config["test"] = load_data(config)
+	embedding, emb_dim = load_embeddings_file("./meerkat/longtail/embeddings/en.polyglot.txt", lower=True)
+	# Assert that emb_dim is equal to we_dim
+	assert(emb_dim == config["we_dim"])
+	config["w2i"] = words_to_indices(config["train"])
+	config["w2i"], config["wembedding"] = construct_embedding(config["w2i"], embedding)
+	config["vocab_size"] = len(config["wembedding"])
+	return config
 
 def train_model(config, graph, sess, saver):
 	"""Train the model"""
@@ -197,7 +211,7 @@ def train_model(config, graph, sess, saver):
 	dataset = config["dataset"]
 	config["tag_map"] = load_params(config["tag_map"])
 	train_index = list(config["train"].index)
-	sess.run(get_op(graph, "assign_wembedding"), feed_dict={get_tensor(graph, "embedding_placeholder:0"): config["embedding"]})
+	sess.run(get_op(graph, "assign_wembedding"), feed_dict={get_tensor(graph, "embedding_placeholder:0"): config["wembedding"]})
 
 	# Train the Model
 	for step in range(eras):
@@ -210,17 +224,6 @@ def train_model(config, graph, sess, saver):
 	final_model_path = ""
 
 	return final_model_path
-
-def preprocess(config):
-	"Split data into training and test, return w2i for data in training, return training data's embedding matrix"""
-	config["train"], config["test"] = load_data(config)
-	embedding, emb_dim = load_embeddings_file("./meerkat/longtail/embeddings/en.polyglot.txt", lower=True)
-	# Assert that emb_dim is equal to we_dim
-	assert(emb_dim == config["we_dim"])
-	config["w2i"] = get_words_as_indices(config["train"])
-	config["wembedding"] = construct_embedding(config["w2i"], embedding)
-	config["vocab_size"] = len(config["embedding"])
-	return config
 
 
 def run_session(config, graph, saver):
