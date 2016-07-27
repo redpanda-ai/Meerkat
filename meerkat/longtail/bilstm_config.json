@@ -6,5 +6,6 @@
 	"activation": "tanh",
 	"ce_dim": 100,
 	"we_dim": 64,
-	"eras": 30
+	"eras": 30,
+	"tag_map": "meerkat/longtail/tag_map.json"
 }
