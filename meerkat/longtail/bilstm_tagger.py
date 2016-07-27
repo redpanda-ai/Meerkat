@@ -114,17 +114,19 @@ def trans_to_tensor(config, sess, graph, tokens, tags):
 	# Encode Characters
 	for token in tokens:
 
-		# TODO add <w> and </w>
+		token = ["<w>"] + list(token) + ["</w>"]
+		token_length = len(token)
+		filler_zeros = np.random.rand(config["max_word_length"] - token_length, config["ce_dim"])
 
 		feed_dict = {
 			get_tensor(graph, "char_inputs:0") : [c2i[c] for c in token],
-			get_tensor(graph, "word_length:0") : len(token),
-			get_tensor(graph, "zeros:0") : np.random.rand(config["max_word_length"] - len(token), config["ce_dim"])
+			get_tensor(graph, "word_length:0") : token_length,
+			get_tensor(graph, "zeros:0") : filler_zeros
 		}
 
 		last_state, rev_last_state = sess.run([lst, rev_lst], feed_dict=feed_dict)
-		char_embed.append(last_state[0][len(token)-1])
-		rev_char_embed.append(rev_last_state[0][len(token)-1])
+		char_embed.append(last_state[0][token_length-1])
+		rev_char_embed.append(rev_last_state[0][token_length-1])
 
 	# Encode Words
 
@@ -151,7 +153,6 @@ def build_graph(config):
 
 	graph = tf.Graph()
 	c2i = config["c2i"]
-	max_wl = config["max_word_length"]
 
 	# Create Graph
 	with graph.as_default():
@@ -159,14 +160,12 @@ def build_graph(config):
 		# Character Embedding
 		word_length = tf.placeholder(tf.int32, name="word_length")
 		char_inputs = tf.placeholder(tf.int32, [None], name="char_inputs")
+		filler_zeros = tf.placeholder(tf.float32, shape=[None, 100], name="zeros")
 		cembed_matrix = tf.Variable(tf.random_uniform([len(c2i.keys()), config["ce_dim"]], -1.0, 1.0), name="cembeds")
 		cembeds = tf.nn.embedding_lookup(cembed_matrix, char_inputs, name="ce_lookup")
 
-		# TODO: Simplify Zero filling
-
-		# Fill cembeds with zeroes up to max_word_length
-		zeros = tf.placeholder(tf.float32, shape=[None, 100], name="zeros")
-		cembed_filler = tf.zeros_like(zeros)
+		# Fill Cembeds with Padding Zeros #TODO: Simplify
+		cembed_filler = tf.zeros_like(filler_zeros)
 		cembed_filled = tf.concat(0, [cembeds, cembed_filler])
 		ce_fixed_size = tf.expand_dims(cembed_filled, 0)
 		rev_cembeds = tf.reverse(cembeds, [True, False])
@@ -178,9 +177,15 @@ def build_graph(config):
 		initial_state = lstm.zero_state(1, tf.float32)
 
 		# Encode Characters with LSTM
-		output, state = rnn.dynamic_rnn(lstm, ce_fixed_size, dtype=tf.float32, sequence_length=tf.expand_dims(word_length, 0), initial_state=initial_state)
+		options = {
+			"dtype": tf.float32,
+			"sequence_length": tf.expand_dims(word_length, 0),
+			"initial_state": initial_state
+		}
+
+		output, state = rnn.dynamic_rnn(lstm, ce_fixed_size, **options)
 		last_state = tf.identity(output, name="last_state")
-		output, state = rnn.dynamic_rnn(lstm, rev_ce_fixed_size, dtype=tf.float32, sequence_length=tf.expand_dims(word_length, 0), initial_state=initial_state, scope="rev")
+		output, state = rnn.dynamic_rnn(lstm, rev_ce_fixed_size, scope="rev", **options)
 		rev_last_state = tf.identity(output, name="rev_last_state")
 		
 		# Combined Word Embedding and Character Embedding Input
