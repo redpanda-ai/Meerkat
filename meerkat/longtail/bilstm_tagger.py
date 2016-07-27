@@ -173,14 +173,13 @@ def build_graph(config):
 		lstm = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"])
 		initial_state = lstm.zero_state(1, tf.float32)
 
-		# Produce input for characters
+		# Encode Characters with LSTM
 		output, state = rnn.dynamic_rnn(lstm, ce_fixed_size, dtype=tf.float32, sequence_length=tf.expand_dims(word_length, 0), initial_state=initial_state)
 		last_state = tf.identity(output, name="last_state")
-		
 		output, state = rnn.dynamic_rnn(lstm, rev_ce_fixed_size, dtype=tf.float32, sequence_length=tf.expand_dims(word_length, 0), initial_state=initial_state, scope="rev")
 		rev_last_state = tf.identity(output, name="rev_last_state")
 		
-		# Input
+		# Combined Word Embedding and Character Embedding Input
 		input_shape = (None, config["ce_dim"] * 2 + config["we_dim"])
 		combined_embeddings = tf.placeholder(tf.float32, shape=input_shape, name="x")
 
