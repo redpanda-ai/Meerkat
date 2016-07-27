@@ -116,7 +116,7 @@ def trans_to_tensor(config, sess, graph, tokens, tags):
 
 		token = ["<w>"] + list(token) + ["</w>"]
 		token_length = len(token)
-		filler_zeros = np.random.rand(config["max_word_length"] - token_length, config["ce_dim"])
+		filler_zeros = np.zeros([config["max_word_length"] - token_length, config["ce_dim"]])
 
 		feed_dict = {
 			get_tensor(graph, "char_inputs:0") : [c2i[c] for c in token],
@@ -164,12 +164,11 @@ def build_graph(config):
 		cembed_matrix = tf.Variable(tf.random_uniform([len(c2i.keys()), config["ce_dim"]], -1.0, 1.0), name="cembeds")
 		cembeds = tf.nn.embedding_lookup(cembed_matrix, char_inputs, name="ce_lookup")
 
-		# Fill Cembeds with Padding Zeros #TODO: Simplify
-		cembed_filler = tf.zeros_like(filler_zeros)
-		cembed_filled = tf.concat(0, [cembeds, cembed_filler])
+		# Fill Cembeds with Padding Zeros
+		cembed_filled = tf.concat(0, [cembeds, filler_zeros])
 		ce_fixed_size = tf.expand_dims(cembed_filled, 0)
 		rev_cembeds = tf.reverse(cembeds, [True, False])
-		rev_cembed_filled = tf.concat(0, [rev_cembeds, cembed_filler])
+		rev_cembed_filled = tf.concat(0, [rev_cembeds, filler_zeros])
 		rev_ce_fixed_size = tf.expand_dims(rev_cembed_filled, 0)
 
 		# Create LSTM for Character Encoding
