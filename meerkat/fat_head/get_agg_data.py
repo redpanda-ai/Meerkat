@@ -10,11 +10,11 @@ import boto3
 from meerkat.various_tools import load_params
 
 def parse_arguments(args):
-	"""This function parses arguments from command line."""
+	"""Parse arguments from command line"""
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--bucket", default="s3yodlee",
 		help="s3 bucket name")
-	parser.add_argument("--prefix", default="meerkat/fathead/aggdata/",
+	parser.add_argument("--prefix", default="meerkat/fat_head/data/agg/",
 		help="s3 object prefix")
 	parser.add_argument("--filename", default="All_Merchants.csv",
 		help="agg data file name in s3")
@@ -24,7 +24,7 @@ def parse_arguments(args):
 	return args
 
 def get_etags():
-	"""Fetch local ETag values from a local file."""
+	"""Fetch local ETag values from a local file"""
 	etags_file = "meerkat/fat_head/data/agg/etags.json"
 	if os.path.isfile(etags_file):
 		logging.info("ETags found.")
