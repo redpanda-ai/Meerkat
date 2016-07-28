@@ -157,12 +157,10 @@ def trans_to_tensor(config, sess, graph, tokens, tags, train=False):
 
 		token = ["<w>"] + list(token) + ["</w>"]
 		token_length = len(token)
-		filler_zeros = np.zeros([config["max_word_length"] - token_length, config["ce_dim"]])
 
 		feed_dict = {
 			get_tensor(graph, "char_inputs:0") : [c2i[c] for c in token],
-			get_tensor(graph, "word_length:0") : token_length,
-			get_tensor(graph, "zeros:0") : filler_zeros
+			get_tensor(graph, "word_length:0") : token_length
 		}
 
 		last_state, rev_last_state = sess.run([lst, rev_lst], feed_dict=feed_dict)
@@ -194,13 +192,14 @@ def char_encoding(config, graph):
 	"""Create graph nodes for character encoding"""
 
 	c2i = config["c2i"]
+	max_wl = config["max_word_length"]
 
 	with graph.as_default():
 
 		# Character Embedding
 		word_length = tf.placeholder(tf.int32, name="word_length")
 		char_inputs = tf.placeholder(tf.int32, [None], name="char_inputs")
-		filler_zeros = tf.placeholder(tf.float32, shape=[None, 100], name="zeros")
+		filler_zeros = tf.zeros(tf.pack([max_wl - word_length, config["ce_dim"]]))
 		cembed_matrix = tf.Variable(tf.random_uniform([len(c2i.keys()), config["ce_dim"]], -1.0, 1.0), name="cembeds")
 		cembeds = tf.nn.embedding_lookup(cembed_matrix, char_inputs, name="ce_lookup")
 
