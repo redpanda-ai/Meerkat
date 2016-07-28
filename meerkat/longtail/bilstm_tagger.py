@@ -203,9 +203,9 @@ def char_encoding(config, graph):
 	with graph.as_default():
 
 		# Character Embedding
-		word_lengths = tf.placeholder(tf.int32, [None], name="word_lengths")
-		char_inputs = tf.placeholder(tf.int32, [None, max_wl], name="char_inputs")
-		rev_char_inputs = tf.placeholder(tf.int32, [None, max_wl], name="rev_char_inputs")
+		word_lengths = tf.placeholder(tf.int32, shape=[None], name="word_lengths")
+		char_inputs = tf.placeholder(tf.int32, shape=[None, max_wl], name="char_inputs")
+		rev_char_inputs = tf.placeholder(tf.int32, shape=[None, max_wl], name="rev_char_inputs")
 		cembed_matrix = tf.Variable(tf.random_uniform([len(c2i.keys()), config["ce_dim"]], -1.0, 1.0), name="cembeds")
 		cembeds = tf.nn.embedding_lookup(cembed_matrix, char_inputs, name="ce_lookup")
 		rev_cembeds = tf.nn.embedding_lookup(cembed_matrix, rev_char_inputs, name="rev_ce_lookup")
@@ -241,9 +241,9 @@ def build_graph(config):
 		char_encoding(config, graph)
 
 		# Word Embedding
-		word_inputs = tf.placeholder(tf.int32, [None], name="word_inputs")
+		word_inputs = tf.placeholder(tf.int32, shape=[None], name="word_inputs")
 		wembed_matrix = tf.Variable(tf.constant(0.0, shape=[config["vocab_size"], config["we_dim"]]), trainable=False, name="wembed_matrix")
-		embedding_placeholder = tf.placeholder(tf.float32, [config["vocab_size"], config["we_dim"]], name="embedding_placeholder")
+		embedding_placeholder = tf.placeholder(tf.float32, shape=[config["vocab_size"], config["we_dim"]], name="embedding_placeholder")
 		assign_wembedding = tf.assign(wembed_matrix, embedding_placeholder, name="assign_wembedding")
 		wembeds = tf.nn.embedding_lookup(wembed_matrix, word_inputs, name="we_lookup")
 		
