@@ -189,7 +189,7 @@ def trans_to_tensor(config, sess, graph, tokens, tags, train=False):
 	print(tokens)
 	print(tensor.shape)
 
-	return tensor, tags
+	return tensor, encoded_tags
 
 def build_graph(config):
 	"""Build CNN"""
