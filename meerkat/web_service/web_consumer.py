@@ -606,14 +606,26 @@ class WebConsumer():
 		if len(debit) > 0:
 			debit_category_classifer(debit, label_key="category_CNN", label_only=False)
 
+		refund_transactions = []
+
 		for transaction in data["transaction_list"]:
-			category = transaction["category_CNN"].get("label", "").strip()
+			category = transaction["category_CNN"].get("label", "")
 			transaction["category_labels"] = [category]
 
 			if category == "":
 				transaction["category_labels"] = ["Other Expenses"]
 				if transaction["ledger_entry"] == "credit":
 					transaction["category_labels"] = ["Other Income"]
+
+			# Collect refund/adjustments transactions to apply category_cnn model one more time
+			if transaction["category_labels"] == ["Refunds/Adjustments"]:
+				refund_transactions.append(transaction)
+
+		# Apply classifier for refund transactions again
+		if len(refund_transactions) > 0:
+			debit_category_classifer(refund_transactions, label_key="category_CNN", label_only=False)
+			for trans in refund_transactions:
+				trans["category_labels"] = [trans["category_CNN"].get("label", "")]
 
 		return data["transaction_list"]
 
