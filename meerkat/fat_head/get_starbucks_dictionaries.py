@@ -55,16 +55,37 @@ def get_single_merchant_df(input_file, chunksize):
 	logging.info("Constructing dataframe from file.")
 	#create a list of dataframe groups, filtered by merchant name
 	merchant = ARGS.merchant
+	dict_of_df_lists = {}
 	dfs = []
+	chunk_num = 0
 	logging.info("Filtering by the following merchant: {0}".format(merchant))
 	for chunk in pd.read_csv(input_file, chunksize=chunksize, error_bad_lines=False,
 		warn_bad_lines=True, encoding='utf-8', quotechar='"', na_filter=False, sep=','):
+		chunk_num += 1
+		if chunk_num % 10 == 0:
+			logging.info("Processing chunk {0:>4}, {1:>4} merchants found.".format(chunk_num,
+				len(dict_of_df_lists.keys())))
 		grouped = chunk.groupby('list_name', as_index=False)
 		groups = dict(list(grouped))
-		if merchant in groups.keys():
-			dfs.append(groups[merchant])
+		logging.info("Group Keys: {0}".format(groups.keys()))
+		my_keys = groups.keys()
+		for key in my_keys:
+			if key not in dict_of_df_lists:
+				dict_of_df_lists[key] = []
+			dict_of_df_lists[key].append(groups[key])
+		#if merchant in groups.keys():
+		#	dfs.append(groups[merchant])
 	#Merge them together
-	df = pd.concat(dfs, ignore_index=True)
+	target_merchants = [ "Ace Hardware", "Walmart", "Walgreens", "Target"
+	]
+	for item in target_merchants:
+		if item in dict_of_df_lists.keys():
+			logging.info("Found {0}".format(key))
+
+	for key in dict_of_df_lists.keys():
+		dict_of_df_lists[key] = pd.concat(dict_of_df_lists[key], ignore_index=True)
+	df = dict_of_df_lists[merchant]
+	#df = pd.concat(dfs, ignore_index=True)
 	#Do some pre-processing
 	logging.info("Preprocessing dataframe.")
 	preprocess_dataframe(df)
