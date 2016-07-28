@@ -1,17 +1,16 @@
+"""This module will sync local agg data with s3"""
+
 import sys
 import os
 import json
 import logging
 import argparse
-import pandas as pd
-
-from boto.s3 import connect_to_region
-from boto.s3.key import Key
 import boto3
 
 from meerkat.various_tools import load_params
 
 def parse_arguments(args):
+	"""This function parses arguments from command line."""
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--bucket", default="s3yodlee",
 		help="s3 bucket name")
@@ -25,8 +24,7 @@ def parse_arguments(args):
 	return args
 
 def get_etags():
-	"""Fetches local ETag values from a local file."""
-	etags = {}
+	"""Fetch local ETag values from a local file."""
 	etags_file = "meerkat/fat_head/data/agg/etags.json"
 	if os.path.isfile(etags_file):
 		logging.info("ETags found.")
@@ -36,6 +34,7 @@ def get_etags():
 	return etags, etags_file
 
 def load_agg_data(**kwargs):
+	"""Load agg data from s3 to the local host"""
 	client = boto3.client("s3")
 	remote_file = kwargs["prefix"] + kwargs["file_name"]
 	local_file = kwargs["save_path"] + kwargs["file_name"]
@@ -66,6 +65,7 @@ def load_agg_data(**kwargs):
 		json.dump(etags, outfile)
 
 def main_process():
+	"""Execute the main programe"""
 	logging.basicConfig(level=logging.INFO)
 
 	args = parse_arguments(sys.argv[1:])
