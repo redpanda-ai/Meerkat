@@ -17,7 +17,6 @@ Created on July 20, 2016
 # Multilingual Part-of-Speech Tagging with Bidirectional Long Short-Term Memory Models and Auxiliary Loss
 # http://arxiv.org/pdf/1604.05529v2.pdf
 # https://github.com/bplank/bilstm-aux
-# https://github.com/KnHuq/Tensorflow-tutorial/blob/master/BiDirectional%20LSTM/bi_directional_lstm.ipynb
 #
 # Deep Learning for Character-based Information Extraction
 # http://www.cs.cmu.edu/~qyj/zhSenna/2014_ecir2014_full.pdf
@@ -149,34 +148,38 @@ def trans_to_tensor(config, sess, graph, tokens, tags, train=False):
 
 	w2i = config["w2i"]
 	c2i = config["c2i"]
-	char_embed, rev_char_embed = [], []
-	rev_lst = get_tensor(graph, "rev_last_state:0")
+	max_wl = config["max_word_length"]
 	lst = get_tensor(graph, "last_state:0")
+	rev_lst = get_tensor(graph, "rev_last_state:0")
+	we_lookup = get_tensor(graph, "we_lookup:0")
+	char_inputs, rev_char_inputs = [], []
+	word_indices = [w2i[w] for w in tokens] if train else [w2i.get(w, w2i["_UNK"]) for w in tokens]
 
-	# Encode Characters
-	for token in tokens:
+	# Lookup Character Indices
+	for i, t in enumerate(tokens):
 
-		token = ["<w>"] + list(token) + ["</w>"]
-		token_length = len(token)
-		filler_zeros = np.zeros([config["max_word_length"] - token_length, config["ce_dim"]])
+		t = ["<w>"] + list(t) + ["</w>"]
+		rev_t = t[::-1]
+		char_inputs.append([])
+		rev_char_inputs.append([])
 
-		feed_dict = {
-			get_tensor(graph, "char_inputs:0") : [c2i[c] for c in token],
-			get_tensor(graph, "word_length:0") : token_length,
-			get_tensor(graph, "zeros:0") : filler_zeros
-		}
+		for ii in range(max_wl):
+			char_index = c2i[t[ii]] if ii < len(t) else 0
+			char_inputs[i].append(char_index)
+			rev_char_index = c2i[rev_t[ii]] if ii < len(rev_t) else 0
+			rev_char_inputs[i].append(rev_char_index)
 
-		last_state, rev_last_state = sess.run([lst, rev_lst], feed_dict=feed_dict)
-		char_embed.append(last_state[0][token_length-1])
-		rev_char_embed.append(rev_last_state[0][token_length-1])
+	# Collect Output
+	feed_dict = {
+		get_tensor(graph, "char_inputs:0") : np.array(char_inputs),
+		get_tensor(graph, "rev_char_inputs:0") : np.array(rev_char_inputs),
+		get_tensor(graph, "word_lengths:0") : [len(t) for t in tokens],
+		get_tensor(graph, "word_inputs:0") : word_indices 
+	}
 
-	# Encode Words
-	if train:
-		word_feed_dict = {get_tensor(graph, "word_inputs:0"): [w2i[w] for w in tokens]}
-	else:
-		word_feed_dict = {get_tensor(graph, "word_inputs:0"): [w2i.get(w, w2i["_UNK"]) for w in tokens]}
-
-	embedded_words = sess.run(get_tensor(graph, "we_lookup:0"), feed_dict=word_feed_dict)
+	last_state, rev_last_state, embedded_words = sess.run([lst, rev_lst, we_lookup], feed_dict=feed_dict)
+	char_embed = [last_state[i][len(t) - 1] for i, t in enumerate(tokens)]
+	rev_char_embed = [rev_last_state[i][len(t) - 1] for i, t in enumerate(tokens)]
 
 	# Merge Encodings
 	char_features = [np.concatenate([c, rc], axis=0) for c, rc in zip(char_embed, reversed(rev_char_embed))]
@@ -187,9 +190,43 @@ def trans_to_tensor(config, sess, graph, tokens, tags, train=False):
 	encoded_tags = encode_tags(config, tags)
 
 	print(tokens)
-	print(tensor.shape)
+	print(tensor.shape) 
 
 	return tensor, encoded_tags
+
+def char_encoding(config, graph):
+	"""Create graph nodes for character encoding"""
+
+	c2i = config["c2i"]
+	max_wl = config["max_word_length"]
+
+	with graph.as_default():
+
+		# Character Embedding
+		word_lengths = tf.placeholder(tf.int32, [None], name="word_lengths")
+		char_inputs = tf.placeholder(tf.int32, [None, max_wl], name="char_inputs")
+		rev_char_inputs = tf.placeholder(tf.int32, [None, max_wl], name="rev_char_inputs")
+		cembed_matrix = tf.Variable(tf.random_uniform([len(c2i.keys()), config["ce_dim"]], -1.0, 1.0), name="cembeds")
+		cembeds = tf.nn.embedding_lookup(cembed_matrix, char_inputs, name="ce_lookup")
+		rev_cembeds = tf.nn.embedding_lookup(cembed_matrix, rev_char_inputs, name="rev_ce_lookup")
+
+		# TODO: Replace extra with zeros instead of UNK embedding
+
+		# Create LSTM for Character Encoding
+		lstm = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"])
+		initial_state = lstm.zero_state(tf.size(word_lengths), tf.float32)
+
+		# Encode Characters with LSTM
+		options = {
+			"dtype": tf.float32,
+			"sequence_length": word_lengths,
+			"initial_state": initial_state
+		}
+
+		output, state = rnn.dynamic_rnn(lstm, cembeds, **options)
+		last_state = tf.identity(output, name="last_state")
+		output, state = rnn.dynamic_rnn(lstm, rev_cembeds, scope="rev", **options)
+		rev_last_state = tf.identity(output, name="rev_last_state")
 
 def build_graph(config):
 	"""Build CNN"""
@@ -197,38 +234,11 @@ def build_graph(config):
 	graph = tf.Graph()
 	c2i = config["c2i"]
 
-	# Create Graph
+	# Build Graph
 	with graph.as_default():
 
 		# Character Embedding
-		word_length = tf.placeholder(tf.int32, name="word_length")
-		char_inputs = tf.placeholder(tf.int32, [None], name="char_inputs")
-		filler_zeros = tf.placeholder(tf.float32, shape=[None, 100], name="zeros")
-		cembed_matrix = tf.Variable(tf.random_uniform([len(c2i.keys()), config["ce_dim"]], -1.0, 1.0), name="cembeds")
-		cembeds = tf.nn.embedding_lookup(cembed_matrix, char_inputs, name="ce_lookup")
-
-		# Fill Cembeds with Padding Zeros
-		cembed_filled = tf.concat(0, [cembeds, filler_zeros])
-		ce_fixed_size = tf.expand_dims(cembed_filled, 0)
-		rev_cembeds = tf.reverse(cembeds, [True, False])
-		rev_cembed_filled = tf.concat(0, [rev_cembeds, filler_zeros])
-		rev_ce_fixed_size = tf.expand_dims(rev_cembed_filled, 0)
-
-		# Create LSTM for Character Encoding
-		lstm = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"])
-		initial_state = lstm.zero_state(1, tf.float32)
-
-		# Encode Characters with LSTM
-		options = {
-			"dtype": tf.float32,
-			"sequence_length": tf.expand_dims(word_length, 0),
-			"initial_state": initial_state
-		}
-
-		output, state = rnn.dynamic_rnn(lstm, ce_fixed_size, **options)
-		last_state = tf.identity(output, name="last_state")
-		output, state = rnn.dynamic_rnn(lstm, rev_ce_fixed_size, scope="rev", **options)
-		rev_last_state = tf.identity(output, name="rev_last_state")
+		char_encoding(config, graph)
 
 		# Word Embedding
 		word_inputs = tf.placeholder(tf.int32, [None], name="word_inputs")
