@@ -19,7 +19,7 @@ def parse_arguments(args):
 	parser.add_argument("--filename", default="All_Merchants.csv",
 		help="agg data file name in s3")
 	parser.add_argument("--savepath", default="meerkat/fat_head/data/agg_data/",
-		help="locally save path of agg data file")
+		help="local save path of agg data file")
 	args = parser.parse_args(args)
 	return args
 
