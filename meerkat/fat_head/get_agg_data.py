@@ -31,7 +31,7 @@ def get_etags(base_dir):
 		logging.info("ETags found.")
 		etags = load_params(etags_file)
 	else:
-		logging.info("Etags not found, agg data will be downloaded.")
+		logging.info("Etags not found")
 	return etags, etags_file
 
 def load_agg_data(**kwargs):
