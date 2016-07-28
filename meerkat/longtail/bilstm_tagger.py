@@ -17,7 +17,6 @@ Created on July 20, 2016
 # Multilingual Part-of-Speech Tagging with Bidirectional Long Short-Term Memory Models and Auxiliary Loss
 # http://arxiv.org/pdf/1604.05529v2.pdf
 # https://github.com/bplank/bilstm-aux
-# https://github.com/KnHuq/Tensorflow-tutorial/blob/master/BiDirectional%20LSTM/bi_directional_lstm.ipynb
 #
 # Deep Learning for Character-based Information Extraction
 # http://www.cs.cmu.edu/~qyj/zhSenna/2014_ecir2014_full.pdf
@@ -191,13 +190,11 @@ def trans_to_tensor(config, sess, graph, tokens, tags, train=False):
 
 	return tensor, encoded_tags
 
-def build_graph(config):
-	"""Build CNN"""
+def char_encoding(config, graph):
+	"""Create graph nodes for character encoding"""
 
-	graph = tf.Graph()
 	c2i = config["c2i"]
 
-	# Create Graph
 	with graph.as_default():
 
 		# Character Embedding
@@ -229,6 +226,18 @@ def build_graph(config):
 		last_state = tf.identity(output, name="last_state")
 		output, state = rnn.dynamic_rnn(lstm, rev_ce_fixed_size, scope="rev", **options)
 		rev_last_state = tf.identity(output, name="rev_last_state")
+
+def build_graph(config):
+	"""Build CNN"""
+
+	graph = tf.Graph()
+	c2i = config["c2i"]
+
+	# Build Graph
+	with graph.as_default():
+
+		# Character Embedding
+		char_encoding(config, graph)
 
 		# Word Embedding
 		word_inputs = tf.placeholder(tf.int32, [None], name="word_inputs")
