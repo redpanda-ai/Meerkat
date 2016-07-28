@@ -1,9 +1,8 @@
 import sys
 import os
-import csv
+import json
 import logging
 import argparse
-import shutil
 import pandas as pd
 
 from boto.s3 import connect_to_region
@@ -50,8 +49,15 @@ def load_agg_data(**kwargs):
 		logging.info("Agg data exists locally no need to download")
 		return
 
+	logging.info("start downloading agg data from s3")
 	client.download_file(kwargs["bucket"], remote_file, local_file)
-	logging.info("Agg data file at: " + local_file)
+	logging.info("Agg data file is downloaded at: " + local_file)
+
+	etags = {}
+	etags[remote_file] = remote_etag
+	with open(kwargs["etags_file"], "w") as outfile:
+		logging.info("Writing {0}".format(kwargs["etags_file"]))
+		json.dump(etags, outfile)
 
 def main_process():
 	logging.basicConfig(level=logging.INFO)
@@ -65,11 +71,7 @@ def main_process():
 	etags, etags_file = get_etags()
 
 	load_agg_data(bucket=bucket, prefix=prefix, file_name=file_name,
-		save_path=save_path, etags=etags)
-
-	#with open(etags_file, "w") as outfile:
-	#	logging.info("Writing {0}".format(etags_file))
-	#	json.dump(etags, outfile)
+		save_path=save_path, etags=etags, etags_file=etags_file)
 
 if __name__ == "__main__":
 	main_process()
