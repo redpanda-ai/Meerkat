@@ -13,8 +13,14 @@ from meerkat.various_tools import load_params
 
 def parse_arguments(args):
 	parser = argparse.ArgumentParser()
-	parser.add_argument("--bucket", default="s3yodlee")
-	parser.add_argument("--prefix", default="meerkat/fathead/aggdata/")
+	parser.add_argument("--bucket", default="s3yodlee",
+		help="s3 bucket name")
+	parser.add_argument("--prefix", default="meerkat/fathead/aggdata/",
+		help="s3 object prefix")
+	parser.add_argument("--filename", default="All_Merchants.csv",
+		help="agg data file name in s3")
+	parser.add_argument("--savepath", default="meerkat/fat_head/data/agg/",
+		help="locally save path of agg data file")
 	args = parser.parse_args(args)
 	return args
 
@@ -61,11 +67,13 @@ def load_agg_data(**kwargs):
 
 def main_process():
 	logging.basicConfig(level=logging.INFO)
+
 	args = parse_arguments(sys.argv[1:])
+
 	bucket = args.bucket
 	prefix = args.prefix
-	file_name = "All_Merchants.csv"
-	save_path = "meerkat/fat_head/data/agg/"
+	file_name = args.filename
+	save_path = args.savepath
 	os.makedirs(save_path, exist_ok=True)
 
 	etags, etags_file = get_etags()
