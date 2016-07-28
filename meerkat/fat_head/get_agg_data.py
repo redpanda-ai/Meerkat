@@ -18,14 +18,15 @@ def parse_arguments(args):
 		help="s3 object prefix")
 	parser.add_argument("--filename", default="All_Merchants.csv",
 		help="agg data file name in s3")
-	parser.add_argument("--savepath", default="meerkat/fat_head/data/agg/",
+	parser.add_argument("--savepath", default="meerkat/fat_head/data/agg_data/",
 		help="locally save path of agg data file")
 	args = parser.parse_args(args)
 	return args
 
-def get_etags():
+def get_etags(base_dir):
 	"""Fetch local ETag values from a local file"""
-	etags_file = "meerkat/fat_head/data/agg/etags.json"
+	etags_file = base_dir + "etags.json"
+	etags = {}
 	if os.path.isfile(etags_file):
 		logging.info("ETags found.")
 		etags = load_params(etags_file)
@@ -35,24 +36,33 @@ def get_etags():
 
 def load_agg_data(**kwargs):
 	"""Load agg data from s3 to the local host"""
+
 	client = boto3.client("s3")
 	remote_file = kwargs["prefix"] + kwargs["file_name"]
 	local_file = kwargs["save_path"] + kwargs["file_name"]
 
+	local_file_exist = False
+	if os.path.isfile(local_file):
+		logging.info("local file {0} exists".format(local_file))
+		local_file_exist = True
+	else:
+		logging.info("local file {0} not found".format(local_file))
+
 	remote_etag = client.list_objects(Bucket=kwargs["bucket"],
 		Prefix=remote_file)["Contents"][0]["ETag"]
 
-	local_etag = None
-	if remote_file in kwargs["etags"]:
-		local_etag = kwargs["etags"][remote_file]
+	if local_file_exist:
+		local_etag = None
+		if remote_file in kwargs["etags"]:
+			local_etag = kwargs["etags"][remote_file]
 
-	logging.info("{0: <6} ETag is : {1}".format("Remote", remote_etag))
-	logging.info("{0: <6} ETag is : {1}".format("Local", local_etag))
+		logging.info("{0: <6} ETag is : {1}".format("Remote", remote_etag))
+		logging.info("{0: <6} ETag is : {1}".format("Local", local_etag))
 
-	#If the file is already local, skip downloading
-	if local_etag == remote_etag:
-		logging.info("Agg data exists locally no need to download")
-		return
+		#If the file is already local, skip downloading
+		if local_etag == remote_etag:
+			logging.info("Agg data exists locally no need to download")
+			return
 
 	logging.info("start downloading agg data from s3")
 	client.download_file(kwargs["bucket"], remote_file, local_file)
@@ -76,7 +86,7 @@ def main_process():
 	save_path = args.savepath
 	os.makedirs(save_path, exist_ok=True)
 
-	etags, etags_file = get_etags()
+	etags, etags_file = get_etags(save_path)
 
 	load_agg_data(bucket=bucket, prefix=prefix, file_name=file_name,
 		save_path=save_path, etags=etags, etags_file=etags_file)
