@@ -1,11 +1,13 @@
 import argparse
-import sys
-import inspect
-import os
 import csv
+import inspect
+import sys
+import os
 import logging
 import pandas as pd
 import json
+
+from functools import reduce
 
 def parse_arguments(args):
 	"""Parses arguments"""
@@ -21,15 +23,57 @@ def parse_arguments(args):
 	parser.set_defaults(dumping=False)
 	return parser.parse_args(args)
 
-def dump_pretty_json_to_file(dictionary, filename):
+def merge(a, b, path=None):
+	"""Useful function to merge complex dictionaries, courtesy of:
+	https://stackoverflow.com/questions/7204805/dictionaries-of-dictionaries-merge
+	I added logic for handling merge conflicts so that new values overwrite old values
+	but throw warnings.
+	"""
+	if path is None:
+		path = []
+	for key in b:
+		if key in a:
+			if isinstance(a[key], dict) and isinstance(b[key], dict):
+				merge(a[key], b[key], path + [str(key)])
+			elif a[key] == b[key]:
+				pass
+			else:
+				#Merge conflict, let the new guy 
+				logging.warning("Conflict at %s" % ".".join(path + [str(key)]))
+				logging.warning("A key {0}".format(a[key]))
+				logging.warning("B key {0}".format(b[key]))
+				logging.warning("Conflict in dicts, resolving with newer value.")
+		else:
+			a[key] = b[key]
+	return a
+
+def dump_pretty_json_to_file(new_object, filename):
 	"""Dumps a pretty-printed JSON object to the file provided."""
-	if ARGS.dumping:
-		full_path = ARGS.filepath + "/" + ARGS.merchant + "/" + filename
-		logging.info("Dumping {0}".format(full_path))
-		with open(full_path, "w") as outfile:
-			json.dump(dictionary, outfile, sort_keys=True, indent=4, separators=(',', ': '))
+	src_object = {}
+	dst_object = {}
+	full_path = ARGS.filepath + "/" + ARGS.merchant + "/" + filename
+	try:
+		with open(full_path, "r") as infile:
+			src_object = json.load(infile)
+	except IOError as e:
+		logging.debug("No pre-existing object, which is fine.")
+	#Merge original and new new_object
+	if isinstance(new_object, dict):
+		dst_object = reduce(merge, [src_object, new_object])
+		dst_object = {str(k): v for k, v in dst_object.items()}
+	elif isinstance(new_object, list):
+		dst_object = list(set().union(new_object, src_object))
 	else:
-		logging.info("Not Dumping {0}".format(filename))
+		logging.critical("It's neither a list nor a dictionary, aborting.")
+		sys.exit()
+	#Dump, if necessary
+	log_write = "'" + ARGS.merchant + "/" + filename + "'"
+	if ARGS.dumping:
+		logging.info("Writing {0}".format(log_write))
+		with open(full_path, "w") as outfile:
+			json.dump(dst_object, outfile, sort_keys=True, indent=4, separators=(',', ': '))
+	else:
+		logging.info("Not Writing {0}".format(log_write))
 
 def expand_abbreviations(city):
 	"""Turns abbreviations into their expanded form."""
@@ -64,16 +108,15 @@ def get_merchant_dataframes(input_file, chunksize):
 		"KFC", "Kmart", "Kohl's", "LongHorn Steakhouse", "Lowe's", "Macy's", "Nordstrom"
 	]
 	#create a list of dataframe groups, filtered by merchant name
-	merchant = ARGS.merchant
 	dict_of_df_lists = {}
 	dfs = []
 	chunk_num = 0
-	logging.info("Filtering by the following merchant: {0}".format(merchant))
+	#logging.info("Filtering by the following merchant: {0}".format(merchant))
 	for chunk in pd.read_csv(input_file, chunksize=chunksize, error_bad_lines=False,
 		warn_bad_lines=True, encoding='utf-8', quotechar='"', na_filter=False, sep=','):
 		chunk_num += 1
 		if chunk_num % 10 == 0:
-			logging.info("Processing chunk {0:>4}, {1:>4} target merchants found.".format(chunk_num,
+			logging.info("Processing chunk {0:07d}, {1:>6} target merchants found.".format(chunk_num,
 				len(dict_of_df_lists.keys())))
 		grouped = chunk.groupby('list_name', as_index=False)
 		groups = dict(list(grouped))
@@ -82,7 +125,7 @@ def get_merchant_dataframes(input_file, chunksize):
 		for key in my_keys:
 			if key in target_merchants:
 				if key not in dict_of_df_lists:
-					logging.info("Adding {0}".format(key))
+					logging.info("***** Discovered {0:>30} ********".format(key))
 					dict_of_df_lists[key] = []
 				dict_of_df_lists[key].append(groups[key])
 
@@ -90,28 +133,27 @@ def get_merchant_dataframes(input_file, chunksize):
 	merchants_found = dict_of_df_lists.keys()
 	found_list = list(merchants_found)
 	missing_list = list(set(target_merchants) - set(found_list))
-	logging.info("Found List: {0}".format(found_list))
-	logging.info("Missing List: {0}".format(missing_list))
-
+	for item in found_list:
+		logging.info("Found {0:>49}".format(item))
+	for item in missing_list:
+		logging.warning("Not Found {0:>42}".format(item))
 	#Merge them together
 	for key in merchants_found:
 		dict_of_df_lists[key] = pd.concat(dict_of_df_lists[key], ignore_index=True)
-	df = dict_of_df_lists[merchant]
-	#df = pd.concat(dfs, ignore_index=True)
-	#Do some pre-processing
-	logging.info("Preprocessing dataframe.")
-	preprocess_dataframe(df)
-	#Return the dataframe
+		#Do some pre-processing
+		logging.info("Preprocessing dataframe for {0:>27}".format(key))
+		preprocess_dataframe(dict_of_df_lists[key])
+
 	return dict_of_df_lists
 
 def get_store_dictionaries(df):
 	"""Writes out two store dictionaries"""
-	logging.info("Generating store dictionaries.")
+	logging.debug("Generating store dictionaries.")
 	#Use only the "store_number", "city", and "state" columns
 	slender_df = df[["store_number", "city", "state"]]
 	store_dict_1, store_dict_2 = {}, {}
 	my_stores = slender_df.set_index("store_number").T.to_dict('list')
-	my_stores = {str(k):str(v) for k,v in my_stores.items()}
+	#my_stores = {str(k):str(v) for k,v in my_stores.items()}
 	#Split the store_id dicts
 	for key in my_stores.keys():
 		key = str(key)
@@ -125,7 +167,6 @@ def get_store_dictionaries(df):
 		store_dict_1[key_1] = my_stores[key]
 		store_dict_2[key_2] = my_stores[key]
 	#Dump the store_id dictionaries
-	#merchant = ARGS.merchant
 	dump_pretty_json_to_file(store_dict_1, "store_id_1.json")
 	dump_pretty_json_to_file(store_dict_2, "store_id_2.json")
 	#Return the dictionaries
@@ -140,7 +181,7 @@ def preprocess_dataframe(df):
 
 def get_unique_city_dictionaries(df):
 	"""Constructs a dictionary using unique city names as keys."""
-	logging.info("Generating unique_city dictionaries for {0}".format(ARGS.merchant))
+	logging.debug("Generating unique_city dictionaries for {0}".format(ARGS.merchant))
 	# Create the unique_city_state dictionary
 	grouped_city = geo_df.groupby('city', as_index=True)
 	groups_city = dict(list(grouped_city))
@@ -161,7 +202,7 @@ def get_unique_city_dictionaries(df):
 def get_geo_dictionary(df):
 	"""Generates three merchant dictionaries and writes them as JSON files"""
 	merchant = ARGS.merchant
-	logging.info("Generating geo dictionaries for '{0}'".format(ARGS.merchant))
+	logging.debug("Generating geo dictionaries for '{0}'".format(ARGS.merchant))
 	#Create a geo-dictionary, using only "state", "city", and "zip_code"
 	geo_df = df[["state", "city", "zip_code"]]
 	grouped = geo_df.groupby(['state', 'city'], as_index=True)
@@ -184,23 +225,24 @@ def get_geo_dictionary(df):
 	return geo_df
 
 def setup_directories():
+	"""This creates the directories on the local file system, if needed."""
 	if ARGS.dumping:
 		output_directory = ARGS.filepath + "/" + ARGS.merchant
-		logging.info("Confirming output directory at {0}".format(output_directory))
+		logging.debug("Confirming output directory at {0}".format(output_directory))
 		os.makedirs(output_directory, exist_ok=True)
 	else:
 		logging.info("No need for output directory for {0}".format(ARGS.merchant))
 
 if __name__ == "__main__":
-	logging.basicConfig(level=logging.INFO)
+	log_format = "%(asctime)s %(levelname)s: %(message)s"
+	logging.basicConfig(format=log_format, level=logging.INFO)
 	ARGS = parse_arguments(sys.argv[1:])
 	merchant_dataframes = get_merchant_dataframes("All_Merchants.csv", 1000)
 	merchants = sorted(list(merchant_dataframes.keys()))
-	logging.info("Merchants {0}".format(merchants))
 	for merchant in merchants:
 		ARGS.merchant = merchant
 		df = merchant_dataframes[merchant]
-		logging.info("Processing '{0}'".format(merchant))
+		logging.info("***** Processing {0:>29} ********".format(merchant))
 		setup_directories()
 		store_dict_1, store_dict_2 = get_store_dictionaries(df)
 		geo_df = get_geo_dictionary(df)
