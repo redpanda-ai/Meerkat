@@ -4,6 +4,7 @@ import csv
 import json
 import logging
 import sys
+import shutil
 import pandas as pd
 
 def parse_arguments(args):
@@ -46,6 +47,11 @@ def get_geo_dictionary(input_file):
 
 	my_json = json.dumps(my_dict, sort_keys=True, indent=4, separators=(',', ': '))
 	return my_json
+
+def copy_file(input_file, directory):
+	"""This function moves uses Linux's 'cp' command to copy files on the local host"""
+	logging.info("Copy the file {0} to directory: {1}".format(input_file, directory))
+	shutil.copy(input_file, directory)
 
 if __name__ == "__main__":
 	logging.basicConfig(level=logging.INFO)

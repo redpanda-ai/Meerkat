@@ -6,14 +6,17 @@ import json
 import argparse
 import inspect
 import logging
+import fileinput
 
 from meerkat.various_tools import load_params
+from meerkat.fat_head.tools import copy_file
 
 def parse_arguments(args):
 	"""Parse arguments from command line"""
 	parser = argparse.ArgumentParser()
 	module_path = inspect.getmodule(inspect.stack()[1][0]).__file__
-	default_project_dir = module_path[:module_path.rfind("/") + 1] + "projects/"
+	base_dir = module_path[:module_path.rfind("/") + 1]
+	default_project_dir = base_dir + "projects/"
 	default_dictionary_dir = "meerkat/fat_head/dictionaries/"
 
 	parser.add_argument("--project_dir", default=default_project_dir)
@@ -96,22 +99,28 @@ def main_process():
 			os.system("pbs --server http://" + server + ":12000 --api-key " +
 				apikey + " --project " + project_json_file + " create_project")
 
-	"""
 		if args.update_project:
-			presenter_file = project_dir + args.task_presenter
-			long_description_file = project_dir + "long_description.md"
-			results_file = project_dir + "results.html"
-			tutorial_file = project_dir + "tutorial.html"
-			tasks_file = project_dir + args.tasks_file
+			template_dir = "meerkat/fat_head/pybossa/template/"
+			presenter_file = template_dir + args.task_presenter
+			copy_file(presenter_file, merchant_dir)
+			merchant_presenter = merchant_dir + args.task_presenter
+			for line in fileinput.input(merchant_presenter, inplace=True):
+				print(line.rstrip().replace("Geomancer", "Geomancer_" + merchant))
+
+			long_description_file = template_dir + "long_description.md"
+			results_file = template_dir + "results.html"
+			tutorial_file = template_dir + "tutorial.html"
 			os.system("pbs --server http://" + server + ":12000 --api-key " +
-				apikey + " --project " + project_json + " update_project --task-presenter " +
-				presenter_file + " --long-description " + long_description_file +
+				apikey + " --project " + project_json_file + " update_project --task-presenter " +
+				merchant_presenter + " --long-description " + long_description_file +
 				" --results " + results_file + " --tutorial " + tutorial_file)
 
-	if args.add_tasks:
-		os.system("pbs --server http://" + server + ":12000 --api-key " +
-			apikey + " --project " + project_json + " add_tasks --tasks-file " +
-			tasks_file)
+	"""
+		if args.add_tasks:
+			tasks_file = project_dir + args.tasks_file
+			os.system("pbs --server http://" + server + ":12000 --api-key " +
+				apikey + " --project " + project_json + " add_tasks --tasks-file " +
+				tasks_file)
 	"""
 if __name__ == "__main__":
 	main_process()
