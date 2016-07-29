@@ -111,18 +111,21 @@ def get_store_dictionaries(df):
 	slender_df = df[["store_number", "city", "state"]]
 	store_dict_1, store_dict_2 = {}, {}
 	my_stores = slender_df.set_index("store_number").T.to_dict('list')
+	my_stores = {str(k):str(v) for k,v in my_stores.items()}
 	#Split the store_id dicts
 	for key in my_stores.keys():
 		key = str(key)
 		#If each key cannot be split by a dash, return the full my_stores_dictionary
 		if key.count("-") == 0:
+			dump_pretty_json_to_file(my_stores, "store_id_1.json")
+			dump_pretty_json_to_file(my_stores, "store_id_2.json")
 			return my_stores, my_stores
 		#Otherwise, build a split dictionary
 		key_1, key_2 = key.split("-")
 		store_dict_1[key_1] = my_stores[key]
 		store_dict_2[key_2] = my_stores[key]
 	#Dump the store_id dictionaries
-	merchant = ARGS.merchant
+	#merchant = ARGS.merchant
 	dump_pretty_json_to_file(store_dict_1, "store_id_1.json")
 	dump_pretty_json_to_file(store_dict_2, "store_id_2.json")
 	#Return the dictionaries
