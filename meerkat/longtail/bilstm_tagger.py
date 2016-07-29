@@ -283,6 +283,7 @@ def build_graph(config):
 	return graph, saver
 
 def add_noise(data, stdev):
+	data = np.asarray(data)
 	return data + np.random.normal(scale=stdev, size=data.shape)
 
 def train_model(config, graph, sess, saver):
