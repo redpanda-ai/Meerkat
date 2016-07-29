@@ -10,7 +10,9 @@
 	"noise_sigma": "0.2",
 	"activation": "tanh",
 	"max_word_length": 50,
+	"num_layers": 3,
 	"ce_dim": 100,
 	"we_dim": 64,
+	"h_dim": 100,
 	"eras": 30
 }

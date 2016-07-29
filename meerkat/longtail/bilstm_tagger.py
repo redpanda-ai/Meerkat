@@ -38,7 +38,6 @@ import sys
 
 import numpy as np
 import tensorflow as tf
-from tensorflow.models.rnn import rnn
 
 from meerkat.classification.tools import reverse_map, get_tensor, get_op, get_variable
 from meerkat.various_tools import load_params, load_piped_dataframe
@@ -184,15 +183,15 @@ def trans_to_tensor(config, sess, graph, tokens, tags, train=False):
 	# Merge Encodings
 	char_features = [np.concatenate([c, rc], axis=0) for c, rc in zip(char_embed, reversed(rev_char_embed))]
 	char_features = np.array(char_features)
-	tensor = np.concatenate([embedded_words, char_features], axis=1)
+	input_tensor = np.concatenate([embedded_words, char_features], axis=1)
 
 	# Encode Tags
 	encoded_tags = encode_tags(config, tags)
 
 	print(tokens)
-	print(tensor.shape) 
+	print(input_tensor.shape) 
 
-	return tensor, encoded_tags
+	return input_tensor, encoded_tags
 
 def char_encoding(config, graph):
 	"""Create graph nodes for character encoding"""
@@ -210,7 +209,7 @@ def char_encoding(config, graph):
 		cembeds = tf.nn.embedding_lookup(cembed_matrix, char_inputs, name="ce_lookup")
 		rev_cembeds = tf.nn.embedding_lookup(cembed_matrix, rev_char_inputs, name="rev_ce_lookup")
 
-		# TODO: Replace extra with zeros instead of UNK embedding
+		# TODO Non-essential: Replace extra with zeros instead of UNK embedding
 
 		# Create LSTM for Character Encoding
 		lstm = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"])
@@ -223,9 +222,9 @@ def char_encoding(config, graph):
 			"initial_state": initial_state
 		}
 
-		output, state = rnn.dynamic_rnn(lstm, cembeds, **options)
+		output, state = tf.nn.dynamic_rnn(lstm, cembeds, **options)
 		last_state = tf.identity(output, name="last_state")
-		output, state = rnn.dynamic_rnn(lstm, rev_cembeds, scope="rev", **options)
+		output, state =  tf.nn.dynamic_rnn(lstm, rev_cembeds, scope="rev", **options)
 		rev_last_state = tf.identity(output, name="rev_last_state")
 
 def build_graph(config):
@@ -249,7 +248,25 @@ def build_graph(config):
 		
 		# Combined Word Embedding and Character Embedding Input
 		input_shape = (None, config["ce_dim"] * 2 + config["we_dim"])
-		combined_embeddings = tf.placeholder(tf.float32, shape=input_shape, name="x")
+		combined_embeddings = tf.placeholder(tf.float32, shape=input_shape, name="input")
+		batched_input = tf.expand_dims(combined_embeddings, 0)
+
+		# Create Model
+		trans_len = tf.placeholder(tf.int64, None, name="trans_length")
+		input_cell = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"] * 2 + config["we_dim"])
+		fw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["h_dim"])
+		bw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["h_dim"])
+		fw_network = tf.nn.rnn_cell.MultiRNNCell([input_cell] + [fw_lstm] * config["num_layers"])
+		bw_network = tf.nn.rnn_cell.MultiRNNCell([input_cell] + [bw_lstm] * config["num_layers"])
+
+		options = {
+			"dtype": tf.float32,
+			"sequence_length": tf.expand_dims(trans_len, 0)
+		}
+
+		(outputs_fw, outputs_bw), output_states = tf.nn.bidirectional_dynamic_rnn(fw_network, bw_network, batched_input, **options)
+		tf.identity(outputs_fw, name="outputs_fw")
+		tf.identity(outputs_bw, name="outputs_bw")
 
 		saver = tf.train.Saver()
 
@@ -271,6 +288,16 @@ def train_model(config, graph, sess, saver):
 			trans = train.loc[t_index]
 			tokens, tags = get_tags(trans)
 			trans, labels = trans_to_tensor(config, sess, graph, tokens, tags)
+
+			feed_dict = {
+				get_tensor(graph, "trans_length:0"): trans.shape[0],
+				get_tensor(graph, "input:0"): trans
+			}
+
+			outputs_fw, outputs_bw = sess.run([get_tensor(graph, "outputs_fw:0"), get_tensor(graph, "outputs_bw:0")], feed_dict=feed_dict)
+			print(outputs_fw.shape)
+			print(outputs_bw.shape)
+			sys.exit()
 
 	final_model_path = ""
 
