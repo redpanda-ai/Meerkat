@@ -273,8 +273,9 @@ def build_graph(config):
 		last_state = tf.identity(output, name="final_rev_last_state")
 
 		# Pass forward and backword vec to final softmax layer
-		softmax_input_shape = input_shape
+		softmax_input_shape = input_shape * 2
 		softmax_feature = tf.placeholder(tf.float32, shape=softmax_input_shape, name="softmax_feature")
+		ground_truth = tf.placeholder(tf.int32, shape=[None, len(config["tag_map"])], name="ground_truth")
 		softmax = tf.nn.softmax(softmax_feature)
 		# TODO: return softmax as a function, work on loss function and optimization
 		saver = tf.train.Saver()
