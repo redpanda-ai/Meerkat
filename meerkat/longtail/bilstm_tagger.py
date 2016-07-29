@@ -306,8 +306,8 @@ def train_model(config, graph, sess, saver):
 
 			# Collect Output
 			feed_dict = {
-				get_tensor(graph, "combinded_embedding:0") : np.asrray(rnn_input),
-				get_tensor(graph, "rev_combinded_embedding:0") : np.asrray(rnn_inputs[::-1])
+				get_tensor(graph, "combined_embedding:0") : np.asrray(rnn_input),
+				get_tensor(graph, "rev_combined_embedding:0") : np.asrray(rnn_inputs[::-1])
 			}
 			lst = get_tensor(graph, "final_last_state")
 			rev_lst = get_tensor(graph, "final_rev_last_state")
