@@ -50,26 +50,59 @@ def expand_abbreviations(city):
 			break
 	return city
 
-def get_single_merchant_df(input_file, chunksize):
+def get_merchant_dataframes(input_file, chunksize):
 	"""Generate a dataframe which is a subset of the input_file grouped by merchant."""
 	logging.info("Constructing dataframe from file.")
+	#Here are the target merchants
+	target_merchants = [ "Ace Hardware", "Walmart", "Walgreens", "Target",
+		"Subway", "Starbucks", "McDonald's", "Costco Wholesale Corp.", "Burger King",
+		"Bed Bath and Beyond",
+		"Aeropostale", "Albertsons", "American Eagle Outfitters", "Applebee's", "Arby's",
+		"AutoZone", "Bahama Breeze", "Barnes & Noble", "Baskin-Robbins", "Bealls",
+		"Eddie V's", "Fedex", "Five Guys", "Food 4 Less", "Francesca's", "Fred Meyer",
+		"Gymboree", "H&M", "Home Depot", "IHOP", "In-N-Out Burger", "J. C. Penney",
+		"KFC", "Kmart", "Kohl's", "LongHorn Steakhouse", "Lowe's", "Macy's", "Nordstrom"
+	]
 	#create a list of dataframe groups, filtered by merchant name
 	merchant = ARGS.merchant
+	dict_of_df_lists = {}
 	dfs = []
+	chunk_num = 0
 	logging.info("Filtering by the following merchant: {0}".format(merchant))
 	for chunk in pd.read_csv(input_file, chunksize=chunksize, error_bad_lines=False,
 		warn_bad_lines=True, encoding='utf-8', quotechar='"', na_filter=False, sep=','):
+		chunk_num += 1
+		if chunk_num % 10 == 0:
+			logging.info("Processing chunk {0:>4}, {1:>4} target merchants found.".format(chunk_num,
+				len(dict_of_df_lists.keys())))
 		grouped = chunk.groupby('list_name', as_index=False)
 		groups = dict(list(grouped))
-		if merchant in groups.keys():
-			dfs.append(groups[merchant])
+		#logging.info("Group Keys: {0}".format(groups.keys()))
+		my_keys = groups.keys()
+		for key in my_keys:
+			if key in target_merchants:
+				if key not in dict_of_df_lists:
+					logging.info("Adding {0}".format(key))
+					dict_of_df_lists[key] = []
+				dict_of_df_lists[key].append(groups[key])
+
+	#Show what you found and did not find
+	merchants_found = dict_of_df_lists.keys()
+	found_list = list(merchants_found)
+	missing_list = list(set(target_merchants) - set(found_list))
+	logging.info("Found List: {0}".format(found_list))
+	logging.info("Missing List: {0}".format(missing_list))
+
 	#Merge them together
-	df = pd.concat(dfs, ignore_index=True)
+	for key in merchants_found:
+		dict_of_df_lists[key] = pd.concat(dict_of_df_lists[key], ignore_index=True)
+	df = dict_of_df_lists[merchant]
+	#df = pd.concat(dfs, ignore_index=True)
 	#Do some pre-processing
 	logging.info("Preprocessing dataframe.")
 	preprocess_dataframe(df)
 	#Return the dataframe
-	return df
+	return dict_of_df_lists
 
 def get_store_dictionaries(df):
 	"""Writes out two store dictionaries"""
@@ -78,13 +111,21 @@ def get_store_dictionaries(df):
 	slender_df = df[["store_number", "city", "state"]]
 	store_dict_1, store_dict_2 = {}, {}
 	my_stores = slender_df.set_index("store_number").T.to_dict('list')
+	my_stores = {str(k):str(v) for k,v in my_stores.items()}
 	#Split the store_id dicts
 	for key in my_stores.keys():
+		key = str(key)
+		#If each key cannot be split by a dash, return the full my_stores_dictionary
+		if key.count("-") == 0:
+			dump_pretty_json_to_file(my_stores, "store_id_1.json")
+			dump_pretty_json_to_file(my_stores, "store_id_2.json")
+			return my_stores, my_stores
+		#Otherwise, build a split dictionary
 		key_1, key_2 = key.split("-")
 		store_dict_1[key_1] = my_stores[key]
 		store_dict_2[key_2] = my_stores[key]
 	#Dump the store_id dictionaries
-	merchant = ARGS.merchant
+	#merchant = ARGS.merchant
 	dump_pretty_json_to_file(store_dict_1, "store_id_1.json")
 	dump_pretty_json_to_file(store_dict_2, "store_id_2.json")
 	#Return the dictionaries
@@ -133,6 +174,7 @@ def get_geo_dictionary(df):
 		if city not in geo_dict[state]:
 			geo_dict[state][city] = []
 		for item in group["zip_code"]:
+			item = str(item)
 			item = item[:5]
 			if item not in geo_dict[state][city]:
 				geo_dict[state][city].append(item)
@@ -146,13 +188,21 @@ def setup_directories():
 		output_directory = ARGS.filepath + "/" + ARGS.merchant
 		logging.info("Confirming output directory at {0}".format(output_directory))
 		os.makedirs(output_directory, exist_ok=True)
+	else:
+		logging.info("No need for output directory for {0}".format(ARGS.merchant))
 
 if __name__ == "__main__":
 	logging.basicConfig(level=logging.INFO)
 	ARGS = parse_arguments(sys.argv[1:])
-	setup_directories()
-	df = get_single_merchant_df("All_Merchants.csv", 1000)
-	store_dict_1, store_dict_2 = get_store_dictionaries(df)
-	geo_df = get_geo_dictionary(df)
-	unique_city_state, unique_city = get_unique_city_dictionaries(df)
+	merchant_dataframes = get_merchant_dataframes("All_Merchants.csv", 1000)
+	merchants = sorted(list(merchant_dataframes.keys()))
+	logging.info("Merchants {0}".format(merchants))
+	for merchant in merchants:
+		ARGS.merchant = merchant
+		df = merchant_dataframes[merchant]
+		logging.info("Processing '{0}'".format(merchant))
+		setup_directories()
+		store_dict_1, store_dict_2 = get_store_dictionaries(df)
+		geo_df = get_geo_dictionary(df)
+		unique_city_state, unique_city = get_unique_city_dictionaries(df)
 
