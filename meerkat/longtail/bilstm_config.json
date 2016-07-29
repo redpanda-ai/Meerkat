@@ -13,5 +13,6 @@
 	"ce_dim": 100,
 	"we_dim": 64,
 	"eras": 30,
+	"noise_sigma": 0.2,
 	"train": true
 }

@@ -281,6 +281,9 @@ def build_graph(config):
 
 	return graph, saver
 
+def add_noise(data, stdev):
+	return data + np.random.normal(scale=stdev, size=data.shape)
+
 def train_model(config, graph, sess, saver):
 	"""Train the model"""
 
@@ -296,10 +299,30 @@ def train_model(config, graph, sess, saver):
 		for t_index in train_index:
 			trans = train.loc[t_index]
 			tokens, tags = get_tags(trans)
-			trans, labels = trans_to_tensor(config, sess, graph, tokens, tags, train=config["train"])
+			rnn_input, labels = trans_to_tensor(config, sess, graph, tokens, tags, train=config["train"])
+			if config["noise_sigma"] > 0.0:
+				rnn_input = add_noise(rnn_input, config["noise_sigma"])
 
-	final_model_path = ""
+			# Collect Output
+			feed_dict = {
+				get_tensor(graph, "combinded_embedding:0") : np.asrray(rnn_input),
+				get_tensor(graph, "rev_combinded_embedding:0") : np.asrray(rnn_inputs[::-1])
+			}
+			lst = get_tensor(graph, "final_last_state")
+			rev_lst = get_tensor(graph, "final_rev_last_state")
+			forward_seq, backward_seq = sess.run([lst, rev_lst], feed_dict=feed_dict)
 
+			# Combine forward and backward pass
+			softmax_input = [np.append(f,b) for f, b in zip(forward_seq, backward_seq[::-1])]
+			if config["noise_sigma"] > 0.0:
+				softmax_input = add_noise(softmax_input, config["noise_sigma"])
+
+			feed_dict = {
+				get_tensor(graph, "softmax_feature:0") : np.asarray(softmax_input),
+				get_tensor(graph, "ground_truth:0"): np.asarray(labels)
+			}
+			# TODO
+			# sess.run(get_op(graph, "train and optimization"), feed_dict=feed_dict)
 	return final_model_path
 
 def evaluate_testset(config, graph, sess, model, test):
