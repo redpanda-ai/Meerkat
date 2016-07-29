@@ -256,8 +256,8 @@ def build_graph(config):
 		input_cell = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"] * 2 + config["we_dim"])
 		fw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["h_dim"])
 		bw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["h_dim"])
-		fw_network = tf.nn.rnn_cell.MultiRNNCell([input_cell] + [fw_lstm] * config["num_layers"])
-		bw_network = tf.nn.rnn_cell.MultiRNNCell([input_cell] + [bw_lstm] * config["num_layers"])
+		fw_network = tf.nn.rnn_cell.MultiRNNCell([input_cell] + ([fw_lstm] * (config["num_layers"] - 1)))
+		bw_network = tf.nn.rnn_cell.MultiRNNCell([input_cell] + ([bw_lstm] * (config["num_layers"] - 1)))
 
 		options = {
 			"dtype": tf.float32,
@@ -265,8 +265,13 @@ def build_graph(config):
 		}
 
 		(outputs_fw, outputs_bw), output_states = tf.nn.bidirectional_dynamic_rnn(fw_network, bw_network, batched_input, **options)
-		tf.identity(outputs_fw, name="outputs_fw")
-		tf.identity(outputs_bw, name="outputs_bw")
+
+		# Prediction
+		weight = tf.Variable(tf.truncated_normal([config["h_dim"] * 2, len(config["tag_map"])], stddev=0.1))
+		bias = tf.Variable(tf.constant(0.1, shape=[len(config["tag_map"])]))
+
+		concat_layer = tf.concat(2, [outputs_fw, tf.reverse(outputs_bw, [False, True, False])], name="concat_layer")
+		prediction = tf.nn.softmax(tf.matmul(tf.squeeze(concat_layer), weight) + bias, name="softmax")
 
 		saver = tf.train.Saver()
 
@@ -294,9 +299,8 @@ def train_model(config, graph, sess, saver):
 				get_tensor(graph, "input:0"): trans
 			}
 
-			outputs_fw, outputs_bw = sess.run([get_tensor(graph, "outputs_fw:0"), get_tensor(graph, "outputs_bw:0")], feed_dict=feed_dict)
-			print(outputs_fw.shape)
-			print(outputs_bw.shape)
+			softmax_output = sess.run(get_tensor(graph, "softmax:0"), feed_dict=feed_dict)
+			print(softmax_output)
 			sys.exit()
 
 	final_model_path = ""
