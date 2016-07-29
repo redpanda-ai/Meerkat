@@ -284,6 +284,8 @@ def build_graph(config):
 			concat_layer = tf.concat(2, [outputs_fw, tf.reverse(outputs_bw, [False, True, False])], name="concat_layer")
 			prediction = tf.nn.softmax(tf.matmul(tf.squeeze(concat_layer), weight) + bias, name=name)
 
+			return prediction
+
 		network = model("training", train=True, noise=config["noise_sigma"])
 		trained_model = model("trained")
 
