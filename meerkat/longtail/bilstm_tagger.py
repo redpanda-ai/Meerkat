@@ -190,7 +190,7 @@ def trans_to_tensor(config, sess, graph, tokens, tags, train=False):
 	encoded_tags = encode_tags(config, tags)
 
 	print(tokens)
-	print(tensor.shape) 
+	print(tensor.shape)
 
 	return tensor, encoded_tags
 
@@ -214,7 +214,7 @@ def char_encoding(config, graph):
 
 		# Create LSTM for Character Encoding
 		lstm = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"])
-		initial_state = lstm.zero_state(tf.size(word_lengths), tf.float32)
+		initial_state = tf.Variable(lstm.zero_state(tf.size(word_lengths), tf.float32), trainable=False)
 
 		# Encode Characters with LSTM
 		options = {
@@ -249,8 +249,34 @@ def build_graph(config):
 		
 		# Combined Word Embedding and Character Embedding Input
 		input_shape = (None, config["ce_dim"] * 2 + config["we_dim"])
-		combined_embeddings = tf.placeholder(tf.float32, shape=input_shape, name="x")
+		combined_embeddings = tf.placeholder(tf.float32, shape=input_shape, name="combined_embeddings")
+		rev_combined_embeddings = tf.placeholder(tf.float32, shape=input_shape, name="rev_combined_embeddings")
 
+		# Create a length function that makes sequence_length variable
+		def length(data):
+			used = tf.sign(tf.reduce_max(tf.abs(data), reduction_indices=2))
+			length = tf.reduce_sum(used, reduction_indices=1)
+			length = tf.cast(length, tf.int32)
+			return length
+
+		# Create main LSTM for combined_embedding
+		lstm_cell = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"]*2+config["we_dim"])
+		initial_state = tf.Variable(lstmc_cell.zero_state(1, tf.float32), trainable=False)
+		options = {
+			"dtype": tf.float32,
+			"initial_state": initial_state,
+			"sequence_length": length(combined_embedding) #sequence_length is same for forward and backward
+		}
+		output, state = rnn.dynamic_rnn(lstm_cell, combined_embedding, **options)
+		last_state = tf.identity(output, name="final_last_state")
+		output, state = rnn.dynamic_rnn(lstm_cell, rev_combined_embedding, **options)
+		last_state = tf.identity(output, name="final_rev_last_state")
+
+		# Pass forward and backword vec to final softmax layer
+		softmax_input_shape = input_shape
+		softmax_feature = tf.placeholder(tf.float32, shape=softmax_input_shape, name="softmax_feature")
+		softmax = tf.nn.softmax(softmax_feature)
+		# TODO: return softmax as a function, work on loss function and optimization
 		saver = tf.train.Saver()
 
 	return graph, saver
@@ -270,7 +296,7 @@ def train_model(config, graph, sess, saver):
 		for t_index in train_index:
 			trans = train.loc[t_index]
 			tokens, tags = get_tags(trans)
-			trans, labels = trans_to_tensor(config, sess, graph, tokens, tags)
+			trans, labels = trans_to_tensor(config, sess, graph, tokens, tags, train=config["train"])
 
 	final_model_path = ""
 

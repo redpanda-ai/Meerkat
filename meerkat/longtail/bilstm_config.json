@@ -12,5 +12,6 @@
 	"max_word_length": 50,
 	"ce_dim": 100,
 	"we_dim": 64,
-	"eras": 30
+	"eras": 30,
+	"train": true
 }
