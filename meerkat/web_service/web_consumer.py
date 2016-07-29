@@ -626,6 +626,8 @@ class WebConsumer():
 			debit_category_classifer(refund_transactions, label_key="category_CNN", label_only=False)
 			for trans in refund_transactions:
 				trans["category_labels"] = [trans["category_CNN"].get("label", "")]
+				if trans["category_labels"] == ["Other Expenses"]:
+					trans["category_labels"] = ["Refunds/Adjustments"]
 
 		return data["transaction_list"]
 
