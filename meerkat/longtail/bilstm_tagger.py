@@ -47,8 +47,8 @@ logging.basicConfig(level=logging.INFO)
 def get_tags(trans):
 	"""Convert df row to list of tags and tokens"""
 
-	tokens = trans["Description"].lower().split()
-	tag = trans["Tagged_merchant_string"].split()
+	tokens = trans[0].lower().split()
+	tag = trans[1].lower().split()
 	tags = []
 
 	for token in tokens:
@@ -154,6 +154,9 @@ def trans_to_tensor(config, sess, graph, tokens, tags, train=False):
 	char_inputs, rev_char_inputs = [], []
 	word_indices = [w2i[w] for w in tokens] if train else [w2i.get(w, w2i["_UNK"]) for w in tokens]
 
+	# Encode Tags
+	encoded_tags = encode_tags(config, tags)
+
 	# Lookup Character Indices
 	for i, t in enumerate(tokens):
 
@@ -184,12 +187,6 @@ def trans_to_tensor(config, sess, graph, tokens, tags, train=False):
 	char_features = [np.concatenate([c, rc], axis=0) for c, rc in zip(char_embed, reversed(rev_char_embed))]
 	char_features = np.array(char_features)
 	input_tensor = np.concatenate([embedded_words, char_features], axis=1)
-
-	# Encode Tags
-	encoded_tags = encode_tags(config, tags)
-
-	print(tokens)
-	print(input_tensor.shape) 
 
 	return input_tensor, encoded_tags
 
@@ -289,6 +286,11 @@ def build_graph(config):
 		network = model("training", train=True, noise=config["noise_sigma"])
 		trained_model = model("trained")
 
+		# Calculate Loss and Optimize
+		labels = tf.placeholder(tf.float32, shape=[None, len(config["tag_map"].keys())], name="y")
+		loss = tf.reduce_mean(tf.reduce_sum(network * labels, 1), name="loss")
+		optimizer = tf.train.GradientDescentOptimizer(config["learning_rate"]).minimize(loss, name="optimizer")
+
 		saver = tf.train.Saver()
 
 	return graph, saver
@@ -305,19 +307,48 @@ def train_model(config, graph, sess, saver):
 	# Train the Model
 	for step in range(eras):
 		random.shuffle(train_index)
+		count = 0
+		total_loss = 0
+
 		for t_index in train_index:
-			trans = train.loc[t_index]
-			tokens, tags = get_tags(trans)
+
+			count += 1
+
+			if count % 500 == 0:
+				print("loss: " + str(total_loss / count))
+				print("%d" % (count / len(train_index) * 100) + "% complete with era")
+
+			row = train.loc[t_index]
+			tokens, tags = get_tags(row)
 			trans, labels = trans_to_tensor(config, sess, graph, tokens, tags)
 
 			feed_dict = {
 				get_tensor(graph, "trans_length:0"): trans.shape[0],
-				get_tensor(graph, "input:0"): trans
+				get_tensor(graph, "input:0"): trans,
+				get_tensor(graph, "y:0"): labels
 			}
 
-			softmax_output = sess.run(get_tensor(graph, "training:0"), feed_dict=feed_dict)
-			print(softmax_output)
-			sys.exit()
+			if len(tokens) == 1:
+
+				print("\n")
+				print(tokens)
+				print(tags)
+				print(row["Tagged_merchant_string"])
+				print("\n")
+
+				print(trans)
+				print(labels)
+
+			try:
+				# Run Training Step
+				optimizer_out, loss = sess.run([get_op(graph, "optimizer"), get_tensor(graph, "loss:0")], feed_dict=feed_dict)
+				total_loss += loss
+			except:
+				print(row)
+
+		# Evaluate Model
+		model = get_tensor(graph, "trained:0")
+		test_accuracy = evaluate_testset(config, graph, sess, model, test)
 
 	final_model_path = ""
 
@@ -326,7 +357,29 @@ def train_model(config, graph, sess, saver):
 def evaluate_testset(config, graph, sess, model, test):
 	"""Check error on test set"""
 
-	test_accuracy = 0
+	total_count = len(test.index)
+	total_correct = 0
+
+	for i in range(total_count):
+
+		row = test.loc[i]
+		tokens, tags = get_tags(row)
+		trans, labels = trans_to_tensor(config, sess, graph, tokens, tags)
+
+
+		if trans[0] == "False":
+			continue
+		
+		feed_dict_test = {get_tensor(graph, "input:0"): trans_test}
+		output = sess.run(model, feed_dict=feed_dict_test)
+
+		correct_count = np.sum(np.argmax(output, 1) == np.argmax(labels_test, 1))
+		total_correct += correct_count
+
+	test_accuracy = 100.0 * (total_correct / total_count)
+	logging.info("Test accuracy: %.2f%%" % test_accuracy)
+	logging.info("Correct count: " + str(total_correct))
+	logging.info("Total count: " + str(total_count))
 
 	return test_accuracy
 
