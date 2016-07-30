@@ -62,6 +62,10 @@ def get_tags(trans):
 		if not found:
 			tags.append("background")
 
+	# TODO: Fix this hack
+	if len(tokens) == 1:
+		return(tokens * 2, tags * 2)
+
 	return (tokens, tags)
 
 def validate_config(config):
@@ -328,17 +332,6 @@ def train_model(config, graph, sess, saver):
 				get_tensor(graph, "y:0"): labels
 			}
 
-			if len(tokens) == 1:
-
-				print("\n")
-				print(tokens)
-				print(tags)
-				print(row["Tagged_merchant_string"])
-				print("\n")
-
-				print(trans)
-				print(labels)
-
 			try:
 				# Run Training Step
 				optimizer_out, loss = sess.run([get_op(graph, "optimizer"), get_tensor(graph, "loss:0")], feed_dict=feed_dict)
@@ -365,7 +358,6 @@ def evaluate_testset(config, graph, sess, model, test):
 		row = test.loc[i]
 		tokens, tags = get_tags(row)
 		trans, labels = trans_to_tensor(config, sess, graph, tokens, tags)
-
 
 		if trans[0] == "False":
 			continue

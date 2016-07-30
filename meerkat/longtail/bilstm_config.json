@@ -4,8 +4,8 @@
 	"alphabet": "abcdefghijklmnopqrstuvwxyz0123456789,;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}",
 	"embeddings": "/home/ubuntu/git/embeddings/en.polyglot.txt",
 	"tag_map": {
-		"1": "background",
-		"2": "merchant"
+		"0": "background",
+		"1": "merchant"
 	},
 	"noise_sigma": 0.2,
 	"activation": "tanh",
