@@ -223,9 +223,9 @@ def char_encoding(config, graph):
 			"initial_state": initial_state
 		}
 
-		output, state = tf.nn.dynamic_rnn(lstm, cembeds, **options)
+		output, state = tf.nn.dynamic_rnn(lstm, cembeds, scope="fw", **options)
 		last_state = tf.identity(output, name="last_state")
-		output, state =  tf.nn.dynamic_rnn(lstm, rev_cembeds, scope="rev", **options)
+		output, state =  tf.nn.dynamic_rnn(lstm, rev_cembeds, scope="bw", **options)
 		rev_last_state = tf.identity(output, name="rev_last_state")
 
 def build_graph(config):
@@ -257,6 +257,8 @@ def build_graph(config):
 
 			# Create Model
 			trans_len = tf.placeholder(tf.int64, None, name="trans_length")
+			tf.identity(trans_len, name="tli")
+
 			input_cell = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"] * 2 + config["we_dim"])
 			fw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["h_dim"])
 			bw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["h_dim"])
@@ -314,7 +316,7 @@ def train_model(config, graph, sess, saver):
 		count = 0
 		total_loss = 0
 
-		for t_index in train_index:
+		for t_index in train_index[0:100]:
 
 			count += 1
 
@@ -326,13 +328,14 @@ def train_model(config, graph, sess, saver):
 			tokens, tags = get_tags(row)
 			trans, labels = trans_to_tensor(config, sess, graph, tokens, tags)
 
-			feed_dict = {
-				get_tensor(graph, "trans_length:0"): trans.shape[0],
-				get_tensor(graph, "input:0"): trans,
-				get_tensor(graph, "y:0"): labels
-			}
-
 			try:
+
+				feed_dict = {
+					get_tensor(graph, "trans_length:0"): trans.shape[0],
+					get_tensor(graph, "input:0"): trans,
+					get_tensor(graph, "y:0"): labels
+				}
+
 				# Run Training Step
 				optimizer_out, loss = sess.run([get_op(graph, "optimizer"), get_tensor(graph, "loss:0")], feed_dict=feed_dict)
 				total_loss += loss
@@ -340,32 +343,39 @@ def train_model(config, graph, sess, saver):
 				print(row)
 
 		# Evaluate Model
-		model = get_tensor(graph, "trained:0")
-		test_accuracy = evaluate_testset(config, graph, sess, model, test)
+		test_accuracy = evaluate_testset(config, graph, sess, test)
 
 	final_model_path = ""
 
 	return final_model_path
 
-def evaluate_testset(config, graph, sess, model, test):
+def evaluate_testset(config, graph, sess, test):
 	"""Check error on test set"""
 
 	total_count = len(test.index)
 	total_correct = 0
+	test_index = list(test.index)
+	random.shuffle(test_index)
+	model = get_tensor(graph, "training:0")
 
-	for i in range(total_count):
+	print("---ENTERING EVALUATION---")
+
+	total_count = 500
+
+	for i in test_index[0:total_count]:
 
 		row = test.loc[i]
 		tokens, tags = get_tags(row)
 		trans, labels = trans_to_tensor(config, sess, graph, tokens, tags)
-
-		if trans[0] == "False":
-			continue
 		
-		feed_dict_test = {get_tensor(graph, "input:0"): trans_test}
+		feed_dict_test = {
+			get_tensor(graph, "input:0"): trans, 
+			get_tensor(graph, "trans_length:0"): trans.shape[0]
+		}
+
 		output = sess.run(model, feed_dict=feed_dict_test)
 
-		correct_count = np.sum(np.argmax(output, 1) == np.argmax(labels_test, 1))
+		correct_count = np.sum(np.argmax(output, 1) == np.argmax(labels, 1))
 		total_correct += correct_count
 
 	test_accuracy = 100.0 * (total_correct / total_count)
