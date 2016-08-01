@@ -456,7 +456,10 @@ class WebConsumer():
 				trans["cnn"] = {"txn_type" : trans.get("txn_type", ""),
 					"txn_sub_type" : trans.get("txn_sub_type", ""),
 					"merchant_name" : trans.pop("CNN", ""),
-					"category_labels" : [trans["category_CNN"].get("label", "")]
+					"category_labels" : [trans["category_CNN"].get("label", "")],
+					"merchant_score" : trans.pop("merchant_score", "0.1"),
+					"subtype_score" : trans.pop("subtype_score", "0.2"),
+					"category_score" : trans.pop("category_score", "0.3")
 					}
 
 			trans.pop("locale_bloom", None)
