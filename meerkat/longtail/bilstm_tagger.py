@@ -250,10 +250,15 @@ def build_graph(config):
 		# Combined Word Embedding and Character Embedding Input
 		input_shape = (None, config["ce_dim"] * 2 + config["we_dim"])
 		combined_embeddings = tf.placeholder(tf.float32, shape=input_shape, name="input")
-		batched_input = tf.expand_dims(combined_embeddings, 0)
 
 		def model(name, train=False, noise=0.0):
 			"""Model to train"""
+
+			if train:
+				input_noise = combined_embeddings + tf.random_normal(tf.shape(combined_embeddings)) * config["noise_sigma"]
+				batched_input = tf.expand_dims(input_noise, 0)
+			else:
+				batched_input = tf.expand_dims(combined_embeddings, 0)
 
 			# Create Model
 			trans_len = tf.placeholder(tf.int64, None, name="trans_length")
@@ -262,12 +267,6 @@ def build_graph(config):
 			input_cell = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"] * 2 + config["we_dim"])
 			fw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["h_dim"])
 			bw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["h_dim"])
-
-			# TODO: Add Noise
-			if train:
-				input_cell = input_cell
-				fw_lstm = fw_lstm
-				bw_lstm = bw_lstm
 
 			fw_network = tf.nn.rnn_cell.MultiRNNCell([input_cell] + ([fw_lstm] * (config["num_layers"] - 1)))
 			bw_network = tf.nn.rnn_cell.MultiRNNCell([input_cell] + ([bw_lstm] * (config["num_layers"] - 1)))
@@ -284,8 +283,14 @@ def build_graph(config):
 			weight = tf.Variable(tf.truncated_normal([config["h_dim"] * 2, len(config["tag_map"])], stddev=0.1))
 			bias = tf.Variable(tf.constant(0.1, shape=[len(config["tag_map"])]))
 
+			# Add Noise and Predict
 			concat_layer = tf.concat(2, [outputs_fw, tf.reverse(outputs_bw, [False, True, False])], name="concat_layer")
-			prediction = tf.nn.softmax(tf.matmul(tf.squeeze(concat_layer), weight) + bias, name=name)
+			
+			if train:
+				output_noise = concat_layer + tf.random_normal(tf.shape(concat_layer)) * noise
+				prediction = tf.nn.softmax(tf.matmul(tf.squeeze(output_noise), weight) + bias, name=name)
+			else:
+				prediction = tf.nn.softmax(tf.matmul(tf.squeeze(concat_layer), weight) + bias, name=name)
 
 			return prediction
 
@@ -316,7 +321,9 @@ def train_model(config, graph, sess, saver):
 		count = 0
 		total_loss = 0
 
-		for t_index in train_index[0:100]:
+		print("ERA: " + str(step))
+
+		for t_index in train_index[0:1000]:
 
 			count += 1
 
@@ -360,7 +367,7 @@ def evaluate_testset(config, graph, sess, test):
 
 	print("---ENTERING EVALUATION---")
 
-	total_count = 500
+	total_count = 1000
 
 	for i in test_index[0:total_count]:
 
