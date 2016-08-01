@@ -321,7 +321,7 @@ def train_model(config, graph, sess, saver):
 
 		print("ERA: " + str(step))
 
-		for t_index in train_index[0:1000]:
+		for t_index in train_index:
 
 			count += 1
 
@@ -361,10 +361,16 @@ def evaluate_testset(config, graph, sess, test):
 	total_correct = 0
 	test_index = list(test.index)
 	random.shuffle(test_index)
+	count = 0
 
 	print("---ENTERING EVALUATION---")
 
-	for i in test_index[0:1000]:
+	for i in test_index:
+
+		count += 1
+
+		if count % 500 == 0:
+			print("%d" % (count / len(test_index) * 100) + "% complete with evaluation")
 
 		row = test.loc[i]
 		tokens, tags = get_tags(row)
