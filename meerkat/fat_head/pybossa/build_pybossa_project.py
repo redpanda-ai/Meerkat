@@ -119,30 +119,37 @@ def main_process():
 		os.makedirs(merchant_dir, exist_ok=True)
 
 		project_json_file = merchant_dir + "project.json"
+		project_name = "Geomancer_" + merchant
 
+		# Create a new pybossa project
 		if args.create_project:
-			project_name = "Geomancer_" + merchant
-			project_json = {
-				"name": project_name,
-				"short_name": project_name,
-				"description": project_name,
-				"question": "geo"
-			}
-			with open(project_json_file, "w") as json_file:
-				logging.info("Writing {0}".format(project_json_file))
-				json.dump(project_json, json_file)
+			if project_name in existing_projects:
+				logging.warning("Project {0} already exists".format(project_name))
+			else:
+				project_json = {
+					"name": project_name,
+					"short_name": project_name,
+					"description": project_name,
+					"question": "geo"
+				}
+				with open(project_json_file, "w") as json_file:
+					logging.info("Writing {0}".format(project_json_file))
+					json.dump(project_json, json_file)
 
-			os.system("pbs --server http://" + server + ":12000 --api-key " +
-				apikey + " --project " + project_json_file + " create_project")
+				os.system("pbs --server http://" + server + ":12000 --api-key " +
+					apikey + " --project " + project_json_file + " create_project")
 
 		merchant_presenter = merchant_dir + args.task_presenter
 		template_dir = "meerkat/fat_head/pybossa/template/"
+
+		# Update pybossa presenter
 		if args.update_presenter:
 			presenter_file = template_dir + args.task_presenter
 			copy_file(presenter_file, merchant_dir)
 			for line in fileinput.input(merchant_presenter, inplace=True):
 				print(line.rstrip().replace("Geomancer", "Geomancer_" + merchant))
 
+		# Update pybossa dictionary
 		if args.update_dictionary:
 			dictionary_dst = "/var/www/html/dictionaries/" + merchant + "/"
 			os.makedirs(dictionary_dst, exist_ok=True)
@@ -166,6 +173,7 @@ def main_process():
 				" --results " + results_file + " --tutorial " + tutorial_file)
 			logging.info("finish pbs update")
 
+		# Add new labeling tasks
 		if args.add_tasks:
 			tasks_file = merchant_dir + args.tasks_file
 			os.system("pbs --server http://" + server + ":12000 --api-key " +
