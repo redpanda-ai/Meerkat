@@ -7,6 +7,7 @@ import argparse
 import inspect
 import logging
 import fileinput
+import requests
 
 from meerkat.various_tools import load_params
 from meerkat.fat_head.tools import copy_file
@@ -31,15 +32,16 @@ def parse_arguments(args):
 	parser.add_argument("--update_presenter", action="store_true")
 	parser.add_argument("--task_presenter", default="presenter_code.html")
 
-	parser.add_argument("--update_dictionaries", action="store_true")
+	parser.add_argument("--update_dictionary", action="store_true")
 
 	parser.add_argument("--add_tasks", action="store_true")
-	parser.add_argument("--tasks_file", default="tasks1.csv")
+	parser.add_argument("--tasks_file", default="tasks.csv")
 
 	args = parser.parse_args(args)
 	return args
 
 def format_merchant_names(top_merchants):
+	"""Format merchant names"""
 	top_merchants_maps = {}
 	for merchant in top_merchants:
 		name = merchant.replace(" ", "_")
@@ -51,6 +53,20 @@ def format_merchant_names(top_merchants):
 	logging.info("Formatting top merchant names:")
 	logging.info(top_merchants_maps)
 	return top_merchants, top_merchants_maps
+
+def format_json_with_callback(dictionary_file):
+	"""Format the json dictionary to work with ajax callback"""
+	# Prepend the json dictionary
+	for line in fileinput.input(dictionary_file, inplace=True):
+		if fileinput.isfirstline():
+			print("callback(")
+			print(line)
+		else:
+			print(line)
+
+	# Append the json dictionary
+	with open(dictionary_file, "a") as d_file:
+		d_file.write(")")
 
 def main_process():
 	"""Execute the main programe"""
@@ -106,39 +122,42 @@ def main_process():
 			os.system("pbs --server http://" + server + ":12000 --api-key " +
 				apikey + " --project " + project_json_file + " create_project")
 
+		merchant_presenter = merchant_dir + args.task_presenter
+		template_dir = "meerkat/fat_head/pybossa/template/"
 		if args.update_presenter:
-			template_dir = "meerkat/fat_head/pybossa/template/"
 			presenter_file = template_dir + args.task_presenter
 			copy_file(presenter_file, merchant_dir)
-			merchant_presenter = merchant_dir + args.task_presenter
 			for line in fileinput.input(merchant_presenter, inplace=True):
 				print(line.rstrip().replace("Geomancer", "Geomancer_" + merchant))
 
-		if args.update_dictionaries:
-			dictionary_dst = "/var/www/html/" + merchant + "/"
+		if args.update_dictionary:
+			dictionary_dst = "/var/www/html/dictionaries/" + merchant + "/"
 			os.makedirs(dictionary_dst, exist_ok=True)
 			copy_file(dictionary_dir + top_merchants_maps[merchant] + "/geo.json", dictionary_dst)
-			for line in fileinput.input(merchant_presenter, inplace=True):
-				print(line)
-				print(line.rstrip().replace("merchant_name", merchant))
 
-			"""
-			long_description_file = template_dir + "long_description.md"
-			results_file = template_dir + "results.html"
-			tutorial_file = template_dir + "tutorial.html"
+			dictionary_file = dictionary_dst + "/geo.json"
+			format_json_with_callback(dictionary_file)
+
+			for line in fileinput.input(merchant_presenter, inplace=True):
+				print(line.rstrip().replace("merchant_name", merchant))
+			logging.info("updated presenter with new dictionary")
+
+		long_description_file = template_dir + "long_description.md"
+		results_file = template_dir + "results.html"
+		tutorial_file = template_dir + "tutorial.html"
+		if args.update_presenter or args.update_dictionary:
+			logging.info("start pbs update")
 			os.system("pbs --server http://" + server + ":12000 --api-key " +
 				apikey + " --project " + project_json_file + " update_project --task-presenter " +
 				merchant_presenter + " --long-description " + long_description_file +
 				" --results " + results_file + " --tutorial " + tutorial_file)
-			"""
+			logging.info("finish pbs update")
 
-		"""
 		if args.add_tasks:
 			tasks_file = merchant_dir + args.tasks_file
 			os.system("pbs --server http://" + server + ":12000 --api-key " +
 				apikey + " --project " + project_json_file + " add_tasks --tasks-file " +
 				tasks_file)
-		"""
 
 if __name__ == "__main__":
 	main_process()
