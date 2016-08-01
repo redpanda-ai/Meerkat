@@ -457,9 +457,9 @@ class WebConsumer():
 					"txn_sub_type" : trans.get("txn_sub_type", ""),
 					"merchant_name" : trans.pop("CNN", ""),
 					"category_labels" : [trans["category_CNN"].get("label", "")],
-					"merchant_score" : trans.pop("merchant_score", "0.1"),
-					"subtype_score" : trans.pop("subtype_score", "0.2"),
-					"category_score" : trans.pop("category_score", "0.3")
+					"merchant_score" : trans.get("merchant_score", "0.0"),
+					"subtype_score" : trans.get("subtype_score", "0.0"),
+					"category_score" : trans.get("category_score", "0.0")
 					}
 
 			trans.pop("locale_bloom", None)
@@ -470,6 +470,9 @@ class WebConsumer():
 			trans.pop("CNN", None)
 			trans.pop("container", None)
 			trans.pop("category_CNN", None)
+			trans.pop("merchant_score", None)
+			trans.pop("subtype_score", None)
+			trans.pop("category_score", None)
 
 		# return transactions
 
@@ -620,17 +623,9 @@ class WebConsumer():
 				if transaction["ledger_entry"] == "credit":
 					transaction["category_labels"] = ["Other Income"]
 
-			# Collect refund/adjustments transactions to apply category_cnn model one more time
+			# Collect refund/adjustments transactions to apply a refund transactions model soon
 			if transaction["category_labels"] == ["Refunds/Adjustments"]:
 				refund_transactions.append(transaction)
-
-		# Apply classifier for refund transactions again
-		if len(refund_transactions) > 0:
-			debit_category_classifer(refund_transactions, label_key="category_CNN", label_only=False)
-			for trans in refund_transactions:
-				trans["category_labels"] = [trans["category_CNN"].get("label", "")]
-				if trans["category_labels"] == ["Other Expenses"]:
-					trans["category_labels"] = ["Refunds/Adjustments"]
 
 		return data["transaction_list"]
 
