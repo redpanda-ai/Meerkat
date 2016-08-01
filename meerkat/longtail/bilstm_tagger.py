@@ -87,7 +87,7 @@ def load_data(config):
 	train = df[msk]
 	test = df[~msk]
 
-	return test, train
+	return train, test
 
 def load_embeddings_file(file_name, sep=" ",lower=False):
 	"""Load embeddings file"""
@@ -323,7 +323,7 @@ def train_model(config, graph, sess, saver):
 
 		print("ERA: " + str(step))
 
-		for t_index in train_index[0:1000]:
+		for t_index in train_index[0:500]:
 
 			count += 1
 
@@ -361,19 +361,22 @@ def evaluate_testset(config, graph, sess, test):
 
 	total_count = len(test.index)
 	total_correct = 0
+	count = 0
 	test_index = list(test.index)
 	random.shuffle(test_index)
 	model = get_tensor(graph, "training:0")
 
 	print("---ENTERING EVALUATION---")
 
-	total_count = 1000
+	for i in test_index:
 
-	for i in test_index[0:total_count]:
-
+		count += 1
 		row = test.loc[i]
 		tokens, tags = get_tags(row)
 		trans, labels = trans_to_tensor(config, sess, graph, tokens, tags)
+
+		if count % 500 == 0:
+			print("%d" % (count / len(test.index) * 100) + "% complete with evaluation")
 		
 		feed_dict_test = {
 			get_tensor(graph, "input:0"): trans, 
