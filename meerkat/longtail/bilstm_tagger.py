@@ -44,6 +44,46 @@ from meerkat.various_tools import load_params, load_piped_dataframe
 
 logging.basicConfig(level=logging.INFO)
 
+class InputNoiseWrapper(tf.nn.rnn_cell.RNNCell):
+	"""Operator adding noise to inputs of the given cell."""
+
+	def __init__(self, cell, stdev=0.0, seed=None):
+		"""Create a cell with added input noise.
+
+		Args:
+			cell: an RNNCell, a projection to output_size is added to it.
+			input_keep_prob: unit Tensor or float between 0 and 1, input keep
+				probability; if it is float and 1, no input dropout will be added.
+			output_keep_prob: unit Tensor or float between 0 and 1, output keep
+				probability; if it is float and 1, no output dropout will be added.
+			seed: (optional) integer, the randomness seed.
+
+		Raises:
+			TypeError: if cell is not an RNNCell.
+			ValueError: if keep_prob is not between 0 and 1.
+		"""
+		if not isinstance(cell, tf.nn.rnn_cell.RNNCell):
+			raise TypeError("The parameter cell is not a RNNCell.")
+		if (isinstance(stdev, float) and not (stdev >= 0.0)):
+			raise ValueError("Parameter stdev must be non-negative: %d" % stdev)
+		self._cell = cell
+		self._stdev = stdev
+		self._seed = seed
+
+	@property
+	def state_size(self):
+		return self._cell.state_size
+
+	@property
+	def output_size(self):
+		return self._cell.output_size
+
+	def __call__(self, inputs, state, scope=None):
+		"""Run the cell with the declared noise."""
+		inputs = inputs + tf.random_normal(tf.shape(inputs), stddev=self._stdev, seed=self._seed)
+		output, new_state = self._cell(inputs, state, scope)
+		return output, new_state
+
 def get_tags(trans):
 	"""Convert df row to list of tags and tokens"""
 
@@ -252,7 +292,7 @@ def build_graph(config):
 		combined_embeddings = tf.placeholder(tf.float32, shape=input_shape, name="input")
 		batched_input = tf.expand_dims(combined_embeddings, 0)
 
-		def model(name, train=False, noise=0.0):
+		def model(name, train=False, noise_sigma=0.0):
 			"""Model to train"""
 
 			# Create Model
@@ -264,10 +304,10 @@ def build_graph(config):
 			bw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["h_dim"])
 
 			# TODO: Add Noise
-			if train:
-				input_cell = input_cell
-				fw_lstm = fw_lstm
-				bw_lstm = bw_lstm
+			if train and noise_sigma > 0.0:
+				input_cell = InputNoiseWrapper(input_cell, stdev=noise_sigma)
+				fw_lstm = InputNoiseWrapper(fw_lstm, stdev=noise_sigma)
+				bw_lstm = InputNoiseWrapper(bw_lstm, stdev=noise_sigma)
 
 			fw_network = tf.nn.rnn_cell.MultiRNNCell([input_cell] + ([fw_lstm] * (config["num_layers"] - 1)))
 			bw_network = tf.nn.rnn_cell.MultiRNNCell([input_cell] + ([bw_lstm] * (config["num_layers"] - 1)))
@@ -289,7 +329,7 @@ def build_graph(config):
 
 			return prediction
 
-		network = model("training", train=True, noise=config["noise_sigma"])
+		network = model("training", train=True, noise_sigma=config["noise_sigma"])
 		trained_model = model("trained")
 
 		# Calculate Loss and Optimize
