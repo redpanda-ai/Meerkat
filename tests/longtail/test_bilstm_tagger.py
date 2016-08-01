@@ -5,14 +5,14 @@ from nose_parameterized import parameterized
 
 from meerkat.longtail import bilstm_tagger as bilstm
 
-class MioTests(unittest.TestCase):
+class BilstmTaggerTests(unittest.TestCase):
 	"""Unittest class for bilstm_tagger"""
 
 	@parameterized.expand([
 		(["Debit PIN Purchase ISLAND OF GOLD SUPERMARFRESH MEADOWSNY", "ISLAND OF GOLD SUPERMAR"],
 			["background", "background", "background", "merchant", "merchant", "merchant", "merchant", "background"]),
-		(["76", "76"],  ["merchant"]),
-		(["PILOT", "PILOT"], ["merchant"]),
+		(["76", "76"],  ["merchant", "merchant"]),
+		(["PILOT", "PILOT"], ["merchant", "merchant"]),
 		(["PAYMENT THANK YOU", ""], ["background", "background", "background"]),
 		(["123 THAI FOOD OAK          HARBOR WA~~08888~~120123052189~~77132~~0~~~0079", "123 THAI FOOD"],
 			["merchant", "merchant", "merchant", "background", "background", "background"]),
