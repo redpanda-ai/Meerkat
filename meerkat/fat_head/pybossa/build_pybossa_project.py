@@ -118,6 +118,7 @@ def main_process():
 					apikey + " --project " + project_json_file + " create_project")
 		elif project_name not in existing_projects:
 			logging.error("Project {0} doesn't exist. Please first create it".format(project_name))
+			return
 
 		merchant_presenter = merchant_dir + args.task_presenter
 		template_dir = "meerkat/fat_head/pybossa/template/"
