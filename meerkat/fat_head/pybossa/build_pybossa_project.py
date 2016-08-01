@@ -9,50 +9,19 @@ import logging
 import fileinput
 import requests
 
-from meerkat.various_tools import load_params
 from meerkat.fat_head.tools import copy_file
 
-def parse_arguments(args):
-	"""Parse arguments from command line"""
-	parser = argparse.ArgumentParser()
-	module_path = inspect.getmodule(inspect.stack()[1][0]).__file__
-	base_dir = module_path[:module_path.rfind("/") + 1]
-	default_project_dir = base_dir + "projects/"
-	default_dictionary_dir = "meerkat/fat_head/dictionaries/"
-
-	parser.add_argument("--project_dir", default=default_project_dir)
-	parser.add_argument("--dictionary_dir", default=default_dictionary_dir)
-	parser.add_argument("--merchant", default="")
-
-	parser.add_argument("--server", default="52.26.175.156")
-	parser.add_argument("--apikey", default="b151d9e8-0b62-432c-aa3f-7f654ba0d983")
-
-	parser.add_argument("--create_project", action="store_true")
-
-	parser.add_argument("--update_presenter", action="store_true")
-	parser.add_argument("--task_presenter", default="presenter_code.html")
-
-	parser.add_argument("--update_dictionary", action="store_true")
-
-	parser.add_argument("--add_tasks", action="store_true")
-	parser.add_argument("--tasks_file", default="tasks.csv")
-
-	args = parser.parse_args(args)
-	return args
-
-def format_merchant_names(top_merchants):
-	"""Format merchant names"""
-	top_merchants_maps = {}
-	for merchant in top_merchants:
-		name = merchant.replace(" ", "_")
-		for mark in '!"#$%&\'()*+,-./:;<=>?@[\]^`{|}~':
-			name = name.replace(mark, '')
-		top_merchants_maps[name] = merchant
-	top_merchants = list(top_merchants_maps.keys())
-
-	logging.info("Formatting top merchant names:")
-	logging.info(top_merchants_maps)
-	return top_merchants, top_merchants_maps
+def create_project_json_file(project_name, project_json_file):
+	"""Create a json file for the new pybossa project"""
+	project_json = {
+		"name": project_name,
+		"short_name": project_name,
+		"description": project_name,
+		"question": "geo"
+	}
+	with open(project_json_file, "w") as json_file:
+		logging.info("Writing {0}".format(project_json_file))
+		json.dump(project_json, json_file)
 
 def format_json_with_callback(dictionary_file):
 	"""Format the json dictionary to work with ajax callback"""
@@ -68,6 +37,20 @@ def format_json_with_callback(dictionary_file):
 	with open(dictionary_file, "a") as d_file:
 		d_file.write(")")
 
+def format_merchant_names(top_merchants):
+	"""Format merchant names"""
+	top_merchants_maps = {}
+	for merchant in top_merchants:
+		name = merchant.replace(" ", "_")
+		for mark in '!"#$%&\'()*+,-./:;<=>?@[]^`{|}~':
+			name = name.replace(mark, '')
+		top_merchants_maps[name] = merchant
+	top_merchants = list(top_merchants_maps.keys())
+
+	logging.info("Formatting top merchant names:")
+	logging.info(top_merchants_maps)
+	return top_merchants, top_merchants_maps
+
 def get_existing_projects(server, apikey):
 	"""Get a list of existing pybossa projects"""
 	port = "12000"
@@ -78,6 +61,17 @@ def get_existing_projects(server, apikey):
 		short_names.append(item["short_name"])
 	logging.info("Existing projects: {0}".format(short_names))
 	return short_names
+
+def get_top_merchant_names(dictionary_dir):
+	"""Get a list of top merchant names that has dictionaries from agg data"""
+	top_merchants = []
+	logging.info("Dictionaries from agg data: {0}".format(dictionary_dir))
+	existing_dictionaries = [obj[0] for obj in os.walk(dictionary_dir)]
+	for merchant in existing_dictionaries:
+		merchant = merchant[merchant.rfind("/") + 1:]
+		if merchant != "":
+			top_merchants.append(merchant)
+	return top_merchants
 
 def main_process():
 	"""Execute the main programe"""
@@ -90,15 +84,9 @@ def main_process():
 	os.makedirs(project_dir, exist_ok=True)
 	logging.info("Pybossa projects: {0}".format(project_dir))
 
-	top_merchants = []
-
 	dictionary_dir = args.dictionary_dir
-	logging.info("Dictionaries from agg data: {0}".format(dictionary_dir))
-	existing_dictionaries = [obj[0] for obj in os.walk(dictionary_dir)]
-	for merchant in existing_dictionaries:
-		merchant = merchant[merchant.rfind("/") + 1:]
-		if merchant != "":
-			top_merchants.append(merchant)
+	top_merchants = get_top_merchant_names(dictionary_dir)
+
 	if args.merchant != "":
 		if args.merchant in top_merchants:
 			top_merchants = [args.merchant]
@@ -107,7 +95,7 @@ def main_process():
 			return
 
 	top_merchants, top_merchants_maps = format_merchant_names(top_merchants)
-	logging.info(top_merchants)
+	logging.info("Top merchants with dictionaries: {0}".format(top_merchants))
 
 	server = args.server
 	apikey = args.apikey
@@ -126,18 +114,12 @@ def main_process():
 			if project_name in existing_projects:
 				logging.warning("Project {0} already exists".format(project_name))
 			else:
-				project_json = {
-					"name": project_name,
-					"short_name": project_name,
-					"description": project_name,
-					"question": "geo"
-				}
-				with open(project_json_file, "w") as json_file:
-					logging.info("Writing {0}".format(project_json_file))
-					json.dump(project_json, json_file)
-
+				create_project_json_file(project_name, project_json_file)
 				os.system("pbs --server http://" + server + ":12000 --api-key " +
 					apikey + " --project " + project_json_file + " create_project")
+
+		if not args.create_project and project_name not in existing_projects:
+			logging.error("Project {0} doesn't exist. Please first create the project".format(project_name))
 
 		merchant_presenter = merchant_dir + args.task_presenter
 		template_dir = "meerkat/fat_head/pybossa/template/"
@@ -166,12 +148,10 @@ def main_process():
 		results_file = template_dir + "results.html"
 		tutorial_file = template_dir + "tutorial.html"
 		if args.update_presenter or args.update_dictionary:
-			logging.info("start pbs update")
 			os.system("pbs --server http://" + server + ":12000 --api-key " +
 				apikey + " --project " + project_json_file + " update_project --task-presenter " +
 				merchant_presenter + " --long-description " + long_description_file +
 				" --results " + results_file + " --tutorial " + tutorial_file)
-			logging.info("finish pbs update")
 
 		# Add new labeling tasks
 		if args.add_tasks:
@@ -179,6 +159,34 @@ def main_process():
 			os.system("pbs --server http://" + server + ":12000 --api-key " +
 				apikey + " --project " + project_json_file + " add_tasks --tasks-file " +
 				tasks_file)
+
+def parse_arguments(args):
+	"""Parse arguments from command line"""
+	parser = argparse.ArgumentParser()
+	module_path = inspect.getmodule(inspect.stack()[1][0]).__file__
+	base_dir = module_path[:module_path.rfind("/") + 1]
+	default_project_dir = base_dir + "projects/"
+	default_dictionary_dir = "meerkat/fat_head/dictionaries/"
+
+	parser.add_argument("--project_dir", default=default_project_dir)
+	parser.add_argument("--dictionary_dir", default=default_dictionary_dir)
+	parser.add_argument("--merchant", default="")
+
+	parser.add_argument("--server", default="52.26.175.156")
+	parser.add_argument("--apikey", default="b151d9e8-0b62-432c-aa3f-7f654ba0d983")
+
+	parser.add_argument("--create_project", action="store_true")
+
+	parser.add_argument("--update_presenter", action="store_true")
+	parser.add_argument("--task_presenter", default="presenter_code.html")
+
+	parser.add_argument("--update_dictionary", action="store_true")
+
+	parser.add_argument("--add_tasks", action="store_true")
+	parser.add_argument("--tasks_file", default="tasks.csv")
+
+	args = parser.parse_args(args)
+	return args
 
 if __name__ == "__main__":
 	main_process()
