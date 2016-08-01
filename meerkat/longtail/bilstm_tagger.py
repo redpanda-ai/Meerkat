@@ -87,7 +87,7 @@ def load_data(config):
 	train = df[msk]
 	test = df[~msk]
 
-	return test, train
+	return train, test
 
 def load_embeddings_file(file_name, sep=" ",lower=False):
 	"""Load embeddings file"""
@@ -310,7 +310,8 @@ def train_model(config, graph, sess, saver):
 
 	eras = config["eras"]
 	dataset = config["dataset"]
-	train, test = load_data(config)
+	train = config["train"]
+	test = config["test"]
 	train_index = list(train.index)
 	sess.run(get_op(graph, "assign_wembedding"), feed_dict={get_tensor(graph, "embedding_placeholder:0"): config["wembedding"]})
 
