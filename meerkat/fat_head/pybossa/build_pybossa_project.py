@@ -28,14 +28,29 @@ def parse_arguments(args):
 
 	parser.add_argument("--create_project", action="store_true")
 
-	parser.add_argument("--update_project", action="store_true")
+	parser.add_argument("--update_presenter", action="store_true")
 	parser.add_argument("--task_presenter", default="presenter_code.html")
+
+	parser.add_argument("--update_dictionaries", action="store_true")
 
 	parser.add_argument("--add_tasks", action="store_true")
 	parser.add_argument("--tasks_file", default="tasks1.csv")
 
 	args = parser.parse_args(args)
 	return args
+
+def format_merchant_names(top_merchants):
+	top_merchants_maps = {}
+	for merchant in top_merchants:
+		name = merchant.replace(" ", "_")
+		for mark in '!"#$%&\'()*+,-./:;<=>?@[\]^`{|}~':
+			name = name.replace(mark, '')
+		top_merchants_maps[name] = merchant
+	top_merchants = list(top_merchants_maps.keys())
+
+	logging.info("Formatting top merchant names:")
+	logging.info(top_merchants_maps)
+	return top_merchants, top_merchants_maps
 
 def main_process():
 	"""Execute the main programe"""
@@ -49,6 +64,7 @@ def main_process():
 	logging.info("Pybossa projects: {0}".format(project_dir))
 
 	top_merchants = []
+
 	dictionary_dir = args.dictionary_dir
 	logging.info("Dictionaries from agg data: {0}".format(dictionary_dir))
 	existing_dictionaries = [obj[0] for obj in os.walk(dictionary_dir)]
@@ -63,17 +79,8 @@ def main_process():
 			logging.error("Merchant {0} doesn't have dictionaries".format(args.merchant))
 			return
 
-	top_merchants_maps = {}
-	for merchant in top_merchants:
-		name = merchant.replace(" ", "_")
-		for mark in '!"#$%&\'()*+,-./:;<=>?@[\]^`{|}~':
-			name = name.replace(mark, '')
-		top_merchants_maps[name] = merchant
-	top_merchants = list(top_merchants_maps.keys())
-
+	top_merchants, top_merchants_maps = format_merchant_names(top_merchants)
 	logging.info(top_merchants)
-	logging.info("Formatting top merchant names:")
-	logging.info(top_merchants_maps)
 
 	server = args.server
 	apikey = args.apikey
@@ -99,7 +106,7 @@ def main_process():
 			os.system("pbs --server http://" + server + ":12000 --api-key " +
 				apikey + " --project " + project_json_file + " create_project")
 
-		if args.update_project:
+		if args.update_presenter:
 			template_dir = "meerkat/fat_head/pybossa/template/"
 			presenter_file = template_dir + args.task_presenter
 			copy_file(presenter_file, merchant_dir)
@@ -107,6 +114,15 @@ def main_process():
 			for line in fileinput.input(merchant_presenter, inplace=True):
 				print(line.rstrip().replace("Geomancer", "Geomancer_" + merchant))
 
+		if args.update_dictionaries:
+			dictionary_dst = "/var/www/html/" + merchant + "/"
+			os.makedirs(dictionary_dst, exist_ok=True)
+			copy_file(dictionary_dir + top_merchants_maps[merchant] + "/geo.json", dictionary_dst)
+			for line in fileinput.input(merchant_presenter, inplace=True):
+				print(line)
+				print(line.rstrip().replace("merchant_name", merchant))
+
+			"""
 			long_description_file = template_dir + "long_description.md"
 			results_file = template_dir + "results.html"
 			tutorial_file = template_dir + "tutorial.html"
@@ -114,13 +130,15 @@ def main_process():
 				apikey + " --project " + project_json_file + " update_project --task-presenter " +
 				merchant_presenter + " --long-description " + long_description_file +
 				" --results " + results_file + " --tutorial " + tutorial_file)
+			"""
 
-	"""
+		"""
 		if args.add_tasks:
-			tasks_file = project_dir + args.tasks_file
+			tasks_file = merchant_dir + args.tasks_file
 			os.system("pbs --server http://" + server + ":12000 --api-key " +
-				apikey + " --project " + project_json + " add_tasks --tasks-file " +
+				apikey + " --project " + project_json_file + " add_tasks --tasks-file " +
 				tasks_file)
-	"""
+		"""
+
 if __name__ == "__main__":
 	main_process()
