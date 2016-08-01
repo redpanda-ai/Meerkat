@@ -87,7 +87,7 @@ def load_data(config):
 	train = df[msk]
 	test = df[~msk]
 
-	return test, train
+	return train, test
 
 def load_embeddings_file(file_name, sep=" ",lower=False):
 	"""Load embeddings file"""
@@ -251,14 +251,15 @@ def build_graph(config):
 		input_shape = (None, config["ce_dim"] * 2 + config["we_dim"])
 		combined_embeddings = tf.placeholder(tf.float32, shape=input_shape, name="input")
 
-		def model(name, train=False, noise=0.0):
+		def model(combined_embeddings, name, train=False, noise_sigma=0.0):
 			"""Model to train"""
 
-			if train:
-				input_noise = combined_embeddings + tf.random_normal(tf.shape(combined_embeddings)) * config["noise_sigma"]
-				batched_input = tf.expand_dims(input_noise, 0)
-			else:
-				batched_input = tf.expand_dims(combined_embeddings, 0)
+			if noise_sigma < 0.0:
+				raise ValueError("noise sigma must be non-negative {0}: ".format(noise_sigma))
+
+			if train and noise_sigma > 0.0:
+				combined_embeddings = combined_embeddings + tf.random_normal(tf.shape(combined_embeddings)) * noise_sigma
+			batched_input = tf.expand_dims(combined_embeddings, 0)
 
 			# Create Model
 			trans_len = tf.placeholder(tf.int64, None, name="trans_length")
@@ -286,16 +287,14 @@ def build_graph(config):
 			# Add Noise and Predict
 			concat_layer = tf.concat(2, [outputs_fw, tf.reverse(outputs_bw, [False, True, False])], name="concat_layer")
 			
-			if train:
-				output_noise = concat_layer + tf.random_normal(tf.shape(concat_layer)) * noise
-				prediction = tf.nn.softmax(tf.matmul(tf.squeeze(output_noise), weight) + bias, name=name)
-			else:
-				prediction = tf.nn.softmax(tf.matmul(tf.squeeze(concat_layer), weight) + bias, name=name)
+			if train and noise_sigma > 0.0:
+				concat_layer = concat_layer + tf.random_normal(tf.shape(concat_layer)) * noise_sigma
+			prediction = tf.nn.softmax(tf.matmul(tf.squeeze(concat_layer), weight) + bias, name=name)
 
 			return prediction
 
-		network = model("training", train=True, noise=config["noise_sigma"])
-		trained_model = model("trained")
+		network = model(combined_embeddings, "training", train=True, noise_sigma=config["noise_sigma"])
+		trained_model = model(combined_embeddings, "trained")
 
 		# Calculate Loss and Optimize
 		labels = tf.placeholder(tf.float32, shape=[None, len(config["tag_map"].keys())], name="y")
@@ -311,7 +310,8 @@ def train_model(config, graph, sess, saver):
 
 	eras = config["eras"]
 	dataset = config["dataset"]
-	train, test = load_data(config)
+	train = config["train"]
+	test = config["test"]
 	train_index = list(train.index)
 	sess.run(get_op(graph, "assign_wembedding"), feed_dict={get_tensor(graph, "embedding_placeholder:0"): config["wembedding"]})
 
