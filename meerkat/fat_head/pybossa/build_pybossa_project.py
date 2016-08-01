@@ -63,7 +63,7 @@ def get_existing_projects(server, apikey):
 	return short_names
 
 def get_top_merchant_names(dictionary_dir):
-	"""Get a list of top merchant names that has dictionaries from agg data"""
+	"""Get a list of top merchants that has dictionaries from agg data"""
 	top_merchants = []
 	logging.info("Dictionaries from agg data: {0}".format(dictionary_dir))
 	existing_dictionaries = [obj[0] for obj in os.walk(dictionary_dir)]
@@ -97,8 +97,7 @@ def main_process():
 	top_merchants, top_merchants_maps = format_merchant_names(top_merchants)
 	logging.info("Top merchants with dictionaries: {0}".format(top_merchants))
 
-	server = args.server
-	apikey = args.apikey
+	server, apikey = args.server, args.apikey
 
 	existing_projects = get_existing_projects(server, apikey)
 
@@ -117,9 +116,8 @@ def main_process():
 				create_project_json_file(project_name, project_json_file)
 				os.system("pbs --server http://" + server + ":12000 --api-key " +
 					apikey + " --project " + project_json_file + " create_project")
-
-		if not args.create_project and project_name not in existing_projects:
-			logging.error("Project {0} doesn't exist. Please first create the project".format(project_name))
+		elif project_name not in existing_projects:
+			logging.error("Project {0} doesn't exist. Please first create it".format(project_name))
 
 		merchant_presenter = merchant_dir + args.task_presenter
 		template_dir = "meerkat/fat_head/pybossa/template/"
@@ -128,8 +126,7 @@ def main_process():
 		if args.update_presenter:
 			presenter_file = template_dir + args.task_presenter
 			copy_file(presenter_file, merchant_dir)
-			for line in fileinput.input(merchant_presenter, inplace=True):
-				print(line.rstrip().replace("Geomancer", "Geomancer_" + merchant))
+			replace_str_in_file(merchant_presenter, "Geomancer", "Geomancer_" + merchant)
 
 		# Update pybossa dictionary
 		if args.update_dictionary:
@@ -140,13 +137,13 @@ def main_process():
 			dictionary_file = dictionary_dst + "/geo.json"
 			format_json_with_callback(dictionary_file)
 
-			for line in fileinput.input(merchant_presenter, inplace=True):
-				print(line.rstrip().replace("merchant_name", merchant))
+			replace_str_in_file(merchant_presenter, "merchant_name", merchant)
 			logging.info("updated presenter with new dictionary")
 
 		long_description_file = template_dir + "long_description.md"
 		results_file = template_dir + "results.html"
 		tutorial_file = template_dir + "tutorial.html"
+
 		if args.update_presenter or args.update_dictionary:
 			os.system("pbs --server http://" + server + ":12000 --api-key " +
 				apikey + " --project " + project_json_file + " update_project --task-presenter " +
@@ -187,6 +184,11 @@ def parse_arguments(args):
 
 	args = parser.parse_args(args)
 	return args
+
+def replace_str_in_file(file_name, old_str, new_str):
+	"""Replace the occurrences of old string with new string in a file"""
+	for line in fileinput.input(file_name, inplace=True):
+		print(line.rstrip().replace(old_str, new_str))
 
 if __name__ == "__main__":
 	main_process()
