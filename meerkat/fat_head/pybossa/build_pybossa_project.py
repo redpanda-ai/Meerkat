@@ -68,6 +68,17 @@ def format_json_with_callback(dictionary_file):
 	with open(dictionary_file, "a") as d_file:
 		d_file.write(")")
 
+def get_existing_projects(server, apikey):
+	"""Get a list of existing pybossa projects"""
+	port = "12000"
+	address = "http://" + server + ":" + port + "/api/project?api_key=" + apikey
+	my_json = requests.get(address).json()
+	short_names = []
+	for item in my_json:
+		short_names.append(item["short_name"])
+	logging.info("Existing projects: {0}".format(short_names))
+	return short_names
+
 def main_process():
 	"""Execute the main programe"""
 	log_format = "%(asctime)s %(levelname)s: %(message)s"
@@ -100,6 +111,8 @@ def main_process():
 
 	server = args.server
 	apikey = args.apikey
+
+	existing_projects = get_existing_projects(server, apikey)
 
 	for merchant in top_merchants:
 		merchant_dir = project_dir + merchant + "/"
