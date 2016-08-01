@@ -250,6 +250,7 @@ def build_graph(config):
 		# Combined Word Embedding and Character Embedding Input
 		input_shape = (None, config["ce_dim"] * 2 + config["we_dim"])
 		combined_embeddings = tf.placeholder(tf.float32, shape=input_shape, name="input")
+		trans_len = tf.placeholder(tf.int64, None, name="trans_length")
 
 		def model(combined_embeddings, name, train=False, noise_sigma=0.0):
 			"""Model to train"""
@@ -262,9 +263,6 @@ def build_graph(config):
 			batched_input = tf.expand_dims(combined_embeddings, 0)
 
 			# Create Model
-			trans_len = tf.placeholder(tf.int64, None, name="trans_length")
-			tf.identity(trans_len, name="tli")
-
 			input_cell = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"] * 2 + config["we_dim"])
 			fw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["h_dim"])
 			bw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["h_dim"])
@@ -333,7 +331,7 @@ def train_model(config, graph, sess, saver):
 
 			row = train.loc[t_index]
 			tokens, tags = get_tags(row)
-			trans, labels = trans_to_tensor(config, sess, graph, tokens, tags)
+			trans, labels = trans_to_tensor(config, sess, graph, tokens, tags, train=True)
 
 			try:
 
@@ -359,28 +357,26 @@ def train_model(config, graph, sess, saver):
 def evaluate_testset(config, graph, sess, test):
 	"""Check error on test set"""
 
-	total_count = len(test.index)
+	total_count = 0
 	total_correct = 0
 	test_index = list(test.index)
 	random.shuffle(test_index)
-	model = get_tensor(graph, "training:0")
 
 	print("---ENTERING EVALUATION---")
 
-	total_count = 1000
-
-	for i in test_index[0:total_count]:
+	for i in test_index[0:1000]:
 
 		row = test.loc[i]
 		tokens, tags = get_tags(row)
 		trans, labels = trans_to_tensor(config, sess, graph, tokens, tags)
+		total_count += len(tokens)
 		
 		feed_dict_test = {
-			get_tensor(graph, "input:0"): trans, 
-			get_tensor(graph, "trans_length:0"): trans.shape[0]
+			get_tensor(graph, "trans_length:0"): trans.shape[0],
+			get_tensor(graph, "input:0"): trans	
 		}
 
-		output = sess.run(model, feed_dict=feed_dict_test)
+		output = sess.run(get_tensor(graph, "trained:0"), feed_dict=feed_dict_test)
 
 		correct_count = np.sum(np.argmax(output, 1) == np.argmax(labels, 1))
 		total_correct += correct_count
