@@ -251,7 +251,7 @@ def build_graph(config):
 		input_shape = (None, config["ce_dim"] * 2 + config["we_dim"])
 		combined_embeddings = tf.placeholder(tf.float32, shape=input_shape, name="input")
 
-		def model(name, train=False, noise_sigma=0.0):
+		def model(combined_embeddings, name, train=False, noise_sigma=0.0):
 			"""Model to train"""
 
 			if noise_sigma < 0.0:
@@ -293,8 +293,8 @@ def build_graph(config):
 
 			return prediction
 
-		network = model("training", train=True, noise_sigma=config["noise_sigma"])
-		trained_model = model("trained")
+		network = model(combined_embeddings, "training", train=True, noise_sigma=config["noise_sigma"])
+		trained_model = model(combined_embeddings, "trained")
 
 		# Calculate Loss and Optimize
 		labels = tf.placeholder(tf.float32, shape=[None, len(config["tag_map"].keys())], name="y")
