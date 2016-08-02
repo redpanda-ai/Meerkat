@@ -145,17 +145,14 @@ def encode_tags(config, tags):
 	encoded_tags = (np.arange(len(tag2id)) == tags[:, None]).astype(np.float32)
 	return encoded_tags
 
-def trans_to_tensor(config, sess, graph, tokens, tags, train=False):
+def trans_to_indices(config, sess, graph, tokens, tags, train=False):
 	"""Convert a transaction to a tensor representation of documents
 	and labels"""
 
 	w2i = config["w2i"]
 	c2i = config["c2i"]
 	max_wl = config["max_word_length"]
-	lst = get_tensor(graph, "last_state:0")
-	rev_lst = get_tensor(graph, "rev_last_state:0")
-	we_lookup = get_tensor(graph, "we_lookup:0")
-	char_inputs, rev_char_inputs = [], []
+	char_inputs = []
 	word_indices = [w2i[w] for w in tokens] if train else [w2i.get(w, w2i["_UNK"]) for w in tokens]
 
 	# Encode Tags
@@ -165,34 +162,16 @@ def trans_to_tensor(config, sess, graph, tokens, tags, train=False):
 	for i, t in enumerate(tokens):
 
 		t = ["<w>"] + list(t) + ["</w>"]
-		rev_t = t[::-1]
 		char_inputs.append([])
-		rev_char_inputs.append([])
 
 		for ii in range(max_wl):
 			char_index = c2i[t[ii]] if ii < len(t) else 0
 			char_inputs[i].append(char_index)
-			rev_char_index = c2i[rev_t[ii]] if ii < len(rev_t) else 0
-			rev_char_inputs[i].append(rev_char_index)
 
-	# Collect Output
-	feed_dict = {
-		get_tensor(graph, "char_inputs:0") : np.array(char_inputs),
-		get_tensor(graph, "rev_char_inputs:0") : np.array(rev_char_inputs),
-		get_tensor(graph, "word_lengths:0") : [len(t) for t in tokens],
-		get_tensor(graph, "word_inputs:0") : word_indices 
-	}
+	char_inputs = np.array(char_inputs)
+	word_lengths = [len(t) for t in tokens]
 
-	last_state, rev_last_state, embedded_words = sess.run([lst, rev_lst, we_lookup], feed_dict=feed_dict)
-	char_embed = [last_state[i][len(t) - 1] for i, t in enumerate(tokens)]
-	rev_char_embed = [rev_last_state[i][len(t) - 1] for i, t in enumerate(tokens)]
-
-	# Merge Encodings
-	char_features = [np.concatenate([c, rc], axis=0) for c, rc in zip(char_embed, reversed(rev_char_embed))]
-	char_features = np.array(char_features)
-	input_tensor = np.concatenate([embedded_words, char_features], axis=1)
-
-	return input_tensor, encoded_tags
+	return char_inputs, word_lengths, word_indices, encoded_tags
 
 def char_encoding(config, graph):
 	"""Create graph nodes for character encoding"""
@@ -203,30 +182,24 @@ def char_encoding(config, graph):
 	with graph.as_default():
 
 		# Character Embedding
-		word_lengths = tf.placeholder(tf.int32, [None], name="word_lengths")
+		word_lengths = tf.placeholder(tf.int64, [None], name="word_lengths")
 		char_inputs = tf.placeholder(tf.int32, [None, max_wl], name="char_inputs")
-		rev_char_inputs = tf.placeholder(tf.int32, [None, max_wl], name="rev_char_inputs")
 		cembed_matrix = tf.Variable(tf.random_uniform([len(c2i.keys()), config["ce_dim"]], -1.0, 1.0), name="cembeds")
 		cembeds = tf.nn.embedding_lookup(cembed_matrix, char_inputs, name="ce_lookup")
-		rev_cembeds = tf.nn.embedding_lookup(cembed_matrix, rev_char_inputs, name="rev_ce_lookup")
-
-		# TODO Non-essential: Replace extra with zeros instead of UNK embedding
 
 		# Create LSTM for Character Encoding
-		lstm = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"], state_is_tuple=True)
-		initial_state = lstm.zero_state(tf.size(word_lengths), tf.float32)
+		fw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"], state_is_tuple=True)
+		bw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"], state_is_tuple=True)
 
 		# Encode Characters with LSTM
 		options = {
 			"dtype": tf.float32,
-			"sequence_length": word_lengths,
-			"initial_state": initial_state
+			"sequence_length": word_lengths
 		}
 
-		output, state = tf.nn.dynamic_rnn(lstm, cembeds, scope="fw", **options)
-		last_state = tf.identity(output, name="last_state")
-		output, state =  tf.nn.dynamic_rnn(lstm, rev_cembeds, scope="bw", **options)
-		rev_last_state = tf.identity(output, name="rev_last_state")
+		(last_state, rev_last_state), output_states = tf.nn.bidirectional_dynamic_rnn(fw_lstm, bw_lstm, cembeds, **options)
+
+		return last_state, rev_last_state
 
 def build_graph(config):
 	"""Build CNN"""
@@ -238,7 +211,7 @@ def build_graph(config):
 	with graph.as_default():
 
 		# Character Embedding
-		char_encoding(config, graph)
+		last_state, rev_last_state = char_encoding(config, graph)
 
 		# Word Embedding
 		word_inputs = tf.placeholder(tf.int32, [None], name="word_inputs")
@@ -248,9 +221,13 @@ def build_graph(config):
 		wembeds = tf.nn.embedding_lookup(wembed_matrix, word_inputs, name="we_lookup")
 		
 		# Combined Word Embedding and Character Embedding Input
-		input_shape = (None, config["ce_dim"] * 2 + config["we_dim"])
-		combined_embeddings = tf.placeholder(tf.float32, shape=input_shape, name="input")
 		trans_len = tf.placeholder(tf.int64, None, name="trans_length")
+		word_lengths = get_tensor(graph, "word_lengths:0")
+		index_lookup = tf.pack([tf.range(tf.size(word_lengths)), tf.to_int32(word_lengths)-1], axis=1, name="index_lookup")
+		
+		char_embeds = tf.gather_nd(last_state, index_lookup)
+		rev_char_embeds = tf.gather_nd(rev_last_state, index_lookup)
+		combined_embeddings = tf.concat(1, [wembeds, char_embeds, tf.reverse(rev_char_embeds, [True, False])])
 
 		# Cells and Weights
 		input_cell = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"] * 2 + config["we_dim"], state_is_tuple=True)
@@ -297,7 +274,7 @@ def build_graph(config):
 		# Calculate Loss and Optimize
 		labels = tf.placeholder(tf.float32, shape=[None, len(config["tag_map"].keys())], name="y")
 		loss = tf.neg(tf.reduce_mean(tf.reduce_sum(network * labels, 1)), name="loss")
-		optimizer = tf.train.GradientDescentOptimizer(config["learning_rate"]).minimize(loss, name="optimizer")
+		optimizer = tf.train.GradientDescentOptimizer(config["learning_rate"]).minimize(loss, var_list=tf.trainable_variables(), name="optimizer")
 
 		saver = tf.train.Saver()
 
@@ -326,24 +303,28 @@ def train_model(config, graph, sess, saver):
 			count += 1
 
 			if count % 500 == 0:
+				print(sess.run(get_tensor(graph, "cembeds:0")))
 				print("loss: " + str(total_loss / count))
 				print("%d" % (count / len(train_index) * 100) + "% complete with era")
 
 			row = train.loc[t_index]
 			tokens, tags = get_tags(row)
-			trans, labels = trans_to_tensor(config, sess, graph, tokens, tags, train=True)
+			char_inputs, word_lengths, word_indices, encoded_tags = trans_to_indices(config, sess, graph, tokens, tags, train=True)
 
 			try:
 
 				feed_dict = {
-					get_tensor(graph, "trans_length:0"): trans.shape[0],
-					get_tensor(graph, "input:0"): trans,
+					get_tensor(graph, "char_inputs:0") : char_inputs,
+					get_tensor(graph, "word_inputs:0") : word_indices,
+					get_tensor(graph, "word_lengths:0") : word_lengths,
+					get_tensor(graph, "trans_length:0"): len(tokens),
 					get_tensor(graph, "y:0"): labels
 				}
 
 				# Run Training Step
 				optimizer_out, loss = sess.run([get_op(graph, "optimizer"), get_tensor(graph, "loss:0")], feed_dict=feed_dict)
 				total_loss += loss
+				
 			except:
 				print(row)
 
@@ -374,12 +355,14 @@ def evaluate_testset(config, graph, sess, test):
 
 		row = test.loc[i]
 		tokens, tags = get_tags(row)
-		trans, labels = trans_to_tensor(config, sess, graph, tokens, tags)
+		char_inputs, word_lengths, word_indices, encoded_tags = trans_to_indices(config, sess, graph, tokens, tags, train=True)
 		total_count += len(tokens)
 		
-		feed_dict_test = {
-			get_tensor(graph, "trans_length:0"): trans.shape[0],
-			get_tensor(graph, "input:0"): trans	
+		feed_dict = {
+			get_tensor(graph, "char_inputs:0") : char_inputs,
+			get_tensor(graph, "word_inputs:0") : word_indices,
+			get_tensor(graph, "word_lengths:0") : word_lengths,
+			get_tensor(graph, "trans_length:0"): len(tokens)
 		}
 
 		output = sess.run(get_tensor(graph, "trained:0"), feed_dict=feed_dict_test)
