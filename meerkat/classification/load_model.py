@@ -125,11 +125,20 @@ def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=False, model
 
 			for index, transaction in enumerate(trans):
 				label = label_map.get(str(labels[index]), "")
-				if 'threshold' in label and scores[index] < math.log(float(label["threshold"])):
+				if 'threshold' in label and label["threshold"] and scores[index] < math.log(float(label["threshold"])):
 					label = label_map.get('1', '') # first class in label map should always be the default one
 				if isinstance(label, dict) and label_only:
 					label = label["label"]
 				transaction[label_key] = label
+
+				# Append score for transaction under debug mode
+				if label_key == "CNN":
+					transaction["merchant_score"] = "{0:.6}".format(math.pow(10, scores[index]))
+				if label_key == "subtype_CNN":
+					transaction["subtype_score"] = "{0:.6}".format(math.pow(10, scores[index]))
+				if label_key == "category_CNN":
+					transaction["category_score"] = "{0:.6}".format(math.pow(10, scores[index]))
+
 		else:
 			return output
 
