@@ -46,9 +46,6 @@ def format_merchant_names(top_merchants):
 			name = name.replace(mark, '')
 		top_merchants_maps[name] = merchant
 	top_merchants = list(top_merchants_maps.keys())
-
-	logging.info("Formatting top merchant names:")
-	logging.info(top_merchants_maps)
 	return top_merchants, top_merchants_maps
 
 def get_existing_projects(server, apikey):
@@ -59,7 +56,6 @@ def get_existing_projects(server, apikey):
 	short_names = []
 	for item in my_json:
 		short_names.append(item["short_name"])
-	logging.info("Existing projects: {0}".format(short_names))
 	return short_names
 
 def get_top_merchant_names(dictionary_dir):
@@ -95,10 +91,9 @@ def main_process():
 			return
 
 	top_merchants, top_merchants_maps = format_merchant_names(top_merchants)
-	logging.info("Top merchants with dictionaries: {0}".format(top_merchants))
+	logging.info("Top merchants project to be processed: {0}".format(top_merchants))
 
 	server, apikey = args.server, args.apikey
-
 	existing_projects = get_existing_projects(server, apikey)
 
 	for merchant in top_merchants:
@@ -139,6 +134,7 @@ def main_process():
 			format_json_with_callback(dictionary_file)
 
 			replace_str_in_file(merchant_presenter, "merchant_name", merchant)
+			replace_str_in_file(merchant_presenter, "server_ip", server)
 			logging.info("updated presenter with new dictionary")
 
 		long_description_file = template_dir + "long_description.md"
