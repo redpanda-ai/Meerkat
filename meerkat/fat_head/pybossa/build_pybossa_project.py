@@ -137,11 +137,11 @@ def main_process():
 			replace_str_in_file(merchant_presenter, "server_ip", server)
 			logging.info("updated presenter with new dictionary")
 
-		long_description_file = template_dir + "long_description.md"
-		results_file = template_dir + "results.html"
-		tutorial_file = template_dir + "tutorial.html"
-
 		if args.update_presenter or args.update_dictionary:
+			long_description_file = template_dir + "long_description.md"
+			results_file = template_dir + "results.html"
+			tutorial_file = template_dir + "tutorial.html"
+
 			os.system("pbs --server http://" + server + ":12000 --api-key " +
 				apikey + " --project " + project_json_file + " update_project --task-presenter " +
 				merchant_presenter + " --long-description " + long_description_file +
