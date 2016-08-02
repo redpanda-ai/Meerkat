@@ -47,8 +47,8 @@
         "txn_sub_type": "Purchase",
         "merchant_name": "Ikea",
         "category_labels": ["Other Expenses"],
-        "merchant_score": "0.1",
-        "subtype_score": "0.2",
-        "category_score": "0.3"
+        "merchant_score": "0.0",
+        "subtype_score": "0.0",
+        "category_score": "0.0"
     }
 }
