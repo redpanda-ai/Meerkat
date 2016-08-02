@@ -130,6 +130,15 @@ def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=False, model
 				if isinstance(label, dict) and label_only:
 					label = label["label"]
 				transaction[label_key] = label
+
+				# Append score for transaction under debug mode
+				if label_key == "CNN":
+					transaction["merchant_score"] = "{0:.6}".format(math.pow(10, scores[index]))
+				if label_key == "subtype_CNN":
+					transaction["subtype_score"] = "{0:.6}".format(math.pow(10, scores[index]))
+				if label_key == "category_CNN":
+					transaction["category_score"] = "{0:.6}".format(math.pow(10, scores[index]))
+
 		else:
 			return output
 
