@@ -35,7 +35,10 @@
 				"merchant_name" : "",
 				"txn_type" : "",
 				"txn_sub_type" : "",
-				"category_labels" : ["Grocery"]
+				"category_labels" : ["Grocery"],
+				"merchant_score" : "0.1",
+				"subtype_score" : "0.2",
+				"category_score" : "0.3"
 			},
 			"search" : {
 				"merchant_name" : "",
@@ -71,7 +74,10 @@
 			"cnn" : {
 				"txn_type" : "",
 				"txn_sub_type" : "",
-				"category_labels" : ["Other Expenses"]
+				"category_labels" : ["Other Expenses"],
+				"merchant_score" : "0.1",
+				"subtype_score" : "0.2",
+				"category_score" : "0.3"
 			}
 		},
 		{
@@ -89,7 +95,10 @@
 				"merchant_name" : "",
 				"txn_type" : "",
 				"txn_sub_type" : "",
-				"category_labels": ["General Merchandise"]
+				"category_labels": ["General Merchandise"],
+				"merchant_score" : "0.1",
+				"subtype_score" : "0.2",
+				"category_score" : "0.3"
 			}
 		}
 	]
