@@ -213,7 +213,7 @@ def char_encoding(config, graph):
 		# TODO Non-essential: Replace extra with zeros instead of UNK embedding
 
 		# Create LSTM for Character Encoding
-		lstm = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"])
+		lstm = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"], state_is_tuple=True)
 		initial_state = lstm.zero_state(tf.size(word_lengths), tf.float32)
 
 		# Encode Characters with LSTM
@@ -242,7 +242,7 @@ def build_graph(config):
 
 		# Word Embedding
 		word_inputs = tf.placeholder(tf.int32, [None], name="word_inputs")
-		wembed_matrix = tf.Variable(tf.constant(0.0, shape=[config["vocab_size"], config["we_dim"]]), trainable=False, name="wembed_matrix")
+		wembed_matrix = tf.Variable(tf.constant(0.0, shape=[config["vocab_size"], config["we_dim"]]), trainable=True, name="wembed_matrix")
 		embedding_placeholder = tf.placeholder(tf.float32, [config["vocab_size"], config["we_dim"]], name="embedding_placeholder")
 		assign_wembedding = tf.assign(wembed_matrix, embedding_placeholder, name="assign_wembedding")
 		wembeds = tf.nn.embedding_lookup(wembed_matrix, word_inputs, name="we_lookup")
@@ -252,6 +252,16 @@ def build_graph(config):
 		combined_embeddings = tf.placeholder(tf.float32, shape=input_shape, name="input")
 		trans_len = tf.placeholder(tf.int64, None, name="trans_length")
 
+		# Cells and Weights
+		input_cell = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"] * 2 + config["we_dim"], state_is_tuple=True)
+		fw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["h_dim"], state_is_tuple=True)
+		bw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["h_dim"], state_is_tuple=True)
+
+		fw_network = tf.nn.rnn_cell.MultiRNNCell([input_cell] + ([fw_lstm] * (config["num_layers"] - 1)), state_is_tuple=True)
+		bw_network = tf.nn.rnn_cell.MultiRNNCell([input_cell] + ([bw_lstm] * (config["num_layers"] - 1)), state_is_tuple=True)
+		weight = tf.Variable(tf.truncated_normal([config["h_dim"] * 2, len(config["tag_map"])], stddev=0.1))
+		bias = tf.Variable(tf.constant(0.1, shape=[len(config["tag_map"])]))
+
 		def model(combined_embeddings, name, train=False, noise_sigma=0.0):
 			"""Model to train"""
 
@@ -260,15 +270,8 @@ def build_graph(config):
 
 			if train and noise_sigma > 0.0:
 				combined_embeddings = combined_embeddings + tf.random_normal(tf.shape(combined_embeddings)) * noise_sigma
+
 			batched_input = tf.expand_dims(combined_embeddings, 0)
-
-			# Create Model
-			input_cell = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"] * 2 + config["we_dim"])
-			fw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["h_dim"])
-			bw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["h_dim"])
-
-			fw_network = tf.nn.rnn_cell.MultiRNNCell([input_cell] + ([fw_lstm] * (config["num_layers"] - 1)))
-			bw_network = tf.nn.rnn_cell.MultiRNNCell([input_cell] + ([bw_lstm] * (config["num_layers"] - 1)))
 
 			options = {
 				"dtype": tf.float32,
@@ -278,16 +281,13 @@ def build_graph(config):
 
 			(outputs_fw, outputs_bw), output_states = tf.nn.bidirectional_dynamic_rnn(fw_network, bw_network, batched_input, **options)
 
-			# Prediction
-			weight = tf.Variable(tf.truncated_normal([config["h_dim"] * 2, len(config["tag_map"])], stddev=0.1))
-			bias = tf.Variable(tf.constant(0.1, shape=[len(config["tag_map"])]))
-
 			# Add Noise and Predict
 			concat_layer = tf.concat(2, [outputs_fw, tf.reverse(outputs_bw, [False, True, False])], name="concat_layer")
 			
 			if train and noise_sigma > 0.0:
 				concat_layer = concat_layer + tf.random_normal(tf.shape(concat_layer)) * noise_sigma
-			prediction = tf.nn.softmax(tf.matmul(tf.squeeze(concat_layer), weight) + bias, name=name)
+
+			prediction = tf.log(tf.nn.softmax(tf.matmul(tf.squeeze(concat_layer), weight) + bias), name=name)
 
 			return prediction
 
@@ -296,7 +296,7 @@ def build_graph(config):
 
 		# Calculate Loss and Optimize
 		labels = tf.placeholder(tf.float32, shape=[None, len(config["tag_map"].keys())], name="y")
-		loss = tf.reduce_mean(tf.reduce_sum(network * labels, 1), name="loss")
+		loss = tf.neg(tf.reduce_mean(tf.reduce_sum(network * labels, 1)), name="loss")
 		optimizer = tf.train.GradientDescentOptimizer(config["learning_rate"]).minimize(loss, name="optimizer")
 
 		saver = tf.train.Saver()
@@ -321,7 +321,7 @@ def train_model(config, graph, sess, saver):
 
 		print("ERA: " + str(step))
 
-		for t_index in train_index:
+		for t_index in train_index[0:1000]:
 
 			count += 1
 
@@ -365,7 +365,7 @@ def evaluate_testset(config, graph, sess, test):
 
 	print("---ENTERING EVALUATION---")
 
-	for i in test_index:
+	for i in test_index[0:1000]:
 
 		count += 1
 
