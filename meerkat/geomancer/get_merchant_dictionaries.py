@@ -9,6 +9,15 @@ import json
 
 from functools import reduce
 
+TARGET_MERCHANTS = [ "Ace Hardware", "Walmart", "Walgreens", "Target", "Subway", "Starbucks", "McDonald's", "Costco Wholesale Corp.", "Burger King",
+	"Bed Bath and Beyond",
+	"Aeropostale", "Albertsons", "American Eagle Outfitters", "Applebee's", "Arby's",
+	"AutoZone", "Bahama Breeze", "Barnes & Noble", "Baskin-Robbins", "Bealls",
+	"Eddie V's", "Fedex", "Five Guys", "Food 4 Less", "Francesca's", "Fred Meyer",
+	"Gymboree", "H&M", "Home Depot", "IHOP", "In-N-Out Burger", "J. C. Penney",
+	"KFC", "Kmart", "Kohl's", "LongHorn Steakhouse", "Lowe's", "Macy's", "Nordstrom"
+	]
+
 def parse_arguments(args):
 	"""Parses arguments"""
 	module_path = inspect.getmodule(inspect.stack()[1][0]).__file__
@@ -94,36 +103,29 @@ def expand_abbreviations(city):
 			break
 	return city
 
-def get_merchant_dataframes(input_file, chunksize):
+def get_merchant_dataframes(input_file, groupby_name, **csv_kwargs):
 	"""Generate a dataframe which is a subset of the input_file grouped by merchant."""
 	logging.info("Constructing dataframe from file.")
 	#Here are the target merchants
-	target_merchants = [ "Ace Hardware", "Walmart", "Walgreens", "Target",
-		"Subway", "Starbucks", "McDonald's", "Costco Wholesale Corp.", "Burger King",
-		"Bed Bath and Beyond",
-		"Aeropostale", "Albertsons", "American Eagle Outfitters", "Applebee's", "Arby's",
-		"AutoZone", "Bahama Breeze", "Barnes & Noble", "Baskin-Robbins", "Bealls",
-		"Eddie V's", "Fedex", "Five Guys", "Food 4 Less", "Francesca's", "Fred Meyer",
-		"Gymboree", "H&M", "Home Depot", "IHOP", "In-N-Out Burger", "J. C. Penney",
-		"KFC", "Kmart", "Kohl's", "LongHorn Steakhouse", "Lowe's", "Macy's", "Nordstrom"
-	]
 	#create a list of dataframe groups, filtered by merchant name
 	dict_of_df_lists = {}
 	dfs = []
 	chunk_num = 0
 	#logging.info("Filtering by the following merchant: {0}".format(merchant))
-	for chunk in pd.read_csv(input_file, chunksize=chunksize, error_bad_lines=False,
-		warn_bad_lines=True, encoding='utf-8', quotechar='"', na_filter=False, sep=','):
+	#for chunk in pd.read_csv(input_file, chunksize=chunksize, error_bad_lines=False,
+	#	warn_bad_lines=True, encoding='utf-8', quotechar='"', na_filter=False, sep=sep):
+	num_chunks = int(sum(1 for line in open(input_file)) / csv_kwargs["chunksize"])
+	for chunk in pd.read_csv(input_file, **csv_kwargs):
 		chunk_num += 1
 		if chunk_num % 10 == 0:
-			logging.info("Processing chunk {0:07d}, {1:>6} target merchants found.".format(chunk_num,
-				len(dict_of_df_lists.keys())))
-		grouped = chunk.groupby('list_name', as_index=False)
+			logging.info("Processing chunk {0:07d} of {1:07d}, {2:>6} target merchants found.".format(chunk_num,
+				num_chunks, len(dict_of_df_lists.keys())))
+		grouped = chunk.groupby(groupby_name, as_index=False)
 		groups = dict(list(grouped))
 		#logging.info("Group Keys: {0}".format(groups.keys()))
 		my_keys = groups.keys()
 		for key in my_keys:
-			if key in target_merchants:
+			if key in TARGET_MERCHANTS:
 				if key not in dict_of_df_lists:
 					logging.info("***** Discovered {0:>30} ********".format(key))
 					dict_of_df_lists[key] = []
@@ -132,7 +134,7 @@ def get_merchant_dataframes(input_file, chunksize):
 	#Show what you found and did not find
 	merchants_found = dict_of_df_lists.keys()
 	found_list = list(merchants_found)
-	missing_list = list(set(target_merchants) - set(found_list))
+	missing_list = list(set(TARGET_MERCHANTS) - set(found_list))
 	for item in found_list:
 		logging.info("Found {0:>49}".format(item))
 	for item in missing_list:
@@ -237,7 +239,9 @@ if __name__ == "__main__":
 	log_format = "%(asctime)s %(levelname)s: %(message)s"
 	logging.basicConfig(format=log_format, level=logging.INFO)
 	ARGS = parse_arguments(sys.argv[1:])
-	merchant_dataframes = get_merchant_dataframes("meerkat/geomancer/data/All_Merchants.csv", 1000)
+	csv_kwargs = { "chunksize": 1000, "error_bad_lines": False, "warn_bad_lines": True, "encoding": "utf-8",
+		"quotechar" : '"', "na_filter" : False, "sep": "," }
+	merchant_dataframes = get_merchant_dataframes("meerkat/geomancer/data/All_Merchants.csv", "list_name", **csv_kwargs)
 	merchants = sorted(list(merchant_dataframes.keys()))
 	for merchant in merchants:
 		ARGS.merchant = merchant
