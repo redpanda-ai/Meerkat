@@ -13,6 +13,7 @@
 	"max_word_length": 100,
 	"num_layers": 3,
 	"ce_dim": 100,
+	"seed": 1512141834,
 	"we_dim": 64,
 	"h_dim": 100,
 	"eras": 30
