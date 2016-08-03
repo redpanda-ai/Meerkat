@@ -222,6 +222,7 @@ def build_graph(config):
 	with graph.as_default():
 
 		# Character Embedding
+		tf.set_random_seed(config["seed"])
 		last_state, rev_last_state, word_lengths = char_encoding(config, graph)
 
 		# Word Embedding
@@ -243,8 +244,8 @@ def build_graph(config):
 		fw_network = tf.nn.rnn_cell.MultiRNNCell([fw_lstm]*config["num_layers"], state_is_tuple=True)
 		bw_network = tf.nn.rnn_cell.MultiRNNCell([bw_lstm]*config["num_layers"], state_is_tuple=True)
 
-		weight = tf.Variable(tf.truncated_normal([config["h_dim"] * 2, len(config["tag_map"])], stddev=0.1), name="weight")
-		bias = tf.Variable(tf.constant(0.1, shape=[len(config["tag_map"])]))
+		weight = tf.Variable(tf.random_uniform([config["h_dim"] * 2, len(config["tag_map"])]), name="weight")
+		bias = tf.Variable(tf.random_uniform([len(config["tag_map"])]))
 
 		def model(combined_embeddings, name, train=False, noise_sigma=0.0):
 			"""Model to train"""
