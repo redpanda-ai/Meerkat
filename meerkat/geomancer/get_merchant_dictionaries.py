@@ -237,7 +237,7 @@ if __name__ == "__main__":
 	log_format = "%(asctime)s %(levelname)s: %(message)s"
 	logging.basicConfig(format=log_format, level=logging.INFO)
 	ARGS = parse_arguments(sys.argv[1:])
-	merchant_dataframes = get_merchant_dataframes("All_Merchants.csv", 1000)
+	merchant_dataframes = get_merchant_dataframes("meerkat/geomancer/data/All_Merchants.csv", 1000)
 	merchants = sorted(list(merchant_dataframes.keys()))
 	for merchant in merchants:
 		ARGS.merchant = merchant
@@ -247,4 +247,6 @@ if __name__ == "__main__":
 		store_dict_1, store_dict_2 = get_store_dictionaries(df)
 		geo_df = get_geo_dictionary(df)
 		unique_city_state, unique_city = get_unique_city_dictionaries(df)
+		# Let's also get the question bank
+
 

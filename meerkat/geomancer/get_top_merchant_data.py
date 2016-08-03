@@ -42,7 +42,7 @@ def main_process():
 	prefix = "meerkat/cnn/data/merchant/" + bank_or_card + "/" + version_dir + "/"
 	extension = "tar.gz"
 	tarball_name = "input.tar.gz"
-	save_path = "meerkat/fat_head/data/input/"
+	save_path = "meerkat/geomancer/data/input/"
 	os.makedirs(save_path, exist_ok=True)
 	pull_from_s3(bucket=bucket, prefix=prefix, extension=extension,
 		file_name=tarball_name, save_path=save_path)

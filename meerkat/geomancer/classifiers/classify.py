@@ -1,7 +1,6 @@
 #################### USAGE ##########################
 
-# python3 -m meerkat.fat_head.classification.classify aligned.csv bloomfilter
-# python3 -m meerkat.fat_head.classification.classify aligned.csv trie
+#Run the module with -h to get help
 
 #####################################################
 
@@ -14,8 +13,8 @@ import numpy as np
 import pandas as pd
 
 
-from meerkat.fat_head.classification.bloomfilter_classifier import BloomfilterClassifier
-from meerkat.fat_head.classification.trie_classifier import TrieClassifier
+from .bloom_filter import BloomfilterClassifier
+from .trie import TrieClassifier
 from sklearn.metrics import classification_report
 
 def parse_arguments():

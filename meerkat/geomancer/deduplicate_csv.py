@@ -1,14 +1,13 @@
 
 #################### USAGE ##########################
 
-# python3 -m meerkat.fat_head.deduplicate_csv Starbucks_bank.csv
-# python3 -m meerkat.fat_head.deduplicate_csv Starbucks_bank.csv --subset DESCRIPTION_UNMASKED
+# Use the -h flag from the command line to get help
 
 #####################################################
 
+import argparse
 import csv
 import sys
-import argparse
 import logging
 import pandas as pd
 from .tools import deduplicate_csv

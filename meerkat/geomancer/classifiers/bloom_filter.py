@@ -1,4 +1,6 @@
 import numpy as np
+import logging
+
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.utils.multiclass import unique_labels
@@ -36,5 +38,8 @@ class BloomfilterClassifier(BaseEstimator, ClassifierMixin):
 			else:
 				y_predict.append('')
 		return y_predict
+
+if __name__ == "__main__":
+	logging.critical("Do not run this module from the command-line, aborting.")
 
 #check_estimator(BloomfilterClassifier)

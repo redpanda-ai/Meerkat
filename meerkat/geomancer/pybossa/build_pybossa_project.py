@@ -9,7 +9,7 @@ import logging
 import fileinput
 import requests
 
-from meerkat.fat_head.tools import copy_file
+from ../tools import copy_file
 
 def create_project_json_file(project_name, project_json_file):
 	"""Create a json file for the new pybossa project"""
@@ -116,7 +116,7 @@ def main_process():
 			return
 
 		merchant_presenter = merchant_dir + args.task_presenter
-		template_dir = "meerkat/fat_head/pybossa/template/"
+		template_dir = "meerkat/geomancer/pybossa/template/"
 
 		# Update pybossa presenter
 		if args.update_presenter:
@@ -160,7 +160,7 @@ def parse_arguments(args):
 	module_path = inspect.getmodule(inspect.stack()[1][0]).__file__
 	base_dir = module_path[:module_path.rfind("/") + 1]
 	default_project_dir = base_dir + "projects/"
-	default_dictionary_dir = "meerkat/fat_head/dictionaries/"
+	default_dictionary_dir = "meerkat/geomancer/dictionaries/"
 
 	parser.add_argument("--project_dir", default=default_project_dir)
 	parser.add_argument("--dictionary_dir", default=default_dictionary_dir)

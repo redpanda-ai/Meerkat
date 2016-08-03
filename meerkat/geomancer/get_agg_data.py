@@ -14,11 +14,11 @@ def parse_arguments(args):
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--bucket", default="s3yodlee",
 		help="s3 bucket name")
-	parser.add_argument("--prefix", default="meerkat/fat_head/data/agg/",
+	parser.add_argument("--prefix", default="meerkat/geomancer/data/agg/",
 		help="s3 object prefix")
-	parser.add_argument("--filename", default="All_Merchants.csv",
+	parser.add_argument("--filename", default="meerkat/geomancer/data/All_Merchants.csv",
 		help="agg data file name in s3")
-	parser.add_argument("--savepath", default="meerkat/fat_head/data/agg_data/",
+	parser.add_argument("--savepath", default="meerkat/geomancer/data/agg_data/",
 		help="local save path of agg data file")
 	args = parser.parse_args(args)
 	return args

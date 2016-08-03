@@ -3,8 +3,11 @@ import csv
 import json
 import logging
 import numpy as np
+import os
+import os.path
 import pandas as pd
 import requests
+import sys
 import time
 
 def parse_arguments():
@@ -66,7 +69,15 @@ if __name__ == "__main__":
 	logging.warning("Project ID is: {0}".format(project_id))
 	df = get_task_run_df(args, project_id)
 	idk = df
-	idk_2 = get_task_df("meerkat/fat_head/pybossa/question_Starbucks_bank.csv")
+	#Ensure that the directory exists
+	target_path = "meerkat/geomancer/merchants/" + args.short_name
+	os.makedirs(target_path, exist_ok=True)
+	question_bank = target_path + "/question_bank.csv"
+	if os.path.isfile(question_bank):
+		idk_2 = get_task_df(question_bank)
+	else:
+		logging.critical("Cannot proceed, {0} not found.".format(question_bank))
+		sys.exit()
 	rows, _ = idk_2.shape
 	idk_2.index = range(args.offset, rows + args.offset)
 	idk_2["task_id"] = idk_2.index
@@ -88,4 +99,4 @@ if __name__ == "__main__":
 	aligned_df = pd.concat(component_dataframes, axis=0)
 	del aligned_df["user_id"]
 	logging.warning("Found {0} unanimously labeled tasks".format(aligned_df.shape[0]))
-	aligned_df.to_csv("aligned.csv", sep="\t", index=False)
+	aligned_df.to_csv(target_path + "/aligned.csv", sep="\t", index=False)

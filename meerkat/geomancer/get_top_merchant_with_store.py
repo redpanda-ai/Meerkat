@@ -18,4 +18,4 @@ def select_merchant_with_store(input_file, chunksize, merchant):
 	logging.info("finish merging dataframes")
 	merged.to_csv(merchant + '_with_store.csv', sep=',', index=False)
 
-select_merchant_with_store("All_Merchants.csv", 1000, "Starbucks")
+select_merchant_with_store("meerkat/geomancer/data/All_Merchants.csv", 1000, "Starbucks")
