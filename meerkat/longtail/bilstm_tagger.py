@@ -238,12 +238,11 @@ def build_graph(config):
 		combined_embeddings = tf.concat(1, [wembeds, char_embeds, tf.reverse(rev_char_embeds, [True, False])], name="combined_embeddings")
 
 		# Cells and Weights
-		input_cell = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"] * 2 + config["we_dim"], state_is_tuple=True)
 		fw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["h_dim"], state_is_tuple=True)
 		bw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["h_dim"], state_is_tuple=True)
+		fw_network = tf.nn.rnn_cell.MultiRNNCell([fw_lstm]*config["num_layers"], state_is_tuple=True)
+		bw_network = tf.nn.rnn_cell.MultiRNNCell([bw_lstm]*config["num_layers"], state_is_tuple=True)
 
-		fw_network = tf.nn.rnn_cell.MultiRNNCell([input_cell] + ([fw_lstm] * (config["num_layers"] - 1)), state_is_tuple=True)
-		bw_network = tf.nn.rnn_cell.MultiRNNCell([input_cell] + ([bw_lstm] * (config["num_layers"] - 1)), state_is_tuple=True)
 		weight = tf.Variable(tf.truncated_normal([config["h_dim"] * 2, len(config["tag_map"])], stddev=0.1), name="weight")
 		bias = tf.Variable(tf.constant(0.1, shape=[len(config["tag_map"])]))
 
@@ -281,8 +280,9 @@ def build_graph(config):
 
 		# Calculate Loss and Optimize
 		labels = tf.placeholder(tf.float32, shape=[None, len(config["tag_map"].keys())], name="y")
-		loss = tf.neg(tf.reduce_mean(tf.reduce_sum(network * labels, 1)), name="loss")
+		loss = tf.neg(tf.reduce_sum(network * labels), name="loss")
 		optimizer = tf.train.GradientDescentOptimizer(config["learning_rate"]).minimize(loss, name="optimizer")
+		# optimizer = tf.train.MomentumOptimizer(config["learning_rate"], 0.9).minimize(loss, name="optimizer")
 
 		saver = tf.train.Saver()
 
@@ -303,6 +303,7 @@ def train_model(config, graph, sess, saver):
 		random.shuffle(train_index)
 		count = 0
 		total_loss = 0
+		total_tagged = 0
 
 		print("ERA: " + str(step))
 		np.set_printoptions(threshold=np.inf)
@@ -326,11 +327,12 @@ def train_model(config, graph, sess, saver):
 			# Run Training Step
 			optimizer_out, loss = sess.run([get_op(graph, "optimizer"), get_tensor(graph, "loss:0")], feed_dict=feed_dict)
 			total_loss += loss
+			total_tagged += len(word_indices)
 
 			# Log
 			if count % 500 == 0:
 				print(sess.run(get_tensor(graph, "combined_embeddings:0"), feed_dict=feed_dict).shape)
-				print("loss: " + str(total_loss / count))
+				print("loss: " + str(total_loss/total_tagged))
 				print("%d" % (count / len(train_index) * 100) + "% complete with era")
 
 		# Evaluate Model
