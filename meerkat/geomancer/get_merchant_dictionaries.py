@@ -8,6 +8,7 @@ import pandas as pd
 import json
 
 from functools import reduce
+from multiprocessing.pool import ThreadPool
 
 TARGET_MERCHANTS = [ "Ace Hardware", "Walmart", "Walgreens", "Target", "Subway", "Starbucks", "McDonald's", "Costco Wholesale Corp.", "Burger King",
 	"Bed Bath and Beyond",
@@ -103,19 +104,42 @@ def expand_abbreviations(city):
 			break
 	return city
 
+def process_chunk(chunk, groupby_name, dict_of_df_lists, dfs, chunk_num, num_chunks):
+	print("chunk #: {0}".format(chunk_num[0]))
+	print(chunk["address"].head())
+	chunk_num[0] += 1
+	if chunk_num[0] % 10 == 0:
+		logging.info("Processing chunk {0:07d} of {1:07d}, {2:>6} target merchants found.".format(chunk_num[0],
+			num_chunks[0], len(dict_of_df_lists.keys())))
+	grouped = chunk.groupby(groupby_name, as_index=False)
+	groups = dict(list(grouped))
+	#logging.info("Group Keys: {0}".format(groups.keys()))
+	my_keys = groups.keys()
+	for key in my_keys:
+		if key in TARGET_MERCHANTS:
+			if key not in dict_of_df_lists:
+				logging.info("***** Discovered {0:>30} ********".format(key))
+				dict_of_df_lists[key] = []
+			dict_of_df_lists[key].append(groups[key])
+
 def get_merchant_dataframes(input_file, groupby_name, **csv_kwargs):
 	"""Generate a dataframe which is a subset of the input_file grouped by merchant."""
 	logging.info("Constructing dataframe from file.")
+	cpu_pool = ThreadPool(processes=10)
 	#Here are the target merchants
 	#create a list of dataframe groups, filtered by merchant name
 	dict_of_df_lists = {}
 	dfs = []
-	chunk_num = 0
+	chunk_num = [0]
 	#logging.info("Filtering by the following merchant: {0}".format(merchant))
 	#for chunk in pd.read_csv(input_file, chunksize=chunksize, error_bad_lines=False,
 	#	warn_bad_lines=True, encoding='utf-8', quotechar='"', na_filter=False, sep=sep):
-	num_chunks = int(sum(1 for line in open(input_file)) / csv_kwargs["chunksize"])
+	num_chunks = [int(sum(1 for line in open(input_file)) / csv_kwargs["chunksize"])]
 	for chunk in pd.read_csv(input_file, **csv_kwargs):
+		cpu_pool.apply_async(process_chunk, (chunk, groupby_name, dict_of_df_lists, dfs, chunk_num, num_chunks))
+	cpu_pool.close()
+	cpu_pool.join()
+	"""
 		chunk_num += 1
 		if chunk_num % 10 == 0:
 			logging.info("Processing chunk {0:07d} of {1:07d}, {2:>6} target merchants found.".format(chunk_num,
@@ -130,6 +154,7 @@ def get_merchant_dataframes(input_file, groupby_name, **csv_kwargs):
 					logging.info("***** Discovered {0:>30} ********".format(key))
 					dict_of_df_lists[key] = []
 				dict_of_df_lists[key].append(groups[key])
+	"""
 
 	#Show what you found and did not find
 	merchants_found = dict_of_df_lists.keys()
@@ -144,7 +169,6 @@ def get_merchant_dataframes(input_file, groupby_name, **csv_kwargs):
 		dict_of_df_lists[key] = pd.concat(dict_of_df_lists[key], ignore_index=True)
 		#Do some pre-processing
 		logging.info("Preprocessing dataframe for {0:>27}".format(key))
-		preprocess_dataframe(dict_of_df_lists[key])
 
 	return dict_of_df_lists
 
@@ -242,15 +266,17 @@ if __name__ == "__main__":
 	csv_kwargs = { "chunksize": 1000, "error_bad_lines": False, "warn_bad_lines": True, "encoding": "utf-8",
 		"quotechar" : '"', "na_filter" : False, "sep": "," }
 	merchant_dataframes = get_merchant_dataframes("meerkat/geomancer/data/All_Merchants.csv", "list_name", **csv_kwargs)
+	"""
 	merchants = sorted(list(merchant_dataframes.keys()))
 	for merchant in merchants:
 		ARGS.merchant = merchant
 		df = merchant_dataframes[merchant]
+		preprocess_dataframe(df)
 		logging.info("***** Processing {0:>29} ********".format(merchant))
 		setup_directories()
 		store_dict_1, store_dict_2 = get_store_dictionaries(df)
 		geo_df = get_geo_dictionary(df)
 		unique_city_state, unique_city = get_unique_city_dictionaries(df)
 		# Let's also get the question bank
-
+	"""
 
