@@ -8,7 +8,9 @@ import pandas as pd
 import json
 
 from functools import reduce
-from multiprocessing.pool import ThreadPool
+import queue
+import threading
+import time
 
 TARGET_MERCHANTS = [ "Ace Hardware", "Walmart", "Walgreens", "Target", "Subway", "Starbucks", "McDonald's", "Costco Wholesale Corp.", "Burger King",
 	"Bed Bath and Beyond",
@@ -104,59 +106,96 @@ def expand_abbreviations(city):
 			break
 	return city
 
-def process_chunk(chunk, groupby_name, dict_of_df_lists, dfs, chunk_num, num_chunks):
-	print("chunk #: {0}".format(chunk_num[0]))
-	print(chunk["address"].head())
-	chunk_num[0] += 1
-	if chunk_num[0] % 10 == 0:
-		logging.info("Processing chunk {0:07d} of {1:07d}, {2:>6} target merchants found.".format(chunk_num[0],
-			num_chunks[0], len(dict_of_df_lists.keys())))
-	grouped = chunk.groupby(groupby_name, as_index=False)
-	groups = dict(list(grouped))
-	#logging.info("Group Keys: {0}".format(groups.keys()))
-	my_keys = groups.keys()
-	for key in my_keys:
-		if key in TARGET_MERCHANTS:
-			if key not in dict_of_df_lists:
-				logging.info("***** Discovered {0:>30} ********".format(key))
-				dict_of_df_lists[key] = []
-			dict_of_df_lists[key].append(groups[key])
+class ThreadProducer(threading.Thread):
+	def __init__(self, param):
+		threading.Thread.__init__(self)
+		self.param = param
+
+	def run(self):
+		input_file = self.param["input_file"]
+		csv_kwargs = self.param["csv_kwargs"]
+		count = 0
+		for chunk in pd.read_csv(input_file, **csv_kwargs):
+			self.param["data_queue"].put(chunk)
+			count += 1
+			logging.info("Populating data queue {0}".format(str(count)))
+		self.param["data_queue_populated"] = True
+		logging.info("data queue is populated, data queue size: {0}".format(self.param["data_queue"].qsize()))
+
+def start_producers(param):
+	logging.info("start producer")
+	producer = ThreadProducer(param)
+	producer.start()
+
+class ThreadConsumer(threading.Thread):
+	def __init__(self, thread_id, param):
+		threading.Thread.__init__(self)
+		self.thread_id = thread_id
+		self.param = param
+		self.param["consumer_queue"].put(self.thread_id)
+
+	def run(self):
+		param = self.param
+		consumer_queue = param["consumer_queue"]
+		while True:
+			if param["data_queue_populated"] and param["data_queue"].empty():
+				param["consumer_queue"].get()
+				param["consumer_queue"].task_done()
+				logging.info("Consumer thread {0} finished".format(str(self.thread_id)))
+				break
+			chunk = param["data_queue"].get()
+			logging.info("consumer thread: {0}; data queue size: {1}".format(str(self.thread_id), param["data_queue"].qsize()))
+
+			param["chunk_num"] += 1
+			logging.info("Processing chunk {0:07d} of {1:07d}, {2:>6} target merchants found.".format(param["chunk_num"],
+				param["num_chunks"], len(param["dict_of_df_lists"].keys())))
+			grouped = chunk.groupby(param["groupby_name"], as_index=False)
+			groups = dict(list(grouped))
+			my_keys = groups.keys()
+			for key in my_keys:
+				if key in TARGET_MERCHANTS:
+					if key not in param["dict_of_df_lists"]:
+						logging.info("***** Discovered {0:>30} ********".format(key))
+						param["dict_of_df_lists"][key] = []
+					param["dict_of_df_lists"][key].append(groups[key])
+			time.sleep(0.1)
+			param["data_queue"].task_done()
+
+def start_consumers(param):
+	for i in range(10):
+		logging.info("start consumer: {0}".format(str(i)))
+		consumer = ThreadConsumer(i, param)
+		consumer.setDaemon(True)
+		consumer.start()
 
 def get_merchant_dataframes(input_file, groupby_name, **csv_kwargs):
 	"""Generate a dataframe which is a subset of the input_file grouped by merchant."""
 	logging.info("Constructing dataframe from file.")
-	cpu_pool = ThreadPool(processes=10)
 	#Here are the target merchants
 	#create a list of dataframe groups, filtered by merchant name
 	dict_of_df_lists = {}
-	dfs = []
-	chunk_num = [0]
-	#logging.info("Filtering by the following merchant: {0}".format(merchant))
-	#for chunk in pd.read_csv(input_file, chunksize=chunksize, error_bad_lines=False,
-	#	warn_bad_lines=True, encoding='utf-8', quotechar='"', na_filter=False, sep=sep):
-	num_chunks = [int(sum(1 for line in open(input_file)) / csv_kwargs["chunksize"])]
-	for chunk in pd.read_csv(input_file, **csv_kwargs):
-		cpu_pool.apply_async(process_chunk, (chunk, groupby_name, dict_of_df_lists, dfs, chunk_num, num_chunks))
-	cpu_pool.close()
-	cpu_pool.join()
-	"""
-		chunk_num += 1
-		if chunk_num % 10 == 0:
-			logging.info("Processing chunk {0:07d} of {1:07d}, {2:>6} target merchants found.".format(chunk_num,
-				num_chunks, len(dict_of_df_lists.keys())))
-		grouped = chunk.groupby(groupby_name, as_index=False)
-		groups = dict(list(grouped))
-		#logging.info("Group Keys: {0}".format(groups.keys()))
-		my_keys = groups.keys()
-		for key in my_keys:
-			if key in TARGET_MERCHANTS:
-				if key not in dict_of_df_lists:
-					logging.info("***** Discovered {0:>30} ********".format(key))
-					dict_of_df_lists[key] = []
-				dict_of_df_lists[key].append(groups[key])
-	"""
+	chunk_num = 0
+	num_chunks = int(sum(1 for line in open(input_file)) / csv_kwargs["chunksize"])
+
+	param = {}
+	param["data_queue_populated"] = False
+	param["data_queue"] = queue.Queue()
+	param["consumer_queue"] = queue.Queue()
+
+	param["input_file"] = input_file
+	param["groupby_name"] = groupby_name
+	param["csv_kwargs"] = csv_kwargs
+	param["chunk_num"] = 0
+	param["num_chunks"] = num_chunks
+	param["dict_of_df_lists"] = {}
+
+	start_producers(param)
+	start_consumers(param)
+	param["consumer_queue"].join()
+	param["data_queue"].join()
 
 	#Show what you found and did not find
+	dict_of_df_lists = param["dict_of_df_lists"]
 	merchants_found = dict_of_df_lists.keys()
 	found_list = list(merchants_found)
 	missing_list = list(set(TARGET_MERCHANTS) - set(found_list))
@@ -266,7 +305,6 @@ if __name__ == "__main__":
 	csv_kwargs = { "chunksize": 1000, "error_bad_lines": False, "warn_bad_lines": True, "encoding": "utf-8",
 		"quotechar" : '"', "na_filter" : False, "sep": "," }
 	merchant_dataframes = get_merchant_dataframes("meerkat/geomancer/data/All_Merchants.csv", "list_name", **csv_kwargs)
-	"""
 	merchants = sorted(list(merchant_dataframes.keys()))
 	for merchant in merchants:
 		ARGS.merchant = merchant
@@ -278,5 +316,4 @@ if __name__ == "__main__":
 		geo_df = get_geo_dictionary(df)
 		unique_city_state, unique_city = get_unique_city_dictionaries(df)
 		# Let's also get the question bank
-	"""
 
