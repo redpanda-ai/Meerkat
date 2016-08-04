@@ -11,7 +11,7 @@
 	"activation": "tanh",
 	"learning_rate": 0.1,
 	"max_word_length": 100,
-	"num_layers": 3,
+	"num_layers": 1,
 	"ce_dim": 100,
 	"seed": 1512141834,
 	"we_dim": 64,

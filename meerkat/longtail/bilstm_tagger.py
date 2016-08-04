@@ -222,6 +222,7 @@ def build_graph(config):
 	with graph.as_default():
 
 		# Character Embedding
+		train = tf.placeholder(tf.bool, name="train")
 		tf.set_random_seed(config["seed"])
 		last_state, rev_last_state, word_lengths = char_encoding(config, graph)
 
@@ -247,43 +248,32 @@ def build_graph(config):
 		weight = tf.Variable(tf.random_uniform([config["h_dim"] * 2, len(config["tag_map"])]), name="weight")
 		bias = tf.Variable(tf.random_uniform([len(config["tag_map"])]))
 
-		def model(combined_embeddings, name, train=False, noise_sigma=0.0):
+		def model(combined_embeddings, noise_sigma=0.0):
 			"""Model to train"""
 
-			if noise_sigma < 0.0:
-				raise ValueError("noise sigma must be non-negative {0}: ".format(noise_sigma))
-
-			if train and noise_sigma > 0.0:
-				combined_embeddings = combined_embeddings + tf.random_normal(tf.shape(combined_embeddings)) * noise_sigma
-
+			combined_embeddings = tf.cond(train, lambda: tf.add(tf.random_normal(tf.shape(combined_embeddings)) * noise_sigma, combined_embeddings), lambda: combined_embeddings)
 			batched_input = tf.expand_dims(combined_embeddings, 0)
 
 			options = {
 				"dtype": tf.float32,
-				"sequence_length": tf.expand_dims(trans_len, 0),
-				"scope": name
+				"sequence_length": tf.expand_dims(trans_len, 0)
 			}
 
 			(outputs_fw, outputs_bw), output_states = tf.nn.bidirectional_dynamic_rnn(fw_network, bw_network, batched_input, **options)
 
 			# Add Noise and Predict
 			concat_layer = tf.concat(2, [outputs_fw, tf.reverse(outputs_bw, [False, True, False])], name="concat_layer")
-			
-			if train and noise_sigma > 0.0:
-				concat_layer = concat_layer + tf.random_normal(tf.shape(concat_layer)) * noise_sigma
-
-			prediction = tf.log(tf.nn.softmax(tf.matmul(tf.squeeze(concat_layer), weight) + bias), name=name)
+			concat_layer = tf.cond(train, lambda: tf.add(tf.random_normal(tf.shape(concat_layer)) * noise_sigma, concat_layer), lambda: concat_layer)
+			prediction = tf.log(tf.nn.softmax(tf.matmul(tf.squeeze(concat_layer), weight) + bias), name="model")
 
 			return prediction
 
-		network = model(combined_embeddings, "training", train=True, noise_sigma=config["noise_sigma"])
-		trained_model = model(combined_embeddings, "trained")
+		network = model(combined_embeddings, noise_sigma=config["noise_sigma"])
 
 		# Calculate Loss and Optimize
 		labels = tf.placeholder(tf.float32, shape=[None, len(config["tag_map"].keys())], name="y")
 		loss = tf.neg(tf.reduce_sum(network * labels), name="loss")
 		optimizer = tf.train.GradientDescentOptimizer(config["learning_rate"]).minimize(loss, name="optimizer")
-		# optimizer = tf.train.MomentumOptimizer(config["learning_rate"], 0.9).minimize(loss, name="optimizer")
 
 		saver = tf.train.Saver()
 
@@ -298,11 +288,11 @@ def train_model(config, graph, sess, saver):
 	test = config["test"]
 	train_index = list(train.index)
 	sess.run(get_op(graph, "assign_wembedding"), feed_dict={get_tensor(graph, "embedding_placeholder:0"): config["wembedding"]})
+	count = 0
 
 	# Train the Model
 	for step in range(eras):
 		random.shuffle(train_index)
-		count = 0
 		total_loss = 0
 		total_tagged = 0
 
@@ -322,7 +312,8 @@ def train_model(config, graph, sess, saver):
 				get_tensor(graph, "word_inputs:0") : word_indices,
 				get_tensor(graph, "word_lengths:0") : word_lengths,
 				get_tensor(graph, "trans_length:0"): len(tokens),
-				get_tensor(graph, "y:0"): labels
+				get_tensor(graph, "y:0"): labels,
+				get_tensor(graph, "train:0"): True
 			}
 
 			# Run Training Step
@@ -331,8 +322,9 @@ def train_model(config, graph, sess, saver):
 			total_tagged += len(word_indices)
 
 			# Log
-			if count % 500 == 0:
-				print(sess.run(get_tensor(graph, "combined_embeddings:0"), feed_dict=feed_dict).shape)
+			if count % 250 == 0:
+				print("count: " + str(count))
+				#print(sess.run(get_tensor(graph, "combined_embeddings:0"), feed_dict=feed_dict).shape)
 				print("loss: " + str(total_loss/total_tagged))
 				print("%d" % (count / len(train_index) * 100) + "% complete with era")
 
@@ -370,10 +362,11 @@ def evaluate_testset(config, graph, sess, test):
 			get_tensor(graph, "char_inputs:0") : char_inputs,
 			get_tensor(graph, "word_inputs:0") : word_indices,
 			get_tensor(graph, "word_lengths:0") : word_lengths,
-			get_tensor(graph, "trans_length:0"): len(tokens)
+			get_tensor(graph, "trans_length:0"): len(tokens),
+			get_tensor(graph, "train:0"): False
 		}
 
-		output = sess.run(get_tensor(graph, "trained:0"), feed_dict=feed_dict)
+		output = sess.run(get_tensor(graph, "model:0"), feed_dict=feed_dict)
 
 		correct_count = np.sum(np.argmax(output, 1) == np.argmax(labels, 1))
 		total_correct += correct_count
