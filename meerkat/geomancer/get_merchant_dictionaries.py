@@ -6,11 +6,17 @@ import json
 import logging
 import os
 import pandas as pd
+import json
+import queue
+import threading
+import datetime
+import time
 import sys
 
 from functools import reduce
 from timeit import default_timer as timer
 from ..classification.load_model import get_tf_cnn_by_name as get_classifier
+from .tools import remove_special_chars
 
 TARGET_MERCHANTS = [ "Ace Hardware", "Walmart", "Walgreens", "Target", "Subway", "Starbucks", "McDonald's", "Costco Wholesale Corp.", "Burger King",
 	"Bed Bath and Beyond",
@@ -99,6 +105,86 @@ def expand_abbreviations(city):
 			break
 	return city
 
+class ThreadProducer(threading.Thread):
+	def __init__(self, param):
+		threading.Thread.__init__(self)
+		self.param = param
+
+	def run(self):
+		input_file = self.param["input_file"]
+		csv_kwargs = self.param["csv_kwargs"]
+		count = 0
+		for chunk in pd.read_csv(input_file, **csv_kwargs):
+			self.param["data_queue"].put(chunk)
+			count += 1
+			logging.info("Populating data queue {0}".format(str(count)))
+		self.param["data_queue_populated"] = True
+		logging.info("data queue is populated, data queue size: {0}".format(self.param["data_queue"].qsize()))
+
+def start_producers(param):
+	logging.info("start producer")
+	producer = ThreadProducer(param)
+	producer.start()
+
+class ThreadConsumer(threading.Thread):
+	def __init__(self, thread_id, param):
+		threading.Thread.__init__(self)
+		self.thread_id = thread_id
+		self.param = param
+		self.param["consumer_queue"].put(self.thread_id)
+
+	def run(self):
+		param = self.param
+		consumer_queue = param["consumer_queue"]
+		while True:
+			if param["data_queue_populated"] and param["data_queue"].empty():
+				param["consumer_queue"].get()
+				param["consumer_queue"].task_done()
+				logging.info("Consumer thread {0} finished".format(str(self.thread_id)))
+				break
+			chunk = param["data_queue"].get()
+			logging.info("consumer thread: {0}; data queue size: {1}".format(str(self.thread_id), param["data_queue"].qsize()))
+
+			param["chunk_num"] += 1
+			if param["chunk_num"] % 10 == 0:
+				logging.info("Processing chunk {0:07d} of {1:07d}, {2:>6} target merchants found.".format(param["chunk_num"],
+					param["num_chunks"], len(param["dict_of_df_lists"].keys())))
+				elapsed = timer() - param["start"]
+				remaining = param["num_chunks"] - param["chunk_num"]
+				completion = float(param["chunk_num"]) / param["num_chunks"] * 100
+				chunk_rate = float(param["chunk_num"]) / elapsed
+				remaining_time = float(remaining) / chunk_rate
+				#Log our progress
+				logging.info(param["log_string"].format(
+					str(datetime.timedelta(seconds=elapsed))[:-7],
+					str(datetime.timedelta(seconds=remaining_time))[:-7],
+					completion, chunk_rate))
+
+			if param["activate_cnn"]:
+				transactions = chunk.to_dict('records')
+				enriched = param["classifier"](transactions, doc_key='DESCRIPTION_UNMASKED',
+					label_key=param["groupby_name"])
+				chunk = pd.DataFrame(enriched)
+
+			grouped = chunk.groupby(param["groupby_name"], as_index=False)
+			groups = dict(list(grouped))
+			my_keys = groups.keys()
+			for key in my_keys:
+				if key in TARGET_MERCHANTS:
+					if key not in param["dict_of_df_lists"]:
+						logging.info("***** Discovered {0:>30} ********".format(key))
+						param["dict_of_df_lists"][key] = []
+					param["dict_of_df_lists"][key].append(groups[key])
+			time.sleep(0.1)
+			param["data_queue"].task_done()
+
+def start_consumers(param):
+	for i in range(10):
+		logging.info("start consumer: {0}".format(str(i)))
+		consumer = ThreadConsumer(i, param)
+		consumer.setDaemon(True)
+		consumer.start()
+
 def get_merchant_dataframes(input_file, groupby_name, **csv_kwargs):
 	"""Generate a dataframe which is a subset of the input_file grouped by merchant."""
 	logging.info("Constructing dataframe from file.")
@@ -108,7 +194,6 @@ def get_merchant_dataframes(input_file, groupby_name, **csv_kwargs):
 	#Here are the target merchants
 	#create a list of dataframe groups, filtered by merchant name
 	dict_of_df_lists = {}
-	dfs = []
 	chunk_num = 0
 	#logging.info("Filtering by the following merchant: {0}".format(merchant))
 	#for chunk in pd.read_csv(input_file, chunksize=chunksize, error_bad_lines=False,
@@ -118,42 +203,30 @@ def get_merchant_dataframes(input_file, groupby_name, **csv_kwargs):
 	num_chunks = int(sum(1 for line in open(input_file)) / csv_kwargs["chunksize"])
 	start = timer()
 	log_string = "Taken: {0} , ETA: {1}, Competion: {2:.2f}%, Chunks/sec: {3:.2f}"
-	for chunk in pd.read_csv(input_file, **csv_kwargs):
-		chunk_num += 1
-		if chunk_num % 10 == 0:
-			logging.info("Processing chunk {0:07d} of {1:07d}, {2:>6} target merchants found."\
-				.format(chunk_num, num_chunks, len(dict_of_df_lists.keys())))
-			elapsed = timer() - start
-			remaining = num_chunks - chunk_num
-			completion = float(chunk_num) / num_chunks * 100
-			chunk_rate = float(chunk_num) / elapsed
-			remaining_time = float(remaining) / chunk_rate
-			#Log our progress
-			logging.info(log_string.format(
-				str(datetime.timedelta(seconds=elapsed))[:-7],
-				str(datetime.timedelta(seconds=remaining_time))[:-7],
-				completion, chunk_rate))
+	param = {}
+	param["data_queue_populated"] = False
+	param["data_queue"] = queue.Queue()
+	param["consumer_queue"] = queue.Queue()
 
-		#Here
-		if activate_cnn:
-			transactions = chunk.to_dict('records')
-			enriched = classifier(transactions, doc_key='DESCRIPTION_UNMASKED',
-				label_key=groupby_name)
-			chunk = pd.DataFrame(enriched)
-			#End Here
+	param["input_file"] = input_file
+	param["groupby_name"] = groupby_name
+	param["csv_kwargs"] = csv_kwargs
+	param["chunk_num"] = 0
+	param["num_chunks"] = num_chunks
+	param["dict_of_df_lists"] = {}
+	param["activate_cnn"] = activate_cnn
+	if activate_cnn:
+		param["classifier"] = classifier
+	param["start"] = start
+	param["log_string"] = log_string
 
-		grouped = chunk.groupby(groupby_name, as_index=False)
-		groups = dict(list(grouped))
-		#logging.info("Group Keys: {0}".format(groups.keys()))
-		my_keys = groups.keys()
-		for key in my_keys:
-			if key in TARGET_MERCHANTS:
-				if key not in dict_of_df_lists:
-					logging.info("***** Discovered {0:>30} ********".format(key))
-					dict_of_df_lists[key] = []
-				dict_of_df_lists[key].append(groups[key])
+	start_producers(param)
+	start_consumers(param)
+	param["consumer_queue"].join()
+	param["data_queue"].join()
 
 	#Show what you found and did not find
+	dict_of_df_lists = param["dict_of_df_lists"]
 	merchants_found = dict_of_df_lists.keys()
 	found_list = list(merchants_found)
 	missing_list = list(set(TARGET_MERCHANTS) - set(found_list))
@@ -166,7 +239,6 @@ def get_merchant_dataframes(input_file, groupby_name, **csv_kwargs):
 		dict_of_df_lists[key] = pd.concat(dict_of_df_lists[key], ignore_index=True)
 		#Do some pre-processing
 		logging.info("Preprocessing dataframe for {0:>27}".format(key))
-		preprocess_dataframe(dict_of_df_lists[key])
 
 	return dict_of_df_lists
 
@@ -266,13 +338,13 @@ if __name__ == "__main__":
 	merchant_dataframes = get_merchant_dataframes("meerkat/geomancer/data/All_Merchants.csv", "list_name", **csv_kwargs)
 	merchants = sorted(list(merchant_dataframes.keys()))
 	for merchant in merchants:
-		ARGS.merchant = merchant
+		ARGS.merchant = remove_special_chars(merchant)
 		df = merchant_dataframes[merchant]
+		preprocess_dataframe(df)
 		logging.info("***** Processing {0:>29} ********".format(merchant))
 		setup_directories()
 		store_dict_1, store_dict_2 = get_store_dictionaries(df)
 		geo_df = get_geo_dictionary(df)
 		unique_city_state, unique_city = get_unique_city_dictionaries(df)
 		# Let's also get the question bank
-
 

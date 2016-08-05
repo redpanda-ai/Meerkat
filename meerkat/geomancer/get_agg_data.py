@@ -16,7 +16,7 @@ def parse_arguments(args):
 		help="s3 bucket name")
 	parser.add_argument("--prefix", default="meerkat/geomancer/data/agg/",
 		help="s3 object prefix")
-	parser.add_argument("--filename", default="meerkat/geomancer/data/All_Merchants.csv",
+	parser.add_argument("--filename", default="All_Merchants.csv",
 		help="agg data file name in s3")
 	parser.add_argument("--savepath", default="meerkat/geomancer/data/agg_data/",
 		help="local save path of agg data file")
@@ -48,6 +48,8 @@ def get_s3_file(**kwargs):
 	else:
 		logging.info("local file {0} not found".format(local_file))
 
+	logging.debug(client.list_objects(Bucket=kwargs["bucket"],
+		Prefix=remote_file))
 	remote_etag = client.list_objects(Bucket=kwargs["bucket"],
 		Prefix=remote_file)["Contents"][0]["ETag"]
 

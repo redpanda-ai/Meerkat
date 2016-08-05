@@ -1,4 +1,5 @@
 import sys
+import re
 import os
 import csv
 import logging
@@ -10,6 +11,7 @@ from meerkat.classification.tools import (pull_from_s3, extract_tarball,
 
 from .get_merchant_dictionaries import TARGET_MERCHANTS, get_merchant_dataframes
 from .get_agg_data import get_s3_file, get_etags
+from .tools import deduplicate_csv, remove_special_chars
 
 def parse_arguments(args):
 	parser = argparse.ArgumentParser()
@@ -50,17 +52,29 @@ def main_process():
 	tasks_prefix = "meerkat/geomancer/merchants/"
 	for file_name in os.listdir(save_path):
 		if file_name.endswith(".csv"):
-			logging.info("csv file at: " + save_path + file_name)
+			csv_file = save_path + file_name
+			logging.info("csv file at: " + csv_file)
+
+			read_csv_kwargs = { "error_bad_lines": False, "encoding": 'utf-8',
+				"quoting": csv.QUOTE_NONE, "na_filter": False, "sep": "|" }
+			to_csv_kwargs = {"sep": "|"}
+			dedup_csv_kwargs = {
+				"read": read_csv_kwargs,
+				"to": to_csv_kwargs
+			}
+			logging.info("Start deduplicate csv")
+			deduplicate_csv(csv_file, "DESCRIPTION_UNMASKED", True, **dedup_csv_kwargs)
+			logging.info("Finish deduplicate csv")
 
 			csv_kwargs = { "chunksize": 1000, "error_bad_lines": False, "encoding": 'utf-8',
 				"quoting": csv.QUOTE_NONE, "na_filter": False, "sep": "|", "activate_cnn": True}
-			merchant_dataframes = get_merchant_dataframes(save_path + file_name, 'MERCHANT_NAME', **csv_kwargs)
+			merchant_dataframes = get_merchant_dataframes(csv_file, 'MERCHANT_NAME', **csv_kwargs)
 			merchants = sorted(list(merchant_dataframes.keys()))
 			for merchant in merchants:
-				tasks = tasks_prefix + merchant + "/" + bank_or_card + "_tasks.csv"
+				formatted_merchant = remove_special_chars(merchant)
+				os.makedirs(tasks_prefix + formatted_merchant, exist_ok=True)
+				tasks = tasks_prefix + formatted_merchant + "/" + bank_or_card + "_tasks.csv"
 				merchant_dataframes[merchant].to_csv(tasks, sep=',', index=False, quoting=csv.QUOTE_ALL)
-
-	#shutil.rmtree(save_path)
 
 if __name__ == "__main__":
 	main_process()
