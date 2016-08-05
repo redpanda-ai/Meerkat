@@ -53,7 +53,7 @@ def main_process():
 			logging.info("csv file at: " + save_path + file_name)
 
 			csv_kwargs = { "chunksize": 1000, "error_bad_lines": False, "encoding": 'utf-8',
-				"quoting": csv.QUOTE_NONE, "na_filter": False, "sep": "|" }
+				"quoting": csv.QUOTE_NONE, "na_filter": False, "sep": "|", "activate_cnn": True}
 			merchant_dataframes = get_merchant_dataframes(save_path + file_name, 'MERCHANT_NAME', **csv_kwargs)
 			merchants = sorted(list(merchant_dataframes.keys()))
 			for merchant in merchants:
