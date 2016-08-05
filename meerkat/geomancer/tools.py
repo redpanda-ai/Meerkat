@@ -13,20 +13,28 @@ def parse_arguments(args):
 	parser.add_argument("--subset", default="")
 	return parser.parse_args(args)
 
-def deduplicate_csv(input_file, subset):
+def deduplicate_csv(input_file, subset, inplace, **csv_kwargs):
 	"""This function de-deduplicates transactions in a csv file"""
-	df = pd.read_csv(input_file, error_bad_lines=False,
-		encoding='utf-8', na_filter=False, sep=',')
+	read = csv_kwargs["read"]
+	to = csv_kwargs["to"]
+	df = pd.read_csv(input_file, **read)
+	original_len = len(df)
 
 	if subset == "":
-		unique_df = df.drop_duplicates(keep="first")
+		unique_df = df.drop_duplicates(keep="first", inplace=inplace)
 	else:
-		unique_df = df.drop_duplicates(subset=subset, keep="first")
+		unique_df = df.drop_duplicates(subset=subset, keep="first", inplace=inplace)
 
-	logging.info("reduced {0} duplicate transactions".format(len(df) - len(unique_df)))
-	output_file = 'deduplicated_' + input_file
-	unique_df.to_csv(output_file, sep=',', index=False, quoting=csv.QUOTE_ALL)
-	logging.info("csv files with unique {0} transactions saved to: {1}".format(len(unique_df), output_file))
+	if inplace:
+		logging.info("reduced {0} duplicate transactions".format(original_len - len(df)))
+		df.to_csv(input_file, **to)
+		logging.info("csv files with unique {0} transactions saved to: {1}".format(len(df), input_file))
+	else:
+		logging.info("reduced {0} duplicate transactions".format(len(df) - len(unique_df)))
+		last_slosh = input_file.rfind("/")
+		output_file = input_file[: last_slosh + 1] + 'deduplicated_' + input_file[last_slosh + 1 :]
+		unique_df.to_csv(output_file, **to)
+		logging.info("csv files with unique {0} transactions saved to: {1}".format(len(unique_df), output_file))
 
 def get_geo_dictionary(input_file):
 	"""This function takes a csv file containing city, state, and zip and creates

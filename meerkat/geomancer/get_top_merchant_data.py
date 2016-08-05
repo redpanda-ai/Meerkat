@@ -50,17 +50,17 @@ def main_process():
 	tasks_prefix = "meerkat/geomancer/merchants/"
 	for file_name in os.listdir(save_path):
 		if file_name.endswith(".csv"):
-			logging.info("csv file at: " + save_path + file_name)
+			csv_file = save_path + file_name
+			logging.info("csv file at: " + csv_file)
 
+			deduplicate_csv(csv_file, ["DESCRIPTION"])
 			csv_kwargs = { "chunksize": 1000, "error_bad_lines": False, "encoding": 'utf-8',
 				"quoting": csv.QUOTE_NONE, "na_filter": False, "sep": "|" }
-			merchant_dataframes = get_merchant_dataframes(save_path + file_name, 'MERCHANT_NAME', **csv_kwargs)
+			merchant_dataframes = get_merchant_dataframes(csv_file, 'MERCHANT_NAME', **csv_kwargs)
 			merchants = sorted(list(merchant_dataframes.keys()))
 			for merchant in merchants:
 				tasks = tasks_prefix + merchant + "/" + bank_or_card + "_tasks.csv"
 				merchant_dataframes[merchant].to_csv(tasks, sep=',', index=False, quoting=csv.QUOTE_ALL)
-
-	#shutil.rmtree(save_path)
 
 if __name__ == "__main__":
 	main_process()
