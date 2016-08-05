@@ -62,7 +62,7 @@ def main_process():
 				"to": to_csv_kwargs
 			}
 			logging.info("Start deduplicate csv")
-			deduplicate_csv(csv_file, "DESCRIPTION", True, **dedup_csv_kwargs)
+			deduplicate_csv(csv_file, "DESCRIPTION_UNMASKED", True, **dedup_csv_kwargs)
 			logging.info("Finish deduplicate csv")
 
 			csv_kwargs = { "chunksize": 1000, "error_bad_lines": False, "encoding": 'utf-8',
