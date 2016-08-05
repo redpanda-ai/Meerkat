@@ -165,23 +165,39 @@ def trans_to_tensor(config, sess, graph, tokens, tags, train=False):
 	char_inputs, rev_char_inputs = [], []
 	word_indices = [w2i[w] for w in tokens] if train else [w2i.get(w, w2i["_UNK"]) for w in tokens]
 
+	char_embed, rev_char_embed = [], []
+	rev_lst = get_tensor(graph, "rev_last_state:0")
+	lst = get_tensor(graph, "last_state:0")
+
 	# Encode Tags
 	encoded_tags = encode_tags(config, tags)
 
-	# Lookup Character Indices
-	for i, t in enumerate(tokens):
+	# Encode Characters
+	for token in tokens:
 
-		t = ["<w>"] + list(t) + ["</w>"]
-		char_inputs.append([])
+		token = ["<w>"] + list(token) + ["</w>"]
+		token_length = len(token)
 
-		for ii in range(max_wl):
-			char_index = c2i[t[ii]] if ii < len(t) else 0
-			char_inputs[i].append(char_index)
+		feed_dict = {
+			get_tensor(graph, "char_inputs:0") : [c2i[c] for c in token],
+			get_tensor(graph, "word_length:0") : token_length
+		}
 
-	char_inputs = np.array(char_inputs)
-	word_lengths = [len(t) for t in tokens]
+		last_state, rev_last_state = sess.run([lst, rev_lst], feed_dict=feed_dict)
+		char_embed.append(last_state[0][token_length-1])
+		rev_char_embed.append(rev_last_state[0][token_length-1])
 
-	return char_inputs, word_lengths, word_indices, encoded_tags
+	char_features = [np.concatenate([c, rc], axis=0) for c, rc in zip(char_embed, reversed(rev_char_embed))]
+	char_features = np.array(char_features)
+
+	# Encode Words
+	word_feed_dict = {get_tensor(graph, "word_inputs:0"): [w2i.get(w, w2i["_UNK"]) for w in tokens]}
+	embedded_words = sess.run(get_tensor(graph, "we_lookup:0"), feed_dict=word_feed_dict)
+
+	# Merge Encodings
+	tensor = np.concatenate([embedded_words, char_features], axis=1)
+
+	return tensor, encoded_tags
 
 def char_encoding(config, graph):
 	"""Create graph nodes for character encoding"""
@@ -192,10 +208,12 @@ def char_encoding(config, graph):
 	with graph.as_default():
 
 		# Character Embedding
-		word_lengths = tf.placeholder(tf.int64, [None], name="word_lengths")
-		char_inputs = tf.placeholder(tf.int32, [None, max_wl], name="char_inputs")
+		word_length = tf.placeholder(tf.int64, name="word_length")
+		char_inputs = tf.placeholder(tf.int32, [None], name="char_inputs")
 		cembed_matrix = tf.Variable(tf.random_uniform([len(c2i.keys()), config["ce_dim"]], -0.25, 0.25), name="cembeds")
 		cembeds = tf.nn.embedding_lookup(cembed_matrix, char_inputs, name="ce_lookup")
+		cembeds = tf.expand_dims(cembeds, 0)
+		cembeds = tf.transpose(cembeds, perm=[1,0,2])
 
 		# Create LSTM for Character Encoding
 		fw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"], state_is_tuple=True)
@@ -204,14 +222,15 @@ def char_encoding(config, graph):
 		# Encode Characters with LSTM
 		options = {
 			"dtype": tf.float32,
-			"sequence_length": word_lengths
+			"sequence_length": word_length,
+			"time_major": True
 		}
 
 		(output_fw, output_bw), output_states = tf.nn.bidirectional_dynamic_rnn(fw_lstm, bw_lstm, cembeds, **options)
+		output_fw = tf.transpose(cembeds, perm=[1,0,2])
+		output_bw = tf.transpose(cembeds, perm=[1,0,2])
 		last_state = tf.identity(output_fw, name="last_state")
 		rev_last_state = tf.identity(output_bw, name="rev_last_state")
-
-		return last_state, rev_last_state, word_lengths
 
 def build_graph(config):
 	"""Build CNN"""
@@ -225,7 +244,7 @@ def build_graph(config):
 		# Character Embedding
 		train = tf.placeholder(tf.bool, name="train")
 		tf.set_random_seed(config["seed"])
-		last_state, rev_last_state, word_lengths = char_encoding(config, graph)
+		char_encoding(config, graph)
 
 		# Word Embedding
 		word_inputs = tf.placeholder(tf.int32, [None], name="word_inputs")
@@ -236,9 +255,8 @@ def build_graph(config):
 		trans_len = tf.placeholder(tf.int64, None, name="trans_length")
 
 		# Combine Embeddings
-		char_embeds = last_relevant(last_state, word_lengths, "char_embeds")
-		rev_char_embeds = last_relevant(rev_last_state, word_lengths, "rev_char_embeds")
-		combined_embeddings = tf.concat(1, [wembeds, char_embeds, tf.reverse(rev_char_embeds, [True, False])], name="combined_embeddings")
+		input_shape = (None, config["ce_dim"] * 2 + config["we_dim"])
+		combined_embeddings = tf.placeholder(tf.float32, shape=input_shape, name="combined_embeddings")
 
 		# Cells and Weights
 		fw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["h_dim"], state_is_tuple=True)
@@ -306,14 +324,12 @@ def train_model(config, graph, sess, saver, run_options, run_metadata):
 
 			row = train.loc[t_index]
 			tokens, tags = get_tags(row)
-			char_inputs, word_lengths, word_indices, labels = trans_to_tensor(config, sess, graph, tokens, tags, train=True)
+			tensor, labels = trans_to_tensor(config, sess, graph, tokens, tags, train=True)
 
 			feed_dict = {
-				get_tensor(graph, "char_inputs:0") : char_inputs,
-				get_tensor(graph, "word_inputs:0") : word_indices,
-				get_tensor(graph, "word_lengths:0") : word_lengths,
-				get_tensor(graph, "trans_length:0"): len(tokens),
+				get_tensor(graph, "combined_embeddings:0") : tensor,
 				get_tensor(graph, "y:0"): labels,
+				get_tensor(graph, "trans_length:0"): len(tokens),
 				get_tensor(graph, "train:0"): True
 			}
 
@@ -329,7 +345,7 @@ def train_model(config, graph, sess, saver, run_options, run_metadata):
 			# Run Training Step
 			optimizer_out, loss = sess.run([get_op(graph, "optimizer"), get_tensor(graph, "loss:0")], feed_dict=feed_dict)
 			total_loss += loss
-			total_tagged += len(word_indices)
+			total_tagged += len(tokens)
 
 			# Log
 			if count % 250 == 0:
@@ -364,15 +380,14 @@ def evaluate_testset(config, graph, sess, test):
 
 		row = test.loc[i]
 		tokens, tags = get_tags(row)
-		char_inputs, word_lengths, word_indices, labels = trans_to_tensor(config, sess, graph, tokens, tags)
+		tensor, labels = trans_to_tensor(config, sess, graph, tokens, tags)
 		total_count += len(tokens)
 		
 		feed_dict = {
-			get_tensor(graph, "char_inputs:0") : char_inputs,
-			get_tensor(graph, "word_inputs:0") : word_indices,
-			get_tensor(graph, "word_lengths:0") : word_lengths,
-			get_tensor(graph, "trans_length:0"): len(tokens),
-			get_tensor(graph, "train:0"): False
+				get_tensor(graph, "combined_embeddings:0") : tensor,
+				get_tensor(graph, "y:0"): labels,
+				get_tensor(graph, "trans_length:0"): len(tokens),
+				get_tensor(graph, "train:0"): True
 		}
 
 		output = sess.run(get_tensor(graph, "model:0"), feed_dict=feed_dict)
