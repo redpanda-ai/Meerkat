@@ -1,15 +1,17 @@
 import argparse
 import csv
+import datetime
 import inspect
-import sys
-import os
+import json
 import logging
+import os
 import pandas as pd
 import json
 import queue
 import threading
 import datetime
 import time
+import sys
 
 from functools import reduce
 from timeit import default_timer as timer
@@ -53,11 +55,11 @@ def merge(a, b, path=None):
 			elif a[key] == b[key]:
 				pass
 			else:
-				#Merge conflict, let the new guy 
+				#Merge conflict, in our case old beats new
 				logging.warning("Conflict at %s" % ".".join(path + [str(key)]))
 				logging.warning("A key {0}".format(a[key]))
 				logging.warning("B key {0}".format(b[key]))
-				logging.warning("Conflict in dicts, resolving with newer value.")
+				logging.warning("Conflict in dicts, keeping older value.")
 		else:
 			a[key] = b[key]
 	return a
@@ -93,15 +95,8 @@ def dump_pretty_json_to_file(new_object, filename):
 def expand_abbreviations(city):
 	"""Turns abbreviations into their expanded form."""
 	maps = {
-		"E. ": "EAST ",
-		"W. ": "WEST ",
-		"N. ": "NORTH ",
-		"S. ": "SOUTH ",
-
-		"ST. ": "SAINT ",
-		"ST ": "SAINT ",
-		"FT. ": "FORT ",
-		"FT ": "FORT "
+		"E. ": "EAST ", "W. ": "WEST ", "N. ": "NORTH ", "S. ": "SOUTH ",
+		"ST. ": "SAINT ", "ST ": "SAINT ", "FT. ": "FORT ", "FT ": "FORT "
 	}
 	for abbr in maps:
 		if city.startswith(abbr):
@@ -199,6 +194,9 @@ def get_merchant_dataframes(input_file, groupby_name, **csv_kwargs):
 	#create a list of dataframe groups, filtered by merchant name
 	dict_of_df_lists = {}
 	chunk_num = 0
+	#logging.info("Filtering by the following merchant: {0}".format(merchant))
+	#for chunk in pd.read_csv(input_file, chunksize=chunksize, error_bad_lines=False,
+	#	warn_bad_lines=True, encoding='utf-8', quotechar='"', na_filter=False, sep=sep):
 	if activate_cnn:
 		classifier = get_classifier("bank_merchant")
 	num_chunks = int(sum(1 for line in open(input_file)) / csv_kwargs["chunksize"])
