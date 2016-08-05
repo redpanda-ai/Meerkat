@@ -215,7 +215,8 @@ def get_merchant_dataframes(input_file, groupby_name, **csv_kwargs):
 	param["num_chunks"] = num_chunks
 	param["dict_of_df_lists"] = {}
 	param["activate_cnn"] = activate_cnn
-	param["classifier"] = classifier
+	if activate_cnn:
+		param["classifier"] = classifier
 	param["start"] = start
 	param["log_string"] = log_string
 
