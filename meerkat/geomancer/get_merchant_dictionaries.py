@@ -16,6 +16,7 @@ import sys
 from functools import reduce
 from timeit import default_timer as timer
 from ..classification.load_model import get_tf_cnn_by_name as get_classifier
+from .tools import remove_special_chars
 
 TARGET_MERCHANTS = [ "Ace Hardware", "Walmart", "Walgreens", "Target", "Subway", "Starbucks", "McDonald's", "Costco Wholesale Corp.", "Burger King",
 	"Bed Bath and Beyond",
@@ -336,7 +337,7 @@ if __name__ == "__main__":
 	merchant_dataframes = get_merchant_dataframes("meerkat/geomancer/data/All_Merchants.csv", "list_name", **csv_kwargs)
 	merchants = sorted(list(merchant_dataframes.keys()))
 	for merchant in merchants:
-		ARGS.merchant = merchant
+		ARGS.merchant = remove_special_chars(merchant)
 		df = merchant_dataframes[merchant]
 		preprocess_dataframe(df)
 		logging.info("***** Processing {0:>29} ********".format(merchant))

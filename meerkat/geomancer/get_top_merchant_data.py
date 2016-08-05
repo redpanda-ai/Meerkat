@@ -1,4 +1,5 @@
 import sys
+import re
 import os
 import csv
 import logging
@@ -10,7 +11,7 @@ from meerkat.classification.tools import (pull_from_s3, extract_tarball,
 
 from .get_merchant_dictionaries import TARGET_MERCHANTS, get_merchant_dataframes
 from .get_agg_data import get_s3_file, get_etags
-from .tools import deduplicate_csv
+from .tools import deduplicate_csv, remove_special_chars
 
 def parse_arguments(args):
 	parser = argparse.ArgumentParser()
@@ -19,6 +20,17 @@ def parse_arguments(args):
 	parser.add_argument("--bucket", default="s3yodlee")
 	args = parser.parse_args(args)
 	return args
+
+def format_merchant_names(top_merchants):
+	"""Format merchant names"""
+	top_merchants_maps = {}
+	for merchant in top_merchants:
+		name = merchant.replace(" ", "_")
+		for mark in '!"#$%&\'()*+,-./:;<=>?@[]^`{|}~':
+			name = name.replace(mark, '')
+		top_merchants_maps[name] = merchant
+	top_merchants = list(top_merchants_maps.keys())
+	return top_merchants, top_merchants_maps
 
 def main_process():
 	log_format = "%(asctime)s %(levelname)s: %(message)s"
@@ -70,8 +82,9 @@ def main_process():
 			merchant_dataframes = get_merchant_dataframes(csv_file, 'MERCHANT_NAME', **csv_kwargs)
 			merchants = sorted(list(merchant_dataframes.keys()))
 			for merchant in merchants:
-				os.makedirs(tasks_prefix + merchant, exist_ok=True)
-				tasks = tasks_prefix + merchant + "/" + bank_or_card + "_tasks.csv"
+				formatted_merchant = remove_special_chars(merchant)
+				os.makedirs(tasks_prefix + formatted_merchant, exist_ok=True)
+				tasks = tasks_prefix + formatted_merchant + "/" + bank_or_card + "_tasks.csv"
 				merchant_dataframes[merchant].to_csv(tasks, sep=',', index=False, quoting=csv.QUOTE_ALL)
 
 if __name__ == "__main__":
