@@ -8,6 +8,7 @@ import pandas as pd
 import json
 import queue
 import threading
+import datetime
 import time
 
 from functools import reduce
@@ -152,21 +153,21 @@ class ThreadConsumer(threading.Thread):
 			if param["chunk_num"] % 10 == 0:
 				logging.info("Processing chunk {0:07d} of {1:07d}, {2:>6} target merchants found.".format(param["chunk_num"],
 					param["num_chunks"], len(param["dict_of_df_lists"].keys())))
-				elapsed = timer() - start
-				remaining = num_chunks - chunk_num
-				completion = float(chunk_num) / num_chunks * 100
-				chunk_rate = float(chunk_num) / elapsed
+				elapsed = timer() - param["start"]
+				remaining = param["num_chunks"] - param["chunk_num"]
+				completion = float(param["chunk_num"]) / param["num_chunks"] * 100
+				chunk_rate = float(param["chunk_num"]) / elapsed
 				remaining_time = float(remaining) / chunk_rate
 				#Log our progress
-				logging.info(log_string.format(
+				logging.info(param["log_string"].format(
 					str(datetime.timedelta(seconds=elapsed))[:-7],
 					str(datetime.timedelta(seconds=remaining_time))[:-7],
 					completion, chunk_rate))
 
-			if activate_cnn:
+			if param["activate_cnn"]:
 				transactions = chunk.to_dict('records')
-				enriched = classifier(transactions, doc_key='DESCRIPTION_UNMASKED',
-					label_key=groupby_name)
+				enriched = param["classifier"](transactions, doc_key='DESCRIPTION_UNMASKED',
+					label_key=param["groupby_name"])
 				chunk = pd.DataFrame(enriched)
 
 			grouped = chunk.groupby(param["groupby_name"], as_index=False)
@@ -199,7 +200,7 @@ def get_merchant_dataframes(input_file, groupby_name, **csv_kwargs):
 	dict_of_df_lists = {}
 	chunk_num = 0
 	if activate_cnn:
-		classifier = get_classifier("card_merchant")
+		classifier = get_classifier("bank_merchant")
 	num_chunks = int(sum(1 for line in open(input_file)) / csv_kwargs["chunksize"])
 	start = timer()
 	log_string = "Taken: {0} , ETA: {1}, Competion: {2:.2f}%, Chunks/sec: {3:.2f}"
@@ -214,6 +215,10 @@ def get_merchant_dataframes(input_file, groupby_name, **csv_kwargs):
 	param["chunk_num"] = 0
 	param["num_chunks"] = num_chunks
 	param["dict_of_df_lists"] = {}
+	param["activate_cnn"] = activate_cnn
+	param["classifier"] = classifier
+	param["start"] = start
+	param["log_string"] = log_string
 
 	start_producers(param)
 	start_consumers(param)

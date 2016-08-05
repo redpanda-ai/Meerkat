@@ -65,9 +65,8 @@ def main_process():
 			deduplicate_csv(csv_file, "DESCRIPTION", True, **dedup_csv_kwargs)
 			logging.info("Finish deduplicate csv")
 
-			csv_kwargs = read_csv_kwargs
-			csv_kwargs["chunksize"] = 1000
-			csv_kwargs["activate_cnn"] = True
+			csv_kwargs = { "chunksize": 1000, "error_bad_lines": False, "encoding": 'utf-8',
+				"quoting": csv.QUOTE_NONE, "na_filter": False, "sep": "|", "activate_cnn": True}
 			merchant_dataframes = get_merchant_dataframes(csv_file, 'MERCHANT_NAME', **csv_kwargs)
 			merchants = sorted(list(merchant_dataframes.keys()))
 			for merchant in merchants:
