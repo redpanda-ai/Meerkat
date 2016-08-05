@@ -1,13 +1,16 @@
 import argparse
 import csv
+import datetime
 import inspect
-import sys
-import os
-import logging
-import pandas as pd
 import json
+import logging
+import os
+import pandas as pd
+import sys
 
 from functools import reduce
+from timeit import default_timer as timer
+from ..classification.load_model import get_tf_cnn_by_name as get_classifier
 
 TARGET_MERCHANTS = [ "Ace Hardware", "Walmart", "Walgreens", "Target", "Subway", "Starbucks", "McDonald's", "Costco Wholesale Corp.", "Burger King",
 	"Bed Bath and Beyond",
@@ -47,11 +50,11 @@ def merge(a, b, path=None):
 			elif a[key] == b[key]:
 				pass
 			else:
-				#Merge conflict, let the new guy 
+				#Merge conflict, in our case old beats new
 				logging.warning("Conflict at %s" % ".".join(path + [str(key)]))
 				logging.warning("A key {0}".format(a[key]))
 				logging.warning("B key {0}".format(b[key]))
-				logging.warning("Conflict in dicts, resolving with newer value.")
+				logging.warning("Conflict in dicts, keeping older value.")
 		else:
 			a[key] = b[key]
 	return a
@@ -87,15 +90,8 @@ def dump_pretty_json_to_file(new_object, filename):
 def expand_abbreviations(city):
 	"""Turns abbreviations into their expanded form."""
 	maps = {
-		"E. ": "EAST ",
-		"W. ": "WEST ",
-		"N. ": "NORTH ",
-		"S. ": "SOUTH ",
-
-		"ST. ": "SAINT ",
-		"ST ": "SAINT ",
-		"FT. ": "FORT ",
-		"FT ": "FORT "
+		"E. ": "EAST ", "W. ": "WEST ", "N. ": "NORTH ", "S. ": "SOUTH ",
+		"ST. ": "SAINT ", "ST ": "SAINT ", "FT. ": "FORT ", "FT ": "FORT "
 	}
 	for abbr in maps:
 		if city.startswith(abbr):
@@ -106,6 +102,8 @@ def expand_abbreviations(city):
 def get_merchant_dataframes(input_file, groupby_name, **csv_kwargs):
 	"""Generate a dataframe which is a subset of the input_file grouped by merchant."""
 	logging.info("Constructing dataframe from file.")
+	activate_cnn = csv_kwargs.get("activate_cnn", False)
+	del csv_kwargs["activate_cnn"]
 	#Here are the target merchants
 	#create a list of dataframe groups, filtered by merchant name
 	dict_of_df_lists = {}
@@ -114,12 +112,35 @@ def get_merchant_dataframes(input_file, groupby_name, **csv_kwargs):
 	#logging.info("Filtering by the following merchant: {0}".format(merchant))
 	#for chunk in pd.read_csv(input_file, chunksize=chunksize, error_bad_lines=False,
 	#	warn_bad_lines=True, encoding='utf-8', quotechar='"', na_filter=False, sep=sep):
+	if activate_cnn:
+		classifier = get_classifier("bank_merchant")
 	num_chunks = int(sum(1 for line in open(input_file)) / csv_kwargs["chunksize"])
+	start = timer()
+	log_string = "Taken: {0} , ETA: {1}, Competion: {2:.2f}%, Chunks/sec: {3:.2f}"
 	for chunk in pd.read_csv(input_file, **csv_kwargs):
 		chunk_num += 1
 		if chunk_num % 10 == 0:
-			logging.info("Processing chunk {0:07d} of {1:07d}, {2:>6} target merchants found.".format(chunk_num,
-				num_chunks, len(dict_of_df_lists.keys())))
+			logging.info("Processing chunk {0:07d} of {1:07d}, {2:>6} target merchants found."\
+				.format(chunk_num, num_chunks, len(dict_of_df_lists.keys())))
+			elapsed = timer() - start
+			remaining = num_chunks - chunk_num
+			completion = float(chunk_num) / num_chunks * 100
+			chunk_rate = float(chunk_num) / elapsed
+			remaining_time = float(remaining) / chunk_rate
+			#Log our progress
+			logging.info(log_string.format(
+				str(datetime.timedelta(seconds=elapsed))[:-7],
+				str(datetime.timedelta(seconds=remaining_time))[:-7],
+				completion, chunk_rate))
+
+		#Here
+		if activate_cnn:
+			transactions = chunk.to_dict('records')
+			enriched = classifier(transactions, doc_key='DESCRIPTION_UNMASKED',
+				label_key=groupby_name)
+			chunk = pd.DataFrame(enriched)
+			#End Here
+
 		grouped = chunk.groupby(groupby_name, as_index=False)
 		groups = dict(list(grouped))
 		#logging.info("Group Keys: {0}".format(groups.keys()))
