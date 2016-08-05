@@ -53,10 +53,14 @@ def last_relevant(output, length, name):
     relevant = tf.gather(flat, index, name=name)
     return relevant
 
-def get_tags(trans):
+def truncate(length, w):
+	return w if len(w) <= length else w[:length]
+
+def get_tags(config, trans):
 	"""Convert df row to list of tags and tokens"""
 
 	tokens = trans[0].lower().split()
+	tokens = [truncate(config["max_wlength"], w) for w in tokens]
 	tag = trans[1].lower().split()
 	tags = []
 
@@ -113,17 +117,23 @@ def load_embeddings_file(file_name, sep=" ",lower=False):
 	print("loaded pre-trained embeddings (word->emb_vec) size: {} (lower: {})".format(len(emb.keys()), lower))
 	return emb, len(emb[word])
 
-def words_to_indices(data):
+def words_to_indices(data, max_wlength=False):
 	"""convert tokens to int, assuming data is a df"""
 	w2i = {}
 	w2i["_UNK"] = 0
+	max_length = 0
 	for row_num, row in enumerate(data.values):
 		tokens = row[0].lower().split()
 		# there are too many unique tokens in description, better to shrink the size
 		for token in tokens:
+			if len(token) > max_length:
+				max_length = len(token)
 			if token not in w2i:
+				if max_wlength:
+					token = truncate(max_wlength, token)
 				w2i[token] = len(w2i)
-	return w2i
+	print("max word length in training data is: {0}".format(max_length))
+	return w2i, max_length
 
 def construct_embedding(config, w2i, loaded_embedding):
 	"""construct an embedding that contains all words in loaded_embedding and w2i"""
@@ -142,7 +152,11 @@ def preprocess(config):
 	embedding, emb_dim = load_embeddings_file(config["embeddings"], lower=True)
 	# Assert that emb_dim is equal to we_dim
 	assert(emb_dim == config["we_dim"])
-	config["w2i"] = words_to_indices(config["train"])
+	config["w2i"], config["max_wlength"] = words_to_indices(config["train"], config["max_word_length"])
+	# use max_word_length if it's declared
+	if config["max_word_length"]:
+		config["max_wlength"] = config["max_word_length"]
+	print("max_wl {0} will be used".format(config["max_wlength"]))
 	config["w2i"], config["wembedding"] = construct_embedding(config, config["w2i"], embedding)
 	config["vocab_size"] = len(config["wembedding"])
 	return config
@@ -160,8 +174,9 @@ def trans_to_tensor(config, sess, graph, tokens, tags, train=False):
 
 	w2i = config["w2i"]
 	c2i = config["c2i"]
-	max_wl = config["max_word_length"]
+	max_wl = config["max_wlength"]
 	char_inputs, rev_char_inputs = [], []
+	tokens = [truncate(max_wl, w) for w in tokens]
 	word_indices = [w2i[w] for w in tokens] if train else [w2i.get(w, w2i["_UNK"]) for w in tokens]
 
 	# Encode Tags
@@ -186,7 +201,7 @@ def char_encoding(config, graph):
 	"""Create graph nodes for character encoding"""
 
 	c2i = config["c2i"]
-	max_wl = config["max_word_length"]
+	max_wl = config["max_wlength"]
 
 	with graph.as_default():
 
@@ -304,7 +319,7 @@ def train_model(config, graph, sess, saver):
 			count += 1
 
 			row = train.loc[t_index]
-			tokens, tags = get_tags(row)
+			tokens, tags = get_tags(config, row)
 			char_inputs, word_lengths, word_indices, labels = trans_to_tensor(config, sess, graph, tokens, tags, train=True)
 
 			feed_dict = {
@@ -354,7 +369,7 @@ def evaluate_testset(config, graph, sess, test):
 			print("%d" % (count / len(test_index) * 100) + "% complete with evaluation")
 
 		row = test.loc[i]
-		tokens, tags = get_tags(row)
+		tokens, tags = get_tags(config, row)
 		char_inputs, word_lengths, word_indices, labels = trans_to_tensor(config, sess, graph, tokens, tags)
 		total_count += len(tokens)
 		
