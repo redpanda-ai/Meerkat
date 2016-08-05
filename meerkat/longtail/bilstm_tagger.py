@@ -38,6 +38,7 @@ import sys
 
 import numpy as np
 import tensorflow as tf
+from tensorflow.python.client import timeline
 
 from meerkat.classification.tools import reverse_map, get_tensor, get_op, get_variable
 from meerkat.various_tools import load_params, load_piped_dataframe
@@ -279,7 +280,7 @@ def build_graph(config):
 
 	return graph, saver
 
-def train_model(config, graph, sess, saver):
+def train_model(config, graph, sess, saver, run_options, run_metadata):
 	"""Train the model"""
 
 	eras = config["eras"]
@@ -316,6 +317,15 @@ def train_model(config, graph, sess, saver):
 				get_tensor(graph, "train:0"): True
 			}
 
+			# Collect GPU Profile
+			if config["profile_gpu"]:
+				optimizer_out, loss = sess.run([get_op(graph, "optimizer"), get_tensor(graph, "loss:0")], feed_dict=feed_dict, options=run_options, run_metadata=run_metadata)
+				tl = timeline.Timeline(run_metadata.step_stats)
+				ctf = tl.generate_chrome_trace_format()
+				with open('timeline.json', 'w') as f:
+					f.write(ctf)
+					sys.exit()
+
 			# Run Training Step
 			optimizer_out, loss = sess.run([get_op(graph, "optimizer"), get_tensor(graph, "loss:0")], feed_dict=feed_dict)
 			total_loss += loss
@@ -324,7 +334,6 @@ def train_model(config, graph, sess, saver):
 			# Log
 			if count % 250 == 0:
 				print("count: " + str(count))
-				#print(sess.run(get_tensor(graph, "combined_embeddings:0"), feed_dict=feed_dict).shape)
 				print("loss: " + str(total_loss/total_tagged))
 				print("%d" % (count / len(train_index) * 100) + "% complete with era")
 
@@ -385,8 +394,10 @@ def run_session(config, graph, saver):
 
 	with tf.Session(graph=graph) as sess:
 
+		run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
+		run_metadata = tf.RunMetadata()
 		tf.initialize_all_variables().run()
-		train_model(config, graph, sess, saver)
+		train_model(config, graph, sess, saver, run_options, run_metadata)
 
 def run_from_command_line():
 	"""Run module from command line"""
