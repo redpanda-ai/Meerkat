@@ -70,6 +70,7 @@ def main_process():
 			merchant_dataframes = get_merchant_dataframes(csv_file, 'MERCHANT_NAME', **csv_kwargs)
 			merchants = sorted(list(merchant_dataframes.keys()))
 			for merchant in merchants:
+				os.makedirs(tasks_prefix + merchant, exist_ok=True)
 				tasks = tasks_prefix + merchant + "/" + bank_or_card + "_tasks.csv"
 				merchant_dataframes[merchant].to_csv(tasks, sep=',', index=False, quoting=csv.QUOTE_ALL)
 
