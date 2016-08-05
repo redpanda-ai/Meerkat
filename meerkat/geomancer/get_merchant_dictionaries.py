@@ -103,7 +103,8 @@ def get_merchant_dataframes(input_file, groupby_name, **csv_kwargs):
 	"""Generate a dataframe which is a subset of the input_file grouped by merchant."""
 	logging.info("Constructing dataframe from file.")
 	activate_cnn = csv_kwargs.get("activate_cnn", False)
-	del csv_kwargs["activate_cnn"]
+	if "activate_cnn" in csv_kwargs:
+		del csv_kwargs["activate_cnn"]
 	#Here are the target merchants
 	#create a list of dataframe groups, filtered by merchant name
 	dict_of_df_lists = {}
