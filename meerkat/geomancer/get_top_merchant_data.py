@@ -21,17 +21,6 @@ def parse_arguments(args):
 	args = parser.parse_args(args)
 	return args
 
-def format_merchant_names(top_merchants):
-	"""Format merchant names"""
-	top_merchants_maps = {}
-	for merchant in top_merchants:
-		name = merchant.replace(" ", "_")
-		for mark in '!"#$%&\'()*+,-./:;<=>?@[]^`{|}~':
-			name = name.replace(mark, '')
-		top_merchants_maps[name] = merchant
-	top_merchants = list(top_merchants_maps.keys())
-	return top_merchants, top_merchants_maps
-
 def main_process():
 	log_format = "%(asctime)s %(levelname)s: %(message)s"
 	logging.basicConfig(format=log_format, level=logging.INFO)
