@@ -6,11 +6,13 @@ import os
 import logging
 import pandas as pd
 import json
-
-from functools import reduce
 import queue
 import threading
 import time
+
+from functools import reduce
+from timeit import default_timer as timer
+from ..classification.load_model import get_tf_cnn_by_name as get_classifier
 
 TARGET_MERCHANTS = [ "Ace Hardware", "Walmart", "Walgreens", "Target", "Subway", "Starbucks", "McDonald's", "Costco Wholesale Corp.", "Burger King",
 	"Bed Bath and Beyond",
@@ -147,8 +149,26 @@ class ThreadConsumer(threading.Thread):
 			logging.info("consumer thread: {0}; data queue size: {1}".format(str(self.thread_id), param["data_queue"].qsize()))
 
 			param["chunk_num"] += 1
-			logging.info("Processing chunk {0:07d} of {1:07d}, {2:>6} target merchants found.".format(param["chunk_num"],
-				param["num_chunks"], len(param["dict_of_df_lists"].keys())))
+			if param["chunk_num"] % 10 == 0:
+				logging.info("Processing chunk {0:07d} of {1:07d}, {2:>6} target merchants found.".format(param["chunk_num"],
+					param["num_chunks"], len(param["dict_of_df_lists"].keys())))
+				elapsed = timer() - start
+				remaining = num_chunks - chunk_num
+				completion = float(chunk_num) / num_chunks * 100
+				chunk_rate = float(chunk_num) / elapsed
+				remaining_time = float(remaining) / chunk_rate
+				#Log our progress
+				logging.info(log_string.format(
+					str(datetime.timedelta(seconds=elapsed))[:-7],
+					str(datetime.timedelta(seconds=remaining_time))[:-7],
+					completion, chunk_rate))
+
+			if activate_cnn:
+				transactions = chunk.to_dict('records')
+				enriched = classifier(transactions, doc_key='DESCRIPTION_UNMASKED',
+					label_key=groupby_name)
+				chunk = pd.DataFrame(enriched)
+
 			grouped = chunk.groupby(param["groupby_name"], as_index=False)
 			groups = dict(list(grouped))
 			my_keys = groups.keys()
@@ -171,12 +191,18 @@ def start_consumers(param):
 def get_merchant_dataframes(input_file, groupby_name, **csv_kwargs):
 	"""Generate a dataframe which is a subset of the input_file grouped by merchant."""
 	logging.info("Constructing dataframe from file.")
+	activate_cnn = csv_kwargs.get("activate_cnn", False)
+	if "activate_cnn" in csv_kwargs:
+		del csv_kwargs["activate_cnn"]
 	#Here are the target merchants
 	#create a list of dataframe groups, filtered by merchant name
 	dict_of_df_lists = {}
 	chunk_num = 0
+	if activate_cnn:
+		classifier = get_classifier("card_merchant")
 	num_chunks = int(sum(1 for line in open(input_file)) / csv_kwargs["chunksize"])
-
+	start = timer()
+	log_string = "Taken: {0} , ETA: {1}, Competion: {2:.2f}%, Chunks/sec: {3:.2f}"
 	param = {}
 	param["data_queue_populated"] = False
 	param["data_queue"] = queue.Queue()
