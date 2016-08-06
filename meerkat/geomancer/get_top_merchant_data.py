@@ -15,6 +15,9 @@ from .get_merchant_dictionaries import TARGET_MERCHANTS, get_merchant_dataframes
 from .get_agg_data import get_s3_file, get_etags
 from .tools import deduplicate_csv, remove_special_chars
 
+logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
+logger = logging.getLogger('get_top_merchant_data')
+
 def parse_arguments(args):
 	parser = argparse.ArgumentParser()
 	parser.add_argument("bank_or_card")
@@ -25,7 +28,6 @@ def parse_arguments(args):
 
 
 def main_process():
-	logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
 	args = parse_arguments(sys.argv[1:])
 	bank_or_card = args.bank_or_card
 	bucket = args.bucket
@@ -38,24 +40,24 @@ def main_process():
 	os.makedirs(save_path, exist_ok=True)
 
 	etags, etags_file = get_etags(save_path)
-	logging.info("Synch-ing with S3")
+	logger.info("Synch-ing with S3")
 	needs_to_be_downloaded = get_s3_file(bucket=bucket, prefix=prefix, file_name=tarball_name,
 		save_path=save_path, etags=etags, etags_file=etags_file)
-	logging.info("Synch-ed")
+	logger.info("Synch-ed")
 
 	if needs_to_be_downloaded:
 		for root, dirs, files in os.walk(save_path):
 			for f in files:
 				if f.endswith(".csv"):
 					os.unlink(os.path.join(root, f))
-					logging.info("{0} is removed".format(f))
+					logger.info("{0} is removed".format(f))
 		extract_tarball(save_path + tarball_name, save_path)
 
 	tasks_prefix = "meerkat/geomancer/merchants/"
 	for file_name in os.listdir(save_path):
 		if file_name.endswith(".csv"):
 			csv_file = save_path + file_name
-			logging.info("csv file at: " + csv_file)
+			logger.info("csv file at: " + csv_file)
 
 			read_csv_kwargs = { "error_bad_lines": False, "encoding": 'utf-8',
 				"quoting": csv.QUOTE_NONE, "na_filter": False, "sep": "|" }
@@ -64,9 +66,9 @@ def main_process():
 				"read": read_csv_kwargs,
 				"to": to_csv_kwargs
 			}
-			logging.info("Start deduplicate csv")
+			logger.info("Start deduplicate csv")
 			deduplicate_csv(csv_file, "DESCRIPTION_UNMASKED", True, **dedup_csv_kwargs)
-			logging.info("Finish deduplicate csv")
+			logger.info("Finish deduplicate csv")
 
 			csv_kwargs = { "chunksize": 1000, "error_bad_lines": False, "encoding": 'utf-8',
 				"quoting": csv.QUOTE_NONE, "na_filter": False, "sep": "|", "activate_cnn": True}

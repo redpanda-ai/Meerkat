@@ -19,6 +19,9 @@ from timeit import default_timer as timer
 from ..classification.load_model import get_tf_cnn_by_name as get_classifier
 from .tools import remove_special_chars
 
+logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
+logger = logging.getLogger('get_merchant_dictionaries')
+
 TARGET_MERCHANTS = [ "Ace Hardware", "Walmart", "Walgreens", "Target", "Subway", "Starbucks", "McDonald's", "Costco Wholesale Corp.", "Burger King",
 	"Bed Bath and Beyond",
 	"Aeropostale", "Albertsons", "American Eagle Outfitters", "Applebee's", "Arby's",
@@ -58,10 +61,10 @@ def merge(a, b, path=None):
 				pass
 			else:
 				#Merge conflict, in our case old beats new
-				logging.warning("Conflict at %s" % ".".join(path + [str(key)]))
-				logging.warning("A key {0}".format(a[key]))
-				logging.warning("B key {0}".format(b[key]))
-				logging.warning("Conflict in dicts, keeping older value.")
+				logger.warning("Conflict at %s" % ".".join(path + [str(key)]))
+				logger.warning("A key {0}".format(a[key]))
+				logger.warning("B key {0}".format(b[key]))
+				logger.warning("Conflict in dicts, keeping older value.")
 		else:
 			a[key] = b[key]
 	return a
@@ -75,7 +78,7 @@ def dump_pretty_json_to_file(new_object, filename):
 		with open(full_path, "r") as infile:
 			src_object = json.load(infile)
 	except IOError as e:
-		logging.debug("No pre-existing object, which is fine.")
+		logger.debug("No pre-existing object, which is fine.")
 	#Merge original and new new_object
 	if isinstance(new_object, dict):
 		dst_object = reduce(merge, [src_object, new_object])
@@ -83,16 +86,16 @@ def dump_pretty_json_to_file(new_object, filename):
 	elif isinstance(new_object, list):
 		dst_object = list(set().union(new_object, src_object))
 	else:
-		logging.critical("It's neither a list nor a dictionary, aborting.")
+		logger.critical("It's neither a list nor a dictionary, aborting.")
 		sys.exit()
 	#Dump, if necessary
 	log_write = "'" + ARGS.merchant + "/" + filename + "'"
 	if ARGS.dumping:
-		logging.info("Writing {0}".format(log_write))
+		logger.info("Writing {0}".format(log_write))
 		with open(full_path, "w") as outfile:
 			json.dump(dst_object, outfile, sort_keys=True, indent=4, separators=(',', ': '))
 	else:
-		logging.info("Not Writing {0}".format(log_write))
+		logger.info("Not Writing {0}".format(log_write))
 
 def expand_abbreviations(city):
 	"""Turns abbreviations into their expanded form."""
@@ -118,12 +121,12 @@ class ThreadProducer(threading.Thread):
 		for chunk in pd.read_csv(input_file, **csv_kwargs):
 			self.param["data_queue"].put(chunk)
 			count += 1
-			logging.info("Populating data queue {0}".format(str(count)))
+			logger.info("Populating data queue {0}".format(str(count)))
 		self.param["data_queue_populated"] = True
-		logging.info("data queue is populated, data queue size: {0}".format(self.param["data_queue"].qsize()))
+		logger.info("data queue is populated, data queue size: {0}".format(self.param["data_queue"].qsize()))
 
 def start_producers(param):
-	logging.info("start producer")
+	logger.info("start producer")
 	producer = ThreadProducer(param)
 	producer.start()
 
@@ -141,14 +144,14 @@ class ThreadConsumer(threading.Thread):
 			if param["data_queue_populated"] and param["data_queue"].empty():
 				param["consumer_queue"].get()
 				param["consumer_queue"].task_done()
-				logging.info("Consumer thread {0} finished".format(str(self.thread_id)))
+				logger.info("Consumer thread {0} finished".format(str(self.thread_id)))
 				break
 			chunk = param["data_queue"].get()
-			logging.info("consumer thread: {0}; data queue size: {1}".format(str(self.thread_id), param["data_queue"].qsize()))
+			logger.info("consumer thread: {0}; data queue size: {1}".format(str(self.thread_id), param["data_queue"].qsize()))
 
 			param["chunk_num"] += 1
 			if param["chunk_num"] % 10 == 0:
-				logging.info("Processing chunk {0:07d} of {1:07d}, {2:>6} target merchants found.".format(param["chunk_num"],
+				logger.info("Processing chunk {0:07d} of {1:07d}, {2:>6} target merchants found.".format(param["chunk_num"],
 					param["num_chunks"], len(param["dict_of_df_lists"].keys())))
 				elapsed = timer() - param["start"]
 				remaining = param["num_chunks"] - param["chunk_num"]
@@ -156,7 +159,7 @@ class ThreadConsumer(threading.Thread):
 				chunk_rate = float(param["chunk_num"]) / elapsed
 				remaining_time = float(remaining) / chunk_rate
 				#Log our progress
-				logging.info(param["log_string"].format(
+				logger.info(param["log_string"].format(
 					str(datetime.timedelta(seconds=elapsed))[:-7],
 					str(datetime.timedelta(seconds=remaining_time))[:-7],
 					completion, chunk_rate))
@@ -173,7 +176,7 @@ class ThreadConsumer(threading.Thread):
 			for key in my_keys:
 				if key in TARGET_MERCHANTS:
 					if key not in param["dict_of_df_lists"]:
-						logging.info("***** Discovered {0:>30} ********".format(key))
+						logger.info("***** Discovered {0:>30} ********".format(key))
 						param["dict_of_df_lists"][key] = []
 					param["dict_of_df_lists"][key].append(groups[key])
 			time.sleep(0.1)
@@ -181,14 +184,14 @@ class ThreadConsumer(threading.Thread):
 
 def start_consumers(param):
 	for i in range(10):
-		logging.info("start consumer: {0}".format(str(i)))
+		logger.info("start consumer: {0}".format(str(i)))
 		consumer = ThreadConsumer(i, param)
 		consumer.setDaemon(True)
 		consumer.start()
 
 def get_merchant_dataframes(input_file, groupby_name, **csv_kwargs):
 	"""Generate a dataframe which is a subset of the input_file grouped by merchant."""
-	logging.info("Constructing dataframe from file.")
+	logger.info("Constructing dataframe from file.")
 	activate_cnn = csv_kwargs.get("activate_cnn", False)
 	if "activate_cnn" in csv_kwargs:
 		del csv_kwargs["activate_cnn"]
@@ -196,7 +199,7 @@ def get_merchant_dataframes(input_file, groupby_name, **csv_kwargs):
 	#create a list of dataframe groups, filtered by merchant name
 	dict_of_df_lists = {}
 	chunk_num = 0
-	#logging.info("Filtering by the following merchant: {0}".format(merchant))
+	#logger.info("Filtering by the following merchant: {0}".format(merchant))
 	#for chunk in pd.read_csv(input_file, chunksize=chunksize, error_bad_lines=False,
 	#	warn_bad_lines=True, encoding='utf-8', quotechar='"', na_filter=False, sep=sep):
 	if activate_cnn:
@@ -232,20 +235,20 @@ def get_merchant_dataframes(input_file, groupby_name, **csv_kwargs):
 	found_list = list(merchants_found)
 	missing_list = list(set(TARGET_MERCHANTS) - set(found_list))
 	for item in found_list:
-		logging.info("Found {0:>49}".format(item))
+		logger.info("Found {0:>49}".format(item))
 	for item in missing_list:
-		logging.warning("Not Found {0:>42}".format(item))
+		logger.warning("Not Found {0:>42}".format(item))
 	#Merge them together
 	for key in merchants_found:
 		dict_of_df_lists[key] = pd.concat(dict_of_df_lists[key], ignore_index=True)
 		#Do some pre-processing
-		logging.info("Preprocessing dataframe for {0:>27}".format(key))
+		logger.info("Preprocessing dataframe for {0:>27}".format(key))
 
 	return dict_of_df_lists
 
 def get_store_dictionaries(df):
 	"""Writes out two store dictionaries"""
-	logging.debug("Generating store dictionaries.")
+	logger.debug("Generating store dictionaries.")
 	#Use only the "store_number", "city", and "state" columns
 	slender_df = df[["store_number", "city", "state"]]
 	store_dict_1, store_dict_2 = {}, {}
@@ -278,7 +281,7 @@ def preprocess_dataframe(df):
 
 def get_unique_city_dictionaries(df):
 	"""Constructs a dictionary using unique city names as keys."""
-	logging.debug("Generating unique_city dictionaries for {0}".format(ARGS.merchant))
+	logger.debug("Generating unique_city dictionaries for {0}".format(ARGS.merchant))
 	# Create the unique_city_state dictionary
 	grouped_city = geo_df.groupby('city', as_index=True)
 	groups_city = dict(list(grouped_city))
@@ -299,7 +302,7 @@ def get_unique_city_dictionaries(df):
 def get_geo_dictionary(df):
 	"""Generates three merchant dictionaries and writes them as JSON files"""
 	merchant = ARGS.merchant
-	logging.debug("Generating geo dictionaries for '{0}'".format(ARGS.merchant))
+	logger.debug("Generating geo dictionaries for '{0}'".format(ARGS.merchant))
 	#Create a geo-dictionary, using only "state", "city", and "zip_code"
 	geo_df = df[["state", "city", "zip_code"]]
 	grouped = geo_df.groupby(['state', 'city'], as_index=True)
@@ -325,13 +328,12 @@ def setup_directories():
 	"""This creates the directories on the local file system, if needed."""
 	if ARGS.dumping:
 		output_directory = ARGS.filepath + "/" + ARGS.merchant
-		logging.debug("Confirming output directory at {0}".format(output_directory))
+		logger.debug("Confirming output directory at {0}".format(output_directory))
 		os.makedirs(output_directory, exist_ok=True)
 	else:
-		logging.info("No need for output directory for {0}".format(ARGS.merchant))
+		logger.info("No need for output directory for {0}".format(ARGS.merchant))
 
 if __name__ == "__main__":
-	logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
 	ARGS = parse_arguments(sys.argv[1:])
 	csv_kwargs = { "chunksize": 1000, "error_bad_lines": False, "warn_bad_lines": True, "encoding": "utf-8",
 		"quotechar" : '"', "na_filter" : False, "sep": "," }
@@ -341,7 +343,7 @@ if __name__ == "__main__":
 		ARGS.merchant = remove_special_chars(merchant)
 		df = merchant_dataframes[merchant]
 		preprocess_dataframe(df)
-		logging.info("***** Processing {0:>29} ********".format(merchant))
+		logger.info("***** Processing {0:>29} ********".format(merchant))
 		setup_directories()
 		store_dict_1, store_dict_2 = get_store_dictionaries(df)
 		geo_df = get_geo_dictionary(df)

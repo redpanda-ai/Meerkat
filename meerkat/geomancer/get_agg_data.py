@@ -10,6 +10,9 @@ import yaml
 
 from meerkat.various_tools import load_params
 
+logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
+logger = logging.getLogger('get_agg_data')
+
 def parse_arguments(args):
 	"""Parse arguments from command line"""
 	parser = argparse.ArgumentParser()
@@ -29,10 +32,10 @@ def get_etags(base_dir):
 	etags_file = base_dir + "etags.json"
 	etags = {}
 	if os.path.isfile(etags_file):
-		logging.info("ETags found.")
+		logger.info("ETags found.")
 		etags = load_params(etags_file)
 	else:
-		logging.info("Etags not found")
+		logger.info("Etags not found")
 	return etags, etags_file
 
 def get_s3_file(**kwargs):
@@ -44,12 +47,12 @@ def get_s3_file(**kwargs):
 
 	local_file_exist = False
 	if os.path.isfile(local_file):
-		logging.info("local file {0} exists".format(local_file))
+		logger.info("local file {0} exists".format(local_file))
 		local_file_exist = True
 	else:
-		logging.info("local file {0} not found".format(local_file))
+		logger.info("local file {0} not found".format(local_file))
 
-	logging.debug(client.list_objects(Bucket=kwargs["bucket"],
+	logger.debug(client.list_objects(Bucket=kwargs["bucket"],
 		Prefix=remote_file))
 	remote_etag = client.list_objects(Bucket=kwargs["bucket"],
 		Prefix=remote_file)["Contents"][0]["ETag"]
@@ -59,23 +62,23 @@ def get_s3_file(**kwargs):
 		if remote_file in kwargs["etags"]:
 			local_etag = kwargs["etags"][remote_file]
 
-		logging.info("{0: <6} ETag is : {1}".format("Remote", remote_etag))
-		logging.info("{0: <6} ETag is : {1}".format("Local", local_etag))
+		logger.info("{0: <6} ETag is : {1}".format("Remote", remote_etag))
+		logger.info("{0: <6} ETag is : {1}".format("Local", local_etag))
 
 		#If the file is already local, skip downloading
 		if local_etag == remote_etag:
-			logging.info("Agg data exists locally no need to download")
+			logger.info("Agg data exists locally no need to download")
 			#File does not need to be downloaded
 			return False
 
-	logging.info("start downloading agg data from s3")
+	logger.info("start downloading agg data from s3")
 	client.download_file(kwargs["bucket"], remote_file, local_file)
-	logging.info("Agg data file is downloaded at: " + local_file)
+	logger.info("Agg data file is downloaded at: " + local_file)
 
 	etags = {}
 	etags[remote_file] = remote_etag
 	with open(kwargs["etags_file"], "w") as outfile:
-		logging.info("Writing {0}".format(kwargs["etags_file"]))
+		logger.info("Writing {0}".format(kwargs["etags_file"]))
 		json.dump(etags, outfile)
 
 	#File needs to be downloaded
@@ -83,8 +86,6 @@ def get_s3_file(**kwargs):
 
 def main_process():
 	"""Execute the main programe"""
-	logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
-
 	args = parse_arguments(sys.argv[1:])
 
 	bucket = args.bucket

@@ -5,6 +5,8 @@
 # Formatters detailed here: http://docs.python.org/2/library/logging.html#logrecord-attributes
 version: 1
 formatters:
+  named:
+    format: '%(asctime)s - %(name)s - %(funcName)s() - %(levelname)s - %(message)s'
   simple:
     format: '%(asctime)s - %(threadName)s - %(module)s.%(funcName)s() - %(levelname)s - %(message)s'
   detail:
@@ -17,12 +19,24 @@ loggers:
   warn:
     handlers: [warn]
     propagate: true
+  get_merchant_dictionaries:
+    handlers: [console]
+    propogate: true
+  get_agg_data:
+    handlers: [console]
+    propogate: true
+  get_top_merchant_data:
+    handlers: [console]
+    propogate: true
+  tools:
+    handlers: [console]
+    propogate: true
 
 handlers:
   console:
     class: logging.StreamHandler
     level: INFO
-    formatter: simple
+    formatter: named
     stream: ext://sys.stdout
   all:
     class: logging.handlers.TimedRotatingFileHandler
@@ -43,5 +57,5 @@ handlers:
 
 root:
   level: INFO
-  handlers: [console, all, warn]
+  handlers: [all, warn]
   propagate: true
