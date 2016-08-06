@@ -54,10 +54,10 @@ def last_relevant(output, length, name):
     relevant = tf.gather(flat, index, name=name)
     return relevant
 
-def get_tags(trans):
+def get_tags(config, trans):
 	"""Convert df row to list of tags and tokens"""
 
-	tokens = trans[0].lower().split()
+	tokens = trans[0].lower().split()[0:config["max_tokens"]]
 	tag = trans[1].lower().split()
 	tags = []
 
@@ -324,7 +324,7 @@ def train_model(config, graph, sess, saver, run_options, run_metadata):
 			count += 1
 
 			row = train.loc[t_index]
-			tokens, tags = get_tags(row)
+			tokens, tags = get_tags(config, row)
 			char_inputs, word_lengths, word_indices, labels = trans_to_tensor(config, sess, graph, tokens, tags, train=True)
 
 			feed_dict = {
@@ -382,7 +382,7 @@ def evaluate_testset(config, graph, sess, test):
 			print("%d" % (count / len(test_index) * 100) + "% complete with evaluation")
 
 		row = test.loc[i]
-		tokens, tags = get_tags(row)
+		tokens, tags = get_tags(config, row)
 		char_inputs, word_lengths, word_indices, labels = trans_to_tensor(config, sess, graph, tokens, tags)
 		total_count += len(tokens)
 		
