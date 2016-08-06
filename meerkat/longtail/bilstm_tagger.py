@@ -193,7 +193,7 @@ def trans_to_tensor(config, sess, graph, tokens, tags, train=False):
 
 	return char_inputs, word_lengths, word_indices, encoded_tags
 
-def char_encoding(config, graph):
+def char_encoding(config, graph, trans_len):
 	"""Create graph nodes for character encoding"""
 
 	c2i = config["c2i"]
@@ -203,12 +203,14 @@ def char_encoding(config, graph):
 
 		# Character Embedding
 		word_lengths = tf.placeholder(tf.int64, [None], name="word_lengths")
+		word_lengths = tf.gather(word_lengths, tf.range(tf.to_int32(trans_len)))
 		char_inputs = tf.placeholder(tf.int32, [None, max_tokens], name="char_inputs")
 		cembed_matrix = tf.Variable(tf.random_uniform([len(c2i.keys()), config["ce_dim"]], -0.25, 0.25), name="cembeds")
 		unpacked = tf.unpack(char_inputs, axis=1)
 
 		char_inputs = unpacked
 		cembeds = tf.nn.embedding_lookup(cembed_matrix, char_inputs, name="ce_lookup")
+		cembeds = tf.gather(cembeds, tf.range(tf.to_int32(trans_len)))
 		cembeds = tf.transpose(cembeds, perm=[1,0,2])
 
 		# Create LSTM for Character Encoding
@@ -239,9 +241,10 @@ def build_graph(config):
 	with graph.as_default():
 
 		# Character Embedding
+		trans_len = tf.placeholder(tf.int64, None, name="trans_length")
 		train = tf.placeholder(tf.bool, name="train")
 		tf.set_random_seed(config["seed"])
-		last_state, rev_last_state, word_lengths = char_encoding(config, graph)
+		last_state, rev_last_state, word_lengths = char_encoding(config, graph, trans_len)
 
 		# Word Embedding
 		word_inputs = tf.placeholder(tf.int32, [None], name="word_inputs")
@@ -249,14 +252,10 @@ def build_graph(config):
 		embedding_placeholder = tf.placeholder(tf.float32, [config["vocab_size"], config["we_dim"]], name="embedding_placeholder")
 		assign_wembedding = tf.assign(wembed_matrix, embedding_placeholder, name="assign_wembedding")
 		wembeds = tf.nn.embedding_lookup(wembed_matrix, word_inputs, name="we_lookup")
-		trans_len = tf.placeholder(tf.int64, None, name="trans_length")
 
 		# Combine Embeddings
 		char_embeds = last_relevant(last_state, word_lengths, "char_embeds")
 		rev_char_embeds = last_relevant(rev_last_state, word_lengths, "rev_char_embeds")
-
-		char_embeds = tf.gather(char_embeds, tf.range(tf.to_int32(trans_len)))
-		rev_char_embeds = tf.gather(rev_char_embeds, tf.range(tf.to_int32(trans_len)))
 		combined_embeddings = tf.concat(1, [wembeds, char_embeds, tf.reverse(rev_char_embeds, [True, False])], name="combined_embeddings")
 
 		# Cells and Weights
@@ -319,7 +318,7 @@ def train_model(config, graph, sess, saver, run_options, run_metadata):
 		print("ERA: " + str(step))
 		np.set_printoptions(threshold=np.inf)
 
-		for t_index in train_index[0:1000]:
+		for t_index in train_index:
 
 			count += 1
 
@@ -374,7 +373,7 @@ def evaluate_testset(config, graph, sess, test):
 
 	print("---ENTERING EVALUATION---")
 
-	for i in test_index[0:1000]:
+	for i in test_index:
 
 		count += 1
 
