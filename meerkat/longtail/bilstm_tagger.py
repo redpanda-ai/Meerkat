@@ -255,8 +255,8 @@ def build_graph(config):
 		char_embeds = last_relevant(last_state, word_lengths, "char_embeds")
 		rev_char_embeds = last_relevant(rev_last_state, word_lengths, "rev_char_embeds")
 
-		sliced = tf.slice(char_embeds, [trans_len - trans_len, 0], [trans_len, config["ce_dim"]], name="debug")
-
+		char_embeds = tf.gather(char_embeds, tf.range(tf.to_int32(trans_len)))
+		rev_char_embeds = tf.gather(rev_char_embeds, tf.range(tf.to_int32(trans_len)))
 		combined_embeddings = tf.concat(1, [wembeds, char_embeds, tf.reverse(rev_char_embeds, [True, False])], name="combined_embeddings")
 
 		# Cells and Weights
@@ -335,11 +335,6 @@ def train_model(config, graph, sess, saver, run_options, run_metadata):
 				get_tensor(graph, "y:0"): labels,
 				get_tensor(graph, "train:0"): True
 			}
-
-			debug = sess.run(get_tensor(graph, "debug:0"), feed_dict=feed_dict)
-			print(tokens)
-			print(debug.shape)
-			sys.exit()
 
 			# Collect GPU Profile
 			if config["profile_gpu"]:
