@@ -3,7 +3,6 @@ import csv
 import datetime
 import inspect
 import json
-import logging
 import os
 import pandas as pd
 import json
@@ -12,6 +11,7 @@ import threading
 import datetime
 import time
 import sys
+import logging
 
 from functools import reduce
 from timeit import default_timer as timer
@@ -330,8 +330,6 @@ def setup_directories():
 		logging.info("No need for output directory for {0}".format(ARGS.merchant))
 
 if __name__ == "__main__":
-	log_format = "%(asctime)s %(levelname)s: %(message)s"
-	logging.basicConfig(format=log_format, level=logging.INFO)
 	ARGS = parse_arguments(sys.argv[1:])
 	csv_kwargs = { "chunksize": 1000, "error_bad_lines": False, "warn_bad_lines": True, "encoding": "utf-8",
 		"quotechar" : '"', "na_filter" : False, "sep": "," }

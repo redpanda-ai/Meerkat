@@ -2,10 +2,12 @@ import sys
 import re
 import os
 import csv
-import logging
 import argparse
 import shutil
 import pandas as pd
+import logging
+import yaml
+
 from meerkat.classification.tools import (pull_from_s3, extract_tarball,
 	check_new_input_file)
 
@@ -21,9 +23,9 @@ def parse_arguments(args):
 	args = parser.parse_args(args)
 	return args
 
+
 def main_process():
-	log_format = "%(asctime)s %(levelname)s: %(message)s"
-	logging.basicConfig(format=log_format, level=logging.INFO)
+	logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
 	args = parse_arguments(sys.argv[1:])
 	bank_or_card = args.bank_or_card
 	bucket = args.bucket
