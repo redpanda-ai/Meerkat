@@ -9,7 +9,7 @@ import pandas as pd
 
 def remove_special_chars(input_string):
 	"""Remove special characters in the input strint"""
-	return re.sub(r"[ |-|'|.|&]", r'', input_string)
+	return re.sub(r"[ |\-|'|.|&]", r'', input_string)
 
 def parse_arguments(args):
 	parser = argparse.ArgumentParser()
