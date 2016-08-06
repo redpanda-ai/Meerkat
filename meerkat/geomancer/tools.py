@@ -4,8 +4,12 @@ import csv
 import json
 import logging
 import sys
+import yaml
 import shutil
 import pandas as pd
+
+logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
+logger = logging.getLogger('tools')
 
 def remove_special_chars(input_string):
 	"""Remove special characters in the input strint"""
@@ -66,5 +70,4 @@ def copy_file(input_file, directory):
 	shutil.copy(input_file, directory)
 
 if __name__ == "__main__":
-	logging.basicConfig(level=logging.INFO)
 	logging.critical("Do not run this module from the command line.")
