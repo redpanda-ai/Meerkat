@@ -1,11 +1,12 @@
 """This module will sync local agg data with s3"""
 
-import sys
-import os
-import json
-import logging
 import argparse
 import boto3
+import json
+import logging
+import os
+import sys
+import yaml
 
 from meerkat.various_tools import load_params
 
@@ -82,7 +83,7 @@ def get_s3_file(**kwargs):
 
 def main_process():
 	"""Execute the main programe"""
-	logging.basicConfig(level=logging.INFO)
+	logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
 
 	args = parse_arguments(sys.argv[1:])
 

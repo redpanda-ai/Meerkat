@@ -12,6 +12,7 @@ import datetime
 import time
 import sys
 import logging
+import yaml
 
 from functools import reduce
 from timeit import default_timer as timer
@@ -330,10 +331,11 @@ def setup_directories():
 		logging.info("No need for output directory for {0}".format(ARGS.merchant))
 
 if __name__ == "__main__":
+	logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
 	ARGS = parse_arguments(sys.argv[1:])
 	csv_kwargs = { "chunksize": 1000, "error_bad_lines": False, "warn_bad_lines": True, "encoding": "utf-8",
 		"quotechar" : '"', "na_filter" : False, "sep": "," }
-	merchant_dataframes = get_merchant_dataframes("meerkat/geomancer/data/All_Merchants.csv", "list_name", **csv_kwargs)
+	merchant_dataframes = get_merchant_dataframes("meerkat/geomancer/data/agg_data/All_Merchants.csv", "list_name", **csv_kwargs)
 	merchants = sorted(list(merchant_dataframes.keys()))
 	for merchant in merchants:
 		ARGS.merchant = remove_special_chars(merchant)
