@@ -36,7 +36,7 @@ def main_process():
 	prefix = "meerkat/cnn/data/merchant/" + bank_or_card + "/" + version_dir + "/"
 	extension = "tar.gz"
 	tarball_name = "input.tar.gz"
-	save_path = "meerkat/geomancer/data/input/"
+	save_path = "meerkat/geomancer/data/input/" + args.bank_or_card + "/"
 	os.makedirs(save_path, exist_ok=True)
 
 	etags, etags_file = get_etags(save_path)
