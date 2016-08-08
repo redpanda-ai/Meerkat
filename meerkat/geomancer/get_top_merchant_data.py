@@ -70,7 +70,7 @@ def main_process():
 				original_len = len(merchant_dataframes[merchant])
 				merchant_dataframes[merchant].drop_duplicates(subset="DESCRIPTION_UNMASKED", keep="first", inplace=True)
 				merchant_dataframes[merchant].to_csv(tasks, sep=',', index=False, quoting=csv.QUOTE_ALL)
-				logging.info("Merchant {0}: {2} duplicate transactions; {1} unique transactions".format(merchant,
+				logger.info("Merchant {0}: {2} duplicate transactions; {1} unique transactions".format(merchant,
 					len(merchant_dataframes[merchant]), original_len - len(merchant_dataframes[merchant])))
 
 if __name__ == "__main__":
