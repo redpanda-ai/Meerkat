@@ -13,7 +13,7 @@ from meerkat.classification.tools import (pull_from_s3, extract_tarball,
 
 from .get_merchant_dictionaries import TARGET_MERCHANTS, get_merchant_dataframes
 from .get_agg_data import get_s3_file, get_etags
-from .tools import deduplicate_csv, remove_special_chars
+from .tools import remove_special_chars
 
 logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
 logger = logging.getLogger('get_top_merchant_data')
@@ -58,18 +58,6 @@ def main_process():
 		if file_name.endswith(".csv"):
 			csv_file = save_path + file_name
 			logger.info("csv file at: " + csv_file)
-
-			read_csv_kwargs = { "error_bad_lines": False, "encoding": 'utf-8',
-				"quoting": csv.QUOTE_NONE, "na_filter": False, "sep": "|" }
-			to_csv_kwargs = {"sep": "|"}
-			dedup_csv_kwargs = {
-				"read": read_csv_kwargs,
-				"to": to_csv_kwargs
-			}
-			logger.info("Start deduplicate csv")
-			deduplicate_csv(csv_file, "DESCRIPTION_UNMASKED", True, **dedup_csv_kwargs)
-			logger.info("Finish deduplicate csv")
-
 			csv_kwargs = { "chunksize": 1000, "error_bad_lines": False, "encoding": 'utf-8',
 				"quoting": csv.QUOTE_NONE, "na_filter": False, "sep": "|", "activate_cnn": True}
 			merchant_dataframes = get_merchant_dataframes(csv_file, 'MERCHANT_NAME', **csv_kwargs)
@@ -78,7 +66,12 @@ def main_process():
 				formatted_merchant = remove_special_chars(merchant)
 				os.makedirs(tasks_prefix + formatted_merchant, exist_ok=True)
 				tasks = tasks_prefix + formatted_merchant + "/" + bank_or_card + "_tasks.csv"
+
+				original_len = len(merchant_dataframes[merchant])
+				merchant_dataframes[merchant].drop_duplicates(subset="DESCRIPTION_UNMASKED", keep="first", inplace=True)
 				merchant_dataframes[merchant].to_csv(tasks, sep=',', index=False, quoting=csv.QUOTE_ALL)
+				logging.info("Merchant {0}: {2} duplicate transactions; {1} unique transactions".format(merchant,
+					len(merchant_dataframes[merchant]), original_len - len(merchant_dataframes[merchant])))
 
 if __name__ == "__main__":
 	main_process()
