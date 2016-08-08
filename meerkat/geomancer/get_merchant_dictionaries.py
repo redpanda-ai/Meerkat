@@ -141,13 +141,19 @@ class ThreadConsumer(threading.Thread):
 		param = self.param
 		consumer_queue = param["consumer_queue"]
 		while True:
+			logger.info("data_queue_populated: {0}, data_queue empty {1}".format(param["data_queue_populated"],
+				param["data_queue"].empty()))
 			if param["data_queue_populated"] and param["data_queue"].empty():
+				#Remove yourself from the consumer queue
+				logger.info("Removing consumer thread.")
 				param["consumer_queue"].get()
+				logger.info("Notifying task done.")
 				param["consumer_queue"].task_done()
 				logger.info("Consumer thread {0} finished".format(str(self.thread_id)))
 				break
 			chunk = param["data_queue"].get()
-			logger.info("consumer thread: {0}; data queue size: {1}".format(str(self.thread_id), param["data_queue"].qsize()))
+			logger.info("consumer thread: {0}; data queue size: {1}, consumer queue size {2}".format(str(self.thread_id),
+				 param["data_queue"].qsize(), param["consumer_queue"].qsize()))
 
 			param["chunk_num"] += 1
 			if param["chunk_num"] % 10 == 0:
@@ -183,7 +189,7 @@ class ThreadConsumer(threading.Thread):
 			param["data_queue"].task_done()
 
 def start_consumers(param):
-	for i in range(10):
+	for i in range(8):
 		logger.info("start consumer: {0}".format(str(i)))
 		consumer = ThreadConsumer(i, param)
 		consumer.setDaemon(True)
