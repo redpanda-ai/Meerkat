@@ -206,16 +206,49 @@ def char_encoding(config, graph, trans_len):
 		word_lengths = tf.gather(word_lengths, tf.range(tf.to_int32(trans_len)))
 		char_inputs = tf.placeholder(tf.int32, [None, max_tokens], name="char_inputs")
 		cembed_matrix = tf.Variable(tf.random_uniform([len(c2i.keys()), config["ce_dim"]], -0.25, 0.25), name="cembeds")
-		unpacked = tf.unpack(char_inputs, axis=1)
-
-		char_inputs = unpacked
-		cembeds = tf.nn.embedding_lookup(cembed_matrix, char_inputs, name="ce_lookup")
-		cembeds = tf.gather(cembeds, tf.range(tf.to_int32(trans_len)))
-		cembeds = tf.transpose(cembeds, perm=[1,0,2])
 
 		# Create LSTM for Character Encoding
 		fw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"], state_is_tuple=True)
 		bw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"], state_is_tuple=True)
+
+		invert_inputs = tf.transpose(char_inputs, perm=[1, 0])
+
+		def one_pass(i, o_fw, o_bw):
+
+			options = {
+				"dtype": tf.float32,
+				"sequence_length": tf.expand_dims(tf.gather(word_lengths, tf.to_int32(i)), 0),
+				"time_major": True,
+				"scope": "char_bilstm"
+			}
+
+			cembeds_invert = tf.nn.embedding_lookup(cembed_matrix, tf.gather(invert_inputs, tf.to_int32(i)))
+			cembeds_invert = tf.transpose(tf.expand_dims(cembeds_invert, 0), perm=[1,0,2])
+
+			(output_fw, output_bw), output_states = tf.nn.bidirectional_dynamic_rnn(fw_lstm, bw_lstm, cembeds_invert, **options)
+
+			# Get Last Relevant
+			output_fw = tf.gather(output_fw, tf.gather(word_lengths, tf.to_int32(i)) - 1)
+			output_bw = tf.gather(output_bw, tf.gather(word_lengths, tf.to_int32(i)) - 1)
+
+			# Append to Previous Token Encodings
+			o_fw = tf.concat(0, [o_fw, output_fw])
+			o_bw = tf.concat(0, [o_bw, output_bw])
+
+			return tf.add(i, 1), o_fw, o_bw
+
+		# Build Loop in Graph
+		i = tf.constant(0.0)
+		o_fw = tf.constant(0.0, shape=[0, 100])
+		o_bw = tf.constant(0.0, shape=[0, 100])
+		float_trans_len = tf.to_float(trans_len)
+		cond = lambda i, o_fw, o_bw: tf.less(i, float_trans_len)
+		i, char_embeds, rev_char_embeds = tf.while_loop(cond, one_pass, [i, o_fw, o_bw], back_prop=True)
+
+		char_inputs = tf.unpack(char_inputs, axis=1)
+		cembeds = tf.nn.embedding_lookup(cembed_matrix, char_inputs, name="ce_lookup")
+		cembeds = tf.gather(cembeds, tf.range(tf.to_int32(trans_len)))
+		cembeds = tf.transpose(cembeds, perm=[1,0,2])
 
 		# Encode Characters with LSTM
 		options = {
