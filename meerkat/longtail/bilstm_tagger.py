@@ -34,6 +34,7 @@ import math
 import os
 import pprint
 import random
+import json
 import sys
 
 import numpy as np
@@ -73,8 +74,8 @@ def get_tags(config, trans):
 			tags.append("background")
 
 	# TODO: Fix this hack
-	if len(tokens) == 1:
-		return(tokens * 2, tags * 2)
+	# if len(tokens) == 1:
+		# return(tokens * 2, tags * 2)
 
 	return (tokens, tags)
 
@@ -155,7 +156,7 @@ def encode_tags(config, tags):
 	encoded_tags = (np.arange(len(tag2id)) == tags[:, None]).astype(np.float32)
 	return encoded_tags
 
-def trans_to_tensor(config, sess, graph, tokens, tags, train=False):
+def trans_to_tensor(config, sess, graph, tokens, tags=None, train=False):
 	"""Convert a transaction to a tensor representation of documents
 	and labels"""
 
@@ -166,7 +167,10 @@ def trans_to_tensor(config, sess, graph, tokens, tags, train=False):
 	word_indices = [w2i[w] for w in tokens] if train else [w2i.get(w, w2i["_UNK"]) for w in tokens]
 
 	# Encode Tags
-	encoded_tags = encode_tags(config, tags)
+	if tags is not None:
+		encoded_tags = encode_tags(config, tags)
+	else:
+		encoded_tags = None
 
 	# Lookup Character Indices
 	max_t_len = len(max(tokens, key=len)) + 2
@@ -318,13 +322,13 @@ def train_model(config, graph, sess, saver, run_options, run_metadata):
 		print("ERA: " + str(step))
 		np.set_printoptions(threshold=np.inf)
 
-		for t_index in train_index:
+		for t_index in train_index[:1000]:
 
 			count += 1
 
 			row = train.loc[t_index]
 			tokens, tags = get_tags(config, row)
-			char_inputs, word_lengths, word_indices, labels = trans_to_tensor(config, sess, graph, tokens, tags, train=True)
+			char_inputs, word_lengths, word_indices, labels = trans_to_tensor(config, sess, graph, tokens, tags=tags, train=True)
 
 			feed_dict = {
 				get_tensor(graph, "char_inputs:0") : char_inputs,
@@ -358,9 +362,24 @@ def train_model(config, graph, sess, saver, run_options, run_metadata):
 		# Evaluate Model
 		test_accuracy = evaluate_testset(config, graph, sess, test)
 
-	final_model_path = ""
-
+		final_model_path = "./meerkat/longtail/models/"
+		os.makedirs(final_model_path, exist_ok=True)
+		w2i_to_json(config["w2i"], final_model_path)
+		save_models(saver, sess, final_model_path)
 	return final_model_path
+
+def save_models(saver, sess, path):
+	ckpt_path = path + "bilstm.ckpt"
+	meta_path = path + "bilstm.meta"
+	model_path = saver.save(sess, ckpt_path)
+	os.rename(ckpt_path+".meta", meta_path)
+	logging.info("Save model to {0}, {1}".format(ckpt_path))
+
+def w2i_to_json(w2i, path):
+	path = path + "w2i.json"
+	with open(path, "w") as fp:
+		json.dump(w2i, fp)
+	logging.info("Save w2i to {0}".format(path))
 
 def evaluate_testset(config, graph, sess, test):
 	"""Check error on test set"""
@@ -382,7 +401,7 @@ def evaluate_testset(config, graph, sess, test):
 
 		row = test.loc[i]
 		tokens, tags = get_tags(config, row)
-		char_inputs, word_lengths, word_indices, labels = trans_to_tensor(config, sess, graph, tokens, tags)
+		char_inputs, word_lengths, word_indices, labels = trans_to_tensor(config, sess, graph, tokens, tags=tags)
 		total_count += len(tokens)
 		
 		feed_dict = {
@@ -415,7 +434,7 @@ def run_session(config, graph, saver):
 		run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
 		run_metadata = tf.RunMetadata()
 		tf.initialize_all_variables().run()
-		train_model(config, graph, sess, saver, run_options, run_metadata)
+		final_model_path = train_model(config, graph, sess, saver, run_options, run_metadata)
 
 def run_from_command_line():
 	"""Run module from command line"""

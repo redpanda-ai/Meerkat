@@ -17,5 +17,5 @@
 	"profile_gpu": false,
 	"we_dim": 64,
 	"h_dim": 100,
-	"eras": 30
+	"eras": 1
 }
