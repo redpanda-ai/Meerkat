@@ -23,9 +23,18 @@ def parse_arguments(args):
 	parser.add_argument("bank_or_card")
 	parser.add_argument("version_dir")
 	parser.add_argument("--bucket", default="s3yodlee")
+	parser.add_argument("--truncate_lines", default=-1, type=int)
 	args = parser.parse_args(args)
 	return args
 
+def extract_clean_files(save_path, tarball_name, extension):
+	"""This clears out a local directory and replaces files of a certain extension."""
+	for root, dirs, files in os.walk(save_path):
+		for f in files:
+			if f.endswith(".csv"):
+				os.unlink(os.path.join(root, f))
+				logger.info("{0} is removed".format(f))
+	extract_tarball(save_path + tarball_name, save_path)
 
 def main_process():
 	args = parse_arguments(sys.argv[1:])
@@ -36,7 +45,7 @@ def main_process():
 	prefix = "meerkat/cnn/data/merchant/" + bank_or_card + "/" + version_dir + "/"
 	extension = "tar.gz"
 	tarball_name = "input.tar.gz"
-	save_path = "meerkat/geomancer/data/input/"
+	save_path = "meerkat/geomancer/data/input/" + args.bank_or_card + "/"
 	os.makedirs(save_path, exist_ok=True)
 
 	etags, etags_file = get_etags(save_path)
@@ -46,12 +55,7 @@ def main_process():
 	logger.info("Synch-ed")
 
 	if needs_to_be_downloaded:
-		for root, dirs, files in os.walk(save_path):
-			for f in files:
-				if f.endswith(".csv"):
-					os.unlink(os.path.join(root, f))
-					logger.info("{0} is removed".format(f))
-		extract_tarball(save_path + tarball_name, save_path)
+		extract_clean_files(save_path, tarball_name, "csv")
 
 	tasks_prefix = "meerkat/geomancer/merchants/"
 	for file_name in os.listdir(save_path):
@@ -60,6 +64,26 @@ def main_process():
 			logger.info("csv file at: " + csv_file)
 			csv_kwargs = { "chunksize": 1000, "error_bad_lines": False, "encoding": 'utf-8',
 				"quoting": csv.QUOTE_NONE, "na_filter": False, "sep": "|", "activate_cnn": True}
+
+			existing_lines = int(sum(1 for line in open(csv_file)))
+			target_lines = args.truncate_lines
+			logger.info("Existing lines: {0}, Target lines: {1}".format(existing_lines, target_lines))
+			if existing_lines >= target_lines:
+				logger.info("Proceeding.")
+			else:
+				logger.info("Unzipping files.")
+				extract_clean_files(save_path, tarball_name, "csv")
+				logger.info("Files unzipped.")
+
+			#Add the ability to truncate lines from the input csv file
+			if args.truncate_lines != -1:
+				logger.info("Truncating to {0} lines.".format(args.truncate_lines))
+				with open(csv_file, "r", encoding="utf-8") as input_file:
+					with open(csv_file + ".temp", "w", encoding="utf-8") as output_file:
+						for i in range(0, args.truncate_lines):
+							output_file.write(input_file.readline())
+				os.rename(csv_file + ".temp", csv_file)
+
 			merchant_dataframes = get_merchant_dataframes(csv_file, 'MERCHANT_NAME', **csv_kwargs)
 			merchants = sorted(list(merchant_dataframes.keys()))
 			for merchant in merchants:
