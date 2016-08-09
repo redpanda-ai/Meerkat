@@ -41,17 +41,6 @@ def format_json_with_callback(dictionary_file):
 	with open(dictionary_file, "a") as d_file:
 		d_file.write(")")
 
-def format_merchant_names(top_merchants):
-	"""Format merchant names"""
-	top_merchants_maps = {}
-	for merchant in top_merchants:
-		name = merchant.replace(" ", "_")
-		for mark in '!"#$%&\'()*+,-./:;<=>?@[]^`{|}~':
-			name = name.replace(mark, '')
-		top_merchants_maps[name] = merchant
-	top_merchants = list(top_merchants_maps.keys())
-	return top_merchants, top_merchants_maps
-
 def get_existing_projects(server, apikey):
 	"""Get a list of existing pybossa projects"""
 	port = "12000"
@@ -66,14 +55,14 @@ def get_top_merchant_names(base_dir):
 	"""Get a list of top merchants that has dictionaries from agg data"""
 	top_merchants = []
 	existing_merchants = [obj[0] for obj in os.walk(base_dir)]
-	logger.info(existing_merchants)
 	for merchant_path in existing_merchants:
 		merchant = merchant_path[merchant_path.rfind("/") + 1:]
 		if merchant != "" and merchant != "pybossa_project":
 			dictionary_exist = False
 			for filename in os.listdir(merchant_path):
-				if filename.endswith('.json'))
+				if filename.endswith('.json'):
 					dictionary_exist = True
+					break
 			if dictionary_exist:
 				top_merchants.append(merchant)
 	return top_merchants
@@ -82,12 +71,10 @@ def main_process():
 	"""Execute the main programe"""
 	args = parse_arguments(sys.argv[1:])
 
-	logger.info("info")
 	base_dir = "meerkat/geomancer/merchants/"
 	os.makedirs(base_dir, exist_ok=True)
 
 	top_merchants = get_top_merchant_names(base_dir)
-	logger.info("Top merchants are {0}".format(top_merchants))
 
 	if args.merchant != "":
 		if args.merchant in top_merchants:
@@ -96,8 +83,7 @@ def main_process():
 			logger.error("Merchant {0} doesn't have dictionaries".format(args.merchant))
 			return
 
-	top_merchants, top_merchants_maps = format_merchant_names(top_merchants)
-	logger.info("Top merchants project to be processed: {0}".format(top_merchants))
+	logger.info("Top merchants project to be processed are: {0}".format(top_merchants))
 
 	server, apikey = args.server, args.apikey
 	existing_projects = get_existing_projects(server, apikey)
@@ -134,7 +120,7 @@ def main_process():
 		if args.update_dictionary:
 			dictionary_dst = "/var/www/html/dictionaries/" + merchant + "/"
 			os.makedirs(dictionary_dst, exist_ok=True)
-			copy_file(dictionary_dir + top_merchants_maps[merchant] + "/geo.json", dictionary_dst)
+			copy_file(base_dir + merchant + "/geo.json", dictionary_dst)
 
 			dictionary_file = dictionary_dst + "/geo.json"
 			format_json_with_callback(dictionary_file)
