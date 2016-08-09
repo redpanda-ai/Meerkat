@@ -215,7 +215,7 @@ def location_split(text):
 	length = len(text)
 
 	for i in range(length - 2, -1, -1):
-		if text[i:i+2] in STATES and tag[i+1] == 'C' and get_word(tag, text, i) not in words[text[i:i+2]]:
+		if text[i:i+2] in STATES and tag[i+1] == 'C' and get_word(tag, text, i) not in words[text[i:i+2]] and not check_co_id(tag, text, i):
 			place = in_trie(text[:i+2])
 			if place:
 				if place[2] in 'EWSN' and tag[i - (len(place) - 2)] == 'C': 
@@ -259,6 +259,15 @@ def get_word(tag, text, index):
 		else:
 			break
 	return text[index:end]
+
+def check_co_id(tag, text, i):
+	if text[i:i+2] == 'CO' and text[i+2:i+4] == 'ID' \
+		and tag[i] == 'B' and tag[i+2] == 'B' and (i + 4 >= len(tag) or tag[i+4] == 'B'):
+		return True
+	elif text[i:i+2] == 'ID' and text[i-2:i] == 'CO' \
+		and tag[i-2] == 'B' and (i+2 >= len(tag) or tag[i+2] == 'B'):
+		return True
+	else: return False
 
 '''
 def main():
@@ -319,15 +328,6 @@ def twotest():
 
 if __name__ == "__main__":
 #	main()
-	print(location_split('altamonte spg fl'))
+	print(location_split('LENDING CLUB     DES:NNN ID:NNN                INDN:XXX Kim               CO ID:FNNN'))
 
-#	count = 0
-#	csv_file = csv.reader(open('NoGeo.csv', encoding="utf-8"))
-#	for row in csv_file:
-#		des = row[11]
-#		result = location_split(des)
-#		if result: count += 1
-#		print('{0} <====== {1}'.format(result, des))
-
-#	print(count)
 
