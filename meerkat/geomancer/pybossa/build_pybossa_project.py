@@ -8,8 +8,12 @@ import inspect
 import logging
 import fileinput
 import requests
+import yaml
 
-from ../tools import copy_file
+from ..tools import copy_file
+
+logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
+logger = logging.getLogger('build_pybossa_project')
 
 def create_project_json_file(project_name, project_json_file):
 	"""Create a json file for the new pybossa project"""
@@ -20,7 +24,7 @@ def create_project_json_file(project_name, project_json_file):
 		"question": "geo"
 	}
 	with open(project_json_file, "w") as json_file:
-		logging.info("Writing {0}".format(project_json_file))
+		logger.info("Writing {0}".format(project_json_file))
 		json.dump(project_json, json_file)
 
 def format_json_with_callback(dictionary_file):
@@ -58,46 +62,48 @@ def get_existing_projects(server, apikey):
 		short_names.append(item["short_name"])
 	return short_names
 
-def get_top_merchant_names(dictionary_dir):
+def get_top_merchant_names(base_dir):
 	"""Get a list of top merchants that has dictionaries from agg data"""
 	top_merchants = []
-	logging.info("Dictionaries from agg data: {0}".format(dictionary_dir))
-	existing_dictionaries = [obj[0] for obj in os.walk(dictionary_dir)]
-	for merchant in existing_dictionaries:
-		merchant = merchant[merchant.rfind("/") + 1:]
-		if merchant != "":
-			top_merchants.append(merchant)
+	existing_merchants = [obj[0] for obj in os.walk(base_dir)]
+	logger.info(existing_merchants)
+	for merchant_path in existing_merchants:
+		merchant = merchant_path[merchant_path.rfind("/") + 1:]
+		if merchant != "" and merchant != "pybossa_project":
+			dictionary_exist = False
+			for filename in os.listdir(merchant_path):
+				if filename.endswith('.json'))
+					dictionary_exist = True
+			if dictionary_exist:
+				top_merchants.append(merchant)
 	return top_merchants
 
 def main_process():
 	"""Execute the main programe"""
-	log_format = "%(asctime)s %(levelname)s: %(message)s"
-	logging.basicConfig(format=log_format, level=logging.INFO)
-
 	args = parse_arguments(sys.argv[1:])
 
-	project_dir = args.project_dir
-	os.makedirs(project_dir, exist_ok=True)
-	logging.info("Pybossa projects: {0}".format(project_dir))
+	logger.info("info")
+	base_dir = "meerkat/geomancer/merchants/"
+	os.makedirs(base_dir, exist_ok=True)
 
-	dictionary_dir = args.dictionary_dir
-	top_merchants = get_top_merchant_names(dictionary_dir)
+	top_merchants = get_top_merchant_names(base_dir)
+	logger.info("Top merchants are {0}".format(top_merchants))
 
 	if args.merchant != "":
 		if args.merchant in top_merchants:
 			top_merchants = [args.merchant]
 		else:
-			logging.error("Merchant {0} doesn't have dictionaries".format(args.merchant))
+			logger.error("Merchant {0} doesn't have dictionaries".format(args.merchant))
 			return
 
 	top_merchants, top_merchants_maps = format_merchant_names(top_merchants)
-	logging.info("Top merchants project to be processed: {0}".format(top_merchants))
+	logger.info("Top merchants project to be processed: {0}".format(top_merchants))
 
 	server, apikey = args.server, args.apikey
 	existing_projects = get_existing_projects(server, apikey)
 
 	for merchant in top_merchants:
-		merchant_dir = project_dir + merchant + "/"
+		merchant_dir = base_dir + merchant + "/pybossa_project/"
 		os.makedirs(merchant_dir, exist_ok=True)
 
 		project_json_file = merchant_dir + "project.json"
@@ -106,13 +112,13 @@ def main_process():
 		# Create a new pybossa project
 		if args.create_project:
 			if project_name in existing_projects:
-				logging.warning("Project {0} already exists".format(project_name))
+				logger.warning("Project {0} already exists".format(project_name))
 			else:
 				create_project_json_file(project_name, project_json_file)
 				os.system("pbs --server http://" + server + ":12000 --api-key " +
 					apikey + " --project " + project_json_file + " create_project")
 		elif project_name not in existing_projects:
-			logging.error("Project {0} doesn't exist. Please first create it".format(project_name))
+			logger.error("Project {0} doesn't exist. Please first create it".format(project_name))
 			return
 
 		merchant_presenter = merchant_dir + args.task_presenter
@@ -135,7 +141,7 @@ def main_process():
 
 			replace_str_in_file(merchant_presenter, "merchant_name", merchant)
 			replace_str_in_file(merchant_presenter, "server_ip", server)
-			logging.info("updated presenter with new dictionary")
+			logger.info("updated presenter with new dictionary")
 
 		if args.update_presenter or args.update_dictionary:
 			long_description_file = template_dir + "long_description.md"
@@ -157,13 +163,7 @@ def main_process():
 def parse_arguments(args):
 	"""Parse arguments from command line"""
 	parser = argparse.ArgumentParser()
-	module_path = inspect.getmodule(inspect.stack()[1][0]).__file__
-	base_dir = module_path[:module_path.rfind("/") + 1]
-	default_project_dir = base_dir + "projects/"
-	default_dictionary_dir = "meerkat/geomancer/dictionaries/"
 
-	parser.add_argument("--project_dir", default=default_project_dir)
-	parser.add_argument("--dictionary_dir", default=default_dictionary_dir)
 	parser.add_argument("--merchant", default="")
 
 	parser.add_argument("--server", default="52.26.175.156")
