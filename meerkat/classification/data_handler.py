@@ -4,6 +4,8 @@ import os
 import sys
 import shutil
 
+import tensorflow as tf
+
 from meerkat.classification.split_data import main_split_data
 from meerkat.classification.tools import (pull_from_s3, check_new_input_file,
 	make_tarfile, copy_file, check_file_exist_in_s3, extract_tarball)
@@ -121,7 +123,6 @@ def upload_result(config, best_model_path, test_file, s3_params):
 	parser.add_argument('--model_name', default='')
 	parser.add_argument('--debug', default=True)
 	args, _ = parser.parse_known_args()
-
 	logging.warning('Apply the best CNN to test data and calculate performance metrics')
 	apply_cnn(args=args)
 
@@ -150,7 +151,7 @@ def upload_result(config, best_model_path, test_file, s3_params):
 			logging.info("Local {0} removed.".format(file_path))
 
 	shutil.rmtree(s3_params["save_path"])
-	logging.info("remove directory of preprocessed files at: {0}".format(save_path))
+	logging.info("remove directory of preprocessed files at: {0}".format(s3_params["save_path"]))
 
 	logging.warning('The whole streamline process has finished')
 
