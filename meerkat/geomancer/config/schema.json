@@ -1,0 +1,28 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "Input schema for meerkat.geomancer",
+	"description": "More Stuff",
+	"type": "object",
+	"properties": {
+		"agg_data" : {
+			"type": "object",
+			"properties": {
+				"bucket": { "type": "string"},
+				"prefix": {
+					"type": "string",
+					"pattern": "^[A-Za-z0-9][A-Za-z0-9\/_.]*\/$"
+				},
+				"filename": {
+					"type": "string",
+					"pattern": "^.*csv$"
+				},
+				"savepath": {
+					"type": "string",
+					"pattern": "^[A-Za-z0-9\/_.]*\/$"
+				}
+			},
+			"required": ["bucket", "prefix", "filename", "savepath"]
+		}
+	},
+	"required": ["agg_data"]
+}

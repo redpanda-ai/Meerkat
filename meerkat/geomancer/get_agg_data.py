@@ -84,9 +84,8 @@ def get_s3_file(**kwargs):
 	#File needs to be downloaded
 	return True
 
-def main_process():
+def main_process(args):
 	"""Execute the main programe"""
-	args = parse_arguments(sys.argv[1:])
 
 	bucket = args.bucket
 	prefix = args.prefix
@@ -101,5 +100,6 @@ def main_process():
 
 
 if __name__ == "__main__":
-	main_process()
+	args = parse_arguments(sys.argv[1:])
+	main_process(args)
 
