@@ -31,6 +31,12 @@ loggers:
   tools:
     handlers: [console]
     propogate: true
+  build_pybossa_project:
+    handlers: [console]
+    propogate: true
+  __main__:
+    handlers: [console]
+    propogate: true
 
 handlers:
   console:
