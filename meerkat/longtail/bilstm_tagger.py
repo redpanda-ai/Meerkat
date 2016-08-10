@@ -39,6 +39,7 @@ import sys
 import numpy as np
 import tensorflow as tf
 from tensorflow.python.client import timeline
+from tensorflow.python.ops import tensor_array_ops
 
 from meerkat.classification.tools import reverse_map, get_tensor, get_op, get_variable
 from meerkat.various_tools import load_params, load_piped_dataframe
@@ -205,63 +206,47 @@ def char_encoding(config, graph, trans_len):
 		word_lengths = tf.placeholder(tf.int64, [None], name="word_lengths")
 		word_lengths = tf.gather(word_lengths, tf.range(tf.to_int32(trans_len)))
 		char_inputs = tf.placeholder(tf.int32, [None, max_tokens], name="char_inputs")
+		char_inputs = tf.transpose(char_inputs, perm=[1, 0])
 		cembed_matrix = tf.Variable(tf.random_uniform([len(c2i.keys()), config["ce_dim"]], -0.25, 0.25), name="cembeds")
 
 		# Create LSTM for Character Encoding
 		fw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"], state_is_tuple=True)
 		bw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"], state_is_tuple=True)
 
-		invert_inputs = tf.transpose(char_inputs, perm=[1, 0])
-
 		def one_pass(i, o_fw, o_bw):
+
+			int_i = tf.to_int32(i)
 
 			options = {
 				"dtype": tf.float32,
-				"sequence_length": tf.expand_dims(tf.gather(word_lengths, tf.to_int32(i)), 0),
-				"time_major": True,
-				"scope": "char_bilstm"
+				"sequence_length": tf.expand_dims(tf.gather(word_lengths, int_i), 0),
+				"time_major": True
 			}
 
-			cembeds_invert = tf.nn.embedding_lookup(cembed_matrix, tf.gather(invert_inputs, tf.to_int32(i)))
+			cembeds_invert = tf.nn.embedding_lookup(cembed_matrix, tf.gather(char_inputs, int_i))
 			cembeds_invert = tf.transpose(tf.expand_dims(cembeds_invert, 0), perm=[1,0,2])
 
 			(output_fw, output_bw), output_states = tf.nn.bidirectional_dynamic_rnn(fw_lstm, bw_lstm, cembeds_invert, **options)
 
 			# Get Last Relevant
-			output_fw = tf.gather(output_fw, tf.gather(word_lengths, tf.to_int32(i)) - 1)
-			output_bw = tf.gather(output_bw, tf.gather(word_lengths, tf.to_int32(i)) - 1)
+			output_fw = tf.gather(output_fw, tf.gather(word_lengths, int_i) - 1)
+			output_bw = tf.gather(output_bw, tf.gather(word_lengths, int_i) - 1)
 
 			# Append to Previous Token Encodings
-			o_fw = tf.concat(0, [o_fw, output_fw])
-			o_bw = tf.concat(0, [o_bw, output_bw])
+			o_fw = o_fw.write(int_i, tf.squeeze(output_fw))
+			o_bw = o_bw.write(int_i, tf.squeeze(output_bw))
 
 			return tf.add(i, 1), o_fw, o_bw
 
 		# Build Loop in Graph
 		i = tf.constant(0.0)
-		o_fw = tf.constant(0.0, shape=[0, 100])
-		o_bw = tf.constant(0.0, shape=[0, 100])
 		float_trans_len = tf.to_float(trans_len)
-		cond = lambda i, o_fw, o_bw: tf.less(i, float_trans_len)
-		i, char_embeds, rev_char_embeds = tf.while_loop(cond, one_pass, [i, o_fw, o_bw], back_prop=True)
+		o_fw = tensor_array_ops.TensorArray(dtype=tf.float32, size=tf.to_int32(trans_len))
+		o_bw = tensor_array_ops.TensorArray(dtype=tf.float32, size=tf.to_int32(trans_len))
+		cond = lambda i, *_: tf.less(i, float_trans_len)
+		i, char_embeds, rev_char_embeds = tf.while_loop(cond, one_pass, [i, o_fw, o_bw])
 
-		char_inputs = tf.unpack(char_inputs, axis=1)
-		cembeds = tf.nn.embedding_lookup(cembed_matrix, char_inputs, name="ce_lookup")
-		cembeds = tf.gather(cembeds, tf.range(tf.to_int32(trans_len)))
-		cembeds = tf.transpose(cembeds, perm=[1,0,2])
-
-		# Encode Characters with LSTM
-		options = {
-			"dtype": tf.float32,
-			"sequence_length": word_lengths,
-			"time_major": True
-		}
-
-		(output_fw, output_bw), output_states = tf.nn.bidirectional_dynamic_rnn(fw_lstm, bw_lstm, cembeds, **options)
-		output_fw = tf.transpose(output_fw, perm=[1,0,2])
-		output_bw = tf.transpose(output_bw, perm=[1,0,2])
-
-		return output_fw, output_bw, word_lengths
+		return char_embeds.pack(), rev_char_embeds.pack()
 
 def build_graph(config):
 	"""Build CNN"""
@@ -277,7 +262,7 @@ def build_graph(config):
 		trans_len = tf.placeholder(tf.int64, None, name="trans_length")
 		train = tf.placeholder(tf.bool, name="train")
 		tf.set_random_seed(config["seed"])
-		last_state, rev_last_state, word_lengths = char_encoding(config, graph, trans_len)
+		char_embeds, rev_char_embeds = char_encoding(config, graph, trans_len)
 
 		# Word Embedding
 		word_inputs = tf.placeholder(tf.int32, [None], name="word_inputs")
@@ -287,8 +272,6 @@ def build_graph(config):
 		wembeds = tf.nn.embedding_lookup(wembed_matrix, word_inputs, name="we_lookup")
 
 		# Combine Embeddings
-		char_embeds = last_relevant(last_state, word_lengths, "char_embeds")
-		rev_char_embeds = last_relevant(rev_last_state, word_lengths, "rev_char_embeds")
 		combined_embeddings = tf.concat(1, [wembeds, char_embeds, tf.reverse(rev_char_embeds, [True, False])], name="combined_embeddings")
 
 		# Cells and Weights
