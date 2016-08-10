@@ -164,7 +164,7 @@ def trans_to_tensor(config, sess, graph, tokens, tags, train=False):
 	c2i = config["c2i"]
 	max_tokens = config["max_tokens"]
 	char_inputs, rev_char_inputs = [], []
-	word_indices = [w2i[w] for w in tokens] if train else [w2i.get(w, w2i["_UNK"]) for w in tokens]
+	word_indices = [w2i.get(w, w2i["_UNK"]) for w in tokens]
 
 	# Encode Tags
 	encoded_tags = encode_tags(config, tags)
@@ -308,7 +308,8 @@ def build_graph(config):
 		# Calculate Loss and Optimize
 		labels = tf.placeholder(tf.float32, shape=[None, len(config["tag_map"].keys())], name="y")
 		loss = tf.neg(tf.reduce_sum(network * labels), name="loss")
-		optimizer = tf.train.GradientDescentOptimizer(config["learning_rate"]).minimize(loss, name="optimizer")
+		optimizer = tf.train.GradientDescentOptimizer(config["learning_rate"])
+		#optimizer = tf.train.GradientDescentOptimizer(config["learning_rate"]).minimize(loss, name="optimizer")
 
 		saver = tf.train.Saver()
 
@@ -340,6 +341,8 @@ def train_model(config, graph, sess, saver, run_options, run_metadata):
 
 			row = train.loc[t_index]
 			tokens, tags = get_tags(config, row)
+			tokens = ["pay", "walmartsupercenter", "debit"]
+			tags = ["background", "merchant", "background"]
 			char_inputs, word_lengths, word_indices, labels = trans_to_tensor(config, sess, graph, tokens, tags, train=True)
 
 			feed_dict = {
@@ -353,20 +356,21 @@ def train_model(config, graph, sess, saver, run_options, run_metadata):
 
 			# Collect GPU Profile
 			if config["profile_gpu"]:
-				optimizer_out, loss = sess.run([get_op(graph, "optimizer"), get_tensor(graph, "loss:0")], feed_dict=feed_dict, options=run_options, run_metadata=run_metadata)
+				print(sess.run(get_tensor(graph, "combined_embeddings:0"), feed_dict=feed_dict, options=run_options, run_metadata=run_metadata))
+				#optimizer_out, loss = sess.run([get_op(graph, "optimizer"), get_tensor(graph, "loss:0")], feed_dict=feed_dict, options=run_options, run_metadata=run_metadata)
 				tl = timeline.Timeline(run_metadata.step_stats)
 				ctf = tl.generate_chrome_trace_format()
 				with open('timeline.json', 'w') as f:
 					f.write(ctf)
-					sys.exit()
 
 			# Run Training Step
-			optimizer_out, loss = sess.run([get_op(graph, "optimizer"), get_tensor(graph, "loss:0")], feed_dict=feed_dict)
-			total_loss += loss
+			#optimizer_out, loss = sess.run([get_op(graph, "optimizer"), get_tensor(graph, "loss:0")], feed_dict=feed_dict)
+			#total_loss += loss
 			total_tagged += len(word_indices)
 
 			# Log
-			if count % 250 == 0:
+			if count % 2 == 0:
+				sys.exit()
 				print("count: " + str(count))
 				print("loss: " + str(total_loss/total_tagged))
 				print("%d" % (count / len(train_index) * 100) + "% complete with era")
