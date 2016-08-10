@@ -73,9 +73,7 @@ def get_tags(config, trans):
 		if not found:
 			tags.append("background")
 
-	# TODO: Fix this hack
-	# if len(tokens) == 1:
-		# return(tokens * 2, tags * 2)
+		return(tokens , tags )
 
 	return (tokens, tags)
 
@@ -287,8 +285,7 @@ def build_graph(config):
 			# Add Noise and Predict
 			concat_layer = tf.concat(2, [outputs_fw, tf.reverse(outputs_bw, [False, True, False])], name="concat_layer")
 			concat_layer = tf.cond(train, lambda: tf.add(tf.random_normal(tf.shape(concat_layer)) * noise_sigma, concat_layer), lambda: concat_layer)
-			prediction = tf.log(tf.nn.softmax(tf.matmul(tf.squeeze(concat_layer), weight) + bias), name="model")
-
+			prediction = tf.log(tf.nn.softmax(tf.matmul(tf.squeeze(concat_layer, [0]), weight) + bias), name="model")
 			return prediction
 
 		network = model(combined_embeddings, noise_sigma=config["noise_sigma"])
@@ -322,7 +319,7 @@ def train_model(config, graph, sess, saver, run_options, run_metadata):
 		print("ERA: " + str(step))
 		np.set_printoptions(threshold=np.inf)
 
-		for t_index in train_index[:1000]:
+		for t_index in train_index:
 
 			count += 1
 
@@ -373,7 +370,7 @@ def save_models(saver, sess, path):
 	meta_path = path + "bilstm.meta"
 	model_path = saver.save(sess, ckpt_path)
 	os.rename(ckpt_path+".meta", meta_path)
-	logging.info("Save model to {0}, {1}".format(ckpt_path))
+	logging.info("Save model to {0}, {1}".format(ckpt_path, meta_path))
 
 def w2i_to_json(w2i, path):
 	path = path + "w2i.json"

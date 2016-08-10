@@ -80,8 +80,6 @@ def get_tf_rnn_by_path(model_path, w2i_path, gpu_mem_fraction=False, model_name=
 	config["model_path"] = model_path
 	meta_path = model_path.split(".ckpt")[0] + ".meta"
 	config["w2i"] = load_params(w2i_path)
-	# cembedding = load_embeddings_file(cembedding_path)
-	# wembedding = load_embeddings_file(wembedding_path)
 
 	# Load Session and Graph
 	ops.reset_default_graph()
@@ -106,8 +104,6 @@ def get_tf_rnn_by_path(model_path, w2i_path, gpu_mem_fraction=False, model_name=
 
 		for index, doc in enumerate(trans):
 			tran = doc[doc_key].lower().split()[0:config["max_tokens"]]
-			# if len(tran) == 1:
-				# tran = tran * 2
 			char_inputs, word_lengths, word_indices, _ = trans_to_tensor(config, sess, graph, tran)
 			feed_dict = {
 				get_tensor(graph, "char_inputs:0"): char_inputs,
