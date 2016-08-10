@@ -6,9 +6,14 @@ Created on Aug 9, 2016
 @author: Matthew Sevrens
 """
 
+import six
+
 import tensorflow as tf
 
+from tensorflow.python.framework import ops
+from tensorflow.python.ops import logging_ops
 from tensorflow.python.ops import tensor_array_ops
+from tensorflow.python.ops import control_flow_ops
 from tensorflow.python.ops import rnn_cell
 from tensorflow.python.util import nest
 
@@ -22,7 +27,7 @@ def infer_state_dtype(explicit_dtype, state):
 
 		inferred_dtypes = [element.dtype for element in nest.flatten(state)]
 
-	    if not inferred_dtypes:
+		if not inferred_dtypes:
 			raise ValueError("Unable to infer dtype from empty state.")
 
 		all_same = all([x == inferred_dtypes[0] for x in inferred_dtypes])
@@ -38,6 +43,53 @@ def infer_state_dtype(explicit_dtype, state):
 
 def rnn_step(time, sequence_length, min_sequence_length, max_sequence_length,
 			zero_output, state, call_cell, state_size, skip_conditionals=False):
+
+	# Convert State to List for Ease of Use
+	flat_state = nest.flatten(state)
+	flat_zero_output = nest.flatten(zero_output)
+
+	def copy_one_through(output, new_output):
+		copy_cond = (time >= sequence_length)
+		return tf.select(copy_cond, output, new_output)
+
+	def copy_some_through(flat_new_output, flat_new_state):
+		flat_new_output = [copy_one_through(zero_output, new_output) for zero_output, new_output in zip(flat_zero_output, flat_new_output)]
+		flat_new_state = [copy_one_through(state, new_state) for state, new_state in zip(flat_state, flat_new_state)]
+		return flat_new_output + flat_new_state
+
+	def maybe_copy_some_through():
+		new_output, new_state = call_cell()
+		nest.assert_same_structure(state, new_state)
+		flat_new_state = nest.flatten(new_state)
+		flat_new_output = nest.flatten(new_output)
+		return control_flow_ops.cond(time < min_sequence_length, lambda: flat_new_output + flat_new_state, lambda: copy_some_through(flat_new_output, flat_new_state))
+
+	if skip_conditionals:
+		new_output, new_state = call_cell()
+		nest.assert_same_structure(state, new_state)
+		new_state = nest.flatten(new_state)
+		new_output = nest.flatten(new_output)
+		final_output_and_state = copy_some_through(new_output, new_state)
+	else:
+		empty_update = lambda: flat_zero_output + flat_state
+		final_output_and_state = control_flow_ops.cond(time >= max_sequence_length, empty_update, maybe_copy_some_through)
+
+	if len(final_output_and_state) != len(flat_zero_output) + len(flat_state):
+		raise ValueError("Internal error: state and output were not concatenated "
+			"correctly.")
+
+	final_output = final_output_and_state[:len(flat_zero_output)]
+	final_state = final_output_and_state[len(flat_zero_output):]
+
+	for output, flat_output in zip(final_output, flat_zero_output):
+		output.set_shape(flat_output.get_shape())
+	for substate, flat_substate in zip(final_state, flat_state):
+		substate.set_shape(flat_substate.get_shape())
+
+	final_output = nest.pack_sequence_as(structure=zero_output, flat_sequence=final_output)
+	final_state = nest.pack_sequence_as(structure=state, flat_sequence=final_state)
+
+	return final_output, final_state
 
 def dynamic_rnn(cell, inputs, sequence_length=None, initial_state=None,
 				dtype=None, parallel_iterations=None, swap_memory=False,
@@ -57,7 +109,7 @@ def dynamic_rnn(cell, inputs, sequence_length=None, initial_state=None,
 		sequence_length = tf.identity(sequence_length, name="sequence_length")
 
 	# Create a New Scope
-	with vs.variable_scope(scope or "RNN") as varscope:
+	with tf.variable_scope(scope or "RNN") as varscope:
 
 		if varscope.caching_device is None:
 			varscope.set_caching_device(lambda op: op.device)
@@ -82,7 +134,7 @@ def dynamic_rnn(cell, inputs, sequence_length=None, initial_state=None,
 			x_shape = tf.shape(x)
 			packed_shape = tf.pack(shape)
 			return logging_ops.Assert(
-				math_ops.reduce_all(math_ops.equal(x_shape, packed_shape)),
+				tf.reduce_all(tf.equal(x_shape, packed_shape)),
 				["Expected shape for Tensor %s is " % x.name,
 				packed_shape, " but saw shape: ", x_shape])
 
@@ -123,7 +175,7 @@ def dynamic_rnn_loop(cell, inputs, initial_state, parallel_iterations,
 	flat_output_size = nest.flatten(cell.output_size)
 
 	# Construct an Initial Output
-	input_shape = array_ops.shape(flat_input[0])
+	input_shape = tf.shape(flat_input[0])
 	time_steps = input_shape[0]
 	batch_size = input_shape[1]
 
@@ -160,10 +212,10 @@ def dynamic_rnn_loop(cell, inputs, initial_state, parallel_iterations,
 	zero_output = nest.pack_sequence_as(structure=cell.output_size, flat_sequence=flat_zero_output)
 
 	if sequence_length is not None:
-		min_sequence_length = math_ops.reduce_min(sequence_length)
-		max_sequence_length = math_ops.reduce_max(sequence_length)
+		min_sequence_length = tf.reduce_min(sequence_length)
+		max_sequence_length = tf.reduce_max(sequence_length)
 
-	time = tf.constant(0, dtype=dtypes.int32, name="time")
+	time = tf.constant(0, dtype=tf.int32, name="time")
 
 	with ops.op_scope([], "dynamic_rnn") as scope:
 		base_name = scope
@@ -212,7 +264,7 @@ def dynamic_rnn_loop(cell, inputs, initial_state, parallel_iterations,
 	# Process Over Each Time Step
 	_, output_final_ta, final_state = tf.while_loop(
 		cond=lambda time, *_: time < time_steps,
-		body=_time_step,
+		body=time_step,
 		loop_vars=(time, output_ta, state),
 		parallel_iterations=parallel_iterations,
 		swap_memory=swap_memory)
@@ -223,9 +275,9 @@ def dynamic_rnn_loop(cell, inputs, initial_state, parallel_iterations,
 	# Restore Shape Information
 	for output, output_size in zip(final_outputs, flat_output_size):
 		shape = state_size_with_prefix(output_size, prefix=[const_time_steps, const_batch_size])
-    	output.set_shape(shape)
+		output.set_shape(shape)
 
-    final_outputs = nest.pack_sequence_as(structure=cell.output_size, flat_sequence=final_outputs)
+	final_outputs = nest.pack_sequence_as(structure=cell.output_size, flat_sequence=final_outputs)
 
 	return (final_outputs, final_state)
 
@@ -243,15 +295,15 @@ def bidirectional_dynamic_rnn(cell_fw, cell_bw, inputs, sequence_length=None,
 		name = "BiRNN"
 	elif isinstance(scope, six.string_types):
 		name = scope
-	elif isinstance(scope, vs.VariableScope):
+	elif isinstance(scope, tf.VariableScope):
 		name = scope.name
 	else:
 		raise TypeError("scope must be a string or an instance of VariableScope")
 
 	# Forward Direction
-	with vs.variable_scope(name + "_FW") as fw_scope:
+	with tf.variable_scope(name + "_FW") as fw_scope:
 
-    	output_fw, output_state_fw = dynamic_rnn(
+		output_fw, output_state_fw = dynamic_rnn(
 		cell=cell_fw, inputs=inputs, sequence_length=sequence_length,
 		initial_state=initial_state_fw, dtype=dtype,
 		parallel_iterations=parallel_iterations, swap_memory=swap_memory,
@@ -265,9 +317,9 @@ def bidirectional_dynamic_rnn(cell_fw, cell_bw, inputs, sequence_length=None,
 		time_dim = 0
 		batch_dim = 1
 
-	with vs.variable_scope(name + "_BW") as bw_scope:
+	with tf.variable_scope(name + "_BW") as bw_scope:
 
-		inputs_reverse = array_ops.reverse_sequence(
+		inputs_reverse = tf.reverse_sequence(
 			input=inputs, seq_lengths=sequence_length,
 			seq_dim=time_dim, batch_dim=batch_dim)
 
@@ -277,7 +329,7 @@ def bidirectional_dynamic_rnn(cell_fw, cell_bw, inputs, sequence_length=None,
 			parallel_iterations=parallel_iterations, swap_memory=swap_memory,
 			time_major=time_major, scope=bw_scope)
 
-		output_bw = array_ops.reverse_sequence(
+		output_bw = tf.reverse_sequence(
 			input=tmp, seq_lengths=sequence_length,
 			seq_dim=time_dim, batch_dim=batch_dim)
 
