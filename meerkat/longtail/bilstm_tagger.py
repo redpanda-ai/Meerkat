@@ -47,13 +47,13 @@ from meerkat.various_tools import load_params, load_piped_dataframe
 logging.basicConfig(level=logging.INFO)
 
 def last_relevant(output, length, name):
-    batch_size = tf.shape(output)[0]
-    max_length = tf.reduce_max(tf.to_int32(length))
-    output_size = int(output.get_shape()[2])
-    index = tf.range(0, batch_size) * max_length + (tf.to_int32(length) - 1)
-    flat = tf.reshape(output, [-1, output_size])
-    relevant = tf.gather(flat, index, name=name)
-    return relevant
+	batch_size = tf.shape(output)[0]
+	max_length = tf.reduce_max(tf.to_int32(length))
+	output_size = int(output.get_shape()[2])
+	index = tf.range(0, batch_size) * max_length + (tf.to_int32(length) - 1)
+	flat = tf.reshape(output, [-1, output_size])
+	relevant = tf.gather(flat, index, name=name)
+	return relevant
 
 def get_tags(config, trans):
 	"""Convert df row to list of tags and tokens"""
@@ -73,7 +73,7 @@ def get_tags(config, trans):
 		if not found:
 			tags.append("background")
 
-		return(tokens , tags )
+		return(tokens , tags)
 
 	return (tokens, tags)
 
@@ -399,7 +399,7 @@ def evaluate_testset(config, graph, sess, test):
 		tokens, tags = get_tags(config, row)
 		char_inputs, word_lengths, word_indices, labels = trans_to_tensor(config, sess, graph, tokens, tags=tags)
 		total_count += len(tokens)
-		
+
 		feed_dict = {
 			get_tensor(graph, "char_inputs:0") : char_inputs,
 			get_tensor(graph, "word_inputs:0") : word_indices,
