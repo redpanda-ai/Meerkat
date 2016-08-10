@@ -162,7 +162,7 @@ def trans_to_tensor(config, sess, graph, tokens, tags=None, train=False):
 	c2i = config["c2i"]
 	max_tokens = config["max_tokens"]
 	char_inputs, rev_char_inputs = [], []
-	word_indices = [w2i[w] for w in tokens] if train else [w2i.get(w, w2i["_UNK"]) for w in tokens]
+	word_indices = [w2i.get(w, w2i["_UNK"]) for w in tokens]
 
 	# Encode Tags
 	if tags is not None:
@@ -171,7 +171,8 @@ def trans_to_tensor(config, sess, graph, tokens, tags=None, train=False):
 		encoded_tags = None
 
 	# Lookup Character Indices
-	max_t_len = len(max(tokens, key=len)) + 2
+	tokens = [["<w>"] + list(t) + ["</w>"] for t in tokens]
+	max_t_len = len(max(tokens, key=len))
 
 	for i in range(max_tokens):
 
@@ -181,7 +182,6 @@ def trans_to_tensor(config, sess, graph, tokens, tags=None, train=False):
 			char_inputs.append([0] * max_t_len)
 			continue
 
-		t = ["<w>"] + list(t) + ["</w>"]
 		char_inputs.append([])
 
 		for ii in range(max_t_len):
@@ -208,9 +208,8 @@ def char_encoding(config, graph, trans_len):
 		word_lengths = tf.gather(word_lengths, tf.range(tf.to_int32(trans_len)))
 		char_inputs = tf.placeholder(tf.int32, [None, max_tokens], name="char_inputs")
 		cembed_matrix = tf.Variable(tf.random_uniform([len(c2i.keys()), config["ce_dim"]], -0.25, 0.25), name="cembeds")
-		unpacked = tf.unpack(char_inputs, axis=1)
-
-		char_inputs = unpacked
+		
+		char_inputs = tf.transpose(char_inputs, perm=[1,0])
 		cembeds = tf.nn.embedding_lookup(cembed_matrix, char_inputs, name="ce_lookup")
 		cembeds = tf.gather(cembeds, tf.range(tf.to_int32(trans_len)))
 		cembeds = tf.transpose(cembeds, perm=[1,0,2])
