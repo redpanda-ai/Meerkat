@@ -358,10 +358,10 @@ def train_model(config, graph, sess, saver, run_options, run_metadata):
 		# Evaluate Model
 		test_accuracy = evaluate_testset(config, graph, sess, test)
 
-		final_model_path = "./meerkat/longtail/models/"
-		os.makedirs(final_model_path, exist_ok=True)
-		w2i_to_json(config["w2i"], final_model_path)
-		save_models(saver, sess, final_model_path)
+	final_model_path = "./meerkat/longtail/models/"
+	os.makedirs(final_model_path, exist_ok=True)
+	w2i_to_json(config["w2i"], final_model_path)
+	save_models(saver, sess, final_model_path)
 	return final_model_path
 
 def save_models(saver, sess, path):

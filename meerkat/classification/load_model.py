@@ -114,7 +114,6 @@ def get_tf_rnn_by_path(model_path, w2i_path, gpu_mem_fraction=False, model_name=
 			}
 
 			output = sess.run(model, feed_dict=feed_dict)
-			print(output)
 			output = [config["tag_map"][str(i)] for i in np.argmax(output, 1)]
 			target_indices = [i for i in range(len(output)) if output[i] == "merchant"]
 			doc[label_key] = " ".join([tran[i] for i in target_indices])
