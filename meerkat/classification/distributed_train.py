@@ -15,7 +15,6 @@ from meerkat.various_tools import load_params, load_piped_dataframe, validate_co
 from meerkat.classification.tensorflow_cnn import (mixed_batching, load_data, validate_config, batch_to_tensor)
 from meerkat.classification.data_handler import download_data, upload_result
 
-
 # Flags for defining the tf.train.ClusterSpec
 tf.app.flags.DEFINE_string("ps_hosts", "52.42.128.45:2222",
                            "Comma-separated list of hostname:port pairs")
@@ -191,7 +190,34 @@ def evaluate_testset(config, trans_pl, sess, model, test):
 
 	return te_accuracy
 
-def train(config, target, cluster):
+def get_meta(config, base):
+
+	with tf.Session() as sess:
+		cost_list = get_cost_list(config)
+		trans_placeholder, labels_placeholder = placeholder_inputs(config)
+		network, model, bn_assigns = inference(trans_placeholder, config)
+		global_step = tf.get_variable('global_step', [], initializer=tf.constant_initializer(0), trainable=False)
+		learning_rate = tf.train.exponential_decay(config["base_rate"], global_step, 15000, 0.5, staircase=True)
+
+		# Calculate Loss and Optimize
+		weighted_labels = cost_list * labels_placeholder
+		loss = tf.neg(tf.reduce_mean(tf.reduce_sum(network * weighted_labels, 1)), name="loss")
+		optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss, global_step, name="optimizer")
+		tf.scalar_summary('loss', loss)
+
+		bn_updates = tf.group(*bn_assigns)
+		with tf.control_dependencies([optimizer]):
+			bn_applier = tf.group(bn_updates, name="bn_applier")
+
+		saver = tf.train.Saver()
+		init_op = tf.initialize_all_variables()
+		sess.run(init_op)
+		saver.save(sess, base + 'train.ckpt')
+	os.remove(base + 'checkpoint')
+	os.remove(base + 'train.ckpt')
+	return base + 'train.ckpt.meta'
+
+def train(config, target, cluster, meta_path):
 
 	is_chief = (FLAGS.task_index == 0)
 
@@ -236,7 +262,7 @@ def train(config, target, cluster):
 			best_accuracy, best_era = 0, 0
 			base = "meerkat/classification/models/"
 			save_dir = base + "checkpoints/"
-			os.makedirs(save_dir, exist_ok=True)
+			if is_chief: os.makedirs(save_dir, exist_ok=True)
 			checkpoints = {}
 
 			local_step = 0
@@ -272,8 +298,12 @@ def train(config, target, cluster):
 					# Save Checkpoint
 					current_era = int(local_step / epochs)
 					if is_chief:
-						meta_path = save_dir + "era_" + str(current_era) + ".ckpt.meta"
-						model_path = saver.save(sess, save_dir + "era_" + str(current_era) + ".ckpt")
+#						tmp_meta_path = "/tmp/train_logs/" + "era_" + str(current_era) + ".ckpt.meta"
+						tmp_model_path = saver.save(sess, "/tmp/train_logs/" + "era_" + str(current_era) + ".ckpt")
+#						meta_path = save_dir + "era_" + str(current_era) + ".ckpt.meta"
+						model_path = save_dir + "era_" + str(current_era) + ".ckpt"
+#						os.rename(tmp_meta_path, meta_path)
+						os.rename(tmp_model_path, model_path)
 						logging.info("Checkpoint saved in file: %s" % model_path)
 						checkpoints[current_era] = model_path
 
@@ -283,7 +313,8 @@ def train(config, target, cluster):
 						best_accuracy = te_accuracy
 
 					if current_era - best_era == 3:
-						if is_chief: model_path = checkpoints[best_era]
+						if is_chief:
+							model_path = checkpoints[best_era]
 						break
 
 				# Log Loss and Update TensorBoard
@@ -325,9 +356,12 @@ def main(_):
 	elif FLAGS.job_name == "worker":
 
 		config, test_file, s3_params = download_data(FLAGS.model_type, FLAGS.bank_or_card, FLAGS.credit_or_debit)
-		final_model_path = train(config, server.target, cluster)
+		meta_path = "meerkat/classification/models/train.ckpt.meta"
+		final_model_path = train(config, server.target, cluster, meta_path)
 		if FLAGS.task_index == 0:
 			upload_result(config, final_model_path, test_file, s3_params)
+		else:
+			shutil.rmtree(s3_params["save_path"])
 
 
 if __name__ == "__main__":
