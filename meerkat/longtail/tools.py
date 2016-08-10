@@ -91,14 +91,12 @@ def rnn_step(time, sequence_length, min_sequence_length, max_sequence_length,
 
 	return final_output, final_state
 
-def dynamic_rnn(cell, inputs, sequence_length=None, dtype=None, 
-				parallel_iterations=None, swap_memory=False,
+def dynamic_rnn(cell, inputs, sequence_length=None, dtype=None,
 				time_major=False, scope=None):
 	
 	if not isinstance(cell, rnn_cell.RNNCell):
 		raise TypeError("cell must be an instance of RNNCell")
 
-	parallel_iterations = parallel_iterations or 32
 	flat_input = nest.flatten(inputs)
 
 	if not time_major:
@@ -145,8 +143,6 @@ def dynamic_rnn(cell, inputs, sequence_length=None, dtype=None,
 			cell,
 			inputs,
 			initial_state,
-			parallel_iterations=parallel_iterations,
-			swap_memory=swap_memory,
 			sequence_length=sequence_length,
 			dtype=dtype)
 
@@ -158,11 +154,9 @@ def dynamic_rnn(cell, inputs, sequence_length=None, dtype=None,
 
 		return (outputs, final_state)
 
-def dynamic_rnn_loop(cell, inputs, initial_state, parallel_iterations,
-					swap_memory, sequence_length=None, dtype=None):
+def dynamic_rnn_loop(cell, inputs, initial_state, sequence_length=None, dtype=None):
 
 	state = initial_state
-	assert isinstance(parallel_iterations, int), "parallel_iterations must be int"
 
 	state_size = cell.state_size
 
@@ -261,8 +255,8 @@ def dynamic_rnn_loop(cell, inputs, initial_state, parallel_iterations,
 		cond=lambda time, *_: time < time_steps,
 		body=time_step,
 		loop_vars=(time, output_ta, state),
-		parallel_iterations=parallel_iterations,
-		swap_memory=swap_memory)
+		parallel_iterations=32,
+		swap_memory=False)
 
 	# Unpack Final Output if Not Using Output Tuples
 	final_outputs = tuple(ta.pack() for ta in output_final_ta)
@@ -277,8 +271,7 @@ def dynamic_rnn_loop(cell, inputs, initial_state, parallel_iterations,
 	return (final_outputs, final_state)
 
 def bidirectional_dynamic_rnn(cell_fw, cell_bw, inputs, sequence_length=None,
-							dtype=None, parallel_iterations=None,
-							swap_memory=False, time_major=False, scope=None):
+							dtype=None, time_major=False, scope=None):
 
 	if not isinstance(cell_fw, rnn_cell.RNNCell):
 		raise TypeError("cell_fw must be an instance of RNNCell")
@@ -299,8 +292,7 @@ def bidirectional_dynamic_rnn(cell_fw, cell_bw, inputs, sequence_length=None,
 
 		output_fw, output_state_fw = dynamic_rnn(
 			cell=cell_fw, inputs=inputs, sequence_length=sequence_length,
-			dtype=dtype, parallel_iterations=parallel_iterations, 
-			swap_memory=swap_memory, time_major=time_major, scope=fw_scope)
+			dtype=dtype, time_major=time_major, scope=fw_scope)
 
 	# Backward direction
 	if not time_major:
@@ -318,8 +310,7 @@ def bidirectional_dynamic_rnn(cell_fw, cell_bw, inputs, sequence_length=None,
 
 		tmp, output_state_bw = dynamic_rnn(
 			cell=cell_bw, inputs=inputs_reverse, sequence_length=sequence_length,
-			dtype=dtype, parallel_iterations=parallel_iterations, swap_memory=swap_memory,
-			time_major=time_major, scope=bw_scope)
+			dtype=dtype, time_major=time_major, scope=bw_scope)
 
 		output_bw = tf.reverse_sequence(
 			input=tmp, seq_lengths=sequence_length,
