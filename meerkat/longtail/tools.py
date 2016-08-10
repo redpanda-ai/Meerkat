@@ -91,10 +91,10 @@ def rnn_step(time, sequence_length, min_sequence_length, max_sequence_length,
 
 	return final_output, final_state
 
-def dynamic_rnn(cell, inputs, sequence_length=None, initial_state=None,
-				dtype=None, parallel_iterations=None, swap_memory=False,
+def dynamic_rnn(cell, inputs, sequence_length=None, dtype=None, 
+				parallel_iterations=None, swap_memory=False,
 				time_major=False, scope=None):
-
+	
 	if not isinstance(cell, rnn_cell.RNNCell):
 		raise TypeError("cell must be an instance of RNNCell")
 
@@ -123,12 +123,7 @@ def dynamic_rnn(cell, inputs, sequence_length=None, initial_state=None,
 				raise ValueError("All inputs should have the same batch size")
 
 		# Set Initial State
-		if initial_state is not None:
-			state = initial_state
-		else:
-			if not dtype:
-				raise ValueError("If no initial_state is provided, dtype must be.")
-			state = cell.zero_state(batch_size, dtype)
+		initial_state = cell.zero_state(batch_size, dtype)
 
 		def assert_has_shape(x, shape):
 			x_shape = tf.shape(x)
@@ -149,7 +144,7 @@ def dynamic_rnn(cell, inputs, sequence_length=None, initial_state=None,
 		(outputs, final_state) = dynamic_rnn_loop(
 			cell,
 			inputs,
-			state,
+			initial_state,
 			parallel_iterations=parallel_iterations,
 			swap_memory=swap_memory,
 			sequence_length=sequence_length,
@@ -282,7 +277,6 @@ def dynamic_rnn_loop(cell, inputs, initial_state, parallel_iterations,
 	return (final_outputs, final_state)
 
 def bidirectional_dynamic_rnn(cell_fw, cell_bw, inputs, sequence_length=None,
-							initial_state_fw=None, initial_state_bw=None,
 							dtype=None, parallel_iterations=None,
 							swap_memory=False, time_major=False, scope=None):
 
@@ -304,10 +298,9 @@ def bidirectional_dynamic_rnn(cell_fw, cell_bw, inputs, sequence_length=None,
 	with tf.variable_scope(name + "_FW") as fw_scope:
 
 		output_fw, output_state_fw = dynamic_rnn(
-		cell=cell_fw, inputs=inputs, sequence_length=sequence_length,
-		initial_state=initial_state_fw, dtype=dtype,
-		parallel_iterations=parallel_iterations, swap_memory=swap_memory,
-		time_major=time_major, scope=fw_scope)
+			cell=cell_fw, inputs=inputs, sequence_length=sequence_length,
+			dtype=dtype, parallel_iterations=parallel_iterations, 
+			swap_memory=swap_memory, time_major=time_major, scope=fw_scope)
 
 	# Backward direction
 	if not time_major:
@@ -325,8 +318,7 @@ def bidirectional_dynamic_rnn(cell_fw, cell_bw, inputs, sequence_length=None,
 
 		tmp, output_state_bw = dynamic_rnn(
 			cell=cell_bw, inputs=inputs_reverse, sequence_length=sequence_length,
-			initial_state=initial_state_bw, dtype=dtype,
-			parallel_iterations=parallel_iterations, swap_memory=swap_memory,
+			dtype=dtype, parallel_iterations=parallel_iterations, swap_memory=swap_memory,
 			time_major=time_major, scope=bw_scope)
 
 		output_bw = tf.reverse_sequence(
