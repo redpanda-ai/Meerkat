@@ -192,7 +192,7 @@ def trans_to_tensor(config, sess, graph, tokens, tags=None, train=False):
 		char_inputs.append([])
 
 		for ii in range(max_t_len):
-			char_index = c2i[t[ii]] if ii < len(t) else 0
+			char_index = c2i.get(t[ii], 0) if ii < len(t) else 0
 			char_inputs[i].append(char_index)
 
 	char_inputs = np.array(char_inputs)
