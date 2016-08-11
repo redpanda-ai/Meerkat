@@ -194,8 +194,10 @@ def dynamic_rnn_loop(cell, inputs, initial_state, sequence_length=None, dtype=No
 		(output, new_state) = call_cell()
 
 		# Fill Unprocessed Steps with Zeros
-		output = tf.dynamic_stitch([indices, invert_indices], [output, flat_zero_output])
-		new_state = tf.dynamic_stitch([indices, invert_indices], [output, flat_state])
+		filler_output = tf.boolean_mask(flat_zero_output, invert_mask)
+		filler_state = tf.boolean_mask(flat_state, invert_mask)
+		output = tf.dynamic_stitch([indices, invert_indices], [output, filler_output])
+		new_state = tf.dynamic_stitch([indices, invert_indices], [new_state, filler_state])
 
 		# Pack State if Using State Tuples
 		output = nest.flatten(output)
