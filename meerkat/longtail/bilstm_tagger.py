@@ -314,10 +314,10 @@ def train_model(config, graph, sess, saver, run_options, run_metadata):
 	train = config["train"]
 	train_index = list(range(len(train)))
 	sess.run(get_op(graph, "assign_wembedding"), feed_dict={get_tensor(graph, "embedding_placeholder:0"): config["wembedding"]})
-	count = 0
 
 	# Train the Model
 	for step in range(eras):
+		count = 0
 		random.shuffle(train_index)
 		total_loss = 0
 		total_tagged = 0
