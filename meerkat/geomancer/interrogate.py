@@ -51,6 +51,7 @@ def get_task_df(server, map_id_to_name, map_name_to_id):
 				dfs[project_name]["question"].append(item["info"]["question"])
 
 def mix_dataframes(df_1, df_2, group_size):
+	"""Mix two dataframes by group size"""
 	mix_df = pd.concat([df_1, df_2]).reset_index(drop=True)
 	mix_df_gpby = mix_df.groupby(list(mix_df.columns))
 
@@ -59,7 +60,7 @@ def mix_dataframes(df_1, df_2, group_size):
 	return mixed_set
 
 def get_new_tasks(old_df, new_df):
-
+	"""Find new dataframes"""
 	set_1 = mix_dataframes(old_df, new_df, 1)
 	#logger.info("set_1 :")
 	#logger.info(set_1)
@@ -77,6 +78,7 @@ def get_new_tasks(old_df, new_df):
 def parse_arguments(args):
 	"""Parse arguments from command line"""
 	parser = argparse.ArgumentParser()
+	parser.add_argument("bank_or_card")
 	parser.add_argument("--server", default="52.26.175.156")
 	parser.add_argument("--apikey", default="b151d9e8-0b62-432c-aa3f-7f654ba0d983")
 	args = parser.parse_args(args)
@@ -84,9 +86,7 @@ def parse_arguments(args):
 
 def main_process(args):
 	"""Execute the main program"""
-
 	server, apikey = args.server, args.apikey
-
 	existing_projects = get_existing_projects(server, apikey)
 	logger.info("Existing projects are: {0}".format(existing_projects))
 
@@ -94,9 +94,10 @@ def main_process(args):
 	top_merchants = get_top_merchant_names(base_dir)
 	logger.info("Top merchants are: {0}".format(top_merchants))
 
+	bank_or_card = args.bank_or_card
 	map_id_to_name, map_name_to_id = {}, {}
 	for merchant in top_merchants:
-		project_name = "Geomancer_" + merchant
+		project_name = "Geomancer_" + bank_or_card + "_" + merchant
 		if project_name in existing_projects:
 			project_id = existing_projects[project_name]
 			map_id_to_name[project_id] = project_name
@@ -117,8 +118,8 @@ def main_process(args):
 		logger.info("old_df: ")
 		logger.info(old_df)
 
-		merchant = project_name[len("Geomancer_"):]
-		new_tasks_file = base_dir + merchant + "/bank_tasks.csv"
+		merchant = project_name[len("Geomancer_") + len(bank_or_card) + 1:]
+		new_tasks_file = base_dir + merchant + "/" + bank_or_card  +"_tasks.csv"
 		new_df = pd.read_csv(new_tasks_file, **csv_kwargs)
 		logger.info("new_df: ")
 		logger.info(new_df)
@@ -128,7 +129,7 @@ def main_process(args):
 			logger.info("No new tasks for {0}".format(project_name))
 			continue
 
-		tasks_file = base_dir + merchant + "/pybossa_project/tasks.csv"
+		tasks_file = base_dir + merchant + "/pybossa_project/" + bank_or_card + "/tasks.csv"
 		new_tasks_df.to_csv(tasks_file, header=["question"], index=False)
 		logger.info("Save new tasks dataframe to {0}".format(tasks_file))
 		args.merchant = merchant

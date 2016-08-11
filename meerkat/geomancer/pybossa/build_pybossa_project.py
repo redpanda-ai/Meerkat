@@ -71,7 +71,6 @@ def main_process(args):
 	"""Execute the main programe"""
 	base_dir = "meerkat/geomancer/merchants/"
 	os.makedirs(base_dir, exist_ok=True)
-
 	top_merchants = get_top_merchant_names(base_dir)
 
 	if args.merchant != "":
@@ -85,13 +84,14 @@ def main_process(args):
 
 	server, apikey = args.server, args.apikey
 	existing_projects = get_existing_projects(server, apikey)
+	bank_or_card = args.bank_or_card
 
 	for merchant in top_merchants:
-		merchant_dir = base_dir + merchant + "/pybossa_project/"
+		merchant_dir = base_dir + merchant + "/pybossa_project/" + bank_or_card + "/"
 		os.makedirs(merchant_dir, exist_ok=True)
 
 		project_json_file = merchant_dir + "project.json"
-		project_name = "Geomancer_" + merchant
+		project_name = "Geomancer_" + bank_or_card + "_" + merchant
 
 		# Create a new pybossa project
 		if 'create_project' in args and args.create_project:
@@ -113,7 +113,7 @@ def main_process(args):
 		if 'update_presenter' in args and args.update_presenter:
 			presenter_file = template_dir + "presenter_code.html"
 			copy_file(presenter_file, merchant_dir)
-			replace_str_in_file(merchant_presenter, "Geomancer", "Geomancer_" + merchant)
+			replace_str_in_file(merchant_presenter, "Geomancer_project", "Geomancer_" + bank_or_card + "_" + merchant)
 			update_presenter = True
 
 		# Update pybossa dictionary
@@ -150,6 +150,8 @@ def main_process(args):
 def parse_arguments(args):
 	"""Parse arguments from command line"""
 	parser = argparse.ArgumentParser()
+
+	parser.add_argument("bank_or_card")
 
 	parser.add_argument("--merchant", default="")
 
