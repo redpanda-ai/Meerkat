@@ -21,14 +21,6 @@ def get_existing_projects(server, apikey):
 		short_names[item["short_name"]] = item["id"]
 	return short_names
 
-def check_rate_limit(server, port):
-	res = requests.get('http://' + server + ':' + port + '/api/project')
-	logger.info("allowed remaining requests: {0}".format(int(res.headers['X-RateLimit-Remaining'])))
-	if int(res.headers['X-RateLimit-Remaining']) < 10:
-		time.sleep(60) # Sleep for 1 minutes
-	else:
-		pass
-
 def get_task_df(server, map_id_to_name, map_name_to_id):
 	"""Builds a pandas dataframe containing task_funs for the indicated project."""
 	offset, limit, port = 0, 100, "12000"
@@ -37,7 +29,6 @@ def get_task_df(server, map_id_to_name, map_name_to_id):
 
 	dfs = {}
 	while remaining_data:
-		#check_rate_limit(server, port)
 		address = prefix + "task?limit=" + str(limit) + "&offset=" + str(offset)
 		my_json = requests.get(address).json()
 		offset = offset + limit
