@@ -21,10 +21,14 @@ logger = logging.getLogger('get_top_merchant_data')
 def parse_arguments(args):
 	parser = argparse.ArgumentParser()
 	parser.add_argument("bank_or_card")
+	parser.add_argument("target_merchants", default=["Starbucks"])
 	parser.add_argument("version_dir")
 	parser.add_argument("--bucket", default="s3yodlee")
+	parser.add_argument("--target_merchant_list", type=list, default=[])
 	parser.add_argument("--truncate_lines", default=-1, type=int)
 	args = parser.parse_args(args)
+	args.target_merchant_list = args.target_merchants[2:-2].split(",")
+	args.target_merchant_list = [ x.strip('" ') for x in args.target_merchant_list ]
 	return args
 
 def extract_clean_files(save_path, tarball_name, extension):
@@ -84,7 +88,8 @@ def main_process():
 							output_file.write(input_file.readline())
 				os.rename(csv_file + ".temp", csv_file)
 
-			merchant_dataframes = get_merchant_dataframes(csv_file, 'MERCHANT_NAME', **csv_kwargs)
+			merchant_dataframes = get_merchant_dataframes(csv_file, 'MERCHANT_NAME',
+				args.target_merchant_list, **csv_kwargs)
 			merchants = sorted(list(merchant_dataframes.keys()))
 			for merchant in merchants:
 				formatted_merchant = remove_special_chars(merchant)
