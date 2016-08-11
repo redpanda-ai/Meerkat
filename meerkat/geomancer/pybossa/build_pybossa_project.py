@@ -57,7 +57,7 @@ def get_top_merchant_names(base_dir):
 	existing_merchants = [obj[0] for obj in os.walk(base_dir)]
 	for merchant_path in existing_merchants:
 		merchant = merchant_path[merchant_path.rfind("/") + 1:]
-		if merchant != "" and merchant != "pybossa_project":
+		if merchant not in ["", "pybossa_project"]:
 			dictionary_exist = False
 			for filename in os.listdir(merchant_path):
 				if filename.endswith('.json'):
