@@ -1,10 +1,12 @@
+import argparse
+import sys
 import pandas as pd
 import requests
 import logging
 import yaml
 import time
 
-from .pybossa.build_pybossa_project import get_top_merchant_names
+from .pybossa.build_pybossa_project import get_top_merchant_names, main_process as add_new_tasks
 
 logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
 logger = logging.getLogger('interrogate')
@@ -41,7 +43,7 @@ def get_task_df(server, map_id_to_name, map_name_to_id):
 		offset = offset + limit
 		logger.info("offset: {0}".format(offset))
 		if not my_json:
-			logger.warning("Collection complete.")
+			logger.warning("Task collection complete")
 			remaining_data = False
 			for key in dfs:
 				dfs[key] = pd.DataFrame(dfs[key])
@@ -53,7 +55,7 @@ def get_task_df(server, map_id_to_name, map_name_to_id):
 				project_id = item["project_id"]
 				project_name = map_id_to_name[project_id]
 				if project_name not in dfs:
-					logger.info("Found tasks for: {0}".format(project_name))
+					logger.info("Found tasks for {0}".format(project_name))
 					dfs[project_name] = {"question": []}
 				dfs[project_name]["question"].append(item["info"]["question"])
 
@@ -68,12 +70,12 @@ def mix_dataframes(df_1, df_2, group_size):
 def get_new_tasks(old_df, new_df):
 
 	set_1 = mix_dataframes(old_df, new_df, 1)
-	logger.info("set_1 :")
-	logger.info(set_1)
+	#logger.info("set_1 :")
+	#logger.info(set_1)
 
 	set_2 = mix_dataframes(old_df, set_1, 1)
-	logger.info("set_2 :")
-	logger.info(set_2)
+	#logger.info("set_2 :")
+	#logger.info(set_2)
 
 	set_3 = mix_dataframes(set_1, set_2, 2)
 	logger.info("set_3 :")
@@ -81,8 +83,20 @@ def get_new_tasks(old_df, new_df):
 
 	return set_3
 
-def main_process():
-	existing_projects = get_existing_projects("52.26.175.156", "b151d9e8-0b62-432c-aa3f-7f654ba0d983")
+def parse_arguments(args):
+	"""Parse arguments from command line"""
+	parser = argparse.ArgumentParser()
+	parser.add_argument("--server", default="52.26.175.156")
+	parser.add_argument("--apikey", default="b151d9e8-0b62-432c-aa3f-7f654ba0d983")
+	args = parser.parse_args(args)
+	return args
+
+def main_process(args):
+	"""Execute the main program"""
+
+	server, apikey = args.server, args.apikey
+
+	existing_projects = get_existing_projects(server, apikey)
 	logger.info("Existing projects are: {0}".format(existing_projects))
 
 	base_dir = "meerkat/geomancer/merchants/"
@@ -100,7 +114,7 @@ def main_process():
 	logger.info("map_id_to_name: {0}".format(map_id_to_name))
 	logger.info("map_name_to_id: {0}".format(map_name_to_id))
 
-	dfs = get_task_df("52.26.175.156", map_id_to_name, map_name_to_id)
+	dfs = get_task_df(server, map_id_to_name, map_name_to_id)
 
 	csv_kwargs = { "usecols": ["DESCRIPTION_UNMASKED"], "error_bad_lines": False, "warn_bad_lines": True, "encoding": "utf-8",
 		"quotechar" : '"', "na_filter" : False, "sep": "," }
@@ -109,17 +123,29 @@ def main_process():
 		logger.info("Interrogating {0}".format(project_name))
 		old_df = dfs[project_name]
 		old_df = old_df.rename(columns = {'question': 'DESCRIPTION_UNMASKED'})
-		logger.info("old_df: ")
-		logger.info(old_df)
+		#logger.info("old_df: ")
+		#logger.info(old_df)
 
 		merchant = project_name[len("Geomancer_"):]
 		new_tasks_file = base_dir + merchant + "/bank_tasks.csv"
 		new_df = pd.read_csv(new_tasks_file, **csv_kwargs)
-		logger.info("new_df: ")
-		logger.info(new_df)
+		#logger.info("new_df: ")
+		#logger.info(new_df)
 		new_tasks_df = get_new_tasks(old_df, new_df)
 
-if __name__ == "__main__":
-	main_process()
+		if new_tasks_df.empty:
+			logger.info("No new tasks for {0}".format(project_name))
+			continue
 
+		tasks_file = base_dir + merchant + "/pybossa_project/tasks.csv"
+		new_tasks_df.to_csv(tasks_file, header=["question"], index=False)
+		logger.info("Save new tasks dataframe to {0}".format(tasks_file))
+		args.merchant = merchant
+		args.add_tasks = True
+		add_new_tasks(args)
+		logger.info("Add new tasks to {0}".format(project_name))
+
+if __name__ == "__main__":
+	args = parse_arguments(sys.argv[1:])
+	main_process(args)
 
