@@ -41,37 +41,6 @@ def infer_state_dtype(explicit_dtype, state):
 	else:
 		return state.dtype
 
-def rnn_step(time, sequence_length, min_sequence_length, max_sequence_length,
-			zero_output, state, call_cell, state_size, skip_conditionals=False):
-
-	# Convert State to List for Ease of Use
-	flat_state = nest.flatten(state)
-	flat_zero_output = nest.flatten(zero_output)
-
-	# Call Cell
-	new_output, new_state = call_cell()
-	nest.assert_same_structure(state, new_state)
-	new_state = nest.flatten(new_state)
-	new_output = nest.flatten(new_output)
-	final_output_and_state = new_output + new_state
-
-	if len(final_output_and_state) != len(flat_zero_output) + len(flat_state):
-		raise ValueError("Internal error: state and output were not concatenated "
-			"correctly.")
-
-	final_output = final_output_and_state[:len(flat_zero_output)]
-	final_state = final_output_and_state[len(flat_zero_output):]
-
-	for output, flat_output in zip(final_output, flat_zero_output):
-		output.set_shape(flat_output.get_shape())
-	for substate, flat_substate in zip(final_state, flat_state):
-		substate.set_shape(flat_substate.get_shape())
-
-	final_output = nest.pack_sequence_as(structure=zero_output, flat_sequence=final_output)
-	final_state = nest.pack_sequence_as(structure=state, flat_sequence=final_state)
-
-	return final_output, final_state
-
 def dynamic_rnn(cell, inputs, sequence_length=None, dtype=None,
 				time_major=False, scope=None):
 	
@@ -221,19 +190,8 @@ def dynamic_rnn_loop(cell, inputs, initial_state, sequence_length=None, dtype=No
 		state = tf.boolean_mask(state, mask)
 		call_cell = lambda: cell(input_t, state)
 
-		if sequence_length is not None:
-			(output, new_state) = rnn_step(
-				time=time,
-				sequence_length=sequence_length,
-				min_sequence_length=min_sequence_length,
-				max_sequence_length=max_sequence_length,
-				zero_output=zero_output,
-				state=state,
-				call_cell=call_cell,
-				state_size=state_size,
-				skip_conditionals=False)
-		else:
-			(output, new_state) = call_cell()
+		# Call Cell
+		(output, new_state) = call_cell()
 
 		# Fill Unprocessed Steps with Zeros
 		output = tf.dynamic_stitch([indices, invert_indices], [output, flat_zero_output])
