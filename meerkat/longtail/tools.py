@@ -48,31 +48,12 @@ def rnn_step(time, sequence_length, min_sequence_length, max_sequence_length,
 	flat_state = nest.flatten(state)
 	flat_zero_output = nest.flatten(zero_output)
 
-	def copy_one_through(output, new_output):
-		copy_cond = (time >= sequence_length)
-		return tf.select(copy_cond, output, new_output)
-
-	def copy_some_through(flat_new_output, flat_new_state):
-		flat_new_output = [copy_one_through(zero_output, new_output) for zero_output, new_output in zip(flat_zero_output, flat_new_output)]
-		flat_new_state = [copy_one_through(state, new_state) for state, new_state in zip(flat_state, flat_new_state)]
-		return flat_new_output + flat_new_state
-
-	def maybe_copy_some_through():
-		new_output, new_state = call_cell()
-		nest.assert_same_structure(state, new_state)
-		flat_new_state = nest.flatten(new_state)
-		flat_new_output = nest.flatten(new_output)
-		return control_flow_ops.cond(time < min_sequence_length, lambda: flat_new_output + flat_new_state, lambda: copy_some_through(flat_new_output, flat_new_state))
-
-	if skip_conditionals:
-		new_output, new_state = call_cell()
-		nest.assert_same_structure(state, new_state)
-		new_state = nest.flatten(new_state)
-		new_output = nest.flatten(new_output)
-		final_output_and_state = copy_some_through(new_output, new_state)
-	else:
-		empty_update = lambda: flat_zero_output + flat_state
-		final_output_and_state = control_flow_ops.cond(time >= max_sequence_length, empty_update, maybe_copy_some_through)
+	# Call Cell
+	new_output, new_state = call_cell()
+	nest.assert_same_structure(state, new_state)
+	new_state = nest.flatten(new_state)
+	new_output = nest.flatten(new_output)
+	final_output_and_state = new_output + new_state
 
 	if len(final_output_and_state) != len(flat_zero_output) + len(flat_state):
 		raise ValueError("Internal error: state and output were not concatenated "
@@ -217,6 +198,18 @@ def dynamic_rnn_loop(cell, inputs, initial_state, sequence_length=None, dtype=No
 	input_ta = tuple(create_ta("input_%d" % i, flat_input[0].dtype) for i in range(len(flat_input)))
 	input_ta = tuple(ta.unpack(input_) for ta, input_ in zip(input_ta, flat_input))
 
+	# Helper Function for Filling Values
+	def copy_one_through(time, output, new_output):
+		copy_cond = (time >= sequence_length)
+		return tf.select(copy_cond, output, new_output)
+
+	def select_relevant(time, params):
+		mask = (time < sequence_length)
+		return tf.boolean_mask(params, mask)
+
+	flat_state = nest.flatten(state)
+	flat_zero_output = nest.flatten(zero_output)
+
 	# Function to Perform at Each Time Step
 	def time_step(time, output_ta, state):
 
@@ -227,6 +220,10 @@ def dynamic_rnn_loop(cell, inputs, initial_state, sequence_length=None, dtype=No
 			input_.set_shape(shape[1:])
 
 		input_t = nest.pack_sequence_as(structure=inputs, flat_sequence=input_t)
+		
+		# Select Only Relevant at This Time Step
+		input_t = select_relevant(time, input_t)
+		state = select_relevant(time, shape)
 		call_cell = lambda: cell(input_t, state)
 
 		if sequence_length is not None:
@@ -242,6 +239,8 @@ def dynamic_rnn_loop(cell, inputs, initial_state, sequence_length=None, dtype=No
 				skip_conditionals=False)
 		else:
 			(output, new_state) = call_cell()
+
+		# TODO: Fill unprocessed state and output with zeros
 
 		# Pack State if Using State Tuples
 		output = nest.flatten(output)
