@@ -78,7 +78,7 @@ def get_new_tasks(old_df, new_df):
 	#logger.info(set_2)
 
 	set_3 = mix_dataframes(set_1, set_2, 2)
-	logger.info("set_3 :")
+	logger.info("new tasks df :")
 	logger.info(set_3)
 
 	return set_3
@@ -123,14 +123,14 @@ def main_process(args):
 		logger.info("Interrogating {0}".format(project_name))
 		old_df = dfs[project_name]
 		old_df = old_df.rename(columns = {'question': 'DESCRIPTION_UNMASKED'})
-		#logger.info("old_df: ")
-		#logger.info(old_df)
+		logger.info("old_df: ")
+		logger.info(old_df)
 
 		merchant = project_name[len("Geomancer_"):]
 		new_tasks_file = base_dir + merchant + "/bank_tasks.csv"
 		new_df = pd.read_csv(new_tasks_file, **csv_kwargs)
-		#logger.info("new_df: ")
-		#logger.info(new_df)
+		logger.info("new_df: ")
+		logger.info(new_df)
 		new_tasks_df = get_new_tasks(old_df, new_df)
 
 		if new_tasks_df.empty:
