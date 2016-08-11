@@ -359,7 +359,7 @@ def train_model(config, graph, sess, saver, run_options, run_metadata):
 			if count % 250 == 0:
 				logging.info("count: " + str(count))
 				logging.info("loss: " + str(total_loss/total_tagged))
-				logging.info("%d" % (count / len(train_index) * 100) + "% complete with era")
+				logging.info("%d" % (count / len(train_index) * 100) + "% complete with era " + str(step))
 
 		# Evaluate Model
 		test_accuracy = evaluate_testset(config, graph, sess, config["test"])
