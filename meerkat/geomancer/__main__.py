@@ -9,8 +9,11 @@ import yaml
 
 from meerkat.various_tools import validate_configuration
 from .get_agg_data import main_process as get_agg_data
-from .get_agg_data import parse_arguments as parse_agg_arguments
-from .get_merchant_dictionaries import parse_arguments as parse_merchant_arguments
+#from .get_agg_data import parse_arguments as parse_agg_arguments
+#from .get_merchant_dictionaries import parse_arguments as parse_merchant_arguments
+
+import meerkat.geomancer.get_merchant_dictionaries as merchant_dictionaries
+
 
 logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
 logger = logging.getLogger('__main__')
@@ -18,6 +21,7 @@ logger = logging.getLogger('__main__')
 def parse_arguments(args):
 	"""Parse arguments from command line"""
 	parser = argparse.ArgumentParser()
+	#FIXME: Would be nice if we could validate this
 	parser.add_argument("config_file", help="file used to set parameters")
 	args = parser.parse_args(args)
 	return args
@@ -25,8 +29,8 @@ def parse_arguments(args):
 def get_module_args(parse_function, config_object):
 	arg_list = []
 	for item in config_object.keys():
-		logger.info("Key: {0}, Value: {1}".format("--" + item, config_object[item]))
-		arg_list.append("--" + item)
+		logger.info("Key: {0}, Value: {1}".format(item, config_object[item]))
+		arg_list.append(item)
 		arg_list.append(config_object[item])
 	logger.info(arg_list)
 	return parse_function(arg_list)
@@ -40,13 +44,17 @@ def main_process():
 	config = validate_configuration(args.config_file, "meerkat/geomancer/config/schema.json")
 
 	#Get AggData
-	module_args = get_module_args(parse_agg_arguments, config["agg_data"])
-	get_agg_data(module_args)
-	#Get Merchant dictionaries
-	module_args = get_module_args(parse_merchant_arguments, config["merchant_dictionaries"])
-	my_object = MerchantDictionaries(module_args)
-	my_object.main_process()
+	#module_args = get_module_args(parse_agg_arguments, config["agg_data"])
+	#get_agg_data(module_args)
+	#module = merchant_dictionaries
+	#module_args = get_module_args(module.parse_arguments, config["agg_data"])
+	#module.AggData(module_args).main_process()
 
+	#Get Merchant dictionaries
+	module = merchant_dictionaries
+	logger.info("Foo")
+	config = config["merchant_dictionaries"]
+	module.MerchantDictionaries(config).main_process()
 
 if __name__ == "__main__":
 	main_process()

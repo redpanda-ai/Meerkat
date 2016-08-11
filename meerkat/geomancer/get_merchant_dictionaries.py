@@ -16,20 +16,10 @@ import yaml
 
 from functools import reduce
 from timeit import default_timer as timer
-from ..classification.load_model import get_tf_cnn_by_name as get_classifier
 from .tools import remove_special_chars
 
 logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
 logger = logging.getLogger('get_merchant_dictionaries')
-
-TARGET_MERCHANTS = [ "Ace Hardware", "Walmart", "Walgreens", "Target", "Subway", "Starbucks", "McDonald's", "Costco Wholesale Corp.", "Burger King",
-	"Bed Bath and Beyond",
-	"Aeropostale", "Albertsons", "American Eagle Outfitters", "Applebee's", "Arby's",
-	"AutoZone", "Bahama Breeze", "Barnes & Noble", "Baskin-Robbins", "Bealls",
-	"Eddie V's", "Fedex", "Five Guys", "Food 4 Less", "Francesca's", "Fred Meyer",
-	"Gymboree", "H&M", "Home Depot", "IHOP", "In-N-Out Burger", "J. C. Penney",
-	"KFC", "Kmart", "Kohl's", "LongHorn Steakhouse", "Lowe's", "Macy's", "Nordstrom"
-	]
 
 def preprocess_dataframe(df):
 	"""Fix up some of the data in our dataframe."""
@@ -53,6 +43,7 @@ def get_merchant_dataframes(input_file, groupby_name, target_merchant_list, **cs
 	#for chunk in pd.read_csv(input_file, chunksize=chunksize, error_bad_lines=False,
 	#	warn_bad_lines=True, encoding='utf-8', quotechar='"', na_filter=False, sep=sep):
 	if activate_cnn:
+		from ..classification.load_model import get_tf_cnn_by_name as get_classifier
 		classifier = get_classifier("bank_merchant")
 	num_chunks = int(sum(1 for line in open(input_file)) / csv_kwargs["chunksize"])
 	start = timer()
@@ -113,8 +104,8 @@ def start_consumers(param):
 		consumer.setDaemon(True)
 		consumer.start()
 
+"""
 def parse_arguments(args):
-	"""Parses arguments"""
 	module_path = inspect.getmodule(inspect.stack()[1][0]).__file__
 	default_path = module_path[:module_path.rfind("/") + 1] + "dictionaries"
 	parser = argparse.ArgumentParser()
@@ -129,7 +120,7 @@ def parse_arguments(args):
 	my_args.target_merchant_list = my_args.target_merchants[2:-2].split(",")
 	my_args.target_merchant_list = [ x.strip('" ') for x in my_args.target_merchant_list ]
 	return my_args
-
+"""
 def merge(a, b, path=None):
 	"""Useful function to merge complex dictionaries, courtesy of:
 	https://stackoverflow.com/questions/7204805/dictionaries-of-dictionaries-merge
@@ -168,9 +159,11 @@ def expand_abbreviations(city):
 
 class MerchantDictionaries:
 	"""Contains methods and data pertaining to the creation and retrieval of merchant dictionaries"""
-	def __init__(self, args):
+	def __init__(self, config):
 		"""Constructor"""
-		self.args = args
+		self.config = config
+		module_path = inspect.getmodule(inspect.stack()[1][0]).__file__
+		self.filepath = module_path[:module_path.rfind("/") + 1] + "merchants"
 
 	def get_store_dictionaries(self, df):
 		"""Writes out two store dictionaries"""
@@ -200,7 +193,7 @@ class MerchantDictionaries:
 
 	def get_unique_city_dictionaries(self, df):
 		"""Constructs a dictionary using unique city names as keys."""
-		logger.debug("Generating unique_city dictionaries for {0}".format(self.args.merchant))
+		logger.debug("Generating unique_city dictionaries for {0}".format(self.config["merchant"]))
 		# Create the unique_city_state dictionary
 		grouped_city = self.geo_df.groupby('city', as_index=True)
 		groups_city = dict(list(grouped_city))
@@ -210,7 +203,7 @@ class MerchantDictionaries:
 			if len(states) == 1:
 				unique_city_state[city.upper()] = states[0].upper()
 		# Write the unique_city_state dictionary to json file
-		merchant = self.args.merchant
+		merchant = self.config["merchant"]
 		self.dump_pretty_json_to_file(unique_city_state, "unique_city_state.json")
 		# Create the unique_city list
 		unique_city = list(unique_city_state.keys())
@@ -220,8 +213,8 @@ class MerchantDictionaries:
 
 	def get_geo_dictionary(self, df):
 		"""Generates three merchant dictionaries and writes them as JSON files"""
-		merchant = self.args.merchant
-		logger.debug("Generating geo dictionaries for '{0}'".format(self.args.merchant))
+		merchant = self.config["merchant"]
+		logger.debug("Generating geo dictionaries for '{0}'".format(self.config["merchant"]))
 		#Create a geo-dictionary, using only "state", "city", and "zip_code"
 		geo_df = df[["state", "city", "zip_code"]]
 		grouped = geo_df.groupby(['state', 'city'], as_index=True)
@@ -248,10 +241,10 @@ class MerchantDictionaries:
 		csv_kwargs = { "chunksize": 1000, "error_bad_lines": False, "warn_bad_lines": True,
 			"encoding": "utf-8", "quotechar" : '"', "na_filter" : False, "sep": "," }
 		merchant_dataframes = get_merchant_dataframes("meerkat/geomancer/data/agg_data/All_Merchants.csv",
-			"list_name", self.args.target_merchant_list, **csv_kwargs)
+			"list_name", self.config["target_merchant_list"], **csv_kwargs)
 		merchants = sorted(list(merchant_dataframes.keys()))
 		for merchant in merchants:
-			self.args.merchant = remove_special_chars(merchant)
+			self.config["merchant"] = remove_special_chars(merchant)
 			df = merchant_dataframes[merchant]
 			preprocess_dataframe(df)
 			logger.info("***** Processing {0:>29} ********".format(merchant))
@@ -263,18 +256,18 @@ class MerchantDictionaries:
 
 	def setup_directories(self):
 		"""This creates the directories on the local file system, if needed."""
-		if self.args.dry_run == "False":
-			output_directory = self.args.filepath + "/" + self.args.merchant
+		if self.config["dry_run"] == "False":
+			output_directory = self.filepath + "/" + self.config["merchant"]
 			logger.debug("Confirming output directory at {0}".format(output_directory))
 			os.makedirs(output_directory, exist_ok=True)
 		else:
-			logger.info("No need for output directory for {0}".format(self.args.merchant))
+			logger.info("No need for output directory for {0}".format(self.config["merchant"]))
 
 	def dump_pretty_json_to_file(self, new_object, filename):
 		"""Dumps a pretty-printed JSON object to the file provided."""
 		src_object = {}
 		dst_object = {}
-		full_path = self.args.filepath + "/" + self.args.merchant + "/" + filename
+		full_path = self.filepath + "/" + self.config["merchant"] + "/" + filename
 		try:
 			with open(full_path, "r") as infile:
 				src_object = json.load(infile)
@@ -290,8 +283,8 @@ class MerchantDictionaries:
 			logger.critical("It's neither a list nor a dictionary, aborting.")
 			sys.exit()
 		#Dump, if necessary
-		log_write = "'" + self.args.merchant + "/" + filename + "'"
-		if self.args.dry_run == "False":
+		log_write = "'" + self.config["merchant"] + "/" + filename + "'"
+		if self.config["dry_run"] == "False":
 			logger.info("Writing {0}".format(log_write))
 			with open(full_path, "w") as outfile:
 				json.dump(dst_object, outfile, sort_keys=True, indent=4, separators=(',', ': '))
@@ -377,7 +370,8 @@ class ThreadConsumer(threading.Thread):
 
 
 if __name__ == "__main__":
-	args = parse_arguments(sys.argv[1:])
-	my_merchant_dictionaries = MerchantDictionaries(args)
-	my_merchant_dictionaries.main_process()
+	#args = parse_arguments(sys.argv[1:])
+	logger.critical("You cannot run this from the command line, aborting.")
+	#my_merchant_dictionaries = MerchantDictionaries(args)
+	#my_merchant_dictionaries.main_process()
 

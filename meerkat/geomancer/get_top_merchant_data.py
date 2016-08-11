@@ -11,7 +11,7 @@ import yaml
 from meerkat.classification.tools import (pull_from_s3, extract_tarball,
 	check_new_input_file)
 
-from .get_merchant_dictionaries import TARGET_MERCHANTS, get_merchant_dataframes
+from .get_merchant_dictionaries import get_merchant_dataframes
 from .get_agg_data import get_s3_file, get_etags
 from .tools import remove_special_chars
 
