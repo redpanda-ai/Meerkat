@@ -110,7 +110,7 @@ def load_embeddings_file(file_name, sep=" ",lower=False):
 			word = word.lower()
 		emb[word] = [float(x) for x in fields[1:]]
 
-	print("loaded pre-trained embeddings (word->emb_vec) size: {} (lower: {})".format(len(emb.keys()), lower))
+	logging.info("loaded pre-trained embeddings (word->emb_vec) size: {} (lower: {})".format(len(emb.keys()), lower))
 	return emb, len(emb[word])
 
 def words_to_indices(data):
@@ -211,7 +211,7 @@ def char_encoding(config, graph, trans_len):
 		
 		char_inputs = tf.transpose(char_inputs, perm=[1,0])
 		cembeds = tf.nn.embedding_lookup(cembed_matrix, char_inputs, name="ce_lookup")
-		cembeds = tf.gather(cembeds, tf.range(tf.to_int32(trans_len)))
+		cembeds = tf.gather(cembeds, tf.range(tf.to_int32(trans_len)), name="actual_ce_lookup")
 		cembeds = tf.transpose(cembeds, perm=[1,0,2])
 
 		# Create LSTM for Character Encoding
@@ -253,6 +253,7 @@ def build_graph(config):
 		embedding_placeholder = tf.placeholder(tf.float32, [config["vocab_size"], config["we_dim"]], name="embedding_placeholder")
 		assign_wembedding = tf.assign(wembed_matrix, embedding_placeholder, name="assign_wembedding")
 		wembeds = tf.nn.embedding_lookup(wembed_matrix, word_inputs, name="we_lookup")
+		wembeds = tf.identity(wembeds, name="actual_we_lookup")
 
 		# Combine Embeddings
 		char_embeds = last_relevant(last_state, word_lengths, "char_embeds")
@@ -315,7 +316,7 @@ def train_model(config, graph, sess, saver, run_options, run_metadata):
 		total_loss = 0
 		total_tagged = 0
 
-		print("ERA: " + str(step))
+		logging.info("ERA: " + str(step))
 		np.set_printoptions(threshold=np.inf)
 
 		for t_index in train_index:
@@ -351,9 +352,9 @@ def train_model(config, graph, sess, saver, run_options, run_metadata):
 
 			# Log
 			if count % 250 == 0:
-				print("count: " + str(count))
-				print("loss: " + str(total_loss/total_tagged))
-				print("%d" % (count / len(train_index) * 100) + "% complete with era")
+				logging.info("count: " + str(count))
+				logging.info("loss: " + str(total_loss/total_tagged))
+				logging.info("%d" % (count / len(train_index) * 100) + "% complete with era")
 
 		# Evaluate Model
 		test_accuracy = evaluate_testset(config, graph, sess, test)
@@ -386,14 +387,14 @@ def evaluate_testset(config, graph, sess, test):
 	random.shuffle(test_index)
 	count = 0
 
-	print("---ENTERING EVALUATION---")
+	logging.info("---ENTERING EVALUATION---")
 
 	for i in test_index:
 
 		count += 1
 
 		if count % 500 == 0:
-			print("%d" % (count / len(test_index) * 100) + "% complete with evaluation")
+			logging.info("%d" % (count / len(test_index) * 100) + "% complete with evaluation")
 
 		row = test.loc[i]
 		tokens, tags = get_tags(config, row)
