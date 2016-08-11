@@ -57,7 +57,7 @@ def get_top_merchant_names(base_dir):
 	existing_merchants = [obj[0] for obj in os.walk(base_dir)]
 	for merchant_path in existing_merchants:
 		merchant = merchant_path[merchant_path.rfind("/") + 1:]
-		if merchant != "" and merchant != "pybossa_project":
+		if merchant not in ["", "pybossa_project"]:
 			dictionary_exist = False
 			for filename in os.listdir(merchant_path):
 				if filename.endswith('.json'):
@@ -67,10 +67,8 @@ def get_top_merchant_names(base_dir):
 				top_merchants.append(merchant)
 	return top_merchants
 
-def main_process():
+def main_process(args):
 	"""Execute the main programe"""
-	args = parse_arguments(sys.argv[1:])
-
 	base_dir = "meerkat/geomancer/merchants/"
 	os.makedirs(base_dir, exist_ok=True)
 
@@ -96,7 +94,7 @@ def main_process():
 		project_name = "Geomancer_" + merchant
 
 		# Create a new pybossa project
-		if args.create_project:
+		if 'create_project' in args and args.create_project:
 			if project_name in existing_projects:
 				logger.warning("Project {0} already exists".format(project_name))
 			else:
@@ -107,17 +105,19 @@ def main_process():
 			logger.error("Project {0} doesn't exist. Please first create it".format(project_name))
 			return
 
-		merchant_presenter = merchant_dir + args.task_presenter
+		merchant_presenter = merchant_dir + "presenter_code.html"
 		template_dir = "meerkat/geomancer/pybossa/template/"
 
+		update_presenter = False
 		# Update pybossa presenter
-		if args.update_presenter:
-			presenter_file = template_dir + args.task_presenter
+		if 'update_presenter' in args and args.update_presenter:
+			presenter_file = template_dir + "presenter_code.html"
 			copy_file(presenter_file, merchant_dir)
 			replace_str_in_file(merchant_presenter, "Geomancer", "Geomancer_" + merchant)
+			update_presenter = True
 
 		# Update pybossa dictionary
-		if args.update_dictionary:
+		if 'update_dictionary' in args and args.update_dictionary:
 			dictionary_dst = "/var/www/html/dictionaries/" + merchant + "/"
 			os.makedirs(dictionary_dst, exist_ok=True)
 			copy_file(base_dir + merchant + "/geo.json", dictionary_dst)
@@ -128,8 +128,9 @@ def main_process():
 			replace_str_in_file(merchant_presenter, "merchant_name", merchant)
 			replace_str_in_file(merchant_presenter, "server_ip", server)
 			logger.info("updated presenter with new dictionary")
+			update_presenter = True
 
-		if args.update_presenter or args.update_dictionary:
+		if update_presenter: 
 			long_description_file = template_dir + "long_description.md"
 			results_file = template_dir + "results.html"
 			tutorial_file = template_dir + "tutorial.html"
@@ -140,8 +141,8 @@ def main_process():
 				" --results " + results_file + " --tutorial " + tutorial_file)
 
 		# Add new labeling tasks
-		if args.add_tasks:
-			tasks_file = merchant_dir + args.tasks_file
+		if 'add_tasks' in args and args.add_tasks:
+			tasks_file = merchant_dir + "tasks.csv"
 			os.system("pbs --server http://" + server + ":12000 --api-key " +
 				apikey + " --project " + project_json_file + " add_tasks --tasks-file " +
 				tasks_file)
@@ -158,12 +159,10 @@ def parse_arguments(args):
 	parser.add_argument("--create_project", action="store_true")
 
 	parser.add_argument("--update_presenter", action="store_true")
-	parser.add_argument("--task_presenter", default="presenter_code.html")
 
 	parser.add_argument("--update_dictionary", action="store_true")
 
 	parser.add_argument("--add_tasks", action="store_true")
-	parser.add_argument("--tasks_file", default="tasks.csv")
 
 	args = parser.parse_args(args)
 	return args
@@ -174,4 +173,5 @@ def replace_str_in_file(file_name, old_str, new_str):
 		print(line.rstrip().replace(old_str, new_str))
 
 if __name__ == "__main__":
-	main_process()
+	args = parse_arguments(sys.argv[1:])
+	main_process(args)
