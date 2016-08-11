@@ -198,21 +198,16 @@ def dynamic_rnn_loop(cell, inputs, initial_state, sequence_length=None, dtype=No
 	input_ta = tuple(create_ta("input_%d" % i, flat_input[0].dtype) for i in range(len(flat_input)))
 	input_ta = tuple(ta.unpack(input_) for ta, input_ in zip(input_ta, flat_input))
 
-	# Helper Function for Filling Values
-	def copy_one_through(time, output, new_output):
-		copy_cond = (time >= sequence_length)
-		return tf.select(copy_cond, output, new_output)
-
-	def select_relevant(time, params):
-		mask = (time < sequence_length)
-		return tf.boolean_mask(params, mask)
-
 	flat_state = nest.flatten(state)
 	flat_zero_output = nest.flatten(zero_output)
 
 	# Function to Perform at Each Time Step
 	def time_step(time, output_ta, state):
 
+		mask = (time < sequence_length)
+		invert_mask = (time >= sequence_length)
+		indices = tf.where(mask)
+		invert_indices = tf.where(invert_mask)
 		input_t = tuple(ta.read(time) for ta in input_ta)
 
 		# Restore Shape Information
@@ -222,8 +217,8 @@ def dynamic_rnn_loop(cell, inputs, initial_state, sequence_length=None, dtype=No
 		input_t = nest.pack_sequence_as(structure=inputs, flat_sequence=input_t)
 		
 		# Select Only Relevant at This Time Step
-		input_t = select_relevant(time, input_t)
-		state = select_relevant(time, shape)
+		input_t = tf.boolean_mask(input_t, mask)
+		state = tf.boolean_mask(state, mask)
 		call_cell = lambda: cell(input_t, state)
 
 		if sequence_length is not None:
@@ -240,7 +235,9 @@ def dynamic_rnn_loop(cell, inputs, initial_state, sequence_length=None, dtype=No
 		else:
 			(output, new_state) = call_cell()
 
-		# TODO: Fill unprocessed state and output with zeros
+		# Fill Unprocessed Steps with Zeros
+		output = tf.dynamic_stitch([indices, invert_indices], [output, flat_zero_output])
+		new_state = tf.dynamic_stitch([indices, invert_indices], [output, flat_state])
 
 		# Pack State if Using State Tuples
 		output = nest.flatten(output)
