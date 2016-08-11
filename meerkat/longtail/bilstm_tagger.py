@@ -422,7 +422,7 @@ def evaluate_testset(config, graph, sess, test):
 	test_accuracy = 100.0 * (total_correct / total_count)
 	logging.info("Number of background tags in testset: {0}".format(num_background))
 	logging.info("Number of merchant tags in testset: {0}".format(num_merchant))
-	logging.info("Merchant ratio of the testset: {0:3.7f}%".format(100*num_merchant/(num_background+num_merchant+0.0)))
+	logging.info("Merchant ratio of the testset: {0:3.2f}%".format(100*num_merchant/(num_background+num_merchant+0.0)))
 	logging.info("Test accuracy: %.2f%%" % test_accuracy)
 	logging.info("Correct count: " + str(total_correct))
 	logging.info("Total count: " + str(total_count))
