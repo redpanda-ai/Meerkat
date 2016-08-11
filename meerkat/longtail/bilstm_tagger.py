@@ -29,6 +29,10 @@ Created on July 20, 2016
 
 ###################################################################################################
 
+############################################ REFERENCE ############################################
+# train and test sets are now a list of tuples after preprocess(), e.g.
+# [(["amazon", "prime", "purchase"], ["merchant", "merchant", "background"]), (...), ...]
+###################################################################################################
 import logging
 import math
 import os
@@ -58,8 +62,8 @@ def last_relevant(output, length, name):
 def get_tags(config, trans):
 	"""Convert df row to list of tags and tokens"""
 
-	tokens = trans[0].lower().split()[0:config["max_tokens"]]
-	tag = trans[1].lower().split()
+	tokens = trans["Description"].lower().split()[0:config["max_tokens"]]
+	tag = trans["Tagged_merchant_string"].lower().split()
 	tags = []
 
 	for token in tokens:
@@ -72,9 +76,6 @@ def get_tags(config, trans):
 				break
 		if not found:
 			tags.append("background")
-
-		return(tokens , tags)
-
 	return (tokens, tags)
 
 def validate_config(config):
@@ -117,10 +118,8 @@ def words_to_indices(data):
 	"""convert tokens to int, assuming data is a df"""
 	w2i = {}
 	w2i["_UNK"] = 0
-	for row_num, row in enumerate(data.values):
-		tokens = row[0].lower().split()
-		# there are too many unique tokens in description, better to shrink the size
-		for token in tokens:
+	for row_num, row in enumerate(data):
+		for token in row[0]:
 			if token not in w2i:
 				w2i[token] = len(w2i)
 	return w2i
@@ -136,9 +135,17 @@ def construct_embedding(config, w2i, loaded_embedding):
 		temp[w2i[word]] = loaded_embedding[word]
 	return w2i, temp
 
+def subpreprocess(config, name):
+	config[name] = config[name].to_dict("record")
+	for i, tran in enumerate(config[name]):
+		config[name][i] = get_tags(config, tran)
+	return config
+
 def preprocess(config):
 	"""Split data into training and test, return w2i for data in training, return training data's embedding matrix"""
 	config["train"], config["test"] = load_data(config)
+	config = subpreprocess(config, "train")
+	config = subpreprocess(config, "test")
 	embedding, emb_dim = load_embeddings_file(config["embeddings"], lower=True)
 	# Assert that emb_dim is equal to we_dim
 	assert(emb_dim == config["we_dim"])
@@ -305,8 +312,7 @@ def train_model(config, graph, sess, saver, run_options, run_metadata):
 	eras = config["eras"]
 	dataset = config["dataset"]
 	train = config["train"]
-	test = config["test"]
-	train_index = list(train.index)
+	train_index = list(range(len(train)))
 	sess.run(get_op(graph, "assign_wembedding"), feed_dict={get_tensor(graph, "embedding_placeholder:0"): config["wembedding"]})
 	count = 0
 
@@ -323,8 +329,7 @@ def train_model(config, graph, sess, saver, run_options, run_metadata):
 
 			count += 1
 
-			row = train.loc[t_index]
-			tokens, tags = get_tags(config, row)
+			tokens, tags = train[t_index]
 			char_inputs, word_lengths, word_indices, labels = trans_to_tensor(config, sess, graph, tokens, tags=tags, train=True)
 
 			feed_dict = {
@@ -357,7 +362,7 @@ def train_model(config, graph, sess, saver, run_options, run_metadata):
 				logging.info("%d" % (count / len(train_index) * 100) + "% complete with era")
 
 		# Evaluate Model
-		test_accuracy = evaluate_testset(config, graph, sess, test)
+		test_accuracy = evaluate_testset(config, graph, sess, config["test"])
 
 	final_model_path = "./meerkat/longtail/models/"
 	os.makedirs(final_model_path, exist_ok=True)
@@ -383,21 +388,21 @@ def evaluate_testset(config, graph, sess, test):
 
 	total_count = 0
 	total_correct = 0
-	test_index = list(test.index)
-	random.shuffle(test_index)
 	count = 0
-
+	num_merchant = 0
+	num_background = 0
 	logging.info("---ENTERING EVALUATION---")
 
-	for i in test_index:
+	for i in range(len(test)):
 
 		count += 1
 
 		if count % 500 == 0:
-			logging.info("%d" % (count / len(test_index) * 100) + "% complete with evaluation")
+			logging.info("%d" % (count / len(test) * 100) + "% complete with evaluation")
 
-		row = test.loc[i]
-		tokens, tags = get_tags(config, row)
+		tokens, tags = test[i]
+		num_merchant += sum([1 for item in tags if item == "merchant"])
+		num_background += sum([1 for item in tags if item == "background"])
 		char_inputs, word_lengths, word_indices, labels = trans_to_tensor(config, sess, graph, tokens, tags=tags)
 		total_count += len(tokens)
 
@@ -415,6 +420,9 @@ def evaluate_testset(config, graph, sess, test):
 		total_correct += correct_count
 
 	test_accuracy = 100.0 * (total_correct / total_count)
+	logging.info("Number of background tags in testset: {0}".format(num_background))
+	logging.info("Number of merchant tags in testset: {0}".format(num_merchant))
+	logging.info("Merchant ratio of the testset: {0:3.7f}%".format(100*num_merchant/(num_background+num_merchant+0.0)))
 	logging.info("Test accuracy: %.2f%%" % test_accuracy)
 	logging.info("Correct count: " + str(total_correct))
 	logging.info("Total count: " + str(total_count))
