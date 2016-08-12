@@ -85,6 +85,32 @@
 					"pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
 				}
 			}
+		},
+		"top_merchant_data" : {
+			"properties": {
+				"bank_or_card": {
+					"enum": ["bank", "card"]
+				},
+				"version_dir": {
+					"type": "string",
+					"minLength": 14,
+					"maxLength": 14
+				},
+				"bucket": {
+					"type": "string"
+				},
+				"truncate_lines": {
+					"type": "integer",
+					"minimum": -1
+				},
+				"target_merchant_list": {
+					"type": "array",
+					"minItems" : 1,
+					"items": { "type": "string" },
+					"uniqueItems": true
+				}
+			},
+			"required": ["bank_or_card", "version_dir", "bucket", "truncate_lines", "target_merchant_list"]
 		}
 	}
 }

@@ -31,5 +31,20 @@
 		"bank_or_card": "bank",
 		"server": "52.26.175.156",
 		"apikey": "b151d9e8-0b62-432c-aa3f-7f654ba0d983"
+	},
+	"top_merchant_data" : {
+		"bank_or_card": "bank",
+		"version_dir": "20160628185500",
+		"bucket": "s3yodlee",
+		"truncate_lines": 10001,
+		"target_merchant_list" : [ "Ace Hardware", "Walmart", "Walgreens", "Target",
+			"Subway", "Starbucks", "McDonald's", "Costco Wholesale Corp.", "Burger King",
+			"Bed Bath and Beyond", "Aeropostale", "Albertsons",
+			"American Eagle Outfitters", "Applebee's", "Arby's", "AutoZone", "Bahama Breeze",
+			"Barnes & Noble", "Baskin-Robbins", "Bealls", "Eddie V's", "Fedex", "Five Guys",
+			"Food 4 Less", "Francesca's", "Fred Meyer", "Gymboree", "H&M", "Home Depot", "IHOP",
+			"In-N-Out Burger", "J. C. Penney", "KFC", "Kmart", "Kohl's", "LongHorn Steakhouse",
+			"Lowe's", "Macy's", "Nordstrom"
+		]
 	}
 }
