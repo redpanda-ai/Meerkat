@@ -159,7 +159,7 @@ class Worker:
 
 	def setup_directories(self):
 		"""This creates the directories on the local file system, if needed."""
-		if self.config["dry_run"] == "False":
+		if not self.config["dry_run"]:
 			output_directory = self.filepath + "/" + self.config["merchant"]
 			logger.debug("Confirming output directory at {0}".format(output_directory))
 			os.makedirs(output_directory, exist_ok=True)
@@ -187,7 +187,7 @@ class Worker:
 			sys.exit()
 		#Dump, if necessary
 		log_write = "'" + self.config["merchant"] + "/" + filename + "'"
-		if self.config["dry_run"] == "False":
+		if not self.config["dry_run"]:
 			logger.info("Writing {0}".format(log_write))
 			with open(full_path, "w") as outfile:
 				json.dump(dst_object, outfile, sort_keys=True, indent=4, separators=(',', ': '))
