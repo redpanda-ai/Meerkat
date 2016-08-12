@@ -8,11 +8,12 @@ import sys
 import yaml
 
 from meerkat.various_tools import validate_configuration
-from .get_agg_data import main_process as get_agg_data
+#:wfrom .get_agg_data import main_process as get_agg_data
 #from .get_agg_data import parse_arguments as parse_agg_arguments
 #from .get_merchant_dictionaries import parse_arguments as parse_merchant_arguments
 
 import meerkat.geomancer.get_merchant_dictionaries as merchant_dictionaries
+import meerkat.geomancer.get_agg_data as agg_data
 
 
 logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
@@ -44,17 +45,16 @@ def main_process():
 	config = validate_configuration(args.config_file, "meerkat/geomancer/config/schema.json")
 
 	#Get AggData
-	#module_args = get_module_args(parse_agg_arguments, config["agg_data"])
-	#get_agg_data(module_args)
-	#module = merchant_dictionaries
-	#module_args = get_module_args(module.parse_arguments, config["agg_data"])
-	#module.AggData(module_args).main_process()
+	logger.info("Fetching agg_data")
+	module = agg_data
+	sub_config = config["agg_data"]
+	module.Worker(sub_config).main_process()
 
 	#Get Merchant dictionaries
+	logger.info("Getting merhcant dictionaries")
 	module = merchant_dictionaries
-	logger.info("Foo")
-	config = config["merchant_dictionaries"]
-	module.MerchantDictionaries(config).main_process()
+	sub_config = config["merchant_dictionaries"]
+	module.Worker(sub_config).main_process()
 
 if __name__ == "__main__":
 	main_process()

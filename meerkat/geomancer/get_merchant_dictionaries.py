@@ -157,7 +157,7 @@ def expand_abbreviations(city):
 			break
 	return city
 
-class MerchantDictionaries:
+class Worker:
 	"""Contains methods and data pertaining to the creation and retrieval of merchant dictionaries"""
 	def __init__(self, config):
 		"""Constructor"""
@@ -370,8 +370,5 @@ class ThreadConsumer(threading.Thread):
 
 
 if __name__ == "__main__":
-	#args = parse_arguments(sys.argv[1:])
 	logger.critical("You cannot run this from the command line, aborting.")
-	#my_merchant_dictionaries = MerchantDictionaries(args)
-	#my_merchant_dictionaries.main_process()
 

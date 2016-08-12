@@ -13,20 +13,6 @@ from meerkat.various_tools import load_params
 logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
 logger = logging.getLogger('get_agg_data')
 
-def parse_arguments(args):
-	"""Parse arguments from command line"""
-	parser = argparse.ArgumentParser()
-	parser.add_argument("--bucket", default="s3yodlee",
-		help="s3 bucket name")
-	parser.add_argument("--prefix", default="meerkat/geomancer/data/agg/",
-		help="s3 object prefix")
-	parser.add_argument("--filename", default="All_Merchants.csv",
-		help="agg data file name in s3")
-	parser.add_argument("--savepath", default="meerkat/geomancer/data/agg_data/",
-		help="local save path of agg data file")
-	args = parser.parse_args(args)
-	return args
-
 def get_etags(base_dir):
 	"""Fetch local ETag values from a local file"""
 	etags_file = base_dir + "etags.json"
@@ -84,22 +70,25 @@ def get_s3_file(**kwargs):
 	#File needs to be downloaded
 	return True
 
-def main_process(args):
-	"""Execute the main programe"""
+class Worker:
+	"""Contains methods and data pertaining to the creation and retrieval of AggData files"""
+	def __init__(self, config):
+		"""Constructor"""
+		self.config = config
 
-	bucket = args.bucket
-	prefix = args.prefix
-	file_name = args.filename
-	save_path = args.savepath
-	os.makedirs(save_path, exist_ok=True)
+	def main_process(self):
+		"""Execute the main programe"""
+		bucket = self.config["bucket"]
+		prefix = self.config["prefix"]
+		file_name = self.config["filename"]
+		save_path = self.config["savepath"]
+		os.makedirs(save_path, exist_ok=True)
 
-	etags, etags_file = get_etags(save_path)
+		etags, etags_file = get_etags(save_path)
 
-	needs_to_be_downloaded = get_s3_file(bucket=bucket, prefix=prefix, file_name=file_name,
-		save_path=save_path, etags=etags, etags_file=etags_file)
-
+		needs_to_be_downloaded = get_s3_file(bucket=bucket, prefix=prefix, file_name=file_name,
+			save_path=save_path, etags=etags, etags_file=etags_file)
 
 if __name__ == "__main__":
-	args = parse_arguments(sys.argv[1:])
-	main_process(args)
+	logger.critical("You cannot run this from the command line, aborting.")
 
