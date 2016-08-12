@@ -3,7 +3,6 @@
 import os
 import sys
 import json
-import argparse
 import inspect
 import logging
 import fileinput
@@ -86,7 +85,7 @@ class Worker:
 		self.config = config
 
 	def main_process(self):
-		"""Execute the main programe"""
+		"""Execute the main program"""
 		base_dir = "meerkat/geomancer/merchants/"
 		os.makedirs(base_dir, exist_ok=True)
 		top_merchants_candidate = get_top_merchant_names(base_dir)
