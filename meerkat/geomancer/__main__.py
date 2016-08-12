@@ -48,15 +48,15 @@ def main_process():
 	if "agg_data" in config:
 		logger.info("Fetching agg_data")
 		module = agg_data
-		sub_config = config["agg_data"]
-		module.Worker(sub_config).main_process()
+		config_snippet = config["agg_data"]
+		module.Worker(config_snippet).main_process()
 
 	#Get Merchant dictionaries
 	if "merchant_dictionaries" in config:
 		logger.info("Getting merchant dictionaries")
 		module = merchant_dictionaries
-		sub_config = config["merchant_dictionaries"]
-		module.Worker(sub_config).main_process()
+		config_snippet = config["merchant_dictionaries"]
+		module.Worker(config_snippet).main_process()
 
 if __name__ == "__main__":
 	main_process()
