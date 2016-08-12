@@ -36,6 +36,38 @@
 				}
 			},
 			"required": ["dry_run", "target_merchant_list"]
+		},
+		"pybossa_project": {
+			"properties": {
+				"bank_or_card": {
+					"enum": [ "bank", "card" ]
+				},
+				"merchants": {
+					"type": "array",
+					"minItems" : 1,
+					"items": { "type": "string" },
+					"uniqueItems": true
+				},
+				"server":
+					"type": "string"
+				},
+				"apikey":
+					"type": "string"
+				},
+				"create_project": {
+					"enum": [ false, true ]
+				},
+				"update_presenter": {
+					"enum": [ false, true ]
+				},
+				"update_dictionary": {
+					"enum": [ false, true ]
+				},
+				"add_tasks": {
+					"enum": [ false, true ]
+				}
+			},
+			"required": ["bank_or_card", "merchants", "server", "apikey", "create_project". "update_presenter", "update_dictionary", "add_tasks"]
 		}
 	}
 }
