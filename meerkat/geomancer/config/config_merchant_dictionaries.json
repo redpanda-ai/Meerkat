@@ -1,0 +1,14 @@
+{
+	"merchant_dictionaries" : {
+		"dry_run": false,
+		"target_merchant_list" : [ "Ace Hardware", "Walmart", "Walgreens", "Target",
+			"Subway", "Starbucks", "McDonald's", "Costco Wholesale Corp.", "Burger King",
+			"Bed Bath and Beyond", "Aeropostale", "Albertsons",
+			"American Eagle Outfitters", "Applebee's", "Arby's", "AutoZone", "Bahama Breeze",
+			"Barnes & Noble", "Baskin-Robbins", "Bealls", "Eddie V's", "Fedex", "Five Guys",
+			"Food 4 Less", "Francesca's", "Fred Meyer", "Gymboree", "H&M", "Home Depot", "IHOP",
+			"In-N-Out Burger", "J. C. Penney", "KFC", "Kmart", "Kohl's", "LongHorn Steakhouse",
+			"Lowe's", "Macy's", "Nordstrom"
+		]
+	}
+}

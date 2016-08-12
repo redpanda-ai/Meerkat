@@ -11,9 +11,8 @@ import yaml
 from meerkat.classification.tools import (pull_from_s3, extract_tarball,
 	check_new_input_file)
 
-from .get_merchant_dictionaries import get_merchant_dataframes
 from .get_agg_data import get_s3_file, get_etags
-from .tools import remove_special_chars
+from .tools import remove_special_chars, get_grouped_dataframes
 
 logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
 logger = logging.getLogger('get_top_merchant_data')
@@ -88,7 +87,7 @@ def main_process():
 							output_file.write(input_file.readline())
 				os.rename(csv_file + ".temp", csv_file)
 
-			merchant_dataframes = get_merchant_dataframes(csv_file, 'MERCHANT_NAME',
+			merchant_dataframes = get_grouped_dataframes(csv_file, 'MERCHANT_NAME',
 				args.target_merchant_list, **csv_kwargs)
 			merchants = sorted(list(merchant_dataframes.keys()))
 			for merchant in merchants:

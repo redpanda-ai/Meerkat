@@ -37,6 +37,5 @@
 			},
 			"required": ["dry_run", "target_merchant_list"]
 		}
-	},
-	"required": ["agg_data"]
+	}
 }
