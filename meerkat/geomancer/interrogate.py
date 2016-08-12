@@ -136,8 +136,6 @@ class Worker:
 			tasks_file = base_dir + merchant + "/pybossa_project/" + bank_or_card + "/tasks.csv"
 			new_tasks_df.to_csv(tasks_file, header=["question"], index=False)
 			logger.info("Save new tasks dataframe to {0}".format(tasks_file))
-			#self.config["merchant"] = merchant
-			#self.config["add_tasks"] = True
 			project_json_file = base_dir + merchant + "/pybossa_project/" + bank_or_card + "/project.json"
 			add_tasks(server, apikey, project_json_file, tasks_file)
 			logger.info("Add new tasks to {0}".format(project_name))

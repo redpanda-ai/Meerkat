@@ -49,10 +49,12 @@
 					"uniqueItems": true
 				},
 				"server": {
-					"type": "string"
+					"type": "string",
+					"minLength": 1
 				},
 				"apikey": {
-					"type": "string"
+					"type": "string",
+					"pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
 				},
 				"create_project": {
 					"enum": [ false, true ]

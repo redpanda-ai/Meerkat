@@ -39,7 +39,7 @@ def main_process():
 	logger.info("Starting")
 	logger.info("Parsing arguments.")
 	args = parse_arguments(sys.argv[1:])
-	logger.info("Validating configuration!!!")
+	logger.info("Validating configuration")
 	config = validate_configuration(args.config_file, "meerkat/geomancer/config/schema.json")
 
 	module_list = [("agg_data", agg_data), ("merchant_dictionaries", merchant_dictionaries),

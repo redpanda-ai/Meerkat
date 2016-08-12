@@ -17,6 +17,12 @@ logger = logging.getLogger('build_pybossa_project')
 
 def add_tasks(server, apikey, project_json_file, tasks_file):
 	"""Add new tasks"""
+	if not os.path.isfile(project_json_file):
+		logger.critical("Cannot proceed, project json file not found")
+		sys.exit()
+	if not os.path.isfile(tasks_file):
+		logger.critical("Cannot proceed, tasks file not found")
+		sys.exit()
 	os.system("pbs --server http://" + server + ":12000 --api-key " +
 		apikey + " --project " + project_json_file + " add_tasks --tasks-file " +
 		tasks_file)
