@@ -37,6 +37,9 @@ loggers:
   __main__:
     handlers: [console]
     propogate: true
+  interrogate:
+    handlers: [console]
+    propogate: true
 
 handlers:
   console:
