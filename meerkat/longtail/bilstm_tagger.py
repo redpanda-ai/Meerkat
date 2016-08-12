@@ -29,11 +29,16 @@ Created on July 20, 2016
 
 ###################################################################################################
 
+############################################ REFERENCE ############################################
+# train and test sets are now a list of tuples after preprocess(), e.g.
+# [(["amazon", "prime", "purchase"], ["merchant", "merchant", "background"]), (...), ...]
+###################################################################################################
 import logging
 import math
 import os
 import pprint
 import random
+import json
 import sys
 
 import numpy as np
@@ -46,19 +51,19 @@ from meerkat.various_tools import load_params, load_piped_dataframe
 logging.basicConfig(level=logging.INFO)
 
 def last_relevant(output, length, name):
-    batch_size = tf.shape(output)[0]
-    max_length = tf.reduce_max(tf.to_int32(length))
-    output_size = int(output.get_shape()[2])
-    index = tf.range(0, batch_size) * max_length + (tf.to_int32(length) - 1)
-    flat = tf.reshape(output, [-1, output_size])
-    relevant = tf.gather(flat, index, name=name)
-    return relevant
+	batch_size = tf.shape(output)[0]
+	max_length = tf.reduce_max(tf.to_int32(length))
+	output_size = int(output.get_shape()[2])
+	index = tf.range(0, batch_size) * max_length + (tf.to_int32(length) - 1)
+	flat = tf.reshape(output, [-1, output_size])
+	relevant = tf.gather(flat, index, name=name)
+	return relevant
 
 def get_tags(config, trans):
 	"""Convert df row to list of tags and tokens"""
 
-	tokens = trans[0].lower().split()[0:config["max_tokens"]]
-	tag = trans[1].lower().split()
+	tokens = trans["Description"].lower().split()[0:config["max_tokens"]]
+	tag = trans["Tagged_merchant_string"].lower().split()
 	tags = []
 
 	for token in tokens:
@@ -71,11 +76,6 @@ def get_tags(config, trans):
 				break
 		if not found:
 			tags.append("background")
-
-	# TODO: Fix this hack
-	if len(tokens) == 1:
-		return(tokens * 2, tags * 2)
-
 	return (tokens, tags)
 
 def validate_config(config):
@@ -111,17 +111,15 @@ def load_embeddings_file(file_name, sep=" ",lower=False):
 			word = word.lower()
 		emb[word] = [float(x) for x in fields[1:]]
 
-	print("loaded pre-trained embeddings (word->emb_vec) size: {} (lower: {})".format(len(emb.keys()), lower))
+	logging.info("loaded pre-trained embeddings (word->emb_vec) size: {} (lower: {})".format(len(emb.keys()), lower))
 	return emb, len(emb[word])
 
 def words_to_indices(data):
 	"""convert tokens to int, assuming data is a df"""
 	w2i = {}
 	w2i["_UNK"] = 0
-	for row_num, row in enumerate(data.values):
-		tokens = row[0].lower().split()
-		# there are too many unique tokens in description, better to shrink the size
-		for token in tokens:
+	for row_num, row in enumerate(data):
+		for token in row[0]:
 			if token not in w2i:
 				w2i[token] = len(w2i)
 	return w2i
@@ -137,9 +135,17 @@ def construct_embedding(config, w2i, loaded_embedding):
 		temp[w2i[word]] = loaded_embedding[word]
 	return w2i, temp
 
+def subpreprocess(config, name):
+	config[name] = config[name].to_dict("record")
+	for i, tran in enumerate(config[name]):
+		config[name][i] = get_tags(config, tran)
+	return config
+
 def preprocess(config):
 	"""Split data into training and test, return w2i for data in training, return training data's embedding matrix"""
 	config["train"], config["test"] = load_data(config)
+	config = subpreprocess(config, "train")
+	config = subpreprocess(config, "test")
 	embedding, emb_dim = load_embeddings_file(config["embeddings"], lower=True)
 	# Assert that emb_dim is equal to we_dim
 	assert(emb_dim == config["we_dim"])
@@ -155,7 +161,7 @@ def encode_tags(config, tags):
 	encoded_tags = (np.arange(len(tag2id)) == tags[:, None]).astype(np.float32)
 	return encoded_tags
 
-def trans_to_tensor(config, sess, graph, tokens, tags, train=False):
+def trans_to_tensor(config, sess, graph, tokens, tags=None, train=False):
 	"""Convert a transaction to a tensor representation of documents
 	and labels"""
 
@@ -166,7 +172,10 @@ def trans_to_tensor(config, sess, graph, tokens, tags, train=False):
 	word_indices = [w2i.get(w, w2i["_UNK"]) for w in tokens]
 
 	# Encode Tags
-	encoded_tags = encode_tags(config, tags)
+	if tags is not None:
+		encoded_tags = encode_tags(config, tags)
+	else:
+		encoded_tags = None
 
 	# Lookup Character Indices
 	tokens = [["<w>"] + list(t) + ["</w>"] for t in tokens]
@@ -183,7 +192,7 @@ def trans_to_tensor(config, sess, graph, tokens, tags, train=False):
 		char_inputs.append([])
 
 		for ii in range(max_t_len):
-			char_index = c2i[t[ii]] if ii < len(t) else 0
+			char_index = c2i.get(t[ii], 0) if ii < len(t) else 0
 			char_inputs[i].append(char_index)
 
 	char_inputs = np.array(char_inputs)
@@ -209,7 +218,7 @@ def char_encoding(config, graph, trans_len):
 		
 		char_inputs = tf.transpose(char_inputs, perm=[1,0])
 		cembeds = tf.nn.embedding_lookup(cembed_matrix, char_inputs, name="ce_lookup")
-		cembeds = tf.gather(cembeds, tf.range(tf.to_int32(trans_len)))
+		cembeds = tf.gather(cembeds, tf.range(tf.to_int32(trans_len)), name="actual_ce_lookup")
 		cembeds = tf.transpose(cembeds, perm=[1,0,2])
 
 		# Create LSTM for Character Encoding
@@ -251,6 +260,7 @@ def build_graph(config):
 		embedding_placeholder = tf.placeholder(tf.float32, [config["vocab_size"], config["we_dim"]], name="embedding_placeholder")
 		assign_wembedding = tf.assign(wembed_matrix, embedding_placeholder, name="assign_wembedding")
 		wembeds = tf.nn.embedding_lookup(wembed_matrix, word_inputs, name="we_lookup")
+		wembeds = tf.identity(wembeds, name="actual_we_lookup")
 
 		# Combine Embeddings
 		char_embeds = last_relevant(last_state, word_lengths, "char_embeds")
@@ -282,8 +292,7 @@ def build_graph(config):
 			# Add Noise and Predict
 			concat_layer = tf.concat(2, [outputs_fw, tf.reverse(outputs_bw, [False, True, False])], name="concat_layer")
 			concat_layer = tf.cond(train, lambda: tf.add(tf.random_normal(tf.shape(concat_layer)) * noise_sigma, concat_layer), lambda: concat_layer)
-			prediction = tf.log(tf.nn.softmax(tf.matmul(tf.squeeze(concat_layer), weight) + bias), name="model")
-
+			prediction = tf.log(tf.nn.softmax(tf.matmul(tf.squeeze(concat_layer, [0]), weight) + bias), name="model")
 			return prediction
 
 		network = model(combined_embeddings, noise_sigma=config["noise_sigma"])
@@ -303,27 +312,25 @@ def train_model(config, graph, sess, saver, run_options, run_metadata):
 	eras = config["eras"]
 	dataset = config["dataset"]
 	train = config["train"]
-	test = config["test"]
-	train_index = list(train.index)
+	train_index = list(range(len(train)))
 	sess.run(get_op(graph, "assign_wembedding"), feed_dict={get_tensor(graph, "embedding_placeholder:0"): config["wembedding"]})
-	count = 0
 
 	# Train the Model
 	for step in range(eras):
+		count = 0
 		random.shuffle(train_index)
 		total_loss = 0
 		total_tagged = 0
 
-		print("ERA: " + str(step))
+		logging.info("ERA: " + str(step))
 		np.set_printoptions(threshold=np.inf)
 
 		for t_index in train_index:
 
 			count += 1
 
-			row = train.loc[t_index]
-			tokens, tags = get_tags(config, row)
-			char_inputs, word_lengths, word_indices, labels = trans_to_tensor(config, sess, graph, tokens, tags, train=True)
+			tokens, tags = train[t_index]
+			char_inputs, word_lengths, word_indices, labels = trans_to_tensor(config, sess, graph, tokens, tags=tags, train=True)
 
 			feed_dict = {
 				get_tensor(graph, "char_inputs:0") : char_inputs,
@@ -350,40 +357,55 @@ def train_model(config, graph, sess, saver, run_options, run_metadata):
 
 			# Log
 			if count % 250 == 0:
-				print("count: " + str(count))
-				print("loss: " + str(total_loss/total_tagged))
-				print("%d" % (count / len(train_index) * 100) + "% complete with era")
+				logging.info("count: " + str(count))
+				logging.info("loss: " + str(total_loss/total_tagged))
+				logging.info("%d" % (count / len(train_index) * 100) + "% complete with era " + str(step))
 
 		# Evaluate Model
-		test_accuracy = evaluate_testset(config, graph, sess, test)
+		test_accuracy = evaluate_testset(config, graph, sess, config["test"])
 
-	final_model_path = ""
-
+	final_model_path = "./meerkat/longtail/models/"
+	os.makedirs(final_model_path, exist_ok=True)
+	w2i_to_json(config["w2i"], final_model_path)
+	save_models(saver, sess, final_model_path)
 	return final_model_path
+
+def save_models(saver, sess, path):
+	ckpt_path = path + "bilstm.ckpt"
+	meta_path = path + "bilstm.meta"
+	model_path = saver.save(sess, ckpt_path)
+	os.rename(ckpt_path+".meta", meta_path)
+	logging.info("Save model to {0}, {1}".format(ckpt_path, meta_path))
+
+def w2i_to_json(w2i, path):
+	path = path + "w2i.json"
+	with open(path, "w") as fp:
+		json.dump(w2i, fp)
+	logging.info("Save w2i to {0}".format(path))
 
 def evaluate_testset(config, graph, sess, test):
 	"""Check error on test set"""
 
 	total_count = 0
 	total_correct = 0
-	test_index = list(test.index)
-	random.shuffle(test_index)
 	count = 0
+	num_merchant = 0
+	num_background = 0
+	logging.info("---ENTERING EVALUATION---")
 
-	print("---ENTERING EVALUATION---")
-
-	for i in test_index:
+	for i in range(len(test)):
 
 		count += 1
 
 		if count % 500 == 0:
-			print("%d" % (count / len(test_index) * 100) + "% complete with evaluation")
+			logging.info("%d" % (count / len(test) * 100) + "% complete with evaluation")
 
-		row = test.loc[i]
-		tokens, tags = get_tags(config, row)
-		char_inputs, word_lengths, word_indices, labels = trans_to_tensor(config, sess, graph, tokens, tags)
+		tokens, tags = test[i]
+		num_merchant += sum([1 for item in tags if item == "merchant"])
+		num_background += sum([1 for item in tags if item == "background"])
+		char_inputs, word_lengths, word_indices, labels = trans_to_tensor(config, sess, graph, tokens, tags=tags)
 		total_count += len(tokens)
-		
+
 		feed_dict = {
 			get_tensor(graph, "char_inputs:0") : char_inputs,
 			get_tensor(graph, "word_inputs:0") : word_indices,
@@ -398,6 +420,9 @@ def evaluate_testset(config, graph, sess, test):
 		total_correct += correct_count
 
 	test_accuracy = 100.0 * (total_correct / total_count)
+	logging.info("Number of background tags in testset: {0}".format(num_background))
+	logging.info("Number of merchant tags in testset: {0}".format(num_merchant))
+	logging.info("Merchant ratio of the testset: {0:3.2f}%".format(100*num_merchant/(num_background+num_merchant+0.0)))
 	logging.info("Test accuracy: %.2f%%" % test_accuracy)
 	logging.info("Correct count: " + str(total_correct))
 	logging.info("Total count: " + str(total_count))
@@ -414,7 +439,7 @@ def run_session(config, graph, saver):
 		run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
 		run_metadata = tf.RunMetadata()
 		tf.initialize_all_variables().run()
-		train_model(config, graph, sess, saver, run_options, run_metadata)
+		final_model_path = train_model(config, graph, sess, saver, run_options, run_metadata)
 
 def run_from_command_line():
 	"""Run module from command line"""
