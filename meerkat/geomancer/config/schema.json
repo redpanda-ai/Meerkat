@@ -26,7 +26,7 @@
 		"merchant_dictionaries": {
 			"properties": {
 				"dry_run": {
-					"enum": [ false, true ]
+					"enum": [false, true]
 				},
 				"target_merchant_list": {
 					"type": "array",
@@ -48,10 +48,10 @@
 					"items": { "type": "string" },
 					"uniqueItems": true
 				},
-				"server":
+				"server": {
 					"type": "string"
 				},
-				"apikey":
+				"apikey": {
 					"type": "string"
 				},
 				"create_project": {
@@ -67,7 +67,22 @@
 					"enum": [ false, true ]
 				}
 			},
-			"required": ["bank_or_card", "merchants", "server", "apikey", "create_project". "update_presenter", "update_dictionary", "add_tasks"]
+			"required": ["bank_or_card", "merchants", "server", "apikey", "create_project", "update_presenter", "update_dictionary", "add_tasks"]
+		},
+		"interrogate": {
+			"properties" : {
+				"bank_or_card": {
+					"enum": ["bank", "card"]
+				},
+				"server" : {
+					"type": "string",
+					"minLength": 1
+				},
+				"apikey" : {
+					"type": "string",
+					"pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+				}
+			}
 		}
 	}
 }

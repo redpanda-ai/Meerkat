@@ -15,6 +15,12 @@ from ..tools import copy_file
 logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
 logger = logging.getLogger('build_pybossa_project')
 
+def add_tasks(server, apikey, project_json_file, tasks_file):
+	"""Add new tasks"""
+	os.system("pbs --server http://" + server + ":12000 --api-key " +
+		apikey + " --project " + project_json_file + " add_tasks --tasks-file " +
+		tasks_file)
+
 def create_project_json_file(project_name, project_json_file):
 	"""Create a json file for the new pybossa project"""
 	project_json = {
@@ -77,13 +83,14 @@ class Worker:
 		"""Execute the main programe"""
 		base_dir = "meerkat/geomancer/merchants/"
 		os.makedirs(base_dir, exist_ok=True)
-		top_merchants = get_top_merchant_names(base_dir)
+		top_merchants_candidate = get_top_merchant_names(base_dir)
 
-		if self.config["merchant"] != []:
-			if self.config["merchant"] in top_merchants:
-				top_merchants = self.config["merchant"]
+		top_merchants = []
+		for merchant in self.config["merchants"]:
+			if merchant in top_merchants_candidate:
+				top_merchants.append(merchant)
 			else:
-				logger.error("Merchant {0} doesn't have dictionaries".format(self.config["merchant"]))
+				logger.error("Merchant {0} doesn't have dictionaries".format(merchant))
 				return
 
 		logger.info("Top merchants project to be processed are: {0}".format(top_merchants))
@@ -98,7 +105,6 @@ class Worker:
 
 			project_json_file = merchant_dir + "project.json"
 			project_name = "Geomancer_" + bank_or_card + "_" + merchant
-
 			# Create a new pybossa project
 			if 'create_project' in self.config and self.config["create_project"]:
 				if project_name in existing_projects:
@@ -149,9 +155,7 @@ class Worker:
 			# Add new labeling tasks
 			if 'add_tasks' in self.config and self.config["add_tasks"]:
 				tasks_file = merchant_dir + "tasks.csv"
-				os.system("pbs --server http://" + server + ":12000 --api-key " +
-					apikey + " --project " + project_json_file + " add_tasks --tasks-file " +
-					tasks_file)
+				add_tasks(server, apikey, project_json_file, tasks_file)
 
 def replace_str_in_file(file_name, old_str, new_str):
 	"""Replace the occurrences of old string with new string in a file"""
