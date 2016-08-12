@@ -22,6 +22,20 @@
 				}
 			},
 			"required": ["bucket", "prefix", "filename", "savepath"]
+		},
+		"merchant_dictionaries": {
+			"properties": {
+				"dry_run": {
+					"enum": [ false, true ]
+				},
+				"target_merchant_list": {
+					"type": "array",
+					"minItems" : 1,
+					"items": { "type": "string" },
+					"uniqueItems": true
+				}
+			},
+			"required": ["dry_run", "target_merchant_list"]
 		}
 	},
 	"required": ["agg_data"]
