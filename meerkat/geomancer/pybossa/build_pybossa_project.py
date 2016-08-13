@@ -65,8 +65,9 @@ def get_existing_projects(server, apikey):
 def get_top_merchant_names(base_dir):
 	"""Get a list of top merchants that has dictionaries from agg data"""
 	top_merchants = []
-	existing_merchants = [obj[0] for obj in os.walk(base_dir)]
-	for merchant_path in existing_merchants:
+	merchants_with_paths = [obj[0] for obj in os.walk(base_dir)]
+	merchants_without_paths = p"foo"]
+	for merchant_path in merchants_with_paths:
 		merchant = merchant_path[merchant_path.rfind("/") + 1:]
 		if merchant not in ["", "pybossa_project"]:
 			dictionary_exist = False
@@ -76,6 +77,8 @@ def get_top_merchant_names(base_dir):
 					break
 			if dictionary_exist:
 				top_merchants.append(merchant)
+			else:
+				logger.error("Merchant {0} doesn't have dictionaries".format(merchant))
 	return top_merchants
 
 class Worker:
@@ -88,15 +91,13 @@ class Worker:
 		"""Execute the main program"""
 		base_dir = "meerkat/geomancer/merchants/"
 		os.makedirs(base_dir, exist_ok=True)
-		top_merchants_candidate = get_top_merchant_names(base_dir)
+		merchants_with_preconditions = get_top_merchant_names(base_dir)
 
 		top_merchants = []
 		for merchant in self.config["merchants"]:
-			if merchant in top_merchants_candidate:
+			if merchant in merchants_with_preconditions:
+				logger.info("Merchant {0} has dictionaries.".format(merchant))
 				top_merchants.append(merchant)
-			else:
-				logger.error("Merchant {0} doesn't have dictionaries".format(merchant))
-				return
 
 		logger.info("Top merchants project to be processed are: {0}".format(top_merchants))
 
