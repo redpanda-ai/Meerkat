@@ -57,8 +57,7 @@ def get_new_tasks(old_df, new_df):
 	set_1 = mix_dataframes(old_df, new_df, 1)
 	set_2 = mix_dataframes(old_df, set_1, 1)
 	set_3 = mix_dataframes(set_1, set_2, 2)
-	logger.info("new tasks df :")
-	logger.info(set_3)
+	logger.info("new tasks df: \n{0}".format(set_3))
 	return set_3
 
 def get_existing_projects(server, apikey):
@@ -111,7 +110,7 @@ class Worker:
 		logger.info("map_name_to_id: {0}".format(map_name_to_id))
 
 		dfs = get_task_df(server, map_id_to_name, map_name_to_id)
-		logger.warning("dfs: {0}".format(dfs))
+		logger.warning("dfs: \n{0}".format(dfs))
 
 		csv_kwargs = { "usecols": ["DESCRIPTION_UNMASKED"], "error_bad_lines": False, "warn_bad_lines": True,
 			"encoding": "utf-8", "quotechar" : '"', "na_filter" : False, "sep": "," }
@@ -120,14 +119,13 @@ class Worker:
 			logger.info("Interrogating {0}".format(project_name))
 			old_df = dfs[project_name]
 			old_df = old_df.rename(columns = {'question': 'DESCRIPTION_UNMASKED'})
-			logger.info("old_df: ")
-			logger.info(old_df)
+			logger.info("old_df: \n{0}".format(old_df))
 
 			merchant = project_name[len("Geomancer_") + len(bank_or_card) + 1:]
 			new_tasks_file = base_dir + merchant + "/" + bank_or_card  +"_tasks.csv"
 			new_df = pd.read_csv(new_tasks_file, **csv_kwargs)
-			logger.info("new_df: ")
-			logger.info(new_df)
+			logger.info("new_df: \n{0}".format(new_df))
+
 			new_tasks_df = get_new_tasks(old_df, new_df)
 
 			if new_tasks_df.empty:
