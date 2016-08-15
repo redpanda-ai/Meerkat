@@ -1,6 +1,14 @@
 {
 	"$schema": "http://json-schema.org/draft-04/schema#",
 	"title": "Input schema for meerkat.geomancer",
+	"definitions": {
+		"target_merchant_list": {
+			"type": "array",
+			"minItems" : 1,
+			"items": { "type": "string" },
+			"uniqueItems": true
+		}
+	},
 	"description": "More Stuff",
 	"type": "object",
 	"properties": {
@@ -67,9 +75,12 @@
 				},
 				"add_tasks": {
 					"enum": [ false, true ]
+				},
+				"target_merchant_list": {
+					"$ref": "#/definitions/target_merchant_list"
 				}
 			},
-			"required": ["bank_or_card", "merchants", "server", "apikey", "create_project", "update_presenter", "update_dictionary", "add_tasks"]
+			"required": ["target_merchant_list", "bank_or_card", "merchants", "server", "apikey", "create_project", "update_presenter", "update_dictionary", "add_tasks"]
 		},
 		"interrogate": {
 			"properties" : {
@@ -83,8 +94,15 @@
 				"apikey" : {
 					"type": "string",
 					"pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+				},
+				"target_merchant_list": {
+					"type": "array",
+					"minItems" : 1,
+					"items": { "type": "string" },
+					"uniqueItems": true
 				}
-			}
+			},
+			"required": ["bank_or_card", "server", "apikey", "target_merchant_list"]
 		},
 		"top_merchant_data" : {
 			"properties": {
