@@ -9,7 +9,7 @@ import fileinput
 import requests
 import yaml
 
-from ..tools import copy_file
+from ..tools import copy_file, get_top_merchant_names
 
 logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
 logger = logging.getLogger('build_pybossa_project')
@@ -62,25 +62,6 @@ def get_existing_projects(server, apikey):
 		short_names.append(item["short_name"])
 	return short_names
 
-def get_top_merchant_names(base_dir):
-	"""Get a list of top merchants that has dictionaries from agg data"""
-	top_merchants = []
-	merchants_with_paths = [obj[0] for obj in os.walk(base_dir)]
-	merchants_without_paths = p"foo"]
-	for merchant_path in merchants_with_paths:
-		merchant = merchant_path[merchant_path.rfind("/") + 1:]
-		if merchant not in ["", "pybossa_project"]:
-			dictionary_exist = False
-			for filename in os.listdir(merchant_path):
-				if filename.endswith('.json'):
-					dictionary_exist = True
-					break
-			if dictionary_exist:
-				top_merchants.append(merchant)
-			else:
-				logger.error("Merchant {0} doesn't have dictionaries".format(merchant))
-	return top_merchants
-
 class Worker:
 	"""Contains methods and data pertaining to the processing of pybossa project"""
 	def __init__(self, config):
@@ -91,14 +72,11 @@ class Worker:
 		"""Execute the main program"""
 		base_dir = "meerkat/geomancer/merchants/"
 		os.makedirs(base_dir, exist_ok=True)
-		merchants_with_preconditions = get_top_merchant_names(base_dir)
+		target_merchants = self.config["target_merchant_list"]
+		merchants_with_preconditions = get_top_merchant_names(base_dir, target_merchants)
 
-		top_merchants = []
-		for merchant in self.config["merchants"]:
-			if merchant in merchants_with_preconditions:
-				logger.info("Merchant {0} has dictionaries.".format(merchant))
-				top_merchants.append(merchant)
-
+		merchants = self.config["merchants"]
+		top_merchants = [item for item in merchants if item in merchants_with_preconditions]
 		logger.info("Top merchants project to be processed are: {0}".format(top_merchants))
 
 		server, apikey = self.config["server"], self.config["apikey"]
@@ -113,6 +91,8 @@ class Worker:
 			project_name = "Geomancer_" + bank_or_card + "_" + merchant
 			# Create a new pybossa project
 			if 'create_project' in self.config and self.config["create_project"]:
+				logger.info(project_name)
+				logger.info(existing_projects)
 				if project_name in existing_projects:
 					logger.warning("Project {0} already exists".format(project_name))
 				else:

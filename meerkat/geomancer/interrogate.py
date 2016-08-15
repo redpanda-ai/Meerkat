@@ -6,7 +6,8 @@ import yaml
 import time
 import os
 
-from .pybossa.build_pybossa_project import get_top_merchant_names, add_tasks
+from .pybossa.build_pybossa_project import add_tasks
+from .tools import get_top_merchant_names
 
 logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
 logger = logging.getLogger('interrogate')
@@ -83,7 +84,8 @@ class Worker:
 		logger.info("Existing projects are: {0}".format(existing_projects))
 
 		base_dir = "meerkat/geomancer/merchants/"
-		top_merchants = get_top_merchant_names(base_dir)
+		target_merchant_list = self.config["target_merchant_list"]
+		top_merchants = get_top_merchant_names(base_dir, target_merchant_list)
 		if len(top_merchants) == 0:
 			logger.critical("There are no top merchants, aborting.")
 			sys.exit()

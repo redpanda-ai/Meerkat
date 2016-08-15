@@ -11,11 +11,35 @@ import shutil
 import pandas as pd
 import threading
 import time
+import os
 
 from timeit import default_timer as timer
 
 logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
 logger = logging.getLogger('tools')
+
+def get_top_merchant_names(base_dir, target_merchants):
+	"""Get a list of top merchants that has dictionaries from agg data"""
+	target_merchants = [remove_special_chars(item) for item in target_merchants]
+	top_merchants = []
+	merchants_with_paths = [obj[0] for obj in os.walk(base_dir)]
+	for merchant_path in merchants_with_paths:
+		merchant = merchant_path[merchant_path.rfind("/") + 1:]
+		if merchant not in ["", "pybossa_project"]:
+			dictionary_exist = False
+			for filename in os.listdir(merchant_path):
+				if filename.endswith('.json'):
+					dictionary_exist = True
+					break
+			if dictionary_exist:
+				top_merchants.append(merchant)
+	top_merchants_with_agg_data = set(target_merchants).intersection(top_merchants)
+	top_merchants_without_agg_data = set(target_merchants) - top_merchants_with_agg_data
+	logger.info("Target merchants with all preconditions satisfied: \
+		{0}".format(top_merchants_with_agg_data))
+	logger.info("Target merchants that can't satisfy all preconditions: \
+		{0}".format(top_merchants_without_agg_data))
+	return top_merchants_with_agg_data
 
 class ThreadProducer(threading.Thread):
 	def __init__(self, param):
