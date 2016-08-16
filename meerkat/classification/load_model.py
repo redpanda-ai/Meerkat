@@ -14,7 +14,7 @@ import logging
 import numpy as np
 import tensorflow as tf
 
-from meerkat.longtail.bilstm_tagger import trans_to_tensor
+from meerkat.longtail.bilstm_tagger import trans_to_tensor, get_tags
 from meerkat.longtail.bilstm_tagger import validate_config as bilstm_validate_config
 from tensorflow.python.framework import ops
 from sklearn.externals import joblib
@@ -100,10 +100,14 @@ def get_tf_rnn_by_path(model_path, w2i_path, gpu_mem_fraction=False, model_name=
 		model = get_tensor(graph, model_name)
 
 	# Generate Helper Function
-	def apply_rnn(trans, doc_key="Description", label_key="merchant_name"):
+	def apply_rnn(trans, doc_key="Description", label_key="predicted", only_merchant_name=True, tags=False):
 
 		for index, doc in enumerate(trans):
-			tran = doc[doc_key].lower().split()[0:config["max_tokens"]]
+			if tags:
+				tran, label = get_tags(config, doc)
+				doc["ground_truth"] = label
+			else:
+				tran = doc[doc_key].lower().split()[0:config["max_tokens"]]
 			char_inputs, word_lengths, word_indices, _ = trans_to_tensor(config, sess, graph, tran)
 			feed_dict = {
 				get_tensor(graph, "char_inputs:0"): char_inputs,
@@ -114,9 +118,13 @@ def get_tf_rnn_by_path(model_path, w2i_path, gpu_mem_fraction=False, model_name=
 			}
 
 			output = sess.run(model, feed_dict=feed_dict)
-			output = [config["tag_map"][str(i)] for i in np.argmax(output, 1)]
-			target_indices = [i for i in range(len(output)) if output[i] == "merchant"]
-			doc[label_key] = " ".join([tran[i] for i in target_indices])
+			if only_merchant_name:
+				# return merchant name if only_merchant_name else return tags of all tokens
+				output = [config["tag_map"][str(i)] for i in np.argmax(output, 1)]
+				target_indices = [i for i in range(len(output)) if output[i] == "merchant"]
+				doc[label_key] = " ".join([tran[i] for i in target_indices])
+			else:
+				doc[label_key] = output
 
 		return trans
 
