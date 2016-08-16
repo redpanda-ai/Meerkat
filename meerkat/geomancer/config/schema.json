@@ -7,15 +7,49 @@
 			"minItems" : 1,
 			"items": { "type": "string" },
 			"uniqueItems": true
+		},
+		"bucket": {
+			"type": "string"
+		},
+		"bank_or_card": {
+			"enum": ["bank", "card"]
+		},
+		"server": {
+			"type": "string",
+			"minLength": 1
+		},
+		"apikey": {
+			"type": "string",
+			"pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
 		}
 	},
 	"description": "More Stuff",
 	"type": "object",
 	"properties": {
+		"common_config": {
+			"type": "object",
+			"properties": {
+				"bucket": {
+					"$ref": "#/definitions/bucket"
+				},
+				"bank_or_card": {
+					"$ref": "#/definitions/bank_or_card"
+				},
+				"server": {
+					"$ref": "#/definitions/server"
+				},
+				"apikey": {
+					"$ref": "#/definitions/apikey"
+				},
+				"target_merchant_list": {
+					"$ref": "#/definitions/target_merchant_list"
+				}
+			},
+			"required": ["target_merchant_list", "bucket", "bank_or_card", "server", "apikey"]
+		},
 		"agg_data" : {
 			"type": "object",
 			"properties": {
-				"bucket": { "type": "string"},
 				"prefix": {
 					"type": "string",
 					"pattern": "^[A-Za-z0-9][A-Za-z0-9\/_.]*\/$"
@@ -29,34 +63,20 @@
 					"pattern": "^[A-Za-z0-9\/_.]*\/$"
 				}
 			},
-			"required": ["bucket", "prefix", "filename", "savepath"]
+			"required": ["prefix", "filename", "savepath"]
 		},
 		"merchant_dictionaries": {
 			"properties": {
 				"dry_run": {
 					"enum": [false, true]
-				},
-				"target_merchant_list": {
-					"$ref": "#/definitions/target_merchant_list"
 				}
 			},
-			"required": ["dry_run", "target_merchant_list"]
+			"required": ["dry_run"]
 		},
 		"pybossa_project": {
 			"properties": {
-				"bank_or_card": {
-					"enum": [ "bank", "card" ]
-				},
 				"merchants": {
 					"$ref": "#/definitions/target_merchant_list"
-				},
-				"server": {
-					"type": "string",
-					"minLength": 1
-				},
-				"apikey": {
-					"type": "string",
-					"pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
 				},
 				"create_project": {
 					"enum": [ false, true ]
@@ -69,54 +89,26 @@
 				},
 				"add_tasks": {
 					"enum": [ false, true ]
-				},
-				"target_merchant_list": {
-					"$ref": "#/definitions/target_merchant_list"
 				}
 			},
-			"required": ["target_merchant_list", "bank_or_card", "merchants", "server", "apikey", "create_project", "update_presenter", "update_dictionary", "add_tasks"]
+			"required": ["merchants", "create_project", "update_presenter", "update_dictionary", "add_tasks"]
 		},
 		"interrogate": {
 			"properties" : {
-				"bank_or_card": {
-					"enum": ["bank", "card"]
-				},
-				"server" : {
-					"type": "string",
-					"minLength": 1
-				},
-				"apikey" : {
-					"type": "string",
-					"pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
-				},
-				"target_merchant_list": {
-					"$ref": "#/definitions/target_merchant_list"
-				}
-			},
-			"required": ["bank_or_card", "server", "apikey", "target_merchant_list"]
+			}
 		},
 		"top_merchant_data" : {
 			"properties": {
-				"bank_or_card": {
-					"enum": ["bank", "card"]
-				},
 				"version_dir": {
 					"type": "string",
-					"minLength": 14,
-					"maxLength": 14
-				},
-				"bucket": {
-					"type": "string"
+					"pattern": "^[0-9]{14}$"
 				},
 				"truncate_lines": {
 					"type": "integer",
 					"minimum": -1
-				},
-				"target_merchant_list": {
-					"$ref": "#/definitions/target_merchant_list"
 				}
 			},
-			"required": ["bank_or_card", "version_dir", "bucket", "truncate_lines", "target_merchant_list"]
+			"required": ["version_dir", "truncate_lines"]
 		}
 	}
 }

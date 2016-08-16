@@ -40,8 +40,16 @@ def main_process():
 	logger.info("Starting")
 	logger.info("Parsing arguments.")
 	args = parse_arguments(sys.argv[1:])
+
+	logger.info("Validating common configuration")
+	common_config = validate_configuration("meerkat/geomancer/config/config_common.json",
+		"meerkat/geomancer/config/schema.json")
+	logger.info("Valid common configuration")
+	common_config_snippet = common_config["common_config"]
+
 	logger.info("Validating configuration")
-	config = validate_configuration(args.config_file, "meerkat/geomancer/config/schema.json")
+	config = validate_configuration(args.config_file,
+		"meerkat/geomancer/config/schema.json")
 	logger.info("Valid configuration")
 
 	module_list = [("agg_data", agg_data), ("merchant_dictionaries", merchant_dictionaries),
@@ -51,7 +59,7 @@ def main_process():
 		if name in config:
 			logger.info("Activating {0} module.".format(name))
 			config_snippet = config[name]
-			module.Worker(config_snippet).main_process()
+			module.Worker(common_config_snippet, config_snippet).main_process()
 
 if __name__ == "__main__":
 	main_process()
