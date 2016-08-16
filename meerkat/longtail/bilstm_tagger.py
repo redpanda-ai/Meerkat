@@ -390,7 +390,6 @@ def evaluate_testset(config, graph, sess, test):
 	total_correct = 0
 	count = 0
 	num_merchant = 0
-	num_background = 0
 	logging.info("---ENTERING EVALUATION---")
 
 	for i in range(len(test)):
@@ -402,7 +401,6 @@ def evaluate_testset(config, graph, sess, test):
 
 		tokens, tags = test[i]
 		num_merchant += sum([1 for item in tags if item == "merchant"])
-		num_background += sum([1 for item in tags if item == "background"])
 		char_inputs, word_lengths, word_indices, labels = trans_to_tensor(config, sess, graph, tokens, tags=tags)
 		total_count += len(tokens)
 
@@ -420,12 +418,11 @@ def evaluate_testset(config, graph, sess, test):
 		total_correct += correct_count
 
 	test_accuracy = 100.0 * (total_correct / total_count)
-	logging.info("Number of background tags in testset: {0}".format(num_background))
 	logging.info("Number of merchant tags in testset: {0}".format(num_merchant))
-	logging.info("Merchant ratio of the testset: {0:3.2f}%".format(100*num_merchant/(num_background+num_merchant+0.0)))
+	logging.info("Merchant percentage of the testset: {0:3.2f}%".format(100.0*num_merchant/total_count))
 	logging.info("Test accuracy: %.2f%%" % test_accuracy)
 	logging.info("Correct count: " + str(total_correct))
-	logging.info("Total count: " + str(total_count))
+	logging.info("Total number of tags: " + str(total_count))
 
 	return test_accuracy
 

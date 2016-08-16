@@ -104,6 +104,7 @@ def get_tf_rnn_by_path(model_path, w2i_path, gpu_mem_fraction=False, model_name=
 
 		for index, doc in enumerate(trans):
 			if tags:
+				# if tags, tag all tokens with get_tags for evaluation purposes
 				tran, label = get_tags(config, doc)
 				doc["ground_truth"] = label
 			else:
