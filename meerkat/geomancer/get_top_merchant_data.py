@@ -27,9 +27,12 @@ def extract_clean_files(save_path, tarball_name, extension):
 
 class Worker:
 	"""Contains methods and data pertaining to the processing of pybossa project"""
-	def __init__(self, config):
+	def __init__(self, common_config, config):
 		"""Constructor"""
 		self.config = config
+		self.config["bank_or_card"] = common_config["bank_or_card"]
+		self.config["bucket"] = common_config["bucket"]
+		self.config["target_merchant_list"] = common_config["target_merchant_list"]
 
 	def main_process(self):
 		bank_or_card = self.config["bank_or_card"]

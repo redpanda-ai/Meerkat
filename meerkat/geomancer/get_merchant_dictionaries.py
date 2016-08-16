@@ -62,9 +62,10 @@ def expand_abbreviations(city):
 
 class Worker:
 	"""Contains methods and data pertaining to the creation and retrieval of merchant dictionaries"""
-	def __init__(self, config):
+	def __init__(self, common_config, config):
 		"""Constructor"""
 		self.config = config
+		self.config["target_merchant_list"] = common_config["target_merchant_list"]
 		module_path = inspect.getmodule(inspect.stack()[1][0]).__file__
 		self.filepath = module_path[:module_path.rfind("/") + 1] + "merchants"
 

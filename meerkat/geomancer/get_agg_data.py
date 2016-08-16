@@ -72,9 +72,10 @@ def get_s3_file(**kwargs):
 
 class Worker:
 	"""Contains methods and data pertaining to the creation and retrieval of AggData files"""
-	def __init__(self, config):
+	def __init__(self, common_config, config):
 		"""Constructor"""
 		self.config = config
+		self.config["bucket"] = common_config["bucket"]
 
 	def main_process(self):
 		"""Execute the main programe"""

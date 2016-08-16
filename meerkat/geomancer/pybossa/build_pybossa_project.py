@@ -64,9 +64,13 @@ def get_existing_projects(server, apikey):
 
 class Worker:
 	"""Contains methods and data pertaining to the processing of pybossa project"""
-	def __init__(self, config):
+	def __init__(self, common_config, config):
 		"""Constructor"""
 		self.config = config
+		self.config["bank_or_card"] = common_config["bank_or_card"]
+		self.config["server"] = common_config["server"]
+		self.config["apikey"] = common_config["apikey"]
+		self.config["target_merchant_list"] = common_config["target_merchant_list"]
 
 	def main_process(self):
 		"""Execute the main program"""
