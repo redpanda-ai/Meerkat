@@ -1,6 +1,5 @@
 {
 	"agg_data" : {
-		"bucket": "s3yodlee",
 		"prefix": "meerkat/geomancer/data/agg/",
 		"filename": "All_Merchants.csv",
 		"savepath": "meerkat/geomancer/data/agg_data/"
