@@ -71,24 +71,6 @@ class WebConsumer():
 			#Load new models from S3
 			load_models_from_s3(config=auto_load_config)
 
-		"""
-		# Get Merchant CNN Models
-		self.bank_merchant_cnn = get_tf_cnn_by_name("bank_merchant", gpu_mem_fraction=gmf)
-		self.card_merchant_cnn = get_tf_cnn_by_name("card_merchant", gpu_mem_fraction=gmf)
-
-		# Get Subtype CNN Models
-		self.card_debit_subtype_cnn = get_tf_cnn_by_name("card_debit_subtype", gpu_mem_fraction=gmf)
-		self.card_credit_subtype_cnn = get_tf_cnn_by_name("card_credit_subtype", gpu_mem_fraction=gmf)
-		self.bank_debit_subtype_cnn = get_tf_cnn_by_name("bank_debit_subtype", gpu_mem_fraction=gmf)
-		self.bank_credit_subtype_cnn = get_tf_cnn_by_name("bank_credit_subtype", gpu_mem_fraction=gmf)
-
-		# Get Category CNN Models
-		self.card_debit_category_cnn = get_tf_cnn_by_name("card_debit_category", gpu_mem_fraction=gmf)
-		self.card_credit_category_cnn = get_tf_cnn_by_name("card_credit_category", gpu_mem_fraction=gmf)
-		self.bank_debit_category_cnn = get_tf_cnn_by_name("bank_debit_category", gpu_mem_fraction=gmf)
-		self.bank_credit_category_cnn = get_tf_cnn_by_name("bank_credit_category", gpu_mem_fraction=gmf)
-		"""
-
 		# Get CNN Models
 		self.models = dict()
 		models_dir = 'meerkat/classification/models/'
