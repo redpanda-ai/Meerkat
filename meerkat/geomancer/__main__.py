@@ -8,13 +8,12 @@ import sys
 import yaml
 
 from meerkat.various_tools import validate_configuration
-#:wfrom .get_agg_data import main_process as get_agg_data
-#from .get_agg_data import parse_arguments as parse_agg_arguments
-#from .get_merchant_dictionaries import parse_arguments as parse_merchant_arguments
 
 import meerkat.geomancer.get_merchant_dictionaries as merchant_dictionaries
 import meerkat.geomancer.get_agg_data as agg_data
+import meerkat.geomancer.pybossa.build_pybossa_project as builder
 import meerkat.geomancer.interrogate as interrogate
+import meerkat.geomancer.get_top_merchant_data as top_merchant_data
 
 logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
 logger = logging.getLogger('__main__')
@@ -41,16 +40,26 @@ def main_process():
 	logger.info("Starting")
 	logger.info("Parsing arguments.")
 	args = parse_arguments(sys.argv[1:])
+
+	logger.info("Validating common configuration")
+	common_config = validate_configuration("meerkat/geomancer/config/config_common.json",
+		"meerkat/geomancer/config/schema.json")
+	logger.info("Valid common configuration")
+	common_config_snippet = common_config["common_config"]
+
 	logger.info("Validating configuration")
-	config = validate_configuration(args.config_file, "meerkat/geomancer/config/schema.json")
+	config = validate_configuration(args.config_file,
+		"meerkat/geomancer/config/schema.json")
+	logger.info("Valid configuration")
 
 	module_list = [("agg_data", agg_data), ("merchant_dictionaries", merchant_dictionaries),
+		("pybossa_project", builder), ("top_merchant_data", top_merchant_data),
 		("interrogate", interrogate)]
 	for name, module in module_list:
 		if name in config:
 			logger.info("Activating {0} module.".format(name))
 			config_snippet = config[name]
-			module.Worker(config_snippet).main_process()
+			common_config_snippet["target_merchant_list"] = module.Worker(common_config_snippet, config_snippet).main_process()
 
 if __name__ == "__main__":
 	main_process()

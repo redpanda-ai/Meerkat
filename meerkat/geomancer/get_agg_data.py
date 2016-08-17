@@ -72,9 +72,11 @@ def get_s3_file(**kwargs):
 
 class Worker:
 	"""Contains methods and data pertaining to the creation and retrieval of AggData files"""
-	def __init__(self, config):
+	def __init__(self, common_config, config):
 		"""Constructor"""
 		self.config = config
+		for key in common_config:
+			self.config[key] = common_config[key]
 
 	def main_process(self):
 		"""Execute the main programe"""
@@ -88,6 +90,8 @@ class Worker:
 
 		needs_to_be_downloaded = get_s3_file(bucket=bucket, prefix=prefix, file_name=file_name,
 			save_path=save_path, etags=etags, etags_file=etags_file)
+
+		return self.config["target_merchant_list"]
 
 if __name__ == "__main__":
 	logger.critical("You cannot run this from the command line, aborting.")

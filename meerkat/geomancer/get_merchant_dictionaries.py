@@ -62,9 +62,11 @@ def expand_abbreviations(city):
 
 class Worker:
 	"""Contains methods and data pertaining to the creation and retrieval of merchant dictionaries"""
-	def __init__(self, config):
+	def __init__(self, common_config, config):
 		"""Constructor"""
 		self.config = config
+		for key in common_config:
+			self.config[key] = common_config[key]
 		module_path = inspect.getmodule(inspect.stack()[1][0]).__file__
 		self.filepath = module_path[:module_path.rfind("/") + 1] + "merchants"
 
@@ -146,6 +148,7 @@ class Worker:
 		merchant_dataframes = get_grouped_dataframes("meerkat/geomancer/data/agg_data/All_Merchants.csv",
 			"list_name", self.config["target_merchant_list"], **csv_kwargs)
 		merchants = sorted(list(merchant_dataframes.keys()))
+		self.config["target_merchant_list"] = merchants
 		for merchant in merchants:
 			self.config["merchant"] = remove_special_chars(merchant)
 			df = merchant_dataframes[merchant]
@@ -156,6 +159,7 @@ class Worker:
 			self.geo_df = self.get_geo_dictionary(df)
 			unique_city_state, unique_city = self.get_unique_city_dictionaries(df)
 			# Let's also get the question bank
+		return self.config["target_merchant_list"]
 
 	def setup_directories(self):
 		"""This creates the directories on the local file system, if needed."""
