@@ -8,12 +8,8 @@
 			"items": { "type": "string" },
 			"uniqueItems": true
 		},
-		"bucket": {
-			"type": "string"
-		},
-		"bank_or_card": {
-			"enum": ["bank", "card"]
-		},
+		"bucket": { "type": "string" },
+		"bank_or_card": { "enum": ["bank", "card"] },
 		"server": {
 			"type": "string",
 			"minLength": 1
@@ -29,21 +25,11 @@
 		"common_config": {
 			"type": "object",
 			"properties": {
-				"bucket": {
-					"$ref": "#/definitions/bucket"
-				},
-				"bank_or_card": {
-					"$ref": "#/definitions/bank_or_card"
-				},
-				"server": {
-					"$ref": "#/definitions/server"
-				},
-				"apikey": {
-					"$ref": "#/definitions/apikey"
-				},
-				"target_merchant_list": {
-					"$ref": "#/definitions/target_merchant_list"
-				}
+				"bucket": { "$ref": "#/definitions/bucket" },
+				"bank_or_card": { "$ref": "#/definitions/bank_or_card" },
+				"server": { "$ref": "#/definitions/server" },
+				"apikey": { "$ref": "#/definitions/apikey" },
+				"target_merchant_list": { "$ref": "#/definitions/target_merchant_list" }
 			},
 			"required": ["target_merchant_list", "bucket", "bank_or_card", "server", "apikey"]
 		},
@@ -67,31 +53,20 @@
 		},
 		"merchant_dictionaries": {
 			"properties": {
-				"dry_run": {
-					"enum": [false, true]
-				}
+				"dry_run": { "enum": [false, true] }
 			},
 			"required": ["dry_run"]
 		},
 		"pybossa_project": {
 			"properties": {
-				"merchants": {
-					"$ref": "#/definitions/target_merchant_list"
-				},
-				"create_project": {
-					"enum": [ false, true ]
-				},
-				"update_presenter": {
-					"enum": [ false, true ]
-				},
-				"update_dictionary": {
-					"enum": [ false, true ]
-				},
-				"add_tasks": {
-					"enum": [ false, true ]
-				}
+				"merchants": { "$ref": "#/definitions/target_merchant_list" },
+				"create_project": { "enum": [ false, true ] },
+				"update_presenter": { "enum": [ false, true ] },
+				"update_dictionary": { "enum": [ false, true ] },
+				"add_tasks": { "enum": [ false, true ] }
 			},
-			"required": ["merchants", "create_project", "update_presenter", "update_dictionary", "add_tasks"]
+			"required": ["merchants", "create_project", "update_presenter", "update_dictionary",
+				"add_tasks"]
 		},
 		"interrogate": {
 			"properties" : {
