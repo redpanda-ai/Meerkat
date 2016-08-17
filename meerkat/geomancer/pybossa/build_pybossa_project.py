@@ -17,11 +17,11 @@ logger = logging.getLogger('build_pybossa_project')
 def add_tasks(server, apikey, project_json_file, tasks_file):
 	"""Add new tasks"""
 	if not os.path.isfile(project_json_file):
-		logger.critical("Cannot proceed, project json file not found")
-		sys.exit()
+		logger.warning("Skipping, project json file not found at {0}".format(project_json_file))
+		return
 	if not os.path.isfile(tasks_file):
-		logger.critical("Cannot proceed, tasks file not found")
-		sys.exit()
+		logger.warning("Skipping, tasks file not found at: {0}".format(tasks_file))
+		return
 	os.system("pbs --server http://" + server + ":12000 --api-key " +
 		apikey + " --project " + project_json_file + " add_tasks --tasks-file " +
 		tasks_file)
@@ -67,20 +67,19 @@ class Worker:
 	def __init__(self, common_config, config):
 		"""Constructor"""
 		self.config = config
-		self.config["bank_or_card"] = common_config["bank_or_card"]
-		self.config["server"] = common_config["server"]
-		self.config["apikey"] = common_config["apikey"]
-		self.config["target_merchant_list"] = common_config["target_merchant_list"]
+		for key in common_config:
+			self.config[key] = common_config[key]
 
 	def main_process(self):
 		"""Execute the main program"""
 		base_dir = "meerkat/geomancer/merchants/"
 		os.makedirs(base_dir, exist_ok=True)
 		target_merchants = self.config["target_merchant_list"]
-		merchants_with_preconditions = get_top_merchant_names(base_dir, target_merchants)
+		top_merchants = get_top_merchant_names(base_dir, target_merchants)
+		self.config["target_merchant_list"] = top_merchants
 
-		merchants = self.config["merchants"]
-		top_merchants = [item for item in merchants if item in merchants_with_preconditions]
+		#merchants = self.config["target_merchant_list"]
+		#top_merchants = [item for item in merchants if item in merchants_with_preconditions]
 		logger.info("Top merchants project to be processed are: {0}".format(top_merchants))
 
 		server, apikey = self.config["server"], self.config["apikey"]
@@ -146,6 +145,7 @@ class Worker:
 			if 'add_tasks' in self.config and self.config["add_tasks"]:
 				tasks_file = merchant_dir + "tasks.csv"
 				add_tasks(server, apikey, project_json_file, tasks_file)
+		return self.config["target_merchant_list"]
 
 def replace_str_in_file(file_name, old_str, new_str):
 	"""Replace the occurrences of old string with new string in a file"""

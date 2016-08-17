@@ -8,7 +8,6 @@
 		"dry_run": false
 	},
 	"pybossa_project" : {
-		"merchants": ["Starbucks"],
 		"create_project": false,
 		"update_presenter": false,
 		"update_dictionary": false,
@@ -18,6 +17,6 @@
 	},
 	"top_merchant_data" : {
 		"version_dir": "20160628185500",
-		"truncate_lines": 10001
+		"truncate_lines": 50001
 	}
 }

@@ -75,10 +75,8 @@ class Worker:
 	def __init__(self, common_config, config):
 		"""Constructor"""
 		self.config = config
-		self.config["bank_or_card"] = common_config["bank_or_card"]
-		self.config["server"] = common_config["server"]
-		self.config["apikey"] = common_config["apikey"]
-		self.config["target_merchant_list"] = common_config["target_merchant_list"]
+		for key in common_config:
+			self.config[key] = common_config[key]
 
 	def main_process(self):
 		"""Execute the main program"""
@@ -89,6 +87,7 @@ class Worker:
 		base_dir = "meerkat/geomancer/merchants/"
 		target_merchant_list = self.config["target_merchant_list"]
 		top_merchants = get_top_merchant_names(base_dir, target_merchant_list)
+		self.config["target_merchant_list"] = top_merchants
 		if len(top_merchants) == 0:
 			logger.critical("There are no top merchants, aborting.")
 			sys.exit()
@@ -141,6 +140,7 @@ class Worker:
 			project_json_file = base_dir + merchant + "/pybossa_project/" + bank_or_card + "/project.json"
 			add_tasks(server, apikey, project_json_file, tasks_file)
 			logger.info("Add new tasks to {0}".format(project_name))
+		return self.config["target_merchant_list"]
 
 if __name__ == "__main__":
 	logger.critical("This module cannot be run from the command line.")

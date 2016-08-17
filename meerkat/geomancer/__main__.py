@@ -53,13 +53,13 @@ def main_process():
 	logger.info("Valid configuration")
 
 	module_list = [("agg_data", agg_data), ("merchant_dictionaries", merchant_dictionaries),
-		("interrogate", interrogate), ("pybossa_project", builder),
-		("top_merchant_data", top_merchant_data)]
+		("pybossa_project", builder), ("top_merchant_data", top_merchant_data),
+		("interrogate", interrogate)]
 	for name, module in module_list:
 		if name in config:
 			logger.info("Activating {0} module.".format(name))
 			config_snippet = config[name]
-			module.Worker(common_config_snippet, config_snippet).main_process()
+			common_config_snippet["target_merchant_list"] = module.Worker(common_config_snippet, config_snippet).main_process()
 
 if __name__ == "__main__":
 	main_process()

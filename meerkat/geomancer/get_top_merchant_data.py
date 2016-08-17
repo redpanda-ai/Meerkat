@@ -30,9 +30,8 @@ class Worker:
 	def __init__(self, common_config, config):
 		"""Constructor"""
 		self.config = config
-		self.config["bank_or_card"] = common_config["bank_or_card"]
-		self.config["bucket"] = common_config["bucket"]
-		self.config["target_merchant_list"] = common_config["target_merchant_list"]
+		for key in common_config:
+			self.config[key] = common_config[key]
 
 	def main_process(self):
 		bank_or_card = self.config["bank_or_card"]
@@ -85,6 +84,7 @@ class Worker:
 				merchant_dataframes = get_grouped_dataframes(csv_file, 'MERCHANT_NAME',
 					self.config["target_merchant_list"], **csv_kwargs)
 				merchants = sorted(list(merchant_dataframes.keys()))
+				self.config["target_merchant_list"] = merchants
 				for merchant in merchants:
 					formatted_merchant = remove_special_chars(merchant)
 					os.makedirs(tasks_prefix + formatted_merchant, exist_ok=True)
@@ -95,6 +95,7 @@ class Worker:
 					merchant_dataframes[merchant].to_csv(tasks, sep=',', index=False, quoting=csv.QUOTE_ALL)
 					logger.info("Merchant {0}: {2} duplicate transactions; {1} unique transactions".format(merchant,
 						len(merchant_dataframes[merchant]), original_len - len(merchant_dataframes[merchant])))
+		return self.config["target_merchant_list"]
 
 if __name__ == "__main__":
 	logger.critical("You cannot run this from the command line, aborting.")

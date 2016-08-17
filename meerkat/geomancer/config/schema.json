@@ -59,14 +59,12 @@
 		},
 		"pybossa_project": {
 			"properties": {
-				"merchants": { "$ref": "#/definitions/target_merchant_list" },
 				"create_project": { "enum": [ false, true ] },
 				"update_presenter": { "enum": [ false, true ] },
 				"update_dictionary": { "enum": [ false, true ] },
 				"add_tasks": { "enum": [ false, true ] }
 			},
-			"required": ["merchants", "create_project", "update_presenter", "update_dictionary",
-				"add_tasks"]
+			"required": ["create_project", "update_presenter", "update_dictionary", "add_tasks"]
 		},
 		"interrogate": {
 			"properties" : {
