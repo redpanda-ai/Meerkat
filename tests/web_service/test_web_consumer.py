@@ -13,10 +13,10 @@ class WebConsumerTest(unittest.TestCase):
 		web_consumer.get_es_connection = web_consumer_fixture.get_mock_esconnection
 		cls.consumer = web_consumer.WebConsumer(params=web_consumer_fixture.get_mock_params(),
 			hyperparams=web_consumer_fixture.get_mock_hyperparams())
-		cls.consumer.bank_credit_subtype_cnn = web_consumer_fixture.get_mock_cnn
-		cls.consumer.bank_debit_subtype_cnn = web_consumer_fixture.get_mock_cnn
-		cls.consumer.bank_merchant_cnn = web_consumer_fixture.get_mock_cnn
-		cls.consumer.card_merchant_cnn = web_consumer_fixture.get_mock_cnn
+		cls.consumer.models['bank_credit_subtype_cnn'] = web_consumer_fixture.get_mock_cnn
+		cls.consumer.models['bank_debit_subtype_cnn'] = web_consumer_fixture.get_mock_cnn
+		cls.consumer.models['bank_merchant_cnn'] = web_consumer_fixture.get_mock_cnn
+		cls.consumer.models['card_merchant_cnn'] = web_consumer_fixture.get_mock_cnn
 
 	def setUp(self):
 		return
