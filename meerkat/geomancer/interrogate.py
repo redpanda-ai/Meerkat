@@ -97,8 +97,7 @@ class Worker:
 			path = "meerkat/geomancer/merchants/" + merchant + "/pybossa_project/" +\
 				self.config["bank_or_card"]
 			if not os.path.exists(path):
-				logger.critical("Cannot proceed, path not found at: {0}".format(path))
-				sys.exit()
+				logger.warning("Skipping {0} merchant: path not found at: {1}".format(merchant, path))
 		logger.info("Top merchants are: {0}".format(top_merchants))
 
 		bank_or_card = self.config["bank_or_card"]
