@@ -18,7 +18,7 @@ from scipy.stats.mstats import zscore
 
 from meerkat.various_tools import get_es_connection, string_cleanse, get_boosted_fields
 from meerkat.various_tools import synonyms, get_bool_query, get_qs_query
-from meerkat.classification.load_model import load_scikit_model, get_tf_cnn_by_name
+from meerkat.classification.load_model import load_scikit_model, get_tf_cnn_by_name, get_tf_cnn_by_path
 from meerkat.classification.auto_load import main_program as load_models_from_s3
 
 # pylint:disable=no-name-in-module
@@ -71,6 +71,7 @@ class WebConsumer():
 			#Load new models from S3
 			load_models_from_s3(config=auto_load_config)
 
+		"""
 		# Get Merchant CNN Models
 		self.bank_merchant_cnn = get_tf_cnn_by_name("bank_merchant", gpu_mem_fraction=gmf)
 		self.card_merchant_cnn = get_tf_cnn_by_name("card_merchant", gpu_mem_fraction=gmf)
@@ -86,6 +87,20 @@ class WebConsumer():
 		self.card_credit_category_cnn = get_tf_cnn_by_name("card_credit_category", gpu_mem_fraction=gmf)
 		self.bank_debit_category_cnn = get_tf_cnn_by_name("bank_debit_category", gpu_mem_fraction=gmf)
 		self.bank_credit_category_cnn = get_tf_cnn_by_name("bank_credit_category", gpu_mem_fraction=gmf)
+		"""
+
+		# Get CNN Models
+		self.models = dict()
+		models_dir = 'meerkat/classification/models/'
+		label_maps_dir = "meerkat/classification/label_maps/"
+		for filename in os.listdir(models_dir):
+			if filename.endswith('.ckpt'):
+				temp = filename.split('.')[:-1]
+				if temp[-1].isdigit():
+					key = '_'.join(temp[1:-1] + [temp[0], temp[-1], 'cnn'])
+				else:
+					key = '_'.join(temp[1:] + [temp[0], 'cnn'])
+				self.models[key] = get_tf_cnn_by_path(models_dir + filename, label_maps_dir + filename[:-4] + 'json', gpu_mem_fraction=gmf)
 
 	def update_hyperparams(self, hyperparams):
 		"""Updates a WebConsumer object's hyper-parameters"""
@@ -540,12 +555,26 @@ class WebConsumer():
 		if len(data["transaction_list"]) == 0:
 			return data["transaction_list"]
 
+		region = str(data["cobrand_region"])
+
 		if data["container"] == "card":
-			credit_subtype_classifer = self.card_credit_subtype_cnn 
-			debit_subtype_classifer = self.card_debit_subtype_cnn
+			if 'card_credit_subtype_' + region + '_cnn' not in self.models:
+				credit_subtype_classifer = self.models['card_credit_subtype_cnn']
+			else:
+				credit_subtype_classifer = self.models['card_credit_subtype_' + region + '_cnn']
+			if 'card_debit_subtype_' + region + '_cnn' not in self.models:
+				debit_subtype_classifer = self.models['card_debit_subtype_cnn']
+			else:
+				debit_subtype_classifer = self.models['card_debit_subtype_' + region + '_cnn']
 		elif data["container"] == "bank":
-			credit_subtype_classifer = self.bank_credit_subtype_cnn
-			debit_subtype_classifer = self.bank_debit_subtype_cnn
+			if 'bank_credit_subtype_' + region + '_cnn' not in self.models:
+				credit_subtype_classifer = self.models['bank_credit_subtype_cnn']
+			else:
+				credit_subtype_classifer = self.models['bank_credit_subtype_' + region + '_cnn']
+			if 'bank_debit_subtype_' + region + '_cnn' not in self.models:
+				debit_subtype_classifer = self.models['bank_debit_subtype_cnn']
+			else:
+				debit_subtype_classifer = self.models['bank_debit_subtype_' + region + '_cnn']
 
 		# Split transactions into groups
 		credit, debit = [], []
@@ -590,12 +619,26 @@ class WebConsumer():
 		if len(data["transaction_list"]) == 0:
 			return data["transaction_list"]
 
+		region = str(data["cobrand_region"])
+
 		if data["container"] == "card":
-			credit_category_classifer = self.card_credit_category_cnn
-			debit_category_classifer = self.card_debit_category_cnn
+			if 'card_credit_category_' + region + '_cnn' not in self.models:
+				credit_category_classifer = self.models['card_credit_category_cnn']
+			else:
+				credit_category_classifer = self.models['card_credit_category_' + region + '_cnn']
+			if 'card_debit_category_' + region + '_cnn' not in self.models:
+				debit_category_classifer = self.models['card_debit_category_cnn']
+			else:
+				debit_category_classifer = self.models['card_debit_category_' + region + '_cnn']
 		elif data["container"] == "bank":
-			credit_category_classifer = self.bank_credit_category_cnn
-			debit_category_classifer = self.bank_debit_category_cnn
+			if 'bank_credit_category_' + region + '_cnn' not in self.models:
+				credit_category_classifer = self.models['bank_credit_category_cnn']
+			else:
+				credit_category_classifer = self.models['bank_credit_category_' + region + '_cnn']
+			if 'bank_debit_category_' + region + '_cnn' not in self.models:
+				debit_category_classifer = self.models['bank_debit_category_cnn']
+			else:
+				debit_category_classifer = self.models['bank_debit_category_' + region + '_cnn']
 
 		# Split transactions into groups
 		credit, debit = [], []
