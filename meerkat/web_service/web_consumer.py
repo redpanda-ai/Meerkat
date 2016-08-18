@@ -455,7 +455,11 @@ class WebConsumer():
 				trans["bloom_filter"] = {"city": trans["city"], "state": trans["state"]}
 				trans["cnn"] = {"txn_type" : trans.get("txn_type", ""),
 					"txn_sub_type" : trans.get("txn_sub_type", ""),
-					"merchant_name" : trans.pop("CNN", "")
+					"merchant_name" : trans.pop("CNN", ""),
+					"category_labels" : [trans["category_CNN"].get("label", "")],
+					"merchant_score" : trans.get("merchant_score", "0.0"),
+					"subtype_score" : trans.get("subtype_score", "0.0"),
+					"category_score" : trans.get("category_score", "0.0")
 					}
 
 			trans.pop("locale_bloom", None)
@@ -466,6 +470,9 @@ class WebConsumer():
 			trans.pop("CNN", None)
 			trans.pop("container", None)
 			trans.pop("category_CNN", None)
+			trans.pop("merchant_score", None)
+			trans.pop("subtype_score", None)
+			trans.pop("category_score", None)
 
 		# return transactions
 
@@ -605,6 +612,8 @@ class WebConsumer():
 		if len(debit) > 0:
 			debit_category_classifer(debit, label_key="category_CNN", label_only=False)
 
+		refund_transactions = []
+
 		for transaction in data["transaction_list"]:
 			category = transaction["category_CNN"].get("label", "")
 			transaction["category_labels"] = [category]
@@ -613,6 +622,10 @@ class WebConsumer():
 				transaction["category_labels"] = ["Other Expenses"]
 				if transaction["ledger_entry"] == "credit":
 					transaction["category_labels"] = ["Other Income"]
+
+			# Collect refund/adjustments transactions to apply a refund transactions model soon
+			if transaction["category_labels"] == ["Refunds/Adjustments"]:
+				refund_transactions.append(transaction)
 
 		return data["transaction_list"]
 
@@ -687,15 +700,18 @@ class WebConsumer():
 		cpu_result = self.__cpu_pool.apply_async(self.__apply_cpu_classifiers, (data, ))
 
 		if not optimizing:
-			# Apply Subtype CNN And Category CNN
+			# Apply Subtype CNN
 			if "cnn_subtype" in services_list or services_list == []:
 				self.__apply_subtype_cnn(data)
-				self.__apply_category_cnn(data)
 			else:
 				# Add the filed to ensure output schema pass
 				for transaction in data["transaction_list"]:
 					transaction["txn_sub_type"] = ""
 					transaction["txn_type"] = ""
+
+			# Apply Category CNN
+			if "cnn_category" in services_list or "cnn_subtype" in services_list or services_list == []:
+				self.__apply_category_cnn(data)
 
 			# Apply Merchant CNN
 			if "cnn_merchant" in services_list or services_list == []:
