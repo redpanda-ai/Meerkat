@@ -49,6 +49,7 @@ def parse_arguments(args):
 		card or bank transactions.")
 
 	#optional arguments
+	parser.add_argument("--region", help="region", default='')
 	parser.add_argument("--credit_or_debit", help="ledger entry", default='')
 	parser.add_argument("--bucket", help="Input bucket name", default='')
 	parser.add_argument("--input_dir", help="Path of the directory immediately \
@@ -64,8 +65,8 @@ def parse_arguments(args):
 
 	args = parser.parse_args(args)
 
-	if args.model_type == 'subtype' and args.credit_or_debit == '':
-		raise Exception('For subtype data you need to declare debit or credit.')
+	if (args.model_type == 'subtype' or args.model_type == 'category') and args.credit_or_debit == '':
+		raise Exception('You need to declare debit or credit.')
 
 	if args.debug:
 		logging.basicConfig(level=logging.DEBUG)
@@ -93,8 +94,11 @@ def main_split_data(args):
 	bank_or_card = args.bank_or_card
 	data_type = model_type + "/" + bank_or_card
 	credit_or_debit = args.credit_or_debit
+	region = args.region
 	if model_type != "merchant":
 		data_type = data_type + '/' + credit_or_debit
+	if region != '':
+		data_type = data_type + '/' + region
 
 	bucket = "s3yodlee" if args.bucket == '' else args.bucket
 	default_prefix = 'meerkat/cnn/data/'
