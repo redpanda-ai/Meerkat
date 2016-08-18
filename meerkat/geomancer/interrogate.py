@@ -123,7 +123,6 @@ class Worker(GeomancerModule):
 			old_df = old_df.rename(columns = {'question': 'DESCRIPTION_UNMASKED'})
 			logger.info("old_df: \n{0}".format(old_df))
 
-			#merchant = project_name[len("Geomancer_") + len(bank_or_card) + 1:]
 			new_tasks_file = base_dir + top_merchant + "/" + bank_or_card  +"_tasks.csv"
 			if not os.path.isfile(new_tasks_file):
 				continue
