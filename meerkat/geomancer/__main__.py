@@ -36,7 +36,7 @@ def get_module_args(parse_function, config_object):
 	return parse_function(arg_list)
 
 def main_process():
-	"""Execute the main programe"""
+	"""Execute the main program"""
 	logger.info("Starting")
 	logger.info("Parsing arguments.")
 	args = parse_arguments(sys.argv[1:])
@@ -52,14 +52,19 @@ def main_process():
 		"meerkat/geomancer/config/schema.json")
 	logger.info("Valid configuration")
 
-	module_list = [("agg_data", agg_data), ("merchant_dictionaries", merchant_dictionaries),
-		("pybossa_project", builder), ("top_merchant_data", top_merchant_data),
-		("interrogate", interrogate)]
-	for name, module in module_list:
-		if name in config:
-			logger.info("Activating {0} module.".format(name))
-			config_snippet = config[name]
-			common_config_snippet["target_merchant_list"] = module.Worker(common_config_snippet, config_snippet).main_process()
+	#module_list = [("agg_data", agg_data), ("merchant_dictionaries", merchant_dictionaries),
+	#	("pybossa_project", builder), ("top_merchant_data", top_merchant_data),
+	#	("interrogate", interrogate)]
+	#module_list = [agg_data, merchant_dictionaries, builder, top_merchant_data, interrogate]
+	module_list = [agg_data, merchant_dictionaries]
+	for module in module_list:
+		logger.info(module.Worker.name)
+		if module.Worker.name in config:
+			logger.info("Activating {0} module.".format(module.Worker.name))
+			config_snippet = config[module.Worker.name]
+			#common_config_snippet["target_merchant_list"] = module.Worker(common_config_snippet, config_snippet).main_process()
+			common_config_snippet = module.Worker(common_config_snippet, config_snippet).main_process()
+			logger.info(common_config_snippet)
 
 if __name__ == "__main__":
 	main_process()
