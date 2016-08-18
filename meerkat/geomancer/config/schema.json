@@ -42,7 +42,7 @@
 				},
 				"filename": {
 					"type": "string",
-					"pattern": "^.*\.tar\.gz$"
+					"pattern": "^[0-9]{8}.tar.gz$"
 				},
 				"savepath": {
 					"type": "string",
