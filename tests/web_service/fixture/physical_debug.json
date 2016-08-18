@@ -45,6 +45,10 @@
     "cnn": {
         "txn_type": "Purchase",
         "txn_sub_type": "Purchase",
-        "merchant_name": "Ikea"
+        "merchant_name": "Ikea",
+        "category_labels": ["Other Expenses"],
+        "merchant_score": "0.0",
+        "subtype_score": "0.0",
+        "category_score": "0.0"
     }
 }

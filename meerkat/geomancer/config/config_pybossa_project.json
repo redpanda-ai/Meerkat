@@ -1,8 +1,8 @@
 {
 	"pybossa_project" : {
 		"create_project": true,
-		"update_presenter": false,
-		"update_dictionary": false,
+		"update_presenter": true,
+		"update_dictionary": true,
 		"add_tasks": false
 	}
 }

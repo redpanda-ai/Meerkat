@@ -52,10 +52,8 @@ def main_process():
 		"meerkat/geomancer/config/schema.json")
 	logger.info("Valid configuration")
 
-	#module_list = [agg_data, merchant_dictionaries, builder, top_merchant_data, interrogate]
-	module_list = [agg_data, merchant_dictionaries]
+	module_list = [agg_data, merchant_dictionaries, builder, top_merchant_data, interrogate]
 	for module in module_list:
-		logger.info(module.Worker.name)
 		if module.Worker.name in config:
 			logger.info("Activating {0} module.".format(module.Worker.name))
 			config_snippet = config[module.Worker.name]
