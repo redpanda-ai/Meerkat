@@ -10,6 +10,7 @@ import requests
 import yaml
 
 from ..tools import copy_file, get_top_merchant_names
+from ..geomancer_module import GeomancerModule
 
 logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
 logger = logging.getLogger('build_pybossa_project')
@@ -62,30 +63,28 @@ def get_existing_projects(server, apikey):
 		short_names.append(item["short_name"])
 	return short_names
 
-class Worker:
+class Worker(GeomancerModule):
 	"""Contains methods and data pertaining to the processing of pybossa project"""
+	name = "pybossa_project"
 	def __init__(self, common_config, config):
 		"""Constructor"""
-		self.config = config
-		for key in common_config:
-			self.config[key] = common_config[key]
+		super(Worker, self).__init__(common_config, config)
 
 	def main_process(self):
 		"""Execute the main program"""
 		base_dir = "meerkat/geomancer/merchants/"
 		os.makedirs(base_dir, exist_ok=True)
-		target_merchants = self.config["target_merchant_list"]
+		target_merchants = self.common_config["target_merchant_list"]
 		top_merchants = get_top_merchant_names(base_dir, target_merchants)
-		self.config["target_merchant_list"] = top_merchants
+		self.common_config["target_merchant_list"] = top_merchants
 
-		#merchants = self.config["target_merchant_list"]
-		#top_merchants = [item for item in merchants if item in merchants_with_preconditions]
 		logger.info("Top merchants project to be processed are: {0}".format(top_merchants))
 
-		server, apikey = self.config["server"], self.config["apikey"]
+		server, apikey = self.common_config["server"], self.common_config["apikey"]
 		existing_projects = get_existing_projects(server, apikey)
-		bank_or_card = self.config["bank_or_card"]
+		logger.info("Existing pybossa projects: {0}".format(existing_projects))
 
+		bank_or_card = self.common_config["bank_or_card"]
 		for merchant in top_merchants:
 			merchant_dir = base_dir + merchant + "/pybossa_project/" + bank_or_card + "/"
 			os.makedirs(merchant_dir, exist_ok=True)
@@ -94,8 +93,6 @@ class Worker:
 			project_name = "Geomancer_" + bank_or_card + "_" + merchant
 			# Create a new pybossa project
 			if 'create_project' in self.config and self.config["create_project"]:
-				logger.info(project_name)
-				logger.info(existing_projects)
 				if project_name in existing_projects:
 					logger.warning("Project {0} already exists".format(project_name))
 				else:
@@ -145,7 +142,7 @@ class Worker:
 			if 'add_tasks' in self.config and self.config["add_tasks"]:
 				tasks_file = merchant_dir + "tasks.csv"
 				add_tasks(server, apikey, project_json_file, tasks_file)
-		return self.config["target_merchant_list"]
+		return self.common_config
 
 def replace_str_in_file(file_name, old_str, new_str):
 	"""Replace the occurrences of old string with new string in a file"""
