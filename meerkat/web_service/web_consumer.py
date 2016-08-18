@@ -76,7 +76,7 @@ class WebConsumer():
 		models_dir = 'meerkat/classification/models/'
 		label_maps_dir = "meerkat/classification/label_maps/"
 		for filename in os.listdir(models_dir):
-			if filename.endswith('.ckpt'):
+			if filename.endswith('.ckpt') and not filename.startswith('train'):
 				temp = filename.split('.')[:-1]
 				if temp[-1].isdigit():
 					key = '_'.join(temp[1:-1] + [temp[0], temp[-1], 'cnn'])
