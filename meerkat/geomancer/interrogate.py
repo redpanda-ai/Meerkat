@@ -8,6 +8,7 @@ import os
 
 from .pybossa.build_pybossa_project import add_tasks
 from .tools import get_top_merchant_names
+from .geomancer_module import GeomancerModule
 
 logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
 logger = logging.getLogger('interrogate')
@@ -70,36 +71,34 @@ def get_existing_projects(server, apikey):
 		short_names[item["short_name"]] = item["id"]
 	return short_names
 
-class Worker:
+class Worker(GeomancerModule):
 	"""Contains methods and data pertaining to the creation and retrieval of AggData files"""
+	name = "interrogate"
 	def __init__(self, common_config, config):
 		"""Constructor"""
-		self.config = config
-		for key in common_config:
-			self.config[key] = common_config[key]
+		super(Worker, self).__init__(common_config, config)
 
 	def main_process(self):
 		"""Execute the main program"""
-		server, apikey = self.config["server"], self.config["apikey"]
+		server, apikey = self.common_config["server"], self.common_config["apikey"]
 		existing_projects = get_existing_projects(server, apikey)
 		logger.info("Existing projects are: {0}".format(existing_projects))
 
 		base_dir = "meerkat/geomancer/merchants/"
-		target_merchant_list = self.config["target_merchant_list"]
+		target_merchant_list = self.common_config["target_merchant_list"]
 		top_merchants = get_top_merchant_names(base_dir, target_merchant_list)
-		self.config["target_merchant_list"] = top_merchants
+		self.common_config["target_merchant_list"] = top_merchants
 		if len(top_merchants) == 0:
 			logger.critical("There are no top merchants, aborting.")
 			sys.exit()
 		#Ensure that all top merchants have a pybossa directory
+		bank_or_card = self.common_config["bank_or_card"]
 		for merchant in top_merchants:
-			path = "meerkat/geomancer/merchants/" + merchant + "/pybossa_project/" +\
-				self.config["bank_or_card"]
+			path = "meerkat/geomancer/merchants/" + merchant + "/pybossa_project/" + bank_or_card
 			if not os.path.exists(path):
 				logger.warning("Skipping {0} merchant: path not found at: {1}".format(merchant, path))
 		logger.info("Top merchants are: {0}".format(top_merchants))
 
-		bank_or_card = self.config["bank_or_card"]
 		map_id_to_name, map_name_to_id = {}, {}
 		for merchant in top_merchants:
 			project_name = "Geomancer_" + bank_or_card + "_" + merchant
@@ -140,7 +139,7 @@ class Worker:
 			project_json_file = base_dir + merchant + "/pybossa_project/" + bank_or_card + "/project.json"
 			add_tasks(server, apikey, project_json_file, tasks_file)
 			logger.info("Add new tasks to {0}".format(project_name))
-		return self.config["target_merchant_list"]
+		return self.common_config
 
 if __name__ == "__main__":
 	logger.critical("This module cannot be run from the command line.")
