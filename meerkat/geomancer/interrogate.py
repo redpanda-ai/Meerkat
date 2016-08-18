@@ -116,7 +116,6 @@ class Worker(GeomancerModule):
 		csv_kwargs = { "usecols": ["DESCRIPTION_UNMASKED"], "error_bad_lines": False, "warn_bad_lines": True,
 			"encoding": "utf-8", "quotechar" : '"', "na_filter" : False, "sep": "," }
 
-		#for project_name in dfs:
 		for top_merchant in top_merchants:
 			project_name = "Geomancer_" + bank_or_card + "_" + top_merchant
 			logger.info("Interrogating {0}".format(project_name))
@@ -124,8 +123,8 @@ class Worker(GeomancerModule):
 			old_df = old_df.rename(columns = {'question': 'DESCRIPTION_UNMASKED'})
 			logger.info("old_df: \n{0}".format(old_df))
 
-			merchant = project_name[len("Geomancer_") + len(bank_or_card) + 1:]
-			new_tasks_file = base_dir + merchant + "/" + bank_or_card  +"_tasks.csv"
+			#merchant = project_name[len("Geomancer_") + len(bank_or_card) + 1:]
+			new_tasks_file = base_dir + top_merchant + "/" + bank_or_card  +"_tasks.csv"
 			if not os.path.isfile(new_tasks_file):
 				continue
 			new_df = pd.read_csv(new_tasks_file, **csv_kwargs)
@@ -137,10 +136,10 @@ class Worker(GeomancerModule):
 				logger.info("No new tasks for {0}".format(project_name))
 				continue
 
-			tasks_file = base_dir + merchant + "/pybossa_project/" + bank_or_card + "/tasks.csv"
+			tasks_file = base_dir + top_merchant + "/pybossa_project/" + bank_or_card + "/tasks.csv"
 			new_tasks_df.to_csv(tasks_file, header=["question"], index=False)
 			logger.info("Save new tasks dataframe to {0}".format(tasks_file))
-			project_json_file = base_dir + merchant + "/pybossa_project/" + bank_or_card + "/project.json"
+			project_json_file = base_dir + top_merchant + "/pybossa_project/" + bank_or_card + "/project.json"
 			add_tasks(server, apikey, project_json_file, tasks_file)
 			logger.info("Add new tasks to {0}".format(project_name))
 		return self.common_config
