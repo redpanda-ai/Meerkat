@@ -524,11 +524,23 @@ class WebConsumer():
 
 	def __apply_merchant_cnn(self, data):
 		"""Apply the merchant CNN to transactions"""
+
+		if "cobrand_region" in data:
+			region = str(data["cobrand_region"])
+		else:
+			region = '000'
+
 		classifier = None
 		if data["container"] == "bank":
-			classifier = self.models['bank_merchant_cnn']
+			if 'bank_merchant_' + region + '_cnn' not in self.models:
+				classifier = self.models['bank_merchant_cnn']
+			else:
+				classifier = self.models['bank_merchant_' + region + '_cnn']
 		else:
-			classifier = self.models['card_merchant_cnn']
+			if 'card_merchant_' + region + '_cnn' not in self.models:
+				classifier = self.models['card_merchant_cnn']
+			else:
+				classifier = self.models['card_merchant_' + region + '_cnn']
 		return classifier(data["transaction_list"], label_only=False)
 
 	def __apply_subtype_cnn(self, data):
