@@ -9,6 +9,7 @@ import sys
 import yaml
 
 from meerkat.various_tools import load_params
+from .geomancer_module import GeomancerModule
 
 logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
 logger = logging.getLogger('get_agg_data')
@@ -70,17 +71,17 @@ def get_s3_file(**kwargs):
 	#File needs to be downloaded
 	return True
 
-class Worker:
+class Worker(GeomancerModule):
 	"""Contains methods and data pertaining to the creation and retrieval of AggData files"""
+	name = "agg_data"
 	def __init__(self, common_config, config):
 		"""Constructor"""
-		self.config = config
-		for key in common_config:
-			self.config[key] = common_config[key]
+		super(Worker, self).__init__(common_config, config)
 
 	def main_process(self):
 		"""Execute the main programe"""
-		bucket = self.config["bucket"]
+		logger.info(Worker.name)
+		bucket = self.common_config["bucket"]
 		prefix = self.config["prefix"]
 		file_name = self.config["filename"]
 		save_path = self.config["savepath"]
@@ -91,7 +92,7 @@ class Worker:
 		needs_to_be_downloaded = get_s3_file(bucket=bucket, prefix=prefix, file_name=file_name,
 			save_path=save_path, etags=etags, etags_file=etags_file)
 
-		return self.config["target_merchant_list"]
+		return self.common_config
 
 if __name__ == "__main__":
 	logger.critical("You cannot run this from the command line, aborting.")
