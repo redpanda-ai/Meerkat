@@ -12,6 +12,7 @@ from meerkat.classification.tools import (pull_from_s3, extract_tarball,
 
 from .get_agg_data import get_s3_file, get_etags
 from .tools import remove_special_chars, get_grouped_dataframes
+from .geomancer_module import GeomancerModule
 
 logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
 logger = logging.getLogger('get_top_merchant_data')
@@ -25,23 +26,22 @@ def extract_clean_files(save_path, tarball_name, extension):
 				logger.info("{0} is removed".format(f))
 	extract_tarball(save_path + tarball_name, save_path)
 
-class Worker:
-	"""Contains methods and data pertaining to the processing of pybossa project"""
+class Worker(GeomancerModule):
+	"""Contains methods and data pertaining to get top merchant data"""
+	name = "top_merchant_data"
 	def __init__(self, common_config, config):
 		"""Constructor"""
-		self.config = config
-		for key in common_config:
-			self.config[key] = common_config[key]
+		super(Worker, self).__init__(common_config, config)
 
 	def main_process(self):
-		bank_or_card = self.config["bank_or_card"]
-		bucket = self.config["bucket"]
+		bank_or_card = self.common_config["bank_or_card"]
+		bucket = self.common_config["bucket"]
 		version_dir = self.config["version_dir"]
 
 		prefix = "meerkat/cnn/data/merchant/" + bank_or_card + "/" + version_dir + "/"
 		extension = "tar.gz"
 		tarball_name = "input.tar.gz"
-		save_path = "meerkat/geomancer/data/input/" + self.config["bank_or_card"] + "/"
+		save_path = "meerkat/geomancer/data/input/" + bank_or_card + "/"
 		os.makedirs(save_path, exist_ok=True)
 
 		etags, etags_file = get_etags(save_path)
@@ -82,9 +82,9 @@ class Worker:
 					os.rename(csv_file + ".temp", csv_file)
 
 				merchant_dataframes = get_grouped_dataframes(csv_file, 'MERCHANT_NAME',
-					self.config["target_merchant_list"], **csv_kwargs)
+					self.common_config["target_merchant_list"], **csv_kwargs)
 				merchants = sorted(list(merchant_dataframes.keys()))
-				self.config["target_merchant_list"] = merchants
+				self.common_config["target_merchant_list"] = merchants
 				for merchant in merchants:
 					formatted_merchant = remove_special_chars(merchant)
 					os.makedirs(tasks_prefix + formatted_merchant, exist_ok=True)
@@ -95,7 +95,7 @@ class Worker:
 					merchant_dataframes[merchant].to_csv(tasks, sep=',', index=False, quoting=csv.QUOTE_ALL)
 					logger.info("Merchant {0}: {2} duplicate transactions; {1} unique transactions".format(merchant,
 						len(merchant_dataframes[merchant]), original_len - len(merchant_dataframes[merchant])))
-		return self.config["target_merchant_list"]
+		return self.common_config
 
 if __name__ == "__main__":
 	logger.critical("You cannot run this from the command line, aborting.")

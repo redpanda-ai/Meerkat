@@ -8,10 +8,10 @@
 		"dry_run": false
 	},
 	"pybossa_project" : {
-		"create_project": false,
-		"update_presenter": false,
-		"update_dictionary": false,
-		"add_tasks": true
+		"create_project": true,
+		"update_presenter": true,
+		"update_dictionary": true,
+		"add_tasks": false
 	},
 	"interrogate" : {
 	},

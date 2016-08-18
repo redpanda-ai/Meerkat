@@ -19,6 +19,9 @@ loggers:
   warn:
     handlers: [warn]
     propagate: true
+  geomancer_module:
+    handlers: [console]
+    propogate: true
   get_merchant_dictionaries:
     handlers: [console]
     propogate: true

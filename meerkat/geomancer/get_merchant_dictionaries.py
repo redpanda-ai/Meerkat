@@ -13,6 +13,7 @@ import yaml
 from functools import reduce
 from timeit import default_timer as timer
 from .tools import remove_special_chars, get_grouped_dataframes
+from .geomancer_module import GeomancerModule
 
 logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
 logger = logging.getLogger('get_merchant_dictionaries')
@@ -60,13 +61,13 @@ def expand_abbreviations(city):
 			break
 	return city
 
-class Worker:
+class Worker(GeomancerModule):
 	"""Contains methods and data pertaining to the creation and retrieval of merchant dictionaries"""
+	name = "merchant_dictionaries"
+
 	def __init__(self, common_config, config):
 		"""Constructor"""
-		self.config = config
-		for key in common_config:
-			self.config[key] = common_config[key]
+		super(Worker, self).__init__(common_config, config)
 		module_path = inspect.getmodule(inspect.stack()[1][0]).__file__
 		self.filepath = module_path[:module_path.rfind("/") + 1] + "merchants"
 
@@ -146,9 +147,9 @@ class Worker:
 		csv_kwargs = { "chunksize": 1000, "error_bad_lines": False, "warn_bad_lines": True,
 			"encoding": "utf-8", "quotechar" : '"', "na_filter" : False, "sep": "," }
 		merchant_dataframes = get_grouped_dataframes("meerkat/geomancer/data/agg_data/All_Merchants.csv",
-			"list_name", self.config["target_merchant_list"], **csv_kwargs)
+			"list_name", self.common_config["target_merchant_list"], **csv_kwargs)
 		merchants = sorted(list(merchant_dataframes.keys()))
-		self.config["target_merchant_list"] = merchants
+		self.common_config["target_merchant_list"] = merchants
 		for merchant in merchants:
 			self.config["merchant"] = remove_special_chars(merchant)
 			df = merchant_dataframes[merchant]
@@ -159,7 +160,7 @@ class Worker:
 			self.geo_df = self.get_geo_dictionary(df)
 			unique_city_state, unique_city = self.get_unique_city_dictionaries(df)
 			# Let's also get the question bank
-		return self.config["target_merchant_list"]
+		return self.common_config
 
 	def setup_directories(self):
 		"""This creates the directories on the local file system, if needed."""
