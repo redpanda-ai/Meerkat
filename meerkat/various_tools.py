@@ -14,6 +14,7 @@ import logging
 import os
 import re
 import sys
+import yaml
 
 import boto
 import numpy as np
@@ -23,6 +24,10 @@ from boto.s3.key import Key
 from boto.s3.connection import Location
 from jsonschema import validate
 from scipy.stats.mstats import zscore
+
+logging.config.dictConfig(yaml.load(open('meerkat/logging.yaml', 'r')))
+#FIXME: Cannot seems to figure out why the formatter name cannot be various_tools
+logger = logging.getLogger('__main__')
 
 def z_score_delta(scores):
 	"""Find the Z-Score Delta"""
@@ -81,12 +86,12 @@ def validate_configuration(config, schema):
 			config = load_params(config)
 			schema = load_params(schema)
 		except ValueError as val_err:
-			logging.error("Config file is mal-formatted {0}".format(val_err))
+			logger.error("Config file is mal-formatted {0}".format(val_err))
 			sys.exit()
 		validate(config, schema)
-		logging.warning("Configuration schema is valid.")
+		logger.warning("Configuration schema is valid.")
 	except IOError:
-		logging.error("File not found, aborting.")
+		logger.error("File not found, aborting.")
 		sys.exit()
 	return config
 
@@ -197,7 +202,7 @@ def load_hyperparameters(params):
 		hyperparameters = json.loads(input_file.read())
 		input_file.close()
 	except IOError:
-		logging.error("%s not found, aborting.", params["input"]["hyperparameters"])
+		logger.error("%s not found, aborting.", params["input"]["hyperparameters"])
 		sys.exit()
 	return hyperparameters
 
@@ -249,12 +254,12 @@ def get_merchant_by_id(*args, **kwargs):
 
 def safely_remove_file(filename):
 	"""Safely removes a file"""
-	logging.debug("Removing {0}".format(filename))
+	logger.debug("Removing {0}".format(filename))
 	try:
 		os.remove(filename)
 	except OSError:
-		logging.critical("Unable to remove {0}".format(filename))
-	logging.info("{0} removed".format(filename))
+		logger.critical("Unable to remove {0}".format(filename))
+	logger.info("{0} removed".format(filename))
 
 def string_cleanse(original_string):
 	"""Strips out characters that might confuse ElasticSearch."""
