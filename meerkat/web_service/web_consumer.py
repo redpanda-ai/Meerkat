@@ -18,7 +18,7 @@ from scipy.stats.mstats import zscore
 
 from meerkat.various_tools import get_es_connection, string_cleanse, get_boosted_fields
 from meerkat.various_tools import synonyms, get_bool_query, get_qs_query
-from meerkat.classification.load_model import load_scikit_model, get_tf_cnn_by_name, get_tf_cnn_by_path
+from meerkat.classification.load_model import load_scikit_model, get_tf_cnn_by_path
 from meerkat.classification.auto_load import main_program as load_models_from_s3
 
 # pylint:disable=no-name-in-module
@@ -82,7 +82,8 @@ class WebConsumer():
 					key = '_'.join(temp[1:-1] + [temp[0], temp[-1], 'cnn'])
 				else:
 					key = '_'.join(temp[1:] + [temp[0], 'cnn'])
-				self.models[key] = get_tf_cnn_by_path(models_dir + filename, label_maps_dir + filename[:-4] + 'json', gpu_mem_fraction=gmf)
+				self.models[key] = get_tf_cnn_by_path(models_dir + filename, \
+					label_maps_dir + filename[:-4] + 'json', gpu_mem_fraction=gmf)
 
 	def update_hyperparams(self, hyperparams):
 		"""Updates a WebConsumer object's hyper-parameters"""
