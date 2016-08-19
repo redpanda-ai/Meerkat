@@ -63,7 +63,12 @@ def get_tags(config, trans):
 	"""Convert df row to list of tags and tokens"""
 
 	tokens = str(trans["Description"]).lower().split()[0:config["max_tokens"]]
-	tag = str(trans["Tagged_merchant_string"]).lower().split()
+	tmp = str(trans["Tagged_merchant_string"]).lower()
+	if "," in tmp:
+		tmp = tmp.split(",")
+		tag = sum([item.split() for item in tmp], [])
+	else:
+		tag = tmp.split()
 	tags = []
 
 	for token in tokens:

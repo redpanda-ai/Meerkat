@@ -10,20 +10,22 @@ class BilstmTaggerTests(unittest.TestCase):
 	"""Unittest class for bilstm_tagger"""
 
 	@parameterized.expand([
-		(["Debit PIN Purchase ISLAND OF GOLD SUPERMARFRESH MEADOWSNY", "ISLAND OF GOLD SUPERMAR"],
+		({"Description": "Debit PIN Purchase ISLAND OF GOLD SUPERMARFRESH MEADOWSNY", "Tagged_merchant_string": "ISLAND OF GOLD SUPERMAR"},
 			["background", "background", "background", "merchant", "merchant", "merchant", "merchant", "background"]),
-		(["76", "76"],  ["merchant", "merchant"]),
-		(["PILOT", "PILOT"], ["merchant", "merchant"]),
-		(["PAYMENT THANK YOU", ""], ["background", "background", "background"]),
-		(["123 THAI FOOD OAK          HARBOR WA~~08888~~120123052189~~77132~~0~~~0079", "123 THAI FOOD"],
+		({"Description": "76", "Tagged_merchant_string": "76"},  ["merchant"]),
+		({"Description": "PAYMENT THANK YOU", "Tagged_merchant_string": ""}, ["background", "background", "background"]),
+		({"Description": "123 THAI FOOD OAK          HARBOR WA~~08888~~120123052189~~77132~~0~~~0079", "Tagged_merchant_string": "123 THAI FOOD"},
 			["merchant", "merchant", "merchant", "background", "background", "background"]),
-		(["A.A. Colony Square H.O.A Bill Payment", "A.A. Colony Square"],
-			["merchant", "merchant", "merchant", "background", "background", "background"]),
-		(["COX CABLE        ONLINE PMT ***********6POS", "COX CABLE"],
-			["merchant", "merchant", "background", "background", "background"])
+		({"Description": "COX CABLE        ONLINE PMT ***********6POS", "Tagged_merchant_string": "COX CABLE"},
+			["merchant", "merchant", "background", "background", "background"]),
+		({"Description": "AMERICAN EXPRESS DES:SETTLEMENT ID:5049791080                INDN:SUBWAY #29955049791080  CO ID:1134992250 CCD", "Tagged_merchant_string": "AMERICAN EXPRESS, SUBWAY"},
+			["merchant", "merchant", "background", "background", "merchant", "background", "background", "background", "background"]),
+		({"Description": "AA MILES BY POINTS     POINTS.COM    IL", "Tagged_merchant_string": "AA, Points.com"},
+			["merchant", "background", "background", "background", "merchant", "background"])
 	])
 	def test_get_tags(self, description, expected_tags):
-		tokens, tags = bilstm.get_tags(description)
+		config = {"max_tokens": 35}
+		tokens, tags = bilstm.get_tags(config, description)
 		self.assertEqual(tags, expected_tags)
 
 	@parameterized.expand([
