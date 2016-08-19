@@ -123,7 +123,6 @@ class ThreadConsumer(threading.Thread):
 		threading.Thread.__init__(self)
 		self.thread_id = thread_id
 		self.param = param
-		#self.param["consumer_queue"].append(self.thread_id)
 
 	def run(self):
 		param = self.param
@@ -131,11 +130,6 @@ class ThreadConsumer(threading.Thread):
 			logger.info("data_queue_populated: {0}, data_queue empty {1}".format(param["data_queue_populated"],
 				param["data_queue"].empty()))
 			if param["data_queue_populated"] and param["data_queue"].empty():
-				#Remove yourself from the consumer queue
-				#logger.info("Removing consumer thread.")
-				#self.param["consumer_queue"].get()
-				#logger.info("Notifying task done.")
-				#self.param["consumer_queue"].task_done()
 				logger.info("Consumer thread {0} finished".format(str(self.thread_id)))
 				break
 			chunk = param["data_queue"].get()
@@ -216,7 +210,7 @@ def get_grouped_dataframes(input_file, groupby_name, target_merchant_list, **csv
 	param = {
 		"activate_cnn": activate_cnn,
 		"chunk_num": 0,
-		"consumer_queue": [], #queue.Queue(),
+		"consumer_queue": [],
 		"csv_kwargs": csv_kwargs,
 		"data_queue": queue.Queue(),
 		"data_queue_populated": False,
@@ -236,8 +230,6 @@ def get_grouped_dataframes(input_file, groupby_name, target_merchant_list, **csv
 	start_producers(param)
 	start_consumers(param, num_consumer_thread)
 	param["data_queue"].join()
-	for i in range(num_consumer_thread):
-		param["data_queue"].put(None)
 	for consumer_thread in param["consumer_queue"]:
 		consumer_thread.join()
 

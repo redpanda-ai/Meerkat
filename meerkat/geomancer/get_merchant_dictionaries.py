@@ -176,10 +176,7 @@ class Worker(GeomancerModule):
 		logger.warning(merchants)
 		logger.warning(len(merchants))
 		for merchant in merchants:
-			formatted_merchant = merchant
-			if merchant.endswith(" US"):
-				formatted_merchant = merchant[:-3]
-			self.config["merchant"] = remove_special_chars(formatted_merchant)
+			self.config["merchant"] = remove_special_chars(merchant)
 			df = merchant_dataframes[merchant]
 			preprocess_dataframe(df)
 			logger.info("***** Processing {0:>29} ********".format(merchant))
