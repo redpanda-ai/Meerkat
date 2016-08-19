@@ -89,7 +89,7 @@ def get_tf_rnn_by_path(model_path, w2i_path, gpu_mem_fraction=False, model_name=
 		gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.25)
 		sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, gpu_options=gpu_options))
 	else:
-		sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
+		sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, device_count={"GPU":0}))
 
 	saver.restore(sess, config["model_path"])
 	graph = sess.graph

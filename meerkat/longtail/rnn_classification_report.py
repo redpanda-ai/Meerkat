@@ -47,13 +47,13 @@ def beautify(item, config):
 	item["predicted"] = " ".join([tran[i] for i in target_indices])
 	return item
 
-def write_mislabeled(data, mode, config):
+def write_mislabeled(data, mode, config, header):
 	if len(data) > 0:
 		data = [beautify(item, config) for item in data]
 		file_path = "./data/RNN_stats/mislabeled.csv"
 		logging.info("Saving mislabeled transactions to {0}".format(file_path))
 		df = pd.DataFrame(data)
-		df.to_csv(file_path, sep="|", mode=mode, index=False)
+		df.to_csv(file_path, sep="|", mode=mode, index=False, header=header)
 
 def evaluate_model(args=None):
 	os.makedirs("./data/RNN_stats/", exist_ok=True)
@@ -67,6 +67,7 @@ def evaluate_model(args=None):
 	model = get_tf_rnn_by_path(args.model, args.w2i)
 	total_trans = count_transactions(args.data)
 	processed = 0.0
+	header = True
 	mode = "w"
 	for chunk in reader:
 		processed += len(chunk)
@@ -81,7 +82,8 @@ def evaluate_model(args=None):
 				con_matrix[rows[i]][columns[i]] += 1
 			if columns != rows:
 				mislabeled.append(item)
-		write_mislabeled(mislabeled, mode, config)
+		write_mislabeled(mislabeled, mode, config, header)
+		header = False
 		mode = "a"
 	con_matrix = pd.DataFrame(con_matrix)
 	con_matrix.columns = [config["tag_map"][str(i)] for i in range(num_labels)]

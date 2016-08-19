@@ -62,8 +62,8 @@ def last_relevant(output, length, name):
 def get_tags(config, trans):
 	"""Convert df row to list of tags and tokens"""
 
-	tokens = trans["Description"].lower().split()[0:config["max_tokens"]]
-	tag = trans["Tagged_merchant_string"].lower().split()
+	tokens = str(trans["Description"]).lower().split()[0:config["max_tokens"]]
+	tag = str(trans["Tagged_merchant_string"]).lower().split()
 	tags = []
 
 	for token in tokens:
