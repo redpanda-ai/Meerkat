@@ -123,25 +123,24 @@ class ThreadConsumer(threading.Thread):
 		threading.Thread.__init__(self)
 		self.thread_id = thread_id
 		self.param = param
-		self.param["consumer_queue"].put(self.thread_id)
+		#self.param["consumer_queue"].append(self.thread_id)
 
 	def run(self):
 		param = self.param
-		consumer_queue = param["consumer_queue"]
 		while True:
 			logger.info("data_queue_populated: {0}, data_queue empty {1}".format(param["data_queue_populated"],
 				param["data_queue"].empty()))
 			if param["data_queue_populated"] and param["data_queue"].empty():
 				#Remove yourself from the consumer queue
-				logger.info("Removing consumer thread.")
-				param["consumer_queue"].get()
-				logger.info("Notifying task done.")
-				param["consumer_queue"].task_done()
+				#logger.info("Removing consumer thread.")
+				#self.param["consumer_queue"].get()
+				#logger.info("Notifying task done.")
+				#self.param["consumer_queue"].task_done()
 				logger.info("Consumer thread {0} finished".format(str(self.thread_id)))
 				break
 			chunk = param["data_queue"].get()
 			logger.info("consumer thread: {0}; data queue size: {1}, consumer queue size {2}".format(str(self.thread_id),
-				 param["data_queue"].qsize(), param["consumer_queue"].qsize()))
+				 param["data_queue"].qsize(), len(self.param["consumer_queue"])))
 
 			param["chunk_num"] += 1
 			if param["chunk_num"] % 10 == 0:
@@ -182,13 +181,18 @@ def start_producers(param):
 	producer = ThreadProducer(param)
 	producer.start()
 
-def start_consumers(param):
+def start_consumers(param, num_consumer_thread):
 	"""Fill me in later"""
-	for i in range(1):
+	for i in range(num_consumer_thread):
+		if param["data_queue_populated"] and param["data_queue"].empty():
+			logger.info("Data queue populated and data queue is empty. Stop adding new consumers.")
+			break
 		logger.info("start consumer: {0}".format(str(i)))
 		consumer = ThreadConsumer(i, param)
 		consumer.setDaemon(True)
 		consumer.start()
+		param["consumer_queue"].append(consumer)
+		time.sleep(0.01)
 
 def get_grouped_dataframes(input_file, groupby_name, target_merchant_list, **csv_kwargs):
 	"""Generate a dataframe which is a subset of the input_file grouped by merchant."""
@@ -212,7 +216,7 @@ def get_grouped_dataframes(input_file, groupby_name, target_merchant_list, **csv
 	param = {
 		"activate_cnn": activate_cnn,
 		"chunk_num": 0,
-		"consumer_queue": queue.Queue(),
+		"consumer_queue": [], #queue.Queue(),
 		"csv_kwargs": csv_kwargs,
 		"data_queue": queue.Queue(),
 		"data_queue_populated": False,
@@ -228,11 +232,14 @@ def get_grouped_dataframes(input_file, groupby_name, target_merchant_list, **csv
 	param["start"] = start
 	param["log_string"] = log_string
 
+	num_consumer_thread = 8
 	start_producers(param)
-	start_consumers(param)
+	start_consumers(param, num_consumer_thread)
 	param["data_queue"].join()
-	param["consumer_queue"].join()
-	#param["data_queue"].join()
+	for i in range(num_consumer_thread):
+		param["data_queue"].put(None)
+	for consumer_thread in param["consumer_queue"]:
+		consumer_thread.join()
 
 	#Show what you found and did not find
 	dict_of_df_lists = param["dict_of_df_lists"]
