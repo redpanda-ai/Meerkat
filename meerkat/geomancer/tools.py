@@ -184,7 +184,7 @@ def start_producers(param):
 
 def start_consumers(param):
 	"""Fill me in later"""
-	for i in range(8):
+	for i in range(1):
 		logger.info("start consumer: {0}".format(str(i)))
 		consumer = ThreadConsumer(i, param)
 		consumer.setDaemon(True)
@@ -230,8 +230,9 @@ def get_grouped_dataframes(input_file, groupby_name, target_merchant_list, **csv
 
 	start_producers(param)
 	start_consumers(param)
-	param["consumer_queue"].join()
 	param["data_queue"].join()
+	param["consumer_queue"].join()
+	#param["data_queue"].join()
 
 	#Show what you found and did not find
 	dict_of_df_lists = param["dict_of_df_lists"]

@@ -13,6 +13,7 @@ import yaml
 from functools import reduce
 from timeit import default_timer as timer
 from .tools import get_etags, get_s3_file, remove_special_chars, get_grouped_dataframes
+from .get_top_merchant_data import extract_clean_files
 from .geomancer_module import GeomancerModule
 
 logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
@@ -156,15 +157,29 @@ class Worker(GeomancerModule):
 			save_path=save_path, etags=etags, etags_file=etags_file)
 		logger.info("Synch-ed")
 
-		"""
-		csv_kwargs = { "chunksize": 1000, "error_bad_lines": False, "warn_bad_lines": True,
-			"encoding": "utf-8", "quotechar" : '"', "na_filter" : False, "sep": "," }
-		merchant_dataframes = get_grouped_dataframes("meerkat/geomancer/data/agg_data/All_Merchants.csv",
-			"list_name", self.common_config["target_merchant_list"], **csv_kwargs)
+		if needs_to_be_downloaded:
+			extract_clean_files(save_path, file_name, "csv")
+		merchant_dataframes = {}
+		for file_name in os.listdir(save_path):
+			if file_name.endswith(".csv"):
+				csv_file = save_path + file_name
+				logger.info("csv file at: " + csv_file)
+				csv_kwargs = { "chunksize": 1000, "error_bad_lines": False, "warn_bad_lines": True,
+					"encoding": "utf-8-sig", "quotechar" : '"', "na_filter" : False, "sep": "," }
+				merchant_dataframes_per_file = get_grouped_dataframes(csv_file,
+					"list_name", self.common_config["target_merchant_list"], **csv_kwargs)
+				merchant_dataframes = merge(merchant_dataframes, merchant_dataframes_per_file)
+
 		merchants = sorted(list(merchant_dataframes.keys()))
 		self.common_config["target_merchant_list"] = merchants
+
+		logger.warning(merchants)
+		logger.warning(len(merchants))
 		for merchant in merchants:
-			self.config["merchant"] = remove_special_chars(merchant)
+			formatted_merchant = merchant
+			if merchant.endswith(" US"):
+				formatted_merchant = merchant[:-3]
+			self.config["merchant"] = remove_special_chars(formatted_merchant)
 			df = merchant_dataframes[merchant]
 			preprocess_dataframe(df)
 			logger.info("***** Processing {0:>29} ********".format(merchant))
@@ -173,7 +188,6 @@ class Worker(GeomancerModule):
 			self.geo_df = self.get_geo_dictionary(df)
 			unique_city_state, unique_city = self.get_unique_city_dictionaries(df)
 			# Let's also get the question bank
-		"""
 		return self.common_config
 
 	def setup_directories(self):
