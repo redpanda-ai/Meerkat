@@ -26,7 +26,7 @@ def get_etags(base_dir):
 	return etags, etags_file
 
 def get_s3_file(**kwargs):
-	"""Load agg data from s3 to the local host"""
+	"""Load data from s3 to the local host"""
 
 	client = boto3.client("s3")
 	remote_file = kwargs["prefix"] + kwargs["file_name"]
@@ -54,13 +54,13 @@ def get_s3_file(**kwargs):
 
 		#If the file is already local, skip downloading
 		if local_etag == remote_etag:
-			logger.info("Agg data exists locally no need to download")
+			logger.info("Data file exists locally no need to download")
 			#File does not need to be downloaded
 			return False
 
-	logger.info("start downloading agg data from s3")
+	logger.info("start downloading data file from s3")
 	client.download_file(kwargs["bucket"], remote_file, local_file)
-	logger.info("Agg data file is downloaded at: " + local_file)
+	logger.info("Data file is downloaded at: " + local_file)
 
 	etags = {}
 	etags[remote_file] = remote_etag
