@@ -25,9 +25,6 @@ loggers:
   get_merchant_dictionaries:
     handlers: [console]
     propogate: true
-  get_agg_data:
-    handlers: [console]
-    propogate: true
   get_top_merchant_data:
     handlers: [console]
     propogate: true

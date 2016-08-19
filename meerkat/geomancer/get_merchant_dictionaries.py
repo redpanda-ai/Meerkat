@@ -12,7 +12,7 @@ import yaml
 
 from functools import reduce
 from timeit import default_timer as timer
-from .tools import remove_special_chars, get_grouped_dataframes
+from .tools import get_etags, get_s3_file, remove_special_chars, get_grouped_dataframes
 from .geomancer_module import GeomancerModule
 
 logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
@@ -144,6 +144,19 @@ class Worker(GeomancerModule):
 
 	def main_process(self):
 		"""This is where it all happens."""
+		bucket = self.common_config["bucket"]
+		prefix = self.config["prefix"]
+		file_name = self.config["filename"]
+		save_path = self.config["savepath"]
+		os.makedirs(save_path, exist_ok=True)
+
+		etags, etags_file = get_etags(save_path)
+		logger.info("Synch-ing with S3")
+		needs_to_be_downloaded = get_s3_file(bucket=bucket, prefix=prefix, file_name=file_name,
+			save_path=save_path, etags=etags, etags_file=etags_file)
+		logger.info("Synch-ed")
+
+		"""
 		csv_kwargs = { "chunksize": 1000, "error_bad_lines": False, "warn_bad_lines": True,
 			"encoding": "utf-8", "quotechar" : '"', "na_filter" : False, "sep": "," }
 		merchant_dataframes = get_grouped_dataframes("meerkat/geomancer/data/agg_data/All_Merchants.csv",
@@ -160,6 +173,7 @@ class Worker(GeomancerModule):
 			self.geo_df = self.get_geo_dictionary(df)
 			unique_city_state, unique_city = self.get_unique_city_dictionaries(df)
 			# Let's also get the question bank
+		"""
 		return self.common_config
 
 	def setup_directories(self):

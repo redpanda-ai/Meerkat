@@ -1,7 +1,0 @@
-{
-	"agg_data" : {
-		"prefix": "meerkat/AggData/",
-		"filename": "20160817.tar.gz",
-		"savepath": "meerkat/geomancer/data/agg_data/"
-	}
-}

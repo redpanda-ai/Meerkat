@@ -33,9 +33,9 @@
 			},
 			"required": ["target_merchant_list", "bucket", "bank_or_card", "server", "apikey"]
 		},
-		"agg_data" : {
-			"type": "object",
+		"merchant_dictionaries": {
 			"properties": {
+				"dry_run": { "enum": [false, true] },
 				"prefix": {
 					"type": "string",
 					"pattern": "^[A-Za-z0-9][A-Za-z0-9\/_.]*\/$"
@@ -49,13 +49,7 @@
 					"pattern": "^[A-Za-z0-9\/_.]*\/$"
 				}
 			},
-			"required": ["prefix", "filename", "savepath"]
-		},
-		"merchant_dictionaries": {
-			"properties": {
-				"dry_run": { "enum": [false, true] }
-			},
-			"required": ["dry_run"]
+			"required": ["dry_run", "prefix", "filename", "savepath"]
 		},
 		"pybossa_project": {
 			"properties": {

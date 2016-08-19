@@ -1,11 +1,9 @@
 {
-	"agg_data" : {
-		"prefix": "meerkat/geomancer/data/agg/",
-		"filename": "All_Merchants.csv",
-		"savepath": "meerkat/geomancer/data/agg_data/"
-	},
 	"merchant_dictionaries" : {
-		"dry_run": false
+		"dry_run": false,
+		"prefix": "meerkat/AggData/",
+		"filename": "20160817.tar.gz",
+		"savepath": "meerkat/geomancer/data/agg_data/"
 	},
 	"pybossa_project" : {
 		"create_project": true,

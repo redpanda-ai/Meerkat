@@ -10,8 +10,7 @@ import yaml
 from meerkat.classification.tools import (pull_from_s3, extract_tarball,
 	check_new_input_file)
 
-from .get_agg_data import get_s3_file, get_etags
-from .tools import remove_special_chars, get_grouped_dataframes
+from .tools import get_etags, get_s3_file, remove_special_chars, get_grouped_dataframes
 from .geomancer_module import GeomancerModule
 
 logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
