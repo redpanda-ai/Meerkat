@@ -42,7 +42,7 @@
 				},
 				"filename": {
 					"type": "string",
-					"pattern": "^.*csv$"
+					"pattern": "^[0-9]{8}.tar.gz$"
 				},
 				"savepath": {
 					"type": "string",

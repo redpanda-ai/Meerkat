@@ -1,0 +1,52 @@
+# adapted from: https://gist.github.com/bootandy/5546891
+# created by Sivan Mehta
+# use with: logging.config.dictConfig(yaml.load(open('logging.yaml', 'r')))
+
+# Formatters detailed here: http://docs.python.org/2/library/logging.html#logrecord-attributes
+version: 1
+formatters:
+  named:
+    format: '%(asctime)s - %(levelname)s - %(module)s.%(funcName)s() - %(message)s'
+  simple:
+    format: '%(asctime)s - %(threadName)s - %(module)s.%(funcName)s() - %(levelname)s - %(message)s'
+  detail:
+    format: '%(asctime)s - %(levelname)s - File: %(filename)s - %(funcName)s() - Line: %(lineno)d -  %(message)s'
+
+loggers:
+  all:
+    handlers: [all]
+    propagate: true
+  warn:
+    handlers: [warn]
+    propagate: true
+  __main__:
+    handlers: [console]
+    propogate: true
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: INFO
+    formatter: named
+    stream: ext://sys.stdout
+  all:
+    class: logging.handlers.TimedRotatingFileHandler
+    level: INFO
+    formatter: simple
+    when: D
+    interval: 1
+    backupCount: 7
+    filename: meerkat/geomancer.log
+  warn:
+    class: logging.handlers.TimedRotatingFileHandler
+    level: WARNING
+    formatter: simple
+    when: D
+    interval: 1
+    backupCount: 7
+    filename: meerkat/geomancer.log
+
+root:
+  level: INFO
+  handlers: [all, warn]
+  propagate: true
