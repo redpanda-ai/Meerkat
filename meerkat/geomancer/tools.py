@@ -186,7 +186,7 @@ def start_consumers(param, num_consumer_thread):
 		consumer.setDaemon(True)
 		consumer.start()
 		param["consumer_queue"].append(consumer)
-		time.sleep(0.01)
+		time.sleep(0.1)
 
 def get_grouped_dataframes(input_file, groupby_name, target_merchant_list, **csv_kwargs):
 	"""Generate a dataframe which is a subset of the input_file grouped by merchant."""
@@ -226,7 +226,7 @@ def get_grouped_dataframes(input_file, groupby_name, target_merchant_list, **csv
 	param["start"] = start
 	param["log_string"] = log_string
 
-	num_consumer_thread = 8
+	num_consumer_thread = 1
 	start_producers(param)
 	start_consumers(param, num_consumer_thread)
 	param["data_queue"].join()

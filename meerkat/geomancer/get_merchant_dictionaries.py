@@ -171,10 +171,13 @@ class Worker(GeomancerModule):
 				merchant_dataframes = merge(merchant_dataframes, merchant_dataframes_per_file)
 
 		merchants = sorted(list(merchant_dataframes.keys()))
+
+		logger.warning("Found {0} target merchants: {1}".format(len(merchants), merchants))
+		missed_list = list(set(self.common_config["target_merchant_list"]) - set(merchants))
+		logger.warning("Miss {0} target merchants: {1}".format(len(missed_list), missed_list))
+
 		self.common_config["target_merchant_list"] = merchants
 
-		logger.warning(merchants)
-		logger.warning(len(merchants))
 		for merchant in merchants:
 			self.config["merchant"] = remove_special_chars(merchant)
 			df = merchant_dataframes[merchant]
