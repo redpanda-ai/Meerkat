@@ -24,6 +24,7 @@ class BilstmTaggerTests(unittest.TestCase):
 			["merchant", "background", "background", "background", "merchant", "background"])
 	])
 	def test_get_tags(self, description, expected_tags):
+		"""test if get_tags produces tag for each token correctly"""
 		config = {"max_tokens": 35}
 		tokens, tags = bilstm.get_tags(config, description)
 		self.assertEqual(tags, expected_tags)
@@ -33,5 +34,7 @@ class BilstmTaggerTests(unittest.TestCase):
 		({"tag_map":{"0": "background", "1": "merchant"}}, ["merchant"], [[0,1]])
 	])
 	def test_encode_tags(self, config, tags, expected):
+		"""test one-hot encoding the tags"""
 		result = bilstm.encode_tags(config, tags)
 		np.testing.assert_array_equal(list(result), expected)
+
