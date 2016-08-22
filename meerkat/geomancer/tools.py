@@ -100,24 +100,6 @@ def get_top_merchant_names(base_dir, target_merchants):
 		{0}".format(top_merchants_without_agg_data))
 	return top_merchants_with_agg_data
 
-class ThreadProducer(threading.Thread):
-	def __init__(self, param):
-		threading.Thread.__init__(self)
-		self.param = param
-		self.geo_df = None
-
-	def run(self):
-		input_file = self.param["input_file"]
-		csv_kwargs = self.param["csv_kwargs"]
-		count = 0
-		for chunk in pd.read_csv(input_file, **csv_kwargs):
-			self.param["data_queue"].put(chunk)
-			count += 1
-			logger.info("Populating data queue {0}".format(str(count)))
-		self.param["data_queue_populated"] = True
-		logger.info("data queue is populated, data queue size: {0}".format(self.param["data_queue"].qsize()))
-
-
 class ThreadConsumer(threading.Thread):
 	def __init__(self, thread_id, param):
 		threading.Thread.__init__(self)
@@ -127,12 +109,12 @@ class ThreadConsumer(threading.Thread):
 	def run(self):
 		param = self.param
 		while True:
+			chunk = param["data_queue"].get()
 			logger.info("data_queue_populated: {0}, data_queue empty {1}".format(param["data_queue_populated"],
 				param["data_queue"].empty()))
-			if param["data_queue_populated"] and param["data_queue"].empty():
+			if chunk is None:
 				logger.info("Consumer thread {0} finished".format(str(self.thread_id)))
 				break
-			chunk = param["data_queue"].get()
 			logger.info("consumer thread: {0}; data queue size: {1}, consumer queue size {2}".format(str(self.thread_id),
 				 param["data_queue"].qsize(), len(self.param["consumer_queue"])))
 
@@ -166,27 +148,27 @@ class ThreadConsumer(threading.Thread):
 						logger.info("***** Discovered {0:>30} ********".format(key))
 						param["dict_of_df_lists"][key] = []
 					param["dict_of_df_lists"][key].append(groups[key])
-			time.sleep(0.1)
 			param["data_queue"].task_done()
 
-def start_producers(param):
+def start_producer(param):
 	"""Fill me in later"""
-	logger.info("start producer")
-	producer = ThreadProducer(param)
-	producer.start()
+	input_file = param["input_file"]
+	csv_kwargs = param["csv_kwargs"]
+	count = 0
+	for chunk in pd.read_csv(input_file, **csv_kwargs):
+		param["data_queue"].put(chunk)
+		count += 1
+		logger.info("Populating data queue {0}".format(str(count)))
+	param["data_queue_populated"] = True
+	logger.info("data queue is populated, data queue size: {0}".format(param["data_queue"].qsize()))
 
 def start_consumers(param, num_consumer_thread):
 	"""Fill me in later"""
 	for i in range(num_consumer_thread):
-		if param["data_queue_populated"] and param["data_queue"].empty():
-			logger.info("Data queue populated and data queue is empty. Stop adding new consumers.")
-			break
 		logger.info("start consumer: {0}".format(str(i)))
 		consumer = ThreadConsumer(i, param)
-		consumer.setDaemon(True)
 		consumer.start()
 		param["consumer_queue"].append(consumer)
-		time.sleep(0.1)
 
 def get_grouped_dataframes(input_file, groupby_name, target_merchant_list, **csv_kwargs):
 	"""Generate a dataframe which is a subset of the input_file grouped by merchant."""
@@ -226,10 +208,15 @@ def get_grouped_dataframes(input_file, groupby_name, target_merchant_list, **csv
 	param["start"] = start
 	param["log_string"] = log_string
 
-	num_consumer_thread = 1
-	start_producers(param)
+	num_consumer_thread = 8
 	start_consumers(param, num_consumer_thread)
+	start_producer(param)
+
 	param["data_queue"].join()
+
+	for i in range(num_consumer_thread):
+		param["data_queue"].put(None)
+
 	for consumer_thread in param["consumer_queue"]:
 		consumer_thread.join()
 
