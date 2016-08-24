@@ -44,7 +44,7 @@ def parse_arguments(args):
 def beautify(item, config):
 	"""make item easier to read"""
 	item.pop("ground_truth")
-	tmp = [config["tag_map"][str(i)] for i in np.argmax(item["predicted"], 1)]
+	tmp = [config["tag_map"][str(i)] for i in np.argmax(item["Predicted"], 1)]
 	target_indices = [i for i in range(len(tmp)) if tmp[i] == "merchant"]
 	tran = item["Description"].split()[:config["max_tokens"]]
 	item["predicted"] = " ".join([tran[i] for i in target_indices])
