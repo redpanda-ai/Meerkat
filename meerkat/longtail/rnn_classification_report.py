@@ -1,4 +1,6 @@
 #/usr/local/bin/python3.3
+# pylint: disable=used-before-assignment
+# pylint: disable=too-many-locals
 
 """This module loads and evaluates a trained RNN (biLSTM) on a provided test set.
 It produces various stats and a confusion matrix for analysis
@@ -20,8 +22,9 @@ import pandas as pd
 import numpy as np
 
 from meerkat.classification.load_model import get_tf_rnn_by_path
-from meerkat.various_tools import load_params, load_piped_dataframe
-from meerkat.classification.classification_report import get_classification_report, count_transactions
+from meerkat.various_tools import load_piped_dataframe
+from meerkat.classification.classification_report import (get_classification_report,
+	count_transactions)
 from meerkat.longtail.bilstm_tagger import validate_config
 from meerkat.classification.tools import reverse_map
 
@@ -47,50 +50,62 @@ def beautify(item, config):
 	item["predicted"] = " ".join([tran[i] for i in target_indices])
 	return item
 
-def write_mislabeled(data, mode, config, header):
-	if len(data) > 0:
-		data = [beautify(item, config) for item in data]
-		file_path = "./data/RNN_stats/mislabeled.csv"
-		logging.info("Saving mislabeled transactions to {0}".format(file_path))
-		df = pd.DataFrame(data)
-		df.to_csv(file_path, sep="|", mode=mode, index=False, header=header)
+def get_write_func(file_path, config):
+	"""return a data writing function"""
+	file_exist = False
+	def write_func(data):
+		"""save data to csv file"""
+		if len(data) > 0:
+			nonlocal file_exist
+			mode = "a" if file_exist else "w"
+			header = False if file_exist else True
+			data = [beautify(item, config) for item in data]
+			logging.info("Saving transactions to {0}".format(file_path))
+			df = pd.DataFrame(data)
+			df.to_csv(file_path, sep="|", mode=mode, index=False, header=header)
+			file_exist = True
+	return write_func
 
 def evaluate_model(args=None):
+	"""evaluates model accuracy and reports various statistics"""
 	os.makedirs("./data/RNN_stats/", exist_ok=True)
 	if args is None:
 		args = parse_arguments(sys.argv[1:])
 	config = validate_config(args.config)
 	num_labels = len(config["tag_map"])
 	con_matrix = [[0] * num_labels for i in range(num_labels)]
-	log_format = "%(asctime)s %(levelname)s: %(message)s"
-	reader = pd.read_csv(args.data, sep="|", chunksize=1000)
+	reader = load_piped_dataframe(args.data, chunksize=1000)
 	model = get_tf_rnn_by_path(args.model, args.w2i)
 	total_trans = count_transactions(args.data)
 	processed = 0.0
-	header = True
-	mode = "w"
+	save_mislabeled = get_write_func("data/RNN_stats/mislabeled.csv", config)
+	save_correct = get_write_func("data/RNN_stats/correct.csv", config)
 	for chunk in reader:
 		processed += len(chunk)
 		mislabeled = []
+		correct = []
 		logging.info("Processing {0:3.2f}% of the data...".format(100*processed/total_trans))
 		chunk = chunk.to_dict("record")
 		chunk = model(chunk, only_merchant_name=False, tags=True)
 		for item in chunk:
 			columns = list(np.argmax(item["predicted"], 1))
 			rows = [int(reverse_map(config["tag_map"])[tag]) for tag in item["ground_truth"]]
-			for i in range(len(rows)):
-				con_matrix[rows[i]][columns[i]] += 1
+			for row, column in zip(rows, columns):
+				con_matrix[row][column] += 1
 			if columns != rows:
 				mislabeled.append(item)
-		write_mislabeled(mislabeled, mode, config, header)
-		header = False
-		mode = "a"
+			else:
+				correct.append(item)
+		save_mislabeled(mislabeled)
+		save_correct(correct)
+
 	con_matrix = pd.DataFrame(con_matrix)
 	con_matrix.columns = [config["tag_map"][str(i)] for i in range(num_labels)]
 	con_matrix_path = "data/RNN_stats/confusion_matrix.csv"
 	con_matrix.to_csv(con_matrix_path, index=False)
 	logging.info("Confusion matrix saved to: {0}".format(con_matrix_path))
-	get_classification_report(con_matrix_path, config["tag_map"], "data/RNN_stats/classification_report.csv")
+	get_classification_report(con_matrix_path, config["tag_map"],
+		"data/RNN_stats/classification_report.csv")
 
 if __name__ == "__main__":
 	evaluate_model()
