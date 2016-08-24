@@ -447,7 +447,9 @@ class WebConsumer():
 				if trans["is_physical_merchant"]:
 					trans["country"] = "US"
 			else:
-				location = location_from_merchant(trans["description"], trans["merchant_name"])
+				location = None
+				if "description" in trans:
+					location = location_from_merchant(trans["description"], trans["merchant_name"])
 				trans["city"] = location[0] if location else ""
 				trans["state"] = location[1] if location else ""
 
