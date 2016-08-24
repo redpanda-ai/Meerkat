@@ -23,6 +23,7 @@ from meerkat.classification.auto_load import main_program as load_models_from_s3
 
 # pylint:disable=no-name-in-module
 from meerkat.classification.bloom_filter.trie import location_split
+from meerkat.classification.bloom_filter.bloomfilter_unique_city import location_from_merchant
 
 # Enabled Models
 BANK_SWS = load_scikit_model("bank_sws")
@@ -446,8 +447,9 @@ class WebConsumer():
 				if trans["is_physical_merchant"]:
 					trans["country"] = "US"
 			else:
-				trans["city"] = ""
-				trans["state"] = ""
+				location = location_from_merchant(trans["description"], trans["merchant_name"])
+				trans["city"] = location[0] if location else ""
+				trans["state"] = location[1] if location else ""
 
 			if debug:
 				trans["bloom_filter"] = {"city": trans["city"], "state": trans["state"]}
