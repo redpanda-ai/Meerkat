@@ -86,7 +86,7 @@ def evaluate_model(args=None):
 		correct = []
 		logging.info("Processing {0:3.2f}% of the data...".format(100*processed/total_trans))
 		chunk = chunk.to_dict("record")
-		chunk = model(chunk, only_merchant_name=False, tags=True)
+		chunk = model(chunk, name_only=False, tags=True)
 		for item in chunk:
 			columns = list(np.argmax(item["predicted"], 1))
 			rows = [int(reverse_map(config["tag_map"])[tag]) for tag in item["ground_truth"]]
