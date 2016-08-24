@@ -88,7 +88,7 @@ def evaluate_model(args=None):
 		chunk = chunk.to_dict("record")
 		chunk = model(chunk, name_only=False, tags=True)
 		for item in chunk:
-			columns = list(np.argmax(item["predicted"], 1))
+			columns = list(np.argmax(item["Predicted"], 1))
 			rows = [int(reverse_map(config["tag_map"])[tag]) for tag in item["ground_truth"]]
 			for row, column in zip(rows, columns):
 				con_matrix[row][column] += 1
