@@ -15,6 +15,7 @@ def create_location_bloom(src_dirs, dst_filename):
 			continue
 		cities = load_params(directory + '/unique_city.json')
 		merchant_name = directory.split('/')[-1].upper()
+		if merchant_name.startswith('COSTCO'): merchant_name = 'COSTCO'
 		for city in cities:
 			sbf.add(city + ' ' + merchant_name)
 
@@ -40,9 +41,10 @@ def get_city_dict():
 	unique_city_state_dict = dict()
 	top_merchants = set()
 	for directory in directories:
-		if directory.split('/')[-1].startswith('merchant'):
+		if directory.split('/')[-1].startswith('merchant') or directory.split('/')[-1].startswith('Bealls'):
 			continue
 		merchant_name = directory.split('/')[-1].upper()
+		if merchant_name.startswith('COSTCO'): merchant_name = 'COSTCO'
 		top_merchants.add(merchant_name)
 		unique_city_state_dict[merchant_name] = load_params(directory + '/unique_city_state.json')
 	return unique_city_state_dict, top_merchants
@@ -51,7 +53,7 @@ city_bloom = get_location_bloom()
 unique_city_state_dict, top_merchants = get_city_dict()
 
 def location_from_merchant(text, merchant):
-	merchant = merchant.upper()
+	merchant = ''.join(merchant.upper().split())
 	if merchant not in top_merchants: return None
 	transaction_word = ['PURCHASE']
 	text = text.upper()
