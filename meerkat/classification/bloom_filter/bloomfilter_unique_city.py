@@ -57,8 +57,8 @@ def location_from_merchant(text, merchant):
 	if merchant not in top_merchants: return None
 	transaction_word = ['PURCHASE']
 	text = text.upper()
-	for i in range(len(text) - 1, int(len(text) / 2), -1):
-		for j in range(i, int(len(text) / 2), -1):
+	for i in range(len(text) - 1, -1, -1):
+		for j in range(i, 0, -1):
 			city = text[j: i + 1]
 			if city + ' ' + merchant in city_bloom and city in unique_city_state_dict[merchant] and city not in transaction_word:
 				return (city, unique_city_state_dict[merchant][city])
@@ -67,4 +67,4 @@ def location_from_merchant(text, merchant):
 
 if __name__ == "__main__":
 	my_location_bloom = get_location_bloom()
-	print(location_from_merchant('XXXXXXXXXXXXXXXXXXXXX DU BOIS', 'fedex'))
+	print(location_from_merchant('COSTCO WHOLESALE    ATLANTA 000009904   7704311702 ', 'COSTCO'))
