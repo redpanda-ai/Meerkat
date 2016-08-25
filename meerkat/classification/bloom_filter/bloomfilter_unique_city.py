@@ -58,7 +58,7 @@ def location_from_merchant(text, merchant):
 	transaction_word = ['PURCHASE']
 	text = text.upper()
 	for i in range(len(text) - 1, -1, -1):
-		for j in range(i, 0, -1):
+		for j in range(i, -1, -1):
 			city = text[j: i + 1]
 			if city + ' ' + merchant in city_bloom and city in unique_city_state_dict[merchant] and city not in transaction_word:
 				return (city, unique_city_state_dict[merchant][city])
