@@ -40,6 +40,7 @@ import os
 import random
 import json
 import sys
+import shutil
 
 import numpy as np
 import tensorflow as tf
@@ -361,8 +362,10 @@ def train_model(*args):
 	config, graph, sess, saver, run_options, run_metadata = args[:]
 
 	best_accuracy, best_era = 0, 0
-	models_dir = "./meerkat/longtail/models/"
-	os.makedirs(models_dir, exist_ok=True)
+	checkpoints_dir = "./meerkat/longtail/checkpoints/"
+	model_dir = "./meerkat/longtail/model/"
+	os.makedirs(checkpoints_dir, exist_ok=True)
+	os.makedirs(model_dir, exist_ok=True)
 	eras = config["eras"]
 	checkpoints = []
 	train = config["train"]
@@ -431,7 +434,7 @@ def train_model(*args):
 		# Evaluate Model
 		test_accuracy = evaluate_testset(config, graph, sess, config["test"])
 		# Save checkpoint
-		current_model_path = save_models(saver, sess, models_dir, step+1)
+		current_model_path = save_models(saver, sess, checkpoints_dir, step+1)
 		logging.info("Checkpoint saved in file: " + current_model_path)
 		checkpoints.append(current_model_path)
 
@@ -441,18 +444,28 @@ def train_model(*args):
 			best_accuracy = test_accuracy
 
 		if step - best_era == 2:
-			final_model_path = checkpoints[best_era]
+			best_model_path = checkpoints[best_era]
+			logging.info("Best era is era {0}.".format(best_era+1))
 			break
 
-	w2i_to_json(config["w2i"], models_dir)
+	# Clean up directory
+	final_model_path = model_dir + "bilstm.ckpt"
+	final_meta_path = model_dir + "bilstm.meta"
+	os.rename(best_model_path, final_model_path)
+	logging.info("Moving final model from {0} to {1}.".format(best_model_path,
+		final_model_path))
+	os.rename(best_model_path+".meta", final_meta_path)
+	logging.info("Moving final meta file from {0} to {1}.".format(
+		best_model_path+".meta", final_meta_path))
+	shutil.rmtree(checkpoints_dir)
+	logging.info("Removing checkpoint files at " + checkpoints_dir)
+	w2i_to_json(config["w2i"], model_dir)
 	return final_model_path
 
 def save_models(saver, sess, path, era):
 	"""save model to ckpt and meta"""
 	ckpt_path = path + "bilstm_era_" + str(era) + ".ckpt"
-	meta_path = path + "bilstm_era_" + str(era) + ".meta"
 	model_path = saver.save(sess, ckpt_path)
-	os.rename(ckpt_path+".meta", meta_path)
 	return model_path
 
 def w2i_to_json(w2i, path):
