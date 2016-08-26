@@ -1,6 +1,6 @@
 {
 	"model_path": "",
-	"dataset": "meerkat/longtail/String_based_merchant_identification_1.csv",
+	"dataset": "meerkat/longtail/data.csv",
 	"alphabet": "abcdefghijklmnopqrstuvwxyz0123456789,;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}",
 	"embeddings": "/home/ubuntu/git/embeddings/en.polyglot.txt",
 	"tag_map": {
@@ -18,5 +18,5 @@
 	"use_cpu": true,
 	"we_dim": 64,
 	"h_dim": 100,
-	"eras": 3
+	"eras": 30
 }
