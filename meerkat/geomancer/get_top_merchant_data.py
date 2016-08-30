@@ -6,6 +6,7 @@ import shutil
 import pandas as pd
 import logging
 import yaml
+import fileinput
 
 from meerkat.classification.tools import (pull_from_s3, extract_tarball,
 	check_new_input_file)
@@ -20,7 +21,7 @@ def extract_clean_files(save_path, tarball_name, extension):
 	"""This clears out a local directory and replaces files of a certain extension."""
 	for root, dirs, files in os.walk(save_path):
 		for f in files:
-			if f.endswith(".csv"):
+			if f.endswith(extension):
 				os.unlink(os.path.join(root, f))
 				logger.info("{0} is removed".format(f))
 	extract_tarball(save_path + tarball_name, save_path)
@@ -35,11 +36,11 @@ class Worker(GeomancerModule):
 	def main_process(self):
 		bank_or_card = self.common_config["bank_or_card"]
 		bucket = self.common_config["bucket"]
-		version_dir = self.config["version_dir"]
+		#version_dir = self.config["version_dir"]
 
-		prefix = "meerkat/cnn/data/merchant/" + bank_or_card + "/" + version_dir + "/"
-		extension = "tar.gz"
-		tarball_name = "input.tar.gz"
+		prefix = "meerkat/geomancer/"
+		#extension = "tar.gz"
+		tarball_name = bank_or_card + "_transaction_sample.tar.gz"
 		save_path = "meerkat/geomancer/data/input/" + bank_or_card + "/"
 		os.makedirs(save_path, exist_ok=True)
 
@@ -50,16 +51,24 @@ class Worker(GeomancerModule):
 		logger.info("Synch-ed")
 
 		if needs_to_be_downloaded:
-			extract_clean_files(save_path, tarball_name, "csv")
+			extract_clean_files(save_path, tarball_name, ".csv")
 
 		tasks_prefix = "meerkat/geomancer/merchants/"
 		for file_name in os.listdir(save_path):
 			if file_name.endswith(".csv"):
 				csv_file = save_path + file_name
 				logger.info("csv file at: " + csv_file)
+
+				pattern = re.compile("(\\|\\|)([^|]+?\=[^|]?)+?")
+				for line in fileinput.input(csv_file, inplace=True):
+					if pattern.search(line):
+						new_line = pattern.sub("  \g<2>", line)
+						print(new_line.rstrip())
+					else:
+						print(line.rstrip())
 				csv_kwargs = { "chunksize": 1000, "error_bad_lines": False, "encoding": 'utf-8',
 					"quoting": csv.QUOTE_NONE, "na_filter": False, "sep": "|", "activate_cnn": True,
-					"cnn": "bank_merchant"}
+					"cnn": bank_or_card + "_merchant" }
 
 				existing_lines = int(sum(1 for line in open(csv_file)))
 				target_lines = self.config["truncate_lines"]
@@ -68,7 +77,7 @@ class Worker(GeomancerModule):
 					logger.info("Proceeding.")
 				else:
 					logger.info("Unzipping files.")
-					extract_clean_files(save_path, tarball_name, "csv")
+					extract_clean_files(save_path, tarball_name, ".csv")
 					logger.info("Files unzipped.")
 
 				#Add the ability to truncate lines from the input csv file
@@ -90,8 +99,8 @@ class Worker(GeomancerModule):
 					tasks = tasks_prefix + formatted_merchant + "/" + bank_or_card + "_tasks.csv"
 
 					original_len = len(merchant_dataframes[merchant])
-					merchant_dataframes[merchant].drop_duplicates(subset="DESCRIPTION_UNMASKED", keep="first", inplace=True)
-					merchant_dataframes[merchant].to_csv(tasks, sep=',', index=False, quoting=csv.QUOTE_ALL)
+					merchant_dataframes[merchant].drop_duplicates(subset="plain_text_description", keep="first", inplace=True)
+					merchant_dataframes[merchant].to_csv(tasks, sep='\t', index=False, quoting=csv.QUOTE_ALL)
 					logger.info("Merchant {0}: {2} duplicate transactions; {1} unique transactions".format(merchant,
 						len(merchant_dataframes[merchant]), original_len - len(merchant_dataframes[merchant])))
 		return self.common_config

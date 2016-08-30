@@ -135,7 +135,7 @@ class ThreadConsumer(threading.Thread):
 
 			if param["activate_cnn"]:
 				transactions = chunk.to_dict('records')
-				enriched = param["classifier"](transactions, doc_key='DESCRIPTION_UNMASKED',
+				enriched = param["classifier"](transactions, doc_key='plain_text_description',
 					label_key=param["groupby_name"])
 				chunk = pd.DataFrame(enriched)
 

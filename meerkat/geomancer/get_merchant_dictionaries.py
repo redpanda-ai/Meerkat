@@ -15,6 +15,7 @@ from timeit import default_timer as timer
 from .tools import get_etags, get_s3_file, remove_special_chars, get_grouped_dataframes
 from .get_top_merchant_data import extract_clean_files
 from .geomancer_module import GeomancerModule
+from meerkat.various_tools import load_params
 
 logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
 logger = logging.getLogger('get_merchant_dictionaries')
@@ -159,6 +160,17 @@ class Worker(GeomancerModule):
 
 		if needs_to_be_downloaded:
 			extract_clean_files(save_path, file_name, "csv")
+
+		target_merchants = self.common_config["target_merchant_list"]
+		merchants_map = load_params("meerkat/geomancer/merchant_name_map.json")
+		merchants_reverse_map = {}
+		for merchant_in_cnn in target_merchants:
+			for merchant in merchants_map[merchant_in_cnn]:
+				merchants_reverse_map[merchant] = merchant_in_cnn
+		merchants_in_agg_data = merchants_reverse_map.keys()
+		logger.info("Merchants in agg data: {0}".format(merchants_in_agg_data))
+		logger.info("Merchant reverse map: {0}".format(merchants_reverse_map))
+
 		merchant_dataframes = {}
 		for file_name in os.listdir(save_path):
 			if file_name.endswith(".csv"):
@@ -167,10 +179,22 @@ class Worker(GeomancerModule):
 				csv_kwargs = { "chunksize": 1000, "error_bad_lines": False, "warn_bad_lines": True,
 					"encoding": "utf-8-sig", "quotechar" : '"', "na_filter" : False, "sep": "," }
 				merchant_dataframes_per_file = get_grouped_dataframes(csv_file,
-					"list_name", self.common_config["target_merchant_list"], **csv_kwargs)
+					"list_name", merchants_in_agg_data, **csv_kwargs)
 				merchant_dataframes = merge(merchant_dataframes, merchant_dataframes_per_file)
 
-		merchants = sorted(list(merchant_dataframes.keys()))
+		merchants_found_in_agg_data = sorted(list(merchant_dataframes.keys()))
+		logger.info("Merchants found in agg data: {0}".format(merchants_found_in_agg_data))
+		merchants = set()
+		formatted_merchant_dataframes = {}
+		for merchant in merchants_found_in_agg_data:
+			merchant_in_cnn = merchants_reverse_map[merchant]
+			if merchant_in_cnn in merchants:
+				formatted_merchant_dataframes[merchant_in_cnn] = formatted_merchant_dataframes[merchant_in_cnn].\
+					append(merchant_dataframes[merchant], ignore_index=True)
+			else:
+				merchants.add(merchant_in_cnn)
+				formatted_merchant_dataframes[merchant_in_cnn] = merchant_dataframes[merchant]
+		merchants = list(merchants)
 
 		logger.warning("Found {0} target merchants: {1}".format(len(merchants), merchants))
 		missed_list = list(set(self.common_config["target_merchant_list"]) - set(merchants))
@@ -180,7 +204,7 @@ class Worker(GeomancerModule):
 
 		for merchant in merchants:
 			self.config["merchant"] = remove_special_chars(merchant)
-			df = merchant_dataframes[merchant]
+			df = formatted_merchant_dataframes[merchant]
 			preprocess_dataframe(df)
 			logger.info("***** Processing {0:>29} ********".format(merchant))
 			self.setup_directories()
