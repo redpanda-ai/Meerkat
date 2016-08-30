@@ -20,6 +20,8 @@ from sklearn.externals import joblib
 from meerkat.various_tools import load_params
 from meerkat.classification.auto_load import main_program as load_models_from_s3
 from meerkat.classification.tensorflow_cnn import (validate_config, get_tensor, string_to_tensor)
+from meerkat.longtail.bilstm_tagger import trans_to_tensor, get_tags
+from meerkat.longtail.bilstm_tagger import validate_config as bilstm_validate_config
 
 def load_scikit_model(model_name):
 	"""Load either Card or Bank classifier depending on
@@ -66,6 +68,71 @@ def get_tf_cnn_by_name(model_name, gpu_mem_fraction=False):
 		sys.exit()
 
 	return get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=gpu_mem_fraction)
+
+def get_tf_rnn_by_path(model_path, w2i_path, gpu_mem_fraction=False, model_name=False):
+	"""Load a tensorflow rnn model"""
+
+	config_path = "meerkat/longtail/bilstm_config.json"
+	if not isfile(model_path):
+		logging.warning("Resources to load model not found.")
+		sys.exit()
+
+	# Load Graph
+	config = bilstm_validate_config(config_path)
+	config["model_path"] = model_path
+	meta_path = model_path.split(".ckpt")[0] + ".meta"
+	config["w2i"] = load_params(w2i_path)
+
+	# Load Session and Graph
+	ops.reset_default_graph()
+	saver = tf.train.import_meta_graph(meta_path)
+
+	if gpu_mem_fraction:
+		gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.25)
+		sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, gpu_options=gpu_options))
+	else:
+		sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, device_count={"GPU":0}))
+
+	saver.restore(sess, config["model_path"])
+	graph = sess.graph
+
+	if not model_name:
+		model = get_tensor(graph, "model:0")
+	else:
+		model = get_tensor(graph, model_name)
+
+	# Generate Helper Function
+	def apply_rnn(trans, doc_key="Description", label_key="Predicted", name_only=True, tags=False):
+		"""Apply RNN to transactions"""
+
+		for _, doc in enumerate(trans):
+			if tags:
+				# if tags, tag all tokens with get_tags for evaluation purposes
+				tran, label = get_tags(config, doc)
+				doc["ground_truth"] = label
+			else:
+				tran = doc[doc_key].lower().split()[0:config["max_tokens"]]
+			char_inputs, word_lengths, word_indices, _ = trans_to_tensor(config, tran)
+			feed_dict = {
+				get_tensor(graph, "char_inputs:0"): char_inputs,
+				get_tensor(graph, "word_inputs:0"): word_indices,
+				get_tensor(graph, "word_lengths:0"): word_lengths,
+				get_tensor(graph, "trans_length:0"): len(tran),
+				get_tensor(graph, "train:0"): False
+			}
+
+			output = sess.run(model, feed_dict=feed_dict)
+			if name_only:
+				# return merchant name if name_only else return tags of all tokens
+				output = [config["tag_map"][str(i)] for i in np.argmax(output, 1)]
+				target_indices = [i for i in range(len(output)) if output[i] == "merchant"]
+				doc[label_key] = " ".join([tran[i] for i in target_indices])
+			else:
+				doc[label_key] = output
+
+		return trans
+
+	return apply_rnn
 
 def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=False, model_name=False):
 	"""Load a tensorFlow module by name"""
