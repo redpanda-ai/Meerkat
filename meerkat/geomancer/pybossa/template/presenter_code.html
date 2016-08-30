@@ -1,7 +1,7 @@
 <div class="row">
 	<div id="skeleton" class="col-md-12">
 		<h2>Geomancer Project</h2>
-		<p>DESCRIPTION_MASKED : <b><span id="question_holder"></span></b></p>
+		<p>DESCRIPTION : <b><span id="question_holder"></span></b></p>
 		<p>Geo :
 			<input type="text" id="answerBoxCity" placeholder="type city here">
 			<input type="text" id="answerBoxState" placeholder="type state here" maxlength="2">
@@ -127,24 +127,26 @@ pybossa.presentTask(function(task, deferred){
 			var isValidCity = true;
 			var isValidZipcode = true;
 			$('#answerBoxState').each(function () {
-				if (!(answer["state"] in maps)) {
-					isValidState = false;
-					$("#answerBoxState").css({
-						"border": "1px solid red",
-						"background": "#FFCECE"
-					});
-				} else if (!(answer["city"] in maps[answer["state"]])) {
-					isValidCity = false;
-					$("#answerBoxCity").css({
-						"border": "1px solid red",
-						"background": "#FFCECE"
-					});
-				} else if ((maps[answer["state"]][answer["city"]].indexOf(answer["zipcode"]) == -1) && (answer["zipcode"].length != 0)) {
-					isValidZipcode = false;
-					$("#answerBoxZipcode").css({
-						"border": "1px solid red",
-						"background": "#FFCECE"
-					});
+				if((answer["city"].length != 0) && (answer["state"].length != 0)) {
+					if (!(answer["state"] in maps)) {
+						isValidState = false;
+						$("#answerBoxState").css({
+							"border": "1px solid red",
+							"background": "#FFCECE"
+						});
+					} else if (!(answer["city"] in maps[answer["state"]])) {
+						isValidCity = false;
+						$("#answerBoxCity").css({
+							"border": "1px solid red",
+							"background": "#FFCECE"
+						});
+					} else if ((maps[answer["state"]][answer["city"]].indexOf(answer["zipcode"]) == -1) && (answer["zipcode"].length != 0)) {
+						isValidZipcode = false;
+						$("#answerBoxZipcode").css({
+							"border": "1px solid red",
+							"background": "#FFCECE"
+						});
+					}
 				} else {
 					$("#answerBoxState").css({
 						"border": "",
