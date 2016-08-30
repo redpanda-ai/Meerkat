@@ -1,11 +1,14 @@
 <div class="row">
 	<div id="skeleton" class="col-md-12">
-		<h2>Fat Head Project</h2>
+		<h2>Geomancer Project</h2>
 		<p>DESCRIPTION_MASKED : <b><span id="question_holder"></span></b></p>
-		<p>Answer :
+		<p>Geo :
 			<input type="text" id="answerBoxCity" placeholder="type city here">
 			<input type="text" id="answerBoxState" placeholder="type state here" maxlength="2">
 			<input type="text" id="answerBoxZipcode" placeholder="type zipcode here" maxlength="5">
+		</p>
+		<p>Store Number :
+			<input type="number" id="answerBoxStoreNumber" placeholder="type store number here" min="0" step="1" style="width: 200px;">
 		</p>
 		<p>
 			<button id="save" class="btn btn-primary">Save Answer</button>
@@ -61,7 +64,7 @@ var maps = {};
 $.ajax({
 	url: "http://server_ip/dictionaries/merchant_name/geo.json",
 	dataType: 'jsonp',
-	jsonpCallback: 'callback',
+	jsonpCallback: 'callback0',
 	success: function(data) {
 		console.log(data);
 		maps = data;
@@ -72,10 +75,10 @@ var store1 = {};
 $.ajax({
 	url: "http://server_ip/dictionaries/merchant_name/store_id_1.json",
 	dataType: 'jsonp',
-	jsonpCallback: 'callback',
+	jsonpCallback: 'callback1',
 	success: function(data) {
 		console.log(data);
-		maps = data;
+		store1 = data;
 	}
 });
 
@@ -83,10 +86,10 @@ var store2 = {};
 $.ajax({
 	url: "http://server_ip/dictionaries/merchant_name/store_id_2.json",
 	dataType: 'jsonp',
-	jsonpCallback: 'callback',
+	jsonpCallback: 'callback2',
 	success: function(data) {
 		console.log(data);
-		maps = data;
+		store2 = data;
 	}
 });
 
@@ -98,6 +101,7 @@ pybossa.presentTask(function(task, deferred){
 		$("#answerBoxCity").val("");
 		$("#answerBoxState").val("");
 		$("#answerBoxZipcode").val("");
+		$("#answerBoxStoreNumber").val("");
 		$("#answerBoxCity").css({
 			"border": "",
 			"background": ""
@@ -117,6 +121,7 @@ pybossa.presentTask(function(task, deferred){
 			answer["state"] = $("#answerBoxState").val().toUpperCase();
 			answer["zipcode"] = $("#answerBoxZipcode").val().toUpperCase();
 			answer["not_in_us"] = false;
+			answer["storenumber"] = $("#answerBoxStoreNumber").val().replace(/^0+/, '');
 
 			var isValidState = true;
 			var isValidCity = true;
@@ -156,7 +161,23 @@ pybossa.presentTask(function(task, deferred){
 				}
 			});
 
-			if (isValidState == false || isValidCity == false|| isValidZipcode == false) {
+			var isValidStoreNumber = true;
+			$('#answerBoxStoreNumber').each(function () {
+				if ((answer["storenumber"].length != 0) && !(answer["storenumber"] in store1 || answer["storenumber"] in store2)) {
+					isValidStoreNumber = false;
+					$("#answerBoxStoreNumber").css({
+						"border": "1px solid red",
+						"background": "#FFCECE"
+					});
+				} else {
+					$("#answerBoxStoreNumber").css({
+						"border": "",
+						"background": ""
+					});
+				}
+			});
+
+			if (isValidState == false || isValidCity == false|| isValidZipcode == false || isValidStoreNumber == false) {
 				evt.preventDefault();
 			} else {
 				pybossa.saveTask(task.id, answer).done(function() {
@@ -190,6 +211,7 @@ pybossa.presentTask(function(task, deferred){
 			answer["state"] = "";
 			answer["zipcode"] = "";
 			answer["not_in_us"] = "";
+			answer["storenumber"] = "";
 			pybossa.saveTask(task.id, answer).done(function() {
 				$("#success").fadeIn();
 					setTimeout(function() {

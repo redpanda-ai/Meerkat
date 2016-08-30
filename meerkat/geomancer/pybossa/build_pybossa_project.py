@@ -39,12 +39,12 @@ def create_project_json_file(project_name, project_json_file):
 		logger.info("Writing {0}".format(project_json_file))
 		json.dump(project_json, json_file)
 
-def format_json_with_callback(dictionary_file):
+def format_json_with_callback(dictionary_file, index):
 	"""Format the json dictionary to work with ajax callback"""
 	# Prepend the json dictionary
 	for line in fileinput.input(dictionary_file, inplace=True):
 		if fileinput.isfirstline():
-			print("callback(")
+			print("callback" + str(index) + "(")
 			print(line)
 		else:
 			print(line)
@@ -119,11 +119,11 @@ class Worker(GeomancerModule):
 				dictionary_dst = "/var/www/html/dictionaries/" + merchant + "/"
 				os.makedirs(dictionary_dst, exist_ok=True)
 				json_files = ["/geo.json", "/store_id_1.json", "/store_id_2.json"]
-				for json_file in json_files:
+				for i, json_file in enumerate(json_files):
 					copy_file(base_dir + merchant + json_file, dictionary_dst)
 
 					dictionary_file = dictionary_dst + json_file
-					format_json_with_callback(dictionary_file)
+					format_json_with_callback(dictionary_file, i)
 
 					replace_str_in_file(merchant_presenter, "merchant_name", merchant)
 					replace_str_in_file(merchant_presenter, "server_ip", server)
