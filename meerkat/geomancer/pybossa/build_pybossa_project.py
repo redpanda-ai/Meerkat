@@ -118,14 +118,16 @@ class Worker(GeomancerModule):
 			if 'update_dictionary' in self.config and self.config["update_dictionary"]:
 				dictionary_dst = "/var/www/html/dictionaries/" + merchant + "/"
 				os.makedirs(dictionary_dst, exist_ok=True)
-				copy_file(base_dir + merchant + "/geo.json", dictionary_dst)
+				json_files = ["/geo.json", "/store_id_1.json", "/store_id_2.json"]
+				for json_file in json_files:
+					copy_file(base_dir + merchant + json_file, dictionary_dst)
 
-				dictionary_file = dictionary_dst + "/geo.json"
-				format_json_with_callback(dictionary_file)
+					dictionary_file = dictionary_dst + json_file
+					format_json_with_callback(dictionary_file)
 
-				replace_str_in_file(merchant_presenter, "merchant_name", merchant)
-				replace_str_in_file(merchant_presenter, "server_ip", server)
-				logger.info("updated presenter with new dictionary")
+					replace_str_in_file(merchant_presenter, "merchant_name", merchant)
+					replace_str_in_file(merchant_presenter, "server_ip", server)
+					logger.info("updated presenter with new dictionary")
 				update_presenter = True
 
 			if update_presenter: 
