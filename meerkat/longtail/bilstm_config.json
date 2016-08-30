@@ -2,7 +2,7 @@
 	"model_path": "",
 	"dataset": "meerkat/longtail/data.csv",
 	"alphabet": "abcdefghijklmnopqrstuvwxyz0123456789,;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}",
-	"embeddings": "/home/ubuntu/git/embeddings/en.polyglot.txt",
+	"embeddings": "",
 	"tag_map": {
 		"0": "background",
 		"1": "merchant"

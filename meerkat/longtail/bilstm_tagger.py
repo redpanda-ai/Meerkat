@@ -17,6 +17,7 @@ Created on July 20, 2016
 # For addtional details on implementation see:
 #
 # Multilingual Part-of-Speech Tagging with Bidirectional Long Short-Term Memory Models
+# and Auxiliary Loss
 # http://arxiv.org/pdf/1604.05529v2.pdf
 # https://github.com/bplank/bilstm-aux
 #
@@ -158,9 +159,12 @@ def preprocess(config):
 	config["train"], config["test"] = load_data(config)
 	config = subpreprocess(config, "train")
 	config = subpreprocess(config, "test")
-	embedding, emb_dim = load_embeddings_file(config["embeddings"], lower=True)
-	# Assert that emb_dim is equal to we_dim
-	assert emb_dim == config["we_dim"]
+	if config["embeddings"] != "":
+		embedding, emb_dim = load_embeddings_file(config["embeddings"], lower=True)
+		# Assert that emb_dim is equal to we_dim
+		assert emb_dim == config["we_dim"]
+	else:
+		embedding = {}
 	config["w2i"] = words_to_indices(config["train"])
 	config["w2i"], config["wembedding"] = construct_embedding(config, config["w2i"], embedding)
 	config["vocab_size"] = len(config["wembedding"])
