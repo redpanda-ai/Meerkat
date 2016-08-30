@@ -17,6 +17,7 @@ Created on July 20, 2016
 # For addtional details on implementation see:
 #
 # Multilingual Part-of-Speech Tagging with Bidirectional Long Short-Term Memory Models
+# and Auxiliary Loss
 # http://arxiv.org/pdf/1604.05529v2.pdf
 # https://github.com/bplank/bilstm-aux
 #
@@ -32,7 +33,7 @@ Created on July 20, 2016
 ###################################################################################################
 
 ############################################ REFERENCE ############################################
-# train and test sets are now a list of tuples after preprocess(), e.g.
+# training and test sets are now a list of tuples after preprocess(), e.g.
 # [(["amazon", "prime", "purchase"], ["merchant", "merchant", "background"]), (...), ...]
 ###################################################################################################
 import logging
@@ -40,6 +41,7 @@ import os
 import random
 import json
 import sys
+import shutil
 
 import numpy as np
 import tensorflow as tf
@@ -157,9 +159,12 @@ def preprocess(config):
 	config["train"], config["test"] = load_data(config)
 	config = subpreprocess(config, "train")
 	config = subpreprocess(config, "test")
-	embedding, emb_dim = load_embeddings_file(config["embeddings"], lower=True)
-	# Assert that emb_dim is equal to we_dim
-	assert emb_dim == config["we_dim"]
+	if config["embeddings"] != "":
+		embedding, emb_dim = load_embeddings_file(config["embeddings"], lower=True)
+		# Assert that emb_dim is equal to we_dim
+		assert emb_dim == config["we_dim"]
+	else:
+		embedding = {}
 	config["w2i"] = words_to_indices(config["train"])
 	config["w2i"], config["wembedding"] = construct_embedding(config, config["w2i"], embedding)
 	config["vocab_size"] = len(config["wembedding"])
@@ -360,7 +365,13 @@ def train_model(*args):
 
 	config, graph, sess, saver, run_options, run_metadata = args[:]
 
+	best_accuracy, best_era = 0, 0
+	checkpoints_dir = "./meerkat/longtail/checkpoints/"
+	model_dir = "./meerkat/longtail/model/"
+	os.makedirs(checkpoints_dir, exist_ok=True)
+	os.makedirs(model_dir, exist_ok=True)
 	eras = config["eras"]
+	checkpoints = []
 	train = config["train"]
 	train_index = list(range(len(train)))
 	sess.run(
@@ -425,21 +436,41 @@ def train_model(*args):
 				logging.info("{0:3.2f}% complete with era {1}".format(count/len(train_index)*100, step+1))
 
 		# Evaluate Model
-		evaluate_testset(config, graph, sess, config["test"])
+		test_accuracy = evaluate_testset(config, graph, sess, config["test"])
+		# Save checkpoint
+		current_model_path = save_models(saver, sess, checkpoints_dir, step+1)
+		logging.info("Checkpoint saved in file: " + current_model_path)
+		checkpoints.append(current_model_path)
 
-	final_model_path = "./meerkat/longtail/models/"
-	os.makedirs(final_model_path, exist_ok=True)
-	w2i_to_json(config["w2i"], final_model_path)
-	save_models(saver, sess, final_model_path)
+		# Stop training if converged
+		if test_accuracy > best_accuracy:
+			best_era = step
+			best_accuracy = test_accuracy
+
+		if step - best_era == 2:
+			best_model_path = checkpoints[best_era]
+			logging.info("Best era is era {0}.".format(best_era+1))
+			break
+
+	# Clean up directory
+	final_model_path = model_dir + "bilstm.ckpt"
+	final_meta_path = model_dir + "bilstm.meta"
+	os.rename(best_model_path, final_model_path)
+	logging.info("Moving final model from {0} to {1}.".format(best_model_path,
+		final_model_path))
+	os.rename(best_model_path+".meta", final_meta_path)
+	logging.info("Moving final meta file from {0} to {1}.".format(
+		best_model_path+".meta", final_meta_path))
+	shutil.rmtree(checkpoints_dir)
+	logging.info("Removing checkpoint files at " + checkpoints_dir)
+	w2i_to_json(config["w2i"], model_dir)
 	return final_model_path
 
-def save_models(saver, sess, path):
+def save_models(saver, sess, path, era):
 	"""save model to ckpt and meta"""
-	ckpt_path = path + "bilstm.ckpt"
-	meta_path = path + "bilstm.meta"
-	_ = saver.save(sess, ckpt_path)
-	os.rename(ckpt_path+".meta", meta_path)
-	logging.info("Save model to {0}, {1}".format(ckpt_path, meta_path))
+	ckpt_path = path + "bilstm_era_" + str(era) + ".ckpt"
+	model_path = saver.save(sess, ckpt_path)
+	return model_path
 
 def w2i_to_json(w2i, path):
 	"""save w2i to json file"""
@@ -487,6 +518,7 @@ def evaluate_testset(config, graph, sess, test):
 	logging.info("Test accuracy: %.2f%%" % test_accuracy)
 	logging.info("Correct count: " + str(total_correct))
 	logging.info("Total number of tags: " + str(total_count))
+	return test_accuracy
 
 def run_session(config, graph, saver):
 	"""Run Session"""
