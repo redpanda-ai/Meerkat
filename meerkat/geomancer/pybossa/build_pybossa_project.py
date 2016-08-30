@@ -27,9 +27,6 @@ def add_tasks(server, apikey, project_json_file, tasks_file):
 		apikey + " --project " + project_json_file + " add_tasks --tasks-file " +
 		tasks_file)
 
-	#os.system("pbs --server http://" + server + ":12000 --api-key " +
-	#	apikey + " --project " + project_json_file + " update-task-redundancy --redundancy 3")
-
 def create_project_json_file(project_name, project_json_file):
 	"""Create a json file for the new pybossa project"""
 	project_json = {

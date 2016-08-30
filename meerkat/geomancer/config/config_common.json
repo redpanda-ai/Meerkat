@@ -2,19 +2,17 @@
 	"common_config": {
 		"bucket": "s3yodlee",
 		"bank_or_card": "bank",
-		"server": "52.26.175.156",
-		"apikey": "b151d9e8-0b62-432c-aa3f-7f654ba0d983",
+		"server": "52.37.199.197",
+		"apikey": "4f373485-2a5f-4dc7-81a1-eac50d7024bf",
 		"target_merchant_list": [
-			"Ace Hardware", "Albertsons", "Albertsons Market", "American Eagle Outfitters",
-			"Applebee's", "Arby's", "AutoZone", "Aéropostale", "Bahama Breeze", "Barnes and Noble",
-			"Baskin Robbins", "Bealls Florida", "Bealls Outlet Stores", "Bealls Tx", "Bed Bath & Beyond",
-			"Best Buy", "Burger King US", "Costco Wholesale Corp.", "Domino's Pizza",
-			"Eddie V's Prime Seafood", "FedEx", "Five Guys", "Food 4 Less", "Fred Meyer",
-			"Fred Meyer Jewelers", "Gymboree", "H&M (Hennes & Mauritz)", "IHOP", "In-N-Out Burger",
-			"JCPenney", "JCPenney Optical", "KFC US", "Kmart", "Kohl's", "LongHorn Steakhouse", "Lowe's",
-			"Macy's", "McDonald's US", "Nordstrom", "Nordstrom Rack", "O'Reilly Auto Parts", "Papa John's",
-			"Pizza Hut", "SUBWAY", "Safeway", "Sally Beauty Supply", "Starbucks US", "Target",
-			"The Home Depot", "ULTA Beauty", "Walgreens", "Walmart", "francesca's", "lululemon athletica"
+			"Ace Hardware", "Aeropostale", "Albertsons", "American Eagle Outfitters", "Applebee's",
+			"Arby's", "AutoZone", "Bahama Breeze", "Barnes & Noble", "Baskin-Robbins", "Bealls",
+			"Bed Bath & Beyond", "Best Buy", "Burger King", "Costco", "Domino's Pizza", "Eddie V's",
+			"FedEx", "Five Guys", "Food 4 Less", "Francesca's", "Fred Meyer", "Gymboree", "H&M",
+			"Home Depot", "IHOP", "In-N-Out Burger", "J. C. Penney", "KFC", "Kmart", "Kohl's",
+			"LongHorn Steakhouse", "Lowe's", "Lululemon", "Macy's", "McDonald's", "Nordstrom",
+			"O'Reilly Auto Parts", "Papa John's Pizza", "Pizza Hut", "Safeway", "Sally Beauty Supply",
+			"Starbucks", "Subway", "Target", "Ulta", "Walgreens", "Walmart"
 		]
 	}
 }
