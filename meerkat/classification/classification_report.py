@@ -137,7 +137,7 @@ def get_classification_report(confusion_matrix_file, label_map, report_path):
 		logging.debug("Confusion matrix is a proper square, continuing")
 
 	#Convert to 0-indexed confusion matrix
-	df.rename(columns=lambda x: int(x) - 1, inplace=True)
+	df.columns = list(range(len(df)))
 	#First order calculations
 	true_positive = pd.DataFrame(df.iat[i, i] for i in range(rows))
 	false_positive = pd.DataFrame(pd.DataFrame(df.sum(axis=0)).values - true_positive.values,
