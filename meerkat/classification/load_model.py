@@ -11,6 +11,7 @@ Created on Feb 25, 2014
 from os.path import isfile
 import sys
 import logging
+import math
 import numpy as np
 import tensorflow as tf
 
@@ -55,7 +56,8 @@ def get_tf_cnn_by_name(model_name, gpu_mem_fraction=False):
 	label_map_base = "meerkat/classification/label_maps/"
 
 	model_names = ["bank_merchant", "card_merchant", "bank_debit_subtype", "bank_credit_subtype",
-		"card_debit_subtype", "card_credit_subtype"]
+		"card_debit_subtype", "card_credit_subtype", "bank_debit_category", "bank_credit_category",
+		"card_debit_category", "card_credit_category"]
 	if model_name in model_names:
 		temp = model_name.split("_")
 		model_type = temp[-1] + '.' + '.'.join(temp[:-1])
@@ -186,12 +188,24 @@ def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=False, model
 		output = sess.run(model, feed_dict=feed_dict_test)
 		if not soft_target:
 			labels = np.argmax(output, 1) + 1
+			scores = np.amax(output, 1)
 
 			for index, transaction in enumerate(trans):
 				label = label_map.get(str(labels[index]), "")
+				if 'threshold' in label and label["threshold"] and scores[index] < math.log(float(label["threshold"])):
+					label = label_map.get('1', '') # first class in label map should always be the default one
 				if isinstance(label, dict) and label_only:
 					label = label["label"]
 				transaction[label_key] = label
+
+				# Append score for transaction under debug mode
+				if label_key == "CNN":
+					transaction["merchant_score"] = "{0:.6}".format(math.exp(scores[index]))
+				if label_key == "subtype_CNN":
+					transaction["subtype_score"] = "{0:.6}".format(math.exp(scores[index]))
+				if label_key == "category_CNN":
+					transaction["category_score"] = "{0:.6}".format(math.exp(scores[index]))
+
 		else:
 			return output
 

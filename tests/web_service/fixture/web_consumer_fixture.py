@@ -32,7 +32,8 @@ def get_transactions_to_clean(case_type):
             "state": "NY",
             "city": "Scars",
             "search": {},
-            "locale_bloom": ["Scars", "NY"]
+            "locale_bloom": ["Scars", "NY"],
+            "category_CNN": {"label": "Other Expenses"}
         }]
 
 def get_proper_output(case_type):
