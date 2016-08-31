@@ -59,15 +59,8 @@ class Worker(GeomancerModule):
 				csv_file = save_path + file_name
 				logger.info("csv file at: " + csv_file)
 
-				pattern = re.compile("(\\|\\|)([^|]+?\=[^|]?)+?")
-				for line in fileinput.input(csv_file, inplace=True):
-					if pattern.search(line):
-						new_line = pattern.sub("  \g<2>", line)
-						print(new_line.rstrip())
-					else:
-						print(line.rstrip())
 				csv_kwargs = { "chunksize": 1000, "error_bad_lines": False, "encoding": 'utf-8',
-					"quoting": csv.QUOTE_NONE, "na_filter": False, "sep": "|", "activate_cnn": True,
+					"quoting": csv.QUOTE_NONE, "na_filter": False, "sep": "\t", "activate_cnn": True,
 					"cnn": bank_or_card + "_merchant" }
 
 				existing_lines = int(sum(1 for line in open(csv_file)))
