@@ -1,6 +1,7 @@
 #!/usr/local/bin/python3
 # pylint: disable=too-many-locals
 # pylint: disable=unused-variable
+# pylint: disable=too-many-statements
 
 """Train a bi-LSTM tagger using tensorFlow
 
