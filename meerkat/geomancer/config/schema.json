@@ -73,9 +73,13 @@
 				"truncate_lines": {
 					"type": "integer",
 					"minimum": -1
+				},
+				"prefix": {
+					"type": "string",
+					"pattern": "^[A-Za-z0-9\/_.]*\/$"
 				}
 			},
-			"required": ["version_dir", "truncate_lines"]
+			"required": ["version_dir", "truncate_lines", "prefix"]
 		}
 	}
 }

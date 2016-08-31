@@ -116,7 +116,7 @@ class ThreadConsumer(threading.Thread):
 				logger.info("Consumer thread {0} finished".format(str(self.thread_id)))
 				break
 			logger.info("consumer thread: {0}; data queue size: {1}, consumer queue size {2}".format(str(self.thread_id),
-				 param["data_queue"].qsize(), len(self.param["consumer_queue"])))
+				 param["data_queue"].qsize(), len(self.param["consumer_list"])))
 
 			param["chunk_num"] += 1
 			if param["chunk_num"] % 10 == 0:
@@ -168,7 +168,7 @@ def start_consumers(param, num_consumer_thread):
 		logger.info("start consumer: {0}".format(str(i)))
 		consumer = ThreadConsumer(i, param)
 		consumer.start()
-		param["consumer_queue"].append(consumer)
+		param["consumer_list"].append(consumer)
 
 def get_grouped_dataframes(input_file, groupby_name, target_merchant_list, **csv_kwargs):
 	"""Generate a dataframe which is a subset of the input_file grouped by merchant."""
@@ -192,7 +192,7 @@ def get_grouped_dataframes(input_file, groupby_name, target_merchant_list, **csv
 	param = {
 		"activate_cnn": activate_cnn,
 		"chunk_num": 0,
-		"consumer_queue": [],
+		"consumer_list": [],
 		"csv_kwargs": csv_kwargs,
 		"data_queue": queue.Queue(),
 		"data_queue_populated": False,
@@ -217,7 +217,7 @@ def get_grouped_dataframes(input_file, groupby_name, target_merchant_list, **csv
 	for i in range(num_consumer_thread):
 		param["data_queue"].put(None)
 
-	for consumer_thread in param["consumer_queue"]:
+	for consumer_thread in param["consumer_list"]:
 		consumer_thread.join()
 
 	#Show what you found and did not find

@@ -6,7 +6,6 @@ import shutil
 import pandas as pd
 import logging
 import yaml
-import fileinput
 
 from meerkat.classification.tools import (pull_from_s3, extract_tarball,
 	check_new_input_file)
@@ -38,9 +37,8 @@ class Worker(GeomancerModule):
 		bucket = self.common_config["bucket"]
 		#version_dir = self.config["version_dir"]
 
-		prefix = "meerkat/geomancer/"
-		#extension = "tar.gz"
-		tarball_name = bank_or_card + "_transaction_sample.tar.gz"
+		prefix = self.config["prefix"]
+		tarball_name = bank_or_card + "_transaction_sample.tab.tar.gz"
 		save_path = "meerkat/geomancer/data/input/" + bank_or_card + "/"
 		os.makedirs(save_path, exist_ok=True)
 
@@ -51,11 +49,11 @@ class Worker(GeomancerModule):
 		logger.info("Synch-ed")
 
 		if needs_to_be_downloaded:
-			extract_clean_files(save_path, tarball_name, ".csv")
+			extract_clean_files(save_path, tarball_name, ".tab")
 
 		tasks_prefix = "meerkat/geomancer/merchants/"
 		for file_name in os.listdir(save_path):
-			if file_name.endswith(".csv"):
+			if file_name.endswith(".tab"):
 				csv_file = save_path + file_name
 				logger.info("csv file at: " + csv_file)
 
