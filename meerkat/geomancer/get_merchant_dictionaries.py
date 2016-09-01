@@ -9,6 +9,7 @@ import queue
 import sys
 import logging
 import yaml
+import re
 
 from functools import reduce
 from timeit import default_timer as timer
@@ -63,6 +64,12 @@ def expand_abbreviations(city):
 			break
 	return city
 
+def remove_leading_zeros(store_number):
+	"""Remove leading zeros in store number"""
+	if isinstance(store_number, str):
+		store_number = store_number.lstrip('0')
+	return store_number
+
 class Worker(GeomancerModule):
 	"""Contains methods and data pertaining to the creation and retrieval of merchant dictionaries"""
 	name = "merchant_dictionaries"
@@ -78,6 +85,11 @@ class Worker(GeomancerModule):
 		logger.debug("Generating store dictionaries.")
 		#Use only the "store_number", "city", and "state" columns
 		slender_df = df[["store_number", "city", "state"]]
+
+		slender_df["store_number"] = slender_df["store_number"].apply(remove_leading_zeros)
+
+		logger.info(slender_df["store_number"].dtypes)
+		logger.info(slender_df)
 		store_dict_1, store_dict_2 = {}, {}
 		my_stores = slender_df.set_index("store_number").T.to_dict('list')
 		#my_stores = {str(k):str(v) for k,v in my_stores.items()}

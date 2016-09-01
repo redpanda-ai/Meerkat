@@ -8,7 +8,7 @@
 			<input type="text" id="answerBoxZipcode" placeholder="type zipcode here" maxlength="5">
 		</p>
 		<p>Store Number :
-			<input type="number" id="answerBoxStoreNumber" placeholder="type store number here" min="0" step="1" style="width: 200px;">
+			<input type="text" id="answerBoxStoreNumber" placeholder="type store number here" style="width: 200px;">
 		</p>
 		<p>
 			<button id="save" class="btn btn-primary">Save Answer</button>
@@ -111,6 +111,10 @@ pybossa.presentTask(function(task, deferred){
 			"background": ""
 		});
 		$("#answerBoxZipcode").css({
+			"border": "",
+			"background": ""
+		});
+		$("#answerBoxStoreNumber").css({
 			"border": "",
 			"background": ""
 		});
