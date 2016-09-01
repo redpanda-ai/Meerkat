@@ -76,7 +76,6 @@ class Worker(GeomancerModule):
 		os.makedirs(base_dir, exist_ok=True)
 		target_merchants = self.common_config["target_merchant_list"]
 		top_merchants = get_top_merchant_names(base_dir, target_merchants)
-		self.common_config["target_merchant_list"] = top_merchants
 
 		logger.info("Top merchants project to be processed are: {0}".format(top_merchants))
 
@@ -135,6 +134,8 @@ class Worker(GeomancerModule):
 				results_file = template_dir + "results.html"
 				tutorial_file = template_dir + "tutorial.html"
 
+				if not os.path.isfile(project_json_file):
+					create_project_json_file(project_name, project_json_file)
 				os.system("pbs --server http://" + server + ":12000 --api-key " +
 					apikey + " --project " + project_json_file + " update_project --task-presenter " +
 					merchant_presenter + " --long-description " + long_description_file +
