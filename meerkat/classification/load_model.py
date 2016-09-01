@@ -11,6 +11,7 @@ Created on Feb 25, 2014
 from os.path import isfile
 import sys
 import logging
+import math
 import numpy as np
 import tensorflow as tf
 
@@ -19,6 +20,8 @@ from sklearn.externals import joblib
 from meerkat.various_tools import load_params
 from meerkat.classification.auto_load import main_program as load_models_from_s3
 from meerkat.classification.tensorflow_cnn import (validate_config, get_tensor, string_to_tensor)
+from meerkat.longtail.bilstm_tagger import trans_to_tensor, get_tags
+from meerkat.longtail.bilstm_tagger import validate_config as bilstm_validate_config
 
 def load_scikit_model(model_name):
 	"""Load either Card or Bank classifier depending on
@@ -53,7 +56,8 @@ def get_tf_cnn_by_name(model_name, gpu_mem_fraction=False):
 	label_map_base = "meerkat/classification/label_maps/"
 
 	model_names = ["bank_merchant", "card_merchant", "bank_debit_subtype", "bank_credit_subtype",
-		"card_debit_subtype", "card_credit_subtype"]
+		"card_debit_subtype", "card_credit_subtype", "bank_debit_category", "bank_credit_category",
+		"card_debit_category", "card_credit_category"]
 	if model_name in model_names:
 		temp = model_name.split("_")
 		model_type = temp[-1] + '.' + '.'.join(temp[:-1])
@@ -64,6 +68,71 @@ def get_tf_cnn_by_name(model_name, gpu_mem_fraction=False):
 		sys.exit()
 
 	return get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=gpu_mem_fraction)
+
+def get_tf_rnn_by_path(model_path, w2i_path, gpu_mem_fraction=False, model_name=False):
+	"""Load a tensorflow rnn model"""
+
+	config_path = "meerkat/longtail/bilstm_config.json"
+	if not isfile(model_path):
+		logging.warning("Resources to load model not found.")
+		sys.exit()
+
+	# Load Graph
+	config = bilstm_validate_config(config_path)
+	config["model_path"] = model_path
+	meta_path = model_path.split(".ckpt")[0] + ".meta"
+	config["w2i"] = load_params(w2i_path)
+
+	# Load Session and Graph
+	ops.reset_default_graph()
+	saver = tf.train.import_meta_graph(meta_path)
+
+	if gpu_mem_fraction:
+		gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.25)
+		sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, gpu_options=gpu_options))
+	else:
+		sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, device_count={"GPU":0}))
+
+	saver.restore(sess, config["model_path"])
+	graph = sess.graph
+
+	if not model_name:
+		model = get_tensor(graph, "model:0")
+	else:
+		model = get_tensor(graph, model_name)
+
+	# Generate Helper Function
+	def apply_rnn(trans, doc_key="Description", label_key="Predicted", name_only=True, tags=False):
+		"""Apply RNN to transactions"""
+
+		for _, doc in enumerate(trans):
+			if tags:
+				# if tags, tag all tokens with get_tags for evaluation purposes
+				tran, label = get_tags(config, doc)
+				doc["ground_truth"] = label
+			else:
+				tran = doc[doc_key].lower().split()[0:config["max_tokens"]]
+			char_inputs, word_lengths, word_indices, _ = trans_to_tensor(config, tran)
+			feed_dict = {
+				get_tensor(graph, "char_inputs:0"): char_inputs,
+				get_tensor(graph, "word_inputs:0"): word_indices,
+				get_tensor(graph, "word_lengths:0"): word_lengths,
+				get_tensor(graph, "trans_length:0"): len(tran),
+				get_tensor(graph, "train:0"): False
+			}
+
+			output = sess.run(model, feed_dict=feed_dict)
+			if name_only:
+				# return merchant name if name_only else return tags of all tokens
+				output = [config["tag_map"][str(i)] for i in np.argmax(output, 1)]
+				target_indices = [i for i in range(len(output)) if output[i] == "merchant"]
+				doc[label_key] = " ".join([tran[i] for i in target_indices])
+			else:
+				doc[label_key] = output
+
+		return trans
+
+	return apply_rnn
 
 def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=False, model_name=False):
 	"""Load a tensorFlow module by name"""
@@ -119,12 +188,24 @@ def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=False, model
 		output = sess.run(model, feed_dict=feed_dict_test)
 		if not soft_target:
 			labels = np.argmax(output, 1) + 1
+			scores = np.amax(output, 1)
 
 			for index, transaction in enumerate(trans):
 				label = label_map.get(str(labels[index]), "")
+				if 'threshold' in label and label["threshold"] and scores[index] < math.log(float(label["threshold"])):
+					label = label_map.get('1', '') # first class in label map should always be the default one
 				if isinstance(label, dict) and label_only:
 					label = label["label"]
 				transaction[label_key] = label
+
+				# Append score for transaction under debug mode
+				if label_key == "CNN":
+					transaction["merchant_score"] = "{0:.6}".format(math.exp(scores[index]))
+				if label_key == "subtype_CNN":
+					transaction["subtype_score"] = "{0:.6}".format(math.exp(scores[index]))
+				if label_key == "category_CNN":
+					transaction["category_score"] = "{0:.6}".format(math.exp(scores[index]))
+
 		else:
 			return output
 

@@ -1,0 +1,6 @@
+{
+    "bank_credit" : ["Other Income", "Refunds/Adjustments"],
+    "card_credit" : ["Other Income", "Refunds/Adjustments", "Transfers"],
+    "bank_debit" : ["ATM/Cash Withdrawals", "Credit Card Payments", "Retirement Contributions", "Savings", "Loans","Mortgage", "Insurance"],
+    "card_debit" : ["Insurance"]
+}

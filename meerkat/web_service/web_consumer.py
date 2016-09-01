@@ -18,11 +18,10 @@ from scipy.stats.mstats import zscore
 
 from meerkat.various_tools import get_es_connection, string_cleanse, get_boosted_fields
 from meerkat.various_tools import synonyms, get_bool_query, get_qs_query
-from meerkat.classification.load_model import load_scikit_model, get_tf_cnn_by_name
+from meerkat.classification.load_model import load_scikit_model, get_tf_cnn_by_path
 from meerkat.classification.auto_load import main_program as load_models_from_s3
 
 # pylint:disable=no-name-in-module
-#from meerkat.classification.bloom_filter.find_entities import location_split
 from meerkat.classification.bloom_filter.trie import location_split
 
 # Enabled Models
@@ -72,12 +71,19 @@ class WebConsumer():
 			#Load new models from S3
 			load_models_from_s3(config=auto_load_config)
 
-		self.bank_merchant_cnn = get_tf_cnn_by_name("bank_merchant", gpu_mem_fraction=gmf)
-		self.card_merchant_cnn = get_tf_cnn_by_name("card_merchant", gpu_mem_fraction=gmf)
-		self.card_debit_subtype_cnn = get_tf_cnn_by_name("card_debit_subtype", gpu_mem_fraction=gmf)
-		self.card_credit_subtype_cnn = get_tf_cnn_by_name("card_credit_subtype", gpu_mem_fraction=gmf)
-		self.bank_debit_subtype_cnn = get_tf_cnn_by_name("bank_debit_subtype", gpu_mem_fraction=gmf)
-		self.bank_credit_subtype_cnn = get_tf_cnn_by_name("bank_credit_subtype", gpu_mem_fraction=gmf)
+		# Get CNN Models
+		self.models = dict()
+		models_dir = 'meerkat/classification/models/'
+		label_maps_dir = "meerkat/classification/label_maps/"
+		for filename in os.listdir(models_dir):
+			if filename.endswith('.ckpt') and not filename.startswith('train'):
+				temp = filename.split('.')[:-1]
+				if temp[-1].isdigit():
+					key = '_'.join(temp[1:-1] + [temp[0], temp[-1], 'cnn'])
+				else:
+					key = '_'.join(temp[1:] + [temp[0], 'cnn'])
+				self.models[key] = get_tf_cnn_by_path(models_dir + filename, \
+					label_maps_dir + filename[:-4] + 'json', gpu_mem_fraction=gmf)
 
 	def update_hyperparams(self, hyperparams):
 		"""Updates a WebConsumer object's hyper-parameters"""
@@ -311,50 +317,66 @@ class WebConsumer():
 
 		return transaction
 
-	def __apply_missing_categories(self, transactions):
-		"""If the factual search fails to find categories do a static lookup
-		on the merchant name"""
-		json_object = open('meerkat/web_service/config/web_service.json')
-		json_data = json.loads(json_object.read())
+	def __apply_category_with_merchant(self, trans):
+		"""Fix category_labels based on merchant_category and subtype_category"""
+		merchant_category = trans.get("CNN", {}).get("category", "").strip()
 
-		general_category = json_data['general_category']
-		#general_category = ['Other Income', 'Other Expenses', \
-		#'Other Bills', 'Service Charges/Fees', 'Transfers']
-		subtype_list = json_data['subtype_category']
-		#subtype_list = ['Service Charge/Fee Refund', 'Refund']
+		if merchant_category == "Use Subtype Rules for Categories" or merchant_category == "":
+			# No valid merchant_category
+			if trans["category_labels"] == ["Other Income"] or \
+			   trans["category_labels"] == ["Other Expenses"]:
+				subtype_category = trans.get("subtype_CNN", {}).get("category", \
+								   trans.get("subtype_CNN", {}).get("label", ""))
+				if isinstance(subtype_category, dict):
+					subtype_category = subtype_category[trans["ledger_entry"].lower()]
+				if subtype_category != "":
+					trans["category_labels"] = [subtype_category]
+		else:
+			# Has an valid merchant_category
+			trans["category_labels"] = [merchant_category]
+
+		trans["CNN"] = trans.get("CNN", {}).get("label", "")
+		trans.pop("subtype_CNN", None)
+
+		return trans
+
+	def __apply_category(self, transactions):
+		"""Fix category_labels with category_cnn"""
+		json_obj = open('meerkat/web_service/config/category.json')
+		json_data = json.loads(json_obj.read())
+		bank_credit = json_data['bank_credit']
+		card_credit = json_data['card_credit']
+		bank_debit = json_data['bank_debit']
+		card_debit = json_data['card_debit']
 
 		for trans in transactions:
-			subtype_category = trans.get("subtype_CNN", {}).get("category",\
-				 trans.get("subtype_CNN", {}).get("label", ""))
-			if isinstance(subtype_category, dict):
-				subtype_category = subtype_category[trans["ledger_entry"].lower()]
+			try:
+				category = trans['category_labels'][0]
+			except IndexError:
+				if trans['ledger_entry'] == 'credit':
+					category = 'Other Income'
+				else:
+					category = 'Other Expenses'
 
-			sub_type = trans.get("txn_sub_type", "")
-
-			if len(subtype_category) == 0 \
-				or subtype_category in general_category or sub_type in subtype_list:
-				# Regular spending transaction
-				trans["search"] = {"category_labels" : trans.get("category_labels", [])}
-
-				if trans.get("category_labels"):
-					trans["CNN"] = trans.get("CNN", {}).get("label", "")
-					if "subtype_CNN" in trans:
-						del trans["subtype_CNN"]
-					continue
-
-				fallback = trans.get("CNN", {}).get("category", "").strip()
-
-				if fallback == "Use Subtype Rules for Categories" or fallback == "":
-					fallback = subtype_category
-
-				trans["category_labels"] = [fallback]
-				trans["CNN"] = trans.get("CNN", {}).get("label", "")
-				trans.pop("subtype_CNN", None)
+			if trans['ledger_entry'] == 'credit' and trans['container'] == 'bank' and \
+				category in bank_credit:
+				self.__apply_category_with_merchant(trans)
+			elif trans['ledger_entry'] == 'credit' and trans['container'] == 'card' and \
+				category in card_credit:
+				self.__apply_category_with_merchant(trans)
+			elif trans['ledger_entry'] == 'debit' and trans['container'] == 'bank' and \
+				category not in bank_debit:
+				self.__apply_category_with_merchant(trans)
+			elif trans['ledger_entry'] == 'debit' and trans['container'] == 'card' and \
+				category not in card_debit:
+				self.__apply_category_with_merchant(trans)
 			else:
-				# Payroll transaction
-				trans["category_labels"] = [subtype_category]
-				trans["CNN"] = trans.get("CNN", {}).get("label", "")
-				trans.pop("subtype_CNN", None)
+				trans['CNN'] = trans.get('CNN', {}).get('label', '')
+				trans.pop('subtype_CNN', None)
+
+			trans['search'] = {'category_labels': trans.get('category_labels', [])}
+
+		return transactions
 
 	def ensure_output_schema(self, transactions, debug):
 		"""Clean output to proper schema"""
@@ -431,7 +453,11 @@ class WebConsumer():
 				trans["bloom_filter"] = {"city": trans["city"], "state": trans["state"]}
 				trans["cnn"] = {"txn_type" : trans.get("txn_type", ""),
 					"txn_sub_type" : trans.get("txn_sub_type", ""),
-					"merchant_name" : trans.pop("CNN", "")
+					"merchant_name" : trans.pop("CNN", ""),
+					"category_labels" : [trans["category_CNN"].get("label", "")],
+					"merchant_score" : trans.get("merchant_score", "0.0"),
+					"subtype_score" : trans.get("subtype_score", "0.0"),
+					"category_score" : trans.get("category_score", "0.0")
 					}
 
 			trans.pop("locale_bloom", None)
@@ -440,6 +466,11 @@ class WebConsumer():
 			trans.pop("date", None)
 			trans.pop("ledger_entry", None)
 			trans.pop("CNN", None)
+			trans.pop("container", None)
+			trans.pop("category_CNN", None)
+			trans.pop("merchant_score", None)
+			trans.pop("subtype_score", None)
+			trans.pop("category_score", None)
 
 		# return transactions
 
@@ -494,11 +525,23 @@ class WebConsumer():
 
 	def __apply_merchant_cnn(self, data):
 		"""Apply the merchant CNN to transactions"""
+
+		if "cobrand_region" in data:
+			region = str(data["cobrand_region"])
+		else:
+			region = '000'
+
 		classifier = None
 		if data["container"] == "bank":
-			classifier = self.bank_merchant_cnn
+			if 'bank_merchant_' + region + '_cnn' not in self.models:
+				classifier = self.models['bank_merchant_cnn']
+			else:
+				classifier = self.models['bank_merchant_' + region + '_cnn']
 		else:
-			classifier = self.card_merchant_cnn
+			if 'card_merchant_' + region + '_cnn' not in self.models:
+				classifier = self.models['card_merchant_cnn']
+			else:
+				classifier = self.models['card_merchant_' + region + '_cnn']
 		return classifier(data["transaction_list"], label_only=False)
 
 	def __apply_subtype_cnn(self, data):
@@ -507,12 +550,29 @@ class WebConsumer():
 		if len(data["transaction_list"]) == 0:
 			return data["transaction_list"]
 
+		if "cobrand_region" in data:
+			region = str(data["cobrand_region"])
+		else:
+			region = '000'
+
 		if data["container"] == "card":
-			credit_subtype_classifer = self.card_credit_subtype_cnn 
-			debit_subtype_classifer = self.card_debit_subtype_cnn
+			if 'card_credit_subtype_' + region + '_cnn' not in self.models:
+				credit_subtype_classifer = self.models['card_credit_subtype_cnn']
+			else:
+				credit_subtype_classifer = self.models['card_credit_subtype_' + region + '_cnn']
+			if 'card_debit_subtype_' + region + '_cnn' not in self.models:
+				debit_subtype_classifer = self.models['card_debit_subtype_cnn']
+			else:
+				debit_subtype_classifer = self.models['card_debit_subtype_' + region + '_cnn']
 		elif data["container"] == "bank":
-			credit_subtype_classifer = self.bank_credit_subtype_cnn
-			debit_subtype_classifer = self.bank_debit_subtype_cnn
+			if 'bank_credit_subtype_' + region + '_cnn' not in self.models:
+				credit_subtype_classifer = self.models['bank_credit_subtype_cnn']
+			else:
+				credit_subtype_classifer = self.models['bank_credit_subtype_' + region + '_cnn']
+			if 'bank_debit_subtype_' + region + '_cnn' not in self.models:
+				debit_subtype_classifer = self.models['bank_debit_subtype_cnn']
+			else:
+				debit_subtype_classifer = self.models['bank_debit_subtype_' + region + '_cnn']
 
 		# Split transactions into groups
 		credit, debit = [], []
@@ -548,6 +608,68 @@ class WebConsumer():
 			txn_type, txn_sub_type = label.split(" - ")
 			transaction["txn_type"] = txn_type
 			transaction["txn_sub_type"] = txn_sub_type
+
+		return data["transaction_list"]
+
+	def __apply_category_cnn(self, data):
+		"""Apply the category CNN to transactions"""
+
+		if len(data["transaction_list"]) == 0:
+			return data["transaction_list"]
+
+		if "cobrand_region" in data:
+			region = str(data["cobrand_region"])
+		else:
+			region = '000'
+
+		if data["container"] == "card":
+			if 'card_credit_category_' + region + '_cnn' not in self.models:
+				credit_category_classifer = self.models['card_credit_category_cnn']
+			else:
+				credit_category_classifer = self.models['card_credit_category_' + region + '_cnn']
+			if 'card_debit_category_' + region + '_cnn' not in self.models:
+				debit_category_classifer = self.models['card_debit_category_cnn']
+			else:
+				debit_category_classifer = self.models['card_debit_category_' + region + '_cnn']
+		elif data["container"] == "bank":
+			if 'bank_credit_category_' + region + '_cnn' not in self.models:
+				credit_category_classifer = self.models['bank_credit_category_cnn']
+			else:
+				credit_category_classifer = self.models['bank_credit_category_' + region + '_cnn']
+			if 'bank_debit_category_' + region + '_cnn' not in self.models:
+				debit_category_classifer = self.models['bank_debit_category_cnn']
+			else:
+				debit_category_classifer = self.models['bank_debit_category_' + region + '_cnn']
+
+		# Split transactions into groups
+		credit, debit = [], []
+
+		for transaction in data["transaction_list"]:
+			if transaction["ledger_entry"] == "credit":
+				credit.append(transaction)
+			if transaction["ledger_entry"] == "debit":
+				debit.append(transaction)
+
+		# Apply classifiers
+		if len(credit) > 0:
+			credit_category_classifer(credit, label_key="category_CNN", label_only=False)
+		if len(debit) > 0:
+			debit_category_classifer(debit, label_key="category_CNN", label_only=False)
+
+		refund_transactions = []
+
+		for transaction in data["transaction_list"]:
+			category = transaction["category_CNN"].get("label", "")
+			transaction["category_labels"] = [category]
+
+			if category == "":
+				transaction["category_labels"] = ["Other Expenses"]
+				if transaction["ledger_entry"] == "credit":
+					transaction["category_labels"] = ["Other Income"]
+
+			# Collect refund/adjustments transactions to apply a refund transactions model soon
+			if transaction["category_labels"] == ["Refunds/Adjustments"]:
+				refund_transactions.append(transaction)
 
 		return data["transaction_list"]
 
@@ -595,6 +717,9 @@ class WebConsumer():
 	def __apply_cpu_classifiers(self, data):
 		"""Apply all the classifiers which are CPU bound.  Written to be
 		run in parallel with GPU bound classifiers."""
+		for transaction in data["transaction_list"]:
+			transaction["container"] = data["container"]
+
 		services_list = data.get("services_list", [])
 		if "bloom_filter" in services_list or services_list == []:
 			self.__apply_locale_bloom(data)
@@ -613,13 +738,13 @@ class WebConsumer():
 
 	def classify(self, data, optimizing=False):
 		"""Classify a set of transactions"""
-
 		services_list = data.get("services_list", [])
 		debug = data.get("debug", False)
 
 		cpu_result = self.__cpu_pool.apply_async(self.__apply_cpu_classifiers, (data, ))
 
 		if not optimizing:
+			# Apply Subtype CNN
 			if "cnn_subtype" in services_list or services_list == []:
 				self.__apply_subtype_cnn(data)
 			else:
@@ -627,19 +752,24 @@ class WebConsumer():
 				for transaction in data["transaction_list"]:
 					transaction["txn_sub_type"] = ""
 					transaction["txn_type"] = ""
+
+			# Apply Category CNN
+			if "cnn_category" in services_list or "cnn_subtype" in services_list or services_list == []:
+				self.__apply_category_cnn(data)
+
+			# Apply Merchant CNN
 			if "cnn_merchant" in services_list or services_list == []:
 				self.__apply_merchant_cnn(data)
 
 		cpu_result.get() # Wait for CPU bound classifiers to finish
 
 		if not optimizing:
-			self.__apply_missing_categories(data["transaction_list"])
+			self.__apply_category(data["transaction_list"])
 
 		self.ensure_output_schema(data["transaction_list"], debug)
 
 		return data
 
 if __name__ == "__main__":
-	# pylint: disable=pointless-string-statement
-	"""Print a warning to not execute this file as a module"""
+	# Print a warning to not execute this file as a module
 	print("This module is a Class; it should not be run from the console.")

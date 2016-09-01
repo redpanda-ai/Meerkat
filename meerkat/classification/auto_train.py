@@ -75,7 +75,8 @@ def parse_arguments(args):
 		"input_dir": "Path of the directory containing input file",
 		"debug": "log at DEBUG level",
 		"info": "log at INFO level",
-		"ensemble": "Including this flag will use ensemble method."
+		"ensemble": "Including this flag will use ensemble method.",
+		"region": "Indicate a region"
 	}
 
 	choices = {
@@ -94,13 +95,14 @@ def parse_arguments(args):
 	parser.add_argument("--output_dir", help=help_text["output_dir"], default='')
 	parser.add_argument("--credit_or_debit", default='', help=help_text["credit_or_debit"])
 	parser.add_argument("--bucket", help=help_text["bucket"], default='s3yodlee')
+	parser.add_argument("--region", help=help_text["region"], default='')
 	parser.add_argument("-d", "--debug", help=help_text["debug"], action="store_true")
 	parser.add_argument("-v", "--info", help=help_text["info"], action="store_true")
 
 	args = parser.parse_args(args)
 
-	if args.model_type == 'subtype' and args.credit_or_debit == '':
-		raise Exception('For subtype data you need to declare debit or credit.')
+	if (args.model_type == 'subtype' or args.model_type == 'category') and args.credit_or_debit == '':
+		raise Exception('You need to declare debit or credit.')
 	if args.debug:
 		logging.basicConfig(level=logging.DEBUG)
 	elif args.info:
@@ -116,9 +118,12 @@ def auto_train():
 	bank_or_card = args.bank_or_card
 	credit_or_debit = args.credit_or_debit
 	model_type = args.model_type
+	region = args.region
 	data_type = model_type + '/' + bank_or_card
 	if model_type != "merchant":
 		data_type = data_type + '/' + credit_or_debit
+	if region != '':
+		data_type = data_type + '/' + region
 
 	default_prefix = 'meerkat/cnn/data/'
 	prefix = default_prefix + data_type + '/' if args.input_dir == '' else args.input_dir

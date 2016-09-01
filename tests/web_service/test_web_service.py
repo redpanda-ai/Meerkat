@@ -30,7 +30,7 @@ def classify_one(self, transaction, max_retries=30):
 	while count <= max_retries:
 		try:
 			r_post = requests.post(
-				"https://localhost/meerkat/v2.2",
+				"https://localhost/meerkat/v2.4",
 				data=transaction,
 				verify=False)
 
@@ -49,7 +49,7 @@ def startup_helper(transaction, max_retries=100, sleep_interval=3):
 		try:
 			sleep(sleep_interval)
 			r_post = requests.post(
-				"https://localhost/meerkat/v2.2",
+				"https://localhost/meerkat/v2.4",
 				data=transaction,
 				verify=False)
 			r_post.connection.close()

@@ -21,4 +21,5 @@ Contributors
 * Matt Sevrens
 * Tina Wu
 * Oscar Pan
+* Feifei Zhu
 * Jie Zhang
