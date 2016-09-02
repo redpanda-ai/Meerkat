@@ -88,8 +88,6 @@ class Worker(GeomancerModule):
 
 		slender_df["store_number"] = slender_df["store_number"].apply(remove_leading_zeros)
 
-		logger.info(slender_df["store_number"].dtypes)
-		logger.info(slender_df)
 		store_dict_1, store_dict_2 = {}, {}
 		my_stores = slender_df.set_index("store_number").T.to_dict('list')
 		#my_stores = {str(k):str(v) for k,v in my_stores.items()}
