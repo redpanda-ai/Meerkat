@@ -694,10 +694,11 @@ class WebConsumer():
 
 			categories = trans.get("category_labels", "")
 
-			if categories != "" and categories != []:
-				categories = json.loads(categories)
-			else:
-				categories = []
+			if isinstance(categories, str):
+				if categories != "":
+					categories = json.loads(categories)
+				else:
+					categories = []
 
 			# Merge sublists into single list if any exist:
 			if any(isinstance(elem, list) for elem in categories):
