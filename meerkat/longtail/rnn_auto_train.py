@@ -22,9 +22,13 @@ import tensorflow as tf
 from meerkat.various_tools import load_params, push_file_to_s3
 from meerkat.longtail.rnn_classification_report import evaluate_model
 from meerkat.longtail.bilstm_tagger import validate_config, preprocess, build_graph, run_session
-from meerkat.classification.tools import check_new_input_file, pull_from_s3, extract_tarball, make_tarfile
+from meerkat.classification.tools import check_new_input_file, pull_from_s3, extract_tarball, make_tarfile, check_file_exist_in_s3
 
 #################################### USAGE ###############################################
+"""
+nohup python3 -m meerkat.longtail.rnn_auto_train &
+nohup python3 -m meerkat.longtail.rnn_auto_train --bucket BUCKET_NAME &
+"""
 ##########################################################################################
 
 def parse_arguments(args):
@@ -63,6 +67,12 @@ def auto_train():
 	s3_params["prefix"] = newest_version_dir + "/"
 	os.makedirs(save_path, exist_ok=True)
 
+	# Model already exists in the newest directory
+	if check_file_exist_in_s3("model.tar.gz", **s3_params):
+		logging.info("Model already exists, please create a new directory and start a new training")
+		sys.exit()
+
+	# Start a new traing with input data
 	if exist_new_input:
 		logging.info("There exists new input data")
 		input_file = pull_from_s3(extension=".tar.gz", file_name="input.tar.gz", **s3_params)
@@ -91,27 +101,28 @@ def auto_train():
 		ckpt_model_file = run_session(config, graph, saver)
 		final_model_path = "./meerkat/longtail/model/"
 
-		# Tar model files and push model.tar.gz to s3
+		# Tar model and push model.tar.gz to s3
 		model_tar_file = "./meerkat/longtail/model.tar.gz"
 		make_tarfile(model_tar_file, final_model_path)
 		push_file_to_s3(model_tar_file, bucket, s3_params["prefix"])
 		logging.info("Push the model to S3")
 		os.remove(model_tar_file)
 
-		# Evaluate the model again test.csv
+		# Evaluate the model against test.csv
 		args.data = test_file
 		args.model = ckpt_model_file
 		args.w2i = final_model_path + "w2i.json"
 		evaluate_model(args)
 		logging.info("Evalute the model on test data")
 
-		# Push result files to s3
+		# Push results to s3
 		result_files = glob.glob(save_path + "*.csv")
 		for single_file in result_files:
 			push_file_to_s3(single_file, bucket, s3_params["prefix"])
 		logging.info("Push all the results to S3")
+		shutil.rmtree(save_path)
 
-	logging.info("RNN training is done")
+	logging.info("RNN auto training is done")
 
 if __name__ == "__main__":
 	"""The main training stream"""
