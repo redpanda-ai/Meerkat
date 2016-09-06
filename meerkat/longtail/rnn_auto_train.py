@@ -17,18 +17,16 @@ import argparse
 
 import numpy as np
 import pandas as pd
-import tensorflow as tf
 
 from meerkat.various_tools import load_params, push_file_to_s3
 from meerkat.longtail.rnn_classification_report import evaluate_model
 from meerkat.longtail.bilstm_tagger import validate_config, preprocess, build_graph, run_session
-from meerkat.classification.tools import check_new_input_file, pull_from_s3, extract_tarball, make_tarfile, check_file_exist_in_s3
+from meerkat.classification.tools import (check_new_input_file, pull_from_s3, extract_tarball,
+		make_tarfile, check_file_exist_in_s3)
 
 #################################### USAGE ###############################################
-"""
-nohup python3 -m meerkat.longtail.rnn_auto_train &
-nohup python3 -m meerkat.longtail.rnn_auto_train --bucket BUCKET_NAME &
-"""
+# nohup python3 -m meerkat.longtail.rnn_auto_train &
+# nohup python3 -m meerkat.longtail.rnn_auto_train --bucket BUCKET_NAME &
 ##########################################################################################
 
 def parse_arguments(args):
@@ -46,7 +44,8 @@ def parse_arguments(args):
 	parser.add_argument("--bucket", help=help_text["bucket"], default="s3yodlee")
 	parser.add_argument("--prefix", help=help_text["prefix"], default="meerkat/rnn/data/")
 	parser.add_argument("--output_dir", help=help_text["output_dir"], default="./data/RNN_stats/")
-	parser.add_argument("--config", help=help_text["config"], default="./meerkat/longtail/bilstm_config.json")
+	parser.add_argument("--config", help=help_text["config"],
+			default="./meerkat/longtail/bilstm_config.json")
 	parser.add_argument("-v", "--info", help=help_text["info"], action="store_true")
 
 	args = parser.parse_args(args)
@@ -63,7 +62,7 @@ def auto_train():
 
 	s3_params = {"bucket": bucket, "prefix": prefix, "save_path": save_path}
 
-	exist_new_input, newest_version_dir, version = check_new_input_file(**s3_params)
+	exist_new_input, newest_version_dir, _ = check_new_input_file(**s3_params)
 	s3_params["prefix"] = newest_version_dir + "/"
 	os.makedirs(save_path, exist_ok=True)
 
@@ -125,5 +124,5 @@ def auto_train():
 	logging.info("RNN auto training is done")
 
 if __name__ == "__main__":
-	"""The main training stream"""
+	# The main training stream
 	auto_train()
