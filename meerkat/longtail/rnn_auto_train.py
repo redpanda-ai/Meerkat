@@ -77,6 +77,9 @@ def auto_train():
 
 		train_file = save_path + "train.csv"
 		test_file = save_path + "test.csv"
+		push_file_to_s3(train_file, bucket, s3_params["prefix"])
+		push_file_to_s3(test_file, bucket, s3_params["prefix"])
+		logging.info("Push train.csv and test.csv to S3")
 
 		config = load_params(args.config)
 		config["dataset"] = train_file
@@ -92,6 +95,7 @@ def auto_train():
 		model_tar_file = "./meerkat/longtail/model.tar.gz"
 		make_tarfile(model_tar_file, final_model_path)
 		push_file_to_s3(model_tar_file, bucket, s3_params["prefix"])
+		logging.info("Push the model to S3")
 		os.remove(model_tar_file)
 
 		# Evaluate the model again test.csv
@@ -99,11 +103,13 @@ def auto_train():
 		args.model = ckpt_model_file
 		args.w2i = final_model_path + "w2i.json"
 		evaluate_model(args)
+		logging.info("Evalute the model on test data")
 
 		# Push result files to s3
 		result_files = glob.glob(save_path + "*.csv")
 		for single_file in result_files:
 			push_file_to_s3(single_file, bucket, s3_params["prefix"])
+		logging.info("Push all the results to S3")
 
 	logging.info("RNN training is done")
 
