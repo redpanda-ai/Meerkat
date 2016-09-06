@@ -78,7 +78,7 @@ def auto_train():
 		extract_tarball(input_file, save_path)
 
 		# Split data.csv into train.csv and test.csv
-		df = pd.read_csv(save_path + "data.csv", sep="|")
+		df = pd.read_csv(save_path + "data.csv", sep="|", encoding="latin-1")
 		shuffled_df = df.reindex(np.random.permutation(df.index))
 		percent = int(df.shape[0] * 0.9)
 		shuffled_df[:percent].to_csv(save_path + "train.csv", header=True, index=False, sep="|")
