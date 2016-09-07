@@ -8,12 +8,13 @@
 			<input type="text" id="answerBoxZipcode" placeholder="type zipcode here" maxlength="5">
 		</p>
 		<p>Store Number :
-			<input type="text" id="answerBoxStoreNumber" placeholder="type store number here" style="width: 200px;">
+			<input type="text" id="answerBoxStoreNumber" placeholder="type store number here" style="width: 300px;">
 		</p>
 		<p>
 			<button id="save" class="btn btn-primary">Save Answer</button>
 			<button id="idk" class="btn btn-primary">I don't know</button>
 			<button id="not_in_us" class="btn btn-primary">Not in US</button>
+			<button id="comment" class="btn btn-primary">Comment</button>
 		</p>
 	</div>
 	<div id="finish" class="alert alert-success" style="display:none;">
@@ -126,31 +127,48 @@ pybossa.presentTask(function(task, deferred){
 			answer["zipcode"] = $("#answerBoxZipcode").val().toUpperCase();
 			answer["not_in_us"] = false;
 			answer["storenumber"] = $("#answerBoxStoreNumber").val().replace(/^0+/, '');
+			answer["comment_city"] = "";
+			answer["comment_state"] = "";
+			answer["comment_zipcode"] = "";
+			answer["comment_not_in_us"] = "";
+			answer["comment_storenumber"] = "";
 
 			var isValidState = true;
 			var isValidCity = true;
 			var isValidZipcode = true;
+			var isValidStoreNumber = true;
+
+			var storenumber = answer["storenumber"]
+			var condition1 = ((storenumber.length != 0) && (storenumber in store1) &&
+				(store1[storenumber][0] == answer["city"]) && (store1[storenumber][1] == answer["state"]))
+			var condition2 = ((storenumber.length != 0) && (storenumber in store2) &&
+				(store2[storenumber][0] == answer["city"]) && (store2[storenumber][1] == answer["state"]))
+
 			$('#answerBoxState').each(function () {
-				if((answer["city"].length != 0) && (answer["state"].length != 0)) {
-					if (!(answer["state"] in maps)) {
-						isValidState = false;
-						$("#answerBoxState").css({
-							"border": "1px solid red",
-							"background": "#FFCECE"
-						});
-					} else if (!(answer["city"] in maps[answer["state"]])) {
-						isValidCity = false;
-						$("#answerBoxCity").css({
-							"border": "1px solid red",
-							"background": "#FFCECE"
-						});
-					} else if ((maps[answer["state"]][answer["city"]].indexOf(answer["zipcode"]) == -1) && (answer["zipcode"].length != 0)) {
-						isValidZipcode = false;
-						$("#answerBoxZipcode").css({
-							"border": "1px solid red",
-							"background": "#FFCECE"
-						});
-					}
+				if (!(answer["state"] in maps)) {
+					isValidState = false;
+					$("#answerBoxState").css({
+						"border": "1px solid red",
+						"background": "#FFCECE"
+					});
+				} else if (!(answer["city"] in maps[answer["state"]])) {
+					isValidCity = false;
+					$("#answerBoxCity").css({
+						"border": "1px solid red",
+						"background": "#FFCECE"
+					});
+				} else if ((maps[answer["state"]][answer["city"]].indexOf(answer["zipcode"]) == -1) && (answer["zipcode"].length != 0)) {
+					isValidZipcode = false;
+					$("#answerBoxZipcode").css({
+						"border": "1px solid red",
+						"background": "#FFCECE"
+					});
+				} else if ((storenumber.length != 0) && (!(condition1 || condition2))) {
+					isValidStoreNumber = false;
+					$("#answerBoxStoreNumber").css({
+						"border": "1px solid red",
+						"background": "#FFCECE"
+					});
 				} else {
 					$("#answerBoxState").css({
 						"border": "",
@@ -164,18 +182,6 @@ pybossa.presentTask(function(task, deferred){
 						"border": "",
 						"background": ""
 					});
-				}
-			});
-
-			var isValidStoreNumber = true;
-			$('#answerBoxStoreNumber').each(function () {
-				if ((answer["storenumber"].length != 0) && !(answer["storenumber"] in store1 || answer["storenumber"] in store2)) {
-					isValidStoreNumber = false;
-					$("#answerBoxStoreNumber").css({
-						"border": "1px solid red",
-						"background": "#FFCECE"
-					});
-				} else {
 					$("#answerBoxStoreNumber").css({
 						"border": "",
 						"background": ""
@@ -202,6 +208,12 @@ pybossa.presentTask(function(task, deferred){
 			answer["state"] = "";
 			answer["zipcode"] = "";
 			answer["not_in_us"] = true;
+			answer["storenumber"] = "";
+			answer["comment_city"] = "";
+			answer["comment_state"] = "";
+			answer["comment_zipcode"] = "";
+			answer["comment_not_in_us"] = "";
+			answer["comment_storenumber"] = "";
 			pybossa.saveTask(task.id, answer).done(function() {
 				$("#success").fadeIn();
 					setTimeout(function() {
@@ -213,6 +225,32 @@ pybossa.presentTask(function(task, deferred){
 
 		$("#idk").off('click').on('click', function(evt) {
 			var answer = {};
+			answer["city"] = "";
+			answer["state"] = "";
+			answer["zipcode"] = "";
+			answer["not_in_us"] = "";
+			answer["storenumber"] = "";
+			answer["comment_city"] = "";
+			answer["comment_state"] = "";
+			answer["comment_zipcode"] = "";
+			answer["comment_not_in_us"] = "";
+			answer["comment_storenumber"] = "";
+			pybossa.saveTask(task.id, answer).done(function() {
+				$("#success").fadeIn();
+					setTimeout(function() {
+						$("#success").hide();
+						deferred.resolve(task);
+					}, 1500);
+			});
+		});
+
+		$("#comment").off('click').on('click', function(evt) {
+			var answer = {};
+			answer["comment_city"] = $.trim($("#answerBoxCity").val().toUpperCase());
+			answer["comment_state"] = $("#answerBoxState").val().toUpperCase();
+			answer["comment_zipcode"] = $("#answerBoxZipcode").val().toUpperCase();
+			answer["comment_not_in_us"] = false;
+			answer["comment_storenumber"] = $("#answerBoxStoreNumber").val().replace(/^0+/, '');
 			answer["city"] = "";
 			answer["state"] = "";
 			answer["zipcode"] = "";
