@@ -1,4 +1,6 @@
 #!/usr/lacal/bin/python3.3
+#pylint: disable=too-many-locals
+#pylint: disable=too-many-statements
 
 """This script streamlines an entire RNN training process from pulling raw
 data from s3 to applying the trained RNN to a test set and return
@@ -16,7 +18,6 @@ import logging
 import argparse
 
 import numpy as np
-import pandas as pd
 
 from meerkat.various_tools import load_params, push_file_to_s3, load_piped_dataframe
 from meerkat.longtail.rnn_classification_report import evaluate_model
@@ -127,7 +128,7 @@ def auto_train():
 		os.rename("./dta/RNN_stats/train.csv", "./data/rnn_data_temp/train.csv")
 		os.rename("./data/RNN_stats/test.csv", "./data/rnn_data_temp/test.csv")
 		make_tarfile(tar_file, "./data/rnn_data_temp/")
-		push_file_to_s3(tar_file, bucket, s3_paramss["prefix"])
+		push_file_to_s3(tar_file, bucket, s3_params["prefix"])
 		logging.info("Push data to S3")
 		os.remove(tar_file)
 		logging.info(tar_file+" removed.")
