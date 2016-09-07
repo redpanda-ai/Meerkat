@@ -89,9 +89,6 @@ def auto_train():
 
 		train_file = save_path + "train.csv"
 		test_file = save_path + "test.csv"
-		push_file_to_s3(train_file, bucket, s3_params["prefix"])
-		push_file_to_s3(test_file, bucket, s3_params["prefix"])
-		logging.info("Push train.csv and test.csv to S3")
 
 		config = load_params(args.config)
 		config["dataset"] = train_file
@@ -123,9 +120,9 @@ def auto_train():
 
 		# Tar data, train and test.csv and push preprocessed.tar.gz to s3
 		os.makedirs("./data/rnn_data_temp/")
-		tar_file = "./data/preprocess.tar.gz"
+		tar_file = "./data/preprocessed.tar.gz"
 		os.rename("./data/RNN_stats/data.csv", "./data/rnn_data_temp/data.csv")
-		os.rename("./dta/RNN_stats/train.csv", "./data/rnn_data_temp/train.csv")
+		os.rename("./data/RNN_stats/train.csv", "./data/rnn_data_temp/train.csv")
 		os.rename("./data/RNN_stats/test.csv", "./data/rnn_data_temp/test.csv")
 		make_tarfile(tar_file, "./data/rnn_data_temp/")
 		push_file_to_s3(tar_file, bucket, s3_params["prefix"])
