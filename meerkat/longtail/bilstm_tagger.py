@@ -104,7 +104,7 @@ def validate_config(config):
 def load_data(config):
 	"""Load labeled data"""
 
-	df = load_piped_dataframe(config["dataset"])
+	df = load_piped_dataframe(config["dataset"], encoding="latin1")
 	msk = np.random.rand(len(df)) < 0.90
 	train = df[msk]
 	test = df[~msk]
