@@ -24,33 +24,37 @@ logger = logging.getLogger('get_merchant_dictionaries')
 def preprocess_dataframe(df):
 	"""Fix up some of the data in our dataframe."""
 	capitalize_word = lambda x: x.upper()
+	df["address"] = df["address"].apply(capitalize_word)
+	df["store_number"] = df["store_number"].apply(remove_leading_zeros)
 	df["state"] = df["state"].apply(capitalize_word)
 	df["city"] = df["city"].apply(capitalize_word)
 	df["city"] = df["city"].apply(expand_abbreviations)
 
-def merge(a, b, path=None):
+def merge(return_dict, other_dict, path=None):
 	"""Useful function to merge complex dictionaries, courtesy of:
 	https://stackoverflow.com/questions/7204805/dictionaries-of-dictionaries-merge
-	I added logic for handling merge conflicts so that new values overwrite old values
-	but throw warnings.
-	"""
+	The return_dict is updated with values from the other_dict, but we always trust
+	the return_dict when there is a conflict.  """
 	if path is None:
 		path = []
-	for key in b:
-		if key in a:
-			if isinstance(a[key], dict) and isinstance(b[key], dict):
-				merge(a[key], b[key], path + [str(key)])
-			elif a[key] == b[key]:
+	for key in other_dict:
+		#For all matching keys
+		if key in return_dict:
+			if isinstance(return_dict[key], dict) and isinstance(other_dict[key], dict):
+				#If both values are dictionaries, recurse
+				merge(return_dict[key], other_dict[key], path + [str(key)])
+			elif return_dict[key] == other_dict[key]:
+				#Else if the values are the same, no changs
 				pass
 			else:
-				#Merge conflict, in our case old beats new
+				#if the values are different, we trust the return_dict
 				logger.warning("Conflict at %s" % ".".join(path + [str(key)]))
-				logger.warning("A key {0}".format(a[key]))
-				logger.warning("B key {0}".format(b[key]))
-				logger.warning("Conflict in dicts, keeping older value.")
+				logger.warning("First dict key {0}".format(return_dict[key]))
+				logger.warning("Second dict key {0}".format(other_dict[key]))
+				logger.warning("Conflict in dicts, keeping return_dict value.")
 		else:
-			a[key] = b[key]
-	return a
+			#For new keys in the other_dict, we add the key/value pair to the return_dict
+			return_dict[key] = other_dict[key]
 
 def expand_abbreviations(city):
 	"""Turns abbreviations into their expanded form."""
@@ -80,13 +84,26 @@ class Worker(GeomancerModule):
 		module_path = inspect.getmodule(inspect.stack()[1][0]).__file__
 		self.filepath = module_path[:module_path.rfind("/") + 1] + "merchants"
 
+	"""
+	def get_address_dictionaries(self, df):
+		logger.info("Generating address dictionaries.")
+		slender_df = df[["address", "zip_code", "store_number", "city", "state"]]
+
+		grouped = slender_df.groupby(["address"], as_index=True)
+		address_dict = {}
+		for name, group in grouped:
+			address = name
+			address_dict[address] = group
+		logger.info(address_dict)
+		self.dump_pretty_json_to_file(address_dict, "address_id.json")
+		return address_dict
+	"""
+
 	def get_store_dictionaries(self, df):
 		"""Writes out two store dictionaries"""
 		logger.debug("Generating store dictionaries.")
 		#Use only the "store_number", "city", and "state" columns
 		slender_df = df[["store_number", "city", "state"]]
-
-		slender_df["store_number"] = slender_df["store_number"].apply(remove_leading_zeros)
 
 		store_dict_1, store_dict_2 = {}, {}
 		my_stores = slender_df.set_index("store_number").T.to_dict('list')
@@ -128,6 +145,30 @@ class Worker(GeomancerModule):
 		# Write the unique_city list to json file
 		self.dump_pretty_json_to_file(unique_city, "unique_city.json")
 		return unique_city_state, unique_city
+
+	def get_address_dictionary(self, df):
+		"""Generates three merchant dictionaries and writes them as JSON files"""
+		merchant = self.config["merchant"]
+		logger.debug("Generating geo dictionaries for '{0}'".format(self.config["merchant"]))
+		geo_df_with_address = df[["state", "city", "zip_code", "address"]]
+		grouped = geo_df_with_address.groupby(['state', 'city', 'address'], as_index=True)
+		geo_dict = {}
+		for name, group in grouped:
+			state, city, address = name
+			state, city, address = state.upper(), city.upper(), address.upper()
+			if state not in geo_dict:
+				geo_dict[state] = {}
+			if city not in geo_dict[state]:
+				geo_dict[state][city] = {}
+			if address not in geo_dict[state][city]:
+				geo_dict[state][city][address] = []
+			for item in group["zip_code"]:
+				item = str(item)
+				item = item[:5]
+				if item not in geo_dict[state][city][address]:
+					geo_dict[state][city][address].append(item)
+		self.dump_pretty_json_to_file(geo_dict, "geo_with_address.json")
+		return geo_df_with_address
 
 	def get_geo_dictionary(self, df):
 		"""Generates three merchant dictionaries and writes them as JSON files"""
@@ -190,7 +231,8 @@ class Worker(GeomancerModule):
 					"encoding": "utf-8-sig", "quotechar" : '"', "na_filter" : False, "sep": "," }
 				merchant_dataframes_per_file = get_grouped_dataframes(csv_file,
 					"list_name", merchants_in_agg_data, **csv_kwargs)
-				merchant_dataframes = merge(merchant_dataframes, merchant_dataframes_per_file)
+				#merchant_dataframes = merge(merchant_dataframes, merchant_dataframes_per_file)
+				merge(merchant_dataframes, merchant_dataframes_per_file)
 
 		merchants_found_in_agg_data = sorted(list(merchant_dataframes.keys()))
 		logger.info("Merchants found in agg data: {0}".format(merchants_found_in_agg_data))
@@ -221,6 +263,8 @@ class Worker(GeomancerModule):
 			store_dict_1, store_dict_2 = self.get_store_dictionaries(df)
 			self.geo_df = self.get_geo_dictionary(df)
 			unique_city_state, unique_city = self.get_unique_city_dictionaries(df)
+			#address_dict = self.get_address_dictionaries(df)
+			geo_with_address = self.get_address_dictionary(df)
 			# Let's also get the question bank
 		return self.common_config
 
@@ -245,8 +289,10 @@ class Worker(GeomancerModule):
 			logger.debug("No pre-existing object, which is fine.")
 		#Merge original and new new_object
 		if isinstance(new_object, dict):
-			dst_object = reduce(merge, [src_object, new_object])
-			dst_object = {str(k): v for k, v in dst_object.items()}
+			#dst_object = reduce(merge, [src_object, new_object])
+			reduce(merge, [src_object, new_object])
+			#dst_object = {str(k): v for k, v in dst_object.items()}
+			dst_object = {str(k): v for k, v in src_object.items()}
 		elif isinstance(new_object, list):
 			dst_object = list(set().union(new_object, src_object))
 		else:
