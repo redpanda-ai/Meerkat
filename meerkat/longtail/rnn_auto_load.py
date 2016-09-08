@@ -51,7 +51,7 @@ def get_classification_accuracy(bucket, file_path):
 		return 0.0
 
 def get_valid_model_directories(bucket, prefix, target_file, model_name):
-	"""Get all valid model directories which must have classification_report.csv and model.tar.gz"""
+	"""Get all valid model directories which must have classification_report.csv and results.tar.gz"""
 	valid_model_directories = []
 	client = boto3.client("s3")
 
