@@ -13,6 +13,7 @@ import meerkat.geomancer.get_merchant_dictionaries as merchant_dictionaries
 import meerkat.geomancer.pybossa.build_pybossa_project as builder
 import meerkat.geomancer.interrogate as interrogate
 import meerkat.geomancer.get_top_merchant_data as top_merchant_data
+import meerkat.geomancer.taskrun_collector as taskrun_collector
 
 logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
 logger = logging.getLogger('__main__')
@@ -51,7 +52,8 @@ def main_process():
 		"meerkat/geomancer/config/schema.json")
 	logger.info("Valid configuration")
 
-	module_list = [merchant_dictionaries, builder, top_merchant_data, interrogate]
+	module_list = [merchant_dictionaries, builder, top_merchant_data, interrogate,
+		taskrun_collector]
 	for module in module_list:
 		if module.Worker.name in config:
 			logger.info("Activating {0} module.".format(module.Worker.name))

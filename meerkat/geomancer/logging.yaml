@@ -43,6 +43,9 @@ loggers:
   interrogate:
     handlers: [console]
     propogate: true
+  taskrun_collector:
+    handlers: [console]
+    propogate: true
 
 handlers:
   console:
