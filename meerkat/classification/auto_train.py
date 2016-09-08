@@ -56,7 +56,7 @@ optional arguments:
   -v, --info            log at INFO leve
 
 EXAMPLE =
-time nohup python3 -m meerkat.classification.auto_train merchant bank -v --ensemble &
+time nohup python3 -m meerkat.classification.auto_train subtype bank --credit_or_debit credit --region 2  &
 """
 ###################################################################################################
 
