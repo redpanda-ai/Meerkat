@@ -118,6 +118,7 @@ def auto_train():
 	bank_or_card = args.bank_or_card
 	credit_or_debit = args.credit_or_debit
 	model_type = args.model_type
+	args.region = 'region_' + args.region
 	region = args.region
 	data_type = model_type + '/' + bank_or_card
 	if model_type != "merchant":
