@@ -111,7 +111,7 @@ def auto_train():
 		# Tar model and push results.tar.gz to s3
 		tar_file = "./meerkat/longtail/results.tar.gz"
 		os.rename("./data/RNN_stats/correct.csv", results_path+"correct.csv")
-		os.rename("./data/RNN_stats/mislabeled.csv", results_path+"correct.csv")
+		os.rename("./data/RNN_stats/mislabeled.csv", results_path+"mislabeled.csv")
 		make_tarfile(tar_file, results_path)
 		push_file_to_s3(tar_file, bucket, s3_params["prefix"])
 		logging.info("Push the model to S3")
