@@ -96,26 +96,24 @@ def get_task_question_by_id(server, task_id):
 	else:
 		return ""
 
-def get_taskrun_results(results, server, redundancy):
-	for key in results:
-		slim_df = results[key]
-		logger.info("Project: {0}".format(key))
-		logger.info("Taskrun result: {0}".format(slim_df))
+def process_taskrun_dfs(dfs, server, redundancy, result_or_comment):
+	for key in dfs:
+		slim_df = dfs[key]
+		logger.info("Processing taskrun dataframes for Project: {0}".format(key))
 
 		component_dataframes = []
 		grouped = slim_df.groupby(["task_id"], as_index=True)
 		for name, group in grouped:
-			original_count = len(group)
-			dedup = group.drop_duplicates(subset=["city", "state", "zipcode", "not_in_us", "storenumber"])
-			if len(dedup) == 1 and original_count == redundancy:
-				component_dataframes.append(dedup)
+			if result_or_comment == "result":
+				original_count = len(group)
+				dedup = group.drop_duplicates(subset=["city", "state", "zipcode", "not_in_us", "storenumber"])
+				if len(dedup) == 1 and original_count == redundancy:
+					component_dataframes.append(dedup)
+			else:
+				component_dataframes.append(group)
 
-		count_of_taskrun_result = len(component_dataframes)
-		if count_of_taskrun_result == 0:
-			logger.info("Not find unanimously taskrun results for {0}".format(component_dataframes))
-			continue
-
-		logger.info("Count of taskrun result: {0}".format(count_of_taskrun_result))
+		count_of_taskrun_df = len(component_dataframes)
+		logger.info("Count of taskrun {0}: {1}".format(result_or_comment, count_of_taskrun_df))
 
 		questions = []
 		for df in component_dataframes:
@@ -123,41 +121,13 @@ def get_taskrun_results(results, server, redundancy):
 			questions.append(question)
 		aligned_df = pd.concat(component_dataframes, axis=0)
 		aligned_df["question"] = questions
-		logger.info("unanimously labeled tasks:\n{0}\n".format(aligned_df))
+		logger.info("labeled task {0}:\n{1}\n".format(result_or_comment, aligned_df))
 
 		bank_or_card = key.split("_")[1]
 		merchant = key.split("_")[2]
 		target_path = "meerkat/geomancer/merchants/" + merchant + "/"
 		os.makedirs(target_path, exist_ok=True)
-		aligned_df.to_csv(target_path + bank_or_card + "_taskrun_result.csv", sep="\t", index=False)
-
-def get_taskrun_comments(comments, server, redundancy):
-	for key in comments:
-		slim_df = comments[key]
-		logger.info("Project: {0}".format(key))
-		logger.info("Taskrun comment: {0}".format(slim_df))
-
-		component_dataframes = []
-		grouped = slim_df.groupby(["task_id"], as_index=True)
-		for name, group in grouped:
-			component_dataframes.append(group)
-
-		count_of_taskrun_result = len(component_dataframes)
-		logger.info("Count of taskrun result: {0}".format(count_of_taskrun_result))
-
-		questions = []
-		for df in component_dataframes:
-			question = get_task_question_by_id(server, int(df["task_id"]))
-			questions.append(question)
-		aligned_df = pd.concat(component_dataframes, axis=0)
-		aligned_df["question"] = questions
-		logger.info("labeled tasks with comments:\n{0}\n".format(aligned_df))
-
-		bank_or_card = key.split("_")[1]
-		merchant = key.split("_")[2]
-		target_path = "meerkat/geomancer/merchants/" + merchant + "/"
-		os.makedirs(target_path, exist_ok=True)
-		aligned_df.to_csv(target_path + bank_or_card + "_taskrun_comments.csv", sep="\t", index=False)
+		aligned_df.to_csv(target_path + bank_or_card + "_taskrun_" + result_or_comment + "s.csv", sep="\t", index=False)
 
 class Worker(GeomancerModule):
 	"""Contains methods and data pertaining to the creation and retrieval of AggData files"""
@@ -191,5 +161,5 @@ class Worker(GeomancerModule):
 
 		results, comments = get_taskrun_df(server, map_id_to_name, map_name_to_id)
 		redundancy = 2
-		get_taskrun_results(results, server, redundancy)
-		get_taskrun_comments(comments, server, redundancy)
+		process_taskrun_dfs(results, server, redundancy, "result")
+		process_taskrun_dfs(comments, server, redundancy, "comment")
