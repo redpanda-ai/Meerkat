@@ -1,4 +1,6 @@
 #!/usr/lacal/bin/python3.3
+#pylint: disable=too-many-locals
+#pylint: disable=too-many-statements
 
 """This script streamlines an entire RNN training process from pulling raw
 data from s3 to applying the trained RNN to a test set and return
@@ -16,9 +18,8 @@ import logging
 import argparse
 
 import numpy as np
-import pandas as pd
 
-from meerkat.various_tools import load_params, push_file_to_s3
+from meerkat.various_tools import load_params, push_file_to_s3, load_piped_dataframe
 from meerkat.longtail.rnn_classification_report import evaluate_model
 from meerkat.longtail.bilstm_tagger import validate_config, preprocess, build_graph, run_session
 from meerkat.classification.tools import (check_new_input_file, pull_from_s3, extract_tarball,
@@ -67,7 +68,7 @@ def auto_train():
 	os.makedirs(save_path, exist_ok=True)
 
 	# Model already exists in the newest directory
-	if check_file_exist_in_s3("model.tar.gz", **s3_params):
+	if check_file_exist_in_s3("results.tar.gz", **s3_params):
 		logging.info("Model already exists, please create a new directory and start a new training")
 		sys.exit()
 
@@ -76,9 +77,11 @@ def auto_train():
 		logging.info("There exists new input data")
 		input_file = pull_from_s3(extension=".tar.gz", file_name="input.tar.gz", **s3_params)
 		extract_tarball(input_file, save_path)
+		os.remove(input_file)
+		logging.info(input_file+" removed.")
 
 		# Split data.csv into train.csv and test.csv
-		df = pd.read_csv(save_path + "data.csv", sep="|", encoding="latin-1")
+		df = load_piped_dataframe(save_path+"data.csv", encoding="latin1")
 		shuffled_df = df.reindex(np.random.permutation(df.index))
 		percent = int(df.shape[0] * 0.9)
 		shuffled_df[:percent].to_csv(save_path + "train.csv", header=True, index=False, sep="|")
@@ -86,9 +89,6 @@ def auto_train():
 
 		train_file = save_path + "train.csv"
 		test_file = save_path + "test.csv"
-		push_file_to_s3(train_file, bucket, s3_params["prefix"])
-		push_file_to_s3(test_file, bucket, s3_params["prefix"])
-		logging.info("Push train.csv and test.csv to S3")
 
 		config = load_params(args.config)
 		config["dataset"] = train_file
@@ -98,28 +98,46 @@ def auto_train():
 		config = preprocess(config)
 		graph, saver = build_graph(config)
 		ckpt_model_file = run_session(config, graph, saver)
-		final_model_path = "./meerkat/longtail/model/"
+		results_path = "./meerkat/longtail/model/"
 
-		# Tar model and push model.tar.gz to s3
-		model_tar_file = "./meerkat/longtail/model.tar.gz"
-		make_tarfile(model_tar_file, final_model_path)
-		push_file_to_s3(model_tar_file, bucket, s3_params["prefix"])
-		logging.info("Push the model to S3")
-		os.remove(model_tar_file)
 
 		# Evaluate the model against test.csv
+		logging.info("Evalute the model on test data")
 		args.data = test_file
 		args.model = ckpt_model_file
-		args.w2i = final_model_path + "w2i.json"
+		args.w2i = results_path + "w2i.json"
 		evaluate_model(args)
-		logging.info("Evalute the model on test data")
 
-		# Push results to s3
+		# Tar model and push results.tar.gz to s3
+		tar_file = "./meerkat/longtail/results.tar.gz"
+		os.rename("./data/RNN_stats/correct.csv", results_path+"correct.csv")
+		os.rename("./data/RNN_stats/mislabeled.csv", results_path+"mislabeled.csv")
+		make_tarfile(tar_file, results_path)
+		push_file_to_s3(tar_file, bucket, s3_params["prefix"])
+		logging.info("Push the model to S3")
+		os.remove(tar_file)
+		logging.info(tar_file+" removed.")
+
+		# Tar data, train and test.csv and push preprocessed.tar.gz to s3
+		os.makedirs("./data/rnn_data_temp/")
+		tar_file = "./data/preprocessed.tar.gz"
+		os.rename("./data/RNN_stats/data.csv", "./data/rnn_data_temp/data.csv")
+		os.rename("./data/RNN_stats/train.csv", "./data/rnn_data_temp/train.csv")
+		os.rename("./data/RNN_stats/test.csv", "./data/rnn_data_temp/test.csv")
+		make_tarfile(tar_file, "./data/rnn_data_temp/")
+		push_file_to_s3(tar_file, bucket, s3_params["prefix"])
+		logging.info("Push data to S3")
+		os.remove(tar_file)
+		logging.info(tar_file+" removed.")
+
+		# Push the rest to s3
 		result_files = glob.glob(save_path + "*.csv")
 		for single_file in result_files:
 			push_file_to_s3(single_file, bucket, s3_params["prefix"])
 		logging.info("Push all the results to S3")
 		shutil.rmtree(save_path)
+		shutil.rmtree(results_path)
+		shutil.rmtree("./data/rnn_data_temp/")
 
 	logging.info("RNN auto training is done")
 
