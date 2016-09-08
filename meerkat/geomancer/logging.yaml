@@ -22,6 +22,9 @@ loggers:
   geomancer_module:
     handlers: [console]
     propogate: true
+  update_dictionaries:
+    handlers: [console]
+    propogate: true
   get_merchant_dictionaries:
     handlers: [console]
     propogate: true
