@@ -74,7 +74,7 @@ def evaluate_model(args=None):
 	config = validate_config(args.config)
 	num_labels = len(config["tag_map"])
 	con_matrix = [[0] * num_labels for i in range(num_labels)]
-	reader = load_piped_dataframe(args.data, chunksize=1000)
+	reader = load_piped_dataframe(args.data, chunksize=1000, encoding="latin1")
 	model = get_tf_rnn_by_path(args.model, args.w2i)
 	total_trans = count_transactions(args.data)
 	processed = 0.0

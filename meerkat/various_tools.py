@@ -108,13 +108,13 @@ def load_dict_ordered(file_name, encoding='utf-8', delimiter="|"):
 	input_file.close()
 	return dict_list, reader.fieldnames
 
-def load_piped_dataframe(filename, chunksize=False, usecols=False):
+def load_piped_dataframe(filename, chunksize=False, usecols=False, encoding="utf-8"):
 	"""Load piped dataframe from file name"""
 
 	options = {
 		"quoting": csv.QUOTE_NONE,
 		"na_filter": False,
-		"encoding": "utf-8",
+		"encoding": encoding,
 		"sep": "|",
 		"error_bad_lines": False
 	}
