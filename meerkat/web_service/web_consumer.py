@@ -78,7 +78,7 @@ class WebConsumer():
 		for filename in os.listdir(models_dir):
 			if filename.endswith('.ckpt') and not filename.startswith('train'):
 				temp = filename.split('.')[:-1]
-				if temp[-1].isdigit():
+				if temp[-1][-1].isdigit():
 					key = '_'.join(temp[1:-1] + [temp[0], temp[-1], 'cnn'])
 				else:
 					key = '_'.join(temp[1:] + [temp[0], 'cnn'])
@@ -527,9 +527,9 @@ class WebConsumer():
 		"""Apply the merchant CNN to transactions"""
 
 		if "cobrand_region" in data:
-			region = str(data["cobrand_region"])
+			region = 'region_' + str(data["cobrand_region"])
 		else:
-			region = '000'
+			region = 'default'
 
 		classifier = None
 		if data["container"] == "bank":
@@ -551,9 +551,9 @@ class WebConsumer():
 			return data["transaction_list"]
 
 		if "cobrand_region" in data:
-			region = str(data["cobrand_region"])
+			region = 'reigion_' + str(data["cobrand_region"])
 		else:
-			region = '000'
+			region = 'default'
 
 		if data["container"] == "card":
 			if 'card_credit_subtype_' + region + '_cnn' not in self.models:
@@ -618,9 +618,9 @@ class WebConsumer():
 			return data["transaction_list"]
 
 		if "cobrand_region" in data:
-			region = str(data["cobrand_region"])
+			region = 'region_' + str(data["cobrand_region"])
 		else:
-			region = '000'
+			region = 'default'
 
 		if data["container"] == "card":
 			if 'card_credit_category_' + region + '_cnn' not in self.models:
