@@ -37,6 +37,7 @@ Created on July 20, 2016
 # training and test sets are now a list of tuples after preprocess(), e.g.
 # [(["amazon", "prime", "purchase"], ["merchant", "merchant", "background"]), (...), ...]
 ###################################################################################################
+
 import logging
 import os
 import random
