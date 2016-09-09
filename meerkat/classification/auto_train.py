@@ -1,8 +1,4 @@
 #!/usr/local/bin/python3.3
-#pylint: disable=too-many-locals
-#pylint: disable=too-many-statements
-#pylint: disable=pointless-string-statement
-#pylint: disable=too-many-branches
 
 """This script streamlines an entire CNN training process from pulling raw
 data from s3 to applying the trained CNN to a test set and return
