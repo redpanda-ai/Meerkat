@@ -1,4 +1,8 @@
 #!/usr/local/bin/python3.3
+#pylint: disable=too-many-locals
+#pylint: disable=too-many-statements
+#pylint: disable=pointless-string-statement
+#pylint: disable=too-many-branches
 
 """This script streamlines an entire CNN training process from pulling raw
 data from s3 to applying the trained CNN to a test set and return
@@ -56,7 +60,7 @@ optional arguments:
   -v, --info            log at INFO leve
 
 EXAMPLE =
-time nohup python3 -m meerkat.classification.auto_train merchant bank -v --ensemble &
+time nohup python3 -m meerkat.classification.auto_train subtype bank --credit_or_debit credit --region 2  &
 """
 ###################################################################################################
 
@@ -118,6 +122,7 @@ def auto_train():
 	bank_or_card = args.bank_or_card
 	credit_or_debit = args.credit_or_debit
 	model_type = args.model_type
+	args.region = 'region_' + args.region
 	region = args.region
 	data_type = model_type + '/' + bank_or_card
 	if model_type != "merchant":
