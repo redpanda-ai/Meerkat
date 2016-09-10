@@ -1,16 +1,29 @@
 <div class="row">
+    <div id="locationField">
+      <input id="autocomplete" placeholder="Enter your address"
+             onFocus="geolocate()" type="text"></input>
+    </div>
 	<div id="skeleton" class="col-md-12">
-		<h2>Fat Head Project</h2>
-		<p>DESCRIPTION_MASKED : <b><span id="question_holder"></span></b></p>
-		<p>Answer :
-			<input type="text" id="answerBoxCity" placeholder="type city here">
-			<input type="text" id="answerBoxState" placeholder="type state here" maxlength="2">
-			<input type="text" id="answerBoxZipcode" placeholder="type zipcode here" maxlength="5">
+		<h2>Geomancer Project</h2>
+		<p>DESCRIPTION : <b><span id="question_holder"></span></b></p>
+		<p>Geo :
+			<input type="text" id="locality" placeholder="type city here">
+			<input type="text" id="administrative_area_level_1" placeholder="type state here" maxlength="2">
+			<input type="text" id="postal_code" placeholder="type zipcode here" maxlength="5">
 		</p>
 		<p>
+			<input type="text" id="street_number" placeholder="type street number here" style="width: 100px;margin-left:35px">
+			<input type="text" id="route" placeholder="type street name here" style="width: 250px">
+		</p>
+        <p>Store Number :
+			<input type="text" id="answerBoxStoreNumber" placeholder="type store number here" style="width: 300px;">
+		</p>
+		<p>
+		    <button id="validate" class="btn btn-primary">Validate</button>
 			<button id="save" class="btn btn-primary">Save Answer</button>
 			<button id="idk" class="btn btn-primary">I don't know</button>
 			<button id="not_in_us" class="btn btn-primary">Not in US</button>
+			<button id="comment" class="btn btn-primary">Comment</button>
 		</p>
 	</div>
 	<div id="finish" class="alert alert-success" style="display:none;">
@@ -57,14 +70,125 @@
 	</div>
 </div>
 <script type="text/javascript">
+    function getSelectedText() {
+        var text = "";
+        if (typeof window.getSelection != "undefined") {
+            text = window.getSelection().toString();
+        } else if (typeof document.selection != "undefined" && document.selection.type == "Text") {
+            text = document.selection.createRange().text;
+        }
+        return text;
+    }
+    
+
+    function doSomethingWithSelectedText() {
+        var selectedText = getSelectedText();
+        if (selectedText) {
+            console.log("Got selected text " + selectedText);
+            $("#autocomplete").on('input',function() {console.log("Change detected!");});
+            $('#autocomplete').val(selectedText);
+             console.log( "before trigger" + $( "#autocomplete" ).val() );
+            $('#autocomplete').trigger("change");
+            console.log( "after trigger" + $( "#autocomplete" ).val() );
+             $('#autocomplete').focus();
+            google.maps.event.trigger(autocomplete, 'place_changed');
+            console.log(place);
+        }
+    }
+    
+    document.onmouseup = doSomethingWithSelectedText;
+    document.onkeyup = doSomethingWithSelectedText;
+
+      var placeSearch, autocomplete;
+      var componentForm = {
+        street_number: 'short_name',
+        route: 'long_name',
+        locality: 'long_name',
+        administrative_area_level_1: 'short_name',
+        /*country: 'long_name',*/
+        postal_code: 'short_name'
+      };
+
+      function initAutocomplete() {
+        // Create the autocomplete object, restricting the search to geographical
+        // location types.
+        autocomplete = new google.maps.places.Autocomplete(
+            /** @type {!HTMLInputElement} */(document.getElementById('autocomplete')),
+            {types: ['geocode']});
+
+        // When the user selects an address from the dropdown, populate the address
+        // fields in the form.
+        autocomplete.addListener('place_changed', fillInAddress);
+      }
+
+      function fillInAddress() {
+        // Get the place details from the autocomplete object.
+        var place = autocomplete.getPlace();
+        console.log(place);
+        for (var component in componentForm) {
+          document.getElementById(component).value = '';
+          document.getElementById(component).disabled = false;
+        }
+
+        // Get each component of the address from the place details
+        // and fill the corresponding field on the form.
+        for (var i = 0; i < place.address_components.length; i++) {
+          var addressType = place.address_components[i].types[0];
+          if (componentForm[addressType]) {
+            var val = place.address_components[i][componentForm[addressType]];
+            document.getElementById(addressType).value = val;
+          }
+        }
+      }
+
+      // Bias the autocomplete object to the user's geographical location,
+      // as supplied by the browser's 'navigator.geolocation' object.
+      function geolocate() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            var geolocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            var circle = new google.maps.Circle({
+              center: geolocation,
+              radius: position.coords.accuracy
+            });
+            autocomplete.setBounds(circle.getBounds());
+          });
+        }
+      }
+  
 var maps = {};
 $.ajax({
-	url: "http://server_ip/dictionaries/merchant_name/geo.json",
+	url: "http://52.37.199.197/dictionaries/BestBuy/geo.json",
 	dataType: 'jsonp',
-	jsonpCallback: 'callback',
+	jsonpCallback: 'callback0',
 	success: function(data) {
-		console.log(data);
+		//console.log(data);
 		maps = data;
+	}
+});
+
+var store1 = {};
+$.ajax({
+	url: "http://52.37.199.197/dictionaries/BestBuy/store_id_1.json",
+	dataType: 'jsonp',
+	jsonpCallback: 'callback1',
+	success: function(data) {
+		//console.log(data);
+		store1 = data;
+	}
+});
+
+var store2 = {};
+$.ajax({
+	url: "http://52.37.199.197/dictionaries/BestBuy/store_id_2.json",
+	dataType: 'jsonp',
+	jsonpCallback: 'callback2',
+	success: function(data) {
+		//console.log(data);
+		store2 = data;
 	}
 });
 
@@ -73,77 +197,173 @@ pybossa.taskLoaded(function(task, deferred){
 });
 pybossa.presentTask(function(task, deferred){
 	if (!$.isEmptyObject(task)) {
-		$("#answerBoxCity").val("");
-		$("#answerBoxState").val("");
-		$("#answerBoxZipcode").val("");
-		$("#answerBoxCity").css({
+		$("#autocomplete").val("");
+		$("#locality").val("");
+		$("#administrative_area_level_1").val("");
+		$("#postal_code").val("");
+		$("#answerBoxStoreNumber").val("");
+		$("#street_number").val("");
+		$("#route").val("");
+		$("#locality").css({
 			"border": "",
 			"background": ""
 		});
-		$("#answerBoxState").css({
+		$("#administrative_area_level_1").css({
 			"border": "",
 			"background": ""
 		});
-		$("#answerBoxZipcode").css({
+		$("#postal_code").css({
 			"border": "",
 			"background": ""
 		});
+		$("#answerBoxStoreNumber").css({
+			"border": "",
+			"background": ""
+		});
+		$("#street_number").css({
+			"border": "",
+			"background": ""
+		});
+		$("#route").css({
+			"border": "",
+			"background": ""
+		});
+
 		$("#question_holder").text(task.info['question']);
-		$("#save").off('click').on('click', function(evt) {
-			var answer = {}
-			answer["city"] = $.trim($("#answerBoxCity").val().toUpperCase());
-			answer["state"] = $("#answerBoxState").val().toUpperCase();
-			answer["zipcode"] = $("#answerBoxZipcode").val().toUpperCase();
-			answer["not_in_us"] = false;
 
-			var isValidState = true;
-			var isValidCity = true;
-			var isValidZipcode = true;
-			$('#answerBoxState').each(function () {
-				if (!(answer["state"] in maps)) {
-					isValidState = false;
-					$("#answerBoxState").css({
-						"border": "1px solid red",
-						"background": "#FFCECE"
-					});
-				} else if (!(answer["city"] in maps[answer["state"]])) {
-					isValidCity = false;
-					$("#answerBoxCity").css({
-						"border": "1px solid red",
-						"background": "#FFCECE"
-					});
-				} else if ((maps[answer["state"]][answer["city"]].indexOf(answer["zipcode"]) == -1) && (answer["zipcode"].length != 0)) {
-					isValidZipcode = false;
-					$("#answerBoxZipcode").css({
-						"border": "1px solid red",
-						"background": "#FFCECE"
-					});
-				} else {
-					$("#answerBoxState").css({
-						"border": "",
-						"background": ""
-					});
-					$("#answerBoxCity").css({
-						"border": "",
-						"background": ""
-					});
-					$("#answerBoxZipcode").css({
-						"border": "",
-						"background": ""
-					});
-				}
-			});
-
-			if (isValidState == false || isValidCity == false|| isValidZipcode == false) {
+		var validAnswer = {};
+		var passValidation = false;
+        $("#save").off('click').on('click', function(evt) {
+			if (!passValidation) {
 				evt.preventDefault();
 			} else {
-				pybossa.saveTask(task.id, answer).done(function() {
+			    //answer = validAnswer;
+				pybossa.saveTask(task.id, validAnswer).done(function() {
 					$("#success").fadeIn();
 					setTimeout(function() {
 						$("#success").hide();
 						deferred.resolve(task);
 					}, 1500);
 				});
+			}
+        });
+
+		$("#validate").off('click').on('click', function(evt) {
+			var answer = {}
+			answer["city"] = $.trim($("#locality").val().toUpperCase());
+			answer["state"] = $("#administrative_area_level_1").val().toUpperCase();
+			answer["zipcode"] = $("#postal_code").val().toUpperCase();
+			answer["not_in_us"] = false;
+			answer["storenumber"] = $("#answerBoxStoreNumber").val().replace(/^0+/, '');
+			answer["streetaddress"] = $.trim( $("#street_number").val().toUpperCase() + $("#route").val().toUpperCase());
+			answer["comment_city"] = "";
+			answer["comment_state"] = "";
+			answer["comment_zipcode"] = "";
+			answer["comment_not_in_us"] = "";
+			answer["comment_storenumber"] = "";
+			answer["comment_streetaddress"] = "";
+
+			var isValidState = true;
+			var isValidCity = true;
+			var isValidZipcode = true;
+			var isValidStoreNumber = true;
+			var isValidStreetAddress = true;
+
+			var storenumber = answer["storenumber"]
+			var instore1 = ((storenumber.length != 0) && (storenumber in store1) &&
+				(store1[storenumber][0] == answer["city"]) && (store1[storenumber][1] == answer["state"]))
+			var instore2 = ((storenumber.length != 0) && (storenumber in store2) &&
+				(store2[storenumber][0] == answer["city"]) && (store2[storenumber][1] == answer["state"]))
+
+		   /*function canFindZipCode(answer) {		        
+                var placeId = "";
+				var geocodeApiURL = "https://maps.googleapis.com/maps/api/geocode/json?";
+				var streetaddress = answer["streetaddress"].replace(/ /g, "+");
+				var city = answer["city"].replace(/ /g, "+");
+				var address = streetaddress + ",+" + city + ",+" + answer["state"];
+				console.log(address);
+				var geocodeApiKey = "AIzaSyBP5QP5VMMt220_ared5epXrKv-Ff3r1ro";
+				var placeDetailApiURL = "https://maps.googleapis.com/maps/api/place/details/json?";
+				var placeDetailApiKey = "AIzaSyDzw431f2x2T9VigH_Yy1ijJt8T8G0MWro";
+                var query = geocodeApiURL + "address=" + address + "&key=" + geocodeApiKey;
+                var found = false;
+                var jqxhr = $.ajax({
+					url: query, 
+ 					async: false,
+					success: function(json) {
+						console.log(json);
+						if (json.results.length != 1) {
+					    	found = false;
+						} else {
+					    	isValidStreetAddress = true;
+							console.log(json.results[0].address_components[7].long_name);
+							console.log(json.results[0].place_id);
+							placeId = json.results[0].place_id;
+							answer["zipcode"] = json.results[0].address_components[7].long_name;
+							$("#postal_code").val(answer["zipcode"]);
+							answer["streetnumber"] = json.results[0].address_components[1].long_name;
+							$("#street_number").val(answer["streetnumber"]);
+							console.log("answer inside getjson")
+							console.log(answer);
+							found = true;
+						}
+					}
+				});
+				return found;
+			}*/
+             
+			$('#administrative_area_level_1').each(function () {
+				if (!(answer["state"] in maps)) {
+					isValidState = false;
+					$("#administrative_area_level_1").css({
+						"border": "1px solid red",
+						"background": "#FFCECE"
+					});
+				} else if (!(answer["city"] in maps[answer["state"]])) {
+					isValidCity = false;
+					$("#locality").css({
+						"border": "1px solid red",
+						"background": "#FFCECE"
+					});
+				} else if ((maps[answer["state"]][answer["city"]].indexOf(answer["zipcode"]) == -1) && (answer["zipcode"].length != 0)) {
+					isValidZipcode = false;
+					$("#postal_code").css({
+						"border": "1px solid red",
+						"background": "#FFCECE"
+					});
+				} else if ((storenumber.length != 0) && (!(instore1 || instore2))) {
+					isValidStoreNumber = false;
+					$("#answerBoxStoreNumber").css({
+						"border": "1px solid red",
+						"background": "#FFCECE"
+					});
+			
+				} else {
+					$("#administrative_area_level_1").css({
+						"border": "",
+						"background": ""
+					});
+					$("#locality").css({
+						"border": "",
+						"background": ""
+					});
+					$("#postal_code").css({
+						"border": "",
+						"background": ""
+					});
+					$("#answerBoxStoreNumber").css({
+						"border": "",
+						"background": ""
+					});
+				}
+			});
+
+			if (isValidState == false || isValidCity == false|| isValidZipcode == false ||
+				isValidStoreNumber == false || isValidStreetAddress == false) {
+				passValidation = false;
+			} else {
+				passValidation = true;
+				validAnswer = answer;
 			}
 		});
 
@@ -153,6 +373,14 @@ pybossa.presentTask(function(task, deferred){
 			answer["state"] = "";
 			answer["zipcode"] = "";
 			answer["not_in_us"] = true;
+			answer["storenumber"] = "";
+			answer["streetaddress"] = "";
+			answer["comment_city"] = "";
+			answer["comment_state"] = "";
+			answer["comment_zipcode"] = "";
+			answer["comment_not_in_us"] = "";
+			answer["comment_storenumber"] = "";
+			answer["comment_streetaddress"] = "";
 			pybossa.saveTask(task.id, answer).done(function() {
 				$("#success").fadeIn();
 					setTimeout(function() {
@@ -168,6 +396,37 @@ pybossa.presentTask(function(task, deferred){
 			answer["state"] = "";
 			answer["zipcode"] = "";
 			answer["not_in_us"] = "";
+			answer["storenumber"] = "";
+			answer["streetaddress"] = "";
+			answer["comment_city"] = "";
+			answer["comment_state"] = "";
+			answer["comment_zipcode"] = "";
+			answer["comment_not_in_us"] = "";
+			answer["comment_storenumber"] = "";
+			answer["comment_streetaddress"] = "";
+			pybossa.saveTask(task.id, answer).done(function() {
+				$("#success").fadeIn();
+					setTimeout(function() {
+						$("#success").hide();
+						deferred.resolve(task);
+					}, 1500);
+			});
+		});
+
+		$("#comment").off('click').on('click', function(evt) {
+			var answer = {};
+			answer["comment_city"] = $.trim($("#locality").val().toUpperCase());
+			answer["comment_state"] = $("#administrative_area_level_1").val().toUpperCase();
+			answer["comment_zipcode"] = $("#postal_code").val().toUpperCase();
+			answer["comment_not_in_us"] = false;
+			answer["comment_storenumber"] = $("#answerBoxStoreNumber").val().replace(/^0+/, '');
+			answer["comment_streetaddress"] = $.trim( $("#street_number").val().toUpperCase() + $("#route").val().toUpperCase());
+			answer["city"] = "";
+			answer["state"] = "";
+			answer["zipcode"] = "";
+			answer["not_in_us"] = "";
+			answer["storenumber"] = "";
+			answer["streetaddress"] = "";
 			pybossa.saveTask(task.id, answer).done(function() {
 				$("#success").fadeIn();
 					setTimeout(function() {
@@ -181,5 +440,8 @@ pybossa.presentTask(function(task, deferred){
 		$("#finish").fadeIn(100);
 	}
 });
-pybossa.run('Geomancer_project');
+pybossa.run('Geomancer_bank_BestBuy');
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD3DDwlANN20mbepZow2SIhLjZPMwBI_84&libraries=places&callback=initAutocomplete"
+        async defer>
 </script>
