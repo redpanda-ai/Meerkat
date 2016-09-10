@@ -1,5 +1,5 @@
-1.  Make sure that you have HCatalog installed.
-2.  Make sure that you have access to the S3 location for the "datafu" jar file.
-3.  Make sure that you have a YARN job queue, perhaps called "ad hoc" that can run our pig script.
-4.  Make sure that we limit our transaction hunt to only those transactions made within the last two years.
-5.  Test everything on a single day, then a single week, however include ALL source_olts
+1.  Make sure to run the pre-pig.sh script
+2.  Make sure that the directory in HDFS referred to by the pig script is clear, Hadoop by default won't destroy your data for you.
+3.  Run the script with nohup pig -useHCatalog YOUR_SCRIPT.pig > my_log 2>&1 &
+4.  When complete, export using the following command:
+	hadoop fs -cp <MY_FILE> s3n://<YOUR_AWS_ACCESS_KEY>:<YOUR_AWS_SECRET_KEY>@<S3_BUCKET>/path/to/some/file/<MY_FILE>
