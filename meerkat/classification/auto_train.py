@@ -1,8 +1,4 @@
 #!/usr/local/bin/python3.3
-#pylint: disable=too-many-locals
-#pylint: disable=too-many-statements
-#pylint: disable=pointless-string-statement
-#pylint: disable=too-many-branches
 
 """This script streamlines an entire CNN training process from pulling raw
 data from s3 to applying the trained CNN to a test set and return
@@ -60,7 +56,8 @@ optional arguments:
   -v, --info            log at INFO leve
 
 EXAMPLE =
-time nohup python3 -m meerkat.classification.auto_train subtype bank --credit_or_debit credit --region 2  &
+time nohup python3 -m meerkat.classification.auto_train subtype bank --credit_or_debit credit \
+	--region 2  &
 """
 ###################################################################################################
 
@@ -122,7 +119,8 @@ def auto_train():
 	bank_or_card = args.bank_or_card
 	credit_or_debit = args.credit_or_debit
 	model_type = args.model_type
-	args.region = 'region_' + args.region
+	if args.region: 
+		args.region = 'region_' + args.region
 	region = args.region
 	data_type = model_type + '/' + bank_or_card
 	if model_type != "merchant":
@@ -141,6 +139,8 @@ def auto_train():
 
 	s3_params = {"bucket": bucket, "prefix": prefix, "save_path": save_path}
 
+	logging.info("s3 bucket: %s" % bucket)
+	logging.info("s3 prefix: %s" % prefix)
 	exist_new_input, newest_version_dir, version = check_new_input_file(**s3_params)
 	s3_params["prefix"] = newest_version_dir + "/"
 
