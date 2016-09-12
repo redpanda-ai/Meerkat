@@ -13,6 +13,7 @@ import threading
 import time
 import os
 import boto3
+import math
 
 from timeit import default_timer as timer
 from meerkat.various_tools import load_params
@@ -186,7 +187,7 @@ def get_grouped_dataframes(input_file, groupby_name, target_merchant_list, **csv
 		from ..classification.load_model import get_tf_cnn_by_name as get_classifier
 		classifier = get_classifier(csv_kwargs.get("cnn", "bank_merchant"))
 		del csv_kwargs["cnn"]
-	num_chunks = int(sum(1 for line in open(input_file)) / csv_kwargs["chunksize"])
+	num_chunks = math.ceil(sum(1 for line in open(input_file)) / csv_kwargs["chunksize"])
 	start = timer()
 	log_string = "Taken: {0} , ETA: {1}, Competion: {2:.2f}%, Chunks/sec: {3:.2f}"
 	param = {

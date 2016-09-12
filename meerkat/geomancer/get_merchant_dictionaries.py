@@ -84,21 +84,6 @@ class Worker(GeomancerModule):
 		module_path = inspect.getmodule(inspect.stack()[1][0]).__file__
 		self.filepath = module_path[:module_path.rfind("/") + 1] + "merchants"
 
-	"""
-	def get_address_dictionaries(self, df):
-		logger.info("Generating address dictionaries.")
-		slender_df = df[["address", "zip_code", "store_number", "city", "state"]]
-
-		grouped = slender_df.groupby(["address"], as_index=True)
-		address_dict = {}
-		for name, group in grouped:
-			address = name
-			address_dict[address] = group
-		logger.info(address_dict)
-		self.dump_pretty_json_to_file(address_dict, "address_id.json")
-		return address_dict
-	"""
-
 	def get_store_dictionaries(self, df):
 		"""Writes out two store dictionaries"""
 		logger.debug("Generating store dictionaries.")
@@ -145,30 +130,6 @@ class Worker(GeomancerModule):
 		# Write the unique_city list to json file
 		self.dump_pretty_json_to_file(unique_city, "unique_city.json")
 		return unique_city_state, unique_city
-
-	def get_address_dictionary(self, df):
-		"""Generates three merchant dictionaries and writes them as JSON files"""
-		merchant = self.config["merchant"]
-		logger.debug("Generating geo dictionaries for '{0}'".format(self.config["merchant"]))
-		geo_df_with_address = df[["state", "city", "zip_code", "address"]]
-		grouped = geo_df_with_address.groupby(['state', 'city', 'address'], as_index=True)
-		geo_dict = {}
-		for name, group in grouped:
-			state, city, address = name
-			state, city, address = state.upper(), city.upper(), address.upper()
-			if state not in geo_dict:
-				geo_dict[state] = {}
-			if city not in geo_dict[state]:
-				geo_dict[state][city] = {}
-			if address not in geo_dict[state][city]:
-				geo_dict[state][city][address] = []
-			for item in group["zip_code"]:
-				item = str(item)
-				item = item[:5]
-				if item not in geo_dict[state][city][address]:
-					geo_dict[state][city][address].append(item)
-		self.dump_pretty_json_to_file(geo_dict, "geo_with_address.json")
-		return geo_df_with_address
 
 	def get_geo_dictionary(self, df):
 		"""Generates three merchant dictionaries and writes them as JSON files"""
@@ -263,8 +224,6 @@ class Worker(GeomancerModule):
 			store_dict_1, store_dict_2 = self.get_store_dictionaries(df)
 			self.geo_df = self.get_geo_dictionary(df)
 			unique_city_state, unique_city = self.get_unique_city_dictionaries(df)
-			#address_dict = self.get_address_dictionaries(df)
-			geo_with_address = self.get_address_dictionary(df)
 			# Let's also get the question bank
 		return self.common_config
 
