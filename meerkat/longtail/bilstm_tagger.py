@@ -68,8 +68,9 @@ def last_relevant(output, length, name):
 def get_tags(config, trans):
 	"""Convert df row to list of tags and tokens"""
 
-	tokens = str(trans["Description"]).lower().split()[0:config["max_tokens"]]
+	tokens = str(trans["Description"]).lower().split()
 	tag = str(trans["Tagged_merchant_string"]).lower()
+
 	if "," in tag:
 		tag = tag.split(",")
 		tag = sum([item.split() for item in tag], [])
@@ -77,7 +78,7 @@ def get_tags(config, trans):
 		tag = tag.split()
 
 	if tag == [] or tag == ["null"]:
-		tags = ["background" for toekn in tokens]
+		tags = ["background" for token in tokens]
 	else:
 		tags = []
 		for token in tokens:
@@ -90,9 +91,6 @@ def get_tags(config, trans):
 					break
 			if not found:
 				tags.append("background")
-
-	tokens = ["pay", "walmartsupercenterwalmartsupercenterwalmartsupercenterwalmartsupercenterwalmartsupercenter", "debit"]
-	tags = ["background", "merchant", "background"]
 
 	return (tokens, tags)
 
@@ -237,62 +235,10 @@ def char_encoding(config, graph, trans_len):
 		word_lengths = tf.placeholder(tf.int64, [None], name="word_lengths")
 		word_lengths = tf.gather(word_lengths, tf.range(tf.to_int32(trans_len)))
 		char_inputs = tf.placeholder(tf.int32, [None, max_tokens], name="char_inputs")
-		char_inputs = tf.transpose(char_inputs, perm=[1, 0])
-		cembed_matrix = tf.Variable(tf.random_uniform([len(c2i.keys()), config["ce_dim"]], -0.25, 0.25), name="cembeds")
-
-		# Create LSTM for Character Encoding
-		fw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"], state_is_tuple=True)
-		bw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"], state_is_tuple=True)
-
-		def one_pass(i, o_fw, o_bw):
-
-			options = {
-				"dtype": tf.float32,
-				"sequence_length": tf.expand_dims(tf.gather(word_lengths, i), 0),
-				"time_major": True
-			}
-
-			cembeds_invert = tf.nn.embedding_lookup(cembed_matrix, tf.gather(char_inputs, i))
-			cembeds_invert = tf.transpose(tf.expand_dims(cembeds_invert, 0), perm=[1,0,2])
-
-			(output_fw, output_bw), _ = tf.nn.bidirectional_dynamic_rnn(fw_lstm, bw_lstm, cembeds_invert, **options)
-
-			# Get Last Relevant
-			output_fw = tf.gather(output_fw, tf.gather(word_lengths, i) - 1)
-			output_bw = tf.gather(output_bw, tf.gather(word_lengths, i) - 1)
-
-			# Append to Previous Token Encodings
-			o_fw = o_fw.write(i, tf.squeeze(output_fw))
-			o_bw = o_bw.write(i, tf.squeeze(output_bw))
-
-			return tf.add(i, 1), o_fw, o_bw
-
-		# Build Loop in Graph
-		i = tf.constant(0)
-		trans_len = tf.to_int32(trans_len)
-		o_fw = tensor_array_ops.TensorArray(dtype=tf.float32, size=trans_len)
-		o_bw = tensor_array_ops.TensorArray(dtype=tf.float32, size=trans_len)
-		cond = lambda i, *_: tf.less(i, trans_len)
-		i, char_embeds, rev_char_embeds = tf.while_loop(cond, one_pass, [i, o_fw, o_bw])
-
-		return char_embeds.pack(), rev_char_embeds.pack()
-
-def char_encoding_slow(config, graph, trans_len):
-	"""Create graph nodes for character encoding"""
-
-	c2i = config["c2i"]
-	max_tokens = config["max_tokens"]
-
-	with graph.as_default():
-
-		# Character Embedding
-		word_lengths = tf.placeholder(tf.int64, [None], name="word_lengths")
-		word_lengths = tf.gather(word_lengths, tf.range(tf.to_int32(trans_len)))
-		char_inputs = tf.placeholder(tf.int32, [None, max_tokens], name="char_inputs")
 		cembed_matrix = tf.Variable(
 			tf.random_uniform([len(c2i.keys()), config["ce_dim"]], -0.25, 0.25),
 			name="cembeds"
-			)
+		)
 
 		char_inputs = tf.transpose(char_inputs, perm=[1, 0])
 		cembeds = tf.nn.embedding_lookup(cembed_matrix, char_inputs, name="ce_lookup")
@@ -312,7 +258,8 @@ def char_encoding_slow(config, graph, trans_len):
 
 		(output_fw, output_bw), _ = tf.nn.bidirectional_dynamic_rnn(
 			fw_lstm, bw_lstm, cembeds, **options
-			)
+		)
+
 		output_fw = tf.transpose(output_fw, perm=[1, 0, 2])
 		output_bw = tf.transpose(output_bw, perm=[1, 0, 2])
 
@@ -334,7 +281,6 @@ def build_graph(config):
 		train = tf.placeholder(tf.bool, name="train")
 		tf.set_random_seed(config["seed"])
 		char_embeds, rev_char_embeds = char_encoding(config, graph, trans_len)
-		#last_state, rev_last_state, word_lengths = char_encoding_slow(config, graph, trans_len)
 
 		# Word Embedding
 		word_inputs = tf.placeholder(tf.int32, [None], name="word_inputs")
@@ -478,17 +424,15 @@ def train_model(*args):
 				time_line = timeline.Timeline(run_metadata.step_stats)
 				ctf = time_line.generate_chrome_trace_format()
 
-				with open('timeline2.json', 'w') as writer:
+				with open('timeline.json', 'w') as writer:
 					writer.write(ctf)
+					sys.exit()
 
 			# Run Training Step
-			#optimizer_out, loss = sess.run(
-			#	[get_op(graph, "optimizer"), get_tensor(graph, "loss:0")],
-			#	feed_dict=feed_dict
-			#)
-
-			if count == 2:
-				sys.exit()
+			optimizer_out, loss = sess.run(
+				[get_op(graph, "optimizer"), get_tensor(graph, "loss:0")],
+				feed_dict=feed_dict
+			)
 
 			total_loss += loss
 			total_tagged += len(word_indices)
