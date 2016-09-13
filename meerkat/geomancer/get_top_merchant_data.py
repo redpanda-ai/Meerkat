@@ -10,8 +10,7 @@ import yaml
 from meerkat.classification.tools import (pull_from_s3, extract_tarball,
 	check_new_input_file)
 
-from .get_agg_data import get_s3_file, get_etags
-from .tools import remove_special_chars, get_grouped_dataframes
+from .tools import get_etags, get_s3_file, remove_special_chars, get_grouped_dataframes
 from .geomancer_module import GeomancerModule
 
 logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
@@ -21,7 +20,7 @@ def extract_clean_files(save_path, tarball_name, extension):
 	"""This clears out a local directory and replaces files of a certain extension."""
 	for root, dirs, files in os.walk(save_path):
 		for f in files:
-			if f.endswith(".csv"):
+			if f.endswith(extension):
 				os.unlink(os.path.join(root, f))
 				logger.info("{0} is removed".format(f))
 	extract_tarball(save_path + tarball_name, save_path)
@@ -36,11 +35,10 @@ class Worker(GeomancerModule):
 	def main_process(self):
 		bank_or_card = self.common_config["bank_or_card"]
 		bucket = self.common_config["bucket"]
-		version_dir = self.config["version_dir"]
+		#version_dir = self.config["version_dir"]
 
-		prefix = "meerkat/cnn/data/merchant/" + bank_or_card + "/" + version_dir + "/"
-		extension = "tar.gz"
-		tarball_name = "input.tar.gz"
+		prefix = self.config["prefix"]
+		tarball_name = bank_or_card + "_transaction_sample.tab.tar.gz"
 		save_path = "meerkat/geomancer/data/input/" + bank_or_card + "/"
 		os.makedirs(save_path, exist_ok=True)
 
@@ -51,37 +49,60 @@ class Worker(GeomancerModule):
 		logger.info("Synch-ed")
 
 		if needs_to_be_downloaded:
-			extract_clean_files(save_path, tarball_name, "csv")
+			extract_clean_files(save_path, tarball_name, ".tab")
 
 		tasks_prefix = "meerkat/geomancer/merchants/"
 		for file_name in os.listdir(save_path):
-			if file_name.endswith(".csv"):
-				csv_file = save_path + file_name
-				logger.info("csv file at: " + csv_file)
+			if file_name.endswith(".tab"):
+				sample_file = save_path + file_name
+				logger.info("Sample file at: " + sample_file)
+
 				csv_kwargs = { "chunksize": 1000, "error_bad_lines": False, "encoding": 'utf-8',
-					"quoting": csv.QUOTE_NONE, "na_filter": False, "sep": "|", "activate_cnn": True,
-					"cnn": "bank_merchant"}
+					"quoting": csv.QUOTE_NONE, "na_filter": False, "sep": "\t", "activate_cnn": True,
+					"cnn": bank_or_card + "_merchant" }
 
-				existing_lines = int(sum(1 for line in open(csv_file)))
-				target_lines = self.config["truncate_lines"]
-				logger.info("Existing lines: {0}, Target lines: {1}".format(existing_lines, target_lines))
-				if existing_lines >= target_lines:
-					logger.info("Proceeding.")
-				else:
+				sample = self.config["sample"]
+				rebuild, limit = sample["rebuild"], sample.get("limit", None)
+				#Destroy empty files
+				current_file_size = int(sum(1 for line in open(sample_file)))
+				if os.stat(sample_file).st_size == 0:
+					logger.info("Destroying empty file.")
+					rebuild = True
+				# Rebuild if the pre-existing file is too small
+				elif limit and (limit + 1) > current_file_size: #adding 1 to the limit to account for header in file size
+					logger.info("Current file has only {0} records, rebuilding.".format(current_file_size - 1))
+					rebuild = True
+				# Rebuild if necessary
+				if rebuild:
 					logger.info("Unzipping files.")
-					extract_clean_files(save_path, tarball_name, "csv")
+					extract_clean_files(save_path, tarball_name, ".tab")
 					logger.info("Files unzipped.")
+				# Limit if necessary
+				if limit:
+					logger.info("Target to truncate to {0} lines".format(limit))
+					lines_processed = 0
+					found_header = False
+					with open(sample_file, "r", encoding="utf-8") as input_file:
+						with open(sample_file + ".temp", "w", encoding="utf-8") as output_file:
+							for line in input_file:
+								output_file.write(line)
+								if not found_header:
+									found_header = True
+									continue
+								lines_processed += 1
+								if lines_processed % 10000 == 0:
+									logger.info("Processed {0} lines".format(lines_processed * 10000))
+								if lines_processed >= limit:
+									logger.info("Truncated to limit: {0}".format(limit))
+									break
+							if lines_processed < limit:
+								logger.warning("Sample file only contains {0} lines, however {1}"
+									" lines were in the limit.".format(lines_processed, limit))
+					os.rename(sample_file + ".temp", sample_file)
 
-				#Add the ability to truncate lines from the input csv file
-				if self.config["truncate_lines"] != -1:
-					logger.info("Truncating to {0} lines.".format(self.config["truncate_lines"]))
-					with open(csv_file, "r", encoding="utf-8") as input_file:
-						with open(csv_file + ".temp", "w", encoding="utf-8") as output_file:
-							for i in range(0, self.config["truncate_lines"]):
-								output_file.write(input_file.readline())
-					os.rename(csv_file + ".temp", csv_file)
+				#Everything is good
 
-				merchant_dataframes = get_grouped_dataframes(csv_file, 'MERCHANT_NAME',
+				merchant_dataframes = get_grouped_dataframes(sample_file, 'MERCHANT_NAME',
 					self.common_config["target_merchant_list"], **csv_kwargs)
 				merchants = sorted(list(merchant_dataframes.keys()))
 				self.common_config["target_merchant_list"] = merchants
@@ -91,8 +112,8 @@ class Worker(GeomancerModule):
 					tasks = tasks_prefix + formatted_merchant + "/" + bank_or_card + "_tasks.csv"
 
 					original_len = len(merchant_dataframes[merchant])
-					merchant_dataframes[merchant].drop_duplicates(subset="DESCRIPTION_UNMASKED", keep="first", inplace=True)
-					merchant_dataframes[merchant].to_csv(tasks, sep=',', index=False, quoting=csv.QUOTE_ALL)
+					merchant_dataframes[merchant].drop_duplicates(subset="plain_text_description", keep="first", inplace=True)
+					merchant_dataframes[merchant].to_csv(tasks, sep='\t', index=False, quoting=csv.QUOTE_ALL)
 					logger.info("Merchant {0}: {2} duplicate transactions; {1} unique transactions".format(merchant,
 						len(merchant_dataframes[merchant]), original_len - len(merchant_dataframes[merchant])))
 		return self.common_config

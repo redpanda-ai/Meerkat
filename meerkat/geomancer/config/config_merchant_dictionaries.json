@@ -1,5 +1,8 @@
 {
 	"merchant_dictionaries" : {
-		"dry_run": false
+		"dry_run": false,
+		"prefix": "meerkat/AggData/",
+		"filename": "20160817.tar.gz",
+		"savepath": "meerkat/geomancer/data/agg_data/"
 	}
 }

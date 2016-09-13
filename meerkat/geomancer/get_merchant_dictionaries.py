@@ -9,11 +9,14 @@ import queue
 import sys
 import logging
 import yaml
+import re
 
 from functools import reduce
 from timeit import default_timer as timer
-from .tools import remove_special_chars, get_grouped_dataframes
+from .tools import get_etags, get_s3_file, remove_special_chars, get_grouped_dataframes
+from .get_top_merchant_data import extract_clean_files
 from .geomancer_module import GeomancerModule
+from meerkat.various_tools import load_params
 
 logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
 logger = logging.getLogger('get_merchant_dictionaries')
@@ -21,33 +24,37 @@ logger = logging.getLogger('get_merchant_dictionaries')
 def preprocess_dataframe(df):
 	"""Fix up some of the data in our dataframe."""
 	capitalize_word = lambda x: x.upper()
+	df["address"] = df["address"].apply(capitalize_word)
+	df["store_number"] = df["store_number"].apply(remove_leading_zeros)
 	df["state"] = df["state"].apply(capitalize_word)
 	df["city"] = df["city"].apply(capitalize_word)
 	df["city"] = df["city"].apply(expand_abbreviations)
 
-def merge(a, b, path=None):
+def merge(return_dict, other_dict, path=None):
 	"""Useful function to merge complex dictionaries, courtesy of:
 	https://stackoverflow.com/questions/7204805/dictionaries-of-dictionaries-merge
-	I added logic for handling merge conflicts so that new values overwrite old values
-	but throw warnings.
-	"""
+	The return_dict is updated with values from the other_dict, but we always trust
+	the return_dict when there is a conflict.  """
 	if path is None:
 		path = []
-	for key in b:
-		if key in a:
-			if isinstance(a[key], dict) and isinstance(b[key], dict):
-				merge(a[key], b[key], path + [str(key)])
-			elif a[key] == b[key]:
+	for key in other_dict:
+		#For all matching keys
+		if key in return_dict:
+			if isinstance(return_dict[key], dict) and isinstance(other_dict[key], dict):
+				#If both values are dictionaries, recurse
+				merge(return_dict[key], other_dict[key], path + [str(key)])
+			elif return_dict[key] == other_dict[key]:
+				#Else if the values are the same, no changs
 				pass
 			else:
-				#Merge conflict, in our case old beats new
+				#if the values are different, we trust the return_dict
 				logger.warning("Conflict at %s" % ".".join(path + [str(key)]))
-				logger.warning("A key {0}".format(a[key]))
-				logger.warning("B key {0}".format(b[key]))
-				logger.warning("Conflict in dicts, keeping older value.")
+				logger.warning("First dict key {0}".format(return_dict[key]))
+				logger.warning("Second dict key {0}".format(other_dict[key]))
+				logger.warning("Conflict in dicts, keeping return_dict value.")
 		else:
-			a[key] = b[key]
-	return a
+			#For new keys in the other_dict, we add the key/value pair to the return_dict
+			return_dict[key] = other_dict[key]
 
 def expand_abbreviations(city):
 	"""Turns abbreviations into their expanded form."""
@@ -60,6 +67,12 @@ def expand_abbreviations(city):
 			city = city.replace(abbr, maps[abbr])
 			break
 	return city
+
+def remove_leading_zeros(store_number):
+	"""Remove leading zeros in store number"""
+	if isinstance(store_number, str):
+		store_number = store_number.lstrip('0')
+	return store_number
 
 class Worker(GeomancerModule):
 	"""Contains methods and data pertaining to the creation and retrieval of merchant dictionaries"""
@@ -76,6 +89,7 @@ class Worker(GeomancerModule):
 		logger.debug("Generating store dictionaries.")
 		#Use only the "store_number", "city", and "state" columns
 		slender_df = df[["store_number", "city", "state"]]
+
 		store_dict_1, store_dict_2 = {}, {}
 		my_stores = slender_df.set_index("store_number").T.to_dict('list')
 		#my_stores = {str(k):str(v) for k,v in my_stores.items()}
@@ -144,15 +158,66 @@ class Worker(GeomancerModule):
 
 	def main_process(self):
 		"""This is where it all happens."""
-		csv_kwargs = { "chunksize": 1000, "error_bad_lines": False, "warn_bad_lines": True,
-			"encoding": "utf-8", "quotechar" : '"', "na_filter" : False, "sep": "," }
-		merchant_dataframes = get_grouped_dataframes("meerkat/geomancer/data/agg_data/All_Merchants.csv",
-			"list_name", self.common_config["target_merchant_list"], **csv_kwargs)
-		merchants = sorted(list(merchant_dataframes.keys()))
+		bucket = self.common_config["bucket"]
+		prefix = self.config["prefix"]
+		file_name = self.config["filename"]
+		save_path = self.config["savepath"]
+		os.makedirs(save_path, exist_ok=True)
+
+		etags, etags_file = get_etags(save_path)
+		logger.info("Synch-ing with S3")
+		needs_to_be_downloaded = get_s3_file(bucket=bucket, prefix=prefix, file_name=file_name,
+			save_path=save_path, etags=etags, etags_file=etags_file)
+		logger.info("Synch-ed")
+
+		if needs_to_be_downloaded:
+			extract_clean_files(save_path, file_name, "csv")
+
+		target_merchants = self.common_config["target_merchant_list"]
+		merchants_map = load_params("meerkat/geomancer/merchant_name_map.json")
+		merchants_reverse_map = {}
+		for merchant_in_cnn in target_merchants:
+			for merchant in merchants_map[merchant_in_cnn]:
+				merchants_reverse_map[merchant] = merchant_in_cnn
+		merchants_in_agg_data = merchants_reverse_map.keys()
+		logger.info("Merchants in agg data: {0}".format(merchants_in_agg_data))
+		logger.info("Merchant reverse map: {0}".format(merchants_reverse_map))
+
+		merchant_dataframes = {}
+		for file_name in os.listdir(save_path):
+			if file_name.endswith(".csv"):
+				csv_file = save_path + file_name
+				logger.info("csv file at: " + csv_file)
+				csv_kwargs = { "chunksize": 1000, "error_bad_lines": False, "warn_bad_lines": True,
+					"encoding": "utf-8-sig", "quotechar" : '"', "na_filter" : False, "sep": "," }
+				merchant_dataframes_per_file = get_grouped_dataframes(csv_file,
+					"list_name", merchants_in_agg_data, **csv_kwargs)
+				#merchant_dataframes = merge(merchant_dataframes, merchant_dataframes_per_file)
+				merge(merchant_dataframes, merchant_dataframes_per_file)
+
+		merchants_found_in_agg_data = sorted(list(merchant_dataframes.keys()))
+		logger.info("Merchants found in agg data: {0}".format(merchants_found_in_agg_data))
+		merchants = set()
+		formatted_merchant_dataframes = {}
+		for merchant in merchants_found_in_agg_data:
+			merchant_in_cnn = merchants_reverse_map[merchant]
+			if merchant_in_cnn in merchants:
+				formatted_merchant_dataframes[merchant_in_cnn] = formatted_merchant_dataframes[merchant_in_cnn].\
+					append(merchant_dataframes[merchant], ignore_index=True)
+			else:
+				merchants.add(merchant_in_cnn)
+				formatted_merchant_dataframes[merchant_in_cnn] = merchant_dataframes[merchant]
+		merchants = list(merchants)
+
+		logger.warning("Found {0} target merchants: {1}".format(len(merchants), merchants))
+		missed_list = list(set(self.common_config["target_merchant_list"]) - set(merchants))
+		logger.warning("Miss {0} target merchants: {1}".format(len(missed_list), missed_list))
+
 		self.common_config["target_merchant_list"] = merchants
+
 		for merchant in merchants:
 			self.config["merchant"] = remove_special_chars(merchant)
-			df = merchant_dataframes[merchant]
+			df = formatted_merchant_dataframes[merchant]
 			preprocess_dataframe(df)
 			logger.info("***** Processing {0:>29} ********".format(merchant))
 			self.setup_directories()
@@ -183,8 +248,10 @@ class Worker(GeomancerModule):
 			logger.debug("No pre-existing object, which is fine.")
 		#Merge original and new new_object
 		if isinstance(new_object, dict):
-			dst_object = reduce(merge, [src_object, new_object])
-			dst_object = {str(k): v for k, v in dst_object.items()}
+			#dst_object = reduce(merge, [src_object, new_object])
+			reduce(merge, [src_object, new_object])
+			#dst_object = {str(k): v for k, v in dst_object.items()}
+			dst_object = {str(k): v for k, v in src_object.items()}
 		elif isinstance(new_object, list):
 			dst_object = list(set().union(new_object, src_object))
 		else:

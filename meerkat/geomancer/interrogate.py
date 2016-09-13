@@ -113,14 +113,14 @@ class Worker(GeomancerModule):
 		dfs = get_task_df(server, map_id_to_name, map_name_to_id)
 		logger.warning("dfs: \n{0}".format(dfs))
 
-		csv_kwargs = { "usecols": ["DESCRIPTION_UNMASKED"], "error_bad_lines": False, "warn_bad_lines": True,
-			"encoding": "utf-8", "quotechar" : '"', "na_filter" : False, "sep": "," }
+		csv_kwargs = { "usecols": ["plain_text_description"], "error_bad_lines": False, "warn_bad_lines": True,
+			"encoding": "utf-8", "quotechar" : '"', "na_filter" : False, "sep": "\t" }
 
 		for top_merchant in top_merchants:
 			project_name = "Geomancer_" + bank_or_card + "_" + top_merchant
 			logger.info("Interrogating {0}".format(project_name))
 			old_df = dfs.get(project_name, pd.DataFrame())
-			old_df = old_df.rename(columns = {'question': 'DESCRIPTION_UNMASKED'})
+			old_df = old_df.rename(columns = {'question': 'plain_text_description'})
 			logger.info("old_df: \n{0}".format(old_df))
 
 			new_tasks_file = base_dir + top_merchant + "/" + bank_or_card  +"_tasks.csv"

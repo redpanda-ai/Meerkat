@@ -22,10 +22,10 @@ loggers:
   geomancer_module:
     handlers: [console]
     propogate: true
-  get_merchant_dictionaries:
+  update_dictionaries:
     handlers: [console]
     propogate: true
-  get_agg_data:
+  get_merchant_dictionaries:
     handlers: [console]
     propogate: true
   get_top_merchant_data:
@@ -41,6 +41,9 @@ loggers:
     handlers: [console]
     propogate: true
   interrogate:
+    handlers: [console]
+    propogate: true
+  taskrun_collector:
     handlers: [console]
     propogate: true
 

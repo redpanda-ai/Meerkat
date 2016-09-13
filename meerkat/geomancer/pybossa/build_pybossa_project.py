@@ -39,12 +39,12 @@ def create_project_json_file(project_name, project_json_file):
 		logger.info("Writing {0}".format(project_json_file))
 		json.dump(project_json, json_file)
 
-def format_json_with_callback(dictionary_file):
+def format_json_with_callback(dictionary_file, index):
 	"""Format the json dictionary to work with ajax callback"""
 	# Prepend the json dictionary
 	for line in fileinput.input(dictionary_file, inplace=True):
 		if fileinput.isfirstline():
-			print("callback(")
+			print("callback" + str(index) + "(")
 			print(line)
 		else:
 			print(line)
@@ -76,7 +76,6 @@ class Worker(GeomancerModule):
 		os.makedirs(base_dir, exist_ok=True)
 		target_merchants = self.common_config["target_merchant_list"]
 		top_merchants = get_top_merchant_names(base_dir, target_merchants)
-		self.common_config["target_merchant_list"] = top_merchants
 
 		logger.info("Top merchants project to be processed are: {0}".format(top_merchants))
 
@@ -118,14 +117,16 @@ class Worker(GeomancerModule):
 			if 'update_dictionary' in self.config and self.config["update_dictionary"]:
 				dictionary_dst = "/var/www/html/dictionaries/" + merchant + "/"
 				os.makedirs(dictionary_dst, exist_ok=True)
-				copy_file(base_dir + merchant + "/geo.json", dictionary_dst)
+				json_files = ["/geo.json", "/store_id_1.json", "/store_id_2.json"]
+				for i, json_file in enumerate(json_files):
+					copy_file(base_dir + merchant + json_file, dictionary_dst)
 
-				dictionary_file = dictionary_dst + "/geo.json"
-				format_json_with_callback(dictionary_file)
+					dictionary_file = dictionary_dst + json_file
+					format_json_with_callback(dictionary_file, i)
 
-				replace_str_in_file(merchant_presenter, "merchant_name", merchant)
-				replace_str_in_file(merchant_presenter, "server_ip", server)
-				logger.info("updated presenter with new dictionary")
+					replace_str_in_file(merchant_presenter, "merchant_name", merchant)
+					replace_str_in_file(merchant_presenter, "server_ip", server)
+					logger.info("updated presenter with new dictionary")
 				update_presenter = True
 
 			if update_presenter: 
@@ -133,6 +134,8 @@ class Worker(GeomancerModule):
 				results_file = template_dir + "results.html"
 				tutorial_file = template_dir + "tutorial.html"
 
+				if not os.path.isfile(project_json_file):
+					create_project_json_file(project_name, project_json_file)
 				os.system("pbs --server http://" + server + ":12000 --api-key " +
 					apikey + " --project " + project_json_file + " update_project --task-presenter " +
 					merchant_presenter + " --long-description " + long_description_file +
