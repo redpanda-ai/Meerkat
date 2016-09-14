@@ -192,6 +192,9 @@ def trans_to_tensor(config, tokens, tags=None):
 	char_inputs = []
 	word_indices = [w2i.get(w, w2i["_UNK"]) for w in tokens]
 
+	# Split Long Tokens
+	tokens, tags, word_indices = split_tokens(tokens, tags, word_indices)
+
 	# Encode Tags
 	if tags is not None:
 		encoded_tags = encode_tags(config, tags)
@@ -361,6 +364,25 @@ def build_graph(config):
 
 	return graph, saver
 
+def split_tokens(tokens, tags, word_indices):
+
+	split_tokens, split_tags, split_word_indices = [], [], []
+
+	for token, tag, word_index in zip(tokens, tags, word_indices):
+		if len(token) > 10:
+			split_token = [token[i:i+5] for i in range(0, len(token), 5)]
+			split_word_indices += [word_index] * len(split_token)
+			split_tags += [tag] * len(split_token)
+			split_tokens += split_token
+		else:
+			split_tokens += [token]
+			split_tags += [tag]
+			split_word_indices += [word_index]
+
+	# Why wont this fucking sync
+
+	return split_tokens, split_tags, split_word_indices
+
 def train_model(*args):
 	"""Train the model"""
 
@@ -406,7 +428,7 @@ def train_model(*args):
 				get_tensor(graph, "char_inputs:0") : char_inputs,
 				get_tensor(graph, "word_inputs:0") : word_indices,
 				get_tensor(graph, "word_lengths:0") : word_lengths,
-				get_tensor(graph, "trans_length:0"): len(tokens),
+				get_tensor(graph, "trans_length:0"): len(word_indices),
 				get_tensor(graph, "y:0"): labels,
 				get_tensor(graph, "train:0"): True
 			}
