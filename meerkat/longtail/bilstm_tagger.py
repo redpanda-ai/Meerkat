@@ -58,7 +58,7 @@ logging.basicConfig(level=logging.INFO)
 def get_tags(config, trans):
 	"""Convert df row to list of tags and tokens"""
 
-	tokens = str(trans["Description"]).lower().split()
+	tokens = str(trans["Description"]).lower().split()[0:config["max_tokens"]]
 	tag = str(trans["Tagged_merchant_string"]).lower()
 
 	if "," in tag:
@@ -81,9 +81,6 @@ def get_tags(config, trans):
 					break
 			if not found:
 				tags.append("background")
-
-	tokens = ["pay", "walmartsupercenter", "debit"]
-	tags = ["background", "merchant", "background"]
 
 	return (tokens, tags)
 
@@ -470,7 +467,7 @@ def train_model(*args):
 				get_tensor(graph, "char_inputs:0") : char_inputs,
 				get_tensor(graph, "word_inputs:0") : word_indices,
 				get_tensor(graph, "word_lengths:0") : word_lengths,
-				get_tensor(graph, "trans_length:0"): len(word_indices),
+				get_tensor(graph, "trans_length:0"): len(tokens),
 				get_tensor(graph, "y:0"): labels,
 				get_tensor(graph, "train:0"): True
 			}
@@ -499,7 +496,7 @@ def train_model(*args):
 			)
 
 			total_loss += loss
-			total_tagged += len(word_indices)
+			total_tagged += len(tokens)
 
 			# Log
 			if count % 250 == 0:
@@ -571,13 +568,13 @@ def evaluate_testset(config, graph, sess, test):
 			config, tokens, tags=tags
 		)
 
-		total_count += len(word_indices)
+		total_count += len(tokens)
 
 		feed_dict = {
 			get_tensor(graph, "char_inputs:0") : char_inputs,
 			get_tensor(graph, "word_inputs:0") : word_indices,
 			get_tensor(graph, "word_lengths:0") : word_lengths,
-			get_tensor(graph, "trans_length:0"): len(word_indices),
+			get_tensor(graph, "trans_length:0"): len(tokens),
 			get_tensor(graph, "train:0"): False
 		}
 
