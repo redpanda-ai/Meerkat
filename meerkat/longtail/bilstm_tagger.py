@@ -529,7 +529,7 @@ def evaluate_testset(config, graph, sess, test):
 			config, tokens, tags=tags
 		)
 
-		total_count += len(tokens)
+		total_count += len(word_indices)
 
 		feed_dict = {
 			get_tensor(graph, "char_inputs:0") : char_inputs,
