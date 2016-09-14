@@ -2,7 +2,7 @@
 	"concurrency" : 8,
 	"batch_size" : 500,
 	"input" : {
-		"filename" : "data/input/smaller_100000.tab",
+		"filename" : "us_places.factual.v3_40.1460184797.tab",
 		"encoding" : "utf-8"
 	},
 	"logging" : {
@@ -13,34 +13,15 @@
 	},
 	"elasticsearch" : {
 		"cluster_nodes" : [
-			"172.31.19.192:9200"
+			"search-keyvalue-pcq5ynjmu6erk2logbfkwbwfo4.us-west-2.es.amazonaws.com:80"
         ],
-		"index" : "dev_test_index",
-		"type" : "dev_test_type",
-		"boost_labels" : [ "query_string", "composite.address" ],
+		"index" : "factual_index",
+		"type" : "factual_type",
+		"boost_labels" : [ "query_string" ],
 		"boost_vectors" : {
 			"factual_id" :        [ 0.0, 0.0 ],
 			"name" :              [ 1.0, 0.0 ],
-			"address" :           [ 1.0, 0.0 ],
-			"address_extended" :  [ 1.0, 0.0 ],
-			"po_box" :            [ 1.0, 0.0 ],
-			"locality" :          [ 1.0, 0.0 ],
-			"region" :            [ 1.0, 0.0 ],
-			"post_town" :         [ 1.0, 0.0 ],
-			"admin_region" :      [ 1.0, 0.0 ],
-			"postcode" :          [ 1.0, 0.0 ],
-			"country" :           [ 1.0, 0.0 ],
-			"tel" :               [ 1.0, 0.0 ],
-			"fax" :               [ 1.0, 0.0 ],
-			"neighborhood" :      [ 1.0, 0.0 ],
-			"email" :             [ 1.0, 0.0 ],
-			"category_ids" :      [ 1.0, 0.0 ],
-			"category_labels" :   [ 1.0, 0.0 ],
-			"status" :            [ 1.0, 0.0 ],
-			"chain_name" :        [ 1.0, 0.0 ],
-			"chain_id" :          [ 1.0, 0.0 ],
-			"pin.location" :      [ 0.0, 0.0 ],
-			"composite.address" : [ 0.0, 3.0 ]
+			"detail":             [ 0.0, 3.0 ]
 		},
 		"composite_fields" : [
 			{
@@ -48,7 +29,7 @@
 					"components" : [ "address", "address_extended", "locality", "region",
 						"postcode", "country" ],
 					"format" : "{0} {1} {2}, {3} {4}, {5}",
-					"index" : "analyzed",
+					"index" : "not_analyzed",
 					"type" : "string"
 				}
 			}
@@ -60,12 +41,12 @@
 					"components" : [
 						{
 							"name" : "number_part",
-							"index" : "analyzed",
+							"index" : "not_analyzed",
 							"type" : "string"
 						},
 						{
 							"name" : "street_part",
-							"index" : "analyzed",
+							"index" : "not_analyzed",
 							"type" : "string"
 						}
 					]
@@ -74,35 +55,14 @@
 		],
 		"type_mapping" : {
 			"mappings" : {
-				"dev_test_type" : {
+				"factual_type" : {
 					"_source" : {
 						"enabled" : true
 					},
 					"properties" : {
-						"factual_id" : { "index" : "analyzed", "type" : "string" },
+						"factual_id" : { "index" : "not_analyzed", "type" : "string" },
 						"name" : { "index" : "analyzed", "type" : "string" },
-						"address" : { "index" : "analyzed", "type" : "string" },
-						"address_extended" : { "index" : "analyzed", "type" : "string" },
-						"po_box" : { "index" : "analyzed", "type" : "string" },
-						"locality" : { "index" : "analyzed", "type" : "string" },
-						"region" : { "index" : "analyzed", "type" : "string" },
-						"post_town" : { "index" : "analyzed", "type" : "string" },
-						"admin_region" : { "index" : "analyzed", "type" : "string" },
-						"postcode" : { "index" : "analyzed", "type" : "string" },
-						"country" : { "index" : "analyzed", "type" : "string" },
-						"tel" : { "index" : "analyzed", "type" : "string" },
-						"fax" : { "index" : "analyzed", "type" : "string" },
-						"neighborhood" : { "index" : "analyzed", "type" : "string" },
-						"website" : { "index" : "analyzed", "type" : "string" },
-						"email" : { "index" : "analyzed", "type" : "string" },
-						"category_ids" : { "index" : "analyzed", "type" : "string" },
-						"category_labels" : { "index" : "analyzed", "type" : "string" },
-						"status" : { "index" : "analyzed", "type" : "string" },
-						"chain_name" : { "index" : "analyzed", "type" : "string" },
-						"chain_id" : { "index" : "analyzed", "type" : "string" },
-						"internal_store_number" : {"index" : "analyzed", "type" : "string"},
-						"pin" : { "properties" : { "location" : {
-							"type" : "geo_shape", "tree" : "quadtree", "precision" : "1m" } }
+						"detail" : { "index" : "not_analyzed", "type" : "string" },
 						}
 					}
 				}

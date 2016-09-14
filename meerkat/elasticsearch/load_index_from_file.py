@@ -76,8 +76,8 @@ class ThreadConsumer(threading.Thread):
 		self.document_queue = params["document_queue"]
 		self.params["concurrency_queue"].put(self.thread_id)
 		cluster_nodes = self.params["elasticsearch"]["cluster_nodes"]
-		self.es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True,
-			sniff_on_connection_fail=True, sniffer_timeout=5, sniff_timeout=5)
+		self.es_connection = Elasticsearch(cluster_nodes, sniff_on_start=False,
+			sniff_on_connection_fail=False, timeout=30)
 		self.__set_logger()
 		self.batch_list = []
 
@@ -221,12 +221,17 @@ class ThreadConsumer(threading.Thread):
 				#Routine to create dispersed_fields
 				self.__create_dispersed_fields(document)
 
-				docs.append(document)
+				doc = dict()
+				doc["name"] = document["name"]
+				doc["factual_id"] = document["factual_id"]
+				doc["detail"] = document
+
+				docs.append(doc)
 				action = {
 					"_index": params["elasticsearch"]["index"],
 					"_type": params["elasticsearch"]["type"],
-					"_id": document["factual_id"],
-					"_source": document,
+					"_id": doc["factual_id"],
+					"_source": doc,
 					"timestamp": datetime.now()
 				}
 				actions.append(action)
@@ -237,17 +242,6 @@ class ThreadConsumer(threading.Thread):
 		my_logger.info("Docs: {0}".format(len(docs)))
 		success, errors = helpers.bulk(self.es_connection, actions)
 		my_logger.info("Success: {0} - Errors: {1}".format(success, errors))
-		#_, errors = helpers.bulk(self.es_connection, actions)
-		# Evaluate Success Rate
-		#success, failure, total = 0, 0, 0
-		#for item in errors:
-		#	if item["index"]["ok"]:
-		#		success += 1
-		#	else:
-		#		failure += 1
-		#	total += 1
-		#my_logger.info("Success/Failure/Total: %i/%i/%i - %i documents in queue."
-		#	, success, failure, total, self.document_queue.qsize())
 		my_logger.info("%i documents in queue.", self.document_queue.qsize())
 
 def start_consumers(params):
@@ -339,8 +333,8 @@ def validate_params(params):
 			+ "' should have exactly " + str(label_length) + " values.", expr=None)
 
 	#Ensure that "boost_vectors" is a subset of your mapping properties
-	add_composite_type_mappings(params)
-	add_dispersed_type_mappings(params)
+#	add_composite_type_mappings(params)
+#	add_dispersed_type_mappings(params)
 
 	missing_keys = validate_boost_vectors(params, my_type, boost_vectors)
 
@@ -390,7 +384,7 @@ def add_dispersed_type_mappings(params):
 def guarantee_index_and_doc_type(es_params):
 	"""Ensure that the index and document type mapping are as they should be"""
 	es_connection = Elasticsearch(es_params["cluster_nodes"], sniff_on_start=False,
-		sniff_on_connection_fail=True, sniffer_timeout=5, sniff_timeout=5)
+		sniff_on_connection_fail=False, timeout=30)
 	_ = es_connection.indices.create(index=es_params["index"], body=es_params["type_mapping"],
 		ignore=400)
 	es_index_status, es_type_status = "created", "created"
