@@ -55,16 +55,6 @@ from meerkat.various_tools import load_params, load_piped_dataframe
 
 logging.basicConfig(level=logging.INFO)
 
-def last_relevant(output, length, name):
-	"""return the last relevant embedding"""
-	batch_size = tf.shape(output)[0]
-	max_length = tf.reduce_max(tf.to_int32(length))
-	output_size = int(output.get_shape()[2])
-	index = tf.range(0, batch_size) * max_length + (tf.to_int32(length) - 1)
-	flat = tf.reshape(output, [-1, output_size])
-	relevant = tf.gather(flat, index, name=name)
-	return relevant
-
 def get_tags(config, trans):
 	"""Convert df row to list of tags and tokens"""
 
@@ -500,16 +490,13 @@ def train_model(*args):
 
 				with open('timeline.json', 'w') as writer:
 					writer.write(ctf)
-					#sys.exit()
+					sys.exit()
 
 			# Run Training Step
-			#optimizer_out, loss = sess.run(
-			#	[get_op(graph, "optimizer"), get_tensor(graph, "loss:0")],
-			#	feed_dict=feed_dict
-			#)
-
-			if count == 2:
-				sys.exit()
+			optimizer_out, loss = sess.run(
+				[get_op(graph, "optimizer"), get_tensor(graph, "loss:0")],
+				feed_dict=feed_dict
+			)
 
 			total_loss += loss
 			total_tagged += len(word_indices)
