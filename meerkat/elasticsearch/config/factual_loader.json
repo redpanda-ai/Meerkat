@@ -62,8 +62,7 @@
 					"properties" : {
 						"factual_id" : { "index" : "not_analyzed", "type" : "string" },
 						"name" : { "index" : "analyzed", "type" : "string" },
-						"detail" : { "index" : "not_analyzed", "type" : "string" },
-						}
+						"detail" : { "index" : "not_analyzed", "type" : "string" }
 					}
 				}
 			},
