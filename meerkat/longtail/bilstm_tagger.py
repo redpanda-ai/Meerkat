@@ -92,6 +92,9 @@ def get_tags(config, trans):
 			if not found:
 				tags.append("background")
 
+	tokens = ["pay", "walmartsupercenter", "debit"]
+	tags = ["background", "merchant", "background"]
+
 	return (tokens, tags)
 
 def validate_config(config):
@@ -193,7 +196,7 @@ def trans_to_tensor(config, tokens, tags=None):
 	word_indices = [w2i.get(w, w2i["_UNK"]) for w in tokens]
 
 	# Split Long Tokens
-	tokens, tags, word_indices = split_tokens(tokens, tags, word_indices)
+	# tokens, tags, word_indices = split_tokens(tokens, tags, word_indices)
 
 	# Encode Tags
 	if tags is not None:
@@ -244,6 +247,46 @@ def char_encoding(config, graph, trans_len):
 		)
 
 		char_inputs = tf.transpose(char_inputs, perm=[1, 0])
+		char_inputs = tf.gather(char_inputs, tf.range(tf.to_int32(trans_len)))
+		cembeds = tf.nn.embedding_lookup(cembed_matrix, char_inputs, name="ce_lookup")
+
+		# Create LSTM for Character Encoding
+		fw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"], state_is_tuple=True)
+		bw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"], state_is_tuple=True)
+
+		# Encode Characters with LSTM
+		options = {
+			"dtype": tf.float32,
+			"sequence_length": word_lengths
+		}
+
+		(output_fw, output_bw), (state_fw, state_bw) = tf.nn.bidirectional_dynamic_rnn(
+			fw_lstm, bw_lstm, cembeds, **options
+		)
+
+		char_embeds = state_fw.h
+		rev_char_embeds = state_bw.h
+
+		return char_embeds, rev_char_embeds
+
+def char_encoding_old(config, graph, trans_len):
+	"""Create graph nodes for character encoding"""
+
+	c2i = config["c2i"]
+	max_tokens = config["max_tokens"]
+
+	with graph.as_default():
+
+		# Character Embedding
+		word_lengths = tf.placeholder(tf.int64, [None], name="word_lengths")
+		word_lengths = tf.gather(word_lengths, tf.range(tf.to_int32(trans_len)))
+		char_inputs = tf.placeholder(tf.int32, [None, max_tokens], name="char_inputs")
+		cembed_matrix = tf.Variable(
+			tf.random_uniform([len(c2i.keys()), config["ce_dim"]], -0.25, 0.25),
+			name="cembeds"
+			)
+
+		char_inputs = tf.transpose(char_inputs, perm=[1, 0])
 		cembeds = tf.nn.embedding_lookup(cembed_matrix, char_inputs, name="ce_lookup")
 		cembeds = tf.gather(cembeds, tf.range(tf.to_int32(trans_len)), name="actual_ce_lookup")
 		cembeds = tf.transpose(cembeds, perm=[1, 0, 2])
@@ -282,7 +325,6 @@ def build_graph(config):
 		# Character Embedding
 		trans_len = tf.placeholder(tf.int64, None, name="trans_length")
 		train = tf.placeholder(tf.bool, name="train")
-		tf.set_random_seed(config["seed"])
 		char_embeds, rev_char_embeds = char_encoding(config, graph, trans_len)
 
 		# Word Embedding
@@ -368,16 +410,26 @@ def split_tokens(tokens, tags, word_indices):
 
 	split_tokens, split_tags, split_word_indices = [], [], []
 
-	for token, tag, word_index in zip(tokens, tags, word_indices):
-		if len(token) > 10:
-			split_token = [token[i:i+5] for i in range(0, len(token), 5)]
-			split_word_indices += [word_index] * len(split_token)
-			split_tags += [tag] * len(split_token)
-			split_tokens += split_token
-		else:
-			split_tokens += [token]
-			split_tags += [tag]
-			split_word_indices += [word_index]
+	if not tags:
+		for token, word_index in zip(tokens, word_indices):
+			if len(token) > 20:
+				split_token = [token[i:i+10] for i in range(0, len(token), 10)]
+				split_word_indices += [word_index] * len(split_token)
+				split_tokens += split_token
+			else:
+				split_tokens += [token]
+				split_word_indices += [word_index]
+	else: 
+		for token, tag, word_index in zip(tokens, tags, word_indices):
+			if len(token) >= 20:
+				split_token = [token[i:i+10] for i in range(0, len(token), 10)]
+				split_word_indices += [word_index] * len(split_token)
+				split_tags += [tag] * len(split_token)
+				split_tokens += split_token
+			else:
+				split_tokens += [token]
+				split_tags += [tag]
+				split_word_indices += [word_index]
 
 	# Why wont this fucking sync
 
@@ -448,13 +500,16 @@ def train_model(*args):
 
 				with open('timeline.json', 'w') as writer:
 					writer.write(ctf)
-					sys.exit()
+					#sys.exit()
 
 			# Run Training Step
-			optimizer_out, loss = sess.run(
-				[get_op(graph, "optimizer"), get_tensor(graph, "loss:0")],
-				feed_dict=feed_dict
-			)
+			#optimizer_out, loss = sess.run(
+			#	[get_op(graph, "optimizer"), get_tensor(graph, "loss:0")],
+			#	feed_dict=feed_dict
+			#)
+
+			if count == 2:
+				sys.exit()
 
 			total_loss += loss
 			total_tagged += len(word_indices)
