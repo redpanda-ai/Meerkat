@@ -535,7 +535,7 @@ def evaluate_testset(config, graph, sess, test):
 			get_tensor(graph, "char_inputs:0") : char_inputs,
 			get_tensor(graph, "word_inputs:0") : word_indices,
 			get_tensor(graph, "word_lengths:0") : word_lengths,
-			get_tensor(graph, "trans_length:0"): len(tokens),
+			get_tensor(graph, "trans_length:0"): len(word_indices),
 			get_tensor(graph, "train:0"): False
 		}
 

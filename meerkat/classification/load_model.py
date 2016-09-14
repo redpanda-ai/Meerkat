@@ -117,7 +117,7 @@ def get_tf_rnn_by_path(model_path, w2i_path, gpu_mem_fraction=False, model_name=
 				get_tensor(graph, "char_inputs:0"): char_inputs,
 				get_tensor(graph, "word_inputs:0"): word_indices,
 				get_tensor(graph, "word_lengths:0"): word_lengths,
-				get_tensor(graph, "trans_length:0"): len(tran),
+				get_tensor(graph, "trans_length:0"): len(word_indices),
 				get_tensor(graph, "train:0"): False
 			}
 
