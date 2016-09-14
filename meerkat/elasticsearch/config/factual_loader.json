@@ -19,9 +19,9 @@
 		"type" : "factual_type",
 		"boost_labels" : [ "query_string" ],
 		"boost_vectors" : {
-			"factual_id" :        [ 0.0, 0.0 ],
-			"name" :              [ 1.0, 0.0 ],
-			"detail":             [ 0.0, 3.0 ]
+			"factual_id" :        [ 0.0 ],
+			"name" :              [ 1.0 ],
+			"detail":             [ 0.0 ]
 		},
 		"composite_fields" : [
 			{
