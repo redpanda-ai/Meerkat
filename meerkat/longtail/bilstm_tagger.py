@@ -235,11 +235,9 @@ def char_encoding(config, graph, trans_len):
 			name="cembeds"
 		)
 
+		# Lookup Embeddings
 		cembeds = tf.nn.embedding_lookup(cembed_matrix, char_inputs, name="ce_lookup")
-
-		# TODO: Insert empty second dimension
-		input_shape = [None, 1, max_wl, config["ce_dim"]]
-		output_shape = [None, cnn_out_width]
+		cembeds = tf.expand_dims(cembeds, 1)
 
 		# Encoder Weights and Biases
 		w_conv = weight_variable(config, [1, kernel_width, config["ce_dim"], cnn_out_width])
