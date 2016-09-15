@@ -106,15 +106,18 @@ def get_tf_rnn_by_path(model_path, w2i_path, gpu_mem_fraction=False, model_name=
 		"""Apply RNN to transactions"""
 
 		for _, doc in enumerate(trans):
+
+			# If tags, tag all tokens with get_tags for evaluation purposes
 			if tags:
-				# if tags, tag all tokens with get_tags for evaluation purposes
 				tran, label = get_tags(config, doc)
 				doc["ground_truth"] = label
 			else:
 				tran = doc[doc_key].lower().split()[0:config["max_tokens"]]
+
 			char_inputs, word_lengths, word_indices, _ = trans_to_tensor(config, tran)
+
 			feed_dict = {
-				get_tensor(graph, "char_inputs:0"): char_inputs,
+				get_tensor(graph, "char_inputs:0") : char_inputs,
 				get_tensor(graph, "word_inputs:0"): word_indices,
 				get_tensor(graph, "word_lengths:0"): word_lengths,
 				get_tensor(graph, "trans_length:0"): len(tran),
@@ -122,8 +125,9 @@ def get_tf_rnn_by_path(model_path, w2i_path, gpu_mem_fraction=False, model_name=
 			}
 
 			output = sess.run(model, feed_dict=feed_dict)
+
+			# Return merchant name if name_only else return tags of all tokens
 			if name_only:
-				# return merchant name if name_only else return tags of all tokens
 				output = [config["tag_map"][str(i)] for i in np.argmax(output, 1)]
 				target_indices = [i for i in range(len(output)) if output[i] == "merchant"]
 				doc[label_key] = " ".join([tran[i] for i in target_indices])

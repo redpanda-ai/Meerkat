@@ -67,8 +67,9 @@ def last_relevant(output, length, name):
 def get_tags(config, trans):
 	"""Convert df row to list of tags and tokens"""
 
-	tokens = str(trans["Description"]).lower().split()[0:config["max_tokens"]]
+	tokens = str(trans["Description"]).lower().split()
 	tag = str(trans["Tagged_merchant_string"]).lower()
+
 	if "," in tag:
 		tag = tag.split(",")
 		tag = sum([item.split() for item in tag], [])
@@ -185,7 +186,6 @@ def trans_to_tensor(config, tokens, tags=None):
 
 	w2i = config["w2i"]
 	c2i = config["c2i"]
-	max_tokens = config["max_tokens"]
 	char_inputs = []
 	word_indices = [w2i.get(w, w2i["_UNK"]) for w in tokens]
 
@@ -196,27 +196,16 @@ def trans_to_tensor(config, tokens, tags=None):
 		encoded_tags = None
 
 	# Lookup Character Indices
-	tokens = [["<w>"] + list(t) + ["</w>"] for t in tokens]
-	max_t_len = len(max(tokens, key=len))
+	tokens = [list(t) for t in tokens]
 
-	for i in range(max_tokens):
+	for i in range(len(tokens)):
 
-		token = tokens[i] if i < len(tokens) else False
-
-		if not token:
-			char_inputs.append([0] * max_t_len)
-			continue
-
-		char_inputs.append([])
-
-		for inner_i in range(max_t_len):
-			char_index = c2i.get(token[inner_i], 0) if inner_i < len(token) else 0
-			char_inputs[i].append(char_index)
+		token = tokens[i]
+		char_indices = [c2i.get(c, 0) for c in token]
+		char_inputs.append(char_indices)
 
 	char_inputs = np.array(char_inputs)
-	char_inputs = np.transpose(char_inputs, (1, 0))
-
-	word_lengths = [len(tokens[i]) if i < len(tokens) else 0 for i in range(max_tokens)]
+	word_lengths = [len(t) for t in tokens]
 
 	return char_inputs, word_lengths, word_indices, encoded_tags
 
@@ -224,7 +213,7 @@ def char_encoding(config, graph, trans_len):
 	"""Create graph nodes for character encoding"""
 
 	c2i = config["c2i"]
-	max_tokens = config["max_tokens"]
+	max_wl = config["max_word_length"]
 
 	with graph.as_default():
 
@@ -237,12 +226,10 @@ def char_encoding(config, graph, trans_len):
 			name="cembeds"
 		)
 
-		char_inputs = tf.transpose(char_inputs, perm=[1, 0])
-		char_inputs = tf.gather(char_inputs, tf.range(tf.to_int32(trans_len)))
 		cembeds = tf.nn.embedding_lookup(cembed_matrix, char_inputs, name="ce_lookup")
-		cembeds = tf.transpose(cembeds, perm=[1, 0, 2])
 
 		# TODO: Insert Char-CNN
+		input_shape = [None, 1, max_wl, config["ce_dim"]]
 
 		encoded_chars = {}
 
@@ -480,7 +467,7 @@ def evaluate_testset(config, graph, sess, test):
 		char_inputs, word_lengths, word_indices, labels = trans_to_tensor(
 			config, tokens, tags=tags
 		)
-		
+
 		total_count += len(tokens)
 
 		feed_dict = {
