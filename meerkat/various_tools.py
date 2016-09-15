@@ -114,7 +114,7 @@ def load_piped_dataframe(filename, chunksize=False, usecols=False):
 	options = {
 		"quoting": csv.QUOTE_NONE,
 		"na_filter": False,
-		"encoding": "utf-8",
+		"encoding": "latin1",
 		"sep": "|",
 		"error_bad_lines": False
 	}
