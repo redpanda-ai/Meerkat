@@ -222,6 +222,7 @@ def char_encoding(config, graph, trans_len):
 	c2i = config["c2i"]
 	max_wl = config["max_word_length"]
 	cnn_out_width = config["cnn_output_width"]
+	kernel_width = config["kernel_width"]
 
 	with graph.as_default():
 
@@ -239,6 +240,10 @@ def char_encoding(config, graph, trans_len):
 		# TODO: Insert Char-CNN
 		input_shape = [None, 1, max_wl, config["ce_dim"]]
 		output_shape = [None, cnn_out_width]
+
+		# Encoder Weights and Biases
+		w_conv = weight_variable(config, [1, kernel_width, config["ce_dim"], cnn_out_width])
+		b_conv = bias_variable([cnn_out_width], kernel_width * config["ce_dim"])
 
 		encoded_chars = {}
 

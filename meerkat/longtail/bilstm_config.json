@@ -13,6 +13,7 @@
 	"max_word_length": 50,
 	"num_layers": 1,
 	"cnn_output_width": 50,
+	"kernel_width": 3,
 	"ce_dim": 100,
 	"seed": 1512141834,
 	"profile_session": false,
