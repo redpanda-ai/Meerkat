@@ -96,10 +96,9 @@ def validate_config(config):
 	"""Validate input configuration"""
 
 	config = load_params(config)
-	config["c2i"] = {a : i + 3 for i, a in enumerate(config["alphabet"])}
-	config["c2i"]["_UNK"] = 0
-	config["c2i"]["<w>"] = 1
-	config["c2i"]["</w>"] = 2
+	config["c2i"] = {a : i + 2 for i, a in enumerate(config["alphabet"])}
+	config["c2i"]["_PAD"] = 0
+	config["c2i"]["_UNK"] = 1
 
 	return config
 
@@ -186,6 +185,7 @@ def trans_to_tensor(config, tokens, tags=None):
 
 	w2i = config["w2i"]
 	c2i = config["c2i"]
+	max_wl = config["max_word_length"]
 	char_inputs = []
 	word_indices = [w2i.get(w, w2i["_UNK"]) for w in tokens]
 
@@ -200,8 +200,15 @@ def trans_to_tensor(config, tokens, tags=None):
 
 	for i in range(len(tokens)):
 
+		# Get Char Indices
 		token = tokens[i]
-		char_indices = [c2i.get(c, 0) for c in token]
+		char_indices = [c2i.get(c, 1) for c in token]
+
+		# Pad Token
+		pad_len = max_wl - len(token)
+		lpad = math.floor(pad_len / 2)
+		rpad = pad_len - lpad
+		char_indices = np.pad(char_indices, pad_width=(lpad, rpad), mode='constant', constant_values=0)
 		char_inputs.append(char_indices)
 
 	char_inputs = np.array(char_inputs)
