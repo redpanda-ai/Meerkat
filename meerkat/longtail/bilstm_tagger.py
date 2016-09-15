@@ -49,7 +49,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.python.client import timeline
 
-from meerkat.classification.tools import reverse_map, get_tensor, get_op
+from meerkat.classification.tools import reverse_map, get_tensor, get_op, conv2d, max_pool
 from meerkat.various_tools import load_params, load_piped_dataframe
 
 logging.basicConfig(level=logging.INFO)
@@ -237,7 +237,7 @@ def char_encoding(config, graph, trans_len):
 
 		cembeds = tf.nn.embedding_lookup(cembed_matrix, char_inputs, name="ce_lookup")
 
-		# TODO: Insert Char-CNN
+		# TODO: Insert empty second dimension
 		input_shape = [None, 1, max_wl, config["ce_dim"]]
 		output_shape = [None, cnn_out_width]
 
@@ -245,7 +245,11 @@ def char_encoding(config, graph, trans_len):
 		w_conv = weight_variable(config, [1, kernel_width, config["ce_dim"], cnn_out_width])
 		b_conv = bias_variable([cnn_out_width], kernel_width * config["ce_dim"])
 
-		encoded_chars = {}
+		# Apply Convolution
+		conv_out = conv2d(cembeds, w_conv) + b_conv
+
+		# Apply Pooling
+		encoded_chars = max_pool(conv_out)
 
 		return encoded_chars
 
