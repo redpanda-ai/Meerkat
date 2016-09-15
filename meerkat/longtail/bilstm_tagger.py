@@ -235,31 +235,18 @@ def char_encoding(config, graph, trans_len):
 		cembed_matrix = tf.Variable(
 			tf.random_uniform([len(c2i.keys()), config["ce_dim"]], -0.25, 0.25),
 			name="cembeds"
-			)
+		)
 
 		char_inputs = tf.transpose(char_inputs, perm=[1, 0])
+		char_inputs = tf.gather(char_inputs, tf.range(tf.to_int32(trans_len)))
 		cembeds = tf.nn.embedding_lookup(cembed_matrix, char_inputs, name="ce_lookup")
-		cembeds = tf.gather(cembeds, tf.range(tf.to_int32(trans_len)), name="actual_ce_lookup")
 		cembeds = tf.transpose(cembeds, perm=[1, 0, 2])
 
-		# Create LSTM for Character Encoding
-		fw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"], state_is_tuple=True)
-		bw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"], state_is_tuple=True)
+		# TODO: Insert Char-CNN
 
-		# Encode Characters with LSTM
-		options = {
-			"dtype": tf.float32,
-			"sequence_length": word_lengths,
-			"time_major": True
-		}
+		encoded_chars = {}
 
-		(output_fw, output_bw), _ = tf.nn.bidirectional_dynamic_rnn(
-			fw_lstm, bw_lstm, cembeds, **options
-			)
-		output_fw = tf.transpose(output_fw, perm=[1, 0, 2])
-		output_bw = tf.transpose(output_bw, perm=[1, 0, 2])
-
-		return output_fw, output_bw, word_lengths
+		return encoded_chars
 
 def build_graph(config):
 	"""Build CNN"""
@@ -272,33 +259,20 @@ def build_graph(config):
 		# Character Embedding
 		trans_len = tf.placeholder(tf.int64, None, name="trans_length")
 		train = tf.placeholder(tf.bool, name="train")
-		tf.set_random_seed(config["seed"])
-		last_state, rev_last_state, word_lengths = char_encoding(config, graph, trans_len)
+		encoded_chars = char_encoding(config, graph, trans_len)
 
 		# Word Embedding
 		word_inputs = tf.placeholder(tf.int32, [None], name="word_inputs")
-		wembed_matrix = tf.Variable(
-			tf.constant(0.0, shape=[config["vocab_size"], config["we_dim"]]),
-			trainable=True,
-			name="wembed_matrix"
-			)
-		embedding_placeholder = tf.placeholder(
-			tf.float32,
-			[config["vocab_size"], config["we_dim"]],
-			name="embedding_placeholder"
-			)
-		assign_wembedding = tf.assign(wembed_matrix, embedding_placeholder, name="assign_wembedding")
+		embed_shape = [config["vocab_size"], config["we_dim"]]
+		embed_init = tf.constant(0.0, shape=embed_shape)
+		wembed_matrix = tf.Variable(embed_init, trainable=True, name="wembed_matrix")
+		embed_placeholder = tf.placeholder(tf.float32, embed_shape, name="embed_placeholder")
+		assign_wembed = tf.assign(wembed_matrix, embed_placeholder, name="assign_wembed")
 		wembeds = tf.nn.embedding_lookup(wembed_matrix, word_inputs, name="we_lookup")
 		wembeds = tf.identity(wembeds, name="actual_we_lookup")
 
 		# Combine Embeddings
-		char_embeds = last_relevant(last_state, word_lengths, "char_embeds")
-		rev_char_embeds = last_relevant(rev_last_state, word_lengths, "rev_char_embeds")
-		combined_embeddings = tf.concat(
-			1,
-			[wembeds, char_embeds, tf.reverse(rev_char_embeds, [True, False])],
-			name="combined_embeddings"
-			)
+		combined_embeds = tf.concat(1, [wembeds, encoded_chars], name="combined_embeds")
 
 		# Cells and Weights
 		fw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["h_dim"], state_is_tuple=True)
@@ -306,57 +280,57 @@ def build_graph(config):
 		fw_network = tf.nn.rnn_cell.MultiRNNCell([fw_lstm]*config["num_layers"], state_is_tuple=True)
 		bw_network = tf.nn.rnn_cell.MultiRNNCell([bw_lstm]*config["num_layers"], state_is_tuple=True)
 
-		weight = tf.Variable(
-			tf.random_uniform([config["h_dim"] * 2, len(config["tag_map"])]),
-			name="weight"
-			)
+		# Initialize Weights and Bias
+		weight_shape = [config["h_dim"] * 2, len(config["tag_map"])]
+		weight_initialize = tf.random_uniform(weight_shape)
+		weight = tf.Variable(weight_initialize, name="weight")
 		bias = tf.Variable(tf.random_uniform([len(config["tag_map"])]))
 
-		def model(combined_embeddings, noise_sigma=0.0):
+		def model(combined_embeds, noise_sigma=0.0):
 			"""Model to train"""
 
-			combined_embeddings = tf.cond(
-				train,
-				lambda: tf.add(tf.random_normal(tf.shape(combined_embeddings)) * noise_sigma,
-					 combined_embeddings),
-				lambda: combined_embeddings
-				)
-			batched_input = tf.expand_dims(combined_embeddings, 0)
+			def add_input_noise():
+				noise = tf.random_normal(tf.shape(combined_embeds))
+				return tf.add(noise * noise_sigma, combined_embeds)
+
+			# Prepare Input
+			combined_embeds = tf.cond(train, add_input_noise, lambda: combined_embeds)
+			batched_input = tf.expand_dims(combined_embeds, 0)
 
 			options = {
 				"dtype": tf.float32,
 				"sequence_length": tf.expand_dims(trans_len, 0)
 			}
 
-			# _ is unused output state
+			# Run Through Bi-LSTM
 			(outputs_fw, outputs_bw), _ = tf.nn.bidirectional_dynamic_rnn(
 				fw_network, bw_network, batched_input, **options
-				)
+			)
 
 			# Add Noise and Predict
 			concat_layer = tf.concat(
 				2,
 				[outputs_fw, tf.reverse(outputs_bw, [False, True, False])],
 				name="concat_layer"
-				)
+			)
+
 			concat_layer = tf.cond(
 				train,
 				lambda: tf.add(tf.random_normal(tf.shape(concat_layer)) * noise_sigma, concat_layer),
 				lambda: concat_layer
-				)
-			prediction = tf.log(
-				tf.nn.softmax(tf.matmul(tf.squeeze(concat_layer, [0]), weight) + bias),
-				name="model"
-				)
+			)
+
+			softmax = tf.nn.softmax(tf.matmul(tf.squeeze(concat_layer, [0]), weight) + bias)
+			prediction = tf.log(softmax, name="model")
+
 			return prediction
 
-		network = model(combined_embeddings, noise_sigma=config["noise_sigma"])
+		network = model(combined_embeds, noise_sigma=config["noise_sigma"])
 
 		# Calculate Loss and Optimize
 		labels = tf.placeholder(tf.float32, shape=[None, len(config["tag_map"].keys())], name="y")
 		loss = tf.neg(tf.reduce_sum(network * labels), name="loss")
-		optimizer = tf.train.GradientDescentOptimizer(
-			config["learning_rate"]).minimize(loss, name="optimizer")
+		optimizer = tf.train.GradientDescentOptimizer(config["learning_rate"]).minimize(loss, name="optimizer")
 
 		saver = tf.train.Saver()
 
@@ -376,10 +350,12 @@ def train_model(*args):
 	checkpoints = []
 	train = config["train"]
 	train_index = list(range(len(train)))
+
+	# Initialize Word Embeddings
 	sess.run(
-		get_op(graph, "assign_wembedding"),
-		feed_dict={get_tensor(graph, "embedding_placeholder:0"): config["wembedding"]}
-		)
+		get_op(graph, "assign_wembed"),
+		feed_dict={get_tensor(graph, "embed_placeholder:0"): config["wembedding"]}
+	)
 
 	# Train the Model
 	for step in range(eras):
@@ -396,9 +372,10 @@ def train_model(*args):
 			count += 1
 
 			tokens, tags = train[t_index]
+
 			char_inputs, word_lengths, word_indices, labels = trans_to_tensor(
 				config, tokens, tags=tags
-				)
+			)
 
 			feed_dict = {
 				get_tensor(graph, "char_inputs:0") : char_inputs,
@@ -411,14 +388,17 @@ def train_model(*args):
 
 			# Collect GPU Profile
 			if config["profile_session"]:
+
 				_, loss = sess.run(
 					[get_op(graph, "optimizer"), get_tensor(graph, "loss:0")],
 					feed_dict=feed_dict,
 					options=run_options,
 					run_metadata=run_metadata
-					)
+				)
+
 				time_line = timeline.Timeline(run_metadata.step_stats)
 				ctf = time_line.generate_chrome_trace_format()
+
 				with open('timeline.json', 'w') as writer:
 					writer.write(ctf)
 					sys.exit()
@@ -427,9 +407,10 @@ def train_model(*args):
 			optimizer_out, loss = sess.run(
 				[get_op(graph, "optimizer"), get_tensor(graph, "loss:0")],
 				feed_dict=feed_dict
-				)
+			)
+
 			total_loss += loss
-			total_tagged += len(word_indices)
+			total_tagged += len(tokens)
 
 			# Log
 			if count % 250 == 0:
@@ -439,6 +420,7 @@ def train_model(*args):
 
 		# Evaluate Model
 		test_accuracy = evaluate_testset(config, graph, sess, config["test"])
+
 		# Save checkpoint
 		current_model_path = save_models(saver, sess, checkpoints_dir, step+1)
 		logging.info("Checkpoint saved in file: " + current_model_path)
@@ -458,14 +440,13 @@ def train_model(*args):
 	final_model_path = model_dir + "bilstm.ckpt"
 	final_meta_path = model_dir + "bilstm.meta"
 	os.rename(best_model_path, final_model_path)
-	logging.info("Moving final model from {0} to {1}.".format(best_model_path,
-		final_model_path))
+	logging.info("Moving final model from {0} to {1}.".format(best_model_path, final_model_path))
 	os.rename(best_model_path+".meta", final_meta_path)
-	logging.info("Moving final meta file from {0} to {1}.".format(
-		best_model_path+".meta", final_meta_path))
+	logging.info("Moving final meta file from {0} to {1}.".format(best_model_path+".meta", final_meta_path))
 	shutil.rmtree(checkpoints_dir)
 	logging.info("Removing checkpoint files at " + checkpoints_dir)
 	w2i_to_json(config["w2i"], model_dir)
+
 	return final_model_path
 
 def save_models(saver, sess, path, era):
@@ -498,7 +479,8 @@ def evaluate_testset(config, graph, sess, test):
 		num_merchant += sum([1 for item in tags if item == "merchant"])
 		char_inputs, word_lengths, word_indices, labels = trans_to_tensor(
 			config, tokens, tags=tags
-			)
+		)
+		
 		total_count += len(tokens)
 
 		feed_dict = {
