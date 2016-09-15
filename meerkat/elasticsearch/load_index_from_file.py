@@ -224,7 +224,7 @@ class ThreadConsumer(threading.Thread):
 				doc = dict()
 				doc["name"] = document["name"]
 				doc["factual_id"] = document["factual_id"]
-				doc["detail"] = document
+				doc["detail"] = str(document)
 
 				docs.append(doc)
 				action = {
@@ -319,8 +319,8 @@ def validate_params(params):
 	my_props = params["elasticsearch"]["type_mapping"]["mappings"]\
 		[my_type]["properties"]
 
-	validate_composite_fields(params, my_props)
-	validate_dispersed_fields(params)
+#	validate_composite_fields(params, my_props)
+#	validate_dispersed_fields(params)
 
 	#Ensure that "boost_labels" and "boost_vectors" row vectors have
 	#the same cardinality
