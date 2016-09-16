@@ -294,8 +294,7 @@ def char_encoding(config, graph, trans_len):
 		# cembeds_bw = tf.gather(cembeds_bw, tf.range(tf.to_int32(trans_len)), name="actual_ce_lookup_bw")
 		# cembeds_bw = tf.transpose(cembeds_bw, perm=[1, 0, 2])
 		# Create LSTM for Character Encoding
-		# fw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"], state_is_tuple=True)
-		fw_lstm = tf.nn.rnn_cell.GRUCell(config["ce_dim"])
+		fw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"], state_is_tuple=True)
 		# bw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"], state_is_tuple=True)
 
 		# Encode Characters with LSTM
@@ -392,10 +391,8 @@ def build_graph(config):
 			)
 
 		# Cells and Weights
-		# fw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["h_dim"], state_is_tuple=True)
-		fw_lstm = tf.nn.rnn_cell.GRUCell(config["h_dim"])
-		# bw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["h_dim"], state_is_tuple=True)
-		bw_lstm = tf.nn.rnn_cell.GRUCell(config["h_dim"])
+		fw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["h_dim"], state_is_tuple=True)
+		bw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["h_dim"], state_is_tuple=True)
 		fw_network = tf.nn.rnn_cell.MultiRNNCell([fw_lstm]*config["num_layers"], state_is_tuple=True)
 		bw_network = tf.nn.rnn_cell.MultiRNNCell([bw_lstm]*config["num_layers"], state_is_tuple=True)
 
