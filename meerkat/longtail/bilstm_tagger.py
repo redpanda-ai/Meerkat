@@ -233,24 +233,30 @@ def char_encoding(config, graph, trans_len):
 		word_lengths = tf.gather(word_lengths, tf.range(tf.to_int32(trans_len)))
 		char_inputs = tf.placeholder(tf.int32, [None, max_wl], name="char_inputs")
 		cembed_matrix = tf.Variable(
-			tf.random_uniform([len(c2i.keys()), config["ce_dim"]], -0.5, 0.5),
+			tf.random_uniform([len(c2i.keys()), config["ce_dim"]], -0.25, 0.25),
 			name="cembeds"
 		)
 
 		# Lookup Embeddings
 		cembeds = tf.nn.embedding_lookup(cembed_matrix, char_inputs, name="ce_lookup")
 		cembeds = tf.expand_dims(cembeds, 1)
-		cembeds = tf.nn.dropout(cembeds, 0.5)
 
 		# Encoder Weights and Biases
 		w_conv = weight_variable(config, [1, kernel_width, config["ce_dim"], cnn_out_width])
 		b_conv = bias_variable([cnn_out_width], kernel_width * config["ce_dim"])
 
+		w_conv2 = weight_variable(config, [1, kernel_width, cnn_out_width, cnn_out_width])
+		b_conv2 = bias_variable([cnn_out_width], kernel_width * cnn_out_width)
+
 		# Apply Convolution
 		conv_out = conv2d(cembeds, w_conv) + b_conv
+		encoded_chars = tf.nn.max_pool(conv_out, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
 
 		# Apply Pooling
-		encoded_chars = tf.nn.max_pool(conv_out, ksize=[1, 1, 7, 1], strides=[1, 1, 7, 1], padding='VALID')
+		conv_out = conv2d(encoded_chars, w_conv2) + b_conv2
+		encoded_chars = tf.nn.max_pool(conv_out, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
+
+		encoded_chars = tf.clip_by_value(encoded_chars, -1.0, 1.0)
 
 		return tf.squeeze(encoded_chars, squeeze_dims=[1, 2], name="encoded_chars")
 
@@ -266,7 +272,6 @@ def build_graph(config):
 		trans_len = tf.placeholder(tf.int64, None, name="trans_length")
 		train = tf.placeholder(tf.bool, name="train")
 		encoded_chars = char_encoding(config, graph, trans_len)
-		encoded_chars = tf.clip_by_value(encoded_chars, 1e-10, 1.0)
 
 		# Word Embedding
 		word_inputs = tf.placeholder(tf.int32, [None], name="word_inputs")
@@ -414,10 +419,12 @@ def train_model(*args):
 					sys.exit()
 
 			# Run Training Step
-			optimizer_out, loss = sess.run(
-				[get_op(graph, "optimizer"), get_tensor(graph, "loss:0")],
+			optimizer_out, loss, ec = sess.run(
+				[get_op(graph, "optimizer"), get_tensor(graph, "loss:0"), get_tensor(graph, "encoded_chars:0")],
 				feed_dict=feed_dict
 			)
+
+			#print(ec)
 
 			total_loss += loss
 			total_tagged += len(tokens)
