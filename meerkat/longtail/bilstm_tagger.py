@@ -171,6 +171,9 @@ def preprocess(config):
 		embedding = {}
 	config["w2i"] = words_to_indices(config["train"])
 	config["w2i"], config["wembedding"] = construct_embedding(config, config["w2i"], embedding)
+	os.makedirs("./meerkat/longtail/model/", exist_ok=True)
+	w2i_to_json(config["w2i"], "./meerkat/longtail/model/")
+	logging.info("Save w2i.json to ./meerkat/longtail/model/")
 	config["vocab_size"] = len(config["wembedding"])
 	return config
 
@@ -459,8 +462,8 @@ def train_model(*args):
 
 	best_accuracy, best_era = 0, 0
 	checkpoints_dir = "./meerkat/longtail/checkpoints/"
-	model_dir = "./meerkat/longtail/model/"
 	os.makedirs(checkpoints_dir, exist_ok=True)
+	model_dir = "./meerkat/longtail/model/"
 	os.makedirs(model_dir, exist_ok=True)
 	eras = config["eras"]
 	checkpoints = []
@@ -558,7 +561,6 @@ def train_model(*args):
 		best_model_path+".meta", final_meta_path))
 	shutil.rmtree(checkpoints_dir)
 	logging.info("Removing checkpoint files at " + checkpoints_dir)
-	w2i_to_json(config["w2i"], model_dir)
 	return final_model_path
 
 def save_models(saver, sess, path, era):
