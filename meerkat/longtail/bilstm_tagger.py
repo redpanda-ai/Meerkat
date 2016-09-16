@@ -201,7 +201,7 @@ def trans_to_tensor(config, tokens, tags=None):
 	c2i = config["c2i"]
 	max_tokens = config["max_tokens"]
 	char_inputs_fw = []
-	char_inputs_bw = []
+	# char_inputs_bw = []
 	word_indices = [w2i.get(w, w2i["_UNK"]) for w in tokens]
 
 	# Encode Tags
@@ -212,11 +212,11 @@ def trans_to_tensor(config, tokens, tags=None):
 
 	# Lookup Character Indices
 	tokens_fw = [cut_word(t, "fw") for t in tokens]
-	tokens_bw = [cut_word(t, "bw") for t in tokens]
+	# tokens_bw = [cut_word(t, "bw") for t in tokens]
 	tokens_fw = [["<w>"] + list(t.replace("!@#", "")) + ["</w>"]*(not t.endswith("!@#")) for t in tokens_fw]
-	tokens_bw = [["<w>"]*(not t.endswith("!@#")) + list(t.replace("!@#", "")) + ["</w>"] for t in tokens_bw]
+	# tokens_bw = [["<w>"]*(not t.endswith("!@#")) + list(t.replace("!@#", "")) + ["</w>"] for t in tokens_bw]
 	max_t_len_fw = len(max(tokens_fw, key=len))
-	max_t_len_bw = len(max(tokens_bw, key=len))
+	# max_t_len_bw = len(max(tokens_bw, key=len))
 
 	for i in range(max_tokens):
 
@@ -237,6 +237,7 @@ def trans_to_tensor(config, tokens, tags=None):
 
 	word_lengths_fw = [len(tokens_fw[i]) if i < len(tokens_fw) else 0 for i in range(max_tokens)]
 
+	"""
 	for i in range(max_tokens):
 
 		token_bw = tokens_bw[i] if i < len(tokens_bw) else False
@@ -250,13 +251,14 @@ def trans_to_tensor(config, tokens, tags=None):
 		for inner_i in range(max_t_len_bw):
 			char_index = c2i.get(token_bw[inner_i], 0) if inner_i < len(token_bw) else 0
 			char_inputs_bw[i].append(char_index)
-
 	char_inputs_bw = np.array(char_inputs_bw)
 	char_inputs_bw = np.transpose(char_inputs_bw, (1, 0))
+	"""
 
 	word_lengths_fw = [len(tokens_fw[i]) if i < len(tokens_fw) else 0 for i in range(max_tokens)]
-	word_lengths_bw = [len(tokens_bw[i]) if i < len(tokens_bw) else 0 for i in range(max_tokens)]
-	return char_inputs_fw, word_lengths_fw, char_inputs_bw, word_lengths_bw, word_indices, encoded_tags
+	# word_lengths_bw = [len(tokens_bw[i]) if i < len(tokens_bw) else 0 for i in range(max_tokens)]
+	# return char_inputs_fw, word_lengths_fw, char_inputs_bw, word_lengths_bw, word_indices, encoded_tags
+	return char_inputs_fw, word_lengths_fw, word_indices, encoded_tags
 
 def char_encoding(config, graph, trans_len):
 	"""Create graph nodes for character encoding"""
@@ -269,10 +271,10 @@ def char_encoding(config, graph, trans_len):
 		# Character Embedding
 		word_lengths_fw = tf.placeholder(tf.int64, [None], name="word_lengths_fw")
 		word_lengths_fw = tf.gather(word_lengths_fw, tf.range(tf.to_int32(trans_len)))
-		word_lengths_bw = tf.placeholder(tf.int64, [None], name="word_lengths_bw")
-		word_lengths_bw = tf.gather(word_lengths_bw, tf.range(tf.to_int32(trans_len)))
+		# word_lengths_bw = tf.placeholder(tf.int64, [None], name="word_lengths_bw")
+		# word_lengths_bw = tf.gather(word_lengths_bw, tf.range(tf.to_int32(trans_len)))
 		char_inputs_fw = tf.placeholder(tf.int32, [None, max_tokens], name="char_inputs_fw")
-		char_inputs_bw = tf.placeholder(tf.int32, [None, max_tokens], name="char_inputs_bw")
+		# char_inputs_bw = tf.placeholder(tf.int32, [None, max_tokens], name="char_inputs_bw")
 		cembed_matrix = tf.Variable(
 			tf.random_uniform([len(c2i.keys()), config["ce_dim"]], -0.25, 0.25),
 			name="cembeds",
@@ -280,17 +282,18 @@ def char_encoding(config, graph, trans_len):
 			)
 
 		char_inputs_fw = tf.transpose(char_inputs_fw, perm=[1, 0])
-		char_inputs_bw = tf.transpose(char_inputs_bw, perm=[1, 0])
+		# char_inputs_bw = tf.transpose(char_inputs_bw, perm=[1, 0])
 		cembeds_fw = tf.nn.embedding_lookup(cembed_matrix, char_inputs_fw, name="ce_lookup_fw")
 		cembeds_fw = tf.gather(cembeds_fw, tf.range(tf.to_int32(trans_len)), name="actual_ce_lookup_fw")
 		cembeds_fw = tf.transpose(cembeds_fw, perm=[1, 0, 2])
 
-		cembeds_bw = tf.nn.embedding_lookup(cembed_matrix, char_inputs_bw, name="ce_lookup")
-		cembeds_bw = tf.gather(cembeds_bw, tf.range(tf.to_int32(trans_len)), name="actual_ce_lookup_bw")
-		cembeds_bw = tf.transpose(cembeds_bw, perm=[1, 0, 2])
+		# cembeds_bw = tf.nn.embedding_lookup(cembed_matrix, char_inputs_bw, name="ce_lookup")
+		# cembeds_bw = tf.gather(cembeds_bw, tf.range(tf.to_int32(trans_len)), name="actual_ce_lookup_bw")
+		# cembeds_bw = tf.transpose(cembeds_bw, perm=[1, 0, 2])
 		# Create LSTM for Character Encoding
-		fw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"], state_is_tuple=True)
-		bw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"], state_is_tuple=True)
+		# fw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"], state_is_tuple=True)
+		fw_lstm = tf.nn.rnn_cell.GRUCell(config["ce_dim"])
+		# bw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["ce_dim"], state_is_tuple=True)
 
 		# Encode Characters with LSTM
 		time_major = True
@@ -299,12 +302,13 @@ def char_encoding(config, graph, trans_len):
 			"sequence_length": word_lengths_fw,
 			"time_major": time_major
 		}
-
+		"""
 		options_bw = {
 			"dtype": tf.float32,
 			"sequence_length": word_lengths_bw,
 			"time_major": time_major
 		}
+		"""
 		#(output_fw, output_bw), _ = tf.nn.bidirectional_dynamic_rnn(
 		#	 fw_lstm, bw_lstm, cembeds, **options
 		#	)
@@ -314,6 +318,7 @@ def char_encoding(config, graph, trans_len):
 			with vs.variable_scope("FW") as fw_scope:
 				output_fw, output_state_fw = tf.nn.dynamic_rnn(fw_lstm, cembeds_fw, **options_fw)
 
+			"""
 			# Backward direction
 			if not time_major:
 				time_dim = 1
@@ -328,12 +333,13 @@ def char_encoding(config, graph, trans_len):
 				tmp, output_state_bw = tf.nn.dynamic_rnn(bw_lstm, inputs_reverse, **options_bw)
 		output_bw = array_ops.reverse_sequence(input=tmp, seq_lengths=word_lengths_bw,
 			seq_dim=time_dim, batch_dim=batch_dim)
-
+			"""
 		# TF code ends
 		output_fw = tf.transpose(output_fw, perm=[1, 0, 2])
-		output_bw = tf.transpose(output_bw, perm=[1, 0, 2])
+		# output_bw = tf.transpose(output_bw, perm=[1, 0, 2])
 
-		return output_fw, output_bw, word_lengths_fw, word_lengths_bw
+		# return output_fw, output_bw, word_lengths_fw, word_lengths_bw
+		return output_fw, word_lengths_fw
 
 def build_graph(config):
 	"""Build CNN"""
@@ -347,7 +353,8 @@ def build_graph(config):
 		trans_len = tf.placeholder(tf.int64, None, name="trans_length")
 		train = tf.placeholder(tf.bool, name="train")
 		tf.set_random_seed(config["seed"])
-		last_state, rev_last_state, word_lengths_fw, word_lengths_bw = char_encoding(config, graph, trans_len)
+		# last_state, rev_last_state, word_lengths_fw, word_lengths_bw = char_encoding(config, graph, trans_len)
+		last_state, word_lengths_fw = char_encoding(config, graph, trans_len)
 
 		# Word Embedding
 		word_inputs = tf.placeholder(tf.int32, [None], name="word_inputs")
@@ -367,16 +374,25 @@ def build_graph(config):
 
 		# Combine Embeddings
 		char_embeds = last_relevant(last_state, word_lengths_fw, "char_embeds")
-		rev_char_embeds = last_relevant(rev_last_state, word_lengths_bw, "rev_char_embeds")
+		# rev_char_embeds = last_relevant(rev_last_state, word_lengths_bw, "rev_char_embeds")
+		"""
 		combined_embeddings = tf.concat(
 			1,
 			[wembeds, char_embeds, tf.reverse(rev_char_embeds, [True, False])],
 			name="combined_embeddings"
 			)
+		"""
+		combined_embeddings = tf.concat(
+			1,
+			[wembeds, char_embeds],
+			name="combined_embeddings"
+			)
 
 		# Cells and Weights
-		fw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["h_dim"], state_is_tuple=True)
-		bw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["h_dim"], state_is_tuple=True)
+		# fw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["h_dim"], state_is_tuple=True)
+		fw_lstm = tf.nn.rnn_cell.GRUCell(config["h_dim"])
+		# bw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["h_dim"], state_is_tuple=True)
+		bw_lstm = tf.nn.rnn_cell.GRUCell(config["h_dim"])
 		fw_network = tf.nn.rnn_cell.MultiRNNCell([fw_lstm]*config["num_layers"], state_is_tuple=True)
 		bw_network = tf.nn.rnn_cell.MultiRNNCell([bw_lstm]*config["num_layers"], state_is_tuple=True)
 
@@ -470,16 +486,17 @@ def train_model(*args):
 			count += 1
 
 			tokens, tags = train[t_index]
-			char_inputs_fw, word_lengths_fw, char_inputs_bw, word_lengths_bw, word_indices, labels = trans_to_tensor(
+			# char_inputs_fw, word_lengths_fw, char_inputs_bw, word_lengths_bw, word_indices, labels = trans_to_tensor(
+			char_inputs_fw, word_lengths_fw, word_indices, labels = trans_to_tensor(
 				config, tokens, tags=tags
 				)
 
 			feed_dict = {
 				get_tensor(graph, "char_inputs_fw:0") : char_inputs_fw,
-				get_tensor(graph, "char_inputs_bw:0") : char_inputs_bw,
+				# get_tensor(graph, "char_inputs_bw:0") : char_inputs_bw,
 				get_tensor(graph, "word_inputs:0") : word_indices,
 				get_tensor(graph, "word_lengths_fw:0") : word_lengths_fw,
-				get_tensor(graph, "word_lengths_bw:0") : word_lengths_bw,
+				# get_tensor(graph, "word_lengths_bw:0") : word_lengths_bw,
 				get_tensor(graph, "trans_length:0"): len(tokens),
 				get_tensor(graph, "y:0"): labels,
 				get_tensor(graph, "train:0"): True
@@ -572,17 +589,18 @@ def evaluate_testset(config, graph, sess, test):
 
 		tokens, tags = item
 		num_merchant += sum([1 for item in tags if item == "merchant"])
-		char_inputs_fw, word_lengths_fw, char_inputs_bw, word_lengths_bw, word_indices, labels = trans_to_tensor(
+		# char_inputs_fw, word_lengths_fw, char_inputs_bw, word_lengths_bw, word_indices, labels = trans_to_tensor(
+		char_inputs_fw, word_lengths_fw, word_indices, labels = trans_to_tensor(
 			config, tokens, tags=tags
 			)
 		total_count += len(tokens)
 
 		feed_dict = {
 			get_tensor(graph, "char_inputs_fw:0") : char_inputs_fw,
-			get_tensor(graph, "char_inputs_bw:0") : char_inputs_bw,
+			# get_tensor(graph, "char_inputs_bw:0") : char_inputs_bw,
 			get_tensor(graph, "word_inputs:0") : word_indices,
 			get_tensor(graph, "word_lengths_fw:0") : word_lengths_fw,
-			get_tensor(graph, "word_lengths_bw:0") : word_lengths_bw,
+			# get_tensor(graph, "word_lengths_bw:0") : word_lengths_bw,
 			get_tensor(graph, "trans_length:0"): len(tokens),
 			get_tensor(graph, "train:0"): False
 		}
