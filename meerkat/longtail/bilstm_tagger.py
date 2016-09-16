@@ -51,7 +51,7 @@ import tensorflow as tf
 from tensorflow.python.client import timeline
 
 from meerkat.classification.tools import reverse_map, get_tensor, get_op
-from meerkat.classification.tools import weight_variable, bias_variable
+from meerkat.classification.tools import conv2d, max_pool, weight_variable, bias_variable
 from meerkat.various_tools import load_params, load_piped_dataframe
 
 logging.basicConfig(level=logging.INFO)
@@ -246,10 +246,10 @@ def char_encoding(config, graph, trans_len):
 		b_conv = bias_variable([cnn_out_width], kernel_width * config["ce_dim"])
 
 		# Apply Convolution
-		conv_out = tf.nn.conv2d(cembeds, w_conv, strides=[1, 1, 1, 1], padding='VALID') + b_conv
+		conv_out = conv2d(cembeds, w_conv) + b_conv
 
 		# Apply Pooling
-		encoded_chars = tf.nn.max_pool(conv_out, ksize=[1, 1, kernel_width, 1], strides=[1, 1, kernel_width, 1], padding='VALID')
+		encoded_chars = tf.nn.max_pool(conv_out, ksize=[1, 1, 7, 1], strides=[1, 1, 7, 1], padding='VALID')
 
 		return tf.squeeze(encoded_chars, squeeze_dims=[1, 2], name="encoded_chars")
 
@@ -265,6 +265,7 @@ def build_graph(config):
 		trans_len = tf.placeholder(tf.int64, None, name="trans_length")
 		train = tf.placeholder(tf.bool, name="train")
 		encoded_chars = char_encoding(config, graph, trans_len)
+		encoded_chars = tf.clip_by_value(encoded_chars, 1e-10, 1.0)
 
 		# Word Embedding
 		word_inputs = tf.placeholder(tf.int32, [None], name="word_inputs")
@@ -335,7 +336,7 @@ def build_graph(config):
 		# Calculate Loss and Optimize
 		labels = tf.placeholder(tf.float32, shape=[None, len(config["tag_map"].keys())], name="y")
 		loss = tf.neg(tf.reduce_sum(network * labels), name="loss")
-		optimizer = tf.train.MomentumOptimizer(config["learning_rate"], 0.9).minimize(loss, name="optimizer")
+		optimizer = tf.train.GradientDescentOptimizer(config["learning_rate"]).minimize(loss, name="optimizer")
 
 		saver = tf.train.Saver()
 
