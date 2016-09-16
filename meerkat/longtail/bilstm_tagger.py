@@ -203,7 +203,7 @@ def trans_to_tensor(config, tokens, tags=None):
 	for i in range(len(tokens)):
 
 		# Get Char Indices
-		token = tokens[i]
+		token = tokens[i][0:max_wl]
 		char_indices = [c2i.get(c, 1) for c in token]
 
 		# Pad Token
@@ -249,9 +249,9 @@ def char_encoding(config, graph, trans_len):
 		conv_out = conv2d(cembeds, w_conv) + b_conv
 
 		# Apply Pooling
-		encoded_chars = max_pool(conv_out)
+		encoded_chars = tf.nn.max_pool(conv_out, ksize=[1, 1, 7, 1], strides=[1, 1, 7, 1], padding='VALID')
 
-		return tf.squeeze(encoded_chars, name="encoded_chars")
+		return tf.squeeze(encoded_chars, squeeze_dims=[1, 2], name="encoded_chars")
 
 def build_graph(config):
 	"""Build CNN"""
@@ -276,8 +276,7 @@ def build_graph(config):
 		wembeds = tf.nn.embedding_lookup(wembed_matrix, word_inputs, name="we_lookup")
 
 		# Combine Embeddings
-		#combined_embeds = tf.concat(1, [wembeds, encoded_chars], name="combined_embeds")
-		combined_embeds = wembeds
+		combined_embeds = tf.concat(1, [wembeds, encoded_chars], name="combined_embeds")
 
 		# Cells and Weights
 		fw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["h_dim"], state_is_tuple=True)
@@ -409,12 +408,10 @@ def train_model(*args):
 					sys.exit()
 
 			# Run Training Step
-			optimizer_out, loss, ec = sess.run(
-				[get_op(graph, "optimizer"), get_tensor(graph, "loss:0"), get_tensor(graph, "encoded_chars:0")],
+			optimizer_out, loss, ec, we = sess.run(
+				[get_op(graph, "optimizer"), get_tensor(graph, "loss:0"), get_tensor(graph, "encoded_chars:0"), get_tensor(graph, "we_lookup:0")],
 				feed_dict=feed_dict
 			)
-
-			print(ec.shape)
 
 			total_loss += loss
 			total_tagged += len(tokens)
