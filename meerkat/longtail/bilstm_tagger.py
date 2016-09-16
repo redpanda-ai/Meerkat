@@ -240,6 +240,7 @@ def char_encoding(config, graph, trans_len):
 		# Lookup Embeddings
 		cembeds = tf.nn.embedding_lookup(cembed_matrix, char_inputs, name="ce_lookup")
 		cembeds = tf.expand_dims(cembeds, 1)
+		cembeds = tf.nn.dropout(cembeds, 0.5)
 
 		# Encoder Weights and Biases
 		w_conv = weight_variable(config, [1, kernel_width, config["ce_dim"], cnn_out_width])
@@ -357,6 +358,9 @@ def train_model(*args):
 	train = config["train"]
 	train_index = list(range(len(train)))
 
+	# Save W2I
+	w2i_to_json(config["w2i"], model_dir)
+
 	# Initialize Word Embeddings
 	sess.run(
 		get_op(graph, "assign_wembed"),
@@ -451,7 +455,7 @@ def train_model(*args):
 	logging.info("Moving final meta file from {0} to {1}.".format(best_model_path+".meta", final_meta_path))
 	shutil.rmtree(checkpoints_dir)
 	logging.info("Removing checkpoint files at " + checkpoints_dir)
-	w2i_to_json(config["w2i"], model_dir)
+	#w2i_to_json(config["w2i"], model_dir)
 
 	return final_model_path
 
