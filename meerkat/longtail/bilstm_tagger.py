@@ -51,7 +51,7 @@ import tensorflow as tf
 from tensorflow.python.client import timeline
 
 from meerkat.classification.tools import reverse_map, get_tensor, get_op
-from meerkat.classification.tools import conv2d, max_pool, weight_variable, bias_variable
+from meerkat.classification.tools import weight_variable, bias_variable
 from meerkat.various_tools import load_params, load_piped_dataframe
 
 logging.basicConfig(level=logging.INFO)
@@ -233,7 +233,7 @@ def char_encoding(config, graph, trans_len):
 		word_lengths = tf.gather(word_lengths, tf.range(tf.to_int32(trans_len)))
 		char_inputs = tf.placeholder(tf.int32, [None, max_wl], name="char_inputs")
 		cembed_matrix = tf.Variable(
-			tf.random_uniform([len(c2i.keys()), config["ce_dim"]], -0.25, 0.25),
+			tf.random_uniform([len(c2i.keys()), config["ce_dim"]], -0.5, 0.5),
 			name="cembeds"
 		)
 
@@ -246,10 +246,10 @@ def char_encoding(config, graph, trans_len):
 		b_conv = bias_variable([cnn_out_width], kernel_width * config["ce_dim"])
 
 		# Apply Convolution
-		conv_out = conv2d(cembeds, w_conv) + b_conv
+		conv_out = tf.nn.conv2d(cembeds, w_conv, strides=[1, 1, 1, 1], padding='VALID') + b_conv
 
 		# Apply Pooling
-		encoded_chars = tf.nn.max_pool(conv_out, ksize=[1, 1, 7, 1], strides=[1, 1, 7, 1], padding='VALID')
+		encoded_chars = tf.nn.max_pool(conv_out, ksize=[1, 1, kernel_width, 1], strides=[1, 1, kernel_width, 1], padding='VALID')
 
 		return tf.squeeze(encoded_chars, squeeze_dims=[1, 2], name="encoded_chars")
 
@@ -277,6 +277,7 @@ def build_graph(config):
 
 		# Combine Embeddings
 		combined_embeds = tf.concat(1, [wembeds, encoded_chars], name="combined_embeds")
+		#combined_embeds = wembeds
 
 		# Cells and Weights
 		fw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["h_dim"], state_is_tuple=True)
@@ -334,7 +335,7 @@ def build_graph(config):
 		# Calculate Loss and Optimize
 		labels = tf.placeholder(tf.float32, shape=[None, len(config["tag_map"].keys())], name="y")
 		loss = tf.neg(tf.reduce_sum(network * labels), name="loss")
-		optimizer = tf.train.GradientDescentOptimizer(config["learning_rate"]).minimize(loss, name="optimizer")
+		optimizer = tf.train.MomentumOptimizer(config["learning_rate"], 0.9).minimize(loss, name="optimizer")
 
 		saver = tf.train.Saver()
 
@@ -408,8 +409,8 @@ def train_model(*args):
 					sys.exit()
 
 			# Run Training Step
-			optimizer_out, loss, ec, we = sess.run(
-				[get_op(graph, "optimizer"), get_tensor(graph, "loss:0"), get_tensor(graph, "encoded_chars:0"), get_tensor(graph, "we_lookup:0")],
+			optimizer_out, loss = sess.run(
+				[get_op(graph, "optimizer"), get_tensor(graph, "loss:0")],
 				feed_dict=feed_dict
 			)
 
