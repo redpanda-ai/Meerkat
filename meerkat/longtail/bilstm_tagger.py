@@ -44,12 +44,14 @@ import random
 import json
 import sys
 import shutil
+import math
 
 import numpy as np
 import tensorflow as tf
 from tensorflow.python.client import timeline
 
-from meerkat.classification.tools import reverse_map, get_tensor, get_op, conv2d, max_pool
+from meerkat.classification.tools import reverse_map, get_tensor, get_op
+from meerkat.classification.tools import conv2d, max_pool, weight_variable, bias_variable
 from meerkat.various_tools import load_params, load_piped_dataframe
 
 logging.basicConfig(level=logging.INFO)
@@ -229,7 +231,7 @@ def char_encoding(config, graph, trans_len):
 		# Character Embedding
 		word_lengths = tf.placeholder(tf.int64, [None], name="word_lengths")
 		word_lengths = tf.gather(word_lengths, tf.range(tf.to_int32(trans_len)))
-		char_inputs = tf.placeholder(tf.int32, [None, max_tokens], name="char_inputs")
+		char_inputs = tf.placeholder(tf.int32, [None, max_wl], name="char_inputs")
 		cembed_matrix = tf.Variable(
 			tf.random_uniform([len(c2i.keys()), config["ce_dim"]], -0.25, 0.25),
 			name="cembeds"
@@ -249,7 +251,7 @@ def char_encoding(config, graph, trans_len):
 		# Apply Pooling
 		encoded_chars = max_pool(conv_out)
 
-		return encoded_chars
+		return tf.squeeze(encoded_chars, name="encoded_chars")
 
 def build_graph(config):
 	"""Build CNN"""
@@ -272,10 +274,10 @@ def build_graph(config):
 		embed_placeholder = tf.placeholder(tf.float32, embed_shape, name="embed_placeholder")
 		assign_wembed = tf.assign(wembed_matrix, embed_placeholder, name="assign_wembed")
 		wembeds = tf.nn.embedding_lookup(wembed_matrix, word_inputs, name="we_lookup")
-		wembeds = tf.identity(wembeds, name="actual_we_lookup")
 
 		# Combine Embeddings
-		combined_embeds = tf.concat(1, [wembeds, encoded_chars], name="combined_embeds")
+		#combined_embeds = tf.concat(1, [wembeds, encoded_chars], name="combined_embeds")
+		combined_embeds = wembeds
 
 		# Cells and Weights
 		fw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["h_dim"], state_is_tuple=True)
@@ -407,10 +409,12 @@ def train_model(*args):
 					sys.exit()
 
 			# Run Training Step
-			optimizer_out, loss = sess.run(
-				[get_op(graph, "optimizer"), get_tensor(graph, "loss:0")],
+			optimizer_out, loss, ec = sess.run(
+				[get_op(graph, "optimizer"), get_tensor(graph, "loss:0"), get_tensor(graph, "encoded_chars:0")],
 				feed_dict=feed_dict
 			)
+
+			print(ec.shape)
 
 			total_loss += loss
 			total_tagged += len(tokens)

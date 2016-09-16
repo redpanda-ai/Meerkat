@@ -18,6 +18,7 @@
 	"seed": 1512141834,
 	"profile_session": false,
 	"use_cpu": true,
+	"randomize": 5e-2,
 	"we_dim": 64,
 	"h_dim": 100,
 	"eras": 30
