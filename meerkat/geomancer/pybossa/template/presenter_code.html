@@ -2,99 +2,98 @@
 	<div id="skeleton" class="col-md-12">
 		<h2>Geomancer Project</h2>
 		<p>DESCRIPTION : <b><span id="question_holder"></span></b></p>
-		<div id="locationField">
-			Manual Entry:
-      		<input id="autocomplete" placeholder="The address you selected" onFocus="geolocate()" type="text" style="width: 400px;margin-bottom:15px"></input>
-    	</div>
-		<p>Full Address Fields :
-			<img id='lockRotate' src='http://52.37.199.197/geo_lock.png' data-swap='http://52.37.199.197/geo_unlock.png' />
-			<input type="text" id="locality" placeholder="type city here">
-			<input type="text" id="administrative_area_level_1" placeholder="type state here" maxlength="2">
-			<input type="text" id="postal_code" placeholder="type zipcode here" maxlength="5">
-		</p>
-		<p>
-			<input type="text" id="street_number" placeholder="type street number here" style="width: 200px">
-			<input type="text" id="route" placeholder="type street name here" style="width: 250px">
-		</p>
-        <p>Store Number :
-			<input type="text" id="answerBoxStoreNumber" placeholder="type store number here" style="width: 300px;">
-		</p>
-		<p>
-		    <button id="validate" class="btn btn-primary">Validate</button>
-			<button id="save" class="btn btn-primary">Save Answer</button>
-			<button id="idk" class="btn btn-primary">I don't know</button>
-			<button id="not_in_us" class="btn btn-primary">Not in US</button>
-			<!--button id="comment" class="btn btn-primary">Comment</button-->
-		</p>
+		<div id='select_type'>			
+			<p>
+				<input type='radio' id='select_geo_address' name='type' value='1'/> Select Geography
+				<input id="autocomplete" placeholder="Manual Entry Geography" onFocus="geolocate()" type="text" style="width: 400px;margin-left:35px"></input>
+			</p>
+			<img id='lockRotate' width="30" height="30" src='http://52.37.199.197/geo_lock.png' />    		
+
+    		<div id="address_fields" style="width: 600px;padding-top:10px;padding-left:10px;border-width:2px;border-style: solid;border-color:#E41D25">
+    			<p>
+					Street address <input type="text" id="street_number" style="width: 180px;margin-left:10px">
+					<input type="text" id="route" style="width: 250px;margin-left:5px">
+				</p> 
+				<p>			
+					City <input type="text" class="validation_fields" id="locality" style="width:158px;margin-left:10px;margin-right:10px">
+					State <input type="text" class="validation_fields" id="administrative_area_level_1" maxlength="2" style="width:100px;margin-left:10px;margin-right:10px">
+					Zipcode <input type="text" class="validation_fields" id="postal_code" maxlength="5" style="width:100px;margin-left:10px;margin-right:10px">
+				</p>
+			</div>
+			<div id="store_number_box" style="margin-top:20px;width:600px;padding-top:10px;padding-left:10px;border-width:2px;border-style:solid;border-color:#E41D25">
+				<p>
+        			<input type='radio' id='select_store_number' name='type' value='2'/> Select Store Number
+					<input type="text" class="validation_fields" id="store_number" placeholder="Manual Entry store number" style="width: 250px;margin-left:15px">
+				</p>
+			</div>
+		</div>
+		<div style="margin-top:20px">
+			<p>
+				<button id="save" class="btn btn-primary">Save Answer</button>
+				<button id="idk" class="btn btn-primary">I don't know</button>
+				<button id="not_in_us" class="btn btn-primary">Not in US</button>
+				<button id="start_over" class="btn btn-primary">Start Over</button>
+			</p>
+		</div>
 	</div>
 
 	<div>
 		<p id="finish" class="alert alert-success" style="display:none;">Congratulations! You have participated in all available tasks!</p>
 		<p id="success" style="display:none;">Well done! Your answer has been saved</p>
-		<p id="valid" style="display:none;">Cool! Your answer is valid</p>
 	</div>
 
 	<iframe
-        id="iframe_map" width="650" height="450" frameborder="0" style="border:0"
+        id="iframe_map" width="650" height="450" frameborder="0" style="border:0; margin-top:10px"
         src="http://52.37.199.197/cat.jpg" allowfullscreen>
     </iframe> 
 </div>
-<script type="text/javascript">
-    function getSelectedText() {
-        var text = "";
-        if (typeof window.getSelection != "undefined") {
-            text = window.getSelection().toString();
-        } else if (typeof document.selection != "undefined" && document.selection.type == "Text") {
-            text = document.selection.createRange().text;
-        }
-        return text;
-    }
 
+<script type="text/javascript">
+	//Variables
+	var locked = true;
+	var isValidState = true;
+	var isValidCity = true;
+	var isValidZipcode = true;
+	var isValidStoreNumber = true;
+	var allow_save = false;
+	var passValidation = false;
+	var lockImage = 'http://52.37.199.197/geo_lock.png';
+	var unlockImage = 'http://52.37.199.197/geo_unlock.png'
+	var maps = {};
+
+	//Functions
     function doSomethingWithSelectedText() {
         var selectedText = getSelectedText();
-        if (selectedText) {      	
-            console.log("Got selected text " + selectedText);
-            $("#autocomplete").on('input',function() {console.log("Change detected!");});
-            $('#autocomplete').val(selectedText);
-             console.log( "before trigger" + $( "#autocomplete" ).val() );
-            $('#autocomplete').trigger("change");
-            console.log( "after trigger" + $( "#autocomplete" ).val() );
-            //$('#autocomplete').focus();
-            //Update the address, perhaps even remove the old value
-            //Reset all form fields
-          	$("#locality").val("");
-          	$('#locality').focus();
-			$("#administrative_area_level_1").val("");
-			$('#administrative_area_level_1').focus();
-			$("#postal_code").val("");
-			$('#postal_code').focus();
-			$("#street_number").val("");  
-			$('#street_number').focus();
-			$("#route").val("");
-			$('#route').focus();
-			//You must return focus to #autocomplete to get the search box moving
-            $('#autocomplete').focus();
+        if (selectedText) {      
+        	if($("#select_geo_address").is(":checked")) {
+            	$('#autocomplete').val(selectedText);
+            	$('#autocomplete').trigger("change");
+            	//Update the address, perhaps even remove the old value
+            	//Reset all form fields
+          		$("#locality").val("");
+          		$('#locality').focus();
+				$("#administrative_area_level_1").val("");
+				$('#administrative_area_level_1').focus();
+				$("#postal_code").val("");
+				$('#postal_code').focus();
+				$("#street_number").val("");  
+				$('#street_number').focus();
+				$("#route").val("");
+				$('#route').focus();
+				//You must return focus to #autocomplete to get the search box moving
+            	$('#autocomplete').focus();
+        	} else {
+				console.log("Got selected store " + selectedText);
+				$('#store_number').val(selectedText);
+				// want to validate store number
+				$('#store_number').trigger("change");
+        	}
         }
-    }
-    
-    function initAutocomplete() {
-        // Create the autocomplete object, restricting the search to geographical
-        // location types.
-        autocomplete = new google.maps.places.Autocomplete(
-            /** @type {!HTMLInputElement} */(document.getElementById('autocomplete')),
-            {types: ['geocode']});
-
-        // When the user selects an address from the dropdown, populate the address
-        // fields in the form.
-        autocomplete.addListener('place_changed', fillInAddress);
-    }
+    } 
 
     function fillInAddress() {
         // Get the place details from the autocomplete object.
-        if (!locked) {
-        	$('#lockRotate').focus();
-        	$('#lockRotate').trigger("click");
-        }
+        lockParameterized("lock");
         var place = autocomplete.getPlace();
         // Can we call the function to update all of the form fields??
         console.log(place);
@@ -103,13 +102,12 @@
         } else {
         	for (var component in componentForm) {
           		document.getElementById(component).value = '';
-          		//document.getElementById(component).disabled = false;
         	}
 
         	// Get each component of the address from the place details
         	// and fill the corresponding field on the form.
         	var isStreetName = false;
-        	for (var i = 0; i < place.address_components.length; i++) {
+        	for (var i = place.address_components.length - 1; i >= 0; i--) {
           		var addressType = place.address_components[i].types[0];
           		if (componentForm[addressType]) {
             		var val = place.address_components[i][componentForm[addressType]];
@@ -118,11 +116,34 @@
           		if (addressType == "route") {
           			isStreetName = true;
           		}
+          		if (addressType == "administrative_area_level_1") {
+					$('#administrative_area_level_1').trigger("change");
+          		}
+          		if (addressType == "locality") {
+					$('#locality').trigger("change");
+          		}
+          		if (addressType == "postal_code") {
+					$('#postal_code').trigger("change");
+          		}
         	}
-        	if (isStreetName) {
-        		console.log("has street address, call api");
 
-          		var query = "https://www.google.com/maps/embed/v1/place?key=AIzaSyD3DDwlANN20mbepZow2SIhLjZPMwBI_84&zoom=24&&maptype=satellite&q=place_id:";
+			if($("#locality").val().length != 0 && $("#administrative_area_level_1").val().length != 0) {
+				$("#select_store_number").attr("disabled", false);
+				$("#store_number").attr("disabled", false);
+				$("#store_number_box").css('border-color', '#FDC606');
+			}
+
+        	if (isStreetName) {
+        		console.log("has street address, call embed api");
+        		var key_index = (Math.floor(Math.random() * 2) + 1).toString();
+				console.log("embed api - key index" + key_index);
+				var key_map =  {
+					"1": "AIzaSyDH0VXC9bEbt8ajPZGmVBq2p8Zl9_zWOm0",
+					"2": "AIzaSyD3DDwlANN20mbepZow2SIhLjZPMwBI_84"
+				}
+				var embed_api_key = key_map[key_index];
+				console.log(embed_api_key);
+          		var query = "https://www.google.com/maps/embed/v1/place?key=" + embed_api_key + "&zoom=24&&maptype=satellite&q=place_id:";
           		place_id = place.place_id;
           		console.log(place_id);
           		query = query + place_id;
@@ -130,13 +151,11 @@
         		$("#iframe_map").attr('src', query);
         	} else {
             //Reset embed to cat picture
-            console.log("No street, adding a cat");
+            console.log("No street address, adding a cat");
             img_url = "http://52.37.199.197/cat.jpg";
         	$("#iframe_map").attr('src', img_url);
         	$("#iframe_map").focus();      		
         	}
-        	
-
     	}
     }
 
@@ -158,6 +177,204 @@
         }
     }
 
+    function getSelectedText() {
+        var text = "";
+        if (typeof window.getSelection != "undefined") {
+            text = window.getSelection().toString();
+        } else if (typeof document.selection != "undefined" && document.selection.type == "Text") {
+            text = document.selection.createRange().text;
+        }
+        return text;
+    }
+
+
+    function initAutocomplete() {
+        // Create the autocomplete object, restricting the search to geographical
+        // location types.
+        autocomplete = new google.maps.places.Autocomplete(
+            /** @type {!HTMLInputElement} */(document.getElementById('autocomplete')),
+            {types: ['geocode']});
+
+        // When the user selects an address from the dropdown, populate the address
+        // fields in the form.
+        autocomplete.addListener('place_changed', fillInAddress);
+    }
+
+	function initialize() {
+		img_url = "http://52.37.199.197/cat.jpg";
+    	$("#iframe_map").attr('src', img_url);
+
+		$("#autocomplete").val("");
+		$("#store_number").val("");
+		lockParameterized("lock");
+
+		$("#store_number").css({"border": "", "background": ""});
+		$("#street_number").css({"border": "","background": ""});
+		$("#route").css({"border": "","background": ""});
+
+		isValidState = true;
+		isValidCity = true;
+		isValidZipcode = true;
+		isValidStoreNumber = true;
+		passValidation = false;
+
+    	$("#select_geo_address").prop("checked", true);
+    	$("#select_store_number").attr("disabled", true);
+    	$("#store_number").attr("disabled", true);
+    	$("#store_number_box").css('border-color', '#E41D25');
+
+    	save_or_cancel = "save";
+		allow_save = false;
+	}
+
+	function lockClear() {
+		$("#administrative_area_level_1").css({"border": "","background": ""});
+		$("#locality").css({"border": "","background": ""});
+		$("#postal_code").css({"border": "","background": ""});		
+		$("#locality").val("");
+		$("#administrative_area_level_1").val("");
+		$("#postal_code").val("");
+		$("#street_number").val("");
+		$("#route").val("");		
+	}
+
+	function lockParameterized(lock_or_unlock) {
+		//Assume anything other than unlock
+		locked = true;
+		border_color = "#E41D25";
+		placeholder = "";
+		icon = lockImage;
+		if (lock_or_unlock == "unlock") {
+			locked = false;
+			border_color = "#FDC606";
+			placeholder = "Enter a value"
+			icon = unlockImage;
+		}
+		//Set values
+     	$("#address_fields").css('border-color', border_color);
+     	$("#locality").prop('disabled', locked);
+		$("#administrative_area_level_1").prop('disabled', locked);
+		$("#postal_code").prop("disabled", locked);
+		$("#street_number").prop("disabled", locked);
+		$("#route").prop("disabled", locked);
+
+		$("#street_number").attr("placeholder", placeholder);
+		$("#route").attr("placeholder", placeholder);
+		$("#locality").attr("placeholder", placeholder);
+		$("#administrative_area_level_1").attr("placeholder", placeholder);
+		$("#postal_code").attr("placeholder", placeholder);	
+
+		lockClear();
+		//Set icon src
+		$("#lockRotate").attr("src", icon);
+	}
+
+	$.ajax({
+		url: "http://52.37.199.197/dictionaries/Walgreens/geo.json",
+		dataType: 'jsonp',
+		jsonpCallback: 'callback0',
+		success: function(data) {
+			console.log(data);
+			maps = data;
+		}
+	});
+
+	var store1 = {};
+	$.ajax({
+		url: "http://52.37.199.197/dictionaries/Walgreens/store_id_1.json",
+		dataType: 'jsonp',
+		jsonpCallback: 'callback1',
+		success: function(data) {
+			console.log(data);
+			store1 = data;
+		}
+	});
+
+	var store2 = {};
+	$.ajax({
+		url: "http://52.37.199.197/dictionaries/Walgreens/store_id_2.json",
+		dataType: 'jsonp',
+		jsonpCallback: 'callback2',
+		success: function(data) {
+			//console.log(data);
+			store2 = data;
+		}
+	});
+ 
+	$('.validation_fields').each(function() {
+   		var elem = $(this);
+   		
+   		elem.data('oldVal', elem.val());
+
+   		elem.bind("propertychange change click keyup input paste", function(event){
+      		if (elem.data('oldVal') != elem.val()) {
+      			elem.data('oldVal', elem.val());
+
+				isValidState = true;
+				isValidCity = true;
+				sValidZipcode = true;
+				isValidStoreNumber = true;
+				allow_save = false;
+
+       			var answer_state = $.trim($("#administrative_area_level_1").val().toUpperCase());
+				var answer_city = $.trim($("#locality").val().toUpperCase());
+				var answer_zipcode = $("#postal_code").val().toUpperCase();
+				var answer_storenumber = $("#store_number").val().replace(/^0+/, '');
+
+				var instore1 = ((answer_storenumber.length != 0) && (answer_storenumber in store1) &&
+					(store1[answer_storenumber][0] == answer_city) && (store1[answer_storenumber][1] == answer_state))
+				var instore2 = ((answer_storenumber.length != 0) && (answer_storenumber in store2) &&
+					(store2[answer_storenumber][0] == answer_city) && (store2[answer_storenumber][1] == answer_state))
+
+				if (answer_state.length > 0 || answer_city.length > 0 || answer_zipcode.length > 0 || answer_storenumber.length > 0) {
+					allow_save = true;
+					save_or_cancel = "save";
+				} else {
+					allow_save = false;
+					save_or_cancel = "cancel";
+				}
+				if (!(answer_state in maps)) {
+					isValidState = false;
+					$("#administrative_area_level_1").css({"border": "1px solid red", "background": "#FFCECE"});
+				} else if (!(answer_city in maps[answer_state])) {
+					isValidCity = false;
+					$("#administrative_area_level_1").css({"border": "", "background": ""});
+					$("#locality").css({"border": "1px solid red", "background": "#FFCECE"});	
+				} else if ((maps[answer_state][answer_city].indexOf(answer_zipcode) == -1) && (answer_zipcode.length != 0)) {
+					isValidZipcode = false;
+					$("#administrative_area_level_1").css({"border": "", "background": ""});
+					$("#locality").css({"border": "", "background": ""});
+					$("#postal_code").css({"border": "1px solid red", "background": "#FFCECE"});
+				} else if ((answer_storenumber.length != 0) && (!(instore1 || instore2))) {
+					isValidStoreNumber = false;
+					$("#administrative_area_level_1").css({"border": "","background": ""});
+					$("#locality").css({"border": "", "background": ""});
+					$("#postal_code").css({"border": "", "background": ""});
+					$("#store_number").css({"border": "1px solid red", "background": "#FFCECE"});		
+				} else {
+					$("#administrative_area_level_1").css({"border": "", "background": ""});
+					$("#locality").css({"border": "", "background": ""});
+					$("#postal_code").css({"border": "", "background": ""});
+					$("#store_number").css({"border": "", "background": ""});
+				}
+     		}
+     		if (isValidState == false || isValidCity == false || isValidZipcode == false || isValidStoreNumber == false) {
+				passValidation = false;
+			} else {
+				passValidation = true;
+			}
+   		});
+   	});
+
+	//This function locks and unlocks the "full address fields"
+ 	$("#lockRotate").click(function() {  
+     	if (locked) {
+     		lockParameterized("unlock");
+     	} else {
+     		lockParameterized("lock");
+     	}
+	});  
+
     document.onmouseup = doSomethingWithSelectedText;
     document.onkeyup = doSomethingWithSelectedText;
 
@@ -170,228 +387,65 @@
         postal_code: 'short_name'
     };
 
-    
-  
-var maps = {};
-$.ajax({
-	url: "http://52.37.199.197/dictionaries/AutoZone/geo.json",
-	dataType: 'jsonp',
-	jsonpCallback: 'callback0',
-	success: function(data) {
-		//console.log(data);
-		maps = data;
-	}
-});
-
-var store1 = {};
-$.ajax({
-	url: "http://52.37.199.197/dictionaries/AutoZone/store_id_1.json",
-	dataType: 'jsonp',
-	jsonpCallback: 'callback1',
-	success: function(data) {
-		//console.log(data);
-		store1 = data;
-	}
-});
-
-var store2 = {};
-$.ajax({
-	url: "http://52.37.199.197/dictionaries/AutoZone/store_id_2.json",
-	dataType: 'jsonp',
-	jsonpCallback: 'callback2',
-	success: function(data) {
-		//console.log(data);
-		store2 = data;
-	}
-});
-
 pybossa.taskLoaded(function(task, deferred){
 	deferred.resolve(task);
 });
-var locked = true;
+
 pybossa.presentTask(function(task, deferred){
+
 	if (!$.isEmptyObject(task)) {
-		img_url = "http://52.37.199.197/cat.jpg";
-        $("#iframe_map").attr('src', img_url);
+		// Initial states
+		var answer = {};
+		initialize();
 
-		$("#autocomplete").val("");
-		$("#locality").val("");
-		$("#administrative_area_level_1").val("");
-		$("#postal_code").val("");
-		$("#answerBoxStoreNumber").val("");
-		$("#street_number").val("");
-		$("#route").val("");
-
-		$("#locality").prop('disabled', true);
-		$("#administrative_area_level_1").prop('disabled', true);
-		$("#postal_code").prop("disabled", true);
-		$("#street_number").prop("disabled", true);
-		$("#route").prop("disabled", true);
-
-		$("#locality").css({
-			"border": "",
-			"background": ""
-		});
-		$("#administrative_area_level_1").css({
-			"border": "",
-			"background": ""
-		});
-		$("#postal_code").css({
-			"border": "",
-			"background": ""
-		});
-		$("#answerBoxStoreNumber").css({
-			"border": "",
-			"background": ""
-		});
-		$("#street_number").css({
-			"border": "",
-			"background": ""
-		});
-		$("#route").css({
-			"border": "",
-			"background": ""
-		});
-
-		//This function locks and unlocks the "full address fields"
- 		$("#lockRotate").click(function() { 
-       		var _this = $(this);
-       		var current = _this.attr("src");
-       		var swap = _this.attr("data-swap");     
-     		_this.attr('src', swap).attr("data-swap",current);   
-     		if (locked) {
-     			locked = false;
-     			$("#locality").prop('disabled', false);
-				$("#administrative_area_level_1").prop('disabled', false);
-				$("#postal_code").prop("disabled", false);
-				$("#street_number").prop("disabled", false);
-				$("#route").prop("disabled", false);
-     		} else {
-     			locked = true;
-     			$("#locality").prop('disabled', true);
-				$("#administrative_area_level_1").prop('disabled', true);
-				$("#postal_code").prop("disabled", true);
-				$("#street_number").prop("disabled", true);
-				$("#route").prop("disabled", true);
-				$("#locality").val("");
-				$("#administrative_area_level_1").val("");
-				$("#postal_code").val("");
-				$("#street_number").val("");
-				$("#route").val("");
-     		}
-		});  
-
-		$("#question_holder").text(task.info['question']);
-
-		var validAnswer = {};
-		var passValidation = false;
+		$("#question_holder").text(task.info['question']);		
+		
         $("#save").off('click').on('click', function(evt) {
-			if (!passValidation) {
-				if (locked) {
-        			$('#lockRotate').focus();
-        			$('#lockRotate').trigger("click");
-        		}
+
+        	if (!allow_save) {
+        		save_or_cancel = "cancel";
+        		window.alert("You must do one of the following to continue:\n 1. Fill in some data.\n 2. Click I don't know.\n 3. Click Not in US");
+        	} else if (!passValidation) {
+				//Provide an opportunity to save invalid data
+				lockParameterized("unlock");
+				if (confirm("Do you want to save custom changes that do not appear to validate?") == true) {
+        			save_or_cancel = "save";
+    			} else {
+        			save_or_cancel = "cancel";
+    			}
 			} 
-			validAnswer["locked"] = locked;
-			pybossa.saveTask(task.id, validAnswer).done(function() {
-				$("#success").fadeIn();
-				setTimeout(function() {
-					$("#success").hide();
-					deferred.resolve(task);
-				}, 1500);
-			});
+        	answer = {
+        		"city": $.trim($("#locality").val().toUpperCase()),
+        		"state": $.trim($("#administrative_area_level_1").val().toUpperCase()),
+        		"zipcode": $("#postal_code").val().toUpperCase(),
+        		"not_in_us": false,
+        		"storenumber": $("#store_number").val().replace(/^0+/, ''),
+        		"streetaddress": $.trim( $("#street_number").val().toUpperCase() + $("#route").val().toUpperCase()),
+        		"locked": locked
+        	};
+        	console.log(save_or_cancel);
+			//Save if necessary
+			if (save_or_cancel == "save") {
+				pybossa.saveTask(task.id, answer).done(function() {
+					$("#success").fadeIn();
+					setTimeout(function() {
+						$("#success").hide();
+						deferred.resolve(task);
+					}, 1500);
+				});
+			}
         });
 
-		$("#validate").off('click').on('click', function(evt) {
-			var answer = {}
-			answer["city"] = $.trim($("#locality").val().toUpperCase());
-			answer["state"] = $("#administrative_area_level_1").val().toUpperCase();
-			answer["zipcode"] = $("#postal_code").val().toUpperCase();
-			answer["not_in_us"] = false;
-			answer["storenumber"] = $("#answerBoxStoreNumber").val().replace(/^0+/, '');
-			answer["streetaddress"] = $.trim( $("#street_number").val().toUpperCase() + $("#route").val().toUpperCase());
-
-			var isValidState = true;
-			var isValidCity = true;
-			var isValidZipcode = true;
-			var isValidStoreNumber = true;
-			var isValidStreetAddress = true;
-
-			var storenumber = answer["storenumber"]
-			var instore1 = ((storenumber.length != 0) && (storenumber in store1) &&
-				(store1[storenumber][0] == answer["city"]) && (store1[storenumber][1] == answer["state"]))
-			var instore2 = ((storenumber.length != 0) && (storenumber in store2) &&
-				(store2[storenumber][0] == answer["city"]) && (store2[storenumber][1] == answer["state"]))
-
-             
-			$('#administrative_area_level_1').each(function () {
-				if (!(answer["state"] in maps)) {
-					isValidState = false;
-					$("#administrative_area_level_1").css({
-						"border": "1px solid red",
-						"background": "#FFCECE"
-					});
-				} else if (!(answer["city"] in maps[answer["state"]])) {
-					isValidCity = false;
-					$("#locality").css({
-						"border": "1px solid red",
-						"background": "#FFCECE"
-					});
-				} else if ((maps[answer["state"]][answer["city"]].indexOf(answer["zipcode"]) == -1) && (answer["zipcode"].length != 0)) {
-					isValidZipcode = false;
-					$("#postal_code").css({
-						"border": "1px solid red",
-						"background": "#FFCECE"
-					});
-				} else if ((storenumber.length != 0) && (!(instore1 || instore2))) {
-					isValidStoreNumber = false;
-					$("#answerBoxStoreNumber").css({
-						"border": "1px solid red",
-						"background": "#FFCECE"
-					});
-			
-				} else {
-					$("#administrative_area_level_1").css({
-						"border": "",
-						"background": ""
-					});
-					$("#locality").css({
-						"border": "",
-						"background": ""
-					});
-					$("#postal_code").css({
-						"border": "",
-						"background": ""
-					});
-					$("#answerBoxStoreNumber").css({
-						"border": "",
-						"background": ""
-					});
-				}
-			});
-
-			if (isValidState == false || isValidCity == false|| isValidZipcode == false ||
-				isValidStoreNumber == false || isValidStreetAddress == false) {
-				passValidation = false;
-			} else {
-				passValidation = true;
-				validAnswer = answer;
-				$("#valid").fadeIn();
-					setTimeout(function() {
-						$("#valid").hide();
-					}, 1500);
-			}
-		});
-
 		$("#not_in_us").off('click').on('click', function(evt) {
-			var answer = {};
-			answer["city"] = "";
-			answer["state"] = "";
-			answer["zipcode"] = "";
-			answer["not_in_us"] = true;
-			answer["storenumber"] = "";
-			answer["streetaddress"] = "";
-			answer["locked"] = true;
+			answer = {
+				"city": "",
+				"state": "",
+				"zipcode": "",
+				"not_in_us": true,
+				"storenumber": "",
+				"streetaddress": "",
+				"locked": true
+			};
 			pybossa.saveTask(task.id, answer).done(function() {
 				$("#success").fadeIn();
 					setTimeout(function() {
@@ -401,15 +455,21 @@ pybossa.presentTask(function(task, deferred){
 			});
 		});
 
+		$("#start_over").off('click').on('click', function(evt) {
+			initialize();
+		});
+
 		$("#idk").off('click').on('click', function(evt) {
-			var answer = {};
-			answer["city"] = "";
-			answer["state"] = "";
-			answer["zipcode"] = "";
-			answer["not_in_us"] = "";
-			answer["storenumber"] = "";
-			answer["streetaddress"] = "";
-			answer["locked"] = true;
+			//console.log(answer);
+			answer = {
+				"city": "",
+				"state": "",
+				"zipcode": "",
+				"not_in_us": "",
+				"storenumber": "",
+				"streetaddress": "",
+				"locked": true
+			};
 			pybossa.saveTask(task.id, answer).done(function() {
 				$("#success").fadeIn();
 					setTimeout(function() {
@@ -424,8 +484,22 @@ pybossa.presentTask(function(task, deferred){
 		$("#finish").fadeIn(100);
 	}
 });
-pybossa.run('Geomancer_card_AutoZone');
+pybossa.run('Geomancer_card_Walgreens');
 </script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD3DDwlANN20mbepZow2SIhLjZPMwBI_84&libraries=places&callback=initAutocomplete"
-        async defer>
+
+<script type="text/javascript">
+	var key_index = (Math.floor(Math.random() * 2) + 1).toString();
+
+	//console.log("map api - key index" + key_index);
+	keys = {
+		"1": "AIzaSyDH0VXC9bEbt8ajPZGmVBq2p8Zl9_zWOm0",
+		"2": "AIzaSyD3DDwlANN20mbepZow2SIhLjZPMwBI_84"
+	}
+    var s = document.createElement("script");
+    s.type = "text/javascript";
+    s.defer = "defer";
+    s.async = "async";
+    s.src = "https://maps.googleapis.com/maps/api/js?key=" + keys[key_index] + "&libraries=places&callback=initAutocomplete";
+
+    $("body").append(s);
 </script>
