@@ -232,8 +232,9 @@ def char_encoding(config, graph, trans_len):
 		word_lengths = tf.placeholder(tf.int64, [None], name="word_lengths")
 		word_lengths = tf.gather(word_lengths, tf.range(tf.to_int32(trans_len)))
 		char_inputs = tf.placeholder(tf.int32, [None, max_wl], name="char_inputs")
+		cembed_init = math.sqrt(3 / cnn_out_width)
 		cembed_matrix = tf.Variable(
-			tf.random_uniform([len(c2i.keys()), config["ce_dim"]], -0.5, 0.5),
+			tf.random_uniform([len(c2i.keys()), config["ce_dim"]], -cembed_init, cembed_init),
 			name="cembeds"
 		)
 
@@ -243,16 +244,22 @@ def char_encoding(config, graph, trans_len):
 		cembeds = tf.nn.dropout(cembeds, 0.5)
 
 		# Encoder Weights and Biases
-		w_conv = weight_variable(config, [1, kernel_width, config["ce_dim"], cnn_out_width])
-		b_conv = bias_variable([cnn_out_width], kernel_width * config["ce_dim"])
+		w_conv = weight_variable(config, [1, 3, config["ce_dim"], cnn_out_width])
+		b_conv = tf.Variable(tf.zeros([cnn_out_width]))
+
+		w_conv2 = weight_variable(config, [1, 3, cnn_out_width, cnn_out_width])
+		b_conv2 = tf.Variable(tf.zeros([cnn_out_width]))
 
 		# Apply Convolution
-		conv_out = conv2d(cembeds, w_conv) + b_conv
-		encoded_chars = tf.nn.max_pool(conv_out, ksize=[1, 1, 7, 1], strides=[1, 1, 7, 1], padding='VALID')
+		conv1 = tf.nn.conv2d(cembeds, w_conv, strides=[1, 1, 1, 1], padding='VALID') + b_conv
+		max_pool1 = tf.nn.max_pool(conv1, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
 
-		encoded_chars = tf.clip_by_value(encoded_chars, -1.0, 1.0)
+		conv2 = tf.nn.conv2d(max_pool1, w_conv2, strides=[1, 1, 1, 1], padding='VALID') + b_conv2
+		max_pool2 = tf.nn.max_pool(conv2, ksize=[1, 1, 3, 1], strides=[1, 1, 3, 1], padding='VALID')
 
-		return tf.squeeze(encoded_chars, squeeze_dims=[1, 2], name="encoded_chars")
+		clipped_encoding = tf.clip_by_value(max_pool2, -1.0, 1.0)
+
+		return tf.squeeze(clipped_encoding, squeeze_dims=[1, 2], name="encoded_chars")
 
 def build_graph(config):
 	"""Build CNN"""
@@ -278,7 +285,7 @@ def build_graph(config):
 
 		# Combine Embeddings
 		combined_embeds = tf.concat(1, [wembeds, encoded_chars], name="combined_embeds")
-		#combined_embeds = wembeds
+		# combined_embeds = wembeds
 
 		# Cells and Weights
 		fw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["h_dim"], state_is_tuple=True)
