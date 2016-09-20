@@ -268,9 +268,10 @@
 		//Set icon src
 		$("#lockRotate").attr("src", icon);
 	}
-
+ 
+ 
 	$.ajax({
-		url: "http://52.37.199.197/dictionaries/Walgreens/geo.json",
+		url: "http://server_ip/dictionaries/merchant_name/geo.json",
 		dataType: 'jsonp',
 		jsonpCallback: 'callback0',
 		success: function(data) {
@@ -281,7 +282,7 @@
 
 	var store1 = {};
 	$.ajax({
-		url: "http://52.37.199.197/dictionaries/Walgreens/store_id_1.json",
+		url: "http://server_ip/dictionaries/merchant_name/store_id_1.json",
 		dataType: 'jsonp',
 		jsonpCallback: 'callback1',
 		success: function(data) {
@@ -292,7 +293,7 @@
 
 	var store2 = {};
 	$.ajax({
-		url: "http://52.37.199.197/dictionaries/Walgreens/store_id_2.json",
+		url: "http://server_ip/dictionaries/merchant_name/store_id_2.json",
 		dataType: 'jsonp',
 		jsonpCallback: 'callback2',
 		success: function(data) {
@@ -307,57 +308,54 @@
    		elem.data('oldVal', elem.val());
 
    		elem.bind("propertychange change click keyup input paste", function(event){
-      		if (elem.data('oldVal') != elem.val()) {
-      			elem.data('oldVal', elem.val());
+      		elem.data('oldVal', elem.val());
 
-				isValidState = true;
-				isValidCity = true;
-				sValidZipcode = true;
-				isValidStoreNumber = true;
+			isValidState = true;
+			isValidCity = true;
+			isValidZipcode = true;
+			isValidStoreNumber = true;
+			allow_save = false;
+
+       		var answer_state = $.trim($("#administrative_area_level_1").val().toUpperCase());
+			var answer_city = $.trim($("#locality").val().toUpperCase());
+			var answer_zipcode = $("#postal_code").val().toUpperCase();
+			var answer_storenumber = $("#store_number").val().replace(/^0+/, '');
+
+			var instore1 = ((answer_storenumber.length != 0) && (answer_storenumber in store1) &&
+				(store1[answer_storenumber][0] == answer_city) && (store1[answer_storenumber][1] == answer_state))
+			var instore2 = ((answer_storenumber.length != 0) && (answer_storenumber in store2) &&
+				(store2[answer_storenumber][0] == answer_city) && (store2[answer_storenumber][1] == answer_state))
+			if (answer_state.length > 0 || answer_city.length > 0 || answer_zipcode.length > 0 || answer_storenumber.length > 0) {
+				allow_save = true;
+				save_or_cancel = "save";
+			} else {
 				allow_save = false;
-
-       			var answer_state = $.trim($("#administrative_area_level_1").val().toUpperCase());
-				var answer_city = $.trim($("#locality").val().toUpperCase());
-				var answer_zipcode = $("#postal_code").val().toUpperCase();
-				var answer_storenumber = $("#store_number").val().replace(/^0+/, '');
-
-				var instore1 = ((answer_storenumber.length != 0) && (answer_storenumber in store1) &&
-					(store1[answer_storenumber][0] == answer_city) && (store1[answer_storenumber][1] == answer_state))
-				var instore2 = ((answer_storenumber.length != 0) && (answer_storenumber in store2) &&
-					(store2[answer_storenumber][0] == answer_city) && (store2[answer_storenumber][1] == answer_state))
-
-				if (answer_state.length > 0 || answer_city.length > 0 || answer_zipcode.length > 0 || answer_storenumber.length > 0) {
-					allow_save = true;
-					save_or_cancel = "save";
-				} else {
-					allow_save = false;
-					save_or_cancel = "cancel";
-				}
-				if (!(answer_state in maps)) {
-					isValidState = false;
-					$("#administrative_area_level_1").css({"border": "1px solid red", "background": "#FFCECE"});
-				} else if (!(answer_city in maps[answer_state])) {
-					isValidCity = false;
-					$("#administrative_area_level_1").css({"border": "", "background": ""});
-					$("#locality").css({"border": "1px solid red", "background": "#FFCECE"});	
-				} else if ((maps[answer_state][answer_city].indexOf(answer_zipcode) == -1) && (answer_zipcode.length != 0)) {
-					isValidZipcode = false;
-					$("#administrative_area_level_1").css({"border": "", "background": ""});
-					$("#locality").css({"border": "", "background": ""});
-					$("#postal_code").css({"border": "1px solid red", "background": "#FFCECE"});
-				} else if ((answer_storenumber.length != 0) && (!(instore1 || instore2))) {
-					isValidStoreNumber = false;
-					$("#administrative_area_level_1").css({"border": "","background": ""});
-					$("#locality").css({"border": "", "background": ""});
-					$("#postal_code").css({"border": "", "background": ""});
-					$("#store_number").css({"border": "1px solid red", "background": "#FFCECE"});		
-				} else {
-					$("#administrative_area_level_1").css({"border": "", "background": ""});
-					$("#locality").css({"border": "", "background": ""});
-					$("#postal_code").css({"border": "", "background": ""});
-					$("#store_number").css({"border": "", "background": ""});
-				}
-     		}
+				save_or_cancel = "cancel";
+			}
+			if (!(answer_state in maps)) {
+				isValidState = false;
+				$("#administrative_area_level_1").css({"border": "1px solid red", "background": "#FFCECE"});
+			} else if (!(answer_city in maps[answer_state])) {
+				isValidCity = false;
+				$("#administrative_area_level_1").css({"border": "", "background": ""});
+				$("#locality").css({"border": "1px solid red", "background": "#FFCECE"});	
+			} else if ((maps[answer_state][answer_city].indexOf(answer_zipcode) == -1) && (answer_zipcode.length != 0)) {
+				isValidZipcode = false;
+				$("#administrative_area_level_1").css({"border": "", "background": ""});
+				$("#locality").css({"border": "", "background": ""});
+				$("#postal_code").css({"border": "1px solid red", "background": "#FFCECE"});
+			} else if ((answer_storenumber.length != 0) && (!(instore1 || instore2))) {
+				isValidStoreNumber = false;
+				$("#administrative_area_level_1").css({"border": "","background": ""});
+				$("#locality").css({"border": "", "background": ""});
+				$("#postal_code").css({"border": "", "background": ""});
+				$("#store_number").css({"border": "1px solid red", "background": "#FFCECE"});		
+			} else {
+				$("#administrative_area_level_1").css({"border": "", "background": ""});
+				$("#locality").css({"border": "", "background": ""});
+				$("#postal_code").css({"border": "", "background": ""});
+				$("#store_number").css({"border": "", "background": ""});
+			}
      		if (isValidState == false || isValidCity == false || isValidZipcode == false || isValidStoreNumber == false) {
 				passValidation = false;
 			} else {
@@ -484,7 +482,7 @@ pybossa.presentTask(function(task, deferred){
 		$("#finish").fadeIn(100);
 	}
 });
-pybossa.run('Geomancer_card_Walgreens');
+pybossa.run('Geomancer_project');
 </script>
 
 <script type="text/javascript">
