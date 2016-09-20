@@ -318,8 +318,8 @@
 
        		var answer_state = $.trim($("#administrative_area_level_1").val().toUpperCase());
 			var answer_city = $.trim($("#locality").val().toUpperCase());
-			var answer_zipcode = $("#postal_code").val().toUpperCase();
-			var answer_storenumber = $("#store_number").val().toUpperCase().replace(/^0+/, '');
+			var answer_zipcode = $.trim($("#postal_code").val().toUpperCase());
+			var answer_storenumber = $.trim($("#store_number").val().toUpperCase().replace(/^0+/, ''));
 
 			var instore1 = ((answer_storenumber.length != 0) && (answer_storenumber in store1) &&
 				(store1[answer_storenumber][0] == answer_city) && (store1[answer_storenumber][1] == answer_state))
@@ -415,9 +415,9 @@ pybossa.presentTask(function(task, deferred){
         	answer = {
         		"city": $.trim($("#locality").val().toUpperCase()),
         		"state": $.trim($("#administrative_area_level_1").val().toUpperCase()),
-        		"zipcode": $("#postal_code").val().toUpperCase(),
+        		"zipcode": $.trim($("#postal_code").val().toUpperCase()),
         		"not_in_us": false,
-        		"storenumber": $("#store_number").val().toUpperCase().replace(/^0+/, ''),
+        		"storenumber": $.trim($("#store_number").val().toUpperCase().replace(/^0+/, '')),
         		"streetaddress": $.trim( $("#street_number").val().toUpperCase() + $("#route").val().toUpperCase()),
         		"locked": locked
         	};
