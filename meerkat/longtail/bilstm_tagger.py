@@ -173,7 +173,6 @@ def preprocess(config):
 	config["w2i"], config["wembedding"] = construct_embedding(config, config["w2i"], embedding)
 	os.makedirs("./meerkat/longtail/model/", exist_ok=True)
 	w2i_to_json(config["w2i"], "./meerkat/longtail/model/")
-	logging.info("Save w2i.json to ./meerkat/longtail/model/")
 	config["vocab_size"] = len(config["wembedding"])
 	return config
 
@@ -408,7 +407,7 @@ def build_graph(config):
 			combined_embeddings = tf.cond(
 				train,
 				lambda: tf.add(tf.random_normal(tf.shape(combined_embeddings)) * noise_sigma,
-					 combined_embeddings),
+					combined_embeddings),
 				lambda: combined_embeddings
 				)
 			batched_input = tf.expand_dims(combined_embeddings, 0)
@@ -429,11 +428,11 @@ def build_graph(config):
 				[outputs_fw, tf.reverse(outputs_bw, [False, True, False])],
 				name="concat_layer"
 				)
-			concat_layer = tf.cond(
-				train,
-				lambda: tf.add(tf.random_normal(tf.shape(concat_layer)) * noise_sigma, concat_layer),
-				lambda: concat_layer
-				)
+			# concat_layer = tf.cond(
+				# train,
+				# lambda: tf.add(tf.random_normal(tf.shape(concat_layer)) * noise_sigma, concat_layer),
+				# lambda: concat_layer
+				#)
 			prediction = tf.log(
 				tf.nn.softmax(tf.matmul(tf.squeeze(concat_layer, [0]), weight) + bias),
 				name="model"
@@ -571,7 +570,7 @@ def w2i_to_json(w2i, path):
 	path = path + "w2i.json"
 	with open(path, "w") as writer:
 		json.dump(w2i, writer)
-	logging.info("Save w2i to {0}".format(path))
+	logging.info("Save w2i.json to {0}".format(path))
 
 def evaluate_testset(config, graph, sess, test):
 	"""Check error on test set"""

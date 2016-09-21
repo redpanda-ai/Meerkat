@@ -1,6 +1,6 @@
 {
 	"model_path": "",
-	"dataset": "meerkat/longtail/data.csv",
+	"dataset": "meerkat/longtail/train.csv",
 	"alphabet": "abcdefghijklmnopqrstuvwxyz0123456789,;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}",
 	"embeddings": "",
 	"tag_map": {
