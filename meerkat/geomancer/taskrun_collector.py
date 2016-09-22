@@ -25,9 +25,7 @@ def get_taskrun_df(server, map_id_to_name, map_name_to_id):
 	prefix = "http://" + server + ":" + port + "/api/"
 
 	results, comments = {}, {}
-	result_keys = ["city", "state", "zipcode", "not_in_us", "storenumber"]
-	comment_keys = ["comment_city", "comment_state", "comment_zipcode",
-		"comment_not_in_us", "comment_storenumber"]
+	result_keys = ["locked", "city", "state", "zipcode", "streetaddress", "storenumber", "not_in_us"]
 	id_keys = ["user_id", "task_id"]
 
 	while remaining_data:
@@ -65,16 +63,14 @@ def get_taskrun_df(server, map_id_to_name, map_name_to_id):
 					comments[project_name] = {}
 					for key in result_keys + id_keys:
 						results[project_name][key] = []
-					for key in comment_keys + id_keys:
+					for key in result_keys + id_keys:
 						comments[project_name][key] = []
 
 				has_comment = False
-				for key in comment_keys:
-					if key in item["info"] and item["info"][key] != "":
-						has_comment = True
-						break
+				if "locked" in item["info"] and not item["info"]["locked"]:
+					has_comment = True
 				if has_comment:
-					for key in comment_keys:
+					for key in result_keys:
 						comments[project_name][key].append(item["info"][key])
 					for key in id_keys:
 						comments[project_name][key].append(item[key])
@@ -96,7 +92,7 @@ def get_task_question_by_id(server, task_id):
 	else:
 		return ""
 
-def process_taskrun_dfs(dfs, server, redundancy, result_or_comment):
+def process_taskrun_dfs(dfs, server, redundancy, label_type):
 	for key in dfs:
 		slim_df = dfs[key]
 		logger.info("Processing taskrun dataframes for Project: {0}".format(key))
@@ -104,30 +100,34 @@ def process_taskrun_dfs(dfs, server, redundancy, result_or_comment):
 		component_dataframes = []
 		grouped = slim_df.groupby(["task_id"], as_index=True)
 		for name, group in grouped:
-			if result_or_comment == "result":
+			if label_type in ["unanimous", "nonunanimous"]:
 				original_count = len(group)
-				dedup = group.drop_duplicates(subset=["city", "state", "zipcode", "not_in_us", "storenumber"])
-				if len(dedup) == 1 and original_count == redundancy:
+				#dedup = group.drop_duplicates(subset=["city", "state", "zipcode", "not_in_us", "storenumber", "streetaddress"])
+				dedup = group.drop_duplicates(subset=["city", "state", "not_in_us"])
+				if label_type == "unanimous" and len(dedup) == 1 and original_count == redundancy:
 					component_dataframes.append(dedup)
+				elif label_type == "nonunanimous" and len(dedup) > 1 and original_count == redundancy:
+					component_dataframes.append(group)
 			else:
 				component_dataframes.append(group)
 
 		count_of_taskrun_df = len(component_dataframes)
-		logger.info("Count of taskrun {0}: {1}".format(result_or_comment, count_of_taskrun_df))
+		logger.info("Count of taskrun {0}: {1}".format(label_type, count_of_taskrun_df))
 
 		questions = []
 		for df in component_dataframes:
-			question = get_task_question_by_id(server, int(df["task_id"]))
-			questions.append(question)
+			for index, row in df.iterrows():
+				question = get_task_question_by_id(server, int(row["task_id"]))
+				questions.append(question)
 		aligned_df = pd.concat(component_dataframes, axis=0)
 		aligned_df["question"] = questions
-		logger.info("labeled task {0}:\n{1}\n".format(result_or_comment, aligned_df))
+		logger.info("labeled task {0}:\n{1}\n".format(label_type, aligned_df))
 
 		bank_or_card = key.split("_")[1]
 		merchant = key.split("_")[2]
 		target_path = "meerkat/geomancer/merchants/" + merchant + "/"
 		os.makedirs(target_path, exist_ok=True)
-		aligned_df.to_csv(target_path + bank_or_card + "_taskrun_" + result_or_comment + "s.csv", sep="\t", index=False)
+		aligned_df.to_csv(target_path + bank_or_card + "_taskrun_" + label_type + ".csv", sep="\t", index=False)
 
 class Worker(GeomancerModule):
 	"""Contains methods and data pertaining to the creation and retrieval of AggData files"""
@@ -148,6 +148,9 @@ class Worker(GeomancerModule):
 		target_merchant_list = self.common_config["target_merchant_list"]
 		top_merchants = get_top_merchant_names(base_dir, target_merchant_list)
 
+		#existing_projects = ["Geomancer_card_Target"]
+		bank_or_card = "card"
+		top_merchants = ["Target"]
 		map_id_to_name, map_name_to_id = {}, {}
 		for merchant in top_merchants:
 			project_name = "Geomancer_" + bank_or_card + "_" + merchant
@@ -161,5 +164,6 @@ class Worker(GeomancerModule):
 
 		results, comments = get_taskrun_df(server, map_id_to_name, map_name_to_id)
 		redundancy = 2
-		process_taskrun_dfs(results, server, redundancy, "result")
+		process_taskrun_dfs(results, server, redundancy, "unanimous")
+		process_taskrun_dfs(results, server, redundancy, "nonunanimous")
 		process_taskrun_dfs(comments, server, redundancy, "comment")
