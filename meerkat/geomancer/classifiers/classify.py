@@ -15,6 +15,7 @@ import pandas as pd
 
 from .bloom_filter import BloomfilterClassifier
 from .trie import TrieClassifier
+from .system_zero import SystemZeroClassifier
 from sklearn.metrics import classification_report
 
 def parse_arguments():
@@ -66,6 +67,8 @@ def main_process():
 		classifier = BloomfilterClassifier()
 	elif classifier == "trie":
 		classifier = TrieClassifier()
+	elif classifier == "system_zero":
+		classifier = SystemZeroClassifier()
 	else:
 		logging.error("Wrong classifier name")
 		sys.exit()
