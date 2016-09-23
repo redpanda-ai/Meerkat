@@ -343,11 +343,8 @@ def train_model(config, graph, sess, saver):
 				predictions = sess.run(get_tensor(graph, "model"+(str(i)+"/cnn")*(num_cnns > 1)+":0"),
 					feed_dict=feed_dict)
 				logging.info("Minibatch accuracy for cnn" + str(i) + ": %.1f%%" % accuracy(predictions, labels))
-			# Estimate Accuracy for Visualization
-			model = [get_tensor(graph, "model"+(str(i+1)+"/cnn")*(num_cnns > 1)+":0") for i in range(num_cnns)]
-			ensemble_accuracy = ensemble_evaluate_testset(config, graph, sess, model, test)
 
-		# Log Loss and Update TensorBoard
+		# Log Loss
 		if step % logging_interval == 0:
 			loss = [sess.run(get_tensor(graph, "trainer/loss"+str(i)+":0"), feed_dict=feed_dict)
 				for i in range(1, num_cnns+1)]
@@ -356,6 +353,8 @@ def train_model(config, graph, sess, saver):
 
 		# Log Progress and Save
 		if step != 0 and step % epochs == 0:
+			model = [get_tensor(graph, "model"+(str(i+1)+"/cnn")*(num_cnns > 1)+":0") for i in range(num_cnns)]
+			ensemble_accuracy = ensemble_evaluate_testset(config, graph, sess, model, test)
 
 			learning_rate = get_variable(graph, "lr:0")
 			logging.info("Testing for era %d" % (step / epochs))

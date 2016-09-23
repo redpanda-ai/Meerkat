@@ -37,6 +37,7 @@ Created on July 20, 2016
 # training and test sets are now a list of tuples after preprocess(), e.g.
 # [(["amazon", "prime", "purchase"], ["merchant", "merchant", "background"]), (...), ...]
 ###################################################################################################
+
 import logging
 import os
 import random
@@ -104,7 +105,7 @@ def validate_config(config):
 def load_data(config):
 	"""Load labeled data"""
 
-	df = load_piped_dataframe(config["dataset"], encoding="latin1")
+	df = load_piped_dataframe(config["dataset"])
 	msk = np.random.rand(len(df)) < 0.90
 	train = df[msk]
 	test = df[~msk]
@@ -168,6 +169,9 @@ def preprocess(config):
 		embedding = {}
 	config["w2i"] = words_to_indices(config["train"])
 	config["w2i"], config["wembedding"] = construct_embedding(config, config["w2i"], embedding)
+	os.makedirs("./meerkat/longtail/model/", exist_ok=True)
+	w2i_to_json(config["w2i"], "./meerkat/longtail/model/")
+	logging.info("Save w2i.json to ./meerkat/longtail/model/")
 	config["vocab_size"] = len(config["wembedding"])
 	return config
 
@@ -368,8 +372,8 @@ def train_model(*args):
 
 	best_accuracy, best_era = 0, 0
 	checkpoints_dir = "./meerkat/longtail/checkpoints/"
-	model_dir = "./meerkat/longtail/model/"
 	os.makedirs(checkpoints_dir, exist_ok=True)
+	model_dir = "./meerkat/longtail/model/"
 	os.makedirs(model_dir, exist_ok=True)
 	eras = config["eras"]
 	checkpoints = []
@@ -464,7 +468,6 @@ def train_model(*args):
 		best_model_path+".meta", final_meta_path))
 	shutil.rmtree(checkpoints_dir)
 	logging.info("Removing checkpoint files at " + checkpoints_dir)
-	w2i_to_json(config["w2i"], model_dir)
 	return final_model_path
 
 def save_models(saver, sess, path, era):
@@ -532,8 +535,7 @@ def run_session(config, graph, saver):
 		run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
 		run_metadata = tf.RunMetadata()
 		tf.initialize_all_variables().run()
-		final_model_path = train_model(config, graph, sess, saver, run_options, run_metadata)
-	return final_model_path
+		_ = train_model(config, graph, sess, saver, run_options, run_metadata)
 
 def run_from_command_line():
 	"""Run module from command line"""

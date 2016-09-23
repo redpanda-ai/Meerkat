@@ -9,15 +9,18 @@ It produces various stats and a confusion matrix for analysis
 """
 
 ############################# USAGE #############################
+
 # python3 -m meerkat.longtail.rnn_classificaiton_report \
 # <path_to_data> <path_to_cktp_file> <path_to_w2i_file> \
 # --config <optional_path_to_config_file>
+
 #################################################################
 
 import logging
 import argparse
 import sys
 import os
+import time
 import pandas as pd
 import numpy as np
 
@@ -30,8 +33,7 @@ from meerkat.classification.tools import reverse_map
 
 def parse_arguments(args):
 	"""Create parser"""
-	parser = argparse.ArgumentParser(description="Test a RNN against a dataset and\
-		return performance statistices")
+	parser = argparse.ArgumentParser(description="Test a RNN and return performance statistics")
 	# Required arguments
 	parser.add_argument("data", help="Path to the test data")
 	parser.add_argument("model", help="Path to the model under test")
@@ -68,25 +70,35 @@ def get_write_func(file_path, config):
 
 def evaluate_model(args=None):
 	"""evaluates model accuracy and reports various statistics"""
+
 	os.makedirs("./data/RNN_stats/", exist_ok=True)
+
 	if args is None:
 		args = parse_arguments(sys.argv[1:])
+
 	config = validate_config(args.config)
 	num_labels = len(config["tag_map"])
 	con_matrix = [[0] * num_labels for i in range(num_labels)]
-	reader = load_piped_dataframe(args.data, chunksize=1000, encoding="latin1")
+	reader = load_piped_dataframe(args.data, chunksize=1000)
 	model = get_tf_rnn_by_path(args.model, args.w2i)
 	total_trans = count_transactions(args.data)
 	processed = 0.0
 	save_mislabeled = get_write_func("data/RNN_stats/mislabeled.csv", config)
 	save_correct = get_write_func("data/RNN_stats/correct.csv", config)
+	elapsed_time = 0
+
 	for chunk in reader:
 		processed += len(chunk)
 		mislabeled = []
 		correct = []
 		logging.info("Processing {0:3.2f}% of the data...".format(100*processed/total_trans))
 		chunk = chunk.to_dict("record")
+
+		start = time.time() 
 		chunk = model(chunk, name_only=False, tags=True)
+		end = time.time()
+		elapsed_time += end - start
+
 		for item in chunk:
 			columns = list(np.argmax(item["Predicted"], 1))
 			rows = [int(reverse_map(config["tag_map"])[tag]) for tag in item["ground_truth"]]
@@ -96,9 +108,11 @@ def evaluate_model(args=None):
 				mislabeled.append(item)
 			else:
 				correct.append(item)
+
 		save_mislabeled(mislabeled)
 		save_correct(correct)
 
+	logging.info("Model evaluates {} transactions per second".format(total_trans / elapsed_time))
 	con_matrix = pd.DataFrame(con_matrix)
 	con_matrix.columns = [config["tag_map"][str(i)] for i in range(num_labels)]
 	con_matrix_path = "data/RNN_stats/confusion_matrix.csv"
