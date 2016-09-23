@@ -34,8 +34,8 @@ SUBS = {
 	"CITY" : "",
 	"SAINT": "ST",
 	"FORT": "FT",
-	"BEACH": "BCH"
-
+	"BEACH": "BCH",
+	"HEIGHTS": "HTS"
 	# can get more in the future
 }
 
@@ -47,7 +47,8 @@ FORMAT = {
 
 	"ST": "SAINT",
 	"FT": "FORT",
-	"BCH": "BEACH"
+	"BCH": "BEACH",
+	"HTS": "HEIGHTS"
 }
 
 class TrieNode():
