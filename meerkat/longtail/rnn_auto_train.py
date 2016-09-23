@@ -81,7 +81,7 @@ def auto_train():
 		logging.info(input_file+" removed.")
 
 		# Split data.csv into train.csv and test.csv
-		df = load_piped_dataframe(save_path+"data.csv")
+		df = load_piped_dataframe(save_path+"data.csv", encoding="latin1")
 		shuffled_df = df.reindex(np.random.permutation(df.index))
 		percent = int(df.shape[0] * 0.9)
 		shuffled_df[:percent].to_csv(save_path + "train.csv", header=True, index=False, sep="|")
