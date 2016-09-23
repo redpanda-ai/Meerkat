@@ -535,7 +535,8 @@ def run_session(config, graph, saver):
 		run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
 		run_metadata = tf.RunMetadata()
 		tf.initialize_all_variables().run()
-		_ = train_model(config, graph, sess, saver, run_options, run_metadata)
+		final_model_path = train_model(config, graph, sess, saver, run_options, run_metadata)
+		return final_model_path
 
 def run_from_command_line():
 	"""Run module from command line"""
