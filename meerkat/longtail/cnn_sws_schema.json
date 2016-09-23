@@ -1,0 +1,66 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "Input schema for meerkat.classification.tensorflow_cnn",
+	"definitions": { },
+	"type": "object",
+	"properties" : {
+		"alphabet" : {
+			"description" : "The list of characters used for the input language",
+			"type" : "string",
+			"minLength" : 2
+		},
+		"base_rate" : {
+			"description" : "Base learning rate, modified according to batch size to prevent exploding gradients",
+			"type" : "number",
+			"minimum" : 0,
+			"maximum" : 1
+		},
+		"batch_size" : {
+			"description" : "The number of documents to batch together in one training step",
+			"type" : "integer",
+			"minimum" : 1
+		},
+		"dataset" : {
+			"description" : "The dataset the model is being trained on",
+			"type" : "string"
+		},
+		"doc_length" : {
+			"description" : "A fixed width of which all documents are cast to either by padding or trucation",
+			"enum" : [105, 132]
+		},
+		"epochs" : {
+			"description" : "The number of training steps between checkpoints",
+			"type" : "integer",
+			"minimum" : 1
+		},
+		"eras" : {
+			"description" : "The number of checkpoints to make during training",
+			"type" : "integer",
+			"minimum" : 1
+		},
+		"mode": {
+			"description" : "Whether to train a model or evaluate a current one",
+			"enum" : ["train", "test"]
+		},
+		"momentum" : {
+			"description" : "A hyperparameter for momentum",
+			"type" : "number",
+			"minimum" : 0,
+			"maximum" : 1
+		},
+		"randomize" : {
+			"description" : "How much to randomize the starting weights",
+			"type" : "number",
+			"minimum" : 0,
+			"maximum" : 1
+		},
+		"model_path" : {
+			"description" : "The path to a model to load",
+			"type": "string",
+			"pattern": "^(.+ckpt|\\s*)$"
+		}
+	},
+	"required" : ["alphabet", "base_rate", "batch_size","doc_length",
+		"model_path", "epochs", "eras", "mode", "momentum", "randomize"]
+}
+

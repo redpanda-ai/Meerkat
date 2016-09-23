@@ -6,15 +6,14 @@
 """Train a CNN using tensorFlow
 
 Created on Apr 16, 2016
-@author: Matthew Sevrens
-@author: Tina Wu
-@author: J. Andrew Key
+@author: Oscar Pan
+@author: Jie Zhang
 """
 
 ############################################# USAGE ###############################################
 
-# meerkat.classification.tensorflow_cnn [config_file]
-# meerkat.classification.tensorflow_cnn meerkat/classification/config/default_tf_config.json
+# meerkat.longtail.cnn_sws [config_file]
+# meerkat.longtail.cnn_sws meerkat/longtail/cnn_sws_config.json
 
 # For addtional details on implementation see:
 # Character-level Convolutional Networks for Text Classification
@@ -36,166 +35,40 @@ import sys
 import numpy as np
 import tensorflow as tf
 
-from .tools import (fill_description_unmasked, reverse_map, batch_normalization, chunks,
+from meerkat.classification.tools import (fill_description_unmasked, batch_normalization, chunks,
 	accuracy, get_tensor, get_op, get_variable, threshold, bias_variable, weight_variable, conv2d,
 	max_pool, get_cost_list, string_to_tensor)
 from meerkat.various_tools import load_params, load_piped_dataframe, validate_configuration
+from meerkat.classification.tensorflow_cnn import (mixed_batching, batch_to_tensor,
+	evaluate_testset)
 
 logging.basicConfig(level=logging.INFO)
-
-def load_soft_target(batch, num_labels):
-	"""load soft target from training set, assuming headers have format 'class_x'"""
-	header = ["class_" + str(i) for i in range(1, num_labels+1)]
-	return  batch[header].as_matrix()
-
-
 def validate_config(config):
 	"""Validate input configuration"""
 
 	config = load_params(config)
-	schema_file = "meerkat/classification/config/tensorflow_cnn_schema.json"
-	config = validate_configuration(config, schema_file)
+	schema = "meerkat/longtail/cnn_sws_schema.json"
+	config = validate_configuration(config, schema)
 	logging.debug("Configuration is :\n{0}".format(pprint.pformat(config)))
-	# about this reshape size, read this wiki page below.
-	# https://github.com/joeandrewkey/Meerkat/wiki/Using-Correct-Tensor-Size
-	reshape = ((config["doc_length"] - 96) / 27) * 256
-	config["reshape"] = int(reshape)
-	config["label_map"] = load_params(config["label_map"])
-	config["num_labels"] = len(config["label_map"].keys())
-	config["alpha_dict"] = {a : i for i, a in enumerate(config["alphabet"])}
-	# This is the base_rate for a normal CNN
-	config["base_rate"] = config["base_rate"] * math.sqrt(config["batch_size"]) / math.sqrt(128)
-	if config.get("soft_target", False):
-		# This is used when training with soft targets
-		config["base_rate"] = (config.get("temperature", 1) ** 2) * config["base_rate"]
+	config["reshape"] = int(((config["doc_length"]-78)/27)*256)
+	config["num_labels"] = 2
+	config["alpha_dict"] = {a: i for i, a in enumerate(config["alphabet"])}
+	config["base_rate"] = config["base_rate"]
 	config["alphabet_length"] = len(config["alphabet"])
-
 	return config
 
 def load_data(config):
 	"""Load labeled data and label map"""
 
-	model_type = config["model_type"]
-	dataset = config["dataset"]
-	label_map = config["label_map"]
-	ledger_entry = config["ledger_entry"]
-
-	ground_truth_labels = {
-		'category' : 'PROPOSED_CATEGORY',
-		'merchant' : 'MERCHANT_NAME',
-		'subtype' : 'PROPOSED_SUBTYPE'
-	}
-
-	label_key = ground_truth_labels[model_type]
-	reversed_map = reverse_map(label_map)
-	map_labels = lambda x: reversed_map.get(str(x[label_key]), "")
-
-	df = load_piped_dataframe(dataset)
-
-	# Verify number of labels
-	if not len(reversed_map) == len(df[label_key].value_counts()):
-		logging.critical("Reversed Map :\n{0}".format(pprint.pformat(reversed_map)))
-		logging.critical("df[label_key].value_counts(): {0}".format(df[label_key].value_counts()))
-		map_keys = reversed_map.keys()
-		keys_in_dataframe = df[label_key].value_counts().index.get_values()
-		missing_keys = map_keys - keys_in_dataframe
-		logging.critical("The dataframe label counts index is missing these {0} items:\n{1}"\
-			.format(len(missing_keys), pprint.pformat(missing_keys)))
-
-		raise Exception('Number of indexes does not match number of labels')
-
-	if model_type != "merchant":
-		df['LEDGER_ENTRY'] = df['LEDGER_ENTRY'].str.lower()
-		grouped = df.groupby('LEDGER_ENTRY', as_index=False)
-		groups = dict(list(grouped))
-		df = groups[ledger_entry]
-
-	df["DESCRIPTION_UNMASKED"] = df.apply(fill_description_unmasked, axis=1)
-	df = df.reindex(np.random.permutation(df.index))
+	df = load_piped_dataframe(config["dataset"])
+	map_labels = lambda x: "2" if x[config["label_name"]] == "" else "1"
 	df["LABEL_NUM"] = df.apply(map_labels, axis=1)
-	df = df[df["LABEL_NUM"] != ""]
-
-	msk = np.random.rand(len(df)) < 0.90
+	msk = np.random.rand(len(df)) < 0.9
 	train = df[msk]
 	test = df[~msk]
-
-	grouped_train = train.groupby('LABEL_NUM', as_index=False)
+	grouped_train = train.groupby("LABEL_NUM", as_index=False)
 	groups_train = dict(list(grouped_train))
-
 	return train, test, groups_train
-
-def mixed_batching(config, df, groups_train):
-	"""Batch from train data using equal class batching"""
-
-	num_labels = config["num_labels"]
-	batch_size = config["batch_size"]
-	half_batch = int(batch_size / 2)
-	indices_to_sample = list(np.random.choice(df.index, half_batch))
-
-	for index in range(half_batch):
-		label = random.randint(1, num_labels)
-		select_group = groups_train[str(label)]
-		indices_to_sample.append(np.random.choice(select_group.index, 1)[0])
-
-	random.shuffle(indices_to_sample)
-	batch = df.loc[indices_to_sample]
-
-	return batch
-
-def batch_to_tensor(config, batch, soft_target=False, doc_key="DESCRIPTION_UNMASED"):
-	"""Convert a batch to a tensor representation"""
-
-	doc_length = config["doc_length"]
-	alphabet_length = config["alphabet_length"]
-	num_labels = config["num_labels"]
-	batch_size = len(batch.index)
-
-	labels = np.array(batch["LABEL_NUM"].astype(int)) - 1
-	labels = (np.arange(num_labels) == labels[:, None]).astype(np.float32)
-	docs = batch[doc_key].tolist()
-	transactions = np.zeros(shape=(batch_size, 1, alphabet_length, doc_length))
-	
-	for index, trans in enumerate(docs):
-		transactions[index][0] = string_to_tensor(config, trans, doc_length)
-
-	transactions = np.transpose(transactions, (0, 1, 3, 2))
-	if soft_target:
-		soft_labels = load_soft_target(batch, num_labels)
-		return transactions, labels, soft_labels
-	return transactions, labels
-
-def evaluate_testset(config, graph, sess, model, test, doc_key="DESCRIPTION_UNMASKED"):
-	"""Check error on test set"""
-
-	with tf.name_scope('accuracy'):
-
-		total_count = len(test.index)
-		correct_count = 0
-		chunked_test = chunks(np.array(test.index), 128)
-		num_chunks = len(chunked_test)
-
-		for i in range(num_chunks):
-
-			batch_test = test.loc[chunked_test[i]]
-			batch_size = len(batch_test)
-
-			trans_test, labels_test = batch_to_tensor(config, batch_test, doc_key=doc_key)
-			feed_dict_test = {get_tensor(graph, "x:0"): trans_test}
-			output = sess.run(model, feed_dict=feed_dict_test)
-
-			batch_correct_count = np.sum(np.argmax(output, 1) == np.argmax(labels_test, 1))
-
-			correct_count += batch_correct_count
-		
-		test_accuracy = 100.0 * (correct_count / total_count)
-		logging.info("Test accuracy: %.2f%%" % test_accuracy)
-		logging.info("Correct count: " + str(correct_count))
-		logging.info("Total count: " + str(total_count))
-
-		accuracy = get_variable(graph, "test_accuracy:0")
-		sess.run(accuracy.assign(test_accuracy))
-
-	return test_accuracy
 
 def build_graph(config):
 	"""Build CNN"""
@@ -207,11 +80,6 @@ def build_graph(config):
 	base_rate = config["base_rate"]
 	batch_size = config["batch_size"]
 	graph = tf.Graph()
-
-	# Get Cost Weights
-	cost_list = get_cost_list(config)
-	for i, cost in enumerate(cost_list):
-		logging.info("Cost for class {0} is {1}".format(i+1, cost))
 
 	# Create Graph
 	with graph.as_default():
@@ -343,8 +211,7 @@ def build_graph(config):
 
 		# Calculate Loss and Optimize
 		with tf.name_scope('trainer'):
-			weighted_labels = cost_list * labels_placeholder
-			loss = tf.neg(tf.reduce_mean(tf.reduce_sum(network * weighted_labels, 1)), name="loss")
+			loss = tf.neg(tf.reduce_mean(tf.reduce_sum(network * labels_placeholder, 1)), name="loss")
 			optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss, name="optimizer")
 			tf.scalar_summary('loss', loss)
 
@@ -368,20 +235,16 @@ def train_model(config, graph, sess, saver):
 	learning_rate_interval = 15000
 
 	best_accuracy, best_era = 0, 0
-	base = "meerkat/classification/models/"
+	base = "meerkat/longtail/sws_model/"
 	save_dir = base + "checkpoints/"
 	os.makedirs(save_dir, exist_ok=True)
 	checkpoints = {}
-
-	# Visualize Using TensorBoard
-	merged = tf.merge_all_summaries()
-	writer = tf.train.SummaryWriter("/home/ubuntu/tensorboard_log", graph)
 
 	for step in range(num_eras):
 
 		# Prepare Data for Training
 		batch = mixed_batching(config, train, groups_train)
-		trans, labels = batch_to_tensor(config, batch)
+		trans, labels = batch_to_tensor(config, batch, doc_key="Description")
 		feed_dict = {
 			get_tensor(graph, "x:0") : trans,
 			get_tensor(graph, "y:0") : labels
@@ -405,7 +268,7 @@ def train_model(config, graph, sess, saver):
 
 			# Evaluate Model and Visualize
 			model = get_tensor(graph, "model:0")
-			test_accuracy = evaluate_testset(config, graph, sess, model, test)
+			test_accuracy = evaluate_testset(config, graph, sess, model, test, doc_key="Description")
 
 			# Save Checkpoint
 			current_era = int(step / epochs)
@@ -419,7 +282,7 @@ def train_model(config, graph, sess, saver):
 				best_era = current_era
 				best_accuracy = test_accuracy
 
-			if current_era - best_era == 3:
+			if current_era - best_era == 0:
 				model_path = checkpoints[best_era]
 				break
 
@@ -427,8 +290,6 @@ def train_model(config, graph, sess, saver):
 		if step % logging_interval == 0:
 			loss = sess.run(get_tensor(graph, "trainer/loss:0"), feed_dict=feed_dict)
 			logging.info("Train loss at epoch {0:>8}: {1:3.7f}".format(step + 1, loss))
-			summary = sess.run(merged, feed_dict=feed_dict)
-			writer.add_summary(summary, step)
 
 		# Update Learning Rate
 		if step != 0 and step % learning_rate_interval == 0:
@@ -463,7 +324,7 @@ def run_session(config, graph, saver):
 			saver.restore(sess, model_path)
 			model = get_tensor(graph, "model:0")
 			_, test, _ = load_data(config)
-			evaluate_testset(config, graph, sess, model, test)
+			evaluate_testset(config, graph, sess, model, test, doc_key="Description")
 
 def run_from_command_line():
 	"""Run module from command line"""
