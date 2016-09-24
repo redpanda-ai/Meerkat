@@ -142,7 +142,7 @@ def mixed_batching(config, df, groups_train):
 
 	return batch
 
-def batch_to_tensor(config, batch, soft_target=False, doc_key="DESCRIPTION_UNMASED"):
+def batch_to_tensor(config, batch, soft_target=False, doc_key="DESCRIPTION_UNMASKED"):
 	"""Convert a batch to a tensor representation"""
 
 	doc_length = config["doc_length"]
