@@ -20,6 +20,8 @@ python3 -m meerkat.classification.classification_report \
 # If working with merchant data
 # If only want to return confusion matrix and performance statistics
 --fast_mode
+# If model being tested is a SWS
+--sws
 
 # Key values will be shifted to upper case.
 """
@@ -46,7 +48,7 @@ import os
 import sys
 import pandas as pd
 
-from meerkat.classification.load_model import get_tf_cnn_by_path
+from meerkat.classification.load_model import get_tf_cnn_by_path, get_sws_by_path
 from meerkat.various_tools import load_params, load_piped_dataframe
 from meerkat.classification.tools import reverse_map
 
@@ -58,9 +60,10 @@ def parse_arguments(args):
 	parser.add_argument('model', help='Path to the model under test')
 	parser.add_argument('data', help='Path to the test data')
 	parser.add_argument('label_map', help='Path to a label map')
-	parser.add_argument('label', type=lambda x: x.upper(),
-		help="Header name of the ground truth label column")
+	parser.add_argument('label', help="Header name of the ground truth label column")
 	# Optional arguments
+	parser.add_argument("--sws", action="store_true",
+		help="Use this argument if model being tested is sws"),
 	parser.add_argument('--model_name', default='', help='Name of the tensor stored in graph.')
 	parser.add_argument('--doc_key', type=lambda x: x.upper(), default='DESCRIPTION_UNMASKED',
 		help='Header name of primary transaction description column')
@@ -193,7 +196,11 @@ def main_process(args=None):
 		logging.basicConfig(format=log_format, level=logging.INFO)
 	else:
 		logging.basicConfig(format=log_format, level=logging.WARNING)
-	doc_key = args.doc_key
+	sws = args.sws
+	if sws:
+		doc_key = "Description"
+	else:
+		doc_key = args.doc_key
 	sec_doc_key = args.secdoc_key
 	machine_label_key = args.predict_key
 	human_label_key = args.label
@@ -211,7 +218,10 @@ def main_process(args=None):
 	#class_names = list(label_map.values())
 
 	confusion_matrix = [[0 for i in range(num_labels + 1)] for j in range(num_labels)]
-	classifier = get_tf_cnn_by_path(args.model, args.label_map, model_name=model_name)
+	if sws:
+		classifier = get_sws_by_path(args.model, args.label_map, model_name=model_name)
+	else:
+		classifier = get_tf_cnn_by_path(args.model, args.label_map, model_name=model_name)
 
 	# Prepare for data saving
 	path = 'data/CNN_stats/'
@@ -232,8 +242,11 @@ def main_process(args=None):
 		my_progress = str(round(((processed/total_transactions) * 100), 2)) + '%'
 		logging.info("Evaluating {0} of the testset".format(my_progress))
 		logging.warning("Testing chunk {0}.".format(chunk_count))
-		if sec_doc_key != '':
+		if sec_doc_key != '' and not sws:
 			chunk[doc_key] = chunk.apply(fill_description, axis=1)
+		if sws:
+			translate_label = lambda x: "no" if x[human_label_key] == "" else "yes"
+			chunk[human_label_key] = chunk.apply(translate_label, axis=1)
 		transactions = chunk.to_dict('records')
 		machine_labeled = classifier(transactions, doc_key=doc_key,
 			label_key=machine_label_key)

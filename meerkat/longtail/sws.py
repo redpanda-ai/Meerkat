@@ -47,7 +47,7 @@ def validate_config(config):
 	"""Validate input configuration"""
 
 	config = load_params(config)
-	schema = "meerkat/longtail/cnn_sws_schema.json"
+	schema = "meerkat/longtail/sws_schema.json"
 	config = validate_configuration(config, schema)
 	logging.debug("Configuration is :\n{0}".format(pprint.pformat(config)))
 	config["reshape"] = int(((config["doc_length"]-78)/27)*256)
@@ -282,7 +282,7 @@ def train_model(config, graph, sess, saver):
 				best_era = current_era
 				best_accuracy = test_accuracy
 
-			if current_era - best_era == 0:
+			if current_era - best_era == 3:
 				model_path = checkpoints[best_era]
 				break
 
