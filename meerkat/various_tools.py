@@ -86,7 +86,7 @@ def validate_configuration(config, schema):
 		validate(config, schema)
 		logging.warning("Configuration schema is valid.")
 	except IOError:
-		logging.error("File not found, aborting.")
+		logging.error("Config or schema file not found, aborting.")
 		sys.exit()
 	return config
 
