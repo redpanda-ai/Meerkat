@@ -224,42 +224,81 @@ def build_graph(config):
 
 		for i in range(1, num_cnns+1):
 			scope_name = ("model" + str(i)) * (num_cnns > 1)
-			with tf.variable_scope(scope_name):
-				bn_scaler = tf.Variable(1.0 * tf.ones([num_labels]))
+			if tf.__version__ == "0.10.0rc0" and num_cnns == 1:
+				with tf.variable_scope(scope_name, default_name==""):
+					bn_scaler = tf.Variable(1.0 * tf.ones([num_labels]))
 
-				w_conv1 = weight_variable(config, [1, 7, alphabet_length, 256])
-				b_conv1 = bias_variable([256], 7 * alphabet_length)
+					w_conv1 = weight_variable(config, [1, 7, alphabet_length, 256])
+					b_conv1 = bias_variable([256], 7 * alphabet_length)
 
-				w_conv2 = weight_variable(config, [1, 7, 256, 256])
-				b_conv2 = bias_variable([256], 7 * 256)
+					w_conv2 = weight_variable(config, [1, 7, 256, 256])
+					b_conv2 = bias_variable([256], 7 * 256)
 
-				w_conv3 = weight_variable(config, [1, 3, 256, 256])
-				b_conv3 = bias_variable([256], 3 * 256)
+					w_conv3 = weight_variable(config, [1, 3, 256, 256])
+					b_conv3 = bias_variable([256], 3 * 256)
 
-				w_conv4 = weight_variable(config, [1, 3, 256, 256])
-				b_conv4 = bias_variable([256], 3 * 256)
+					w_conv4 = weight_variable(config, [1, 3, 256, 256])
+					b_conv4 = bias_variable([256], 3 * 256)
 
-				w_conv5 = weight_variable(config, [1, 3, 256, 256])
-				b_conv5 = bias_variable([256], 3 * 256)
+					w_conv5 = weight_variable(config, [1, 3, 256, 256])
+					b_conv5 = bias_variable([256], 3 * 256)
 
-				w_fc1 = weight_variable(config, [reshape, 1024])
-				b_fc1 = bias_variable([1024], reshape)
+					w_fc1 = weight_variable(config, [reshape, 1024])
+					b_fc1 = bias_variable([1024], reshape)
 
-				w_fc2 = weight_variable(config, [1024, num_labels])
-				b_fc2 = bias_variable([num_labels], 1024)
+					w_fc2 = weight_variable(config, [1024, num_labels])
+					b_fc2 = bias_variable([num_labels], 1024)
 
-				if not soft_target:
-					prob_train = encoder(trans_placeholder, "softmax", i, train=True)
-				else:
-					prob_train, softmax_flat = encoder(trans_placeholder, "softmax", i, train=True,
-						soft_target=soft_target)
-				softmax.append(prob_train)
-				network.append(logsoftmax(softmax[i-1], "network"))
-				prob_full = encoder(trans_placeholder, "softmax_full", i, train=False)
-				if soft_target:
-					cnn.append(logsoftmax(prob_full, "model"))
-				else:
-					cnn.append(logsoftmax(prob_full, "cnn"*(num_cnns > 1)))
+					if not soft_target:
+						prob_train = encoder(trans_placeholder, "softmax", i, train=True)
+					else:
+						prob_train, softmax_flat = encoder(trans_placeholder, "softmax", i, train=True,
+							soft_target=soft_target)
+					softmax.append(prob_train)
+					network.append(logsoftmax(softmax[i-1], "network"))
+					prob_full = encoder(trans_placeholder, "softmax_full", i, train=False)
+					if soft_target:
+						cnn.append(logsoftmax(prob_full, "model"))
+					else:
+						cnn.append(logsoftmax(prob_full, "cnn"*(num_cnns > 1)))
+
+			else:
+				with tf.variable_scope(scope_name):
+					bn_scaler = tf.Variable(1.0 * tf.ones([num_labels]))
+
+					w_conv1 = weight_variable(config, [1, 7, alphabet_length, 256])
+					b_conv1 = bias_variable([256], 7 * alphabet_length)
+
+					w_conv2 = weight_variable(config, [1, 7, 256, 256])
+					b_conv2 = bias_variable([256], 7 * 256)
+
+					w_conv3 = weight_variable(config, [1, 3, 256, 256])
+					b_conv3 = bias_variable([256], 3 * 256)
+
+					w_conv4 = weight_variable(config, [1, 3, 256, 256])
+					b_conv4 = bias_variable([256], 3 * 256)
+
+					w_conv5 = weight_variable(config, [1, 3, 256, 256])
+					b_conv5 = bias_variable([256], 3 * 256)
+
+					w_fc1 = weight_variable(config, [reshape, 1024])
+					b_fc1 = bias_variable([1024], reshape)
+
+					w_fc2 = weight_variable(config, [1024, num_labels])
+					b_fc2 = bias_variable([num_labels], 1024)
+
+					if not soft_target:
+						prob_train = encoder(trans_placeholder, "softmax", i, train=True)
+					else:
+						prob_train, softmax_flat = encoder(trans_placeholder, "softmax", i, train=True,
+							soft_target=soft_target)
+					softmax.append(prob_train)
+					network.append(logsoftmax(softmax[i-1], "network"))
+					prob_full = encoder(trans_placeholder, "softmax_full", i, train=False)
+					if soft_target:
+						cnn.append(logsoftmax(prob_full, "model"))
+					else:
+						cnn.append(logsoftmax(prob_full, "cnn"*(num_cnns > 1)))
 
 		ensemble = sum(softmax) / (num_cnns + 0.0)
 		weighted_labels = cost_list * labels_placeholder
