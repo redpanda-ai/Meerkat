@@ -119,6 +119,9 @@ def sws_auto_train():
 		make_tarfile(preprocessed, save_path)
 		push_file_to_s3(preprocessed, bucket, s3_params["prefix"])
 		os.remove(preprocessed)
+		os.remove(train_file)
+		os.remove(test_file)
+		os.remove(save_path + "data.csv")
 
 		stats = ["classification_report.csv", "confusion_matrix.csv", "correct.csv", "mislabeled.csv"]
 		for single in stats:
