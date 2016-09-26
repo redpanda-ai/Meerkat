@@ -92,6 +92,13 @@ def sws_auto_train():
 		train_file = save_path + "train.csv"
 		test_file = save_path + "test.csv"
 
+		preprocessed = save_path + "preprocessed.tar.gz"
+		make_tarfile(preprocessed, save_path)
+		push_file_to_s3(preprocessed, bucket, s3_params["prefix"])
+		os.remove(preprocessed)
+		os.remove(save_path + "data.csv")
+		logging.info("preprocessed.tar.gz (data.csv, train.csv, test.csv) has been uploaded to S3")
+
 		config = load_params(args.config)
 		config["dataset"] = train_file
 
@@ -102,7 +109,7 @@ def sws_auto_train():
 		results_path = "./meerkat/longtail/sws_model/"
 
 		# Evaluate the model against test.csv
-		logging.info("Evalute the model on test data")
+		logging.info("Evaluting the model on test data")
 		args.data = test_file
 		args.model = ckpt_model_file
 		args.model_name = ""
@@ -113,32 +120,34 @@ def sws_auto_train():
 		args.sws = True
 		args.secdoc_key = "Description"
 		evaluate_model(args)
+		logging.info("The {} has been evaluated".format(test_file))
 
 		# Update stats to S3
-		preprocessed = save_path + "preprocessed.tar.gz"
-		make_tarfile(preprocessed, save_path)
-		push_file_to_s3(preprocessed, bucket, s3_params["prefix"])
-		os.remove(preprocessed)
-		os.remove(train_file)
-		os.remove(test_file)
-		os.remove(save_path + "data.csv")
-
 		stats = ["classification_report.csv", "confusion_matrix.csv", "correct.csv", "mislabeled.csv"]
 		for single in stats:
 			os.rename("./data/CNN_stats/" + single, save_path + single)
 
 		for single in stats[0:2]:
 			push_file_to_s3(save_path + single, bucket, s3_params["prefix"])
+			logging.info("{} has been uploaded to S3".format(single))
 
 		model_files = ["train.ckpt", "train.meta"]
 		for single in model_files:
 			os.rename(results_path + single, save_path + single)
+			logging.info("{} has been moved from {} to {}".format(single, results_path, save_path))
+
+		os.remove(train_file)
+		os.remove(test_file)
 
 		results = save_path + "results.tar.gz"
 		make_tarfile(results, save_path)
 		push_file_to_s3(results, bucket, s3_params["prefix"])
+		logging.info("{} has been uploaded to S3".format(results))
+
 		shutil.rmtree(results_path)
 		shutil.rmtree(save_path)
+		logging.info("{} has been deleted".format(results_path))
+		logging.info("{} has been deleted".format(save_path))
 
 	logging.info("SWS auto training is done")
 
