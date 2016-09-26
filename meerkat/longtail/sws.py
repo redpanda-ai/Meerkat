@@ -319,7 +319,8 @@ def run_session(config, graph, saver):
 		tf.initialize_all_variables().run()
 
 		if mode == "train":
-			train_model(config, graph, sess, saver)
+			final_model_path = train_model(config, graph, sess, saver)
+			return final_model_path
 		elif mode == "test":
 			saver.restore(sess, model_path)
 			model = get_tensor(graph, "model:0")
