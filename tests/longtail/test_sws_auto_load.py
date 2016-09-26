@@ -1,6 +1,5 @@
 """Unit test for meerkat/longtail/sws_auto_load.py"""
 
-import os
 import unittest
 from nose_parameterized import parameterized
 import meerkat.longtail.sws_auto_load as load

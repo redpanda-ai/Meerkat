@@ -47,7 +47,6 @@ def sws_auto_load():
 	prefix = args.prefix
 	save_path = args.save_path + "/" * (args.save_path[-1] != "/")
 
-
 	best_accuracy, best_model_prefix = 0.0, ""
 	target_file, model_name = "classification_report.csv", "results.tar.gz"
 
