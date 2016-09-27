@@ -1,6 +1,5 @@
 #!/usr/local/bin/python3
 # pylint: disable=unused-variable
-# pylint: disable=unused-argument
 # pylint: disable=too-many-locals
 
 """Train a CNN using tensorFlow
@@ -12,8 +11,8 @@ Created on Apr 16, 2016
 
 ############################################# USAGE ###############################################
 
-# meerkat.longtail.cnn_sws [config_file]
-# meerkat.longtail.cnn_sws meerkat/longtail/cnn_sws_config.json
+# meerkat.longtail.sws [config_file]
+# meerkat.longtail.sws meerkat/longtail/sws_config.json
 
 # For addtional details on implementation see:
 # Character-level Convolutional Networks for Text Classification
@@ -25,19 +24,16 @@ Created on Apr 16, 2016
 ###################################################################################################
 
 import logging
-import math
 import os
 import pprint
-import random
 import shutil
 import sys
 
 import numpy as np
 import tensorflow as tf
 
-from meerkat.classification.tools import (fill_description_unmasked, batch_normalization, chunks,
-	accuracy, get_tensor, get_op, get_variable, threshold, bias_variable, weight_variable, conv2d,
-	max_pool, get_cost_list, string_to_tensor)
+from meerkat.classification.tools import (batch_normalization, max_pool, conv2d,
+	accuracy, get_tensor, get_op, get_variable, threshold, bias_variable, weight_variable)
 from meerkat.various_tools import load_params, load_piped_dataframe, validate_configuration
 from meerkat.classification.tensorflow_cnn import (mixed_batching, batch_to_tensor,
 	evaluate_testset)
@@ -58,7 +54,7 @@ def validate_config(config):
 	return config
 
 def load_data(config):
-	"""Load labeled data and label map"""
+	"""Load labeled data and create labels"""
 
 	df = load_piped_dataframe(config["dataset"])
 	map_labels = lambda x: "2" if x[config["label_name"]] == "" else "1"
@@ -86,7 +82,6 @@ def build_graph(config):
 
 		learning_rate = tf.Variable(base_rate, trainable=False, name="lr")
 		test_accuracy = tf.Variable(0, trainable=False, name="test_accuracy")
-		tf.scalar_summary('test_accuracy', test_accuracy)
 
 					# [batch, height, width, channels]
 		input_shape = [None, 1, doc_length, alphabet_length]
@@ -174,7 +169,7 @@ def build_graph(config):
 			with tf.control_dependencies([assign_mean, assign_var]):
 				return (batch - mean) / tf.sqrt(var + 1e-10)
 
-		def encoder(inputs, name, train=False, noise_std=0.0):
+		def encoder(inputs, name, train=False):
 			"""Add model layers to the graph"""
 
 			details = {"layer_count": 0}
@@ -213,7 +208,6 @@ def build_graph(config):
 		with tf.name_scope('trainer'):
 			loss = tf.neg(tf.reduce_mean(tf.reduce_sum(network * labels_placeholder, 1)), name="loss")
 			optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss, name="optimizer")
-			tf.scalar_summary('loss', loss)
 
 		bn_updates = tf.group(*bn_assigns)
 		with tf.control_dependencies([optimizer]):
@@ -295,9 +289,12 @@ def train_model(config, graph, sess, saver):
 		if step != 0 and step % learning_rate_interval == 0:
 			learning_rate = get_variable(graph, "lr:0")
 			sess.run(learning_rate.assign(learning_rate / 2))
+	final_model_path = clean_directory(base, dataset, model_path, meta_path, save_dir)
+	return final_model_path
 
-	# Clean Up Directory
-	dataset_path = os.path.basename(dataset).split(".")[0]
+def clean_directory(base, dataset_path, model_path, meta_path, save_dir):
+	"""Clean Up Directory"""
+	dataset_path = os.path.basename(dataset_path).split(".")[0]
 	final_model_path = base + dataset_path + ".ckpt"
 	final_meta_path = base + dataset_path + ".meta"
 	logging.info("Moving final model from {0} to {1}.".format(model_path, final_model_path))
@@ -305,7 +302,6 @@ def train_model(config, graph, sess, saver):
 	os.rename(meta_path, final_meta_path)
 	logging.info("Deleting unneeded directory of checkpoints at {0}".format(save_dir))
 	shutil.rmtree(save_dir)
-
 	return final_model_path
 
 def run_session(config, graph, saver):

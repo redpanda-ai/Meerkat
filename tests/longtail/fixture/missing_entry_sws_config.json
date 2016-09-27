@@ -1,0 +1,14 @@
+{
+	"mode": "train",
+	"model_path": "",
+	"label_name": "Tagged_merchant_string",
+	"batch_size": 128,
+	"doc_length": 105,
+	"randomize": 5e-2,
+	"momentum": 0.9,
+	"base_rate": 2e-2,
+	"decay": 1e-5,
+	"epochs": 5000,
+	"eras": 25
+}
+
