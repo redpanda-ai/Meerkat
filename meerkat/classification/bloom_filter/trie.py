@@ -77,7 +77,7 @@ class Trie():
 			recursion to ultimately find out whether the word is in the entire Trie."""
 			any_char = "."
 
-			if word == '' or word[0] == any_char:
+			if not word:
 				if node.isword:
 					#Base case #0: Found a word
 					result.append(path)
@@ -85,6 +85,9 @@ class Trie():
 				else: 
 					#Base case #1: Did not find a word
 					return False
+			if word[0] == any_char and node.isword:
+				result.append(path)
+				return True
 			if word[0] == any_char:
 				#Recursive case #0: Search for the word starts with (.) until found
 				for child_key in node.children:
@@ -293,3 +296,4 @@ def get_word(beginning_indices, text, idx):
 
 if __name__ == "__main__":
 	print("This module is not meant to be run from the console.")
+	print(location_split('TARGET 00015149 North RICHLAND Hi TX'))
