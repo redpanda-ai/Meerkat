@@ -18,7 +18,7 @@ from scipy.stats.mstats import zscore
 
 from meerkat.various_tools import get_es_connection, string_cleanse, get_boosted_fields
 from meerkat.various_tools import synonyms, get_bool_query, get_qs_query
-from meerkat.classification.load_model import load_scikit_model, get_tf_cnn_by_path
+from meerkat.classification.load_model import load_scikit_model, get_tf_cnn_by_path, get_sws_by_path
 from meerkat.classification.auto_load import main_program as load_models_from_s3
 
 # pylint:disable=no-name-in-module
@@ -84,6 +84,13 @@ class WebConsumer():
 					key = '_'.join(temp[1:] + [temp[0], 'cnn'])
 				self.models[key] = get_tf_cnn_by_path(models_dir + filename, \
 					label_maps_dir + filename[:-4] + 'json', gpu_mem_fraction=gmf)
+
+		# Load SWS Model
+		sws_model_path = "./meerkat/classification/models/sws_model/train.ckpt"
+		sws_label_map_path = "./meerkat/longtail/sws_map.json"
+		if os.path.exists(sws_model_path) is False:
+			logging.warning("Please run python3 -m meerkat.longtail.sws_auto_load")
+		self.models["sws"] = get_sws_by_path(sws_model_path, sws_label_map_path)
 
 	def update_hyperparams(self, hyperparams):
 		"""Updates a WebConsumer object's hyper-parameters"""
@@ -459,6 +466,7 @@ class WebConsumer():
 					"subtype_score" : trans.get("subtype_score", "0.0"),
 					"category_score" : trans.get("category_score", "0.0")
 					}
+				trans["sws"] = trans.get("Should_search", "")
 
 			trans.pop("locale_bloom", None)
 			trans.pop("description", None)
@@ -471,6 +479,7 @@ class WebConsumer():
 			trans.pop("merchant_score", None)
 			trans.pop("subtype_score", None)
 			trans.pop("category_score", None)
+			trans.pop("Should_search", None)
 
 		# return transactions
 
@@ -610,6 +619,11 @@ class WebConsumer():
 			transaction["txn_sub_type"] = txn_sub_type
 
 		return data["transaction_list"]
+
+	def __apply_sws(self, data):
+		"""Apply sws model to transactions"""
+		sws_classifier = self.models["sws"]
+		sws_classifier(data["transaction_list"], label_key="Should_search")
 
 	def __apply_category_cnn(self, data):
 		"""Apply the category CNN to transactions"""
@@ -765,7 +779,11 @@ class WebConsumer():
 		cpu_result.get() # Wait for CPU bound classifiers to finish
 
 		if not optimizing:
+			# Fix category_label after category_cnn has been applied
 			self.__apply_category(data["transaction_list"])
+
+		# Apply sws model to transactions
+		self.__apply_sws(data)
 
 		self.ensure_output_schema(data["transaction_list"], debug)
 

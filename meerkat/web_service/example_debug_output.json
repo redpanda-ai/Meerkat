@@ -27,6 +27,7 @@
 			"longitude" : "",
 			"txn_type" : "",
 			"txn_sub_type" : "",
+			"sws": "",
 			"bloom_filter" : {
 				"city": "Sunnyvale",
 				"state": "CA"
@@ -67,6 +68,7 @@
 			"txn_type" : "Payment",
 			"txn_sub_type": "",
 			"category_labels" : [""],
+			"sws": "",
 			"bloom_filter" : {
 				"city": "Sunnyvale",
 				"state": "CA"
@@ -87,6 +89,7 @@
 			"is_physical_merchant" : false,
 			"merchant_name" : "Amazon",
 			"category_labels" : ["General Merchandise"],
+			"sws" : "",
 			"bloom_filter" : {
 				"city": "Sunnyvale",
 				"state": "CA"

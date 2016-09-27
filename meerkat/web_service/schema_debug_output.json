@@ -33,6 +33,7 @@
 				"txn_sub_type" : { "type" : "string" },
 				"txn_type" : { "type" : "string" },
 				"website" : { "type" : "string" },
+				"sws" : { "type" : "string" },
 				"bloom_filter": {
 					"city" : { "type" : "string" },
 					"state" : { "type" : "string" }
@@ -79,7 +80,7 @@
 				"fax_number", "is_physical_merchant", "latitude", "longitude", "match_found",
 				"merchant_name", "neighbourhood", "phone_number", "postal_code", "source",
 				"source_merchant_id","state", "store_id", "street", "transaction_id",
-				"txn_sub_type", "txn_type", "website", "cnn", "search", "bloom_filter"],
+				"txn_sub_type", "txn_type", "website", "cnn", "search", "bloom_filter", "sws"],
 			"additionalProperties" : false
 		},
 		"non_physical_merchant_response" : {
@@ -92,6 +93,7 @@
 				"merchant_name" : { "type" : "string" },
 				"txn_sub_type" : { "type" : "string" },
 				"txn_type" : { "type" : "string" },
+				"sws" : { "type" : "string" },
 				"category_labels" : {
 					"type" : "array",
 					"items" : {
@@ -117,7 +119,7 @@
 					"category_score" : { "type" : "string"}
 				}
 			},
-			"required": [ "city", "state", "transaction_id", "is_physical_merchant", "merchant_name", "category_labels", "bloom_filter", "cnn"],
+			"required": [ "city", "state", "transaction_id", "is_physical_merchant", "merchant_name", "category_labels", "bloom_filter", "cnn", "sws"],
 			"additionalProperties" : false
 		},
 		"non_merchant_category_response" : {
@@ -129,6 +131,7 @@
 				"is_physical_merchant" : { "enum" : [ false ] },
 				"txn_sub_type" : { "type" : "string" },
 				"txn_type" : { "type" : "string" },
+				"sws" : { "type" : "string" },
 				"category_labels" : {
 					"type" : "array",
 					"items" : {
@@ -154,7 +157,7 @@
 					"category_score" : { "type" : "string"}
 				}
 			},
-			"required": [ "city", "state", "transaction_id", "is_physical_merchant", "txn_type", "txn_sub_type", "category_labels", "cnn", "bloom_filter"],
+			"required": [ "city", "state", "transaction_id", "is_physical_merchant", "txn_type", "txn_sub_type", "category_labels", "cnn", "bloom_filter", "sws"],
 			"additionalProperties" : false
 		}
 	},
