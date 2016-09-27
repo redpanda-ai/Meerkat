@@ -78,13 +78,13 @@ class TrieTests(unittest.TestCase):
 		result = trie.location_split(my_text)
 		self.assertEqual(expected, result)
 
-#	def test_location_split_union_to_union(self):
-#		"""location_split test to find york, ny in a string that contains
-#		new york elsewhere"""
-#		my_text = "Andy bought yet another car in Union, NJ!!"
-#		expected = ("Union", "NJ")
-#		result = trie.location_split(my_text)
-#		self.assertEqual(expected, result)
+	def test_location_split_union_to_union(self):
+		"""location_split test to find york, ny in a string that contains
+		new york elsewhere"""
+		my_text = "Andy bought yet another car in Union, NJ!!"
+		expected = ("Union", "NJ")
+		result = trie.location_split(my_text)
+		self.assertEqual(expected, result)
 
 	def test_location_split_smushed(self):
 		"""location_split test to find new york ny in string that is 
