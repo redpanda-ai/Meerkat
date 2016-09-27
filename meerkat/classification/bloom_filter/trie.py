@@ -244,12 +244,15 @@ def location_split(description):
 		words = load_params(json_file)
 	length = len(text)
 
+	direction_abbreviations = ["E", "W", "S", "N"]
 	for i in range(length - 2, -1, -1):
 		if (text[i:i+2] in STATES and i+1 not in beginning_indices and
 			get_word(beginning_indices, text, i) not in words[text[i:i+2]]):
 			place = get_biggest_match(text[:i+2])
 			if place:
-				if place[2] in 'EWSN' and i - (len(place) - 2) not in beginning_indices: 
+				# check if the first letter is a direction_abbreviation AND if it is word unto itself
+				if place[2] in direction_abbreviations and i - (len(place) - 2) not in beginning_indices: 
+					# remove the non-abbreviation and then search again
 					plc = place[:2] + place[3:]
 					if plc == TRIE.search(plc):
 						place = plc
