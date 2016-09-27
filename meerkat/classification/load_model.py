@@ -103,7 +103,7 @@ def get_tf_rnn_by_path(model_path, w2i_path, gpu_mem_fraction=False, model_name=
 		model = get_tensor(graph, model_name)
 
 	# Generate Helper Function
-	def apply_rnn(trans, doc_key="Description", label_key="Predicted", name_only=True, tags=False):
+	def apply_rnn(trans, doc_key="description", label_key="Predicted", name_only=True, tags=False):
 		"""Apply RNN to transactions"""
 
 		for _, doc in enumerate(trans):

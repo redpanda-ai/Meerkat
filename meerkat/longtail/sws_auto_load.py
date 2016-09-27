@@ -70,8 +70,10 @@ def sws_auto_load():
 	logging.info("The best sws model has been saved in {}".format(sws_model_path))
 	logging.info("Removing " + save_path + model_name)
 	os.remove(save_path + model_name)
-	os.remove(sws_model_path + "classification_report.csv")
-	os.remove(sws_model_path + "confusion_matrix.csv")
+
+	stats = ["classification_report.csv", "confusion_matrix.csv", "correct.csv", "mislabeled.csv"]
+	for single in stats:
+		os.remove(sws_model_path + single)
 
 	logging.info("SWS auto_load is done")
 

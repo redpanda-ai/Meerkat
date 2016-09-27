@@ -6,6 +6,7 @@
 import os
 import sys
 import logging
+import shutil
 import argparse
 import boto3
 import pandas as pd
@@ -95,12 +96,17 @@ def auto_load():
 	logging.info("The best model path is {}".format(best_model_prefix))
 
 	download_file_from_s3(args.bucket, best_model_prefix + model_name, save_path + model_name)
+	rnn_model_path = save_path + "rnn_model/"
+	if os.path.exists(rnn_model_path):
+		shutil.rmtree(rnn_model_path)
+	os.mkdir(rnn_model_path)
+
 	extract_tarball(save_path + model_name, save_path + "rnn_model/")
-	os.remove(save_path+"rnn_model/"+"correct.csv")
-	os.remove(save_path+"rnn_model/"+"mislabeled.csv")
 	logging.info("The best RNN model has been saved in {}".format(save_path + "rnn_model/"))
-	logging.info("Removing "+save_path+model_name)
+	logging.info("Removing " + save_path + model_name)
 	os.remove(save_path + model_name)
+	os.remove(rnn_model_path + "correct.csv")
+	os.remove(rnn_model_path + "mislabeled.csv")
 
 	logging.info("RNN auto_load is done")
 
