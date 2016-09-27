@@ -2,9 +2,11 @@
 
 Created on Jun 26, 2016
 @author: Feifei Zhu
+@author: J. Andrew Key
 """
 
 import csv
+import re
 
 from .generate_json import generate_js
 from meerkat.various_tools import load_params
@@ -36,7 +38,7 @@ LENGTHENINGS = {}
 for key in SHORTENINGS.keys():
 	LENGTHENINGS[SHORTENINGS[key]] = key
 
-#We are doing something important: FIXME
+# New York City shows up a lot as New York
 SHORTENINGS["CITY"] = ""
 
 class TrieNode():
@@ -71,28 +73,29 @@ class Trie():
 		node.isword = True
 
 	def search(self, word):
-		"""Searches to see if the 'word' is already in the Trie."""
+		"""Searches to see if the word is already in the Trie."""
 		def find(node, word, path):
-			"""The period character (.) signifies any letter, similar to the regex notation for .
+			"""The period character (.) signifies any letter, similar to the regex notation for (.)
 			This tail-recursive function updates the word, the path, and the node at each level of
 			recursion to ultimately find out whether the word is in the entire Trie."""
 			any_char = "."
 
-			if not word:
+			if word == '' or word[0] == any_char:
 				if node.isword:
+					#Base case #0: Found a word
 					result.append(path)
 					return True
-				else:
+				else: 
+					#Base case #1: Did not find a word
 					return False
-			if word[0] == any_char and node.isword:
-				result.append(path)
-				return True
 			if word[0] == any_char:
+				#Recursive case #0: Search for the word starts with (.) until found
 				for child_key in node.children:
 					if find(node.children[child_key], word[1:], path + child_key):
 						return True
 				return False
 			else:
+				#Recursive case #1: Search for the word until found
 				child = node.children.get(word[0])
 				if not child:
 					return False
@@ -127,12 +130,12 @@ def get_short_forms(city):
 			token_lists.append(token_list)
 			return
 		#move forward in our list of tokens
-		token_index += 1
+#		token_index += 1
 		#Generate the list where we SKIP abbreviations
-		depth_first_search(token_index=token_index, token_list=token_list + [tokens[token_index]])
+		depth_first_search(token_index=token_index + 1, token_list=token_list + [tokens[token_index]])
 		#Generate the list where we ABBREVIATE, if we can
 		if tokens[token_index] in SHORTENINGS:
-			depth_first_search(token_index=token_index,
+			depth_first_search(token_index=token_index + 1,
 				token_list=token_list + [SHORTENINGS[tokens[token_index]]])
 
 	#Find all possible short forms of the city name
@@ -219,73 +222,62 @@ def get_biggest_match(my_string, use_wildcards=False):
 
 	return biggest
 
-def location_split(text):
-	tag = tag_text(text)
-	text = standardize(text)
+def location_split(description):
+	"""
+	This is the main function of this module,
+	input: string - the transaction's description
+	returns: (string, string) - A (city, state) tuple or None
+	"""
+	pattern = re.compile(" co id:", re.IGNORECASE)
+	description = pattern.sub('', description)
+	beginning_indices = get_beginning_indices(description)
+	text = standardize(description)
 	json_file = 'meerkat/classification/bloom_filter/assets/words_start_with_states.json'
-	try:
-		open(json_file)
-	except:
-		generate_js()
 	words = load_params(json_file)
+	if not isinstance(words, dict): 
+		generate_js()
+		words = load_params(json_file)
 	length = len(text)
 
 	for i in range(length - 2, -1, -1):
-		if (text[i:i+2] in STATES and tag[i+1] == 'C' and
-			get_word(tag, text, i) not in words[text[i:i+2]] and not check_co_id(tag, text, i)):
+		if (text[i:i+2] in STATES and i+1 not in beginning_indices and
+			get_word(beginning_indices, text, i) not in words[text[i:i+2]]):
 			place = get_biggest_match(text[:i+2])
 			if place:
-				if place[2] in 'EWSN' and tag[i - (len(place) - 2)] == 'C': 
+				if place[2] in 'EWSN' and i - (len(place) - 2) not in beginning_indices: 
 					plc = place[:2] + place[3:]
 					if plc == TRIE.search(plc):
 						place = plc
-				try: return MAP[place]
-				except: pass
+				if place in MAP: 
+					return MAP[place]
 
 	for i in range(length - 2, -1, -1):
-		if text[i:i+2] in STATES and (i == length - 2 or tag[i + 2] == 'B'):
+		if text[i:i+2] in STATES and (i == length - 2 or i + 2 in beginning_indices):
 			place = get_biggest_match(text[:i+2], True)
 			if place:
-				try: return MAP[place]
-				except: pass
+				if place in MAP: 
+					return MAP[place]
 
 	return None
 
-def tag_text(text):
-	'''make tag for text'''
+def get_beginning_indices(text):
+	'''Record the index that shows where each token begins.'''
 	text = text.replace('\'', '')
 	for mark in r'!"#$%&\'()*+,-./:;<=>?@[\]^_`{|}~':
 		text = text.replace(mark, ' ')
 	text = text.strip()
-	tag = ''
-	for i in range(len(text)):
-		if text[i] == ' ':
-			continue
-		elif i == 0 or text[i - 1] == ' ':
-			tag += 'B'
-		else:
-			tag += 'C'
-	return tag
+	beginning_indices = []
+	index = 0
+	for _, token in enumerate(text.split()):
+		beginning_indices.append(index)
+		index += len(token)
+	beginning_indices.append(index)
+	return beginning_indices
 
-def get_word(tag, text, index):
-	'''get the word concact with state'''
-	end = index + 2
-	for ch in tag[index + 2:]:
-		if ch == 'C':
-			end += 1
-		else:
-			break
-	return text[index:end]
-
-def check_co_id(tag, text, i):
-	if text[i:i+2] == 'CO' and text[i+2:i+4] == 'ID' \
-		and tag[i] == 'B' and tag[i+2] == 'B' and (i + 4 >= len(tag) or tag[i+4] == 'B'):
-		return True
-	elif text[i:i+2] == 'ID' and text[i-2:i] == 'CO' \
-		and tag[i-2] == 'B' and (i+2 >= len(tag) or tag[i+2] == 'B'):
-		return True
-	else: return False
+def get_word(beginning_indices, text, idx):
+	'''get the substring starting with the state name'''
+	position = [pos for pos in beginning_indices if pos > idx][0]
+	return text[idx:position]
 
 if __name__ == "__main__":
 	print("This module is not meant to be run from the console.")
-
