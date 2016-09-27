@@ -80,19 +80,18 @@ class Trie():
 			if not word:
 				if node.isword:
 					#Base case #0: Found a word
-					result.append(path)
-					return True
+					return path
 				else: 
 					#Base case #1: Did not find a word
 					return False
 			if word[0] == any_char and node.isword:
-				result.append(path)
-				return True
+				return path
 			if word[0] == any_char:
 				#Recursive case #0: Search for the word starts with (.) until found
 				for child_key in node.children:
-					if find(node.children[child_key], word[1:], path + child_key):
-						return True
+					path =  find(node.children[child_key], word[1:], path + child_key)
+					if path:
+						return path
 				return False
 			else:
 				#Recursive case #1: Search for the word until found
@@ -101,12 +100,8 @@ class Trie():
 					return False
 				return find(child, word[1:], path + word[0])
 		# This result list will only has one element
-		result = []
 		state = word[:2]
-		if find(self.root.children[state], word[2:], state):
-			return result[0]
-		else:
-			return False
+		return find(self.root.children[state], word[2:], state)
 
 def standardize(text):
 	"""converts text to all caps, no punctuation, and no whitespace"""
