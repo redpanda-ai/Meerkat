@@ -183,11 +183,11 @@ def get_best_models(*args):
 	with open(etags_file, "w") as outfile:
 		logging.info("Writing {0}".format(etags_file))
 		json.dump(etags, outfile)
-	
-		#Get the results.tar.gz file from the path in S3
-		#Get the meta and json from the tarball and move to the correct path locally.
+
 	# Cleanup
-	safely_remove_file("confusion_matrix.csv")
+	stats = ["classification_report.csv", "confusion_matrix.csv", "correct.csv", "mislabeled.csv"]
+	for single in stats:
+		safely_remove_file(single)
 	safely_remove_file(target)
 
 def get_etags():
