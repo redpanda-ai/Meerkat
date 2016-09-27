@@ -18,7 +18,7 @@ from scipy.stats.mstats import zscore
 
 from meerkat.various_tools import get_es_connection, string_cleanse, get_boosted_fields
 from meerkat.various_tools import synonyms, get_bool_query, get_qs_query
-from meerkat.classification.load_model import load_scikit_model, get_tf_cnn_by_path, get_sws_by_path
+from meerkat.classification.load_model import load_scikit_model, get_tf_cnn_by_path, get_sws_by_path, get_tf_rnn_by_path
 from meerkat.classification.auto_load import main_program as load_models_from_s3
 
 # pylint:disable=no-name-in-module
@@ -91,6 +91,13 @@ class WebConsumer():
 		if os.path.exists(sws_model_path) is False:
 			logging.warning("Please run python3 -m meerkat.longtail.sws_auto_load")
 		self.models["sws"] = get_sws_by_path(sws_model_path, sws_label_map_path)
+
+		# Load RNN Model
+		rnn_model_path = "./meerkat/classification/models/rnn_model/bilstm.ckpt"
+		w2i_path = "./meerkat/classification/models/rnn_model/w2i.json"
+		if os.path.exists(rnn_model_path) is False:
+			logging.warning("Please run python3 -m meerkat.longtail.rnn_auto_load")
+		self.models["rnn"] = get_tf_rnn_by_path(rnn_model_path, w2i_path)
 
 	def update_hyperparams(self, hyperparams):
 		"""Updates a WebConsumer object's hyper-parameters"""
@@ -467,6 +474,7 @@ class WebConsumer():
 					"category_score" : trans.get("category_score", "0.0")
 					}
 				trans["sws"] = trans.get("Should_search", "")
+				trans["rnn"] = trans.get("Predicted_RNN", "")
 
 			trans.pop("locale_bloom", None)
 			trans.pop("description", None)
@@ -480,6 +488,7 @@ class WebConsumer():
 			trans.pop("subtype_score", None)
 			trans.pop("category_score", None)
 			trans.pop("Should_search", None)
+			trans.pop("Predicted_RNN", None)
 
 		# return transactions
 
@@ -624,6 +633,18 @@ class WebConsumer():
 		"""Apply sws model to transactions"""
 		sws_classifier = self.models["sws"]
 		sws_classifier(data["transaction_list"], label_key="Should_search")
+
+	def __apply_rnn(self, data):
+		"""Apply rnn model to transactions"""
+		rnn_classifier = self.models["rnn"]
+		should_search_transactions = []
+		for trans in data["transaction_list"]:
+			if trans.get("Should_search", "") == "yes":
+				should_search_transactions.append(trans)
+			else:
+				trans["Predicted_RNN"] = "No rnn provided since sws is no"
+
+		rnn_classifier(should_search_transactions, label_key="Predicted_RNN")
 
 	def __apply_category_cnn(self, data):
 		"""Apply the category CNN to transactions"""
@@ -784,6 +805,9 @@ class WebConsumer():
 
 		# Apply sws model to transactions
 		self.__apply_sws(data)
+
+		# Apply rnn model to transactions
+		self.__apply_rnn(data)
 
 		self.ensure_output_schema(data["transaction_list"], debug)
 
