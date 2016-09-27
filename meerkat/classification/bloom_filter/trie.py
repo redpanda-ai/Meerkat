@@ -100,6 +100,7 @@ class Trie():
 				if not child:
 					return False
 				return find(child, word[1:], path + word[0])
+		# This result list will only has one element
 		result = []
 		state = word[:2]
 		if find(self.root.children[state], word[2:], state):
