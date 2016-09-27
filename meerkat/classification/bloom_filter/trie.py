@@ -38,9 +38,6 @@ LENGTHENINGS = {}
 for key in SHORTENINGS.keys():
 	LENGTHENINGS[SHORTENINGS[key]] = key
 
-# New York City shows up a lot as New York
-SHORTENINGS["CITY"] = ""
-
 class TrieNode():
 	"""This is the most basic component data structure within a Trie"""
 	def __init__(self):
@@ -190,6 +187,12 @@ def build_trie(csv_filename, json_filename):
 			for short_form in short_forms:
 				trie.add(state_name + short_form)
 				city_map[state_name + short_form] = (city_name, state_name)
+
+	# heandle New York and New York City
+	trie.add('NYNEWYORK')
+	city_map['NYNEWYORK'] = ('New York', 'NY')
+	trie.add('NYNEWYORKCITY')
+	city_map['NYNEWYORKCITY'] = ('New York', 'NY')
 
 	return trie, city_map
 
