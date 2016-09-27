@@ -35,7 +35,7 @@ class ClassifcationReportTests(unittest.TestCase):
 			self.assertEqual(parser.model, "model")
 			self.assertEqual(parser.data, "data")
 			self.assertEqual(parser.label_map, "label_map")
-			self.assertEqual(parser.label, "label".upper())
+			self.assertEqual(parser.label, "label")
 			self.assertEqual(parser.doc_key, "SNOZ")
 
 	@parameterized.expand([

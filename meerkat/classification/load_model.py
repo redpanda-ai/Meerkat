@@ -22,6 +22,7 @@ from meerkat.classification.auto_load import main_program as load_models_from_s3
 from meerkat.classification.tensorflow_cnn import (validate_config, get_tensor, string_to_tensor)
 from meerkat.longtail.bilstm_tagger import trans_to_tensor, get_tags
 from meerkat.longtail.bilstm_tagger import validate_config as bilstm_validate_config
+from meerkat.longtail.sws import validate_config as sws_validate_config
 
 def load_scikit_model(model_name):
 	"""Load either Card or Bank classifier depending on
@@ -212,6 +213,67 @@ def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=False, model
 		return trans
 
 	return apply_cnn
+
+def get_sws_by_path(model_path, label_map_path, gpu_mem_fraction=False, model_name=False):
+	"""Load a tensorFlow module by name"""
+
+	# Load Config
+	config_path = "meerkat/longtail/sws_config.json"
+
+	# Validate Model and Label Map
+	if not isfile(model_path):
+		logging.warning("Resouces to load model not found. Loading from S3")
+		load_models_from_s3()
+
+	# Load Graph
+	config = load_params(config_path)
+	config["label_map"] = label_map_path
+	config["model_path"] = model_path
+	meta_path = model_path.split(".ckpt")[0] + ".meta"
+	config = sws_validate_config(config)
+	label_map = load_params(config["label_map"])
+
+	# Load Session and Graph
+	ops.reset_default_graph()
+	saver = tf.train.import_meta_graph(meta_path)
+
+	if gpu_mem_fraction:
+		gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.25)
+		sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, gpu_options=gpu_options))
+	else:
+		sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
+
+	saver.restore(sess, config["model_path"])
+	graph = sess.graph
+
+	if not model_name:
+		model = get_tensor(graph, "model:0")
+	else:
+		model = get_tensor(graph, model_name)
+
+	# Generate Helper Function
+	def apply_sws(trans, doc_key="Description", label_key="Should_search", soft_target=False):
+		"""Apply CNN to transactions"""
+
+		doc_length = config["doc_length"]
+		batch_size = len(trans)
+
+		tensor = np.zeros(shape=(batch_size, 1, config["alphabet_length"], doc_length))
+
+		for index, doc in enumerate(trans):
+			tensor[index][0] = string_to_tensor(config, doc[doc_key], doc_length)
+
+		tensor = np.transpose(tensor, (0, 1, 3, 2))
+		feed_dict_test = {get_tensor(graph, "x:0"): tensor}
+		output = sess.run(model, feed_dict=feed_dict_test)
+		labels = np.argmax(output, 1) + 1
+
+		for index, transaction in enumerate(trans):
+			transaction[label_key] = label_map.get(str(labels[index]), "")
+
+		return trans
+
+	return apply_sws
 
 if __name__ == "__main__":
 	# pylint:disable=pointless-string-statement
