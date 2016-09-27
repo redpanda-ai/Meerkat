@@ -62,6 +62,30 @@ class TrieTests(unittest.TestCase):
 		result = trie.location_split(my_text)
 		self.assertEqual(expected, result)
 
+	def test_location_split_nyc_to_nyc(self):
+		"""location_split test to find york, ny in a string that contains
+		new york elsewhere"""
+		my_text = "Andy bought a car in New York City, NY!!"
+		expected = ("New York City", "NY")
+		result = trie.location_split(my_text)
+		self.assertEqual(expected, result)
+
+	def test_location_split_union_city_to_union_city(self):
+		"""location_split test to find york, ny in a string that contains
+		new york elsewhere"""
+		my_text = "Andy bought another car in Union City, NJ!!"
+		expected = ("Union City", "NJ")
+		result = trie.location_split(my_text)
+		self.assertEqual(expected, result)
+
+#	def test_location_split_union_to_union(self):
+#		"""location_split test to find york, ny in a string that contains
+#		new york elsewhere"""
+#		my_text = "Andy bought yet another car in Union, NJ!!"
+#		expected = ("Union", "NJ")
+#		result = trie.location_split(my_text)
+#		self.assertEqual(expected, result)
+
 	def test_location_split_smushed(self):
 		"""location_split test to find new york ny in string that is 
 		'smushed' to be without spaces"""
