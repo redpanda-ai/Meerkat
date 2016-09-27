@@ -197,9 +197,13 @@ TRIE, MAP = build_trie("meerkat/classification/bloom_filter/assets/us_cities_lar
 
 def get_biggest_match(my_string, use_wildcards=False):
 	"""Return the largest match for my_string that is within the trie."""
+	#Non-wildcard variables
 	state_size, min_city_size = 2, 3
 	min_string_length = state_size + min_city_size
-	min_wildcard_length = min_string_length + 5
+
+	#Wildcard variables
+	min_partial_city_size = 8
+	min_wildcard_length = state_size + min_partial_city_size
 
 	if len(my_string) < min_string_length:
 		return None
@@ -214,9 +218,10 @@ def get_biggest_match(my_string, use_wildcards=False):
 			if place:
 				biggest = place
 	else:
+		max_wildcard_chars = 4
 		for i in range(len(my_string) - min_wildcard_length, -1, -1):
 			city = my_string[i:-state_size]
-			place = TRIE.search(state + city + '....')
+			place = TRIE.search(state + city + '.' * max_wildcard_chars)
 			if place:
 				biggest = place
 
