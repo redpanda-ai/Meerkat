@@ -177,9 +177,8 @@ def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=False, model
 		"""Apply CNN to transactions"""
 
 		doc_length = config["doc_length"]
-		batch_size = len(trans)
 
-		tensor = np.zeros(shape=(batch_size, 1, config["alphabet_length"], doc_length))
+		tensor = np.zeros(shape=(len(trans), 1, config["alphabet_length"], doc_length))
 
 		for index, doc in enumerate(trans):
 			tensor[index][0] = string_to_tensor(config, doc[doc_key], doc_length)
@@ -193,7 +192,8 @@ def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=False, model
 
 			for index, transaction in enumerate(trans):
 				label = label_map.get(str(labels[index]), "")
-				if 'threshold' in label and label["threshold"] and scores[index] < math.log(float(label["threshold"])):
+				if ('threshold' in label and label["threshold"] and
+					scores[index] < math.log(float(label["threshold"]))):
 					label = label_map.get('1', '') # first class in label map should always be the default one
 				if isinstance(label, dict) and label_only:
 					label = label["label"]
@@ -256,9 +256,8 @@ def get_sws_by_path(model_path, label_map_path, gpu_mem_fraction=False, model_na
 		"""Apply CNN to transactions"""
 
 		doc_length = config["doc_length"]
-		batch_size = len(trans)
 
-		tensor = np.zeros(shape=(batch_size, 1, config["alphabet_length"], doc_length))
+		tensor = np.zeros(shape=(len(trans), 1, config["alphabet_length"], doc_length))
 
 		for index, doc in enumerate(trans):
 			tensor[index][0] = string_to_tensor(config, doc[doc_key], doc_length)
