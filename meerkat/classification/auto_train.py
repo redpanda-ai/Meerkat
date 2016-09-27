@@ -29,38 +29,6 @@ from meerkat.various_tools import load_params, safe_input, push_file_to_s3
 from meerkat.classification.auto_load import get_single_file_from_tarball
 from meerkat.classification.classification_report import main_process as apply_cnn
 
-############################## USAGE ###############################################################
-"""
-USAGE =
-usage: auto_train [-h] [--input_dir INPUT_DIR] [--output_dir OUTPUT_DIR]
-                  [--credit_or_debit CREDIT_OR_DEBIT] [--bucket BUCKET] [-d]
-                  [-v]
-                  {subtype,merchant,category} {bank,card}
-
-positional arguments:
-  {subtype,merchant,category}
-                        Pick a valid Classifier type
-  {bank,card}           Is the model being trained on card or bank
-                        transactions?
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --input_dir INPUT_DIR
-                        Path of the directory containing input file
-  --output_dir OUTPUT_DIR
-                        Directory to write files to. Default is meerkat/data/
-  --credit_or_debit CREDIT_OR_DEBIT
-                        Is the model for credit or debit transactions?
-  --bucket BUCKET       Input bucket name, default is s3yodlee
-  -d, --debug           log at DEBUG level
-  -v, --info            log at INFO leve
-
-EXAMPLE =
-time nohup python3 -m meerkat.classification.auto_train subtype bank --credit_or_debit credit \
-	--region 2  &
-"""
-###################################################################################################
-
 def parse_arguments(args):
 	"""This function parses arguments from our command line."""
 
@@ -260,8 +228,6 @@ def auto_train():
 	apply_cnn(args=args)
 	copy_file(best_model_path, tarball_directory)
 	copy_file(best_model_path.replace(".ckpt", ".meta"), tarball_directory)
-	# copy_file("meerkat/classification/models/train.ckpt", tarball_directory)
-	# copy_file("meerkat/classification/models/train.meta", tarball_directory)
 	make_tarfile("results.tar.gz", tarball_directory)
 	logging.info("Uploading results.tar.gz to S3 {0}".format(s3_params["prefix"]))
 	push_file_to_s3("results.tar.gz", bucket, s3_params["prefix"])
