@@ -7,6 +7,7 @@
 import argparse
 import csv
 import logging
+import yaml
 import re
 import sys
 import numpy as np
@@ -15,7 +16,11 @@ import pandas as pd
 
 from .bloom_filter import BloomfilterClassifier
 from .trie import TrieClassifier
+from .system_zero import SystemZeroClassifier
 from sklearn.metrics import classification_report
+
+logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
+logger = logging.getLogger('classifier')
 
 def parse_arguments():
 	"""Parses arguments from the command-line"""
@@ -52,11 +57,10 @@ def format_classification_report(report):
 			lines.append(report_format.format(sum_match.group(1), sum_match.group(2), sum_match.group(3), sum_match.group(4), sum_match.group(5)))
 		elif first_match:
 			lines.append(report_format.format("", first_match.group(1), first_match.group(2), first_match.group(3), first_match.group(4)))
-	logging.info(str.join("\n", lines))
+	logger.info(str.join("\n", lines))
 
 def main_process():
 	"""This does all the work."""
-	logging.basicConfig(level=logging.INFO)
 
 	args = parse_arguments()
 	input_csv_file = args.input_csv_file
@@ -66,8 +70,10 @@ def main_process():
 		classifier = BloomfilterClassifier()
 	elif classifier == "trie":
 		classifier = TrieClassifier()
+	elif classifier == "system_zero":
+		classifier = SystemZeroClassifier()
 	else:
-		logging.error("Wrong classifier name")
+		logger.error("Wrong classifier name")
 		sys.exit()
 
 	df = pd.read_csv(input_csv_file, error_bad_lines=False,
@@ -98,9 +104,9 @@ def main_process():
 	descriptions = [item for item in list(df['question'])]
 
 	true_positives = 0
-	logging.info("{:<20}".format("Predicted") + "{:<20}".format("Labeled") + "{:<80}".format("Description"))
+	logger.info("{:<20}".format("Predicted") + "{:<20}".format("Labeled") + "{:<80}".format("Description"))
 	for i in range(len(y_predict)):
-		logging.info("{:<20}".format(y_predict[i]) + "{:<20}".format(y_true[i]) + "{:<80}".format(descriptions[i]))
+		logger.info("{:<20}".format(y_predict[i]) + "{:<20}".format(y_true[i]) + "{:<80}".format(descriptions[i]))
 		if y_predict[i] == y_true[i]:
 			true_positives += 1
 
@@ -111,15 +117,15 @@ def main_process():
 		#columns = line.split("\t")
 		#columns = [x.strip() for x in columns]
 		#if len(columns) >=4:
-		#	logging.info(report_format.format(columns[0],columns[1],columns[2],columns[3]))
+		#	logger.info(report_format.format(columns[0],columns[1],columns[2],columns[3]))
 		#else:
-		#	logging.info(columns)
-		#logging.info("! {0}".format(line))
-	#logging.info(report)
+		#	logger.info(columns)
+		#logger.info("! {0}".format(line))
+	#logger.info(report)
 
 	# calculate accuracy
 	accuracy = true_positives / len(y_predict)
-	logging.info("Accuray is: {:.2%}".format(accuracy))
+	logger.info("Accuray is: {:.2%}".format(accuracy))
 
 if __name__ == "__main__":
 	main_process()
