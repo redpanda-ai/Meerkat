@@ -1,4 +1,6 @@
 #!/usr/local/bin/python3.3
+#pylint: disable=too-many-statements
+#pylint: disable=too-many-branches
 
 """This module enriches transactions with additional
 data found by Meerkat
@@ -18,7 +20,8 @@ from scipy.stats.mstats import zscore
 
 from meerkat.various_tools import get_es_connection, string_cleanse, get_boosted_fields
 from meerkat.various_tools import synonyms, get_bool_query, get_qs_query
-from meerkat.classification.load_model import load_scikit_model, get_tf_cnn_by_path, get_sws_by_path, get_tf_rnn_by_path
+from meerkat.classification.load_model import (load_scikit_model, get_tf_cnn_by_path,
+		get_sws_by_path, get_tf_rnn_by_path)
 from meerkat.classification.auto_load import main_program as load_models_from_s3
 
 # pylint:disable=no-name-in-module
