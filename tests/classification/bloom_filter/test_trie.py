@@ -62,11 +62,11 @@ class TrieTests(unittest.TestCase):
 		result = trie.location_split(my_text)
 		self.assertEqual(expected, result)
 
-	def test_location_split_nyc_to_nyc(self):
+	def test_location_split_nyc_to_ny(self):
 		"""location_split test to find york, ny in a string that contains
 		new york elsewhere"""
 		my_text = "Andy bought a car in New York City, NY!!"
-		expected = ("New York City", "NY")
+		expected = ("New York", "NY")
 		result = trie.location_split(my_text)
 		self.assertEqual(expected, result)
 
