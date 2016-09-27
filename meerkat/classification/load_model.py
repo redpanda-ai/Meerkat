@@ -252,8 +252,8 @@ def get_sws_by_path(model_path, label_map_path, gpu_mem_fraction=False, model_na
 		model = get_tensor(graph, model_name)
 
 	# Generate Helper Function
-	def apply_sws(trans, doc_key="Description", label_key="Should_search"):
-		"""Apply CNN to transactions"""
+	def apply_sws(trans, doc_key="description", label_key="Should_search"):
+		"""Apply SWS to transactions"""
 
 		doc_length = config["doc_length"]
 
