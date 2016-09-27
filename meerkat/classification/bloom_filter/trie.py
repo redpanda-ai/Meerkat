@@ -192,7 +192,7 @@ def build_trie(csv_filename, json_filename):
 	trie.add('NYNEWYORK')
 	city_map['NYNEWYORK'] = ('New York', 'NY')
 	trie.add('NYNEWYORKCITY')
-	city_map['NYNEWYORKCITY'] = ('New York City', 'NY')
+	city_map['NYNEWYORKCITY'] = ('New York', 'NY')
 
 	return trie, city_map
 
