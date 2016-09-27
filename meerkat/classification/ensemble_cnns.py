@@ -353,7 +353,8 @@ def train_model(config, graph, sess, saver):
 
 		# Log Progress and Save
 		if step != 0 and step % epochs == 0:
-			model = [get_tensor(graph, "model"+(str(i+1)+"/cnn")*(num_cnns > 1)+":0") for i in range(num_cnns)]
+			model = [get_tensor(graph, "model"+(str(i+1)+"/cnn")*(num_cnns > 1)+":0") \
+				for i in range(num_cnns)]
 			ensemble_accuracy = ensemble_evaluate_testset(config, graph, sess, model, test)
 
 			learning_rate = get_variable(graph, "lr:0")
