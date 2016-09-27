@@ -293,4 +293,3 @@ def get_word(beginning_indices, text, idx):
 
 if __name__ == "__main__":
 	print("This module is not meant to be run from the console.")
-	print(location_split("Union, NJ"))
