@@ -192,7 +192,8 @@ def get_tf_cnn_by_path(model_path, label_map_path, gpu_mem_fraction=False, model
 
 			for index, transaction in enumerate(trans):
 				label = label_map.get(str(labels[index]), "")
-				if 'threshold' in label and label["threshold"] and scores[index] < math.log(float(label["threshold"])):
+				if ('threshold' in label and label["threshold"] and
+					scores[index] < math.log(float(label["threshold"]))):
 					label = label_map.get('1', '') # first class in label map should always be the default one
 				if isinstance(label, dict) and label_only:
 					label = label["label"]
