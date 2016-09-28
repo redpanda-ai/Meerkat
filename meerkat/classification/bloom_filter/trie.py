@@ -89,9 +89,9 @@ class Trie():
 			if word[0] == any_char:
 				#Recursive case #0: Search for the word starts with (.) until found
 				for child_key in node.children:
-					path =  find(node.children[child_key], word[1:], path + child_key)
-					if path:
-						return path
+					result =  find(node.children[child_key], word[1:], path + child_key)
+					if result:
+						return result
 				return False
 			else:
 				#Recursive case #1: Search for the word until found
