@@ -57,7 +57,7 @@ class LoadIndexFromFileTests (unittest.TestCase):
 
 	"""
 	@parameterized.expand([
-		([False, "created", "created"]),
+		([True, "created", "created"]),
 		([False, "created", "created"])
 	])
 	def test_guarantee_index_and_doc_type(self, preexisting_index, index_found, type_found):
