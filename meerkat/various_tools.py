@@ -341,6 +341,23 @@ def get_bool_query(starting_from=0, size=0):
 		}
 	}
 
+def get_merchant_quey(term, city, state):
+	"""return a bool style ElasticSearch query object"""
+	return {
+		"query": {
+			"bool": {
+				"must": [
+					{ "match": { "name": { "query": term, "fuzziness": 1, "max_expansions": 1, "operator": "and" } } }
+				],
+				"should": [
+					{ "match": { "locality": { "query": city, "operator": "and" } } },
+					{ "match": { "region": { "query": state, "operator": "and" } } }
+				],
+				"minimum_should_match" : 0
+			}
+		}
+	}
+
 def get_qs_query(term, field_list=None, boost=1.0):
 	"""Returns a "query_string" style ElasticSearch query object"""
 	if field_list is None:

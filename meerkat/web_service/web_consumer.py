@@ -17,8 +17,8 @@ from multiprocessing.pool import ThreadPool
 from scipy.stats.mstats import zscore
 
 from meerkat.various_tools import get_es_connection, string_cleanse, get_boosted_fields
-from meerkat.various_tools import synonyms, get_bool_query, get_qs_query
-from meerkat.classification.load_model import load_scikit_model, get_tf_cnn_by_path
+from meerkat.various_tools import synonyms, get_merchant_query
+from meerkat.classification.load_model import load_scikit_model, get_tf_cnn_by_path, get_tf_rnn_by_path
 from meerkat.classification.auto_load import main_program as load_models_from_s3
 
 # pylint:disable=no-name-in-module
@@ -85,6 +85,9 @@ class WebConsumer():
 				self.models[key] = get_tf_cnn_by_path(models_dir + filename, \
 					label_maps_dir + filename[:-4] + 'json', gpu_mem_fraction=gmf)
 
+		# Get RNN Models
+		self.merchant_rnn = get_tf_rnn_by_path('meerkat/longtail/models/bilstm.ckpt', 'meerkat/longtail/models/w2i.json')
+
 	def update_hyperparams(self, hyperparams):
 		"""Updates a WebConsumer object's hyper-parameters"""
 		self.hyperparams = hyperparams
@@ -92,36 +95,25 @@ class WebConsumer():
 	def __get_query(self, transaction):
 		"""Create an optimized query"""
 
-		result_size = self.hyperparams.get("es_result_size", "10")
-		fields = self.params["output"]["results"]["fields"]
-		locale_bloom = transaction["locale_bloom"]
-		transaction = string_cleanse(transaction["description"]).rstrip()
-
 		# Input transaction must not be empty
-		if len(transaction) <= 2 and re.match('^[a-zA-Z0-9_]+$', transaction):
+		if len(transaction['description']) <= 2 and re.match('^[a-zA-Z0-9_]+$', transaction['description'])):
 			return
 
+		locale_bloom = transaction["locale_bloom"]
+		if transaction["CNN"] != '':
+			term = transaction["CNN"]
+		else:
+			self.merchant_rnn([transaction])
+			term = transaction["Predict"]
+
 		# Replace synonyms
-		transaction = synonyms(transaction)
-		transaction = string_cleanse(transaction)
+		term = synonyms(term)
+		term = string_cleanse(term)
 
-		# Construct Optimized Query
-		o_query = get_bool_query(size=result_size)
-		o_query["fields"] = fields
-		o_query["_source"] = "pin.*"
-		should_clauses = o_query["query"]["bool"]["should"]
-		field_boosts = get_boosted_fields(self.hyperparams, "standard_fields")
-		simple_query = get_qs_query(transaction, field_boosts)
-		should_clauses.append(simple_query)
-
-		# Add Locale Sub Query
-		if locale_bloom != None:
-			city_query = get_qs_query(locale_bloom[0].lower(), ['locality'])
-			state_query = get_qs_query(locale_bloom[1].lower(), ['region'])
-			should_clauses.append(city_query)
-			should_clauses.append(state_query)
-
-		return o_query
+		if locale_bloom:
+			return get_merchant_query(term, locale_bloom[0], locale_bloom[1])
+		else:
+			return get_merchant_query(term, '', '')
 
 	def __search_index(self, queries):
 		"""Search against a structured index"""
@@ -173,40 +165,25 @@ class WebConsumer():
 			hit_fields["longitude"] = "%.6f" % (float(coordinates[0]))
 			hit_fields["latitude"] = "%.6f" % (float(coordinates[1]))
 
-		# Collect Fallback Data
-		names = {}
-		names["business_names"] =\
-			[result.get("fields", {"name" : ""}).get("name", "") for result in hits]
-		names["business_names"] =\
-			[name[0] for name in names["business_names"] if isinstance(name, list)]
-		names["city_names"] =\
-			[result.get("fields", {"locality" : ""}).get("locality", "") for result in hits]
-		names["city_names"] = [name[0] for name in names["city_names"] if isinstance(name, list)]
-		names["state_names"] =\
-			[result.get("fields", {"region" : ""}).get("region", "") for result in hits]
-		names["state_names"] = [name[0] for name in names["state_names"] if isinstance(name, list)]
-
-		# Need Names
-		if len(names["business_names"]) < 2:
-			transaction = self.__no_result(transaction)
-			return transaction
-
-		# City Names Cause issues
-		if names["business_names"][0] in self.cities:
-			transaction = self.__no_result(transaction)
-			return transaction
-
-		# Collect Relevancy Scores
-		scores = [hit["_score"] for hit in hits]
-		z_score_delta, raw_score = self.__z_score_delta(scores)
-		
-		thresholds = [float(hyperparams.get("z_score_threshold", "2")), \
-			float(hyperparams.get("raw_score_threshold", "1"))]
-		decision = True if (z_score_delta > thresholds[0]) and (raw_score > thresholds[1]) else False
+		name = top_hit["_source"].get("name", '')
+		locality = top_hits["_source"].get("locality", '')
+		region = top_hits["_source"].get("region", '')
+		city, state = (transaction['locale_bloom'][0], transaction['locale_bloom'][1]) if transaction['locale_bloom'] else ('', '')
+		total = result['hits']['total']
+		decision = False
+		if locality.lower().replace('.', '') != city.lower() or region.upper() != state.upper():
+			if name.lower().replace('-', ' ').replace('\'', '') != tran["Processed"].lower():
+				name = ''
+		else:
+			if total == 1:
+				decision = True
+			else:
+				if name != hits[1]["_source"].get('name', '') or locality != hits[1]["_source"].get("locality", '') or region != hits[0]["_source"].get("region", ''):
+					if name.lower().replace('-', ' ').replace('\'', '') == tran["Processed"].lower():
+						decison = True
 		
 		# Enrich Data if Passes Boundary
-		args = [decision, transaction, hit_fields,\
-			 names["business_names"], names["city_names"], names["state_names"], z_score_delta]
+		args = [decision, transaction, hit_fields, name, city, state]
 		return self.__enrich_transaction(*args)
 
 	def __no_result(self, transaction):
@@ -236,9 +213,9 @@ class WebConsumer():
 		decision = argv[0]
 		transaction = argv[1]
 		hit_fields = argv[2]
-		business_names = argv[3]
-		city_names = argv[4]
-		state_names = argv[5]
+		name = argv[3]
+		city = argv[4]
+		state = argv[5]
 
 		params = self.params
 		field_names = params["output"]["results"]["fields"]
@@ -742,6 +719,10 @@ class WebConsumer():
 		services_list = data.get("services_list", [])
 		debug = data.get("debug", False)
 
+		# Apply Merchant CNN
+		if "cnn_merchant" in services_list or services_list == []:
+			self.__apply_merchant_cnn(data)
+
 		cpu_result = self.__cpu_pool.apply_async(self.__apply_cpu_classifiers, (data, ))
 
 		if not optimizing:
@@ -758,9 +739,6 @@ class WebConsumer():
 			if "cnn_category" in services_list or "cnn_subtype" in services_list or services_list == []:
 				self.__apply_category_cnn(data)
 
-			# Apply Merchant CNN
-			if "cnn_merchant" in services_list or services_list == []:
-				self.__apply_merchant_cnn(data)
 
 		cpu_result.get() # Wait for CPU bound classifiers to finish
 
