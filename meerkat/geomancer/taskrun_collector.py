@@ -1,24 +1,20 @@
-import csv
-import json
+"""Collect pybossa taskrun results"""
+
 import logging
-import numpy as np
 import os
 import os.path
 import pandas as pd
 import requests
-import sys
 import yaml
-import boto3
 
 from .tools import get_top_merchant_names
 from .geomancer_module import GeomancerModule
 from .interrogate import get_existing_projects
-from meerkat.various_tools import load_params
 
 logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
 logger = logging.getLogger('taskrun_collector')
 
-def get_taskrun_df(server, map_id_to_name, map_name_to_id):
+def get_taskrun_df(server, map_id_to_name):
 	"""Builds a pandas dataframe containing task_funs for the indicated project."""
 	offset, limit, port = 0, 100, "12000"
 	remaining_data = True
@@ -53,7 +49,6 @@ def get_taskrun_df(server, map_id_to_name, map_name_to_id):
 
 		for item in my_json:
 			if item["project_id"] in map_id_to_name:
-				my_info = item["info"]
 				project_id = item["project_id"]
 				project_name = map_id_to_name[project_id]
 				logger.info("Project ID: {0}, Project Name: {1}".format(project_id, project_name))
@@ -93,16 +88,16 @@ def get_task_question_by_id(server, task_id):
 		return ""
 
 def process_taskrun_dfs(dfs, server, redundancy, label_type):
+	"""Process taskrun dataframes based on different label types"""
 	for key in dfs:
 		slim_df = dfs[key]
 		logger.info("Processing taskrun dataframes for Project: {0}".format(key))
 
 		component_dataframes = []
 		grouped = slim_df.groupby(["task_id"], as_index=True)
-		for name, group in grouped:
+		for _, group in grouped:
 			if label_type in ["unanimous", "nonunanimous"]:
 				original_count = len(group)
-				#dedup = group.drop_duplicates(subset=["city", "state", "zipcode", "not_in_us", "storenumber", "streetaddress"])
 				dedup = group.drop_duplicates(subset=["city", "state", "not_in_us"])
 				if label_type == "unanimous" and len(dedup) == 1 and original_count == redundancy:
 					component_dataframes.append(dedup)
@@ -116,7 +111,7 @@ def process_taskrun_dfs(dfs, server, redundancy, label_type):
 
 		questions = []
 		for df in component_dataframes:
-			for index, row in df.iterrows():
+			for _, row in df.iterrows():
 				question = get_task_question_by_id(server, int(row["task_id"]))
 				questions.append(question)
 		aligned_df = pd.concat(component_dataframes, axis=0)
@@ -127,7 +122,8 @@ def process_taskrun_dfs(dfs, server, redundancy, label_type):
 		merchant = key.split("_")[2]
 		target_path = "meerkat/geomancer/merchants/" + merchant + "/"
 		os.makedirs(target_path, exist_ok=True)
-		aligned_df.to_csv(target_path + bank_or_card + "_taskrun_" + label_type + ".csv", sep="\t", index=False)
+		aligned_df.to_csv(target_path + bank_or_card + "_taskrun_" +\
+			label_type + ".csv", sep="\t", index=False)
 
 class Worker(GeomancerModule):
 	"""Contains methods and data pertaining to the creation and retrieval of AggData files"""
@@ -151,18 +147,16 @@ class Worker(GeomancerModule):
 		#existing_projects = ["Geomancer_card_Target"]
 		bank_or_card = "card"
 		top_merchants = ["Target"]
-		map_id_to_name, map_name_to_id = {}, {}
+		map_id_to_name = {}
 		for merchant in top_merchants:
 			project_name = "Geomancer_" + bank_or_card + "_" + merchant
 			if project_name in existing_projects:
 				project_id = existing_projects[project_name]
 				map_id_to_name[project_id] = project_name
-				map_name_to_id[project_name] = project_id
 
 		logger.info("map_id_to_name: {0}".format(map_id_to_name))
-		logger.info("map_name_to_id: {0}".format(map_name_to_id))
 
-		results, comments = get_taskrun_df(server, map_id_to_name, map_name_to_id)
+		results, comments = get_taskrun_df(server, map_id_to_name)
 		redundancy = 2
 		process_taskrun_dfs(results, server, redundancy, "unanimous")
 		process_taskrun_dfs(results, server, redundancy, "nonunanimous")

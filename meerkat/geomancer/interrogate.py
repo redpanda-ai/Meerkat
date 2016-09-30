@@ -1,10 +1,9 @@
-import sys
-import pandas as pd
-import requests
 import logging
-import yaml
-import time
 import os
+import sys
+import requests
+import yaml
+import pandas as pd
 
 from .pybossa.build_pybossa_project import add_tasks
 from .tools import get_top_merchant_names
@@ -13,7 +12,7 @@ from .geomancer_module import GeomancerModule
 logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
 logger = logging.getLogger('interrogate')
 
-def get_task_df(server, map_id_to_name, map_name_to_id):
+def get_task_df(server, map_id_to_name):
 	"""Builds a pandas dataframe containing task_funs for the indicated project."""
 	offset, limit, port = 0, 100, "12000"
 	remaining_data = True
@@ -35,7 +34,6 @@ def get_task_df(server, map_id_to_name, map_name_to_id):
 		for item in my_json:
 			#logger.info("item: {0}".format(item))
 			if item["project_id"] in map_id_to_name:
-				my_info = item["info"]
 				project_id = item["project_id"]
 				project_name = map_id_to_name[project_id]
 				logger.info("Project ID: {0}, Project Name: {1}".format(project_id, project_name))
@@ -99,28 +97,27 @@ class Worker(GeomancerModule):
 				logger.warning("Skipping {0} merchant: path not found at: {1}".format(merchant, path))
 		logger.info("Top merchants are: {0}".format(top_merchants))
 
-		map_id_to_name, map_name_to_id = {}, {}
+		map_id_to_name = {}
 		for merchant in top_merchants:
 			project_name = "Geomancer_" + bank_or_card + "_" + merchant
 			if project_name in existing_projects:
 				project_id = existing_projects[project_name]
 				map_id_to_name[project_id] = project_name
-				map_name_to_id[project_name] = project_id
 
 		logger.info("map_id_to_name: {0}".format(map_id_to_name))
-		logger.info("map_name_to_id: {0}".format(map_name_to_id))
 
-		dfs = get_task_df(server, map_id_to_name, map_name_to_id)
+		dfs = get_task_df(server, map_id_to_name)
 		logger.warning("dfs: \n{0}".format(dfs))
 
-		csv_kwargs = { "usecols": ["plain_text_description"], "error_bad_lines": False, "warn_bad_lines": True,
-			"encoding": "utf-8", "quotechar" : '"', "na_filter" : False, "sep": "\t" }
+		csv_kwargs = {"usecols": ["plain_text_description"], "error_bad_lines": False,
+			"warn_bad_lines": True, "encoding": "utf-8", "quotechar" : '"',
+			"na_filter" : False, "sep": "\t"}
 
 		for top_merchant in top_merchants:
 			project_name = "Geomancer_" + bank_or_card + "_" + top_merchant
 			logger.info("Interrogating {0}".format(project_name))
 			old_df = dfs.get(project_name, pd.DataFrame())
-			old_df = old_df.rename(columns = {'question': 'plain_text_description'})
+			old_df = old_df.rename(columns={'question': 'plain_text_description'})
 			logger.info("old_df: \n{0}".format(old_df))
 
 			new_tasks_file = base_dir + top_merchant + "/" + bank_or_card  +"_tasks.csv"
@@ -138,7 +135,8 @@ class Worker(GeomancerModule):
 			tasks_file = base_dir + top_merchant + "/pybossa_project/" + bank_or_card + "/tasks.csv"
 			new_tasks_df.to_csv(tasks_file, header=["question"], index=False)
 			logger.info("Save new tasks dataframe to {0}".format(tasks_file))
-			project_json_file = base_dir + top_merchant + "/pybossa_project/" + bank_or_card + "/project.json"
+			project_json_file = base_dir + top_merchant + "/pybossa_project/" +\
+				bank_or_card + "/project.json"
 			add_tasks(server, apikey, project_json_file, tasks_file)
 			logger.info("Add new tasks to {0}".format(project_name))
 		return self.common_config

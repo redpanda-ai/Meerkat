@@ -1,14 +1,9 @@
-import sys
-import re
 import os
 import csv
-import shutil
-import pandas as pd
 import logging
 import yaml
 
-from meerkat.classification.tools import (pull_from_s3, extract_tarball,
-	check_new_input_file)
+from meerkat.classification.tools import extract_tarball
 
 from .tools import get_etags, get_s3_file, remove_special_chars, get_grouped_dataframes
 from .geomancer_module import GeomancerModule
@@ -18,11 +13,11 @@ logger = logging.getLogger('get_top_merchant_data')
 
 def extract_clean_files(save_path, tarball_name, extension):
 	"""This clears out a local directory and replaces files of a certain extension."""
-	for root, dirs, files in os.walk(save_path):
-		for f in files:
-			if f.endswith(extension):
-				os.unlink(os.path.join(root, f))
-				logger.info("{0} is removed".format(f))
+	for root, _, files in os.walk(save_path):
+		for file_name in files:
+			if file_name.endswith(extension):
+				os.unlink(os.path.join(root, file_name))
+				logger.info("{0} is removed".format(file_name))
 	extract_tarball(save_path + tarball_name, save_path)
 
 class Worker(GeomancerModule):
@@ -57,9 +52,9 @@ class Worker(GeomancerModule):
 				sample_file = save_path + file_name
 				logger.info("Sample file at: " + sample_file)
 
-				csv_kwargs = { "chunksize": 1000, "error_bad_lines": False, "encoding": 'utf-8',
+				csv_kwargs = {"chunksize": 1000, "error_bad_lines": False, "encoding": 'utf-8',
 					"quoting": csv.QUOTE_NONE, "na_filter": False, "sep": "\t", "activate_cnn": True,
-					"cnn": bank_or_card + "_merchant" }
+					"cnn": bank_or_card + "_merchant"}
 
 				sample = self.config["sample"]
 				rebuild, limit = sample["rebuild"], sample.get("limit", None)
@@ -69,7 +64,8 @@ class Worker(GeomancerModule):
 					logger.info("Destroying empty file.")
 					rebuild = True
 				# Rebuild if the pre-existing file is too small
-				elif limit and (limit + 1) > current_file_size: #adding 1 to the limit to account for header in file size
+				# adding 1 to the limit to account for header in file size
+				elif limit and (limit + 1) > current_file_size:
 					logger.info("Current file has only {0} records, rebuilding.".format(current_file_size - 1))
 					rebuild = True
 				# Rebuild if necessary
@@ -112,9 +108,11 @@ class Worker(GeomancerModule):
 					tasks = tasks_prefix + formatted_merchant + "/" + bank_or_card + "_tasks.csv"
 
 					original_len = len(merchant_dataframes[merchant])
-					merchant_dataframes[merchant].drop_duplicates(subset="plain_text_description", keep="first", inplace=True)
+					merchant_dataframes[merchant].drop_duplicates(subset="plain_text_description",
+						keep="first", inplace=True)
 					merchant_dataframes[merchant].to_csv(tasks, sep='\t', index=False, quoting=csv.QUOTE_ALL)
-					logger.info("Merchant {0}: {2} duplicate transactions; {1} unique transactions".format(merchant,
+					logger.info("Merchant {0}: {2} duplicate transactions; {1} unique \
+						transactions".format(merchant,
 						len(merchant_dataframes[merchant]), original_len - len(merchant_dataframes[merchant])))
 		return self.common_config
 

@@ -1,21 +1,20 @@
+"""The place where you put frequently used functions"""
+
 import re
 import queue
 import datetime
 import argparse
-import csv
 import json
 import logging
-import sys
-import yaml
-import shutil
-import pandas as pd
-import threading
-import time
-import os
-import boto3
 import math
-
+import os
+import threading
 from timeit import default_timer as timer
+import shutil
+import yaml
+import pandas as pd
+import boto3
+
 from meerkat.various_tools import load_params
 
 logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
@@ -102,6 +101,7 @@ def get_top_merchant_names(base_dir, target_merchants):
 	return top_merchants_with_agg_data
 
 class ThreadConsumer(threading.Thread):
+	"""Consumer Thread"""
 	def __init__(self, thread_id, param):
 		threading.Thread.__init__(self)
 		self.thread_id = thread_id
@@ -111,17 +111,20 @@ class ThreadConsumer(threading.Thread):
 		param = self.param
 		while True:
 			chunk = param["data_queue"].get()
-			logger.info("data_queue_populated: {0}, data_queue empty {1}".format(param["data_queue_populated"],
+			logger.info("data_queue_populated: {0}, \
+				data_queue empty {1}".format(param["data_queue_populated"],
 				param["data_queue"].empty()))
 			if chunk is None:
 				logger.info("Consumer thread {0} finished".format(str(self.thread_id)))
 				break
-			logger.info("consumer thread: {0}; data queue size: {1}, consumer queue size {2}".format(str(self.thread_id),
-				 param["data_queue"].qsize(), len(self.param["consumer_list"])))
+			logger.info("consumer thread: {0}; data queue size: {1}, \
+				consumer queue size {2}".format(str(self.thread_id),
+				param["data_queue"].qsize(), len(self.param["consumer_list"])))
 
 			param["chunk_num"] += 1
 			if param["chunk_num"] % 10 == 0:
-				logger.info("Processing chunk {0:07d} of {1:07d}, {2:>6} target merchants found.".format(param["chunk_num"],
+				logger.info("Processing chunk {0:07d} of {1:07d}, \
+					{2:>6} target merchants found.".format(param["chunk_num"],
 					param["num_chunks"], len(param["dict_of_df_lists"].keys())))
 				elapsed = timer() - param["start"]
 				remaining = param["num_chunks"] - param["chunk_num"]
@@ -182,7 +185,6 @@ def get_grouped_dataframes(input_file, groupby_name, target_merchant_list, **csv
 	#Here are the target merchants
 	#create a list of dataframe groups, filtered by merchant name
 	dict_of_df_lists = {}
-	chunk_num = 0
 	if activate_cnn:
 		from ..classification.load_model import get_tf_cnn_by_name as get_classifier
 		classifier = get_classifier(csv_kwargs.get("cnn", "bank_merchant"))
@@ -215,7 +217,7 @@ def get_grouped_dataframes(input_file, groupby_name, target_merchant_list, **csv
 
 	param["data_queue"].join()
 
-	for i in range(num_consumer_thread):
+	for _ in range(num_consumer_thread):
 		param["data_queue"].put(None)
 
 	for consumer_thread in param["consumer_list"]:
@@ -246,6 +248,7 @@ def remove_special_chars(input_string):
 	return re.sub(r"[ |\-|'|.|&]", r'', input_string)
 
 def parse_arguments(args):
+	"""Parse arguments"""
 	parser = argparse.ArgumentParser()
 	parser.add_argument("input_file")
 	parser.add_argument("--subset", default="")
@@ -254,7 +257,7 @@ def parse_arguments(args):
 def deduplicate_csv(input_file, subset, inplace, **csv_kwargs):
 	"""This function de-deduplicates transactions in a csv file"""
 	read = csv_kwargs["read"]
-	to = csv_kwargs["to"]
+	save_to_csv = csv_kwargs["to"]
 	df = pd.read_csv(input_file, **read)
 	original_len = len(df)
 
@@ -265,14 +268,15 @@ def deduplicate_csv(input_file, subset, inplace, **csv_kwargs):
 
 	if inplace:
 		logging.info("reduced {0} duplicate transactions".format(original_len - len(df)))
-		df.to_csv(input_file, **to)
+		df.to_csv(input_file, **save_to_csv)
 		logging.info("csv files with unique {0} transactions saved to: {1}".format(len(df), input_file))
 	else:
 		logging.info("reduced {0} duplicate transactions".format(len(df) - len(unique_df)))
 		last_slosh = input_file.rfind("/")
 		output_file = input_file[: last_slosh + 1] + 'deduplicated_' + input_file[last_slosh + 1 :]
-		unique_df.to_csv(output_file, **to)
-		logging.info("csv files with unique {0} transactions saved to: {1}".format(len(unique_df), output_file))
+		unique_df.to_csv(output_file, **save_to_csv)
+		logging.info("csv files with unique {0} transactions \
+			saved to: {1}".format(len(unique_df), output_file))
 
 def get_geo_dictionary(input_file):
 	"""This function takes a csv file containing city, state, and zip and creates
