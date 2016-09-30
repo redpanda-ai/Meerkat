@@ -199,7 +199,7 @@ def main_process(args=None):
 	human_label_key = args.label
 	model_name = False if args.model_name == '' else args.model_name
 	fast_mode = args.fast_mode
-	reader = load_piped_dataframe(args.data, chunksize=1000)
+	reader = load_piped_dataframe(args.data, chunksize=128)
 	total_transactions = count_transactions(args.data)
 	processed = 0.0
 	label_map = load_params(args.label_map)

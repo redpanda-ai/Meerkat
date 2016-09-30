@@ -1,26 +1,26 @@
 {
-    "input" : {
-        "hyperparameters" : "meerkat/web_service/config/hyperparameters/default.json",
-        "encoding" : "utf-8"
-    },
-    "output" : {
-        "results" : {
-            "fields" : [
-                "name", "category_labels", "address", "locality", "country",
-                "region", "postcode", "factual_id", "internal_store_number",
-                "latitude", "longitude", "website", "tel", "fax", "chain_name", "neighborhood"],
-            "labels" : [
-                "merchant_name", "category_labels", "street", "city", "country",
-                "state", "postal_code", "source_merchant_id", "store_id",
-                "latitude", "longitude", "website", "phone_number", "fax_number", "chain_name", "neighbourhood"]
-        }
-    },
-    "elasticsearch" : {
-		"skip_es": false,
-        "cluster_nodes" : [
-            "internal-default-vpc-meerkat-lb-2028162053.us-west-2.elb.amazonaws.com"
-        ],
-        "index" : "factual_index",
-        "type" : "factual_type"
-    }
+	"input" : {
+		"hyperparameters" : "meerkat/web_service/config/hyperparameters/default.json",
+		"encoding" : "utf-8"
+	},
+	"output" : {
+		"results" : {
+			"fields" : [
+				"name", "category_labels", "address", "locality", "country",
+				"region", "postcode", "factual_id", "internal_store_number",
+				"latitude", "longitude", "website", "tel", "fax", "chain_name", "neighborhood"],
+			"labels" : [
+				"merchant_name", "category_labels", "street", "city", "country",
+				"state", "postal_code", "source_merchant_id", "store_id",
+				"latitude", "longitude", "website", "phone_number", "fax_number", "chain_name", "neighbourhood"]
+		}
+	},
+	"elasticsearch" : {
+		"skip_es": true,
+		"cluster_nodes" : [
+			"internal-default-vpc-meerkat-lb-2028162053.us-west-2.elb.amazonaws.com"
+		],
+		"index" : "factual_index",
+		"type" : "factual_type"
+	}
 }
