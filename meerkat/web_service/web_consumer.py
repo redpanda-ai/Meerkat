@@ -96,19 +96,20 @@ class WebConsumer():
 		"""Create an optimized query"""
 
 		# Input transaction must not be empty
-		if len(transaction['description']) <= 2 and re.match('^[a-zA-Z0-9_]+$', transaction['description'])):
+		if len(transaction['description']) <= 2 and re.match('^[a-zA-Z0-9_]+$', transaction['description']):
 			return
 
 		locale_bloom = transaction["locale_bloom"]
-		if transaction["CNN"] != '':
-			term = transaction["CNN"]
+		if transaction["CNN"]['label'] != '':
+			term = transaction["CNN"]['label']
 		else:
 			self.merchant_rnn([transaction])
-			term = transaction["Predict"]
+			term = transaction["Predicted"]
 
 		# Replace synonyms
 		term = synonyms(term)
 		term = string_cleanse(term)
+		transaction["Processed"] = term
 
 		if locale_bloom:
 			return get_merchant_query(term, locale_bloom[0], locale_bloom[1])
@@ -151,39 +152,38 @@ class WebConsumer():
 
 		# Collect Necessary Information
 		hits = results['hits']['hits']
-		top_hit = hits[0]
-		hit_fields = top_hit.get("fields", "")
-
-		# If no results return
-		if hit_fields == "":
+		if len(hits) <= 0: 
 			transaction = self.__no_result(transaction)
 			return transaction
+		top_hit = hits[0]
 
 		# Elasticsearch v1.0 bug workaround
 		if top_hit["_source"].get("pin", "") != "":
 			coordinates = top_hit["_source"]["pin"]["location"]["coordinates"]
-			hit_fields["longitude"] = "%.6f" % (float(coordinates[0]))
-			hit_fields["latitude"] = "%.6f" % (float(coordinates[1]))
+			top_hit["_source"]["longitude"] = "%.6f" % (float(coordinates[0]))
+			top_hit["_source"]["latitude"] = "%.6f" % (float(coordinates[1]))
 
 		name = top_hit["_source"].get("name", '')
-		locality = top_hits["_source"].get("locality", '')
-		region = top_hits["_source"].get("region", '')
+		locality = top_hit["_source"].get("locality", '')
+		region = top_hit["_source"].get("region", '')
 		city, state = (transaction['locale_bloom'][0], transaction['locale_bloom'][1]) if transaction['locale_bloom'] else ('', '')
-		total = result['hits']['total']
+		total = results['hits']['total']
 		decision = False
 		if locality.lower().replace('.', '') != city.lower() or region.upper() != state.upper():
-			if name.lower().replace('-', ' ').replace('\'', '') != tran["Processed"].lower():
+			if name.lower().replace('-', ' ').replace('\'', '') != transaction["Processed"].lower():
 				name = ''
 		else:
 			if total == 1:
 				decision = True
 			else:
-				if name != hits[1]["_source"].get('name', '') or locality != hits[1]["_source"].get("locality", '') or region != hits[0]["_source"].get("region", ''):
-					if name.lower().replace('-', ' ').replace('\'', '') == tran["Processed"].lower():
-						decison = True
+				if len(hits) < 2:
+					transaction = self.__no_result(transaction)
+					return transaction
+				if locality != hits[1]["_source"].get("locality", '') or region != hits[0]["_source"].get("region", ''):
+					decison = True
 		
 		# Enrich Data if Passes Boundary
-		args = [decision, transaction, hit_fields, name, city, state]
+		args = [decision, transaction, top_hit, name, city, state]
 		return self.__enrich_transaction(*args)
 
 	def __no_result(self, transaction):
@@ -204,7 +204,6 @@ class WebConsumer():
 		transaction["source"] = "FACTUAL"
 		transaction["confidence_score"] = ""
 
-
 		return transaction
 
 	def __enrich_transaction(self, *argv):
@@ -212,14 +211,14 @@ class WebConsumer():
 		
 		decision = argv[0]
 		transaction = argv[1]
-		hit_fields = argv[2]
+		top_hit = argv[2]
 		name = argv[3]
 		city = argv[4]
 		state = argv[5]
 
 		params = self.params
 		field_names = params["output"]["results"]["fields"]
-		fields_in_hit = [field for field in hit_fields]
+		fields_in_hit = [field for field in top_hit["_source"]]
 		transaction["match_found"] = False
 
 		# Collect Mapping Details
@@ -230,22 +229,23 @@ class WebConsumer():
 			transaction["match_found"] = True
 			for field in field_names:
 				if field in fields_in_hit:
-					field_content = hit_fields[field][0] if isinstance(hit_fields[field],\
- 						(list)) else str(hit_fields[field])
+					field_content = top_hit["_source"][field][0] if isinstance(top_hit["_source"][field],\
+ 						(list)) else str(top_hit["_source"][field])
 					transaction[attr_map.get(field, field)] = field_content
 				else:
 					transaction[attr_map.get(field, field)] = ""
 
 			if not transaction.get("country") or transaction["country"] == "":
 				logging.warning(("Factual response for merchant {} has no country code. "
-					"Defaulting to US.").format(hit_fields["factual_id"][0]))
+					"Defaulting to US.").format(top_hit["_source"]["factual_id"][0]))
 				transaction["country"] = "US"
 		# Add Business Name, City and State as a fallback
 		if decision is False:
 			for field in field_names:
 				transaction[attr_map.get(field, field)] = ""
-			transaction = self.__business_name_fallback(business_names, transaction, attr_map)
-			transaction = self.__geo_fallback(city_names, state_names, transaction, attr_map)
+			transaction["merchant_name"] = name
+			transaction["city"] = city
+			transaction["state"] = state
 			#Ensuring that there is a country code that matches the schema limitation
 			transaction["country"] = "US"
 
@@ -448,6 +448,8 @@ class WebConsumer():
 			trans.pop("merchant_score", None)
 			trans.pop("subtype_score", None)
 			trans.pop("category_score", None)
+			trans.pop("Predicted", None)
+			trans.pop("Processed", None)
 
 		# return transactions
 

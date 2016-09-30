@@ -341,13 +341,13 @@ def get_bool_query(starting_from=0, size=0):
 		}
 	}
 
-def get_merchant_quey(term, city, state):
+def get_merchant_query(term, city, state):
 	"""return a bool style ElasticSearch query object"""
 	return {
 		"query": {
 			"bool": {
 				"must": [
-					{ "match": { "name": { "query": term, "fuzziness": 1, "max_expansions": 1, "operator": "and" } } }
+					{ "match": { "name": { "query": term, "fuzziness": 3, "max_expansions": 3, "operator": "and" } } }
 				],
 				"should": [
 					{ "match": { "locality": { "query": city, "operator": "and" } } },
