@@ -347,7 +347,7 @@ def get_merchant_query(term, city, state):
 		"query": {
 			"bool": {
 				"must": [
-					{ "match": { "name": { "query": term, "fuzziness": 3, "max_expansions": 3, "operator": "and" } } }
+					{ "match": { "name": { "query": term, "fuzziness": 1, "max_expansions": 2, "operator": "and" } } }
 				],
 				"should": [
 					{ "match": { "locality": { "query": city, "operator": "and" } } },

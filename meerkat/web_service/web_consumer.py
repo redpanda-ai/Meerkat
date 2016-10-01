@@ -181,7 +181,10 @@ class WebConsumer():
 					return transaction
 				if locality != hits[1]["_source"].get("locality", '') or region != hits[0]["_source"].get("region", ''):
 					decison = True
-		
+				else:
+					if name.lower().replace('-', ' ').replace('\'', '') != hits[1]["_source"].get("name", ''):
+						name = ''
+
 		# Enrich Data if Passes Boundary
 		args = [decision, transaction, top_hit, name, city, state]
 		return self.__enrich_transaction(*args)
