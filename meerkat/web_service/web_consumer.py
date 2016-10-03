@@ -387,6 +387,8 @@ class WebConsumer():
 				trans["txn_type"] = trans.get("txn_type", "")
 				trans["website"] = trans.get("website", "")
 
+			if not trans["category_labels"]:
+				trans["category_labels"] = [trans["category_CNN"].get("label", "")]
 			trans["city"] = trans.get("city", "")
 			trans["state"] = trans.get("state", "")
 			trans["transaction_id"] = trans.get("transaction_id", None)
