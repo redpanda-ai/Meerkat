@@ -533,7 +533,7 @@ class WebConsumer():
 			return data["transaction_list"]
 
 		if "cobrand_region" in data:
-			region = 'reigion_' + str(data["cobrand_region"])
+			region = 'region_' + str(data["cobrand_region"])
 		else:
 			region = 'default'
 
