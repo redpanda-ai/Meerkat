@@ -220,10 +220,9 @@ def get_biggest_match(my_string, use_wildcards=False):
 			if place:
 				biggest = place
 	else:
-		max_wildcard_chars = 4
 		for i in range(len(my_string) - min_wildcard_length, -1, -1):
 			city = my_string[i:-state_size]
-			place = TRIE.search(state + city + '.' * max_wildcard_chars)
+			place = TRIE.search(state + city + '.' * (len(city) // 2))
 			if place:
 				biggest = place
 
