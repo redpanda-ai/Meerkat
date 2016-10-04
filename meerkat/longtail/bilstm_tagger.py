@@ -280,28 +280,19 @@ def build_graph(config):
 
 		# Word Embedding
 		word_inputs = tf.placeholder(tf.int32, [None], name="word_inputs")
-		wembed_matrix = tf.Variable(
-			tf.constant(0.0, shape=[config["vocab_size"], config["we_dim"]]),
-			trainable=True,
-			name="wembed_matrix"
-			)
-		embedding_placeholder = tf.placeholder(
-			tf.float32,
-			[config["vocab_size"], config["we_dim"]],
-			name="embedding_placeholder"
-			)
-		assign_wembedding = tf.assign(wembed_matrix, embedding_placeholder, name="assign_wembedding")
+		wembed_shape = [config["vocab_size"], config["we_dim"]]
+		wembed_init = tf.constant(0.0, shape=wembed_shape)
+		wembed_matrix = tf.Variable(wembed_init, trainable=True, name="wembed_matrix")
+		wembed_placeholder = tf.placeholder(tf.float32, wembed_shape, name="wembed_placeholder")
+		assign_wembedding = tf.assign(wembed_matrix, wembed_placeholder, name="assign_wembedding")
 		wembeds = tf.nn.embedding_lookup(wembed_matrix, word_inputs, name="we_lookup")
 		wembeds = tf.identity(wembeds, name="actual_we_lookup")
 
 		# Combine Embeddings
 		char_embeds = last_relevant(last_state, word_lengths, "char_embeds")
 		rev_char_embeds = last_relevant(rev_last_state, word_lengths, "rev_char_embeds")
-		combined_embeddings = tf.concat(
-			1,
-			[wembeds, char_embeds, tf.reverse(rev_char_embeds, [True, False])],
-			name="combined_embeddings"
-			)
+		embed_list = [wembeds, char_embeds, tf.reverse(rev_char_embeds, [True, False])]
+		combined_embeds = tf.concat(1, embed_list, name="combined_embeds")
 
 		# Cells and Weights
 		fw_lstm = tf.nn.rnn_cell.BasicLSTMCell(config["h_dim"], state_is_tuple=True)
@@ -309,32 +300,29 @@ def build_graph(config):
 		fw_network = tf.nn.rnn_cell.MultiRNNCell([fw_lstm]*config["num_layers"], state_is_tuple=True)
 		bw_network = tf.nn.rnn_cell.MultiRNNCell([bw_lstm]*config["num_layers"], state_is_tuple=True)
 
-		weight = tf.Variable(
-			tf.random_uniform([config["h_dim"] * 2, len(config["tag_map"])]),
-			name="weight"
-			)
+		weight_shape = [config["h_dim"] * 2, len(config["tag_map"])]
+		weight = tf.Variable(tf.random_uniform(weight_shape), name="weight")
 		bias = tf.Variable(tf.random_uniform([len(config["tag_map"])]))
 
-		def model(combined_embeddings, noise_sigma=0.0):
+		def model(combined_embeds, noise_sigma=0.0):
 			"""Model to train"""
 
-			combined_embeddings = tf.cond(
-				train,
-				lambda: tf.add(tf.random_normal(tf.shape(combined_embeddings)) * noise_sigma,
-					 combined_embeddings),
-				lambda: combined_embeddings
-				)
-			batched_input = tf.expand_dims(combined_embeddings, 0)
+			def add_input_noise():
+				noise = tf.random_normal(tf.shape(combined_embeds))
+				return tf.add(noise * noise_sigma, combined_embeds)
+
+			combined_embeds = tf.cond(train, add_input_noise, lambda: combined_embeds)
+			batched_input = tf.expand_dims(combined_embeds, 0)
 
 			options = {
 				"dtype": tf.float32,
 				"sequence_length": tf.expand_dims(trans_len, 0)
 			}
 
-			# _ is unused output state
+			# Apply LSTM
 			(outputs_fw, outputs_bw), _ = tf.nn.bidirectional_dynamic_rnn(
 				fw_network, bw_network, batched_input, **options
-				)
+			)
 
 			# Add Noise and Predict
 			concat_layer = tf.concat(
@@ -353,7 +341,7 @@ def build_graph(config):
 				)
 			return prediction
 
-		network = model(combined_embeddings, noise_sigma=config["noise_sigma"])
+		network = model(combined_embeds, noise_sigma=config["noise_sigma"])
 
 		# Calculate Loss and Optimize
 		labels = tf.placeholder(tf.float32, shape=[None, len(config["tag_map"].keys())], name="y")
@@ -381,7 +369,7 @@ def train_model(*args):
 	train_index = list(range(len(train)))
 	sess.run(
 		get_op(graph, "assign_wembedding"),
-		feed_dict={get_tensor(graph, "embedding_placeholder:0"): config["wembedding"]}
+		feed_dict={get_tensor(graph, "wembed_placeholder:0"): config["wembedding"]}
 		)
 
 	# Train the Model
