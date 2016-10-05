@@ -13,8 +13,8 @@ logger = logging.getLogger('tools')
 
 endpoint = 'search-agg-index-drnxobzbjwkomgpm5dnfqccypa.us-west-2.es.amazonaws.com'
 host = [{'host': endpoint, 'port': 80}]
-index_name = 'agg_index_20161003_test_4'
-index_type = 'agg_type_20161003_test_4'
+index_name = 'agg_index_20161003_test_5'
+index_type = 'agg_type_20161003_test_5'
 
 def match_all():
 	es = Elasticsearch(host)
@@ -49,6 +49,8 @@ def build_index(df, es, chunk_count, chunksize):
 		df[column] = df[column].astype('str')
 
 	data = df.to_dict(orient='records')
+	#Strip whitespace, which may interfere with a term query
+	df.apply(lambda x: x.str.strip(), axis=1)
 
 	actions = []
 	offset = chunk_count * chunksize
@@ -56,6 +58,7 @@ def build_index(df, es, chunk_count, chunksize):
 	for i in range(len(data)):
 		#It may be preferable to use pandas to alter the dataframe ahead of time.
 		#For now, I'm just removing all NaN values
+
 		for j in list(data[i]):
 			if data[i][j] == "nan":
 				del data[i][j]
