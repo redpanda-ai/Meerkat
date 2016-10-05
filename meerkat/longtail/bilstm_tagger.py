@@ -69,6 +69,7 @@ def get_tags(config, trans):
 
 	tokens = str(trans["Description"]).lower().split()[0:config["max_tokens"]]
 	tag = str(trans["Tagged_merchant_string"]).lower()
+
 	if "," in tag:
 		tag = tag.split(",")
 		tag = sum([item.split() for item in tag], [])
@@ -89,6 +90,7 @@ def get_tags(config, trans):
 					break
 			if not found:
 				tags.append("background")
+
 	return (tokens, tags)
 
 def validate_config(config):
@@ -276,7 +278,6 @@ def build_graph(config):
 		# Character Embedding
 		trans_len = tf.placeholder(tf.int64, None, name="trans_length")
 		train = tf.placeholder(tf.bool, name="train")
-		tf.set_random_seed(config["seed"])
 		last_state, rev_last_state, word_lengths = char_encoding(config, graph, trans_len)
 
 		# Word Embedding
