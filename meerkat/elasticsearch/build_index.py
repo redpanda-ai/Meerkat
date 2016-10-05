@@ -54,10 +54,11 @@ def real_main(filename):
 	reader = pd.read_csv(filename, chunksize=chunksize, dtype=dtype)
 	for chunk in reader:
 		logger.info("Chunk {0}".format(chunk_count))
-		load_index(chunk, es, chunk_count, chunksize)
+		load_dataframe_into_index(chunk, es, chunk_count, chunksize)
 		chunk_count += 1
 
-def load_index(df, es, chunk_count, chunksize):
+def load_dataframe_into_index(df, es, chunk_count, chunksize):
+	"""Bulk Load a dataframe into the index"""
 	#This ensures that all columns are cast as strings
 	for column in df.columns:
 		df[column] = df[column].astype('str')
