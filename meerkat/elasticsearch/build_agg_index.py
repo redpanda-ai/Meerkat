@@ -85,12 +85,13 @@ def build_index(filename):
 	reader = pd.read_csv(filename, chunksize=chunksize, dtype=dtype)
 	pool = mp.Pool(mp.cpu_count())
 
+	funclist = []
 	for chunk in reader:
 		logger.info("Chunk {0}".format(chunk_count))
 		kwargs = {"chunk_count": chunk_count, "chunksize": chunksize}
-		# load_dataframe_into_index(chunk, **kwargs)
+		load_dataframe_into_index(chunk, **kwargs)
 		# pool.apply(load_dataframe_into_index, [chunk], kwargs)
-		pool.apply_async(load_dataframe_into_index, [chunk], kwargs)
+		# pool.apply_async(load_dataframe_into_index, [chunk], kwargs)
 
 		chunk_count += 1
 
