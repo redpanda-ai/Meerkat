@@ -17,7 +17,7 @@ es = Elasticsearch(host)
 
 def pprint(dictionary, header=""):
 	"""Simple function to pretty print a dictionary"""
-	logger.info(header + "\n" + json.dumps(dictionary, sort_keys=True, indent=4))
+	logger.info("{0}\n{1}".format(header, json.dumps(dictionary, sort_keys=True, indent=4)))
 
 def search(query, **kwargs):
 	"""Performs an Elasticsearch 'search'"""
@@ -26,12 +26,9 @@ def search(query, **kwargs):
 	kwargs["doc_type"] = index_type
 	kwargs["body"] = query
 	results = es.search(**kwargs)['hits']['hits']
-	hits = len(results)
-	if hits > 0:
-		pprint(results, header="Results:")
-	else:
-		logger.info("No results")
-	return hits, results
+	pprint(results, header="Results: " + str(len(results)))
+
+	return len(results), results
 
 def match_all():
 	"""Query used to ensure that there are documents in the index."""
