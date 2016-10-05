@@ -87,10 +87,11 @@ def search_with_name_city_and_state(list_name, city, state):
 	return search(query)
 
 if __name__ == '__main__':
-	search_with_name_and_store("Title Credit Finance", "GA1287")
+	search_with_name_and_store("The Home Depot", "6372")
 	search_with_name_and_store("Colonial Finance", "4672")
 	search_with_name_and_store("Advance America", "1623")
 
+	search_with_name_city_and_state("The Home Depot", "Fort Lauderdale", "FL")
 	search_with_name_city_and_state("Walmart", "Chicago", "IL")
 	search_with_name_city_and_state("Redken", "Springfield", "IL")
 
