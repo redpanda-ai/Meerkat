@@ -7,7 +7,7 @@ from elasticsearch import Elasticsearch
 from elasticsearch import helpers
 
 
-logging.config.dictConfig(yaml.load(open('meerkat/logging.yaml', 'r')))
+logging.config.dictConfig(yaml.load(open('meerkat/geomancer/logging.yaml', 'r')))
 logger = logging.getLogger('tools')
 
 endpoint = 'search-agg-index-drnxobzbjwkomgpm5dnfqccypa.us-west-2.es.amazonaws.com'
