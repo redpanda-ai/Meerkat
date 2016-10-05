@@ -56,7 +56,6 @@ def build_index(df, es, chunk_count, chunksize):
 	for i in range(len(data)):
 		#It may be preferable to use pandas to alter the dataframe ahead of time.
 		#For now, I'm just removing all NaN values
-		data_clone = dict(data[i])
 		for j in list(data[i]):
 			if data[i][j] == "nan":
 				del data[i][j]
