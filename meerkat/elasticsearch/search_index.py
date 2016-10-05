@@ -25,8 +25,10 @@ def search(query, **kwargs):
 	kwargs["index"] = index_name
 	kwargs["doc_type"] = index_type
 	kwargs["body"] = query
-	results = es.search(**kwargs)['hits']['hits']
-	pprint(results, header="Results: " + str(len(results)))
+	#results = es.search(**kwargs)['hits']['hits']
+	results = es.search(**kwargs)
+	#pprint(results, header="Results: " + str(len(results)))
+	pprint(results, header="Results: " + str(len(results['hits']['hits'])))
 
 	return len(results), results
 
