@@ -25,12 +25,12 @@ def search(query, **kwargs):
 	kwargs["index"] = index_name
 	kwargs["doc_type"] = index_type
 	kwargs["body"] = query
-	#results = es.search(**kwargs)['hits']['hits']
-	results = es.search(**kwargs)
-	#pprint(results, header="Results: " + str(len(results)))
-	pprint(results, header="Results: " + str(len(results['hits']['hits'])))
 
-	return len(results), results
+	results = es.search(**kwargs)
+	hit_total = results['hits']['total']
+	pprint(results, header="Total Hits: {0}".format(hit_total))
+
+	return hit_total, results
 
 def match_all():
 	"""Query used to ensure that there are documents in the index."""
