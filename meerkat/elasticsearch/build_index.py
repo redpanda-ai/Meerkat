@@ -90,5 +90,3 @@ def load_dataframe_into_index(df, es, chunk_count, chunksize):
 
 if __name__ == '__main__':
 	real_main('./selected-lists-5224.csv')
-	#Uncomment the following to look at a sample result of a match_all query
-	#match_all()
