@@ -40,6 +40,7 @@ Created on July 20, 2016
 
 import logging
 import os
+import re
 import random
 import json
 import sys
@@ -92,6 +93,44 @@ def get_tags(config, trans):
 				tags.append("background")
 
 	return (tokens, tags)
+
+def tokenize(trans):
+	"""Custom tokenization function"""
+	
+	output = ""
+	prev_char = ""
+
+	for t in trans:
+
+		insert_space = False
+
+		# Conditions to Split
+		if prev_char.isdigit() and t.isalpha():
+			insert_space = True
+		if prev_char.isalpha() and t.isdigit():
+			insert_space = True
+		if prev_char.isupper() != t.isupper() and (prev_char.isalpha() and t.isalpha()):
+			insert_space = True
+
+		if insert_space:
+			output += " " + t
+		else:
+			output += t
+
+		prev_char = t
+
+	return ' '.join(output.split())
+	
+def get_token_tag_pairs(config, trans):
+	"""Convert df row to list of tags and tokens"""
+
+	# Tokenize String
+	# break on whitespace, special characters, number character boundary, uppercase lowercase boundary
+
+	# Get Tags
+
+	# Map tokens to Tags
+
 
 def validate_config(config):
 	"""Validate input configuration"""
