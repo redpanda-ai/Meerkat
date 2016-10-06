@@ -3,6 +3,8 @@ import sys
 import logging
 import yaml
 import json
+import queue
+import threading
 import pandas as pd
 import multiprocessing as mp
 from elasticsearch import Elasticsearch
@@ -94,5 +96,38 @@ def build_index(filename):
 		# pool.apply(load_dataframe_into_index, [chunk], kwargs)
 		# pool.apply_async(load_dataframe_into_index, [chunk], kwargs)
 
+def build_index_multi_threading():
+	if es.indices.exists(index_name):
+		logger.warning("Deleting existing index: {}".format(index_name))
+		res = es.indices.delete(index=index_name)
+
+	def worker():
+		while True:
+			df, kwargs = q.get()
+			if df is None: break
+			load_dataframe_into_index(df, **kwargs)
+			q.task_done()
+
+	q = queue.Queue()
+	threads = []
+	for i in range(3):
+		t = threading.Thread(target=worker)
+		t.start()
+		threads.append(t)
+
+	chunk_count, chunksize = 0, 10000
+	reader = pd.read_csv('./selected-lists-5224.csv', chunksize=chunksize)
+	for chunk in reader:
+		chunk_count += 1
+		kwargs = {"chunk_count": chunk_count, "chunksize": chunksize}
+		q.put((chunk, kwargs))
+
+	q.join()
+
+	for i in range(3):
+		q.put(None)
+	for t in threads:
+		t.join()
+
 if __name__ == '__main__':
-	build_index('./selected-lists-5224.csv')
+	build_index_multi_threading()
