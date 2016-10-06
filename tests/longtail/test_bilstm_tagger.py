@@ -69,24 +69,28 @@ class BilstmTaggerTests(unittest.TestCase):
 		self.assertEqual(result_wembedding.shape, (expected_w2i_length, fixture_config["we_dim"]))
 
 	def test_tokenize(self):
-		"""test word imbedding is properly constructed"""
+		"""Test is transactions are properly tokenized"""
 
 		input_trans = [
 			"1227WENDY'S VALDOSTA GA                  0XXXXXXXXXXXXXXXX",
 			"9668491207Staples, Inc BURTON MI               0XXXXXXXXXXXXXXXX",
 			"1218BP#9493560CIRCLE K 2708 ORLANDO FL   0XXXXXXXXXXXXXXXX",
-			"5288941207TARGET T2760 TARGET T2 OXNARD CA     0XXXXXXXXXXXXXXXX"
+			"5288941207TARGET T2760 TARGET T2 OXNARD CA     0XXXXXXXXXXXXXXXX",
+			"1223WM SUPERC Wal-Mart Sup PALMDALE CA   0XXXXXXXXXXXXXXXX",
+			"1210AmazonPrime Membersh amzn.com/prme NV0XXXXXXXXXXXXXXXX"
 		]
 
 		output_trans = [
 			"1227 WENDY'S VALDOSTA GA 0 XXXXXXXXXXXXXXXX",
 			"9668491207 Staples, Inc BURTON MI 0 XXXXXXXXXXXXXXXX",
 			"1218 BP #9493560 CIRCLE K 2708 ORLANDO FL 0 XXXXXXXXXXXXXXXX",
-			"5288941207 TARGET T2760 TARGET T2 OXNARD CA 0 XXXXXXXXXXXXXXXX"
+			"5288941207 TARGET T 2760 TARGET T 2 OXNARD CA 0 XXXXXXXXXXXXXXXX",
+			"1223 WM SUPERC Wal-Mart Sup PALMDALE CA 0 XXXXXXXXXXXXXXXX",
+			"1210 AmazonPrime Membersh amzn.com/prme NV 0 XXXXXXXXXXXXXXXX"
 		]
 
 		for key, value in zip(input_trans, output_trans):
-			self.assertEqual(tokenize(key), value)
+			self.assertEqual(bilstm.tokenize(key), value)
 
 	@parameterized.expand([
 		(["76"], ["merchant"], [[1, 36, 35 ,2], [0, 0, 0, 0]], [4, 0], [0]),

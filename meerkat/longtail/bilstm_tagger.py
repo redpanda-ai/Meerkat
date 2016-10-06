@@ -96,23 +96,22 @@ def get_tags(config, trans):
 
 def tokenize(trans):
 	"""Custom tokenization function"""
-	
+
 	output = ""
 	prev_char = ""
 
 	for t in trans:
 
-		insert_space = False
+		add_space = False
 
-		# Conditions to Split
-		if prev_char.isdigit() and t.isalpha():
-			insert_space = True
-		if prev_char.isalpha() and t.isdigit():
-			insert_space = True
-		if prev_char.isupper() != t.isupper() and (prev_char.isalpha() and t.isalpha()):
-			insert_space = True
+		if t.isalpha() and prev_char.isdigit():
+			add_space = True
+		if t.isdigit() and prev_char.isalpha():
+			add_space = True
+		if t == "#" and prev_char.isalpha():
+			add_space = True
 
-		if insert_space:
+		if add_space:
 			output += " " + t
 		else:
 			output += t
@@ -120,12 +119,15 @@ def tokenize(trans):
 		prev_char = t
 
 	return ' '.join(output.split())
-	
+
 def get_token_tag_pairs(config, trans):
 	"""Convert df row to list of tags and tokens"""
 
 	# Tokenize String
-	# break on whitespace, special characters, number character boundary, uppercase lowercase boundary
+	# break on whitespace DONE
+	# special characters, 
+	# number character boundary, 
+	# uppercase lowercase boundary
 
 	# Get Tags
 
