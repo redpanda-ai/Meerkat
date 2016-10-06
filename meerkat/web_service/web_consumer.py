@@ -166,6 +166,7 @@ class WebConsumer():
 		name = top_hit["_source"].get("name", '')
 		locality = top_hit["_source"].get("locality", '')
 		region = top_hit["_source"].get("region", '')
+
 		city, state = (transaction['locale_bloom'][0], transaction['locale_bloom'][1]) if transaction['locale_bloom'] else ('', '')
 		total = results['hits']['total']
 		decision = False
@@ -179,11 +180,11 @@ class WebConsumer():
 				if len(hits) < 2:
 					transaction = self.__no_result(transaction)
 					return transaction
-				if locality != hits[1]["_source"].get("locality", '') or region != hits[0]["_source"].get("region", ''):
-					decison = True
-#				else:
-#					if name.lower().replace('-', ' ').replace('\'', '') != hits[1]["_source"].get("name", ''):
-#						name = ''
+				if locality != hits[1]["_source"].get("locality", '') or region != hits[1]["_source"].get("region", ''):
+					decision = True
+				else:
+					if name.lower() != hits[1]["_source"].get("name", ''):
+						name = ''
 
 		# Enrich Data if Passes Boundary
 		args = [decision, transaction, top_hit, name, city, state]
@@ -432,6 +433,7 @@ class WebConsumer():
 				trans["state"] = ""
 
 			if debug:
+				trans["RNN"] = trans.get("Predicted", "")
 				trans["bloom_filter"] = {"city": trans["city"], "state": trans["state"]}
 				trans["cnn"] = {"txn_type" : trans.get("txn_type", ""),
 					"txn_sub_type" : trans.get("txn_sub_type", ""),
