@@ -183,8 +183,13 @@ class WebConsumer():
 				if locality != hits[1]["_source"].get("locality", '') or region != hits[1]["_source"].get("region", ''):
 					decision = True
 				else:
-					if name.lower() != hits[1]["_source"].get("name", ''):
-						name = ''
+					scores = [hit["_score"] for hit in hits]
+					z_score_delta, raw_score = self.__z_score_delta(scores)
+					thresholds = [float(hyperparams.get("z_score_threshold", "2")), float(hyperparams.get("raw_score_threshold", "1"))]
+					decision = True if (z_score_delta > thresholds[0]) and (raw_score > thresholds[1]) else False
+					if not decision:
+						if name.lower() != hits[1]["_source"].get("name", ''):
+							name = ''
 
 		# Enrich Data if Passes Boundary
 		args = [decision, transaction, top_hit, name, city, state]
