@@ -157,9 +157,14 @@ def start_producer(param):
 	csv_kwargs = param["csv_kwargs"]
 	count = 0
 	for chunk in pd.read_csv(input_file, **csv_kwargs):
+		my_qsize = param["data_queue"].qsize()
+		while my_qsize >= 300:
+			logger.warning("!!!!!!!!!!!!!     Producer will sleep, qsize is {0}".format(my_qsize))
+			time.sleep(10)
+			my_qsize = param["data_queue"].qsize()
 		param["data_queue"].put(chunk)
 		count += 1
-		logger.info("Populating data queue {0}".format(str(count)))
+		logger.info("Populating chunks placed: {0}, data_queue size {1}".format(count, my_qsize))
 	param["data_queue_populated"] = True
 	logger.info("data queue is populated, data queue size: {0}".format(param["data_queue"].qsize()))
 

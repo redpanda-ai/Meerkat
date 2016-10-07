@@ -38,7 +38,7 @@ class Worker(GeomancerModule):
 		#version_dir = self.config["version_dir"]
 
 		prefix = self.config["prefix"]
-		tarball_name = bank_or_card + "_transaction_sample.tab.tar.gz"
+		tarball_name = bank_or_card + "_transaction_sample.20161003.tab.tar.gz"
 		save_path = "meerkat/geomancer/data/input/" + bank_or_card + "/"
 		os.makedirs(save_path, exist_ok=True)
 
