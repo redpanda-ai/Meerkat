@@ -15,7 +15,7 @@ logger = logging.getLogger('tools')
 
 endpoint = 'search-agg-index-drnxobzbjwkomgpm5dnfqccypa.us-west-2.es.amazonaws.com'
 host = [{'host': endpoint, 'port': 80}]
-index_name, index_type = 'agg_index_20161004', 'agg_type'
+index_name, index_type = 'agg_index_20161006', 'agg_type'
 es = Elasticsearch(host)
 
 def load_dataframe_into_index(df, **kwargs):
@@ -125,7 +125,7 @@ def build_index_multi_threading():
 	q.join()
 
 	for i in range(3):
-		q.put(None)
+		q.put((None, None))
 	for t in threads:
 		t.join()
 
