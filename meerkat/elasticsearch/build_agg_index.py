@@ -13,9 +13,9 @@ from elasticsearch import helpers
 logging.config.dictConfig(yaml.load(open('meerkat/logging.yaml', 'r')))
 logger = logging.getLogger('tools')
 
-endpoint = 'search-agg-index-drnxobzbjwkomgpm5dnfqccypa.us-west-2.es.amazonaws.com'
+endpoint = 'search-agg-and-factual-aq75mydw7arj5htk3dvasbgx4e.us-west-2.es.amazonaws.com'
 host = [{'host': endpoint, 'port': 80}]
-index_name, index_type = 'agg_index_20161006', 'agg_type'
+index_name, index_type = 'agg_index_20161010', 'agg_type'
 es = Elasticsearch(host)
 
 def load_dataframe_into_index(df, **kwargs):
@@ -96,7 +96,8 @@ def build_index(filename):
 		# pool.apply(load_dataframe_into_index, [chunk], kwargs)
 		# pool.apply_async(load_dataframe_into_index, [chunk], kwargs)
 
-def build_index_multi_threading():
+def build_index_multi_threading(filename):
+	"Build index with the threading module"""
 	if es.indices.exists(index_name):
 		logger.warning("Deleting existing index: {}".format(index_name))
 		res = es.indices.delete(index=index_name)
@@ -110,13 +111,13 @@ def build_index_multi_threading():
 
 	q = queue.Queue()
 	threads = []
-	for i in range(3):
+	for i in range(8):
 		t = threading.Thread(target=worker)
 		t.start()
 		threads.append(t)
 
 	chunk_count, chunksize = 0, 10000
-	reader = pd.read_csv('./selected-lists-5224.csv', chunksize=chunksize)
+	reader = pd.read_csv(filename, chunksize=chunksize)
 	for chunk in reader:
 		chunk_count += 1
 		kwargs = {"chunk_count": chunk_count, "chunksize": chunksize}
@@ -124,10 +125,12 @@ def build_index_multi_threading():
 
 	q.join()
 
-	for i in range(3):
+	for i in range(8):
 		q.put((None, None))
 	for t in threads:
 		t.join()
 
 if __name__ == '__main__':
-	build_index_multi_threading()
+	build_index('./selected-lists-5224.csv')
+	sys.exit()
+	build_index_multi_threading('./selected-lists-5224.csv')
