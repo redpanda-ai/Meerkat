@@ -11,16 +11,6 @@ from tests.longtail.fixture import bilstm_tagger_fixture
 class BilstmTaggerTests(unittest.TestCase):
 	"""Unittest class for bilstm_tagger"""
 
-	def test_get_token_tag_pairs(self):
-		"""test if get_tags produces tag for each token correctly"""
-		config = bilstm_tagger_fixture.get_config()
-		transactions = bilstm_tagger_fixture.get_token_tag_pairs_input()
-
-		for trans in transactions:
-			tokens, tags = bilstm.get_token_tag_pairs(config, trans[0])
-			self.assertEqual(tags, trans[1])
-			self.assertEqual(tokens, trans[2])
-
 	def test_tokenize(self):
 		"""Test is transactions are properly tokenized"""
 
@@ -30,7 +20,8 @@ class BilstmTaggerTests(unittest.TestCase):
 			"1218BP#9493560CIRCLE K 2708 ORLANDO FL   0XXXXXXXXXXXXXXXX",
 			"5288941207TARGET T2760 TARGET T2 OXNARD CA     0XXXXXXXXXXXXXXXX",
 			"1223WM SUPERC Wal-Mart Sup PALMDALE CA   0XXXXXXXXXXXXXXXX",
-			"1210AmazonPrime Membersh amzn.com/prme NV0XXXXXXXXXXXXXXXX"
+			"1210AmazonPrime Membersh amzn.com/prme NV0XXXXXXXXXXXXXXXX",
+			"123 THAI FOOD OAK          HARBOR WA~~08888~~120123052189~~77132~~0~~~0079"
 		]
 
 		output_trans = [
@@ -39,11 +30,24 @@ class BilstmTaggerTests(unittest.TestCase):
 			"1218 BP #9493560 CIRCLE K 2708 ORLANDO FL 0 XXXXXXXXXXXXXXXX",
 			"5288941207 TARGET T 2760 TARGET T 2 OXNARD CA 0 XXXXXXXXXXXXXXXX",
 			"1223 WM SUPERC Wal-Mart Sup PALMDALE CA 0 XXXXXXXXXXXXXXXX",
-			"1210 AmazonPrime Membersh amzn.com/prme NV 0 XXXXXXXXXXXXXXXX"
+			"1210 AmazonPrime Membersh amzn.com/prme NV 0 XXXXXXXXXXXXXXXX",
+			"123 THAI FOOD OAK HARBOR WA ~~08888~~120123052189~~77132~~0~~~0079"
 		]
 
 		for key, value in zip(input_trans, output_trans):
-			self.assertEqual(bilstm.tokenize(key), value)
+			trans = {"DESCRIPTION": key}
+			self.assertEqual(bilstm.tokenize(trans), value)
+
+	def test_get_token_tag_pairs(self):
+		"""test if get_tags produces tag for each token correctly"""
+
+		config = bilstm_tagger_fixture.get_config()
+		transactions = bilstm_tagger_fixture.get_token_tag_pairs_input()
+
+		for trans in transactions:
+			tokens, tags = bilstm.get_token_tag_pairs(config, trans[0])
+			self.assertEqual(tags, trans[1])
+			self.assertEqual(tokens, trans[2])
 
 	@parameterized.expand([
 		({"tag_map": {"0": "background", "1": "merchant"}}, ["merchant", "background", "merchant"], [[0,1],[1,0],[0,1]]),
