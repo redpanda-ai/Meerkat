@@ -6,6 +6,7 @@ import yaml
 import pandas as pd
 from elasticsearch import Elasticsearch
 from elasticsearch import helpers
+from meerkat.various_tools import z_score_delta
 
 logging.config.dictConfig(yaml.load(open('meerkat/logging.yaml', 'r')))
 logger = logging.getLogger('tools')
@@ -37,7 +38,7 @@ def match_all():
 	query = {"query": {"match_all": {}}}
 	return search(query)
 
-def search_index(name):
+def search_with_name(name):
 	"""Basic query with no rules."""
 	query = {
 		'query': {
@@ -49,7 +50,16 @@ def search_index(name):
 		'_source': ['list_name', 'address', 'city', 'state', 'zip_code',
 			'phone_number', 'store_number']
 	}
-	return search(query)
+
+	hits, results = search(query)
+	scores = []
+	for result in results['hits']['hits']:
+		scores.append(result['_score'])
+	z_score = z_score_delta(scores)
+	if z_score and z_score > 0.5:
+		return True, results[0]
+
+	return False, None
 
 def search_with_name_and_store(list_name, store_number):
 	"""Finds the exact store or no store for a particular merchant and store number."""
@@ -65,24 +75,10 @@ def search_with_name_and_store(list_name, store_number):
 		'_source': ['list_name', 'address', 'city', 'state', 'zip_code',
 			'phone_number', 'store_number']
 	}
-	return search(query)
-
-def search_with_name_city_and_state(list_name, city, state):
-	"""Finds multiple stores when provided a name, city and state.."""
-	query = {
-		'query': {
-			'bool': {
-				'must': [
-					{'term': {'list_name': list_name}},
-					{'term': {'city': city}},
-					{'term': {'state': state}}
-				]
-			}
-		},
-		'_source': ['list_name', 'address', 'city', 'state', 'zip_code',
-			'phone_number', 'store_number']
-	}
-	return search(query)
+	hits, results = search(query)
+	if hits > 0:
+		return True, results['hits']['hits'][0]
+	return False, None
 
 def clean_store_number(store_number):
 	chars = list(store_number)
@@ -111,20 +107,83 @@ def search_with_name_and_zip(list_name, zip_code, description):
 	for result in results['hits']['hits']:
 		store_number = clean_store_number(result['_source']['store_number'])
 		if description.find(store_number) != -1:
-			logger.info('Find the store')
-			logger.info(result)
+			return True, result
+
+	scores = []
+	for result in results['hits']['hits']:
+		scores.append(result['_score'])
+	z_score = z_score_delta(scores)
+	if z_score and z_score > 0.5:
+		return True, results[0]
+
+	return False, None
+
+def search_with_name_city_and_state(list_name, city, state, description):
+	"""Finds multiple stores when provided a name, city and state.."""
+	query = {
+		'query': {
+			'bool': {
+				'must': [
+					{'term': {'list_name': list_name}},
+					{'term': {'city': city}},
+					{'term': {'state': state}}
+				]
+			}
+		},
+		'_source': ['list_name', 'address', 'city', 'state', 'zip_code',
+			'phone_number', 'store_number']
+	}
+
+	hits, results = search(query)
+	for result in results['hits']['hits']:
+		store_number = clean_store_number(result['_source']['store_number'])
+		if description.find(store_number) != -1:
+			return True, result
+
+	scores = []
+	for result in results['hits']['hits']:
+		scores.append(result['_score'])
+	z_score = z_score_delta(scores)
+	if z_score and z_score > 0.5:
+		return True, results[0]
+
+	return False, None
+
+def process_trans(filename):
+	df = pd.read_csv(filename, sep='|')
+	df['ADDRESS'] = ''
+
+	count = 0
+	for index, row in df.iterrows():
+		count += 1
+		if count == 200: break
+
+		print(row)
+		des, name = row['DESCRIPTION'], row['MERCHANT_NAME']
+		city, state = row['LOCALITY'], row['STATE']
+		store, phone = row['STORE_NUMBER'], row['PHONE_NUMBER']
+
+		tran = row.notnull()
+		flag_des, flag_name = tran['DESCRIPTION'], tran['MERCHANT_NAME']
+		flag_city, flag_state = tran['LOCALITY'], tran['STATE']
+		flag_store, flag_phone = tran['STORE_NUMBER'], tran['PHONE_NUMBER']
+
+		print(tran)
+		if flag_name and flag_city and flag_state:
+			flag, result = search_with_name_city_and_state(name, city, state, des)
+			if flag:
+				df.set_value(index, 'ADDRESS', result['_source']['address'])
+				continue
+		if flag_name and flag_store:
+			flag, result = search_with_name_and_store(name, store)
+			if flag:
+				df.set_value(index, 'ADDRESS', result['_source']['address'])
+				continue
+
+		df.set_value(index, 'ADDRESS', "No Address Found")
+
+	df.to_csv('./test.csv', sep='|', index=False, header=True)
+	print('Done')
 
 if __name__ == '__main__':
-	# search_with_name_and_zip("The Home Depot", "78745", "THE HOME DEPOT #6570     SUNSET VALLEYTX")
-	# search_with_name_and_zip("Walgreens", "33180", "WALGREENS #4955          AVENTURA     FL")
-	search_with_name_and_zip("Target", "60707", "TARGET        00019240   CHICAGO      IL")
-
-	# search_with_name_and_store("The Home Depot", "6372")
-	# search_with_name_and_store("Colonial Finance", "4672")
-	# search_with_name_and_store("Advance America", "1623")
-
-	# search_with_name_city_and_state("The Home Depot", "Fort Lauderdale", "FL")
-	# search_with_name_city_and_state("Walmart", "Chicago", "IL")
-	# search_with_name_city_and_state("Redken", "Springfield", "IL")
-
-	# search_index("Target")
+	process_trans('./processed_credit.csv')
