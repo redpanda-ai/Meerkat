@@ -94,11 +94,12 @@ def get_tags(config, trans):
 
 	return (tokens, tags)
 
-def tokenize(trans):
+def tokenize(config, trans):
 	"""Custom tokenization function"""
 
 	output = ""
 	prev_char = ""
+	trans = ' '.join(trans["DESCRIPTION"].split())
 
 	for t in trans:
 
@@ -118,16 +119,13 @@ def tokenize(trans):
 
 		prev_char = t
 
-	return ' '.join(output.split())
+	return output
 
 def get_token_tag_pairs(config, trans):
 	"""Convert df row to list of tags and tokens"""
 
 	# Tokenize String
-	# break on whitespace DONE
-	# special characters, 
-	# number character boundary, 
-	# uppercase lowercase boundary
+	tokens = tokenize(config, trans).split()
 
 	# Get Tags
 
