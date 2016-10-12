@@ -1,6 +1,6 @@
 {
 	"input" : {
-		"hyperparameters" : "meerkat/web_service/config/hyperparameters/default.json",
+		"hyperparameters" : "meerkat/web_service/config/hyperparameters/new1.json",
 		"encoding" : "utf-8"
 	},
 	"output" : {
@@ -16,9 +16,9 @@
 		}
 	},
 	"elasticsearch" : {
-		"skip_es": true,
+		"skip_es": false,
 		"cluster_nodes" : [
-			"internal-default-vpc-meerkat-lb-2028162053.us-west-2.elb.amazonaws.com"
+			"search-factual-index-ykw57nh3wz7pyctr4cjymsz3ka.us-west-2.es.amazonaws.com:80"
 		],
 		"index" : "factual_index",
 		"type" : "factual_type"

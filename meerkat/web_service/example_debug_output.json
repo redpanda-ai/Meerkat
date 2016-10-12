@@ -31,6 +31,9 @@
 				"city": "Sunnyvale",
 				"state": "CA"
 			},
+			"rnn": {
+				"merchant_name" : ""
+			},
 			"cnn" : {
 				"merchant_name" : "",
 				"txn_type" : "",
@@ -71,6 +74,9 @@
 				"city": "Sunnyvale",
 				"state": "CA"
 			},
+			"rnn": {
+				"merchant_name" : ""
+			},
 			"cnn" : {
 				"txn_type" : "",
 				"txn_sub_type" : "",
@@ -90,6 +96,9 @@
 			"bloom_filter" : {
 				"city": "Sunnyvale",
 				"state": "CA"
+			},
+			"rnn": {
+				"merchant_name" : ""
 			},
 			"cnn" : {
 				"merchant_name" : "",

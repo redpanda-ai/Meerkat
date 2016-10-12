@@ -18,7 +18,7 @@ from scipy.stats.mstats import zscore
 
 from meerkat.various_tools import get_es_connection, string_cleanse, get_boosted_fields
 from meerkat.various_tools import synonyms, get_bool_query, get_qs_query
-from meerkat.classification.load_model import load_scikit_model, get_tf_cnn_by_path
+from meerkat.classification.load_model import load_scikit_model, get_tf_cnn_by_path, get_tf_rnn_by_path
 from meerkat.classification.auto_load import main_program as load_models_from_s3
 
 # pylint:disable=no-name-in-module
@@ -85,6 +85,9 @@ class WebConsumer():
 				self.models[key] = get_tf_cnn_by_path(models_dir + filename, \
 					label_maps_dir + filename[:-4] + 'json', gpu_mem_fraction=gmf)
 
+		# Get RNN Models
+		self.rnn_model = get_tf_rnn_by_path('meerkat/longtail/models/bilstm.ckpt', 'meerkat/longtail/models/w2i.json')
+
 	def update_hyperparams(self, hyperparams):
 		"""Updates a WebConsumer object's hyper-parameters"""
 		self.hyperparams = hyperparams
@@ -95,31 +98,31 @@ class WebConsumer():
 		result_size = self.hyperparams.get("es_result_size", "10")
 		fields = self.params["output"]["results"]["fields"]
 		locale_bloom = transaction["locale_bloom"]
-		transaction = string_cleanse(transaction["description"]).rstrip()
-
-		# Input transaction must not be empty
-		if len(transaction) <= 2 and re.match('^[a-zA-Z0-9_]+$', transaction):
-			return
-
-		# Replace synonyms
-		transaction = synonyms(transaction)
-		transaction = string_cleanse(transaction)
 
 		# Construct Optimized Query
 		o_query = get_bool_query(size=result_size)
 		o_query["fields"] = fields
 		o_query["_source"] = "pin.*"
 		should_clauses = o_query["query"]["bool"]["should"]
+		must_clauses = o_query["query"]["bool"]["must"]
 		field_boosts = get_boosted_fields(self.hyperparams, "standard_fields")
-		simple_query = get_qs_query(transaction, field_boosts)
-		should_clauses.append(simple_query)
+		# Add Merchant Sub Query
+		if transaction['CNN']['label'] != '':
+			term = string_cleanse(transaction['CNN']['label'])
+			merchant_query = get_qs_query(term, ['name'], field_boosts['name'], operator="AND")
+			must_clauses.append(merchant_query)
+		elif transaction['Predicted'] != '':
+			term = synonyms(transaction['Predicted'])
+			term = string_cleanse(term)
+			merchant_query = get_qs_query(term, ['name'], field_boosts['name'])
+			must_clauses.append(merchant_query)
 
 		# Add Locale Sub Query
 		if locale_bloom != None:
-			city_query = get_qs_query(locale_bloom[0].lower(), ['locality'])
-			state_query = get_qs_query(locale_bloom[1].lower(), ['region'])
-			should_clauses.append(city_query)
-			should_clauses.append(state_query)
+			city_query = get_qs_query(locale_bloom[0].lower(), ['locality'], field_boosts['locality'])
+			state_query = get_qs_query(locale_bloom[1].lower(), ['region'], field_boosts['region'], operator="AND")
+			must_clauses.append(city_query)
+			must_clauses.append(state_query)
 
 		return o_query
 
@@ -159,6 +162,9 @@ class WebConsumer():
 
 		# Collect Necessary Information
 		hits = results['hits']['hits']
+		if len(hits) < 1:
+			transaction = self.__no_result(transaction)
+			return transaction
 		top_hit = hits[0]
 		hit_fields = top_hit.get("fields", "")
 
@@ -188,16 +194,18 @@ class WebConsumer():
 
 		# Need Names
 		if len(names["business_names"]) < 2:
-			transaction = self.__no_result(transaction)
-			return transaction
+			names["business_names"].append("")
 
-		# City Names Cause issues
-		if names["business_names"][0] in self.cities:
-			transaction = self.__no_result(transaction)
-			return transaction
+		if len(names["city_names"]) < 2:
+			names["city_names"].append("")
+
+		if len(names["state_names"]) < 2:
+			names["state_names"].append("")
 
 		# Collect Relevancy Scores
 		scores = [hit["_score"] for hit in hits]
+		if len(scores) < 2:
+			scores.append(0.0)
 		z_score_delta, raw_score = self.__z_score_delta(scores)
 		
 		thresholds = [float(hyperparams.get("z_score_threshold", "2")), \
@@ -459,6 +467,7 @@ class WebConsumer():
 					"subtype_score" : trans.get("subtype_score", "0.0"),
 					"category_score" : trans.get("category_score", "0.0")
 					}
+				trans["rnn"] = {"merchant_name": trans.get("Predicted", "")}
 
 			trans.pop("locale_bloom", None)
 			trans.pop("description", None)
@@ -471,6 +480,7 @@ class WebConsumer():
 			trans.pop("merchant_score", None)
 			trans.pop("subtype_score", None)
 			trans.pop("category_score", None)
+			trans.pop("Predicted", None)
 
 		# return transactions
 
@@ -673,6 +683,9 @@ class WebConsumer():
 
 		return data["transaction_list"]
 
+	def __apply_rnn(self, transactions):
+		self.rnn_model(transactions, doc_key="description")
+
 	@staticmethod
 	def __apply_locale_bloom(data):
 		""" Apply the locale bloom filter to transactions"""
@@ -729,6 +742,10 @@ class WebConsumer():
 				transaction["locale_bloom"] = None
 		physical, non_physical = self.__sws(data)
 
+		# Apply RNN
+		if "rnn" in services_list or services_list == []:
+			self.__apply_rnn(physical)
+
 		if "search" in services_list or services_list == [] and \
 		not self.params["elasticsearch"]["skip_es"]:
 			physical = self.__enrich_physical(physical)
@@ -741,6 +758,10 @@ class WebConsumer():
 		"""Classify a set of transactions"""
 		services_list = data.get("services_list", [])
 		debug = data.get("debug", False)
+
+		# Apply Merchant CNN
+		if "cnn_merchant" in services_list or services_list == []:
+			self.__apply_merchant_cnn(data)
 
 		cpu_result = self.__cpu_pool.apply_async(self.__apply_cpu_classifiers, (data, ))
 
@@ -757,10 +778,6 @@ class WebConsumer():
 			# Apply Category CNN
 			if "cnn_category" in services_list or "cnn_subtype" in services_list or services_list == []:
 				self.__apply_category_cnn(data)
-
-			# Apply Merchant CNN
-			if "cnn_merchant" in services_list or services_list == []:
-				self.__apply_merchant_cnn(data)
 
 		cpu_result.get() # Wait for CPU bound classifiers to finish
 
