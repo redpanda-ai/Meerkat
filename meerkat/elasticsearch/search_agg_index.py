@@ -16,7 +16,14 @@ def basic_search(list_name):
 	query = {
 		'query': {
 			'bool': {
-				'must': {'term': {'list_name': list_name}}
+				'must': {
+					'match': {
+						'list_name': {
+							'query': list_name,
+							'fuzziness': 2
+						}
+					}
+				}
 			}
 		}
 	}
@@ -35,7 +42,8 @@ def create_must_query(list_name, state, zip_code):
 	if state != '':
 		must_query.append({'match': {'state': state}})
 	if zip_code != '':
-		must_query.append({'match': {'zip_code': zip_code}})
+		zip_query = {'zip_code': {'query': zip_code, 'fuzziness': 1, 'boost': 3}}
+		must_query.append({'match': zip_query})
 	return must_query
 
 def create_should_query(city, store_number, phone_number):
@@ -44,9 +52,11 @@ def create_should_query(city, store_number, phone_number):
 	if city != '':
 		should_query.append({'match': {'city': city}})
 	if store_number != '':
-		should_query.append({'match': {'store_number': store_number}})
+		store = {'store_number': {'query': store_number, 'fuzziness': 1, 'boost': 3}}
+		should_query.append({'match': store})
 	if phone_number != '':
-		should_query.append({'match': {'phone_number': phone_number}})
+		phone = {'phone_number': {'query': phone_number, 'fuzziness': 3, 'boost': 2}}
+		should_query.append({'match': phone})
 	return should_query
 
 def create_bool_query(must, should):
@@ -88,7 +98,8 @@ def search_index(filename):
 
 		results = es.msearch(body=requests)['responses']
 		hits = results[0]['hits']['total']
-		print('hits: {}    agg: {}'.format(hits, data[i]['Agg_Name']))
+		if hits == 0:
+			print('hits: {}, agg: {}'.format(hits, data[i]['Agg_Name']))
 		requests = list()
 
 if __name__ == '__main__':
