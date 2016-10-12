@@ -15,7 +15,7 @@ logger = logging.getLogger('tools')
 
 endpoint = 'search-agg-and-factual-aq75mydw7arj5htk3dvasbgx4e.us-west-2.es.amazonaws.com'
 host = [{'host': endpoint, 'port': 80}]
-index_name, index_type = 'agg_index_20161010', 'agg_type'
+index_name, index_type = 'agg_index', 'agg_type'
 es = Elasticsearch(host)
 
 def load_dataframe_into_index(df, **kwargs):
@@ -24,9 +24,8 @@ def load_dataframe_into_index(df, **kwargs):
 	for column in df.columns:
 		df[column] = df[column].astype('str')
 
+	df = df.apply(lambda x: x.str.strip(), axis=1)
 	data = df.to_dict(orient='records')
-	# Strip whitespace, which may interfere with a term query
-	df.apply(lambda x: x.str.strip(), axis=1)
 
 	actions = []
 	offset = kwargs['chunk_count'] * kwargs['chunksize']
