@@ -129,9 +129,12 @@ def get_token_tag_pairs(config, trans):
 	# Tag Column Map
 	entities = {}
 	tag_column_map = config["tag_column_map"]
-	for key, value in enumerate(tag_column_map):
+	for key, value in tag_column_map.items():
+		if key not in trans: continue
 		tag = trans[key].split(",")
 		entities[value] = tag
+
+	print(entities)
 
 	# Tokenize String
 	tokens = tokenize(trans).split()
@@ -205,8 +208,10 @@ def construct_embedding(config, w2i, loaded_embedding):
 def subpreprocess(config, name):
 	"""check the reference above"""
 	config[name] = config[name].to_dict("record")
+	random.shuffle(config[name])
 	for i, tran in enumerate(config[name]):
-		config[name][i] = get_tags(config, tran)
+		config[name][i] = get_token_tag_pairs(config, tran)
+		sys.exit()
 	return config
 
 def preprocess(config):

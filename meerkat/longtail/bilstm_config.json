@@ -1,8 +1,15 @@
 {
 	"model_path": "",
-	"dataset": "meerkat/longtail/train.csv",
+	"dataset": "processed_credit.csv",
 	"alphabet": "abcdefghijklmnopqrstuvwxyz0123456789,;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}",
 	"embeddings": "../embeddings/en.polyglot.txt",
+	"tag_column_map": {
+		"MERCHANT_NAME": "merchant",
+		"LOCALITY": "city",
+		"STORE_NUMBER": "store_number",
+		"PHONE_NUMBER": "phone_number",
+		"ADDRESS": "address"
+	},
 	"tag_map": {
 		"0": "background",
 		"1": "merchant",
