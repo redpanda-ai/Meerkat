@@ -126,6 +126,13 @@ def tokenize(trans):
 def get_token_tag_pairs(config, trans):
 	"""Convert df row to list of tags and tokens"""
 
+	# Tag Column Map
+	entities = {}
+	tag_column_map = config["tag_column_map"]
+	for key, value in enumerate(tag_column_map):
+		tag = trans[key].split(",")
+		entities[value] = tag
+
 	# Tokenize String
 	tokens = tokenize(trans).split()
 
