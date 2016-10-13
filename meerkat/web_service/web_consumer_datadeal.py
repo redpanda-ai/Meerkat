@@ -156,7 +156,8 @@ class WebConsumerDatadeal():
 		self.__apply_merchant_cnn(data)
 
 		# Apply RNN
-		#self.__apply_rnn(data)
+		#if trans['CNN']['label'] != '':
+			#self.__apply_rnn(data)
 
 		# Apply Elasticsearch
 		self.__search_in_agg_or_factual(data)
