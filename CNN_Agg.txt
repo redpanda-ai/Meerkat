@@ -1,0 +1,3050 @@
+[
+  {
+    "CNN_Name": "16 Handles",
+    "Agg_Name": "16 Handles"
+  },
+  {
+    "CNN_Name": "1-800-Flowers",
+    "Agg_Name": "1-800-Flowers"
+  },
+  {
+    "CNN_Name": "24 Hour Fitness",
+    "Agg_Name": "24 Hour Fitness"
+  },
+  {
+    "CNN_Name": "7-Eleven",
+    "Agg_Name": "7-Eleven US"
+  },
+  {
+    "CNN_Name": "99 Cents Only Stores",
+    "Agg_Name": "99 Cents Only Stores"
+  },
+  {
+    "CNN_Name": "99 Ranch Market",
+    "Agg_Name": "99 Ranch Market"
+  },
+  {
+    "CNN_Name": "A&P",
+    "Agg_Name": "A&P"
+  },
+  {
+    "CNN_Name": "A&W",
+    "Agg_Name": "A&W Restaurants"
+  },
+  {
+    "CNN_Name": "A.C. Moore",
+    "Agg_Name": "A.C. Moore"
+  },
+  {
+    "CNN_Name": "AAA",
+    "Agg_Name": "AAA"
+  },
+  {
+    "CNN_Name": "Aaron Brothers",
+    "Agg_Name": "Aaron Brothers"
+  },
+  {
+    "CNN_Name": "Academy Sports + Outdoors",
+    "Agg_Name": "Academy Sports + Outdoors"
+  },
+  {
+    "CNN_Name": "Ace Hardware",
+    "Agg_Name": "Ace Hardware"
+  },
+  {
+    "CNN_Name": "Acme Markets",
+    "Agg_Name": "Acme Markets"
+  },
+  {
+    "CNN_Name": "Adidas",
+    "Agg_Name": "Adidas"
+  },
+  {
+    "CNN_Name": "ADT Security",
+    "Agg_Name": "ADT Security Services"
+  },
+  {
+    "CNN_Name": "Advance Auto Parts",
+    "Agg_Name": "Advance Auto Parts"
+  },
+  {
+    "CNN_Name": "AdvoCare",
+    "Agg_Name": "Advocare"
+  },
+  {
+    "CNN_Name": "Aerosoles",
+    "Agg_Name": "Aerosoles"
+  },
+  {
+    "CNN_Name": "Alamo Rent a Car",
+    "Agg_Name": "Alamo Rent A Car"
+  },
+  {
+    "CNN_Name": "Albertsons",
+    "Agg_Name": "Albertsons"
+  },
+  {
+    "CNN_Name": "ALDI",
+    "Agg_Name": "ALDI"
+  },
+  {
+    "CNN_Name": "Aldo",
+    "Agg_Name": "ALDO"
+  },
+  {
+    "CNN_Name": "Allstate",
+    "Agg_Name": "Allstate Insurance"
+  },
+  {
+    "CNN_Name": "Allsup's",
+    "Agg_Name": "Allsup's"
+  },
+  {
+    "CNN_Name": "American Apparel",
+    "Agg_Name": "American Apparel"
+  },
+  {
+    "CNN_Name": "American Eagle Outfitters",
+    "Agg_Name": "American Eagle Outfitters"
+  },
+  {
+    "CNN_Name": "American Family Insurance",
+    "Agg_Name": "American Family Insurance (AmFam)"
+  },
+  {
+    "CNN_Name": "AmeriGas Inc",
+    "Agg_Name": "Amerigas"
+  },
+  {
+    "CNN_Name": "Ameriprise Financial",
+    "Agg_Name": "Ameriprise Financial"
+  },
+  {
+    "CNN_Name": "Amtrak",
+    "Agg_Name": "Amtrak"
+  },
+  {
+    "CNN_Name": "Ann Taylor",
+    "Agg_Name": "Ann Taylor"
+  },
+  {
+    "CNN_Name": "Anthropologie",
+    "Agg_Name": "Anthropologie"
+  },
+  {
+    "CNN_Name": "Anytime Fitness",
+    "Agg_Name": "Anytime Fitness"
+  },
+  {
+    "CNN_Name": "Applebee's",
+    "Agg_Name": "Applebee's"
+  },
+  {
+    "CNN_Name": "Aramark",
+    "Agg_Name": "Aramark Uniform & Career Apparel"
+  },
+  {
+    "CNN_Name": "Arby's",
+    "Agg_Name": "Arby's"
+  },
+  {
+    "CNN_Name": "ARCO",
+    "Agg_Name": "ARCO"
+  },
+  {
+    "CNN_Name": "Aritzia",
+    "Agg_Name": "Aritzia"
+  },
+  {
+    "CNN_Name": "Armani Exchange",
+    "Agg_Name": "Armani Exchange (A/X)"
+  },
+  {
+    "CNN_Name": "Associated Supermarkets",
+    "Agg_Name": "Associated Supermarkets"
+  },
+  {
+    "CNN_Name": "AT&T",
+    "Agg_Name": "AT&T"
+  },
+  {
+    "CNN_Name": "Athleta",
+    "Agg_Name": "Athleta"
+  },
+  {
+    "CNN_Name": "Atlanta Bread Company",
+    "Agg_Name": "Atlanta Bread"
+  },
+  {
+    "CNN_Name": "Au Bon Pain",
+    "Agg_Name": "Au Bon Pain"
+  },
+  {
+    "CNN_Name": "Audi",
+    "Agg_Name": "Audi"
+  },
+  {
+    "CNN_Name": "Auntie Anne's",
+    "Agg_Name": "Auntie Anne's"
+  },
+  {
+    "CNN_Name": "AutoZone",
+    "Agg_Name": "AutoZone"
+  },
+  {
+    "CNN_Name": "Aveda",
+    "Agg_Name": "Aveda"
+  },
+  {
+    "CNN_Name": "Avis Rent a Car System",
+    "Agg_Name": "Avis Rent A Car"
+  },
+  {
+    "CNN_Name": "Bahama Breeze",
+    "Agg_Name": "Bahama Breeze"
+  },
+  {
+    "CNN_Name": "Baja Fresh",
+    "Agg_Name": "Baja Fresh"
+  },
+  {
+    "CNN_Name": "Bakers",
+    "Agg_Name": "Baker's Supermarkets"
+  },
+  {
+    "CNN_Name": "Bally Total Fitness",
+    "Agg_Name": "Bally Total Fitness"
+  },
+  {
+    "CNN_Name": "Banana Republic",
+    "Agg_Name": "Banana Republic"
+  },
+  {
+    "CNN_Name": "Banfield",
+    "Agg_Name": "Banfield Pet Hospital"
+  },
+
+  {
+    "CNN_Name": "Bar Louie",
+    "Agg_Name": "Bar Louie"
+  },
+  {
+    "CNN_Name": "Bare Escentuals",
+    "Agg_Name": "Bare Escentuals"
+  },
+  {
+    "CNN_Name": "Bartell Drugs",
+    "Agg_Name": "Bartell Drugs"
+  },
+  {
+    "CNN_Name": "Bashas' Supermarkets",
+    "Agg_Name": "Bashas' Supermarkets"
+  },
+  {
+    "CNN_Name": "Bass Pro Shops",
+    "Agg_Name": "Bass Pro Shops"
+  },
+  {
+    "CNN_Name": "Bath & Body Works",
+    "Agg_Name": "Bath & Body Works"
+  },
+  {
+    "CNN_Name": "Batteries Plus",
+    "Agg_Name": "Batteries Plus Bulbs"
+  },
+  {
+    "CNN_Name": "Bealls",
+    "Agg_Name": "Bealls Outlet Stores"
+  },
+  {
+    "CNN_Name": "Bebe Stores",
+    "Agg_Name": "bebe"
+  },
+  {
+    "CNN_Name": "Bed Bath & Beyond",
+    "Agg_Name": "Bed Bath & Beyond"
+  },
+  {
+    "CNN_Name": "Belk",
+    "Agg_Name": "Belk"
+  },
+  {
+    "CNN_Name": "Benihana",
+    "Agg_Name": "Benihana"
+  },
+
+  {
+    "CNN_Name": "Bertucci's",
+    "Agg_Name": "Bertucci's"
+  },
+  {
+    "CNN_Name": "Best Buy",
+    "Agg_Name": "Best Buy"
+  },
+  {
+    "CNN_Name": "Best Western",
+    "Agg_Name": "Best Western"
+  },
+  {
+    "CNN_Name": "BevMo!",
+    "Agg_Name": "BevMo"
+  },
+  {
+    "CNN_Name": "Big 5 Sporting Goods",
+    "Agg_Name": "Big 5 Sporting Goods"
+  },
+  {
+    "CNN_Name": "Big Lots",
+    "Agg_Name": "Big Lots Stores"
+  },
+  {
+    "CNN_Name": "Big Y",
+    "Agg_Name": "Big Y Foods"
+  },
+  {
+    "CNN_Name": "BI-LO",
+    "Agg_Name": "BI-LO"
+  },
+  {
+    "CNN_Name": "BJ's Wholesale Club",
+    "Agg_Name": "BJ's Wholesale Club"
+  },
+  {
+    "CNN_Name": "Blaze Pizza",
+    "Agg_Name": "Blaze Pizza"
+  },
+  {
+    "CNN_Name": "Blimpie",
+    "Agg_Name": "Blimpie"
+  },
+  {
+    "CNN_Name": "Blockbuster",
+    "Agg_Name": "Blockbuster"
+  },
+  {
+    "CNN_Name": "Bloomingdale's",
+    "Agg_Name": "Bloomingdale's"
+  },
+  {
+    "CNN_Name": "BMW",
+    "Agg_Name": "BMW"
+  },
+  {
+    "CNN_Name": "Bob Evans",
+    "Agg_Name": "Bob Evans"
+  },
+  {
+    "CNN_Name": "Bojangles",
+    "Agg_Name": "Bojangles'"
+  },
+  {
+    "CNN_Name": "Boloco",
+    "Agg_Name": "Boloco"
+  },
+  {
+    "CNN_Name": "Bonefish Grill",
+    "Agg_Name": "Bonefish Grill"
+  },
+  {
+    "CNN_Name": "Bon-Ton",
+    "Agg_Name": "Bon-Ton Stores"
+  },
+  {
+    "CNN_Name": "Books-A-Million",
+    "Agg_Name": "Books-A-Million"
+  },
+  {
+    "CNN_Name": "Boost Mobile",
+    "Agg_Name": "Boost Mobile"
+  },
+  {
+    "CNN_Name": "Booster Juice",
+    "Agg_Name": "Booster Juice"
+  },
+  {
+    "CNN_Name": "Boscov's",
+    "Agg_Name": "Boscov's"
+  },
+  {
+    "CNN_Name": "Boston Market",
+    "Agg_Name": "Boston Market"
+  },
+  {
+    "CNN_Name": "BP Global",
+    "Agg_Name": "BP"
+  },
+  {
+    "CNN_Name": "Braum's",
+    "Agg_Name": "Braum's Ice Cream and Dairy Stores"
+  },
+  {
+    "CNN_Name": "Bristol Farms",
+    "Agg_Name": "Bristol Farms"
+  },
+  {
+    "CNN_Name": "Brooks Brothers",
+    "Agg_Name": "Brooks Brothers"
+  },
+  {
+    "CNN_Name": "Brookstone",
+    "Agg_Name": "Brookstone"
+  },
+  {
+    "CNN_Name": "Bruegger's",
+    "Agg_Name": "Bruegger's"
+  },
+  {
+    "CNN_Name": "Buc-ee's",
+    "Agg_Name": "Buc-ee's"
+  },
+  {
+    "CNN_Name": "Buckle",
+    "Agg_Name": "Buckle"
+  },
+  {
+    "CNN_Name": "Budget Rent a Car",
+    "Agg_Name": "Budget Rent A Car"
+  },
+  {
+    "CNN_Name": "Buffalo Wild Wings",
+    "Agg_Name": "Buffalo Wild Wings"
+  },
+  {
+    "CNN_Name": "Burger King",
+    "Agg_Name": "Burger King US"
+  },
+  {
+    "CNN_Name": "Burlington Coat Factory",
+    "Agg_Name": "Burlington Coat Factory"
+  },
+  {
+    "CNN_Name": "Buy Buy Baby",
+    "Agg_Name": "Buy Buy Baby"
+  },
+  {
+    "CNN_Name": "Cabela's",
+    "Agg_Name": "Cabela's"
+  },
+  {
+    "CNN_Name": "California Pizza Kitchen",
+    "Agg_Name": "California Pizza Kitchen"
+  },
+  {
+    "CNN_Name": "California Tortilla",
+    "Agg_Name": "California Tortilla"
+  },
+  {
+    "CNN_Name": "Calvin Klein",
+    "Agg_Name": "Calvin Klein"
+  },
+  {
+    "CNN_Name": "Camping World",
+    "Agg_Name": "Camping World"
+  },
+  {
+    "CNN_Name": "Capital One",
+    "Agg_Name": "Capital One"
+  },
+  {
+    "CNN_Name": "Captain D's",
+    "Agg_Name": "Captain D's Seafood Restaurant"
+  },
+  {
+    "CNN_Name": "Cardenas Markets",
+    "Agg_Name": "Cardenas Markets"
+  },
+  {
+    "CNN_Name": "Caribou Coffee",
+    "Agg_Name": "Caribou Coffee"
+  },
+  {
+    "CNN_Name": "Carl's Jr.",
+    "Agg_Name": "Carl's Jr."
+  },
+  {
+    "CNN_Name": "Carmike Cinemas",
+    "Agg_Name": "Carmike Cinemas"
+  },
+  {
+    "CNN_Name": "Carrabba's Italian Grill",
+    "Agg_Name": "Carrabba's Italian Grill"
+  },
+  {
+    "CNN_Name": "Carter's",
+    "Agg_Name": "Carter's"
+  },
+  {
+    "CNN_Name": "Casey's General Stores",
+    "Agg_Name": "Casey's General Stores"
+  },
+  {
+    "CNN_Name": "CEFCO",
+    "Agg_Name": "CEFCO Convenience Stores"
+  },
+  {
+    "CNN_Name": "Central Market",
+    "Agg_Name": "Central Market"
+  },
+  {
+    "CNN_Name": "Century 21 Real Estate",
+    "Agg_Name": "Century 21 Real Estate"
+  },
+  {
+    "CNN_Name": "Century Theatres",
+    "Agg_Name": "Century Theatres"
+  },
+  {
+    "CNN_Name": "CenturyLink",
+    "Agg_Name": "CenturyLink"
+  },
+  {
+    "CNN_Name": "Charley's Grilled Subs",
+    "Agg_Name": "Charley's"
+  },
+  {
+    "CNN_Name": "Charlotte Russe",
+    "Agg_Name": "Charlotte Russe"
+  },
+  {
+    "CNN_Name": "Charming Charlie",
+    "Agg_Name": "Charming Charlie"
+  },
+  {
+    "CNN_Name": "Charter Communications",
+    "Agg_Name": "Charter Communications"
+  },
+  {
+    "CNN_Name": "Checkers",
+    "Agg_Name": "Checkers Drive-In Restaurants"
+  },
+  {
+    "CNN_Name": "Cheddar's",
+    "Agg_Name": "Cheddar's Casual Cafè"
+  },
+  {
+    "CNN_Name": "Chevron",
+    "Agg_Name": "Chevron"
+  },
+  {
+    "CNN_Name": "Chevys Fresh Mex",
+    "Agg_Name": "Chevys Fresh Mex"
+  },
+  {
+    "CNN_Name": "Chicken Express",
+    "Agg_Name": "Chicken Express"
+  },
+  {
+    "CNN_Name": "Chick-fil-A",
+    "Agg_Name": "Chick-fil-A"
+  },
+  {
+    "CNN_Name": "Chico's",
+    "Agg_Name": "Chico's"
+  },
+  {
+    "CNN_Name": "Chili's",
+    "Agg_Name": "Chili's Grill & Bar"
+  },
+  {
+    "CNN_Name": "Chipotle",
+    "Agg_Name": "Chipotle Mexican Grill"
+  },
+  {
+    "CNN_Name": "Chrysler",
+    "Agg_Name": "Chrysler"
+  },
+  {
+    "CNN_Name": "Chuck E. Cheese's",
+    "Agg_Name": "Chuck E. Cheese's"
+  },
+  {
+    "CNN_Name": "Church's Chicken",
+    "Agg_Name": "Church's Chicken"
+  },
+  {
+    "CNN_Name": "Chuy's",
+    "Agg_Name": "Chuy's"
+  },
+  {
+    "CNN_Name": "Cinemark Theatres",
+    "Agg_Name": "Cinemark Theatres"
+  },
+  {
+    "CNN_Name": "Cinnabon",
+    "Agg_Name": "Cinnabon"
+  },
+  {
+    "CNN_Name": "Circle K",
+    "Agg_Name": "Circle K Stores"
+  },
+  {
+    "CNN_Name": "Citgo",
+    "Agg_Name": "CITGO Petroleum"
+  },
+  {
+    "CNN_Name": "City Market",
+    "Agg_Name": "City Market"
+  },
+  {
+    "CNN_Name": "Claire's",
+    "Agg_Name": "Claire's Stores"
+  },
+  {
+    "CNN_Name": "Clarks",
+    "Agg_Name": "Clarks"
+  },
+  {
+    "CNN_Name": "Coach USA",
+    "Agg_Name": "Coach"
+  },
+  {
+    "CNN_Name": "Coco's Bakery Restaurant",
+    "Agg_Name": "Coco's Bakery Restaurants"
+  },
+  {
+    "CNN_Name": "Cold Stone Creamery",
+    "Agg_Name": "Cold Stone Creamery"
+  },
+  {
+    "CNN_Name": "Cole Haan",
+    "Agg_Name": "Cole Haan"
+  },
+  {
+    "CNN_Name": "Columbia Sportswear",
+    "Agg_Name": "Columbia Sportswear"
+  },
+  {
+    "CNN_Name": "Comcast",
+    "Agg_Name": "Comcast"
+  },
+  {
+    "CNN_Name": "Comfort Suites",
+    "Agg_Name": "Comfort Suites"
+  },
+  {
+    "CNN_Name": "Cook Out",
+    "Agg_Name": "Cook Out"
+  },
+  {
+    "CNN_Name": "Copps",
+    "Agg_Name": "Copps"
+  },
+  {
+    "CNN_Name": "Corner Bakery Cafe",
+    "Agg_Name": "Corner Bakery Cafe"
+  },
+  {
+    "CNN_Name": "Corner Store",
+    "Agg_Name": "Corner Store"
+  },
+  {
+    "CNN_Name": "Cosi",
+    "Agg_Name": "Cosi"
+  },
+  {
+    "CNN_Name": "Cost Plus World Market",
+    "Agg_Name": "World Market"
+  },
+  {
+    "CNN_Name": "Cox Communications",
+    "Agg_Name": "Cox Communications"
+  },
+  {
+    "CNN_Name": "Cracker Barrel",
+    "Agg_Name": "Cracker Barrel"
+  },
+  {
+    "CNN_Name": "Crate and Barrel",
+    "Agg_Name": "Crate and Barrel"
+  },
+  {
+    "CNN_Name": "Crazy 8",
+    "Agg_Name": "Crazy 8"
+  },
+  {
+    "CNN_Name": "Crocs",
+    "Agg_Name": "Crocs"
+  },
+  {
+    "CNN_Name": "Crossfit",
+    "Agg_Name": "CrossFit"
+  },
+  {
+    "CNN_Name": "Crowne Plaza",
+    "Agg_Name": "Crowne Plaza Hotels and Resorts"
+  },
+  {
+    "CNN_Name": "Crumbs",
+    "Agg_Name": "Crumbs Bake Shop"
+  },
+  {
+    "CNN_Name": "Cub Foods",
+    "Agg_Name": "Cub Foods"
+  },
+  {
+    "CNN_Name": "Culver's",
+    "Agg_Name": "Culver's"
+  },
+  {
+    "CNN_Name": "Cumberland Farms",
+    "Agg_Name": "Cumberland Farms"
+  },
+  {
+    "CNN_Name": "CVS Caremark",
+    "Agg_Name": "CVS"
+  },
+  {
+    "CNN_Name": "CVS Pharmacy",
+    "Agg_Name": "CVS"
+  },
+  {
+    "CNN_Name": "D'Agostino",
+    "Agg_Name": "D'Agostino"
+  },
+  {
+    "CNN_Name": "Dairy Queen",
+    "Agg_Name": "Dairy Queen"
+  },
+  {
+    "CNN_Name": "Dave & Buster's",
+    "Agg_Name": "Dave & Buster's"
+  },
+  {
+    "CNN_Name": "David's Bridal",
+    "Agg_Name": "David's Bridal"
+  },
+  {
+    "CNN_Name": "DavidsTea",
+    "Agg_Name": "DAVIDsTEA"
+  },
+  {
+    "CNN_Name": "Dean & DeLuca",
+    "Agg_Name": "Dean & DeLuca"
+  },
+  {
+    "CNN_Name": "Del Taco",
+    "Agg_Name": "Del Taco"
+  },
+  {
+    "CNN_Name": "Delta Sonic",
+    "Agg_Name": "Delta Sonic"
+  },
+  {
+    "CNN_Name": "Denny's",
+    "Agg_Name": "Denny's"
+  },
+  {
+    "CNN_Name": "Dickey's Barbecue Pit",
+    "Agg_Name": "Dickey's Barbecue Pit"
+  },
+  {
+    "CNN_Name": "Dick's Sporting Goods",
+    "Agg_Name": "Dick's Sporting Goods"
+  },
+  {
+    "CNN_Name": "Dierbergs Markets",
+    "Agg_Name": "Dierbergs Markets"
+  },
+  {
+    "CNN_Name": "Dillard's",
+    "Agg_Name": "Dillard's"
+  },
+  {
+    "CNN_Name": "Dillons",
+    "Agg_Name": "Dillons Supermarkets"
+  },
+  {
+    "CNN_Name": "Dish Network",
+    "Agg_Name": "Dish Network"
+  },
+  {
+    "CNN_Name": "Disney",
+    "Agg_Name": "Disney Store"
+  },
+  {
+    "CNN_Name": "Dollar General Store",
+    "Agg_Name": "Dollar General"
+  },
+  {
+    "CNN_Name": "Dollar Tree",
+    "Agg_Name": "Dollar Tree"
+  },
+  {
+    "CNN_Name": "Domino's Pizza",
+    "Agg_Name": "Domino's Pizza"
+  },
+  {
+    "CNN_Name": "Doubletree",
+    "Agg_Name": "DoubleTree by Hilton"
+  },
+  {
+    "CNN_Name": "Dressbarn",
+    "Agg_Name": "Dressbarn"
+  },
+  {
+    "CNN_Name": "DSW",
+    "Agg_Name": "DSW (Designer Shoe Warehouse)"
+  },
+  {
+    "CNN_Name": "Duane Reade",
+    "Agg_Name": "Duane Reade"
+  },
+  {
+    "CNN_Name": "Dunkin' Donuts",
+    "Agg_Name": "Dunkin' Donuts"
+  },
+  {
+    "CNN_Name": "Dunkin' Donuts / Baskin-Robbins",
+    "Agg_Name": "Dunkin' Donuts"
+  },
+  {
+    "CNN_Name": "Earls",
+    "Agg_Name": "Earls Restaurants"
+  },
+  {
+    "CNN_Name": "Earth Fare",
+    "Agg_Name": "Earth Fare"
+  },
+  {
+    "CNN_Name": "Eddie Bauer",
+    "Agg_Name": "Eddie Bauer"
+  },
+  {
+    "CNN_Name": "Eddie V's",
+    "Agg_Name": "Eddie V's Prime Seafood"
+  },
+  {
+    "CNN_Name": "Edible Arrangements",
+    "Agg_Name": "Edible Arrangements"
+  },
+  {
+    "CNN_Name": "Edward Jones",
+    "Agg_Name": "Edward Jones"
+  },
+  {
+    "CNN_Name": "El Pollo Loco",
+    "Agg_Name": "El Pollo Loco"
+  },
+  {
+    "CNN_Name": "Elephant Bar",
+    "Agg_Name": "Elephant Bar"
+  },
+  {
+    "CNN_Name": "Embassy Suites Hotels",
+    "Agg_Name": "Embassy Suites Hotels"
+  },
+  {
+    "CNN_Name": "Enterprise Rent-A-Car",
+    "Agg_Name": "Enterprise Rent-A-Car"
+  },
+  {
+    "CNN_Name": "European Wax Center",
+    "Agg_Name": "European Wax Center (EWC)"
+  },
+  {
+    "CNN_Name": "Extra Space Storage",
+    "Agg_Name": "Extra Space Storage"
+  },
+  {
+    "CNN_Name": "Extreme Pita",
+    "Agg_Name": "Extreme Pita"
+  },
+  {
+    "CNN_Name": "Exxon Mobil",
+    "Agg_Name": "Exxon Mobil"
+  },
+  {
+    "CNN_Name": "E-Z-GO",
+    "Agg_Name": "E-Z-GO"
+  },
+  {
+    "CNN_Name": "f.y.e.",
+    "Agg_Name": "f.y.e. (for your entertainment)"
+  },
+  {
+    "CNN_Name": "Fairfield Inn",
+    "Agg_Name": "Fairfield Inn & Suites by Marriott"
+  },
+  {
+    "CNN_Name": "Fairway Market",
+    "Agg_Name": "Fairway Market"
+  },
+  {
+    "CNN_Name": "Family Christian Stores",
+    "Agg_Name": "Family Christian"
+  },
+  {
+    "CNN_Name": "Family Dollar",
+    "Agg_Name": "Family Dollar Stores"
+  },
+  {
+    "CNN_Name": "Family Fare",
+    "Agg_Name": "Family Fare"
+  },
+  {
+    "CNN_Name": "Famous Dave's",
+    "Agg_Name": "Famous Dave's"
+  },
+  {
+    "CNN_Name": "Famous Footwear",
+    "Agg_Name": "Famous Footwear"
+  },
+  {
+    "CNN_Name": "Fantastic Sams",
+    "Agg_Name": "Fantastic Sams"
+  },
+  {
+    "CNN_Name": "Fareway",
+    "Agg_Name": "Fareway Stores"
+  },
+  {
+    "CNN_Name": "Farm Fresh Food & Pharmacy",
+    "Agg_Name": "Farm Fresh"
+  },
+  {
+    "CNN_Name": "Farmer Boys",
+    "Agg_Name": "Farmer Boys"
+  },
+  {
+    "CNN_Name": "Farmers Insurance Group",
+    "Agg_Name": "Farmers Insurance Group"
+  },
+  {
+    "CNN_Name": "Fazoli's",
+    "Agg_Name": "Fazoli's"
+  },
+  {
+    "CNN_Name": "FedEx",
+    "Agg_Name": "FedEx"
+  },
+  {
+    "CNN_Name": "Fiesta Mart",
+    "Agg_Name": "Fiesta Mart"
+  },
+  {
+    "CNN_Name": "Finish Line",
+    "Agg_Name": "Finish Line"
+  },
+  {
+    "CNN_Name": "Firehouse Subs",
+    "Agg_Name": "Firehouse Subs"
+  },
+  {
+    "CNN_Name": "Firestone",
+    "Agg_Name": "Firestone Complete Auto Care"
+  },
+  {
+    "CNN_Name": "First Watch",
+    "Agg_Name": "First Watch Restaurants"
+  },
+  {
+    "CNN_Name": "Five Below",
+    "Agg_Name": "Five Below"
+  },
+  {
+    "CNN_Name": "Five Guys",
+    "Agg_Name": "Five Guys"
+  },
+  {
+    "CNN_Name": "Food 4 Less",
+    "Agg_Name": "Food 4 Less"
+  },
+  {
+    "CNN_Name": "Food Basics",
+    "Agg_Name": "Food Basics"
+  },
+  {
+    "CNN_Name": "Food City",
+    "Agg_Name": "Food City"
+  },
+  {
+    "CNN_Name": "Food Lion",
+    "Agg_Name": "Food Lion"
+  },
+  {
+    "CNN_Name": "FoodLand",
+    "Agg_Name": "Foodland"
+  },
+  {
+    "CNN_Name": "Foot Locker",
+    "Agg_Name": "Foot Locker"
+  },
+  {
+    "CNN_Name": "Ford Motor Company",
+    "Agg_Name": "Ford Motor Company"
+  },
+  {
+    "CNN_Name": "Forever 21",
+    "Agg_Name": "Forever 21"
+  },
+  {
+    "CNN_Name": "Fossil Group",
+    "Agg_Name": "Fossil"
+  },
+  {
+    "CNN_Name": "Four Seasons Hotels And Resorts",
+    "Agg_Name": "Four Seasons Hotels and Resorts"
+  },
+  {
+    "CNN_Name": "Francesca's",
+    "Agg_Name": "francesca's"
+  },
+  {
+    "CNN_Name": "Fred Meyer",
+    "Agg_Name": "Fred Meyer"
+  },
+  {
+    "CNN_Name": "Fred Meyer Fuel",
+    "Agg_Name": "Fred Meyer"
+  },
+  {
+    "CNN_Name": "Freddy's Frozen Custard & Steakburgers",
+    "Agg_Name": "Freddy's Frozen Custard"
+  },
+  {
+    "CNN_Name": "Freebirds World Burrito",
+    "Agg_Name": "Freebirds World Burrito"
+  },
+  {
+    "CNN_Name": "Fresh & Easy",
+    "Agg_Name": "Fresh & Easy"
+  },
+  {
+    "CNN_Name": "Freshii",
+    "Agg_Name": "Freshii"
+  },
+  {
+    "CNN_Name": "Friendly's",
+    "Agg_Name": "Friendly's Ice Cream"
+  },
+  {
+    "CNN_Name": "Fry's Electronics",
+    "Agg_Name": "Fry's Electronics"
+  },
+  {
+    "CNN_Name": "Fuddruckers",
+    "Agg_Name": "Fuddruckers"
+  },
+  {
+    "CNN_Name": "Fuzzy's Taco Shop",
+    "Agg_Name": "Fuzzy's Taco"
+  },
+  {
+    "CNN_Name": "Gamestop",
+    "Agg_Name": "GameStop"
+  },
+  {
+    "CNN_Name": "Gander Mountain",
+    "Agg_Name": "Gander Mountain"
+  },
+  {
+    "CNN_Name": "Gap Inc.",
+    "Agg_Name": "Gap"
+  },
+  {
+    "CNN_Name": "Geek Squad",
+    "Agg_Name": "Geek Squad"
+  },
+  {
+    "CNN_Name": "Geico",
+    "Agg_Name": "Geico"
+  },
+  {
+    "CNN_Name": "Gelson's Markets",
+    "Agg_Name": "Gelson's Markets"
+  },
+  {
+    "CNN_Name": "Genghis Grill",
+    "Agg_Name": "Genghis Grill"
+  },
+  {
+    "CNN_Name": "Ghirardelli Chocolate",
+    "Agg_Name": "Ghirardelli Chocolate"
+  },
+  {
+    "CNN_Name": "Giant Eagle",
+    "Agg_Name": "Giant Eagle"
+  },
+  {
+    "CNN_Name": "Giant Food",
+    "Agg_Name": "Giant Food"
+  },
+  {
+    "CNN_Name": "GNC",
+    "Agg_Name": "GNC (General Nutrition Centers)"
+  },
+  {
+    "CNN_Name": "Godiva Chocolatier",
+    "Agg_Name": "Godiva"
+  },
+  {
+    "CNN_Name": "Golden Corral",
+    "Agg_Name": "Golden Corral"
+  },
+  {
+    "CNN_Name": "Gold's Gym",
+    "Agg_Name": "Gold's Gym"
+  },
+  {
+    "CNN_Name": "Golfsmith",
+    "Agg_Name": "Golfsmith"
+  },
+  {
+    "CNN_Name": "Goodwill",
+    "Agg_Name": "Goodwill Industries"
+  },
+  {
+    "CNN_Name": "Goodyear",
+    "Agg_Name": "Goodyear Tire & Rubber Co."
+  },
+  {
+    "CNN_Name": "Gordmans",
+    "Agg_Name": "Gordmans"
+  },
+  {
+    "CNN_Name": "Gordon Biersch",
+    "Agg_Name": "Gordon Biersch Restaurant & Brewery"
+  },
+  {
+    "CNN_Name": "Great Clips",
+    "Agg_Name": "Great Clips"
+  },
+  {
+    "CNN_Name": "Greyhound",
+    "Agg_Name": "Greyhound"
+  },
+  {
+    "CNN_Name": "Guess",
+    "Agg_Name": "GUESS International"
+  },
+  {
+    "CNN_Name": "Guitar Center",
+    "Agg_Name": "Guitar Center"
+  },
+  {
+    "CNN_Name": "Gulf Oil LP",
+    "Agg_Name": "Gulf Oil"
+  },
+  {
+    "CNN_Name": "Gymboree",
+    "Agg_Name": "Gymboree"
+  },
+  {
+    "CNN_Name": "H Mart",
+    "Agg_Name": "H Mart"
+  },
+  {
+    "CNN_Name": "H&M",
+    "Agg_Name": "H&M (Hennes & Mauritz)"
+  },
+  {
+    "CNN_Name": "H&R Block",
+    "Agg_Name": "H&R Block"
+  },
+  {
+    "CNN_Name": "Hair Cuttery",
+    "Agg_Name": "Hair Cuttery"
+  },
+  {
+    "CNN_Name": "Half Price Books",
+    "Agg_Name": "Half Price Books"
+  },
+  {
+    "CNN_Name": "Hallmark",
+    "Agg_Name": "Hallmark Cards"
+  },
+  {
+    "CNN_Name": "Hampton Inn Hotels",
+    "Agg_Name": "Hampton"
+  },
+  {
+    "CNN_Name": "Hancock Fabrics",
+    "Agg_Name": "Hancock Fabrics"
+  },
+  {
+    "CNN_Name": "Hanes",
+    "Agg_Name": "Hanesbrands"
+  },
+  {
+    "CNN_Name": "Hanna Andersson",
+    "Agg_Name": "Hanna Andersson"
+  },
+  {
+    "CNN_Name": "Hannaford",
+    "Agg_Name": "Hannaford Supermarkets"
+  },
+  {
+    "CNN_Name": "Harbor Freight Tools",
+    "Agg_Name": "Harbor Freight Tools"
+  },
+  {
+    "CNN_Name": "Hard Rock",
+    "Agg_Name": "Hard Rock Cafe"
+  },
+  {
+    "CNN_Name": "Hardee's",
+    "Agg_Name": "Hardee's"
+  },
+  {
+    "CNN_Name": "Harkins Theatres",
+    "Agg_Name": "Harkins Theatres"
+  },
+  {
+    "CNN_Name": "Harmon",
+    "Agg_Name": "Harmons"
+  },
+  {
+    "CNN_Name": "Harris Teeter",
+    "Agg_Name": "Harris Teeter"
+  },
+  {
+    "CNN_Name": "H-E-B",
+    "Agg_Name": "H-E-B"
+  },
+  {
+    "CNN_Name": "Hibbett Sports",
+    "Agg_Name": "Hibbett Sports"
+  },
+  {
+    "CNN_Name": "Hillstone",
+    "Agg_Name": "Hillstone Restaurant Group"
+  },
+  {
+    "CNN_Name": "Hilton Garden Inn",
+    "Agg_Name": "Hilton Garden Inn"
+  },
+  {
+    "CNN_Name": "Hobby Lobby",
+    "Agg_Name": "Hobby Lobby Stores"
+  },
+  {
+    "CNN_Name": "Holiday Inn",
+    "Agg_Name": "Holiday Inn"
+  },
+  {
+    "CNN_Name": "Holiday Stationstores",
+    "Agg_Name": "Holiday Station"
+  },
+  {
+    "CNN_Name": "Hollister",
+    "Agg_Name": "Hollister"
+  },
+  {
+    "CNN_Name": "Home Depot",
+    "Agg_Name": "The Home Depot"
+  },
+  {
+    "CNN_Name": "Homeland",
+    "Agg_Name": "Homeland"
+  },
+  {
+    "CNN_Name": "Homewood Suites",
+    "Agg_Name": "Homewood"
+  },
+  {
+    "CNN_Name": "Honda",
+    "Agg_Name": "Honda"
+  },
+  {
+    "CNN_Name": "HoneyBaked Ham",
+    "Agg_Name": "HoneyBaked Ham"
+  },
+  {
+    "CNN_Name": "Hooters",
+    "Agg_Name": "Hooters"
+  },
+  {
+    "CNN_Name": "Hot Topic",
+    "Agg_Name": "Hot Topic"
+  },
+  {
+    "CNN_Name": "Houlihan's",
+    "Agg_Name": "Houlihan's Restaurants"
+  },
+  {
+    "CNN_Name": "HP",
+    "Agg_Name": "Freshpet"
+  },
+  {
+    "CNN_Name": "Hungry Howie's Pizza",
+    "Agg_Name": "Hungry Howie's Pizza & Subs"
+  },
+  {
+    "CNN_Name": "Hyatt",
+    "Agg_Name": "Hyatt Hotels & Resorts"
+  },
+  {
+    "CNN_Name": "Hy-Vee",
+    "Agg_Name": "Hy-Vee"
+  },
+  {
+    "CNN_Name": "IHOP",
+    "Agg_Name": "IHOP"
+  },
+  {
+    "CNN_Name": "IKEA",
+    "Agg_Name": "IKEA"
+  },
+  {
+    "CNN_Name": "Ingles Markets",
+    "Agg_Name": "Ingles Markets"
+  },
+  {
+    "CNN_Name": "In-N-Out Burger",
+    "Agg_Name": "In-N-Out Burger"
+  },
+  {
+    "CNN_Name": "J.Crew",
+    "Agg_Name": "J.Crew"
+  },
+  {
+    "CNN_Name": "J.Jill",
+    "Agg_Name": "J.Jill"
+  },
+  {
+    "CNN_Name": "Jack in the Box",
+    "Agg_Name": "Jack in the Box"
+  },
+  {
+    "CNN_Name": "Jamba Juice",
+    "Agg_Name": "Jamba Juice"
+  },
+  {
+    "CNN_Name": "Janie and Jack",
+    "Agg_Name": "Janie and Jack"
+  },
+  {
+    "CNN_Name": "Jason's Deli",
+    "Agg_Name": "Jason's Deli"
+  },
+  {
+    "CNN_Name": "Jersey Mike's Subs",
+    "Agg_Name": "Jersey Mike's"
+  },
+  {
+    "CNN_Name": "Jiffy Lube",
+    "Agg_Name": "Jiffy Lube"
+  },
+  {
+    "CNN_Name": "Jimmy John's",
+    "Agg_Name": "Jimmy John's"
+  },
+  {
+    "CNN_Name": "Jo-Ann Fabric and Craft Stores",
+    "Agg_Name": "Jo-Ann Fabric and Craft Stores"
+  },
+  {
+    "CNN_Name": "Johnny Rockets",
+    "Agg_Name": "Johnny Rockets"
+  },
+  {
+    "CNN_Name": "JoS. A. Bank",
+    "Agg_Name": "Jos. A. Bank Clothiers"
+  },
+  {
+    "CNN_Name": "Journeys",
+    "Agg_Name": "Journeys"
+  },
+  {
+    "CNN_Name": "JPMorgan Chase",
+    "Agg_Name": "Chase"
+  },
+  {
+    "CNN_Name": "Juice Generation",
+    "Agg_Name": "Juice Generation"
+  },
+  {
+    "CNN_Name": "Kaiser Permanente",
+    "Agg_Name": "Kaiser Permanente"
+  },
+  {
+    "CNN_Name": "Kangaroo Express",
+    "Agg_Name": "Kangaroo Express"
+  },
+  {
+    "CNN_Name": "Kate Spade",
+    "Agg_Name": "kate spade"
+  },
+  {
+    "CNN_Name": "Kay Jewelers",
+    "Agg_Name": "Kay Jewelers"
+  },
+  {
+    "CNN_Name": "Kenneth Cole Production",
+    "Agg_Name": "Kenneth Cole Productions"
+  },
+  {
+    "CNN_Name": "Key Food",
+    "Agg_Name": "Key Food"
+  },
+  {
+    "CNN_Name": "KFC",
+    "Agg_Name": "KFC US"
+  },
+  {
+    "CNN_Name": "King Kullen",
+    "Agg_Name": "King Kullen Grocery Co."
+  },
+  {
+    "CNN_Name": "King Soopers",
+    "Agg_Name": "King Soopers"
+  },
+  {
+    "CNN_Name": "Kirkland's",
+    "Agg_Name": "Kirkland's"
+  },
+  {
+    "CNN_Name": "Kitchen Collection",
+    "Agg_Name": "Kitchen Collection"
+  },
+  {
+    "CNN_Name": "Kmart",
+    "Agg_Name": "Kmart"
+  },
+  {
+    "CNN_Name": "Kohl's",
+    "Agg_Name": "Kohl's"
+  },
+  {
+    "CNN_Name": "Kona Grill",
+    "Agg_Name": "Kona Grill"
+  },
+  {
+    "CNN_Name": "Krispy Kreme",
+    "Agg_Name": "Krispy Kreme Doughnuts"
+  },
+  {
+    "CNN_Name": "Kroger",
+    "Agg_Name": "Kroger"
+  },
+  {
+    "CNN_Name": "Kum & Go",
+    "Agg_Name": "Kum & Go"
+  },
+  {
+    "CNN_Name": "Kwik Fill",
+    "Agg_Name": "Kwik Fill"
+  },
+  {
+    "CNN_Name": "Kwik Shop",
+    "Agg_Name": "Kwik Shop"
+  },
+  {
+    "CNN_Name": "Kwik Trip",
+    "Agg_Name": "Kwik Trip"
+  },
+  {
+    "CNN_Name": "L.L.Bean",
+    "Agg_Name": "L.L.Bean"
+  },
+  {
+    "CNN_Name": "LA Fitness",
+    "Agg_Name": "LA Fitness"
+  },
+  {
+    "CNN_Name": "La Madeleine",
+    "Agg_Name": "La Madeleine"
+  },
+  {
+    "CNN_Name": "La Quinta Inns & Suites",
+    "Agg_Name": "La Quinta Inns & Suites"
+  },
+  {
+    "CNN_Name": "La Senza",
+    "Agg_Name": "La Senza"
+  },
+  {
+    "CNN_Name": "LabCorp",
+    "Agg_Name": "LabCorp"
+  },
+  {
+    "CNN_Name": "Lane Bryant",
+    "Agg_Name": "Lane Bryant"
+  },
+  {
+    "CNN_Name": "Lanier Parking",
+    "Agg_Name": "Lanier"
+  },
+  {
+    "CNN_Name": "Le Pain Quotidien",
+    "Agg_Name": "Le Pain Quotidien"
+  },
+  {
+    "CNN_Name": "Learning Express Toys",
+    "Agg_Name": "Learning Express Toys"
+  },
+  {
+    "CNN_Name": "Legal Sea Foods",
+    "Agg_Name": "Legal Sea Foods"
+  },
+  {
+    "CNN_Name": "Lenny's Sub Shop",
+    "Agg_Name": "Lenny's Sub Shop"
+  },
+  {
+    "CNN_Name": "LensCrafters",
+    "Agg_Name": "LensCrafters"
+  },
+  {
+    "CNN_Name": "Liberty Mutual",
+    "Agg_Name": "Liberty Mutual Insurance"
+  },
+  {
+    "CNN_Name": "Lincoln Benefit Life",
+    "Agg_Name": "Lincoln"
+  },
+  {
+    "CNN_Name": "Little Caesars",
+    "Agg_Name": "Little Caesars"
+  },
+  {
+    "CNN_Name": "Loaf 'N Jug",
+    "Agg_Name": "Loaf 'N Jug"
+  },
+  {
+    "CNN_Name": "Loehmann's",
+    "Agg_Name": "Loehmann's"
+  },
+  {
+    "CNN_Name": "Lone Star Steakhouse & Saloon",
+    "Agg_Name": "Lone Star Steakhouse"
+  },
+  {
+    "CNN_Name": "Long John Silver's",
+    "Agg_Name": "Long John Silver's"
+  },
+  {
+    "CNN_Name": "LongHorn Steakhouse",
+    "Agg_Name": "LongHorn Steakhouse"
+  },
+  {
+    "CNN_Name": "Love's",
+    "Agg_Name": "Love's Travel Stops and Country Stores"
+  },
+  {
+    "CNN_Name": "Lowe's",
+    "Agg_Name": "Lowe's"
+  },
+  {
+    "CNN_Name": "Luby's Cafe",
+    "Agg_Name": "Luby's"
+  },
+  {
+    "CNN_Name": "Lucky Brand",
+    "Agg_Name": "Lucky Brand"
+  },
+  {
+    "CNN_Name": "Lucky Supermarkets",
+    "Agg_Name": "Lucky Supermarkets"
+  },
+  {
+    "CNN_Name": "Lukoil",
+    "Agg_Name": "LUKOIL North America"
+  },
+  {
+    "CNN_Name": "Lululemon",
+    "Agg_Name": "lululemon athletica"
+  },
+  {
+    "CNN_Name": "Macy's",
+    "Agg_Name": "Macy's"
+  },
+  {
+    "CNN_Name": "Maggiano's Little Italy",
+    "Agg_Name": "Maggiano's Little Italy"
+  },
+  {
+    "CNN_Name": "Manchu WOK",
+    "Agg_Name": "Manchu Wok"
+  },
+  {
+    "CNN_Name": "MAPCO",
+    "Agg_Name": "MAPCO Mart"
+  },
+  {
+    "CNN_Name": "Mariano's",
+    "Agg_Name": "Mariano's"
+  },
+  {
+    "CNN_Name": "Market Basket",
+    "Agg_Name": "Market Basket Foods"
+  },
+  {
+    "CNN_Name": "Marriott Hotels",
+    "Agg_Name": "Marriott Hotels & Resorts"
+  },
+  {
+    "CNN_Name": "Marshalls",
+    "Agg_Name": "Marshalls"
+  },
+  {
+    "CNN_Name": "Massage Envy",
+    "Agg_Name": "Massage Envy"
+  },
+  {
+    "CNN_Name": "Maurices",
+    "Agg_Name": "maurices"
+  },
+  {
+    "CNN_Name": "Maverik",
+    "Agg_Name": "Maverik"
+  },
+  {
+    "CNN_Name": "McAlister's Deli",
+    "Agg_Name": "McAlister's Deli"
+  },
+  {
+    "CNN_Name": "McDonald's",
+    "Agg_Name": "McDonald's US"
+  },
+  {
+    "CNN_Name": "Meijer",
+    "Agg_Name": "Meijer"
+  },
+  {
+    "CNN_Name": "Mellow Mushroom",
+    "Agg_Name": "Mellow Mushroom"
+  },
+  {
+    "CNN_Name": "Men's Wearhouse",
+    "Agg_Name": "The Men's Wearhouse"
+  },
+  {
+    "CNN_Name": "Merry Maids",
+    "Agg_Name": "Merry Maids"
+  },
+  {
+    "CNN_Name": "MetroPCS",
+    "Agg_Name": "MetroPCS Wireless"
+  },
+  {
+    "CNN_Name": "Mi Cocina Restaurant",
+    "Agg_Name": "Mi Cocina"
+  },
+  {
+    "CNN_Name": "Michael Kors",
+    "Agg_Name": "Michael Kors"
+  },
+  {
+    "CNN_Name": "Michaels",
+    "Agg_Name": "Michaels Stores"
+  },
+  {
+    "CNN_Name": "Micro Center",
+    "Agg_Name": "Micro Center"
+  },
+  {
+    "CNN_Name": "Microsoft",
+    "Agg_Name": "Microsoft"
+  },
+  {
+    "CNN_Name": "Mills Fleet Farm",
+    "Agg_Name": "Mills Fleet Farm"
+  },
+  {
+    "CNN_Name": "Mimi's Cafe",
+    "Agg_Name": "Mimi's Cafe"
+  },
+  {
+    "CNN_Name": "Modell's",
+    "Agg_Name": "Modell's Sporting Goods"
+  },
+  {
+    "CNN_Name": "Moe's Southwest Grill",
+    "Agg_Name": "Moe's Southwest Grill"
+  },
+  {
+    "CNN_Name": "Morton Williams",
+    "Agg_Name": "Morton Williams Supermarkets"
+  },
+  {
+    "CNN_Name": "Motherhood",
+    "Agg_Name": "Motherhood Maternity Outlet"
+  },
+  {
+    "CNN_Name": "Murphy USA",
+    "Agg_Name": "Murphy USA"
+  },
+  {
+    "CNN_Name": "Nando's",
+    "Agg_Name": "Nando's U.S."
+  },
+  {
+    "CNN_Name": "NAPA Auto Parts",
+    "Agg_Name": "Napa Auto Parts"
+  },
+  {
+    "CNN_Name": "National Car Rental",
+    "Agg_Name": "National Car Rental"
+  },
+  {
+    "CNN_Name": "Navy Exchange",
+    "Agg_Name": "Navy Exchange"
+  },
+  {
+    "CNN_Name": "Neiman Marcus",
+    "Agg_Name": "Neiman Marcus"
+  },
+  {
+    "CNN_Name": "New Seasons Market",
+    "Agg_Name": "New Seasons Market"
+  },
+  {
+    "CNN_Name": "New York & Company",
+    "Agg_Name": "New York & Company"
+  },
+  {
+    "CNN_Name": "New York Life Insurance Company",
+    "Agg_Name": "New York Life Insurance"
+  },
+  {
+    "CNN_Name": "Newk's Eatery",
+    "Agg_Name": "Newk's Eatery"
+  },
+  {
+    "CNN_Name": "Nike",
+    "Agg_Name": "Nike"
+  },
+  {
+    "CNN_Name": "Nine West",
+    "Agg_Name": "Nine West"
+  },
+  {
+    "CNN_Name": "Nissan",
+    "Agg_Name": "Nissan North America"
+  },
+  {
+    "CNN_Name": "No Frills",
+    "Agg_Name": "No Frills Supermarkets"
+  },
+  {
+    "CNN_Name": "Nob Hill",
+    "Agg_Name": "Nob Hill Foods"
+  },
+  {
+    "CNN_Name": "Noodles & Company",
+    "Agg_Name": "Noodles & Company"
+  },
+  {
+    "CNN_Name": "Nordstrom",
+    "Agg_Name": "Nordstrom"
+  },
+  {
+    "CNN_Name": "North Shore Farms",
+    "Agg_Name": "North Shore Farms"
+  },
+  {
+    "CNN_Name": "Northwestern Mutual",
+    "Agg_Name": "Northwestern Mutual"
+  },
+  {
+    "CNN_Name": "NSTAR",
+    "Agg_Name": "Coinstar"
+  },
+  {
+    "CNN_Name": "Nugget Market",
+    "Agg_Name": "Nugget Market"
+  },
+  {
+    "CNN_Name": "Ocean State Job Lot",
+    "Agg_Name": "Ocean State Job Lot"
+  },
+  {
+    "CNN_Name": "O'Charley's",
+    "Agg_Name": "O'Charley's"
+  },
+  {
+    "CNN_Name": "Office Depot",
+    "Agg_Name": "Office Depot"
+  },
+  {
+    "CNN_Name": "OfficeMax",
+    "Agg_Name": "OfficeMax"
+  },
+  {
+    "CNN_Name": "Old Chicago Pizza and Taproom",
+    "Agg_Name": "Old Chicago Pizza and Taproom"
+  },
+  {
+    "CNN_Name": "Old Navy",
+    "Agg_Name": "Old Navy"
+  },
+  {
+    "CNN_Name": "Olive Garden",
+    "Agg_Name": "Olive Garden"
+  },
+  {
+    "CNN_Name": "Ollie's Bargain Outlet",
+    "Agg_Name": "Ollie's Bargain Outlet"
+  },
+  {
+    "CNN_Name": "Omaha Steaks",
+    "Agg_Name": "Omaha Steaks"
+  },
+  {
+    "CNN_Name": "On the Border",
+    "Agg_Name": "On The Border"
+  },
+  {
+    "CNN_Name": "Once Upon A Child",
+    "Agg_Name": "Once Upon a Child"
+  },
+  {
+    "CNN_Name": "Oncue Express",
+    "Agg_Name": "OnCue"
+  },
+  {
+    "CNN_Name": "Orchard Supply Hardware",
+    "Agg_Name": "Orchard Supply Hardware"
+  },
+  {
+    "CNN_Name": "O'Reilly Auto Parts",
+    "Agg_Name": "O'Reilly Auto Parts"
+  },
+  {
+    "CNN_Name": "Outback Steakhouse",
+    "Agg_Name": "Outback Steakhouse"
+  },
+  {
+    "CNN_Name": "PacSun",
+    "Agg_Name": "PacSun"
+  },
+  {
+    "CNN_Name": "Palm Beach Tan",
+    "Agg_Name": "Palm Beach Tan"
+  },
+  {
+    "CNN_Name": "Panda Express",
+    "Agg_Name": "Panda Express"
+  },
+  {
+    "CNN_Name": "Panera Bread",
+    "Agg_Name": "Panera Bread"
+  },
+  {
+    "CNN_Name": "Papa John's Pizza",
+    "Agg_Name": "Papa John's"
+  },
+  {
+    "CNN_Name": "Papa Murphy's",
+    "Agg_Name": "Papa Murphy's"
+  },
+  {
+    "CNN_Name": "Paper Source",
+    "Agg_Name": "Paper Source"
+  },
+  {
+    "CNN_Name": "Pappadeaux Seafood Kitchen",
+    "Agg_Name": "Pappadeaux Seafood Kitchen"
+  },
+  {
+    "CNN_Name": "Pappasito's Cantina",
+    "Agg_Name": "Pappasito's Cantina"
+  },
+  {
+    "CNN_Name": "Papyrus",
+    "Agg_Name": "PAPYRUS"
+  },
+  {
+    "CNN_Name": "Paradise Bakery & Cafe",
+    "Agg_Name": "Paradise Bakery & Cafe"
+  },
+  {
+    "CNN_Name": "Paris Baguette",
+    "Agg_Name": "Paris Baguette USA"
+  },
+  {
+    "CNN_Name": "Party City",
+    "Agg_Name": "Party City"
+  },
+  {
+    "CNN_Name": "Pathmark",
+    "Agg_Name": "Pathmark"
+  },
+  {
+    "CNN_Name": "Pavilions",
+    "Agg_Name": "Pavilions"
+  },
+  {
+    "CNN_Name": "Payless ShoeSource",
+    "Agg_Name": "Payless ShoeSource"
+  },
+  {
+    "CNN_Name": "Pei Wei",
+    "Agg_Name": "Pei Wei Asian Diner"
+  },
+  {
+    "CNN_Name": "Penn Station East Coast Subs",
+    "Agg_Name": "Penn Station"
+  },
+  {
+    "CNN_Name": "Pep Boys",
+    "Agg_Name": "Pep Boys"
+  },
+  {
+    "CNN_Name": "Performance Bicycle",
+    "Agg_Name": "Performance Bicycle"
+  },
+  {
+    "CNN_Name": "Pet Food Express",
+    "Agg_Name": "Pet Food Express"
+  },
+  {
+    "CNN_Name": "Pet Valu",
+    "Agg_Name": "Pet Valu"
+  },
+  {
+    "CNN_Name": "Petco's",
+    "Agg_Name": "Petco"
+  },
+  {
+    "CNN_Name": "Petland",
+    "Agg_Name": "Petland"
+  },
+  {
+    "CNN_Name": "Petsmart",
+    "Agg_Name": "PetSmart"
+  },
+  {
+    "CNN_Name": "Pick 'n Save",
+    "Agg_Name": "Pick 'n Save"
+  },
+  {
+    "CNN_Name": "Pier 1 Imports",
+    "Agg_Name": "Pier 1 Imports"
+  },
+  {
+    "CNN_Name": "Piggly Wiggly",
+    "Agg_Name": "Piggly Wiggly"
+  },
+  {
+    "CNN_Name": "Pilot",
+    "Agg_Name": "Pilot Travel Centers"
+  },
+  {
+    "CNN_Name": "Pinch A Penny Pool Patio Spa",
+    "Agg_Name": "Pinch A Penny"
+  },
+  {
+    "CNN_Name": "Pinkberry",
+    "Agg_Name": "Pinkberry"
+  },
+  {
+    "CNN_Name": "Pita Pit",
+    "Agg_Name": "Pita Pit"
+  },
+  {
+    "CNN_Name": "Pizza Hut",
+    "Agg_Name": "Pizza Hut"
+  },
+  {
+    "CNN_Name": "Planet Fitness",
+    "Agg_Name": "Planet Fitness"
+  },
+  {
+    "CNN_Name": "Pollo Tropical",
+    "Agg_Name": "Pollo Tropical"
+  },
+  {
+    "CNN_Name": "Popeyes Louisiana Kitchen",
+    "Agg_Name": "Popeyes Louisiana Kitchen"
+  },
+  {
+    "CNN_Name": "Portillo's",
+    "Agg_Name": "Portillo's Restaurants"
+  },
+  {
+    "CNN_Name": "Potbelly",
+    "Agg_Name": "Potbelly Sandwich Works"
+  },
+  {
+    "CNN_Name": "Pottery Barn",
+    "Agg_Name": "Pottery Barn"
+  },
+  {
+    "CNN_Name": "Pret a Manger",
+    "Agg_Name": "Pret A Manger (USA)"
+  },
+  {
+    "CNN_Name": "Price Chopper",
+    "Agg_Name": "Price Chopper"
+  },
+  {
+    "CNN_Name": "Primerica",
+    "Agg_Name": "Primerica"
+  },
+  {
+    "CNN_Name": "Publix Super Markets",
+    "Agg_Name": "Publix Super Markets"
+  },
+  {
+    "CNN_Name": "Qdoba Mexican Grill",
+    "Agg_Name": "Qdoba Mexican Grill"
+  },
+  {
+    "CNN_Name": "QFC",
+    "Agg_Name": "QFC (Quality Food Centers)"
+  },
+  {
+    "CNN_Name": "Quest Diagnostics",
+    "Agg_Name": "Quest Diagnostics"
+  },
+  {
+    "CNN_Name": "QuikTrip",
+    "Agg_Name": "QuikTrip"
+  },
+  {
+    "CNN_Name": "Quiznos",
+    "Agg_Name": "Quiznos"
+  },
+
+  {
+    "CNN_Name": "RaceTrac",
+    "Agg_Name": "RaceTrac"
+  },
+  {
+    "CNN_Name": "Rack Room Shoes",
+    "Agg_Name": "Rack Room Shoes"
+  },
+  {
+    "CNN_Name": "Radioshack",
+    "Agg_Name": "RadioShack"
+  },
+  {
+    "CNN_Name": "Radisson Hotels",
+    "Agg_Name": "Radisson"
+  },
+  {
+    "CNN_Name": "Raising Cane's",
+    "Agg_Name": "Raising Cane's"
+  },
+  {
+    "CNN_Name": "Raley's",
+    "Agg_Name": "Raley's"
+  },
+  {
+    "CNN_Name": "Ralph Lauren",
+    "Agg_Name": "Ralph Lauren"
+  },
+  {
+    "CNN_Name": "Ralphs",
+    "Agg_Name": "Ralphs"
+  },
+  {
+    "CNN_Name": "Ramada",
+    "Agg_Name": "Ramada"
+  },
+  {
+    "CNN_Name": "Randall's",
+    "Agg_Name": "Randall's Food Markets"
+  },
+  {
+    "CNN_Name": "Red Lobster",
+    "Agg_Name": "Red Lobster"
+  },
+  {
+    "CNN_Name": "Red Mango",
+    "Agg_Name": "Red Mango"
+  },
+  {
+    "CNN_Name": "Red Robin",
+    "Agg_Name": "Red Robin Gourmet Burgers"
+  },
+  {
+    "CNN_Name": "Redbox",
+    "Agg_Name": "Redbox"
+  },
+  {
+    "CNN_Name": "Redner's Markets",
+    "Agg_Name": "Redner's Markets"
+  },
+  {
+    "CNN_Name": "Reebok",
+    "Agg_Name": "Reebok"
+  },
+  {
+    "CNN_Name": "REI",
+    "Agg_Name": "REI"
+  },
+  {
+    "CNN_Name": "Republic Services",
+    "Agg_Name": "Republic Services"
+  },
+  {
+    "CNN_Name": "Retro Fitness",
+    "Agg_Name": "Retro Fitness"
+  },
+  {
+    "CNN_Name": "Ricker's",
+    "Agg_Name": "Ricker's"
+  },
+  {
+    "CNN_Name": "Rite Aid",
+    "Agg_Name": "Rite Aid"
+  },
+  {
+    "CNN_Name": "Road Ranger",
+    "Agg_Name": "Road Ranger"
+  },
+  {
+    "CNN_Name": "Robeks",
+    "Agg_Name": "Robeks"
+  },
+  {
+    "CNN_Name": "Roche Bros",
+    "Agg_Name": "Roche Bros."
+  },
+  {
+    "CNN_Name": "Ross Stores Inc.",
+    "Agg_Name": "Ross Stores"
+  },
+  {
+    "CNN_Name": "Roti Mediterranean Grill",
+    "Agg_Name": "Roti Mediterranean Grill"
+  },
+  {
+    "CNN_Name": "Round Table Pizza",
+    "Agg_Name": "Round Table Pizza"
+  },
+  {
+    "CNN_Name": "Rouses",
+    "Agg_Name": "Rouses Markets"
+  },
+  {
+    "CNN_Name": "Royal Farms",
+    "Agg_Name": "Royal Farms"
+  },
+  {
+    "CNN_Name": "Rubio's",
+    "Agg_Name": "Rubio's Restaurants"
+  },
+  {
+    "CNN_Name": "Ruby Tuesday",
+    "Agg_Name": "Ruby Tuesday"
+  },
+  {
+    "CNN_Name": "Safeway",
+    "Agg_Name": "Safeway"
+  },
+  {
+    "CNN_Name": "Saks Fifth Avenue",
+    "Agg_Name": "Saks Fifth Avenue"
+  },
+  {
+    "CNN_Name": "Saladworks",
+    "Agg_Name": "Saladworks"
+  },
+  {
+    "CNN_Name": "Sally Beauty Supply",
+    "Agg_Name": "Sally Beauty Supply"
+  },
+  {
+    "CNN_Name": "Saltgrass Steak House",
+    "Agg_Name": "Saltgrass Steak House"
+  },
+  {
+    "CNN_Name": "Sam's Club",
+    "Agg_Name": "Sam's Club"
+  },
+  {
+    "CNN_Name": "Sarku Japan",
+    "Agg_Name": "Sarku Japan"
+  },
+  {
+    "CNN_Name": "Save Mart",
+    "Agg_Name": "Save Mart Supermarkets"
+  },
+  {
+    "CNN_Name": "Save-A-Lot",
+    "Agg_Name": "Save-A-Lot (Supervalu)"
+  },
+  {
+    "CNN_Name": "Sbarro",
+    "Agg_Name": "Sbarro"
+  },
+  {
+    "CNN_Name": "Schlotzsky's",
+    "Agg_Name": "Schlotzsky's"
+  },
+  {
+    "CNN_Name": "Schnucks",
+    "Agg_Name": "Schnucks"
+  },
+  {
+    "CNN_Name": "Sears",
+    "Agg_Name": "Sears"
+  },
+  {
+    "CNN_Name": "Seasons 52",
+    "Agg_Name": "Seasons 52"
+  },
+  {
+    "CNN_Name": "Sedano's",
+    "Agg_Name": "Sedano's Supermarkets"
+  },
+  {
+    "CNN_Name": "See's Candies",
+    "Agg_Name": "See's Candies"
+  },
+  {
+    "CNN_Name": "Sephora",
+    "Agg_Name": "Sephora"
+  },
+  {
+    "CNN_Name": "Shake Shack",
+    "Agg_Name": "Shake Shack"
+  },
+  {
+    "CNN_Name": "Shari's Berries",
+    "Agg_Name": "Shari's"
+  },
+  {
+    "CNN_Name": "Sharky's",
+    "Agg_Name": "Sharky's Woodfired Mexican Grill"
+  },
+  {
+    "CNN_Name": "Shaw's",
+    "Agg_Name": "Shaw's"
+  },
+  {
+    "CNN_Name": "Sheetz",
+    "Agg_Name": "Sheetz"
+  },
+  {
+    "CNN_Name": "Shell",
+    "Agg_Name": "Shell Oil"
+  },
+  {
+    "CNN_Name": "Sheraton Hotels",
+    "Agg_Name": "Sheraton Hotels & Resorts"
+  },
+  {
+    "CNN_Name": "Sherwin-Williams",
+    "Agg_Name": "Sherwin-Williams"
+  },
+  {
+    "CNN_Name": "Shipley Do-Nuts",
+    "Agg_Name": "Shipley Do-Nuts"
+  },
+  {
+    "CNN_Name": "Shoe Carnival",
+    "Agg_Name": "Shoe Carnival"
+  },
+  {
+    "CNN_Name": "Shop 'n Save",
+    "Agg_Name": "Shop 'n Save"
+  },
+  {
+    "CNN_Name": "Shopko",
+    "Agg_Name": "Shopko"
+  },
+  {
+    "CNN_Name": "Shoppers Food & Pharmacy",
+    "Agg_Name": "SHOPPERS Food & Pharmacy"
+  },
+  {
+    "CNN_Name": "ShopRite",
+    "Agg_Name": "ShopRite"
+  },
+  {
+    "CNN_Name": "Sierra Trading Post",
+    "Agg_Name": "Sierra Trading Post"
+  },
+  {
+    "CNN_Name": "Skechers",
+    "Agg_Name": "SKECHERS"
+  },
+  {
+    "CNN_Name": "Smart & Final",
+    "Agg_Name": "Smart & Final"
+  },
+  {
+    "CNN_Name": "Smashburger",
+    "Agg_Name": "Smashburger"
+  },
+  {
+    "CNN_Name": "Smokey Bones",
+    "Agg_Name": "Smokey Bones"
+  },
+  {
+    "CNN_Name": "Smoothie King",
+    "Agg_Name": "Smoothie King"
+  },
+  {
+    "CNN_Name": "Soma Intimates",
+    "Agg_Name": "Soma Intimates"
+  },
+  {
+    "CNN_Name": "Sonic Drive-In",
+    "Agg_Name": "Sonic"
+  },
+  {
+    "CNN_Name": "Soulcycle BMX",
+    "Agg_Name": "SoulCycle"
+  },
+  {
+    "CNN_Name": "Spencer's",
+    "Agg_Name": "Spencer's"
+  },
+  {
+    "CNN_Name": "Spirit Halloween",
+    "Agg_Name": "Spirit Halloween"
+  },
+  {
+    "CNN_Name": "Sport Chalet",
+    "Agg_Name": "Sport Chalet"
+  },
+  {
+    "CNN_Name": "Sport Clips",
+    "Agg_Name": "Sport Clips"
+  },
+  {
+    "CNN_Name": "Sprint",
+    "Agg_Name": "Sprint"
+  },
+  {
+    "CNN_Name": "Staples",
+    "Agg_Name": "Staples"
+  },
+  {
+    "CNN_Name": "Star Market",
+    "Agg_Name": "Star Market"
+  },
+  {
+    "CNN_Name": "Starbucks",
+    "Agg_Name": "Starbucks US"
+  },
+  {
+    "CNN_Name": "State Farm Insurance",
+    "Agg_Name": "State Farm"
+  },
+  {
+    "CNN_Name": "Stater Bros.",
+    "Agg_Name": "Stater Bros. Markets"
+  },
+  {
+    "CNN_Name": "Steak 'n Shake",
+    "Agg_Name": "Steak 'n Shake"
+  },
+  {
+    "CNN_Name": "Stein Mart",
+    "Agg_Name": "Stein Mart"
+  },
+  {
+    "CNN_Name": "Stewart's Shops",
+    "Agg_Name": "Stewart's Shops"
+  },
+  {
+    "CNN_Name": "Stop & Shop",
+    "Agg_Name": "Stop & Shop"
+  },
+  {
+    "CNN_Name": "Stride Rite",
+    "Agg_Name": "Stride Rite"
+  },
+  {
+    "CNN_Name": "Subway",
+    "Agg_Name": "SUBWAY"
+  },
+  {
+    "CNN_Name": "Sunglass Hut",
+    "Agg_Name": "Sunglass Hut"
+  },
+  {
+    "CNN_Name": "Sunoco",
+    "Agg_Name": "Sunoco"
+  },
+  {
+    "CNN_Name": "Sunset Foods",
+    "Agg_Name": "Sunset Foods"
+  },
+
+  {
+    "CNN_Name": "Super 8",
+    "Agg_Name": "Super 8"
+  },
+  {
+    "CNN_Name": "SuperAmerica",
+    "Agg_Name": "SuperAmerica"
+  },
+  {
+    "CNN_Name": "Supercuts",
+    "Agg_Name": "Supercuts"
+  },
+  {
+    "CNN_Name": "Sur La Table",
+    "Agg_Name": "Sur La Table"
+  },
+  {
+    "CNN_Name": "Sweet Tomatoes",
+    "Agg_Name": "Sweet Tomatoes"
+  },
+  {
+    "CNN_Name": "Sweetbay Supermarket",
+    "Agg_Name": "Sweetbay Supermarket"
+  },
+  {
+    "CNN_Name": "Taco Bell",
+    "Agg_Name": "Taco Bell"
+  },
+  {
+    "CNN_Name": "Taco Bueno",
+    "Agg_Name": "Taco Bueno"
+  },
+  {
+    "CNN_Name": "Taco Cabana",
+    "Agg_Name": "Taco Cabana"
+  },
+  {
+    "CNN_Name": "TacoTime",
+    "Agg_Name": "TacoTime"
+  },
+  {
+    "CNN_Name": "Talbots",
+    "Agg_Name": "Talbots"
+  },
+  {
+    "CNN_Name": "Target",
+    "Agg_Name": "Target"
+  },
+  {
+    "CNN_Name": "TCBY",
+    "Agg_Name": "TCBY"
+  },
+  {
+    "CNN_Name": "Teavana",
+    "Agg_Name": "Teavana"
+  },
+  {
+    "CNN_Name": "Tedeschi Food Shops",
+    "Agg_Name": "Tedeschi Food Shops"
+  },
+  {
+    "CNN_Name": "Tender Greens",
+    "Agg_Name": "Tender Greens"
+  },
+  {
+    "CNN_Name": "Terminix",
+    "Agg_Name": "Terminix"
+  },
+  {
+    "CNN_Name": "Tesla",
+    "Agg_Name": "Tesla Motors"
+  },
+  {
+    "CNN_Name": "Tesoro",
+    "Agg_Name": "Tesoro"
+  },
+  {
+    "CNN_Name": "Texaco",
+    "Agg_Name": "Texaco"
+  },
+  {
+    "CNN_Name": "Texas Roadhouse",
+    "Agg_Name": "Texas Roadhouse"
+  },
+  {
+    "CNN_Name": "TGI Fridays",
+    "Agg_Name": "TGI Fridays"
+  },
+  {
+    "CNN_Name": "The Body Shop",
+    "Agg_Name": "The Body Shop"
+  },
+  {
+    "CNN_Name": "The Capital Grille",
+    "Agg_Name": "The Capital Grille"
+  },
+  {
+    "CNN_Name": "The Cheesecake Factory",
+    "Agg_Name": "The Cheesecake Factory"
+  },
+  {
+    "CNN_Name": "The Children's Place",
+    "Agg_Name": "The Children's Place"
+  },
+  {
+    "CNN_Name": "The Coffee Bean",
+    "Agg_Name": "The Coffee Bean & Tea Leaf"
+  },
+  {
+    "CNN_Name": "The Container Store",
+    "Agg_Name": "The Container Store"
+  },
+  {
+    "CNN_Name": "The Counter",
+    "Agg_Name": "The Counter"
+  },
+  {
+    "CNN_Name": "The Flame Broiler",
+    "Agg_Name": "The Flame Broiler"
+  },
+  {
+    "CNN_Name": "The Food Emporium",
+    "Agg_Name": "The Food Emporium"
+  },
+  {
+    "CNN_Name": "The Fresh Market",
+    "Agg_Name": "The Fresh Market"
+  },
+  {
+    "CNN_Name": "The Habit Burger Grill",
+    "Agg_Name": "The Habit Burger Grill"
+  },
+  {
+    "CNN_Name": "The Hertz Corporation",
+    "Agg_Name": "Hertz"
+  },
+  {
+    "CNN_Name": "The Keg Steakhouse & Bar",
+    "Agg_Name": "The Keg Steakhouse & Bar"
+  },
+  {
+    "CNN_Name": "The Limited",
+    "Agg_Name": "The Limited"
+  },
+  {
+    "CNN_Name": "The Melting Pot",
+    "Agg_Name": "The Melting Pot Restaurant"
+  },
+  {
+    "CNN_Name": "The North Face",
+    "Agg_Name": "The North Face"
+  },
+  {
+    "CNN_Name": "The Paradies Shops",
+    "Agg_Name": "Paradies"
+  },
+  {
+    "CNN_Name": "The Sports Authority",
+    "Agg_Name": "Sports Authority"
+  },
+  {
+    "CNN_Name": "The Travelers Companies",
+    "Agg_Name": "Travelers"
+  },
+  {
+    "CNN_Name": "The UPS Store",
+    "Agg_Name": "The UPS Store"
+  },
+  {
+    "CNN_Name": "The Vitamin Shoppe",
+    "Agg_Name": "The Vitamin Shoppe"
+  },
+  {
+    "CNN_Name": "Things Remembered",
+    "Agg_Name": "Things Remembered"
+  },
+  {
+    "CNN_Name": "Thorntons",
+    "Agg_Name": "Thorntons"
+  },
+  {
+    "CNN_Name": "Tiffany & Co.",
+    "Agg_Name": "Tiffany & Co."
+  },
+  {
+    "CNN_Name": "Tijuana Flats",
+    "Agg_Name": "Tijuana Flats"
+  },
+  {
+    "CNN_Name": "Tilted Kilt",
+    "Agg_Name": "Tilted Kilt"
+  },
+  {
+    "CNN_Name": "Tim Hortons",
+    "Agg_Name": "Tim Hortons"
+  },
+  {
+    "CNN_Name": "Time Warner Cable",
+    "Agg_Name": "Time Warner Cable"
+  },
+  {
+    "CNN_Name": "T-Mobile",
+    "Agg_Name": "T-Mobile"
+  },
+  {
+    "CNN_Name": "TOGO'S",
+    "Agg_Name": "Togo's Eateries"
+  },
+  {
+    "CNN_Name": "Tom Thumb",
+    "Agg_Name": "Tom Thumb"
+  },
+  {
+    "CNN_Name": "Tommy Bahama",
+    "Agg_Name": "Tommy Bahama"
+  },
+  {
+    "CNN_Name": "Tommy Hilfiger",
+    "Agg_Name": "Tommy Hilfiger"
+  },
+  {
+    "CNN_Name": "Tory Burch",
+    "Agg_Name": "Tory Burch"
+  },
+  {
+    "CNN_Name": "Total Wine & More",
+    "Agg_Name": "Total Wine & More"
+  },
+  {
+    "CNN_Name": "Toyota",
+    "Agg_Name": "Toyota"
+  },
+  {
+    "CNN_Name": "Toys 'R' Us",
+    "Agg_Name": "Toys 'R' Us"
+  },
+  {
+    "CNN_Name": "Trader Joe's",
+    "Agg_Name": "Trader Joe's"
+  },
+  {
+    "CNN_Name": "True Value",
+    "Agg_Name": "True Value Hardware"
+  },
+  {
+    "CNN_Name": "TruGreen",
+    "Agg_Name": "TruGreen"
+  },
+  {
+    "CNN_Name": "Tuesday Morning",
+    "Agg_Name": "Tuesday Morning"
+  },
+  {
+    "CNN_Name": "Turkey Hill Dairy",
+    "Agg_Name": "Turkey Hill"
+  },
+  {
+    "CNN_Name": "Tutti Frutti Frozen Yogurt",
+    "Agg_Name": "Tutti Frutti"
+  },
+  {
+    "CNN_Name": "U-Haul",
+    "Agg_Name": "U-Haul"
+  },
+  {
+    "CNN_Name": "Ulta",
+    "Agg_Name": "ULTA Beauty"
+  },
+  {
+    "CNN_Name": "Uncle Julio's",
+    "Agg_Name": "Uncle Julio's"
+  },
+  {
+    "CNN_Name": "Under Armour",
+    "Agg_Name": "Under Armour"
+  },
+  {
+    "CNN_Name": "Uniqlo",
+    "Agg_Name": "UNIQLO US"
+  },
+  {
+    "CNN_Name": "United Dairy Farmers",
+    "Agg_Name": "UDF (United Dairy Farmers)"
+  },
+  {
+    "CNN_Name": "Uno Chicago Grill",
+    "Agg_Name": "Uno Chicago Grill"
+  },
+  {
+    "CNN_Name": "Urban Outfitters",
+    "Agg_Name": "Urban Outfitters"
+  },
+  {
+    "CNN_Name": "USPS",
+    "Agg_Name": "United States Postal Service (USPS)"
+  },
+  {
+    "CNN_Name": "Valero",
+    "Agg_Name": "Valero Energy"
+  },
+  {
+    "CNN_Name": "Vallarta Supermarkets",
+    "Agg_Name": "Vallarta Supermarkets"
+  },
+  {
+    "CNN_Name": "Value Village",
+    "Agg_Name": "Value Village Thrift Stores"
+  },
+  {
+    "CNN_Name": "Van Heusen",
+    "Agg_Name": "Van Heusen"
+  },
+  {
+    "CNN_Name": "Vans",
+    "Agg_Name": "Vans"
+  },
+  {
+    "CNN_Name": "Vapiano",
+    "Agg_Name": "Vapiano"
+  },
+  {
+    "CNN_Name": "Vera Bradley",
+    "Agg_Name": "Vera Bradley"
+  },
+  {
+    "CNN_Name": "Verizon",
+    "Agg_Name": "Verizon Wireless"
+  },
+  {
+    "CNN_Name": "Victoria's Secret",
+    "Agg_Name": "Victoria's Secret"
+  },
+  {
+    "CNN_Name": "Village Inn",
+    "Agg_Name": "Village Inn"
+  },
+  {
+    "CNN_Name": "Virgin Mobile",
+    "Agg_Name": "Virgin Mobile"
+  },
+  {
+    "CNN_Name": "Von Maur",
+    "Agg_Name": "Von Maur"
+  },
+  {
+    "CNN_Name": "Vons",
+    "Agg_Name": "Vons"
+  },
+  {
+    "CNN_Name": "Waffle House",
+    "Agg_Name": "Waffle House"
+  },
+  {
+    "CNN_Name": "Waldbaum's",
+    "Agg_Name": "Waldbaum's"
+  },
+  {
+    "CNN_Name": "Walgreens",
+    "Agg_Name": "Walgreens"
+  },
+  {
+    "CNN_Name": "Walmart",
+    "Agg_Name": "Walmart"
+  },
+  {
+    "CNN_Name": "Waste Management",
+    "Agg_Name": "Waste Management"
+  },
+  {
+    "CNN_Name": "Wawa Inc.",
+    "Agg_Name": "Wawa"
+  },
+  {
+    "CNN_Name": "Wegmans",
+    "Agg_Name": "Wegmans Food Markets"
+  },
+  {
+    "CNN_Name": "Weight Watchers",
+    "Agg_Name": "Weight Watchers"
+  },
+  {
+    "CNN_Name": "Weis Markets",
+    "Agg_Name": "Weis Markets"
+  },
+  {
+    "CNN_Name": "Wendy's",
+    "Agg_Name": "Wendy's"
+  },
+  {
+    "CNN_Name": "West Marine",
+    "Agg_Name": "West Marine"
+  },
+  {
+    "CNN_Name": "Western Beef",
+    "Agg_Name": "Western Beef"
+  },
+  {
+    "CNN_Name": "Westin Hotels & Resorts",
+    "Agg_Name": "Westin Hotels & Resorts"
+  },
+  {
+    "CNN_Name": "Wet Seal",
+    "Agg_Name": "Wet Seal"
+  },
+  {
+    "CNN_Name": "Whataburger",
+    "Agg_Name": "Whataburger"
+  },
+  {
+    "CNN_Name": "Which Wich",
+    "Agg_Name": "Which Wich"
+  },
+  {
+    "CNN_Name": "White Castle",
+    "Agg_Name": "White Castle"
+  },
+  {
+    "CNN_Name": "White House Black Market",
+    "Agg_Name": "White House Black Market"
+  },
+  {
+    "CNN_Name": "Whole Foods",
+    "Agg_Name": "Whole Foods Market"
+  },
+  {
+    "CNN_Name": "Wienerschnitzel",
+    "Agg_Name": "Wienerschnitzel"
+  },
+  {
+    "CNN_Name": "Williams-Sonoma",
+    "Agg_Name": "Williams-Sonoma"
+  },
+  {
+    "CNN_Name": "WinCo Foods",
+    "Agg_Name": "WinCo Foods"
+  },
+  {
+    "CNN_Name": "Wingstop",
+    "Agg_Name": "Wingstop"
+  },
+  {
+    "CNN_Name": "Wolfgang Puck",
+    "Agg_Name": "Wolfgang Puck"
+  },
+  {
+    "CNN_Name": "Woodman's Markets",
+    "Agg_Name": "Woodman's Market"
+  },
+  {
+    "CNN_Name": "Xplornet Communications",
+    "Agg_Name": "Xplor"
+  },
+  {
+    "CNN_Name": "XSport",
+    "Agg_Name": "XSport Fitness"
+  },
+  {
+    "CNN_Name": "XSport Fitness",
+    "Agg_Name": "XSport Fitness"
+  },
+  {
+    "CNN_Name": "Yankee Candle",
+    "Agg_Name": "Yankee Candle"
+  },
+  {
+    "CNN_Name": "Yard House",
+    "Agg_Name": "Yard House"
+  },
+  {
+    "CNN_Name": "YMCA",
+    "Agg_Name": "YMCA"
+  },
+  {
+    "CNN_Name": "Zales",
+    "Agg_Name": "Zales"
+  },
+  {
+    "CNN_Name": "Zara",
+    "Agg_Name": "Zara"
+  },
+  {
+    "CNN_Name": "Zaxby's",
+    "Agg_Name": "Zaxby's"
+  },
+  {
+    "CNN_Name": "Zumiez",
+    "Agg_Name": "Zumiez"
+  },
+  {
+    "CNN_Name": "Abercrombie & Fitch",
+    "Agg_Name": "Abercrombie and Fitch"
+  },
+  {
+    "CNN_Name": "Abercrombie & Fitch",
+    "Agg_Name": "Abercrombie Kids"
+  },
+  {
+    "CNN_Name": "Aeropostale",
+    "Agg_Name": "Aéropostale"
+  },
+  {
+    "CNN_Name": "Andronico's Market",
+    "Agg_Name": "Andronico's Community Markets"
+  },
+  {
+    "CNN_Name": "Apple Inc.",
+    "Agg_Name": "Apple Retail Store"
+  },
+  {
+    "CNN_Name": "Barnes & Noble",
+    "Agg_Name": "Barnes and Noble"
+  },
+  {
+    "CNN_Name": "Baskin-Robbins",
+    "Agg_Name": "Baskin Robbins"
+  },
+  {
+    "CNN_Name": "BJ's Restaurant & Brewery",
+    "Agg_Name": "BJ's Restaurants"
+  },
+  {
+    "CNN_Name": "BJ's Wholesale Club Fuel",
+    "Agg_Name": "BJ's Wholesale Club"
+  },
+  {
+    "CNN_Name": "Chop't",
+    "Agg_Name": "Chopt Creative Salad"
+  },
+  {
+    "CNN_Name": "Costco",
+    "Agg_Name": "Costco Wholesale Corp."
+  },
+  {
+    "CNN_Name": "C-Town Supermarkets",
+    "Agg_Name": "C Town Supermarkets"
+  },
+  {
+    "CNN_Name": "Dominick's",
+    "Agg_Name": "Dominick's Finer Foods"
+  },
+  {
+    "CNN_Name": "Dutch Bros. Coffee",
+    "Agg_Name": "Dutch Bros Coffee"
+  },
+  {
+    "CNN_Name": "Einstein Bros Bagels",
+    "Agg_Name": "Einstein Brothers"
+  },
+  {
+    "CNN_Name": "EXPRESS INC",
+    "Agg_Name": "Express"
+  },
+  {
+    "CNN_Name": "FreshCo",
+    "Agg_Name": "Fresh"
+  },
+  {
+    "CNN_Name": "Fry's Food and Drug",
+    "Agg_Name": "Fry's Food & Drug Stores"
+  },
+  {
+    "CNN_Name": "Gordon Food Service Store",
+    "Agg_Name": "Gordon Food Service (GFS)"
+  },
+  {
+    "CNN_Name": "Gristede's",
+    "Agg_Name": "Gristedes"
+  },
+  {
+    "CNN_Name": "Haagen-Dazs",
+    "Agg_Name": "Haagen Dazs"
+  },
+  {
+    "CNN_Name": "Hale & Hearty",
+    "Agg_Name": "Hale and Hearty"
+  },
+  {
+    "CNN_Name": "Hilton Hotels & Resorts",
+    "Agg_Name": "Hilton International"
+  },
+  {
+    "CNN_Name": "J. C. Penney",
+    "Agg_Name": "JCPenney"
+  },
+  {
+    "CNN_Name": "Jack Astor's Bar and Grill",
+    "Agg_Name": "Jack Astor's Bar & Grill"
+  },
+  {
+    "CNN_Name": "Kroger Fuel",
+    "Agg_Name": "Kroger"
+  },
+  {
+    "CNN_Name": "La Boulange",
+    "Agg_Name": "Le Boulanger"
+  },
+  {
+    "CNN_Name": "Levi's",
+    "Agg_Name": "Levi Strauss & Co."
+  },
+  {
+    "CNN_Name": "Lord & Taylor",
+    "Agg_Name": "Lord and Taylor"
+  },
+  {
+    "CNN_Name": "Murphy Oil",
+    "Agg_Name": "Murphy USA"
+  },
+  {
+    "CNN_Name": "P. F. Chang's",
+    "Agg_Name": "P.F. Chang's China Bistro"
+  },
+  {
+    "CNN_Name": "Peet's Coffee & Tea",
+    "Agg_Name": "Peet's Coffee and Tea"
+  },
+  {
+    "CNN_Name": "Progressive Insurance",
+    "Agg_Name": "Progressive Casualty Insurance"
+  },
+  {
+    "CNN_Name": "QuikStop",
+    "Agg_Name": "Quik Stop"
+  },
+  {
+    "CNN_Name": "Regal Cinemas",
+    "Agg_Name": "Regal Entertainment Group"
+  },
+  {
+    "CNN_Name": "Roots",
+    "Agg_Name": "Roots Canada"
+  },
+  {
+    "CNN_Name": "Safeway Fuel",
+    "Agg_Name": "Safeway"
+  },
+  {
+    "CNN_Name": "SmartStyle",
+    "Agg_Name": "SmartStyle Family Hair Salons"
+  },
+  {
+    "CNN_Name": "Smith's Food and Drug",
+    "Agg_Name": "Smith's Food & Drug Stores"
+  },
+  {
+    "CNN_Name": "Specialty's Cafe & Bakery",
+    "Agg_Name": "Specialty's Cafe and Bakery"
+  },
+  {
+    "CNN_Name": "Sprout's Farmers Market",
+    "Agg_Name": "Sprouts Farmers Market"
+  },
+  {
+    "CNN_Name": "Super Fresh",
+    "Agg_Name": "Superfresh"
+  },
+  {
+    "CNN_Name": "T.J.Maxx",
+    "Agg_Name": "T.J. Maxx"
+  },
+  {
+    "CNN_Name": "Tractor Supply Company",
+    "Agg_Name": "Tractor Supply Co."
+  },
+  {
+    "CNN_Name": "Tropical Smoothie Cafe",
+    "Agg_Name": "Tropical Smoothie Café"
+  },
+  {
+    "CNN_Name": "Yogurt Land",
+    "Agg_Name": "Yogurtland"
+  },
+  {
+    "CNN_Name": "Cox Enterprises",
+    "Agg_Name": "Cox Communications"
+  },
+  {
+    "CNN_Name": "Fleming's Prime Steakhouse And Vine Bar",
+    "Agg_Name": "Fleming’s Prime Steakhouse and Wine Bar"
+  },
+  {
+    "CNN_Name": "Mercedes-Benz",
+    "Agg_Name": "Mercedes Benz USA"
+  },
+  {
+    "CNN_Name": "Zoes Kitchen",
+    "Agg_Name": "Zoës Kitchen"
+  }
+]
