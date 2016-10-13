@@ -111,10 +111,8 @@ def enrich_transaction(trans, hit):
 		pprint(trans)
 	return trans
 
-def search_index(filename):
+def search_agg_index(data):
 	"""Enrich transactions with agg index"""
-	data = json.loads(open(filename).read())
-
 	requests = []
 	header = {'index': index_name, 'doc_type': index_type}
 
@@ -143,5 +141,6 @@ def search_index(filename):
 		requests = []
 
 if __name__ == '__main__':
-	search_index('./CNN_Agg.txt')
+	data = json.loads(open('./CNN_Agg.txt').read())
+	search_agg_index(data)
 	# basic_search('Starbucks US')
