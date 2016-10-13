@@ -20,7 +20,7 @@ def basic_search(list_name):
 					'match': {
 						'list_name': {
 							'query': list_name,
-							'fuzziness': 2
+							'fuzziness': 0
 						}
 					}
 				}
@@ -75,21 +75,17 @@ def create_bool_query(must, should):
 
 def search_index(filename):
 	"""Search agg index for the input file"""
-	df = pd.read_csv(filename, sep='|')
-	df = df.fillna('')
-	data = df.to_dict(orient='records')
+	data = json.loads(open(filename).read())
 
-	data = json.loads(open('./CNN_Agg.txt').read())
 	requests = []
 	header = {'index': index_name, 'doc_type': index_type}
 
 	for i in range(len(data)):
 		tran = data[i]
-		description, list_name = tran.get('DESCRIPTION', ''), tran.get('MERCHANT_NAME', '')
-		city, state, zip_code = tran.get('LOCALITY', ''), tran.get('STATE', ''), tran.get('ZIP_CODE', '')
-		store_number, phone_number = tran.get('STORE_NUMBER', ''), tran.get('PHONE_NUMBER', '')
+		list_name = tran.get('Agg_Name', '')
+		city, state, zip_code = tran.get('city', ''), tran.get('state', ''), tran.get('zip_code', '')
+		store_number, phone_number = tran.get('store_number', ''), tran.get('phone_number', '')
 
-		list_name = data[i].get('Agg_Name', '')
 		must = create_must_query(list_name, state, zip_code)
 		should = create_should_query(city, store_number, phone_number)
 		query = create_bool_query(must, should)
@@ -98,10 +94,9 @@ def search_index(filename):
 
 		results = es.msearch(body=requests)['responses']
 		hits = results[0]['hits']['total']
-		if hits == 0:
-			print('hits: {}, agg: {}'.format(hits, data[i]['Agg_Name']))
+		print('hits: {}, agg: {}'.format(hits, data[i]['Agg_Name']))
 		requests = list()
 
 if __name__ == '__main__':
-	search_index('./processed_credit.csv')
-	# basic_search('Armani Exchange (A/X)')
+	search_index('./CNN_Agg.txt')
+	# basic_search('Starbucks US')
