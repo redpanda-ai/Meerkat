@@ -132,12 +132,15 @@ def get_token_tag_pairs(config, trans):
 	for key, value in tag_column_map.items():
 		if key not in trans: continue
 		tag = trans[key].split(",")
+		tag = [tokenize({"DESCRIPTION": t}).split() if " " in t else t for t in tag]
 		entities[value] = tag
 
+	print(trans["DESCRIPTION"])
 	print(entities)
 
 	# Tokenize String
 	tokens = tokenize(trans).split()
+	print(tokens)
 
 	# Get Tags
 	tags = []
