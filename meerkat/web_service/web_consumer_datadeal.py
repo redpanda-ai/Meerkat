@@ -22,8 +22,7 @@ from meerkat.classification.load_model import load_scikit_model, get_tf_cnn_by_p
 from meerkat.classification.auto_load import main_program as load_models_from_s3
 from meerkat.various_tools import load_params
 
-
-class WebConsumer():
+class WebConsumerDatadeal():
 	"""Acts as a web service client to process and enrich
 	transactions in real time"""
 
@@ -118,27 +117,35 @@ class WebConsumer():
 				trans["agg_merchant_name"] = self.merchant_name_map[cnn_merchant]
 				data_to_search_in_agg.append(trans)
 			else:
+				"""
 				if cnn_merchant != '':
 					trans["merchant_name"] = cnn_merchant
 				else:
 					# TODO: get rnn_merchant
 					trans["merchant_name"] = rnn_merchant
+				"""
 				data_to_search_in_factual.append(trans)
 		return data_to_search_in_agg, data_to_search_in_factual
 
 	def __search_in_agg_or_factual(self, data):
 		for transaction in data["transaction_list"]:
 			transaction["container"] = data["container"]
+			transaction["datadeal"] = True
 		data_to_search_in_agg, data_to_search_in_factual = self.__choose_agg_or_factual(data)
-		search_in_batch = self.params.get("search_in_batch", True)
-		if search_in_batch:
+		"""
+		search_agg_in_batch = self.params.get("search_agg_in_batch", True)
+		search_factual_in_batch = self.params.get("search_factual_in_batch", True)
+		if search_agg_in_batch:
 			data_to_search_in_agg = self.__enrich_by_agg(data_to_search_in_agg)
-			data_to_search_in_factual = self.__enrich_by_factual(data_to_search_in_factual)
 		else:
 			for i in range(len(data_to_search_in_agg)):
 				data_to_search_in_agg[i] = self.__enrich_by_agg(data_to_search_in_agg[i])
+		if search_factual_in_batch:
+			data_to_search_in_factual = self.__enrich_by_factual(data_to_search_in_factual)
+		else:
 			for i in range(len(data_to_search_in_factual)):
 				data_to_search_in_factual[i] = self.__enrich_by_factual(data_to_search_in_factual[i])
+		"""
 		return data_to_search_in_agg, data_to_search_in_factual
 
 	def classify(self, data, optimizing=False):
@@ -148,13 +155,13 @@ class WebConsumer():
 		self.__apply_merchant_cnn(data)
 
 		# Apply RNN
-		self.__apply_rnn(data)
+		#self.__apply_rnn(data)
 
 		# Apply Elasticsearch
 		self.__search_in_agg_or_factual(data)
 
 		# Process enriched data to ensure output schema
-		self.ensure_output_schema(data["transaction_list"])
+		#self.ensure_output_schema(data["transaction_list"])
 
 		return data
 
