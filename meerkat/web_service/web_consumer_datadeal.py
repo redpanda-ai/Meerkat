@@ -112,9 +112,11 @@ class WebConsumerDatadeal():
 		"""Split transactions to search in agg index or factual index"""
 		data_to_search_in_agg, data_to_search_in_factual = [], []
 		for trans in data["transaction_list"]:
+			if "country" in trans and trans["country"] != "US":
+				continue
 			cnn_merchant = trans['CNN']['label']
 			if cnn_merchant != '' and cnn_merchant in self.merchant_name_map:
-				trans["agg_merchant_name"] = self.merchant_name_map[cnn_merchant]
+				trans["Agg_Name"] = self.merchant_name_map[cnn_merchant]
 				data_to_search_in_agg.append(trans)
 			else:
 				"""
@@ -130,7 +132,6 @@ class WebConsumerDatadeal():
 	def __search_in_agg_or_factual(self, data):
 		for transaction in data["transaction_list"]:
 			transaction["container"] = data["container"]
-			transaction["datadeal"] = True
 		data_to_search_in_agg, data_to_search_in_factual = self.__choose_agg_or_factual(data)
 		"""
 		search_agg_in_batch = self.params.get("search_agg_in_batch", True)
