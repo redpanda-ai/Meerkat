@@ -109,17 +109,20 @@ class WebConsumer():
 		# Add Merchant Sub Query
 		if transaction['CNN']['label'] != '':
 			term = string_cleanse(transaction['CNN']['label'])
-			merchant_query = get_qs_query(term, ['name'], field_boosts['name'], operator="AND")
+			merchant_query = get_qs_query(term, ['name'], field_boosts['name'])
+			merchant_query["query_string"]["fuzziness"] = "AUTO"
 			must_clauses.append(merchant_query)
 		elif transaction['Predicted'] != '':
 			term = synonyms(transaction['Predicted'])
 			term = string_cleanse(term)
 			merchant_query = get_qs_query(term, ['name'], field_boosts['name'])
+			merchant_query["query_string"]["fuzziness"] = "AUTO"
 			must_clauses.append(merchant_query)
 
 		# Add Locale Sub Query
 		if locale_bloom != None:
-			city_query = get_qs_query(locale_bloom[0].lower(), ['locality'], field_boosts['locality'])
+			city_query = get_qs_query(locale_bloom[0].lower(), ['locality'], field_boosts['locality'], operator="AND")
+			city_query["query_string"]["fuzziness"] = "AUTO"
 			state_query = get_qs_query(locale_bloom[1].lower(), ['region'], field_boosts['region'], operator="AND")
 			must_clauses.append(city_query)
 			must_clauses.append(state_query)
