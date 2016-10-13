@@ -54,15 +54,7 @@ class Meerkat_Datadeal_API(APIHandler):
 	def post(self):
 		"""Handle post requests asynchonously"""
 		data = json.loads(self.request.body.decode())
-		# Identify Metadata with Meerkat
-		# Futures, threadpools, generator coroutines, and functions as arguments
-		# allow us to submit the normally 'blocking function' meerkat.classify
-		# and its data to a ThreadPoolExecutor, where one of 14 threads will execute
-		# the function to its completion.  However, the 'Future' class encapsulates
-		# the execution, which we can return even before the Executor reaches a 'done'
-		# state.
 		results = yield self.thread_pool.submit(self.meerkat.classify, data)
-		#results = self.meerkat.classify(data)
 		return results
 
 	def get(self):
