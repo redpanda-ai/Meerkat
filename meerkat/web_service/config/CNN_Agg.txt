@@ -209,7 +209,7 @@
   },
   {
     "CNN_Name": "Bakers",
-    "Agg_Name": "Bakers shoes"
+    "Agg_Name": "Baker's Supermarkets"
   },
   {
     "CNN_Name": "Bally Total Fitness",
