@@ -72,7 +72,15 @@ def get_token_tag_pairs_input():
 			"STATE": "IL"
 			},
 			["merchant", "background", "background", "background", "merchant", "state"],
-			["AA", "MILES", "BY", "POINTS", "POINTS.COM", "IL"])
+			["AA", "MILES", "BY", "POINTS", "POINTS.COM", "IL"]),
+		({
+			"DESCRIPTION": "VILLAGE OF BARTLETT      BARTLETT     IL", 
+			"MERCHANT_NAME": "VILLAGE OF BARTLETT",
+			"LOCALITY": "BARTLETT",
+			"CITY": "IL"
+			},
+			["merchant", "merchant", "merchant", "city", "state"],
+			["VILLAGE", "OF", "BARTLETT", "BARTLETT", "IL"])
 	]
 
 	return transactions

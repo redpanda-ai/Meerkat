@@ -121,29 +121,46 @@ def tokenize(trans):
 
 		prev_char = t
 
-	return output
+	return output.split()
 
 def get_token_tag_pairs(config, trans):
 	"""Convert df row to list of tags and tokens"""
 
 	# Tag Column Map
+	tag_lookup = {}
 	entities = {}
 	tag_column_map = config["tag_column_map"]
+
+	# Create Tag Lookup
 	for key, value in tag_column_map.items():
+
 		if key not in trans: continue
 		tag = trans[key].split(",")
-		tag = [tokenize({"DESCRIPTION": t}).split() if " " in t else t for t in tag]
+		tag = [tokenize({"DESCRIPTION": t}) if " " in t else t for t in tag]
+
+		for t in tag:
+			if t == "":
+				continue
+			if type(t) is str:
+				tag_lookup[t] = value
+			else:
+				for x in t:
+					tag_lookup[x] = value
+
 		entities[value] = tag
 
 	print(trans["DESCRIPTION"])
+	print(tag_lookup)
 	print(entities)
 
 	# Tokenize String
-	tokens = tokenize(trans).split()
-	print(tokens)
+	tokens = tokenize(trans)
 
 	# Get Tags
-	tags = []
+	tags = [tag_lookup.get(token, "background") for token in tokens]
+
+	print(tokens)
+	print(tags)
 
 	# Map tokens to Tags
 
