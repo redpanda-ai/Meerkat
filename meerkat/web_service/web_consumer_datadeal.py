@@ -127,13 +127,13 @@ class WebConsumerDatadeal():
 		if city != '':
 			city_query = get_qs_query(city, ['locality'], field_boosts['locality'], operator="AND")
 			city_query["query_string"]["fuzziness"] = "AUTO"
-			should_clauses.append(city_query)
+			must_clauses.append(city_query)
 		if state != '':
 			state_query = get_qs_query(state, ['region'], field_boosts['region'], operator="AND")
 			must_clauses.append(state_query)
 		if phone_number != '':
 			phone_query = get_qs_query(phone_number, ['tel'], field_boosts['tel'], operator="AND")
-			should_query.append(phone_query)
+			should_clauses.append(phone_query)
 		if postal_code != '':
 			postcode_query = get_qs_query(postal_code, ['postcode'], field_boosts['postcode'], operator="AND")
 			must_clauses.append(postcode_query)
