@@ -289,7 +289,7 @@ class WebConsumerDatadeal():
 
 		# Ensure Proper Casing
 		if transaction["factual_search"][attr_map['name']] == transaction["factual_search"][attr_map['name']].upper():
-			transaction["factual_search"][attr_map['name']] = string.capwords(transaction[["factual_search"]attr_map['name']], " ")
+			transaction["factual_search"][attr_map['name']] = string.capwords(transaction["factual_search"][attr_map['name']], " ")
 
 		return transaction
 
