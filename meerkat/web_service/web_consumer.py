@@ -109,8 +109,8 @@ class WebConsumer():
 		# Add Merchant Sub Query
 		if transaction['CNN']['label'] != '':
 			term = string_cleanse(transaction['CNN']['label'])
-			merchant_query = get_qs_query(term, ['name'], field_boosts['name'])
-			merchant_query["query_string"]["fuzziness"] = "AUTO"
+			merchant_query = get_qs_query(term, ['name'], field_boosts['name'], operator="AND")
+#			merchant_query["query_string"]["fuzziness"] = "AUTO"
 			must_clauses.append(merchant_query)
 		elif transaction['Predicted'] != '':
 			term = synonyms(transaction['Predicted'])
@@ -124,7 +124,7 @@ class WebConsumer():
 			city_query = get_qs_query(locale_bloom[0].lower(), ['locality'], field_boosts['locality'], operator="AND")
 			city_query["query_string"]["fuzziness"] = "AUTO"
 			state_query = get_qs_query(locale_bloom[1].lower(), ['region'], field_boosts['region'], operator="AND")
-			must_clauses.append(city_query)
+			should_clauses.append(city_query)
 			must_clauses.append(state_query)
 
 		return o_query
@@ -207,12 +207,13 @@ class WebConsumer():
 
 		# Collect Relevancy Scores
 		scores = [hit["_score"] for hit in hits]
-		if len(scores) < 2:
-			scores.append(0.0)
-		z_score_delta, raw_score = self.__z_score_delta(scores)
-		
 		thresholds = [float(hyperparams.get("z_score_threshold", "2")), \
 			float(hyperparams.get("raw_score_threshold", "1"))]
+
+		if len(scores) <= 2:
+			z_score_delta, raw_score = thresholds[0] + 1, scores[0]
+		else:
+			z_score_delta, raw_score = self.__z_score_delta(scores)
 		decision = True if (z_score_delta > thresholds[0]) and (raw_score > thresholds[1]) else False
 		
 		# Enrich Data if Passes Boundary
