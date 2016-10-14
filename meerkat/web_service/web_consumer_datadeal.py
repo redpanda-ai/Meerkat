@@ -18,7 +18,8 @@ from scipy.stats.mstats import zscore
 
 from meerkat.various_tools import get_es_connection, string_cleanse, get_boosted_fields
 from meerkat.various_tools import synonyms, get_bool_query, get_qs_query
-from meerkat.classification.load_model import load_scikit_model, get_tf_cnn_by_path, get_tf_rnn_by_path
+from meerkat.classification.load_model import (load_scikit_model,
+	get_tf_cnn_by_path, get_tf_rnn_by_path)
 from meerkat.classification.auto_load import main_program as load_models_from_s3
 from meerkat.various_tools import load_params
 from meerkat.elasticsearch.search_agg_index import search_agg_index
@@ -78,7 +79,8 @@ class WebConsumerDatadeal():
 		models_dir = 'meerkat/classification/models/'
 		label_maps_dir = "meerkat/classification/label_maps/"
 		for filename in os.listdir(models_dir):
-			if filename.startswith('merchant') and filename.endswith('.ckpt') and not filename.startswith('train'):
+			if (filename.startswith('merchant') and filename.endswith('.ckpt') and
+				not filename.startswith('train')):
 				temp = filename.split('.')[:-1]
 				if temp[-1][-1].isdigit():
 					key = '_'.join(temp[1:-1] + [temp[0], temp[-1], 'cnn'])
@@ -88,11 +90,15 @@ class WebConsumerDatadeal():
 					label_maps_dir + filename[:-4] + 'json', gpu_mem_fraction=gmf)
 
 		# Get RNN Models
-		self.merchant_rnn = get_tf_rnn_by_path('meerkat/longtail/models/bilstm.ckpt', 'meerkat/longtail/models/w2i.json')
+		rnn_model_path = "./meerkat/classification/models/rnn_model/bilstm.ckpt"
+		w2i_path = "./meerkat/classification/models/rnn_model/w2i.json"
+		if os.path.exists(rnn_model_path) is False:
+			logging.warning("Please run python3 -m meerkat.longtail.rnn_auto_load")
+		self.models["rnn"] = get_tf_rnn_by_path(rnn_model_path, w2i_path)
 
 	def __apply_rnn(self, trans):
 		"""Apply RNN to transactions"""
-		classifier = self.merchant_rnn
+		classifier = self.models["rnn"]
 		return classifier(trans, doc_key="description", label_key="RNN_merchant_name")
 
 	def __apply_merchant_cnn(self, data):
@@ -127,29 +133,28 @@ class WebConsumerDatadeal():
 				trans["Agg_Name"] = self.merchant_name_map[cnn_merchant]
 				data_to_search_in_agg.append(trans)
 			else:
-				"""
 				if cnn_merchant != '':
 					trans["merchant_name"] = cnn_merchant
-				else:
-					# TODO: get rnn_merchant
-					trans["merchant_name"] = rnn_merchant
-				"""
-				data_to_search_in_factual.append(trans)
+					data_to_search_in_factual.append(trans)
+				elif 'RNN_merchant_name' in trans and trans['RNN_merchant_name'] != '':
+					trans["merchant_name"] = trans['RNN_merchant_name']
+					data_to_search_in_factual.append(trans)
 		return data_to_search_in_agg, data_to_search_in_factual
 
 	def __search_in_agg_or_factual(self, data):
+		"""Enrich transactions with agg search or factual search"""
 		for transaction in data["transaction_list"]:
 			transaction["container"] = data["container"]
 		data_to_search_in_agg, data_to_search_in_factual = self.__choose_agg_or_factual(data)
 		data["count_agg_search_input"] = len(data_to_search_in_agg)
 		search_agg_in_batch = self.params.get("search_agg_in_batch", True)
 		search_factual_in_batch = self.params.get("search_factual_in_batch", True)
+		"""
 		if search_agg_in_batch:
 			data_to_search_in_agg = search_agg_index(data_to_search_in_agg)
 		else:
 			for i in range(len(data_to_search_in_agg)):
 				data_to_search_in_agg[i] = self.__enrich_by_agg(data_to_search_in_agg[i])
-		"""
 		if search_factual_in_batch:
 			data_to_search_in_factual = self.__enrich_by_factual(data_to_search_in_factual)
 		else:
@@ -163,28 +168,37 @@ class WebConsumerDatadeal():
 
 		# Apply Merchant CNN
 		self.__apply_merchant_cnn(data)
-		count_cnn_found = 0
-		for trans in data["transaction_list"]:
-			if trans['CNN']['label'] != '':
-				count_cnn_found += 1
 
-			# Apply RNN
+		# Apply RNN
+		for trans in data["transaction_list"]:
 			if trans['CNN']['label'] == '':
 				self.__apply_rnn([trans])
 
 		# Apply Elasticsearch
-		"""
 		self.__search_in_agg_or_factual(data)
-		count_agg_search_found = 0
-		for trans in data["transaction_list"]:
-			if 'agg_search' in trans:
-				count_agg_search_found += 1
-		"""
 
 		# Process enriched data to ensure output schema
 		#self.ensure_output_schema(data["transaction_list"])
 
-		data["count_cnn_found"] = count_cnn_found
+		# Count results
+		count_cnn_merchant_found = 0
+		count_rnn_merchant_found = 0
+		count_no_merchant_name = 0
+		#count_agg_search_found = 0
+		for trans in data["transaction_list"]:
+			if trans['CNN']['label'] != '':
+				count_cnn_merchant_found += 1
+			if 'RNN_merchant_name' in trans:
+				count_rnn_merchant_found += 1
+			#if 'agg_search' in trans:
+			#	count_agg_search_found += 1
+			if (trans['CNN']['label'] == '' and 'RNN_merchant_name' in trans and
+				trans['RNN_merchant_name'] == ''):
+				count_no_merchant_name += 1
+				print("empty merchant name {0}".format(trans))
+		data["count_cnn_merchant_found"] = count_cnn_merchant_found
+		data["count_rnn_merchant_found"] = count_rnn_merchant_found
+		data["count_no_merchant_name"] = count_no_merchant_name
 		#data["count_agg_search_found"] = count_agg_search_found
 		return data
 
