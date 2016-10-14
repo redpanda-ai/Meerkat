@@ -125,6 +125,36 @@ def tokenize(trans):
 
 	return output.split()
 
+def get_tag_index(tokens, tag):
+	"""Convert df row to list of tags and tokens"""
+
+	if len(tag) > 1:
+		tag = sum([item.split() for item in tag], [])
+	else:
+		tag = tag[0].split()
+
+	print(tokens)
+	print(tag)
+
+	if tag == [] or tag == ["null"]:
+		tags = [0 for token in tokens]
+	else:
+		tags = []
+		for token in tokens:
+			found = False
+			for word in tag:
+				if word.lower() in token.lower() and tag.index(word) == 0:
+					tags.append(1)
+					tag = tag[1:]
+					found = True
+					break
+			if not found:
+				tags.append(0)
+
+	hits = [i for i, val in enumerate(tags) if val == 1]
+
+	return hits
+
 def get_token_tag_pairs(config, trans):
 	"""Convert df row to list of tags and tokens"""
 
@@ -145,9 +175,13 @@ def get_token_tag_pairs(config, trans):
 
 	# Tokenize String
 	tokens = tokenize(trans)
+	tags = ["background"] * len(tokens)
 
 	# Get Tags
-	tags = ["background"] * len(tokens)
+	for tag_name, tag in entities.items():
+		indices = get_tag_index(tokens, tag)
+		for i in indices:
+			tags[i] = tag_name
 
 	print(tokens)
 	print(tags)
