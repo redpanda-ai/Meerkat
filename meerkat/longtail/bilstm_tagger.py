@@ -65,35 +65,6 @@ def last_relevant(output, length, name):
 	relevant = tf.gather(flat, index, name=name)
 	return relevant
 
-def get_tags(config, trans):
-	"""Convert df row to list of tags and tokens"""
-
-	tokens = str(trans["Description"]).lower().split()[0:config["max_tokens"]]
-	tag = str(trans["Tagged_merchant_string"]).lower()
-
-	if "," in tag:
-		tag = tag.split(",")
-		tag = sum([item.split() for item in tag], [])
-	else:
-		tag = tag.split()
-
-	if tag == [] or tag == ["null"]:
-		tags = ["background" for toekn in tokens]
-	else:
-		tags = []
-		for token in tokens:
-			found = False
-			for word in tag:
-				if word in token and tag.index(word) == 0:
-					tags.append("merchant")
-					tag = tag[1:]
-					found = True
-					break
-			if not found:
-				tags.append("background")
-
-	return (tokens, tags)
-
 def tokenize(trans):
 	"""Custom tokenization function"""
 
@@ -174,7 +145,13 @@ def get_token_tag_pairs(config, trans):
 	tokens = tokenize(trans)
 	tags = ["background"] * len(tokens)
 
-	# Get Tags
+	# Tag Merchant
+	tag = entities["merchant"]
+	indices = get_tag_index(tokens, tag, tags)
+	for i in indices: tags[i] = "merchant"
+	del entities["merchant"]
+
+	# Tag Other Entities
 	for tag_name, tag in entities.items():
 		indices = get_tag_index(tokens, tag, tags)
 		for i in indices:
