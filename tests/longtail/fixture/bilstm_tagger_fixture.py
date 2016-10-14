@@ -11,7 +11,8 @@ def get_config():
 			"LOCALITY": "city",
 			"STORE_NUMBER": "store_number",
 			"PHONE_NUMBER": "phone_number",
-			"ADDRESS": "address"
+			"ADDRESS": "address",
+			"STATE": "state"
 		},
 		"max_tokens": 35
 	}
