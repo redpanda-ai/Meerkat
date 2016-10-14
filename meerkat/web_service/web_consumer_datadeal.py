@@ -173,6 +173,8 @@ class WebConsumerDatadeal():
 		for trans in data["transaction_list"]:
 			if trans['CNN']['label'] == '':
 				self.__apply_rnn([trans])
+			else:
+				trans['RNN_merchant_name'] = ''
 
 		# Apply Elasticsearch
 		self.__search_in_agg_or_factual(data)
@@ -188,12 +190,11 @@ class WebConsumerDatadeal():
 		for trans in data["transaction_list"]:
 			if trans['CNN']['label'] != '':
 				count_cnn_merchant_found += 1
-			if 'RNN_merchant_name' in trans:
+			if trans['RNN_merchant_name'] != '':
 				count_rnn_merchant_found += 1
 			#if 'agg_search' in trans:
 			#	count_agg_search_found += 1
-			if (trans['CNN']['label'] == '' and 'RNN_merchant_name' in trans and
-				trans['RNN_merchant_name'] == ''):
+			if trans['CNN']['label'] == '' and trans['RNN_merchant_name'] == '':
 				count_no_merchant_name += 1
 				print("empty merchant name {0}".format(trans))
 		data["count_cnn_merchant_found"] = count_cnn_merchant_found
