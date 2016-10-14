@@ -96,6 +96,269 @@ class WebConsumerDatadeal():
 			logging.warning("Please run python3 -m meerkat.longtail.rnn_auto_load")
 		self.models["rnn"] = get_tf_rnn_by_path(rnn_model_path, w2i_path)
 
+	def __get_query(self, transaction):
+		"""Create an optimized query"""
+
+		result_size = self.hyperparams.get("es_result_size", "10")
+		fields = self.params["output"]["results"]["fields"]
+		city, state = transaction["city"], transaction["state"]
+		phone_number, postal_code = transaction["phone_number"], transaction["postal_code"]
+
+		# Construct Optimized Query
+		o_query = get_bool_query(size=result_size)
+		o_query["fields"] = fields
+		o_query["_source"] = "pin.*"
+		should_clauses = o_query["query"]["bool"]["should"]
+		must_clauses = o_query["query"]["bool"]["must"]
+		field_boosts = get_boosted_fields(self.hyperparams, "standard_fields")
+		# Add Merchant Sub Query
+		if transaction['CNN']['label'] != '':
+			term = string_cleanse(transaction['CNN']['label'])
+			merchant_query = get_qs_query(term, ['name'], field_boosts['name'], operator="AND")
+			must_clauses.append(merchant_query)
+		elif transaction['RNN_merchant_name'] != '':
+			term = synonyms(transaction['RNN_merchant_name'])
+			term = string_cleanse(term)
+			merchant_query = get_qs_query(term, ['name'], field_boosts['name'])
+			merchant_query["query_string"]["fuzziness"] = "AUTO"
+			must_clauses.append(merchant_query)
+
+		# Add Locale Sub Query
+		if city != '':
+			city_query = get_qs_query(city, ['locality'], field_boosts['locality'], operator="AND")
+			city_query["query_string"]["fuzziness"] = "AUTO"
+			should_clauses.append(city_query)
+		if state != '':
+			state_query = get_qs_query(state, ['region'], field_boosts['region'], operator="AND")
+			must_clauses.append(state_query)
+		if phone_number != '':
+			phone_query = get_qs_query(phone_number, ['tel'], field_boosts['tel'], operator="AND")
+			should_query.append(phone_query)
+		if postal_code != '':
+			postcode_query = get_qs_query(postal_code, ['postcode'], field_boosts['postcode'], operator="AND")
+			must_clauses.append(postcode_query)
+
+		return o_query
+
+	def __search_index(self, queries):
+		"""Search against a structured index"""
+		index = self.params["elasticsearch"]["index"]
+		results = self.elastic_search.msearch(queries, index=index)
+		return results
+
+	@staticmethod
+	def __z_score_delta(scores):
+		"""Find the Z-Score Delta"""
+		if len(scores) < 2:
+			return None, None
+		z_scores = zscore(scores)
+		first_score, second_score = z_scores[0:2]
+		z_score_delta = round(first_score - second_score, 3)
+		return z_score_delta, scores[0]
+
+	def __process_results(self, results, transaction):
+		"""Process search results and enrich transaction
+		with found data"""
+
+		hyperparams = self.hyperparams
+
+		# Must be at least one result
+		if "hits" not in results or results["hits"]["total"] == 0:
+			transaction = self.__no_result(transaction)
+			return transaction
+
+		# Collect Necessary Information
+		hits = results['hits']['hits']
+		if len(hits) < 1:
+			transaction = self.__no_result(transaction)
+			return transaction
+		top_hit = hits[0]
+		hit_fields = top_hit.get("fields", "")
+
+		# If no results return
+		if hit_fields == "":
+			transaction = self.__no_result(transaction)
+			return transaction
+
+		# Elasticsearch v1.0 bug workaround
+		if top_hit["_source"].get("pin", "") != "":
+			coordinates = top_hit["_source"]["pin"]["location"]["coordinates"]
+			hit_fields["longitude"] = "%.6f" % (float(coordinates[0]))
+			hit_fields["latitude"] = "%.6f" % (float(coordinates[1]))
+
+		# Collect Fallback Data
+		names = {}
+		names["business_names"] =\
+			[result.get("fields", {"name" : ""}).get("name", "") for result in hits]
+		names["business_names"] =\
+			[name[0] for name in names["business_names"] if isinstance(name, list)]
+		names["city_names"] =\
+			[result.get("fields", {"locality" : ""}).get("locality", "") for result in hits]
+		names["city_names"] = [name[0] for name in names["city_names"] if isinstance(name, list)]
+		names["state_names"] =\
+			[result.get("fields", {"region" : ""}).get("region", "") for result in hits]
+		names["state_names"] = [name[0] for name in names["state_names"] if isinstance(name, list)]
+
+		# Need Names
+		if len(names["business_names"]) < 2:
+			names["business_names"].append("")
+
+		if len(names["city_names"]) < 2:
+			names["city_names"].append("")
+
+		if len(names["state_names"]) < 2:
+			names["state_names"].append("")
+
+		# Collect Relevancy Scores
+		scores = [hit["_score"] for hit in hits]
+		thresholds = [float(hyperparams.get("z_score_threshold", "2")), \
+			float(hyperparams.get("raw_score_threshold", "1"))]
+
+		if len(scores) <= 2:
+			z_score_delta, raw_score = thresholds[0] + 1, scores[0]
+		else:
+			z_score_delta, raw_score = self.__z_score_delta(scores)
+		decision = True if (z_score_delta > thresholds[0]) and (raw_score > thresholds[1]) else False
+		
+		# Enrich Data if Passes Boundary
+		args = [decision, transaction, hit_fields,\
+			 names["business_names"], names["city_names"], names["state_names"], z_score_delta]
+		return self.__enrich_transaction(*args)
+
+	def __no_result(self, transaction):
+		"""Make sure transactions have proper attribute names"""
+
+		params = self.params
+		fields = params["output"]["results"]["fields"]
+		labels = params["output"]["results"]["labels"]
+		attr_map = dict(zip(fields, labels))
+
+		for field in fields:
+			transaction[attr_map.get(field, field)] = ""
+
+		transaction["match_found"] = False
+		# Add fields required
+		if transaction["country"] == "":
+			transaction["country"] = "US"
+		transaction["source"] = "FACTUAL"
+		transaction["confidence_score"] = ""
+
+		return transaction
+
+	def __enrich_transaction(self, *argv):
+		"""Enriches the transaction with additional data"""
+		
+		decision = argv[0]
+		transaction = argv[1]
+		hit_fields = argv[2]
+		business_names = argv[3]
+		city_names = argv[4]
+		state_names = argv[5]
+
+		params = self.params
+		field_names = params["output"]["results"]["fields"]
+		fields_in_hit = [field for field in hit_fields]
+		transaction["match_found"] = False
+
+		# Collect Mapping Details
+		attr_map = dict(zip(params["output"]["results"]["fields"], params["output"]["results"]["labels"]))
+
+		# Enrich with found data
+		if decision is True:
+			transaction["match_found"] = True
+			for field in field_names:
+				if field in fields_in_hit:
+					field_content = hit_fields[field][0] if isinstance(hit_fields[field],\
+ 						(list)) else str(hit_fields[field])
+					transaction["factual_search"][attr_map.get(field, field)] = field_content
+				else:
+					transaction["factual_search"][attr_map.get(field, field)] = ""
+
+			if not transaction.get("country") or transaction["country"] == "":
+				logging.warning(("Factual response for merchant {} has no country code. "
+					"Defaulting to US.").format(hit_fields["factual_id"][0]))
+				transaction["factual_search"]["country"] = "US"
+		# Add Business Name, City and State as a fallback
+		if decision is False:
+			for field in field_names:
+				transaction["factual_search"][attr_map.get(field, field)] = ""
+			transaction = self.__business_name_fallback(business_names, transaction, attr_map)
+			transaction = self.__geo_fallback(city_names, state_names, transaction, attr_map)
+			#Ensuring that there is a country code that matches the schema limitation
+			transaction["factual_search"]["country"] = "US"
+
+		# Ensure Proper Casing
+		if transaction["factual_search"][attr_map['name']] == transaction["factual_search"][attr_map['name']].upper():
+			transaction["factual_search"][attr_map['name']] = string.capwords(transaction[["factual_search"]attr_map['name']], " ")
+
+		return transaction
+
+	@staticmethod
+	def __geo_fallback(city_names, state_names, transaction, attr_map):
+		"""Basic logic to obtain a fallback for city and state
+		when no factual_id is found"""
+		city_names = city_names[0:2]
+		state_names = state_names[0:2]
+		states_equal = state_names.count(state_names[0]) == len(state_names)
+		city_in_transaction = (city_names[0].lower() in transaction["description"].lower())
+		state_in_transaction = (state_names[0].lower() in transaction["description"].lower())
+
+		if city_in_transaction:
+			transaction[attr_map['locality']] = city_names[0]
+
+		if states_equal and state_in_transaction:
+			transaction[attr_map['region']] = state_names[0]
+
+		return transaction
+
+	def __business_name_fallback(self, business_names, transaction, attr_map):
+		"""Basic logic to obtain a fallback for business name
+		when no factual_id is found"""
+		business_names = business_names[0:2]
+		top_name = business_names[0].lower()
+		all_equal = business_names.count(business_names[0]) == len(business_names)
+		not_a_city = top_name not in self.cities
+
+		if all_equal and not_a_city:
+			transaction[attr_map['name']] = business_names[0]
+
+		return transaction
+
+	def __search_factual_index(self, transactions):
+		"""Enrich physical transactions with Meerkat"""
+		if len(transactions) == 0:
+			return transactions
+
+		enriched, queries = [], []
+		index = self.params["elasticsearch"]["index"]
+
+		for trans in transactions:
+			query = self.__get_query(trans)
+
+			header = {"index": index}
+			# add routing to header
+			if self.params["routed"] and trans.get("locale_bloom", None):
+				region = trans["locale_bloom"][1]
+				header["routing"] = region.upper()
+
+			queries.append(header)
+			queries.append(query)
+
+		queries = '\n'.join(map(json.dumps, queries))
+		results = self.__search_index(queries)
+
+		# Error Handling
+		if results is None:
+			return transactions
+
+		results = results['responses']
+
+		for result, transaction in zip(results, transactions):
+			trans_plus = self.__process_results(result, transaction)
+			enriched.append(trans_plus)
+
+		return enriched
+
 	def __apply_rnn(self, trans):
 		"""Apply RNN to transactions"""
 		classifier = self.models["rnn"]

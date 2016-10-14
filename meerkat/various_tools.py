@@ -259,7 +259,7 @@ def safely_remove_file(filename):
 def string_cleanse(original_string):
 	"""Strips out characters that might confuse ElasticSearch."""
 	bad_characters = [r"\[", r"\]", r"\{", r"\}", r'"', r"/", r"\\", r"\:", r"\(",\
-	 r"\)", r"-", r"\+", r"<", r">", r"'", r"!", r"\*", r"\|\|", r"&&", r"~"]
+	 r"\)", r"-", r"\+", r"<", r">", r"!", r"\*", r"\|\|", r"&&", r"~"]
 	bad_character_regex = "|".join(bad_characters)
 	cleanse_pattern = re.compile(bad_character_regex)
 	with_spaces = re.sub(cleanse_pattern, " ", original_string)
@@ -328,20 +328,20 @@ def get_magic_query(params, transaction, boost=1.0):
 
 	return magic_query
 
-def get_bool_query(starting_from=0, size=0):
+def get_bool_query(size=0):
 	"""Returns a bool style ElasticSearch query object"""
 	return {
-		"from" : starting_from,
 		"size" : size,
 		"query" : {
 			"bool": {
-				"minimum_number_should_match": 1,
-				"should": []
+				"minimum_number_should_match": 0,
+				"should": [],
+				"must": []
 			}
 		}
 	}
 
-def get_qs_query(term, field_list=None, boost=1.0):
+def get_qs_query(term, field_list=None, boost=1.0, operator="OR"):
 	"""Returns a "query_string" style ElasticSearch query object"""
 	if field_list is None:
 		field_list = []
@@ -349,6 +349,7 @@ def get_qs_query(term, field_list=None, boost=1.0):
 		"query_string": {
 			"query": term,
 			"fields": field_list,
+			"default_operator": operator,
 			"boost" : boost
 		}
 	}
