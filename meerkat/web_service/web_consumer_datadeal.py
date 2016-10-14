@@ -18,7 +18,7 @@ from scipy.stats.mstats import zscore
 
 from meerkat.various_tools import get_es_connection, string_cleanse, get_boosted_fields
 from meerkat.various_tools import synonyms, get_bool_query, get_qs_query
-from meerkat.classification.load_model import load_scikit_model, get_tf_cnn_by_path
+from meerkat.classification.load_model import load_scikit_model, get_tf_cnn_by_path, get_tf_rnn_by_path
 from meerkat.classification.auto_load import main_program as load_models_from_s3
 from meerkat.various_tools import load_params
 from meerkat.elasticsearch.search_agg_index import search_agg_index
@@ -87,10 +87,17 @@ class WebConsumerDatadeal():
 				self.models[key] = get_tf_cnn_by_path(models_dir + filename, \
 					label_maps_dir + filename[:-4] + 'json', gpu_mem_fraction=gmf)
 
+		# Get RNN Models
+		self.merchant_rnn = get_tf_rnn_by_path('meerkat/longtail/models/bilstm.ckpt', 'meerkat/longtail/models/w2i.json')
+
+	def __apply_rnn(self, trans):
+		"""Apply RNN to transactions"""
+		classifier = self.merchant_rnn
+		return classifier(trans, doc_key="description", label_key="RNN_merchant_name")
+
 	def __apply_merchant_cnn(self, data):
 		"""Apply the merchant CNN to transactions"""
 
-		logging.info(data)
 		if "cobrand_region" in data:
 			region = 'region_' + str(data["cobrand_region"])
 		else:
@@ -134,6 +141,7 @@ class WebConsumerDatadeal():
 		for transaction in data["transaction_list"]:
 			transaction["container"] = data["container"]
 		data_to_search_in_agg, data_to_search_in_factual = self.__choose_agg_or_factual(data)
+		data["count_agg_search_input"] = len(data_to_search_in_agg)
 		search_agg_in_batch = self.params.get("search_agg_in_batch", True)
 		search_factual_in_batch = self.params.get("search_factual_in_batch", True)
 		if search_agg_in_batch:
@@ -155,17 +163,29 @@ class WebConsumerDatadeal():
 
 		# Apply Merchant CNN
 		self.__apply_merchant_cnn(data)
+		count_cnn_found = 0
+		for trans in data["transaction_list"]:
+			if trans['CNN']['label'] != '':
+				count_cnn_found += 1
 
-		# Apply RNN
-		#if trans['CNN']['label'] != '':
-			#self.__apply_rnn(data)
+			# Apply RNN
+			if trans['CNN']['label'] == '':
+				self.__apply_rnn([trans])
 
 		# Apply Elasticsearch
+		"""
 		self.__search_in_agg_or_factual(data)
+		count_agg_search_found = 0
+		for trans in data["transaction_list"]:
+			if 'agg_search' in trans:
+				count_agg_search_found += 1
+		"""
 
 		# Process enriched data to ensure output schema
 		#self.ensure_output_schema(data["transaction_list"])
 
+		data["count_cnn_found"] = count_cnn_found
+		#data["count_agg_search_found"] = count_agg_search_found
 		return data
 
 if __name__ == "__main__":

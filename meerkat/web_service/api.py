@@ -35,7 +35,7 @@ class Meerkat_Datadeal_API(APIHandler):
 	with open(base_dir + "example_output.json") as data_file:
 		example_output = json.load(data_file)
 
-	with open(base_dir + "schema_debug_output_datadeal.json") as data_file:
+	with open(base_dir + "schema_debug_output.json") as data_file:
 		schema_debug_output = json.load(data_file)
 
 	with open(base_dir + "example_debug_output.json") as data_file:
