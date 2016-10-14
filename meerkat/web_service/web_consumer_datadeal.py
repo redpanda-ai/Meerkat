@@ -396,12 +396,14 @@ class WebConsumerDatadeal():
 				trans["Agg_Name"] = self.merchant_name_map[cnn_merchant]
 				data_to_search_in_agg.append(trans)
 			else:
+				"""
 				if cnn_merchant != '':
 					trans["merchant_name"] = cnn_merchant
 					data_to_search_in_factual.append(trans)
 				elif 'RNN_merchant_name' in trans and trans['RNN_merchant_name'] != '':
 					trans["merchant_name"] = trans['RNN_merchant_name']
-					data_to_search_in_factual.append(trans)
+				"""
+				data_to_search_in_factual.append(trans)
 		return data_to_search_in_agg, data_to_search_in_factual
 
 	def __search_in_agg_or_factual(self, data):
@@ -418,12 +420,12 @@ class WebConsumerDatadeal():
 		else:
 			for i in range(len(data_to_search_in_agg)):
 				data_to_search_in_agg[i] = self.__enrich_by_agg(data_to_search_in_agg[i])
+		"""
 		if search_factual_in_batch:
-			data_to_search_in_factual = self.__enrich_by_factual(data_to_search_in_factual)
+			data_to_search_in_factual = self.__search_factual_index(data_to_search_in_factual)
 		else:
 			for i in range(len(data_to_search_in_factual)):
 				data_to_search_in_factual[i] = self.__enrich_by_factual(data_to_search_in_factual[i])
-		"""
 		return data_to_search_in_agg, data_to_search_in_factual
 
 	def classify(self, data, optimizing=False):
