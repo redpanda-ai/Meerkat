@@ -71,7 +71,7 @@ def create_bool_query(must_query, should_query):
 				'should': should_query
 			}
 		},
-		'size': 10,
+		'size': 1000,
 		'_source': attributes
 	}
 	return bool_query
@@ -122,7 +122,7 @@ def process_query_result(trans, query_result):
 		if store_number.find('-') != -1:
 			store_number = store_number.split('-')[0]
 		if store_number != '' and des.find(store_number) != -1:
-			logging.critical('Find a store number in description')
+			logging.critical('Found a store number in description')
 			return hit['_source']
 
 	z_scores = zscore(scores)

@@ -412,6 +412,15 @@
             "label": "Subway",
             "threshold": "0.80"
         },
+        "agg_search": {
+            "address": "24433 Katy Freeway",
+            "city": "Katy",
+            "list_name": "SUBWAY",
+            "phone_number": "(281) 394-2060",
+            "state": "TX",
+            "store_number": "56392",
+            "zip_code": "77494"
+        },
         "amount": 10,
         "city": "KATY",
         "container": "card",
@@ -850,6 +859,15 @@
             "label": "Starbucks",
             "threshold": "0.60"
         },
+        "agg_search": {
+            "address": "801 Hawthorn Street",
+            "city": "San Diego",
+            "list_name": "Starbucks US",
+            "phone_number": "(619) 235-4376",
+            "state": "CA",
+            "store_number": "8784-94384",
+            "zip_code": "92101-8409"
+        },
         "amount": 10,
         "city": "San Diego",
         "container": "card",
@@ -1287,13 +1305,13 @@
             "threshold": "0.80"
         },
         "agg_search": {
-            "address": "3101 Overland",
+            "address": "3450 Overland Ave",
             "city": "Los Angeles",
             "list_name": "7-Eleven US",
-            "phone_number": "(310) 815-0711",
+            "phone_number": "(310) 836-4686",
             "state": "CA",
-            "store_number": "39551",
-            "zip_code": "90034"
+            "store_number": "13731",
+            "zip_code": "90034-5406"
         },
         "amount": 10,
         "city": "LOS ANGELES",
@@ -5368,6 +5386,15 @@
             "category": "Groceries",
             "label": "7-Eleven",
             "threshold": "0.80"
+        },
+        "agg_search": {
+            "address": "2620 Lake Austin Blvd",
+            "city": "Austin",
+            "list_name": "7-Eleven US",
+            "phone_number": "(512) 478-9059",
+            "state": "TX",
+            "store_number": "25157",
+            "zip_code": "78703-4453"
         },
         "amount": 10,
         "city": "AUSTIN",
@@ -10733,13 +10760,13 @@
             "threshold": "0.80"
         },
         "agg_search": {
-            "address": "2655 John Young Pkwy",
+            "address": "2460 N John Young Pkwy",
             "city": "Kissimmee",
             "list_name": "7-Eleven US",
-            "phone_number": "(407) 343-0786",
+            "phone_number": "(407) 846-0880",
             "state": "FL",
-            "store_number": "39249",
-            "zip_code": "34741"
+            "store_number": "24832",
+            "zip_code": "34741-2225"
         },
         "amount": 10,
         "city": "KISSIMMEE",
@@ -11176,6 +11203,15 @@
             "label": "Starbucks",
             "threshold": "0.60"
         },
+        "agg_search": {
+            "address": "1101 - 1109 Avenue of the Americas",
+            "city": "New York",
+            "list_name": "Starbucks US",
+            "phone_number": "(212) 382-3917",
+            "state": "NY",
+            "store_number": "15440-156484",
+            "zip_code": "10036-6706"
+        },
         "amount": 10,
         "city": "New York",
         "container": "card",
@@ -11314,13 +11350,13 @@
             "threshold": "0.80"
         },
         "agg_search": {
-            "address": "2400 N Lincoln Ave (Satellite)",
+            "address": "2635 North Clark Street",
             "city": "Chicago",
             "list_name": "McDonald's US",
-            "phone_number": "(773) 388-3621",
+            "phone_number": "(773) 549-6272",
             "state": "IL",
-            "store_number": "24267",
-            "zip_code": "60614"
+            "store_number": "912",
+            "zip_code": "60614-1524"
         },
         "amount": 10,
         "city": "CHICAGO",
