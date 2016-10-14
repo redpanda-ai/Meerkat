@@ -118,12 +118,13 @@ def search_agg_index(data):
 
 	for i in range(len(data)):
 		trans = data[i]
-		list_name = [trans.get('Agg_Name', '')]
+		pprint(trans)
+		list_name = trans.get('Agg_Name', [])
 		if len(list_name) == 0 or list_name[0] == '':
 			logging.critical('A transaction with valid agg name is required, skip this one')
 			continue
 
-		city, state, zip_code = trans.get('city', ''), trans.get('state', ''), trans.get('zip_code', '')
+		city, state, zip_code = trans.get('city', ''), trans.get('state', ''), trans.get('postal_code', '')
 		store_number, phone_number = trans.get('store_number', ''), trans.get('phone_number', '')
 
 		must_query = create_must_query(list_name, state, zip_code)
@@ -136,6 +137,7 @@ def search_agg_index(data):
 		requests.extend([header, bool_query])
 
 		result = es.msearch(body=requests)['responses'][0]
+		pprint(result)
 		hit = process_query_result(result)
 		enriched_trans = enrich_transaction(trans, hit)
 		requests = []

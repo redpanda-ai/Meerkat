@@ -21,6 +21,7 @@ from meerkat.various_tools import synonyms, get_bool_query, get_qs_query
 from meerkat.classification.load_model import load_scikit_model, get_tf_cnn_by_path
 from meerkat.classification.auto_load import main_program as load_models_from_s3
 from meerkat.various_tools import load_params
+from meerkat.elasticsearch.search_agg_index import search_agg_index
 
 class WebConsumerDatadeal():
 	"""Acts as a web service client to process and enrich
@@ -77,7 +78,7 @@ class WebConsumerDatadeal():
 		models_dir = 'meerkat/classification/models/'
 		label_maps_dir = "meerkat/classification/label_maps/"
 		for filename in os.listdir(models_dir):
-			if filename.endswith('.ckpt') and not filename.startswith('train'):
+			if filename.startswith('merchant') and filename.endswith('.ckpt') and not filename.startswith('train'):
 				temp = filename.split('.')[:-1]
 				if temp[-1][-1].isdigit():
 					key = '_'.join(temp[1:-1] + [temp[0], temp[-1], 'cnn'])
@@ -133,14 +134,15 @@ class WebConsumerDatadeal():
 		for transaction in data["transaction_list"]:
 			transaction["container"] = data["container"]
 		data_to_search_in_agg, data_to_search_in_factual = self.__choose_agg_or_factual(data)
-		"""
 		search_agg_in_batch = self.params.get("search_agg_in_batch", True)
 		search_factual_in_batch = self.params.get("search_factual_in_batch", True)
+		print("!!!!!!!!!!!data to search in agg: {0}".format(data_to_search_in_agg))
 		if search_agg_in_batch:
-			data_to_search_in_agg = self.__enrich_by_agg(data_to_search_in_agg)
+			data_to_search_in_agg = search_agg_index(data_to_search_in_agg)
 		else:
 			for i in range(len(data_to_search_in_agg)):
 				data_to_search_in_agg[i] = self.__enrich_by_agg(data_to_search_in_agg[i])
+		"""
 		if search_factual_in_batch:
 			data_to_search_in_factual = self.__enrich_by_factual(data_to_search_in_factual)
 		else:
