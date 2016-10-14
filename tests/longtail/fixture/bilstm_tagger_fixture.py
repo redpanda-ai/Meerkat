@@ -6,6 +6,7 @@ def get_config():
 	"""Return config"""
 
 	config = {
+		"alphabet": "abcdefghijklmnopqrstuvwxyz0123456789,;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}",
 		"tag_column_map": {
 			"MERCHANT_NAME": "merchant",
 			"LOCALITY": "city",

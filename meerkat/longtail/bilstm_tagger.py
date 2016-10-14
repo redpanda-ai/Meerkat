@@ -138,9 +138,6 @@ def get_token_tag_pairs(config, trans):
 		tag = [" ".join(tokenize({"DESCRIPTION": t})) if " " in t else t for t in tag]
 		entities[value] = tag
 
-	print(trans["DESCRIPTION"])
-	print(entities)
-
 	# Tokenize String
 	tokens = tokenize(trans)
 	tags = ["background"] * len(tokens)
@@ -157,14 +154,7 @@ def get_token_tag_pairs(config, trans):
 		for i in indices:
 			tags[i] = tag_name
 
-	print(tokens)
-	print(tags)
-	print("\n")
-
-	# Map tokens to Tags
-
 	return tokens, tags
-
 
 def validate_config(config):
 	"""Validate input configuration"""
@@ -174,6 +164,12 @@ def validate_config(config):
 	config["c2i"]["_UNK"] = 0
 	config["c2i"]["<w>"] = 1
 	config["c2i"]["</w>"] = 2
+
+	config["tag_map"] = {"0": "background"}
+	for i, tag_name in enumerate(config["tag_column_map"].values()):
+		config["tag_map"][str(i + 1)] = tag_name
+
+	print(config["tag_map"])
 
 	return config
 

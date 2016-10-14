@@ -60,7 +60,7 @@ class BilstmTaggerTests(unittest.TestCase):
 
 	def test_validate_config(self):
 		"""make sure special chars have indices"""
-		fixture_config = {"alphabet": "abcdefghijklmnopqrstuvwxyz0123456789,;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}"}
+		fixture_config = bilstm_tagger_fixture.get_config()
 		result = bilstm.validate_config(fixture_config)
 		self.assertEqual(result["c2i"]["_UNK"],  0)
 		self.assertEqual(result["c2i"]["<w>"], 1)
@@ -95,7 +95,14 @@ class BilstmTaggerTests(unittest.TestCase):
 		"""test if tokens and chars got translated to indices properly"""
 		fixture_config = {
 			"alphabet": "abcdefghijklmnopqrstuvwxyz0123456789,;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}",
-			"tag_map": {"0": "background", "1": "merchant"}
+			"tag_column_map": {
+				"MERCHANT_NAME": "merchant",
+				"LOCALITY": "city",
+				"STORE_NUMBER": "store_number",
+				"PHONE_NUMBER": "phone_number",
+				"ADDRESS": "address",
+				"STATE": "state"
+			}
 		}
 		fixture_config = bilstm.validate_config(fixture_config)
 		fixture_config["w2i"] = {"_UNK": 0, "amazon": 1, "prime": 2, "purchase": 3}
