@@ -136,7 +136,6 @@ class WebConsumerDatadeal():
 		data_to_search_in_agg, data_to_search_in_factual = self.__choose_agg_or_factual(data)
 		search_agg_in_batch = self.params.get("search_agg_in_batch", True)
 		search_factual_in_batch = self.params.get("search_factual_in_batch", True)
-		print("!!!!!!!!!!!data to search in agg: {0}".format(data_to_search_in_agg))
 		if search_agg_in_batch:
 			data_to_search_in_agg = search_agg_index(data_to_search_in_agg)
 		else:
