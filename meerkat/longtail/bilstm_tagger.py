@@ -133,9 +133,6 @@ def get_tag_index(tokens, tag):
 	else:
 		tag = tag[0].split()
 
-	print(tokens)
-	print(tag)
-
 	if tag == [] or tag == ["null"]:
 		tags = [0 for token in tokens]
 	else:
@@ -143,7 +140,7 @@ def get_tag_index(tokens, tag):
 		for token in tokens:
 			found = False
 			for word in tag:
-				if word.lower() in token.lower() and tag.index(word) == 0:
+				if word.lower() in token.lower() and tag.index(word) == 0 and len(word) > len(token) / 2:
 					tags.append(1)
 					tag = tag[1:]
 					found = True
@@ -185,6 +182,7 @@ def get_token_tag_pairs(config, trans):
 
 	print(tokens)
 	print(tags)
+	print("\n")
 
 	# Map tokens to Tags
 
