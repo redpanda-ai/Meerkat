@@ -71,31 +71,66 @@ def create_bool_query(must_query, should_query):
 				'should': should_query
 			}
 		},
-		'size': 1000,
+		'size': 10,
 		'_source': attributes
 	}
 	return bool_query
 
-def process_query_result(query_result):
+def process_query_result(trans, query_result):
 	"""Process the query hits based on z scores"""
 	hits_total = query_result['hits']['total']
-	logging.info('The number of hits is: {}'.format(hits_total))
 
-	if hits_total < 3:
-		logging.warning('The number of hits is less than 3')
+	# 0 hit
+	if hits_total == 0:
+		logging.critical('The number of hits is 0')
 		return None
 
+	# 1 hit
+	if hits_total == 1:
+		logging.critical('The number of hits is 1')
+		return query_result['hits']['hits'][0]['_source']
+
+	des = trans.get('description', '')
+
+	# 2 hits
+	if hits_total == 2:
+		logging.critical('The number of hits is 2')
+		first, second = query_result['hits']['hits'][0], query_result['hits']['hits'][1]
+		first_store = first['_source'].get('store_number', '')
+		second_store = second['_source'].get('store_number', '')
+
+		if first_store != '' and des.find(first_store) != -1:
+			logging.critical('Find a store number in description')
+			return first['_source']
+		if second_store != '' and des.find(second_store) != -1:
+			logging.critical('Find a store number in description')
+			return second['_source']
+
+		if first['_score'] - second['_score'] >= 0.1:
+			return first['_source']
+		else:
+			return None
+
+	# 3 or more hits
 	hits_list = query_result['hits']['hits']
 	scores = []
+
 	for hit in hits_list:
 		scores.append(hit['_score'])
 
+		store_number = hit['_source'].get('store_number', '')
+		if store_number.find('-') != -1:
+			store_number = store_number.split('-')[0]
+		if store_number != '' and des.find(store_number) != -1:
+			logging.critical('Find a store number in description')
+			return hit['_source']
+
 	z_scores = zscore(scores)
-	if z_scores[0] - z_scores[1] >= 0:
+	if z_scores[0] - z_scores[1] >= 0.1:
 		logging.info('This query has a top hit based on z scores')
 		return hits_list[0]['_source']
 
-	logging.warning('No top hit based on z scores')
+	logging.critical('No top hit based on z scores')
 	return None
 
 def enrich_transaction(trans, hit):
@@ -116,8 +151,11 @@ def search_agg_index(data):
 	requests = []
 	header = {'index': index_name, 'doc_type': index_type}
 
-	for i in range(1, 2):
+	for i in range(len(data)):
 		trans = data[i]
+		logging.info('The transaction is:')
+		pprint(trans)
+
 		list_name = trans.get('Agg_Name', '')
 		if len(list_name) == 0 or list_name[0] == '':
 			logging.critical('A transaction with valid agg name is required, skip this one')
@@ -137,11 +175,14 @@ def search_agg_index(data):
 
 		result = es.msearch(body=requests)['responses'][0]
 		pprint(result)
-		hit = process_query_result(result)
+		hit = process_query_result(trans, result)
 		enriched_trans = enrich_transaction(trans, hit)
 		requests = []
 
 if __name__ == '__main__':
 	data = json.loads(open('./agg_input.json').read())
 	search_agg_index(data)
-	# basic_search('Starbucks US')
+	with open('./agg_output.json', 'w') as outfile:
+		json.dump(data, outfile, indent=4, sort_keys=True)
+
+	# basic_search('Chick-fil-A')
