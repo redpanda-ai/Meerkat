@@ -9,7 +9,7 @@ from scipy.stats.mstats import zscore
 
 logging.getLogger().setLevel(logging.INFO)
 
-endpoint = 'search-agg-and-factual-aq75mydw7arj5htk3dvasbgx4e.us-west-2.es.amazonaws.com'
+endpoint = 'search-agg-factual-nuz5jggrftlzjd5f7c2ehkmhlu.us-west-2.es.amazonaws.com'
 host = [{'host': endpoint, 'port': 80}]
 index_name, index_type = 'agg_index', 'agg_type'
 es = Elasticsearch(host)
@@ -28,7 +28,7 @@ def basic_search(list_name):
 	else:
 		logging.warning('The number of hits is zero')
 
-def create_must_query(list_name, state, zip_code):
+def create_must_query(list_name, city, state, zip_code):
 	"""Create a must query"""
 	must_query = []
 	if len(list_name) == 1 and list_name[0] != '':
@@ -41,18 +41,18 @@ def create_must_query(list_name, state, zip_code):
 			bool_query['bool']['should'].append({'term': {'list_name': name}})
 		must_query.append(bool_query)
 
+	if city != '':
+		must_query.append({'match': {'city': city}})
 	if state != '':
 		must_query.append({'match': {'state': state}})
 	if zip_code != '':
-		zip_query = {'zip_code': {'query': zip_code, 'fuzziness': 'AUTO', 'boost': 3}}
+		zip_query = {'zip_code': {'query': zip_code, 'fuzziness': 'AUTO', 'boost': 2}}
 		must_query.append({'match': zip_query})
 	return must_query
 
-def create_should_query(city, store_number, phone_number):
+def create_should_query(store_number, phone_number):
 	"""Create a should query"""
 	should_query = []
-	if city != '':
-		should_query.append({'match': {'city': city}})
 	if store_number != '':
 		store = {'store_number': {'query': store_number, 'fuzziness': 'AUTO', 'boost': 3}}
 		should_query.append({'match': store})
@@ -116,18 +116,18 @@ def search_agg_index(data):
 	requests = []
 	header = {'index': index_name, 'doc_type': index_type}
 
-	for i in range(len(data)):
+	for i in range(1, 2):
 		trans = data[i]
-		list_name = [trans.get('Agg_Name', '')]
+		list_name = trans.get('Agg_Name', '')
 		if len(list_name) == 0 or list_name[0] == '':
 			logging.critical('A transaction with valid agg name is required, skip this one')
 			continue
 
-		city, state, zip_code = trans.get('city', ''), trans.get('state', ''), trans.get('zip_code', '')
+		city, state, zip_code = trans.get('city', ''), trans.get('state', ''), trans.get('postal_code', '')
 		store_number, phone_number = trans.get('store_number', ''), trans.get('phone_number', '')
 
-		must_query = create_must_query(list_name, state, zip_code)
-		should_query = create_should_query(city, store_number, phone_number)
+		must_query = create_must_query(list_name, city, state, zip_code)
+		should_query = create_should_query(store_number, phone_number)
 		bool_query = create_bool_query(must_query, should_query)
 
 		logging.info('The query for this transaction is:')
@@ -136,11 +136,12 @@ def search_agg_index(data):
 		requests.extend([header, bool_query])
 
 		result = es.msearch(body=requests)['responses'][0]
+		pprint(result)
 		hit = process_query_result(result)
 		enriched_trans = enrich_transaction(trans, hit)
 		requests = []
 
 if __name__ == '__main__':
-	data = json.loads(open('./CNN_Agg.txt').read())
+	data = json.loads(open('./agg_input.json').read())
 	search_agg_index(data)
 	# basic_search('Starbucks US')
