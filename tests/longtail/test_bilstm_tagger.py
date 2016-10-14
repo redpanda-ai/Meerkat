@@ -36,7 +36,7 @@ class BilstmTaggerTests(unittest.TestCase):
 
 		for key, value in zip(input_trans, output_trans):
 			trans = {"DESCRIPTION": key}
-			self.assertEqual(bilstm.tokenize(trans), value)
+			self.assertEqual(bilstm.tokenize(trans), value.split())
 
 	def test_get_token_tag_pairs(self):
 		"""test if get_tags produces tag for each token correctly"""

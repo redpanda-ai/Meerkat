@@ -1,5 +1,7 @@
 """Fixtures for test_bilstm_tagger"""
 
+import random
+
 def get_config():
 	"""Return config"""
 
@@ -26,8 +28,8 @@ def get_token_tag_pairs_input():
 			"LOCALITY": "MEADOWS",
 			"STATE": "NY"
 			},
-			["background", "background", "background", "merchant", "merchant", "merchant", "merchant", "city", "state"],
-			["Debit", "PIN", "Purchase", "ISLAND", "OF", "GOLD", "SUPERMARFRESH", "MEADOWS", "NY"]),
+			["background", "background", "background", "merchant", "merchant", "merchant", "merchant", "city"],
+			["Debit", "PIN", "Purchase", "ISLAND", "OF", "GOLD", "SUPERMARFRESH", "MEADOWSNY"]),
 		({
 			"DESCRIPTION": "76", 
 			"MERCHANT_NAME": "76"
@@ -82,6 +84,8 @@ def get_token_tag_pairs_input():
 			["merchant", "merchant", "merchant", "city", "state"],
 			["VILLAGE", "OF", "BARTLETT", "BARTLETT", "IL"])
 	]
+
+	random.shuffle(transactions)
 
 	return transactions
 

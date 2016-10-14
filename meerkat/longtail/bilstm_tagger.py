@@ -113,6 +113,8 @@ def tokenize(trans):
 			add_space = True
 		if t == "~" and prev_char.isalpha():
 			add_space = True
+		if t == ":":
+			t = t + " "
 
 		if add_space:
 			output += " " + t
@@ -136,7 +138,7 @@ def get_token_tag_pairs(config, trans):
 
 		if key not in trans: continue
 		tag = trans[key].split(",")
-		tag = [tokenize({"DESCRIPTION": t}) if " " in t else t for t in tag]
+		tag = [" ".join(tokenize({"DESCRIPTION": t})) if " " in t else t for t in tag]
 
 		for t in tag:
 			if t == "":
@@ -149,15 +151,22 @@ def get_token_tag_pairs(config, trans):
 
 		entities[value] = tag
 
+		# Issues
+		# Duplicate tokens with different tag types
+		# Tokens in other tokens that tokenizer can not split
+
 	print(trans["DESCRIPTION"])
-	print(tag_lookup)
 	print(entities)
 
 	# Tokenize String
 	tokens = tokenize(trans)
 
 	# Get Tags
-	tags = [tag_lookup.get(token, "background") for token in tokens]
+	tags = []
+
+	for token in tokens:
+		tag_name = tag_lookup.get(token, "background")
+		tags.append(tag_name)
 
 	print(tokens)
 	print(tags)
