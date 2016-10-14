@@ -232,16 +232,17 @@ class WebConsumerDatadeal():
 		fields = params["output"]["results"]["fields"]
 		labels = params["output"]["results"]["labels"]
 		attr_map = dict(zip(fields, labels))
+		transaction["factual_search"] = dict()
 
 		for field in fields:
-			transaction[attr_map.get(field, field)] = ""
+			transaction["factual_search"][attr_map.get(field, field)] = ""
 
-		transaction["match_found"] = False
+		transaction["factual_search"]["match_found"] = False
 		# Add fields required
-		if transaction["country"] == "":
-			transaction["country"] = "US"
-		transaction["source"] = "FACTUAL"
-		transaction["confidence_score"] = ""
+		if transaction["factual_search"]["country"] == "":
+			transaction["factual_search"]["country"] = "US"
+		transaction["factual_search"]["source"] = "FACTUAL"
+		transaction["factual_search"]["confidence_score"] = ""
 
 		return transaction
 
@@ -291,6 +292,7 @@ class WebConsumerDatadeal():
 		# Ensure Proper Casing
 		if transaction["factual_search"][attr_map['name']] == transaction["factual_search"][attr_map['name']].upper():
 			transaction["factual_search"][attr_map['name']] = string.capwords(transaction["factual_search"][attr_map['name']], " ")
+		transaction["factual_search"]["confidence_score"] = ""
 
 		return transaction
 
