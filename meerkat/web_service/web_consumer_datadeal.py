@@ -262,6 +262,7 @@ class WebConsumerDatadeal():
 
 		# Collect Mapping Details
 		attr_map = dict(zip(params["output"]["results"]["fields"], params["output"]["results"]["labels"]))
+		transaction["factual_search"] = dict()
 
 		# Enrich with found data
 		if decision is True:
