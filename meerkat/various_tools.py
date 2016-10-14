@@ -287,9 +287,7 @@ def get_boosted_fields(hyperparams, vector_name):
 	"""Returns a list of boosted fields built from a boost vector"""
 	boost_row_labels, boost_column_vectors = build_boost_vectors(hyperparams)
 	boost_vector = boost_column_vectors[vector_name]
-	return [x + "^" + str(y)\
-		for x, y in zip(boost_row_labels, boost_vector)\
-		if y != 0.0]
+	return dict(zip(boost_row_labels, boost_vector))
 
 def get_magic_query(params, transaction, boost=1.0):
 	"""Build a magic query from pretrained boost vectors"""
