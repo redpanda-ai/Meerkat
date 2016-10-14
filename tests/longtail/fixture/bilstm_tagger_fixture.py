@@ -80,7 +80,7 @@ def get_token_tag_pairs_input():
 			"DESCRIPTION": "VILLAGE OF BARTLETT      BARTLETT     IL", 
 			"MERCHANT_NAME": "VILLAGE OF BARTLETT",
 			"LOCALITY": "BARTLETT",
-			"CITY": "IL"
+			"STATE": "IL"
 			},
 			["merchant", "merchant", "merchant", "city", "state"],
 			["VILLAGE", "OF", "BARTLETT", "BARTLETT", "IL"])
