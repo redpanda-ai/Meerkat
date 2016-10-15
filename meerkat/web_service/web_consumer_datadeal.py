@@ -127,7 +127,7 @@ class WebConsumerDatadeal():
 		if city != '':
 			city_query = get_qs_query(city, ['locality'], field_boosts['locality'], operator="AND")
 			city_query["query_string"]["fuzziness"] = "AUTO"
-			must_clauses.append(city_query)
+			should_clauses.append(city_query)
 		if state != '':
 			state_query = get_qs_query(state, ['region'], field_boosts['region'], operator="AND")
 			must_clauses.append(state_query)
@@ -214,8 +214,10 @@ class WebConsumerDatadeal():
 		thresholds = [float(hyperparams.get("z_score_threshold", "2")), \
 			float(hyperparams.get("raw_score_threshold", "1"))]
 
-		if len(scores) <= 2:
+		if len(scores) == 1:
 			z_score_delta, raw_score = thresholds[0] + 1, scores[0]
+		elif len(scores) == 2:
+			z_score_delta, raw_score = scores[0] - scores[1], scores[0]
 		else:
 			z_score_delta, raw_score = self.__z_score_delta(scores)
 		decision = True if (z_score_delta > thresholds[0]) and (raw_score > thresholds[1]) else False
