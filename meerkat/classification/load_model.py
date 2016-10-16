@@ -20,7 +20,7 @@ from sklearn.externals import joblib
 from meerkat.various_tools import load_params
 from meerkat.classification.auto_load import main_program as load_models_from_s3
 from meerkat.classification.tensorflow_cnn import (validate_config, get_tensor, string_to_tensor)
-from meerkat.longtail.bilstm_tagger import trans_to_tensor, get_tags
+from meerkat.longtail.bilstm_tagger import trans_to_tensor, get_token_tag_pairs
 from meerkat.longtail.bilstm_tagger import validate_config as bilstm_validate_config
 
 def load_scikit_model(model_name):
@@ -108,7 +108,7 @@ def get_tf_rnn_by_path(model_path, w2i_path, gpu_mem_fraction=False, model_name=
 		for _, doc in enumerate(trans):
 			if tags:
 				# if tags, tag all tokens with get_tags for evaluation purposes
-				tran, label = get_tags(config, doc)
+				tran, label = get_token_tag_pairs(config, doc)
 				doc["ground_truth"] = label
 			else:
 				tran = doc[doc_key].lower().split()[0:config["max_tokens"]]

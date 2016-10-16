@@ -8,7 +8,7 @@
 		"LOCALITY": "city",
 		"STORE_NUMBER": "store_number",
 		"PHONE_NUMBER": "phone_number",
-		"ADDRESS": "address"
+		"STATE": "state"
 	},
 	"tag_map": {
 		"0": "background",
@@ -16,8 +16,7 @@
 		"2": "store_number",
 		"3": "city",
 		"4": "state",
-		"5": "phone_number",
-		"6": "address"
+		"5": "phone_number"
 	},
 	"noise_sigma": 0.2,
 	"activation": "tanh",

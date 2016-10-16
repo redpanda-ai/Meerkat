@@ -165,12 +165,6 @@ def validate_config(config):
 	config["c2i"]["<w>"] = 1
 	config["c2i"]["</w>"] = 2
 
-	config["tag_map"] = {"0": "background"}
-	for i, tag_name in enumerate(config["tag_column_map"].values()):
-		config["tag_map"][str(i + 1)] = tag_name
-
-	print(config["tag_map"])
-
 	return config
 
 def load_data(config):
@@ -226,7 +220,6 @@ def subpreprocess(config, name):
 	random.shuffle(config[name])
 	for i, tran in enumerate(config[name]):
 		config[name][i] = get_token_tag_pairs(config, tran)
-		sys.exit()
 	return config
 
 def preprocess(config):
