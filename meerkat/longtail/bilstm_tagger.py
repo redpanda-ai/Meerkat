@@ -70,7 +70,8 @@ def tokenize(trans):
 
 	output = ""
 	prev_char = ""
-	trans = ' '.join(trans["DESCRIPTION"].split())
+	trans = ' '.join(trans.split())
+	split_chars = ["#", "~", "*"]
 
 	for t in trans:
 
@@ -80,9 +81,7 @@ def tokenize(trans):
 			add_space = True
 		if t.isdigit() and prev_char.isalpha():
 			add_space = True
-		if t == "#" and prev_char.isalpha():
-			add_space = True
-		if t == "~" and prev_char.isalpha():
+		if t in split_chars and prev_char.isalpha():
 			add_space = True
 		if t == ":":
 			t = t + " "
@@ -135,7 +134,7 @@ def get_token_tag_pairs(config, trans):
 
 		if key not in trans: continue
 		tag = trans[key].split(",")
-		tag = [" ".join(tokenize({"DESCRIPTION": t})) if " " in t else t for t in tag]
+		tag = [" ".join(tokenize(t)) if " " in t else t for t in tag]
 		entities[value] = tag
 
 	# Tokenize String
@@ -219,7 +218,7 @@ def subpreprocess(config, name):
 	config[name] = config[name].to_dict("record")
 	random.shuffle(config[name])
 	for i, tran in enumerate(config[name]):
-		config[name][i] = get_token_tag_pairs(config, tran)
+		config[name][i] = get_token_tag_pairs(config, tran["DESCRIPTION"])
 	return config
 
 def preprocess(config):

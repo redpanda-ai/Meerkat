@@ -20,7 +20,7 @@ from sklearn.externals import joblib
 from meerkat.various_tools import load_params
 from meerkat.classification.auto_load import main_program as load_models_from_s3
 from meerkat.classification.tensorflow_cnn import (validate_config, get_tensor, string_to_tensor)
-from meerkat.longtail.bilstm_tagger import trans_to_tensor, get_token_tag_pairs
+from meerkat.longtail.bilstm_tagger import trans_to_tensor, get_token_tag_pairs, tokenize
 from meerkat.longtail.bilstm_tagger import validate_config as bilstm_validate_config
 
 def load_scikit_model(model_name):
@@ -106,12 +106,14 @@ def get_tf_rnn_by_path(model_path, w2i_path, gpu_mem_fraction=False, model_name=
 		"""Apply RNN to transactions"""
 
 		for _, doc in enumerate(trans):
+
 			if tags:
 				# if tags, tag all tokens with get_tags for evaluation purposes
 				tran, label = get_token_tag_pairs(config, doc)
 				doc["ground_truth"] = label
 			else:
-				tran = doc[doc_key].lower().split()[0:config["max_tokens"]]
+				tran = tokenize(doc[doc_key])
+
 			char_inputs, word_lengths, word_indices, _ = trans_to_tensor(config, tran)
 			feed_dict = {
 				get_tensor(graph, "char_inputs:0"): char_inputs,
@@ -122,6 +124,9 @@ def get_tf_rnn_by_path(model_path, w2i_path, gpu_mem_fraction=False, model_name=
 			}
 
 			output = sess.run(model, feed_dict=feed_dict)
+			print([config["tag_map"][str(i)] for i in np.argmax(output, 1)])
+			print(tran)
+
 			if name_only:
 				# return merchant name if name_only else return tags of all tokens
 				output = [config["tag_map"][str(i)] for i in np.argmax(output, 1)]
