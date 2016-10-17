@@ -394,8 +394,8 @@ class WebConsumerDatadeal():
 		"""Split transactions to search in agg index or factual index"""
 		data_to_search_in_agg, data_to_search_in_factual = [], []
 		for trans in data["transaction_list"]:
-			if "country" in trans and trans["country"] != "US":
-				continue
+			#if "country" in trans and trans["country"] != "US":
+			#	continue
 			cnn_merchant = trans['CNN']['label']
 			if cnn_merchant != '' and cnn_merchant in self.merchant_name_map:
 				trans["Agg_Name"] = self.merchant_name_map[cnn_merchant]
@@ -416,21 +416,19 @@ class WebConsumerDatadeal():
 		for transaction in data["transaction_list"]:
 			transaction["container"] = data["container"]
 		data_to_search_in_agg, data_to_search_in_factual = self.__choose_agg_or_factual(data)
-		data["count_agg_search_input"] = len(data_to_search_in_agg)
+		#data["count_agg_search_input"] = len(data_to_search_in_agg)
 		search_agg_in_batch = self.params.get("search_agg_in_batch", True)
 		search_factual_in_batch = self.params.get("search_factual_in_batch", True)
-		"""
 		if search_agg_in_batch:
 			data_to_search_in_agg = search_agg_index(data_to_search_in_agg)
 		else:
 			for i in range(len(data_to_search_in_agg)):
-				data_to_search_in_agg[i] = self.__enrich_by_agg(data_to_search_in_agg[i])
-		"""
+				data_to_search_in_agg[i] = search_agg_index([data_to_search_in_agg[i]])
 		if search_factual_in_batch:
 			data_to_search_in_factual = self.__search_factual_index(data_to_search_in_factual)
 		else:
 			for i in range(len(data_to_search_in_factual)):
-				data_to_search_in_factual[i] = self.__enrich_by_factual(data_to_search_in_factual[i])
+				data_to_search_in_factual[i] = self.__search_factual_index([data_to_search_in_factual[i]])
 		return data_to_search_in_agg, data_to_search_in_factual
 
 	def classify(self, data, optimizing=False):
@@ -453,24 +451,26 @@ class WebConsumerDatadeal():
 		#self.ensure_output_schema(data["transaction_list"])
 
 		# Count results
+		"""
 		count_cnn_merchant_found = 0
 		count_rnn_merchant_found = 0
 		count_no_merchant_name = 0
-		#count_agg_search_found = 0
+		count_agg_search_found = 0
 		for trans in data["transaction_list"]:
 			if trans['CNN']['label'] != '':
 				count_cnn_merchant_found += 1
 			if trans['RNN_merchant_name'] != '':
 				count_rnn_merchant_found += 1
-			#if 'agg_search' in trans:
-			#	count_agg_search_found += 1
+			if 'agg_search' in trans:
+				count_agg_search_found += 1
 			if trans['CNN']['label'] == '' and trans['RNN_merchant_name'] == '':
 				count_no_merchant_name += 1
 				print("empty merchant name {0}".format(trans))
 		data["count_cnn_merchant_found"] = count_cnn_merchant_found
 		data["count_rnn_merchant_found"] = count_rnn_merchant_found
 		data["count_no_merchant_name"] = count_no_merchant_name
-		#data["count_agg_search_found"] = count_agg_search_found
+		data["count_agg_search_found"] = count_agg_search_found
+		"""
 		return data
 
 if __name__ == "__main__":
