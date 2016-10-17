@@ -13,7 +13,7 @@ from elasticsearch import helpers
 logging.config.dictConfig(yaml.load(open('meerkat/logging.yaml', 'r')))
 logger = logging.getLogger('tools')
 
-endpoint = 'search-agg-and-factual-aq75mydw7arj5htk3dvasbgx4e.us-west-2.es.amazonaws.com'
+endpoint = 'search-agg-factual-nuz5jggrftlzjd5f7c2ehkmhlu.us-west-2.es.amazonaws.com'
 host = [{'host': endpoint, 'port': 80}]
 index_name, index_type = 'agg_index', 'agg_type'
 es = Elasticsearch(host)
@@ -64,7 +64,6 @@ def build_index(filename):
 				},
 				"properties" : {
 					"list_name": not_analyzed_string,
-					"city": not_analyzed_string,
 					"state": not_analyzed_string
 				}
 			}
