@@ -88,7 +88,10 @@ def process_query_result(trans, query_result):
 	# 1 hit
 	if hits_total == 1:
 		logging.critical('The number of hits is 1')
-		return query_result['hits']['hits'][0]['_source']
+		if query_result['hits']['hits'][0]['_score'] >= 1.0:
+			return query_result['hits']['hits'][0]['_source']
+		else:
+			return None
 
 	des = trans.get('description', '')
 
@@ -182,6 +185,7 @@ def search_agg_index(data):
 if __name__ == '__main__':
 	data = json.loads(open('./agg_input.json').read())
 	search_agg_index(data)
+	sys.exit()
 	with open('./agg_output.json', 'w') as outfile:
 		json.dump(data, outfile, indent=4, sort_keys=True)
 
