@@ -1,7 +1,7 @@
 {
 	"es_result_size": "45",
 	"z_score_threshold": "2.000",
-	"raw_score_threshold": "3.000",
+	"raw_score_threshold": "5.000",
 	"good_description" : "2",
  	"boost_labels" : ["standard_fields"],
 	"boost_vectors" :  {
