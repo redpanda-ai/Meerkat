@@ -90,11 +90,13 @@ class WebConsumerDatadeal():
 					label_maps_dir + filename[:-4] + 'json', gpu_mem_fraction=gmf)
 
 		# Get RNN Models
+		"""
 		rnn_model_path = "./meerkat/classification/models/rnn_model/bilstm.ckpt"
 		w2i_path = "./meerkat/classification/models/rnn_model/w2i.json"
 		if os.path.exists(rnn_model_path) is False:
 			logging.warning("Please run python3 -m meerkat.longtail.rnn_auto_load")
 		self.models["rnn"] = get_tf_rnn_by_path(rnn_model_path, w2i_path)
+		"""
 
 	def __get_query(self, transaction):
 		"""Create an optimized query"""
@@ -416,7 +418,6 @@ class WebConsumerDatadeal():
 		for transaction in data["transaction_list"]:
 			transaction["container"] = data["container"]
 		data_to_search_in_agg, data_to_search_in_factual = self.__choose_agg_or_factual(data)
-		#data["count_agg_search_input"] = len(data_to_search_in_agg)
 		search_agg_in_batch = self.params.get("search_agg_in_batch", True)
 		search_factual_in_batch = self.params.get("search_factual_in_batch", True)
 		if search_agg_in_batch:
@@ -438,11 +439,13 @@ class WebConsumerDatadeal():
 		self.__apply_merchant_cnn(data)
 
 		# Apply RNN
+		"""
 		for trans in data["transaction_list"]:
 			if trans['CNN']['label'] == '':
 				self.__apply_rnn([trans])
 			else:
 				trans['RNN_merchant_name'] = ''
+		"""
 
 		# Apply Elasticsearch
 		self.__search_in_agg_or_factual(data)
@@ -450,27 +453,6 @@ class WebConsumerDatadeal():
 		# Process enriched data to ensure output schema
 		#self.ensure_output_schema(data["transaction_list"])
 
-		# Count results
-		"""
-		count_cnn_merchant_found = 0
-		count_rnn_merchant_found = 0
-		count_no_merchant_name = 0
-		count_agg_search_found = 0
-		for trans in data["transaction_list"]:
-			if trans['CNN']['label'] != '':
-				count_cnn_merchant_found += 1
-			if trans['RNN_merchant_name'] != '':
-				count_rnn_merchant_found += 1
-			if 'agg_search' in trans:
-				count_agg_search_found += 1
-			if trans['CNN']['label'] == '' and trans['RNN_merchant_name'] == '':
-				count_no_merchant_name += 1
-				print("empty merchant name {0}".format(trans))
-		data["count_cnn_merchant_found"] = count_cnn_merchant_found
-		data["count_rnn_merchant_found"] = count_rnn_merchant_found
-		data["count_no_merchant_name"] = count_no_merchant_name
-		data["count_agg_search_found"] = count_agg_search_found
-		"""
 		return data
 
 if __name__ == "__main__":

@@ -11,13 +11,14 @@
 				"state": { "type": "string" },
 				"country": { "type": "string" },
 				"postal_code": { "type": "string" },
-				"processed_merchant_name": { "type": "string" },
+				"RNN_merchant_name": { "type": "string" },
 				"store_number": {"type": "string"},
 				"phone_number": { "type": "string" },
 				"amount" : { "type": "number" },
 				"ledger_entry" : { "enum" : [ "debit", "credit" ] },
 				"date" : { "type": "string" }
 			},
+			"additionalProperties" : false,
 			"required": ["transaction_id", "description", "amount", "date", "ledger_entry"]
 		}
 	},
