@@ -12,6 +12,7 @@
 				"country": { "type": "string" },
 				"postal_code": { "type": "string" },
 				"RNN_merchant_name": { "type": "string" },
+				"website_url": { "type": "string" },
 				"store_number": {"type": "string"},
 				"phone_number": { "type": "string" },
 				"amount" : { "type": "number" },

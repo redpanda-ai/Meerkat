@@ -411,8 +411,8 @@ class WebConsumerDatadeal():
 		for transaction in data["transaction_list"]:
 			transaction["container"] = data["container"]
 		data_to_search_in_agg, data_to_search_in_factual = self.__choose_agg_or_factual(data)
-		search_agg_in_batch = self.params.get("search_agg_in_batch", True)
-		search_factual_in_batch = self.params.get("search_factual_in_batch", True)
+		search_agg_in_batch = self.params.get("search_agg_in_batches", True)
+		search_factual_in_batch = self.params.get("search_factual_in_batches", True)
 		if search_agg_in_batch:
 			data_to_search_in_agg = search_agg_index(data_to_search_in_agg)
 		else:

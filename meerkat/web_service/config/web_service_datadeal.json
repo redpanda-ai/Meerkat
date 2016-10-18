@@ -24,6 +24,6 @@
 		"type" : "factual_type"
 	},
 	"merchant_name_map_path": "meerkat/web_service/config/merchant_name_map.json",
-	"search_agg_in_batch": true,
-	"search_factual_in_batch": false
+	"search_agg_in_batches": true,
+	"search_factual_in_batches": false
 }
