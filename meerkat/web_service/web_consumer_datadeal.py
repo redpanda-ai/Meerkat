@@ -396,20 +396,13 @@ class WebConsumerDatadeal():
 		"""Split transactions to search in agg index or factual index"""
 		data_to_search_in_agg, data_to_search_in_factual = [], []
 		for trans in data["transaction_list"]:
-			#if "country" in trans and trans["country"] != "US":
-			#	continue
+			if "country" in trans and trans["country"] not in ["US", "USA"]:
+				continue
 			cnn_merchant = trans['CNN']['label']
 			if cnn_merchant != '' and cnn_merchant in self.merchant_name_map:
 				trans["Agg_Name"] = self.merchant_name_map[cnn_merchant]
 				data_to_search_in_agg.append(trans)
 			else:
-				"""
-				if cnn_merchant != '':
-					trans["merchant_name"] = cnn_merchant
-					data_to_search_in_factual.append(trans)
-				elif 'RNN_merchant_name' in trans and trans['RNN_merchant_name'] != '':
-					trans["merchant_name"] = trans['RNN_merchant_name']
-				"""
 				data_to_search_in_factual.append(trans)
 		return data_to_search_in_agg, data_to_search_in_factual
 
@@ -437,15 +430,6 @@ class WebConsumerDatadeal():
 
 		# Apply Merchant CNN
 		self.__apply_merchant_cnn(data)
-
-		# Apply RNN
-		"""
-		for trans in data["transaction_list"]:
-			if trans['CNN']['label'] == '':
-				self.__apply_rnn([trans])
-			else:
-				trans['RNN_merchant_name'] = ''
-		"""
 
 		# Apply Elasticsearch
 		self.__search_in_agg_or_factual(data)
