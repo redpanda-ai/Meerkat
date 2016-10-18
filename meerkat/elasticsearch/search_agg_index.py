@@ -71,7 +71,7 @@ def create_bool_query(must_query, should_query):
 				'should': should_query
 			}
 		},
-		'size': 1000,
+		'size': 10000,
 		'_source': attributes
 	}
 	return bool_query
