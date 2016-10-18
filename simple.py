@@ -110,13 +110,6 @@ def clean_dataframe(my_df, renames):
 def get_rnn_merchant(my_df):
 	predicted = merchant_rnn([{"Description": my_df["description"]}])[0]["Predicted"]
 	return predicted
-	#try:
-	#	result = re.sub(re.escape(predicted, "", my_df["description"],
-	#		flags=re.IGNORECASE))
-	#	result = my_df["description"][result.start():result.end()]
-	#except:
-	#	result = ""
-	#return result
 
 def main_process(args=None):
 	"""Opens up the input file and loads it into a dataframe"""
@@ -128,8 +121,10 @@ def main_process(args=None):
 	my_df.rename(index=str, columns=renames, inplace=True)
 	clean_dataframe(my_df, renames)
 	my_df["rnn_merchant"] = my_df.apply(get_rnn_merchant, axis=1)
-#	apply_rnn(my_df)
 	logger.info(my_df)
+	#I should call the web service with the dataframe broken into 1000 transactions per call.
+	#Take all of the responses and write it out to a file...
+	logger.info("All done.")
 
 def parse_arguments(args):
 	"""Correctly parses command line arguments for the program"""
