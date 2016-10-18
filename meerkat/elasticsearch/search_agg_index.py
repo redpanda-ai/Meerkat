@@ -63,7 +63,9 @@ def create_should_query(store_number, phone_number):
 
 def create_bool_query(must_query, should_query):
 	"""Create a bool query with must and should query"""
-	attributes = ['list_name', 'address', 'city', 'state', 'zip_code', 'phone_number', 'store_number']
+	attributes = ['list_name', 'address', 'city', 'state', 'zip_code', 'phone_number',\
+					'store_number', 'latitude', 'longitude', 'source_url']
+
 	bool_query = {
 		'query': {
 			'bool': {
@@ -138,7 +140,9 @@ def process_query_result(trans, query_result):
 
 def enrich_transaction(trans, hit):
 	"""Enrich the input transaction with agg index hit"""
-	attributes = ['list_name', 'address', 'city', 'state', 'zip_code', 'phone_number', 'store_number']
+	attributes = ['list_name', 'address', 'city', 'state', 'zip_code', 'phone_number',\
+					'store_number', 'latitude', 'longitude', 'source_url']
+
 	if hit is not None:
 		trans['agg_search'] = {}
 		for key in attributes:
@@ -185,7 +189,6 @@ def search_agg_index(data):
 if __name__ == '__main__':
 	data = json.loads(open('./agg_input.json').read())
 	search_agg_index(data)
-	sys.exit()
 	with open('./agg_output.json', 'w') as outfile:
 		json.dump(data, outfile, indent=4, sort_keys=True)
 
