@@ -7,9 +7,12 @@ import sys
 import yaml
 
 from meerkat.various_tools import load_params
+from meerkat.classification.load_model import get_tf_rnn_by_path
 
 logging.config.dictConfig(yaml.load(open('logging.yaml', 'r')))
 logger = logging.getLogger('basic')
+
+merchant_rnn = get_tf_rnn_by_path("rnn/bilstm.ckpt", "rnn/w2i.json")
 
 def get_renames(rename_type):
 	"""Fetches the proper rename dict, used to rename columns in the dataframe."""
@@ -76,11 +79,8 @@ def preprocess_dataframe(args):
 
 def clean_dataframe(my_df, renames):
 	"""Removes unneeded columns, renames others."""
-	#header_names = list(my_df.columns.values)
-	#logger.info(header_names)
 	my_df.rename(index=str, columns=renames, inplace=True)
 	header_names = list(my_df.columns.values)
-	#logger.info(header_names)
 	reverse_renames = {}
 	for key in renames.keys():
 		val = renames[key]
@@ -101,16 +101,29 @@ def clean_dataframe(my_df, renames):
 	#Remove processed column
 	del my_df["city_or_phone"]
 
+def get_rnn_merchant(my_df):
+	predicted = merchant_rnn([{"Description": my_df["description"]}])[0]["Predicted"]
+	return predicted
+	#try:
+	#	result = re.sub(re.escape(predicted, "", my_df["description"],
+	#		flags=re.IGNORECASE))
+	#	result = my_df["description"][result.start():result.end()]
+	#except:
+	#	result = ""
+	#return result
+
 def main_process(args=None):
 	"""Opens up the input file and loads it into a dataframe"""
 	if args is None:
 		args = parse_arguments(sys.argv[1:])
 	logger.info("Starting main process")
 	my_df = preprocess_dataframe(args)
-	file_type = get_file_type(args)
-	renames = get_renames(file_type)
-	clean_dataframe(my_df, renames)
+	renames = get_renames(get_file_type(args))
 	my_df.rename(index=str, columns=renames, inplace=True)
+	clean_dataframe(my_df, renames)
+	#get_rnn_merchant = lambda x: merchant_rnn([{"Description": x["description"]}][0]["Predicted"])
+	my_df["rnn_merchant"] = my_df.apply(get_rnn_merchant, axis=1)
+#	apply_rnn(my_df)
 	logger.info(my_df)
 
 def parse_arguments(args):
