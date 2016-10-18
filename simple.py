@@ -61,7 +61,7 @@ def preprocess_dataframe(args):
 		"quoting": csv.QUOTE_NONE, "encoding": "utf-8", "sep": "|", "error_bad_lines": True,
 		"warn_bad_lines": True, "chunksize": 1, "na_filter": False
 	}
-	#We don't really need the entire file get 2 rows from the first chunk
+	#We don't really need the entire file get 1 row from the first chunk
 	reader = pd.read_csv(args.input_file, **kwargs)
 	my_df = reader.get_chunk(0)
 	header_names = list(my_df.columns.values)
@@ -91,13 +91,19 @@ def clean_dataframe(my_df, renames):
 			logger.info("Removing superflous column {0}".format(column))
 			del my_df[column]
 	#lambda functions
+	phone_regex = "^[0-9][0-9\-]*$"
+	website_regex = "^.*\.com.*$"
+	city_regex = "^[a-z ]+.*$"
 	get_phone = lambda x: x["city_or_phone"] \
-		if re.match("^[0-9\-]*$", x["city_or_phone"]) else ""
+		if re.match(phone_regex, x["city_or_phone"]) else ""
+	get_website = lambda x: x["city_or_phone"] \
+		if re.match(website_regex, x["city_or_phone"], flags=re.IGNORECASE) else ""
 	get_city = lambda x: x["city_or_phone"] \
-		if not re.match("^[0-9\-]*$", x["city_or_phone"]) else ""
+		if ( re.match(city_regex, x["city_or_phone"], flags=re.IGNORECASE) and  not re.match(website_regex, x["city_or_phone"], flags=re.IGNORECASE) ) else ""
 	#Add some columns
 	my_df["phone"] = my_df.apply(get_phone, axis=1)
 	my_df["city"] = my_df.apply(get_city, axis=1)
+	my_df["website"] = my_df.apply(get_website, axis=1)
 	#Remove processed column
 	del my_df["city_or_phone"]
 
@@ -121,7 +127,6 @@ def main_process(args=None):
 	renames = get_renames(get_file_type(args))
 	my_df.rename(index=str, columns=renames, inplace=True)
 	clean_dataframe(my_df, renames)
-	#get_rnn_merchant = lambda x: merchant_rnn([{"Description": x["description"]}][0]["Predicted"])
 	my_df["rnn_merchant"] = my_df.apply(get_rnn_merchant, axis=1)
 #	apply_rnn(my_df)
 	logger.info(my_df)
