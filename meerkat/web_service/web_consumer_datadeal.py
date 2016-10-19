@@ -252,7 +252,7 @@ class WebConsumerDatadeal():
 
 	def __enrich_transaction(self, *argv):
 		"""Enriches the transaction with additional data"""
-		
+
 		decision = argv[0]
 		transaction = argv[1]
 		hit_fields = argv[2]
@@ -425,8 +425,91 @@ class WebConsumerDatadeal():
 				data_to_search_in_factual[i] = self.__search_factual_index([data_to_search_in_factual[i]])
 		return data_to_search_in_agg, data_to_search_in_factual
 
+	def enrich_with_search_fields(self, trans, agg_or_factual, map_input_fields, fields_not_in_input):
+		"""Enrich transaction with fields in search"""
+		# Override input fields by search
+		for field in map_input_fields:
+			search_field = map_input_fields[field]
+			if trans[agg_or_factual].get(search_field, "") != "":
+				trans[field] = trans[agg_or_factual][search_field]
+
+		# Add search fields to transaction
+		for field in fields_not_in_input:
+			trans[field] = trans[agg_or_factual].get(field, "")
+
+	def ensure_output_schema(self, transactions, debug):
+		"""Merge fields and clean output to proper schema"""
+		for trans in transactions:
+			# In debug mode, keep all input fields
+			if debug:
+				input_fields = ["city", "state", "country", "postal_code", "RNN_merchant_name",
+					"store_number", "phone_number", "website_url"]
+				trans["input"] = {}
+				for field in input_fields:
+					trans["input"][field] = trans.get(field, "")
+
+			# Enrich transaction with merchant name
+			if trans.get("CNN", "") != "" and trans["CNN"].get("label", "") != '':
+				trans["merchant_name"] = trans["CNN"]["label"]
+			elif trans.get("agg_search", "") != "" and trans["agg_search"].get("list_name") != "":
+				trans["merchant_name"] = trans["agg_search"]["list_name"]
+			elif trans.get("factual_search", "") != "" and trans["factual_search"].get("merchant_name") != "":
+				trans["merchant_name"] = trans["factual_search"]["merchant_name"]
+			else:
+				trans["merchant_name"] = trans["RNN_merchant_name"]
+
+			# Enrich transaction with fields found in search
+			fields_not_in_input = ["longitude", "latitude", "address"]
+			if "agg_search" in trans:
+				map_input_fields_to_agg = {
+					"city" : "city",
+					"state": "state",
+					"phone_number": "phone_number",
+					"postal_code": "zip_code",
+					"website_url": "source_url"
+				}
+				self.enrich_with_search_fields(trans, "agg_search",
+					map_input_fields_to_agg, fields_not_in_input)
+			elif "factual_search" in trans:
+				map_input_fields_to_factual = {
+					"city" : "city",
+					"state": "state",
+					"phone_number": "phone_number",
+					"postal_code": "postal_code",
+					"website_url": "website"
+				}
+				self.enrich_with_search_fields(trans, "factual_search",
+					map_input_fields_to_factual, fields_not_in_input)
+
+			# Ensure these fields exist in output
+			output_fields = ["city", "state", "address", "longitude", "latitude",
+				"website_url", "store_number", "phone_number", "postal_code",
+				"transaction_id"]
+			map_fields_for_output = {
+				"phone_number": "phone",
+				"postal_code": "zip_code",
+				"transaction_id": "row_id"
+			}
+			for field in output_fields:
+				if field in map_fields_for_output:
+					output_field = map_fields_for_output[field]
+					trans[output_field] = trans.get(field, "")
+					trans.pop(field, None)
+				else:
+					trans[field] = trans.get(field, "")
+
+			# Remove fields not in output schema
+			if debug is False:
+				fields_to_remove = ["description", "amount", "date", "ledger_entry", "CNN",
+					"container", "RNN_merchant_name", "Agg_Name", "factual_search",
+					"agg_search", "merchant_score", "country", "match_found"]
+				for field in fields_to_remove:
+					trans.pop(field, None)
+
 	def classify(self, data, optimizing=False):
 		"""Classify a set of transactions"""
+		#debug = data.get("debug", False)
+		debug = True
 
 		# Apply Merchant CNN
 		self.__apply_merchant_cnn(data)
@@ -435,8 +518,9 @@ class WebConsumerDatadeal():
 		self.__search_in_agg_or_factual(data)
 
 		# Process enriched data to ensure output schema
-		#self.ensure_output_schema(data["transaction_list"])
+		self.ensure_output_schema(data["transaction_list"], debug)
 
+		print(len(data))
 		return data
 
 if __name__ == "__main__":
