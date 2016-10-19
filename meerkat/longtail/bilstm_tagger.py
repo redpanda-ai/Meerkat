@@ -122,12 +122,14 @@ def get_tag_index(tokens, tag, tagged):
 
 	return hits
 
-def get_token_tag_pairs(config, trans):
+def get_token_tag_pairs(config, trans, doc_key="DESCRIPTION"):
 	"""Convert df row to list of tags and tokens"""
 
 	# Tag Column Map
 	entities = {}
 	tag_column_map = config["tag_column_map"]
+
+	print(trans)
 
 	# Create Tag Lookup
 	for key, value in tag_column_map.items():
@@ -218,7 +220,7 @@ def subpreprocess(config, name):
 	config[name] = config[name].to_dict("record")
 	random.shuffle(config[name])
 	for i, tran in enumerate(config[name]):
-		config[name][i] = get_token_tag_pairs(config, tran["DESCRIPTION"])
+		config[name][i] = get_token_tag_pairs(config, tran, doc_key="DESCRIPTION")
 	return config
 
 def preprocess(config):

@@ -10,7 +10,7 @@ It produces various stats and a confusion matrix for analysis
 
 ############################# USAGE #############################
 
-# python3 -m meerkat.longtail.rnn_classificaiton_report \
+# python3 -m meerkat.longtail.rnn_classification_report \
 # <path_to_data> <path_to_cktp_file> <path_to_w2i_file> \
 # --config <optional_path_to_config_file>
 
@@ -95,7 +95,7 @@ def evaluate_model(args=None):
 		chunk = chunk.to_dict("record")
 
 		start = time.time() 
-		chunk = model(chunk, name_only=False, tags=True)
+		chunk = model(chunk, name_only=False, tags=True, doc_key="DESCRIPTION")
 		end = time.time()
 		elapsed_time += end - start
 
