@@ -396,7 +396,7 @@ class WebConsumerDatadeal():
 		"""Split transactions to search in agg index or factual index"""
 		data_to_search_in_agg, data_to_search_in_factual = [], []
 		for trans in data["transaction_list"]:
-			if "country" in trans and trans["country"] not in ["US", "USA"]:
+			if trans.get("country", "") not in ["", "US", "USA"]:
 				continue
 			cnn_merchant = trans['CNN']['label']
 			if cnn_merchant != '' and cnn_merchant in self.merchant_name_map:
@@ -508,8 +508,7 @@ class WebConsumerDatadeal():
 
 	def classify(self, data, optimizing=False):
 		"""Classify a set of transactions"""
-		#debug = data.get("debug", False)
-		debug = True
+		debug = data.get("debug", False)
 
 		# Apply Merchant CNN
 		self.__apply_merchant_cnn(data)
@@ -520,7 +519,6 @@ class WebConsumerDatadeal():
 		# Process enriched data to ensure output schema
 		self.ensure_output_schema(data["transaction_list"], debug)
 
-		print(len(data))
 		return data
 
 if __name__ == "__main__":
