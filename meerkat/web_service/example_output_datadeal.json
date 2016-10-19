@@ -1,0 +1,46 @@
+{
+	"cobrand_id" : 1234,
+	"user_id" : 2345,
+	"container" : "card",
+	"transaction_list" : [
+            {
+                "address": "4316 Buffalo Rd",
+                "city": "Erie",
+                "latitude": "42.1461353",
+                "longitude": "-80.0045373",
+                "merchant_name": "McDonald's",
+                "phone": "(814) 899-1000",
+                "row_id": 45431,
+                "state": "PA",
+                "store_number": "M4361",
+                "website_url": "www.mcdonalds.com",
+                "zip_code": "16510"
+            },
+            {
+                "address": "6200 Chew Ave",
+                "city": "Philadelphia",
+                "latitude": "40.0496001",
+                "longitude": "-75.1719993",
+                "merchant_name": "U-Haul",
+                "phone": "(215) 844-1690",
+                "row_id": 76554,
+                "state": "PA",
+                "store_number": "",
+                "website_url": "www.uhaul.com/",
+                "zip_code": "19138"
+            },
+            {
+                "address": "1089 Central St",
+                "city": "Leominster",
+                "latitude": "42.4975025",
+                "longitude": "-71.7455895",
+                "merchant_name": "Dollar Tree",
+                "phone": "(978) 534-7283",
+                "row_id": 71755,
+                "state": "MA",
+                "store_number": "4474 00044743",
+                "website_url": "www.dollartree.com",
+                "zip_code": "01453-4807"
+            }
+	]
+}
