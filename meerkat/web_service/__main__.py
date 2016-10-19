@@ -20,7 +20,7 @@ import yaml
 
 from tornado_json.application import Application
 from tornado.options import define, options
-from meerkat.web_service.api import Meerkat_API
+from meerkat.web_service.api import Meerkat_API, Meerkat_Datadeal_API
 
 # Define Some Defaults
 define("port", default=(len(sys.argv) > 1 and str(sys.argv[1]) or 443),
@@ -38,6 +38,7 @@ def main():
 
 	# Define valid routes
 	routes = [
+		("/meerkat_datadeal/?", Meerkat_Datadeal_API),
 		("/meerkat/v2.4/?", Meerkat_API),
 		("/meerkat/v2.3/?", Meerkat_API),
 		("/meerkat/v2.2/?", Meerkat_API),
