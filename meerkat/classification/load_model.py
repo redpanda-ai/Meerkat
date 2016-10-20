@@ -14,6 +14,8 @@ import logging
 import math
 import numpy as np
 import tensorflow as tf
+from itertools import groupby
+from collections import defaultdict
 
 from tensorflow.python.framework import ops
 from sklearn.externals import joblib
@@ -127,11 +129,22 @@ def get_tf_rnn_by_path(model_path, w2i_path, gpu_mem_fraction=False, model_name=
 			output = sess.run(model, feed_dict=feed_dict)
 
 			if name_only:
-				# return merchant name if name_only else return tags of all tokens
+
+				# Tag Tokens
 				output = [config["tag_map"][str(i)] for i in np.argmax(output, 1)]
-				print(output)
-				print(tran)
-				doc[label_key] = dict(zip(tran, output))
+				tagged = list(zip(tran, output))
+				grouped, dict_output = [], defaultdict(list)
+
+				# Group Sequential Tokens
+				for tag, group in groupby(tagged, lambda x: x[1]):
+					merged = " ".join([x[0] for x in group])
+					grouped.append((tag, merged))
+
+				# Create Dict
+				for x in grouped:
+					dict_output[x[0]].append(x[1])
+
+				doc[label_key] = grouped
 			else:
 				doc[label_key] = output
 
