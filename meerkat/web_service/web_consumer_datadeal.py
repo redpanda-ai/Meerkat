@@ -508,7 +508,7 @@ class WebConsumerDatadeal():
 				trans['CNN'].pop("threshold", None)
 				trans['CNN'].pop("category", None)
 				fields_to_remove = ["amount", "date", "ledger_entry", "container",
-					"merchant_score", "match_found"]
+					"merchant_score", "country", "match_found"]
 				for field in fields_to_remove:
 					trans.pop(field, None)
 
