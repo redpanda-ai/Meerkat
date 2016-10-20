@@ -425,7 +425,7 @@ class WebConsumerDatadeal():
 				data_to_search_in_factual[i] = self.__search_factual_index([data_to_search_in_factual[i]])
 		return data_to_search_in_agg, data_to_search_in_factual
 
-	def enrich_with_search_fields(self, trans, agg_or_factual, map_input_fields, fields_not_in_input):
+	def enrich_with_search_fields(self, trans, agg_or_factual, map_input_fields, fields_with_same_name):
 		"""Enrich transaction with fields in search"""
 		# Override input fields by search
 		for field in map_input_fields:
@@ -434,8 +434,9 @@ class WebConsumerDatadeal():
 				trans[field] = trans[agg_or_factual][search_field]
 
 		# Add search fields to transaction
-		for field in fields_not_in_input:
-			trans[field] = trans[agg_or_factual].get(field, "")
+		for field in fields_with_same_name:
+			if trans[agg_or_factual].get(field, "") != "":
+				trans[field] = trans[agg_or_factual].get(field, "")
 
 	def ensure_output_schema(self, transactions, debug):
 		"""Merge fields and clean output to proper schema"""
@@ -459,27 +460,23 @@ class WebConsumerDatadeal():
 				trans["merchant_name"] = trans["RNN_merchant_name"]
 
 			# Enrich transaction with fields found in search
-			fields_not_in_input = ["longitude", "latitude", "address"]
+			fields_with_same_name = ["city", "state", "phone_number", "longitude", "latitude"]
 			if "agg_search" in trans:
 				map_input_fields_to_agg = {
-					"city" : "city",
-					"state": "state",
-					"phone_number": "phone_number",
+					"address": "address",
 					"postal_code": "zip_code",
 					"website_url": "source_url"
 				}
 				self.enrich_with_search_fields(trans, "agg_search",
-					map_input_fields_to_agg, fields_not_in_input)
+					map_input_fields_to_agg, fields_with_same_name)
 			elif "factual_search" in trans:
 				map_input_fields_to_factual = {
-					"city" : "city",
-					"state": "state",
-					"phone_number": "phone_number",
+					"address": "street",
 					"postal_code": "postal_code",
 					"website_url": "website"
 				}
 				self.enrich_with_search_fields(trans, "factual_search",
-					map_input_fields_to_factual, fields_not_in_input)
+					map_input_fields_to_factual, fields_with_same_name)
 
 			# Ensure these fields exist in output
 			output_fields = ["city", "state", "address", "longitude", "latitude",
@@ -503,6 +500,14 @@ class WebConsumerDatadeal():
 				fields_to_remove = ["description", "amount", "date", "ledger_entry", "CNN",
 					"container", "RNN_merchant_name", "Agg_Name", "factual_search",
 					"agg_search", "merchant_score", "country", "match_found"]
+				for field in fields_to_remove:
+					trans.pop(field, None)
+			else:
+				trans['CNN']['merchant_score'] =  trans.get("merchant_score", "0.0")
+				trans['CNN'].pop("threshold", None)
+				trans['CNN'].pop("category", None)
+				fields_to_remove = ["amount", "date", "ledger_entry", "container",
+					"merchant_score", "match_found"]
 				for field in fields_to_remove:
 					trans.pop(field, None)
 

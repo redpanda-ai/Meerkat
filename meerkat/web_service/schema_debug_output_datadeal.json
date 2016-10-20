@@ -1,0 +1,103 @@
+{
+	"$schema" : "http://json-schema.org/draft-04/schema#",
+	"title" : "meerkat_categorize output",
+	"definitions": {
+		"response" : {
+			"type" : "object",
+			"properties" : {
+				"row_id" : { "type" : "number" },
+				"merchant_name" : { "type" : "string" },
+				"address" : { "type" : "string" },
+				"city" : { "type" : "string" },
+				"state" : { "type" : "string" },
+				"zip_code" : { "type" : "string" },
+				"phone" : { "type" : "string" },
+				"longitude" : { "type" : "string" },
+				"latitude" : { "type" : "string" },
+				"website_url" : { "type" : "string" },
+				"store_number" : { "type" : "string" },
+				"country" : { "type" : "string" },
+				"description" : { "type" : "string" },
+				"Agg_Name" : {
+					"type" : "array",
+					"items" : { "type" : "string" }
+				},
+				"RNN_merchant_name" : { "type": "string"},
+				"CNN" : {
+					"label_name" : { "type" : "string" },
+					"merchant_score" : { "type" : "string" }
+				},
+				"input" : {
+					"RNN_merchant_name" : { "type" : "string" },
+					"city" : { "type" : "string" },
+					"country" : { "type" : "string" },
+					"phone_number" : { "type" : "string" },
+					"postal_code" : { "type" : "string" },
+					"state" : { "type" : "string" },
+					"store_number" : { "type" : "string" },
+					"website_url" : { "type" : "string" }
+				},
+				"agg_search" : {
+					"address" : { "type" : "string" },
+					"city" : { "type" : "string" },
+					"state" : { "type" : "string" },
+					"zip_code" : { "type" : "string" },
+					"longitude" : { "type" : "string" },
+					"latitude" : { "type" : "string" },
+					"list_name" : { "type" : "string" },
+					"phone_number" : { "type" : "string" },
+					"store_number" : { "type" : "string" },
+					"source_url" : { "type" : "string" }
+				},
+				"factual_search" : {
+					"street" : { "type" : "string" },
+					"city" : { "type" : "string" },
+					"state" : { "type" : "string" },
+					"postal_code" : { "type" : "string" },
+					"longitude" : { "type" : "string" },
+					"latitude" : { "type" : "string" },
+					"merchant_name" : { "type" : "string" },
+					"phone_number" : { "type" : "string" },
+					"website" : { "type" : "string" },
+					"source_merchant_id" : { "type" : "string" },
+					"category_labels" : { "type" : "string" },
+					"chain_name" : { "type" : "string" },
+					"confidence_score" : { "type" : "string" },
+					"country" : { "type" : "string" },
+					"neighbourhood" : { "type" : "string" },
+					"store_id" : { "type" : "string" },
+					"fax_number" : { "type" : "string" }
+				}
+			},
+			"required" : [ "row_id", "merchant_name", "address", "city", "state", "zip_code",
+				"phone", "longitude", "latitude", "website_url", "store_number",
+				"description", "CNN", "input"],
+			"additionalProperties" : false
+		}
+	},
+	"description": "A schema for defining output from 'meerkat_categorize'",
+	"type" : "object",
+	"properties" : {
+		"cobrand_id" : {
+			"description" : "Yodlee's number to uniquely identify the cobrand",
+			"type" : "number"
+		},
+		"user_id" : {
+			"description" : "Yodlee's number to uniquely identify a user within a cobrand",
+			"type" : "number"
+		},
+		"container" : { "enum" : [ "bank", "card" ] },
+		"transaction_list" : {
+			"description" : "An array containing at least one of the following response types.",
+			"type" : "array",
+			"items": {
+				"oneOf": [
+					{"$ref": "#/definitions/response"}
+				]
+			},
+			"minItems": 1,
+			"uniqueItems": true
+		}
+	},
+	"required": ["cobrand_id", "user_id", "container", "transaction_list"]
+}

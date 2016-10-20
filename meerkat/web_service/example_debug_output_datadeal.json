@@ -1,0 +1,142 @@
+{
+	"cobrand_id" : 1234,
+	"user_id" : 2345,
+	"container" : "card",
+	"transaction_list" : [
+            {
+                "Agg_Name": [
+                    "McDonald's US"
+                ],
+                "CNN": {
+                    "label": "McDonald's",
+                    "merchant_score": "0.999998"
+                },
+                "RNN_merchant_name": "MCDONALD'S",
+                "address": "4316 Buffalo Rd",
+                "agg_search": {
+                    "address": "4316 Buffalo Rd",
+                    "city": "Erie",
+                    "latitude": "42.1461353",
+                    "list_name": "McDonald's US",
+                    "longitude": "-80.0045373",
+                    "phone_number": "(814) 899-1000",
+                    "source_url": "www.mcdonalds.com",
+                    "state": "PA",
+                    "store_number": "3423",
+                    "zip_code": "16510"
+                },
+                "city": "Erie",
+                "country": "US",
+                "description": "MCDONALD'S M4361 OF PA   ERIE         PA",
+                "input": {
+                    "RNN_merchant_name": "MCDONALD'S",
+                    "city": "ERIE",
+                    "country": "US",
+                    "phone_number": "",
+                    "postal_code": "16510",
+                    "state": "PA",
+                    "store_number": "M4361",
+                    "website_url": ""
+                },
+                "latitude": "42.1461353",
+                "longitude": "-80.0045373",
+                "merchant_name": "McDonald's",
+                "phone": "(814) 899-1000",
+                "row_id": 45431,
+                "state": "PA",
+                "store_number": "M4361",
+                "website_url": "www.mcdonalds.com",
+                "zip_code": "16510"
+            },
+            {
+                "Agg_Name": [
+                    "U-Haul"
+                ],
+                "CNN": {
+                    "label": "U-Haul",
+                    "merchant_score": "1.0"
+                },
+                "RNN_merchant_name": "U-HAUL",
+                "address": "6200 Chew Ave",
+                "agg_search": {
+                    "address": "6200 Chew Ave",
+                    "city": "Philadelphia",
+                    "latitude": "40.0496001",
+                    "list_name": "U-Haul",
+                    "longitude": "-75.1719993",
+                    "phone_number": "(215) 844-1690",
+                    "source_url": "www.uhaul.com/",
+                    "state": "PA",
+                    "store_number": "43754",
+                    "zip_code": "19138"
+                },
+                "city": "Philadelphia",
+                "country": "US",
+                "description": "U-HAUL CT CHELTEHAM      PHILADELPHIA PA",
+                "input": {
+                    "RNN_merchant_name": "U-HAUL",
+                    "city": "PHILADELPHIA",
+                    "country": "US",
+                    "phone_number": "",
+                    "postal_code": "19138",
+                    "state": "PA",
+                    "store_number": "",
+                    "website_url": ""
+                },
+                "latitude": "40.0496001",
+                "longitude": "-75.1719993",
+                "merchant_name": "U-Haul",
+                "phone": "(215) 844-1690",
+                "row_id": 76554,
+                "state": "PA",
+                "store_number": "",
+                "website_url": "www.uhaul.com/",
+                "zip_code": "19138"
+            },
+            {
+                "Agg_Name": [
+                    "Dollar Tree"
+                ],
+                "CNN": {
+                    "label": "Dollar Tree",
+                    "merchant_score": "1.0"
+                },
+                "RNN_merchant_name": "DOLRTREE",
+                "address": "1089 Central St",
+                "agg_search": {
+                    "address": "1089 Central St",
+                    "city": "Leominster",
+                    "latitude": "42.4975025",
+                    "list_name": "Dollar Tree",
+                    "longitude": "-71.7455895",
+                    "phone_number": "(978) 534-7283",
+                    "source_url": "www.dollartree.com",
+                    "state": "MA",
+                    "store_number": "4474",
+                    "zip_code": "01453-4807"
+                },
+                "city": "Leominster",
+                "country": "US",
+                "description": "DOLRTREE 4474 00044743   LEOMINSTER   MA",
+                "input": {
+                    "RNN_merchant_name": "DOLRTREE",
+                    "city": "LEOMINSTER",
+                    "country": "US",
+                    "phone_number": "",
+                    "postal_code": "1453",
+                    "state": "MA",
+                    "store_number": "4474 00044743",
+                    "website_url": ""
+                },
+                "latitude": "42.4975025",
+                "longitude": "-71.7455895",
+                "merchant_name": "Dollar Tree",
+                "phone": "(978) 534-7283",
+                "row_id": 71755,
+                "state": "MA",
+                "store_number": "4474 00044743",
+                "website_url": "www.dollartree.com",
+                "zip_code": "01453-4807"
+            }
+	]
+}
