@@ -26,7 +26,6 @@
                     "zip_code": "16510"
                 },
                 "city": "Erie",
-                "country": "US",
                 "description": "MCDONALD'S M4361 OF PA   ERIE         PA",
                 "input": {
                     "RNN_merchant_name": "MCDONALD'S",
@@ -44,7 +43,7 @@
                 "phone": "(814) 899-1000",
                 "row_id": 45431,
                 "state": "PA",
-                "store_number": "M4361",
+                "store_number": "3423",
                 "website_url": "www.mcdonalds.com",
                 "zip_code": "16510"
             },
@@ -71,7 +70,6 @@
                     "zip_code": "19138"
                 },
                 "city": "Philadelphia",
-                "country": "US",
                 "description": "U-HAUL CT CHELTEHAM      PHILADELPHIA PA",
                 "input": {
                     "RNN_merchant_name": "U-HAUL",
@@ -89,7 +87,7 @@
                 "phone": "(215) 844-1690",
                 "row_id": 76554,
                 "state": "PA",
-                "store_number": "",
+                "store_number": "43754",
                 "website_url": "www.uhaul.com/",
                 "zip_code": "19138"
             },
@@ -116,7 +114,6 @@
                     "zip_code": "01453-4807"
                 },
                 "city": "Leominster",
-                "country": "US",
                 "description": "DOLRTREE 4474 00044743   LEOMINSTER   MA",
                 "input": {
                     "RNN_merchant_name": "DOLRTREE",
@@ -134,7 +131,7 @@
                 "phone": "(978) 534-7283",
                 "row_id": 71755,
                 "state": "MA",
-                "store_number": "4474 00044743",
+                "store_number": "4474",
                 "website_url": "www.dollartree.com",
                 "zip_code": "01453-4807"
             }
