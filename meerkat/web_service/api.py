@@ -6,9 +6,60 @@ from tornado import gen
 from tornado_json.requesthandlers import APIHandler
 
 from meerkat.web_service.web_consumer import WebConsumer
+from meerkat.web_service.web_consumer_datadeal import WebConsumerDatadeal
 from meerkat.web_service import schema
 from meerkat.various_tools import (load_params, get_us_cities,\
 	load_hyperparameters)
+
+class Meerkat_Datadeal_API(APIHandler):
+	"""This class is the Meerkat Datadeal API."""
+	cities = get_us_cities()
+	base_dir = "meerkat/web_service/"
+	params = load_params(base_dir + "config/web_service_datadeal.json")
+	hyperparams = load_hyperparameters(params)
+	meerkat = WebConsumerDatadeal(params, hyperparams, cities)
+	#This thread pool can deal with 'blocking functions' like meerkat.classify
+	# 14 is best thread number Andy has tried.
+	thread_pool = concurrent.futures.ThreadPoolExecutor(14)
+
+	# pylint: disable=bad-continuation
+	with open(base_dir + "schema_input_datadeal.json") as data_file:
+		schema_input = json.load(data_file)
+
+	with open(base_dir + "example_input.json") as data_file:
+		example_input = json.load(data_file)
+
+	with open(base_dir + "schema_output_datadeal.json") as data_file:
+		schema_output = json.load(data_file)
+
+	with open(base_dir + "example_output.json") as data_file:
+		example_output = json.load(data_file)
+
+	with open(base_dir + "schema_debug_output.json") as data_file:
+		schema_debug_output = json.load(data_file)
+
+	with open(base_dir + "example_debug_output.json") as data_file:
+		example_debug_output = json.load(data_file)
+
+	@schema.validate(
+		input_schema=schema_input,
+		input_example=example_input,
+		output_schema=schema_output,
+		output_example=example_output,
+		debug_output_schema=schema_debug_output,
+		debug_output_example=example_debug_output
+	)
+
+	@gen.coroutine
+	def post(self):
+		"""Handle post requests asynchonously"""
+		data = json.loads(self.request.body.decode())
+		results = yield self.thread_pool.submit(self.meerkat.classify, data)
+		return results
+
+	def get(self):
+		"""Handle get requests"""
+		return None
 
 class Meerkat_API(APIHandler):
 	"""This class is the Meerkat API."""
