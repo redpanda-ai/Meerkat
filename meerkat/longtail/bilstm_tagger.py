@@ -129,8 +129,6 @@ def get_token_tag_pairs(config, trans, doc_key="DESCRIPTION"):
 	entities = {}
 	tag_column_map = config["tag_column_map"]
 
-	print(trans)
-
 	# Create Tag Lookup
 	for key, value in tag_column_map.items():
 
@@ -140,7 +138,7 @@ def get_token_tag_pairs(config, trans, doc_key="DESCRIPTION"):
 		entities[value] = tag
 
 	# Tokenize String
-	tokens = tokenize(trans)
+	tokens = tokenize(trans[doc_key])
 	tags = ["background"] * len(tokens)
 
 	# Tag Merchant
