@@ -463,6 +463,7 @@ class WebConsumerDatadeal():
 			fields_with_same_name = ["city", "state", "phone_number", "longitude", "latitude"]
 			if "agg_search" in trans:
 				map_input_fields_to_agg = {
+					"store_number": "store_number",
 					"address": "address",
 					"postal_code": "zip_code",
 					"website_url": "source_url"
