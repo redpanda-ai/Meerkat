@@ -460,24 +460,24 @@ class WebConsumerDatadeal():
 				trans["merchant_name"] = trans["RNN_merchant_name"]
 
 			# Enrich transaction with fields found in search
-			fields_with_same_name = ["city", "state", "phone_number", "longitude", "latitude"]
 			if "agg_search" in trans:
+				same_name_for_agg_and_input = ["city", "state", "phone_number", "longitude",
+					"latitude", "store_number", "address"]
 				map_input_fields_to_agg = {
-					"store_number": "store_number",
-					"address": "address",
 					"postal_code": "zip_code",
 					"website_url": "source_url"
 				}
 				self.enrich_with_search_fields(trans, "agg_search",
-					map_input_fields_to_agg, fields_with_same_name)
+					map_input_fields_to_agg, same_name_for_agg_and_input)
 			elif "factual_search" in trans:
+				same_name_for_factual_and_input = ["city", "state", "phone_number", "longitude",
+					"latitude", "postal_code"]
 				map_input_fields_to_factual = {
 					"address": "street",
-					"postal_code": "postal_code",
 					"website_url": "website"
 				}
 				self.enrich_with_search_fields(trans, "factual_search",
-					map_input_fields_to_factual, fields_with_same_name)
+					map_input_fields_to_factual, same_name_for_factual_and_input)
 
 			# Ensure these fields exist in output
 			output_fields = ["city", "state", "address", "longitude", "latitude",
