@@ -144,7 +144,7 @@ def get_tf_rnn_by_path(model_path, w2i_path, gpu_mem_fraction=False, model_name=
 				for x in grouped:
 					dict_output[x[0]].append(x[1])
 
-				doc[label_key] = grouped
+				doc[label_key] = dict(dict_output)
 			else:
 				doc[label_key] = output
 
