@@ -461,6 +461,10 @@ class WebConsumerDatadeal():
 
 			# Enrich transaction with fields found in search
 			if "agg_search" in trans:
+				# Only output store number found in agg search
+				if trans["agg_search"].get("store_number", "") == "":
+					trans["store_number"] = ""
+
 				same_name_for_agg_and_input = ["city", "state", "phone_number", "longitude",
 					"latitude", "store_number", "address"]
 				map_input_fields_to_agg = {
