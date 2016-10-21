@@ -219,22 +219,8 @@ def main_process(args=None):
 	#Re-order everything
 	results_df = results_df[header]
 	#Write it out to a file
-	results_df.to_csv("test.csv", index=header, sep="|", mode="w", header=header)
+	results_df.to_csv("test.csv", index=False, sep="|", mode="w", header=header)
 	logger.info("Written to test.csv")
-	#logger.info("All Responses: {0}".format(result_dfs))
-	
-
-	#logger.info(json.dumps(web_requests[len(web_requests) - 1], sort_keys=True, indent=4, separators=(',', ':')))
-	#logger.info("Web request count: {0}".format(len(web_requests)))
-
-	#Turn the dataframe into batches of transactions as JSON
-	#Set the web reqest to the web service
-	#Parse the results
-	#Write results to file
-
-	#logger.info(my_df)
-	#I should call the web service with the dataframe broken into 1000 transactions per call.
-	#Take all of the responses and write it out to a file...
 	logger.info("All done.")
 
 def parse_arguments(args):
