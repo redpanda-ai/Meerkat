@@ -67,13 +67,10 @@ def preprocess_dataframe(args):
 	reader = pd.read_csv(args.input_file, **kwargs)
 	my_df = reader.get_chunk(0)
 	header_names = list(my_df.columns.values)
-	#logger.info(my_df)
-	logger.info(header_names)
 	#Set all data types to "str"
 	dtype = {}
 	for column in header_names:
 		dtype[column] = "str"
-	#logger.info(dtype)
 	#Now lets grab the entire file as a dataframe
 	del kwargs["chunksize"]
 	kwargs["dtype"] = dtype
@@ -129,15 +126,14 @@ def get_blank_transaction_dict():
 		"latitude": [], "website_url": [], "store_number": [] }
 
 def get_results_df_from_web_service(my_web_request, container):
-	"""I do stuff"""
-	#logger.info("Number of transactions: {0}".format(len(my_web_request["transaction_list"])))
-	response = requests.post("https://localhost:443/meerkat_datadeal/", verify=False, data=json.dumps(my_web_request))
-	#logger.info(json.dumps(my_web_request, sort_keys=True, indent=4, separators=(',', ':')))
+	"""Sends a single web request dict to the web service, then converts the
+	result into a results dataframe"""
+	response = requests.post("https://localhost:443/meerkat_datadeal/", verify=False,
+		data=json.dumps(my_web_request))
 	if "data" not in response.text:
 		logger.critical("There is no data in the response, the response is {0}".format(response))
 		sys.exit()
 	response_data = json.loads(response.text)["data"]
-	#logger.info(json.dumps(response_data, sort_keys=True, indent=4, separators=(',', ':')))
 	my_results = get_blank_transaction_dict()
 	my_keys = my_results.keys()
 	for transaction in response_data["transaction_list"]:
@@ -186,14 +182,9 @@ def main_process(args=None):
 			if my_web_request is not None:
 				logger.info("Transaction count {0}".format(transaction_count))
 				result_dfs.append(get_results_df_from_web_service(my_web_request, container))
-				#web_requests.append(my_web_request.copy())
 			#Create a new batch
-			my_web_request = {
-				"cobrand_id": 0,
-				"user_id": 0,
-				"container": container,
-				"transaction_list": []
-			}
+			my_web_request = { "cobrand_id": 0, "user_id": 0, "container": container,
+				"transaction_list": [] }
 		#Ensure that each transaction has some default values
 		transaction["transaction_id"] = int(transaction["transaction_id"])
 		transaction["ledger_entry"] = "debit"
@@ -219,8 +210,8 @@ def main_process(args=None):
 	#Re-order everything
 	results_df = results_df[header]
 	#Write it out to a file
-	results_df.to_csv("test.csv", index=False, sep="|", mode="w", header=header)
-	logger.info("Written to test.csv")
+	results_df.to_csv(args.output_file, index=False, sep="|", mode="w", header=header)
+	logger.info("Results written to {0}".format(args.output_file))
 	logger.info("All done.")
 
 def parse_arguments(args):
@@ -228,6 +219,7 @@ def parse_arguments(args):
 	parser = argparse.ArgumentParser(description="It's simple.")
 	#Required arguments
 	parser.add_argument('input_file', help='Path to input file on local drive')
+	parser.add_argument('output_file', help='Path to output file on local drive')
 	return parser.parse_args(args)
 
 if __name__ == "__main__":
