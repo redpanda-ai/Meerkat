@@ -109,15 +109,17 @@ def clean_dataframe(my_df, renames):
 
 def get_rnn_merchant(my_df):
 	"""This is a stub implementation, no multi-class RNN exists."""
+	#FIXME
 	#from meerkat.classification.load_model import get_tf_rnn_by_path
 	#merchant_rnn = get_tf_rnn_by_path("rnn/bilstm.ckpt", "rnn/w2i.json")
 	#predicted = merchant_rnn([{"Description": my_df["description"]}])[0]["Predicted"]
-	predicted = "RNN_MERCHANT FIXME"
+	predicted = "RNN_MERCHANT_FIXME"
 	return predicted
 
 def get_store_number(my_df):
 	"""This is a stub implementation, no multi-class RNN exists."""
-	predicted = "STORE_NUMBER FIXME"
+	#FIXME
+	predicted = "RNN_STORE_NUMBER_FIXME"
 	return predicted
 
 def get_results_df_from_web_service(my_web_request, container):
