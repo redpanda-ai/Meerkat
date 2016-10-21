@@ -23,7 +23,7 @@ def get_renames(rename_type):
 		return {
 			"row_id": "transaction_id",
 			"at_transactiondescription2": "description",
-			"at_transactioncity": "city_or_phone",
+			"at_transactioncity": "mystery_field",
 			"at_transactionstateprovince": "state",
 			"at_transactioncountrycode": "country",
 			"at_transactionpostalcode1": "postal_code"
@@ -32,7 +32,7 @@ def get_renames(rename_type):
 		return {
 			"row_id": "transaction_id",
 			"card_acpt_merchant_name": "description",
-			"at_transactioncity": "city_or_phone",
+			"at_transactioncity": "mystery_field",
 			"at_transactionstateprovince": "state",
 			"at_transactioncountrycode": "country",
 			"at_transactionpostalcode1": "postal_code"
@@ -93,18 +93,19 @@ def clean_dataframe(my_df, renames):
 	phone_regex = "^[0-9][0-9\-]*$"
 	website_regex = "^.*\.com.*$"
 	city_regex = "^[a-z ]+.*$"
-	get_phone = lambda x: x["city_or_phone"] \
-		if re.match(phone_regex, x["city_or_phone"]) else ""
-	get_website = lambda x: x["city_or_phone"] \
-		if re.match(website_regex, x["city_or_phone"], flags=re.IGNORECASE) else ""
-	get_city = lambda x: x["city_or_phone"] \
-		if ( re.match(city_regex, x["city_or_phone"], flags=re.IGNORECASE) and not re.match(website_regex, x["city_or_phone"], flags=re.IGNORECASE) ) else ""
+	#split 'mystery_field' into phone, website, or city
+	get_phone = lambda x: x["mystery_field"] \
+		if re.match(phone_regex, x["mystery_field"]) else ""
+	get_website = lambda x: x["mystery_field"] \
+		if re.match(website_regex, x["mystery_field"], flags=re.IGNORECASE) else ""
+	get_city = lambda x: x["mystery_field"] \
+		if ( re.match(city_regex, x["mystery_field"], flags=re.IGNORECASE) and not re.match(website_regex, x["mystery_field"], flags=re.IGNORECASE) ) else ""
 	#Add some columns
 	my_df["phone_number"] = my_df.apply(get_phone, axis=1)
 	my_df["city"] = my_df.apply(get_city, axis=1)
 	my_df["website_url"] = my_df.apply(get_website, axis=1)
 	#Remove processed column
-	del my_df["city_or_phone"]
+	del my_df["mystery_field"]
 
 def get_rnn_merchant(my_df):
 	"""This is a stub implementation, no multi-class RNN exists."""
@@ -157,7 +158,7 @@ def main_process(args=None):
 	renames = get_renames(file_type)
 	#2. Rename certain columns in the dataframe
 	my_df.rename(index=str, columns=renames, inplace=True)
-	#3. Remove unneeded columns, split city_or_phone
+	#3. Remove unneeded columns, split mystery_field
 	clean_dataframe(my_df, renames)
 	#4. Use the RNN to grab a few more columns
 	my_df["RNN_merchant_name"] = my_df.apply(get_rnn_merchant, axis=1)
