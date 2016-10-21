@@ -107,6 +107,7 @@ def clean_dataframe(my_df, renames):
 	del my_df["city_or_phone"]
 
 def get_rnn_merchant(my_df):
+	"""This is a stub implementation, no multi-class RNN exists."""
 	#from meerkat.classification.load_model import get_tf_rnn_by_path
 	#merchant_rnn = get_tf_rnn_by_path("rnn/bilstm.ckpt", "rnn/w2i.json")
 	#predicted = merchant_rnn([{"Description": my_df["description"]}])[0]["Predicted"]
@@ -114,16 +115,9 @@ def get_rnn_merchant(my_df):
 	return predicted
 
 def get_store_number(my_df):
-	#merchant_rnn = get_tf_rnn_by_path("rnn/bilstm.ckpt", "rnn/w2i.json")
-	#predicted = merchant_rnn([{"Description": my_df["description"]}])[0]["Predicted"]
+	"""This is a stub implementation, no multi-class RNN exists."""
 	predicted = "STORE_NUMBER FIXME"
 	return predicted
-
-def get_blank_transaction_dict():
-	return {
-		"row_id": [], "merchant_name": [], "address": [], "city": [],
-		"state": [], "zip_code": [], "phone": [], "longitude": [],
-		"latitude": [], "website_url": [], "store_number": [] }
 
 def get_results_df_from_web_service(my_web_request, container):
 	"""Sends a single web request dict to the web service, then converts the
@@ -134,47 +128,51 @@ def get_results_df_from_web_service(my_web_request, container):
 		logger.critical("There is no data in the response, the response is {0}".format(response))
 		sys.exit()
 	response_data = json.loads(response.text)["data"]
-	my_results = get_blank_transaction_dict()
+	#Create a blank dictionary of results, each value needs to be a list
+	my_results = {
+		"row_id": [], "merchant_name": [], "address": [], "city": [],
+		"state": [], "zip_code": [], "phone": [], "longitude": [],
+		"latitude": [], "website_url": [], "store_number": [] }
 	my_keys = my_results.keys()
+	#Append an element to for each key in each transaction
 	for transaction in response_data["transaction_list"]:
 		for key in my_keys:
 			my_results[key].append(transaction[key])
-
 	#Add non-transaction_list values
 	my_results["cobrand_id"] = 0
 	my_results["user_id"] = 0
 	my_results["container"] = container
-
 	#Convert the dictionary to a dataframe
 	my_df = pd.DataFrame.from_dict(my_results)
-	#logger.info("my_df:\n{0}".format(my_df))
 	return my_df
-	#sys.exit()
 
 def main_process(args=None):
 	"""Opens up the input file and loads it into a dataframe"""
 	if args is None:
 		args = parse_arguments(sys.argv[1:])
 	logger.info("Starting main process")
+	#1. Get the input data
 	my_df = preprocess_dataframe(args)
 	file_type = get_file_type(args)
 	renames = get_renames(file_type)
+	#2. Rename certain columns in the dataframe
 	my_df.rename(index=str, columns=renames, inplace=True)
+	#3. Remove unneeded columns, split city_or_phone
 	clean_dataframe(my_df, renames)
+	#4. Use the RNN to grab a few more columns
 	my_df["RNN_merchant_name"] = my_df.apply(get_rnn_merchant, axis=1)
 	my_df["store_number"] = my_df.apply(get_store_number, axis=1)
-	#the web service input requires ledger_entry, amount, and container"
 
-	#make a payload, convert the dataframe
 	amount, ledger_entry, container, my_date = 10, "debit", "bank", "2016-01-01"
 	if file_type == "credit":
 		container = "card"
+	#5. Transform the dataframe to a record-oriented dictionary
 	my_transactions = my_df.to_dict(orient="records")
 
-	transaction_max = 100
-	transaction_count = 0
-	result_dfs = []
+	transaction_max, transaction_count, result_dfs = 100, 0, []
 	my_web_request = None
+	#6. Create batches of transactions to send as a data payload, and issue web service
+	#requests.
 	for transaction in my_transactions:
 		#Create a new batch
 		if transaction_count % transaction_max == 0:
@@ -196,23 +194,22 @@ def main_process(args=None):
 	#Close the final batch of transactions
 	if my_web_request is not None:
 		result_dfs.append(get_results_df_from_web_service(my_web_request, container))
-		#web_requests.append(my_web_request.copy())
 
+	#7. Merge all results into a single dataframe
 	results_df = pd.concat(result_dfs, ignore_index=True)
 	logger.info("All Results: {0}".format(results_df.shape))
 	header = [ "row_id", "merchant_name", "address", "city", "state", "zip_code",
 		"phone", "longitude", "latitude", "website_url", "store_number" ]
+	#8. Drop extraneous columns
 	df_column_list = list(results_df.columns.values)
 	for column in df_column_list:
 		if column not in header:
 			del results_df[column]
-
-	#Re-order everything
+	#9. Re-order everything
 	results_df = results_df[header]
-	#Write it out to a file
+	#10. Write out the results into a delimited file
 	results_df.to_csv(args.output_file, index=False, sep="|", mode="w", header=header)
 	logger.info("Results written to {0}".format(args.output_file))
-	logger.info("All done.")
 
 def parse_arguments(args):
 	"""Correctly parses command line arguments for the program"""
@@ -223,6 +220,8 @@ def parse_arguments(args):
 	return parser.parse_args(args)
 
 if __name__ == "__main__":
+	logger.info("Starting main_process.")
 	main_process()
+	logger.info("main_process complete.")
 
 
