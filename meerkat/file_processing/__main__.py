@@ -216,6 +216,9 @@ def main_process(args=None):
 		if column not in header:
 			del results_df[column]
 
+	#Re-order everything
+	results_df = results_df[header]
+	#Write it out to a file
 	results_df.to_csv("test.csv", index=header, sep="|", mode="w", header=header)
 	logger.info("Written to test.csv")
 	#logger.info("All Responses: {0}".format(result_dfs))
