@@ -35,8 +35,7 @@ class BilstmTaggerTests(unittest.TestCase):
 		]
 
 		for key, value in zip(input_trans, output_trans):
-			trans = {"DESCRIPTION": key}
-			self.assertEqual(bilstm.tokenize(trans), value.split())
+			self.assertEqual(bilstm.tokenize(key), value.split())
 
 	def test_get_token_tag_pairs(self):
 		"""test if get_tags produces tag for each token correctly"""
@@ -100,9 +99,16 @@ class BilstmTaggerTests(unittest.TestCase):
 				"LOCALITY": "city",
 				"STORE_NUMBER": "store_number",
 				"PHONE_NUMBER": "phone_number",
-				"ADDRESS": "address",
 				"STATE": "state"
-			}
+			},
+			"tag_map": {
+				"0": "background",
+				"1": "merchant",
+				"2": "store_number",
+				"3": "city",
+				"4": "state",
+				"5": "phone_number"
+			},
 		}
 		fixture_config = bilstm.validate_config(fixture_config)
 		fixture_config["w2i"] = {"_UNK": 0, "amazon": 1, "prime": 2, "purchase": 3}

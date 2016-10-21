@@ -68,6 +68,8 @@ def beautify(item, config):
 	for tag, tokens in dict(dict_output).items():
 		item["predicted_" + tag] = ", ".join(tokens)
 
+	print(item)
+
 	del item["Predicted"]
 
 	return item
