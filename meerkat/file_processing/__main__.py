@@ -121,7 +121,7 @@ def get_rnn_merchant(my_df):
 	merchant = my_df["description"]
 	tagged = MERCHANT_RNN([{"Description": merchant}])
 	logger.info(tagged)
-	if merchant in tagged[0]["Predicted"]:
+	if "merchant" in tagged[0]["Predicted"]:
 		try:
 			tag = re.match(re.escape(tagged[0]["Predicted"]["merchant"]), my_df["description"], re.IGNORECASE)
 			tag = merchant[tag.start():tag.end()]
