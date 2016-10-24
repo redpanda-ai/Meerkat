@@ -6,30 +6,47 @@ import pandas as pd
 from nose_parameterized import parameterized
 
 from meerkat.longtail import bilstm_tagger as bilstm
+from tests.longtail.fixture import bilstm_tagger_fixture
 
 class BilstmTaggerTests(unittest.TestCase):
 	"""Unittest class for bilstm_tagger"""
 
-	@parameterized.expand([
-		({"Description": "Debit PIN Purchase ISLAND OF GOLD SUPERMARFRESH MEADOWSNY", "Tagged_merchant_string": "ISLAND OF GOLD SUPERMAR"},
-			["background", "background", "background", "merchant", "merchant", "merchant", "merchant", "background"]),
-		({"Description": "76", "Tagged_merchant_string": "76"},  ["merchant"]),
-		({"Description": "PAYMENT THANK YOU", "Tagged_merchant_string": ""}, ["background", "background", "background"]),
-		({"Description": "PAYMENT THANK YOU", "Tagged_merchant_string": "Null"}, ["background", "background", "background"]),
-		({"Description": "123 THAI FOOD OAK          HARBOR WA~~08888~~120123052189~~77132~~0~~~0079", "Tagged_merchant_string": "123 THAI FOOD"},
-			["merchant", "merchant", "merchant", "background", "background", "background"]),
-		({"Description": "COX CABLE        ONLINE PMT ***********6POS", "Tagged_merchant_string": "COX CABLE"},
-			["merchant", "merchant", "background", "background", "background"]),
-		({"Description": "AMERICAN EXPRESS DES:SETTLEMENT ID:5049791080                INDN:SUBWAY #29955049791080  CO ID:1134992250 CCD", "Tagged_merchant_string": "AMERICAN EXPRESS, SUBWAY"},
-			["merchant", "merchant", "background", "background", "merchant", "background", "background", "background", "background"]),
-		({"Description": "AA MILES BY POINTS     POINTS.COM    IL", "Tagged_merchant_string": "AA, Points.com"},
-			["merchant", "background", "background", "background", "merchant", "background"])
-	])
-	def test_get_tags(self, description, expected_tags):
+	def test_tokenize(self):
+		"""Test is transactions are properly tokenized"""
+
+		input_trans = [
+			"1227WENDY'S VALDOSTA GA                  0XXXXXXXXXXXXXXXX",
+			"9668491207Staples, Inc BURTON MI               0XXXXXXXXXXXXXXXX",
+			"1218BP#9493560CIRCLE K 2708 ORLANDO FL   0XXXXXXXXXXXXXXXX",
+			"5288941207TARGET T2760 TARGET T2 OXNARD CA     0XXXXXXXXXXXXXXXX",
+			"1223WM SUPERC Wal-Mart Sup PALMDALE CA   0XXXXXXXXXXXXXXXX",
+			"1210AmazonPrime Membersh amzn.com/prme NV0XXXXXXXXXXXXXXXX",
+			"123 THAI FOOD OAK          HARBOR WA~~08888~~120123052189~~77132~~0~~~0079"
+		]
+
+		output_trans = [
+			"1227 WENDY'S VALDOSTA GA 0 XXXXXXXXXXXXXXXX",
+			"9668491207 Staples, Inc BURTON MI 0 XXXXXXXXXXXXXXXX",
+			"1218 BP #9493560 CIRCLE K 2708 ORLANDO FL 0 XXXXXXXXXXXXXXXX",
+			"5288941207 TARGET T 2760 TARGET T 2 OXNARD CA 0 XXXXXXXXXXXXXXXX",
+			"1223 WM SUPERC Wal-Mart Sup PALMDALE CA 0 XXXXXXXXXXXXXXXX",
+			"1210 AmazonPrime Membersh amzn.com/prme NV 0 XXXXXXXXXXXXXXXX",
+			"123 THAI FOOD OAK HARBOR WA ~~08888~~120123052189~~77132~~0~~~0079"
+		]
+
+		for key, value in zip(input_trans, output_trans):
+			self.assertEqual(bilstm.tokenize(key), value.split())
+
+	def test_get_token_tag_pairs(self):
 		"""test if get_tags produces tag for each token correctly"""
-		config = {"max_tokens": 35}
-		tokens, tags = bilstm.get_tags(config, description)
-		self.assertEqual(tags, expected_tags)
+
+		config = bilstm_tagger_fixture.get_config()
+		transactions = bilstm_tagger_fixture.get_token_tag_pairs_input()
+
+		for trans in transactions:
+			tokens, tags = bilstm.get_token_tag_pairs(config, trans[0])
+			self.assertEqual(tags, trans[1])
+			self.assertEqual(tokens, trans[2])
 
 	@parameterized.expand([
 		({"tag_map": {"0": "background", "1": "merchant"}}, ["merchant", "background", "merchant"], [[0,1],[1,0],[0,1]]),
@@ -42,7 +59,7 @@ class BilstmTaggerTests(unittest.TestCase):
 
 	def test_validate_config(self):
 		"""make sure special chars have indices"""
-		fixture_config = {"alphabet": "abcdefghijklmnopqrstuvwxyz0123456789,;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}"}
+		fixture_config = bilstm_tagger_fixture.get_config()
 		result = bilstm.validate_config(fixture_config)
 		self.assertEqual(result["c2i"]["_UNK"],  0)
 		self.assertEqual(result["c2i"]["<w>"], 1)
@@ -68,6 +85,7 @@ class BilstmTaggerTests(unittest.TestCase):
 		self.assertEqual(len(result_w2i.keys()), expected_w2i_length)
 		self.assertEqual(result_wembedding.shape, (expected_w2i_length, fixture_config["we_dim"]))
 
+
 	@parameterized.expand([
 		(["76"], ["merchant"], [[1, 36, 35 ,2], [0, 0, 0, 0]], [4, 0], [0]),
 		(["ama", "purchase"], None, [[1, 3, 15 ,3, 2, 0, 0, 0, 0, 0],[1, 18, 23, 20, 5, 10, 3, 21, 7, 2]], [5, 10], [0, 3])
@@ -76,7 +94,21 @@ class BilstmTaggerTests(unittest.TestCase):
 		"""test if tokens and chars got translated to indices properly"""
 		fixture_config = {
 			"alphabet": "abcdefghijklmnopqrstuvwxyz0123456789,;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}",
-			"tag_map": {"0": "background", "1": "merchant"}
+			"tag_column_map": {
+				"MERCHANT_NAME": "merchant",
+				"LOCALITY": "city",
+				"STORE_NUMBER": "store_number",
+				"PHONE_NUMBER": "phone_number",
+				"STATE": "state"
+			},
+			"tag_map": {
+				"0": "background",
+				"1": "merchant",
+				"2": "store_number",
+				"3": "city",
+				"4": "state",
+				"5": "phone_number"
+			},
 		}
 		fixture_config = bilstm.validate_config(fixture_config)
 		fixture_config["w2i"] = {"_UNK": 0, "amazon": 1, "prime": 2, "purchase": 3}

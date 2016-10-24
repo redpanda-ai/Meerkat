@@ -1,11 +1,22 @@
 {
 	"model_path": "",
-	"dataset": "meerkat/longtail/data.csv",
+	"dataset": "processed_credit.csv",
 	"alphabet": "abcdefghijklmnopqrstuvwxyz0123456789,;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}",
-	"embeddings": "",
+	"embeddings": "../embeddings/en.polyglot.txt",
+	"tag_column_map": {
+		"MERCHANT_NAME": "merchant",
+		"LOCALITY": "city",
+		"STORE_NUMBER": "store_number",
+		"PHONE_NUMBER": "phone_number",
+		"STATE": "state"
+	},
 	"tag_map": {
 		"0": "background",
-		"1": "merchant"
+		"1": "merchant",
+		"2": "store_number",
+		"3": "city",
+		"4": "state",
+		"5": "phone_number"
 	},
 	"noise_sigma": 0.2,
 	"activation": "tanh",
@@ -13,7 +24,6 @@
 	"max_tokens": 35,
 	"num_layers": 1,
 	"ce_dim": 100,
-	"seed": 1512141834,
 	"profile_session": false,
 	"use_cpu": true,
 	"we_dim": 64,
