@@ -107,20 +107,37 @@ def clean_dataframe(my_df, renames):
 	#Remove processed column
 	del my_df["mystery_field"]
 
+def hasNumbers(inputString):
+	"""Check if input string has number"""
+	return any(char.isdigit() for char in inputString)
+
 def get_rnn_merchant(my_df):
 	"""This is a stub implementation, no multi-class RNN exists."""
 	#FIXME
-	#from meerkat.classification.load_model import get_tf_rnn_by_path
-	#merchant_rnn = get_tf_rnn_by_path("rnn/bilstm.ckpt", "rnn/w2i.json")
-	#predicted = merchant_rnn([{"Description": my_df["description"]}])[0]["Predicted"]
-	predicted = "RNN_MERCHANT_FIXME"
-	return predicted
+	merchant = my_df["description"]
+	from meerkat.classification.load_model import get_tf_rnn_by_path
+	model_path = "meerkat/classification/models/rnn_model/"
+	merchant_rnn = get_tf_rnn_by_path(model_path + "bilstm.ckpt", model_path + "w2i.json")
+	tagged = merchant_rnn([{"Description": merchant}])
+	try:
+		tag = re.match(re.escape(tagged[0]["Predicted"]["merchant"]), my_df["description"], re.IGNORECASE)
+		tag = merchant[tag.start():tag.end()]
+	except:
+		return tagged[0]["Predicted"]["merchant"]
+	return tag
 
 def get_store_number(my_df):
 	"""This is a stub implementation, no multi-class RNN exists."""
 	#FIXME
-	predicted = "RNN_STORE_NUMBER_FIXME"
-	return predicted
+	#store_number_rnn = get_tf_rnn_by_path("rnn/bilstm.ckpt", "rnn/w2i.json")
+	desc = my_df["description"]
+	try:
+		merchant_removed = re.sub(re.escape(my_df["RNN_merchant_name"]), "", desc, flags=re.IGNORECASE)
+	except:
+		return ""
+
+	output = [t for t in merchant_removed.split() if not t.isalpha() and hasNumbers(t)]
+	return " ".join(output)
 
 def get_results_df_from_web_service(my_web_request, container):
 	"""Sends a single web request dict to the web service, then converts the
