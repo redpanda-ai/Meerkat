@@ -1,0 +1,50 @@
+{
+	"cobrand_id" : 1234,
+	"user_id" : 2345,
+	"container" : "card",
+	"debug" : false,
+	"transaction_list" : [
+        {
+            "RNN_merchant_name": "MCDONALD'S",
+            "amount": 10,
+            "city": "ERIE",
+            "country": "US",
+            "date": "2016-10-14",
+            "description": "MCDONALD'S M4361 OF PA   ERIE         PA",
+            "ledger_entry": "debit",
+            "phone_number": "",
+            "postal_code": "16510",
+            "state": "PA",
+            "store_number": "M4361",
+            "transaction_id": 45431
+        },
+        {
+            "RNN_merchant_name": "U-HAUL",
+            "amount": 10,
+            "city": "PHILADELPHIA",
+            "country": "US",
+            "date": "2016-10-14",
+            "description": "U-HAUL CT CHELTEHAM      PHILADELPHIA PA",
+            "ledger_entry": "debit",
+            "phone_number": "",
+            "postal_code": "19138",
+            "state": "PA",
+            "store_number": "",
+            "transaction_id": 76554
+        },
+        {
+            "RNN_merchant_name": "DOLRTREE",
+            "amount": 10,
+            "city": "LEOMINSTER",
+            "country": "US",
+            "date": "2016-10-14",
+            "description": "DOLRTREE 4474 00044743   LEOMINSTER   MA",
+            "ledger_entry": "debit",
+            "phone_number": "",
+            "postal_code": "1453",
+            "state": "MA",
+            "store_number": "4474 00044743",
+            "transaction_id": 71755
+        }
+	]
+}
