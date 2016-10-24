@@ -252,7 +252,7 @@ class WebConsumerDatadeal():
 
 	def __enrich_transaction(self, *argv):
 		"""Enriches the transaction with additional data"""
-		
+
 		decision = argv[0]
 		transaction = argv[1]
 		hit_fields = argv[2]
@@ -396,7 +396,7 @@ class WebConsumerDatadeal():
 		"""Split transactions to search in agg index or factual index"""
 		data_to_search_in_agg, data_to_search_in_factual = [], []
 		for trans in data["transaction_list"]:
-			if "country" in trans and trans["country"] not in ["US", "USA"]:
+			if trans.get("country", "") not in ["", "US", "USA"]:
 				continue
 			cnn_merchant = trans['CNN']['label']
 			if cnn_merchant != '' and cnn_merchant in self.merchant_name_map:
@@ -411,8 +411,8 @@ class WebConsumerDatadeal():
 		for transaction in data["transaction_list"]:
 			transaction["container"] = data["container"]
 		data_to_search_in_agg, data_to_search_in_factual = self.__choose_agg_or_factual(data)
-		search_agg_in_batch = self.params.get("search_agg_in_batch", True)
-		search_factual_in_batch = self.params.get("search_factual_in_batch", True)
+		search_agg_in_batch = self.params.get("search_agg_in_batches", True)
+		search_factual_in_batch = self.params.get("search_factual_in_batches", True)
 		if search_agg_in_batch:
 			data_to_search_in_agg = search_agg_index(data_to_search_in_agg)
 		else:
@@ -425,8 +425,100 @@ class WebConsumerDatadeal():
 				data_to_search_in_factual[i] = self.__search_factual_index([data_to_search_in_factual[i]])
 		return data_to_search_in_agg, data_to_search_in_factual
 
+	def enrich_with_search_fields(self, trans, agg_or_factual, map_input_fields, fields_with_same_name):
+		"""Enrich transaction with fields in search"""
+		# Override input fields by search
+		for field in map_input_fields:
+			search_field = map_input_fields[field]
+			if trans[agg_or_factual].get(search_field, "") != "":
+				trans[field] = trans[agg_or_factual][search_field]
+
+		# Add search fields to transaction
+		for field in fields_with_same_name:
+			if trans[agg_or_factual].get(field, "") != "":
+				trans[field] = trans[agg_or_factual].get(field, "")
+
+	def ensure_output_schema(self, transactions, debug):
+		"""Merge fields and clean output to proper schema"""
+		for trans in transactions:
+			# In debug mode, keep all input fields
+			if debug:
+				input_fields = ["city", "state", "country", "postal_code", "RNN_merchant_name",
+					"store_number", "phone_number", "website_url"]
+				trans["input"] = {}
+				for field in input_fields:
+					trans["input"][field] = trans.get(field, "")
+
+			# Enrich transaction with merchant name
+			if trans.get("CNN", "") != "" and trans["CNN"].get("label", "") != '':
+				trans["merchant_name"] = trans["CNN"]["label"]
+			elif trans.get("agg_search", "") != "" and trans["agg_search"].get("list_name") != "":
+				trans["merchant_name"] = trans["agg_search"]["list_name"]
+			elif trans.get("factual_search", "") != "" and trans["factual_search"].get("merchant_name") != "":
+				trans["merchant_name"] = trans["factual_search"]["merchant_name"]
+			else:
+				trans["merchant_name"] = trans["RNN_merchant_name"]
+
+			# Enrich transaction with fields found in search
+			if "agg_search" in trans:
+				# Only output store number found in agg search
+				if trans["agg_search"].get("store_number", "") == "":
+					trans["store_number"] = ""
+
+				same_name_for_agg_and_input = ["city", "state", "phone_number", "longitude",
+					"latitude", "store_number", "address"]
+				map_input_fields_to_agg = {
+					"postal_code": "zip_code",
+					"website_url": "source_url"
+				}
+				self.enrich_with_search_fields(trans, "agg_search",
+					map_input_fields_to_agg, same_name_for_agg_and_input)
+			elif "factual_search" in trans:
+				same_name_for_factual_and_input = ["city", "state", "phone_number", "longitude",
+					"latitude", "postal_code"]
+				map_input_fields_to_factual = {
+					"address": "street",
+					"website_url": "website"
+				}
+				self.enrich_with_search_fields(trans, "factual_search",
+					map_input_fields_to_factual, same_name_for_factual_and_input)
+
+			# Ensure these fields exist in output
+			output_fields = ["city", "state", "address", "longitude", "latitude",
+				"website_url", "store_number", "phone_number", "postal_code",
+				"transaction_id"]
+			map_fields_for_output = {
+				"phone_number": "phone",
+				"postal_code": "zip_code",
+				"transaction_id": "row_id"
+			}
+			for field in output_fields:
+				if field in map_fields_for_output:
+					output_field = map_fields_for_output[field]
+					trans[output_field] = trans.get(field, "")
+					trans.pop(field, None)
+				else:
+					trans[field] = trans.get(field, "")
+
+			# Remove fields not in output schema
+			if debug is False:
+				fields_to_remove = ["description", "amount", "date", "ledger_entry", "CNN",
+					"container", "RNN_merchant_name", "Agg_Name", "factual_search",
+					"agg_search", "merchant_score", "country", "match_found"]
+				for field in fields_to_remove:
+					trans.pop(field, None)
+			else:
+				trans['CNN']['merchant_score'] =  trans.get("merchant_score", "0.0")
+				trans['CNN'].pop("threshold", None)
+				trans['CNN'].pop("category", None)
+				fields_to_remove = ["amount", "date", "ledger_entry", "container",
+					"merchant_score", "country", "match_found"]
+				for field in fields_to_remove:
+					trans.pop(field, None)
+
 	def classify(self, data, optimizing=False):
 		"""Classify a set of transactions"""
+		debug = data.get("debug", False)
 
 		# Apply Merchant CNN
 		self.__apply_merchant_cnn(data)
@@ -435,7 +527,7 @@ class WebConsumerDatadeal():
 		self.__search_in_agg_or_factual(data)
 
 		# Process enriched data to ensure output schema
-		#self.ensure_output_schema(data["transaction_list"])
+		self.ensure_output_schema(data["transaction_list"], debug)
 
 		return data
 
