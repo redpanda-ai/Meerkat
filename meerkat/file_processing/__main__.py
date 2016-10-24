@@ -12,6 +12,10 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 #from meerkat.various_tools import load_params
+from meerkat.classification.load_model import get_tf_rnn_by_path
+MODEL_PATH = "meerkat/classification/models/rnn_model/"
+#MODEL_PATH = "rnn/"
+MERCHANT_RNN = get_tf_rnn_by_path(MODEL_PATH + "bilstm.ckpt", MODEL_PATH + "w2i.json")
 
 logging.config.dictConfig(yaml.load(open('meerkat/file_processing/logging.yaml', 'r')))
 logger = logging.getLogger('basic')
@@ -115,15 +119,16 @@ def get_rnn_merchant(my_df):
 	"""This is a stub implementation, no multi-class RNN exists."""
 	#FIXME
 	merchant = my_df["description"]
-	from meerkat.classification.load_model import get_tf_rnn_by_path
-	model_path = "meerkat/classification/models/rnn_model/"
-	merchant_rnn = get_tf_rnn_by_path(model_path + "bilstm.ckpt", model_path + "w2i.json")
-	tagged = merchant_rnn([{"Description": merchant}])
-	try:
-		tag = re.match(re.escape(tagged[0]["Predicted"]["merchant"]), my_df["description"], re.IGNORECASE)
-		tag = merchant[tag.start():tag.end()]
-	except:
-		return tagged[0]["Predicted"]["merchant"]
+	tagged = MERCHANT_RNN([{"Description": merchant}])
+	logger.info(tagged)
+	if merchant in tagged[0]["Predicted"]:
+		try:
+			tag = re.match(re.escape(tagged[0]["Predicted"]["merchant"]), my_df["description"], re.IGNORECASE)
+			tag = merchant[tag.start():tag.end()]
+		except:
+			return tagged[0]["Predicted"]["merchant"]
+	else:
+		return ""
 	return tag
 
 def get_store_number(my_df):
