@@ -28,7 +28,7 @@ def basic_search(list_name):
 	else:
 		logging.warning('The number of hits is zero')
 
-def create_must_query(list_name, city, state, zip_code):
+def create_must_query(list_name, city, state, zip_code, params):
 	"""Create a must query"""
 	must_query = []
 	if len(list_name) == 1 and list_name[0] != '':
@@ -46,18 +46,18 @@ def create_must_query(list_name, city, state, zip_code):
 	if state != '':
 		must_query.append({'match': {'state': state}})
 	if zip_code != '':
-		zip_query = {'zip_code': {'query': zip_code, 'fuzziness': 'AUTO', 'boost': 2}}
+		zip_query = {'zip_code': {'query': zip_code, 'fuzziness': 'AUTO', 'boost': params['boost']['zip_code']}}
 		must_query.append({'match': zip_query})
 	return must_query
 
-def create_should_query(store_number, phone_number):
+def create_should_query(store_number, phone_number, params):
 	"""Create a should query"""
 	should_query = []
 	if store_number != '':
-		store = {'store_number': {'query': store_number, 'fuzziness': 'AUTO', 'boost': 3}}
+		store = {'store_number': {'query': store_number, 'fuzziness': 'AUTO', 'boost': params['boost']['store_number']}}
 		should_query.append({'match': store})
 	if phone_number != '':
-		phone = {'phone_number': {'query': phone_number, 'fuzziness': 'AUTO', 'boost': 2}}
+		phone = {'phone_number': {'query': phone_number, 'fuzziness': 'AUTO', 'boost': params['boost']['phone_number']}}
 		should_query.append({'match': phone})
 	return should_query
 
@@ -78,7 +78,7 @@ def create_bool_query(must_query, should_query):
 	}
 	return bool_query
 
-def process_query_result(trans, query_result):
+def process_query_result(trans, query_result, params):
 	"""Process the query hits based on z scores"""
 	hits_total = query_result['hits']['total']
 
@@ -90,7 +90,7 @@ def process_query_result(trans, query_result):
 	# 1 hit
 	if hits_total == 1:
 		logging.critical('The number of hits is 1')
-		if query_result['hits']['hits'][0]['_score'] >= 1.0:
+		if query_result['hits']['hits'][0]['_score'] >= params['threshold']['raw_score']:
 			return query_result['hits']['hits'][0]['_source']
 		else:
 			return None
@@ -102,7 +102,12 @@ def process_query_result(trans, query_result):
 		logging.critical('The number of hits is 2')
 		first, second = query_result['hits']['hits'][0], query_result['hits']['hits'][1]
 		first_store = first['_source'].get('store_number', '')
+		if first_store.startswith('T'):
+			first_store = first_store[1:]
+
 		second_store = second['_source'].get('store_number', '')
+		if second_store.startswith('T'):
+			second_store = second_store[1:]
 
 		if first_store != '' and des.find(first_store) != -1:
 			logging.critical('Find a store number in description')
@@ -111,7 +116,7 @@ def process_query_result(trans, query_result):
 			logging.critical('Find a store number in description')
 			return second['_source']
 
-		if first['_score'] - second['_score'] >= 0.1:
+		if first['_score'] - second['_score'] >= params['threshold']['z_score']:
 			return first['_source']
 		else:
 			return None
@@ -124,6 +129,8 @@ def process_query_result(trans, query_result):
 		scores.append(hit['_score'])
 
 		store_number = hit['_source'].get('store_number', '')
+		if store_number.startswith('T'):
+			store_number = store_number[1:]
 		if store_number.find('-') != -1:
 			store_number = store_number.split('-')[0]
 		if store_number != '' and des.find(store_number) != -1:
@@ -131,7 +138,7 @@ def process_query_result(trans, query_result):
 			return hit['_source']
 
 	z_scores = zscore(scores)
-	if z_scores[0] - z_scores[1] >= 0.1:
+	if z_scores[0] - z_scores[1] >= params['threshold']['z_score']:
 		logging.info('This query has a top hit based on z scores')
 		return hits_list[0]['_source']
 
@@ -153,8 +160,12 @@ def enrich_transaction(trans, hit):
 		#pprint(trans)
 	return trans
 
-def search_agg_index(data):
+def search_agg_index(data, params=None):
 	"""Enrich transactions with agg index"""
+	if params is None:
+		params = json.loads(open('./meerkat/web_service/config/hyperparameters/search_agg_index_config.json').read())
+	#pprint(params)
+
 	requests = []
 	header = {'index': index_name, 'doc_type': index_type}
 
@@ -163,7 +174,7 @@ def search_agg_index(data):
 		logging.info('The transaction is:')
 		#pprint(trans)
 
-		list_name = trans.get('Agg_Name', '')
+		list_name = trans.get('Agg_Name', [])
 		if len(list_name) == 0 or list_name[0] == '':
 			logging.critical('A transaction with valid agg name is required, skip this one')
 			continue
@@ -171,8 +182,8 @@ def search_agg_index(data):
 		city, state, zip_code = trans.get('city', ''), trans.get('state', ''), trans.get('postal_code', '')
 		store_number, phone_number = trans.get('store_number', ''), trans.get('phone_number', '')
 
-		must_query = create_must_query(list_name, city, state, zip_code)
-		should_query = create_should_query(store_number, phone_number)
+		must_query = create_must_query(list_name, city, state, zip_code, params)
+		should_query = create_should_query(store_number, phone_number, params)
 		bool_query = create_bool_query(must_query, should_query)
 
 		logging.info('The query for this transaction is:')
@@ -182,7 +193,7 @@ def search_agg_index(data):
 
 		result = es.msearch(body=requests)['responses'][0]
 		#pprint(result)
-		hit = process_query_result(trans, result)
+		hit = process_query_result(trans, result, params)
 		enriched_trans = enrich_transaction(trans, hit)
 		requests = []
 
