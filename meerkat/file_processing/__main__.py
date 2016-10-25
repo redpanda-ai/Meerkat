@@ -57,7 +57,7 @@ def get_file_type(args):
 	else:
 		logger.error("Cannot identify file type for {0}, aborting".format(args.file_name))
 		sys.exit()
-	#logger.info("File type is {0}".format(file_type))
+	logger.info("File type is {0}".format(file_type))
 	return file_type
 
 def preprocess_dataframe(args):
@@ -65,7 +65,8 @@ def preprocess_dataframe(args):
 	kwargs = {
 		#"quoting": csv.QUOTE_NONE,
 		"encoding": "utf-8", "sep": "|", "error_bad_lines": True,
-		"warn_bad_lines": True, "chunksize": 1, "na_filter": False, "quotechar": '"'
+		"warn_bad_lines": True, "chunksize": 1, "na_filter": False
+		#"quotechar": '"'
 	}
 	#We don't really need the entire file get 1 row from the first chunk
 	reader = pd.read_csv(args.input_file, **kwargs)
@@ -91,7 +92,7 @@ def clean_dataframe(my_df, renames):
 	#Remove unused columns
 	for column in header_names:
 		if column not in reverse_renames:
-			#logger.info("Removing superflous column {0}".format(column))
+			logger.info("Removing superflous column {0}".format(column))
 			del my_df[column]
 	#lambda functions
 	phone_regex = "^[0-9][0-9\-]*$"
@@ -172,7 +173,7 @@ def get_results_df_from_web_service(my_web_request, container):
 		"latitude": [], "website_url": [], "store_number": [] }
 	my_keys = my_results.keys()
 	#Append an element to for each key in each transaction
-	#logger.info(response_data)
+	logger.info(response_data)
 	for transaction in response_data["transaction_list"]:
 		for key in my_keys:
 			my_results[key].append(transaction[key])
@@ -216,7 +217,7 @@ def main_process(args=None):
 		if transaction_count % transaction_max == 0:
 			#Append existing batch to web_requests
 			if my_web_request is not None:
-				#logger.info("Transaction count {0}".format(transaction_count))
+				logger.info("Transaction count {0}".format(transaction_count))
 				result_dfs.append(get_results_df_from_web_service(my_web_request, container))
 			#Create a new batch
 			my_web_request = { "cobrand_id": 0, "user_id": 0, "container": container,
@@ -235,7 +236,7 @@ def main_process(args=None):
 
 	#7. Merge all results into a single dataframe
 	results_df = pd.concat(result_dfs, ignore_index=True)
-	#logger.info("All Results: {0}".format(results_df.shape))
+	logger.info("All Results: {0}".format(results_df.shape))
 	header = [ "row_id", "merchant_name", "address", "city", "state", "zip_code",
 		"phone", "longitude", "latitude", "website_url", "store_number" ]
 	#8. Drop extraneous columns
@@ -247,7 +248,7 @@ def main_process(args=None):
 	results_df = results_df[header]
 	#10. Write out the results into a delimited file
 	results_df.to_csv(args.output_file, index=False, sep="|", mode="w", header=header)
-	#logger.info("Results written to {0}".format(args.output_file))
+	logger.info("Results written to {0}".format(args.output_file))
 
 def parse_arguments(args):
 	"""Correctly parses command line arguments for the program"""

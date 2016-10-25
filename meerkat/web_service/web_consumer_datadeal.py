@@ -19,7 +19,7 @@ from scipy.stats.mstats import zscore
 from meerkat.various_tools import get_es_connection, string_cleanse, get_boosted_fields
 from meerkat.various_tools import synonyms, get_bool_query, get_qs_query
 from meerkat.classification.load_model import (load_scikit_model,
-	get_tf_cnn_by_path, get_tf_rnn_by_path)
+	get_tf_cnn_by_path)
 from meerkat.classification.auto_load import main_program as load_models_from_s3
 from meerkat.various_tools import load_params
 from meerkat.elasticsearch.search_agg_index import search_agg_index
@@ -356,11 +356,6 @@ class WebConsumerDatadeal():
 			enriched.append(trans_plus)
 
 		return enriched
-
-	def __apply_rnn(self, trans):
-		"""Apply RNN to transactions"""
-		classifier = self.models["rnn"]
-		return classifier(trans, doc_key="description", label_key="RNN_merchant_name")
 
 	def __apply_merchant_cnn(self, data):
 		"""Apply the merchant CNN to transactions"""
