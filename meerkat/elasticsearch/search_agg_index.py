@@ -171,7 +171,7 @@ def search_agg_index(data):
 	for i in range(len(data)):
 		trans = data[i]
 		logging.info('The transaction is:')
-		pprint(trans)
+		#pprint(trans)
 
 		list_name = trans.get('Agg_Name', [])
 		if len(list_name) == 0 or list_name[0] == '':
@@ -186,12 +186,12 @@ def search_agg_index(data):
 		bool_query = create_bool_query(must_query, should_query)
 
 		logging.info('The query for this transaction is:')
-		pprint(bool_query)
+		#pprint(bool_query)
 
 		requests.extend([header, bool_query])
 
 		result = es.msearch(body=requests)['responses'][0]
-		pprint(result)
+		#pprint(result)
 		hit = process_query_result(trans, result, params)
 		enriched_trans = enrich_transaction(trans, hit)
 		requests = []
