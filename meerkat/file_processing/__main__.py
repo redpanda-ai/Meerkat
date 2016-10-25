@@ -120,13 +120,12 @@ def get_rnn_merchant(my_df):
 	#FIXME
 	merchant = my_df["description"]
 	tagged = MERCHANT_RNN([{"Description": merchant}])
-	logger.info(tagged)
 	if "merchant" in tagged[0]["Predicted"]:
 		try:
-			tag = re.match(re.escape(tagged[0]["Predicted"]["merchant"]), my_df["description"], re.IGNORECASE)
+			tag = re.match(re.escape(tagged[0]["Predicted"]["merchant"][0]), my_df["description"], re.IGNORECASE)
 			tag = merchant[tag.start():tag.end()]
 		except:
-			return tagged[0]["Predicted"]["merchant"]
+			return tagged[0]["Predicted"]["merchant"][0]
 	else:
 		return ""
 	return tag
@@ -160,6 +159,7 @@ def get_results_df_from_web_service(my_web_request, container):
 		"latitude": [], "website_url": [], "store_number": [] }
 	my_keys = my_results.keys()
 	#Append an element to for each key in each transaction
+	logger.info(response_data)
 	for transaction in response_data["transaction_list"]:
 		for key in my_keys:
 			my_results[key].append(transaction[key])

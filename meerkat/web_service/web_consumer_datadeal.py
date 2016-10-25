@@ -89,15 +89,6 @@ class WebConsumerDatadeal():
 				self.models[key] = get_tf_cnn_by_path(models_dir + filename, \
 					label_maps_dir + filename[:-4] + 'json', gpu_mem_fraction=gmf)
 
-		# Get RNN Models
-		"""
-		rnn_model_path = "./meerkat/classification/models/rnn_model/bilstm.ckpt"
-		w2i_path = "./meerkat/classification/models/rnn_model/w2i.json"
-		if os.path.exists(rnn_model_path) is False:
-			logging.warning("Please run python3 -m meerkat.longtail.rnn_auto_load")
-		self.models["rnn"] = get_tf_rnn_by_path(rnn_model_path, w2i_path)
-		"""
-
 	def __get_query(self, transaction):
 		"""Create an optimized query"""
 
