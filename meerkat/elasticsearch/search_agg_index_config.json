@@ -1,0 +1,11 @@
+{
+	"boost": {
+		"zip_code": 2,
+		"store_number": 3,
+		"phone_number": 2
+	},
+	"threshold": {
+		"raw_score": 1.0,
+		"z_score": 0.1
+	}
+}
