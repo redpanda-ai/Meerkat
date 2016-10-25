@@ -199,7 +199,6 @@ def search_agg_index(data, params=None):
 
 if __name__ == '__main__':
 	data = json.loads(open('./agg_input.json').read())
-	config = {'a', 1}
 	search_agg_index(data)
 	with open('./agg_output.json', 'w') as outfile:
 		json.dump(data, outfile, indent=4, sort_keys=True)
