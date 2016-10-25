@@ -14,13 +14,15 @@ import logging
 import math
 import numpy as np
 import tensorflow as tf
+from itertools import groupby
+from collections import defaultdict
 
 from tensorflow.python.framework import ops
 from sklearn.externals import joblib
 from meerkat.various_tools import load_params
 from meerkat.classification.auto_load import main_program as load_models_from_s3
 from meerkat.classification.tensorflow_cnn import (validate_config, get_tensor, string_to_tensor)
-from meerkat.longtail.bilstm_tagger import trans_to_tensor, get_tags
+from meerkat.longtail.bilstm_tagger import trans_to_tensor, get_token_tag_pairs, tokenize
 from meerkat.longtail.bilstm_tagger import validate_config as bilstm_validate_config
 
 def load_scikit_model(model_name):
@@ -106,13 +108,16 @@ def get_tf_rnn_by_path(model_path, w2i_path, gpu_mem_fraction=False, model_name=
 		"""Apply RNN to transactions"""
 
 		for _, doc in enumerate(trans):
+
 			if tags:
 				# if tags, tag all tokens with get_tags for evaluation purposes
-				tran, label = get_tags(config, doc)
+				tran, label = get_token_tag_pairs(config, doc, doc_key=doc_key)
 				doc["ground_truth"] = label
 			else:
-				tran = doc[doc_key].lower().split()[0:config["max_tokens"]]
+				tran = tokenize(doc[doc_key])
+
 			char_inputs, word_lengths, word_indices, _ = trans_to_tensor(config, tran)
+
 			feed_dict = {
 				get_tensor(graph, "char_inputs:0"): char_inputs,
 				get_tensor(graph, "word_inputs:0"): word_indices,
@@ -122,11 +127,24 @@ def get_tf_rnn_by_path(model_path, w2i_path, gpu_mem_fraction=False, model_name=
 			}
 
 			output = sess.run(model, feed_dict=feed_dict)
+
 			if name_only:
-				# return merchant name if name_only else return tags of all tokens
+
+				# Tag Tokens
 				output = [config["tag_map"][str(i)] for i in np.argmax(output, 1)]
-				target_indices = [i for i in range(len(output)) if output[i] == "merchant"]
-				doc[label_key] = " ".join([tran[i] for i in target_indices])
+				tagged = list(zip(tran, output))
+				grouped, dict_output = [], defaultdict(list)
+
+				# Group Sequential Tokens
+				for tag, group in groupby(tagged, lambda x: x[1]):
+					merged = " ".join([x[0] for x in group])
+					grouped.append((tag, merged))
+
+				# Create Dict
+				for x in grouped:
+					dict_output[x[0]].append(x[1])
+
+				doc[label_key] = dict(dict_output)
 			else:
 				doc[label_key] = output
 

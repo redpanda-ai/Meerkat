@@ -10,8 +10,8 @@ class VariousToolsTests(unittest.TestCase):
 	"""UnitTest class for various_tools."""
 
 	@parameterized.expand([
-		(['term', None, { "query_string": { "query": 'term', "fields": [], "boost": 1.0 } }]),
-		(['term', ['city'], { "query_string": { "query": 'term', "fields": ['city'], "boost": 1.0 } }])
+		(['term', None, { "query_string": { "query": 'term', "fields": [], "default_operator": "OR", "boost": 1.0 } }]),
+		(['term', ['city'], { "query_string": { "query": 'term', "fields": ['city'], "default_operator": "OR", "boost": 1.0 } }])
 	])
 	def test_get_qs_query(self, term, field_list, expected):
 		result = various_tools.get_qs_query(term, field_list)
@@ -19,7 +19,7 @@ class VariousToolsTests(unittest.TestCase):
 
 	def test_get_bool_query(self):
 		result = various_tools.get_bool_query()
-		self.assertEqual(result, { "from" : 0, "size" : 0, "query" : { "bool": { "minimum_number_should_match": 1, "should": [] } } })
+		self.assertEqual(result, { "size" : 0, "query" : { "bool": { "minimum_number_should_match": 0, "should": [], "must": [] } } })
 
 	@parameterized.expand([
 		([[8.0, 4.0, 2.0, 1.0], 1.492]),
@@ -31,7 +31,7 @@ class VariousToolsTests(unittest.TestCase):
 		self.assertEqual(various_tools.z_score_delta(scores), z_score_delta)
 
 	@parameterized.expand([
-		(["Weekend at Bernie's[]{}/:", "weekend at bernie s"]),
+		(["Weekend at Bernie's[]{}/:", "weekend at bernie's"]),
 		(['Trans with "" quotes', 'trans with quotes'])
 	])
 	def test_string_cleanse(self, input_str, expected_str):

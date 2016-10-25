@@ -11,7 +11,7 @@ class RnnClassificationReportTests(unittest.TestCase):
 
 	@parameterized.expand([
 		("tests/longtail/fixture/test_get_write_func.csv",
-			[{"ground_truth": [], "Predicted": [[1,0], [0,1]], "Description": "Purchase Amazon"}],
+			[{"ground_truth": [], "Predicted": [[1,0], [0,1]], "DESCRIPTION": "Purchase Amazon"}],
 			True
 		),
 		("tests/longtail/fixture/test_get_write_func.csv", [], False)
@@ -27,17 +27,17 @@ class RnnClassificationReportTests(unittest.TestCase):
 			os.remove(filename)
 
 	@parameterized.expand([
-		({"ground_truth": [], "Predicted": [[1,0], [0,1]], "Description": "Purchase Amazon"},
-			"Amazon"),
-		({"ground_truth": 123, "Predicted": [[1,0], [1,0], [1,0]], "Description": "payment thank you"},
-			"")
+		({"ground_truth": [], "Predicted": [[1,0], [0,1]], "DESCRIPTION": "Purchase Amazon"},
+			"Purchase"),
+		({"ground_truth": 123, "Predicted": [[1,0], [1,0], [1,0]], "DESCRIPTION": "payment thank you"},
+			"payment thank you")
 	])
 	def test_beautify(self, item, expected):
 		config = {"tag_map": {"0": "background", "1": "merchant"},
 					"max_tokens": 35
 				}
 		result = cr.beautify(item, config)
-		self.assertEqual(result["Predicted"], expected)
+		self.assertEqual(result["predicted_background"], expected)
 
 	@parameterized.expand([
 		(False, ["data", "model", "w2i", "--config", "SNOZ"])

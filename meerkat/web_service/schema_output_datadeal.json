@@ -1,0 +1,50 @@
+{
+	"$schema" : "http://json-schema.org/draft-04/schema#",
+	"title" : "meerkat_categorize output",
+	"definitions": {
+		"response" : {
+			"type" : "object",
+			"properties" : {
+				"row_id" : { "type" : "number" },
+				"merchant_name" : { "type" : "string" },
+				"address" : { "type" : "string" },
+				"city" : { "type" : "string" },
+				"state" : { "type" : "string"},
+				"zip_code" : { "type" : "string" },
+				"phone" : { "type" : "string"},
+				"longitude" : { "type" : "string" },
+				"latitude" : { "type" : "string" },
+				"website_url" : { "type" : "string" },
+				"store_number" : { "type" : "string"}
+			},
+			"required" : [ "row_id", "merchant_name", "address", "city", "state", "zip_code",
+				"phone", "longitude", "latitude", "website_url", "store_number"],
+			"additionalProperties" : false
+		}
+	},
+	"description": "A schema for defining output from 'meerkat_categorize'",
+	"type" : "object",
+	"properties" : {
+		"cobrand_id" : {
+			"description" : "Yodlee's number to uniquely identify the cobrand",
+			"type" : "number"
+		},
+		"user_id" : {
+			"description" : "Yodlee's number to uniquely identify a user within a cobrand",
+			"type" : "number"
+		},
+		"container" : { "enum" : [ "bank", "card" ] },
+		"transaction_list" : {
+			"description" : "An array containing at least one of the following response types.",
+			"type" : "array",
+			"items": {
+				"oneOf": [
+					{"$ref": "#/definitions/response"}
+				]
+			},
+			"minItems": 1,
+			"uniqueItems": true
+		}
+	},
+	"required": ["cobrand_id", "user_id", "container", "transaction_list"]
+}

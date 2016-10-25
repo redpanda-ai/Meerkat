@@ -10,7 +10,7 @@ It produces various stats and a confusion matrix for analysis
 
 ############################# USAGE #############################
 
-# python3 -m meerkat.longtail.rnn_classificaiton_report \
+# python3 -m meerkat.longtail.rnn_classification_report \
 # <path_to_data> <path_to_cktp_file> <path_to_w2i_file> \
 # --config <optional_path_to_config_file>
 
@@ -23,12 +23,14 @@ import os
 import time
 import pandas as pd
 import numpy as np
+from itertools import groupby
+from collections import defaultdict
 
 from meerkat.classification.load_model import get_tf_rnn_by_path
 from meerkat.various_tools import load_piped_dataframe
 from meerkat.classification.classification_report import (get_classification_report,
 	count_transactions)
-from meerkat.longtail.bilstm_tagger import validate_config
+from meerkat.longtail.bilstm_tagger import validate_config, tokenize
 from meerkat.classification.tools import reverse_map
 
 def parse_arguments(args):
@@ -45,11 +47,31 @@ def parse_arguments(args):
 
 def beautify(item, config):
 	"""make item easier to read"""
+
 	item.pop("ground_truth")
-	tmp = [config["tag_map"][str(i)] for i in np.argmax(item["Predicted"], 1)]
-	target_indices = [i for i in range(len(tmp)) if tmp[i] == "merchant"]
-	tran = item["Description"].split()[:config["max_tokens"]]
-	item["Predicted"] = " ".join([tran[i] for i in target_indices])
+	output = [config["tag_map"][str(i)] for i in np.argmax(item["Predicted"], 1)]
+
+	tran = tokenize(item["DESCRIPTION"])
+	tagged = list(zip(tran, output))
+	grouped, dict_output = [], defaultdict(list)
+
+	# Group Sequential Tokens
+	for tag, group in groupby(tagged, lambda x: x[1]):
+		merged = " ".join([x[0] for x in group])
+		grouped.append((tag, merged))
+
+	# Create Dict
+	for x in grouped:
+		dict_output[x[0]].append(x[1])
+
+	# Add To Output
+	for tag, tokens in dict(dict_output).items():
+		item["predicted_" + tag] = ", ".join(tokens)
+
+	print(item)
+
+	del item["Predicted"]
+
 	return item
 
 def get_write_func(file_path, config):
@@ -95,12 +117,12 @@ def evaluate_model(args=None):
 		chunk = chunk.to_dict("record")
 
 		start = time.time() 
-		chunk = model(chunk, name_only=False, tags=True)
+		chunk = model(chunk, name_only=False, tags=True, doc_key="DESCRIPTION")
 		end = time.time()
 		elapsed_time += end - start
 
 		for item in chunk:
-			columns = list(np.argmax(item["Predicted"], 1))
+			columns = [i for i in np.argmax(item["Predicted"], 1)]
 			rows = [int(reverse_map(config["tag_map"])[tag]) for tag in item["ground_truth"]]
 			for row, column in zip(rows, columns):
 				con_matrix[row][column] += 1
