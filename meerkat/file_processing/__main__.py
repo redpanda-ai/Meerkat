@@ -120,11 +120,9 @@ def process_description(my_df):
 
 	# Find the following patterns and replace with empty string
 	patterns = [r'PAYPAL \*', r'SQ \*', r'GOOGLE \*', r'MSFT \*', r'MICROSOFT \*', r"IN \*"]
-	logger.info("before: " + merchant)
 	for cur_pattern in patterns:
 		pattern = re.compile(cur_pattern, re.IGNORECASE)
 		merchant = pattern.sub("", merchant)
-	logger.info("after: " + merchant)
 	return merchant
 
 def get_rnn_merchant(my_df):
@@ -207,7 +205,6 @@ def main_process(args=None):
 	my_df["RNN_merchant_name"] = my_df.apply(get_rnn_merchant, axis=1)
 	my_df["store_number"] = my_df.apply(get_store_number, axis=1)
 
-	print(my_df)
 	amount, ledger_entry, container, my_date = 10, "debit", "bank", "2016-01-01"
 	if file_type == "credit":
 		container = "card"
