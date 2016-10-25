@@ -14,7 +14,6 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 #from meerkat.various_tools import load_params
 from meerkat.classification.load_model import get_tf_rnn_by_path
 MODEL_PATH = "meerkat/classification/models/rnn_model/"
-#MODEL_PATH = "rnn/"
 MERCHANT_RNN = get_tf_rnn_by_path(MODEL_PATH + "bilstm.ckpt", MODEL_PATH + "w2i.json")
 
 logging.config.dictConfig(yaml.load(open('meerkat/file_processing/logging.yaml', 'r')))
@@ -58,14 +57,15 @@ def get_file_type(args):
 	else:
 		logger.error("Cannot identify file type for {0}, aborting".format(args.file_name))
 		sys.exit()
-	logger.info("File type is {0}".format(file_type))
+	#logger.info("File type is {0}".format(file_type))
 	return file_type
 
 def preprocess_dataframe(args):
 	"""Reads the input_file into a dataframe"""
 	kwargs = {
-		"quoting": csv.QUOTE_NONE, "encoding": "utf-8", "sep": "|", "error_bad_lines": True,
-		"warn_bad_lines": True, "chunksize": 1, "na_filter": False
+		#"quoting": csv.QUOTE_NONE,
+		"encoding": "utf-8", "sep": "|", "error_bad_lines": True,
+		"warn_bad_lines": True, "chunksize": 1, "na_filter": False, "quotechar": '"'
 	}
 	#We don't really need the entire file get 1 row from the first chunk
 	reader = pd.read_csv(args.input_file, **kwargs)
@@ -91,7 +91,7 @@ def clean_dataframe(my_df, renames):
 	#Remove unused columns
 	for column in header_names:
 		if column not in reverse_renames:
-			logger.info("Removing superflous column {0}".format(column))
+			#logger.info("Removing superflous column {0}".format(column))
 			del my_df[column]
 	#lambda functions
 	phone_regex = "^[0-9][0-9\-]*$"
@@ -117,10 +117,25 @@ def hasNumbers(inputString):
 
 def get_rnn_merchant(my_df):
 	"""This is a stub implementation, no multi-class RNN exists."""
-	#FIXME
 	merchant = my_df["description"]
+
+	pattern = re.compile("SQ \*", re.IGNORECASE)
+	merchant = pattern.sub("", merchant)
+
+	pattern = re.compile("GOOGLE \*", re.IGNORECASE)
+	merchant = pattern.sub("", merchant)
+
+	if merchant == "":
+		return ""
+
 	tagged = MERCHANT_RNN([{"Description": merchant}])
 	if "merchant" in tagged[0]["Predicted"]:
+		if len(tagged[0]["Predicted"]["merchant"]) > 1:
+			merchant_str = ""
+			for merchant_substr in tagged[0]["Predicted"]["merchant"]:
+				merchant_str += merchant_substr + " "
+			tagged[0]["Predicted"]["merchant"] = [merchant_str[:-1]]
+			logger.warning(tagged)
 		try:
 			tag = re.match(re.escape(tagged[0]["Predicted"]["merchant"][0]), my_df["description"], re.IGNORECASE)
 			tag = merchant[tag.start():tag.end()]
@@ -132,8 +147,6 @@ def get_rnn_merchant(my_df):
 
 def get_store_number(my_df):
 	"""This is a stub implementation, no multi-class RNN exists."""
-	#FIXME
-	#store_number_rnn = get_tf_rnn_by_path("rnn/bilstm.ckpt", "rnn/w2i.json")
 	desc = my_df["description"]
 	try:
 		merchant_removed = re.sub(re.escape(my_df["RNN_merchant_name"]), "", desc, flags=re.IGNORECASE)
@@ -159,7 +172,7 @@ def get_results_df_from_web_service(my_web_request, container):
 		"latitude": [], "website_url": [], "store_number": [] }
 	my_keys = my_results.keys()
 	#Append an element to for each key in each transaction
-	logger.info(response_data)
+	#logger.info(response_data)
 	for transaction in response_data["transaction_list"]:
 		for key in my_keys:
 			my_results[key].append(transaction[key])
@@ -203,7 +216,7 @@ def main_process(args=None):
 		if transaction_count % transaction_max == 0:
 			#Append existing batch to web_requests
 			if my_web_request is not None:
-				logger.info("Transaction count {0}".format(transaction_count))
+				#logger.info("Transaction count {0}".format(transaction_count))
 				result_dfs.append(get_results_df_from_web_service(my_web_request, container))
 			#Create a new batch
 			my_web_request = { "cobrand_id": 0, "user_id": 0, "container": container,
@@ -222,7 +235,7 @@ def main_process(args=None):
 
 	#7. Merge all results into a single dataframe
 	results_df = pd.concat(result_dfs, ignore_index=True)
-	logger.info("All Results: {0}".format(results_df.shape))
+	#logger.info("All Results: {0}".format(results_df.shape))
 	header = [ "row_id", "merchant_name", "address", "city", "state", "zip_code",
 		"phone", "longitude", "latitude", "website_url", "store_number" ]
 	#8. Drop extraneous columns
@@ -234,7 +247,7 @@ def main_process(args=None):
 	results_df = results_df[header]
 	#10. Write out the results into a delimited file
 	results_df.to_csv(args.output_file, index=False, sep="|", mode="w", header=header)
-	logger.info("Results written to {0}".format(args.output_file))
+	#logger.info("Results written to {0}".format(args.output_file))
 
 def parse_arguments(args):
 	"""Correctly parses command line arguments for the program"""
