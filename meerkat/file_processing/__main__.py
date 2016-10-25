@@ -63,10 +63,8 @@ def get_file_type(args):
 def preprocess_dataframe(args):
 	"""Reads the input_file into a dataframe"""
 	kwargs = {
-		#"quoting": csv.QUOTE_NONE,
 		"encoding": "utf-8", "sep": "|", "error_bad_lines": True,
 		"warn_bad_lines": True, "chunksize": 1, "na_filter": False
-		#"quotechar": '"'
 	}
 	#We don't really need the entire file get 1 row from the first chunk
 	reader = pd.read_csv(args.input_file, **kwargs)
@@ -173,7 +171,6 @@ def get_results_df_from_web_service(my_web_request, container):
 		"latitude": [], "website_url": [], "store_number": [] }
 	my_keys = my_results.keys()
 	#Append an element to for each key in each transaction
-	logger.info(response_data)
 	for transaction in response_data["transaction_list"]:
 		for key in my_keys:
 			my_results[key].append(transaction[key])
