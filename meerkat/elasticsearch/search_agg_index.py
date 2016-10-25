@@ -3,7 +3,7 @@ import json
 import logging
 import numpy as np
 import pandas as pd
-from pprint import pprint
+#from pprint import pprint
 from elasticsearch import Elasticsearch
 from scipy.stats.mstats import zscore
 
