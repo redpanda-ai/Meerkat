@@ -114,16 +114,23 @@ def hasNumbers(inputString):
 	"""Check if input string has number"""
 	return any(char.isdigit() for char in inputString)
 
-def get_rnn_merchant(my_df):
-	"""This is a stub implementation, no multi-class RNN exists."""
+def process_description(my_df):
+	"""Preprocess description field"""
 	merchant = my_df["description"]
 
 	# Find the following patterns and replace with empty string
 	patterns = [r'PAYPAL \*', r'SQ \*', r'GOOGLE \*', r'MSFT \*', r'MICROSOFT \*', r"IN \*"]
+	logger.info("before: " + merchant)
 	for cur_pattern in patterns:
 		pattern = re.compile(cur_pattern, re.IGNORECASE)
 		merchant = pattern.sub("", merchant)
+	logger.info("after: " + merchant)
+	return merchant
 
+def get_rnn_merchant(my_df):
+	"""This is a stub implementation, no multi-class RNN exists."""
+
+	merchant = my_df["description"]
 	if merchant == "":
 		return ""
 
@@ -196,9 +203,11 @@ def main_process(args=None):
 	#3. Remove unneeded columns, split mystery_field
 	clean_dataframe(my_df, renames)
 	#4. Use the RNN to grab a few more columns
+	my_df["description"] = my_df.apply(process_description, axis=1)
 	my_df["RNN_merchant_name"] = my_df.apply(get_rnn_merchant, axis=1)
 	my_df["store_number"] = my_df.apply(get_store_number, axis=1)
 
+	print(my_df)
 	amount, ledger_entry, container, my_date = 10, "debit", "bank", "2016-01-01"
 	if file_type == "credit":
 		container = "card"
