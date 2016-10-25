@@ -160,10 +160,11 @@ def enrich_transaction(trans, hit):
 		#pprint(trans)
 	return trans
 
-def search_agg_index(data):
+def search_agg_index(data, params=None):
 	"""Enrich transactions with agg index"""
-	params = json.loads(open('./meerkat/elasticsearch/search_agg_index_config.json').read())
-	pprint(params)
+	if params is None:
+		params = json.loads(open('./meerkat/elasticsearch/search_agg_index_config.json').read())
+	#pprint(params)
 
 	requests = []
 	header = {'index': index_name, 'doc_type': index_type}
