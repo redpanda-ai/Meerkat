@@ -3,7 +3,7 @@ import json
 import logging
 import numpy as np
 import pandas as pd
-from pprint import pprint
+#from pprint import pprint
 from elasticsearch import Elasticsearch
 from scipy.stats.mstats import zscore
 
@@ -24,7 +24,7 @@ def basic_search(list_name):
 	result = es.search(index=index_name, doc_type=index_type, body=query)
 	if result['hits']['total'] > 0:
 		logging.info('The number of hits is {}'.format(result['hits']['total']))
-		pprint(result['hits']['hits'][0])
+		#pprint(result['hits']['hits'][0])
 	else:
 		logging.warning('The number of hits is zero')
 
@@ -157,7 +157,7 @@ def enrich_transaction(trans, hit):
 				trans['agg_search'][key] = hit.get(key, '')
 
 		logging.info('This transaction has been enriched with agg index')
-		pprint(trans)
+		#pprint(trans)
 	return trans
 
 def search_agg_index(data):
