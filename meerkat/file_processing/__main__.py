@@ -118,11 +118,11 @@ def get_rnn_merchant(my_df):
 	"""This is a stub implementation, no multi-class RNN exists."""
 	merchant = my_df["description"]
 
-	pattern = re.compile("SQ \*", re.IGNORECASE)
-	merchant = pattern.sub("", merchant)
-
-	pattern = re.compile("GOOGLE \*", re.IGNORECASE)
-	merchant = pattern.sub("", merchant)
+	# Find the following patterns and replace with empty string
+	patterns = [r'PAYPAL \*', r'SQ \*', r'GOOGLE \*', r'MSFT \*', r'MICROSOFT \*', r"IN \*"]
+	for cur_pattern in patterns:
+		pattern = re.compile(cur_pattern, re.IGNORECASE)
+		merchant = pattern.sub("", merchant)
 
 	if merchant == "":
 		return ""
