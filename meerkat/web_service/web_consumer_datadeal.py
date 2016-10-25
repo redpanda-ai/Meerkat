@@ -93,6 +93,7 @@ class WebConsumerDatadeal():
 		"""Create an optimized query"""
 
 		result_size = self.hyperparams.get("es_result_size", "10")
+		fuzziness = self.hyperparams.get("fuzziness", "AUTO")
 		fields = self.params["output"]["results"]["fields"]
 		city, state = transaction["city"], transaction["state"]
 		phone_number, postal_code = transaction["phone_number"], transaction["postal_code"]
@@ -113,13 +114,13 @@ class WebConsumerDatadeal():
 			term = synonyms(transaction['RNN_merchant_name'])
 			term = string_cleanse(term)
 			merchant_query = get_qs_query(term, ['name'], field_boosts['name'])
-			merchant_query["query_string"]["fuzziness"] = "AUTO"
+			merchant_query["query_string"]["fuzziness"] = fuzziness
 			must_clauses.append(merchant_query)
 
 		# Add Locale Sub Query
 		if city != '':
 			city_query = get_qs_query(city, ['locality'], field_boosts['locality'], operator="AND")
-			city_query["query_string"]["fuzziness"] = "AUTO"
+			city_query["query_string"]["fuzziness"] = fuzziness
 			should_clauses.append(city_query)
 		if state != '':
 			state_query = get_qs_query(state, ['region'], field_boosts['region'], operator="AND")
