@@ -19,7 +19,7 @@ from scipy.stats.mstats import zscore
 from meerkat.various_tools import get_es_connection, string_cleanse, get_boosted_fields
 from meerkat.various_tools import synonyms, get_bool_query, get_qs_query
 from meerkat.classification.load_model import (load_scikit_model,
-	get_tf_cnn_by_path, get_tf_rnn_by_path)
+	get_tf_cnn_by_path)
 from meerkat.classification.auto_load import main_program as load_models_from_s3
 from meerkat.various_tools import load_params
 from meerkat.elasticsearch.search_agg_index import search_agg_index
@@ -88,15 +88,6 @@ class WebConsumerDatadeal():
 					key = '_'.join(temp[1:] + [temp[0], 'cnn'])
 				self.models[key] = get_tf_cnn_by_path(models_dir + filename, \
 					label_maps_dir + filename[:-4] + 'json', gpu_mem_fraction=gmf)
-
-		# Get RNN Models
-		"""
-		rnn_model_path = "./meerkat/classification/models/rnn_model/bilstm.ckpt"
-		w2i_path = "./meerkat/classification/models/rnn_model/w2i.json"
-		if os.path.exists(rnn_model_path) is False:
-			logging.warning("Please run python3 -m meerkat.longtail.rnn_auto_load")
-		self.models["rnn"] = get_tf_rnn_by_path(rnn_model_path, w2i_path)
-		"""
 
 	def __get_query(self, transaction):
 		"""Create an optimized query"""
@@ -365,11 +356,6 @@ class WebConsumerDatadeal():
 			enriched.append(trans_plus)
 
 		return enriched
-
-	def __apply_rnn(self, trans):
-		"""Apply RNN to transactions"""
-		classifier = self.models["rnn"]
-		return classifier(trans, doc_key="description", label_key="RNN_merchant_name")
 
 	def __apply_merchant_cnn(self, data):
 		"""Apply the merchant CNN to transactions"""

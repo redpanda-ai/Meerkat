@@ -12,6 +12,9 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 #from meerkat.various_tools import load_params
+from meerkat.classification.load_model import get_tf_rnn_by_path
+MODEL_PATH = "meerkat/classification/models/rnn_model/"
+MERCHANT_RNN = get_tf_rnn_by_path(MODEL_PATH + "bilstm.ckpt", MODEL_PATH + "w2i.json")
 
 logging.config.dictConfig(yaml.load(open('meerkat/file_processing/logging.yaml', 'r')))
 logger = logging.getLogger('basic')
@@ -60,7 +63,7 @@ def get_file_type(args):
 def preprocess_dataframe(args):
 	"""Reads the input_file into a dataframe"""
 	kwargs = {
-		"quoting": csv.QUOTE_NONE, "encoding": "utf-8", "sep": "|", "error_bad_lines": True,
+		"encoding": "utf-8", "sep": "|", "error_bad_lines": True,
 		"warn_bad_lines": True, "chunksize": 1, "na_filter": False
 	}
 	#We don't really need the entire file get 1 row from the first chunk
@@ -107,20 +110,50 @@ def clean_dataframe(my_df, renames):
 	#Remove processed column
 	del my_df["mystery_field"]
 
+def hasNumbers(inputString):
+	"""Check if input string has number"""
+	return any(char.isdigit() for char in inputString)
+
 def get_rnn_merchant(my_df):
 	"""This is a stub implementation, no multi-class RNN exists."""
-	#FIXME
-	#from meerkat.classification.load_model import get_tf_rnn_by_path
-	#merchant_rnn = get_tf_rnn_by_path("rnn/bilstm.ckpt", "rnn/w2i.json")
-	#predicted = merchant_rnn([{"Description": my_df["description"]}])[0]["Predicted"]
-	predicted = "RNN_MERCHANT_FIXME"
-	return predicted
+	merchant = my_df["description"]
+
+	pattern = re.compile("SQ \*", re.IGNORECASE)
+	merchant = pattern.sub("", merchant)
+
+	pattern = re.compile("GOOGLE \*", re.IGNORECASE)
+	merchant = pattern.sub("", merchant)
+
+	if merchant == "":
+		return ""
+
+	tagged = MERCHANT_RNN([{"Description": merchant}])
+	if "merchant" in tagged[0]["Predicted"]:
+		if len(tagged[0]["Predicted"]["merchant"]) > 1:
+			merchant_str = ""
+			for merchant_substr in tagged[0]["Predicted"]["merchant"]:
+				merchant_str += merchant_substr + " "
+			tagged[0]["Predicted"]["merchant"] = [merchant_str[:-1]]
+			logger.warning(tagged)
+		try:
+			tag = re.match(re.escape(tagged[0]["Predicted"]["merchant"][0]), my_df["description"], re.IGNORECASE)
+			tag = merchant[tag.start():tag.end()]
+		except:
+			return tagged[0]["Predicted"]["merchant"][0]
+	else:
+		return ""
+	return tag
 
 def get_store_number(my_df):
 	"""This is a stub implementation, no multi-class RNN exists."""
-	#FIXME
-	predicted = "RNN_STORE_NUMBER_FIXME"
-	return predicted
+	desc = my_df["description"]
+	try:
+		merchant_removed = re.sub(re.escape(my_df["RNN_merchant_name"]), "", desc, flags=re.IGNORECASE)
+	except:
+		return ""
+
+	output = [t for t in merchant_removed.split() if not t.isalpha() and hasNumbers(t)]
+	return " ".join(output)
 
 def get_results_df_from_web_service(my_web_request, container):
 	"""Sends a single web request dict to the web service, then converts the
