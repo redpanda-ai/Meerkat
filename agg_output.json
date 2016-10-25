@@ -5548,6 +5548,18 @@
             "threshold": "0.80"
         },
         "RNN_merchant_name": "TARGET",
+        "agg_search": {
+            "address": "5959 Poplar Ave",
+            "city": "Memphis",
+            "latitude": "35.1008757",
+            "list_name": "Target",
+            "longitude": "-89.8635704",
+            "phone_number": "(901) 261-5079",
+            "source_url": "www.target.com",
+            "state": "TN",
+            "store_number": "T2474",
+            "zip_code": "38119-3938"
+        },
         "amount": 10,
         "city": "MEMPHIS",
         "container": "card",
