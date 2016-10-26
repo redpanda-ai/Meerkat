@@ -34,7 +34,7 @@
                     "phone_number": "",
                     "postal_code": "16510",
                     "state": "PA",
-                    "store_number": "M4361",
+                    "store_number": ["M4361"],
                     "website_url": ""
                 },
                 "latitude": "42.1461353",
@@ -78,7 +78,7 @@
                     "phone_number": "",
                     "postal_code": "19138",
                     "state": "PA",
-                    "store_number": "",
+                    "store_number": [""],
                     "website_url": ""
                 },
                 "latitude": "40.0496001",
@@ -122,7 +122,7 @@
                     "phone_number": "",
                     "postal_code": "1453",
                     "state": "MA",
-                    "store_number": "4474 00044743",
+                    "store_number": ["4474 00044743"],
                     "website_url": ""
                 },
                 "latitude": "42.4975025",

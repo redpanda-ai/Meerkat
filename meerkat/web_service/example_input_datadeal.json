@@ -15,7 +15,7 @@
             "phone_number": "",
             "postal_code": "16510",
             "state": "PA",
-            "store_number": "M4361",
+            "store_number": ["M4361"],
             "transaction_id": 45431
         },
         {
@@ -29,7 +29,7 @@
             "phone_number": "",
             "postal_code": "19138",
             "state": "PA",
-            "store_number": "",
+            "store_number": [],
             "transaction_id": 76554
         },
         {
@@ -43,7 +43,7 @@
             "phone_number": "",
             "postal_code": "1453",
             "state": "MA",
-            "store_number": "4474 00044743",
+            "store_number": ["4474 00044743"],
             "transaction_id": 71755
         }
 	]

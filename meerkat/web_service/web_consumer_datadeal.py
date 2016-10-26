@@ -388,6 +388,11 @@ class WebConsumerDatadeal():
 			cnn_merchant = trans['CNN']['label']
 			if cnn_merchant != '' and cnn_merchant in self.merchant_name_map:
 				trans["Agg_Name"] = self.merchant_name_map[cnn_merchant]
+				# TODO after integrate with agg search, remove this
+				if trans["store_number"] != []:
+					trans["store_number"] = trans["store_number"][0]
+				else:
+					trans["store_number"] = ""
 				data_to_search_in_agg.append(trans)
 			else:
 				data_to_search_in_factual.append(trans)
@@ -431,10 +436,11 @@ class WebConsumerDatadeal():
 			# In debug mode, keep all input fields
 			if debug:
 				input_fields = ["city", "state", "country", "postal_code", "RNN_merchant_name",
-					"store_number", "phone_number", "website_url"]
+					"phone_number", "website_url"]
 				trans["input"] = {}
 				for field in input_fields:
 					trans["input"][field] = trans.get(field, "")
+				trans["input"]["store_number"] = trans.get("store_number", [])
 
 			# Enrich transaction with merchant name
 			if trans.get("CNN", "") != "" and trans["CNN"].get("label", "") != '':
@@ -446,14 +452,16 @@ class WebConsumerDatadeal():
 			else:
 				trans["merchant_name"] = trans["RNN_merchant_name"]
 
+			# Only output store number found in agg search
+			if "agg_search" in trans and trans["agg_search"].get("store_number", "") != "":
+				trans["store_number"] = trans["agg_search"]["store_number"]
+			else:
+				trans["store_number"] = ""
+
 			# Enrich transaction with fields found in search
 			if "agg_search" in trans:
-				# Only output store number found in agg search
-				if trans["agg_search"].get("store_number", "") == "":
-					trans["store_number"] = ""
-
 				same_name_for_agg_and_input = ["city", "state", "phone_number", "longitude",
-					"latitude", "store_number", "address"]
+					"latitude", "address"]
 				map_input_fields_to_agg = {
 					"postal_code": "zip_code",
 					"website_url": "source_url"
