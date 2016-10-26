@@ -36,7 +36,10 @@
 					"phone_number" : { "type" : "string" },
 					"postal_code" : { "type" : "string" },
 					"state" : { "type" : "string" },
-					"store_number" : { "type" : "array" },
+					"store_number" : {
+						"type" : "array",
+						"items" : { "type" : "string" }
+					},
 					"website_url" : { "type" : "string" }
 				},
 				"agg_search" : {
