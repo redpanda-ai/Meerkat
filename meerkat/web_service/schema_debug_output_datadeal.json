@@ -16,7 +16,7 @@
 				"latitude" : { "type" : "string" },
 				"website_url" : { "type" : "string" },
 				"store_number" : {
-					"type" : "string",
+					"type" : "array",
 					"items" : { "type" : "string" }
 				},
 				"description" : { "type" : "string" },

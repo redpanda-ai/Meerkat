@@ -78,7 +78,7 @@
                     "phone_number": "",
                     "postal_code": "19138",
                     "state": "PA",
-                    "store_number": [""],
+                    "store_number": [],
                     "website_url": ""
                 },
                 "latitude": "40.0496001",
