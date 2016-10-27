@@ -403,13 +403,13 @@ class WebConsumerDatadeal():
 
 		# Search in Agg data
 		if search_agg_in_batch:
-			data_to_search_in_agg = search_agg_index(data_to_search_in_agg)
+			search_agg_index(data_to_search_in_agg)
 		else:
 			for i in range(len(data_to_search_in_agg)):
-				data_to_search_in_agg[i] = search_agg_index([data_to_search_in_agg[i]])
+				search_agg_index([data_to_search_in_agg[i]])
 
 		# If not found in agg search, do a facutal search
-		for transaction in data_to_search_in_agg:
+		for i, transaction in enumerate(data_to_search_in_agg):
 			if "agg_search" not in transaction:
 				data_to_search_in_factual.append(transaction)
 
