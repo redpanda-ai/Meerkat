@@ -11,7 +11,7 @@ logging.getLogger().setLevel(logging.INFO)
 
 endpoint = 'search-agg-factual-nuz5jggrftlzjd5f7c2ehkmhlu.us-west-2.es.amazonaws.com'
 host = [{'host': endpoint, 'port': 80}]
-index_name, index_type = 'agg_index', 'agg_type'
+index_name, index_type = 'agg_index_10272016', 'agg_type_10272016'
 es = Elasticsearch(host)
 
 def basic_search(list_name):
@@ -28,9 +28,11 @@ def basic_search(list_name):
 	else:
 		logging.warning('The number of hits is zero')
 
-def create_must_query(list_name, city, state, zip_code, params):
-	"""Create a must query"""
-	must_query = []
+def create_must_and_should(list_name, city, state, zip_code, store_number, phone_number, params):
+	"""Create must and should query"""
+	must_query, should_query = [], []
+
+	# list_name always stays in must query
 	if len(list_name) == 1 and list_name[0] != '':
 		must_query.append({'term': {'list_name': list_name[0]}})
 	else:
@@ -41,37 +43,35 @@ def create_must_query(list_name, city, state, zip_code, params):
 			bool_query['bool']['should'].append({'term': {'list_name': name}})
 		must_query.append(bool_query)
 
+	# city and state always stay in must query
 	if city != '':
 		must_query.append({'match': {'city': city}})
 	if state != '':
 		must_query.append({'match': {'state': state}})
-	if zip_code != '':
-		zip_query = {'zip_code': {'query': zip_code, 'fuzziness': 'AUTO', 'boost': params['boost']['zip_code']}}
-		must_query.append({'match': zip_query})
-	return must_query
 
-def create_should_query(store_number, phone_number, params):
-	"""Create a should query"""
-	should_query = []
+	has_valid_store = False
 
-	# 1 store number
-	if len(store_number) == 1 and store_number[0] != '':
-		store = {'store_number': {'query': store_number[0], 'fuzziness': 'AUTO', 'boost': params['boost']['store_number']}}
+	# store number always stays in should query
+	if store_number != '':
+		store = {'store_number': {'query': store_number, 'fuzziness': 'AUTO', 'boost': params['boost']['store_number']}}
 		should_query.append({'match': store})
+		has_valid_store = True
 
-	# 2 or more store numbers
-	if len(store_number) > 1:
-		bool_query = {'bool': {'should': [], 'minimum_should_match': 1}}
-		for number in store_number:
-			if number != '':
-				number_query = {'store_number': {'query': number, 'fuzziness': 'AUTO', 'boost': params['boost']['store_number']}}
-				bool_query['bool']['should'].append({'match': number_query})
-		should_query.append(bool_query)
+	# zip_code stays in should query if store number exists, otherwise stays in must query with ZERO fuzziness
+	if zip_code != '':
+		if has_valid_store == True:
+			zip_query = {'zip_code': {'query': zip_code, 'fuzziness': 'AUTO', 'boost': params['boost']['zip_code']}}
+			should_query.append({'match': zip_query})
+		else:
+			zip_query = {'zip_code': {'query': zip_code, 'fuzziness': 0, 'boost': params['boost']['zip_code']}}
+			must_query.append({'match': zip_query})
 
+	# phone number always stays in should query
 	if phone_number != '':
 		phone = {'phone_number': {'query': phone_number, 'fuzziness': 'AUTO', 'boost': params['boost']['phone_number']}}
 		should_query.append({'match': phone})
-	return should_query
+
+	return must_query, should_query
 
 def create_bool_query(must_query, should_query):
 	"""Create a bool query with must and should query"""
@@ -192,11 +192,9 @@ def search_agg_index(data, params=None):
 			continue
 
 		city, state, zip_code = trans.get('city', ''), trans.get('state', ''), trans.get('postal_code', '')
-		phone_number = trans.get('phone_number', '')
-		store_number = trans.get('store_number', [])
+		phone_number, store_number = trans.get('phone_number', ''), trans.get('store_number', '')
 
-		must_query = create_must_query(list_name, city, state, zip_code, params)
-		should_query = create_should_query(store_number, phone_number, params)
+		must_query, should_query = create_must_and_should(list_name, city, state, zip_code, store_number, phone_number, params)
 		bool_query = create_bool_query(must_query, should_query)
 
 		logging.info('The query for this transaction is:')
@@ -213,8 +211,7 @@ def search_agg_index(data, params=None):
 
 if __name__ == '__main__':
 	data = json.loads(open('./agg_input.json').read())
+	data = list(np.random.permutation(data))
 	search_agg_index(data)
 	with open('./agg_output.json', 'w') as outfile:
 		json.dump(data, outfile, indent=4, sort_keys=True)
-
-	# basic_search('Chick-fil-A')
