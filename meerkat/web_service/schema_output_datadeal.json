@@ -6,7 +6,7 @@
 			"type" : "object",
 			"properties" : {
 				"row_id" : { "type" : "number" },
-				"description" : { "type" : "number" },
+				"description" : { "type" : "string" },
 				"merchant_name" : { "type" : "string" },
 				"address" : { "type" : "string" },
 				"city" : { "type" : "string" },

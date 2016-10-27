@@ -484,7 +484,7 @@ class WebConsumerDatadeal():
 			# Ensure these fields exist in output
 			output_fields = ["city", "state", "address", "longitude", "latitude",
 				"website_url", "store_number", "phone_number", "postal_code",
-				"transaction_id"]
+				"transaction_id", "description"]
 			map_fields_for_output = {
 				"phone_number": "phone",
 				"postal_code": "zip_code",
