@@ -22,19 +22,10 @@ LOGGER = logging.getLogger('basic')
 def get_renames(rename_type):
 	"""Fetches the proper rename dict, used to rename columns in the dataframe."""
 	renames = None
-	if rename_type in ['credit', 'debit_ach']:
+	if rename_type in ['credit', 'debit_ach', 'debit_pos']:
 		return {
 			"row_id": "transaction_id",
 			"at_transactiondescription2": "description",
-			"at_transactioncity": "mystery_field",
-			"at_transactionstateprovince": "state",
-			"at_transactioncountrycode": "country",
-			"at_transactionpostalcode1": "postal_code"
-		}
-	elif rename_type == 'debit_pos':
-		return {
-			"row_id": "transaction_id",
-			"card_acpt_merchant_name": "description",
 			"at_transactioncity": "mystery_field",
 			"at_transactionstateprovince": "state",
 			"at_transactioncountrycode": "country",
