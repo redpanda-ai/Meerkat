@@ -385,7 +385,7 @@ class WebConsumerDatadeal():
 		for trans in data["transaction_list"]:
 			if trans.get("country", "") not in ["", "US", "USA"]:
 				continue
-			cnn_merchant = trans['CNN']['label']
+			cnn_merchant = trans.get('CNN', {}).get('label', '')
 			if cnn_merchant != '' and cnn_merchant in self.merchant_name_map:
 				trans["Agg_Name"] = self.merchant_name_map[cnn_merchant]
 				data_to_search_in_agg.append(trans)
@@ -484,7 +484,7 @@ class WebConsumerDatadeal():
 			# Ensure these fields exist in output
 			output_fields = ["city", "state", "address", "longitude", "latitude",
 				"website_url", "store_number", "phone_number", "postal_code",
-				"transaction_id"]
+				"transaction_id", "description"]
 			map_fields_for_output = {
 				"phone_number": "phone",
 				"postal_code": "zip_code",
@@ -500,15 +500,16 @@ class WebConsumerDatadeal():
 
 			# Remove fields not in output schema
 			if debug is False:
-				fields_to_remove = ["description", "amount", "date", "ledger_entry", "CNN",
+				fields_to_remove = ["amount", "date", "ledger_entry", "CNN",
 					"container", "RNN_merchant_name", "Agg_Name", "factual_search",
 					"agg_search", "merchant_score", "country", "match_found"]
 				for field in fields_to_remove:
 					trans.pop(field, None)
 			else:
-				trans['CNN']['merchant_score'] =  trans.get("merchant_score", "0.0")
-				trans['CNN'].pop("threshold", None)
-				trans['CNN'].pop("category", None)
+				if 'CNN' in trans:
+					trans['CNN']['merchant_score'] =  trans.get("merchant_score", "0.0")
+					trans['CNN'].pop("threshold", None)
+					trans['CNN'].pop("category", None)
 				fields_to_remove = ["amount", "date", "ledger_entry", "container",
 					"merchant_score", "country", "match_found"]
 				for field in fields_to_remove:
@@ -516,13 +517,16 @@ class WebConsumerDatadeal():
 
 	def classify(self, data, optimizing=False):
 		"""Classify a set of transactions"""
+		services_list = data.get("services_list", [])
 		debug = data.get("debug", False)
 
 		# Apply Merchant CNN
-		self.__apply_merchant_cnn(data)
+		if "CNN" in services_list or services_list == []:
+			self.__apply_merchant_cnn(data)
 
 		# Apply Elasticsearch
-		self.__search_in_agg_or_factual(data)
+		if "search" in services_list or services_list == []:
+			self.__search_in_agg_or_factual(data)
 
 		# Process enriched data to ensure output schema
 		self.ensure_output_schema(data["transaction_list"], debug)
