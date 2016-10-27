@@ -400,11 +400,20 @@ class WebConsumerDatadeal():
 		data_to_search_in_agg, data_to_search_in_factual = self.__choose_agg_or_factual(data)
 		search_agg_in_batch = self.params.get("search_agg_in_batches", True)
 		search_factual_in_batch = self.params.get("search_factual_in_batches", True)
+
+		# Search in Agg data
 		if search_agg_in_batch:
-			data_to_search_in_agg = search_agg_index(data_to_search_in_agg)
+			search_agg_index(data_to_search_in_agg)
 		else:
 			for i in range(len(data_to_search_in_agg)):
-				data_to_search_in_agg[i] = search_agg_index([data_to_search_in_agg[i]])
+				search_agg_index([data_to_search_in_agg[i]])
+
+		# If not found in agg search, do a facutal search
+		for i, transaction in enumerate(data_to_search_in_agg):
+			if "agg_search" not in transaction:
+				data_to_search_in_factual.append(transaction)
+
+		# Search in Factual data
 		if search_factual_in_batch:
 			data_to_search_in_factual = self.__search_factual_index(data_to_search_in_factual)
 		else:
@@ -446,14 +455,16 @@ class WebConsumerDatadeal():
 			else:
 				trans["merchant_name"] = trans["RNN_merchant_name"]
 
+			# Only output store number found in agg search
+			if "agg_search" in trans and trans["agg_search"].get("store_number", "") != "":
+				trans["store_number"] = trans["agg_search"]["store_number"]
+			else:
+				trans["store_number"] = ""
+
 			# Enrich transaction with fields found in search
 			if "agg_search" in trans:
-				# Only output store number found in agg search
-				if trans["agg_search"].get("store_number", "") == "":
-					trans["store_number"] = ""
-
 				same_name_for_agg_and_input = ["city", "state", "phone_number", "longitude",
-					"latitude", "store_number", "address"]
+					"latitude", "address"]
 				map_input_fields_to_agg = {
 					"postal_code": "zip_code",
 					"website_url": "source_url"
