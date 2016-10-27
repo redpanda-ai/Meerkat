@@ -528,7 +528,6 @@ class WebConsumerDatadeal():
 		if "search" in services_list or services_list == []:
 			self.__search_in_agg_or_factual(data)
 
-		print(data)
 		# Process enriched data to ensure output schema
 		self.ensure_output_schema(data["transaction_list"], debug)
 
