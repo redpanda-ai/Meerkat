@@ -13,8 +13,8 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 #from meerkat.various_tools import load_params
 from meerkat.classification.load_model import get_tf_rnn_by_path
-MODEL_PATH = "meerkat/classification/models/rnn_model/"
-MERCHANT_RNN = get_tf_rnn_by_path(MODEL_PATH + "bilstm.ckpt", MODEL_PATH + "w2i.json")
+MODEL_PATH = "meerkat/classification/models/multi_rnn_model/"
+MULTICLASS_RNN = get_tf_rnn_by_path(MODEL_PATH + "bilstm.ckpt", MODEL_PATH + "w2i.json")
 
 logging.config.dictConfig(yaml.load(open('meerkat/file_processing/logging.yaml', 'r')))
 LOGGER = logging.getLogger('basic')
@@ -118,33 +118,36 @@ def process_description(my_df):
 		merchant = pattern.sub("", merchant)
 	return merchant
 
+def run_multi_class_rnn(my_df):
+	"""Get multi-class RNN result"""
+	desc = my_df["description"]
+	print(desc)
+	if desc == "":
+		return {}
+	tagged = MULTICLASS_RNN([{"Description": desc}])
+	print(desc)
+	return tagged[0]["Predicted"]
+
 def get_rnn_merchant(my_df):
 	"""This is a stub implementation, no multi-class RNN exists."""
-
-	merchant = my_df["description"]
-	if merchant == "":
-		return ""
-
-	tagged = MERCHANT_RNN([{"Description": merchant}])
-	if "merchant" in tagged[0]["Predicted"]:
-		merchant_str = " ".join(tagged[0]["Predicted"]["merchant"])
-		tagged[0]["Predicted"]["merchant"] = [merchant_str]
-		LOGGER.warning(tagged)
-		tag = re.match(re.escape(tagged[0]["Predicted"]["merchant"][0]),\
+	desc = my_df["description"]
+	predicted = my_df["predicted"]
+	LOGGER.info(predicted)
+	if "merchant" in predicted:
+		merchant_str = " ".join(predicted["merchant"])
+		predicted["merchant"] = [merchant_str]
+		tag = re.match(re.escape(predicted["merchant"][0]),\
 			my_df["description"], re.IGNORECASE)
 		if tag: #There are matches
-			return merchant[tag.start():tag.end()]
+			return desc[tag.start():tag.end()]
 		else:
-			return tagged[0]["Predicted"]["merchant"][0]
+			return predicted["merchant"][0]
 	else:
 		return ""
 
 def get_store_number(my_df):
 	"""This is a stub implementation, no multi-class RNN exists."""
-	desc = my_df["description"]
-	merchant_removed = re.sub(re.escape(my_df["RNN_merchant_name"]), "", desc, flags=re.IGNORECASE)
-	output = [t for t in merchant_removed.split() if not t.isalpha() and has_numbers(t)]
-	return " ".join(output)
+	return my_df["predicted"].get("store_number", [])
 
 def get_results_df_from_web_service(my_web_request, container):
 	"""Sends a single web request dict to the web service, then converts the
@@ -188,8 +191,10 @@ def main_process(args=None):
 	clean_dataframe(my_df, renames)
 	#4. Use the RNN to grab a few more columns
 	my_df["description"] = my_df.apply(process_description, axis=1)
+	my_df["predicted"] = my_df.apply(run_multi_class_rnn, axis=1)
 	my_df["RNN_merchant_name"] = my_df.apply(get_rnn_merchant, axis=1)
 	my_df["store_number"] = my_df.apply(get_store_number, axis=1)
+	del my_df["predicted"]
 
 	container = "bank"
 	if file_type == "credit":

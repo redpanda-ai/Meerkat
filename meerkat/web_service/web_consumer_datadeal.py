@@ -440,10 +440,11 @@ class WebConsumerDatadeal():
 			# In debug mode, keep all input fields
 			if debug:
 				input_fields = ["city", "state", "country", "postal_code", "RNN_merchant_name",
-					"store_number", "phone_number", "website_url"]
+					"phone_number", "website_url"]
 				trans["input"] = {}
 				for field in input_fields:
 					trans["input"][field] = trans.get(field, "")
+				trans["input"]["store_number"] = trans.get("store_number", [])
 
 			# Enrich transaction with merchant name
 			if trans.get("CNN", "") != "" and trans["CNN"].get("label", "") != '':

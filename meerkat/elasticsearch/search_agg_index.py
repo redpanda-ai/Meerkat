@@ -53,9 +53,21 @@ def create_must_query(list_name, city, state, zip_code, params):
 def create_should_query(store_number, phone_number, params):
 	"""Create a should query"""
 	should_query = []
-	if store_number != '':
-		store = {'store_number': {'query': store_number, 'fuzziness': 'AUTO', 'boost': params['boost']['store_number']}}
+
+	# 1 store number
+	if len(store_number) == 1 and store_number[0] != '':
+		store = {'store_number': {'query': store_number[0], 'fuzziness': 'AUTO', 'boost': params['boost']['store_number']}}
 		should_query.append({'match': store})
+
+	# 2 or more store numbers
+	if len(store_number) > 1:
+		bool_query = {'bool': {'should': [], 'minimum_should_match': 1}}
+		for number in store_number:
+			if number != '':
+				number_query = {'store_number': {'query': number, 'fuzziness': 'AUTO', 'boost': params['boost']['store_number']}}
+				bool_query['bool']['should'].append({'match': number_query})
+		should_query.append(bool_query)
+
 	if phone_number != '':
 		phone = {'phone_number': {'query': phone_number, 'fuzziness': 'AUTO', 'boost': params['boost']['phone_number']}}
 		should_query.append({'match': phone})
@@ -180,7 +192,8 @@ def search_agg_index(data, params=None):
 			continue
 
 		city, state, zip_code = trans.get('city', ''), trans.get('state', ''), trans.get('postal_code', '')
-		store_number, phone_number = trans.get('store_number', ''), trans.get('phone_number', '')
+		phone_number = trans.get('phone_number', '')
+		store_number = trans.get('store_number', [])
 
 		must_query = create_must_query(list_name, city, state, zip_code, params)
 		should_query = create_should_query(store_number, phone_number, params)
@@ -195,6 +208,7 @@ def search_agg_index(data, params=None):
 		#pprint(result)
 		hit = process_query_result(trans, result, params)
 		enriched_trans = enrich_transaction(trans, hit)
+		#pprint(enriched_trans)
 		requests = []
 
 if __name__ == '__main__':
