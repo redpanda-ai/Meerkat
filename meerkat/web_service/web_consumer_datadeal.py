@@ -500,7 +500,7 @@ class WebConsumerDatadeal():
 
 			# Remove fields not in output schema
 			if debug is False:
-				fields_to_remove = ["description", "amount", "date", "ledger_entry", "CNN",
+				fields_to_remove = ["amount", "date", "ledger_entry", "CNN",
 					"container", "RNN_merchant_name", "Agg_Name", "factual_search",
 					"agg_search", "merchant_score", "country", "match_found"]
 				for field in fields_to_remove:
