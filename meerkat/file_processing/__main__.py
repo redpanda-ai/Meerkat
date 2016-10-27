@@ -216,6 +216,8 @@ def main_process(args=None):
 		transaction["ledger_entry"] = "debit"
 		transaction["amount"] = 10
 		transaction["date"] = "2016-01-01"
+		if file_type == "debit_ach":
+			my_web_request["services_list"] = ["CNN"]
 		#Add each transaction to the transaction_list for the web_request
 		my_web_request["transaction_list"].append(transaction.copy())
 		transaction_count += 1
