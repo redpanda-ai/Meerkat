@@ -35,9 +35,11 @@ import collections
 from copy import deepcopy
 
 from meerkat.various_tools import get_qs_query, get_bool_query, safe_input
-from meerkat.various_tools import load_params, get_es_connection, string_cleanse
+from meerkat.various_tools import load_params, get_es_connection, string_cleanse, load_hyperparameters
 from meerkat.various_tools import get_merchant_by_id, load_dict_ordered, write_dict_list
 from meerkat.various_tools import safe_print, synonyms, get_magic_query, stopwords, z_score_delta
+
+from meerkat.web_service.web_consumer_datadeal import WebConsumerDatadeal
 
 class DummyFile(object):
 	"""Resemble the stdout/stderr object but it prints nothing to screen"""
@@ -246,6 +248,9 @@ def autolink_and_verify(params, es_connection):
 	"""Label transactions using magic queries 
 	and do quick validation"""
 
+	hyperparams = load_hyperparameters(params)
+	consumer = WebConsumerDatadeal(params=params, hyperparams=hyperparams)
+
 	prompt_mode_change("find and verify")
 	unlinked = params["compare_indices"]["unlinked"]
 	params["compare_indices"]["unlinked"] = []
@@ -255,19 +260,20 @@ def autolink_and_verify(params, es_connection):
 		safe_print(str(len(unlinked)) + " unlinked remaining")
 		random.shuffle(unlinked)
 		transaction = unlinked.pop()
-		results = search_with_magic_query(params, transaction, es_connection)
+		results = search_with_magic_query(params, transaction, es_connection, consumer)
 		reconcile_autolinked(params, transaction, results)
 
 	print_stats(params)
 
-def search_with_magic_query(params, transaction, es_connection):
+def search_with_magic_query(params, transaction, es_connection, consumer):
 	"""Search using a pretrained query"""
 
 	index = sys.argv[4]
-	magic_query = get_magic_query(params, transaction)
-	
+
+	transaction["description"] = transaction["DESCRIPTION_UNMASKED"]
+
 	try:
-		results = es_connection.search(index=index, body=magic_query)
+		results = consumer.search_factual_index([transaction])['responses'][0]
 	except:
 		results = {"hits":{"total":0}}
 
@@ -304,7 +310,7 @@ def reconcile_autolinked(params, transaction, results):
 	if user_input in accepted_inputs:
 		_, hit = get_hit(results, int(user_input))
 		transaction["relinked_id"] = hit["factual_id"]
-		update_user_context(params, transaction, hit)
+		#update_user_context(params, transaction, hit)
 		params["compare_indices"]["relinked"].append(transaction)
 	else:
 		# Add transaction to another queue for later analysis
@@ -581,7 +587,7 @@ def null_decision_boundary(params, transaction, results):
 	if user_input in accepted_inputs:
 		_, hit = get_hit(results, int(user_input))
 		transaction["relinked_id"] = hit["factual_id"]
-		update_user_context(params, transaction, hit)
+		#update_user_context(params, transaction, hit)
 		params["compare_indices"]["relinked"].append(transaction)
 	else:
 		# Add transaction to another queue for later analysis
@@ -752,21 +758,24 @@ def print_formatted_result(results, index):
 
 	# Print Details
 	details_formatted = [hit.get(field, "") for field in fields_to_print]
+	details_formatted = [detail if type(detail) is str else detail[0] for detail in details_formatted]
 	details_formatted = ", ".join(details_formatted)
 	safe_print("{:7}".format("[" + str(index) + "] ") + " " + str(details_formatted))
 
 def get_hit(search_results, index):
 	"""get z-score of the hits and return an indexed hit"""
 	# Must have results
-	if search_results['hits']['total'] < (index + 1):
-		return False, False
 
 	hits = search_results['hits']['hits']
-	scores = [hit['_score'] for hit in hits]
-	z_score = z_score_delta(scores)
-	hit = hits[index]
 
-	return z_score, hit["_source"]
+	try:
+		scores = [hit['_score'] for hit in hits]
+		z_score = z_score_delta(scores)
+		hit = hits[index]
+	except:
+		return False, False
+
+	return z_score, hit["fields"]
 
 
 def verify_arguments():

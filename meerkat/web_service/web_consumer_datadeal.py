@@ -105,7 +105,7 @@ class WebConsumerDatadeal():
 		must_clauses = o_query["query"]["bool"]["must"]
 		field_boosts = get_boosted_fields(self.hyperparams, "standard_fields")
 		# Add Merchant Sub Query
-		if transaction['CNN']['label'] != '':
+		if transaction.get('CNN', {}).get('label', '') != '':
 			term = string_cleanse(transaction['CNN']['label'])
 			merchant_query = get_qs_query(term, ['name'], field_boosts['name'], operator="AND")
 			must_clauses.append(merchant_query)
@@ -322,7 +322,7 @@ class WebConsumerDatadeal():
 
 		return transaction
 
-	def __search_factual_index(self, transactions):
+	def search_factual_index(self, transactions):
 		"""Enrich physical transactions with Meerkat"""
 		if len(transactions) == 0:
 			return transactions
@@ -344,6 +344,8 @@ class WebConsumerDatadeal():
 
 		queries = '\n'.join(map(json.dumps, queries))
 		results = self.__search_index(queries)
+
+		return results
 
 		# Error Handling
 		if results is None:
@@ -405,10 +407,10 @@ class WebConsumerDatadeal():
 			for i in range(len(data_to_search_in_agg)):
 				data_to_search_in_agg[i] = search_agg_index([data_to_search_in_agg[i]])
 		if search_factual_in_batch:
-			data_to_search_in_factual = self.__search_factual_index(data_to_search_in_factual)
+			data_to_search_in_factual = self.search_factual_index(data_to_search_in_factual)
 		else:
 			for i in range(len(data_to_search_in_factual)):
-				data_to_search_in_factual[i] = self.__search_factual_index([data_to_search_in_factual[i]])
+				data_to_search_in_factual[i] = self.search_factual_index([data_to_search_in_factual[i]])
 		return data_to_search_in_agg, data_to_search_in_factual
 
 	def enrich_with_search_fields(self, trans, agg_or_factual, map_input_fields, fields_with_same_name):
