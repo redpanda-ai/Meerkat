@@ -111,7 +111,7 @@ def process_description(my_df):
 	merchant = my_df["description"]
 
 	# Find the following patterns and replace with empty string
-	merchants = ["PAYPAL", "SQ", "GOOGLE", "MSFT", "MICROSOFT", "IN"]
+	merchants = ["ABC","PAYPAL", "SQ", "GOOGLE", "MSFT", "MICROSOFT", "IN"]
 	patterns = [r"" + m + r" +\*" for m in merchants]
 	for cur_pattern in patterns:
 		pattern = re.compile(cur_pattern, re.IGNORECASE)
@@ -174,6 +174,17 @@ def get_results_df_from_web_service(my_web_request, container):
 	my_df = pd.DataFrame.from_dict(my_results)
 	return my_df
 
+def process_postal_code(my_df):
+	"""Preprocess postal_code field"""
+	postal_code = my_df["postal_code"]
+	if postal_code.find('-') != -1:
+		postal_code = postal_code.split('-')[0]
+	if postal_code.endswith(".0"):
+		postal_code = postal_code[:-2]
+	if len(postal_code) == 4:
+		postal_code = "0" + postal_code
+	return postal_code
+
 def main_process(args=None):
 	"""Opens up the input file and loads it into a dataframe"""
 	if args is None:
@@ -187,9 +198,10 @@ def main_process(args=None):
 	my_df.rename(index=str, columns=renames, inplace=True)
 	#3. Remove unneeded columns, split mystery_field
 	clean_dataframe(my_df, renames)
-	#4. Use the RNN to grab a few more columns
+	my_df["postal_code"] = my_df.apply(process_postal_code, axis=1)
 	my_df["input_description"] = my_df["description"]
 	my_df["description"] = my_df.apply(process_description, axis=1)
+	#4. Use the RNN to grab a few more columns
 	my_df["RNN_merchant_name"] = my_df.apply(get_rnn_merchant, axis=1)
 	my_df["store_number"] = my_df.apply(get_store_number, axis=1)
 

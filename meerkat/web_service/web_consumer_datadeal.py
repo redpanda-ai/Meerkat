@@ -529,9 +529,25 @@ class WebConsumerDatadeal():
 
 	def find_substr_as_cnn_name(self, data):
 		"""Find substr in description that is a cnn merchant name"""
-		for trans in data["transaction_list"]:
-			print(trans)
-			if 'CNN' in trans and trans['CNN'].get('label', '') == '':
+		print(self.cnn_to_substr_map)
+		"""
+		data["transaction_list"][0]['CNN']['label'] = "foo"
+		print(id(data["transaction_list"][0]))
+		print(id(data["transaction_list"][1]))
+		print(id(data["transaction_list"][0]['CNN']))
+		print(id(data["transaction_list"][1]['CNN']))
+		print(id(data["transaction_list"][0]['CNN']['label']))
+		print(id(data["transaction_list"][1]['CNN']['label']))
+		print(data["transaction_list"][0]['CNN']['label'])
+		print(data["transaction_list"][1]['CNN']['label'])
+		return
+		"""
+		i = 0
+		while i < len(data["transaction_list"]):
+			print("before")
+			print(data["transaction_list"][i])
+			cur_cnn_name = data["transaction_list"][i]['CNN'].get('label', '')
+			if 'CNN' in data["transaction_list"][i] and data["transaction_list"][i]['CNN'].get('label', '') == '':
 				found = False
 				for cnn_name, keyword in self.cnn_to_substr_map.items():
 					if found:
@@ -539,12 +555,16 @@ class WebConsumerDatadeal():
 					for substr in keyword:
 						if found:
 							break
-						print(substr)
-						print(trans["description"])
-						if trans["description"].find(substr) != -1:
-							trans['CNN']['label'] = cnn_name
+						print(data["transaction_list"][i]["description"].find(substr))
+						if data["transaction_list"][i]["description"].find(substr) != -1:
+							# create a new dictionary for CNN
+							data["transaction_list"][i]['CNN'] = {}
+							data["transaction_list"][i]['CNN']['label'] = cnn_name
+							#data["transaction_list"][i]['CNN']['label'] = cnn_name
 							found = True
-			print(trans)
+			print("after")
+			print(data["transaction_list"][i])
+			i += 1
 
 	def classify(self, data, optimizing=False):
 		"""Classify a set of transactions"""
@@ -554,6 +574,12 @@ class WebConsumerDatadeal():
 		# Apply Merchant CNN
 		if "CNN" in services_list or services_list == []:
 			self.__apply_merchant_cnn(data)
+			print(id(data["transaction_list"][0]))
+			print(id(data["transaction_list"][1]))
+			print(id(data["transaction_list"][0]['CNN']))
+			print(id(data["transaction_list"][1]['CNN']))
+			print(data["transaction_list"][0]['CNN'])
+			print(data["transaction_list"][1]['CNN'])
 			# Find CNN in substr to CNN map
 			self.find_substr_as_cnn_name(data)
 
