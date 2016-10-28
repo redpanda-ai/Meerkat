@@ -26,7 +26,7 @@
                     "zip_code": "16510"
                 },
                 "city": "Erie",
-                "description": "MCDONALD'S M4361 OF PA   ERIE         PA",
+                "input_description": "MCDONALD'S M4361 OF PA   ERIE         PA",
                 "input": {
                     "RNN_merchant_name": "MCDONALD'S",
                     "city": "ERIE",
@@ -70,7 +70,7 @@
                     "zip_code": "19138"
                 },
                 "city": "Philadelphia",
-                "description": "U-HAUL CT CHELTEHAM      PHILADELPHIA PA",
+                "input_description": "U-HAUL CT CHELTEHAM      PHILADELPHIA PA",
                 "input": {
                     "RNN_merchant_name": "U-HAUL",
                     "city": "PHILADELPHIA",
@@ -114,7 +114,7 @@
                     "zip_code": "01453-4807"
                 },
                 "city": "Leominster",
-                "description": "DOLRTREE 4474 00044743   LEOMINSTER   MA",
+                "input_description": "DOLRTREE 4474 00044743   LEOMINSTER   MA",
                 "input": {
                     "RNN_merchant_name": "DOLRTREE",
                     "city": "LEOMINSTER",

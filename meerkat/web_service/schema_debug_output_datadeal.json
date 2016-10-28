@@ -16,7 +16,7 @@
 				"latitude" : { "type" : "string" },
 				"website_url" : { "type" : "string" },
 				"store_number" : { "type" : "string" },
-				"description" : { "type" : "string" },
+				"input_description" : { "type" : "string" },
 				"Agg_Name" : {
 					"type" : "array",
 					"items" : { "type" : "string" }
@@ -70,7 +70,7 @@
 			},
 			"required" : [ "row_id", "merchant_name", "address", "city", "state", "zip_code",
 				"phone", "longitude", "latitude", "website_url", "store_number",
-				"description", "CNN", "input"],
+				"input_description", "CNN", "input"],
 			"additionalProperties" : false
 		}
 	},

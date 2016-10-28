@@ -484,7 +484,7 @@ class WebConsumerDatadeal():
 			# Ensure these fields exist in output
 			output_fields = ["city", "state", "address", "longitude", "latitude",
 				"website_url", "store_number", "phone_number", "postal_code",
-				"transaction_id", "description"]
+				"transaction_id", "input_description"]
 			map_fields_for_output = {
 				"phone_number": "phone",
 				"postal_code": "zip_code",
@@ -500,7 +500,7 @@ class WebConsumerDatadeal():
 
 			# Remove fields not in output schema
 			if debug is False:
-				fields_to_remove = ["amount", "date", "ledger_entry", "CNN",
+				fields_to_remove = ["description", "amount", "date", "ledger_entry", "CNN",
 					"container", "RNN_merchant_name", "Agg_Name", "factual_search",
 					"agg_search", "merchant_score", "country", "match_found"]
 				for field in fields_to_remove:
@@ -510,7 +510,7 @@ class WebConsumerDatadeal():
 					trans['CNN']['merchant_score'] =  trans.get("merchant_score", "0.0")
 					trans['CNN'].pop("threshold", None)
 					trans['CNN'].pop("category", None)
-				fields_to_remove = ["amount", "date", "ledger_entry", "container",
+				fields_to_remove = ["description", "amount", "date", "ledger_entry", "container",
 					"merchant_score", "country", "match_found"]
 				for field in fields_to_remove:
 					trans.pop(field, None)
