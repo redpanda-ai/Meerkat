@@ -157,7 +157,8 @@ def get_results_df_from_web_service(my_web_request, container):
 	response_data = json.loads(response.text)["data"]
 	#Create a blank dictionary of results, each value needs to be a list
 	my_results = {
-		"row_id": [], "input_description": [], "merchant_name": [], "address": [], "city": [],
+		"row_id": [], "input_description": [], "merchant_name": [],
+		"description_substring": [], "address": [], "city": [],
 		"state": [], "zip_code": [], "phone": [], "longitude": [],
 		"latitude": [], "website_url": [], "store_number": []}
 	my_keys = my_results.keys()
@@ -229,7 +230,8 @@ def main_process(args=None):
 	#7. Merge all results into a single dataframe
 	results_df = pd.concat(result_dfs, ignore_index=True)
 	LOGGER.info("All Results: {0}".format(results_df.shape))
-	header = ["row_id", "input_description", "merchant_name", "address", "city", "state", "zip_code",
+	header = ["row_id", "input_description", "merchant_name", "description_substring",
+		 "address", "city", "state", "zip_code",
 		"phone", "longitude", "latitude", "website_url", "store_number"]
 	#8. Drop extraneous columns
 	df_column_list = list(results_df.columns.values)
