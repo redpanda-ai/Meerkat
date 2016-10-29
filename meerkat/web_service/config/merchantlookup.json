@@ -4,24 +4,28 @@
    "CNN Name": "7-Eleven"
  },
  {
-   "Keyword": "FOREVER 21",
-   "CNN Name": "Forever 21"
- },
- {
-   "Keyword": "WAL-SAMS",
-   "CNN Name": "Walmart"
- },
- {
-   "Keyword": "7 ELEVEN",
-   "CNN Name": "7-Eleven"
- },
- {
-   "Keyword": "GAS COSTCO",
-   "CNN Name": "Costco Gas"
+   "Keyword": "A&P",
+   "CNN Name": "A&P"
  },
  {
    "Keyword": "ACME",
    "CNN Name": "Acme Markets"
+ },
+ {
+   "Keyword": "ACS",
+   "CNN Name": "ACS Education Services"
+ },
+ {
+   "Keyword": "AEP",
+   "CNN Name": "American Electric Power"
+ },
+ {
+   "Keyword": "AES",
+   "CNN Name": "American Educational Services"
+ },
+ {
+   "Keyword": "AFLAC",
+   "CNN Name": "Aflac"
  },
  {
    "Keyword": "ALBERTSONS",
@@ -32,28 +36,20 @@
    "CNN Name": "Albertsons"
  },
  {
-   "Keyword": "PGANDE ",
-   "CNN Name": "PG&E"
+   "Keyword": "Alliant - WPL",
+   "CNN Name": "Alliant Energy"
  },
  {
    "Keyword": "AMER ELECT PWR",
    "CNN Name": "American Electric Power"
  },
  {
-   "Keyword": "PG&E/EZ-PAY",
-   "CNN Name": "PG&E"
+   "Keyword": "ANTHEM BLUECROSS",
+   "CNN Name": "Blue Cross Blue Shield Association"
  },
  {
-   "Keyword": "AEP",
-   "CNN Name": "American Electric Power"
- },
- {
-   "Keyword": "DELL PREFERRED",
-   "CNN Name": "Dell"
- },
- {
-   "Keyword": "Alliant - WPL",
-   "CNN Name": "Alliant Energy"
+   "Keyword": "AUTOPAY/DISH",
+   "CNN Name": "Dish Network"
  },
  {
    "Keyword": "BK OF AM CRD ACH ",
@@ -88,10 +84,6 @@
    "CNN Name": "JPMorgan Chase"
  },
  {
-   "Keyword": "CHASE",
-   "CNN Name": "JPMorgan Chase"
- },
- {
    "Keyword": "CHASE AUTO FINAN ",
    "CNN Name": "JPMorgan Chase"
  },
@@ -100,15 +92,15 @@
    "CNN Name": "JPMorgan Chase"
  },
  {
+   "Keyword": "CHASE HOME LEND",
+   "CNN Name": "JPMorgan Chase"
+ },
+ {
    "Keyword": "CHASE STDNT LOAN ",
    "CNN Name": "JPMorgan Chase"
  },
  {
    "Keyword": "CHASEHOMEFINANCE ",
-   "CNN Name": "JPMorgan Chase"
- },
- {
-   "Keyword": "CHASE HOME LEND",
    "CNN Name": "JPMorgan Chase"
  },
  {
@@ -124,6 +116,10 @@
    "CNN Name": "Los Angeles Municipal Service"
  },
  {
+   "Keyword": "COLUMBIA GAS OH",
+   "CNN Name": "Columbia Gas"
+ },
+ {
    "Keyword": "COLUMBIA GAS OH  ",
    "CNN Name": "Columbia Gas"
  },
@@ -132,7 +128,183 @@
    "CNN Name": "comcast"
  },
  {
+   "Keyword": "COMED",
+   "CNN Name": "Commonwealth Edison"
+ },
+ {
    "Keyword": "COMMONWEALTH ED",
    "CNN Name": "Commonwealth Edison"
+ },
+ {
+   "Keyword": "CSAA IG",
+   "CNN Name": "AAA"
+ },
+ {
+   "Keyword": "DEL TACO",
+   "CNN Name": "Del Taco"
+ },
+ {
+   "Keyword": "DELL PREFERRED",
+   "CNN Name": "Dell"
+ },
+ {
+   "Keyword": "DUKE AUTO PAYMT",
+   "CNN Name": "Duke Energy"
+ },
+ {
+   "Keyword": "DUKE/EZ-PAY",
+   "CNN Name": "Duke Energy"
+ },
+ {
+   "Keyword": "FLORIDA PREPAID",
+   "CNN Name": "Florida Prepaid"
+ },
+ {
+   "Keyword": "FOREVER 21",
+   "CNN Name": "Forever 21"
+ },
+ {
+   "Keyword": "FPL DIRECT DEBIT",
+   "CNN Name": "Florida Power & Light"
+ },
+ {
+   "Keyword": "GAS COSTCO",
+   "CNN Name": "Costco Gas"
+ },
+ {
+   "Keyword": "GREAT LAKES",
+   "CNN Name": "Great Lakes Educational Loans"
+ },
+ {
+   "Keyword": "H&M",
+   "CNN Name": "H&M"
+ },
+ {
+   "Keyword": "HEB",
+   "CNN Name": "HEB Gas & Car Wash"
+ },
+ {
+   "Keyword": "KEY FOOD",
+   "CNN Name": "Key Food"
+ },
+ {
+   "Keyword": "LA FITNESS",
+   "CNN Name": "LA Fitness"
+ },
+ {
+   "Keyword": "LENDING CLUB",
+   "CNN Name": "Lending Club"
+ },
+ {
+   "Keyword": "METROPCS",
+   "CNN Name": "MetroPCS"
+ },
+ {
+   "Keyword": "NATIONAL GRID NY",
+   "CNN Name": "National Grid"
+ },
+ {
+   "Keyword": "Nationstar",
+   "CNN Name": "Nationstar Mortgage"
+ },
+ {
+   "Keyword": "NewYorkLife-AARP",
+   "CNN Name": "AARP"
+ },
+ {
+   "Keyword": "PANDA EXPRESS",
+   "CNN Name": "Panda Express"
+ },
+ {
+   "Keyword": "PG&E/EZ-PAY",
+   "CNN Name": "PG&E"
+ },
+ {
+   "Keyword": "PGANDE ",
+   "CNN Name": "PG&E"
+ },
+ {
+   "Keyword": "PILOT",
+   "CNN Name": "Pilot"
+ },
+ {
+   "Keyword": "ProgressEngyFl",
+   "CNN Name": "Progress Energy"
+ },
+ {
+   "Keyword": "QUIKTRIP",
+   "CNN Name": "QuikTrip"
+ },
+ {
+   "Keyword": "SAM'S Club",
+   "CNN Name": "Sam's Club"
+ },
+ {
+   "Keyword": "SHELL",
+   "CNN Name": "Shell"
+ },
+ {
+   "Keyword": "SO CAL GAS",
+   "CNN Name": "Southern California Gas Company"
+ },
+ {
+   "Keyword": "SO CALIF EDISON",
+   "CNN Name": "Southern California Edison"
+ },
+ {
+   "Keyword": "T MOBILE",
+   "CNN Name": "T-Mobile"
+ },
+ {
+   "Keyword": "TARGET",
+   "CNN Name": "Target"
+ },
+ {
+   "Keyword": "THE HARTFORD",
+   "CNN Name": "The Hartford"
+ },
+ {
+   "Keyword": "TIME INSURANCE",
+   "CNN Name": "Time Insurance"
+ },
+ {
+   "Keyword": "TJ TJ MAXX",
+   "CNN Name": "T.J.Maxx"
+ },
+ {
+   "Keyword": "UBER",
+   "CNN Name": "Uber"
+ },
+ {
+   "Keyword": "ULTA 3",
+   "CNN Name": "Ulta"
+ },
+ {
+   "Keyword": "UNITEDHEALTHONE",
+   "CNN Name": "UnitedHealthcare"
+ },
+ {
+   "Keyword": "WAL-SAMS",
+   "CNN Name": "Walmart"
+ },
+ {
+   "Keyword": "XBOX LIVE",
+   "CNN Name": "Xbox"
+ },
+ {
+   "Keyword": "WF HOME MTG      ",
+   "CNN Name": "Wells Fargo"
+ },
+ {
+   "Keyword": "76 10",
+   "CNN Name": "Union 76"
+ },
+ {
+   "Keyword": "76 00",
+   "CNN Name": "Union 76"
+ },
+ {
+   "Keyword": "76 FUEL",
+   "CNN Name": "Union 76"
  }
 ]
