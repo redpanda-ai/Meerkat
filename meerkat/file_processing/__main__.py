@@ -177,12 +177,14 @@ def get_results_df_from_web_service(my_web_request, container):
 def process_postal_code(my_df):
 	"""Preprocess postal_code field"""
 	postal_code = my_df["postal_code"]
-	if postal_code.endswith(".0"):
-		postal_code = postal_code[:-2]
+	if '.' in postal_code:
+		postal_code = postal_code.split('.')[0]
+	if '-' in postal_code:
+		postal_code = postal_code.split('-')[0]
+	if postal_code == '00000':
+		return postal_code
 	postal_code = postal_code.zfill(5)
-	if postal_code == "00000":
-		return ""
-	return postal_code
+	return postal_code if postal_code != '00000' else ''
 
 def main_process(args=None):
 	"""Opens up the input file and loads it into a dataframe"""
