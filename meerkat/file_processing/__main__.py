@@ -111,7 +111,7 @@ def process_description(my_df):
 	merchant = my_df["description"]
 
 	# Find the following patterns and replace with empty string
-	merchants = ["PAYPAL", "SQ", "GOOGLE", "MSFT", "MICROSOFT", "IN"]
+	merchants = ["ABC","PAYPAL", "SQ", "GOOGLE", "MSFT", "MICROSOFT", "IN"]
 	patterns = [r"" + m + r" +\*" for m in merchants]
 	for cur_pattern in patterns:
 		pattern = re.compile(cur_pattern, re.IGNORECASE)
@@ -157,7 +157,8 @@ def get_results_df_from_web_service(my_web_request, container):
 	response_data = json.loads(response.text)["data"]
 	#Create a blank dictionary of results, each value needs to be a list
 	my_results = {
-		"row_id": [], "description": [], "merchant_name": [], "address": [], "city": [],
+		"row_id": [], "input_description": [], "merchant_name": [],
+		"description_substring": [], "address": [], "city": [],
 		"state": [], "zip_code": [], "phone": [], "longitude": [],
 		"latitude": [], "website_url": [], "store_number": []}
 	my_keys = my_results.keys()
@@ -173,6 +174,18 @@ def get_results_df_from_web_service(my_web_request, container):
 	my_df = pd.DataFrame.from_dict(my_results)
 	return my_df
 
+def process_postal_code(my_df):
+	"""Preprocess postal_code field"""
+	postal_code = my_df["postal_code"]
+	if '.' in postal_code:
+		postal_code = postal_code.split('.')[0]
+	if '-' in postal_code:
+		postal_code = postal_code.split('-')[0]
+	if postal_code == '00000':
+		return postal_code
+	postal_code = postal_code.zfill(5)
+	return postal_code if postal_code != '00000' else ''
+
 def main_process(args=None):
 	"""Opens up the input file and loads it into a dataframe"""
 	if args is None:
@@ -186,8 +199,10 @@ def main_process(args=None):
 	my_df.rename(index=str, columns=renames, inplace=True)
 	#3. Remove unneeded columns, split mystery_field
 	clean_dataframe(my_df, renames)
-	#4. Use the RNN to grab a few more columns
+	my_df["postal_code"] = my_df.apply(process_postal_code, axis=1)
+	my_df["input_description"] = my_df["description"]
 	my_df["description"] = my_df.apply(process_description, axis=1)
+	#4. Use the RNN to grab a few more columns
 	my_df["RNN_merchant_name"] = my_df.apply(get_rnn_merchant, axis=1)
 	my_df["store_number"] = my_df.apply(get_store_number, axis=1)
 
@@ -228,7 +243,8 @@ def main_process(args=None):
 	#7. Merge all results into a single dataframe
 	results_df = pd.concat(result_dfs, ignore_index=True)
 	LOGGER.info("All Results: {0}".format(results_df.shape))
-	header = ["row_id", "description", "merchant_name", "address", "city", "state", "zip_code",
+	header = ["row_id", "input_description", "merchant_name", "description_substring",
+		 "address", "city", "state", "zip_code",
 		"phone", "longitude", "latitude", "website_url", "store_number"]
 	#8. Drop extraneous columns
 	df_column_list = list(results_df.columns.values)

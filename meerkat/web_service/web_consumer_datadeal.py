@@ -46,6 +46,7 @@ class WebConsumerDatadeal():
 				self.params["routed"] = "_routing" in mapping[index]["mappings"][index_type]
 
 		self.load_merchant_name_map()
+		self.load_cnn_to_substr_map()
 		self.load_tf_models()
 		self.hyperparams = hyperparams if hyperparams else {}
 		self.cities = cities if cities else {}
@@ -55,6 +56,12 @@ class WebConsumerDatadeal():
 		merchant_name_map_path = self.params.get("merchant_name_map_path", None)
 		if merchant_name_map_path is not None:
 			self.merchant_name_map = load_params(merchant_name_map_path)
+
+	def load_cnn_to_substr_map(self):
+		"""Load a json map to convert substring to CNN merchant name"""
+		cnn_to_substr_map_path = self.params.get("cnn_to_substr_map_path", None)
+		if cnn_to_substr_map_path is not None:
+			self.cnn_to_substr_map = load_params(cnn_to_substr_map_path)
 
 	def load_tf_models(self):
 		"""Load all tensorFlow models"""
@@ -453,7 +460,7 @@ class WebConsumerDatadeal():
 			elif trans.get("factual_search", "") != "" and trans["factual_search"].get("merchant_name") != "":
 				trans["merchant_name"] = trans["factual_search"]["merchant_name"]
 			else:
-				trans["merchant_name"] = trans["RNN_merchant_name"]
+				trans["merchant_name"] = "" #trans["RNN_merchant_name"]
 
 			# Only output store number found in agg search
 			if "agg_search" in trans and trans["agg_search"].get("store_number", "") != "":
@@ -484,10 +491,11 @@ class WebConsumerDatadeal():
 			# Ensure these fields exist in output
 			output_fields = ["city", "state", "address", "longitude", "latitude",
 				"website_url", "store_number", "phone_number", "postal_code",
-				"transaction_id", "description"]
+				"transaction_id", "input_description", "RNN_merchant_name"]
 			map_fields_for_output = {
 				"phone_number": "phone",
 				"postal_code": "zip_code",
+				"RNN_merchant_name": "description_substring",
 				"transaction_id": "row_id"
 			}
 			for field in output_fields:
@@ -498,9 +506,13 @@ class WebConsumerDatadeal():
 				else:
 					trans[field] = trans.get(field, "")
 
+			# Only output description substring when merchant name is empty
+			if trans["merchant_name"] != "":
+				trans["description_substring"] = ""
+
 			# Remove fields not in output schema
 			if debug is False:
-				fields_to_remove = ["amount", "date", "ledger_entry", "CNN",
+				fields_to_remove = ["description", "amount", "date", "ledger_entry", "CNN",
 					"container", "RNN_merchant_name", "Agg_Name", "factual_search",
 					"agg_search", "merchant_score", "country", "match_found"]
 				for field in fields_to_remove:
@@ -510,10 +522,30 @@ class WebConsumerDatadeal():
 					trans['CNN']['merchant_score'] =  trans.get("merchant_score", "0.0")
 					trans['CNN'].pop("threshold", None)
 					trans['CNN'].pop("category", None)
-				fields_to_remove = ["amount", "date", "ledger_entry", "container",
+				fields_to_remove = ["description", "amount", "date", "ledger_entry", "container",
 					"merchant_score", "country", "match_found"]
 				for field in fields_to_remove:
 					trans.pop(field, None)
+
+	def find_substr_as_cnn_name(self, data):
+		"""Find substr in description that is a cnn merchant name"""
+		i = 0
+		while i < len(data["transaction_list"]):
+			cur_cnn_name = data["transaction_list"][i]['CNN'].get('label', '')
+			if 'CNN' in data["transaction_list"][i] and data["transaction_list"][i]['CNN'].get('label', '') == '':
+				found = False
+				for cnn_name, keyword in self.cnn_to_substr_map.items():
+					if found:
+						break
+					for substr in keyword:
+						if found:
+							break
+						if data["transaction_list"][i]["description"].find(substr) != -1:
+							# create a new dictionary for CNN
+							data["transaction_list"][i]['CNN'] = {'label': cnn_name}
+							#data["transaction_list"][i]['CNN']['label'] = cnn_name
+							found = True
+			i += 1
 
 	def classify(self, data, optimizing=False):
 		"""Classify a set of transactions"""
@@ -523,6 +555,8 @@ class WebConsumerDatadeal():
 		# Apply Merchant CNN
 		if "CNN" in services_list or services_list == []:
 			self.__apply_merchant_cnn(data)
+			# Find CNN in substr to CNN map
+			self.find_substr_as_cnn_name(data)
 
 		# Apply Elasticsearch
 		if "search" in services_list or services_list == []:
