@@ -170,7 +170,7 @@ def enrich_transaction(trans, hit):
 
 		# logging.critical('This transaction has been enriched with agg index')
 		if hit['_score'] < 2.0:
-			logging.critical('transaction: {}, raw_score: {}'.format(trans, hit['_score']))
+			logging.critical('transaction id: {}, raw_score: {}'.format(trans.get('transaction_id', ''), hit['_score']))
 	return trans
 
 def search_agg_index(data, params=None):
