@@ -7,7 +7,7 @@ import pandas as pd
 from elasticsearch import Elasticsearch
 from scipy.stats.mstats import zscore
 
-logging.getLogger().setLevel(logging.INFO)
+logging.getLogger().setLevel(logging.CRITICAL)
 
 endpoint = 'search-agg-factual-nuz5jggrftlzjd5f7c2ehkmhlu.us-west-2.es.amazonaws.com'
 host = [{'host': endpoint, 'port': 80}]
@@ -103,7 +103,7 @@ def process_query_result(trans, query_result, params):
 	if hits_total == 1:
 		logging.critical('The number of hits is 1')
 		if query_result['hits']['hits'][0]['_score'] >= params['threshold']['raw_score']:
-			return query_result['hits']['hits'][0]['_source']
+			return query_result['hits']['hits'][0]
 		else:
 			return None
 
@@ -123,13 +123,13 @@ def process_query_result(trans, query_result, params):
 
 		if first_store != '' and des.find(first_store) != -1:
 			logging.critical('Find a store number in description')
-			return first['_source']
+			return first
 		if second_store != '' and des.find(second_store) != -1:
 			logging.critical('Find a store number in description')
-			return second['_source']
+			return second
 
 		if first['_score'] - second['_score'] >= params['threshold']['z_score']:
-			return first['_source']
+			return first
 		else:
 			return None
 
@@ -147,12 +147,12 @@ def process_query_result(trans, query_result, params):
 			store_number = store_number.split('-')[0]
 		if store_number != '' and des.find(store_number) != -1:
 			logging.critical('Found a store number in description')
-			return hit['_source']
+			return hit
 
 	z_scores = zscore(scores)
 	if z_scores[0] - z_scores[1] >= params['threshold']['z_score']:
 		logging.info('This query has a top hit based on z scores')
-		return hits_list[0]['_source']
+		return hits_list[0]
 
 	logging.critical('No top hit based on z scores')
 	return None
@@ -165,11 +165,13 @@ def enrich_transaction(trans, hit):
 	if hit is not None:
 		trans['agg_search'] = {}
 		for key in attributes:
-			if hit.get(key, '') != '':
-				trans['agg_search'][key] = hit.get(key, '')
+			if hit['_source'].get(key, '') != '':
+				trans['agg_search'][key] = hit['_source'].get(key, '')
 
-		logging.info('This transaction has been enriched with agg index')
-		#pprint(trans)
+		logging.critical('This transaction has been enriched with agg index')
+		if hit['_score'] < 2.0:
+			logging.critical('The score for this transaction is less than 2.0')
+			logging.critical(trans)
 	return trans
 
 def search_agg_index(data, params=None):
@@ -213,5 +215,6 @@ if __name__ == '__main__':
 	data = json.loads(open('./agg_input.json').read())
 	data = list(np.random.permutation(data))
 	search_agg_index(data)
+	sys.exit()
 	with open('./agg_output.json', 'w') as outfile:
 		json.dump(data, outfile, indent=4, sort_keys=True)
