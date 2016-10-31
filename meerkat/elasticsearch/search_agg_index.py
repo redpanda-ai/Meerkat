@@ -7,7 +7,7 @@ import pandas as pd
 from elasticsearch import Elasticsearch
 from scipy.stats.mstats import zscore
 
-logging.getLogger().setLevel(logging.INFO)
+logging.getLogger().setLevel(logging.CRITICAL)
 
 endpoint = 'search-agg-factual-nuz5jggrftlzjd5f7c2ehkmhlu.us-west-2.es.amazonaws.com'
 host = [{'host': endpoint, 'port': 80}]
@@ -96,14 +96,14 @@ def process_query_result(trans, query_result, params):
 
 	# 0 hit
 	if hits_total == 0:
-		logging.critical('The number of hits is 0')
+		logging.warning('The number of hits is 0')
 		return None
 
 	# 1 hit
 	if hits_total == 1:
-		logging.critical('The number of hits is 1')
+		logging.warning('The number of hits is 1')
 		if query_result['hits']['hits'][0]['_score'] >= params['threshold']['raw_score']:
-			return query_result['hits']['hits'][0]['_source']
+			return query_result['hits']['hits'][0]
 		else:
 			return None
 
@@ -111,7 +111,7 @@ def process_query_result(trans, query_result, params):
 
 	# 2 hits
 	if hits_total == 2:
-		logging.critical('The number of hits is 2')
+		logging.warning('The number of hits is 2')
 		first, second = query_result['hits']['hits'][0], query_result['hits']['hits'][1]
 		first_store = first['_source'].get('store_number', '')
 		if first_store.startswith('T'):
@@ -122,14 +122,14 @@ def process_query_result(trans, query_result, params):
 			second_store = second_store[1:]
 
 		if first_store != '' and des.find(first_store) != -1:
-			logging.critical('Find a store number in description')
-			return first['_source']
+			logging.warning('Find a store number in description')
+			return first
 		if second_store != '' and des.find(second_store) != -1:
-			logging.critical('Find a store number in description')
-			return second['_source']
+			logging.warning('Find a store number in description')
+			return second
 
 		if first['_score'] - second['_score'] >= params['threshold']['z_score']:
-			return first['_source']
+			return first
 		else:
 			return None
 
@@ -146,15 +146,15 @@ def process_query_result(trans, query_result, params):
 		if store_number.find('-') != -1:
 			store_number = store_number.split('-')[0]
 		if store_number != '' and des.find(store_number) != -1:
-			logging.critical('Found a store number in description')
-			return hit['_source']
+			logging.warning('Found a store number in description')
+			return hit
 
 	z_scores = zscore(scores)
 	if z_scores[0] - z_scores[1] >= params['threshold']['z_score']:
 		logging.info('This query has a top hit based on z scores')
-		return hits_list[0]['_source']
+		return hits_list[0]
 
-	logging.critical('No top hit based on z scores')
+	logging.warning('No top hit based on z scores')
 	return None
 
 def enrich_transaction(trans, hit):
@@ -165,15 +165,18 @@ def enrich_transaction(trans, hit):
 	if hit is not None:
 		trans['agg_search'] = {}
 		for key in attributes:
-			if hit.get(key, '') != '':
-				trans['agg_search'][key] = hit.get(key, '')
+			if hit['_source'].get(key, '') != '':
+				trans['agg_search'][key] = hit['_source'].get(key, '')
 
-		logging.info('This transaction has been enriched with agg index')
-		#pprint(trans)
+		# logging.critical('This transaction has been enriched with agg index')
+		if hit['_score'] < 2.0:
+			logging.critical('transaction: {}, raw_score: {}'.format(trans, hit['_score']))
 	return trans
 
 def search_agg_index(data, params=None):
 	"""Enrich transactions with agg index"""
+	logging.getLogger().setLevel(logging.CRITICAL)
+
 	if params is None:
 		params = json.loads(open('./meerkat/web_service/config/hyperparameters/search_agg_index_config.json').read())
 	#pprint(params)
@@ -188,7 +191,7 @@ def search_agg_index(data, params=None):
 
 		list_name = trans.get('Agg_Name', [])
 		if len(list_name) == 0 or list_name[0] == '':
-			logging.critical('A transaction with valid agg name is required, skip this one')
+			logging.warning('A transaction with valid agg name is required, skip this one')
 			continue
 
 		city, state, zip_code = trans.get('city', ''), trans.get('state', ''), trans.get('postal_code', '')
@@ -213,5 +216,6 @@ if __name__ == '__main__':
 	data = json.loads(open('./agg_input.json').read())
 	data = list(np.random.permutation(data))
 	search_agg_index(data)
+	sys.exit()
 	with open('./agg_output.json', 'w') as outfile:
 		json.dump(data, outfile, indent=4, sort_keys=True)
