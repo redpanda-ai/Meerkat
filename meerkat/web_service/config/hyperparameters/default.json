@@ -2,6 +2,7 @@
 	"es_result_size": "45",
 	"z_score_threshold": "2.000",
 	"raw_score_threshold": "6.040",
+	"fuzziness": "AUTO",
 	"good_description" : "2",
  	"boost_labels" : ["standard_fields"],
 	"boost_vectors" :  {

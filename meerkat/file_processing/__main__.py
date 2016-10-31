@@ -1,10 +1,10 @@
+"""This module does file processing for the data-deal branch of Meerkat"""
 import json
 import argparse
-import csv
 import re
 import logging
-import pandas as pd
 import sys
+import pandas as pd
 import yaml
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
@@ -17,12 +17,12 @@ MODEL_PATH = "meerkat/classification/models/rnn_model/"
 MERCHANT_RNN = get_tf_rnn_by_path(MODEL_PATH + "bilstm.ckpt", MODEL_PATH + "w2i.json")
 
 logging.config.dictConfig(yaml.load(open('meerkat/file_processing/logging.yaml', 'r')))
-logger = logging.getLogger('basic')
+LOGGER = logging.getLogger('basic')
 
 def get_renames(rename_type):
 	"""Fetches the proper rename dict, used to rename columns in the dataframe."""
 	renames = None
-	if rename_type in ['credit', 'debit_ach']:
+	if rename_type in ['credit', 'debit_ach', 'debit_pos']:
 		return {
 			"row_id": "transaction_id",
 			"at_transactiondescription2": "description",
@@ -31,23 +31,14 @@ def get_renames(rename_type):
 			"at_transactioncountrycode": "country",
 			"at_transactionpostalcode1": "postal_code"
 		}
-	elif rename_type == 'debit_pos':
-		return {
-			"row_id": "transaction_id",
-			"card_acpt_merchant_name": "description",
-			"at_transactioncity": "mystery_field",
-			"at_transactionstateprovince": "state",
-			"at_transactioncountrycode": "country",
-			"at_transactionpostalcode1": "postal_code"
-		}
 	else:
-		logger.error("{0} is Not a valid file_type, aborting".format(rename_type))
+		LOGGER.error("{0} is Not a valid file_type, aborting".format(rename_type))
 		sys.exit()
 	return renames
 
 def get_file_type(args):
 	"""Determines the file type, based upon the name of the input file."""
-	logger.warning(args.input_file)
+	LOGGER.warning(args.input_file)
 	if args.input_file.find('_credit') != -1:
 		file_type = 'credit'
 	elif args.input_file.find('_debit_pos') != -1:
@@ -55,9 +46,9 @@ def get_file_type(args):
 	elif args.input_file.find('_debit_ach') != -1:
 		file_type = 'debit_ach'
 	else:
-		logger.error("Cannot identify file type for {0}, aborting".format(args.file_name))
+		LOGGER.error("Cannot identify file type for {0}, aborting".format(args.file_name))
 		sys.exit()
-	logger.info("File type is {0}".format(file_type))
+	LOGGER.info("File type is {0}".format(file_type))
 	return file_type
 
 def preprocess_dataframe(args):
@@ -90,19 +81,20 @@ def clean_dataframe(my_df, renames):
 	#Remove unused columns
 	for column in header_names:
 		if column not in reverse_renames:
-			logger.info("Removing superflous column {0}".format(column))
+			LOGGER.info("Removing superflous column {0}".format(column))
 			del my_df[column]
 	#lambda functions
-	phone_regex = "^[0-9][0-9\-]*$"
-	website_regex = "^.*\.com.*$"
-	city_regex = "^[a-z ]+.*$"
+	phone_regex = r"^[0-9][0-9\-]*$"
+	website_regex = r"^.*\.com.*$"
+	city_regex = r"^[a-z ]+.*$"
 	#split 'mystery_field' into phone, website, or city
 	get_phone = lambda x: x["mystery_field"] \
 		if re.match(phone_regex, x["mystery_field"]) else ""
 	get_website = lambda x: x["mystery_field"] \
 		if re.match(website_regex, x["mystery_field"], flags=re.IGNORECASE) else ""
 	get_city = lambda x: x["mystery_field"] \
-		if ( re.match(city_regex, x["mystery_field"], flags=re.IGNORECASE) and not re.match(website_regex, x["mystery_field"], flags=re.IGNORECASE) ) else ""
+		if (re.match(city_regex, x["mystery_field"], flags=re.IGNORECASE) \
+		and not re.match(website_regex, x["mystery_field"], flags=re.IGNORECASE)) else ""
 	#Add some columns
 	my_df["phone_number"] = my_df.apply(get_phone, axis=1)
 	my_df["city"] = my_df.apply(get_city, axis=1)
@@ -110,49 +102,48 @@ def clean_dataframe(my_df, renames):
 	#Remove processed column
 	del my_df["mystery_field"]
 
-def hasNumbers(inputString):
+def has_numbers(inputString):
 	"""Check if input string has number"""
 	return any(char.isdigit() for char in inputString)
 
-def get_rnn_merchant(my_df):
-	"""This is a stub implementation, no multi-class RNN exists."""
+def process_description(my_df):
+	"""Preprocess description field"""
 	merchant = my_df["description"]
 
-	pattern = re.compile("SQ \*", re.IGNORECASE)
-	merchant = pattern.sub("", merchant)
+	# Find the following patterns and replace with empty string
+	merchants = ["ABC","PAYPAL", "SQ", "GOOGLE", "MSFT", "MICROSOFT", "IN"]
+	patterns = [r"" + m + r" +\*" for m in merchants]
+	for cur_pattern in patterns:
+		pattern = re.compile(cur_pattern, re.IGNORECASE)
+		merchant = pattern.sub("", merchant)
+	return merchant
 
-	pattern = re.compile("GOOGLE \*", re.IGNORECASE)
-	merchant = pattern.sub("", merchant)
+def get_rnn_merchant(my_df):
+	"""This is a stub implementation, no multi-class RNN exists."""
 
+	merchant = my_df["description"]
 	if merchant == "":
 		return ""
 
 	tagged = MERCHANT_RNN([{"Description": merchant}])
 	if "merchant" in tagged[0]["Predicted"]:
-		if len(tagged[0]["Predicted"]["merchant"]) > 1:
-			merchant_str = ""
-			for merchant_substr in tagged[0]["Predicted"]["merchant"]:
-				merchant_str += merchant_substr + " "
-			tagged[0]["Predicted"]["merchant"] = [merchant_str[:-1]]
-			logger.warning(tagged)
-		try:
-			tag = re.match(re.escape(tagged[0]["Predicted"]["merchant"][0]), my_df["description"], re.IGNORECASE)
-			tag = merchant[tag.start():tag.end()]
-		except:
+		merchant_str = " ".join(tagged[0]["Predicted"]["merchant"])
+		tagged[0]["Predicted"]["merchant"] = [merchant_str]
+		LOGGER.warning(tagged)
+		tag = re.match(re.escape(tagged[0]["Predicted"]["merchant"][0]),\
+			my_df["description"], re.IGNORECASE)
+		if tag: #There are matches
+			return merchant[tag.start():tag.end()]
+		else:
 			return tagged[0]["Predicted"]["merchant"][0]
 	else:
 		return ""
-	return tag
 
 def get_store_number(my_df):
 	"""This is a stub implementation, no multi-class RNN exists."""
 	desc = my_df["description"]
-	try:
-		merchant_removed = re.sub(re.escape(my_df["RNN_merchant_name"]), "", desc, flags=re.IGNORECASE)
-	except:
-		return ""
-
-	output = [t for t in merchant_removed.split() if not t.isalpha() and hasNumbers(t)]
+	merchant_removed = re.sub(re.escape(my_df["RNN_merchant_name"]), "", desc, flags=re.IGNORECASE)
+	output = [t for t in merchant_removed.split() if not t.isalpha() and has_numbers(t)]
 	return " ".join(output)
 
 def get_results_df_from_web_service(my_web_request, container):
@@ -161,14 +152,15 @@ def get_results_df_from_web_service(my_web_request, container):
 	response = requests.post("https://localhost:443/meerkat_datadeal/", verify=False,
 		data=json.dumps(my_web_request))
 	if "data" not in response.text:
-		logger.critical("There is no data in the response, the response is {0}".format(response))
+		LOGGER.critical("There is no data in the response, the response is {0}".format(response))
 		sys.exit()
 	response_data = json.loads(response.text)["data"]
 	#Create a blank dictionary of results, each value needs to be a list
 	my_results = {
-		"row_id": [], "merchant_name": [], "address": [], "city": [],
+		"row_id": [], "input_description": [], "merchant_name": [],
+		"description_substring": [], "address": [], "city": [],
 		"state": [], "zip_code": [], "phone": [], "longitude": [],
-		"latitude": [], "website_url": [], "store_number": [] }
+		"latitude": [], "website_url": [], "store_number": []}
 	my_keys = my_results.keys()
 	#Append an element to for each key in each transaction
 	for transaction in response_data["transaction_list"]:
@@ -182,11 +174,23 @@ def get_results_df_from_web_service(my_web_request, container):
 	my_df = pd.DataFrame.from_dict(my_results)
 	return my_df
 
+def process_postal_code(my_df):
+	"""Preprocess postal_code field"""
+	postal_code = my_df["postal_code"]
+	if '.' in postal_code:
+		postal_code = postal_code.split('.')[0]
+	if '-' in postal_code:
+		postal_code = postal_code.split('-')[0]
+	if postal_code == '00000':
+		return postal_code
+	postal_code = postal_code.zfill(5)
+	return postal_code if postal_code != '00000' else ''
+
 def main_process(args=None):
 	"""Opens up the input file and loads it into a dataframe"""
 	if args is None:
 		args = parse_arguments(sys.argv[1:])
-	logger.info("Starting main process")
+	LOGGER.info("Starting main process")
 	#1. Get the input data
 	my_df = preprocess_dataframe(args)
 	file_type = get_file_type(args)
@@ -195,11 +199,14 @@ def main_process(args=None):
 	my_df.rename(index=str, columns=renames, inplace=True)
 	#3. Remove unneeded columns, split mystery_field
 	clean_dataframe(my_df, renames)
+	my_df["postal_code"] = my_df.apply(process_postal_code, axis=1)
+	my_df["input_description"] = my_df["description"]
+	my_df["description"] = my_df.apply(process_description, axis=1)
 	#4. Use the RNN to grab a few more columns
 	my_df["RNN_merchant_name"] = my_df.apply(get_rnn_merchant, axis=1)
 	my_df["store_number"] = my_df.apply(get_store_number, axis=1)
 
-	amount, ledger_entry, container, my_date = 10, "debit", "bank", "2016-01-01"
+	container = "bank"
 	if file_type == "credit":
 		container = "card"
 	#5. Transform the dataframe to a record-oriented dictionary
@@ -214,16 +221,18 @@ def main_process(args=None):
 		if transaction_count % transaction_max == 0:
 			#Append existing batch to web_requests
 			if my_web_request is not None:
-				logger.info("Transaction count {0}".format(transaction_count))
+				LOGGER.info("Transaction count {0}".format(transaction_count))
 				result_dfs.append(get_results_df_from_web_service(my_web_request, container))
 			#Create a new batch
-			my_web_request = { "cobrand_id": 0, "user_id": 0, "container": container,
-				"transaction_list": [] }
+			my_web_request = {"cobrand_id": 0, "user_id": 0, "container": container,
+				"transaction_list": []}
 		#Ensure that each transaction has some default values
 		transaction["transaction_id"] = int(transaction["transaction_id"])
 		transaction["ledger_entry"] = "debit"
 		transaction["amount"] = 10
-		transaction["date"] = my_date
+		transaction["date"] = "2016-01-01"
+		if file_type == "debit_ach":
+			my_web_request["services_list"] = ["CNN"]
 		#Add each transaction to the transaction_list for the web_request
 		my_web_request["transaction_list"].append(transaction.copy())
 		transaction_count += 1
@@ -233,9 +242,10 @@ def main_process(args=None):
 
 	#7. Merge all results into a single dataframe
 	results_df = pd.concat(result_dfs, ignore_index=True)
-	logger.info("All Results: {0}".format(results_df.shape))
-	header = [ "row_id", "merchant_name", "address", "city", "state", "zip_code",
-		"phone", "longitude", "latitude", "website_url", "store_number" ]
+	LOGGER.info("All Results: {0}".format(results_df.shape))
+	header = ["row_id", "input_description", "merchant_name", "description_substring",
+		 "address", "city", "state", "zip_code",
+		"phone", "longitude", "latitude", "website_url", "store_number"]
 	#8. Drop extraneous columns
 	df_column_list = list(results_df.columns.values)
 	for column in df_column_list:
@@ -245,7 +255,7 @@ def main_process(args=None):
 	results_df = results_df[header]
 	#10. Write out the results into a delimited file
 	results_df.to_csv(args.output_file, index=False, sep="|", mode="w", header=header)
-	logger.info("Results written to {0}".format(args.output_file))
+	LOGGER.info("Results written to {0}".format(args.output_file))
 
 def parse_arguments(args):
 	"""Correctly parses command line arguments for the program"""
@@ -256,8 +266,8 @@ def parse_arguments(args):
 	return parser.parse_args(args)
 
 if __name__ == "__main__":
-	logger.info("Starting main_process.")
+	LOGGER.info("Starting main_process.")
 	main_process()
-	logger.info("main_process complete.")
+	LOGGER.info("main_process complete.")
 
 
