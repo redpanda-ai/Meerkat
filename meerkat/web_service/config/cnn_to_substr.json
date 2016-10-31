@@ -1,25 +1,199 @@
 {
     "7-Eleven": [
-        "7-ELEVEN",
-        "7 ELEVEN"
+        "7-ELEVEN"
+    ],
+    "A&P": [
+        "A&P"
+    ],
+    "AAA": [
+        "CSAA IG"
+    ],
+    "AARP": [
+        "NewYorkLife-AARP"
+    ],
+    "ACS Education Services": [
+        "ACS"
     ],
     "Acme Markets": [
         "ACME"
+    ],
+    "Aflac": [
+        "AFLAC"
     ],
     "Albertsons": [
         "ALBERTSONS",
         "ALBERTSON'S"
     ],
+    "Alliant Energy": [
+        "Alliant - WPL"
+    ],
+    "American Educational Services": [
+        "AES"
+    ],
+    "American Electric Power": [
+        "AEP",
+        "AMER ELECT PWR"
+    ],
+    "Bank of America": [
+        "BK OF AM CRD ACH ",
+        "BK OF AMER VI/MC ",
+        "BKAMERICA"
+    ],
+    "Blue Cross Blue Shield Association": [
+        "ANTHEM BLUECROSS"
+    ],
+    "California Water Service": [
+        "CALWATER"
+    ],
+    "Central Mortgage Company": [
+        "CENTRAL MORTGAGE "
+    ],
+    "Cigna": [
+        "CIGNA",
+        "CIGNA-LOYAL"
+    ],
+    "City of Charlotte NC": [
+        "CHARLOTTE UTILTY "
+    ],
+    "Columbia Gas": [
+        "COLUMBIA GAS OH",
+        "COLUMBIA GAS OH  "
+    ],
+    "Commonwealth Edison": [
+        "COMED",
+        "COMMONWEALTH ED"
+    ],
     "Costco Gas": [
         "GAS COSTCO"
+    ],
+    "Del Taco": [
+        "DEL TACO"
+    ],
+    "Dell": [
+        "DELL PREFERRED"
+    ],
+    "Dish Network": [
+        "AUTOPAY/DISH"
+    ],
+    "Duke Energy": [
+        "DUKE AUTO PAYMT",
+        "DUKE/EZ-PAY"
+    ],
+    "Florida Power & Light": [
+        "FPL DIRECT DEBIT"
+    ],
+    "Florida Prepaid": [
+        "FLORIDA PREPAID"
     ],
     "Forever 21": [
         "FOREVER 21"
     ],
+    "Great Lakes Educational Loans": [
+        "GREAT LAKES"
+    ],
+    "H&M": [
+        "H&M"
+    ],
+    "HEB Gas & Car Wash": [
+        "HEB"
+    ],
+    "JPMorgan Chase": [
+        "CHASE AUTO",
+        "CHASE AUTO FIN",
+        "CHASE AUTO FINAN ",
+        "CHASE HOME FIN ",
+        "CHASE HOME LEND",
+        "CHASE STDNT LOAN ",
+        "CHASEHOMEFINANCE "
+    ],
+    "Key Food": [
+        "KEY FOOD"
+    ],
+    "LA Fitness": [
+        "LA FITNESS"
+    ],
+    "Lending Club": [
+        "LENDING CLUB"
+    ],
+    "Los Angeles Municipal Service": [
+        "CITY OF LA DWP W "
+    ],
+    "MetroPCS": [
+        "METROPCS"
+    ],
+    "National Grid": [
+        "NATIONAL GRID NY"
+    ],
+    "Nationstar Mortgage": [
+        "Nationstar"
+    ],
     "PG&E": [
-        "PGANDE"
+        "PG&E/EZ-PAY",
+        "PGANDE "
+    ],
+    "Panda Express": [
+        "PANDA EXPRESS"
+    ],
+    "Pilot": [
+        "PILOT"
+    ],
+    "Progress Energy": [
+        "ProgressEngyFl"
+    ],
+    "QuikTrip": [
+        "QUIKTRIP"
+    ],
+    "Sam's Club": [
+        "SAM'S Club"
+    ],
+    "Shell": [
+        "SHELL"
+    ],
+    "Southern California Edison": [
+        "SO CALIF EDISON"
+    ],
+    "Southern California Gas Company": [
+        "SO CAL GAS"
+    ],
+    "T-Mobile": [
+        "T MOBILE"
+    ],
+    "T.J.Maxx": [
+        "TJ TJ MAXX"
+    ],
+    "Target": [
+        "TARGET"
+    ],
+    "The Hartford": [
+        "THE HARTFORD"
+    ],
+    "Time Insurance": [
+        "TIME INSURANCE"
+    ],
+    "Uber": [
+        "UBER"
+    ],
+    "Ulta": [
+        "ULTA 3"
+    ],
+    "Union 76": [
+        "76 10",
+        "76 00",
+        "76 FUEL"
+    ],
+    "UnitedHealthcare": [
+        "UNITEDHEALTHONE"
     ],
     "Walmart": [
         "WAL-SAMS"
+    ],
+    "Wells Fargo": [
+        "WF HOME MTG      "
+    ],
+    "Xbox": [
+        "XBOX LIVE"
+    ],
+    "comcast": [
+        "COMCAST"
     ]
 }
