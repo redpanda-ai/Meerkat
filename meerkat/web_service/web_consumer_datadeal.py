@@ -554,8 +554,8 @@ class WebConsumerDatadeal():
 		"""Add log for transactions with CNN merchant score less than threshold"""
 		for transaction in data["transaction_list"]:
 			if float(transaction["merchant_score"]) < 0.99:
-				logging.critical("row id: {0}, description: {1}, CNN label: {2}, CNN merchant score: {3}".format(transaction["transaction_id"],
-					transaction["description"], transaction["CNN"]["label"], transaction["merchant_score"]))
+				logging.critical("transaction id: {0}, description: {1}, CNN label: {2}, CNN merchant score: {3}".format(transaction["transaction_id"],
+					transaction["description"], transaction.get('CNN', {}).get("label", ''), transaction.get("merchant_score"), "0"))
 
 	def classify(self, data, optimizing=False):
 		"""Classify a set of transactions"""
