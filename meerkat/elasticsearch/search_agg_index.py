@@ -175,6 +175,8 @@ def enrich_transaction(trans, hit):
 
 def search_agg_index(data, params=None):
 	"""Enrich transactions with agg index"""
+	logging.getLogger().setLevel(logging.CRITICAL)
+
 	if params is None:
 		params = json.loads(open('./meerkat/web_service/config/hyperparameters/search_agg_index_config.json').read())
 	#pprint(params)
