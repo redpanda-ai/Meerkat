@@ -224,7 +224,7 @@ class WebConsumerDatadeal():
 		decision = True if (z_score_delta > thresholds[0]) and (raw_score > thresholds[1]) else False
 		if decision:
 			if z_score_delta < thresholds[0] + 1 or raw_score < thresholds[1] + 1:
-				logging.warning("transaction: {0}, z_score_delta: {1}, raw_score: {2}". format(transaction,
+				logging.critical("transaction id: {0}, z_score_delta: {1}, raw_score: {2}". format(transaction["transaction_id"],
 				z_score_delta, raw_score))
 
 		# Enrich Data if Passes Boundary
@@ -547,7 +547,6 @@ class WebConsumerDatadeal():
 						if data["transaction_list"][i]["description"].find(substr) != -1:
 							# create a new dictionary for CNN
 							data["transaction_list"][i]['CNN'] = {'label': cnn_name}
-							#data["transaction_list"][i]['CNN']['label'] = cnn_name
 							found = True
 			i += 1
 
@@ -555,8 +554,8 @@ class WebConsumerDatadeal():
 		"""Add log for transactions with CNN merchant score less than threshold"""
 		for transaction in data["transaction_list"]:
 			if float(transaction["merchant_score"]) < 0.99:
-				logging.warning("CNN: row id: {0}, description: {1}, CNN: {2}, CNN merchant score: {3}".format(transaction["transaction_id"],
-					transaction["description"], transaction["CNN"], transaction["merchant_score"], threshold))
+				logging.critical("row id: {0}, description: {1}, CNN label: {2}, CNN merchant score: {3}".format(transaction["transaction_id"],
+					transaction["description"], transaction["CNN"]["label"], transaction["merchant_score"]))
 
 	def classify(self, data, optimizing=False):
 		"""Classify a set of transactions"""
