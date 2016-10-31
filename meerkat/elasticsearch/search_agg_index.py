@@ -96,12 +96,12 @@ def process_query_result(trans, query_result, params):
 
 	# 0 hit
 	if hits_total == 0:
-		logging.critical('The number of hits is 0')
+		logging.warning('The number of hits is 0')
 		return None
 
 	# 1 hit
 	if hits_total == 1:
-		logging.critical('The number of hits is 1')
+		logging.warning('The number of hits is 1')
 		if query_result['hits']['hits'][0]['_score'] >= params['threshold']['raw_score']:
 			return query_result['hits']['hits'][0]
 		else:
@@ -111,7 +111,7 @@ def process_query_result(trans, query_result, params):
 
 	# 2 hits
 	if hits_total == 2:
-		logging.critical('The number of hits is 2')
+		logging.warning('The number of hits is 2')
 		first, second = query_result['hits']['hits'][0], query_result['hits']['hits'][1]
 		first_store = first['_source'].get('store_number', '')
 		if first_store.startswith('T'):
@@ -122,10 +122,10 @@ def process_query_result(trans, query_result, params):
 			second_store = second_store[1:]
 
 		if first_store != '' and des.find(first_store) != -1:
-			logging.critical('Find a store number in description')
+			logging.warning('Find a store number in description')
 			return first
 		if second_store != '' and des.find(second_store) != -1:
-			logging.critical('Find a store number in description')
+			logging.warning('Find a store number in description')
 			return second
 
 		if first['_score'] - second['_score'] >= params['threshold']['z_score']:
@@ -146,7 +146,7 @@ def process_query_result(trans, query_result, params):
 		if store_number.find('-') != -1:
 			store_number = store_number.split('-')[0]
 		if store_number != '' and des.find(store_number) != -1:
-			logging.critical('Found a store number in description')
+			logging.warning('Found a store number in description')
 			return hit
 
 	z_scores = zscore(scores)
@@ -154,7 +154,7 @@ def process_query_result(trans, query_result, params):
 		logging.info('This query has a top hit based on z scores')
 		return hits_list[0]
 
-	logging.critical('No top hit based on z scores')
+	logging.warning('No top hit based on z scores')
 	return None
 
 def enrich_transaction(trans, hit):
@@ -168,10 +168,9 @@ def enrich_transaction(trans, hit):
 			if hit['_source'].get(key, '') != '':
 				trans['agg_search'][key] = hit['_source'].get(key, '')
 
-		logging.critical('This transaction has been enriched with agg index')
+		# logging.critical('This transaction has been enriched with agg index')
 		if hit['_score'] < 2.0:
-			logging.critical('The score for this transaction is less than 2.0')
-			logging.critical(trans)
+			logging.critical('transaction: {}, raw_score: {}'.format(trans, hit['_score']))
 	return trans
 
 def search_agg_index(data, params=None):
@@ -190,7 +189,7 @@ def search_agg_index(data, params=None):
 
 		list_name = trans.get('Agg_Name', [])
 		if len(list_name) == 0 or list_name[0] == '':
-			logging.critical('A transaction with valid agg name is required, skip this one')
+			logging.warning('A transaction with valid agg name is required, skip this one')
 			continue
 
 		city, state, zip_code = trans.get('city', ''), trans.get('state', ''), trans.get('postal_code', '')
