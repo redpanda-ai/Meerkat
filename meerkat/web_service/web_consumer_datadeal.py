@@ -222,7 +222,11 @@ class WebConsumerDatadeal():
 		else:
 			z_score_delta, raw_score = self.__z_score_delta(scores)
 		decision = True if (z_score_delta > thresholds[0]) and (raw_score > thresholds[1]) else False
-		
+		if decision:
+			if z_score_delta < thresholds[0] + 1 or raw_score < thresholds[1] + 1:
+				logging.warning("transaction: {0}, z_score_delta: {1}, raw_score: {2}". format(transaction,
+				z_score_delta, raw_score))
+
 		# Enrich Data if Passes Boundary
 		args = [decision, transaction, hit_fields,\
 			 names["business_names"], names["city_names"], names["state_names"], z_score_delta]
@@ -547,6 +551,13 @@ class WebConsumerDatadeal():
 							found = True
 			i += 1
 
+	def log_for_low_cnn_merchant_score(self, data, threshold):
+		"""Add log for transactions with CNN merchant score less than threshold"""
+		for transaction in data["transaction_list"]:
+			if float(transaction["merchant_score"]) < 0.99:
+				logging.warning("CNN: row id: {0}, description: {1}, CNN: {2}, CNN merchant score: {3}".format(transaction["transaction_id"],
+					transaction["description"], transaction["CNN"], transaction["merchant_score"], threshold))
+
 	def classify(self, data, optimizing=False):
 		"""Classify a set of transactions"""
 		services_list = data.get("services_list", [])
@@ -555,8 +566,13 @@ class WebConsumerDatadeal():
 		# Apply Merchant CNN
 		if "CNN" in services_list or services_list == []:
 			self.__apply_merchant_cnn(data)
+
 			# Find CNN in substr to CNN map
 			self.find_substr_as_cnn_name(data)
+
+			# Add log for transactions with CNN merchant score less than 0.99
+			threshold = 0.99
+			self.log_for_low_cnn_merchant_score(data, threshold)
 
 		# Apply Elasticsearch
 		if "search" in services_list or services_list == []:
