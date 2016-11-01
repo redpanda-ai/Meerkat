@@ -12,7 +12,15 @@
    "CNN Name": "Acme Markets"
  },
  {
-   "Keyword": "ACS",
+   "Keyword": "ACS Express Pay",
+   "CNN Name": "ACS Education Services"
+ },
+ {
+   "Keyword": "ACS  ",
+   "CNN Name": "ACS Education Services"
+ },
+ {
+   "Keyword": "ACS SLS",
    "CNN Name": "ACS Education Services"
  },
  {
@@ -20,7 +28,7 @@
    "CNN Name": "American Electric Power"
  },
  {
-   "Keyword": "AES",
+   "Keyword": "AES  ",
    "CNN Name": "American Educational Services"
  },
  {
@@ -157,7 +165,7 @@
  },
  {
    "Keyword": "FLORIDA PREPAID",
-   "CNN Name": "Florida Prepaid"
+   "CNN Name": "Florida Power & Light"
  },
  {
    "Keyword": "FOREVER 21",
@@ -297,14 +305,243 @@
  },
  {
    "Keyword": "76 10",
-   "CNN Name": "Union 76"
+   "CNN Name": "76 Gas Station"
  },
  {
    "Keyword": "76 00",
-   "CNN Name": "Union 76"
+   "CNN Name": "76 Gas Station"
  },
  {
    "Keyword": "76 FUEL",
-   "CNN Name": "Union 76"
+   "CNN Name": "76 Gas Station"
+ },
+ {
+   "Keyword": "76 5",
+   "CNN Name": "76 Gas Station"
+ },
+ {
+   "Keyword": "76 6",
+   "CNN Name": "76 Gas Station"
+ },
+ {
+   "Keyword": "76 7",
+   "CNN Name": "76 Gas Station"
+ },
+ {
+   "Keyword": "76 EXPRESS STOP",
+   "CNN Name": "76 Gas Station"
+ },
+ {
+   "Keyword": "TONY'S FRESH",
+   "CNN Name": "Tony's Fresh Market"
+ },
+ {
+   "Keyword": "U. P. S.",
+   "CNN Name": "The UPS Store"
+ },
+ {
+   "Keyword": "TXU*BILL PAYMENT",
+   "CNN Name": "TXU Energy"
+ },
+ {
+   "Keyword": "TWIN LIQUORS",
+   "CNN Name": "Twin Liquors"
+ },
+ {
+   "Keyword": "TRANSPREMIERLIFE",
+   "CNN Name": "Transamerica Premier Life"
+ },
+ {
+   "Keyword": "REDBOX� GIFTCRD",
+   "CNN Name": "RedBox"
+ },
+ {
+   "Keyword": "GOSMART",
+   "CNN Name": "GoSmart"
+ },
+ {
+   "Keyword": "CRICKET",
+   "CNN Name": "Cricket Wireless"
+ },
+ {
+   "Keyword": "ASSURANCE WRLS",
+   "CNN Name": "Assurance Wireless"
+ },
+ {
+   "Keyword": "VIRGIN MOBILE",
+   "CNN Name": "Virgin Mobile"
+ },
+ {
+   "Keyword": "T-MOBILE",
+   "CNN Name": "T-Mobile"
+ },
+ {
+   "Keyword": "BOOST PREPAID",
+   "CNN Name": "Boost Mobile"
+ },
+ {
+   "Keyword": "AT&T",
+   "CNN Name": "AT&T"
+ },
+ {
+   "Keyword": "VICTORIA NAILS",
+   "CNN Name": "Victoria Nails"
+ },
+ {
+   "Keyword": "HAWK NELSON",
+   "CNN Name": "HAWK NELSON"
+ },
+ {
+   "Keyword": "AMBIT MARKETING",
+   "CNN Name": "AMBIT MARKETING"
+ },
+ {
+   "Keyword": "AMERICAN BROADBAND",
+   "CNN Name": "AMERICAN BROADBAND"
+ },
+ {
+   "Keyword": "ARDOVINOS PIZZA",
+   "CNN Name": "ARDOVINOS PIZZA"
+ },
+ {
+   "Keyword": "ATASCOSITA FOOD",
+   "CNN Name": "ATASCOSITA FOOD"
+ },
+ {
+   "Keyword": "GREATER ATLANTA BAR BQ",
+   "CNN Name": "GREATER ATLANTA BBQ"
+ },
+ {
+   "Keyword": "TOMMY BAHAMA",
+   "CNN Name": "Tommy Bahama"
+ },
+ {
+   "Keyword": "TMOBILE",
+   "CNN Name": "T-Mobile"
+ },
+ {
+   "Keyword": "TIO NETWORKS",
+   "CNN Name": "TIO NETWORKS"
+ },
+ {
+   "Keyword": "TIME WISE",
+   "CNN Name": "Time Wise"
+ },
+ {
+   "Keyword": "TIGER MART",
+   "CNN Name": "Tiger Mart"
+ },
+ {
+   "Keyword": "THE MEN'S WEARHOUSE",
+   "CNN Name": "Men's Wearhouse"
+ },
+ {
+   "Keyword": "THE LEGO STORE",
+   "CNN Name": "THE LEGO STORE"
+ },
+ {
+   "Keyword": "THE GUARDIAN",
+   "CNN Name": "The Guardian"
+ },
+ {
+   "Keyword": "THE GROVE",
+   "CNN Name": "The Grove"
+ },
+ {
+   "Keyword": "PEOPLES GAS",
+   "CNN Name": "Peoples Gas"
+ },
+
+ {
+   "Keyword": "ZAPPOS.COM",
+   "CNN Name": "Zappos"
+ },
+ {
+   "Keyword": "YARD HOUSE",
+   "CNN Name": "Yard House"
+ },
+ {
+   "Keyword": "WU SANTANDER CSM",
+   "CNN Name": "Santander Consumer USA"
+ },
+ {
+   "Keyword": "WU GMFinan",
+   "CNN Name": "GM Financial"
+ },
+ {
+   "Keyword": "WHOLESOME CHOICE",
+   "CNN Name": "Wholesome Choice Market"
+ },
+ {
+   "Keyword": "WAWA",
+   "CNN Name": "Wawa Inc."
+ },
+ {
+   "Keyword": "WALDBAUM'S",
+   "CNN Name": "Waldbaum's"
+ },
+ {
+   "Keyword": "VW CREDIT, TEL",
+   "CNN Name": "Volkswagen Group"
+ },
+ {
+   "Keyword": "VUDU.COM",
+   "CNN Name": "Vudu"
+ },
+ {
+   "Keyword": "AT&T",
+   "CNN Name": "AT&T"
+ },
+ {
+   "Keyword": "VANS.COM",
+   "CNN Name": "Vans"
+ },
+ {
+   "Keyword": "VALUE VILLAGE",
+   "CNN Name": "Value Village"
+ },
+ {
+   "Keyword": "VALERO",
+   "CNN Name": "Valero"
+ },
+ {
+   "Keyword": "SNACK SODA VENDING",
+   "CNN Name": "Snack & Soda Vending"
+ },
+ {
+   "Keyword": "CANTEEN VENDING",
+   "CNN Name": "Canteen Vending Services"
+ },
+ {
+   "Keyword": "XSPORT",
+   "CNN Name": "XSport Fitness"
+ },
+ {
+   "Keyword": "T.M.C.C",
+   "CNN Name": "Toyota"
+ },
+ {
+   "Keyword": "SUPER 1 FOODS",
+   "CNN Name": "Super 1 Foods"
+ },
+ {
+   "Keyword": "STUBHUB, INC",
+   "CNN Name": "Stubhub"
+ },
+ {
+   "Keyword": "STOP N SAVE",
+   "CNN Name": "Stop N Save"
+ },
+ {
+   "Keyword": "STOP N GO",
+   "CNN Name": "Stop-N-Go"
+ },
+ {
+   "Keyword": "STEW LEONARDS",
+   "CNN Name": "Stew Leonards"
+ },
+ {
+   "Keyword": "MARBLES #",
+   "CNN Name": "Marbles: The Brain Store"
  }
 ]
