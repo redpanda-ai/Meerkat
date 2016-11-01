@@ -111,8 +111,11 @@ def process_description(my_df):
 	merchant = my_df["description"]
 
 	# Find the following patterns and replace with empty string
-	merchants = ["ABC","PAYPAL", "SQ", "GOOGLE", "MSFT", "MICROSOFT", "IN"]
+	merchants = ["ABC","PAYPAL", "SQ", "GOOGLE", "MSFT", "MICROSOFT", "IN", "VESTA"]
 	patterns = [r"" + m + r" +\*" for m in merchants]
+	patterns.append(r"EEPAY/GARNWC")
+	patterns.append(r"ABC\*")
+	patterns.append(r"USA\*")
 	for cur_pattern in patterns:
 		pattern = re.compile(cur_pattern, re.IGNORECASE)
 		merchant = pattern.sub("", merchant)
