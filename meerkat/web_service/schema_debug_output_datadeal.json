@@ -7,6 +7,7 @@
 			"properties" : {
 				"row_id" : { "type" : "number" },
 				"merchant_name" : { "type" : "string" },
+				"description_substring" : { "type" : "string" },
 				"address" : { "type" : "string" },
 				"city" : { "type" : "string" },
 				"state" : { "type" : "string" },
@@ -15,11 +16,8 @@
 				"longitude" : { "type" : "string" },
 				"latitude" : { "type" : "string" },
 				"website_url" : { "type" : "string" },
-				"store_number" : {
-					"type" : "array",
-					"items" : {"type": "string"}
-				},
-				"description" : { "type" : "string" },
+				"store_number" : { "type" : "string" },
+				"input_description" : { "type" : "string" },
 				"Agg_Name" : {
 					"type" : "array",
 					"items" : { "type" : "string" }
@@ -76,7 +74,7 @@
 			},
 			"required" : [ "row_id", "merchant_name", "address", "city", "state", "zip_code",
 				"phone", "longitude", "latitude", "website_url", "store_number",
-				"description", "CNN", "input"],
+				"input_description", "CNN", "input", "description_substring"],
 			"additionalProperties" : false
 		}
 	},

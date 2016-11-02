@@ -1,0 +1,356 @@
+{
+    "7-Eleven": [
+        "7-ELEVEN"
+    ],
+    "76 Gas Station": [
+        "76 10",
+        "76 00",
+        "76 FUEL",
+        "76 5",
+        "76 6",
+        "76 7",
+        "76 EXPRESS STOP"
+    ],
+    "A&P": [
+        "A&P"
+    ],
+    "AAA": [
+        "CSAA IG"
+    ],
+    "AARP": [
+        "NewYorkLife-AARP"
+    ],
+    "ACS Education Services": [
+        "ACS Express Pay",
+        "ACS  ",
+        "ACS SLS"
+    ],
+    "AMBIT MARKETING": [
+        "AMBIT MARKETING"
+    ],
+    "AMERICAN BROADBAND": [
+        "AMERICAN BROADBAND"
+    ],
+    "ARDOVINOS PIZZA": [
+        "ARDOVINOS PIZZA"
+    ],
+    "AT&T": [
+        "AT&T",
+        "AT&T"
+    ],
+    "ATASCOSITA FOOD": [
+        "ATASCOSITA FOOD"
+    ],
+    "Acme Markets": [
+        "ACME"
+    ],
+    "Aflac": [
+        "AFLAC"
+    ],
+    "Albertsons": [
+        "ALBERTSONS",
+        "ALBERTSON'S"
+    ],
+    "Alliant Energy": [
+        "Alliant - WPL"
+    ],
+    "American Educational Services": [
+        "AES  "
+    ],
+    "American Electric Power": [
+        "AEP",
+        "AMER ELECT PWR"
+    ],
+    "Assurance Wireless": [
+        "ASSURANCE WRLS"
+    ],
+    "Bank of America": [
+        "BK OF AM CRD ACH ",
+        "BK OF AMER VI/MC ",
+        "BKAMERICA"
+    ],
+    "Blue Cross Blue Shield Association": [
+        "ANTHEM BLUECROSS"
+    ],
+    "Boost Mobile": [
+        "BOOST PREPAID"
+    ],
+    "California Water Service": [
+        "CALWATER"
+    ],
+    "Canteen Vending Services": [
+        "CANTEEN VENDING"
+    ],
+    "Central Mortgage Company": [
+        "CENTRAL MORTGAGE "
+    ],
+    "Cigna": [
+        "CIGNA",
+        "CIGNA-LOYAL"
+    ],
+    "City of Charlotte NC": [
+        "CHARLOTTE UTILTY "
+    ],
+    "Columbia Gas": [
+        "COLUMBIA GAS OH",
+        "COLUMBIA GAS OH  "
+    ],
+    "Commonwealth Edison": [
+        "COMED",
+        "COMMONWEALTH ED"
+    ],
+    "Costco Gas": [
+        "GAS COSTCO"
+    ],
+    "Cricket Wireless": [
+        "CRICKET"
+    ],
+    "Del Taco": [
+        "DEL TACO"
+    ],
+    "Dell": [
+        "DELL PREFERRED"
+    ],
+    "Dish Network": [
+        "AUTOPAY/DISH"
+    ],
+    "Duke Energy": [
+        "DUKE AUTO PAYMT",
+        "DUKE/EZ-PAY"
+    ],
+    "Florida Power & Light": [
+        "FLORIDA PREPAID",
+        "FPL DIRECT DEBIT"
+    ],
+    "Forever 21": [
+        "FOREVER 21"
+    ],
+    "GM Financial": [
+        "WU GMFinan"
+    ],
+    "GREATER ATLANTA BBQ": [
+        "GREATER ATLANTA BAR BQ"
+    ],
+    "GoSmart": [
+        "GOSMART"
+    ],
+    "Great Lakes Educational Loans": [
+        "GREAT LAKES"
+    ],
+    "H&M": [
+        "H&M"
+    ],
+    "HAWK NELSON": [
+        "HAWK NELSON"
+    ],
+    "HEB Gas & Car Wash": [
+        "HEB"
+    ],
+    "JPMorgan Chase": [
+        "CHASE AUTO",
+        "CHASE AUTO FIN",
+        "CHASE AUTO FINAN ",
+        "CHASE HOME FIN ",
+        "CHASE HOME LEND",
+        "CHASE STDNT LOAN ",
+        "CHASEHOMEFINANCE "
+    ],
+    "Key Food": [
+        "KEY FOOD"
+    ],
+    "LA Fitness": [
+        "LA FITNESS"
+    ],
+    "Lending Club": [
+        "LENDING CLUB"
+    ],
+    "Los Angeles Municipal Service": [
+        "CITY OF LA DWP W "
+    ],
+    "Marbles: The Brain Store": [
+        "MARBLES #"
+    ],
+    "Men's Wearhouse": [
+        "THE MEN'S WEARHOUSE"
+    ],
+    "MetroPCS": [
+        "METROPCS"
+    ],
+    "National Grid": [
+        "NATIONAL GRID NY"
+    ],
+    "Nationstar Mortgage": [
+        "Nationstar"
+    ],
+    "PG&E": [
+        "PG&E/EZ-PAY",
+        "PGANDE "
+    ],
+    "Panda Express": [
+        "PANDA EXPRESS"
+    ],
+    "Peoples Gas": [
+        "PEOPLES GAS"
+    ],
+    "Pilot": [
+        "PILOT"
+    ],
+    "Progress Energy": [
+        "ProgressEngyFl"
+    ],
+    "QuikTrip": [
+        "QUIKTRIP"
+    ],
+    "RedBox": [
+        "REDBOX\ufffd GIFTCRD"
+    ],
+    "Sam's Club": [
+        "SAM'S Club"
+    ],
+    "Santander Consumer USA": [
+        "WU SANTANDER CSM"
+    ],
+    "Shell": [
+        "SHELL"
+    ],
+    "Snack & Soda Vending": [
+        "SNACK SODA VENDING"
+    ],
+    "Southern California Edison": [
+        "SO CALIF EDISON"
+    ],
+    "Southern California Gas Company": [
+        "SO CAL GAS"
+    ],
+    "Stew Leonards": [
+        "STEW LEONARDS"
+    ],
+    "Stop N Save": [
+        "STOP N SAVE"
+    ],
+    "Stop-N-Go": [
+        "STOP N GO"
+    ],
+    "Stubhub": [
+        "STUBHUB, INC"
+    ],
+    "Super 1 Foods": [
+        "SUPER 1 FOODS"
+    ],
+    "T-Mobile": [
+        "T MOBILE",
+        "T-MOBILE",
+        "TMOBILE"
+    ],
+    "T.J.Maxx": [
+        "TJ TJ MAXX"
+    ],
+    "THE LEGO STORE": [
+        "THE LEGO STORE"
+    ],
+    "TIO NETWORKS": [
+        "TIO NETWORKS"
+    ],
+    "TXU Energy": [
+        "TXU*BILL PAYMENT"
+    ],
+    "Target": [
+        "TARGET"
+    ],
+    "The Grove": [
+        "THE GROVE"
+    ],
+    "The Guardian": [
+        "THE GUARDIAN"
+    ],
+    "The Hartford": [
+        "THE HARTFORD"
+    ],
+    "The UPS Store": [
+        "U. P. S."
+    ],
+    "Tiger Mart": [
+        "TIGER MART"
+    ],
+    "Time Insurance": [
+        "TIME INSURANCE"
+    ],
+    "Time Wise": [
+        "TIME WISE"
+    ],
+    "Tommy Bahama": [
+        "TOMMY BAHAMA"
+    ],
+    "Tony's Fresh Market": [
+        "TONY'S FRESH"
+    ],
+    "Toyota": [
+        "T.M.C.C"
+    ],
+    "Transamerica Premier Life": [
+        "TRANSPREMIERLIFE"
+    ],
+    "Twin Liquors": [
+        "TWIN LIQUORS"
+    ],
+    "Uber": [
+        "UBER"
+    ],
+    "Ulta": [
+        "ULTA 3"
+    ],
+    "UnitedHealthcare": [
+        "UNITEDHEALTHONE"
+    ],
+    "Valero": [
+        "VALERO"
+    ],
+    "Value Village": [
+        "VALUE VILLAGE"
+    ],
+    "Vans": [
+        "VANS.COM"
+    ],
+    "Victoria Nails": [
+        "VICTORIA NAILS"
+    ],
+    "Virgin Mobile": [
+        "VIRGIN MOBILE"
+    ],
+    "Volkswagen Group": [
+        "VW CREDIT, TEL"
+    ],
+    "Vudu": [
+        "VUDU.COM"
+    ],
+    "Waldbaum's": [
+        "WALDBAUM'S"
+    ],
+    "Walmart": [
+        "WAL-SAMS"
+    ],
+    "Wawa Inc.": [
+        "WAWA"
+    ],
+    "Wells Fargo": [
+        "WF HOME MTG      "
+    ],
+    "Wholesome Choice Market": [
+        "WHOLESOME CHOICE"
+    ],
+    "XSport Fitness": [
+        "XSPORT"
+    ],
+    "Xbox": [
+        "XBOX LIVE"
+    ],
+    "Yard House": [
+        "YARD HOUSE"
+    ],
+    "Zappos": [
+        "ZAPPOS.COM"
+    ],
+    "comcast": [
+        "COMCAST"
+    ]
+}

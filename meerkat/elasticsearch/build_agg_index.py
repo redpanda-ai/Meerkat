@@ -15,7 +15,7 @@ logger = logging.getLogger('tools')
 
 endpoint = 'search-agg-factual-nuz5jggrftlzjd5f7c2ehkmhlu.us-west-2.es.amazonaws.com'
 host = [{'host': endpoint, 'port': 80}]
-index_name, index_type = 'agg_index', 'agg_type'
+index_name, index_type = 'agg_index_10272016', 'agg_type_10272016'
 es = Elasticsearch(host)
 
 def load_dataframe_into_index(df, **kwargs):
@@ -26,6 +26,11 @@ def load_dataframe_into_index(df, **kwargs):
 
 	df = df.apply(lambda x: x.str.strip(), axis=1)
 	data = df.to_dict(orient='records')
+
+	# Clean zip code to 5 digits only if a hyphen exists
+	for item in data:
+		if 'zip_code' in item and item['zip_code'].find('-') != -1:
+			item['zip_code'] = item['zip_code'].split('-')[0]
 
 	actions = []
 	offset = kwargs['chunk_count'] * kwargs['chunksize']
@@ -83,7 +88,7 @@ def build_index(filename):
 	# build the index, one chunk at a time
 	chunk_count, chunksize = 0, 10000
 	reader = pd.read_csv(filename, chunksize=chunksize, dtype=dtype)
-	pool = mp.Pool(mp.cpu_count())
+	# pool = mp.Pool(mp.cpu_count())
 
 	for chunk in reader:
 		chunk_count += 1
@@ -130,5 +135,3 @@ def build_index_multi_threading(filename):
 
 if __name__ == '__main__':
 	build_index('./selected-lists-5224.csv')
-	sys.exit()
-	build_index_multi_threading('./selected-lists-5224.csv')

@@ -46,6 +46,7 @@ class WebConsumerDatadeal():
 				self.params["routed"] = "_routing" in mapping[index]["mappings"][index_type]
 
 		self.load_merchant_name_map()
+		self.load_cnn_to_substr_map()
 		self.load_tf_models()
 		self.hyperparams = hyperparams if hyperparams else {}
 		self.cities = cities if cities else {}
@@ -55,6 +56,12 @@ class WebConsumerDatadeal():
 		merchant_name_map_path = self.params.get("merchant_name_map_path", None)
 		if merchant_name_map_path is not None:
 			self.merchant_name_map = load_params(merchant_name_map_path)
+
+	def load_cnn_to_substr_map(self):
+		"""Load a json map to convert substring to CNN merchant name"""
+		cnn_to_substr_map_path = self.params.get("cnn_to_substr_map_path", None)
+		if cnn_to_substr_map_path is not None:
+			self.cnn_to_substr_map = load_params(cnn_to_substr_map_path)
 
 	def load_tf_models(self):
 		"""Load all tensorFlow models"""
@@ -215,7 +222,11 @@ class WebConsumerDatadeal():
 		else:
 			z_score_delta, raw_score = self.__z_score_delta(scores)
 		decision = True if (z_score_delta > thresholds[0]) and (raw_score > thresholds[1]) else False
-		
+		if decision:
+			if z_score_delta < thresholds[0] + 1 or raw_score < thresholds[1] + 1:
+				logging.critical("transaction id: {0}, z_score_delta: {1}, raw_score: {2}". format(transaction["transaction_id"],
+				z_score_delta, raw_score))
+
 		# Enrich Data if Passes Boundary
 		args = [decision, transaction, hit_fields,\
 			 names["business_names"], names["city_names"], names["state_names"], z_score_delta]
@@ -385,7 +396,7 @@ class WebConsumerDatadeal():
 		for trans in data["transaction_list"]:
 			if trans.get("country", "") not in ["", "US", "USA"]:
 				continue
-			cnn_merchant = trans['CNN']['label']
+			cnn_merchant = trans.get('CNN', {}).get('label', '')
 			if cnn_merchant != '' and cnn_merchant in self.merchant_name_map:
 				trans["Agg_Name"] = self.merchant_name_map[cnn_merchant]
 				data_to_search_in_agg.append(trans)
@@ -454,7 +465,7 @@ class WebConsumerDatadeal():
 			elif trans.get("factual_search", "") != "" and trans["factual_search"].get("merchant_name") != "":
 				trans["merchant_name"] = trans["factual_search"]["merchant_name"]
 			else:
-				trans["merchant_name"] = trans["RNN_merchant_name"]
+				trans["merchant_name"] = "" #trans["RNN_merchant_name"]
 
 			# Only output store number found in agg search
 			if "agg_search" in trans and trans["agg_search"].get("store_number", "") != "":
@@ -485,10 +496,11 @@ class WebConsumerDatadeal():
 			# Ensure these fields exist in output
 			output_fields = ["city", "state", "address", "longitude", "latitude",
 				"website_url", "store_number", "phone_number", "postal_code",
-				"transaction_id"]
+				"transaction_id", "input_description", "RNN_merchant_name"]
 			map_fields_for_output = {
 				"phone_number": "phone",
 				"postal_code": "zip_code",
+				"RNN_merchant_name": "description_substring",
 				"transaction_id": "row_id"
 			}
 			for field in output_fields:
@@ -499,6 +511,10 @@ class WebConsumerDatadeal():
 				else:
 					trans[field] = trans.get(field, "")
 
+			# Only output description substring when merchant name is empty
+			if trans["merchant_name"] != "":
+				trans["description_substring"] = ""
+
 			# Remove fields not in output schema
 			if debug is False:
 				fields_to_remove = ["description", "amount", "date", "ledger_entry", "CNN",
@@ -507,23 +523,60 @@ class WebConsumerDatadeal():
 				for field in fields_to_remove:
 					trans.pop(field, None)
 			else:
-				trans['CNN']['merchant_score'] =  trans.get("merchant_score", "0.0")
-				trans['CNN'].pop("threshold", None)
-				trans['CNN'].pop("category", None)
-				fields_to_remove = ["amount", "date", "ledger_entry", "container",
+				if 'CNN' in trans:
+					trans['CNN']['merchant_score'] =  trans.get("merchant_score", "0.0")
+					trans['CNN'].pop("threshold", None)
+					trans['CNN'].pop("category", None)
+				fields_to_remove = ["description", "amount", "date", "ledger_entry", "container",
 					"merchant_score", "country", "match_found"]
 				for field in fields_to_remove:
 					trans.pop(field, None)
 
+	def find_substr_as_cnn_name(self, data):
+		"""Find substr in description that is a cnn merchant name"""
+		i = 0
+		while i < len(data["transaction_list"]):
+			cur_cnn_name = data["transaction_list"][i]['CNN'].get('label', '')
+			if 'CNN' in data["transaction_list"][i] and data["transaction_list"][i]['CNN'].get('label', '') == '':
+				found = False
+				for cnn_name, keyword in self.cnn_to_substr_map.items():
+					if found:
+						break
+					for substr in keyword:
+						if found:
+							break
+						if data["transaction_list"][i]["description"].find(substr) != -1:
+							# create a new dictionary for CNN
+							data["transaction_list"][i]['CNN'] = {'label': cnn_name}
+							found = True
+			i += 1
+
+	def log_for_low_cnn_merchant_score(self, data, threshold):
+		"""Add log for transactions with CNN merchant score less than threshold"""
+		for transaction in data["transaction_list"]:
+			if float(transaction["merchant_score"]) < 0.99 and transaction.get('CNN', {}).get('label', '') != '':
+				logging.critical("transaction id: {0}, description: {1}, CNN label: {2}, CNN merchant score: {3}".format(transaction["transaction_id"],
+					transaction["description"], transaction.get('CNN', {}).get("label", ''), transaction.get("merchant_score"), "0"))
+
 	def classify(self, data, optimizing=False):
 		"""Classify a set of transactions"""
+		services_list = data.get("services_list", [])
 		debug = data.get("debug", False)
 
 		# Apply Merchant CNN
-		self.__apply_merchant_cnn(data)
+		if "CNN" in services_list or services_list == []:
+			self.__apply_merchant_cnn(data)
+
+			# Find CNN in substr to CNN map
+			self.find_substr_as_cnn_name(data)
+
+			# Add log for transactions with CNN merchant score less than 0.99
+			threshold = 0.99
+			self.log_for_low_cnn_merchant_score(data, threshold)
 
 		# Apply Elasticsearch
-		self.__search_in_agg_or_factual(data)
+		if "search" in services_list or services_list == []:
+			self.__search_in_agg_or_factual(data)
 
 		# Process enriched data to ensure output schema
 		self.ensure_output_schema(data["transaction_list"], debug)
