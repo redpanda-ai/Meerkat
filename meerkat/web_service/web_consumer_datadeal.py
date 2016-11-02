@@ -117,12 +117,26 @@ class WebConsumerDatadeal():
 			term = string_cleanse(transaction['CNN']['label'])
 			merchant_query = get_qs_query(term, ['name'], field_boosts['name'], operator="AND")
 			must_clauses.append(merchant_query)
+
+			if transaction['RNN_merchant_name'] != '':
+				term1 = synonyms(transaction['RNN_merchant_name'])
+				term1 = string_cleanse(term1)
+				merchant_query1 = get_qs_query(term1, ['name'], field_boosts['name'])
+				merchant_query1["query_string"]["fuzziness"] = fuzziness
+				should_clauses.append(merchant_query1)
+
 		elif transaction['RNN_merchant_name'] != '':
 			term = synonyms(transaction['RNN_merchant_name'])
 			term = string_cleanse(term)
 			merchant_query = get_qs_query(term, ['name'], field_boosts['name'])
 			merchant_query["query_string"]["fuzziness"] = fuzziness
 			must_clauses.append(merchant_query)
+
+			term1 = synonyms(transaction['description'])
+			term1 = string_cleanse(term1)
+			merchant_query1 = get_qs_query(term1, ['name'], field_boosts['name'])
+			merchant_query1["query_string"]["fuzziness"] = fuzziness
+			should_clauses.append(merchant_query1)
 
 		# Add Locale Sub Query
 		if city != '':
