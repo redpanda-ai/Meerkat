@@ -55,7 +55,8 @@ def preprocess_dataframe(args):
 	"""Reads the input_file into a dataframe"""
 	kwargs = {
 		"encoding": "utf-8", "sep": "|", "error_bad_lines": True,
-		"warn_bad_lines": True, "chunksize": 1, "na_filter": False
+		"warn_bad_lines": True, "chunksize": 1, "na_filter": False,
+		"usecols": ['DESCRIPTION_UNMASKED']
 	}
 	#We don't really need the entire file get 1 row from the first chunk
 	reader = pd.read_csv(args.input_file, **kwargs)
@@ -148,9 +149,9 @@ def get_rnn_merchant(my_df):
 	else:
 		return ""
 
-def get_store_number(my_df):
-	"""This is a stub implementation, no multi-class RNN exists."""
-	return my_df["predicted"].get("store_number", [])
+#def get_store_number(my_df):
+	#"""This is a stub implementation, no multi-class RNN exists."""
+	#return my_df["predicted"].get("store_number", [])
 
 def get_results_df_from_web_service(my_web_request, container):
 	"""Sends a single web request dict to the web service, then converts the
@@ -197,26 +198,39 @@ def main_process(args=None):
 	if args is None:
 		args = parse_arguments(sys.argv[1:])
 	LOGGER.info("Starting main process")
+
 	#1. Get the input data
 	my_df = preprocess_dataframe(args)
-	file_type = get_file_type(args)
-	renames = get_renames(file_type)
+	renames = {'DESCRIPTION_UNMASKED': 'description'}
 	#2. Rename certain columns in the dataframe
 	my_df.rename(index=str, columns=renames, inplace=True)
-	#3. Remove unneeded columns, split mystery_field
-	clean_dataframe(my_df, renames)
-	my_df["postal_code"] = my_df.apply(process_postal_code, axis=1)
+	#my_df["postal_code"] = my_df.apply(process_postal_code, axis=1)
 	my_df["input_description"] = my_df["description"]
 	my_df["description"] = my_df.apply(process_description, axis=1)
 	#4. Use the RNN to grab a few more columns
 	my_df["predicted"] = my_df.apply(run_multi_class_rnn, axis=1)
 	my_df["RNN_merchant_name"] = my_df.apply(get_rnn_merchant, axis=1)
+
+	get_store_number = lambda x: x["predicted"].get("store_number", [])
+	get_city = lambda x: x["predicted"]["city"][0] \
+		if len(x["predicted"].get("city", [])) > 1 else ""
+	get_state = lambda x: x["predicted"]["state"][0] \
+		if len(x["predicted"].get("state", [])) > 1 else ""
+	get_phone_number = lambda x: x["predicted"]["phone_number"][0] \
+		if len(x["predicted"].get("phone_number", [])) > 1 else ""
 	my_df["store_number"] = my_df.apply(get_store_number, axis=1)
+	my_df["city"] = my_df.apply(get_city, axis=1)
+	my_df["state"] = my_df.apply(get_state, axis=1)
+	my_df["phone_number"] = my_df.apply(get_phone_number, axis=1)
 	del my_df["predicted"]
 
+	my_df["postal_code"] = ""
+	my_df["website_url"] = ""
+	my_df["transaction_id"] = my_df.index
+
 	container = "bank"
-	if file_type == "credit":
-		container = "card"
+	#if file_type == "credit":
+	#	container = "card"
 	#5. Transform the dataframe to a record-oriented dictionary
 	my_transactions = my_df.to_dict(orient="records")
 
@@ -239,8 +253,8 @@ def main_process(args=None):
 		transaction["ledger_entry"] = "debit"
 		transaction["amount"] = 10
 		transaction["date"] = "2016-01-01"
-		if file_type == "debit_ach":
-			my_web_request["services_list"] = ["CNN"]
+		#if file_type == "debit_ach":
+		#	my_web_request["services_list"] = ["CNN"]
 		#Add each transaction to the transaction_list for the web_request
 		my_web_request["transaction_list"].append(transaction.copy())
 		transaction_count += 1

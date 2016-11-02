@@ -399,6 +399,9 @@ class WebConsumerDatadeal():
 			cnn_merchant = trans.get('CNN', {}).get('label', '')
 			if cnn_merchant != '' and cnn_merchant in self.merchant_name_map:
 				trans["Agg_Name"] = self.merchant_name_map[cnn_merchant]
+				# TODO use 1st store number
+				trans["store_number"] = trans["store_number"][0] \
+					if len(trans.get("store_number", [])) > 1 else ""
 				data_to_search_in_agg.append(trans)
 			else:
 				data_to_search_in_factual.append(trans)
@@ -578,6 +581,7 @@ class WebConsumerDatadeal():
 		if "search" in services_list or services_list == []:
 			self.__search_in_agg_or_factual(data)
 
+		print(data)
 		# Process enriched data to ensure output schema
 		self.ensure_output_schema(data["transaction_list"], debug)
 
