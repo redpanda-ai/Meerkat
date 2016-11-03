@@ -24,6 +24,8 @@ from meerkat.classification.auto_load import main_program as load_models_from_s3
 from meerkat.various_tools import load_params
 from meerkat.elasticsearch.search_agg_index import search_agg_index
 
+from meerkat.classification.bloom_filter.trie import location_split
+
 class WebConsumerDatadeal():
 	"""Acts as a web service client to process and enrich
 	transactions in real time"""
@@ -522,7 +524,7 @@ class WebConsumerDatadeal():
 			if debug is False:
 				fields_to_remove = ["description", "amount", "date", "ledger_entry", "CNN",
 					"container", "RNN_merchant_name", "Agg_Name", "factual_search",
-					"agg_search", "merchant_score", "country", "match_found"]
+					"agg_search", "merchant_score", "country", "match_found", "locale_bloom"]
 				for field in fields_to_remove:
 					trans.pop(field, None)
 			else:
@@ -531,7 +533,7 @@ class WebConsumerDatadeal():
 					trans['CNN'].pop("threshold", None)
 					trans['CNN'].pop("category", None)
 				fields_to_remove = ["description", "amount", "date", "ledger_entry", "container",
-					"merchant_score", "country", "match_found"]
+					"merchant_score", "country", "match_found", "locale_bloom"]
 				for field in fields_to_remove:
 					trans.pop(field, None)
 
@@ -561,6 +563,18 @@ class WebConsumerDatadeal():
 				logging.critical("transaction id: {0}, description: {1}, CNN label: {2}, CNN merchant score: {3}".format(transaction["transaction_id"],
 					transaction["description"], transaction.get('CNN', {}).get("label", ''), transaction.get("merchant_score"), "0"))
 
+	@staticmethod
+	def __apply_locale_bloom(data):
+		""" Apply the locale bloom filter to transactions"""
+		for trans in data["transaction_list"]:
+			try:
+				description = trans["description"]
+				trans["locale_bloom"] = location_split(description)
+			except KeyError:
+				pass
+
+		return data["transaction_list"]
+
 	def classify(self, data, optimizing=False):
 		"""Classify a set of transactions"""
 		services_list = data.get("services_list", [])
@@ -576,6 +590,19 @@ class WebConsumerDatadeal():
 			# Add log for transactions with CNN merchant score less than 0.99
 			threshold = 0.99
 			self.log_for_low_cnn_merchant_score(data, threshold)
+
+		if "locale_bloom" in services_list or services_list == []:
+			self.__apply_locale_bloom(data)
+		else:
+			for transaction in data["transaction_list"]:
+				transaction["locale_bloom"] = None
+
+		for transaction in data["transaction_list"]:
+			if transaction.get("locale_bloom", None):
+				transaction["city"] = transaction["locale_bloom"][0].lower()
+				transaction["state"] = transaction["locale_bloom"][1].lower()
+			else:
+				transaction["city"], transaction["state"] = "", ""
 
 		# Apply Elasticsearch
 		if "search" in services_list or services_list == []:
