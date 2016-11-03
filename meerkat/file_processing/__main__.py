@@ -187,16 +187,6 @@ def process_postal_code(my_df):
 	postal_code = postal_code.zfill(5)
 	return postal_code if postal_code != '00000' else ''
 
-def get_store_number_re(my_df):
-	"""This is a stub implementation, no multi-class RNN exists."""
-	desc = my_df["description"]
-	merchant_removed = re.sub(re.escape(my_df["RNN_merchant_name"]), "", desc, flags=re.IGNORECASE)
-	output = [t for t in merchant_removed.split() if not t.isalpha() and has_numbers(t)]
-	store_number = " ".join(output)
-	#if store_number[0] == '#':
-	#	store_number = store_number[1:]
-	return [store_number]
-
 def main_process(args=None):
 	"""Opens up the input file and loads it into a dataframe"""
 	if args is None:
@@ -208,7 +198,6 @@ def main_process(args=None):
 	renames = {'plain_text_description': 'description'}
 	#2. Rename certain columns in the dataframe
 	my_df.rename(index=str, columns=renames, inplace=True)
-	#my_df["postal_code"] = my_df.apply(process_postal_code, axis=1)
 	my_df["input_description"] = my_df["description"]
 	my_df["description"] = my_df.apply(process_description, axis=1)
 	#4. Use the RNN to grab a few more columns
@@ -223,13 +212,12 @@ def main_process(args=None):
 	get_phone_number = lambda x: x["predicted"]["phone_number"][0] \
 		if len(x["predicted"].get("phone_number", [])) > 1 else ""
 	my_df["store_number"] = my_df.apply(get_store_number, axis=1)
-	my_df["RNN_store_number"] = my_df.apply(get_store_number, axis=1)
 	my_df["city"] = my_df.apply(get_city, axis=1)
 	my_df["state"] = my_df.apply(get_state, axis=1)
 	my_df["phone_number"] = my_df.apply(get_phone_number, axis=1)
 	del my_df["predicted"]
+	# Get rnn output for debug
 	my_df.to_csv("rnn_output.csv", index=False, sep="|", mode="w")
-	del my_df["RNN_store_number"]
 
 	my_df["postal_code"] = ""
 	my_df["website_url"] = ""
