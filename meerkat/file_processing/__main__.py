@@ -54,9 +54,9 @@ def get_file_type(args):
 def preprocess_dataframe(args):
 	"""Reads the input_file into a dataframe"""
 	kwargs = {
-		"encoding": "utf-8", "sep": "|", "error_bad_lines": True,
+		"encoding": "utf-8", "sep": "\t", "error_bad_lines": True,
 		"warn_bad_lines": True, "chunksize": 1, "na_filter": False,
-		"usecols": ['DESCRIPTION_UNMASKED']
+		"usecols": ['plain_text_description']
 	}
 	#We don't really need the entire file get 1 row from the first chunk
 	reader = pd.read_csv(args.input_file, **kwargs)
@@ -125,11 +125,9 @@ def process_description(my_df):
 def run_multi_class_rnn(my_df):
 	"""Get multi-class RNN result"""
 	desc = my_df["description"]
-	print(desc)
 	if desc == "":
 		return {}
 	tagged = MULTICLASS_RNN([{"Description": desc}])
-	print(desc)
 	return tagged[0]["Predicted"]
 
 def get_rnn_merchant(my_df):
@@ -148,10 +146,6 @@ def get_rnn_merchant(my_df):
 			return predicted["merchant"][0]
 	else:
 		return ""
-
-#def get_store_number(my_df):
-	#"""This is a stub implementation, no multi-class RNN exists."""
-	#return my_df["predicted"].get("store_number", [])
 
 def get_results_df_from_web_service(my_web_request, container):
 	"""Sends a single web request dict to the web service, then converts the
@@ -193,6 +187,16 @@ def process_postal_code(my_df):
 	postal_code = postal_code.zfill(5)
 	return postal_code if postal_code != '00000' else ''
 
+def get_store_number_re(my_df):
+	"""This is a stub implementation, no multi-class RNN exists."""
+	desc = my_df["description"]
+	merchant_removed = re.sub(re.escape(my_df["RNN_merchant_name"]), "", desc, flags=re.IGNORECASE)
+	output = [t for t in merchant_removed.split() if not t.isalpha() and has_numbers(t)]
+	store_number = " ".join(output)
+	#if store_number[0] == '#':
+	#	store_number = store_number[1:]
+	return [store_number]
+
 def main_process(args=None):
 	"""Opens up the input file and loads it into a dataframe"""
 	if args is None:
@@ -201,7 +205,7 @@ def main_process(args=None):
 
 	#1. Get the input data
 	my_df = preprocess_dataframe(args)
-	renames = {'DESCRIPTION_UNMASKED': 'description'}
+	renames = {'plain_text_description': 'description'}
 	#2. Rename certain columns in the dataframe
 	my_df.rename(index=str, columns=renames, inplace=True)
 	#my_df["postal_code"] = my_df.apply(process_postal_code, axis=1)
@@ -219,10 +223,13 @@ def main_process(args=None):
 	get_phone_number = lambda x: x["predicted"]["phone_number"][0] \
 		if len(x["predicted"].get("phone_number", [])) > 1 else ""
 	my_df["store_number"] = my_df.apply(get_store_number, axis=1)
+	my_df["RNN_store_number"] = my_df.apply(get_store_number, axis=1)
 	my_df["city"] = my_df.apply(get_city, axis=1)
 	my_df["state"] = my_df.apply(get_state, axis=1)
 	my_df["phone_number"] = my_df.apply(get_phone_number, axis=1)
 	del my_df["predicted"]
+	my_df.to_csv("rnn_output.csv", index=False, sep="|", mode="w")
+	del my_df["RNN_store_number"]
 
 	my_df["postal_code"] = ""
 	my_df["website_url"] = ""

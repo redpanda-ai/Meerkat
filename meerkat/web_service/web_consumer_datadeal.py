@@ -403,7 +403,9 @@ class WebConsumerDatadeal():
 				trans["Agg_Name"] = self.merchant_name_map[cnn_merchant]
 				# TODO use 1st store number
 				trans["store_number"] = trans["store_number"][0] \
-					if len(trans.get("store_number", [])) > 1 else ""
+					if len(trans.get("store_number", [])) >= 1 else ""
+				print("store_number: ")
+				print(trans["store_number"])
 				data_to_search_in_agg.append(trans)
 			else:
 				data_to_search_in_factual.append(trans)
@@ -597,18 +599,27 @@ class WebConsumerDatadeal():
 			for transaction in data["transaction_list"]:
 				transaction["locale_bloom"] = None
 
+
 		for transaction in data["transaction_list"]:
 			if transaction.get("locale_bloom", None):
-				transaction["city"] = transaction["locale_bloom"][0].lower()
-				transaction["state"] = transaction["locale_bloom"][1].lower()
+				transaction["city"] = transaction["locale_bloom"][0]
+				transaction["state"] = transaction["locale_bloom"][1]
 			else:
 				transaction["city"], transaction["state"] = "", ""
+
+		for transaction in data["transaction_list"]:
+			print("before search")
+			print(transaction)
+			print("\n")
 
 		# Apply Elasticsearch
 		if "search" in services_list or services_list == []:
 			self.__search_in_agg_or_factual(data)
 
-		print(data)
+		for transaction in data["transaction_list"]:
+			print("after search")
+			print(transaction)
+			print("\n")
 		# Process enriched data to ensure output schema
 		self.ensure_output_schema(data["transaction_list"], debug)
 
