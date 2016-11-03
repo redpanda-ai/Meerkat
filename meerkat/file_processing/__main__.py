@@ -206,11 +206,11 @@ def main_process(args=None):
 
 	get_store_number = lambda x: x["predicted"].get("store_number", [])
 	get_city = lambda x: x["predicted"]["city"][0] \
-		if len(x["predicted"].get("city", [])) > 1 else ""
+		if len(x["predicted"].get("city", [])) >= 1 else ""
 	get_state = lambda x: x["predicted"]["state"][0] \
-		if len(x["predicted"].get("state", [])) > 1 else ""
+		if len(x["predicted"].get("state", [])) >= 1 else ""
 	get_phone_number = lambda x: x["predicted"]["phone_number"][0] \
-		if len(x["predicted"].get("phone_number", [])) > 1 else ""
+		if len(x["predicted"].get("phone_number", [])) >= 1 else ""
 	my_df["store_number"] = my_df.apply(get_store_number, axis=1)
 	my_df["city"] = my_df.apply(get_city, axis=1)
 	my_df["state"] = my_df.apply(get_state, axis=1)
