@@ -402,8 +402,8 @@ class WebConsumerDatadeal():
 			if cnn_merchant != '' and cnn_merchant in self.merchant_name_map:
 				trans["Agg_Name"] = self.merchant_name_map[cnn_merchant]
 				# TODO use 1st store number
-				#trans["store_number"] = trans["store_number"][0] \
-				#	if len(trans.get("store_number", [])) >= 1 else ""
+				trans["store_number"] = trans["store_number"][0] \
+					if len(trans.get("store_number", [])) >= 1 else ""
 				data_to_search_in_agg.append(trans)
 			else:
 				data_to_search_in_factual.append(trans)
@@ -501,7 +501,7 @@ class WebConsumerDatadeal():
 			# Ensure these fields exist in output
 			output_fields = ["city", "state", "address", "longitude", "latitude",
 				"website_url", "store_number", "phone_number", "postal_code",
-				"transaction_id", "input_description", "RNN_merchant_name"]
+				"transaction_id", "input_description", "RNN_merchant_name", "RNN_store_number"]
 			map_fields_for_output = {
 				"phone_number": "phone",
 				"postal_code": "zip_code",
@@ -533,7 +533,7 @@ class WebConsumerDatadeal():
 					trans['CNN'].pop("threshold", None)
 					trans['CNN'].pop("category", None)
 				fields_to_remove = ["description", "amount", "date", "ledger_entry", "container",
-					"merchant_score", "country", "match_found", "locale_bloom"]
+					"merchant_score", "country", "match_found", "locale_bloom", "RNN_store_number"]
 				for field in fields_to_remove:
 					trans.pop(field, None)
 
@@ -580,6 +580,10 @@ class WebConsumerDatadeal():
 		services_list = data.get("services_list", [])
 		debug = data.get("debug", False)
 
+		# For debug
+		for transaction in data["transaction_list"]:
+			transaction["RNN_store_number"] = transaction["store_number"]
+
 		# Apply Merchant CNN
 		if "CNN" in services_list or services_list == []:
 			self.__apply_merchant_cnn(data)
@@ -591,12 +595,12 @@ class WebConsumerDatadeal():
 			threshold = 0.99
 			self.log_for_low_cnn_merchant_score(data, threshold)
 
+		"""
 		if "locale_bloom" in services_list or services_list == []:
 			self.__apply_locale_bloom(data)
 		else:
 			for transaction in data["transaction_list"]:
 				transaction["locale_bloom"] = None
-
 
 		for transaction in data["transaction_list"]:
 			if transaction.get("locale_bloom", None):
@@ -604,6 +608,7 @@ class WebConsumerDatadeal():
 				transaction["state"] = transaction["locale_bloom"][1]
 			else:
 				transaction["city"], transaction["state"] = "", ""
+		"""
 
 		for transaction in data["transaction_list"]:
 			logging.critical("before search: {0}\n".format(transaction))

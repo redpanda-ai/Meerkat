@@ -14,6 +14,7 @@
                 "row_id": 45431,
                 "state": "PA",
                 "store_number": "3423",
+                "RNN_store_number": ["3423"],
                 "website_url": "www.mcdonalds.com",
                 "input_description": "MCDONALD'S M4361 OF PA   ERIE         PA",
                 "zip_code": "16510"
@@ -29,6 +30,7 @@
                 "row_id": 76554,
                 "state": "PA",
                 "store_number": "43754",
+                "RNN_store_number": [],
                 "website_url": "www.uhaul.com/",
                 "input_description": "U-HAUL CT CHELTEHAM      PHILADELPHIA PA",
                 "zip_code": "19138"
@@ -44,6 +46,7 @@
                 "row_id": 71755,
                 "state": "MA",
                 "store_number": "4474",
+                "RNN_store_number": ["4474"],
                 "website_url": "www.dollartree.com",
                 "input_description": "DOLRTREE 4474 00044743   LEOMINSTER   MA",
                 "zip_code": "01453-4807"

@@ -161,7 +161,7 @@ def get_results_df_from_web_service(my_web_request, container):
 		"row_id": [], "input_description": [], "merchant_name": [],
 		"description_substring": [], "address": [], "city": [],
 		"state": [], "zip_code": [], "phone": [], "longitude": [],
-		"latitude": [], "website_url": [], "store_number": []}
+		"latitude": [], "website_url": [], "store_number": [], "RNN_store_number": []}
 	my_keys = my_results.keys()
 	#Append an element to for each key in each transaction
 	for transaction in response_data["transaction_list"]:
@@ -211,6 +211,11 @@ def main_process(args=None):
 		if len(x["predicted"].get("state", [])) >= 1 else ""
 	get_phone_number = lambda x: x["predicted"]["phone_number"][0] \
 		if len(x["predicted"].get("phone_number", [])) >= 1 else ""
+	"""
+	get_city = lambda x: x["predicted"].get("city", [])
+	get_state = lambda x: x["predicted"].get("state", [])
+	get_phone_number = lambda x: x["predicted"].get("phone_number", [])
+	"""
 	my_df["store_number"] = my_df.apply(get_store_number, axis=1)
 	my_df["city"] = my_df.apply(get_city, axis=1)
 	my_df["state"] = my_df.apply(get_state, axis=1)
@@ -262,7 +267,7 @@ def main_process(args=None):
 	LOGGER.info("All Results: {0}".format(results_df.shape))
 	header = ["row_id", "input_description", "merchant_name", "description_substring",
 		 "address", "city", "state", "zip_code",
-		"phone", "longitude", "latitude", "website_url", "store_number"]
+		"phone", "longitude", "latitude", "website_url", "store_number", "RNN_store_number"]
 	#8. Drop extraneous columns
 	df_column_list = list(results_df.columns.values)
 	for column in df_column_list:

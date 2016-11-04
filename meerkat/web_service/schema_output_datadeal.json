@@ -17,10 +17,11 @@
 				"longitude" : { "type" : "string" },
 				"latitude" : { "type" : "string" },
 				"website_url" : { "type" : "string" },
+				"RNN_store_number" : { "type" : "array" },
 				"store_number" : { "type" : "string"}
 			},
 			"required" : [ "row_id", "input_description", "merchant_name", "address", "city", "state", "zip_code",
-				"phone", "longitude", "latitude", "website_url", "store_number", "description_substring"],
+				"phone", "longitude", "latitude", "website_url", "store_number", "description_substring", "RNN_store_number"],
 			"additionalProperties" : false
 		}
 	},
