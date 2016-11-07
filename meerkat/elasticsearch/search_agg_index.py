@@ -47,12 +47,15 @@ def create_must_and_should(list_name, city, state, zip_code, store_number, phone
 	if city != '':
 		must_query.append({'match': {'city': city}})
 	if state != '':
-		must_query.append({'match': {'state': state}})
+		must_query.append({'match': {'state': state.upper()}})
 
 	has_valid_store = False
 
 	# store number always stays in should query
 	if store_number != '':
+		# Cut off the store number for Target only
+		if list_name[0] == 'Target' and len(store_number) >= 8 and store_number.startswith('000'):
+			store_number = 'T' + store_number[3:7]
 		store = {'store_number': {'query': store_number, 'fuzziness': 'AUTO', 'boost': params['boost']['store_number']}}
 		should_query.append({'match': store})
 		has_valid_store = True
@@ -214,7 +217,6 @@ def search_agg_index(data, params=None):
 
 if __name__ == '__main__':
 	data = json.loads(open('./agg_input.json').read())
-	data = list(np.random.permutation(data))
 	search_agg_index(data)
 	sys.exit()
 	with open('./agg_output.json', 'w') as outfile:
