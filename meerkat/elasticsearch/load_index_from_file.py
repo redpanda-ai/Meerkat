@@ -13,13 +13,12 @@ Updated on July 17, 2015
 """
 
 #################### USAGE ##########################
-
 # Note: Experts only! Do not touch!
 
-# python3 -m meerkat.bulk_loader meerkat/config/factual_loader.json
+# python3 -m meerkat.elasticsearch.load_index_from_file\
+# meerkat/elasticsearch/config/factual_loader.json
 
 # Estimated runtime: ~40 mins / # number of cluster nodes
-
 #####################################################
 
 import argparse
@@ -76,8 +75,8 @@ class ThreadConsumer(threading.Thread):
 		self.document_queue = params["document_queue"]
 		self.params["concurrency_queue"].put(self.thread_id)
 		cluster_nodes = self.params["elasticsearch"]["cluster_nodes"]
-		self.es_connection = Elasticsearch(cluster_nodes, sniff_on_start=True,
-			sniff_on_connection_fail=True, sniffer_timeout=5, sniff_timeout=5)
+		self.es_connection = Elasticsearch(cluster_nodes, sniff_on_start=False,
+			sniff_on_connection_fail=False, timeout=30)
 		self.__set_logger()
 		self.batch_list = []
 
@@ -390,7 +389,7 @@ def add_dispersed_type_mappings(params):
 def guarantee_index_and_doc_type(es_params):
 	"""Ensure that the index and document type mapping are as they should be"""
 	es_connection = Elasticsearch(es_params["cluster_nodes"], sniff_on_start=False,
-		sniff_on_connection_fail=True, sniffer_timeout=5, sniff_timeout=5)
+		sniff_on_connection_fail=False, timeout=30)
 	_ = es_connection.indices.create(index=es_params["index"], body=es_params["type_mapping"],
 		ignore=400)
 	es_index_status, es_type_status = "created", "created"
