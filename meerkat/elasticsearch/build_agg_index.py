@@ -13,9 +13,9 @@ from elasticsearch import helpers
 logging.config.dictConfig(yaml.load(open('meerkat/logging.yaml', 'r')))
 logger = logging.getLogger('tools')
 
-endpoint = 'search-agg-factual-nuz5jggrftlzjd5f7c2ehkmhlu.us-west-2.es.amazonaws.com'
+endpoint = 'search-agg-and-factual-vg5k5k2rygh7uqqunja3kjkbgu.us-west-2.es.amazonaws.com'
 host = [{'host': endpoint, 'port': 80}]
-index_name, index_type = 'agg_index_10272016', 'agg_type_10272016'
+index_name, index_type = 'agg_index', 'agg_type'
 es = Elasticsearch(host)
 
 def load_dataframe_into_index(df, **kwargs):
@@ -27,10 +27,12 @@ def load_dataframe_into_index(df, **kwargs):
 	df = df.apply(lambda x: x.str.strip(), axis=1)
 	data = df.to_dict(orient='records')
 
-	# Clean zip code to 5 digits only if a hyphen exists
+	# Clean zip code to 5 digits only if a hyphen exists, and capitalize state
 	for item in data:
 		if 'zip_code' in item and item['zip_code'].find('-') != -1:
 			item['zip_code'] = item['zip_code'].split('-')[0]
+		if 'state' in item:
+			item['state'] = item['state'].upper()
 
 	actions = []
 	offset = kwargs['chunk_count'] * kwargs['chunksize']
