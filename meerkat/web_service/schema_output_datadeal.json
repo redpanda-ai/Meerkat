@@ -6,7 +6,9 @@
 			"type" : "object",
 			"properties" : {
 				"row_id" : { "type" : "number" },
+				"input_description" : { "type" : "string" },
 				"merchant_name" : { "type" : "string" },
+				"description_substring" : { "type" : "string" },
 				"address" : { "type" : "string" },
 				"city" : { "type" : "string" },
 				"state" : { "type" : "string"},
@@ -17,8 +19,8 @@
 				"website_url" : { "type" : "string" },
 				"store_number" : { "type" : "string"}
 			},
-			"required" : [ "row_id", "merchant_name", "address", "city", "state", "zip_code",
-				"phone", "longitude", "latitude", "website_url", "store_number"],
+			"required" : [ "row_id", "input_description", "merchant_name", "address", "city", "state", "zip_code",
+				"phone", "longitude", "latitude", "website_url", "store_number", "description_substring"],
 			"additionalProperties" : false
 		}
 	},

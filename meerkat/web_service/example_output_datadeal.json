@@ -9,11 +9,13 @@
                 "latitude": "42.1461353",
                 "longitude": "-80.0045373",
                 "merchant_name": "McDonald's",
+                "description_substring": "",
                 "phone": "(814) 899-1000",
                 "row_id": 45431,
                 "state": "PA",
                 "store_number": "3423",
                 "website_url": "www.mcdonalds.com",
+                "input_description": "MCDONALD'S M4361 OF PA   ERIE         PA",
                 "zip_code": "16510"
             },
             {
@@ -22,11 +24,13 @@
                 "latitude": "40.0496001",
                 "longitude": "-75.1719993",
                 "merchant_name": "U-Haul",
+                "description_substring": "",
                 "phone": "(215) 844-1690",
                 "row_id": 76554,
                 "state": "PA",
                 "store_number": "43754",
                 "website_url": "www.uhaul.com/",
+                "input_description": "U-HAUL CT CHELTEHAM      PHILADELPHIA PA",
                 "zip_code": "19138"
             },
             {
@@ -35,11 +39,13 @@
                 "latitude": "42.4975025",
                 "longitude": "-71.7455895",
                 "merchant_name": "Dollar Tree",
+                "description_substring": "",
                 "phone": "(978) 534-7283",
                 "row_id": 71755,
                 "state": "MA",
                 "store_number": "4474",
                 "website_url": "www.dollartree.com",
+                "input_description": "DOLRTREE 4474 00044743   LEOMINSTER   MA",
                 "zip_code": "01453-4807"
             }
 	]

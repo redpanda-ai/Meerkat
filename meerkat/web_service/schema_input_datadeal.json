@@ -7,6 +7,7 @@
 			"properties": {
 				"transaction_id" : { "type": "number" },
 				"description" : { "type": "string" },
+				"input_description" : { "type": "string" },
 				"city": { "type": "string" },
 				"state": { "type": "string" },
 				"country": { "type": "string" },
