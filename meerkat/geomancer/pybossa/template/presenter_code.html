@@ -7,7 +7,7 @@
 				<input type='radio' id='select_geo_address' name='type' value='1'/> Select Geography
 				<input id="autocomplete" placeholder="Manual Entry Geography" onFocus="geolocate()" type="text" style="width: 400px;margin-left:35px"></input>
 			</p>
-			<img id='lockRotate' width="30" height="30" src='http://52.37.199.197/geo_lock.png' />    		
+			<img id='lockRotate' width="30" height="30" src='http://35.161.19.63/geo_lock.png' />    		
 
     		<div id="address_fields" style="width: 600px;padding-top:10px;padding-left:10px;border-width:2px;border-style: solid;border-color:#E41D25">
     			<p>
@@ -44,7 +44,7 @@
 
 	<iframe
         id="iframe_map" width="650" height="450" frameborder="0" style="border:0; margin-top:10px"
-        src="http://52.37.199.197/cat.jpg" allowfullscreen>
+        src="http://35.161.19.63/cat.jpg" allowfullscreen>
     </iframe> 
 </div>
 
@@ -57,8 +57,8 @@
 	var isValidStoreNumber = true;
 	var allow_save = false;
 	var passValidation = false;
-	var lockImage = 'http://52.37.199.197/geo_lock.png';
-	var unlockImage = 'http://52.37.199.197/geo_unlock.png'
+	var lockImage = 'http://35.161.19.63/geo_lock.png';
+	var unlockImage = 'http://35.161.19.63/geo_unlock.png'
 	var maps = {};
 
 	//Functions
@@ -152,7 +152,7 @@
         	} else {
             //Reset embed to cat picture
             console.log("No street address, adding a cat");
-            img_url = "http://52.37.199.197/cat.jpg";
+            img_url = "http://35.161.19.63/cat.jpg";
         	$("#iframe_map").attr('src', img_url);
         	$("#iframe_map").focus();      		
         	}
@@ -201,7 +201,7 @@
     }
 
 	function initialize() {
-		img_url = "http://52.37.199.197/cat.jpg";
+		img_url = "http://35.161.19.63/cat.jpg";
     	$("#iframe_map").attr('src', img_url);
 
 		$("#autocomplete").val("");

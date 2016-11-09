@@ -36,7 +36,7 @@ def local_file_upload(args, s_file, d_file):
 def get_timestamp_of_remote_file(file_path):
 	"""Get the timestamp of a remote file."""
 	my_pattern = re.compile(r'.*(\d{4}-\d{2}-\d{2} \d{2}:\d{2}\S{13}).*')
-	with SshMachine("52.37.199.197", user="ubuntu", keyfile="/home/ubuntu/.ssh/twu.pem") as rem:
+	with SshMachine("35.161.19.63", user="ubuntu", keyfile="/home/ubuntu/.ssh/twu.pem") as rem:
 		timestamp = rem["ls"]["-Fal"]["--time-style=full-iso"][file_path]
 		try:
 			stdout = timestamp()
@@ -92,7 +92,7 @@ def real_main():
 
 			format_json_with_callback(updated_dict_path, 0)
 			upload_args = {
-				"ip_address": "52.37.199.197",
+				"ip_address": "35.161.19.63",
 				"port" : 22,
 				"username": "ubuntu",
 				"key_path": "/home/ubuntu/.ssh/twu.pem"

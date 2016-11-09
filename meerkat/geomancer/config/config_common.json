@@ -2,7 +2,7 @@
 	"common_config": {
 		"bucket": "s3yodlee",
 		"bank_or_card": "card",
-		"server": "52.37.199.197",
+		"server": "35.161.19.63",
 		"apikey": "4f373485-2a5f-4dc7-81a1-eac50d7024bf",
 		"target_merchant_list": [
 			"Ace Hardware", "Aeropostale", "Albertsons", "American Eagle Outfitters", "Applebee's",
