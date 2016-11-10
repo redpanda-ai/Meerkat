@@ -9,7 +9,6 @@ from scipy.stats.mstats import zscore
 
 logging.getLogger().setLevel(logging.CRITICAL)
 
-# endpoint = 'search-agg-factual-nuz5jggrftlzjd5f7c2ehkmhlu.us-west-2.es.amazonaws.com'
 endpoint = 'search-agg-and-factual-vg5k5k2rygh7uqqunja3kjkbgu.us-west-2.es.amazonaws.com'
 host = [{'host': endpoint, 'port': 80}]
 index_name, index_type = 'agg_index', 'agg_type'
@@ -219,5 +218,6 @@ def search_agg_index(data, params=None):
 if __name__ == '__main__':
 	data = json.loads(open('./agg_input.json').read())
 	search_agg_index(data)
+	sys.exit()
 	with open('./agg_output.json', 'w') as outfile:
 		json.dump(data, outfile, indent=4, sort_keys=True)
