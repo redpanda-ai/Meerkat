@@ -9,9 +9,9 @@ from scipy.stats.mstats import zscore
 
 logging.getLogger().setLevel(logging.CRITICAL)
 
-endpoint = 'search-agg-factual-nuz5jggrftlzjd5f7c2ehkmhlu.us-west-2.es.amazonaws.com'
+endpoint = 'search-agg-and-factual-vg5k5k2rygh7uqqunja3kjkbgu.us-west-2.es.amazonaws.com'
 host = [{'host': endpoint, 'port': 80}]
-index_name, index_type = 'agg_index_10272016', 'agg_type_10272016'
+index_name, index_type = 'agg_index', 'agg_type'
 es = Elasticsearch(host)
 
 def basic_search(list_name):
